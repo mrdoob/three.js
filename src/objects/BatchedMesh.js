@@ -306,7 +306,7 @@ class BatchedMesh extends Mesh {
 		const batchGeometry = this.geometry;
 		if ( Boolean( geometry.getIndex() ) !== Boolean( batchGeometry.getIndex() ) ) {
 
-			throw new Error( 'BatchedMesh: All geometries must consistently have "index".' );
+			throw new Error( 'THREE.BatchedMesh: All geometries must consistently have "index".' );
 
 		}
 
@@ -314,7 +314,7 @@ class BatchedMesh extends Mesh {
 
 			if ( ! geometry.hasAttribute( attributeName ) ) {
 
-				throw new Error( `BatchedMesh: Added geometry missing "${ attributeName }". All geometries must have consistent attributes.` );
+				throw new Error( `THREE.BatchedMesh: Added geometry missing "${ attributeName }". All geometries must have consistent attributes.` );
 
 			}
 
@@ -322,7 +322,7 @@ class BatchedMesh extends Mesh {
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
 			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( 'BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
+				throw new Error( 'THREE.BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
 
 			}
 
@@ -335,7 +335,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		if ( instanceId < 0 || instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
+			throw new Error( `THREE.BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -346,7 +346,7 @@ class BatchedMesh extends Mesh {
 		const geometryInfoList = this._geometryInfo;
 		if ( geometryId < 0 || geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
+			throw new Error( `THREE.BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
@@ -417,7 +417,7 @@ class BatchedMesh extends Mesh {
 		// ensure we're not over geometry
 		if ( atCapacity && this._availableInstanceIds.length === 0 ) {
 
-			throw new Error( 'BatchedMesh: Maximum item count reached.' );
+			throw new Error( 'THREE.BatchedMesh: Maximum item count reached.' );
 
 		}
 
@@ -506,7 +506,7 @@ class BatchedMesh extends Mesh {
 			geometryInfo.vertexStart + geometryInfo.reservedVertexCount > this._maxVertexCount
 		) {
 
-			throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
+			throw new Error( 'THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
 
 		}
 
@@ -543,7 +543,7 @@ class BatchedMesh extends Mesh {
 
 		if ( geometryId >= this._geometryCount ) {
 
-			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
+			throw new Error( 'THREE.BatchedMesh: Maximum geometry count reached.' );
 
 		}
 
@@ -560,7 +560,7 @@ class BatchedMesh extends Mesh {
 			geometry.attributes.position.count > geometryInfo.reservedVertexCount
 		) {
 
-			throw new Error( 'BatchedMesh: Reserved space not large enough for provided geometry.' );
+			throw new Error( 'THREE.BatchedMesh: Reserved space not large enough for provided geometry.' );
 
 		}
 
