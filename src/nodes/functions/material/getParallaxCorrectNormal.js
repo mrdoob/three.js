@@ -1,4 +1,4 @@
-import { positionWorld } from '../../accessors/Position';
+import { positionWorld } from '../../accessors/Position.js';
 import { float, Fn, min, normalize, sub, vec3 } from '../../tsl/TSLBase.js';
 
 // https://devlog-martinsh.blogspot.com/2011/09/box-projected-cube-environment-mapping.html
