@@ -1317,6 +1317,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	recycleBuffer( buffer ) {
+
+		this.textureUtils.recycleBuffer( buffer );
+
+	}
+
 	_setFramebuffer( descriptor ) {
 
 		const { gl, state } = this;
