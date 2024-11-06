@@ -107,7 +107,7 @@ export default class RenderObject {
 
 	get hardwareClippingPlanes() {
 
-		return ( this.clippingContext === null || this.material.alphaToCoverage ) ? 0 : this.clippingContext.unionClippingCount;
+		return this.material.hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
 
 	}
 

@@ -244,13 +244,15 @@ class NodeMaterial extends Material {
 
 	setupHardwareClipping( builder ) {
 
+		this.hardwareClipping = false;
+
 		if ( builder.clippingContext === null ) return;
 
 		const candidateCount = builder.clippingContext.unionPlanes.length;
 
 		// 8 planes supported by WebGL ANGLE_clip_cull_distance and WebGPU clip-distances
 
-		if ( ! this.alphaToCoverage && candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
+		if ( candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
 
 			builder.stack.add( hardwareClipping() );
 

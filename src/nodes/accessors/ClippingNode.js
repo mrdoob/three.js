@@ -31,6 +31,8 @@ class ClippingNode extends Node {
 		const clippingContext = builder.clippingContext;
 		const { intersectionPlanes, unionPlanes } = clippingContext;
 
+		this.hardwareClipping = builder.material.hardwareClipping;
+
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
 			return this.setupAlphaToCoverage( intersectionPlanes, unionPlanes );
@@ -41,7 +43,7 @@ class ClippingNode extends Node {
 
 		} else {
 
-			return this.setupDefault( intersectionPlanes, unionPlanes, builder );
+			return this.setupDefault( intersectionPlanes, unionPlanes );
 
 		}
 
@@ -58,7 +60,7 @@ class ClippingNode extends Node {
 
 			const numUnionPlanes = unionPlanes.length;
 
-			if ( numUnionPlanes > 0 ) {
+			if ( ! this.hardwareClipping && numUnionPlanes > 0 ) {
 
 				const clippingPlanes = uniformArray( unionPlanes );
 
@@ -105,15 +107,13 @@ class ClippingNode extends Node {
 
 	}
 
-	setupDefault( intersectionPlanes, unionPlanes, builder ) {
-
-		const hardwareClipping = builder.material.hardwareClipping;
+	setupDefault( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
 			const numUnionPlanes = unionPlanes.length;
 
-			if ( ! hardwareClipping && numUnionPlanes > 0 ) {
+			if ( ! this.hardwareClipping && numUnionPlanes > 0 ) {
 
 				const clippingPlanes = uniformArray( unionPlanes );
 
