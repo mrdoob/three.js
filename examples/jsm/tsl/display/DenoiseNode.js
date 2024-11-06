@@ -18,17 +18,19 @@ class DenoiseNode extends TempNode {
 		this.normalNode = normalNode;
 		this.noiseNode = noiseNode;
 
-		this.cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 		this.lumaPhi = uniform( 5 );
 		this.depthPhi = uniform( 5 );
 		this.normalPhi = uniform( 5 );
 		this.radius = uniform( 5 );
 		this.index = uniform( 0 );
 
+		this.updateBeforeType = NodeUpdateType.FRAME;
+
+		// uniforms
+
 		this._resolution = uniform( new Vector2() );
 		this._sampleVectors = uniformArray( generatePdSamplePointInitializer( 16, 2, 1 ) );
-
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 
 	}
 
@@ -46,7 +48,7 @@ class DenoiseNode extends TempNode {
 
 		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this.cameraProjectionMatrixInverse );
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
@@ -55,7 +57,7 @@ class DenoiseNode extends TempNode {
 			const depth = sampleDepth( sampleUv ).toVar();
 			const normal = sampleNormal( sampleUv ).toVar();
 			const neighborColor = texel.rgb;
-			const viewPos = getViewPosition( sampleUv, depth, this.cameraProjectionMatrixInverse ).toVar();
+			const viewPos = getViewPosition( sampleUv, depth, this._cameraProjectionMatrixInverse ).toVar();
 
 			const normalDiff = dot( viewNormal, normal ).toVar();
 			const normalSimilarity = pow( max( normalDiff, 0 ), this.normalPhi ).toVar();
@@ -84,7 +86,7 @@ class DenoiseNode extends TempNode {
 
 			const center = vec3( texel.rgb ).toVar();
 
-			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 
 			const noiseResolution = textureSize( this.noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
