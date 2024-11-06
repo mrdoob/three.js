@@ -157,18 +157,6 @@ class Bindings extends DataMap {
 
 				}
 
-				const textureData = backend.get( texture );
-
-				if ( backend.isWebGPUBackend === true && textureData.texture === undefined && textureData.externalTexture === undefined ) {
-
-					// TODO: Remove this once we found why updated === false isn't bound to a texture in the WebGPU backend
-					console.error( 'Bindings._update: binding should be available:', binding, updated, texture, binding.textureNode.value, needsBindingsUpdate );
-
-					this.textures.updateTexture( texture );
-					needsBindingsUpdate = true;
-
-				}
-
 				if ( texture.isStorageTexture === true ) {
 
 					const textureData = this.get( texture );
