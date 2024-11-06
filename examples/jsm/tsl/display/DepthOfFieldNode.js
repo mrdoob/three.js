@@ -10,7 +10,7 @@ class DepthOfFieldNode extends TempNode {
 
 	constructor( textureNode, viewZNode, focusNode, apertureNode, maxblurNode ) {
 
-		super();
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.viewZNode = viewZNode;

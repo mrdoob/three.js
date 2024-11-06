@@ -6,6 +6,10 @@ const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
+/**
+ * References:
+ * https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
+ */
 class GTAONode extends TempNode {
 
 	static get type() {
@@ -16,7 +20,7 @@ class GTAONode extends TempNode {
 
 	constructor( depthNode, normalNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;

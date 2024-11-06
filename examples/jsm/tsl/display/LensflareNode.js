@@ -20,7 +20,7 @@ class LensflareNode extends TempNode {
 
 	constructor( textureNode, params = {} ) {
 
-		super();
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 
