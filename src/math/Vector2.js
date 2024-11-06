@@ -240,8 +240,8 @@ class Vector2 {
 
 		// assumes min < max, componentwise
 
-		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
-		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
+		this.x = MathUtils.clamp( this.x, min.x, max.x );
+		this.y = MathUtils.clamp( this.y, min.y, max.y );
 
 		return this;
 
@@ -249,8 +249,8 @@ class Vector2 {
 
 	clampScalar( minVal, maxVal ) {
 
-		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
-		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
+		this.x = MathUtils.clamp( this.x, minVal, maxVal );
+		this.y = MathUtils.clamp( this.y, minVal, maxVal );
 
 		return this;
 
@@ -260,7 +260,7 @@ class Vector2 {
 
 		const length = this.length();
 
-		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
+		return this.divideScalar( length || 1 ).multiplyScalar( MathUtils.clamp( length, min, max ) );
 
 	}
 
