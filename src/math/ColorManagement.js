@@ -1,6 +1,18 @@
 import { SRGBColorSpace, LinearSRGBColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
+const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+	0.4123908, 0.3575843, 0.1804808,
+	0.2126390, 0.7151687, 0.0721923,
+	0.0193308, 0.1191948, 0.9505322
+);
+
+const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
+	3.2409699, - 1.5373832, - 0.4986108,
+	- 0.9692436, 1.8759675, 0.0415551,
+	0.0556301, - 0.2039770, 1.0569715
+);
+
 function createColorManagement() {
 
 	const ColorManagement = {
@@ -133,18 +145,6 @@ function createColorManagement() {
 	const REC709_PRIMARIES = [ 0.640, 0.330, 0.300, 0.600, 0.150, 0.060 ];
 	const REC709_LUMINANCE_COEFFICIENTS = [ 0.2126, 0.7152, 0.0722 ];
 	const D65 = [ 0.3127, 0.3290 ];
-
-	const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
-		0.4123908, 0.3575843, 0.1804808,
-		0.2126390, 0.7151687, 0.0721923,
-		0.0193308, 0.1191948, 0.9505322
-	);
-
-	const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
-		3.2409699, - 1.5373832, - 0.4986108,
-		- 0.9692436, 1.8759675, 0.0415551,
-		0.0556301, - 0.2039770, 1.0569715
-	);
 
 	ColorManagement.define( {
 
