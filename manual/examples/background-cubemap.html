@@ -88,14 +88,14 @@ function main() {
 	{
 
 		const loader = new THREE.CubeTextureLoader();
-		const texture = loader.load( [
+		const texture = loader.load([
 			'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
 			'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
 			'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
 			'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
 			'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
 			'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
-		] );
+		]);
 		scene.background = texture;
 
 	}
