@@ -288,6 +288,10 @@
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
 
+			"Renderers / Common": {
+				"ClippingGroup": "api/en/renderers/common/ClippingGroup"
+			},
+
 			"Renderers / Shaders": {
 				"ShaderChunk": "api/en/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
