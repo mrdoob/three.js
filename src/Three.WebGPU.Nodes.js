@@ -1,3 +1,5 @@
+// This entry point exports only WebGPURenderer.Nodes.
+
 import { REVISION } from './constants.js';
 
 export { WebGLArrayRenderTarget } from './renderers/WebGLArrayRenderTarget.js';
@@ -156,6 +158,7 @@ export { Controls } from './extras/Controls.js';
 export { DataUtils } from './extras/DataUtils.js';
 export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
+//export { TextureUtils } from './extras/TextureUtils.js';
 //export { PMREMGenerator } from './extras/PMREMGenerator.js';
 //export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export { createCanvasElement } from './utils.js';
@@ -164,9 +167,15 @@ export * from './Three.Legacy.js';
 
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nodes.js';
+//import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
+//export { StandardNodeLibrary };
+import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
+export { BasicNodeLibrary };
+//export { default as ClippingGroup } from './renderers/common/ClippingGroup.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
+//export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
-export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
+export { default as PMREMGenerator2 } from './renderers/common/extras/PMREMGenerator2.js';
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
 import * as PostProcessingUtils from './renderers/common/PostProcessingUtils.js';
 export { PostProcessingUtils };

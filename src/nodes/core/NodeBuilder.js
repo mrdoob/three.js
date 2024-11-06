@@ -20,7 +20,7 @@ import { getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 
-import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
+import PMREMGenerator2 from '../../renderers/common/extras/PMREMGenerator2.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
@@ -168,7 +168,7 @@ class NodeBuilder {
 
 		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
 
-		return new PMREMGenerator( this.renderer );
+		return new PMREMGenerator2( this.renderer );
 
 	}
 

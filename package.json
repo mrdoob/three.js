@@ -15,7 +15,9 @@
     "./addons": "./examples/jsm/Addons.js",
     "./addons/*": "./examples/jsm/*",
     "./src/*": "./src/*",
+    "./webgl": "./build/three.webgl.js",
     "./webgpu": "./build/three.webgpu.js",
+    "./webgpu.nodes": "./build/three.webgpu.nodes.js",
     "./tsl": "./build/three.webgpu.js"
   },
   "repository": {

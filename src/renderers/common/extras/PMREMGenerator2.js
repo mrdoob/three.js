@@ -95,7 +95,7 @@ const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
  * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
 */
 
-class PMREMGenerator {
+class PMREMGenerator2 {
 
 	constructor( renderer ) {
 
@@ -768,4 +768,4 @@ function _getEquirectMaterial( envTexture ) {
 
 }
 
-export default PMREMGenerator;
+export default PMREMGenerator2;

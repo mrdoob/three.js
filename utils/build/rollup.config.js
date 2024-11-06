@@ -75,6 +75,18 @@ const builds = [
 		]
 	},
 	{
+		input: 'src/Three.WebGL.js',
+		plugins: [
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgl.js'
+			}
+		]
+	},
+	{
 		input: 'src/Three.WebGPU.js',
 		plugins: [
 			header()
@@ -109,6 +121,19 @@ const builds = [
 			{
 				format: 'esm',
 				file: 'build/three.module.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGL.js',
+		plugins: [
+			header(),
+			terser()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgl.min.js'
 			}
 		]
 	},

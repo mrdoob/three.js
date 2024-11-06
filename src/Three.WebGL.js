@@ -1,4 +1,4 @@
-// This entry point exports all renderers.
+// This entry point exports only WebGLRenderer.
 
 import { REVISION } from './constants.js';
 
@@ -42,7 +42,7 @@ export { DepthTexture } from './textures/DepthTexture.js';
 export { Texture } from './textures/Texture.js';
 export * from './geometries/Geometries.js';
 export * from './materials/Materials.js';
-export { Material } from './materials/Material.js';
+// export { Material } from './materials/Material.js';
 export { AnimationLoader } from './loaders/AnimationLoader.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
@@ -165,30 +165,30 @@ export { createCanvasElement } from './utils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
 
-export * from './materials/nodes/NodeMaterials.js';
-export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.js';
-import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
-export { StandardNodeLibrary };
-import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
-export { BasicNodeLibrary };
-export { default as ClippingGroup } from './renderers/common/ClippingGroup.js';
-export { default as Lighting } from './renderers/common/Lighting.js';
-export { default as BundleGroup } from './renderers/common/BundleGroup.js';
-export { default as QuadMesh } from './renderers/common/QuadMesh.js';
-export { default as PMREMGenerator2 } from './renderers/common/extras/PMREMGenerator2.js';
-export { default as PostProcessing } from './renderers/common/PostProcessing.js';
-import * as PostProcessingUtils from './renderers/common/PostProcessingUtils.js';
-export { PostProcessingUtils };
-export { default as StorageTexture } from './renderers/common/StorageTexture.js';
-export { default as StorageBufferAttribute } from './renderers/common/StorageBufferAttribute.js';
-export { default as StorageInstancedBufferAttribute } from './renderers/common/StorageInstancedBufferAttribute.js';
-export { default as IndirectStorageBufferAttribute } from './renderers/common/IndirectStorageBufferAttribute.js';
-export { default as IESSpotLight } from './lights/webgpu/IESSpotLight.js';
-export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
-export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';
-export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';
-export * from './nodes/Nodes.js';
-export * from './nodes/TSL.js';
+//export * from './materials/nodes/NodeMaterials.js';
+//export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.js';
+//import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
+//export { StandardNodeLibrary };
+//import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
+//export { BasicNodeLibrary };
+//export { default as ClippingGroup } from './renderers/common/ClippingGroup.js';
+//export { default as Lighting } from './renderers/common/Lighting.js';
+//export { default as BundleGroup } from './renderers/common/BundleGroup.js';
+//export { default as QuadMesh } from './renderers/common/QuadMesh.js';
+//export { default as PMREMGenerator2 } from './renderers/common/extras/PMREMGenerator2.js';
+//export { default as PostProcessing } from './renderers/common/PostProcessing.js';
+//import * as PostProcessingUtils from './renderers/common/PostProcessingUtils.js';
+//export { PostProcessingUtils };
+//export { default as StorageTexture } from './renderers/common/StorageTexture.js';
+//export { default as StorageBufferAttribute } from './renderers/common/StorageBufferAttribute.js';
+//export { default as StorageInstancedBufferAttribute } from './renderers/common/StorageInstancedBufferAttribute.js';
+//export { default as IndirectStorageBufferAttribute } from './renderers/common/IndirectStorageBufferAttribute.js';
+//export { default as IESSpotLight } from './lights/webgpu/IESSpotLight.js';
+//export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
+//export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';
+//export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';
+//export * from './nodes/Nodes.js';
+//export * from './nodes/TSL.js';
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
