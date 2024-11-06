@@ -19,7 +19,7 @@ class BloomNode extends TempNode {
 
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.strength = uniform( strength );

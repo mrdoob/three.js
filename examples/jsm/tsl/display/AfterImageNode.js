@@ -16,7 +16,7 @@ class AfterImageNode extends TempNode {
 
 	constructor( textureNode, damp = 0.96 ) {
 
-		super( textureNode );
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.textureNodeOld = texture();

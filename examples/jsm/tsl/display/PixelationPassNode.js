@@ -11,7 +11,7 @@ class PixelationNode extends TempNode {
 
 	constructor( textureNode, depthNode, normalNode, pixelSize, normalEdgeStrength, depthEdgeStrength ) {
 
-		super();
+		super( 'vec4' );
 
 		// Input textures
 
@@ -158,7 +158,7 @@ class PixelationPassNode extends PassNode {
 
 	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
 
-		super( 'color', scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter } );
+		super( PassNode.COLOR, scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter } );
 
 		this.pixelSize = pixelSize;
 		this.normalEdgeStrength = normalEdgeStrength;

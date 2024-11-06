@@ -10,7 +10,7 @@ class FilmNode extends TempNode {
 
 	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.intensityNode = intensityNode;

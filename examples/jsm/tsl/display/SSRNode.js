@@ -19,7 +19,7 @@ class SSRNode extends TempNode {
 
 	constructor( colorNode, depthNode, normalNode, metalnessNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.colorNode = colorNode;
 		this.depthNode = depthNode;

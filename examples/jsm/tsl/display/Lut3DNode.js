@@ -10,7 +10,7 @@ class Lut3DNode extends TempNode {
 
 	constructor( inputNode, lutNode, size, intensityNode ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.lutNode = lutNode;

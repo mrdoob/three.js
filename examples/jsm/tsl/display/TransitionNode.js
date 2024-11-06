@@ -10,7 +10,7 @@ class TransitionNode extends TempNode {
 
 	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode ) {
 
-		super();
+		super( 'vec4' );
 
 		// Input textures
 

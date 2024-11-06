@@ -11,7 +11,7 @@ class DenoiseNode extends TempNode {
 
 	constructor( textureNode, depthNode, normalNode, noiseNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.depthNode = depthNode;
