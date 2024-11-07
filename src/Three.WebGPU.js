@@ -25,6 +25,7 @@ export { LineLoop } from './objects/LineLoop.js';
 export { Line } from './objects/Line.js';
 export { Points } from './objects/Points.js';
 export { Group } from './objects/Group.js';
+export { ClippingGroup } from './objects/ClippingGroup.js';
 export { VideoTexture } from './textures/VideoTexture.js';
 export { FramebufferTexture } from './textures/FramebufferTexture.js';
 export { Source } from './textures/Source.js';
@@ -164,7 +165,6 @@ export * from './Three.Legacy.js';
 
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.js';
-export { default as ClippingGroup } from './renderers/common/ClippingGroup.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';

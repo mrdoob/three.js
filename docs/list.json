@@ -267,6 +267,7 @@
 			"Objects": {
 				"BatchedMesh": "api/en/objects/BatchedMesh",
 				"Bone": "api/en/objects/Bone",
+				"ClippingGroup": "api/en/objects/ClippingGroup",
 				"Group": "api/en/objects/Group",
 				"InstancedMesh": "api/en/objects/InstancedMesh",
 				"Line": "api/en/objects/Line",
@@ -286,10 +287,6 @@
 				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
-			},
-
-			"Renderers / Common": {
-				"ClippingGroup": "api/en/renderers/common/ClippingGroup"
 			},
 
 			"Renderers / Shaders": {
