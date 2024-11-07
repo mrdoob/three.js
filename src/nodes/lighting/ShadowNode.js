@@ -344,11 +344,12 @@ class ShadowNode extends Node {
 
 		const shadowColor = texture( shadowMap.texture, shadowCoord );
 		const shadowNode = frustumTest.select( filterFn( { depthTexture: ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture, shadowCoord, shadow } ), float( 1 ) );
+		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
 
-		return mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) );
+		return shadowOutput;
 
 	}
 
@@ -356,7 +357,17 @@ class ShadowNode extends Node {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		return this._node !== null ? this._node : ( this._node = this.setupShadow( builder ) );
+		let node = this._node;
+
+		if ( node === null ) {
+
+			this._node = node = this.setupShadow( builder );
+
+		}
+
+		shadowsTotal.mulAssign( node );
+
+		return node;
 
 	}
 
@@ -481,4 +492,7 @@ class ShadowNode extends Node {
 
 export default ShadowNode;
 
+const shadowsTotal = /*@__PURE__*/ float( 1 ).toVar();
+
 export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
+export const shadows = /*@__PURE__*/ shadowsTotal.oneMinus().toVar( 'shadows' );
