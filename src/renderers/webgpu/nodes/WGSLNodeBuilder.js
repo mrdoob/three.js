@@ -269,6 +269,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					code += `\t\ttsl_mirrorWrapping_float( coord.${ axis } )`;
 
+				} else {
+
+					code += `\t\tcoord.${ axis }`;
+
+					console.warn( 'WebGPURenderer: Unsupported wrap mode does not support vertex shader.' );
+
 				}
 
 			};
