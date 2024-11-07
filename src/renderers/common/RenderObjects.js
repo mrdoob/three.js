@@ -40,12 +40,11 @@ class RenderObjects {
 
 			renderObject.updateClipping( clippingContext );
 
-			// force update if geometry has changed
-			const forceUpdate = renderObject.geometry.id !== renderObject.object.geometry.id;
+			const needsGeometryUpdate = renderObject.needsGeometryUpdate;
 
-			if ( forceUpdate || renderObject.version !== material.version || renderObject.needsUpdate ) {
+			if ( renderObject.version !== material.version || renderObject.needsUpdate || needsGeometryUpdate ) {
 
-				if ( forceUpdate || renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
+				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
 					renderObject.dispose();
 
@@ -54,6 +53,12 @@ class RenderObjects {
 				} else {
 
 					renderObject.version = material.version;
+
+					if ( needsGeometryUpdate ) {
+
+						renderObject.setGeometry( object.geometry );
+
+					}
 
 				}
 

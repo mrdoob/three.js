@@ -147,6 +147,13 @@ export default class RenderObject {
 
 	}
 
+	setGeometry( geometry ) {
+
+		this.geometry = geometry;
+		this.attributes = null;
+
+	}
+
 	getAttributes() {
 
 		if ( this.attributes !== null ) return this.attributes;
@@ -373,6 +380,12 @@ export default class RenderObject {
 		}
 
 		return hashString( cacheKey );
+
+	}
+
+	get needsGeometryUpdate() {
+
+		return this.geometry.id !== this.object.geometry.id;
 
 	}
 
