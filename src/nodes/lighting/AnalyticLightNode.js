@@ -47,6 +47,12 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	setupShadowNode() {
+
+		return shadow( this.light );
+
+	}
+
 	setupShadow( builder ) {
 
 		const { renderer } = builder;
@@ -67,7 +73,7 @@ class AnalyticLightNode extends LightingNode {
 
 			} else {
 
-				shadowNode = shadow( this.light );
+				shadowNode = this.setupShadowNode( builder );
 
 			}
 

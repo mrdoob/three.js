@@ -5,6 +5,7 @@ import { lightViewPosition } from '../accessors/Lights.js';
 import { positionView } from '../accessors/Position.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
+import { pointShadow } from './PointShadowNode.js';
 
 export const directPointLight = Fn( ( { color, lightViewPosition, cutoffDistance, decayExponent }, builder ) => {
 
@@ -61,7 +62,15 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
-	setup() {
+	setupShadowNode() {
+
+		return pointShadow( this.light );
+
+	}
+
+	setup( builder ) {
+
+		super.setup( builder );
 
 		directPointLight( {
 			color: this.colorNode,
