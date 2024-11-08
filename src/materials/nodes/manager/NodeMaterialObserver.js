@@ -115,6 +115,15 @@ class NodeMaterialObserver {
 
 			}
 
+			if ( data.material.transmission > 0 ) {
+
+				const { width, height } = renderObject.context;
+
+				data.bufferWidth = width;
+				data.bufferHeight = height;
+
+			}
+
 			this.renderObjects.set( renderObject, data );
 
 		}
@@ -242,6 +251,21 @@ class NodeMaterialObserver {
 			} else if ( value !== mtlValue ) {
 
 				materialData[ property ] = mtlValue;
+
+				return false;
+
+			}
+
+		}
+
+		if ( materialData.transmission > 0 ) {
+
+			const { width, height } = renderObject.context;
+
+			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+				renderObjectData.bufferWidth = width;
+				renderObjectData.bufferHeight = height;
 
 				return false;
 

@@ -1,11 +1,15 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, PostProcessingUtils } from 'three';
-import { getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
+import { getNormalFromDepth, getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial, PostProcessingUtils } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
+/**
+ * References:
+ * https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
+ */
 class GTAONode extends TempNode {
 
 	static get type() {
@@ -16,10 +20,12 @@ class GTAONode extends TempNode {
 
 	constructor( depthNode, normalNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
+
+		this.resolutionScale = 1;
 
 		this.radius = uniform( 0.25 );
 		this.resolution = uniform( new Vector2() );
@@ -27,20 +33,29 @@ class GTAONode extends TempNode {
 		this.distanceExponent = uniform( 1 );
 		this.distanceFallOff = uniform( 1 );
 		this.scale = uniform( 1 );
-		this.noiseNode = texture( generateMagicSquareNoise() );
+		this.samples = uniform( 16 );
 
-		this.cameraProjectionMatrix = uniform( camera.projectionMatrix );
-		this.cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		this.SAMPLES = uniform( 16 );
+		// render targets
 
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
-		this._material = null;
-		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
+		// uniforms
 
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this._noiseNode = texture( generateMagicSquareNoise() );
+		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
+		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+
+		// materials
+
+		this._material = new NodeMaterial();
+		this._material.name = 'GTAO';
+
+		//
+
+		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
 
 	}
 
@@ -51,6 +66,9 @@ class GTAONode extends TempNode {
 	}
 
 	setSize( width, height ) {
+
+		width = Math.round( this.resolutionScale * width );
+		height = Math.round( this.resolutionScale * height );
 
 		this.resolution.value.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
@@ -90,7 +108,8 @@ class GTAONode extends TempNode {
 		const uvNode = uv();
 
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
+		const sampleNoise = ( uv ) => this._noiseNode.uv( uv );
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
 		const ao = Fn( () => {
 
@@ -98,12 +117,12 @@ class GTAONode extends TempNode {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse ).toVar();
-			const viewNormal = this.normalNode.rgb.normalize().toVar();
+			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
+			const viewNormal = sampleNormal( uvNode ).toVar();
 
 			const radiusToUse = this.radius;
 
-			const noiseResolution = textureSize( this.noiseNode, 0 );
+			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
 			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
 			const noiseTexel = sampleNoise( noiseUv );
@@ -112,8 +131,8 @@ class GTAONode extends TempNode {
 			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).select( 3, 5 ).toVar();
-			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
+			const DIRECTIONS = this.samples.lessThan( 30 ).select( 3, 5 ).toVar();
+			const STEPS = add( this.samples, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
 
 			const ao = float( 0 ).toVar();
 
@@ -137,9 +156,9 @@ class GTAONode extends TempNode {
 
 					// x
 
-					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this.cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
-					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this.cameraProjectionMatrixInverse ).toVar();
+					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
@@ -151,9 +170,9 @@ class GTAONode extends TempNode {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this.cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
-					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this.cameraProjectionMatrixInverse ).toVar();
+					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
@@ -182,10 +201,8 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const material = this._material || ( this._material = new NodeMaterial() );
-		material.fragmentNode = ao().context( builder.getSharedContext() );
-		material.name = 'GTAO';
-		material.needsUpdate = true;
+		this._material.fragmentNode = ao().context( builder.getSharedContext() );
+		this._material.needsUpdate = true;
 
 		//
 
@@ -196,6 +213,8 @@ class GTAONode extends TempNode {
 	dispose() {
 
 		this._aoRenderTarget.dispose();
+
+		this._material.dispose();
 
 	}
 

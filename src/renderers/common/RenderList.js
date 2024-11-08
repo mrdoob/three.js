@@ -1,4 +1,4 @@
-import { LightsNode } from '../../nodes/Nodes.js';
+import { DoubleSide } from '../../constants.js';
 
 function painterSortStable( a, b ) {
 
@@ -48,19 +48,31 @@ function reversePainterSortStable( a, b ) {
 
 }
 
+function needsDoublePass( material ) {
+
+	const hasTransmission = material.transmission > 0 || material.transmissionNode;
+
+	return hasTransmission && material.side === DoubleSide && material.forceSinglePass === false;
+
+}
+
 class RenderList {
 
-	constructor() {
+	constructor( lighting, scene, camera ) {
 
 		this.renderItems = [];
 		this.renderItemsIndex = 0;
 
 		this.opaque = [];
+		this.transparentDoublePass = [];
 		this.transparent = [];
 		this.bundles = [];
 
-		this.lightsNode = new LightsNode( [] );
+		this.lightsNode = lighting.getNode( scene, camera );
 		this.lightsArray = [];
+
+		this.scene = scene;
+		this.camera = camera;
 
 		this.occlusionQueryCount = 0;
 
@@ -71,6 +83,7 @@ class RenderList {
 		this.renderItemsIndex = 0;
 
 		this.opaque.length = 0;
+		this.transparentDoublePass.length = 0;
 		this.transparent.length = 0;
 		this.bundles.length = 0;
 
@@ -82,7 +95,7 @@ class RenderList {
 
 	}
 
-	getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
+	getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
 		let renderItem = this.renderItems[ this.renderItemsIndex ];
 
@@ -96,7 +109,8 @@ class RenderList {
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
-				group: group
+				group: group,
+				clippingContext: clippingContext
 			};
 
 			this.renderItems[ this.renderItemsIndex ] = renderItem;
@@ -111,6 +125,7 @@ class RenderList {
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
+			renderItem.clippingContext = clippingContext;
 
 		}
 
@@ -120,21 +135,41 @@ class RenderList {
 
 	}
 
-	push( object, geometry, material, groupOrder, z, group ) {
+	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
-		( material.transparent === true || material.transmission > 0 ? this.transparent : this.opaque ).push( renderItem );
+		if ( material.transparent === true || material.transmission > 0 ) {
+
+			if ( needsDoublePass( material ) ) this.transparentDoublePass.push( renderItem );
+
+			this.transparent.push( renderItem );
+
+		} else {
+
+			this.opaque.push( renderItem );
+
+		}
 
 	}
 
-	unshift( object, geometry, material, groupOrder, z, group ) {
+	unshift( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		( material.transparent === true ? this.transparent : this.opaque ).unshift( renderItem );
+		if ( material.transparent === true || material.transmission > 0 ) {
+
+			if ( needsDoublePass( material ) ) this.transparentDoublePass.unshift( renderItem );
+
+			this.transparent.unshift( renderItem );
+
+		} else {
+
+			this.opaque.unshift( renderItem );
+
+		}
 
 	}
 
@@ -153,6 +188,7 @@ class RenderList {
 	sort( customOpaqueSort, customTransparentSort ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
+		if ( this.transparentDoublePass.length > 1 ) this.transparentDoublePass.sort( customTransparentSort || reversePainterSortStable );
 		if ( this.transparent.length > 1 ) this.transparent.sort( customTransparentSort || reversePainterSortStable );
 
 	}
@@ -179,6 +215,7 @@ class RenderList {
 			renderItem.renderOrder = null;
 			renderItem.z = null;
 			renderItem.group = null;
+			renderItem.clippingContext = null;
 
 		}
 

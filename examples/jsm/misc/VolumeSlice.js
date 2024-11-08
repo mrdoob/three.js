@@ -68,6 +68,7 @@ class VolumeSlice {
 
 		const canvasMap = new Texture( this.canvas );
 		canvasMap.minFilter = LinearFilter;
+		canvasMap.generateMipmaps = false;
 		canvasMap.wrapS = canvasMap.wrapT = ClampToEdgeWrapping;
 		canvasMap.colorSpace = SRGBColorSpace;
 		const material = new MeshBasicMaterial( { map: canvasMap, side: DoubleSide, transparent: true } );

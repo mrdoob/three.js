@@ -6,17 +6,13 @@ import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.
 
 class ShaderMaterial extends Material {
 
-	static get type() {
-
-		return 'ShaderMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isShaderMaterial = true;
+
+		this.type = 'ShaderMaterial';
 
 		this.defines = {};
 		this.uniforms = {};

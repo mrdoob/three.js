@@ -97,17 +97,21 @@ const parse = ( source ) => {
 
 			let resolvedType = type;
 
-			if ( resolvedType.startsWith( 'texture' ) ) {
-
-				resolvedType = type.split( '<' )[ 0 ];
-
-			} else if ( resolvedType.startsWith( 'ptr' ) ) {
+			if ( resolvedType.startsWith( 'ptr' ) ) {
 
 				resolvedType = 'pointer';
 
-			}
+			} else {
 
-			resolvedType = wgslTypeLib[ resolvedType ] || resolvedType;
+				if ( resolvedType.startsWith( 'texture' ) ) {
+
+					resolvedType = type.split( '<' )[ 0 ];
+
+				}
+
+				resolvedType = wgslTypeLib[ resolvedType ];
+
+			}
 
 			inputs.push( new NodeFunctionInput( resolvedType, name ) );
 

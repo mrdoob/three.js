@@ -109,6 +109,7 @@
 				const textureCanvas2 = textureCanvas.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestFilter;
+				textureCanvas2.generateMipmaps = false;
 
 				const materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );

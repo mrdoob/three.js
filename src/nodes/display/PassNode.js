@@ -226,8 +226,9 @@ class PassNode extends TempNode {
 
 		if ( textureNode === undefined ) {
 
-			this._textureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
-			this._textureNodes[ name ].updateTexture();
+			textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			textureNode.updateTexture();
+			this._textureNodes[ name ] = textureNode;
 
 		}
 
@@ -243,8 +244,9 @@ class PassNode extends TempNode {
 
 			if ( this._textureNodes[ name ] === undefined ) this.getTextureNode( name );
 
-			this._previousTextureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
-			this._previousTextureNodes[ name ].updateTexture();
+			textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+			textureNode.updateTexture();
+			this._previousTextureNodes[ name ] = textureNode;
 
 		}
 

@@ -2,17 +2,13 @@ import { Material } from './Material.js';
 
 class MeshDistanceMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshDistanceMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDistanceMaterial = true;
+
+		this.type = 'MeshDistanceMaterial';
 
 		this.map = null;
 

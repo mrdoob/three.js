@@ -132,6 +132,7 @@ export * from './accessors/Lights.js';
 export * from './lighting/LightsNode.js';
 export * from './lighting/LightingContextNode.js';
 export * from './lighting/ShadowNode.js';
+export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
@@ -155,5 +156,6 @@ export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCo
 export * from './lighting/LightUtils.js';
 
 export { default as getGeometryRoughness } from './functions/material/getGeometryRoughness.js';
+export { default as getParallaxCorrectNormal } from './functions/material/getParallaxCorrectNormal.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';
 export { default as getShIrradianceAt } from './functions/material/getShIrradianceAt.js';

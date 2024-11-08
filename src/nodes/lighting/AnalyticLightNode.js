@@ -5,6 +5,7 @@ import { Color } from '../../math/Color.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { hash } from '../core/NodeUtils.js';
 import { shadow } from './ShadowNode.js';
+import { nodeObject } from '../tsl/TSLCore.js';
 
 class AnalyticLightNode extends LightingNode {
 
@@ -56,7 +57,19 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowColorNode === null ) {
 
-			const shadowNode = shadow( this.light );
+			const customShadowNode = this.light.shadow.shadowNode;
+
+			let shadowNode;
+
+			if ( customShadowNode !== undefined ) {
+
+				shadowNode = nodeObject( customShadowNode );
+
+			} else {
+
+				shadowNode = shadow( this.light );
+
+			}
 
 			this.shadowNode = shadowNode;
 

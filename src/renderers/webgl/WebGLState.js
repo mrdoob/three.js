@@ -14,7 +14,7 @@ const reversedFuncs = {
 	[ GreaterEqualDepth ]: LessEqualDepth,
 };
 
-function WebGLState( gl ) {
+function WebGLState( gl, extensions ) {
 
 	function ColorBuffer() {
 
@@ -88,7 +88,33 @@ function WebGLState( gl ) {
 
 			setReversed: function ( value ) {
 
+				if ( reversed !== value ) {
+
+					const ext = extensions.get( 'EXT_clip_control' );
+
+					if ( reversed ) {
+
+						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+					} else {
+
+						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.NEGATIVE_ONE_TO_ONE_EXT );
+
+					}
+
+					const oldDepth = currentDepthClear;
+					currentDepthClear = null;
+					this.setClear( oldDepth );
+
+				}
+
 				reversed = value;
+
+			},
+
+			getReversed: function () {
+
+				return reversed;
 
 			},
 
@@ -187,6 +213,12 @@ function WebGLState( gl ) {
 
 				if ( currentDepthClear !== depth ) {
 
+					if ( reversed ) {
+
+						depth = 1 - depth;
+
+					}
+
 					gl.clearDepth( depth );
 					currentDepthClear = depth;
 
@@ -201,6 +233,7 @@ function WebGLState( gl ) {
 				currentDepthMask = null;
 				currentDepthFunc = null;
 				currentDepthClear = null;
+				reversed = false;
 
 			}
 
@@ -1171,6 +1204,9 @@ function WebGLState( gl ) {
 
 		gl.depthMask( true );
 		gl.depthFunc( gl.LESS );
+
+		depthBuffer.setReversed( false );
+
 		gl.clearDepth( 1 );
 
 		gl.stencilMask( 0xffffffff );

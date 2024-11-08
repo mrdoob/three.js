@@ -13,10 +13,16 @@ import { getFormat } from '../utils/WebGPUTextureUtils.js';
 import WGSLNodeParser from './WGSLNodeParser.js';
 import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
 
-import { NoColorSpace, FloatType } from '../../../constants.js';
+import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = self.GPUShaderStage;
+
+const wrapNames = {
+	[ RepeatWrapping ]: 'repeat',
+	[ ClampToEdgeWrapping ]: 'clamp',
+	[ MirroredRepeatWrapping ]: 'mirror'
+};
 
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage ? GPUShaderStage.VERTEX : 1,
@@ -57,20 +63,11 @@ const wgslTypeLib = {
 	bvec4: 'vec4<bool>',
 
 	mat2: 'mat2x2<f32>',
-	imat2: 'mat2x2<i32>',
-	umat2: 'mat2x2<u32>',
-	bmat2: 'mat2x2<bool>',
-
 	mat3: 'mat3x3<f32>',
-	imat3: 'mat3x3<i32>',
-	umat3: 'mat3x3<u32>',
-	bmat3: 'mat3x3<bool>',
-
-	mat4: 'mat4x4<f32>',
-	imat4: 'mat4x4<i32>',
-	umat4: 'mat4x4<u32>',
-	bmat4: 'mat4x4<bool>'
+	mat4: 'mat4x4<f32>'
 };
+
+const wgslCodeCache = {};
 
 const wgslPolyfill = {
 	tsl_xor: new CodeNode( 'fn tsl_xor( a : bool, b : bool ) -> bool { return ( a || b ) && !( a && b ); }' ),
@@ -82,7 +79,10 @@ const wgslPolyfill = {
 	equals_bvec2: new CodeNode( 'fn tsl_equals_bvec2( a : vec2f, b : vec2f ) -> vec2<bool> { return vec2<bool>( a.x == b.x, a.y == b.y ); }' ),
 	equals_bvec3: new CodeNode( 'fn tsl_equals_bvec3( a : vec3f, b : vec3f ) -> vec3<bool> { return vec3<bool>( a.x == b.x, a.y == b.y, a.z == b.z ); }' ),
 	equals_bvec4: new CodeNode( 'fn tsl_equals_bvec4( a : vec4f, b : vec4f ) -> vec4<bool> { return vec4<bool>( a.x == b.x, a.y == b.y, a.z == b.z, a.w == b.w ); }' ),
-	repeatWrapping: new CodeNode( `
+	repeatWrapping_float: new CodeNode( 'fn tsl_repeatWrapping_float( coord: f32 ) -> f32 { return fract( coord ); }' ),
+	mirrorWrapping_float: new CodeNode( 'fn tsl_mirrorWrapping_float( coord: f32 ) -> f32 { let mirrored = fract( coord * 0.5 ) * 2.0; return 1.0 - abs( 1.0 - mirrored ); }' ),
+	clampWrapping_float: new CodeNode( 'fn tsl_clampWrapping_float( coord: f32 ) -> f32 { return clamp( coord, 0.0, 1.0 ); }' ),
+	repeatWrapping: new CodeNode( /* wgsl */`
 fn tsl_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> {
 
 	let uvScaled = vec2<u32>( uv * vec2<f32>( dimension ) );
@@ -91,10 +91,9 @@ fn tsl_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> {
 
 }
 ` ),
-	biquadraticTexture: new CodeNode( `
-fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32 ) -> vec4f {
+	biquadraticTexture: new CodeNode( /* wgsl */`
+fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, iRes : vec2u, level : i32 ) -> vec4f {
 
-	let iRes = vec2i( textureDimensions( map, level ) );
 	let res = vec2f( iRes );
 
 	let uvScaled = coord * res;
@@ -106,10 +105,10 @@ fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32 ) -
 	let iuv = floor( uv );
 	let f = fract( uv );
 
-	let rg1 = textureLoad( map, vec2i( iuv + vec2( 0.5, 0.5 ) ) % iRes, level );
-	let rg2 = textureLoad( map, vec2i( iuv + vec2( 1.5, 0.5 ) ) % iRes, level );
-	let rg3 = textureLoad( map, vec2i( iuv + vec2( 0.5, 1.5 ) ) % iRes, level );
-	let rg4 = textureLoad( map, vec2i( iuv + vec2( 1.5, 1.5 ) ) % iRes, level );
+	let rg1 = textureLoad( map, vec2u( iuv + vec2( 0.5, 0.5 ) ) % iRes, level );
+	let rg2 = textureLoad( map, vec2u( iuv + vec2( 1.5, 0.5 ) ) % iRes, level );
+	let rg3 = textureLoad( map, vec2u( iuv + vec2( 0.5, 1.5 ) ) % iRes, level );
+	let rg4 = textureLoad( map, vec2u( iuv + vec2( 1.5, 1.5 ) ) % iRes, level );
 
 	return mix( mix( rg1, rg2, f.x ), mix( rg3, rg4, f.x ), f.y );
 
@@ -240,11 +239,94 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	generateWrapFunction( texture ) {
+
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T`;
+
+		let nodeCode = wgslCodeCache[ functionName ];
+
+		if ( nodeCode === undefined ) {
+
+			let code = `fn ${ functionName }( coord : vec2f ) -> vec2f {\n\n\treturn vec2f(\n`;
+
+			const addWrapSnippet = ( wrap, axis ) => {
+
+				if ( wrap === RepeatWrapping ) {
+
+					this._include( 'repeatWrapping_float' );
+
+					code += `\t\ttsl_repeatWrapping_float( coord.${ axis } )`;
+
+				} else if ( wrap === ClampToEdgeWrapping ) {
+
+					this._include( 'clampWrapping_float' );
+
+					code += `\t\ttsl_clampWrapping_float( coord.${ axis } )`;
+
+				} else if ( wrap === MirroredRepeatWrapping ) {
+
+					this._include( 'mirrorWrapping_float' );
+
+					code += `\t\ttsl_mirrorWrapping_float( coord.${ axis } )`;
+
+				} else {
+
+					code += `\t\tcoord.${ axis }`;
+
+					console.warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
+
+				}
+
+			};
+
+			addWrapSnippet( texture.wrapS, 'x' );
+
+			code += ',\n';
+
+			addWrapSnippet( texture.wrapT, 'y' );
+
+			code += '\n\t);\n\n}\n';
+
+			wgslCodeCache[ functionName ] = nodeCode = new CodeNode( code );
+
+		}
+
+		nodeCode.build( this );
+
+		return functionName;
+
+	}
+
+	generateTextureDimension( texture, textureProperty, levelSnippet ) {
+
+		const textureData = this.getDataFromNode( texture, this.shaderStage, this.globalCache );
+
+		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
+
+		let propertyName = textureData.dimensionsSnippet[ levelSnippet ];
+
+		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
+
+			propertyName = `textureDimension_${ texture.id }_${ levelSnippet }`;
+
+			this.addLineFlowCode( `let ${ propertyName } = textureDimensions( ${ textureProperty }, i32( ${ levelSnippet } ) );` );
+
+			textureData.dimensionsSnippet[ levelSnippet ] = propertyName;
+
+		}
+
+		return propertyName;
+
+	}
+
 	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0' ) {
 
 		this._include( 'biquadraticTexture' );
 
-		return `tsl_biquadraticTexture( ${ textureProperty }, ${ uvSnippet }, i32( ${ levelSnippet } ) )`;
+		const wrapFunction = this.generateWrapFunction( texture );
+		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
+
+		return `tsl_biquadraticTexture( ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet } ), ${ textureDimension }, i32( ${ levelSnippet } ) )`;
 
 	}
 
@@ -703,6 +785,12 @@ ${ flowData.code }
 
 	}
 
+	getClipDistance() {
+
+		return 'varyings.hw_clip_distances';
+
+	}
+
 	isFlipY() {
 
 		return false;
@@ -762,6 +850,13 @@ ${ flowData.code }
 	enableDualSourceBlending() {
 
 		this.enableDirective( 'dual_source_blending' );
+
+	}
+
+	enableHardwareClipping( planeCount ) {
+
+		this.enableClipDistances();
+		this.getBuiltin( 'clip_distances', 'hw_clip_distances', `array<f32, ${ planeCount } >`, 'vertex' );
 
 	}
 
@@ -1249,6 +1344,10 @@ ${ flowData.code }
 			if ( name === 'float32Filterable' ) {
 
 				result = this.renderer.hasFeature( 'float32-filterable' );
+
+			} else if ( name === 'clipDistance' ) {
+
+				result = this.renderer.hasFeature( 'clip-distances' );
 
 			}
 

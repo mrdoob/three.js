@@ -320,15 +320,13 @@
 	[method:undefined onBeforeRender]( [param:WebGLRenderer renderer], [param:Scene scene], [param:Camera camera], [param:BufferGeometry geometry], [param:Object3D object], [param:Group group] )
 </h3>
 <p>
-	An optional callback that is executed immediately before the material is used to 
-	render a 3D object.
+	在使用材质渲染 3D 对象之前立即执行的可选回调。
 </p>
 <p>
-	Unlike properties, the callback is not supported by [page:Material.clone .clone](), 
-	[page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+	与属性不同，回调不支持 [page:Material.clone .clone]()、[page:Material.copy .copy]() 和 [page:Material.toJSON .toJSON]()。
 </p>
 <p>
-	This callback is only supported in `WebGLRenderer` (not `WebGPURenderer`). 
+	此回调仅支持 `WebGLRenderer` (不支持 `WebGPURenderer`)。
 </p>
 
 <h3>[method:String customProgramCacheKey]()</h3>

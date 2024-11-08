@@ -3,7 +3,35 @@ import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { lightViewPosition } from '../accessors/Lights.js';
 import { positionView } from '../accessors/Position.js';
-import { renderGroup } from '../TSL.js';
+import { Fn } from '../tsl/TSLBase.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
+
+export const directPointLight = Fn( ( { color, lightViewPosition, cutoffDistance, decayExponent }, builder ) => {
+
+	const lightingModel = builder.context.lightingModel;
+
+	const lVector = lightViewPosition.sub( positionView ); // @TODO: Add it into LightNode
+
+	const lightDirection = lVector.normalize();
+	const lightDistance = lVector.length();
+
+	const lightAttenuation = getDistanceAttenuation( {
+		lightDistance,
+		cutoffDistance,
+		decayExponent
+	} );
+
+	const lightColor = color.mul( lightAttenuation );
+
+	const reflectedLight = builder.context.reflectedLight;
+
+	lightingModel.direct( {
+		lightDirection,
+		lightColor,
+		reflectedLight
+	}, builder.stack, builder );
+
+} );
 
 class PointLightNode extends AnalyticLightNode {
 
@@ -33,32 +61,14 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
+	setup() {
 
-		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
-
-		const lightingModel = builder.context.lightingModel;
-
-		const lVector = lightViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
-
-		const lightDirection = lVector.normalize();
-		const lightDistance = lVector.length();
-
-		const lightAttenuation = getDistanceAttenuation( {
-			lightDistance,
-			cutoffDistance: cutoffDistanceNode,
-			decayExponent: decayExponentNode
-		} );
-
-		const lightColor = colorNode.mul( lightAttenuation );
-
-		const reflectedLight = builder.context.reflectedLight;
-
-		lightingModel.direct( {
-			lightDirection,
-			lightColor,
-			reflectedLight
-		}, builder.stack, builder );
+		directPointLight( {
+			color: this.colorNode,
+			lightViewPosition: lightViewPosition( this.light ),
+			cutoffDistance: this.cutoffDistanceNode,
+			decayExponent: this.decayExponentNode
+		} ).append();
 
 	}
 

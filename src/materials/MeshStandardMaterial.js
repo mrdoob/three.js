@@ -6,17 +6,13 @@ import { Euler } from '../math/Euler.js';
 
 class MeshStandardMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshStandardMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshStandardMaterial = true;
+
+		this.type = 'MeshStandardMaterial';
 
 		this.defines = { 'STANDARD': '' };
 

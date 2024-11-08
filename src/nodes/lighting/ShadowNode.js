@@ -344,11 +344,12 @@ class ShadowNode extends Node {
 
 		const shadowColor = texture( shadowMap.texture, shadowCoord );
 		const shadowNode = frustumTest.select( filterFn( { depthTexture: ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture, shadowCoord, shadow } ), float( 1 ) );
+		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
 
-		return mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) );
+		return shadowOutput;
 
 	}
 
@@ -356,7 +357,27 @@ class ShadowNode extends Node {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		return this._node !== null ? this._node : ( this._node = this.setupShadow( builder ) );
+		let node = this._node;
+
+		if ( node === null ) {
+
+			this._node = node = this.setupShadow( builder );
+
+		}
+
+		if ( builder.material.shadowNode ) { // @deprecated, r171
+
+			console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".receivedShadowNode" instead.' );
+
+		}
+
+		if ( builder.material.receivedShadowNode ) {
+
+			node = builder.material.receivedShadowNode( node );
+
+		}
+
+		return node;
 
 	}
 

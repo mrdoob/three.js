@@ -34,7 +34,7 @@ class ToonOutlinePassNode extends PassNode {
 
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
-		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode ) => {
+		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode, clippingContext ) => {
 
 			// only render outline for supported materials
 
@@ -43,7 +43,7 @@ class ToonOutlinePassNode extends PassNode {
 				if ( material.wireframe === false ) {
 
 					const outlineMaterial = this._getOutlineMaterial( material );
-					renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode );
+					renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode, clippingContext );
 
 				}
 
@@ -51,7 +51,7 @@ class ToonOutlinePassNode extends PassNode {
 
 			// default
 
-			renderer.renderObject( object, scene, camera, geometry, material, group, lightsNode );
+			renderer.renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext );
 
 		} );
 

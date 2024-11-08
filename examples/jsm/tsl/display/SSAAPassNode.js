@@ -1,5 +1,5 @@
-import { AdditiveBlending, Color, Vector2, PostProcessingUtils } from 'three';
-import { nodeObject, uniform, mrt, PassNode, QuadMesh, texture, NodeMaterial, getTextureIndex } from 'three/tsl';
+import { AdditiveBlending, Color, Vector2 } from 'three';
+import { nodeObject, uniform, mrt, PassNode, QuadMesh, texture, NodeMaterial, getTextureIndex, PostProcessingUtils } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -210,7 +210,6 @@ class SSAAPassNode extends PassNode {
 		this._quadMesh.material.depthWrite = false;
 		this._quadMesh.material.premultipliedAlpha = true;
 		this._quadMesh.material.blending = AdditiveBlending;
-		this._quadMesh.material.normals = false;
 		this._quadMesh.material.name = 'SSAA';
 
 		return super.setup( builder );

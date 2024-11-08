@@ -1,6 +1,6 @@
 import NodeMaterial from './NodeMaterial.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
-import { materialLineDashSize, materialLineGapSize, materialLineScale } from '../../nodes/accessors/MaterialNode.js';
+import { materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale } from '../../nodes/accessors/MaterialNode.js';
 import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
 import { varying, float } from '../../nodes/tsl/TSLBase.js';
 
@@ -26,6 +26,8 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 		this.setDefaultValues( _defaultValues );
 
+		this.dashOffset = 0;
+
 		this.offsetNode = null;
 		this.dashScaleNode = null;
 		this.dashSizeNode = null;
@@ -37,7 +39,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 	setupVariants() {
 
-		const offsetNode = this.offsetNode;
+		const offsetNode = this.offsetNode ? float( this.offsetNodeNode ) : materialLineDashOffset;
 		const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
 		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 		const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;

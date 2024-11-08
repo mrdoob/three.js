@@ -1,5 +1,5 @@
-import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, passTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { NearestFilter, RenderTarget, Vector2 } from 'three';
+import { getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, passTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4, PostProcessingUtils } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -19,7 +19,7 @@ class SSRNode extends TempNode {
 
 	constructor( colorNode, depthNode, normalNode, metalnessNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.colorNode = colorNode;
 		this.depthNode = depthNode;

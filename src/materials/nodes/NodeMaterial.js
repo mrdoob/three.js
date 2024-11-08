@@ -13,7 +13,6 @@ import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.j
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinningReference } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
-import { lights } from '../../nodes/lighting/LightsNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
@@ -21,8 +20,9 @@ import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, perspectiveDepthToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
-import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
+import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
+import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 
 class NodeMaterial extends Material {
 
@@ -32,18 +32,25 @@ class NodeMaterial extends Material {
 
 	}
 
+	get type() {
+
+		return this.constructor.type;
+
+	}
+
+	set type( _value ) { /* */ }
+
 	constructor() {
 
 		super();
 
 		this.isNodeMaterial = true;
 
-		this.type = this.constructor.type;
-
 		this.forceSinglePass = false;
 
 		this.fog = true;
 		this.lights = false;
+		this.hardwareClipping = false;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -60,8 +67,9 @@ class NodeMaterial extends Material {
 		this.geometryNode = null;
 
 		this.depthNode = null;
-		this.shadowNode = null;
 		this.shadowPositionNode = null;
+		this.receivedShadowNode = null;
+		this.castShadowNode = null;
 
 		this.outputNode = null;
 		this.mrtNode = null;
@@ -93,6 +101,9 @@ class NodeMaterial extends Material {
 
 		builder.context.setupNormal = () => this.setupNormal( builder );
 
+		const renderer = builder.renderer;
+		const renderTarget = renderer.getRenderTarget();
+
 		// < VERTEX STAGE >
 
 		builder.addStack();
@@ -115,7 +126,21 @@ class NodeMaterial extends Material {
 
 		const clippingNode = this.setupClipping( builder );
 
-		if ( this.depthWrite === true ) this.setupDepth( builder );
+		if ( this.depthWrite === true ) {
+
+			// only write depth if depth buffer is configured
+
+			if ( renderTarget !== null ) {
+
+				if ( renderTarget.depthBuffer === true ) this.setupDepth( builder );
+
+			} else {
+
+				if ( renderer.depth === true ) this.setupDepth( builder );
+
+			}
+
+		}
 
 		if ( this.fragmentNode === null ) {
 
@@ -142,11 +167,9 @@ class NodeMaterial extends Material {
 
 			// MRT
 
-			const renderTarget = builder.renderer.getRenderTarget();
-
 			if ( renderTarget !== null ) {
 
-				const mrt = builder.renderer.getMRT();
+				const mrt = renderer.getMRT();
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
@@ -195,11 +218,11 @@ class NodeMaterial extends Material {
 
 		if ( builder.clippingContext === null ) return null;
 
-		const { globalClippingCount, localClippingCount } = builder.clippingContext;
+		const { unionPlanes, intersectionPlanes } = builder.clippingContext;
 
 		let result = null;
 
-		if ( globalClippingCount || localClippingCount ) {
+		if ( unionPlanes.length > 0 || intersectionPlanes.length > 0 ) {
 
 			const samples = builder.renderer.samples;
 
@@ -217,6 +240,28 @@ class NodeMaterial extends Material {
 		}
 
 		return result;
+
+	}
+
+	setupHardwareClipping( builder ) {
+
+		this.hardwareClipping = false;
+
+		if ( builder.clippingContext === null ) return;
+
+		const candidateCount = builder.clippingContext.unionPlanes.length;
+
+		// 8 planes supported by WebGL ANGLE_clip_cull_distance and WebGPU clip-distances
+
+		if ( candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
+
+			builder.stack.add( hardwareClipping() );
+
+			this.hardwareClipping = true;
+
+		}
+
+		return;
 
 	}
 
@@ -309,6 +354,8 @@ class NodeMaterial extends Material {
 
 		}
 
+		this.setupHardwareClipping( builder );
+
 		const mvp = modelViewProjection();
 
 		builder.context.vertex = builder.removeStack();
@@ -365,6 +412,14 @@ class NodeMaterial extends Material {
 			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+
+		}
+
+		// ALPHA HASH
+
+		if ( this.alphaHash === true ) {
+
+			diffuseColor.a.lessThan( getAlphaHashThreshold( positionLocal ) ).discard();
 
 		}
 
@@ -460,7 +515,7 @@ class NodeMaterial extends Material {
 
 		if ( materialLightsNode.length > 0 ) {
 
-			lightsN = lights( [ ...lightsN.getLights(), ...materialLightsNode ] );
+			lightsN = builder.renderer.lighting.createNode( [ ...lightsN.getLights(), ...materialLightsNode ] );
 
 		}
 
@@ -487,7 +542,7 @@ class NodeMaterial extends Material {
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && lightsNode.getScope().getLights().length > 0 ) {
+		if ( lightsNode && lightsNode.getScope().hasLights ) {
 
 			const lightingModel = this.setupLightingModel( builder );
 
@@ -638,8 +693,9 @@ class NodeMaterial extends Material {
 		this.geometryNode = source.geometryNode;
 
 		this.depthNode = source.depthNode;
-		this.shadowNode = source.shadowNode;
 		this.shadowPositionNode = source.shadowPositionNode;
+		this.receivedShadowNode = source.receivedShadowNode;
+		this.castShadowNode = source.castShadowNode;
 
 		this.outputNode = source.outputNode;
 		this.mrtNode = source.mrtNode;

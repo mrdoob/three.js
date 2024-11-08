@@ -5,18 +5,17 @@ class Animation {
 		this.nodes = nodes;
 		this.info = info;
 
-		this.animationLoop = null;
-		this.requestId = null;
-
-		this._init();
+		this._context = self;
+		this._animationLoop = null;
+		this._requestId = null;
 
 	}
 
-	_init() {
+	start() {
 
 		const update = ( time, frame ) => {
 
-			this.requestId = self.requestAnimationFrame( update );
+			this._requestId = this._context.requestAnimationFrame( update );
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
@@ -24,7 +23,7 @@ class Animation {
 
 			this.info.frame = this.nodes.nodeFrame.frameId;
 
-			if ( this.animationLoop !== null ) this.animationLoop( time, frame );
+			if ( this._animationLoop !== null ) this._animationLoop( time, frame );
 
 		};
 
@@ -32,16 +31,29 @@ class Animation {
 
 	}
 
-	dispose() {
+	stop() {
 
-		self.cancelAnimationFrame( this.requestId );
-		this.requestId = null;
+		this._context.cancelAnimationFrame( this._requestId );
+
+		this._requestId = null;
 
 	}
 
 	setAnimationLoop( callback ) {
 
-		this.animationLoop = callback;
+		this._animationLoop = callback;
+
+	}
+
+	setContext( context ) {
+
+		this._context = context;
+
+	}
+
+	dispose() {
+
+		this.stop();
 
 	}
 

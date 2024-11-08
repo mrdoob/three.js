@@ -22,11 +22,6 @@ import { IESSpotLightNode } from '../../../nodes/Nodes.js';
 import { LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../../constants.js';
 import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping } from '../../../nodes/display/ToneMappingFunctions.js';
 
-// Color Space
-import { LinearSRGBColorSpace, SRGBColorSpace } from '../../../constants.js';
-import { linearSRGBTosRGB, sRGBToLinearSRGB } from '../../../nodes/display/ColorSpaceFunctions.js';
-import { getColorSpaceMethod } from '../../../nodes/display/ColorSpaceNode.js';
-
 class BasicNodeLibrary extends NodeLibrary {
 
 	constructor() {
@@ -48,9 +43,6 @@ class BasicNodeLibrary extends NodeLibrary {
 		this.addToneMapping( acesFilmicToneMapping, ACESFilmicToneMapping );
 		this.addToneMapping( agxToneMapping, AgXToneMapping );
 		this.addToneMapping( neutralToneMapping, NeutralToneMapping );
-
-		this.addColorSpace( linearSRGBTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
-		this.addColorSpace( sRGBToLinearSRGB, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
 
 	}
 

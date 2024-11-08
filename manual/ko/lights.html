@@ -139,7 +139,7 @@ scene.add(light);
 <p>아래는 lil-gui를 만드는 코드입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 </pre>
 <p>결과물은 다음과 같죠.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -173,7 +173,7 @@ scene.add(light);
 -gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 +gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
 +gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-hemisphere.html"></iframe></div>
@@ -202,7 +202,7 @@ scene.add(light.target);
 <p>이 역시 GUI를 사용해 목표의 위치를 조정할 수 있도록 만들겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 gui.add(light.target.position, 'x', -10, 10);
 gui.add(light.target.position, 'z', -10, 10);
 gui.add(light.target.position, 'y', 0, 10);
@@ -246,7 +246,7 @@ scene.add(helper);
 
 const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 
 +makeXYZGUI(gui, light.position, 'position', updateLight);
 +makeXYZGUI(gui, light.target.position, 'target', updateLight);
@@ -297,7 +297,7 @@ scene.add(helper);
 <p>거리도 조정할 수 있도록 GUI에 추가하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 250, 1);
 +gui.add(light, 'distance', 0, 40).onChange(updateLight);
 
 makeXYZGUI(gui, light.position, 'position', updateLight);

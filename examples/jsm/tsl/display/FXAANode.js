@@ -11,7 +11,7 @@ class FXAANode extends TempNode {
 
 	constructor( textureNode ) {
 
-		super();
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 

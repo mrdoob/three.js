@@ -15,6 +15,7 @@ import ClippingContext from './ClippingContext.js';
 import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
 import NodeLibrary from './nodes/NodeLibrary.js';
+import Lighting from './Lighting.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -77,15 +78,15 @@ class Renderer {
 		this.depth = depth;
 		this.stencil = stencil;
 
-		this.clippingPlanes = [];
-
 		this.info = new Info();
 
 		this.nodes = {
-			library: new NodeLibrary(),
 			modelViewMatrix: null,
 			modelNormalViewMatrix: null
 		};
+
+		this.library = new NodeLibrary();
+		this.lighting = new Lighting();
 
 		// internals
 
@@ -140,6 +141,9 @@ class Renderer {
 
 		this._handleObjectFunction = this._renderObjectDirect;
 
+		this._isDeviceLost = false;
+		this.onDeviceLost = this._onDeviceLost;
+
 		this._initialized = false;
 		this._initPromise = null;
 
@@ -169,7 +173,7 @@ class Renderer {
 
 				const material = scene.overrideMaterial || object.material;
 
-				const renderObject = this._objects.get( object, material, scene, camera, renderList.lightsNode, renderContext );
+				const renderObject = this._objects.get( object, material, scene, camera, renderList.lightsNode, renderContext, renderContext.clippingContext );
 
 				const { fragmentShader, vertexShader } = renderObject.getNodeBuilderState();
 
@@ -238,12 +242,13 @@ class Renderer {
 			this._pipelines = new Pipelines( backend, this._nodes );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
-			this._renderLists = new RenderLists();
+			this._renderLists = new RenderLists( this.lighting );
 			this._bundles = new RenderBundles();
 			this._renderContexts = new RenderContexts();
 
 			//
 
+			this._animation.start();
 			this._initialized = true;
 
 			resolve();
@@ -261,6 +266,8 @@ class Renderer {
 	}
 
 	async compileAsync( scene, camera, targetScene = null ) {
+
+		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) await this.init();
 
@@ -304,7 +311,7 @@ class Renderer {
 		renderContext.stencil = this.stencil;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( this, camera );
+		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
 		//
 
@@ -315,7 +322,7 @@ class Renderer {
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
-		this._projectObject( scene, camera, 0, renderList );
+		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
 		if ( targetScene !== scene ) {
@@ -364,10 +371,11 @@ class Renderer {
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
+		const transparentDoublePassObjects = renderList.transparentDoublePass;
 		const lightsNode = renderList.lightsNode;
 
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 		// restore render tree
 
@@ -395,6 +403,12 @@ class Renderer {
 
 	}
 
+	async waitForGPU() {
+
+		await this.backend.waitForGPU();
+
+	}
+
 	setMRT( mrt ) {
 
 		this._mrt = mrt;
@@ -408,6 +422,23 @@ class Renderer {
 		return this._mrt;
 
 	}
+
+	_onDeviceLost( info ) {
+
+		let errorMessage = `THREE.WebGPURenderer: ${info.api} Device Lost:\n\nMessage: ${info.message}`;
+
+		if ( info.reason ) {
+
+			errorMessage += `\nReason: ${info.reason}`;
+
+		}
+
+		console.error( errorMessage );
+
+		this._isDeviceLost = true;
+
+	}
+
 
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
@@ -443,7 +474,7 @@ class Renderer {
 
 			const opaqueObjects = renderList.opaque;
 
-			if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
@@ -542,6 +573,8 @@ class Renderer {
 	}
 
 	_renderScene( scene, camera, useFrameBufferTarget = true ) {
+
+		if ( this._isDeviceLost === true ) return;
 
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
@@ -645,7 +678,7 @@ class Renderer {
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( this, camera );
+		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
 		//
 
@@ -659,7 +692,7 @@ class Renderer {
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
-		this._projectObject( scene, camera, 0, renderList );
+		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		renderList.finish();
 
@@ -719,13 +752,14 @@ class Renderer {
 		const {
 			bundles,
 			lightsNode,
+			transparentDoublePass: transparentDoublePassObjects,
 			transparent: transparentObjects,
 			opaque: opaqueObjects
 		} = renderList;
 
 		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 		// finish render pass
 
@@ -1110,6 +1144,7 @@ class Renderer {
 	dispose() {
 
 		this.info.dispose();
+		this.backend.dispose();
 
 		this._animation.dispose();
 		this._objects.dispose();
@@ -1152,6 +1187,8 @@ class Renderer {
 	}
 
 	compute( computeNodes ) {
+
+		if ( this.isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) {
 
@@ -1274,11 +1311,56 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
-		const renderContext = this._currentRenderContext;
+		if ( rectangle !== null ) {
 
-		this._textures.updateTexture( framebufferTexture );
+			if ( rectangle.isVector2 ) {
 
-		rectangle = rectangle === null ? _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height ) : rectangle;
+				rectangle = _vector4.set( rectangle.x, rectangle.y, framebufferTexture.image.width, framebufferTexture.image.height ).floor();
+
+			} else if ( rectangle.isVector4 ) {
+
+				rectangle = _vector4.copy( rectangle ).floor();
+
+			} else {
+
+				console.error( 'THREE.Renderer.copyFramebufferToTexture: Invalid rectangle.' );
+
+				return;
+
+			}
+
+		} else {
+
+			rectangle = _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height );
+
+		}
+
+		//
+
+		let renderContext = this._currentRenderContext;
+		let renderTarget;
+
+		if ( renderContext !== null ) {
+
+			renderTarget = renderContext.renderTarget;
+
+		} else {
+
+			renderTarget = this._renderTarget || this._getFrameBufferTarget();
+
+			if ( renderTarget !== null ) {
+
+				this._textures.updateRenderTarget( renderTarget );
+
+				renderContext = this._textures.get( renderTarget );
+
+			}
+
+		}
+
+		//
+
+		this._textures.updateTexture( framebufferTexture, { renderTarget } );
 
 		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
@@ -1293,14 +1375,13 @@ class Renderer {
 
 	}
 
-
 	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0, faceIndex = 0 ) {
 
 		return this.backend.copyTextureToBuffer( renderTarget.textures[ index ], x, y, width, height, faceIndex );
 
 	}
 
-	_projectObject( object, camera, groupOrder, renderList ) {
+	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
 
 		if ( object.visible === false ) return;
 
@@ -1311,6 +1392,8 @@ class Renderer {
 			if ( object.isGroup ) {
 
 				groupOrder = object.renderOrder;
+
+				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
 
 			} else if ( object.isLOD ) {
 
@@ -1334,7 +1417,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
 
 					}
 
@@ -1372,7 +1455,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
 
 							}
 
@@ -1380,7 +1463,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
 
 					}
 
@@ -1413,7 +1496,7 @@ class Renderer {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this._projectObject( children[ i ], camera, groupOrder, renderList );
+			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
 
 		}
 
@@ -1429,7 +1512,47 @@ class Renderer {
 
 	}
 
-	_renderObjects( renderList, camera, scene, lightsNode ) {
+	_renderTransparents( renderList, doublePassList, camera, scene, lightsNode ) {
+
+		if ( doublePassList.length > 0 ) {
+
+			// render back side
+
+			for ( const { material } of doublePassList ) {
+
+				material.side = BackSide;
+
+			}
+
+			this._renderObjects( doublePassList, camera, scene, lightsNode, 'backSide' );
+
+			// render front side
+
+			for ( const { material } of doublePassList ) {
+
+				material.side = FrontSide;
+
+			}
+
+			this._renderObjects( renderList, camera, scene, lightsNode );
+
+			// restore
+
+			for ( const { material } of doublePassList ) {
+
+				material.side = DoubleSide;
+
+			}
+
+		} else {
+
+			this._renderObjects( renderList, camera, scene, lightsNode );
+
+		}
+
+	}
+
+	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
 
 		// process renderable objects
 
@@ -1440,7 +1563,7 @@ class Renderer {
 			// @TODO: Add support for multiple materials per object. This will require to extract
 			// the material from the renderItem object and pass it with its group data to renderObject().
 
-			const { object, geometry, material, group } = renderItem;
+			const { object, geometry, material, group, clippingContext } = renderItem;
 
 			if ( camera.isArrayCamera ) {
 
@@ -1463,7 +1586,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode, clippingContext, passId );
 
 					}
 
@@ -1471,7 +1594,7 @@ class Renderer {
 
 			} else {
 
-				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
 
 			}
 
@@ -1479,7 +1602,7 @@ class Renderer {
 
 	}
 
-	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
@@ -1514,36 +1637,10 @@ class Renderer {
 				}
 
 
-				if ( material.shadowNode && material.shadowNode.isNode ) {
+				if ( material.castShadowNode && material.castShadowNode.isNode ) {
 
 					overrideFragmentNode = overrideMaterial.fragmentNode;
-					overrideMaterial.fragmentNode = material.shadowNode;
-
-				}
-
-				if ( this.localClippingEnabled ) {
-
-					if ( material.clipShadows ) {
-
-						if ( overrideMaterial.clippingPlanes !== material.clippingPlanes ) {
-
-							overrideMaterial.clippingPlanes = material.clippingPlanes;
-							overrideMaterial.needsUpdate = true;
-
-						}
-
-						if ( overrideMaterial.clipIntersection !== material.clipIntersection ) {
-
-							overrideMaterial.clipIntersection = material.clipIntersection;
-
-						}
-
-					} else if ( Array.isArray( overrideMaterial.clippingPlanes ) ) {
-
-						overrideMaterial.clippingPlanes = null;
-						overrideMaterial.needsUpdate = true;
-
-					}
+					overrideMaterial.fragmentNode = material.castShadowNode;
 
 				}
 
@@ -1558,16 +1655,16 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, 'backSide' ); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId );
 
 		}
 
@@ -1597,9 +1694,9 @@ class Renderer {
 
 	}
 
-	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
+	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
@@ -1638,9 +1735,9 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, clippingContext, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 
 		//
 

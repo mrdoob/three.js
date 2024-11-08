@@ -1,5 +1,5 @@
-import { Color, DepthTexture, FloatType, RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, passTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
+import { Color, DepthTexture, FloatType, RenderTarget, Vector2 } from 'three';
+import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, passTexture, texture, perspectiveDepthToViewZ, positionView, PostProcessingUtils } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -30,9 +30,9 @@ class OutlineNode extends TempNode {
 		this.scene = scene;
 		this.camera = camera;
 		this.selectedObjects = selectedObjects;
+		this.edgeThicknessNode = nodeObject( edgeThickness );
+		this.edgeGlowNode = nodeObject( edgeGlow );
 		this.downSampleRatio = downSampleRatio;
-		this.edgeThickness = edgeThickness;
-		this.edgeGlow = edgeGlow;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -354,13 +354,13 @@ class OutlineNode extends TempNode {
 				weightSum.addAssign( w.mul( 2 ) );
 				uvOffset.addAssign( delta );
 
-			} );
+			} );
 
 			return diffuseSum.div( weightSum );
 
 		} );
 
-		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThickness );
+		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThicknessNode );
 		this._separableBlurMaterial.needsUpdate = true;
 
 		this._separableBlurMaterial2.fragmentNode = seperableBlur( MAX_RADIUS );
@@ -374,7 +374,7 @@ class OutlineNode extends TempNode {
 			const edgeValue2 = this._edge2TextureUniform;
 			const maskColor = this._maskTextureUniform;
 
-			const edgeValue = edgeValue1.add( edgeValue2.mul( this.edgeGlow ) );
+			const edgeValue = edgeValue1.add( edgeValue2.mul( this.edgeGlowNode ) );
 
 			return maskColor.r.mul( edgeValue );
 
@@ -431,4 +431,4 @@ class OutlineNode extends TempNode {
 
 export default OutlineNode;
 
-export const outline = ( scene, camera, selectedObjects ) => nodeObject( new OutlineNode( scene, camera, selectedObjects ) );
+export const outline = ( scene, camera, params ) => nodeObject( new OutlineNode( scene, camera, params ) );

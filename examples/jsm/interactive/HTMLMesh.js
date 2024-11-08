@@ -62,6 +62,7 @@ class HTMLTexture extends CanvasTexture {
 		this.colorSpace = SRGBColorSpace;
 		this.minFilter = LinearFilter;
 		this.magFilter = LinearFilter;
+		this.generateMipmaps = false;
 
 		// Create an observer on the DOM, and run html2canvas update in the next loop
 		const observer = new MutationObserver( () => {

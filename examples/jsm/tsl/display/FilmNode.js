@@ -1,4 +1,4 @@
-import { TempNode, rand, Fn, fract, timerLocal, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
+import { TempNode, rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
 
 class FilmNode extends TempNode {
 
@@ -10,7 +10,7 @@ class FilmNode extends TempNode {
 
 	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.intensityNode = intensityNode;
@@ -25,7 +25,7 @@ class FilmNode extends TempNode {
 		const film = Fn( () => {
 
 			const base = this.inputNode.rgb;
-			const noise = rand( fract( uvNode.add( timerLocal() ) ) );
+			const noise = rand( fract( uvNode.add( time ) ) );
 
 			let color = base.add( base.mul( clamp( noise.add( 0.1 ), 0, 1 ) ) );
 

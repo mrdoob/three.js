@@ -1,5 +1,5 @@
-import { HalfFloatType, RenderTarget, Vector2, Vector3, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
+import { HalfFloatType, RenderTarget, Vector2, Vector3 } from 'three';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, PostProcessingUtils } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -19,7 +19,7 @@ class BloomNode extends TempNode {
 
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.strength = uniform( strength );
@@ -134,13 +134,11 @@ class BloomNode extends TempNode {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
-			renderer.clear();
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
-			renderer.clear();
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
@@ -150,7 +148,6 @@ class BloomNode extends TempNode {
 		// 3. Composite All the mips
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
-		renderer.clear();
 		_quadMesh.material = this._compositeMaterial;
 		_quadMesh.render( renderer );
 

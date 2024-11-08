@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
-import jimp from 'jimp';
+import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
 class PromiseQueue {
@@ -89,18 +89,18 @@ const exceptionList = [
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_materials_alphahash',
+	'webgpu_materials_alphahash',
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
 	'webgl_postprocessing_transition',
 	'webgl_postprocessing_glitch',
 	'webgl_postprocessing_dof2',
-	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap',
 	'webgl_shadowmap_progressive',
+	'webgpu_shadowmap_progressive',
 	'webgl_test_memory2',
-	'webgl_tiled_forward',
 	'webgl_points_dynamic',
 	'webgpu_multisampled_renderbuffers',
 	'webgl_test_wide_gamut',
@@ -121,12 +121,15 @@ const exceptionList = [
 	'webgpu_sprites',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_bloom_emissive',
+	'webgpu_lights_tiled',
+	'webgpu_postprocessing_traa',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',
 	'webgpu_compute_sort_bitonic',
 
 	// WebGPURenderer: Unknown problem
+	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
 	'webgpu_lightprobe_cubecamera',
@@ -153,7 +156,7 @@ const exceptionList = [
 	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_tsl_vfx_tornado',
 	'webgpu_textures_anisotropy',
-	'webgpu_backdrop_water',
+	'webgpu_materials_envmaps_bpcem',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
@@ -292,6 +295,7 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
+		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
 		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
@@ -558,7 +562,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-		const screenshot = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality );
+		const screenshot = ( await Jimp.read( await page.screenshot(), { quality: jpgQuality } ) ).scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
 
@@ -566,7 +570,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			/* Make screenshots */
 
-			await screenshot.writeAsync( `examples/screenshots/${ file }.jpg` );
+			await screenshot.write( `examples/screenshots/${ file }.jpg` );
 
 			console.green( `Screenshot generated for file ${ file }` );
 
@@ -578,11 +582,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			try {
 
-				expected = ( await jimp.read( `examples/screenshots/${ file }.jpg` ) ).quality( jpgQuality );
+				expected = ( await Jimp.read( `examples/screenshots/${ file }.jpg`, { quality: jpgQuality } ) );
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -601,8 +605,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -617,9 +621,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
-				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
