@@ -247,25 +247,27 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( nodeCode === undefined ) {
 
+			const includes = [];
+
 			let code = `fn ${ functionName }( coord : vec2f ) -> vec2f {\n\n\treturn vec2f(\n`;
 
 			const addWrapSnippet = ( wrap, axis ) => {
 
 				if ( wrap === RepeatWrapping ) {
 
-					this._include( 'repeatWrapping_float' );
+					includes.push( wgslPolyfill.repeatWrapping_float );
 
 					code += `\t\ttsl_repeatWrapping_float( coord.${ axis } )`;
 
 				} else if ( wrap === ClampToEdgeWrapping ) {
 
-					this._include( 'clampWrapping_float' );
+					includes.push( wgslPolyfill.clampWrapping_float );
 
 					code += `\t\ttsl_clampWrapping_float( coord.${ axis } )`;
 
 				} else if ( wrap === MirroredRepeatWrapping ) {
 
-					this._include( 'mirrorWrapping_float' );
+					includes.push( wgslPolyfill.mirrorWrapping_float );
 
 					code += `\t\ttsl_mirrorWrapping_float( coord.${ axis } )`;
 
@@ -287,7 +289,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			code += '\n\t);\n\n}\n';
 
-			wgslCodeCache[ functionName ] = nodeCode = new CodeNode( code );
+			wgslCodeCache[ functionName ] = nodeCode = new CodeNode( code, includes );
 
 		}
 
