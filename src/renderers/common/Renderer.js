@@ -1637,10 +1637,10 @@ class Renderer {
 				}
 
 
-				if ( material.shadowNode && material.shadowNode.isNode ) {
+				if ( material.castShadowNode && material.castShadowNode.isNode ) {
 
 					overrideFragmentNode = overrideMaterial.fragmentNode;
-					overrideMaterial.fragmentNode = material.shadowNode;
+					overrideMaterial.fragmentNode = material.castShadowNode;
 
 				}
 

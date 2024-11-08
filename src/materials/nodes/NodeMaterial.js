@@ -67,8 +67,9 @@ class NodeMaterial extends Material {
 		this.geometryNode = null;
 
 		this.depthNode = null;
-		this.shadowNode = null;
 		this.shadowPositionNode = null;
+		this.receivedShadowNode = null;
+		this.castShadowNode = null;
 
 		this.outputNode = null;
 		this.mrtNode = null;
@@ -692,8 +693,9 @@ class NodeMaterial extends Material {
 		this.geometryNode = source.geometryNode;
 
 		this.depthNode = source.depthNode;
-		this.shadowNode = source.shadowNode;
 		this.shadowPositionNode = source.shadowPositionNode;
+		this.receivedShadowNode = source.receivedShadowNode;
+		this.castShadowNode = source.castShadowNode;
 
 		this.outputNode = source.outputNode;
 		this.mrtNode = source.mrtNode;

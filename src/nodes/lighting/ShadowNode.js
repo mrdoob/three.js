@@ -365,7 +365,17 @@ class ShadowNode extends Node {
 
 		}
 
-		shadowsTotal.mulAssign( node );
+		if ( builder.material.shadowNode ) { // @deprecated, r171
+
+			console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".receivedShadowNode" instead.' );
+
+		}
+
+		if ( builder.material.receivedShadowNode ) {
+
+			node = builder.material.receivedShadowNode( node );
+
+		}
 
 		return node;
 
@@ -492,7 +502,4 @@ class ShadowNode extends Node {
 
 export default ShadowNode;
 
-const shadowsTotal = /*@__PURE__*/ float( 1 ).toVar();
-
 export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
-export const shadows = /*@__PURE__*/ shadowsTotal.oneMinus().toVar( 'shadows' );
