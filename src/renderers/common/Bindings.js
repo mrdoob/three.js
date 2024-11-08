@@ -118,6 +118,7 @@ class Bindings extends DataMap {
 		let needsBindingsUpdate = false;
 		let cacheBindings = true;
 		let cacheIndex = 0;
+		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
 
@@ -169,7 +170,8 @@ class Bindings extends DataMap {
 
 				} else {
 
-					cacheIndex = cacheIndex * 10 + texture.id * 10 + texture.version;
+					cacheIndex = cacheIndex * 10 + texture.id;
+					version += texture.version;
 
 				}
 
@@ -207,7 +209,7 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheIndex : 0 );
+			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheIndex : 0, version );
 
 		}
 
