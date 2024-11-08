@@ -163,13 +163,14 @@ class Bindings extends DataMap {
 
 				const textureData = backend.get( texture );
 
-				if ( textureData.externalTexture !== undefined || texturesTextureData.isDefaultTexture) {
+				if ( textureData.externalTexture !== undefined || texturesTextureData.isDefaultTexture ) {
 
 					cacheBindings = false;
 
 				} else {
 
 					cacheIndex = cacheIndex * 10 + texture.id * 10 + texture.version;
+
 				}
 
 				if ( backend.isWebGPUBackend === true && textureData.texture === undefined && textureData.externalTexture === undefined ) {
