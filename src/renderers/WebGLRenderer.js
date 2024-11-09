@@ -2403,8 +2403,10 @@ class WebGLRenderer {
 				const layer = activeCubeFace;
 				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel, layer );
 
-			} else if ( renderTarget !== null ) {
+			} else if ( renderTarget !== null && activeMipmapLevel !== 0 ) {
 
+				// Only bind the frame buffer if we are using a scratch frame buffer to render to a mipmap.
+				// If we rebind the texture when using a multi sample buffer then an error about inconsistent samples will be thrown.
 				const textureProperties = properties.get( renderTarget.texture );
 				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, textureProperties.__webglTexture, activeMipmapLevel );
 
