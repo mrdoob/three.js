@@ -38,11 +38,12 @@ class HardwareClipDistancesElementNode extends ArrayElementNode {
 
 class HardwareClipDistancesNode extends Node {
 
-	constructor() {
+	constructor( numPlanes ) {
 
 		super( 'float' );
 
 		this.isHardwareClipDistancesNode = true;
+		this.clipDistancePlanes = numPlanes;
 
 	}
 
@@ -53,7 +54,7 @@ class HardwareClipDistancesNode extends Node {
 
 		const numClippingPlanes = globalClippingCount + localClippingCount;
 
-		const propertyName = builder.getClipDistances( numClippingPlanes || 1 );
+		const propertyName = builder.getClipDistances( this.clipDistancePlanes || numClippingPlanes || 1 );
 
 		return propertyName;
 
@@ -67,4 +68,4 @@ class HardwareClipDistancesNode extends Node {
 
 }
 
-export const clipDistances = () => nodeObject( new HardwareClipDistancesNode() );
+export const clipDistances = ( numPlanes ) => nodeObject( new HardwareClipDistancesNode( numPlanes ) );

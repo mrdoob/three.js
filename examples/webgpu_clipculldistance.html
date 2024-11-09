@@ -30,9 +30,10 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
-			import { attribute, positionLocal, Fn, cameraProjectionMatrix, modelViewMatrix, clipDistances, sin, timerLocal } from 'three/tsl';
+			import { attribute, uniform, positionLocal, Fn, cameraProjectionMatrix, modelViewMatrix, clipDistances } from 'three/tsl';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, controls, scene, renderer, stats;
+			let camera, controls, scene, renderer, stats, gui;
 
 			init();
 
@@ -80,12 +81,20 @@
 				geometry.setAttribute( 'position', positionAttribute );
 				geometry.setAttribute( 'color', colorAttribute );
 
+				const effectController = {
+					xClip: uniform( 0.0 ),
+					yClip: uniform( 0.0 ),
+					zClip: uniform( 0.0 ),
+				};
+
 				const material = new THREE.MeshBasicNodeMaterial();
 				material.vertexNode = Fn( () => {
 
-					const clip = clipDistances( 1 );
-					const time = sin( timerLocal() );
-					clip.element( 0 ).assign( positionLocal.x.sub( time.mul( 0.5 ) ) );
+					const clip = clipDistances( 3 );
+					// Clip along x, y, and z planes
+					clip.element( 0 ).assign( positionLocal.x.sub( effectController.xClip ) );
+					clip.element( 1 ).assign( positionLocal.y.sub( effectController.yClip ) );
+					clip.element( 2 ).assign( positionLocal.z.sub( effectController.zClip ) );
 
 					return cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
 			
@@ -98,6 +107,11 @@
 				scene.add( mesh );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+
+				gui = new GUI();
+				gui.add( effectController.xClip, 'value', - 0.5, 0.5, 0.01 ).name( 'X Plane' );
+				gui.add( effectController.yClip, 'value', - 0.5, 0.5, 0.01 ).name( 'Y Plane' );
+				gui.add( effectController.zClip, 'value', - 0.5, 0.5, 0.01 ).name( 'Z Plane' );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
