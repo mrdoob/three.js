@@ -403,7 +403,7 @@ export default class RenderObject {
 
 		if ( this.object.receiveShadow ) {
 
-			cacheKey += hash( cacheKey, 1 );
+			cacheKey = hash( cacheKey, 1 );
 
 		}
 
