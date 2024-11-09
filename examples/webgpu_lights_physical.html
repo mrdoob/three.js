@@ -238,7 +238,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer( { forceWebGL: false } );
 				console.log( renderer.backend );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -309,14 +309,14 @@
 
 				renderer.render( scene, camera );
 
-				if ( ! postProcessing.test ) {
+				/*if ( ! postProcessing.test ) {
 
 					const scenePass = THREE.pass( scene, camera );
 
 					postProcessing.outputNode = scenePass.add( THREE.texture( bulbLight.shadow.map.texture ) );
 					postProcessing.test = true;
 
-				}
+				}*/
 
 				//postProcessing.render();
 
