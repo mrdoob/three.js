@@ -9,7 +9,7 @@ class DataTexture extends Texture {
 
 		this.isDataTexture = true;
 
-		this.image = { data: data, width: width, height: height };
+		this.image = { data, width, height };
 
 		this.generateMipmaps = false;
 		this.flipY = false;

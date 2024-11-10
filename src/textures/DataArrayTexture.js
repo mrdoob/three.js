@@ -3,16 +3,13 @@ import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
 class DataArrayTexture extends Texture {
 
-	constructor( data = null, width = 1, height = 1, depth = 1 ) {
+	constructor( data = null, width = 1, height = 1, depth = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, colorSpace ) {
 
-		super( null );
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
 
 		this.isDataArrayTexture = true;
 
 		this.image = { data, width, height, depth };
-
-		this.magFilter = NearestFilter;
-		this.minFilter = NearestFilter;
 
 		this.wrapR = ClampToEdgeWrapping;
 
