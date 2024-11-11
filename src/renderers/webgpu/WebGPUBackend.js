@@ -332,7 +332,7 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
+			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${ renderContext.id }` } );
 
 			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
@@ -1178,7 +1178,7 @@ class WebGPUBackend extends Backend {
 			// Push an error scope to catch any errors during query set creation
 			this.device.pushErrorScope( 'out-of-memory' );
 
-			const timeStampQuerySet = await this.device.createQuerySet( { type: 'timestamp', count: 2 } );
+			const timeStampQuerySet = await this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_renderContext_${renderContext.id}` } );
 
 			// Pop the error scope and check for errors
 			const error = await this.device.popErrorScope();
