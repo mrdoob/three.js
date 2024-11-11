@@ -1199,15 +1199,13 @@ class WebGPUBackend extends Backend {
 
 			const timestampWrites = {
 				querySet: timeStampQuerySet,
-				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins
-				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends
+				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
+				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
 			};
 
 			Object.assign( descriptor, { timestampWrites } );
 
 			renderContextData.timeStampQuerySet = timeStampQuerySet;
-
-			renderContextData.attemptingTimeStampQuerySet = false;
 
 		}
 
