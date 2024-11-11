@@ -1187,7 +1187,7 @@ class WebGPUBackend extends Backend {
 
 				if ( ! renderContextData.attemptingTimeStampQuerySetFailed ) {
 
-					console.error( '[GPUOutOfMemoryError] Failed to create timestamp query set. This may be because timestamp queries are already running in other tabs. To enable timestamp measurements, please close other tabs using GPU resources and reload the page.' );
+					console.error( `[GPUOutOfMemoryError][renderContext_${renderContext.id}]:\nFailed to create timestamp query set. This may be because timestamp queries are already running in other tabs.` );
 					renderContextData.attemptingTimeStampQuerySetFailed = true;
 
 				}
