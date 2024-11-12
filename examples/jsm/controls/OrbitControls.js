@@ -787,7 +787,6 @@ class OrbitControls extends Controls {
 					if ( this.enableRotate ) {
 
 						this._rotateUp( _twoPI * this.rotateSpeed / this.domElement.clientHeight );
-						needsUpdate = true;
 
 					}
 
@@ -796,12 +795,12 @@ class OrbitControls extends Controls {
 					if ( this.enablePan ) {
 
 						this._pan( 0, this.keyPanSpeed );
-						needsUpdate = true;
 
 					}
 
 				}
 
+				needsUpdate = true;
 				break;
 
 			case this.keys.BOTTOM:
@@ -811,7 +810,6 @@ class OrbitControls extends Controls {
 					if ( this.enableRotate ) {
 
 						this._rotateUp( - _twoPI * this.rotateSpeed / this.domElement.clientHeight );
-						needsUpdate = true;
 
 					}
 
@@ -820,12 +818,12 @@ class OrbitControls extends Controls {
 					if ( this.enablePan ) {
 
 						this._pan( 0, - this.keyPanSpeed );
-						needsUpdate = true;
 
 					}
 
 				}
 
+				needsUpdate = true;
 				break;
 
 			case this.keys.LEFT:
@@ -835,7 +833,6 @@ class OrbitControls extends Controls {
 					if ( this.enableRotate ) {
 
 						this._rotateLeft( _twoPI * this.rotateSpeed / this.domElement.clientHeight );
-						needsUpdate = true;
 
 					}
 
@@ -844,12 +841,12 @@ class OrbitControls extends Controls {
 					if ( this.enablePan ) {
 
 						this._pan( this.keyPanSpeed, 0 );
-						needsUpdate = true;
 
 					}
 
 				}
 
+				needsUpdate = true;
 				break;
 
 			case this.keys.RIGHT:
@@ -859,7 +856,6 @@ class OrbitControls extends Controls {
 					if ( this.enableRotate ) {
 
 						this._rotateLeft( - _twoPI * this.rotateSpeed / this.domElement.clientHeight );
-						needsUpdate = true;
 
 					}
 
@@ -868,12 +864,12 @@ class OrbitControls extends Controls {
 					if ( this.enablePan ) {
 
 						this._pan( - this.keyPanSpeed, 0 );
-						needsUpdate = true;
 
 					}
 
 				}
 
+				needsUpdate = true;
 				break;
 
 		}
