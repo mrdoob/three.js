@@ -11,7 +11,7 @@ import {
 	Vector4,
 } from 'three';
 
-import { Line2NodeMaterial } from 'three/webgpu';
+import { Line2NodeMaterial } from 'three/tsl';
 
 import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 

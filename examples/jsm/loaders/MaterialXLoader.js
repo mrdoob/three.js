@@ -1,6 +1,6 @@
 import { FileLoader, Loader, TextureLoader, RepeatWrapping } from 'three';
 
-import { MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
+import { MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/tsl';
 
 import {
 	float, bool, int, vec2, vec3, vec4, color, texture,
