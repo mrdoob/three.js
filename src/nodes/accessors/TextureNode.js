@@ -126,9 +126,9 @@ class TextureNode extends UniformNode {
 
 		const texture = this.value;
 
-		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+		if ( builder.isFlipY() && ( texture.image instanceof ImageBitmap || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
 
-			if ( this.sampler ) {
+			if ( this.sampler || texture.image instanceof ImageBitmap ) {
 
 				uvNode = uvNode.flipY();
 
