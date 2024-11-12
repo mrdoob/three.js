@@ -105,6 +105,12 @@ export default class RenderObject {
 
 	}
 
+	get hardwareClippingPlanes() {
+
+		return this.material.hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
+
+	}
+
 	getNodeBuilderState() {
 
 		return this._nodeBuilderState || ( this._nodeBuilderState = this._nodes.getForRender( this ) );
@@ -138,6 +144,13 @@ export default class RenderObject {
 	getChainArray() {
 
 		return [ this.object, this.material, this.context, this.lightsNode ];
+
+	}
+
+	setGeometry( geometry ) {
+
+		this.geometry = geometry;
+		this.attributes = null;
 
 	}
 
@@ -367,6 +380,12 @@ export default class RenderObject {
 		}
 
 		return hashString( cacheKey );
+
+	}
+
+	get needsGeometryUpdate() {
+
+		return this.geometry.id !== this.object.geometry.id;
 
 	}
 
