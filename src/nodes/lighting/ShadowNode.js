@@ -367,7 +367,7 @@ class ShadowNode extends Node {
 
 		if ( builder.material.shadowNode ) { // @deprecated, r171
 
-			console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".receivedShadowNode" instead.' );
+			console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
 		}
 

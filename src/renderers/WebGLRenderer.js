@@ -639,6 +639,7 @@ class WebGLRenderer {
 			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
+			background.dispose();
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();
