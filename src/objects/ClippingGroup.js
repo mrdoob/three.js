@@ -1,4 +1,4 @@
-import { Group } from '../../objects/Group.js';
+import { Group } from './Group.js';
 
 class ClippingGroup extends Group {
 
@@ -16,4 +16,4 @@ class ClippingGroup extends Group {
 
 }
 
-export default ClippingGroup;
+export { ClippingGroup };
