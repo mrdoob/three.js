@@ -1,4 +1,4 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, logarithmicDepthToViewZ, viewZToPerspectiveDepth } from 'three';
 import { getNormalFromDepth, getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial, PostProcessingUtils } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -26,6 +26,9 @@ class GTAONode extends TempNode {
 		this.normalNode = normalNode;
 
 		this.resolutionScale = 1;
+
+		this.cameraNear = uniform( 'float' ).onRenderUpdate( () => camera.near );
+		this.cameraFar = uniform( 'float' ).onRenderUpdate( () => camera.far );
 
 		this.radius = uniform( 0.25 );
 		this.resolution = uniform( new Vector2() );
@@ -107,7 +110,22 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
+		const sampleDepth = ( uv ) => {
+
+			const depth = this.depthNode.uv( uv ).x;
+
+			if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+				const viewZ = logarithmicDepthToViewZ( depth, this.cameraNear, this.cameraFar );
+
+				return viewZToPerspectiveDepth( viewZ, this.cameraNear, this.cameraFar );
+
+			}
+
+			return depth;
+
+		};
+
 		const sampleNoise = ( uv ) => this._noiseNode.uv( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 

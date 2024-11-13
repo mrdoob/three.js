@@ -15,7 +15,7 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { perspectiveDepthToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -316,7 +316,7 @@ class ShadowNode extends Node {
 			const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
 			const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
 
-			coordZ = perspectiveDepthToLogarithmicDepth( w, cameraNearLocal, cameraFarLocal );
+			coordZ = viewZToLogarithmicDepth( w.negate(), cameraNearLocal, cameraFarLocal );
 
 		}
 
