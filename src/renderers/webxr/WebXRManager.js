@@ -50,14 +50,6 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		const cameraL = new PerspectiveCamera();
-		cameraL.viewport = new Vector4();
-
-		const cameraR = new PerspectiveCamera();
-		cameraR.viewport = new Vector4();
-
-		const cameras = [ cameraL, cameraR ];
-
 		const cameraXR = new ArrayCamera();
 
 		let _currentDepthNear = null;
@@ -551,8 +543,8 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			cameraXR.near = cameraR.near = cameraL.near = depthNear;
-			cameraXR.far = cameraR.far = cameraL.far = depthFar;
+			cameraXR.near = depthNear;
+			cameraXR.far = depthFar;
 
 			if ( _currentDepthNear !== cameraXR.near || _currentDepthFar !== cameraXR.far ) {
 
@@ -568,32 +560,52 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			cameraL.layers.mask = camera.layers.mask | 0b010;
-			cameraR.layers.mask = camera.layers.mask | 0b100;
-			cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
-
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
 
 			updateCamera( cameraXR, parent );
 
+			const userCameraLayerMask = camera.layers.mask;
+			let cameraXRLayerMask = camera.layers.mask;
+
 			for ( let i = 0; i < cameras.length; i ++ ) {
 
-				updateCamera( cameras[ i ], parent );
+				const camera = cameras[ i ];
+				updateCamera( camera, parent );
+
+				camera.near = depthNear;
+				camera.far = depthFar;
+
+				switch ( camera.userData.eye ) {
+
+					case 'right':
+						camera.layers.mask = userCameraLayerMask | 0b100;
+						break;
+					case 'none':
+					case 'left':
+					default:
+						camera.layers.mask = userCameraLayerMask | 0b010;
+						break;
+
+				}
+
+				cameraXRLayerMask = cameraXRLayerMask | camera.layers.mask;
 
 			}
+
+			cameraXR.layers.mask = cameraXRLayerMask;
 
 			// update projection matrix for proper view frustum culling
 
 			if ( cameras.length === 2 ) {
 
-				setProjectionFromUnion( cameraXR, cameraL, cameraR );
+				setProjectionFromUnion( cameraXR, cameras[ 0 ], cameras[ 1 ] );
 
 			} else {
 
 				// assume single camera setup (AR)
 
-				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
+				cameraXR.projectionMatrix.copy( cameras[ 0 ].projectionMatrix );
 
 			}
 
@@ -743,14 +755,29 @@ class WebXRManager extends EventDispatcher {
 
 					}
 
-					let camera = cameras[ i ];
+					let camera = cameraXR.cameras[ i ];
 
 					if ( camera === undefined ) {
 
 						camera = new PerspectiveCamera();
-						camera.layers.enable( i );
 						camera.viewport = new Vector4();
-						cameras[ i ] = camera;
+
+						camera.layers.enable( i ); // is this necessary?
+
+						switch ( view.eye ) {
+
+							case 'right':
+								camera.layers.enable( 2 );
+								break;
+							case 'none':
+							case 'left':
+							default:
+								camera.layers.enable( 1 );
+								break;
+
+						}
+
+						camera.userData.eye = view.eye;
 
 					}
 
