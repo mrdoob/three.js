@@ -313,8 +313,8 @@ class ShadowNode extends Node {
 			// The normally available "cameraNear" and "cameraFar" nodes cannot be used here because they do not get
 			// updated to use the shadow camera. So, we have to declare our own "local" ones here.
 			// TODO: How do we get the cameraNear/cameraFar nodes to use the shadow camera so we don't have to declare local ones here?
-			const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
-			const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
+			const cameraNearLocal = reference( 'near', 'float', shadow.camera );
+			const cameraFarLocal = reference( 'far', 'float', shadow.camera );
 
 			coordZ = viewZToLogarithmicDepth( w.negate(), cameraNearLocal, cameraFarLocal );
 
