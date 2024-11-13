@@ -2039,7 +2039,6 @@ class ArcballControls extends Controls {
 
 			state = JSON.stringify( {
 				arcballState: {
-
 					cameraFar: this.object.far,
 					cameraMatrix: this.object.matrix,
 					cameraNear: this.object.near,
