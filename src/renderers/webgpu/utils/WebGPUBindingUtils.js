@@ -140,7 +140,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindings( bindGroup ) {
+	createBindings( bindGroup, bindings, cacheIndex, version = 0 ) {
 
 		const { backend, bindGroupLayoutCache } = this;
 		const bindingsData = backend.get( bindGroup );
@@ -156,10 +156,40 @@ class WebGPUBindingUtils {
 
 		}
 
-		const bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
+		let bindGroupGPU;
 
-		bindingsData.layout = bindLayoutGPU;
+		if ( cacheIndex > 0 ) {
+
+			if ( bindingsData.groups === undefined ) {
+
+				bindingsData.groups = [];
+				bindingsData.versions = [];
+
+			}
+
+			if ( bindingsData.versions[ cacheIndex ] === version ) {
+
+				bindGroupGPU = bindingsData.groups[ cacheIndex ];
+
+			}
+
+		}
+
+		if ( bindGroupGPU === undefined ) {
+
+			bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
+
+			if ( cacheIndex > 0 ) {
+
+				bindingsData.groups[ cacheIndex ] = bindGroupGPU;
+				bindingsData.versions[ cacheIndex ] = version;
+
+			}
+
+		}
+
 		bindingsData.group = bindGroupGPU;
+		bindingsData.layout = bindLayoutGPU;
 
 	}
 
