@@ -204,6 +204,8 @@ class TiledLightsNode extends LightsNode {
 		lightingModel.directDiffuse.append();
 		lightingModel.directSpecular.append();
 
+		super.setupLights( builder, lightNodes );
+
 		Fn( () => {
 
 			Loop( this.tileLightCount, ( { i } ) => {
@@ -228,10 +230,6 @@ class TiledLightsNode extends LightsNode {
 			} );
 
 		} )().append();
-
-		// others lights
-
-		super.setupLights( builder, lightNodes );
 
 	}
 
