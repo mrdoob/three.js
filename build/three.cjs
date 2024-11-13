@@ -38468,6 +38468,24 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 	}
 
+	function dispose() {
+
+		if ( boxMesh !== undefined ) {
+
+			boxMesh.geometry.dispose();
+			boxMesh.material.dispose();
+
+		}
+
+		if ( planeMesh !== undefined ) {
+
+			planeMesh.geometry.dispose();
+			planeMesh.material.dispose();
+
+		}
+
+	}
+
 	return {
 
 		getClearColor: function () {
@@ -38494,7 +38512,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		},
 		render: render,
-		addToRenderList: addToRenderList
+		addToRenderList: addToRenderList,
+		dispose: dispose
 
 	};
 
@@ -52234,6 +52253,7 @@ class WebGLRenderer {
 			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
+			background.dispose();
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();
