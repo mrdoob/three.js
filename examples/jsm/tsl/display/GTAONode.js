@@ -1,5 +1,5 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, logarithmicDepthToViewZ, viewZToPerspectiveDepth } from 'three';
-import { getNormalFromDepth, getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial, PostProcessingUtils } from 'three/tsl';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial, PostProcessingUtils } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -27,8 +27,8 @@ class GTAONode extends TempNode {
 
 		this.resolutionScale = 1;
 
-		this.cameraNear = uniform( 'float' ).onRenderUpdate( () => camera.near );
-		this.cameraFar = uniform( 'float' ).onRenderUpdate( () => camera.far );
+		this.cameraNear = reference( 'near', 'float', camera );
+		this.cameraFar = reference( 'far', 'float', camera );
 
 		this.radius = uniform( 0.25 );
 		this.resolution = uniform( new Vector2() );
