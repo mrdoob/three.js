@@ -1,4 +1,4 @@
-import { Fn } from '../tsl/TSLBase.js';
+import { Fn, vec4 } from '../tsl/TSLBase.js';
 import { mix, min, step } from '../math/MathNode.js';
 
 export const burn = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
@@ -50,5 +50,18 @@ export const overlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	inputs: [
 		{ name: 'base', type: 'vec3' },
 		{ name: 'blend', type: 'vec3' }
+	]
+} );
+
+export const normalBlend = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
+
+	return vec4( base.rgb.mul( blend.a.oneMinus() ).add( blend.rgb.mul( blend.a ) ), base.a );
+
+} ).setLayout( {
+	name: 'normalBlend',
+	type: 'vec4',
+	inputs: [
+		{ name: 'base', type: 'vec4' },
+		{ name: 'blend', type: 'vec4' }
 	]
 } );
