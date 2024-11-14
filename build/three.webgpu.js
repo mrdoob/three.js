@@ -5247,7 +5247,7 @@ class TextureNode extends UniformNode {
 
 		const texture = this.value;
 
-		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+		if ( builder.isFlipY() && ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
 
 			if ( this.sampler ) {
 
@@ -14202,9 +14202,13 @@ class RenderObjects {
 
 			renderObject.updateClipping( clippingContext );
 
-			const needsGeometryUpdate = renderObject.needsGeometryUpdate;
+			if ( renderObject.needsGeometryUpdate ) {
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate || needsGeometryUpdate ) {
+				renderObject.setGeometry( object.geometry );
+
+			}
+
+			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
@@ -14215,12 +14219,6 @@ class RenderObjects {
 				} else {
 
 					renderObject.version = material.version;
-
-					if ( needsGeometryUpdate ) {
-
-						renderObject.setGeometry( object.geometry );
-
-					}
 
 				}
 
