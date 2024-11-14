@@ -2,7 +2,8 @@ import BufferNode from './BufferNode.js';
 import { bufferAttribute } from './BufferAttributeNode.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
-import { GPUBufferBindingType } from '../../renderers/webgpu/utils/WebGPUConstants.js';
+import { NodeAccess } from '../core/constants.js';
+import { getTypeFromLength } from '../core/NodeUtils.js';
 
 class StorageBufferNode extends BufferNode {
 
@@ -12,13 +13,20 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	constructor( value, bufferType, bufferCount = 0 ) {
+	constructor( value, bufferType = null, bufferCount = 0 ) {
+
+		if ( bufferType === null && ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) ) {
+
+			bufferType = getTypeFromLength( value.itemSize );
+			bufferCount = value.count;
+
+		}
 
 		super( value, bufferType, bufferCount );
 
 		this.isStorageBufferNode = true;
 
-		this.access = GPUBufferBindingType.Storage;
+		this.access = NodeAccess.READ_WRITE;
 		this.isAtomic = false;
 
 		this.bufferObject = false;
@@ -94,7 +102,7 @@ class StorageBufferNode extends BufferNode {
 
 	toReadOnly() {
 
-		return this.setAccess( GPUBufferBindingType.ReadOnlyStorage );
+		return this.setAccess( NodeAccess.READ_ONLY );
 
 	}
 

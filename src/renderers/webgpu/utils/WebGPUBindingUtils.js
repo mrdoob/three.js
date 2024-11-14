@@ -1,8 +1,9 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType
+	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType, GPUBufferBindingType, GPUStorageTextureAccess
 } from './WebGPUConstants.js';
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
+import { NodeAccess } from '../../../nodes/core/constants.js';
 
 class WebGPUBindingUtils {
 
@@ -35,7 +36,25 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					buffer.type = binding.access;
+					if ( binding.visibility & 4 ) {
+
+						// compute
+
+						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
+
+							buffer.type = GPUBufferBindingType.Storage;
+
+						} else {
+
+							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+						}
+
+					} else {
+
+						buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+					}
 
 				}
 
@@ -63,10 +82,26 @@ class WebGPUBindingUtils {
 
 			} else if ( binding.isSampledTexture && binding.store ) {
 
-				const format = this.backend.get( binding.texture ).texture.format;
+				const storageTexture = {}; // GPUStorageTextureBindingLayout
+				storageTexture.format = this.backend.get( binding.texture ).texture.format;
+
 				const access = binding.access;
 
-				bindingGPU.storageTexture = { format, access }; // GPUStorageTextureBindingLayout
+				if ( access === NodeAccess.READ_WRITE ) {
+
+					storageTexture.access = GPUStorageTextureAccess.ReadWrite;
+
+				} else if ( access === NodeAccess.WRITE_ONLY ) {
+
+					storageTexture.access = GPUStorageTextureAccess.WriteOnly;
+
+				} else {
+
+					storageTexture.access = GPUStorageTextureAccess.ReadOnly;
+
+				}
+
+				bindingGPU.storageTexture = storageTexture;
 
 			} else if ( binding.isSampledTexture ) {
 

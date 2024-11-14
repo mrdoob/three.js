@@ -22,6 +22,12 @@ export const NodeType = {
 	MATRIX4: 'mat4'
 };
 
+export const NodeAccess = {
+	READ_ONLY: 'readOnly',
+	WRITE_ONLY: 'writeOnly',
+	READ_WRITE: 'readWrite',
+};
+
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
 export const defaultBuildStages = [ 'setup', 'analyze', 'generate' ];
 export const shaderStages = [ ...defaultShaderStages, 'compute' ];
