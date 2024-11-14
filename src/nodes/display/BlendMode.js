@@ -53,12 +53,12 @@ export const overlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-export const normalBlend = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
+export const blendNormal = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return vec4( base.rgb.mul( blend.a.oneMinus() ).add( blend.rgb.mul( blend.a ) ), base.a );
 
 } ).setLayout( {
-	name: 'normalBlend',
+	name: 'blendNormal',
 	type: 'vec4',
 	inputs: [
 		{ name: 'base', type: 'vec4' },

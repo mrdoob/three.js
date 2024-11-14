@@ -28,7 +28,7 @@
 
 	<script type="module">
 		import * as THREE from 'three';
-		import { pass, mrt, output, transformedNormalView, metalness, normalBlend, screenUV, color } from 'three/tsl';
+		import { pass, mrt, output, transformedNormalView, metalness, blendNormal, screenUV, color } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -107,7 +107,7 @@
 
 			// blend SSR over beauty
 		
-			const outputNode = normalBlend( scenePassColor, ssrPass );
+			const outputNode = blendNormal( scenePassColor, ssrPass );
 
 			postProcessing.outputNode = outputNode;
 
