@@ -3,108 +3,113 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 class TriangleGeometry extends BufferGeometry {
 
-  constructor( width = 1, height = 1, skew = 0, detail = 0 ) {
+	constructor( width = 1, height = 1, skew = 0, detail = 0 ) {
 
-    super();
+		super();
 
-    this.type = 'TriangleGeometry';
+		this.type = 'TriangleGeometry';
 
-    this.parameters = {
-      width: width,
-      height: height,
-      skew: skew,
-      detail: detail
-    };
+		this.parameters = {
+			width: width,
+			height: height,
+			skew: skew,
+			detail: detail
+		};
 
-    // buffers
+		// buffers
 
-    const indices = [];
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-    // vertex helper variables
+		// vertex helper variables
 
-    const segments = Math.max( Math.floor( detail + 1 ), 1 );
+		const segments = Math.max( Math.floor( detail + 1 ), 1 );
 
-    const equilateralHeight = Math.sqrt( 3 ) / 2;
-    const apex = equilateralHeight * height;
-    
-    const offsetX = width / 2;
-    const offsetY = apex / 3;
-    const offsetU = ( 1 - equilateralHeight ) / 2;
+		const equilateralHeight = Math.sqrt( 3 ) / 2;
+		const apex = equilateralHeight * height;
 
-    // vertices, normals, and uvs
+		const offsetX = width / 2;
+		const offsetY = apex / 3;
+		const offsetU = ( 1 - equilateralHeight ) / 2;
 
-    for ( let i = 0; i < segments + 1; i ++ ) {
-      for ( let j = 0; j < i + 1; j ++ ) {
+		// vertices, normals, and uvs
 
-        const uvX = ( i + j ) / segments / 2;
-        const uvY = ( i - j ) / segments;
+		for ( let i = 0; i < segments + 1; i ++ ) {
 
-        const x = uvX * width - offsetX + uvY * skew / 2;
-        const y = uvY * apex - offsetY;
+			for ( let j = 0; j < i + 1; j ++ ) {
 
-        vertices.push( x, y, 0 );
+				const uvX = ( i + j ) / segments / 2;
+				const uvY = ( i - j ) / segments;
 
-        normals.push( 0, 0, 1 );
+				const x = uvX * width - offsetX + uvY * skew / 2;
+				const y = uvY * apex - offsetY;
 
-        uvs.push( uvX );
-        uvs.push( uvY * equilateralHeight + offsetU );
+				vertices.push( x, y, 0 );
 
-      }
+				normals.push( 0, 0, 1 );
 
-    }
+				uvs.push( uvX );
+				uvs.push( uvY * equilateralHeight + offsetU );
 
-    // index helper variables
+			}
 
-    let lateralStride = 2;
-    let diagonalStride = 1;
+		}
 
-    // indices
+		// index helper variables
 
-    for ( let i = 0; i < segments; i ++ ) {
-      for ( let j = 0; j < i + 1; j ++ ) {
+		let lateralStride = 2;
+		let diagonalStride = 1;
 
-        const a = i * ( i + 1 ) / 2 + j;
-        const b = i + lateralStride;
-        const c = i + diagonalStride;
-        const d = a + 1;
-        
-        indices.push( a, b, c );
+		// indices
 
-        if ( 0 < i && j < i ) {
-          indices.push( a, d, b );
-        }
+		for ( let i = 0; i < segments; i ++ ) {
 
-        lateralStride ++;
-        diagonalStride ++;
+			for ( let j = 0; j < i + 1; j ++ ) {
 
-      }
-    }
+				const a = i * ( i + 1 ) / 2 + j;
+				const b = i + lateralStride;
+				const c = i + diagonalStride;
+				const d = a + 1;
+				
+				indices.push( a, b, c );
 
-    this.setIndex( indices );
-    this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-    this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-    this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+				if ( 0 < i && j < i ) {
 
-  }
+					indices.push( a, d, b );
 
-  copy( source ) {
+				}
 
-    super.copy( source );
+				lateralStride ++;
+				diagonalStride ++;
 
-    this.parameters = Object.assign( {}, source.parameters );
+			}
 
-    return this;
+		}
 
-  }
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
-  static fromJSON( data ) {
+	}
 
-    return new TriangleGeometry( data.width, data.height, data.skew );
+	copy( source ) {
 
-  }
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
+	static fromJSON( data ) {
+
+		return new TriangleGeometry( data.width, data.height, data.skew );
+
+	}
 
 }
 
