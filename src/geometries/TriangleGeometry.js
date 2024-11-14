@@ -72,7 +72,7 @@ class TriangleGeometry extends BufferGeometry {
 				const b = i + lateralStride;
 				const c = i + diagonalStride;
 				const d = a + 1;
-				
+
 				indices.push( a, b, c );
 
 				if ( 0 < i && j < i ) {
