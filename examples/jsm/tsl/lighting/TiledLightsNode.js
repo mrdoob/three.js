@@ -1,9 +1,10 @@
 import {
 	storageObject, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop,
-	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight
+	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
+	LightsNode, NodeUpdateType, StorageBufferAttribute
 } from 'three/tsl';
 
-import { DataTexture, FloatType, LightsNode, NodeUpdateType, RGBAFormat, StorageBufferAttribute, Vector2, Vector3 } from 'three';
+import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3 } from 'three';
 
 export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, minBounds, maxBounds ] ) => {
 
