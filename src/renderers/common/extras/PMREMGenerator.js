@@ -468,11 +468,7 @@ class PMREMGenerator {
 
 		for ( let i = 1; i < n; i ++ ) {
 
-			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
-
-			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
-
-			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			this._blur( cubeUVRenderTarget, i - 1, i );
 
 		}
 
@@ -487,7 +483,7 @@ class PMREMGenerator {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 */
-	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	_blur( cubeUVRenderTarget, lodIn, lodOut ) {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
@@ -496,22 +492,18 @@ class PMREMGenerator {
 			pingPongRenderTarget,
 			lodIn,
 			lodOut,
-			sigma,
-			'latitudinal',
-			poleAxis );
+			'latitudinal' );
 
 		this._halfBlur(
 			pingPongRenderTarget,
 			cubeUVRenderTarget,
 			lodOut,
 			lodOut,
-			sigma,
-			'longitudinal',
-			poleAxis );
+			'longitudinal' );
 
 	}
 
-	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	_halfBlur( targetIn, targetOut, lodIn, lodOut, direction ) {
 
 		const renderer = this._renderer;
 		const blurMaterial = this._blurMaterial;
@@ -519,7 +511,7 @@ class PMREMGenerator {
 		const blurMesh = this._lodMeshes[ lodOut ];
 
 		blurMesh.material = blurMaterial;
-		blurMesh.userData = this._getUserDataBlur( targetIn, lodIn, sigmaRadians, direction, poleAxis );
+		blurMesh.userData = this._getUserDataBlur( targetIn, lodIn, lodOut, direction );
 
 		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
 
@@ -537,7 +529,7 @@ class PMREMGenerator {
 
 	}
 
-	_getUserDataBlur( targetIn, lodIn, sigmaRadians, direction, poleAxis ) {
+	_getUserDataBlur( targetIn, lodIn, lodOut, direction ) {
 
 		const cache = this._userData[ direction ];
 
@@ -554,6 +546,8 @@ class PMREMGenerator {
 		// populate data for this pass
 
 		const { _lodMax } = this;
+
+		const sigmaRadians = Math.sqrt( this._sigmas[ lodOut ] * this._sigmas[ lodOut ] - this._sigmas[ lodOut - 1 ] * this._sigmas[ lodOut - 1 ] );
 
 		// Number of standard deviations at which to cut off the discrete approximation.
 		const STANDARD_DEVIATIONS = 3;
@@ -598,6 +592,9 @@ class PMREMGenerator {
 			weights[ i ] = weights[ i ] / sum;
 
 		}
+
+		const n = this._lodPlanes.length;
+		const poleAxis = _axisDirections[ ( n - lodOut - 1 ) % _axisDirections.length ];
 
 		const userData = {
 			latitudinal: direction === 'latitudinal' ? 1 : 0,
