@@ -212,10 +212,6 @@
 				const velocityStorage = array( velocityArray, 'vec3' ).label( 'velocityStorage' );
 				const phaseStorage = array( phaseArray, 'float' ).label( 'phaseStorage' );
 
-				positionStorage.setBufferObject( true );
-				velocityStorage.setBufferObject( true );
-				phaseStorage.setBufferObject( true );
-
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
 			
 				effectController = {
