@@ -112,7 +112,7 @@ class PMREMGenerator {
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 		this._backgroundBox = null;
-		this._userData = {};
+		this._userData = { longitudinal: [], latitudinal: [] };
 
 	}
 
@@ -539,20 +539,19 @@ class PMREMGenerator {
 
 	_getUserDataBlur( targetIn, lodIn, sigmaRadians, direction, poleAxis ) {
 
-		const cacheKey = `${ direction }-${ lodIn }`;
+		const cache = this._userData[ direction ];
 
-		const u = this._userData[ cacheKey ];
-
-		if ( u !== undefined ) return u;
-
-
-		// populate data for this pass
-
-		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
+		if ( cache === undefined ) {
 
 			console.error( 'blur direction must be either latitudinal or longitudinal!' );
 
 		}
+
+		const u = cache[ lodIn ];
+
+		if ( u !== undefined ) return u;
+
+		// populate data for this pass
 
 		const { _lodMax } = this;
 
@@ -611,7 +610,7 @@ class PMREMGenerator {
 			mipInt: _lodMax - lodIn
 		};
 
-		this._userData[ cacheKey ] = userData;
+		cache[ lodIn ] = userData;
 
 		return userData;
 
@@ -747,7 +746,6 @@ function _getBlurShader( lodMax, width, height ) {
 	const CUBEUV_MAX_MIP = float( lodMax );
 
 	const material = _getMaterial( 'blur' );
-	material._envMap = texture( null );
 
 	const materialUniforms = {
 		n,
