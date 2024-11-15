@@ -52,32 +52,27 @@ class TriangleGeometry extends BufferGeometry {
 
 		}
 
-		// index helper variables
-
-		let lateralStride = 2;
-		let diagonalStride = 1;
 
 		// indices
+
+		let stride = 1;
 
 		for ( let i = 0; i < segments; i ++ ) {
 
 			for ( let j = 0; j < i + 1; j ++ ) {
 
 				const a = i * ( i + 1 ) / 2 + j;
-				const b = i + lateralStride;
-				const c = i + diagonalStride;
-				const d = a + 1;
+				const b = i + stride + 1;
 
-				indices.push( a, b, c );
+				indices.push( a, b, i + stride );
 
 				if ( 0 < i && j < i ) {
 
-					indices.push( a, d, b );
+					indices.push( a, a + 1, b );
 
 				}
 
-				lateralStride ++;
-				diagonalStride ++;
+				stride ++;
 
 			}
 
