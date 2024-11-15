@@ -17,6 +17,5 @@ export * from './SphereGeometry.js';
 export * from './TetrahedronGeometry.js';
 export * from './TorusGeometry.js';
 export * from './TorusKnotGeometry.js';
-export * from './TriangleGeometry.js';
 export * from './TubeGeometry.js';
 export * from './WireframeGeometry.js';
