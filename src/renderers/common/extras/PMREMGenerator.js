@@ -112,7 +112,8 @@ class PMREMGenerator {
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 		this._backgroundBox = null;
-		this._userData = { longitudinal: [], latitudinal: [] };
+		this._userDataMap = new WeakMap();
+		this._userData = null;
 
 	}
 
@@ -128,6 +129,8 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
+
+		if ( this._userData === null ) this._userData = { longitudinal: [], latitudinal: [] };
 
 		this._setSize( 256 );
 
@@ -264,6 +267,17 @@ class PMREMGenerator {
 			this._setSize( texture.image.width / 4 );
 
 		}
+
+		let userData = this._userDataMap.get( texture );
+
+		if ( userData === undefined ) {
+
+			userData = { longitudinal: [], latitudinal: [] };
+			this._userDataMap.set( texture, userData );
+
+		}
+
+		this._userData = userData;
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
