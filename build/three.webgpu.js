@@ -27985,11 +27985,25 @@ class Renderer {
 
 	async renderAsync( scene, camera ) {
 
-		if ( this._initialized === false ) await this.init();
+		return new Promise( async ( resolve, reject ) => {
 
-		const renderContext = this._renderScene( scene, camera );
+			try {
 
-		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+				if ( this._initialized === false ) await this.init();
+
+				const renderContext = this._renderScene( scene, camera );
+
+				await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+				resolve();
+
+			} catch ( error ) {
+
+				reject( error );
+
+			}
+
+		} );
 
 	}
 
