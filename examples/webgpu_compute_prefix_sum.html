@@ -9,10 +9,9 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br /> This example demonstrates a bitonic sort running step by step in a compute shader.
-			<br /> The left canvas swaps values within workgroup local arrays. The right swaps values within storage buffers.
-			<br /> Reference implementation by <a href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">Tim Gfrerer</a>
-			<br /> 
+			<br /> Prefix sum performance comparisons.
+			<br /> Each display loops through initialization, sum, and validation steps.
+			<br/>
 			<div id="local_swap" style="
 				position: absolute;
 				top: 150px;
@@ -54,151 +53,201 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, uniform, uv, uint, float, Fn, vec2, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
+			import { If, vec3, uniform, uv, uint, float, Fn, vec2, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const numElements = 16384;
-
-
-			const computePrefixSklanskyFn = Fn( ( currentElements, uniformStorage ) => {
-
-				If( instanceIndex.equal( numElements - 1 ), () => {
-
-					uniformStorage.element( 0 ).mulAssign( 2 );
-
-				} );
-
-
-			} )().compute();
-
-			const computePrefixKoggeStoneFn = Fn( () => {
-
-			
-
-
-			} )().compute();
-
-			const prefixSumMethods = {
-				// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer
-				'Reset': {
-					threads: [ numElements ],
-					dispatches: 1,
-					initFn: Fn( ( [ currentElements ] ) => {
-
-						currentElements.element( instanceIndex ).equal( 8000 );
-			
-					} ),
-					runFn: Fn( ( [ currentElements ] ) => {
-
-						currentElements.element( instanceIndex ).equal( instanceIndex );
-
-
-					} )
-				},
-				// Incorrect prefix sum to test the validation
-				'Incorrect': {
-					threads: [ numElements ],
-					dispatches: 1,
-					initFn: Fn( ( [ currentElements ] ) => {
-			
-						currentElements.element( instanceIndex ).equal( 7 );
-
-
-					} ),
-					runFn: Fn( ( [ currentElements ] ) => {
-
-						currentElements.element( instanceIndex ).equal( uint( numElements ).sub( instanceIndex ) );
-
-					} )
-				},
-				'Sklansky (Favor Dispatch)': {
-					threads: Array( Math.log2( numElements ) ).fill( numElements / 2 ),
-					initFn: () => console.log( 'test' ),
-					runFn: computePrefixSklanskyFn,
-					dispatches: Math.log2( numElements ),
-				},
-				'Kogge-Stone (Favor Dispatch)': {
-					threads: Array( Math.log2( numElements ) ).map( ( _, idx ) => {
-
-						return numElements - 2 ** idx;
-			
-					} ),
-					initFn: () => console.log( 'test' ),
-					runFn: computePrefixKoggeStoneFn,
-					dispatches: Math.log2( numElements )
-				}
-			};
-
+			const numElements = 256;
 
 			const effectController = {
 				// Sqr root of 16834
 				gridWidth: uniform( Math.sqrt( numElements ) ),
 				gridHeight: uniform( Math.sqrt( numElements ) ),
-				highlight: uniform( 1 ),
-				'Display Mode': 'Swap Zone Highlight'
+				validate: uniform( 0 ),
+				'Left Display Algo': 'Fake Prefix',
+				'Right Display Algo': 'Kogge-Stone (Favor Dispatch)',
 			};
 
+			const algorithms = [
+				'Sklansky (Favor Dispatch)',
+				'Kogge-Stone (Favor Dispatch)',
+				'Fake Prefix',
+				'Incorrect'
+			];
+
 			const gui = new GUI();
-			gui.add( effectController, 'Display Mode', [ 'Elements', 'Swap Zone Highlight' ] ).onChange( () => {
 
-				if ( effectController[ 'Display Mode' ] === 'Elements' ) {
+			//gui.add( effectController, 'Step' );
+			gui.add( effectController, 'Left Display Algo', algorithms );
+			gui.add( effectController, 'Right Display Algo', algorithms );
 
-					effectController.highlight.value = 0;
-
-			
-				} else {
-
-					effectController.highlight.value = 1;
-			
-				}
-
-			
-			} );
-
-			// Allow Workgroup Array Swaps
-			init( false, 'Reset' );
-
-			// Global Swaps Only
-			init( true, 'Incorrect' );
-
+			// Initialize Two Views
+			init( false );
+			init( true );
 
 			// When forceGlobalSwap is true, force all valid local swaps to be global swaps.
-			async function init( forceGlobalSwap, algoType ) {
+			async function init( rightSide ) {
 
-				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
-				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
-				camera.position.z = 1;
-
-				const scene = new THREE.Scene();
-
+				// Create prefix sort data
 				const array = new Uint32Array( Array.from( { length: numElements }, ( _, i ) => {
 
 					return i;
 
 				} ) );
 
+				const infoArray = new Uint32Array( 5 ).fill( 1 );
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storage( currentElementsBuffer, 'uint', numElements ).label( 'Elements' );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint', currentElementsBuffer.count ).label( 'Elements' );
+				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
+				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count );
+
+				const initMethod = ( currentElements ) => {
+
+					currentElements.element( instanceIndex ).assign( 1 );
+			
+				};
+
+				// Define and compile prefix sum methods.
+				const prefixSumMethods = {
+					// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer.
+					// This method should only be used to validate the correctness of new algorithms, and not as
+					// a yardstick for performance.
+					'Fake Prefix': {
+						// # of values in the threads array indicates the number of dispatches
+						threads: [ numElements ],
+						runMethod: ( currentElements ) => {
+
+							currentElements.element( instanceIndex ).assign( instanceIndex.add( 1 ) );
+			
+						},
+					},
+					// Emulates an incorrect prefix sum by manually assigning the instanceIndex's inverse value.
+					// Used to demonstrate a completely incorrect algorithm
+					'Incorrect': {
+						threads: [ numElements ],
+						runMethod: ( currentElements ) => {
+
+							currentElements.element( instanceIndex ).assign( uint( numElements ).sub( instanceIndex ) );
+
+						},
+					},
+					'Sklansky (Favor Dispatch)': {
+						threads: Array( Math.log2( numElements ) ).fill( numElements / 2 ),
+						runMethod: ( currentElements ) => {
+
+			
+
+			
+						},
+					},
+					'Kogge-Stone (Favor Dispatch)': {
+						threads: Array( Math.floor( Math.log2( numElements ) ) ).fill().map( ( _, idx ) => {
+
+							return idx === 0 ? numElements : numElements - 2 ** idx;
+			
+						} ),
+						initMethod: ( currentElements, info ) => {
+
+							initMethod( currentElements );
+							info.element( 0 ).assign( 1 );
+
+						},
+						runMethod: ( currentElements, info ) => {
+
+							const offset = info.element( 0 );
+
+							const baseValue = currentElements.element( instanceIndex );
+							const offsetValue = currentElements.element( instanceIndex.add( offset ) );
+
+							offsetValue.addAssign( baseValue );
+
+							workgroupBarrier();
+
+							If( instanceIndex.equal( numElements - 1 ), () => {
+
+								info.element( 0 ).mulAssign( 2 );
+
+							} );
+
+						}
+					}
+				};
+
+
+				// Pre-compile shaders
+				for ( const key in prefixSumMethods ) {
+
+					// Compile init function
+					if ( prefixSumMethods[ key ].initMethod ) {
+
+						prefixSumMethods[ key ].initFunction = Fn( () => {
+
+							prefixSumMethods[ key ].initMethod( currentElementsStorage, infoStorage );
+
+						} )().compute( numElements );
+
+					} else {
+
+						prefixSumMethods[ key ].initFunction = Fn( () => {
+
+							initMethod( currentElementsStorage );
+
+						} )().compute( numElements );
+
+					}
+
+					prefixSumMethods[ key ].runFunctions = [];
+
+					const runFunctionTemplate = Fn( ( ) => {
+
+						prefixSumMethods[ key ].runMethod( currentElementsStorage, infoStorage );
+
+					} );
+
+					for ( let i = 0; i < prefixSumMethods[ key ].threads.length; i ++ ) {
+
+						prefixSumMethods[ key ].runFunctions.push( runFunctionTemplate().compute( prefixSumMethods[ key ].threads[ i ] ) );
+
+			
+					}
+
+				}
+			
+				console.log( prefixSumMethods );
+
+				// Create standard scene
+				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
 
 				const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
 
 				const display = Fn( () => {
 
 					const { gridWidth, gridHeight } = effectController;
-
 					const newUV = uv().mul( vec2( gridWidth, gridHeight ) );
-
 					const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
-
 					const elementIndex = uint( gridWidth ).mul( pixel.y ).add( pixel.x );
-
 					const colorChanger = currentElementsStorage.element( elementIndex );
-
 					const subtracter = float( colorChanger ).div( gridWidth.mul( gridHeight ) );
-
 					const color = vec3( subtracter.oneMinus() ).toVar();
+					If( effectController.validate.equal( 1 ), () => {
+
+						If( colorChanger.equal( elementIndex.add( 1 ) ), () => {
+
+							color.g.assign( 255.0 );
+
+						} ).Else( () => {
+
+							color.r.assign( 255.0 );
+
+						} );
+
+
+					} );
 
 					return color;
 
@@ -213,8 +262,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
-				//renderer.setAnimationLoop( animate );
-
 				document.body.appendChild( renderer.domElement );
 				renderer.domElement.style.position = 'absolute';
 				renderer.domElement.style.top = '0';
@@ -222,7 +269,7 @@
 				renderer.domElement.style.width = '50%';
 				renderer.domElement.style.height = '100%';
 
-				if ( forceGlobalSwap ) {
+				if ( rightSide ) {
 
 					renderer.domElement.style.left = '50%';
 
@@ -234,47 +281,67 @@
 
 				}
 
-				const algorithm = prefixSumMethods[ algoType ];
-			
-				const init = algorithm.initFn( currentElementsStorage ).compute( numElements );
-
-				renderer.compute( init );
-
-				let isRun = true;
+				let stepType = 'Init';
 
 				 const stepAnimation = async function () {
 
-					if ( isRun ) {
+					const algoType = rightSide ?
+						effectController[ 'Right Display Algo' ] :
+						effectController[ 'Left Display Algo' ];
 
-						console.log( `Running prefix sum algo: ${algoType}` );
+					const algorithm = prefixSumMethods[ algoType ];
 
-						for ( let i = 0; i < algorithm.dispatches; i ++ ) {
+					switch ( stepType ) {
 
-							console.log( algorithm );
+						case 'Run': {
+			
 
-							const compiled = algorithm.runFn( currentElementsStorage ).compute( algorithm.threads[ i ] );
+							// Execute each dispatch
+							for ( let i = 0; i < algorithm.threads.length; i ++ ) {
 
-							renderer.compute( compiled );
+								renderer.compute( algorithm.runFunctions[ i ] );
+
+							}
+
+							stepType = 'Validate';
+
+			
+						}
+
+							break;
+
+						case 'Validate': {
+
+							const currentElements = new Uint32Array( await renderer.getArrayBufferAsync( currentElementsBuffer ) );
+							//console.log( currentElements );
+
+							effectController.validate.value = 1;
+							stepType = 'Init';
 
 						}
 
-						isRun = false;
+							break;
 
-					} else {
+						case 'Init': {
 
-						console.log( `Initializing prefix sum algo: ${algoType}` );
-						renderer.compute( algorithm.initFn( currentElementsStorage ).compute( numElements ) );
+							renderer.compute( algorithm.initFunction );
 
-						isRun = true;
+							stepType = 'Run';
+
+			
+						}
+
+							break;
 
 
 					}
 
 					renderer.render( scene, camera );
 
+					effectController.validate.value = 0;
+
 					setTimeout( stepAnimation, 1000 );
 			
-
 				};
 
 				stepAnimation();
