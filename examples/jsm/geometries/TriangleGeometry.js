@@ -3,17 +3,19 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 class TriangleGeometry extends BufferGeometry {
 
-	constructor( width = 1, height = Math.sqrt( 3 ) / 2, skew = 0, detail = 0 ) {
+	constructor( width = 1, height = Math.sqrt( 3 ) / 2, skew = 0, segments = 1 ) {
 
 		super();
 
 		this.type = 'TriangleGeometry';
 
+		segments = Math.max( Math.floor( segments ), 1 );
+
 		this.parameters = {
 			width: width,
 			height: height,
 			skew: skew,
-			detail: detail
+			segments: segments
 		};
 
 		// buffers
@@ -25,7 +27,6 @@ class TriangleGeometry extends BufferGeometry {
 
 		// vertex helper variables
 
-		const segments = Math.max( Math.floor( detail + 1 ), 1 );
 		const offsetX = width / 2;
 		const offsetY = height / 3;
 
