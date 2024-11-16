@@ -1,11 +1,11 @@
 import InstanceNode from './InstanceNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class InstancedObjectNode extends InstanceNode {
+class InstancedMeshNode extends InstanceNode {
 
 	static get type() {
 
-		return 'InstancedObjectNode';
+		return 'InstancedMeshNode';
 
 	}
 
@@ -21,6 +21,6 @@ class InstancedObjectNode extends InstanceNode {
 
 }
 
-export default InstancedObjectNode;
+export default InstancedMeshNode;
 
-export const instancedObject = /*@__PURE__*/ nodeProxy( InstancedObjectNode );
+export const instancedMesh = /*@__PURE__*/ nodeProxy( InstancedMeshNode );
