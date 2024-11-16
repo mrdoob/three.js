@@ -22,6 +22,7 @@ class StorageBufferNode extends BufferNode {
 		this.isAtomic = false;
 
 		this.bufferObject = false;
+		this.bufferStruct = false;
 		this.bufferCount = bufferCount;
 
 		this._attribute = null;
@@ -79,6 +80,14 @@ class StorageBufferNode extends BufferNode {
 	setBufferObject( value ) {
 
 		this.bufferObject = value;
+
+		return this;
+
+	}
+
+	setBufferStruct( value ) {
+
+		this.bufferStruct = value;
 
 		return this;
 
@@ -166,4 +175,5 @@ export default StorageBufferNode;
 
 // Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
+export const storageStruct = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferStruct( true ) );
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );

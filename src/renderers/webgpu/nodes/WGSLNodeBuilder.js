@@ -964,6 +964,45 @@ ${ flowData.code }
 
 	}
 
+	getStructType( shaderStage ) {
+
+		const uniforms = this.uniforms[ shaderStage ];
+
+		const bufferStructMap = new Map();
+
+		uniforms.forEach( ( uniform ) => {
+
+			const { name, node } = uniform;
+			const hasBufferStruct = node.bufferStruct === true;
+			bufferStructMap.set( name, hasBufferStruct );
+
+		} );
+
+		return bufferStructMap;
+
+	}
+
+	getBufferStructMembers( members ) {
+
+		const structMembers = members.map( ( { name, type, isAtomic } ) => {
+
+			let finalType = wgslTypeLib[ type ];
+
+			if ( ! finalType ) {
+
+				console.warn( `Unrecognized type: ${type}` );
+				finalType = 'vec4<f32>';
+
+			}
+
+			return `${name}: ${isAtomic ? `atomic<${finalType}>` : finalType}`;
+
+		} );
+
+		return `\t${structMembers.join( ',\n\t' )}`;
+
+	}
+
 	getStructMembers( struct ) {
 
 		const snippets = [];
@@ -1171,12 +1210,14 @@ ${ flowData.code }
 				const bufferType = this.getType( bufferNode.bufferType );
 				const bufferCount = bufferNode.bufferCount;
 
+				const structName = uniform.value.name;
+				const isArray = bufferNode.value.array.length !== bufferNode.value.itemSize;
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
 				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${bufferType}>` : `${bufferType}`;
-				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
+				const bufferSnippet = bufferNode.bufferStruct ? this.getBufferStructMembers( bufferType ) : `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+				bufferSnippets.push( this._getWGSLStructBinding( bufferNode.bufferStruct, isArray, 'NodeBuffer_' + bufferNode.id, structName, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
 			} else {
 
@@ -1199,7 +1240,7 @@ ${ flowData.code }
 
 			const group = uniformGroups[ name ];
 
-			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
+			structSnippets.push( this._getWGSLStructBinding( false, false, name, undefined, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
 
 		}
 
@@ -1228,8 +1269,19 @@ ${ flowData.code }
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
 			stageData.scopedArrays = this.getScopedArrays( shaderStage );
+			stageData.bufferStruct = this.getStructType( shaderStage );
 
 			//
+
+			const reduceFlow = ( flow ) => {
+
+				return flow.replace( /&(\w+)\.(\w+)/g, ( match, bufferName, uniformName ) =>
+
+					stageData.bufferStruct.get( uniformName ) === true ? `&${bufferName}` : match
+
+				);
+
+			};
 
 			let flow = '// code\n\n';
 			flow += this.flowCode[ shaderStage ];
@@ -1254,6 +1306,8 @@ ${ flowData.code }
 				}
 
 				flow += `${ flowSlotData.code }\n\t`;
+
+				flow = reduceFlow( flow );
 
 				if ( node === mainNode && shaderStage !== 'compute' ) {
 
@@ -1493,14 +1547,27 @@ ${vars}
 
 	}
 
-	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
+	_getWGSLStructBinding( isBufferStruct, isArray, name, structName, vars, access, binding = 0, group = 0 ) {
 
-		const structName = name + 'Struct';
-		const structSnippet = this._getWGSLStruct( structName, vars );
+		if ( ! isBufferStruct ) {
 
-		return `${structSnippet}
+			const _structName = name + 'Struct';
+			const structSnippet = this._getWGSLStruct( _structName, vars );
+
+			return `${structSnippet}
 @binding( ${binding} ) @group( ${group} )
-var<${access}> ${name} : ${structName};`;
+var<${access}> ${name} : ${_structName};`;
+
+		} else {
+
+			const structSnippet = this._getWGSLStruct( structName, vars );
+			const structAccessor = isArray ? `array<${structName}>` : structName;
+
+			return `${structSnippet}
+@binding( ${binding} ) @group( ${group} )
+var<${access}> ${name} : ${structAccessor};`;
+
+		}
 
 	}
 
