@@ -20,11 +20,13 @@ class InstanceNode extends Node {
 
 	}
 
-	constructor( instanceMesh ) {
+	constructor( count, instanceMatrix, instanceColor ) {
 
 		super( 'void' );
 
-		this.instanceMesh = instanceMesh;
+		this.count = count;
+		this.instanceMatrix = instanceMatrix;
+		this.instanceColor = instanceColor;
 
 		this.instanceMatrixNode = null;
 
@@ -39,28 +41,25 @@ class InstanceNode extends Node {
 
 	setup( builder ) {
 
-		let instanceMatrixNode = this.instanceMatrixNode;
-		let instanceColorNode = this.instanceColorNode;
+		const { count, instanceMatrix, instanceColor } = this;
 
-		const instanceMesh = this.instanceMesh;
+		let { instanceMatrixNode, instanceColorNode } = this;
 
 		if ( instanceMatrixNode === null ) {
 
-			const instanceAttribute = instanceMesh.instanceMatrix;
-
 			// Both WebGPU and WebGL backends have UBO max limited to 64kb. Matrix count number bigger than 1000 ( 16 * 4 * 1000 = 64kb ) will fallback to attribute.
 
-			if ( instanceMesh.count <= 1000 ) {
+			if ( count <= 1000 ) {
 
-				instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', Math.max( instanceMesh.count, 1 ) ).element( instanceIndex );
+				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
 			} else {
 
-				const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
+				const buffer = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
 
 				this.buffer = buffer;
 
-				const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+				const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 				const instanceBuffers = [
 					// F.Signature -> bufferAttribute( array, type, stride, offset )
@@ -78,13 +77,11 @@ class InstanceNode extends Node {
 
 		}
 
-		const instanceColorAttribute = instanceMesh.instanceColor;
+		if ( instanceColor && instanceColorNode === null ) {
 
-		if ( instanceColorAttribute && instanceColorNode === null ) {
+			const buffer = new InstancedBufferAttribute( instanceColor.array, 3 );
 
-			const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
-
-			const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+			const bufferFn = instanceColor.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 			this.bufferColor = buffer;
 
@@ -123,15 +120,15 @@ class InstanceNode extends Node {
 
 	update( /*frame*/ ) {
 
-		if ( this.instanceMesh.instanceMatrix.usage !== DynamicDrawUsage && this.buffer != null && this.instanceMesh.instanceMatrix.version !== this.buffer.version ) {
+		if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.buffer != null && this.instanceMatrix.version !== this.buffer.version ) {
 
-			this.buffer.version = this.instanceMesh.instanceMatrix.version;
+			this.buffer.version = this.instanceMatrix.version;
 
 		}
 
-		if ( this.instanceMesh.instanceColor && this.instanceMesh.instanceColor.usage !== DynamicDrawUsage && this.bufferColor != null && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceColor && this.instanceColor.usage !== DynamicDrawUsage && this.bufferColor != null && this.instanceColor.version !== this.bufferColor.version ) {
 
-			this.bufferColor.version = this.instanceMesh.instanceColor.version;
+			this.bufferColor.version = this.instanceColor.version;
 
 		}
 
