@@ -5,7 +5,7 @@ class InstancedObjectNode extends InstanceNode {
 
 	static get type() {
 
-		return 'InstancedMeshNode';
+		return 'InstancedObjectNode';
 
 	}
 
