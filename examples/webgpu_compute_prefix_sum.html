@@ -57,29 +57,78 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const numElements = 256;
+			// Max number of elements that can be summed with a basic scan.
+			// Corresponds to the default size of a workgroup in Three.js
+			const maxScanElements = 64;
+
+			// Max number of elements in each display.
+			const maxElements = 4096;
 
 			const effectController = {
 				// Sqr root of 16834
-				gridWidth: uniform( Math.sqrt( numElements ) ),
-				gridHeight: uniform( Math.sqrt( numElements ) ),
+				leftGridDim: uniform( Math.sqrt( maxElements ) ),
+				rightGridDim: uniform( Math.sqrt( maxScanElements ) ),
 				validate: uniform( 0 ),
-				'Left Display Algo': 'Fake Prefix',
-				'Right Display Algo': 'Kogge-Stone (Favor Dispatch)',
+				// Algorithm being displayed
+				'Left Method Name': 'Fake Prefix',
+				'Right Method Name': 'Kogge-Stone (Dispatch)',
+				// Category the algorithm belongs to.
+				'Left Method Type': 'Validation',
+				'Right Method Type': 'Scan',
 			};
 
 			const algorithms = [
-				'Sklansky (Favor Dispatch)',
-				'Kogge-Stone (Favor Dispatch)',
+				'Sklansky (Dispatch)',
+				'Kogge-Stone (Dispatch)',
 				'Fake Prefix',
 				'Incorrect'
 			];
 
 			const gui = new GUI();
 
-			//gui.add( effectController, 'Step' );
-			gui.add( effectController, 'Left Display Algo', algorithms );
-			gui.add( effectController, 'Right Display Algo', algorithms );
+			const switchMethodType = ( side ) => {
+
+				const methodType = `${side} Method Type`;
+
+				switch ( effectController[ `${side} Display Algo` ] ) {
+
+					case 'Fake Prefix':
+					case 'Incorrect': {
+
+						effectController[ methodType ] = 'Validation';
+						break;
+
+					}
+
+					case 'Sklansky (Dispatch)':
+					case 'Kogge-Stone (Dispatch)': {
+
+						effectController[ methodType ] = 'Scan';
+
+						break;
+			
+					}
+
+			
+				}
+
+
+
+			
+			};
+
+			gui.add( effectController, 'Left Method Name', algorithms ).onChange( () => {
+
+				switchMethodType( 'Left' );
+
+
+			} );
+
+			gui.add( effectController, 'Right Method Name', algorithms ).onChange( () => {
+			
+				switchMethodType( 'Right' );
+
+			} );
 
 			// Initialize Two Views
 			init( false );
@@ -89,7 +138,7 @@
 			async function init( rightSide ) {
 
 				// Create prefix sort data
-				const array = new Uint32Array( Array.from( { length: numElements }, ( _, i ) => {
+				const array = new Uint32Array( Array.from( { length: maxElements }, ( _, i ) => {
 
 					return i;
 
@@ -108,107 +157,144 @@
 			
 				};
 
+
 				// Define and compile prefix sum methods.
 				const prefixSumMethods = {
-					// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer.
-					// This method should only be used to validate the correctness of new algorithms, and not as
-					// a yardstick for performance.
-					'Fake Prefix': {
-						// # of values in the threads array indicates the number of dispatches
-						threads: [ numElements ],
-						runMethod: ( currentElements ) => {
+					// Methods to test whether the prefix sum validation is working as expected.
+					'Validation': {
+						// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer.
+						// This method should only be used to validate the correctness of new algorithms, and not as
+						// a yardstick for performance.
+						'Fake Prefix': {
+							threads: [ maxElements ],
+							runMethod: ( currentElements ) => {
 
-							currentElements.element( instanceIndex ).assign( instanceIndex.add( 1 ) );
+								currentElements.element( instanceIndex ).assign( instanceIndex.add( 1 ) );
 			
+							},
 						},
+						// Emulates an incorrect prefix sum by manually assigning the instanceIndex's inverse value.
+						// Used to demonstrate a completely incorrect algorithm
+						'Incorrect': {
+							threads: [ maxElements ],
+							runMethod: ( currentElements ) => {
+
+								currentElements.element( instanceIndex ).assign( uint( maxElements ).sub( instanceIndex ) );
+
+							},
+						}
 					},
-					// Emulates an incorrect prefix sum by manually assigning the instanceIndex's inverse value.
-					// Used to demonstrate a completely incorrect algorithm
-					'Incorrect': {
-						threads: [ numElements ],
-						runMethod: ( currentElements ) => {
-
-							currentElements.element( instanceIndex ).assign( uint( numElements ).sub( instanceIndex ) );
-
-						},
-					},
-					'Sklansky (Favor Dispatch)': {
-						threads: Array( Math.log2( numElements ) ).fill( numElements / 2 ),
-						runMethod: ( currentElements ) => {
+					'Scan': {
+						'Sklansky (Dispatch)': {
+							threads: Array( Math.log2( maxScanElements ) ).fill( maxScanElements / 2 ),
+							runMethod: ( currentElements ) => {
 
 			
 
 			
+							},
 						},
-					},
-					'Kogge-Stone (Favor Dispatch)': {
-						threads: Array( Math.floor( Math.log2( numElements ) ) ).fill().map( ( _, idx ) => {
+						'Kogge-Stone (Dispatch)': {
+							threads: Array( Math.floor( Math.log2( maxScanElements ) ) ).fill().map( ( _, idx ) => {
 
-							return idx === 0 ? numElements : numElements - 2 ** idx;
+								return idx === 0 ? maxScanElements : maxScanElements - 2 ** idx;
 			
-						} ),
-						initMethod: ( currentElements, info ) => {
+							} ),
+							initMethod: ( currentElements, info ) => {
 
-							initMethod( currentElements );
-							info.element( 0 ).assign( 1 );
+								initMethod( currentElements );
+								info.element( 0 ).assign( 1 );
 
-						},
-						runMethod: ( currentElements, info ) => {
+							},
+							runMethod: ( currentElements, info ) => {
 
-							const offset = info.element( 0 );
+								const offset = info.element( 0 );
 
-							const baseValue = currentElements.element( instanceIndex );
-							const offsetValue = currentElements.element( instanceIndex.add( offset ) );
+								const baseValue = currentElements.element( instanceIndex );
+								const offsetValue = currentElements.element( instanceIndex.add( offset ) );
 
-							offsetValue.addAssign( baseValue );
+								workgroupBarrier();
 
-							workgroupBarrier();
+								offsetValue.addAssign( baseValue );
 
-							If( instanceIndex.equal( numElements - 1 ), () => {
+								workgroupBarrier();
 
-								info.element( 0 ).mulAssign( 2 );
+								If( instanceIndex.equal( maxScanElements - 1 ), () => {
 
-							} );
+									info.element( 0 ).mulAssign( 2 );
 
+								} );
+
+							}
 						}
 					}
 				};
 
+				console.log( prefixSumMethods );
 
 				// Pre-compile shaders
-				for ( const key in prefixSumMethods ) {
+				for ( const methodType in prefixSumMethods ) {
 
-					// Compile init function
-					if ( prefixSumMethods[ key ].initMethod ) {
+					console.log( methodType );
 
-						prefixSumMethods[ key ].initFunction = Fn( () => {
+					let numElements = 0;
+					switch ( methodType ) {
 
-							prefixSumMethods[ key ].initMethod( currentElementsStorage, infoStorage );
+						case 'Validation': {
 
-						} )().compute( numElements );
+							numElements = maxElements;
+							break;
 
-					} else {
+						}
 
-						prefixSumMethods[ key ].initFunction = Fn( () => {
+						case 'Scan': {
 
-							initMethod( currentElementsStorage );
+							numElements = maxScanElements;
+							break;
+			
+						}
 
-						} )().compute( numElements );
 
 					}
 
-					prefixSumMethods[ key ].runFunctions = [];
+					for ( const methodName in prefixSumMethods[ methodType ] ) {
 
-					const runFunctionTemplate = Fn( ( ) => {
+						console.log( methodName );
 
-						prefixSumMethods[ key ].runMethod( currentElementsStorage, infoStorage );
+						const method = prefixSumMethods[ methodType ][ methodName ];
 
-					} );
+						// Compile init function
+						if ( method.initMethod ) {
 
-					for ( let i = 0; i < prefixSumMethods[ key ].threads.length; i ++ ) {
+							method.initFunction = Fn( () => {
 
-						prefixSumMethods[ key ].runFunctions.push( runFunctionTemplate().compute( prefixSumMethods[ key ].threads[ i ] ) );
+								method.initMethod( currentElementsStorage, infoStorage );
 
+							} )().compute( numElements );
+
+						} else {
+
+							method.initFunction = Fn( () => {
+
+								initMethod( currentElementsStorage );
+
+							} )().compute( numElements );
+
+						}
+
+						method.runFunctions = [];
+
+						const runFunctionTemplate = Fn( ( ) => {
+
+							method.runMethod( currentElementsStorage, infoStorage );
+
+						} );
+
+						for ( let i = 0; i < method.threads.length; i ++ ) {
+
+							method.runFunctions.push( runFunctionTemplate().compute( method.threads[ i ] ) );
+
+						}
 			
 					}
 
@@ -227,12 +313,12 @@
 
 				const display = Fn( () => {
 
-					const { gridWidth, gridHeight } = effectController;
-					const newUV = uv().mul( vec2( gridWidth, gridHeight ) );
+					const gridDim = rightSide ? effectController.rightGridDim : effectController.leftGridDim;
+					const newUV = uv().mul( vec2( gridDim ) );
 					const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
-					const elementIndex = uint( gridWidth ).mul( pixel.y ).add( pixel.x );
+					const elementIndex = uint( gridDim ).mul( pixel.y ).add( pixel.x );
 					const colorChanger = currentElementsStorage.element( elementIndex );
-					const subtracter = float( colorChanger ).div( gridWidth.mul( gridHeight ) );
+					const subtracter = float( colorChanger ).div( gridDim.mul( gridDim ) );
 					const color = vec3( subtracter.oneMinus() ).toVar();
 					If( effectController.validate.equal( 1 ), () => {
 
@@ -285,11 +371,15 @@
 
 				 const stepAnimation = async function () {
 
-					const algoType = rightSide ?
-						effectController[ 'Right Display Algo' ] :
-						effectController[ 'Left Display Algo' ];
+					const methodType = rightSide ?
+						effectController[ 'Right Method Type' ] :
+						effectController[ 'Left Method Type' ];
 
-					const algorithm = prefixSumMethods[ algoType ];
+					const methodName = rightSide ?
+						effectController[ 'Right Method Name' ] :
+						effectController[ 'Left Method Name' ];
+
+					const method = prefixSumMethods[ methodType ][ methodName ];
 
 					switch ( stepType ) {
 
@@ -297,9 +387,9 @@
 			
 
 							// Execute each dispatch
-							for ( let i = 0; i < algorithm.threads.length; i ++ ) {
+							for ( let i = 0; i < method.threads.length; i ++ ) {
 
-								renderer.compute( algorithm.runFunctions[ i ] );
+								renderer.compute( method.runFunctions[ i ] );
 
 							}
 
@@ -324,7 +414,10 @@
 
 						case 'Init': {
 
-							renderer.compute( algorithm.initFunction );
+							console.log( `${methodType} ${methodName}` );
+							console.log( method.initFunction );
+
+							renderer.compute( method.initFunction );
 
 							stepType = 'Run';
 
