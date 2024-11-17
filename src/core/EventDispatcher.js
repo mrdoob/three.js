@@ -2,86 +2,40 @@
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-class EventDispatcher {
+class NewEventDispatcher {
+    constructor() {
+        this._listeners = new Map();
+    }
 
-	addEventListener( type, listener ) {
+    addEventListener(type, listener) {
+        const listeners = this._listeners.get(type) || this._listeners.set(type, new Set()).get(type);
+        listeners.add(listener);
+    }
 
-		if ( this._listeners === undefined ) this._listeners = {};
+    hasEventListener(type, listener) {
+        const listeners = this._listeners.get(type);
+        return listeners ? listeners.has(listener) : false;
+    }
 
-		const listeners = this._listeners;
+    removeEventListener(type, listener) {
+        const listeners = this._listeners.get(type);
+        if (listeners) {
+            listeners.delete(listener);
 
-		if ( listeners[ type ] === undefined ) {
+            if (listeners.size === 0) {
+                this._listeners.delete(type);
+            }
+        }
+    }
 
-			listeners[ type ] = [];
-
-		}
-
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
-
-			listeners[ type ].push( listener );
-
-		}
-
-	}
-
-	hasEventListener( type, listener ) {
-
-		if ( this._listeners === undefined ) return false;
-
-		const listeners = this._listeners;
-
-		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
-
-	}
-
-	removeEventListener( type, listener ) {
-
-		if ( this._listeners === undefined ) return;
-
-		const listeners = this._listeners;
-		const listenerArray = listeners[ type ];
-
-		if ( listenerArray !== undefined ) {
-
-			const index = listenerArray.indexOf( listener );
-
-			if ( index !== - 1 ) {
-
-				listenerArray.splice( index, 1 );
-
-			}
-
-		}
-
-	}
-
-	dispatchEvent( event ) {
-
-		if ( this._listeners === undefined ) return;
-
-		const listeners = this._listeners;
-		const listenerArray = listeners[ event.type ];
-
-		if ( listenerArray !== undefined ) {
-
-			event.target = this;
-
-			// Make a copy, in case listeners are removed while iterating.
-			const array = listenerArray.slice( 0 );
-
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
-				array[ i ].call( this, event );
-
-			}
-
-			event.target = null;
-
-		}
-
-	}
-
+    dispatchEvent(event) {
+        const listeners = this._listeners.get(event.type);
+        if (listeners) {
+            event.target = this;
+            listeners.forEach(listener => listener.call(this, event));
+            event.target = null;
+        }
+    }
 }
-
 
 export { EventDispatcher };
