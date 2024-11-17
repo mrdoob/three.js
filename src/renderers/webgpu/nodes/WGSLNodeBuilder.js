@@ -1343,6 +1343,8 @@ ${ flowData.code }
 
 					}
 
+					flow = reduceFlow( flow );
+
 				}
 
 			}
