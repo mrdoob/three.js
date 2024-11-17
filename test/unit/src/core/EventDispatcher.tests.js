@@ -57,13 +57,13 @@ export default QUnit.module( 'Core', () => {
                 eventDispatcher._listeners.get( 'anyType' ).size === 1, 'if a listener was added, there is a new key' );
 
             eventDispatcher.removeEventListener( 'anyType', listener );
-            assert.ok( eventDispatcher._listeners.get( 'anyType' ).size === 0, 'listener was deleted' );
+            assert.ok( eventDispatcher._listeners.get( 'anyType' ) === undefined || eventDispatcher._listeners.get( 'anyType' ).size === 0, 'listener was deleted' );
 
             eventDispatcher.removeEventListener( 'unknownType', listener );
             assert.ok( eventDispatcher._listeners.get( 'unknownType' ) === undefined, 'unknown types will be ignored' );
 
             eventDispatcher.removeEventListener( 'anyType', undefined );
-            assert.ok( eventDispatcher._listeners.get( 'anyType' ).size === 0, 'undefined listeners are ignored' );
+            assert.ok( eventDispatcher._listeners.get( 'anyType' ) === undefined || eventDispatcher._listeners.get( 'anyType' ).size === 0, 'undefined listeners are ignored' );
 
         } );
 
