@@ -38,8 +38,8 @@ class TriangleGeometry extends BufferGeometry {
 		const maxU = Math.min( length / height, 1);
 		const maxV = Math.min( height / length, 1);
 
-		const offsetU = skew + width > 0 ? (1 - maxU) / 2 : (length - width) / length;
-		const offsetV = (1 - maxV) / 2;
+		const offsetU = skew + width > 0 ? ( 1 - maxU ) / 2 : ( length - width ) / length;
+		const offsetV = ( 1 - maxV ) / 2;
 
 		// vertices, normals, and uvs
 
