@@ -27,8 +27,19 @@ class TriangleGeometry extends BufferGeometry {
 
 		// vertex helper variables
 
-		const offsetX = width / 2;
+		const widthHalf = width / 2;
+		const skewHalf = skew / 2;
+
+		const offsetX = ( width + widthHalf + skewHalf ) / 3;
 		const offsetY = height / 3;
+
+		const length = Math.max( Math.abs( skewHalf ) + widthHalf, width );
+
+		const maxU = Math.min( length / height, 1);
+		const maxV = Math.min( height / length, 1);
+
+		const offsetU = skew + width > 0 ? (1 - maxU) / 2 : (length - width) / length;
+		const offsetV = (1 - maxV) / 2;
 
 		// vertices, normals, and uvs
 
@@ -36,18 +47,20 @@ class TriangleGeometry extends BufferGeometry {
 
 			for ( let j = 0; j < i + 1; j ++ ) {
 
-				const uvX = ( i + j ) / segments / 2;
-				const uvY = ( i - j ) / segments;
+				const normX = ( i + j ) / segments / 2;
+				const normY = ( i - j ) / segments;
 
-				const x = uvX * width - offsetX + uvY * skew / 2;
-				const y = uvY * height - offsetY;
+				const x = normX * width + normY * skewHalf;
+				const y = normY * height;
 
-				vertices.push( x, y, 0 );
+				const u = maxU * x / length;
+				const v = maxV * y / height;
+
+				vertices.push( x - offsetX, y - offsetY, 0 );
 
 				normals.push( 0, 0, 1 );
 
-				uvs.push( uvX );
-				uvs.push( uvY );
+				uvs.push( u + offsetU, v + offsetV );
 
 			}
 
@@ -98,7 +111,7 @@ class TriangleGeometry extends BufferGeometry {
 
 	static fromJSON( data ) {
 
-		return new TriangleGeometry( data.width, data.height, data.skew );
+		return new TriangleGeometry( data.width, data.height, data.skew, data.segments );
 
 	}
 
