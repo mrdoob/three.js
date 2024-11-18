@@ -1233,7 +1233,8 @@
 				"VR 컨텐츠를 만드는 방법": "manual/ko/introduction/How-to-create-VR-content",
 				"후처리 사용 방법": "manual/ko/introduction/How-to-use-post-processing",
 				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
-				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
+				"애니메이션 시스템": "manual/ko/introduction/Animation-system",
+				"색상 관리": "manual/ko/introduction/Color-management"
 			}
 
 		},
