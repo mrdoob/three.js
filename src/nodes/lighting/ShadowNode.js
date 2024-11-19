@@ -17,6 +17,8 @@ import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSys
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 
+const shadowPosition = vec3().toVar( 'shadowPosition' );
+
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
 	return texture( depthTexture, shadowCoord.xy ).compare( shadowCoord.z );
@@ -233,7 +235,7 @@ class ShadowNode extends Node {
 
 	setupShadow( builder ) {
 
-		const { object, renderer } = builder;
+		const { renderer } = builder;
 
 		if ( _overrideMaterial === null ) {
 
@@ -287,9 +289,7 @@ class ShadowNode extends Node {
 		const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const position = object.material.shadowPositionNode || positionWorld;
-
-		let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( transformedNormalWorld.mul( normalBias ) ) );
+		let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( shadowPosition.add( transformedNormalWorld.mul( normalBias ) ) );
 
 		let coordZ;
 
@@ -357,27 +357,33 @@ class ShadowNode extends Node {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		let node = this._node;
+		return Fn( ( { material } ) => {
 
-		if ( node === null ) {
+			shadowPosition.assign( material.shadowPositionNode || positionWorld );
 
-			this._node = node = this.setupShadow( builder );
+			let node = this._node;
 
-		}
+			if ( node === null ) {
 
-		if ( builder.material.shadowNode ) { // @deprecated, r171
+				this._node = node = this.setupShadow( builder );
 
-			console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
+			}
 
-		}
+			if ( builder.material.shadowNode ) { // @deprecated, r171
 
-		if ( builder.material.receivedShadowNode ) {
+				console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
-			node = builder.material.receivedShadowNode( node );
+			}
 
-		}
+			if ( builder.material.receivedShadowNode ) {
 
-		return node;
+				node = builder.material.receivedShadowNode( node );
+
+			}
+
+			return node;
+
+		} )();
 
 	}
 
