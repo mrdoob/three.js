@@ -16,7 +16,7 @@ import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUCo
 import { NoColorSpace, FloatType } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
-const GPUShaderStage = self.GPUShaderStage;
+const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
 
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage ? GPUShaderStage.VERTEX : 1,
@@ -123,7 +123,7 @@ const wgslMethods = {
 
 // WebGPU issue: does not support pow() with negative base on Windows
 
-if ( /Windows/g.test( navigator.userAgent ) ) {
+if ( typeof navigator === 'undefined' ? false : /Windows/g.test( navigator.userAgent ) ) {
 
 	wgslPolyfill.pow_float = new CodeNode( 'fn tsl_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
 	wgslPolyfill.pow_vec2 = new CodeNode( 'fn tsl_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
@@ -141,7 +141,7 @@ if ( /Windows/g.test( navigator.userAgent ) ) {
 
 let diagnostics = '';
 
-if ( /Firefox|Deno/g.test( navigator.userAgent ) !== true ) {
+if ( ( typeof navigator === 'undefined' ? false : /Firefox|Deno/g.test( navigator.userAgent ) ) !== true ) {
 
 	diagnostics += 'diagnostic( off, derivative_uniformity );\n';
 

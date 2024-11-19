@@ -64,7 +64,7 @@ class WebGPUBackend extends Backend {
 				powerPreference: parameters.powerPreference
 			};
 
-			const adapter = await navigator.gpu.requestAdapter( adapterOptions );
+			const adapter = typeof navigator === 'undefined' ? false : await navigator.gpu.requestAdapter( adapterOptions );
 
 			if ( adapter === null ) {
 
