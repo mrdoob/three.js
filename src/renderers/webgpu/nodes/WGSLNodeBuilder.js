@@ -1026,7 +1026,7 @@ ${ flowData.code }
 
 				const type = ptrType || fullType;
 
-				if (Object.values(wgslTypeLib).includes(structName) || structName === null) {
+				if ( Object.values( wgslTypeLib ).includes( structName ) || structName === null ) {
 
 					continue;
 
