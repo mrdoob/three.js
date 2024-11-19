@@ -1338,7 +1338,7 @@ ${ flowData.code }
 					.split( /\s*,\s*/ )
 					.map( part => part.trim() )
 					.filter( part => part.includes( '&' ) )
-					.map( part => part.replace( '&', '' ) )
+					.map( part => part.replace( /&/g, '' ) )
 					.filter( part => ! part.includes( '.' ) );
 
 			};
