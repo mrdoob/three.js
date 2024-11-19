@@ -16,8 +16,10 @@ import {
 	CompressedTexture,
 	CompressedArrayTexture,
 	CompressedCubeTexture,
-	Data3DTexture,
+	DataArrayTexture,
+	DataCubeTexture,
 	DataTexture,
+	Data3DTexture,
 	FileLoader,
 	FloatType,
 	HalfFloatType,
@@ -294,25 +296,53 @@ class KTX2Loader extends Loader {
 
 		if ( messageType === 'error' ) return Promise.reject( error );
 
+		const mipmaps = faces[ 0 ].mipmaps;
+
 		let texture;
 
-		if ( container.faceCount === 6 ) {
+		if ( format === RGBAFormat ) {
 
-			texture = new CompressedCubeTexture( faces, format, type );
+			// THREE.DataTexture
+
+			if ( container.faceCount === 6 ) {
+
+				texture = new DataCubeTexture( mipmaps[ 0 ].data, format, type );
+				texture.mipmaps = mipmaps.map( ( mip ) => new DataCubeTexture( mip.data, mip.width, mip.height ) );
+
+			} else if ( container.layerCount > 1 ) {
+
+				texture = new DataArrayTexture( mipmaps[ 0 ].data, width, height, container.layerCount, format, type )
+				texture.mipmaps = mipmaps;
+
+			} else {
+
+				texture = new DataTexture( mipmaps[ 0 ].data, width, height, format, type );
+				texture.mipmaps = mipmaps;
+
+			}
 
 		} else {
 
-			const mipmaps = faces[ 0 ].mipmaps;
+			// THREE.CompressedTexture
 
-			texture = container.layerCount > 1
-				? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, type )
-				: new CompressedTexture( mipmaps, width, height, format, type );
+			if ( container.faceCount === 6 ) {
+
+				texture = new CompressedCubeTexture( faces, format, type );
+
+			} else if ( container.layerCount > 1 ) {
+
+				texture = new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, type )
+
+			} else {
+
+				texture = new CompressedTexture( mipmaps, width, height, format, type );
+
+			}
+
+			texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+			texture.magFilter = LinearFilter;
 
 		}
-
-		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
-		texture.magFilter = LinearFilter;
-		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
 		texture.colorSpace = parseColorSpace( container );
