@@ -1457,9 +1457,9 @@ ${ flowData.code }
 
 
 				flow = reduceFlow( flow );
-				pointerNames = extractPointerNames(flow);
-				structnameMapping = createStructNameMapping(pointerNames, stageData.customStructNames);
-				stageData.uniforms = replaceStructNamesInUniforms(stageData.uniforms, structnameMapping);
+				pointerNames = extractPointerNames( flow );
+				structnameMapping = createStructNameMapping( pointerNames, stageData.customStructNames );
+				stageData.uniforms = replaceStructNamesInUniforms( stageData.uniforms, structnameMapping );
 
 				if ( node === mainNode && shaderStage !== 'compute' ) {
 
@@ -1496,9 +1496,9 @@ ${ flowData.code }
 					}
 
 					flow = reduceFlow( flow );
-					pointerNames = extractPointerNames(flow);
-					structnameMapping = createStructNameMapping(pointerNames, stageData.customStructNames);
-					stageData.uniforms = replaceStructNamesInUniforms(stageData.uniforms, structnameMapping);
+					pointerNames = extractPointerNames( flow );
+					structnameMapping = createStructNameMapping( pointerNames, stageData.customStructNames );
+					stageData.uniforms = replaceStructNamesInUniforms( stageData.uniforms, structnameMapping );
 
 				}
 
