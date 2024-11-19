@@ -123,7 +123,7 @@ const wgslMethods = {
 
 // WebGPU issue: does not support pow() with negative base on Windows
 
-if ( typeof navigator !== 'undefined'  && /Windows/g.test( navigator.userAgent ) ) {
+if ( typeof navigator !== 'undefined' && /Windows/g.test( navigator.userAgent ) ) {
 
 	wgslPolyfill.pow_float = new CodeNode( 'fn tsl_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
 	wgslPolyfill.pow_vec2 = new CodeNode( 'fn tsl_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
