@@ -1347,12 +1347,12 @@ ${ flowData.code }
 
 				const resultMap = new Map();
 
-				for (let i = 0; i < nodeBuffers.length; i++) {
+				for ( let i = 0; i < nodeBuffers.length; i++ ) {
 
 					const bufferName = nodeBuffers[ i ];
 					const struct = structs[ i ];
 
-					resultMap.set(bufferName, struct.structName);
+					resultMap.set( bufferName, struct.structName );
 
 				}
 
