@@ -1020,7 +1020,7 @@ ${ flowData.code }
 
 			while ( ( paramMatch = parameterRegex.exec( parameterString ) ) !== null ) {
 
-				const [ fullMatch, name, fullType, ptrType, arrayType, directStructName ] = paramMatch;
+				const [ , name, fullType, ptrType, arrayType, directStructName ] = paramMatch;
 
 				const structName = arrayType || directStructName || null;
 
