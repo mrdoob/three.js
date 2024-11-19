@@ -112,17 +112,26 @@ class WebGPUUtils {
 
 		// TODO: Remove this check when Quest 34.5 is out
 		// https://github.com/mrdoob/three.js/pull/29221/files#r1731833949
-
-		if ( typeof navigator === 'undefined' ? false : navigator.userAgent.includes( 'Quest' ) ) {
-
-			return GPUTextureFormat.BGRA8Unorm;
-
+	
+		if ( typeof navigator !== 'undefined' ) {
+	
+			if ( navigator.userAgent.includes( 'Quest' ) ) {
+	
+				return GPUTextureFormat.BGRA8Unorm;
+	
+			} else {
+	
+				return navigator.gpu.getPreferredCanvasFormat();
+	
+			}
+	
 		} else {
-
-			return typeof navigator === 'undefined' ? false : navigator.gpu.getPreferredCanvasFormat();
-
+	
+	
+			return GPUTextureFormat.BGRA8Unorm;
+	
 		}
-
+	
 	}
 
 }
