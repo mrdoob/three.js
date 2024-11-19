@@ -1653,7 +1653,7 @@ ${vars}
 
 		const structName = name + 'Struct';
 		const structSnippet = this._getWGSLStruct( structName, vars );
-		const structName_ = isBufferStruct ? (isArray ? `array<${structName}>` : structName) : structName;
+		const structName_ = isBufferStruct ? ( isArray ? `array<${structName}>` : structName ) : structName;
 
 		return `${structSnippet}
 @binding( ${binding} ) @group( ${group} )
