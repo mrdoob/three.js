@@ -55,7 +55,9 @@ export const blendOverlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 export const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
-	return vec4( base.rgb.mul( blend.a.oneMinus() ).add( blend.rgb.mul( blend.a ) ), base.a );
+	const outAlpha = blend.a.add( base.a.mul( blend.a.oneMinus() ) );
+
+	return vec4( blend.rgb.mul( blend.a ).add( base.rgb.mul( base.a ).mul( blend.a.oneMinus() ) ).div( outAlpha ), outAlpha );
 
 } ).setLayout( {
 	name: 'blendColor',
