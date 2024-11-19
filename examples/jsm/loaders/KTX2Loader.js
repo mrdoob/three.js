@@ -339,10 +339,10 @@ class KTX2Loader extends Loader {
 
 			}
 
-			texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
-			texture.magFilter = LinearFilter;
-
 		}
+
+		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		texture.magFilter = LinearFilter;
 
 		texture.needsUpdate = true;
 		texture.colorSpace = parseColorSpace( container );
