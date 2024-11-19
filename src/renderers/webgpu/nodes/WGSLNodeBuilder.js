@@ -1652,7 +1652,7 @@ ${vars}
 	_getWGSLStructBinding( isBufferStruct, isArray, name, vars, access, binding = 0, group = 0 ) {
 
 		const structName = name + 'Struct';
-		const structSnippet = this._getWGSLStruct(structName, vars);
+		const structSnippet = this._getWGSLStruct( structName, vars );
 		const structName_ = isBufferStruct ? (isArray ? `array<${structName}>` : structName) : structName;
 
 		return `${structSnippet}
