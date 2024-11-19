@@ -1400,61 +1400,6 @@ ${ flowData.code }
 				flow += `${ flowSlotData.code }\n\t`;
 
 
-				/*
-				REVIEW COMMENT remove after review
-
-				before reduceFlow:
-				compute( &NodeBuffer_554.nodeUniform0, &NodeBuffer_558.nodeUniform1, &NodeBuffer_555.nodeUniform2, &NodeBuffer_556.nodeUniform3, &NodeBuffer_557.nodeUniform4, &NodeBuffer_559.nodeUniform5, instanceIndex, object.nodeUniform6 );
-				
-				after reduceFlow: reduceFlow checks whether there is a storageStruct and if so then the 
-				postfix is ​​removed so that the pointer points to the struct and not to a content in the struct
-				compute( &NodeBuffer_554, &NodeBuffer_558, &NodeBuffer_555.nodeUniform2, &NodeBuffer_556.nodeUniform3, &NodeBuffer_557.nodeUniform4, &NodeBuffer_559.nodeUniform5, instanceIndex, object.nodeUniform6 );
-
-				extractPointerNames reads the names of the reduced pointers and stores them in an array
-				Array(2)
-				0: "NodeBuffer_554"
-				1: "NodeBuffer_558"
-
-				getCustomStructNameFromShader at the beginning reads the structNames from the shader header
-				Array(2)
-				0: {name: 'drawBuffer', type: 'storage', structName: 'DrawBuffer'}
-				1: {name: 'meshletInfo', type: 'storage', structName: 'MeshletInfo'}
-
-
-				createStructNameMapping links the automatic generated WGSLNodeBuilder for each struct with the struct name specified by the user. 
-				This is necessary because in wgslFn the user can choose any name in the shader in ptr for structs.
-
-				Map(2)
-				[[Entries]]
-				0: {"NodeBuffer_554" => "DrawBuffer"}
-				1: {"NodeBuffer_558" => "MeshletInfo"}
-
-				replaceStructNames then replaces the names in the uniforms in the custom structs that the WGSLNodeBuilder 
-				created with the name chosen by the user.
-
-				before replaceStructNames:
-
-				struct NodeBuffer_554Struct {
-					vertexCount: u32,
-					instanceCount: u32,
-					firstVertex: u32,
-					firstInstance: u32
-				};
-				@binding( 0 ) @group( 0 )
-				var<storage, read_write> NodeBuffer_554 : NodeBuffer_554Struct;
-
-				after replaceStructNames:
-
-				struct DrawBuffer {
-					vertexCount: u32,
-					instanceCount: u32,
-					firstVertex: u32,
-					firstInstance: u32
-				};
-				@binding( 0 ) @group( 0 )
-				var<storage, read_write> NodeBuffer_554 : DrawBuffer;
-				*/
-
 
 				flow = reduceFlow( flow );
 				pointerNames = extractPointerNames( flow );
