@@ -55,6 +55,7 @@ export * from './accessors/Camera.js';
 export * from './accessors/VertexColorNode.js';
 export * from './accessors/CubeTextureNode.js';
 export * from './accessors/InstanceNode.js';
+export * from './accessors/InstancedMeshNode.js';
 export * from './accessors/BatchNode.js';
 export * from './accessors/MaterialNode.js';
 export * from './accessors/MaterialProperties.js';
@@ -83,7 +84,7 @@ export * from './accessors/UserDataNode.js';
 export * from './accessors/VelocityNode.js';
 
 // display
-export * from './display/BlendMode.js';
+export * from './display/BlendModes.js';
 export * from './display/BumpMapNode.js';
 export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';

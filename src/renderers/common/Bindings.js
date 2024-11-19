@@ -32,7 +32,7 @@ class Bindings extends DataMap {
 
 				this._init( bindGroup );
 
-				this.backend.createBindings( bindGroup, bindings );
+				this.backend.createBindings( bindGroup, bindings, 0 );
 
 				groupData.bindGroup = bindGroup;
 
@@ -56,7 +56,7 @@ class Bindings extends DataMap {
 
 				this._init( bindGroup );
 
-				this.backend.createBindings( bindGroup, bindings );
+				this.backend.createBindings( bindGroup, bindings, 0 );
 
 				groupData.bindGroup = bindGroup;
 
@@ -116,6 +116,9 @@ class Bindings extends DataMap {
 		const { backend } = this;
 
 		let needsBindingsUpdate = false;
+		let cacheBindings = true;
+		let cacheIndex = 0;
+		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
 
@@ -145,7 +148,9 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampledTexture ) {
 
-				if ( binding.needsBindingsUpdate( this.textures.get( binding.texture ).generation ) ) needsBindingsUpdate = true;
+				const texturesTextureData = this.textures.get( binding.texture );
+
+				if ( binding.needsBindingsUpdate( texturesTextureData.generation ) ) needsBindingsUpdate = true;
 
 				const updated = binding.update();
 
@@ -158,6 +163,17 @@ class Bindings extends DataMap {
 				}
 
 				const textureData = backend.get( texture );
+
+				if ( textureData.externalTexture !== undefined || texturesTextureData.isDefaultTexture ) {
+
+					cacheBindings = false;
+
+				} else {
+
+					cacheIndex = cacheIndex * 10 + texture.id;
+					version += texture.version;
+
+				}
 
 				if ( backend.isWebGPUBackend === true && textureData.texture === undefined && textureData.externalTexture === undefined ) {
 
@@ -193,7 +209,7 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings );
+			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheIndex : 0, version );
 
 		}
 

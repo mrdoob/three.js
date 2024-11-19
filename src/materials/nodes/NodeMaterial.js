@@ -7,7 +7,7 @@ import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/cor
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
 import { normalLocal } from '../../nodes/accessors/Normal.js';
-import { instance } from '../../nodes/accessors/InstanceNode.js';
+import { instancedMesh } from '../../nodes/accessors/InstancedMeshNode.js';
 import { batch } from '../../nodes/accessors/BatchNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
@@ -18,7 +18,7 @@ import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
-import { depth, perspectiveDepthToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
+import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
@@ -285,7 +285,7 @@ class NodeMaterial extends Material {
 
 				if ( camera.isPerspectiveCamera ) {
 
-					depthNode = perspectiveDepthToLogarithmicDepth( modelViewProjection().w, cameraNear, cameraFar );
+					depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
 
 				} else {
 
@@ -342,9 +342,9 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
+		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
-			instance( object ).append();
+			instancedMesh( object ).append();
 
 		}
 

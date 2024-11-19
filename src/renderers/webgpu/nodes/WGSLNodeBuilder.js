@@ -13,7 +13,10 @@ import { getFormat } from '../utils/WebGPUTextureUtils.js';
 import WGSLNodeParser from './WGSLNodeParser.js';
 import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
 
-import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from '../../../constants.js';
+import VarNode from '../../../nodes/core/VarNode.js';
+import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
+
+import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = self.GPUShaderStage;
@@ -82,17 +85,8 @@ const wgslPolyfill = {
 	repeatWrapping_float: new CodeNode( 'fn tsl_repeatWrapping_float( coord: f32 ) -> f32 { return fract( coord ); }' ),
 	mirrorWrapping_float: new CodeNode( 'fn tsl_mirrorWrapping_float( coord: f32 ) -> f32 { let mirrored = fract( coord * 0.5 ) * 2.0; return 1.0 - abs( 1.0 - mirrored ); }' ),
 	clampWrapping_float: new CodeNode( 'fn tsl_clampWrapping_float( coord: f32 ) -> f32 { return clamp( coord, 0.0, 1.0 ); }' ),
-	repeatWrapping: new CodeNode( /* wgsl */`
-fn tsl_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> {
-
-	let uvScaled = vec2<u32>( uv * vec2<f32>( dimension ) );
-
-	return ( ( uvScaled % dimension ) + dimension ) % dimension;
-
-}
-` ),
 	biquadraticTexture: new CodeNode( /* wgsl */`
-fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, iRes : vec2u, level : i32 ) -> vec4f {
+fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, iRes : vec2u, level : u32 ) -> vec4f {
 
 	let res = vec2f( iRes );
 
@@ -201,7 +195,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, '0' );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0' );
 
 		}
 
@@ -233,7 +227,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, levelSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet );
 
 		}
 
@@ -305,40 +299,51 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
-		let propertyName = textureData.dimensionsSnippet[ levelSnippet ];
+		let textureDimensionNode = textureData.dimensionsSnippet[ levelSnippet ];
 
 		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
 
-			propertyName = `textureDimension_${ texture.id }_${ levelSnippet }`;
+			let textureDimensionsParams;
 
-			this.addLineFlowCode( `let ${ propertyName } = textureDimensions( ${ textureProperty }, i32( ${ levelSnippet } ) );` );
+			if ( texture.isMultisampleRenderTargetTexture === true ) {
 
-			textureData.dimensionsSnippet[ levelSnippet ] = propertyName;
+				textureDimensionsParams = textureProperty;
+
+			} else {
+
+				textureDimensionsParams = `${ textureProperty }, u32( ${ levelSnippet } )`;
+
+			}
+
+			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, 'uvec2' ) );
+
+			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
 
 		}
 
-		return propertyName;
+		return textureDimensionNode.build( this );
 
 	}
 
-	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0' ) {
+	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0u' ) {
 
 		this._include( 'biquadraticTexture' );
 
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
-		return `tsl_biquadraticTexture( ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet } ), ${ textureDimension }, i32( ${ levelSnippet } ) )`;
+		return `tsl_biquadraticTexture( ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet } ), ${ textureDimension }, u32( ${ levelSnippet } ) )`;
 
 	}
 
-	generateTextureLod( texture, textureProperty, uvSnippet, levelSnippet = '0' ) {
+	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet = '0u' ) {
 
-		this._include( 'repeatWrapping' );
+		const wrapFunction = this.generateWrapFunction( texture );
+		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
-		const dimension = texture.isMultisampleRenderTargetTexture === true ? `textureDimensions( ${ textureProperty } )` : `textureDimensions( ${ textureProperty }, 0 )`;
+		const coordSnippet = `vec2u( ${ wrapFunction }( ${ uvSnippet } ) * vec2f( ${ textureDimension } ) )`;
 
-		return `textureLoad( ${ textureProperty }, tsl_repeatWrapping( ${ uvSnippet }, ${ dimension } ), i32( ${ levelSnippet } ) )`;
+		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, levelSnippet );
 
 	}
 
@@ -346,11 +351,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( depthSnippet ) {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, ${ levelSnippet } )`;
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
 		} else {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
 
 		}
 
@@ -362,9 +367,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	isSampleCompare( texture ) {
+
+		return texture.isDepthTexture === true && texture.compareFunction !== null;
+
+	}
+
 	isUnfilterable( texture ) {
 
-		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) || texture.isMultisampleRenderTargetTexture === true;
+		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
+			( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) ||
+			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
+			texture.isMultisampleRenderTargetTexture === true;
 
 	}
 
@@ -378,7 +392,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else if ( this.isUnfilterable( texture ) ) {
 
-			snippet = this.generateTextureLod( texture, textureProperty, uvSnippet, '0', depthSnippet, shaderStage );
+			snippet = this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0', shaderStage );
 
 		} else {
 
@@ -1106,7 +1120,7 @@ ${ flowData.code }
 
 				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
 
-					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
+					if ( this.isSampleCompare( texture ) ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 

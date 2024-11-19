@@ -15,7 +15,9 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { perspectiveDepthToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+
+const shadowWorldPosition = vec3().toVar( 'shadowWorldPosition' );
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -275,10 +277,10 @@ class ShadowNode extends Node {
 			// The normally available "cameraNear" and "cameraFar" nodes cannot be used here because they do not get
 			// updated to use the shadow camera. So, we have to declare our own "local" ones here.
 			// TODO: How do we get the cameraNear/cameraFar nodes to use the shadow camera so we don't have to declare local ones here?
-			const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
-			const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
+			const cameraNearLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
+			const cameraFarLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
 
-			coordZ = perspectiveDepthToLogarithmicDepth( w, cameraNearLocal, cameraFarLocal );
+			coordZ = viewZToLogarithmicDepth( w.negate(), cameraNearLocal, cameraFarLocal );
 
 		}
 
@@ -294,7 +296,7 @@ class ShadowNode extends Node {
 
 	setupShadow( builder ) {
 
-		const { object, renderer } = builder;
+		const { renderer } = builder;
 
 		if ( _overrideMaterial === null ) {
 
@@ -347,9 +349,7 @@ class ShadowNode extends Node {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const position = object.material.shadowPositionNode || positionWorld;
-
-		const shadowPosition = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( transformedNormalWorld.mul( normalBias ) ) );
+		const shadowPosition = uniform( shadow.matrix ).setGroup( renderGroup ).mul( shadowWorldPosition.add( transformedNormalWorld.mul( normalBias ) ) );
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -380,27 +380,33 @@ class ShadowNode extends Node {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		let node = this._node;
+		return Fn( ( { material } ) => {
 
-		if ( node === null ) {
+			shadowWorldPosition.assign( material.shadowPositionNode || positionWorld );
 
-			this._node = node = this.setupShadow( builder );
+			let node = this._node;
 
-		}
+			if ( node === null ) {
 
-		if ( builder.material.shadowNode ) { // @deprecated, r171
+				this._node = node = this.setupShadow( builder );
 
-			console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
+			}
 
-		}
+			if ( builder.material.shadowNode ) { // @deprecated, r171
 
-		if ( builder.material.receivedShadowNode ) {
+				console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
-			node = builder.material.receivedShadowNode( node );
+			}
 
-		}
+			if ( builder.material.receivedShadowNode ) {
 
-		return node;
+				node = builder.material.receivedShadowNode( node );
+
+			}
+
+			return node;
+
+		} )();
 
 	}
 

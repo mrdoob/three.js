@@ -332,7 +332,7 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
+			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${ renderContext.id }` } );
 
 			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
@@ -1166,7 +1166,7 @@ class WebGPUBackend extends Backend {
 	}
 
 
-	initTimestampQuery( renderContext, descriptor ) {
+	async initTimestampQuery( renderContext, descriptor ) {
 
 		if ( ! this.trackTimestamp ) return;
 
@@ -1174,9 +1174,28 @@ class WebGPUBackend extends Backend {
 
 		if ( ! renderContextData.timeStampQuerySet ) {
 
-			// Create a GPUQuerySet which holds 2 timestamp query results: one for the
-			// beginning and one for the end of compute pass execution.
-			const timeStampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2 } );
+
+			// Push an error scope to catch any errors during query set creation
+			this.device.pushErrorScope( 'out-of-memory' );
+
+			const timeStampQuerySet = await this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_renderContext_${renderContext.id}` } );
+
+			// Pop the error scope and check for errors
+			const error = await this.device.popErrorScope();
+
+			if ( error ) {
+
+				if ( ! renderContextData.attemptingTimeStampQuerySetFailed ) {
+
+					console.error( `[GPUOutOfMemoryError][renderContext_${renderContext.id}]:\nFailed to create timestamp query set. This may be because timestamp queries are already running in other tabs.` );
+					renderContextData.attemptingTimeStampQuerySetFailed = true;
+
+				}
+
+				renderContextData.timeStampQuerySet = null; // Mark as unavailable
+				return;
+
+			}
 
 			const timestampWrites = {
 				querySet: timeStampQuerySet,
@@ -1184,9 +1203,7 @@ class WebGPUBackend extends Backend {
 				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
 			};
 
-			Object.assign( descriptor, {
-				timestampWrites,
-			} );
+			Object.assign( descriptor, { timestampWrites } );
 
 			renderContextData.timeStampQuerySet = timeStampQuerySet;
 
@@ -1202,6 +1219,7 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
+		if ( ! renderContextData.timeStampQuerySet ) return;
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
 
@@ -1237,6 +1255,8 @@ class WebGPUBackend extends Backend {
 		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
+
+		if ( ! renderContextData.timeStampQuerySet ) return;
 
 		if ( renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
@@ -1341,15 +1361,15 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
-	createBindings( bindGroup ) {
+	createBindings( bindGroup, bindings, cacheIndex, version ) {
 
-		this.bindingUtils.createBindings( bindGroup );
+		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
 
 	}
 
-	updateBindings( bindGroup ) {
+	updateBindings( bindGroup, bindings, cacheIndex, version ) {
 
-		this.bindingUtils.createBindings( bindGroup );
+		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
 
 	}
 

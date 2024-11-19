@@ -155,7 +155,7 @@ class SSRNode extends TempNode {
 
 			const metalness = this.metalnessNode.uv( uvNode ).r;
 
-			 // fragments with no metalness do not reflect their environment
+			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
 
 			// compute some standard FX entities
@@ -213,6 +213,13 @@ class SSRNode extends TempNode {
 			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
 			Loop( { start: int( 0 ), end: int( this._maxStep ), type: 'int', condition: '<' }, ( { i } ) => {
+
+				// TODO: Remove this when Chrome is fixed, see https://issues.chromium.org/issues/372714384#comment14
+				If( metalness.equal( 0 ), () => {
+
+					Break();
+
+				} );
 
 				// stop if the maximum number of steps is reached for this specific ray
 				If( float( i ).greaterThanEqual( totalStep ), () => {

@@ -1528,6 +1528,24 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 	}
 
+	function dispose() {
+
+		if ( boxMesh !== undefined ) {
+
+			boxMesh.geometry.dispose();
+			boxMesh.material.dispose();
+
+		}
+
+		if ( planeMesh !== undefined ) {
+
+			planeMesh.geometry.dispose();
+			planeMesh.material.dispose();
+
+		}
+
+	}
+
 	return {
 
 		getClearColor: function () {
@@ -1554,7 +1572,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		},
 		render: render,
-		addToRenderList: addToRenderList
+		addToRenderList: addToRenderList,
+		dispose: dispose
 
 	};
 
@@ -3761,18 +3780,6 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		}
 
-		for ( const name in geometry.morphAttributes ) {
-
-			const array = geometry.morphAttributes[ name ];
-
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
-				attributes.remove( array[ i ] );
-
-			}
-
-		}
-
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		delete geometries[ geometry.id ];
@@ -3823,22 +3830,6 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		for ( const name in geometryAttributes ) {
 
 			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
-
-		}
-
-		// morph targets
-
-		const morphAttributes = geometry.morphAttributes;
-
-		for ( const name in morphAttributes ) {
-
-			const array = morphAttributes[ name ];
-
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
-				attributes.update( array[ i ], gl.ARRAY_BUFFER );
-
-			}
 
 		}
 
@@ -15294,6 +15285,7 @@ class WebGLRenderer {
 			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
+			background.dispose();
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();

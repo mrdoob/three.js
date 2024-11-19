@@ -9,8 +9,10 @@ import {
 	Sphere,
 	Vector3,
 	Vector4,
-	Line2NodeMaterial
 } from 'three';
+
+import { Line2NodeMaterial } from 'three/tsl';
+
 import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 
 const _start = new Vector3();

@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { log2, nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
+import { float, log, log2, nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
 import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
@@ -116,8 +116,10 @@ export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ )
 // maps perspective depth in [ 0, 1 ] to viewZ
 export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
 
-export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, near, far ) => {
+// -near maps to 0; -far maps to 1
+export const viewZToLogarithmicDepth = ( viewZ, near, far ) => {
 
+	// NOTE: viewZ must be negative--see explanation at the end of this comment block.
 	// The final logarithmic depth formula used here is adapted from one described in an
 	// article by Thatcher Ulrich (see http://tulrich.com/geekstuff/log_depth_buffer.txt),
 	// which was an improvement upon an earlier formula one described in an
@@ -139,12 +141,25 @@ export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, near, far ) =>
 	// 1. Clamp the camera near plane so we don't divide by 0.
 	// 2. Use log2 instead of log to avoid an extra multiply (shaders implement log using log2).
 	// 3. Assume K is 1 (K = maximum value in depth buffer; see Ulrich's formula above).
-	// 4. Add 1 to each division by cameraNear to ensure the depth curve is shifted to the left as cameraNear increases.
-	// For visual representation of this depth curve, see https://www.desmos.com/calculator/lz5rqfysih
+	// 4. To maintain consistency with the functions "viewZToOrthographicDepth" and "viewZToPerspectiveDepth",
+	//    we modify the formula here to use 'viewZ' instead of 'w'. The other functions expect a negative viewZ,
+	//    so we do the same here, hence the 'viewZ.negate()' call.
+	// For visual representation of this depth curve, see https://www.desmos.com/calculator/uyqk0vex1u
 	near = near.max( 1e-6 ).toVar();
-	const numerator = log2( perspectiveW.div( near ).add( 1 ) );
-	const denominator = log2( far.div( near ).add( 1 ) );
+	const numerator = log2( viewZ.negate().div( near ) );
+	const denominator = log2( far.div( near ) );
 	return numerator.div( denominator );
+
+};
+
+// maps logarithmic depth in [ 0, 1 ] to viewZ
+export const logarithmicDepthToViewZ = ( depth, near, far ) => {
+
+	// NOTE: we add a 'negate()' call to the return value here to maintain consistency with
+	// the functions "orthographicDepthToViewZ" and "perspectiveDepthToViewZ" (they return
+	// a negative viewZ).
+	const exponent = depth.mul( log( far.div( near ) ) );
+	return float( Math.E ).pow( exponent ).mul( near ).negate();
 
 };
 
