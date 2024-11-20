@@ -53,16 +53,16 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, vec3, uniform, uv, uint, float, Fn, vec2, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
+			import { If, vec3, Loop, uniform, uv, uint, float, Fn, vec2, uvec2, floor, pow, instanceIndex, invocationLocalIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			// Max number of elements that can be summed with a basic scan.
 			// Corresponds to the default size of a workgroup in Three.js
-			const maxScanElements = 64;
+			const maxScanElements = 16384;
 
 			// Max number of elements in each display.
-			const maxElements = 4096;
+			const maxElements = 16384;
 
 			const effectController = {
 				// Sqr root of 16834
@@ -158,6 +158,22 @@
 				};
 
 
+				const LoopThroughWorkgroup = ( callback ) => {
+
+					const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
+
+					Loop( {
+						start: uint( 0 ),
+						type: 'uint',
+						end: uint( maxScanElements ),
+						condition: '<',
+						update: '+= WORKGROUP_SIZE',
+						name: 'workgroupIndex'
+					}, callback );
+
+				};
+
+
 				// Define and compile prefix sum methods.
 				const prefixSumMethods = {
 					// Methods to test whether the prefix sum validation is working as expected.
@@ -186,42 +202,120 @@
 					},
 					'Scan': {
 						'Sklansky (Dispatch)': {
-							threads: Array( Math.log2( maxScanElements ) ).fill( maxScanElements / 2 ),
+							threads: [ 64 ],
 							runMethod: ( currentElements ) => {
 
-			
+								const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
+								const prevReduction = uint( 0 ).toVar( 'prevReduction' );
+
+								Loop( {
+									start: uint( 0 ),
+									type: 'uint',
+									end: uint( Math.log2( WORKGROUP_SIZE ) - 1 ),
+									condition: '<',
+									update: '+= 1',
+									name: 'iteration'
+								}, ( { iteration } ) => {
+
+									const step = pow( 2, iteration.add( 1 ) ).toVar( 'step' );
+
+									// Alternative (Way I would like to use)
+
+									const jStart = uint( pow( 2, iteration ).sub( 1 ) );
+									const kIters = uint( pow( 2, iteration ) );
+
+									const accessIndex = jStart.add( step.mul( invocationLocalIndex.div( kIters ) ) );
+									const assignIndex = fract( invocationLocalIndex, kIters ).add( 1 );
+
+									currentElements.element( assignIndex ).addAssign( currentElements.element( accessIndex ) );
+
+									workgroupBarrier();
 
 			
+
+									// Pseudo code direct
+
+									Loop( {
+										start: uint( pow( 2, iteration ).sub( 1 ) ),
+										type: 'uint',
+										end: WORKGROUP_SIZE,
+										condition: '<',
+										update: '+= step',
+										name: 'j',
+									}, ( { j } ) => {
+
+										Loop( {
+											start: uint( 0 ),
+											type: 'uint',
+											end: uint( pow( 2, iteration ) ),
+											condition: '<',
+											update: '+= 1',
+											name: 'k'
+										}, ( { k } ) => {
+			
+											currentElements.element( j.add( k ).add( 1 ) ).addAssign( currentElements.element( j ) );
+
+											workgroupBarrier();
+
+										} );
+
+									} );
+
+								} );
+
+
 							},
 						},
 						'Kogge-Stone (Dispatch)': {
-							threads: Array( Math.floor( Math.log2( maxScanElements ) ) ).fill().map( ( _, idx ) => {
-
-								return idx === 0 ? maxScanElements : maxScanElements - 2 ** idx;
-			
-							} ),
+							threads: [ 64 ],
 							initMethod: ( currentElements, info ) => {
 
 								initMethod( currentElements );
 								info.element( 0 ).assign( 1 );
 
 							},
-							runMethod: ( currentElements, info ) => {
+							runMethod: ( currentElements ) => {
 
-								const offset = info.element( 0 );
+								const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
+								const prevReduction = uint( 0 ).toVar( 'prevReduction' );
 
-								const baseValue = currentElements.element( instanceIndex );
-								const offsetValue = currentElements.element( instanceIndex.add( offset ) );
+								LoopThroughWorkgroup( ( { workgroupIndex } ) => {
 
-								workgroupBarrier();
+									Loop( {
+										start: uint( 1 ),
+										end: WORKGROUP_SIZE,
+										type: 'uint',
+										condition: '<=',
+										update: '<<= 1',
+										name: 'j',
+									}, ( { j } ) => {
 
-								offsetValue.addAssign( baseValue );
+										const t = uint( 0 ).toVar( 't' );
 
-								workgroupBarrier();
+										If( invocationLocalIndex.greaterThanEqual( j ), () => {
 
-								If( instanceIndex.equal( maxScanElements - 1 ), () => {
+											t.assign( currentElements.element( invocationLocalIndex.sub( j ).add( workgroupIndex ) ) );
 
-									info.element( 0 ).mulAssign( 2 );
+
+										} );
+			
+										workgroupBarrier();
+
+										If( invocationLocalIndex.greaterThanEqual( j ), () => {
+
+											currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( t );
+
+										} );
+
+										workgroupBarrier();
+
+
+									} );
+
+									currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( prevReduction );
+									workgroupBarrier();
+
+									prevReduction.assign( currentElements.element( workgroupIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
 
 								} );
 
