@@ -1,4 +1,4 @@
-import * as MathUtils from './MathUtils.js';
+import { clamp } from './MathUtils.js';
 
 class Vector4 {
 
@@ -465,10 +465,10 @@ class Vector4 {
 
 		// assumes min < max, componentwise
 
-		this.x = MathUtils.clamp( this.x, min.x, max.x );
-		this.y = MathUtils.clamp( this.y, min.y, max.y );
-		this.z = MathUtils.clamp( this.z, min.z, max.z );
-		this.w = MathUtils.clamp( this.w, min.w, max.w );
+		this.x = clamp( this.x, min.x, max.x );
+		this.y = clamp( this.y, min.y, max.y );
+		this.z = clamp( this.z, min.z, max.z );
+		this.w = clamp( this.w, min.w, max.w );
 
 		return this;
 
@@ -476,10 +476,10 @@ class Vector4 {
 
 	clampScalar( minVal, maxVal ) {
 
-		this.x = MathUtils.clamp( this.x, minVal, maxVal );
-		this.y = MathUtils.clamp( this.y, minVal, maxVal );
-		this.z = MathUtils.clamp( this.z, minVal, maxVal );
-		this.w = MathUtils.clamp( this.w, minVal, maxVal );
+		this.x = clamp( this.x, minVal, maxVal );
+		this.y = clamp( this.y, minVal, maxVal );
+		this.z = clamp( this.z, minVal, maxVal );
+		this.w = clamp( this.w, minVal, maxVal );
 
 		return this;
 
@@ -489,7 +489,7 @@ class Vector4 {
 
 		const length = this.length();
 
-		return this.divideScalar( length || 1 ).multiplyScalar( MathUtils.clamp( length, min, max ) );
+		return this.divideScalar( length || 1 ).multiplyScalar( clamp( length, min, max ) );
 
 	}
 

@@ -1,4 +1,4 @@
-import * as MathUtils from './MathUtils.js';
+import { clamp } from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
 
 class Vector3 {
@@ -338,9 +338,9 @@ class Vector3 {
 
 		// assumes min < max, componentwise
 
-		this.x = MathUtils.clamp( this.x, min.x, max.x );
-		this.y = MathUtils.clamp( this.y, min.y, max.y );
-		this.z = MathUtils.clamp( this.z, min.z, max.z );
+		this.x = clamp( this.x, min.x, max.x );
+		this.y = clamp( this.y, min.y, max.y );
+		this.z = clamp( this.z, min.z, max.z );
 
 		return this;
 
@@ -348,9 +348,9 @@ class Vector3 {
 
 	clampScalar( minVal, maxVal ) {
 
-		this.x = MathUtils.clamp( this.x, minVal, maxVal );
-		this.y = MathUtils.clamp( this.y, minVal, maxVal );
-		this.z = MathUtils.clamp( this.z, minVal, maxVal );
+		this.x = clamp( this.x, minVal, maxVal );
+		this.y = clamp( this.y, minVal, maxVal );
+		this.z = clamp( this.z, minVal, maxVal );
 
 		return this;
 
@@ -360,7 +360,7 @@ class Vector3 {
 
 		const length = this.length();
 
-		return this.divideScalar( length || 1 ).multiplyScalar( MathUtils.clamp( length, min, max ) );
+		return this.divideScalar( length || 1 ).multiplyScalar( clamp( length, min, max ) );
 
 	}
 
@@ -530,7 +530,7 @@ class Vector3 {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
+		return Math.acos( clamp( theta, - 1, 1 ) );
 
 	}
 

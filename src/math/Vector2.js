@@ -1,4 +1,4 @@
-import * as MathUtils from './MathUtils.js';
+import { clamp } from './MathUtils.js';
 
 class Vector2 {
 
@@ -240,8 +240,8 @@ class Vector2 {
 
 		// assumes min < max, componentwise
 
-		this.x = MathUtils.clamp( this.x, min.x, max.x );
-		this.y = MathUtils.clamp( this.y, min.y, max.y );
+		this.x = clamp( this.x, min.x, max.x );
+		this.y = clamp( this.y, min.y, max.y );
 
 		return this;
 
@@ -249,8 +249,8 @@ class Vector2 {
 
 	clampScalar( minVal, maxVal ) {
 
-		this.x = MathUtils.clamp( this.x, minVal, maxVal );
-		this.y = MathUtils.clamp( this.y, minVal, maxVal );
+		this.x = clamp( this.x, minVal, maxVal );
+		this.y = clamp( this.y, minVal, maxVal );
 
 		return this;
 
@@ -260,7 +260,7 @@ class Vector2 {
 
 		const length = this.length();
 
-		return this.divideScalar( length || 1 ).multiplyScalar( MathUtils.clamp( length, min, max ) );
+		return this.divideScalar( length || 1 ).multiplyScalar( clamp( length, min, max ) );
 
 	}
 
@@ -365,7 +365,7 @@ class Vector2 {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
+		return Math.acos( clamp( theta, - 1, 1 ) );
 
 	}
 
