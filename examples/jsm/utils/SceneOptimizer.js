@@ -46,6 +46,7 @@ class SceneOptimizer {
 	getMaterialPropertiesHash( material ) {
 
 		const mapProps = [
+			'map',
 			'alphaMap',
 			'aoMap',
 			'bumpMap',
@@ -237,7 +238,15 @@ class SceneOptimizer {
 				0
 			);
 
-			const batchedMaterial = new THREE.MeshPhysicalMaterial( group.materialProps );
+			const batchedMaterial = new group.materialProps.constructor( group.materialProps );
+
+			if ( batchedMaterial.color !== undefined ) {
+
+				// Reset color to white, color will be set per instance
+				batchedMaterial.color.set( 1, 1, 1 );
+
+			}
+
 			const batchedMesh = new THREE.BatchedMesh(
 				maxGeometries,
 				maxVertices,
