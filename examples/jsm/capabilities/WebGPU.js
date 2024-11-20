@@ -1,11 +1,3 @@
-if ( self.GPUShaderStage === undefined ) {
-
-	self.GPUShaderStage = { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
-
-}
-
-// statics
-
 let isAvailable = navigator.gpu !== undefined;
 
 
