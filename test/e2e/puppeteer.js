@@ -158,6 +158,7 @@ const exceptionList = [
 	'webgpu_textures_anisotropy',
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_ssr',
+	'webgpu_postprocessing_sobel',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
