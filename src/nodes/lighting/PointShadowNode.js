@@ -8,18 +8,55 @@ import { sub, div, mul } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { glslFn } from '../code/FunctionNode.js';
+import { perspectiveDepthToViewZ } from '../TSL.js';
 
-export const cubeToUV = /*@__PURE__*/ Fn( ( [ v_immutable, texelSizeY_immutable ] ) => {
+// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
+// vector suitable for 2D texture mapping. This code uses the following layout for the
+// 2D texture:
+//
+// xzXZ
+//  y Y
+//
+// Y - Positive y direction
+// y - Negative y direction
+// X - Positive x direction
+// x - Negative x direction
+// Z - Positive z direction
+// z - Negative z direction
+//
+// Source and test bed:
+// https://gist.github.com/tschw/da10c43c467ce8afd0c4
 
-	const texelSizeY = float( texelSizeY_immutable ).toVar();
-	const v = vec3( v_immutable ).toVar();
-	const absV = vec3( abs( v ) ).toVar();
-	const scaleToCube = float( div( 1.0, max( absV.x, max( absV.y, absV.z ) ) ) ).toVar();
+export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
+
+	const v = pos.toVar();
+
+	// Number of texels to avoid at the edge of each square
+
+	const absV = abs( v );
+
+	// Intersect unit cube
+
+	const scaleToCube = div( 1.0, max( absV.x, max( absV.y, absV.z ) ) );
 	absV.mulAssign( scaleToCube );
-	v.mulAssign( scaleToCube.mul( sub( 1.0, mul( 2.0, texelSizeY ) ) ) );
+
+	// Apply scale to avoid seams
+
+	// two texels less per square (one texel will do for NEAREST)
+	v.mulAssign( scaleToCube.mul( texelSizeY.mul( 2 ).oneMinus() ) );
+
+	// Unwrap
+
+	// space: -1 ... 1 range for each square
+	//
+	// #X##		dim    := ( 4 , 2 )
+	//  # #		center := ( 1 , 1 )
+
 	const planar = vec2( v.xy ).toVar();
-	const almostATexel = float( mul( 1.5, texelSizeY ) ).toVar();
-	const almostOne = float( sub( 1.0, almostATexel ) ).toVar();
+
+	const almostATexel = texelSizeY.mul( 1.5 );
+	const almostOne = almostATexel.oneMinus();
 
 	If( absV.z.greaterThanEqual( almostOne ), () => {
 
@@ -31,17 +68,21 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ v_immutable, texelSizeY_immutable 
 
 	} ).ElseIf( absV.x.greaterThanEqual( almostOne ), () => {
 
-		const signX = float( sign( v.x ) ).toVar();
-		planar.x.assign( v.z.mul( signX ).add( mul( 2.0, signX ) ) );
+		const signX = sign( v.x );
+		planar.x.assign( v.z.mul( signX ).add( signX.mul( 2.0 ) ) );
 
 	} ).ElseIf( absV.y.greaterThanEqual( almostOne ), () => {
 
-		const signY = float( sign( v.y ) ).toVar();
-		planar.x.assign( v.x.add( mul( 2.0, signY ) ).add( 2.0 ) );
+		const signY = sign( v.y );
+		planar.x.assign( v.x.add( signY.mul( 2.0 ) ).add( 2.0 ) );
 		planar.y.assign( v.z.mul( signY ).sub( 2.0 ) );
 
 	} );
 
+	// Transform to UV space
+
+	// scale := 0.5 / dim
+	// translate := ( center + 0.5 ) / dim
 	return vec2( 0.125, 0.25 ).mul( planar ).add( vec2( 0.375, 0.75 ) );
 
 } ).setLayout( {
@@ -55,6 +96,8 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ v_immutable, texelSizeY_immutable 
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
+	// for point lights, the uniform @vShadowCoord is re-purposed to hold
+	// the vector from the light to the world-space position of the fragment.
 	const lightToPosition = shadowCoord.xyz.toVar();
 	const lightToPositionLength = lightToPosition.length();
 
@@ -65,23 +108,24 @@ const BasicShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const result = float( 1.0 ).toVar();
 
-	If( lightToPositionLength.sub( cameraFarLocal ).lessThanEqual( 0.0 ).and( lightToPositionLength.sub( cameraNearLocal ) ), () => {
+	If( lightToPositionLength.sub( cameraFarLocal ).lessThanEqual( 0.0 ).and( lightToPositionLength.sub( cameraNearLocal ).greaterThanEqual( 0.0 ) ), () => {
 
-		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar();
+		// dp = normalized distance from light to fragment position
+		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar(); // need to clamp?
 		dp.addAssign( bias );
 
+		// bd3D = base direction 3D
 		const bd3D = lightToPosition.normalize();
 		const texelSize = vec2( 1.0 ).div( mapSize.mul( vec2( 4.0, 2.0 ) ) );
 
-		const uv = cubeToUV( bd3D, texelSize.y ).flipY();
+		const uv = cubeToUV( bd3D, texelSize.y );
 
-		const dpRemap = dp.add( 1 ).div( 2 ); // unchecked
-
-		result.assign( texture( depthTexture, uv ).compare( dpRemap ).select( 1, 0 ) );
+		// no percentage-closer filtering
+		result.assign( texture( depthTexture, uv.flipY() ).compare( dp ).select( 1, 0 ) );
 
 	} );
 
-	return mix( 1.0, result, 1 );
+	return result;
 
 } );
 
@@ -111,9 +155,9 @@ class PointShadowNode extends ShadowNode {
 
 	}
 
-	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
+	setupShadowFilter( builder, { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } ) {
 
-		return BasicShadowMap( { depthTexture, shadowCoord, shadow } );
+		return BasicShadowMap( { shadowTexture, depthTexture, shadowCoord, shadow } );
 
 	}
 

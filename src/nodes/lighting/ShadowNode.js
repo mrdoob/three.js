@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { positionWorld } from '../accessors/Position.js';
+import { positionView, positionWorld } from '../accessors/Position.js';
 import { transformedNormalWorld } from '../accessors/Normal.js';
 import { mix, fract, step, max, clamp, sqrt } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
@@ -15,7 +15,8 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { depth, linearDepth, viewZToLogarithmicDepth, viewZToPerspectiveDepth } from '../display/ViewportDepthNode.js';
+import { modelViewProjection, objectPosition } from '../TSL.js';
 
 const shadowWorldPosition = vec3().toVar( 'shadowWorldPosition' );
 
@@ -298,17 +299,27 @@ class ShadowNode extends Node {
 
 		const { renderer } = builder;
 
+		const shadow = this.shadow;
+		const shadowMapType = renderer.shadowMap.type;
+
 		if ( _overrideMaterial === null ) {
+
+			const nearDistance = reference( 'near', 'float', shadow.camera ).setGroup( renderGroup );
+			const farDistance = reference( 'far', 'float', shadow.camera ).setGroup( renderGroup );
+
+			const referencePosition = objectPosition( shadow.camera );
+
+			let dist = positionWorld.sub( referencePosition ).length();
+			dist = dist.sub( nearDistance ).div( farDistance.sub( nearDistance ) );
+			dist = dist.saturate(); // clamp to [ 0, 1 ]
 
 			_overrideMaterial = new NodeMaterial();
 			_overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
+			_overrideMaterial.depthNode = dist;
 			_overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
 			_overrideMaterial.name = 'ShadowMaterial';
 
 		}
-
-		const shadow = this.shadow;
-		const shadowMapType = renderer.shadowMap.type;
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.compareFunction = LessCompare;
@@ -364,7 +375,7 @@ class ShadowNode extends Node {
 
 		const shadowDepthTexture = ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
 
-		const shadowNode = this.setupShadowFilter( builder, { filterFn, depthTexture: shadowDepthTexture, shadowCoord, shadow } );
+		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow } );
 
 		const shadowColor = texture( shadowMap.texture, shadowCoord );
 		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
