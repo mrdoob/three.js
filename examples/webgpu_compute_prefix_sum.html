@@ -224,8 +224,9 @@
 									const jStart = uint( pow( 2, iteration ).sub( 1 ) );
 									const kIters = uint( pow( 2, iteration ) );
 
+									// Emulate iteration through and k
 									const accessIndex = jStart.add( step.mul( invocationLocalIndex.div( kIters ) ) );
-									const assignIndex = fract( invocationLocalIndex, kIters ).add( 1 );
+									const assignIndex = jStart.add( fract( invocationLocalIndex, kIters ) ).add( 1 );
 
 									currentElements.element( assignIndex ).addAssign( currentElements.element( accessIndex ) );
 
