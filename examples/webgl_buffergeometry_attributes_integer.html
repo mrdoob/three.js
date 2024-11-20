@@ -108,7 +108,7 @@
 							value: [ map1, map2, map3 ]
 						}
 					},
-					vertexShader: `
+					vertexShader: /* glsl */`
 						in int textureIndex;
 
 						flat out int vIndex; // "flat" indicates that the value will not be interpolated (required for integer attributes)
@@ -123,7 +123,7 @@
 
 						}
 					`,
-					fragmentShader: `
+					fragmentShader: /* glsl */`
 						flat in int vIndex;
 						in vec2 vUv;
 
