@@ -1309,6 +1309,12 @@ class Renderer {
 
 	}
 
+	hasInitialized() {
+
+		return this._initialized;
+
+	}
+
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
 		if ( rectangle !== null ) {
