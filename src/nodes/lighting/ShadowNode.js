@@ -43,13 +43,13 @@ const linearShadowDistance = ( light ) => {
 
 };
 
-const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
+const BasicShadowFn = Fn( ( { depthTexture, shadowCoord } ) => {
 
 	return texture( depthTexture, shadowCoord.xy ).compare( shadowCoord.z );
 
 } );
 
-const PCFShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+const PCFShadowFn = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -88,7 +88,7 @@ const PCFShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 } );
 
-const PCFSoftShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+const PCFSoftShadowFn = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -146,7 +146,7 @@ const PCFSoftShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 // VSM
 
-const VSMShadowMapNode = Fn( ( { depthTexture, shadowCoord } ) => {
+const VSMShadowFn = Fn( ( { depthTexture, shadowCoord } ) => {
 
 	const occlusion = float( 1 ).toVar();
 
@@ -220,7 +220,7 @@ const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 } );
 
-const _shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMapNode ];
+const _shadowFilterLib = [ BasicShadowFn, PCFShadowFn, PCFSoftShadowFn, VSMShadowFn ];
 
 //
 
