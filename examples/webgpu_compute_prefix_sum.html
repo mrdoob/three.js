@@ -53,13 +53,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, vec3, Loop, uniform, uv, uint, float, Fn, vec2, uvec2, floor, pow, instanceIndex, invocationLocalIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
+			import { If, vec3, Loop, uniform, uv, uint, float, fract, modInt, Fn, vec2, uvec2, floor, pow, instanceIndex, invocationLocalIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			// Max number of elements that can be summed with a basic scan.
-			// Corresponds to the default size of a workgroup in Three.js
-			const maxScanElements = 16384;
 
 			// Max number of elements in each display.
 			const maxElements = 16384;
@@ -67,68 +63,25 @@
 			const effectController = {
 				// Sqr root of 16834
 				leftGridDim: uniform( Math.sqrt( maxElements ) ),
-				rightGridDim: uniform( Math.sqrt( maxScanElements ) ),
+				rightGridDim: uniform( Math.sqrt( maxElements ) ),
 				validate: uniform( 0 ),
 				// Algorithm being displayed
 				'Left Method Name': 'Fake Prefix',
-				'Right Method Name': 'Kogge-Stone (Dispatch)',
-				// Category the algorithm belongs to.
-				'Left Method Type': 'Validation',
-				'Right Method Type': 'Scan',
+				'Right Method Name': 'Kogge-Stone',
 			};
 
 			const algorithms = [
-				'Sklansky (Dispatch)',
-				'Kogge-Stone (Dispatch)',
+				'Sklansky',
+				'Kogge-Stone',
 				'Fake Prefix',
 				'Incorrect'
 			];
 
 			const gui = new GUI();
 
-			const switchMethodType = ( side ) => {
+			gui.add( effectController, 'Left Method Name', algorithms );
 
-				const methodType = `${side} Method Type`;
-
-				switch ( effectController[ `${side} Display Algo` ] ) {
-
-					case 'Fake Prefix':
-					case 'Incorrect': {
-
-						effectController[ methodType ] = 'Validation';
-						break;
-
-					}
-
-					case 'Sklansky (Dispatch)':
-					case 'Kogge-Stone (Dispatch)': {
-
-						effectController[ methodType ] = 'Scan';
-
-						break;
-			
-					}
-
-			
-				}
-
-
-
-			
-			};
-
-			gui.add( effectController, 'Left Method Name', algorithms ).onChange( () => {
-
-				switchMethodType( 'Left' );
-
-
-			} );
-
-			gui.add( effectController, 'Right Method Name', algorithms ).onChange( () => {
-			
-				switchMethodType( 'Right' );
-
-			} );
+			gui.add( effectController, 'Right Method Name', algorithms );
 
 			// Initialize Two Views
 			init( false );
@@ -151,7 +104,7 @@
 				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
 				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count );
 
-				const initMethod = ( currentElements ) => {
+				const genericInitMethod = ( currentElements ) => {
 
 					currentElements.element( instanceIndex ).assign( 1 );
 			
@@ -165,7 +118,7 @@
 					Loop( {
 						start: uint( 0 ),
 						type: 'uint',
-						end: uint( maxScanElements ),
+						end: uint( maxElements ),
 						condition: '<',
 						update: '+= WORKGROUP_SIZE',
 						name: 'workgroupIndex'
@@ -176,222 +129,179 @@
 
 				// Define and compile prefix sum methods.
 				const prefixSumMethods = {
-					// Methods to test whether the prefix sum validation is working as expected.
-					'Validation': {
-						// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer.
-						// This method should only be used to validate the correctness of new algorithms, and not as
-						// a yardstick for performance.
-						'Fake Prefix': {
-							threads: [ maxElements ],
-							runMethod: ( currentElements ) => {
+					// VALIDATION METHODS: Methods to test whether the prefix sum validation is working as expected.
+					//
+					// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer.
+					// This method should only be used to validate the correctness of new algorithms, and not as
+					// a yardstick for performance.
+					'Fake Prefix': {
+						threads: [ maxElements ],
+						runMethod: ( currentElements ) => {
 
-								currentElements.element( instanceIndex ).assign( instanceIndex.add( 1 ) );
+							currentElements.element( instanceIndex ).assign( instanceIndex.add( 1 ) );
 			
-							},
 						},
-						// Emulates an incorrect prefix sum by manually assigning the instanceIndex's inverse value.
-						// Used to demonstrate a completely incorrect algorithm
-						'Incorrect': {
-							threads: [ maxElements ],
-							runMethod: ( currentElements ) => {
-
-								currentElements.element( instanceIndex ).assign( uint( maxElements ).sub( instanceIndex ) );
-
-							},
-						}
 					},
-					'Scan': {
-						'Sklansky (Dispatch)': {
-							threads: [ 64 ],
-							runMethod: ( currentElements ) => {
+					// Emulates an incorrect prefix sum by manually assigning the instanceIndex's inverse value.
+					// Used to demonstrate a completely incorrect algorithm
+					'Incorrect': {
+						threads: [ maxElements ],
+						runMethod: ( currentElements ) => {
 
-								const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
-								const prevReduction = uint( 0 ).toVar( 'prevReduction' );
+							currentElements.element( instanceIndex ).assign( uint( maxElements ).sub( instanceIndex ) );
+
+						},
+					},
+					// BASIC SCANS
+					'Sklansky': {
+						threads: [ 32 ],
+						runMethod: ( currentElements ) => {
+
+							const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
+							const prevReduction = uint( 0 ).toVar( 'prevReduction' );
+
+							LoopThroughWorkgroup( ( { workgroupIndex } ) => {
+
+								const effectiveIndex = invocationLocalIndex.add( workgroupIndex );
 
 								Loop( {
 									start: uint( 0 ),
 									type: 'uint',
-									end: uint( Math.log2( WORKGROUP_SIZE ) - 1 ),
+									end: uint( Math.log2( 64 ) ),
 									condition: '<',
 									update: '+= 1',
 									name: 'iteration'
 								}, ( { iteration } ) => {
 
-									const step = pow( 2, iteration.add( 1 ) ).toVar( 'step' );
+									const step = uint( 1 ).shiftLeft( iteration.add( 1 ) ).toVar( 'step' );
 
 									// Alternative (Way I would like to use)
 
-									const jStart = uint( pow( 2, iteration ).sub( 1 ) );
-									const kIters = uint( pow( 2, iteration ) );
+									const jStart = ( uint( 1 ).shiftLeft( iteration ) ).sub( 1 ).toVar( 'jStart' );
+									const kIters = uint( 1 ).shiftLeft( iteration ).toVar( 'kIters' );
 
 									// Emulate iteration through and k
-									const accessIndex = jStart.add( step.mul( invocationLocalIndex.div( kIters ) ) );
-									const assignIndex = jStart.add( fract( invocationLocalIndex, kIters ) ).add( 1 );
+									const accessIndex = jStart.add( step.mul( effectiveIndex.div( kIters ) ) ).toVar( 'accessIndex' );
+									const assignIndex = accessIndex.add( modInt( effectiveIndex, kIters ) ).add( 1 ).toVar( 'assignIndex' );
 
 									currentElements.element( assignIndex ).addAssign( currentElements.element( accessIndex ) );
 
 									workgroupBarrier();
 
-			
-
-									// Pseudo code direct
-
-									Loop( {
-										start: uint( pow( 2, iteration ).sub( 1 ) ),
-										type: 'uint',
-										end: WORKGROUP_SIZE,
-										condition: '<',
-										update: '+= step',
-										name: 'j',
-									}, ( { j } ) => {
-
-										Loop( {
-											start: uint( 0 ),
-											type: 'uint',
-											end: uint( pow( 2, iteration ) ),
-											condition: '<',
-											update: '+= 1',
-											name: 'k'
-										}, ( { k } ) => {
-			
-											currentElements.element( j.add( k ).add( 1 ) ).addAssign( currentElements.element( j ) );
-
-											workgroupBarrier();
-
-										} );
-
-									} );
-
 								} );
 
+								currentElements.element( effectiveIndex ).addAssign( prevReduction );
+								workgroupBarrier();
 
-							},
+								prevReduction.assign( currentElements.element( workgroupIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
+
+							} );
+
+
 						},
-						'Kogge-Stone (Dispatch)': {
-							threads: [ 64 ],
-							initMethod: ( currentElements, info ) => {
+					},
+					'Kogge-Stone': {
+						threads: [ 64 ],
+						initMethod: ( currentElements, info ) => {
 
-								initMethod( currentElements );
-								info.element( 0 ).assign( 1 );
+							genericInitMethod( currentElements );
+							info.element( 0 ).assign( 1 );
 
-							},
-							runMethod: ( currentElements ) => {
+						},
+						runMethod: ( currentElements ) => {
 
-								const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
-								const prevReduction = uint( 0 ).toVar( 'prevReduction' );
+							const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
+							const prevReduction = uint( 0 ).toVar( 'prevReduction' );
 
-								LoopThroughWorkgroup( ( { workgroupIndex } ) => {
+							LoopThroughWorkgroup( ( { workgroupIndex } ) => {
 
-									Loop( {
-										start: uint( 1 ),
-										end: WORKGROUP_SIZE,
-										type: 'uint',
-										condition: '<=',
-										update: '<<= 1',
-										name: 'j',
-									}, ( { j } ) => {
+								Loop( {
+									start: uint( 1 ),
+									end: WORKGROUP_SIZE,
+									type: 'uint',
+									condition: '<=',
+									update: '<<= 1',
+									name: 'j',
+								}, ( { j } ) => {
 
-										const t = uint( 0 ).toVar( 't' );
+									const t = uint( 0 ).toVar( 't' );
 
-										If( invocationLocalIndex.greaterThanEqual( j ), () => {
+									If( invocationLocalIndex.greaterThanEqual( j ), () => {
 
-											t.assign( currentElements.element( invocationLocalIndex.sub( j ).add( workgroupIndex ) ) );
-
-
-										} );
-			
-										workgroupBarrier();
-
-										If( invocationLocalIndex.greaterThanEqual( j ), () => {
-
-											currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( t );
-
-										} );
-
-										workgroupBarrier();
+										t.assign( currentElements.element( invocationLocalIndex.sub( j ).add( workgroupIndex ) ) );
 
 
 									} );
-
-									currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( prevReduction );
+			
 									workgroupBarrier();
 
-									prevReduction.assign( currentElements.element( workgroupIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
+									If( invocationLocalIndex.greaterThanEqual( j ), () => {
+
+										currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( t );
+
+									} );
+
+									workgroupBarrier();
+
 
 								} );
 
-							}
+								currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( prevReduction );
+								workgroupBarrier();
+
+								prevReduction.assign( currentElements.element( workgroupIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
+
+							} );
+
 						}
 					}
 				};
 
-				console.log( prefixSumMethods );
 
-				// Pre-compile shaders
-				for ( const methodType in prefixSumMethods ) {
+				for ( const methodName in prefixSumMethods ) {
 
-					console.log( methodType );
+					const method = prefixSumMethods[ methodName ];
 
-					let numElements = 0;
-					switch ( methodType ) {
 
-						case 'Validation': {
+					if ( method.initMethod ) {
 
-							numElements = maxElements;
-							break;
+						// Check if the current method requires additional initialization steps
 
-						}
+						method.initFunction = Fn( () => {
 
-						case 'Scan': {
+							method.initMethod( currentElementsStorage, infoStorage );
 
-							numElements = maxScanElements;
-							break;
-			
-						}
+						} )().compute( maxElements );
 
+
+
+					} else {
+
+						// Otherwise, simply run the generic initialization method.
+
+						method.initFunction = Fn( () => {
+
+							genericInitMethod( currentElementsStorage );
+
+						} )().compute( maxElements );
 
 					}
 
-					for ( const methodName in prefixSumMethods[ methodType ] ) {
+					method.runFunctions = [];
 
-						console.log( methodName );
+					const runFunctionTemplate = Fn( ( ) => {
 
-						const method = prefixSumMethods[ methodType ][ methodName ];
+						method.runMethod( currentElementsStorage, infoStorage );
 
-						// Compile init function
-						if ( method.initMethod ) {
+					} );
 
-							method.initFunction = Fn( () => {
+					for ( let i = 0; i < method.threads.length; i ++ ) {
 
-								method.initMethod( currentElementsStorage, infoStorage );
+						method.runFunctions.push( runFunctionTemplate().compute( method.threads[ i ] ) );
 
-							} )().compute( numElements );
-
-						} else {
-
-							method.initFunction = Fn( () => {
-
-								initMethod( currentElementsStorage );
-
-							} )().compute( numElements );
-
-						}
-
-						method.runFunctions = [];
-
-						const runFunctionTemplate = Fn( ( ) => {
-
-							method.runMethod( currentElementsStorage, infoStorage );
-
-						} );
-
-						for ( let i = 0; i < method.threads.length; i ++ ) {
-
-							method.runFunctions.push( runFunctionTemplate().compute( method.threads[ i ] ) );
-
-						}
-			
 					}
+			
+			
 
 				}
 			
@@ -466,15 +376,11 @@
 
 				 const stepAnimation = async function () {
 
-					const methodType = rightSide ?
-						effectController[ 'Right Method Type' ] :
-						effectController[ 'Left Method Type' ];
-
 					const methodName = rightSide ?
 						effectController[ 'Right Method Name' ] :
 						effectController[ 'Left Method Name' ];
 
-					const method = prefixSumMethods[ methodType ][ methodName ];
+					const method = prefixSumMethods[ methodName ];
 
 					switch ( stepType ) {
 
@@ -508,9 +414,6 @@
 							break;
 
 						case 'Init': {
-
-							console.log( `${methodType} ${methodName}` );
-							console.log( method.initFunction );
 
 							renderer.compute( method.initFunction );
 
