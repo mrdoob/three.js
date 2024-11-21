@@ -318,6 +318,12 @@ class ShadowNode extends Node {
 
 	}
 
+	getShadowFilterFn( type ) {
+
+		return _shadowFilterLib[ type ];
+
+	}
+
 	setupShadow( builder ) {
 
 		const { renderer } = builder;
@@ -382,7 +388,7 @@ class ShadowNode extends Node {
 
 		//
 
-		const filterFn = shadow.filterNode || _shadowFilterLib[ renderer.shadowMap.type ] || null;
+		const filterFn = shadow.filterNode || this.getShadowFilterFn( renderer.shadowMap.type ) || null;
 
 		if ( filterFn === null ) {
 
