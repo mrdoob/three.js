@@ -1248,7 +1248,14 @@ ${ flowData.code }
 				const bufferType = this.getType( bufferNode.bufferType );
 				const bufferCount = bufferNode.bufferCount;
 
-				const isArray = bufferNode.value.array.length !== bufferNode.value.itemSize;
+				let isArray = false;
+
+				if ( bufferNode.value?.array?.length && bufferNode.value?.itemSize ) {
+
+					isArray = bufferType && bufferNode.value.array.length > bufferNode.value.itemSize;
+
+				}
+
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
 				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${bufferType}>` : `${bufferType}`;
 				const bufferSnippet = bufferNode.bufferStruct ? this.getMembersFromCustomStruct( bufferType ) : `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
