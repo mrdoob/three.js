@@ -106,6 +106,8 @@ class AnalyticLightNode extends LightingNode {
 		} else if ( this.shadowNode !== null ) {
 
 			this.shadowNode.dispose();
+			this.shadowNode = null;
+			this.shadowColorNode = null;
 
 		}
 
