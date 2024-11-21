@@ -96,13 +96,13 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
 	]
 } );
 
-const BasicShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize } ) => {
+export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize } ) => {
 
 	return texture( depthTexture, cubeToUV( bd3D, texelSize.y ) ).compare( dp );
 
 } );
 
-const FilteredShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
+export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize.y );
@@ -175,7 +175,7 @@ class PointShadowNode extends ShadowNode {
 
 	getShadowFilterFn( type ) {
 
-		return type === BasicShadowMap ? BasicShadowFn : FilteredShadowFn;
+		return type === BasicShadowMap ? BasicPointShadowFilter : PointShadowFilter;
 
 	}
 

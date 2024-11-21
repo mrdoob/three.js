@@ -43,13 +43,13 @@ const linearShadowDistance = ( light ) => {
 
 };
 
-const BasicShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
+export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
 
 	return texture( depthTexture, shadowCoord.xy ).compare( shadowCoord.z );
 
 } );
 
-const PCFShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -88,7 +88,7 @@ const PCFShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) 
 
 } );
 
-const PCFSoftShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -146,7 +146,7 @@ const PCFSoftShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow 
 
 // VSM
 
-const VSMShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
+export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
 
 	const occlusion = float( 1 ).toVar();
 
@@ -220,7 +220,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 } );
 
-const _shadowFilterLib = [ BasicShadowFn, PCFShadowFn, PCFSoftShadowFn, VSMShadowFn ];
+const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter ];
 
 //
 
