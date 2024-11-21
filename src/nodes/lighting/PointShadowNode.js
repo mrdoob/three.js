@@ -9,6 +9,7 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Color } from '../../math/Color.js';
+import { BasicShadowMap } from '../../constants.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
 
@@ -84,7 +85,7 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
 
 	// scale := 0.5 / dim
 	// translate := ( center + 0.5 ) / dim
-	return vec2( 0.125, 0.25 ).mul( planar ).add( vec2( 0.375, 0.75 ) );
+	return vec2( 0.125, 0.25 ).mul( planar ).add( vec2( 0.375, 0.75 ) ).flipY();
 
 } ).setLayout( {
 	name: 'cubeToUV',
@@ -95,7 +96,31 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
 	]
 } );
 
-const BasicShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+const BasicShadowFn = Fn( ( { depthTexture, bd3D, dp, texelSize } ) => {
+
+	return texture( depthTexture, cubeToUV( bd3D, texelSize.y ) ).compare( dp );
+
+} );
+
+const FilteredShadowFn = Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
+
+	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize.y );
+
+	return texture( depthTexture, cubeToUV( bd3D.add( offset.xyy ), texelSize.y ) ).compare( dp )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yyy ), texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.xyx ), texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yyx ), texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D, texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.xxy ), texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yxy ), texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.xxx ), texelSize.y ) ).compare( dp ) )
+		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yxx ), texelSize.y ) ).compare( dp ) )
+		.mul( 1.0 / 9.0 );
+
+} );
+
+const pointShadowFilter = Fn( ( { filterFn, depthTexture, shadowCoord, shadow } ) => {
 
 	// for point lights, the uniform @vShadowCoord is re-purposed to hold
 	// the vector from the light to the world-space position of the fragment.
@@ -119,10 +144,8 @@ const BasicShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 		const bd3D = lightToPosition.normalize();
 		const texelSize = vec2( 1.0 ).div( mapSize.mul( vec2( 4.0, 2.0 ) ) );
 
-		const uv = cubeToUV( bd3D, texelSize.y );
-
-		// no percentage-closer filtering
-		result.assign( texture( depthTexture, uv.flipY() ).compare( dp ).select( 1, 0 ) );
+		// percentage-closer filtering
+		result.assign( filterFn( { depthTexture, bd3D, dp, texelSize, shadow } ) );
 
 	} );
 
@@ -150,6 +173,12 @@ class PointShadowNode extends ShadowNode {
 
 	}
 
+	getShadowFilterFn( type ) {
+
+		return type === BasicShadowMap ? BasicShadowFn : FilteredShadowFn;
+
+	}
+
 	setupShadowCoord( builder, shadowPosition ) {
 
 		return shadowPosition;
@@ -158,7 +187,7 @@ class PointShadowNode extends ShadowNode {
 
 	setupShadowFilter( builder, { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } ) {
 
-		return BasicShadowMap( { shadowTexture, depthTexture, shadowCoord, shadow } );
+		return pointShadowFilter( { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } );
 
 	}
 
