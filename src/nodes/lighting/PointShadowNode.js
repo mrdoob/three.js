@@ -96,13 +96,13 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
 	]
 } );
 
-const BasicShadowFn = Fn( ( { depthTexture, bd3D, dp, texelSize } ) => {
+const BasicShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize } ) => {
 
 	return texture( depthTexture, cubeToUV( bd3D, texelSize.y ) ).compare( dp );
 
 } );
 
-const FilteredShadowFn = Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
+const FilteredShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize.y );
@@ -120,7 +120,7 @@ const FilteredShadowFn = Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) =
 
 } );
 
-const pointShadowFilter = Fn( ( { filterFn, depthTexture, shadowCoord, shadow } ) => {
+const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow } ) => {
 
 	// for point lights, the uniform @vShadowCoord is re-purposed to hold
 	// the vector from the light to the world-space position of the fragment.

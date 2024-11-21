@@ -18,9 +18,9 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 
-const shadowWorldPosition = vec3().toVar( 'shadowWorldPosition' );
+const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
 
-const linearDistance = Fn( ( [ position, cameraNear, cameraFar ] ) => {
+const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
 	let dist = positionWorld.sub( position ).length();
 	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
@@ -43,13 +43,13 @@ const linearShadowDistance = ( light ) => {
 
 };
 
-const BasicShadowFn = Fn( ( { depthTexture, shadowCoord } ) => {
+const BasicShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
 
 	return texture( depthTexture, shadowCoord.xy ).compare( shadowCoord.z );
 
 } );
 
-const PCFShadowFn = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+const PCFShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -88,7 +88,7 @@ const PCFShadowFn = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 } );
 
-const PCFSoftShadowFn = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+const PCFSoftShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -146,7 +146,7 @@ const PCFSoftShadowFn = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 // VSM
 
-const VSMShadowFn = Fn( ( { depthTexture, shadowCoord } ) => {
+const VSMShadowFn = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
 
 	const occlusion = float( 1 ).toVar();
 
@@ -168,7 +168,7 @@ const VSMShadowFn = Fn( ( { depthTexture, shadowCoord } ) => {
 
 } );
 
-const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
+const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -194,7 +194,7 @@ const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 } );
 
-const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
+const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
