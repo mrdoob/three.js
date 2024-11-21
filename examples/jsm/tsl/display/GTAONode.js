@@ -27,17 +27,6 @@ class GTAONode extends TempNode {
 
 		this.resolutionScale = 1;
 
-		this.cameraNear = reference( 'near', 'float', camera );
-		this.cameraFar = reference( 'far', 'float', camera );
-
-		this.radius = uniform( 0.25 );
-		this.resolution = uniform( new Vector2() );
-		this.thickness = uniform( 1 );
-		this.distanceExponent = uniform( 1 );
-		this.distanceFallOff = uniform( 1 );
-		this.scale = uniform( 1 );
-		this.samples = uniform( 16 );
-
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		// render targets
@@ -47,9 +36,19 @@ class GTAONode extends TempNode {
 
 		// uniforms
 
+		this.radius = uniform( 0.25 );
+		this.resolution = uniform( new Vector2() );
+		this.thickness = uniform( 1 );
+		this.distanceExponent = uniform( 1 );
+		this.distanceFallOff = uniform( 1 );
+		this.scale = uniform( 1 );
+		this.samples = uniform( 16 );
+
 		this._noiseNode = texture( generateMagicSquareNoise() );
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+		this._cameraNear = reference( 'near', 'float', camera );
+		this._cameraFar = reference( 'far', 'float', camera );
 
 		// materials
 
@@ -112,13 +111,13 @@ class GTAONode extends TempNode {
 
 		const sampleDepth = ( uv ) => {
 
-			const depth = this.depthNode.uv( uv ).x;
+			const depth = this.depthNode.uv( uv ).r;
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
-				const viewZ = logarithmicDepthToViewZ( depth, this.cameraNear, this.cameraFar );
+				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
 
-				return viewZToPerspectiveDepth( viewZ, this.cameraNear, this.cameraFar );
+				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
 
 			}
 
