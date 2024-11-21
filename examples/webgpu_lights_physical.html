@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - lights - physical lights</title>
+		<title>three.js webgpu - physical lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -35,7 +35,6 @@
 
 			let camera, scene, renderer, bulbLight, bulbMat, hemiLight, stats;
 			let ballMat, cubeMat, floorMat;
-			let postProcessing;
 
 			let previousShadowMap = false;
 
@@ -82,6 +81,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
+				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.x = - 4;
@@ -219,27 +219,14 @@
 				boxMesh2.castShadow = true;
 				scene.add( boxMesh2 );
 
-				const boxMesh4 = new THREE.Mesh( boxGeometry, cubeMat );
-				boxMesh4.position.set( 0, 0.25, 0 );
-				boxMesh4.castShadow = true;
-				//scene.add( boxMesh4 );
-
 				const boxMesh3 = new THREE.Mesh( boxGeometry, cubeMat );
 				boxMesh3.position.set( 7, 0.25, 0 );
 				boxMesh3.castShadow = true;
 				scene.add( boxMesh3 );
 
-				const walls = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), floorMat );
-				walls.position.set( 0, 9, 0 );
-				walls.castShadow = true;
-				//walls.material.side = THREE.DoubleSide;
-				walls.geometry.scale( - 1, 1, 1 );
-				scene.add( walls );
-
 				//
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: false } );
-				console.log( renderer.backend );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -248,17 +235,13 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
 
-
-				postProcessing = new THREE.PostProcessing( renderer );
-
-
-
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 20;
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				//
 
 				const gui = new GUI();
 
@@ -303,22 +286,8 @@
 				const time = Date.now() * 0.0005;
 
 				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
-				//bulbLight.position.y = .5;
-				//bulbLight.position.y = 1.5;
-				//bulbLight.position.y = 1.5;
 
 				renderer.render( scene, camera );
-
-				/*if ( ! postProcessing.test ) {
-
-					const scenePass = THREE.pass( scene, camera );
-
-					postProcessing.outputNode = scenePass.add( THREE.texture( bulbLight.shadow.map.texture ) );
-					postProcessing.test = true;
-
-				}*/
-
-				//postProcessing.render();
 
 				stats.update();
 

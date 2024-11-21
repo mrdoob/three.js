@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { positionView, positionWorld } from '../accessors/Position.js';
+import { positionWorld } from '../accessors/Position.js';
 import { transformedNormalWorld } from '../accessors/Normal.js';
 import { mix, fract, step, max, clamp, sqrt } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
@@ -15,10 +15,33 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { depth, linearDepth, viewZToLogarithmicDepth, viewZToPerspectiveDepth } from '../display/ViewportDepthNode.js';
-import { modelViewProjection, objectPosition } from '../TSL.js';
+import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { objectPosition } from '../accessors/Object3DNode.js';
 
 const shadowWorldPosition = vec3().toVar( 'shadowWorldPosition' );
+
+const linearDistance = Fn( ( [ position, cameraNear, cameraFar ] ) => {
+
+	let dist = positionWorld.sub( position ).length();
+	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
+	dist = dist.saturate(); // clamp to [ 0, 1 ]
+
+	return dist;
+
+} );
+
+const linearShadowDistance = ( light ) => {
+
+	const camera = light.shadow.camera;
+
+	const nearDistance = reference( 'near', 'float', camera ).setGroup( renderGroup );
+	const farDistance = reference( 'far', 'float', camera ).setGroup( renderGroup );
+
+	const referencePosition = objectPosition( light );
+
+	return linearDistance( referencePosition, nearDistance, farDistance );
+
+};
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -299,23 +322,17 @@ class ShadowNode extends Node {
 
 		const { renderer } = builder;
 
-		const shadow = this.shadow;
+		const { light, shadow } = this;
+
 		const shadowMapType = renderer.shadowMap.type;
 
 		if ( _overrideMaterial === null ) {
 
-			const nearDistance = reference( 'near', 'float', shadow.camera ).setGroup( renderGroup );
-			const farDistance = reference( 'far', 'float', shadow.camera ).setGroup( renderGroup );
-
-			const referencePosition = objectPosition( shadow.camera );
-
-			let dist = positionWorld.sub( referencePosition ).length();
-			dist = dist.sub( nearDistance ).div( farDistance.sub( nearDistance ) );
-			dist = dist.saturate(); // clamp to [ 0, 1 ]
+			const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
 
 			_overrideMaterial = new NodeMaterial();
 			_overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
-			_overrideMaterial.depthNode = dist;
+			_overrideMaterial.depthNode = depthNode;
 			_overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
 			_overrideMaterial.name = 'ShadowMaterial';
 

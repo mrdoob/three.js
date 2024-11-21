@@ -1,15 +1,16 @@
 import ShadowNode from './ShadowNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { float, vec2, vec3, If, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec2, If, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { mix, max, abs, sign } from '../math/MathNode.js';
-import { sub, div, mul } from '../math/OperatorNode.js';
+import { max, abs, sign } from '../math/MathNode.js';
+import { sub, div } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { glslFn } from '../code/FunctionNode.js';
-import { perspectiveDepthToViewZ } from '../TSL.js';
+import { Color } from '../../math/Color.js';
+
+const _clearColor = /*@__PURE__*/ new Color();
 
 // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
 // vector suitable for 2D texture mapping. This code uses the following layout for the
@@ -89,7 +90,7 @@ export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
 	name: 'cubeToUV',
 	type: 'vec2',
 	inputs: [
-		{ name: 'v', type: 'vec3' },
+		{ name: 'pos', type: 'vec3' },
 		{ name: 'texelSizeY', type: 'float' }
 	]
 } );
@@ -179,8 +180,11 @@ class PointShadowNode extends ShadowNode {
 
 		const previousAutoClear = renderer.autoClear;
 
+		const previousClearColor = renderer.getClearColor( _clearColor );
+		const previousClearAlpha = renderer.getClearAlpha();
+
 		renderer.autoClear = false;
-		renderer.setClearColor( 0xffffff, 1 );
+		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
 		renderer.clear();
 
 		const viewportCount = shadow.getViewportCount();
@@ -200,8 +204,6 @@ class PointShadowNode extends ShadowNode {
 			);
 
 			shadowMap.viewport.copy( _viewport );
-			//shadowMap.scissor.copy( _viewport );
-			//shadowMap.scissorTest = true;
 
 			shadow.updateMatrices( light, vp );
 
@@ -212,6 +214,7 @@ class PointShadowNode extends ShadowNode {
 		//
 
 		renderer.autoClear = previousAutoClear;
+		renderer.setClearColor( previousClearColor, previousClearAlpha );
 
 	}
 

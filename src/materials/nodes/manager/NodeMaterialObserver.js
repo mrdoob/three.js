@@ -85,7 +85,7 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			const { geometry, material } = renderObject;
+			const { geometry, material, object } = renderObject;
 
 			data = {
 				material: this.getMaterialData( material ),
@@ -94,18 +94,18 @@ class NodeMaterialObserver {
 					indexVersion: geometry.index ? geometry.index.version : null,
 					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
 				},
-				worldMatrix: renderObject.object.matrixWorld.clone()
+				worldMatrix: object.matrixWorld.clone()
 			};
 
-			if ( renderObject.object.center ) {
+			if ( object.center ) {
 
-				data.center = renderObject.object.center.clone();
+				data.center = object.center.clone();
 
 			}
 
-			if ( renderObject.object.morphTargetInfluences ) {
+			if ( object.morphTargetInfluences ) {
 
-				data.morphTargetInfluences = renderObject.object.morphTargetInfluences.slice();
+				data.morphTargetInfluences = object.morphTargetInfluences.slice();
 
 			}
 
@@ -289,7 +289,8 @@ class NodeMaterialObserver {
 
 		}
 
-		// Compare each attribute
+		// compare each attribute
+
 		for ( const name of storedAttributeNames ) {
 
 			const storedAttributeData = storedAttributes[ name ];
@@ -297,7 +298,7 @@ class NodeMaterialObserver {
 
 			if ( attribute === undefined ) {
 
-				// Attribute was removed
+				// attribute was removed
 				delete storedAttributes[ name ];
 				return false;
 
@@ -312,7 +313,8 @@ class NodeMaterialObserver {
 
 		}
 
-		// Check index
+		// check index
+
 		const index = geometry.index;
 		const storedIndexVersion = storedGeometryData.indexVersion;
 		const currentIndexVersion = index ? index.version : null;
@@ -324,7 +326,8 @@ class NodeMaterialObserver {
 
 		}
 
-		// Check drawRange
+		// check drawRange
+
 		if ( storedGeometryData.drawRange.start !== geometry.drawRange.start || storedGeometryData.drawRange.count !== geometry.drawRange.count ) {
 
 			storedGeometryData.drawRange.start = geometry.drawRange.start;

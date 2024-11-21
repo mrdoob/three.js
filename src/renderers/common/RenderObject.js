@@ -1,4 +1,4 @@
-import { hash, hashString } from '../../nodes/core/NodeUtils.js';
+import { hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 
@@ -379,6 +379,8 @@ export default class RenderObject {
 
 		}
 
+		cacheKey += object.receiveShadow + ',';
+
 		return hashString( cacheKey );
 
 	}
@@ -403,7 +405,7 @@ export default class RenderObject {
 
 		if ( this.object.receiveShadow ) {
 
-			cacheKey = hash( cacheKey, 1 );
+			cacheKey += 1;
 
 		}
 
