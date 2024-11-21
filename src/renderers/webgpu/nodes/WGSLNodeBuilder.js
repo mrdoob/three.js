@@ -1250,7 +1250,7 @@ ${ flowData.code }
 
 				let isArray = false;
 
-				if ( bufferNode.value?.array?.length && bufferNode.value?.itemSize ) {
+				if ( bufferNode.value && bufferNode.value.array && bufferNode.value.itemSize ) {
 
 					isArray = bufferType && bufferNode.value.array.length > bufferNode.value.itemSize;
 
