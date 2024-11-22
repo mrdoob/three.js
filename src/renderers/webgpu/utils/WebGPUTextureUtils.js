@@ -230,7 +230,7 @@ class WebGPUTextureUtils {
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		textureData.texture.destroy();
+		if ( textureData.texture !== undefined ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
