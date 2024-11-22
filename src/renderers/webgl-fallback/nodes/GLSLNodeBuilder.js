@@ -61,7 +61,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinearSRGB( texture ) {
+	needsToWorkingColorSpace( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
