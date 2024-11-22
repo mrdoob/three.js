@@ -31185,6 +31185,7 @@ class Audio extends Object3D {
 	onEnded() {
 
 		this.isPlaying = false;
+		this._progress = 0;
 
 	}
 
