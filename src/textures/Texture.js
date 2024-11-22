@@ -10,7 +10,7 @@ import {
 	UVMapping,
 	NoColorSpace,
 } from '../constants.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
@@ -27,7 +27,7 @@ class Texture extends EventDispatcher {
 
 		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 		this.name = '';
 

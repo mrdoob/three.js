@@ -2,7 +2,7 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { clamp } from '../math/MathUtils.js';
 
 class LatheGeometry extends BufferGeometry {
 
@@ -23,7 +23,7 @@ class LatheGeometry extends BufferGeometry {
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
 
-		phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
+		phiLength = clamp( phiLength, 0, Math.PI * 2 );
 
 		// buffers
 

@@ -7,7 +7,7 @@ import { Sphere } from '../math/Sphere.js';
 import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 import { arrayNeedsUint32 } from '../utils.js';
 
 let _id = 0;
@@ -29,7 +29,7 @@ class BufferGeometry extends EventDispatcher {
 
 		Object.defineProperty( this, 'id', { value: _id ++ } );
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 		this.name = '';
 		this.type = 'BufferGeometry';

@@ -6,7 +6,7 @@ import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
 import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
 import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
 import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
 class AnimationClip {
@@ -18,7 +18,7 @@ class AnimationClip {
 		this.duration = duration;
 		this.blendMode = blendMode;
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 		// this means it should figure out its duration by scanning the tracks
 		if ( this.duration < 0 ) {
