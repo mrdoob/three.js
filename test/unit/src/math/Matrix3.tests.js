@@ -3,7 +3,7 @@
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 
-function matrixEquals3( a, b, tolerance ) {
+function matrixEquals3( b, a, tolerance ) {
 
 	tolerance = tolerance || 0.0001;
 	if ( a.elements.length != b.elements.length ) {
@@ -14,7 +14,7 @@ function matrixEquals3( a, b, tolerance ) {
 
 	for ( let i = 0, il = a.elements.length; i < il; i ++ ) {
 
-		const delta = a.elements[ i ] - b.elements[ i ];
+		const delta = Math.abs( a.elements[ i ] - b.elements[ i ] );
 		if ( delta > tolerance ) {
 
 			return false;
