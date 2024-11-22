@@ -978,6 +978,83 @@ ${ flowData.code }
 
 	}
 
+	getTypeFromCustomStruct( shaderStage ) {
+
+		const uniforms = this.uniforms[ shaderStage ];
+
+		const bufferStructMap = new Map();
+
+		uniforms.forEach( ( uniform ) => {
+
+			const { name, node } = uniform;
+			const hasBufferStruct = node.bufferStruct === true;
+			bufferStructMap.set( name, hasBufferStruct );
+
+		} );
+
+		return bufferStructMap;
+
+	}
+
+	getMembersFromCustomStruct( members ) {
+
+		const structMembers = members.map( ( { name, type, isAtomic } ) => {
+
+			let finalType = wgslTypeLib[ type ];
+
+			if ( ! finalType ) {
+
+				console.warn( `Unrecognized type: ${type}` );
+				finalType = 'vec4<f32>';
+
+			}
+
+			return `${name}: ${isAtomic ? `atomic<${finalType}>` : finalType}`;
+
+		} );
+
+		return `\t${structMembers.join( ',\n\t' )}`;
+
+	}
+
+	getCustomStructNameFromShader( source ) {
+
+		//This declarationRegexp can be adopted as a new standard in a separate PR and would no longer be necessary separately here.
+		//The difference is that the shader return type is optional
+
+		const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*(?:->\s*([a-z_0-9]+(?:<[\s\S]+?>)?))?/i;
+		const parameterRegex = /([a-z_0-9]+)\s*:\s*(ptr<\s*([a-z_0-9]+),\s*(?:array<([a-z_0-9<>]+)>|([a-z_0-9]+))[^>]*>|[a-z_0-9<>,]+)/ig;
+
+		const results = [];
+
+		source = source.trim();
+
+		const declaration = source.match( declarationRegexp );
+
+		if ( declaration !== null && declaration.length === 4 ) {
+
+			let paramMatch;
+
+			while ( ( paramMatch = parameterRegex.exec( declaration[ 2 ] ) ) !== null ) {
+
+				const name = paramMatch[ 1 ];
+
+				const structName = paramMatch[ 4 ] || paramMatch[ 5 ];	//4 array, 5 single
+
+				if ( structName && ! Object.values( wgslTypeLib ).includes( structName ) ) {
+
+					results.push( { name, structName } );
+
+				}
+
+			}
+
+		}
+
+		return results;
+
+	}
+
 	getStructMembers( struct ) {
 
 		const snippets = [];
@@ -1185,12 +1262,20 @@ ${ flowData.code }
 				const bufferType = this.getType( bufferNode.bufferType );
 				const bufferCount = bufferNode.bufferCount;
 
+				let isArray = false;
+
+				if ( bufferNode.value && bufferNode.value.array && bufferNode.value.itemSize ) {
+
+					isArray = bufferType && bufferNode.value.array.length > bufferNode.value.itemSize;
+
+				}
+
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
 				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${bufferType}>` : `${bufferType}`;
-				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
+				const bufferSnippet = bufferNode.bufferStruct ? this.getMembersFromCustomStruct( bufferType ) : `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+				bufferSnippets.push( this._getWGSLStructBinding( bufferNode.bufferStruct, isArray, 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
 			} else {
 
@@ -1213,7 +1298,7 @@ ${ flowData.code }
 
 			const group = uniformGroups[ name ];
 
-			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
+			structSnippets.push( this._getWGSLStructBinding( false, false, name, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
 
 		}
 
@@ -1242,9 +1327,69 @@ ${ flowData.code }
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
 			stageData.scopedArrays = this.getScopedArrays( shaderStage );
+			stageData.isBufferStruct = this.getTypeFromCustomStruct( shaderStage );
+			stageData.customStructNames = this.getCustomStructNameFromShader( stageData.codes );
 
 			//
 
+			const reduceFlow = ( flow ) => {
+
+				return flow.replace( /&(\w+)\.(\w+)/g, ( match, bufferName, uniformName ) =>
+
+					stageData.isBufferStruct.get( uniformName ) === true ? `&${bufferName}` : match
+
+				);
+
+			};
+
+			const extractPointerNames = ( source ) => {
+
+				const match = source.match( /\(([^)]+)\)/ );
+				if ( ! match ) return [];
+
+				const content = match[ 1 ];
+
+				return content
+					.split( /\s*,\s*/ )
+					.map( part => part.trim() )
+					.filter( part => part.includes( '&' ) )
+					.map( part => part.replace( /&/g, '' ) )
+					.filter( part => ! part.includes( '.' ) );
+
+			};
+
+			const createStructNameMapping = ( nodeBuffers, structs ) => {
+
+				const resultMap = new Map();
+
+				for ( let i = 0; i < nodeBuffers.length; i ++ ) {
+
+					const bufferName = nodeBuffers[ i ];
+					const struct = structs[ i ];
+
+					resultMap.set( bufferName, struct.structName );
+
+				}
+
+				return resultMap;
+
+			};
+
+			const replaceStructNamesInUniforms = ( shaderCode, map ) => {
+
+				for ( const [ key, value ] of map.entries() ) {
+
+					const regex = new RegExp( `\\b${key}Struct\\b`, 'g' );
+					shaderCode = shaderCode.replace( regex, value );
+
+				}
+
+				return shaderCode;
+
+			};
+
+
+			let pointerNames, structnameMapping;
 			let flow = '// code\n\n';
 			flow += this.flowCode[ shaderStage ];
 
@@ -1268,6 +1413,13 @@ ${ flowData.code }
 				}
 
 				flow += `${ flowSlotData.code }\n\t`;
+
+
+
+				flow = reduceFlow( flow );
+				pointerNames = extractPointerNames( flow );
+				structnameMapping = createStructNameMapping( pointerNames, stageData.customStructNames );
+				stageData.uniforms = replaceStructNamesInUniforms( stageData.uniforms, structnameMapping );
 
 				if ( node === mainNode && shaderStage !== 'compute' ) {
 
@@ -1302,6 +1454,11 @@ ${ flowData.code }
 						}
 
 					}
+
+					flow = reduceFlow( flow );
+					pointerNames = extractPointerNames( flow );
+					structnameMapping = createStructNameMapping( pointerNames, stageData.customStructNames );
+					stageData.uniforms = replaceStructNamesInUniforms( stageData.uniforms, structnameMapping );
 
 				}
 
@@ -1507,14 +1664,15 @@ ${vars}
 
 	}
 
-	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
+	_getWGSLStructBinding( isBufferStruct, isArray, name, vars, access, binding = 0, group = 0 ) {
 
 		const structName = name + 'Struct';
 		const structSnippet = this._getWGSLStruct( structName, vars );
+		const structName_ = isBufferStruct ? ( isArray ? `array<${structName}>` : structName ) : structName;
 
 		return `${structSnippet}
 @binding( ${binding} ) @group( ${group} )
-var<${access}> ${name} : ${structName};`;
+var<${access}> ${name} : ${structName_};`;
 
 	}
 
