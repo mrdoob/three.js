@@ -183,7 +183,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
