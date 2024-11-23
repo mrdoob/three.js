@@ -572,7 +572,7 @@ ${ flowData.code }
 			for ( const varying of varyings ) {
 
 				if ( shaderStage === 'compute' ) varying.needsInterpolation = true;
-				const type = varying.type;
+				const type = this.getType( varying.type );
 				const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
 				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
@@ -585,7 +585,7 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					const type = varying.type;
+					const type = this.getType( varying.type );
 					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
 					snippet += `${flat}in ${type} ${varying.name};\n`;
