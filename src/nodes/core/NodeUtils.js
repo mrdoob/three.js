@@ -117,6 +117,34 @@ export function* getNodeChildren( node, toJSON = false ) {
 
 }
 
+const typeFromLength = /*@__PURE__*/ new Map( [
+	[ 1, 'float' ],
+	[ 2, 'vec2' ],
+	[ 3, 'vec3' ],
+	[ 4, 'vec4' ],
+	[ 9, 'mat3' ],
+	[ 16, 'mat4' ]
+] );
+
+export function getTypeFromLength( length ) {
+
+	return typeFromLength.get( length );
+
+}
+
+export function getLengthFromType( type ) {
+
+	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /vec2/.test( type ) ) return 2;
+	if ( /vec3/.test( type ) ) return 3;
+	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat3/.test( type ) ) return 9;
+	if ( /mat4/.test( type ) ) return 16;
+
+	console.error( 'THREE.TSL: Unsupported type:', type );
+
+}
+
 export function getValueType( value ) {
 
 	if ( value === undefined || value === null ) return null;

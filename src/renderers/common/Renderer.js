@@ -1315,6 +1315,28 @@ class Renderer {
 
 	}
 
+	async initTextureAsync( texture ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		this._textures.updateTexture( texture );
+
+	}
+
+	initTexture( texture ) {
+
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+
+			return false;
+
+		}
+
+		this._textures.updateTexture( texture );
+
+	}
+
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
 		if ( rectangle !== null ) {
