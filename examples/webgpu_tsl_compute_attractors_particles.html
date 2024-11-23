@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, If, PI, color, cos, instanceIndex, Loop, mix, mod, sin, storage, Fn, uint, uniform, uniformArray, hash, vec3, vec4 } from 'three/tsl';
+			import { float, If, PI, color, cos, instanceIndex, Loop, mix, mod, sin, instancedArray, Fn, uint, uniform, uniformArray, hash, vec3, vec4 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -154,8 +154,8 @@
 				const colorA = uniform( color( '#5900ff' ) );
 				const colorB = uniform( color( '#ffa575' ) );
 
-				const positionBuffer = storage( new THREE.StorageInstancedBufferAttribute( count, 3 ), 'vec3', count );
-				const velocityBuffer = storage( new THREE.StorageInstancedBufferAttribute( count, 3 ), 'vec3', count );
+				const positionBuffer = instancedArray( count, 'vec3' );
+				const velocityBuffer = instancedArray( count, 'vec3' );
 
 				const sphericalToVec3 = Fn( ( [ phi, theta ] ) => {
 

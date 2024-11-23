@@ -124,7 +124,6 @@ ${ flowData.code }
 
 			let format = isInteger ? RedIntegerFormat : RedFormat;
 
-
 			if ( itemSize === 2 ) {
 
 				format = isInteger ? RGIntegerFormat : RGFormat;
@@ -201,7 +200,6 @@ ${ flowData.code }
 			attributeData.pbo = attribute.pbo;
 
 		}
-
 
 		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 		const textureName = this.getPropertyName( nodeUniform );
