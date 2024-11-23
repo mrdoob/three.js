@@ -1,5 +1,5 @@
 import {
-	array, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop,
+	attributeArray, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop,
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
 	LightsNode, NodeUpdateType
 } from 'three/tsl';
@@ -290,7 +290,7 @@ class TiledLightsNode extends LightsNode {
 		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
 
 		const lightIndexesArray = new Int32Array( count * 4 * 2 );
-		const lightIndexes = array( lightIndexesArray, 'ivec4' ).label( 'lightIndexes' );
+		const lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).label( 'lightIndexes' );
 
 		// compute
 
