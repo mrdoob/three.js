@@ -116,6 +116,12 @@ class PMREMGenerator {
 
 	}
 
+	get hasInitialized() {
+
+		return this._renderer.hasInitialized();
+
+	}
+
 	/**
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
 	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
@@ -124,6 +130,14 @@ class PMREMGenerator {
 	 * is placed at the origin).
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
+
+		if ( this.hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
+
+			return this.fromSceneAsync( scene, sigma, near, far );
+
+		}
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
@@ -150,12 +164,36 @@ class PMREMGenerator {
 
 	}
 
+	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100 ) {
+
+		if ( this.hasInitialized === false ) await this._renderer.init();
+
+		return this.fromScene( scene, sigma, near, far );
+
+	}
+
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
+
+		if ( this.hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
+
+			return this.fromEquirectangularAsync( equirectangular, renderTarget );
+
+		}
+
+		return this._fromTexture( equirectangular, renderTarget );
+
+	}
+
+	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
+
+		if ( this.hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( equirectangular, renderTarget );
 
@@ -167,6 +205,22 @@ class PMREMGenerator {
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
+
+		if ( this.hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
+
+			return this.fromCubemapAsync( cubemap, renderTarget );
+
+		}
+
+		return this._fromTexture( cubemap, renderTarget );
+
+	}
+
+	async fromCubemapAsync( cubemap, renderTarget = null ) {
+
+		if ( this.hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( cubemap, renderTarget );
 
