@@ -1,5 +1,5 @@
-import { Color, Vector2, NearestFilter, Matrix4 } from 'three';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PassNode, QuadMesh, texture, NodeMaterial, uniform, uv, vec2, vec4, luminance, PostProcessingUtils } from 'three/tsl';
+import { Color, Vector2, NearestFilter, Matrix4, PostProcessingUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();

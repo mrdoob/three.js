@@ -2,9 +2,13 @@ import {
 	Color,
 	Mesh,
 	Vector2,
-	Vector3
-} from 'three';
-import { Fn, NodeMaterial, NodeUpdateType, TempNode, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
+	Vector3,
+	NodeMaterial,
+	NodeUpdateType,
+	TempNode
+} from 'three/webgpu';
+
+import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
 
 /**
  * References:

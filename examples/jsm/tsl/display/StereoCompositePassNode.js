@@ -1,5 +1,5 @@
-import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2 } from 'three';
-import { PassNode, QuadMesh, texture, PostProcessingUtils } from 'three/tsl';
+import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PassNode, QuadMesh, PostProcessingUtils } from 'three/webgpu';
+import { texture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();

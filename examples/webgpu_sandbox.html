@@ -15,8 +15,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
-					"three/debug": "../src/Three.WebGPU.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -28,6 +28,20 @@
 			import { time, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute } from 'three/tsl';
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+
+			let code = '';
+
+			const tsl = { ... THREE.TSL };
+			const keys = Object.keys( tsl ).sort();
+
+			for ( const key of keys ) {
+
+				code += `export const ${ key } = TSL.${ key };\n`;
+
+			}
+
+			console.log( code );
+			//console.log( `export { ${ keys.join( ',\n\t' ) } };` );
 
 			let camera, scene, renderer;
 

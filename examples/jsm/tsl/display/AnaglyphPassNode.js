@@ -1,5 +1,5 @@
-import { Matrix3 } from 'three';
-import { clamp, nodeObject, Fn, vec4, uv, uniform, max, NodeMaterial } from 'three/tsl';
+import { Matrix3, NodeMaterial } from 'three/webgpu';
+import { clamp, nodeObject, Fn, vec4, uv, uniform, max } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
