@@ -3,7 +3,7 @@ import StorageBufferAttribute from '../../renderers/common/StorageBufferAttribut
 import { storage } from './StorageBufferNode.js';
 import { getLengthFromType } from '../core/NodeUtils.js';
 
-export const array = ( count, type = 'float' ) => {
+export const attributeArray = ( count, type = 'float' ) => {
 
 	const itemSize = getLengthFromType( type );
 

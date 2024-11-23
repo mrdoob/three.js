@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, array, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, attributeArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -208,9 +208,9 @@
 				// Labels applied to storage nodes and uniform nodes are reflected within the shader output,
 				// and are useful for debugging purposes.
 
-				const positionStorage = array( positionArray, 'vec3' ).label( 'positionStorage' );
-				const velocityStorage = array( velocityArray, 'vec3' ).label( 'velocityStorage' );
-				const phaseStorage = array( phaseArray, 'float' ).label( 'phaseStorage' );
+				const positionStorage = attributeArray( positionArray, 'vec3' ).label( 'positionStorage' );
+				const velocityStorage = attributeArray( velocityArray, 'vec3' ).label( 'velocityStorage' );
+				const phaseStorage = attributeArray( phaseArray, 'float' ).label( 'phaseStorage' );
 
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
 			
