@@ -1,4 +1,5 @@
-import * as THREE from 'three';
+import { REVISION } from 'three/webgpu';
+import * as TSL from 'three/tsl';
 
 import { VariableDeclaration, Accessor } from './AST.js';
 
@@ -68,7 +69,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( THREE[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
+		if ( TSL[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
 
 			this.imports.add( name );
 
@@ -690,7 +691,7 @@ ${ this.tab }} )`;
 		const imports = [ ...this.imports ];
 		const exports = [ ...this.global ];
 
-		let header = '// Three.js Transpiler r' + THREE.REVISION + '\n\n';
+		let header = '// Three.js Transpiler r' + REVISION + '\n\n';
 		let footer = '';
 
 		if ( this.iife ) {

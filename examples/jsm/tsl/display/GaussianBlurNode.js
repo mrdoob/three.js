@@ -1,5 +1,5 @@
-import { RenderTarget, Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, If, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, passTexture, mul, NodeMaterial, PostProcessingUtils } from 'three/tsl';
+import { RenderTarget, Vector2, NodeMaterial, PostProcessingUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
+import { nodeObject, Fn, If, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul } from 'three/tsl';
 
 // WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
 // alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.

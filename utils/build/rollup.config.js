@@ -105,6 +105,24 @@ const builds = [
 	},
 	{
 		input: {
+			'three.tsl.js': 'src/Three.TSL.js',
+		},
+		plugins: [
+			header()
+		],
+		preserveEntrySignatures: 'allow-extension',
+		output: [
+			{
+				format: 'esm',
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
+			}
+		],
+		external: [ 'three/webgpu' ]
+	},
+	{
+		input: {
 			'three.core.min.js': 'src/Three.core.js',
 			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.Nodes.js',
 		},
@@ -143,6 +161,25 @@ const builds = [
 				entryFileNames: '[name]',
 			}
 		]
+	},
+	{
+		input: {
+			'three.tsl.min.js': 'src/Three.TSL.js'
+		},
+		plugins: [
+			header(),
+			terser()
+		],
+		preserveEntrySignatures: 'allow-extension',
+		output: [
+			{
+				format: 'esm',
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
+			}
+		],
+		external: [ 'three/webgpu' ]
 	},
 	{
 		input: 'src/Three.js',

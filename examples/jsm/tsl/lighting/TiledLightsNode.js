@@ -1,10 +1,9 @@
+import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
+
 import {
 	attributeArray, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop,
-	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
-	LightsNode, NodeUpdateType
+	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight
 } from 'three/tsl';
-
-import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3 } from 'three';
 
 export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, minBounds, maxBounds ] ) => {
 
