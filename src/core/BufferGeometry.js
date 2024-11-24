@@ -304,7 +304,7 @@ class BufferGeometry extends EventDispatcher {
 
 		} else {
 
-			for ( let i = 0, l = Math.min(positionAttribute.count, points.length); i < l; i ++ ) {
+			for ( let i = 0, l = Math.min( positionAttribute.count, points.length ); i < l; i ++ ) {
 
 				const point = points[ i ];
 				positionAttribute.setXYZ( i, point.x, point.y, point.z || 0 );
