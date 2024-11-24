@@ -116,7 +116,7 @@ class PMREMGenerator {
 
 	}
 
-	get hasInitialized() {
+	get _hasInitialized() {
 
 		return this._renderer.hasInitialized();
 
@@ -131,7 +131,7 @@ class PMREMGenerator {
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
-		if ( this.hasInitialized === false ) {
+		if ( this._hasInitialized === false ) {
 
 			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
@@ -166,7 +166,7 @@ class PMREMGenerator {
 
 	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100 ) {
 
-		if ( this.hasInitialized === false ) await this._renderer.init();
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this.fromScene( scene, sigma, near, far );
 
@@ -179,7 +179,7 @@ class PMREMGenerator {
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
-		if ( this.hasInitialized === false ) {
+		if ( this._hasInitialized === false ) {
 
 			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
 
@@ -193,7 +193,7 @@ class PMREMGenerator {
 
 	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
 
-		if ( this.hasInitialized === false ) await this._renderer.init();
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( equirectangular, renderTarget );
 
@@ -206,7 +206,7 @@ class PMREMGenerator {
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
-		if ( this.hasInitialized === false ) {
+		if ( this._hasInitialized === false ) {
 
 			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
 
@@ -220,7 +220,7 @@ class PMREMGenerator {
 
 	async fromCubemapAsync( cubemap, renderTarget = null ) {
 
-		if ( this.hasInitialized === false ) await this._renderer.init();
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( cubemap, renderTarget );
 
