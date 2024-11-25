@@ -15,10 +15,6 @@ class LineGeometry extends LineSegmentsGeometry {
 	setPositions( array ) {
 
 		// converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
-
-				const length = array.length - 3;
-				const points = new Float32Array( 2 * length );
-
 		const count = array.length / 3 - 1;
 		const points = new Float32Array( 6 * count );
 
