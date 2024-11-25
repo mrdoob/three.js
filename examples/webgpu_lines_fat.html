@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color } from 'three/tsl';
+			import { color, float, uniform } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -113,6 +113,8 @@
 					alphaToCoverage: true,
 
 				} );
+
+				matLine.opacityNode = uniform( float( 0.5 ) );
 
 				line = new Line2( geometry, matLine );
 				line.computeLineDistances();
@@ -213,7 +215,8 @@
 					'dashed': false,
 					'dash offset': 0,
 					'dash scale': 1,
-					'dash / gap': 1
+					'dash / gap': 1,
+					'alpha': 1
 				};
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, '"line-strip"': 1 } ).onChange( function ( val ) {
@@ -310,6 +313,12 @@
 							break;
 
 					}
+
+				} );
+
+				gui.add( param, 'alpha', 0, 1 ).onChange( function ( val ) {
+
+					matLine.opacityNode.value = val;
 
 				} );
 
