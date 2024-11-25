@@ -131,7 +131,7 @@ class PMREMGenerator {
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
 
-		this._setSize( 256 ); // @TODO: calculate the cube size from optional renderTarget
+		this._setSize( 256 );
 
 		if ( this._hasInitialized === false ) {
 
