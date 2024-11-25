@@ -242,9 +242,9 @@ export class DynamicElement {
 
 export class AccessorElements {
 
-	constructor( property, elements = [] ) {
+	constructor( object, elements = [] ) {
 
-		this.property = property;
+		this.object = object;
 		this.elements = elements;
 
 		this.isAccessorElements = true;

@@ -44,7 +44,7 @@ const unaryLib = {
 	'--': 'decrement' // decrementBefore
 };
 
-const isPrimitive = ( value ) => /^(true|false|-?\d)/.test( value );
+const isPrimitive = ( value ) => /^(true|false|-?(\d|\.\d))/.test( value );
 
 class TSLEncoder {
 
@@ -159,6 +159,10 @@ class TSLEncoder {
 
 				this.addImport( opFn );
 
+			} else if ( opFn === '.' ) {
+
+				code = left + opFn + right;
+
 			} else {
 
 				code = left + '.' + opFn + '( ' + right + ' )';
@@ -193,7 +197,7 @@ class TSLEncoder {
 
 		} else if ( node.isAccessorElements ) {
 
-			code = node.property;
+			code = this.emitExpression( node.object );
 
 			for ( const element of node.elements ) {
 
@@ -249,7 +253,7 @@ class TSLEncoder {
 
 		} else if ( node.isUnary && node.expression.isNumber ) {
 
-			code = node.type + ' ' + node.expression.value;
+			code = node.expression.type + '( ' + node.type + ' ' + node.expression.value + ' )';
 
 		} else if ( node.isUnary ) {
 
