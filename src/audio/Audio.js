@@ -412,6 +412,8 @@ class Audio extends Object3D {
 		this.playbackRate = source.playbackRate;
 		this.hasPlaybackControl = source.hasPlaybackControl;
 
+		this.filters = source.filters.slice();
+
 		if ( source.sourceType !== 'buffer' ) {
 
 			console.warn( 'THREE.Audio: Audio source type cannot be copied.' );
