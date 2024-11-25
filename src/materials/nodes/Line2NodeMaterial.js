@@ -40,6 +40,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.lineWidth = 1;
 
 		this.lineColorNode = null;
+		this.opacityNode = null;
 
 		this.offsetNode = null;
 		this.dashScaleNode = null;
@@ -286,7 +287,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			}
 
-			const alpha = float( 1 ).toVar( 'alpha' );
+			const alpha = float( this.opacityNode ? this.opacityNode : 1 ).toVar( 'alpha' );
 
 			if ( useWorldUnits ) {
 
