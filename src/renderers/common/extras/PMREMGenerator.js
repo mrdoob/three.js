@@ -129,13 +129,19 @@ class PMREMGenerator {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
+
+		this._setSize( 256 );
 
 		if ( this._hasInitialized === false ) {
 
 			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
-			return this.fromSceneAsync( scene, sigma, near, far );
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromSceneAsync( scene, sigma, near, far, cubeUVRenderTarget );
+
+			return cubeUVRenderTarget;
 
 		}
 
@@ -143,9 +149,7 @@ class PMREMGenerator {
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		this._setSize( 256 );
-
-		const cubeUVRenderTarget = this._allocateTargets();
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
@@ -164,11 +168,11 @@ class PMREMGenerator {
 
 	}
 
-	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100 ) {
+	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
 
 		if ( this._hasInitialized === false ) await this._renderer.init();
 
-		return this.fromScene( scene, sigma, near, far );
+		return this.fromScene( scene, sigma, near, far, renderTarget );
 
 	}
 
@@ -183,7 +187,13 @@ class PMREMGenerator {
 
 			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
 
-			return this.fromEquirectangularAsync( equirectangular, renderTarget );
+			this._setSizeFromTexture( equirectangular );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
+
+			return cubeUVRenderTarget;
 
 		}
 
@@ -210,7 +220,13 @@ class PMREMGenerator {
 
 			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
 
-			return this.fromCubemapAsync( cubemap, renderTarget );
+			this._setSizeFromTexture( cubemap );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromCubemapAsync( cubemap, renderTarget );
+
+			return cubeUVRenderTarget;
 
 		}
 
@@ -278,6 +294,20 @@ class PMREMGenerator {
 
 	// private interface
 
+	_setSizeFromTexture( texture ) {
+
+		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
+
+			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+
+		} else { // Equirectangular
+
+			this._setSize( texture.image.width / 4 );
+
+		}
+
+	}
+
 	_setSize( cubeSize ) {
 
 		this._lodMax = Math.floor( Math.log2( cubeSize ) );
@@ -309,15 +339,7 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
-
-			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
-
-		} else { // Equirectangular
-
-			this._setSize( texture.image.width / 4 );
-
-		}
+		this._setSizeFromTexture( texture );
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
