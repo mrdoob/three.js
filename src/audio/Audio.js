@@ -400,6 +400,14 @@ class Audio extends Object3D {
 
 		super.copy( source, recursive );
 
+		if ( source.sourceType !== 'buffer' ) {
+
+			console.warn( 'THREE.Audio: Audio source type cannot be copied.' );
+
+			return this;
+
+		}
+
 		this.autoplay = source.autoplay;
 
 		this.buffer = source.buffer;
@@ -411,18 +419,9 @@ class Audio extends Object3D {
 		this.duration = source.duration;
 		this.playbackRate = source.playbackRate;
 		this.hasPlaybackControl = source.hasPlaybackControl;
+		this.sourceType = source.sourceType;
 
 		this.filters = source.filters.slice();
-
-		if ( source.sourceType !== 'buffer' ) {
-
-			console.warn( 'THREE.Audio: Audio source type cannot be copied.' );
-
-			return this;
-
-		}
-
-		this.sourceType = source.sourceType;
 
 		return this;
 
