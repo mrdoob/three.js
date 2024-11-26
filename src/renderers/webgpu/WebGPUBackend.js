@@ -1166,7 +1166,7 @@ class WebGPUBackend extends Backend {
 	}
 
 
-	async initTimestampQuery( renderContext, descriptor ) {
+	initTimestampQuery( renderContext, descriptor ) {
 
 		if ( ! this.trackTimestamp ) return;
 
@@ -1175,27 +1175,8 @@ class WebGPUBackend extends Backend {
 		if ( ! renderContextData.timeStampQuerySet ) {
 
 
-			// Push an error scope to catch any errors during query set creation
-			this.device.pushErrorScope( 'out-of-memory' );
-
-			const timeStampQuerySet = await this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_renderContext_${renderContext.id}` } );
-
-			// Pop the error scope and check for errors
-			const error = await this.device.popErrorScope();
-
-			if ( error ) {
-
-				if ( ! renderContextData.attemptingTimeStampQuerySetFailed ) {
-
-					console.error( `[GPUOutOfMemoryError][renderContext_${renderContext.id}]:\nFailed to create timestamp query set. This may be because timestamp queries are already running in other tabs.` );
-					renderContextData.attemptingTimeStampQuerySetFailed = true;
-
-				}
-
-				renderContextData.timeStampQuerySet = null; // Mark as unavailable
-				return;
-
-			}
+			const type = renderContext.isComputeNode ? 'compute' : 'render';
+			const timeStampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
 			const timestampWrites = {
 				querySet: timeStampQuerySet,
@@ -1219,7 +1200,6 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		if ( ! renderContextData.timeStampQuerySet ) return;
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
 
@@ -1235,18 +1215,21 @@ class WebGPUBackend extends Backend {
 					label: 'timestamp result buffer',
 					size: size,
 					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-				} ),
-				isMappingPending: false,
+				} )
 			};
 
 		}
 
-		const { resolveBuffer, resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
+		const { resolveBuffer, resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
-		if ( isMappingPending === true ) return;
 
 		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
-		encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
+
+		if ( resultBuffer.mapState === 'unmapped' ) {
+
+			encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
+
+		}
 
 	}
 
@@ -1256,29 +1239,31 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		if ( ! renderContextData.timeStampQuerySet ) return;
 
 		if ( renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
-		const { resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
-
-		if ( isMappingPending === true ) return;
-
-		renderContextData.currentTimestampQueryBuffers.isMappingPending = true;
-
-		resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
-
-			const times = new BigUint64Array( resultBuffer.getMappedRange() );
-			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+		const { resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
 
-			this.renderer.info.updateTimestamp( type, duration );
 
-			resultBuffer.unmap();
+		await this.device.queue.onSubmittedWorkDone();
 
-			renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
+		if ( resultBuffer.mapState === 'unmapped' ) {
 
-		} );
+			resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+
+				const times = new BigUint64Array( resultBuffer.getMappedRange() );
+				const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+
+
+				this.renderer.info.updateTimestamp( type, duration );
+
+				resultBuffer.unmap();
+
+
+			} );
+
+		}
 
 	}
 
