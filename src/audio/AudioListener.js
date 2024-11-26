@@ -105,6 +105,9 @@ class AudioListener extends Object3D {
 
 		this.matrixWorld.decompose( _position, _quaternion, _scale );
 
+		if ( ! Number.isFinite( _position.x ) || ! Number.isFinite( _position.y ) || !Number.isFinite( _position.z ))
+			return;
+
 		_orientation.set( 0, 0, - 1 ).applyQuaternion( _quaternion );
 
 		if ( listener.positionX ) {
