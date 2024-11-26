@@ -82,7 +82,7 @@
 					new THREE.Vector3( 0, 1, 0 ),
 					new THREE.Vector3( 1, 0, - 0.5 ).normalize()
 				] );
-				const attractorsLength = uniform( attractorsPositions.array.length );
+				const attractorsLength = uniform( attractorsPositions.array.length, 'uint' );
 				const attractors = [];
 				const helpersRingGeometry = new THREE.RingGeometry( 1, 1.02, 32, 1, 0, Math.PI * 1.5 );
 				const helpersArrowGeometry = new THREE.ConeGeometry( 0.1, 0.4, 12, 1, false );
