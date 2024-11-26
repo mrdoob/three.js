@@ -1,4 +1,5 @@
-import { TempNode, rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
+import { TempNode } from 'three/webgpu';
+import { rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
 
 class FilmNode extends TempNode {
 

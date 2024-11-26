@@ -130,4 +130,12 @@ class RTTNode extends TextureNode {
 export default RTTNode;
 
 export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
-export const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );
+
+export const convertToTexture = ( node, ...params ) => {
+
+	if ( node.isTextureNode ) return node;
+	if ( node.isPassNode ) return node.getTextureNode();
+
+	return rtt( node, ...params );
+
+};

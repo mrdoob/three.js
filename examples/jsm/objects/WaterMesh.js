@@ -1,9 +1,11 @@
 import {
 	Color,
 	Mesh,
-	Vector3
-} from 'three';
-import { Fn, NodeMaterial, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+	Vector3,
+	NodeMaterial
+} from 'three/webgpu';
+
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * Work based on :

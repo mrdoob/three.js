@@ -1,6 +1,6 @@
 import TextureNode from './TextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
-import { GPUStorageTextureAccess } from '../../renderers/webgpu/utils/WebGPUConstants.js';
+import { NodeAccess } from '../core/constants.js';
 
 class StorageTextureNode extends TextureNode {
 
@@ -18,7 +18,7 @@ class StorageTextureNode extends TextureNode {
 
 		this.isStorageTextureNode = true;
 
-		this.access = GPUStorageTextureAccess.WriteOnly;
+		this.access = NodeAccess.WRITE_ONLY;
 
 	}
 
@@ -62,15 +62,21 @@ class StorageTextureNode extends TextureNode {
 
 	}
 
+	toReadWrite() {
+
+		return this.setAccess( NodeAccess.READ_WRITE );
+
+	}
+
 	toReadOnly() {
 
-		return this.setAccess( GPUStorageTextureAccess.ReadOnly );
+		return this.setAccess( NodeAccess.READ_ONLY );
 
 	}
 
 	toWriteOnly() {
 
-		return this.setAccess( GPUStorageTextureAccess.WriteOnly );
+		return this.setAccess( NodeAccess.WRITE_ONLY );
 
 	}
 

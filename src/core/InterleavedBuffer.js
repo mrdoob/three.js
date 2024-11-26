@@ -1,4 +1,4 @@
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
 class InterleavedBuffer {
@@ -16,7 +16,7 @@ class InterleavedBuffer {
 
 		this.version = 0;
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 	}
 
@@ -92,7 +92,7 @@ class InterleavedBuffer {
 
 		if ( this.array.buffer._uuid === undefined ) {
 
-			this.array.buffer._uuid = MathUtils.generateUUID();
+			this.array.buffer._uuid = generateUUID();
 
 		}
 
@@ -131,7 +131,7 @@ class InterleavedBuffer {
 
 		if ( this.array.buffer._uuid === undefined ) {
 
-			this.array.buffer._uuid = MathUtils.generateUUID();
+			this.array.buffer._uuid = generateUUID();
 
 		}
 

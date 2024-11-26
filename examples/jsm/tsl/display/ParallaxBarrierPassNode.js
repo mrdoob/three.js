@@ -1,4 +1,5 @@
-import { nodeObject, Fn, vec4, uv, NodeMaterial, If, mod, screenCoordinate } from 'three/tsl';
+import { NodeMaterial } from 'three/webgpu';
+import { nodeObject, Fn, vec4, uv, If, mod, screenCoordinate } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 
 class ParallaxBarrierPassNode extends StereoCompositePassNode {

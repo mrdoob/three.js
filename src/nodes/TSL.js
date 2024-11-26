@@ -47,6 +47,7 @@ export * from './tsl/TSLBase.js';
 
 // accessors
 export * from './accessors/AccessorsUtils.js';
+export * from './accessors/Arrays.js';
 export * from './accessors/UniformArrayNode.js';
 export * from './accessors/Bitangent.js';
 export * from './accessors/BufferAttributeNode.js';

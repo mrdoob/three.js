@@ -9,9 +9,8 @@ import {
 	Sphere,
 	Vector3,
 	Vector4,
-} from 'three';
-
-import { Line2NodeMaterial } from 'three/tsl';
+	Line2NodeMaterial
+} from 'three/webgpu';
 
 import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 

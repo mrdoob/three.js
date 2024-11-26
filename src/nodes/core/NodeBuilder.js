@@ -7,6 +7,7 @@ import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { getTypeFromLength } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -34,14 +35,6 @@ import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
 import { IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
 
 const rendererCache = new WeakMap();
-
-const typeFromLength = new Map( [
-	[ 2, 'vec2' ],
-	[ 3, 'vec3' ],
-	[ 4, 'vec4' ],
-	[ 9, 'mat3' ],
-	[ 16, 'mat4' ]
-] );
 
 const typeFromArray = new Map( [
 	[ Int8Array, 'int' ],
@@ -708,7 +701,7 @@ class NodeBuilder {
 
 		if ( length === 1 ) return componentType;
 
-		const baseType = typeFromLength.get( length );
+		const baseType = getTypeFromLength( length );
 		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
 
 		return prefix + baseType;

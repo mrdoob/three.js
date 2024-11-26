@@ -1,5 +1,5 @@
-import { RenderTarget, Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, QuadMesh, NodeMaterial, vec2, vec3, Loop, threshold, PostProcessingUtils } from 'three/tsl';
+import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils } from 'three/webgpu';
+import { nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, vec2, vec3, Loop, threshold } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 

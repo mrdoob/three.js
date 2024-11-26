@@ -28,7 +28,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -37,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, uniform, texture, instanceIndex, float, hash, vec3, storage, If } from 'three/tsl';
+			import { Fn, uniform, texture, instancedArray, instanceIndex, float, hash, vec3, If } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -77,11 +78,9 @@
 
 				//
 
-				const createBuffer = () => storage( new THREE.StorageInstancedBufferAttribute( particleCount, 3 ), 'vec3', particleCount );
-
-				const positionBuffer = createBuffer();
-				const velocityBuffer = createBuffer();
-				const colorBuffer = createBuffer();
+				const positionBuffer = instancedArray( particleCount, 'vec3' );
+				const velocityBuffer = instancedArray( particleCount, 'vec3' );
+				const colorBuffer = instancedArray( particleCount, 'vec3' );
 
 				// compute
 

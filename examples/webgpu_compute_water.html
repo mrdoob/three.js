@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -27,7 +28,7 @@
 
 			import * as THREE from 'three';
 
-			import { color, instanceIndex, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storageObject, min, max, positionLocal, transformNormalToView } from 'three/tsl';
+			import { color, instanceIndex, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView } from 'three/tsl';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -126,13 +127,8 @@
 
 				}
 
-				const heightBufferAttribute = new THREE.StorageBufferAttribute( heightArray, 1 );
-				const prevHeightBufferAttribute = new THREE.StorageBufferAttribute( prevHeightArray, 1 );
-
-				const heightStorage = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).label( 'Height' );
-				const prevHeightStorage = storageObject( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count ).label( 'PrevHeight' );
-
-				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly().label( 'HeightRead' );
+				const heightStorage = instancedArray( heightArray ).label( 'Height' );
+				const prevHeightStorage = instancedArray( prevHeightArray ).label( 'PrevHeight' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
 				const getNeighborIndicesTSL = ( index ) => {
@@ -255,11 +251,11 @@
 				waterMaterial.positionNode = Fn( () => {
 
 					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
-					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightRead );
+					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightStorage );
 
 					varyingProperty( 'vec3', 'v_normalView' ).assign( transformNormalToView( vec3( normalX, negate( normalY ), 1.0 ) ) );
 
-					return vec3( positionLocal.x, positionLocal.y, heightRead.element( vertexIndex ) );
+					return vec3( positionLocal.x, positionLocal.y, heightStorage.element( vertexIndex ) );
 
 				} )();
 
@@ -300,12 +296,8 @@
 				sphereVelocityArray.fill( 0.0 );
 
 				// Sphere Instance Storage
-				const sphereInstancePositionAttribute = new THREE.StorageInstancedBufferAttribute( spherePositionArray, 3 );
-				const sphereInstancePositionStorage = storageObject( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).label( 'SpherePosition' );
-				const sphereInstancePositionRead = storageObject( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).toReadOnly();
-
-				const sphereVelocityAttribute = new THREE.StorageInstancedBufferAttribute( sphereVelocityArray, 2 );
-				const sphereVelocityStorage = storageObject( sphereVelocityAttribute, 'vec2', sphereVelocityAttribute.count ).label( 'SphereVelocity' );
+				const sphereInstancePositionStorage = instancedArray( spherePositionArray, 'vec3' ).label( 'SpherePosition' );
+				const sphereVelocityStorage = instancedArray( sphereVelocityArray, 'vec2' ).label( 'SphereVelocity' );
 
 				computeSphere = Fn( () => {
 
@@ -330,13 +322,13 @@
 					const heightInstanceIndex = zCoord.mul( WIDTH ).add( xCoord );
 
 					// Set to read-only to be safe, even if it's not strictly necessary for compute access.
-					const height = heightRead.element( heightInstanceIndex );
+					const height = heightStorage.element( heightInstanceIndex );
 
 					// Assign height to sphere position
 					instancePosition.y.assign( height );
 
 					// Calculate normal of the water mesh at this location.
-					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightRead );
+					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightStorage );
 
 					normalX.mulAssign( 0.1 );
 					normalY.mulAssign( 0.1 );
@@ -380,7 +372,7 @@
 
 				sphereMaterial.positionNode = Fn( () => {
 
-					const instancePosition = sphereInstancePositionRead.element( instanceIndex );
+					const instancePosition = sphereInstancePositionStorage.element( instanceIndex );
 
 					const newPosition = positionLocal.add( instancePosition );
 
