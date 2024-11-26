@@ -108,6 +108,7 @@ class WebGPUAttributeUtils {
 		const buffer = backend.get( bufferAttribute ).buffer;
 
 		const array = bufferAttribute.array;
+		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
 		if ( updateRanges.length === 0 ) {
@@ -123,15 +124,21 @@ class WebGPUAttributeUtils {
 
 		} else {
 
+			const byteOffsetFactor = isTypedArray ? 1 : array.BYTES_PER_ELEMENT;
+
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
+
+				const dataOffset = range.start * byteOffsetFactor;
+				const size = range.count * byteOffsetFactor;
+
 				device.queue.writeBuffer(
 					buffer,
 					0,
 					array,
-					range.start * array.BYTES_PER_ELEMENT,
-					range.count * array.BYTES_PER_ELEMENT
+					dataOffset,
+					size
 				);
 
 			}
@@ -296,6 +303,12 @@ class WebGPUAttributeUtils {
 		}
 
 		return format;
+
+	}
+
+	_isTypedArray( array ) {
+
+		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
 
 	}
 
