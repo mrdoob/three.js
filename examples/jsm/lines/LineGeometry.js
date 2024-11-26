@@ -20,8 +20,13 @@ class LineGeometry extends LineSegmentsGeometry {
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			points.set( array.slice( 3 * i, 3 * ( i + 1 ) ), 6 * i );
-			points.set( array.slice( 3 * ( i + 1 ), 3 * ( i + 2 ) ), 6 * i + 3 );
+			points[ 6 * i ] = array[ 3 * i ];
+			points[ 6 * i + 1 ] = array[ 3 * i + 1 ];
+			points[ 6 * i + 2 ] = array[ 3 * i + 2 ];
+
+			points[ 6 * i + 3 ] = array[ 3 * ( i + 1 ) ];
+			points[ 6 * i + 4 ] = array[ 3 * ( i + 1 ) + 1 ];
+			points[ 6 * i + 5 ] = array[ 3 * ( i + 1 ) + 2 ];
 
 		}
 
@@ -39,8 +44,13 @@ class LineGeometry extends LineSegmentsGeometry {
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			colors.set( array.slice( 3 * i, 3 * ( i + 1 ) ), 6 * i );
-			colors.set( array.slice( 3 * ( i + 1 ), 3 * ( i + 2 ) ), 6 * i + 3 );
+			colors[ 6 * i ] = array[ 3 * i ];
+			colors[ 6 * i + 1 ] = array[ 3 * i + 1 ];
+			colors[ 6 * i + 2 ] = array[ 3 * i + 2 ];
+
+			colors[ 6 * i + 3 ] = array[ 3 * ( i + 1 ) ];
+			colors[ 6 * i + 4 ] = array[ 3 * ( i + 1 ) + 1 ];
+			colors[ 6 * i + 5 ] = array[ 3 * ( i + 1 ) + 2 ];
 
 		}
 
