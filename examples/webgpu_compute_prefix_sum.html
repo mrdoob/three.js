@@ -12,7 +12,7 @@
 			<br /> Prefix sum performance comparisons.
 			<br /> Each display loops through initialization, sum, and validation steps.
 			<br/>
-			<div id="local_swap" style="
+			<div id="left_side" style="
 				position: absolute;
 				top: 150px;
 				left: 0;
@@ -25,7 +25,7 @@
 				pointer-events: none;
 				text-align: left;
 			"></div>
-			<div id="global_swap" style="
+			<div id="right_side" style="
 			position: absolute;
 			top: 150px;
 			right: 0;
@@ -66,22 +66,25 @@
 				rightGridDim: uniform( Math.sqrt( maxElements ) ),
 				validate: uniform( 0 ),
 				// Algorithm being displayed
-				'Left Method Name': 'Fake Prefix',
+				'Left Method Name': 'Fake',
 				'Right Method Name': 'Kogge-Stone',
 			};
 
 			const algorithms = [
 				'Sklansky',
 				'Kogge-Stone',
-				'Fake Prefix',
+				'Fake',
 				'Incorrect'
 			];
 
 			const gui = new GUI();
-
 			gui.add( effectController, 'Left Method Name', algorithms );
-
 			gui.add( effectController, 'Right Method Name', algorithms );
+
+			const timestamps = {
+				left_side: document.getElementById( 'left_side' ),
+				right_side: document.getElementById( 'right_side' )
+			};
 
 			// Initialize Two Views
 			init( false );
@@ -134,7 +137,7 @@
 					// Emulates a prefix sum by manually assigning the instanceIndex to the storage buffer.
 					// This method should only be used to validate the correctness of new algorithms, and not as
 					// a yardstick for performance.
-					'Fake Prefix': {
+					'Fake': {
 						threads: [ maxElements ],
 						runMethod: ( currentElements ) => {
 
@@ -373,8 +376,11 @@
 				}
 
 				let stepType = 'Init';
+				renderer.info.autoReset = false;
 
 				 const stepAnimation = async function () {
+
+					renderer.info.reset();
 
 					const methodName = rightSide ?
 						effectController[ 'Right Method Name' ] :
@@ -404,7 +410,6 @@
 						case 'Validate': {
 
 							const currentElements = new Uint32Array( await renderer.getArrayBufferAsync( currentElementsBuffer ) );
-							//console.log( currentElements );
 
 							effectController.validate.value = 1;
 							stepType = 'Init';
@@ -414,6 +419,8 @@
 							break;
 
 						case 'Init': {
+
+							effectController.validate.value = 0;
 
 							renderer.compute( method.initFunction );
 
@@ -429,7 +436,14 @@
 
 					renderer.render( scene, camera );
 
-					effectController.validate.value = 0;
+					console.log( renderer.info );
+
+					timestamps[ rightSide ? 'right_side' : 'left_side' ].innerHTML = `
+
+							Compute ${rightSide ? effectController[ 'Right Method Name' ] : effectController[ 'Left Method Name' ]} Prefix Sum: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms
+					`;
+
 
 					setTimeout( stepAnimation, 1000 );
 			
