@@ -1239,12 +1239,9 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-
 		if ( renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
 		const { resultBuffer } = renderContextData.currentTimestampQueryBuffers;
-
-
 
 		await this.device.queue.onSubmittedWorkDone();
 
