@@ -42,7 +42,8 @@
 			const analyserBuffer = new Uint8Array( 1024 );
 			let analyserTexture;
 
-			init();
+			const startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
 
 			async function playAudioBuffer() {
 
@@ -79,6 +80,9 @@
 
 			async function init() {
 
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
+
 				// audio buffer
 
 				const soundBuffer = await fetch( 'sounds/webgpu-audio-processing.mp3' ).then( res => res.arrayBuffer() );
@@ -104,7 +108,7 @@
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
 				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
 
-				waveNode.setPBO( true );
+				// waveNode.setPBO( true );
 
 				// params
 
@@ -192,15 +196,7 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-
-				document.onclick = () => {
-
-					const overlay = document.getElementById( 'overlay' );
-					if ( overlay !== null ) overlay.remove();
-
-					playAudioBuffer();
-
-				};
+				playAudioBuffer();
 
 			}
 
