@@ -40,7 +40,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.lineWidth = 1;
 
 		this.lineColorNode = null;
-		this.opacityNode = null;
 
 		this.offsetNode = null;
 		this.dashScaleNode = null;
@@ -310,7 +309,7 @@ class Line2NodeMaterial extends NodeMaterial {
 					if ( useAlphaToCoverage && renderer.samples > 1 ) {
 
 						const dnorm = norm.fwidth();
-						alpha.assign( alpha.mul( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() ) );
+						alpha.mulAssign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
 
 					} else {
 
@@ -335,7 +334,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
-						alpha.assign( alpha.mul( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() ) );
+						alpha.mulAssign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
 					} );
 
