@@ -381,6 +381,13 @@ function MenubarAdd( editor ) {
 
 		editor.execute( new AddObjectCommand( editor, light ) );
 
+		const lightTarget = new THREE.Object3D();
+		lightTarget.name = 'DirectionalLight Target';
+		editor.execute( new AddObjectCommand( editor, lightTarget ) );
+
+		light.target = lightTarget;
+		lightTarget.userData[ 'fatherLightUUID' ] = light.uuid;
+
 	} );
 	lightSubmenu.add( option );
 
