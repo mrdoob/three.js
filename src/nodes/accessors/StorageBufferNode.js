@@ -180,7 +180,7 @@ export default StorageBufferNode;
 
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
 
-export const storageObject = ( value, type, count ) => {
+export const storageObject = ( value, type, count ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
 
