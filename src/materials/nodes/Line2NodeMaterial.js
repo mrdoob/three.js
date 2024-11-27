@@ -393,8 +393,6 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
 
-			this.blending = NoBlending;
-
 		}
 
 	}
