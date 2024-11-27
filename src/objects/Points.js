@@ -43,7 +43,7 @@ class Points extends Object3D {
 
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
-		const threshold = raycaster.params.Points.threshold;
+		var threshold = raycaster.params.Points.threshold;
 		const drawRange = geometry.drawRange;
 
 		// Checking boundingSphere distance to ray
@@ -61,12 +61,19 @@ class Points extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-		const localThresholdSq = localThreshold * localThreshold;
-
 		const index = geometry.index;
 		const attributes = geometry.attributes;
 		const positionAttribute = attributes.position;
+		const pointsizeAttribute = attributes.pointsize;
+
+		if ( pointsizeAttribute ) {
+
+			threshold = 1;
+
+		}
+
+		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThresholdSq = localThreshold * localThreshold;
 
 		if ( index !== null ) {
 
@@ -80,6 +87,21 @@ class Points extends Object3D {
 				_position.fromBufferAttribute( positionAttribute, a );
 
 				testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
+
+			}
+
+		} else if ( pointsizeAttribute ) {
+
+			const start = Math.max( 0, drawRange.start );
+			const end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
+
+			for ( let i = start, l = end; i < l; i ++ ) {
+
+				_position.fromBufferAttribute( positionAttribute, i );
+
+				const pointsize = pointsizeAttribute.getX( i );
+
+				testPoint( _position, i, localThresholdSq * pointsize * pointsize, matrixWorld, raycaster, intersects, this );
 
 			}
 
