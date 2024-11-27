@@ -101,14 +101,10 @@
 
 				waveArray = instancedArray( waveBuffer );
 
-				// read-only buffer
-
-				const waveNode = instancedArray( waveBuffer );
-
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
 				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
 
-				// waveNode.setPBO( true );
+				waveArray.setPBO( true );
 
 				// params
 
@@ -127,14 +123,14 @@
 
 					const time = index.mul( pitch );
 
-					let wave = waveNode.element( time );
+					let wave = waveArray.element( time );
 
 
 					// delay
 
 					for ( let i = 1; i < 7; i ++ ) {
 
-						const waveOffset = waveNode.element( index.sub( delayOffset.mul( sampleRate ).mul( i ) ).mul( pitch ) );
+						const waveOffset = waveArray.element( index.sub( delayOffset.mul( sampleRate ).mul( i ) ).mul( pitch ) );
 						const waveOffsetVolume = waveOffset.mul( delayVolume.div( i * i ) );
 
 						wave = wave.add( waveOffsetVolume );
@@ -189,6 +185,7 @@
 				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );

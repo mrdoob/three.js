@@ -28,8 +28,8 @@ class StorageBufferNode extends BufferNode {
 
 		this.access = NodeAccess.READ_WRITE;
 		this.isAtomic = false;
+		this.isPBO = false;
 
-		this.bufferObject = false;
 		this.bufferCount = bufferCount;
 
 		this._attribute = null;
@@ -84,11 +84,17 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	setBufferObject( value ) {
+	setPBO( value ) {
 
-		this.bufferObject = value;
+		this.isPBO = value;
 
 		return this;
+
+	}
+
+	getPBO() {
+
+		return this.isPBO;
 
 	}
 
@@ -172,6 +178,12 @@ class StorageBufferNode extends BufferNode {
 
 export default StorageBufferNode;
 
-// Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
-export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
+
+export const storageObject = ( value, type, count ) => {
+
+	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
+
+	return storage( value, type, count ).setPBO( true );
+
+};
