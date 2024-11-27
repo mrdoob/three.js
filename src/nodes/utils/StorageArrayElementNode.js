@@ -33,7 +33,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			if ( this.node.bufferObject === true ) {
+			if ( this.node.isPBO === true ) {
 
 				builder.setupPBO( this.node );
 
@@ -55,7 +55,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			if ( this.node.bufferObject === true && isAssignContext !== true ) {
+			if ( this.node.isPBO === true && isAssignContext !== true && ( this.node.value.isInstancedBufferAttribute || builder.shaderStage !== 'compute' ) ) {
 
 				snippet = builder.generatePBO( this );
 
