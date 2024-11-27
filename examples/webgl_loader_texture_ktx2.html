@@ -29,9 +29,10 @@
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TextureHelper } from 'three/addons/helpers/TextureHelper.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, controls, loader, material;
+			let camera, scene, renderer, controls, loader, helper;
 
 			const SAMPLES = {
 				'BasisU ETC1S': '2d_etc1s.ktx2',
@@ -43,6 +44,10 @@
 				'RGBA16 Linear (UASTC HDR)': '2d_rgba16_uastc_hdr_linear.ktx2',
 				'RGBA32 Linear': '2d_rgba32_linear.ktx2',
 				'ASTC 6x6 (mobile)': '2d_astc_6x6.ktx2',
+
+				// Cube
+				'Cube / BasisU ETC1S': 'cubemap_etc1s.ktx2',
+				'Cube / BasisU UASTC': 'cubemap_uastc.ktx2',
 			};
 
 			const FORMAT_LABELS = {
@@ -99,16 +104,6 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 
-				// PlaneGeometry UVs assume flipY=true, which compressed textures don't support.
-				const geometry = flipY( new THREE.PlaneGeometry() );
-				material = new THREE.MeshBasicMaterial( {
-					color: 0xFFFFFF,
-					side: THREE.DoubleSide,
-					transparent: true,
-				} );
-				const mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
-
 				loader = new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
@@ -149,9 +144,17 @@
 					const texture = await loader.loadAsync( `./textures/compressed/${path}` );
 					texture.minFilter = THREE.NearestMipmapNearestFilter;
 
-					material.map = texture;
-					material.needsUpdate = true;
+					if ( helper ) {
 
+						scene.remove( helper );
+						helper.dispose();
+
+					}
+
+					helper = new TextureHelper( texture );
+					scene.add( helper );
+
+					console.info( `class: ${ texture.constructor.name }` );
 					console.info( `format: ${ FORMAT_LABELS[ texture.format ] }` );
 					console.info( `type: ${ TYPE_LABELS[ texture.type ] }` );
 					console.info( `colorSpace: ${ texture.colorSpace }` );
@@ -164,21 +167,6 @@
 
 				// NOTE: Call `loader.dispose()` when finished loading textures.
 
-
-			}
-
-			/** Correct UVs to be compatible with `flipY=false` textures. */
-			function flipY( geometry ) {
-
-				const uv = geometry.attributes.uv;
-
-				for ( let i = 0; i < uv.count; i ++ ) {
-
-					uv.setY( i, 1 - uv.getY( i ) );
-
-				}
-
-				return geometry;
 
 			}
 
