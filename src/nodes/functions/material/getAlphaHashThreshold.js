@@ -24,7 +24,7 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	const maxDeriv = max(
 		length( dFdx( position.xyz ) ),
 		length( dFdy( position.xyz ) )
-	).toVar( 'maxDeriv' );
+	);
 
 	const pixScale = float( 1 ).div( float( ALPHA_HASH_SCALE ).mul( maxDeriv ) ).toVar( 'pixScale' );
 
@@ -32,13 +32,13 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	const pixScales = vec2(
 		exp2( floor( log2( pixScale ) ) ),
 		exp2( ceil( log2( pixScale ) ) )
-	).toVar( 'pixScales' );
+	);
 
 	// Compute alpha thresholds at our two noise scales
 	const alpha = vec2(
 		hash3D( floor( pixScales.x.mul( position.xyz ) ) ),
 		hash3D( floor( pixScales.y.mul( position.xyz ) ) ),
-	).toVar( 'alpha' );
+	);
 
 	// Factor to interpolate lerp with
 	const lerpFactor = fract( log2( pixScale ) ).toVar( 'lerpFactor' );
@@ -59,6 +59,12 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	// Avoids ατ == 0. Could also do ατ =1-ατ
 	return clamp( threshold, 1.0e-6, 1.0 );
 
+} ).setLayout( {
+	name: 'getAlphaHashThreshold',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec3' }
+	]
 } );
 
 export default getAlphaHashThreshold;
