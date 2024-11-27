@@ -1,5 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
-import { varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { dashSize, gapSize, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth, materialOpacity } from '../../nodes/accessors/MaterialNode.js';
@@ -9,7 +9,6 @@ import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ScreenNode.js';
-import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
 import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
