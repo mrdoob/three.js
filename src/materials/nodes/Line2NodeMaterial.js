@@ -2,7 +2,7 @@ import NodeMaterial from './NodeMaterial.js';
 import { varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
-import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
+import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth, materialOpacity } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
@@ -10,8 +10,10 @@ import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ScreenNode.js';
 import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
+import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
+import { NoBlending } from '../../constants.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
@@ -45,6 +47,8 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashScaleNode = null;
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
+
+		this.blending = NoBlending;
 
 		this.setValues( params );
 
@@ -267,7 +271,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.fragmentNode = Fn( () => {
+		this.colorNode = Fn( () => {
 
 			const vUv = uv();
 
@@ -382,6 +386,16 @@ class Line2NodeMaterial extends NodeMaterial {
 			return vec4( lineColorNode, alpha );
 
 		} )();
+
+		if ( this.transparent ) {
+
+			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+
+			this.blending = NoBlending;
+
+		}
 
 	}
 
