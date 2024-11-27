@@ -9,8 +9,10 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br /> Prefix sum performance comparisons.
-			<br /> Each display loops through initialization, sum, and validation steps.
+			<br /> Three.js TSL implemtations of multiple prefix sum algorithms.
+			<br /> Each display loops through an initialization, sum, and validation step.
+			<
+			<br /> Reference implementations and resources by <a href="https://github.com/b0nes164/GPUPrefixSums/">b0nes164</a>
 			<br/>
 			<div id="left_side" style="
 				position: absolute;
@@ -44,7 +46,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -53,7 +56,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, vec3, Loop, uniform, uv, uint, float, fract, modInt, Fn, vec2, uvec2, floor, pow, instanceIndex, invocationLocalIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, storage } from 'three/tsl';
+			import { If, vec3, Loop, uniform, uv, uint, float, modInt, Fn, vec2, uvec2, floor, instanceIndex, invocationLocalIndex, workgroupBarrier, storage } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -265,7 +268,6 @@
 
 					const method = prefixSumMethods[ methodName ];
 
-
 					if ( method.initMethod ) {
 
 						// Check if the current method requires additional initialization steps
@@ -304,11 +306,7 @@
 
 					}
 			
-			
-
 				}
-			
-				console.log( prefixSumMethods );
 
 				// Create standard scene
 				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
@@ -375,7 +373,8 @@
 
 				}
 
-				let stepType = 'Init';
+				let currentStep = 'Init';
+				let lastStep = '';
 				renderer.info.autoReset = false;
 
 				 const stepAnimation = async function () {
@@ -388,19 +387,20 @@
 
 					const method = prefixSumMethods[ methodName ];
 
-					switch ( stepType ) {
+					switch ( currentStep ) {
 
-						case 'Run': {
+						case 'Sum': {
 			
 
 							// Execute each dispatch
 							for ( let i = 0; i < method.threads.length; i ++ ) {
 
-								renderer.compute( method.runFunctions[ i ] );
+								await renderer.computeAsync( method.runFunctions[ i ] );
 
 							}
 
-							stepType = 'Validate';
+							lastStep = 'Sum';
+							currentStep = 'Validate';
 
 			
 						}
@@ -412,7 +412,9 @@
 							const currentElements = new Uint32Array( await renderer.getArrayBufferAsync( currentElementsBuffer ) );
 
 							effectController.validate.value = 1;
-							stepType = 'Init';
+			
+							lastStep = 'Validate';
+							currentStep = 'Init';
 
 						}
 
@@ -422,9 +424,10 @@
 
 							effectController.validate.value = 0;
 
-							renderer.compute( method.initFunction );
+							await renderer.computeAsync( method.initFunction );
+							lastStep = 'Init';
 
-							stepType = 'Run';
+							currentStep = 'Sum';
 
 			
 						}
@@ -434,14 +437,13 @@
 
 					}
 
-					renderer.render( scene, camera );
-
-					console.log( renderer.info );
+					await renderer.renderAsync( scene, camera );
 
 					timestamps[ rightSide ? 'right_side' : 'left_side' ].innerHTML = `
 
-							Compute ${rightSide ? effectController[ 'Right Method Name' ] : effectController[ 'Left Method Name' ]} Prefix Sum: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms
+							Compute ${rightSide ? effectController[ 'Right Method Name' ] : effectController[ 'Left Method Name' ]} Prefix Sum<br>
+							${lastStep} pass in ${lastStep === 'Validate' ? 0 : renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+
 					`;
 
 
