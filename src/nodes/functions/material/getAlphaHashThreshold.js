@@ -41,17 +41,17 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	);
 
 	// Factor to interpolate lerp with
-	const lerpFactor = fract( log2( pixScale ) ).toVar( 'lerpFactor' );
+	const lerpFactor = fract( log2( pixScale ) );
 
 	// Interpolate alpha threshold from noise at two scales
-	const x = add( mul( lerpFactor.oneMinus(), alpha.x ), mul( lerpFactor, alpha.y ) ).toVar( 'x' );
+	const x = add( mul( lerpFactor.oneMinus(), alpha.x ), mul( lerpFactor, alpha.y ) );
 
 	// Pass into CDF to compute uniformly distrib threshold
-	const a = min( lerpFactor, lerpFactor.oneMinus() ).toVar( 'a' );
+	const a = min( lerpFactor, lerpFactor.oneMinus() );
 	const cases = vec3(
 		x.mul( x ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ),
 		x.sub( mul( 0.5, a ) ).div( sub( 1.0, a ) ),
-		sub( 1.0, sub( 1.0, x ).mul( sub( 1.0, x ) ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ) ) ).toVar( 'cases' );
+		sub( 1.0, sub( 1.0, x ).mul( sub( 1.0, x ) ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ) ) );
 
 	// Find our final, uniformly distributed alpha threshold (ατ)
 	const threshold = x.lessThan( a.oneMinus() ).select( x.lessThan( a ).select( cases.x, cases.y ), cases.z );
