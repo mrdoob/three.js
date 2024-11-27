@@ -1539,7 +1539,7 @@ class WebGPUBackend extends Backend {
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				origin: { x: rectangle.x, y: rectangle.y, z: 0 }
+				origin: [ rectangle.x, rectangle.y, 0 ],
 			},
 			{
 				texture: destinationGPU
@@ -1567,6 +1567,20 @@ class WebGPUBackend extends Backend {
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+			if ( renderContext.viewport ) {
+
+				this.updateViewport( renderContext );
+
+			}
+
+			if ( renderContext.scissor ) {
+
+				const { x, y, width, height } = renderContext.scissorValue;
+
+				renderContextData.currentPass.setScissorRect( x, y, width, height );
+
+			}
 
 		} else {
 
