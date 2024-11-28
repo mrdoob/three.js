@@ -156,7 +156,7 @@
 				// only smooth when not rendering with flat colors to improve processing time
 				const ldrawPromise =
 					new LDrawLoader()
-						.setConditionalLineMaterial(LDrawConditionalLineMaterial)
+						.setConditionalLineMaterial( LDrawConditionalLineMaterial )
 						.setPath( 'models/ldraw/officialLibrary/' )
 						.loadAsync( 'models/7140-1-X-wingFighter.mpd_Packed.mpd', onProgress )
 						.then( function ( legoGroup ) {
