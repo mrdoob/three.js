@@ -79,9 +79,8 @@ class Node extends EventDispatcher {
 
 		/**
 		 * Whether this node is global or not. This property is relevant for the internal
-		 * node caching system.
-		 *
-		 * TODO Add more details when this property should be set to true.
+		 * node caching system. All nodes which should be declared just once should
+		 * set this flag to `true` (a typical example is `AttributeNode`).
 		 *
 		 * @type {Boolean}
 		 * @default false
@@ -405,10 +404,13 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * TODO
+	 * This method is used during the build process of a node and ensures
+	 * equal nodes are not built multiple times but just once. For exmaple if
+	 * `attribute( 'uv' )` is used multiple times by the user, the build
+	 * process makes sure to process just the first node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node} TODO
+	 * @return {Node} The shared node if possible. Otherwise `this` is returned.
 	 */
 	getShared( builder ) {
 
