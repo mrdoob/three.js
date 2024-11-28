@@ -22,7 +22,7 @@ class AnalyticLightNode extends LightingNode {
 		this.light = light;
 
 		this.color = new Color();
-		this.colorNode = light.colorNode || uniform( this.color ).setGroup( renderGroup );
+		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
 
 		this.baseColorNode = null;
 
