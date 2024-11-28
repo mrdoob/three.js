@@ -138,6 +138,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @param {Function} callback - The update method.
 	 * @param {String} updateType - The update type.
+	 * @return {Node} A reference to this node.
 	 */
 	onUpdate( callback, updateType ) {
 
@@ -153,6 +154,7 @@ class Node extends EventDispatcher {
 	 * this method automatically sets the update type to `FRAME`.
 	 *
 	 * @param {Function} callback - The update method.
+	 * @return {Node} A reference to this node.
 	 */
 	onFrameUpdate( callback ) {
 
@@ -165,6 +167,7 @@ class Node extends EventDispatcher {
 	 * this method automatically sets the update type to `RENDER`.
 	 *
 	 * @param {Function} callback - The update method.
+	 * @return {Node} A reference to this node.
 	 */
 	onRenderUpdate( callback ) {
 
@@ -177,6 +180,7 @@ class Node extends EventDispatcher {
 	 * this method automatically sets the update type to `OBJECT`.
 	 *
 	 * @param {Function} callback - The update method.
+	 * @return {Node} A reference to this node.
 	 */
 	onObjectUpdate( callback ) {
 
@@ -188,6 +192,7 @@ class Node extends EventDispatcher {
 	 * Convenient method for defining {@link Node#updateReference}.
 	 *
 	 * @param {Function} callback - The update method.
+	 * @return {Node} A reference to this node.
 	 */
 	onReference( callback ) {
 
