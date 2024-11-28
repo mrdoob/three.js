@@ -151,7 +151,7 @@ class Node extends EventDispatcher {
 
 	/**
 	 * Convenient method for defining {@link Node#update}. Similar to {@link Node#onUpdate}, but
-	 * the this method automatically sets the update type to `FRAME`.
+	 * this method automatically sets the update type to `FRAME`.
 	 *
 	 * @param {Function} callback - The update method.
 	 */
@@ -163,7 +163,7 @@ class Node extends EventDispatcher {
 
 	/**
 	 * Convenient method for defining {@link Node#update}. Similar to {@link Node#onUpdate}, but
-	 * the this method automatically sets the update type to `RENDER`.
+	 * this method automatically sets the update type to `RENDER`.
 	 *
 	 * @param {Function} callback - The update method.
 	 */
@@ -175,7 +175,7 @@ class Node extends EventDispatcher {
 
 	/**
 	 * Convenient method for defining {@link Node#update}. Similar to {@link Node#onUpdate}, but
-	 * the this method automatically sets the update type to `OBJECT`.
+	 * this method automatically sets the update type to `OBJECT`.
 	 *
 	 * @param {Function} callback - The update method.
 	 */
@@ -216,7 +216,7 @@ class Node extends EventDispatcher {
 	 * Nodes might refer to other objects like materials. This method allows to dynamically update the reference
 	 * to such objects based on a given state (e.g. the current node frame or builder).
 	 *
-	 * @param {Any} state - This method can be invocated in different contexts so state can refer to any object type.
+	 * @param {Any} state - This method can be invocated in different contexts so `state` can refer to any object type.
 	 * @return {Any} The updated reference.
 	 */
 	updateReference( /*state*/ ) {
