@@ -3,7 +3,7 @@
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, WebGLCoordinateSystem, BackSide, CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, PointsMaterial, LineBasicMaterial, LineDashedMaterial, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, NoBlending, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, WebGLCoordinateSystem, BackSide, CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, PointsMaterial, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
@@ -8891,7 +8891,7 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	const maxDeriv = max$1(
 		length( dFdx( position.xyz ) ),
 		length( dFdy( position.xyz ) )
-	).toVar( 'maxDeriv' );
+	);
 
 	const pixScale = float( 1 ).div( float( ALPHA_HASH_SCALE ).mul( maxDeriv ) ).toVar( 'pixScale' );
 
@@ -8899,26 +8899,26 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	const pixScales = vec2(
 		exp2( floor( log2( pixScale ) ) ),
 		exp2( ceil( log2( pixScale ) ) )
-	).toVar( 'pixScales' );
+	);
 
 	// Compute alpha thresholds at our two noise scales
 	const alpha = vec2(
 		hash3D( floor( pixScales.x.mul( position.xyz ) ) ),
 		hash3D( floor( pixScales.y.mul( position.xyz ) ) ),
-	).toVar( 'alpha' );
+	);
 
 	// Factor to interpolate lerp with
-	const lerpFactor = fract( log2( pixScale ) ).toVar( 'lerpFactor' );
+	const lerpFactor = fract( log2( pixScale ) );
 
 	// Interpolate alpha threshold from noise at two scales
-	const x = add( mul( lerpFactor.oneMinus(), alpha.x ), mul( lerpFactor, alpha.y ) ).toVar( 'x' );
+	const x = add( mul( lerpFactor.oneMinus(), alpha.x ), mul( lerpFactor, alpha.y ) );
 
 	// Pass into CDF to compute uniformly distrib threshold
-	const a = min$1( lerpFactor, lerpFactor.oneMinus() ).toVar( 'a' );
+	const a = min$1( lerpFactor, lerpFactor.oneMinus() );
 	const cases = vec3(
 		x.mul( x ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ),
 		x.sub( mul( 0.5, a ) ).div( sub( 1.0, a ) ),
-		sub( 1.0, sub( 1.0, x ).mul( sub( 1.0, x ) ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ) ) ).toVar( 'cases' );
+		sub( 1.0, sub( 1.0, x ).mul( sub( 1.0, x ) ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ) ) );
 
 	// Find our final, uniformly distributed alpha threshold (ατ)
 	const threshold = x.lessThan( a.oneMinus() ).select( x.lessThan( a ).select( cases.x, cases.y ), cases.z );
@@ -8926,6 +8926,12 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	// Avoids ατ == 0. Could also do ατ =1-ατ
 	return clamp( threshold, 1.0e-6, 1.0 );
 
+} ).setLayout( {
+	name: 'getAlphaHashThreshold',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec3' }
+	]
 } );
 
 class NodeMaterial extends Material {
@@ -9831,6 +9837,38 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 }
 
+let _sharedFramebuffer = null;
+
+class ViewportSharedTextureNode extends ViewportTextureNode {
+
+	static get type() {
+
+		return 'ViewportSharedTextureNode';
+
+	}
+
+	constructor( uvNode = screenUV, levelNode = null ) {
+
+		if ( _sharedFramebuffer === null ) {
+
+			_sharedFramebuffer = new FramebufferTexture();
+
+		}
+
+		super( uvNode, levelNode, _sharedFramebuffer );
+
+	}
+
+	updateReference() {
+
+		return this;
+
+	}
+
+}
+
+const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );
+
 const _defaultValues$b = /*@__PURE__*/ new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
@@ -9863,6 +9901,8 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashScaleNode = null;
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
+
+		this.blending = NoBlending;
 
 		this.setValues( params );
 
@@ -10085,7 +10125,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.fragmentNode = Fn( () => {
+		this.colorNode = Fn( () => {
 
 			const vUv = uv();
 
@@ -10200,6 +10240,14 @@ class Line2NodeMaterial extends NodeMaterial {
 			return vec4( lineColorNode, alpha );
 
 		} )();
+
+		if ( this.transparent ) {
+
+			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+
+		}
 
 	}
 
@@ -17374,7 +17422,15 @@ class RTTNode extends TextureNode {
 }
 
 const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
-const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );
+
+const convertToTexture = ( node, ...params ) => {
+
+	if ( node.isTextureNode ) return node;
+	if ( node.isPassNode ) return node.getTextureNode();
+
+	return rtt( node, ...params );
+
+};
 
 /**
 * Computes a position in view space based on a fragment's screen position expressed as uv coordinates, the fragments
@@ -17521,7 +17577,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			if ( this.node.bufferObject === true ) {
+			if ( this.node.isPBO === true ) {
 
 				builder.setupPBO( this.node );
 
@@ -17543,7 +17599,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			if ( this.node.bufferObject === true && isAssignContext !== true ) {
+			if ( this.node.isPBO === true && isAssignContext !== true && ( this.node.value.isInstancedBufferAttribute || builder.shaderStage !== 'compute' ) ) {
 
 				snippet = builder.generatePBO( this );
 
@@ -17598,8 +17654,8 @@ class StorageBufferNode extends BufferNode {
 
 		this.access = NodeAccess.READ_WRITE;
 		this.isAtomic = false;
+		this.isPBO = false;
 
-		this.bufferObject = false;
 		this.bufferCount = bufferCount;
 
 		this._attribute = null;
@@ -17654,11 +17710,17 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	setBufferObject( value ) {
+	setPBO( value ) {
 
-		this.bufferObject = value;
+		this.isPBO = value;
 
 		return this;
+
+	}
+
+	getPBO() {
+
+		return this.isPBO;
 
 	}
 
@@ -17740,9 +17802,15 @@ class StorageBufferNode extends BufferNode {
 
 }
 
-// Read-Write Storage
 const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
-const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
+
+const storageObject = ( value, type, count ) => { // @deprecated, r171
+
+	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
+
+	return storage( value, type, count ).setPBO( true );
+
+};
 
 const attributeArray = ( count, type = 'float' ) => {
 
@@ -18423,38 +18491,6 @@ class PosterizeNode extends TempNode {
 }
 
 const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode );
-
-let _sharedFramebuffer = null;
-
-class ViewportSharedTextureNode extends ViewportTextureNode {
-
-	static get type() {
-
-		return 'ViewportSharedTextureNode';
-
-	}
-
-	constructor( uvNode = screenUV, levelNode = null ) {
-
-		if ( _sharedFramebuffer === null ) {
-
-			_sharedFramebuffer = new FramebufferTexture();
-
-		}
-
-		super( uvNode, levelNode, _sharedFramebuffer );
-
-	}
-
-	updateReference() {
-
-		return this;
-
-	}
-
-}
-
-const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -24408,6 +24444,12 @@ class NumberNodeUniform extends NumberUniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Vector2NodeUniform extends Vector2Uniform {
@@ -24423,6 +24465,12 @@ class Vector2NodeUniform extends Vector2Uniform {
 	getValue() {
 
 		return this.nodeUniform.value;
+
+	}
+
+	getType() {
+
+		return this.nodeUniform.type;
 
 	}
 
@@ -24444,6 +24492,12 @@ class Vector3NodeUniform extends Vector3Uniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Vector4NodeUniform extends Vector4Uniform {
@@ -24459,6 +24513,12 @@ class Vector4NodeUniform extends Vector4Uniform {
 	getValue() {
 
 		return this.nodeUniform.value;
+
+	}
+
+	getType() {
+
+		return this.nodeUniform.type;
 
 	}
 
@@ -24480,6 +24540,12 @@ class ColorNodeUniform extends ColorUniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Matrix3NodeUniform extends Matrix3Uniform {
@@ -24498,6 +24564,12 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Matrix4NodeUniform extends Matrix4Uniform {
@@ -24513,6 +24585,12 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 	getValue() {
 
 		return this.nodeUniform.value;
+
+	}
+
+	getType() {
+
+		return this.nodeUniform.type;
 
 	}
 
@@ -24616,13 +24694,19 @@ class PMREMGenerator {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
+
+		this._setSize( 256 );
 
 		if ( this._hasInitialized === false ) {
 
 			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
-			return this.fromSceneAsync( scene, sigma, near, far );
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromSceneAsync( scene, sigma, near, far, cubeUVRenderTarget );
+
+			return cubeUVRenderTarget;
 
 		}
 
@@ -24630,9 +24714,7 @@ class PMREMGenerator {
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		this._setSize( 256 );
-
-		const cubeUVRenderTarget = this._allocateTargets();
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
@@ -24651,11 +24733,11 @@ class PMREMGenerator {
 
 	}
 
-	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100 ) {
+	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
 
 		if ( this._hasInitialized === false ) await this._renderer.init();
 
-		return this.fromScene( scene, sigma, near, far );
+		return this.fromScene( scene, sigma, near, far, renderTarget );
 
 	}
 
@@ -24670,7 +24752,13 @@ class PMREMGenerator {
 
 			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
 
-			return this.fromEquirectangularAsync( equirectangular, renderTarget );
+			this._setSizeFromTexture( equirectangular );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
+
+			return cubeUVRenderTarget;
 
 		}
 
@@ -24697,7 +24785,13 @@ class PMREMGenerator {
 
 			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
 
-			return this.fromCubemapAsync( cubemap, renderTarget );
+			this._setSizeFromTexture( cubemap );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromCubemapAsync( cubemap, renderTarget );
+
+			return cubeUVRenderTarget;
 
 		}
 
@@ -24765,6 +24859,20 @@ class PMREMGenerator {
 
 	// private interface
 
+	_setSizeFromTexture( texture ) {
+
+		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
+
+			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+
+		} else { // Equirectangular
+
+			this._setSize( texture.image.width / 4 );
+
+		}
+
+	}
+
 	_setSize( cubeSize ) {
 
 		this._lodMax = Math.floor( Math.log2( cubeSize ) );
@@ -24796,15 +24904,7 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
-
-			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
-
-		} else { // Equirectangular
-
-			this._setSize( texture.image.width / 4 );
-
-		}
+		this._setSizeFromTexture( texture );
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
@@ -30393,10 +30493,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset ] !== v ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset ] = a[ offset ] = v;
 			updated = true;
@@ -30414,10 +30515,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
@@ -30437,10 +30539,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
@@ -30461,10 +30564,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
@@ -30553,6 +30657,14 @@ class UniformsGroup extends UniformBuffer {
 		}
 
 		return updated;
+
+	}
+
+	_getBufferForType( type ) {
+
+		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) return new Int32Array( this.buffer.buffer );
+		if ( type === 'uint' || type === 'uvec2' || type === 'uvec3' || type === 'uvec4' ) return new Uint32Array( this.buffer.buffer );
+		return this.buffer;
 
 	}
 
@@ -39889,6 +40001,7 @@ class WebGPUAttributeUtils {
 		const buffer = backend.get( bufferAttribute ).buffer;
 
 		const array = bufferAttribute.array;
+		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
 		if ( updateRanges.length === 0 ) {
@@ -39904,15 +40017,21 @@ class WebGPUAttributeUtils {
 
 		} else {
 
+			const byteOffsetFactor = isTypedArray ? 1 : array.BYTES_PER_ELEMENT;
+
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
+
+				const dataOffset = range.start * byteOffsetFactor;
+				const size = range.count * byteOffsetFactor;
+
 				device.queue.writeBuffer(
 					buffer,
 					0,
 					array,
-					range.start * array.BYTES_PER_ELEMENT,
-					range.count * array.BYTES_PER_ELEMENT
+					dataOffset,
+					size
 				);
 
 			}
@@ -40077,6 +40196,12 @@ class WebGPUAttributeUtils {
 		}
 
 		return format;
+
+	}
+
+	_isTypedArray( array ) {
+
+		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
 
 	}
 
@@ -42235,7 +42360,7 @@ class WebGPUBackend extends Backend {
 	}
 
 
-	async initTimestampQuery( renderContext, descriptor ) {
+	initTimestampQuery( renderContext, descriptor ) {
 
 		if ( ! this.trackTimestamp ) return;
 
@@ -42244,27 +42369,8 @@ class WebGPUBackend extends Backend {
 		if ( ! renderContextData.timeStampQuerySet ) {
 
 
-			// Push an error scope to catch any errors during query set creation
-			this.device.pushErrorScope( 'out-of-memory' );
-
-			const timeStampQuerySet = await this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_renderContext_${renderContext.id}` } );
-
-			// Pop the error scope and check for errors
-			const error = await this.device.popErrorScope();
-
-			if ( error ) {
-
-				if ( ! renderContextData.attemptingTimeStampQuerySetFailed ) {
-
-					console.error( `[GPUOutOfMemoryError][renderContext_${renderContext.id}]:\nFailed to create timestamp query set. This may be because timestamp queries are already running in other tabs.` );
-					renderContextData.attemptingTimeStampQuerySetFailed = true;
-
-				}
-
-				renderContextData.timeStampQuerySet = null; // Mark as unavailable
-				return;
-
-			}
+			const type = renderContext.isComputeNode ? 'compute' : 'render';
+			const timeStampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
 			const timestampWrites = {
 				querySet: timeStampQuerySet,
@@ -42288,7 +42394,6 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		if ( ! renderContextData.timeStampQuerySet ) return;
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
 
@@ -42304,18 +42409,21 @@ class WebGPUBackend extends Backend {
 					label: 'timestamp result buffer',
 					size: size,
 					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-				} ),
-				isMappingPending: false,
+				} )
 			};
 
 		}
 
-		const { resolveBuffer, resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
+		const { resolveBuffer, resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
-		if ( isMappingPending === true ) return;
 
 		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
-		encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
+
+		if ( resultBuffer.mapState === 'unmapped' ) {
+
+			encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
+
+		}
 
 	}
 
@@ -42325,29 +42433,28 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		if ( ! renderContextData.timeStampQuerySet ) return;
-
 		if ( renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
-		const { resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
+		const { resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
-		if ( isMappingPending === true ) return;
+		await this.device.queue.onSubmittedWorkDone();
 
-		renderContextData.currentTimestampQueryBuffers.isMappingPending = true;
+		if ( resultBuffer.mapState === 'unmapped' ) {
 
-		resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+			resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
 
-			const times = new BigUint64Array( resultBuffer.getMappedRange() );
-			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+				const times = new BigUint64Array( resultBuffer.getMappedRange() );
+				const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
 
 
-			this.renderer.info.updateTimestamp( type, duration );
+				this.renderer.info.updateTimestamp( type, duration );
 
-			resultBuffer.unmap();
+				resultBuffer.unmap();
 
-			renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
 
-		} );
+			} );
+
+		}
 
 	}
 
@@ -42626,7 +42733,7 @@ class WebGPUBackend extends Backend {
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				origin: { x: rectangle.x, y: rectangle.y, z: 0 }
+				origin: [ rectangle.x, rectangle.y, 0 ],
 			},
 			{
 				texture: destinationGPU
@@ -42654,6 +42761,20 @@ class WebGPUBackend extends Backend {
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+			if ( renderContext.viewport ) {
+
+				this.updateViewport( renderContext );
+
+			}
+
+			if ( renderContext.scissor ) {
+
+				const { x, y, width, height } = renderContext.scissorValue;
+
+				renderContextData.currentPass.setScissorRect( x, y, width, height );
+
+			}
 
 		} else {
 
