@@ -48,7 +48,7 @@ class Node extends EventDispatcher {
 		 * The update type of the node's {@link Node#updateBefore} method. Possible values are listed in {@link NodeUpdateType}.
 		 *
 		 * @type {String}
-		 * @default none
+		 * @default 'none'
 		 */
 		this.updateBeforeType = NodeUpdateType.NONE;
 
@@ -56,7 +56,7 @@ class Node extends EventDispatcher {
 		 * The update type of the node's {@link Node#updateAfter} method. Possible values are listed in {@link NodeUpdateType}.
 		 *
 		 * @type {String}
-		 * @default none
+		 * @default 'none'
 		 */
 		this.updateAfterType = NodeUpdateType.NONE;
 
