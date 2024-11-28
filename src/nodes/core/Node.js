@@ -320,9 +320,9 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the hash of the node which is used to identify the node. By
-	 * default it's the {@link Node#uuid} however this method sometimes needs to be overwritten
-	 * in derived classes.
+	 * Returns the hash of the node which is used to identify the node. By default it's
+	 * the {@link Node#uuid} however derived node classes might have to overwrite this method
+	 * depending on their implementation.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The hash.
