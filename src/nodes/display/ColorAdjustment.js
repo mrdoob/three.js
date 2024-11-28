@@ -5,6 +5,8 @@ import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { LinearSRGBColorSpace } from '../../constants.js';
 
+/** @module ColorAdjustment **/
+
 export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return luminance( color.rgb );
@@ -52,6 +54,7 @@ export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, lumina
  * saturation. The CDL should be typically be given input in a log space (such as LogC, ACEScc,
  * or AgX Log), and will return output in the same space. Output may require clamping >=0.
  *
+ * @method
  * @param {vec4} color Input (-Infinity < input < +Infinity)
  * @param {number | vec3} slope Slope (0 ≤ slope < +Infinity)
  * @param {number | vec3} offset Offset (-Infinity < offset < +Infinity; typically -1 < offset < 1)
@@ -62,8 +65,8 @@ export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, lumina
  *
  * References:
  * - ASC CDL v1.2
- * - https://blender.stackexchange.com/a/55239/43930
- * - https://docs.acescentral.com/specifications/acescc/
+ * - {@link https://blender.stackexchange.com/a/55239/43930}
+ * - {@link https://docs.acescentral.com/specifications/acescc/}
  */
 export const cdl = /*@__PURE__*/ Fn( ( [
 	color,
