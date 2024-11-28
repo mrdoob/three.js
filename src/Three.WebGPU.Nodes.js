@@ -1,4 +1,4 @@
-export * from './Three.core.js';
+export * from './Three.Core.js';
 
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nodes.js';
