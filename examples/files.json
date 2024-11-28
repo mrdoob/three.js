@@ -338,6 +338,7 @@
 		"webgpu_lights_physical",
 		"webgpu_lights_rectarealight",
 		"webgpu_lights_selective",
+		"webgpu_lights_spotlight",
 		"webgpu_lights_tiled",
 		"webgpu_lines_fat_wireframe",
 		"webgpu_lines_fat",
