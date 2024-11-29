@@ -18,7 +18,7 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 
-const shadowMaterialLib =/*@__PURE__*/  new WeakMap();
+const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
 
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
