@@ -61,18 +61,6 @@
     "no-irregular-whitespace": [
       "error"
     ],
-    "no-console": [
-      "error",
-      {
-        "allow": [
-          "warn",
-          "error"
-        ]
-      }
-    ],
-    "no-unused-vars": [
-      "error"
-    ],
     "no-duplicate-imports": [
       "error"
     ]

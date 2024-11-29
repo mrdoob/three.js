@@ -665,7 +665,7 @@ class WebGLRenderer {
 
 			event.preventDefault();
 
-			console.warn( 'THREE.WebGLRenderer: Context Lost.' );
+			console.log( 'THREE.WebGLRenderer: Context Lost.' );
 
 			_isContextLost = true;
 
@@ -673,7 +673,7 @@ class WebGLRenderer {
 
 		function onContextRestore( /* event */ ) {
 
-			console.warn( 'THREE.WebGLRenderer: Context Restored.' );
+			console.log( 'THREE.WebGLRenderer: Context Restored.' );
 
 			_isContextLost = false;
 
