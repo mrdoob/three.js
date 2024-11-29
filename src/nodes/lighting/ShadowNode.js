@@ -411,7 +411,7 @@ class ShadowNode extends Node {
 		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow } );
 
 		const shadowColor = texture( shadowMap.texture, shadowCoord );
-		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor.rgb, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
