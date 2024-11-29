@@ -1,5 +1,5 @@
-import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, passTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
+import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -19,7 +19,7 @@ class SSRNode extends TempNode {
 
 	constructor( colorNode, depthNode, normalNode, metalnessNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.colorNode = colorNode;
 		this.depthNode = depthNode;
@@ -42,10 +42,10 @@ class SSRNode extends TempNode {
 		this.thickness = uniform( 0.1 ); // controls the cutoff between what counts as a possible reflection hit and what does not
 		this.opacity = uniform( 1 ); // controls the transparency of the reflected colors
 
-		this._cameraNear = uniform( camera.near );
-		this._cameraFar = uniform( camera.far );
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+		this._cameraNear = reference( 'near', 'float', camera );
+		this._cameraFar = reference( 'far', 'float', camera );
 		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera ? 1 : 0 );
 		this._resolution = uniform( new Vector2() );
 		this._maxStep = uniform( 0 );
@@ -151,15 +151,31 @@ class SSRNode extends TempNode {
 
 		} );
 
+		const sampleDepth = ( uv ) => {
+
+			const depth = this.depthNode.uv( uv ).r;
+
+			if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
+
+				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
+
+			}
+
+			return depth;
+
+		};
+
 		const ssr = Fn( () => {
 
 			const metalness = this.metalnessNode.uv( uvNode ).r;
 
-			 // fragments with no metalness do not reflect their environment
+			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
 
 			// compute some standard FX entities
-			const depth = this.depthNode.uv( uvNode ).r.toVar();
+			const depth = sampleDepth( uvNode ).toVar();
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const viewNormal = this.normalNode.rgb.normalize().toVar();
 
@@ -214,6 +230,13 @@ class SSRNode extends TempNode {
 			// it does not exceed d1 (the maximum ray extend)
 			Loop( { start: int( 0 ), end: int( this._maxStep ), type: 'int', condition: '<' }, ( { i } ) => {
 
+				// TODO: Remove this when Chrome is fixed, see https://issues.chromium.org/issues/372714384#comment14
+				If( metalness.equal( 0 ), () => {
+
+					Break();
+
+				} );
+
 				// stop if the maximum number of steps is reached for this specific ray
 				If( float( i ).greaterThanEqual( totalStep ), () => {
 
@@ -233,7 +256,7 @@ class SSRNode extends TempNode {
 
 				// compute new uv, depth, viewZ and viewPosition for the new location on the ray
 				const uvNode = xy.div( this._resolution );
-				const d = this.depthNode.uv( uvNode ).r.toVar();
+				const d = sampleDepth( uvNode ).toVar();
 				const vZ = getViewZ( d ).toVar();
 				const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 

@@ -1,5 +1,5 @@
-import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PostProcessingUtils } from 'three';
-import { PassNode, QuadMesh, texture } from 'three/tsl';
+import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PassNode, QuadMesh, PostProcessingUtils } from 'three/webgpu';
+import { texture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -55,7 +55,7 @@ class StereoCompositePassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, stereo, renderTarget } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -84,7 +84,7 @@ class StereoCompositePassNode extends PassNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, scene, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

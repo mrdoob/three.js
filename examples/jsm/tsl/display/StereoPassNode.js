@@ -1,5 +1,5 @@
-import { StereoCamera, Vector2, PostProcessingUtils } from 'three';
-import { PassNode, nodeObject } from 'three/tsl';
+import { StereoCamera, Vector2, PassNode, PostProcessingUtils } from 'three/webgpu';
+import { nodeObject } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 

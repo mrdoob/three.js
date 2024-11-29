@@ -204,6 +204,7 @@ class ArcballControls extends Controls {
 		this.enableRotate = true;
 		this.enableZoom = true;
 		this.enableGizmos = true;
+		this.enableFocus = true;
 
 		this.minDistance = 0;
 		this.maxDistance = Infinity;
@@ -697,7 +698,7 @@ class ArcballControls extends Controls {
 
 	onDoubleTap( event ) {
 
-		if ( this.enabled && this.enablePan && this.scene != null ) {
+		if ( this.enabled && this.enablePan && this.enableFocus && this.scene != null ) {
 
 			this.dispatchEvent( _startEvent );
 
@@ -2036,29 +2037,32 @@ class ArcballControls extends Controls {
 		let state;
 		if ( this.object.isOrthographicCamera ) {
 
-			state = JSON.stringify( { arcballState: {
+			state = JSON.stringify( {
+				arcballState: {
+					cameraFar: this.object.far,
+					cameraMatrix: this.object.matrix,
+					cameraNear: this.object.near,
+					cameraUp: this.object.up,
+					cameraZoom: this.object.zoom,
+					gizmoMatrix: this._gizmos.matrix
 
-				cameraFar: this.object.far,
-				cameraMatrix: this.object.matrix,
-				cameraNear: this.object.near,
-				cameraUp: this.object.up,
-				cameraZoom: this.object.zoom,
-				gizmoMatrix: this._gizmos.matrix
-
-			} } );
+				}
+			} );
 
 		} else if ( this.object.isPerspectiveCamera ) {
 
-			state = JSON.stringify( { arcballState: {
-				cameraFar: this.object.far,
-				cameraFov: this.object.fov,
-				cameraMatrix: this.object.matrix,
-				cameraNear: this.object.near,
-				cameraUp: this.object.up,
-				cameraZoom: this.object.zoom,
-				gizmoMatrix: this._gizmos.matrix
+			state = JSON.stringify( {
+				arcballState: {
+					cameraFar: this.object.far,
+					cameraFov: this.object.fov,
+					cameraMatrix: this.object.matrix,
+					cameraNear: this.object.near,
+					cameraUp: this.object.up,
+					cameraZoom: this.object.zoom,
+					gizmoMatrix: this._gizmos.matrix
 
-			} } );
+				}
+			} );
 
 		}
 
@@ -2233,7 +2237,7 @@ class ArcballControls extends Controls {
 	 * @param {Matrix4} camera Transformation to be applied to the camera
 	 * @param {Matrix4} gizmos Transformation to be applied to gizmos
 	 */
-	 setTransformationMatrices( camera = null, gizmos = null ) {
+	setTransformationMatrices( camera = null, gizmos = null ) {
 
 		if ( camera != null ) {
 
@@ -2620,7 +2624,7 @@ class ArcballControls extends Controls {
 				this.applyTransformMatrix( this.scale( newDistance / distance, this._gizmos.position ) );
 				this.updateMatrixState();
 
-			 }
+			}
 
 			//check fov
 			if ( this.object.fov < this.minFov || this.object.fov > this.maxFov ) {

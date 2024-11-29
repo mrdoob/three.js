@@ -1,4 +1,5 @@
-import { TempNode, nodeObject, Fn, float, uv, convertToTexture, vec4, If, int, clamp, sub, mix } from 'three/tsl';
+import { TempNode } from 'three/webgpu';
+import { nodeObject, Fn, float, uv, convertToTexture, vec4, If, int, clamp, sub, mix } from 'three/tsl';
 
 class TransitionNode extends TempNode {
 
@@ -10,7 +11,7 @@ class TransitionNode extends TempNode {
 
 	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode ) {
 
-		super();
+		super( 'vec4' );
 
 		// Input textures
 

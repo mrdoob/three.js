@@ -2,9 +2,11 @@ import {
 	BackSide,
 	BoxGeometry,
 	Mesh,
-	Vector3
-} from 'three';
-import { Fn, NodeMaterial, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
+	Vector3,
+	NodeMaterial
+} from 'three/webgpu';
+
+import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
  * Based on "A Practical Analytic Model for Daylight"

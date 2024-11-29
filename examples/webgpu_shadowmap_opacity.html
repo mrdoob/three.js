@@ -16,7 +16,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -112,8 +113,8 @@
 				dragon.castShadow = dragon2.castShadow = true;
 				dragon.receiveShadow = dragon2.receiveShadow = true;
 
-				dragon.material.shadowNode = customShadow( dragon.material.attenuationColor );
-				dragon2.material.shadowNode = customShadow( dragon2.material.attenuationColor );
+				dragon.material.castShadowNode = customShadow( dragon.material.attenuationColor );
+				dragon2.material.castShadowNode = customShadow( dragon2.material.attenuationColor );
 
 				//
 

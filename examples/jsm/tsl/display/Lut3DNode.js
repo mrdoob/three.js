@@ -1,4 +1,5 @@
-import { TempNode, nodeObject, Fn, float, uniform, vec3, vec4, mix } from 'three/tsl';
+import { TempNode } from 'three/webgpu';
+import { nodeObject, Fn, float, uniform, vec3, vec4, mix } from 'three/tsl';
 
 class Lut3DNode extends TempNode {
 
@@ -10,7 +11,7 @@ class Lut3DNode extends TempNode {
 
 	constructor( inputNode, lutNode, size, intensityNode ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.lutNode = lutNode;

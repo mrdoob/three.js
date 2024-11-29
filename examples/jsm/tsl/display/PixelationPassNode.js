@@ -1,5 +1,5 @@
-import { NearestFilter, Vector4 } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, PassNode, property } from 'three/tsl';
+import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property } from 'three/tsl';
 
 class PixelationNode extends TempNode {
 
@@ -11,7 +11,7 @@ class PixelationNode extends TempNode {
 
 	constructor( textureNode, depthNode, normalNode, pixelSize, normalEdgeStrength, depthEdgeStrength ) {
 
-		super();
+		super( 'vec4' );
 
 		// Input textures
 
@@ -158,7 +158,7 @@ class PixelationPassNode extends PassNode {
 
 	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
 
-		super( 'color', scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter } );
+		super( PassNode.COLOR, scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter } );
 
 		this.pixelSize = pixelSize;
 		this.normalEdgeStrength = normalEdgeStrength;

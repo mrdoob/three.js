@@ -1,4 +1,4 @@
-import { FileLoader, Loader, TextureLoader, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, RepeatWrapping } from 'three';
+import { FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
 
 import {
 	float, bool, int, vec2, vec3, vec4, color, texture,
@@ -396,7 +396,7 @@ class MaterialXNode {
 
 		} else if ( this.hasReference ) {
 
-			if ( this.element === 'output' && this.output && out === null  ) {
+			if ( this.element === 'output' && this.output && out === null ) {
 
 				out = this.output;
 

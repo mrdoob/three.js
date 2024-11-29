@@ -10,7 +10,8 @@ import {
 	Vector3,
 	Vector4,
 	Line2NodeMaterial
-} from 'three';
+} from 'three/webgpu';
+
 import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 
 const _start = new Vector3();

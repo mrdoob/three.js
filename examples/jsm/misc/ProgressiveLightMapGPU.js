@@ -1,5 +1,5 @@
-import { DoubleSide, FloatType, HalfFloatType, PlaneGeometry, Mesh, RenderTarget, Scene } from 'three';
-import { add, float, mix, MeshPhongNodeMaterial, NodeMaterial, output, sub, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
+import { DoubleSide, FloatType, HalfFloatType, PlaneGeometry, Mesh, RenderTarget, Scene, MeshPhongNodeMaterial, NodeMaterial } from 'three/webgpu';
+import { add, float, mix, output, sub, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
 
 import { potpack } from '../libs/potpack.module.js';
 

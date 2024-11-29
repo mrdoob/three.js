@@ -1,5 +1,6 @@
-import { Vector2, Vector3 } from 'three';
-import { getNormalFromDepth, getViewPosition, convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
+import { DataTexture, RepeatWrapping, Vector2, Vector3, TempNode } from 'three/webgpu';
+import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
+import { SimplexNoise } from '../../math/SimplexNoise.js';
 
 class DenoiseNode extends TempNode {
 
@@ -9,26 +10,29 @@ class DenoiseNode extends TempNode {
 
 	}
 
-	constructor( textureNode, depthNode, normalNode, noiseNode, camera ) {
+	constructor( textureNode, depthNode, normalNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
-		this.noiseNode = noiseNode;
 
-		this.cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+		this.noiseNode = texture( generateDefaultNoise() );
+
 		this.lumaPhi = uniform( 5 );
 		this.depthPhi = uniform( 5 );
 		this.normalPhi = uniform( 5 );
 		this.radius = uniform( 5 );
 		this.index = uniform( 0 );
 
+		this.updateBeforeType = NodeUpdateType.FRAME;
+
+		// uniforms
+
 		this._resolution = uniform( new Vector2() );
 		this._sampleVectors = uniformArray( generatePdSamplePointInitializer( 16, 2, 1 ) );
-
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 
 	}
 
@@ -46,7 +50,7 @@ class DenoiseNode extends TempNode {
 
 		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this.cameraProjectionMatrixInverse );
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
@@ -55,7 +59,7 @@ class DenoiseNode extends TempNode {
 			const depth = sampleDepth( sampleUv ).toVar();
 			const normal = sampleNormal( sampleUv ).toVar();
 			const neighborColor = texel.rgb;
-			const viewPos = getViewPosition( sampleUv, depth, this.cameraProjectionMatrixInverse ).toVar();
+			const viewPos = getViewPosition( sampleUv, depth, this._cameraProjectionMatrixInverse ).toVar();
 
 			const normalDiff = dot( viewNormal, normal ).toVar();
 			const normalSimilarity = pow( max( normalDiff, 0 ), this.normalPhi ).toVar();
@@ -84,7 +88,7 @@ class DenoiseNode extends TempNode {
 
 			const center = vec3( texel.rgb ).toVar();
 
-			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 
 			const noiseResolution = textureSize( this.noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
@@ -178,4 +182,36 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 }
 
-export const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( noiseNode ), camera ) );
+function generateDefaultNoise( size = 64 ) {
+
+	const simplex = new SimplexNoise();
+
+	const arraySize = size * size * 4;
+	const data = new Uint8Array( arraySize );
+
+	for ( let i = 0; i < size; i ++ ) {
+
+		for ( let j = 0; j < size; j ++ ) {
+
+			const x = i;
+			const y = j;
+
+			data[ ( i * size + j ) * 4 ] = ( simplex.noise( x, y ) * 0.5 + 0.5 ) * 255;
+			data[ ( i * size + j ) * 4 + 1 ] = ( simplex.noise( x + size, y ) * 0.5 + 0.5 ) * 255;
+			data[ ( i * size + j ) * 4 + 2 ] = ( simplex.noise( x, y + size ) * 0.5 + 0.5 ) * 255;
+			data[ ( i * size + j ) * 4 + 3 ] = ( simplex.noise( x + size, y + size ) * 0.5 + 0.5 ) * 255;
+
+		}
+
+	}
+
+	const noiseTexture = new DataTexture( data, size, size );
+	noiseTexture.wrapS = RepeatWrapping;
+	noiseTexture.wrapT = RepeatWrapping;
+	noiseTexture.needsUpdate = true;
+
+	return noiseTexture;
+
+}
+
+export const denoise = ( node, depthNode, normalNode, camera ) => nodeObject( new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );

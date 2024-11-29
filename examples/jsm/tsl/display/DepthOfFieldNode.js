@@ -1,4 +1,5 @@
-import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
+import { TempNode, NodeUpdateType } from 'three/webgpu';
+import { convertToTexture, nodeObject, Fn, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
 
 class DepthOfFieldNode extends TempNode {
 
@@ -10,7 +11,7 @@ class DepthOfFieldNode extends TempNode {
 
 	constructor( textureNode, viewZNode, focusNode, apertureNode, maxblurNode ) {
 
-		super();
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.viewZNode = viewZNode;

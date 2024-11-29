@@ -201,7 +201,12 @@ document.body.appendChild( renderer.domElement );
 			<li>`WEBGL_compressed_texture_s3tc`</li>
 			<li>`WEBGL_compressed_texture_pvrtc`</li>
 			<li>`WEBGL_compressed_texture_etc1`</li>
+			<li>See more: <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Using_Extensions#extension_list" target="_blank">Extension list</a></li>
 		</ul>
+
+		<p>
+			- [page:Boolean has]( [param:String extensionName] ): `true` if the extension is supported.
+		</p>
 
 		<h3>[property:string outputColorSpace]</h3>
 		<p>
@@ -380,7 +385,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion] | [param:Box3 srcRegion], [param:Vector2 dstPosition] | [param:Vector3 dstPosition], [param:Number dstLevel] )
+			[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion] | [param:Box3 srcRegion], [param:Vector2 dstPosition] | [param:Vector3 dstPosition], [param:Number srcLevel], [param:Number dstLevel] )
 		</h3>
 		<p>
 			Copies the pixels of a texture in the bounds '[page:Box3 srcRegion]' in the destination texture starting from the given position.

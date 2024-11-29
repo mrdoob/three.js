@@ -1,5 +1,5 @@
-import { HalfFloatType, RenderTarget, Vector2, Vector3, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
+import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils, NodeUpdateType } from 'three/webgpu';
+import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -19,7 +19,7 @@ class BloomNode extends TempNode {
 
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
-		super();
+		super( 'vec4' );
 
 		this.inputNode = inputNode;
 		this.strength = uniform( strength );

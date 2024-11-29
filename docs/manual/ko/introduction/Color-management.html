@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+	<style>
+		blockquote {
+			font-size: 0.8em;
+			line-height: 1.5em;
+			margin-left: 0;
+			border-left: 4px solid #cccccc;
+			padding: 1em 2em 1em 2em;
+		}
+
+		blockquote p:first-child {
+			margin-top: 0;
+		}
+
+		blockquote p:last-child {
+			margin-bottom: 0;
+		}
+
+		figure {
+			width: 100%;
+			margin: 1em 0;
+			font-style: italic;
+		}
+
+		figure img {
+			width: 100%;
+		}
+
+		figure.float {
+			float: right;
+			max-width: 30%;
+			margin: 1em;
+		}
+
+		@media all and ( max-width: 640px ) {
+
+			figure.float {
+				float: none;
+				max-width: 100%;
+			}
+
+		}
+	</style>
+</head>
+
+<body>
+	<h1>색상 관리[name]</h1>
+
+	<h2>색상 공간이란 무엇입니까?</h2>
+
+	<p>
+		각 색상 공간은 정밀도 및 디스플레이 기술과 관련된 기술적 제한을 충족하는 동시에 다양한 색상을 지원하기 위해 선택된 여러 설계 결정의 집합입니다.3D 에셋을 만들거나 장면에 3D 에셋을 어셈블할 때 이러한 속성이 무엇인지, 한 색상 공간의 속성과 장면의 다른 색상 공간의 관계를 이해하는 것이 중요합니다.
+	</p>
+
+	<figure class="float">
+		<img src="resources/srgb_gamut.png" alt="">
+		<figcaption>
+			CIE 1931 색상 차트에 표시된 sRGB 색상 및 흰색 점(D65)을 참조하십시오.색상 영역은 3D 볼륨인 sRGB 색재현율의 2D 투영을 나타냅니다.출처: <a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
+		</figcaption>
+	</figure>
+
+	<ul>
+		<li>
+			<b>원색:</b>원색(예를 들어 빨간색, 녹색, 파란색)은 절대적인 것이 아니다.그들은
+			제한된 정밀도 제약조건을 기반으로 가시 스펙트럼에서 선택
+			사용 가능한 디스플레이 장치의 성능색상은 원색의 비율을 나타냅니다.
+		</li>
+		<li>
+			<b> 흰색: </b> 대부분의 색상 공간은 다음과 같이 설계되었습니다.
+			원색 <i>R=G=B</i>는 색상이 없거나 "무채색" 으로 표시됩니다.모양
+			흰색이나 회색과 같은 소색 차이의 변화는 인간의 지각에 달려 있고 인간의 지각은
+			어느 정도 관찰자의 배경에 달려 있다.색상 공간의 균형을 맞추려면 흰색 점을 지정합니다.
+			이러한 요구 사항.sRGB 색상 공간에 정의된 흰색 점은
+			[link:https://en.wikipedia.org/wiki/Illuminant_D65D65]。
+		</li>
+		<li>
+			<b> 전송 함수: </b> 색재현율과 색상 모델을 선택한 후에도
+			숫자와 색상 공간 사이의 매핑을 정의합니다 (전달 함수).<i>r=0.5</i> 여부
+			물리적 조도가 <i>r=1.0</i>보다 50% 낮음을 나타냅니까?또는 인식에 따라 밝기 50% 감소
+			보통 사람의 눈?이것들은 서로 다른 것이다. 이런 차이는
+			수학 함수전송 함수는 <i> 선형 </i> 또는 <i> 비선형 </i> 일 수 있습니다.
+			색상 공간에 대한 대상입니다.sRGB는 비선형 전송 함수를 정의합니다.그것들
+			함수는 가끔 <i>gamma 함수 </i>와 비슷하지만 "gamma"는
+			애매모호하니 이런 상황에서는 피해야 한다.
+		</li>
+	</ul>
+
+		원색, 흰색 점 및 전송 함수라는 세 개의 매개변수는 각 매개변수가 특정 대상에 대해 선택된 색상 공간을 정의합니다.매개변수를 정의한 후에는 다음과 같은 추가 용어가 도움이 됩니다.
+
+		<ul>
+			<li>
+			<b> 색상 모델: </b> 선택한 색재현율에서 숫자로 색상을 식별하는 구문 - 색상의 좌표계입니다.three.js에서는 주로 RGB 색상에 초점을 맞춥니다.세 개의 좌표 <i>r, g, b∈[0,1]</i>("닫힌 도메인") 또는<i> r, g, b∈[0, ></i>("개역"), 각 마스터 도메인의 일부를 나타냅니다.색상.기타 색상 모델(HSL, Lab, LCH)은 일반적으로 예술 제어에 사용됩니다.
+			</li>
+			<li>
+			<b> 색재현율: </b> 원색과 흰색 점을 선택한 경우 가시 스펙트럼 내의 볼륨 (색재현율)이 볼륨에 포함되지 않는 색상 (색상 외부) 닫힌 도메인 [0,1] RGB 값으로는 표시할 수 없습니다.열린 도메인 [0, 에서 색재현율은 다음과 같습니다.기술적으로 무한하다.
+			</li>
+			</ul>
+
+	<p>
+		[page: SRGBColorSpace]("sRGB") 및 [page: LinearSRGBColorSpace]("Linear-sRGB") 두 가지 일반적인 색상 공간을 고려합니다.둘 다 같은 원색과 흰색 점을 사용하기 때문에 같은 색재현율을 가집니다.둘 다 RGB 색상 모델을 사용합니다.이들은 전송 함수에서만 다릅니다. 선형 sRGB는 물리적 빛 강도와 선형 관계입니다.sRGB는 비선형 sRGB 전달 함수를 사용하여 사람의 눈이 빛을 감지하는 방식과 일반적인 디스플레이 장치의 응답성에 더 가깝습니다.
+	</p>
+
+	<p>
+		이런 차이는 매우 중요하다.조명 계산 및 기타 렌더링 작업은 일반적으로 선형 색상 공간에서 수행되어야 합니다.그러나 선형 색상은 이미지나 프레임 버퍼에서 저장 효율이 낮고 인간 관찰자가 볼 때 올바르게 보이지 않습니다.따라서 텍스쳐 입력 및 최종 렌더링 이미지에는 일반적으로 비선형 sRGB 색상 공간이 사용됩니다.
+	</p>
+
+	<blockquote>
+		<p>
+			ℹ️ <i><b>NOTICE:</b> 일부 현대 모니터는 Display-P3와 같은 더 넓은 색재현율을 지원하지만 네트워크 플랫폼의 그래픽 API는 sRGB에 크게 의존합니다.현재 three.js를 사용하는 응용 프로그램은 일반적으로 sRGB 및 Linear sRGB 색상 공간만 사용합니다.</i>
+		</p>
+	</blockquote>
+
+	<h2>색채공간의 역할</h2>
+
+	<p>
+		현대 렌더링 방법에 필요한 선형 워크플로우는 일반적으로 여러 색상 공간과 관련되며 각 색상 공간은 특정 역할에 할당됩니다.선형 및 비선형 색상 공간은 다음과 같이 서로 다른 역할에 적용됩니다.
+	</p>
+
+	<h3>색상 공간 가져오기</h3>
+
+	<p>
+    three.js에 제공되는 색상 -- 색상 선택기, 텍스쳐, 3D 모델 및 다른 소스에서 가져온 각 색상 공간은 연관되어 있습니다.Linear sRGB 작업 색상 공간에 아직 없는 색상을 변환하고 텍스쳐에 올바른 <i>texture.colorSpace</i> 할당을 할당해야 합니다.세 가지 조건이 충족되면 특정 변환을 자동으로 수행할 수 있습니다 (sRGB의 16진수 및 CSS 색상).색상을 초기화하기 전에 ColorManagement API를 활성화합니다.
+	</p>
+
+	<code>
+    THREE.ColorManagement.enabled = true;
+	</code>
+
+	<p>
+		THREE.ColorManagement 기본적으로 활성화됩니다.
+	</p>
+
+	<ul>
+		<li>
+			<b>Materials, lights, and shaders:</b> 재료, 조명 및 셰이더의 색상은 RGB 컴포넌트를 Linear sRGB 작업 색상 공간에 저장합니다.
+		</li>
+		<li>
+			<b>Vertex colors:</b> [page:BufferAttribute BufferAttributes] RGB 컴포넌트 저장 선형 sRGB 작업 색상 공간.
+		</li>
+		<li>
+			<b> 색상 텍스처: </b>.map 또는.emissiveMap과 같은 색상 정보가 포함된 PNG 또는 JPEG[페이지: 텍스처 텍스처]는 닫힌 도메인 sRGB 색상 공간을 사용하며 <i>Texture.colorSpace=SRGBColorSpace</i>를 사용해야 합니다.OpenEXR(.envMap 또는.lightMap의 경우) 같은 형식은 <i>texture.colorSpace LinearSRGBColorSpace</i>로 표시된 선형 sRGB 색상 공간을 사용합니다.
+			또한 개역 [0,]의 값을 포함할 수 있습니다.
+			</li>
+			<li>
+			<b> 비컬러 텍스쳐: </b> 색상 정보를 저장하지 않는 텍스쳐(예:.normalMap 또는.rawnessMap)에는 연관된 색상 공간이 없으며, 일반적으로 (기본값) 텍스쳐 메모 <i> texture.colorSpace = NoColorSpace</i> 를 사용합니다.기술적인 이유로 비색상 데이터가 다른 비선형 인코딩으로 표시될 수 있는 경우는 극히 일부입니다.
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b> 경고: </b> 많은 3D 모델의 형식이 색상 공간 정보를 올바르거나 일관되게 정의하지 않습니다.three.js가 대부분의 상황을 처리하려고 시도하지만 이전 파일 형식의 문제는 흔합니다.최상의 결과를 얻으려면 glTF 2.0([page:GLTFLoader])을 사용하고 가능한 한 빨리 온라인 뷰어에서 3D 모델을 테스트하여 자산 자체가 정확한지 확인하십시오</i>
+		</p>
+	</blockquote>
+
+	<h3>작업 색상 공간</h3>
+
+	<p>
+		렌더링, 보간 및 기타 많은 작업은 RGB 컴포넌트가 실제 조명에 비례하는 열린 도메인 선형 작업 색상 공간에서 수행되어야 합니다.three.js에서 작업 색상 공간은 Linear-sRGB입니다.
+	</p>
+
+	<h3>출력 색상 공간</h3>
+
+	<p>
+		디스플레이 장치, 이미지 또는 비디오로 출력하는 것은 열린 도메인의 Linear-sRGB 작업 색상 공간에서 다른 색상 공간으로 변환하는 것과 관련될 수 있습니다.이 변환은 기본 렌더링 프로세스([page:WebGLRender.outputColorSpace]) 또는 사후 처리 프로세스에서 수행할 수 있습니다.
+	</p>
+
+	<code>
+    renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
+	</code>
+
+	<ul>
+		<li>
+			<b> 표시: </b> WebGL 캔버스에 기록된 색상은 sRGB 색상 공간에 있어야 합니다.
+		</li>
+		<li>
+			<b>Image:</b>이미지를 쓰는 색상은 형식과 용도에 맞는 색상 공간을 사용해야 합니다.PNG 또는 JPEG 텍스쳐를 쓴 전체 렌더링 이미지는 일반적으로 sRGB 색상 공간을 사용합니다.송신, 조명 맵 또는 [0,1] 범위에 국한되지 않는 다른 데이터를 포함하는 이미지는 일반적으로 OpenEXR과 같은 Open 도메인 선형 sRGB 색상 공간과 호환되는 이미지 형식을 사용합니다.
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b> 경고: </b> 렌더링 대상은 sRGB 또는 선형 sRGB를 사용할 수 있습니다.sRGB는 제한된 정밀도를 더 잘 활용합니다.닫힌 도메인에서 8 비트는 일반적으로 sRGB에 충분하지만 선형 sRGB는 ≥ 12 비트 (반 부동 소수점) 가 필요할 수 있습니다.후속 라인 단계에서 선형 sRGB 입력이 필요한 경우 추가 변환으로 인해 적은 성능 비용이 발생할 수 있습니다</i>
+		</p>
+	</blockquote>
+
+	<p>
+    [page:ShaderMaterial] 및 [page:RawShaderMaterial] 기반 사용자 지정 재료는 자체 출력 색상 공간 변환을 수행해야 합니다."ShaderMaterial" 인스턴스의 경우 "colorspace_fragment" 셰이더 블록을 세그먼트 셰이더의 "main()" 함수에 추가하면 충분합니다.
+	</p>
+
+	<h2>과 협력 THREE.Color 인스턴스</h2>
+
+	<p>
+		[page:Color] 인스턴스를 읽거나 수정하는 방법은 데이터가 three.js 작업 색상 공간인 Linear sRGB에 이미 있다고 가정합니다.RGB 및 HSL 구성 요소는 Color 인스턴스에 저장된 데이터의 직접 표현으로 암시적으로 변환되지 않습니다.색상 데이터는 <i>를 사용하여 명시적으로 변환할 수 있습니다 <i>.convertLinearToSRGB()</i>
+		or <i>.convertSRGBToLinear()</i>.
+	</p>
+
+	<code>
+		// RGB components (no change).
+		color.r = color.g = color.b = 0.5;
+		console.log( color.r ); // → 0.5
+
+		// Manual conversion.
+		color.r = 0.5;
+		color.convertSRGBToLinear();
+		console.log( color.r ); // → 0.214041140
+	</code>
+
+	<p>
+		<i>ColorManagement.enabled=true</i>(권장)를 설정하면 일부 변환이 자동으로 수행됩니다.16진수와 CSS 색상은 일반적으로 sRGB이기 때문에 [page:Color] 메서드는 setter에서 이러한 입력을 sRGB에서 Linear sRGB로 자동 변환하거나 getter에서 16진수 또는 CSS 출력을 반환할 때 Linear sRG에서 sRGB로 변환합니다.
+	</p>
+
+	<code>
+		// Hexadecimal conversion.
+		color.setHex( 0x808080 );
+		console.log( color.r ); // → 0.214041140
+		console.log( color.getHex() ); // → 0x808080
+
+		// CSS conversion.
+		color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' );
+		console.log( color.r ); // → 0.214041140
+
+		// Override conversion with 'colorSpace' argument.
+		color.setHex( 0x808080, LinearSRGBColorSpace );
+		console.log( color.r ); // → 0.5
+		console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
+		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
+	</code>
+
+	<h2>일반적인 오류</h2>
+
+	<p>
+		단일 색상이나 텍스쳐 구성이 잘못되면 예상보다 더 어둡거나 밝게 표시됩니다.렌더기의 출력 색상 공간 구성이 잘못되면 전체 장면이 더 어둡게 보일 수 있습니다 (예: sRGB로 변환할 수 없음). 또는 더 밝게 보일 수 있습니다 (예: 사후 처리된 sRGB 이중 변환).각 상황에서 문제가 고르지 않을 수 있으며 조명을 단순히 증가 / 감소한다고 해서 문제가 해결되지는 않습니다.
+	</p>
+
+	<p>
+		다음과 같은 상황이 발생하면 더욱 미묘한 문제가 나타난다<i> 둘 다 </i>색상 공간 입력과 출력 색상 공간이 올바르지 않습니다. 전체적인 밝기 수준은 좋을 수 있지만 다른 조명에서 색상이 예기치 않게 변경되거나 그림자가 예상보다 과장되고 부드러워 보일 수 있습니다.이 두 가지 잘못은 결코 하나의 정확성과 같지 않다. 중요한 것은 일이다 색상 공간은 선형 (장면 참조) 이고 출력 색상 공간은 비선형 (디스플레이 참조) 입니다.
+	</p>
+
+	<h2>추가 읽기</h2>
+
+	<ul>
+		<li>
+			<a href="https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-24-importance-being-linear" target="_blank" rel="noopener">GPU Gems 3: 선형의 중요성</a>,저자: Larry Gritz and Eugene d'Eon
+		</li>
+		<li>
+			<a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/" target="_blank" rel="noopener">모든 프로그래머는 gamma에 대해 알아야 합니다</a>, 저자:John Novak
+		</li>
+		<li>
+			<a href="https://hg2dc.com/" target="_blank" rel="noopener">디지털 색상 보행시선 안내서</a>,저자: Troy Sobotka
+		</li>
+		<li>
+			<a href="https://docs.blender.org/manual/en/latest/render/color_management.html" target="_blank" rel="noopener">색상 관리</a>,저자: Blender
+		</li>
+	</ul>
+
+</body>
+
+</html>

@@ -5,11 +5,13 @@ import {
 	Matrix4,
 	Box3,
 	Object3D,
-	WebGLCoordinateSystem
-} from 'three';
+	WebGLCoordinateSystem,
+	NodeUpdateType,
+	Node
+} from 'three/webgpu';
 
 import { CSMFrustum } from './CSMFrustum.js';
-import { viewZToOrthographicDepth, reference, uniform, float, vec4, vec2, If, Fn, min, renderGroup, positionView, Node, NodeUpdateType, shadow } from 'three/tsl';
+import { viewZToOrthographicDepth, reference, uniform, float, vec4, vec2, If, Fn, min, renderGroup, positionView, shadow } from 'three/tsl';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new CSMFrustum();
@@ -253,7 +255,7 @@ class CSMShadowNode extends Node {
 
 	setupFade() {
 
-		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup ).label( 'cameraNear' );
+		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
 		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
@@ -327,7 +329,7 @@ class CSMShadowNode extends Node {
 
 	setupStandard() {
 
-		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup ).label( 'cameraNear' );
+		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
 		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )

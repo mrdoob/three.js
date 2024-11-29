@@ -315,17 +315,13 @@ const GouraudShader = {
 
 class MeshGouraudMaterial extends ShaderMaterial {
 
-	static get type() {
-
-		return 'MeshGouraudMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshGouraudMaterial = true;
+
+		this.type = 'MeshGouraudMaterial';
 
 		//this.color = new THREE.Color( 0xffffff ); // diffuse
 

@@ -1,5 +1,5 @@
-import { AdditiveBlending, Color, Vector2, PostProcessingUtils } from 'three';
-import { nodeObject, uniform, mrt, PassNode, QuadMesh, texture, NodeMaterial, getTextureIndex } from 'three/tsl';
+import { AdditiveBlending, Color, Vector2, PostProcessingUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
+import { nodeObject, uniform, mrt, texture, getTextureIndex } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
