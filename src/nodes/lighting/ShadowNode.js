@@ -18,6 +18,7 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 
+const shadowMaterialLib =/*@__PURE__*/  new WeakMap();
 const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
 
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
@@ -40,6 +41,28 @@ const linearShadowDistance = ( light ) => {
 	const referencePosition = objectPosition( light );
 
 	return linearDistance( referencePosition, nearDistance, farDistance );
+
+};
+
+const getShadowMaterial = ( light ) => {
+
+	let material = shadowMaterialLib.get( light );
+
+	if ( material === undefined ) {
+
+		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
+
+		material = new NodeMaterial();
+		material.colorNode = vec4( 0, 0, 0, 1 );
+		material.depthNode = depthNode;
+		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
+		material.name = 'ShadowMaterial';
+
+		shadowMaterialLib.set( light, material );
+
+	}
+
+	return material;
 
 };
 
@@ -224,7 +247,6 @@ const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilt
 
 //
 
-let _overrideMaterial = null;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class ShadowNode extends Node {
@@ -332,18 +354,6 @@ class ShadowNode extends Node {
 
 		const shadowMapType = renderer.shadowMap.type;
 
-		if ( _overrideMaterial === null ) {
-
-			const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
-
-			_overrideMaterial = new NodeMaterial();
-			_overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
-			_overrideMaterial.depthNode = depthNode;
-			_overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
-			_overrideMaterial.name = 'ShadowMaterial';
-
-		}
-
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.compareFunction = LessCompare;
 
@@ -401,7 +411,7 @@ class ShadowNode extends Node {
 		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow } );
 
 		const shadowColor = texture( shadowMap.texture, shadowCoord );
-		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor.rgb, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
@@ -467,7 +477,7 @@ class ShadowNode extends Node {
 
 		const currentOverrideMaterial = scene.overrideMaterial;
 
-		scene.overrideMaterial = _overrideMaterial;
+		scene.overrideMaterial = getShadowMaterial( light );
 
 		shadow.camera.layers.mask = camera.layers.mask;
 
