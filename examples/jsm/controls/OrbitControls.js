@@ -92,6 +92,7 @@ class OrbitControls extends Controls {
 		// Set to false to disable rotating
 		this.enableRotate = true;
 		this.rotateSpeed = 1.0;
+		this.keyRotateSpeed = 1.0;
 
 		// Set to false to disable panning
 		this.enablePan = true;
@@ -786,7 +787,7 @@ class OrbitControls extends Controls {
 
 					if ( this.enableRotate ) {
 
-						this._rotateUp( _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+						this._rotateUp( _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
 
 					}
 
@@ -809,7 +810,7 @@ class OrbitControls extends Controls {
 
 					if ( this.enableRotate ) {
 
-						this._rotateUp( - _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+						this._rotateUp( - _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
 
 					}
 
@@ -832,7 +833,7 @@ class OrbitControls extends Controls {
 
 					if ( this.enableRotate ) {
 
-						this._rotateLeft( _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+						this._rotateLeft( _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
 
 					}
 
@@ -855,7 +856,7 @@ class OrbitControls extends Controls {
 
 					if ( this.enableRotate ) {
 
-						this._rotateLeft( - _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+						this._rotateLeft( - _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
 
 					}
 
