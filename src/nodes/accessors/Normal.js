@@ -1,9 +1,8 @@
 import { attribute } from '../core/AttributeNode.js';
 import { cameraViewMatrix } from './Camera.js';
 import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
-import { mat3, vec3 } from '../tsl/TSLBase.js';
+import { mat3, vec3, Fn, varying } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
-import { Fn, varying } from '../tsl/TSLBase.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
 
 export const normalGeometry = /*@__PURE__*/ attribute( 'normal', 'vec3' );

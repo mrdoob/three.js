@@ -60,6 +60,9 @@
     ],
     "no-irregular-whitespace": [
       "error"
+    ],
+    "no-duplicate-imports": [
+      "error"
     ]
   }
 }
