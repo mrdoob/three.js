@@ -20548,6 +20548,37 @@ function getLightData( light ) {
 
 }
 
+function lightShadowMatrix( light ) {
+
+	const data = getLightData( light );
+
+	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => {
+
+		light.shadow.updateMatrices( light );
+
+		return light.shadow.matrix;
+
+	} ) );
+
+}
+
+function lightProjectionUV( light ) {
+
+	const data = getLightData( light );
+
+	if ( data.projectionUV === undefined ) {
+
+		const spotLightCoord = lightShadowMatrix( light ).mul( positionWorld );
+
+		data.projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
+
+
+	}
+
+	return data.projectionUV;
+
+}
+
 function lightPosition( light ) {
 
 	const data = getLightData( light );
@@ -20839,6 +20870,7 @@ class LightsNode extends Node {
 
 const lights = ( lights = [] ) => nodeObject( new LightsNode() ).setLights( lights );
 
+const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
 
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
@@ -20861,6 +20893,29 @@ const linearShadowDistance = ( light ) => {
 	const referencePosition = objectPosition( light );
 
 	return linearDistance( referencePosition, nearDistance, farDistance );
+
+};
+
+const getShadowMaterial = ( light ) => {
+
+	let material = shadowMaterialLib.get( light );
+
+	if ( material === undefined ) {
+
+		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
+
+		material = new NodeMaterial();
+		material.colorNode = vec4( 0, 0, 0, 1 );
+		material.depthNode = depthNode;
+		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
+		material.blending = NoBlending;
+		material.name = 'ShadowMaterial';
+
+		shadowMaterialLib.set( light, material );
+
+	}
+
+	return material;
 
 };
 
@@ -21045,7 +21100,6 @@ const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilt
 
 //
 
-let _overrideMaterial = null;
 const _quadMesh$1 = /*@__PURE__*/ new QuadMesh();
 
 class ShadowNode extends Node {
@@ -21153,18 +21207,6 @@ class ShadowNode extends Node {
 
 		const shadowMapType = renderer.shadowMap.type;
 
-		if ( _overrideMaterial === null ) {
-
-			const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
-
-			_overrideMaterial = new NodeMaterial();
-			_overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
-			_overrideMaterial.depthNode = depthNode;
-			_overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
-			_overrideMaterial.name = 'ShadowMaterial';
-
-		}
-
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.compareFunction = LessCompare;
 
@@ -21204,7 +21246,7 @@ class ShadowNode extends Node {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = uniform( shadow.matrix ).setGroup( renderGroup ).mul( shadowWorldPosition.add( transformedNormalWorld.mul( normalBias ) ) );
+		const shadowPosition = lightShadowMatrix( light ).mul( shadowWorldPosition.add( transformedNormalWorld.mul( normalBias ) ) );
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -21267,10 +21309,8 @@ class ShadowNode extends Node {
 
 	renderShadow( frame ) {
 
-		const { shadow, shadowMap, light } = this;
+		const { shadow, shadowMap } = this;
 		const { renderer, scene } = frame;
-
-		shadow.updateMatrices( light );
 
 		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height );
 
@@ -21290,12 +21330,15 @@ class ShadowNode extends Node {
 
 		const currentOverrideMaterial = scene.overrideMaterial;
 
-		scene.overrideMaterial = _overrideMaterial;
+		scene.overrideMaterial = getShadowMaterial( light );
 
 		shadow.camera.layers.mask = camera.layers.mask;
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
+		const currentMRT = renderer.getMRT();
+
+		renderer.setMRT( null );
 
 		renderer.setRenderObjectFunction( ( object, ...params ) => {
 
@@ -21322,6 +21365,8 @@ class ShadowNode extends Node {
 		}
 
 		renderer.setRenderTarget( currentRenderTarget );
+
+		renderer.setMRT( currentMRT );
 
 		scene.overrideMaterial = currentOverrideMaterial;
 
@@ -21409,12 +21454,10 @@ class AnalyticLightNode extends LightingNode {
 
 		super();
 
-		this.updateType = NodeUpdateType.FRAME;
-
 		this.light = light;
 
 		this.color = new Color();
-		this.colorNode = uniform( this.color ).setGroup( renderGroup );
+		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
 
 		this.baseColorNode = null;
 
@@ -21422,6 +21465,8 @@ class AnalyticLightNode extends LightingNode {
 		this.shadowColorNode = null;
 
 		this.isAnalyticLightNode = true;
+
+		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
@@ -21645,8 +21690,8 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	const lightToPosition = shadowCoord.xyz.toVar();
 	const lightToPositionLength = lightToPosition.length();
 
-	const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
-	const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
+	const cameraNearLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
+	const cameraFarLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
 	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = uniform( shadow.mapSize ).setGroup( renderGroup );
 
@@ -23636,6 +23681,8 @@ var TSL = /*#__PURE__*/Object.freeze({
 	lessThan: lessThan,
 	lessThanEqual: lessThanEqual,
 	lightPosition: lightPosition,
+	lightProjectionUV: lightProjectionUV,
+	lightShadowMatrix: lightShadowMatrix,
 	lightTargetDirection: lightTargetDirection,
 	lightTargetPosition: lightTargetPosition,
 	lightViewPosition: lightViewPosition,
@@ -27251,7 +27298,18 @@ class SpotLightNode extends AnalyticLightNode {
 			decayExponent: decayExponentNode
 		} );
 
-		const lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
+		let lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
+
+		if ( light.map ) {
+
+			const spotLightCoord = lightProjectionUV( light );
+			const projectedTexture = texture( light.map, spotLightCoord.xy ).onRenderUpdate( () => light.map );
+
+			const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
+
+			lightColor = inSpotLightMap.select( lightColor.mul( projectedTexture ), lightColor );
+
+		}
 
 		const reflectedLight = builder.context.reflectedLight;
 
@@ -30089,7 +30147,7 @@ class Renderer {
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
 		let overridePositionNode;
-		let overrideFragmentNode;
+		let overrideColorNode;
 		let overrideDepthNode;
 
 		//
@@ -30109,6 +30167,9 @@ class Renderer {
 
 			}
 
+			overrideMaterial.alphaTest = material.alphaTest;
+			overrideMaterial.alphaMap = material.alphaMap;
+
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
@@ -30120,11 +30181,10 @@ class Renderer {
 
 				}
 
-
 				if ( material.castShadowNode && material.castShadowNode.isNode ) {
 
-					overrideFragmentNode = overrideMaterial.fragmentNode;
-					overrideMaterial.fragmentNode = material.castShadowNode;
+					overrideColorNode = overrideMaterial.colorNode;
+					overrideMaterial.colorNode = material.castShadowNode;
 
 				}
 
@@ -30166,9 +30226,9 @@ class Renderer {
 
 		}
 
-		if ( overrideFragmentNode !== undefined ) {
+		if ( overrideColorNode !== undefined ) {
 
-			scene.overrideMaterial.fragmentNode = overrideFragmentNode;
+			scene.overrideMaterial.colorNode = overrideColorNode;
 
 		}
 
@@ -38623,7 +38683,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
 
-		if ( depthSnippet ) {
+		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
+
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
+
+		} else if ( depthSnippet ) {
 
 			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
