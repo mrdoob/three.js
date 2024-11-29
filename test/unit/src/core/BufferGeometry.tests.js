@@ -463,14 +463,20 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		const toHalfFloatArray = ( f32Array ) => {
+
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
+
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
+
 			}
+
 			return f16Array;
+
 		};
 
 		QUnit.test( 'computeBoundingBox - Float16', ( assert ) => {
+
 			const vertices = [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ];
 			const geometry = new BufferGeometry();
 
@@ -490,6 +496,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		QUnit.test( 'computeBoundingSphere - Float16', ( assert ) => {
+
 			const vertices = [ - 10, 0, 0, 10, 0, 0 ];
 			const geometry = new BufferGeometry();
 

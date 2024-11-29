@@ -7,8 +7,7 @@ import {
 } from 'three';
 import { CopyShader } from '../shaders/CopyShader.js';
 import { ShaderPass } from './ShaderPass.js';
-import { MaskPass } from './MaskPass.js';
-import { ClearMaskPass } from './MaskPass.js';
+import { ClearMaskPass, MaskPass } from './MaskPass.js';
 
 class EffectComposer {
 
