@@ -12,7 +12,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { HalfFloatType, LessCompare, NoBlending, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
@@ -56,6 +56,7 @@ const getShadowMaterial = ( light ) => {
 		material.colorNode = vec4( 0, 0, 0, 1 );
 		material.depthNode = depthNode;
 		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
+		material.blending = NoBlending;
 		material.name = 'ShadowMaterial';
 
 		shadowMaterialLib.set( light, material );
@@ -483,6 +484,9 @@ class ShadowNode extends Node {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
+		const currentMRT = renderer.getMRT();
+
+		renderer.setMRT( null );
 
 		renderer.setRenderObjectFunction( ( object, ...params ) => {
 
@@ -509,6 +513,8 @@ class ShadowNode extends Node {
 		}
 
 		renderer.setRenderTarget( currentRenderTarget );
+
+		renderer.setMRT( currentMRT );
 
 		scene.overrideMaterial = currentOverrideMaterial;
 
