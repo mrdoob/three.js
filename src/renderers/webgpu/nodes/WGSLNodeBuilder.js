@@ -1301,8 +1301,6 @@ ${ flowData.code }
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
 
-			console.log( this.computeShader );
-
 		}
 
 	}

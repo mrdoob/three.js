@@ -73,6 +73,7 @@
 			};
 
 			const algorithms = [
+				'Sklansky (No Partition)',
 				'Sklansky',
 				'Kogge-Stone',
 				'Fake',
@@ -113,18 +114,32 @@
 			
 				};
 
+				// Useful loops
 
-				const LoopThroughWorkgroup = ( callback ) => {
+				const LoopThroughWorkgroup = ( startValue, callback ) => {
 
 					const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
 
 					Loop( {
-						start: uint( 0 ),
+						start: uint( startValue ),
 						type: 'uint',
 						end: uint( maxElements ),
 						condition: '<',
 						update: '+= WORKGROUP_SIZE',
-						name: 'workgroupIndex'
+						name: 'workloadIndex'
+					}, callback );
+
+				};
+
+				const LoopThroughBinary = ( startValue, callback ) => {
+
+					Loop( {
+						start: uint( startValue ),
+						type: 'uint',
+						end: uint( maxElements ),
+						condition: '<',
+						update: '<<= 1',
+						name: 'shiftIndex'
 					}, callback );
 
 				};
@@ -156,6 +171,7 @@
 						},
 					},
 					// BASIC SCANS
+					// https://github.com/b0nes164/GPUPrefixSums/discussions/15#discussioncomment-11332960
 					'Sklansky': {
 						threads: [ 32 ],
 						runMethod: ( currentElements ) => {
@@ -163,9 +179,9 @@
 							const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
 							const prevReduction = uint( 0 ).toVar( 'prevReduction' );
 
-							LoopThroughWorkgroup( ( { workgroupIndex } ) => {
+							LoopThroughWorkgroup( 0, ( { workloadIndex } ) => {
 
-								const effectiveIndex = invocationLocalIndex.add( workgroupIndex );
+								const effectiveIndex = invocationLocalIndex.add( workloadIndex );
 
 								Loop( {
 									start: uint( 0 ),
@@ -196,7 +212,7 @@
 								currentElements.element( effectiveIndex ).addAssign( prevReduction );
 								workgroupBarrier();
 
-								prevReduction.assign( currentElements.element( workgroupIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
+								prevReduction.assign( currentElements.element( workloadIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
 
 							} );
 
@@ -216,7 +232,7 @@
 							const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
 							const prevReduction = uint( 0 ).toVar( 'prevReduction' );
 
-							LoopThroughWorkgroup( ( { workgroupIndex } ) => {
+							LoopThroughWorkgroup( 0, ( { workloadIndex } ) => {
 
 								Loop( {
 									start: uint( 1 ),
@@ -231,7 +247,7 @@
 
 									If( invocationLocalIndex.greaterThanEqual( j ), () => {
 
-										t.assign( currentElements.element( invocationLocalIndex.sub( j ).add( workgroupIndex ) ) );
+										t.assign( currentElements.element( invocationLocalIndex.sub( j ).add( workloadIndex ) ) );
 
 
 									} );
@@ -240,7 +256,7 @@
 
 									If( invocationLocalIndex.greaterThanEqual( j ), () => {
 
-										currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( t );
+										currentElements.element( invocationLocalIndex.add( workloadIndex ) ).addAssign( t );
 
 									} );
 
@@ -249,10 +265,10 @@
 
 								} );
 
-								currentElements.element( invocationLocalIndex.add( workgroupIndex ) ).addAssign( prevReduction );
+								currentElements.element( invocationLocalIndex.add( workloadIndex ) ).addAssign( prevReduction );
 								workgroupBarrier();
 
-								prevReduction.assign( currentElements.element( workgroupIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
+								prevReduction.assign( currentElements.element( workloadIndex.add( WORKGROUP_SIZE ).sub( 1 ) ) );
 
 							} );
 
