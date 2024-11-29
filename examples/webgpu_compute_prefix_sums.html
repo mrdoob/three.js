@@ -55,7 +55,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, vec3, Loop, uniform, uv, uint, float, modInt, Fn, vec2, uvec2, floor, instanceIndex, invocationLocalIndex, workgroupBarrier, storage } from 'three/tsl';
+			import { If, vec3, Loop, uniform, instancedArray, uv, uint, float, modInt, Fn, vec2, uvec2, floor, instanceIndex, invocationLocalIndex, workgroupBarrier, storage } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -104,10 +104,8 @@
 
 				const infoArray = new Uint32Array( 5 ).fill( 1 );
 
-				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storage( currentElementsBuffer, 'uint', currentElementsBuffer.count ).label( 'Elements' );
-				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
-				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count );
+				const currentElementsBuffer = instancedArray( array );
+				const infoBuffer = instancedArray( infoArray );
 
 				const genericInitMethod = ( currentElements ) => {
 
@@ -273,7 +271,7 @@
 
 						method.initFunction = Fn( () => {
 
-							method.initMethod( currentElementsStorage, infoStorage );
+							method.initMethod( currentElementsBuffer, infoBuffer );
 
 						} )().compute( maxElements );
 
@@ -285,7 +283,7 @@
 
 						method.initFunction = Fn( () => {
 
-							genericInitMethod( currentElementsStorage );
+							genericInitMethod( currentElementsBuffer );
 
 						} )().compute( maxElements );
 
@@ -295,7 +293,7 @@
 
 					const runFunctionTemplate = Fn( ( ) => {
 
-						method.runMethod( currentElementsStorage, infoStorage );
+						method.runMethod( currentElementsBuffer, infoBuffer );
 
 					} );
 
@@ -322,7 +320,7 @@
 					const newUV = uv().mul( vec2( gridDim ) );
 					const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
 					const elementIndex = uint( gridDim ).mul( pixel.y ).add( pixel.x );
-					const colorChanger = currentElementsStorage.element( elementIndex );
+					const colorChanger = currentElementsBuffer.element( elementIndex );
 					const subtracter = float( colorChanger ).div( gridDim.mul( gridDim ) );
 					const color = vec3( subtracter.oneMinus() ).toVar();
 					If( effectController.validate.equal( 1 ), () => {
@@ -408,8 +406,6 @@
 
 						case 'Validate': {
 
-							const currentElements = new Uint32Array( await renderer.getArrayBufferAsync( currentElementsBuffer ) );
-
 							effectController.validate.value = 1;
 			
 							lastStep = 'Validate';
@@ -425,7 +421,6 @@
 
 							await renderer.computeAsync( method.initFunction );
 							lastStep = 'Init';
-
 							currentStep = 'Sum';
 
 			
