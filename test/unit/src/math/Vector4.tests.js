@@ -272,7 +272,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'divide', ( assert) => {
+		QUnit.test( 'divide', ( assert ) => {
 
 			const a = new Vector4( 7, 8, 9, 0 );
 			const b = new Vector4( 2, 2, 3, 4 );

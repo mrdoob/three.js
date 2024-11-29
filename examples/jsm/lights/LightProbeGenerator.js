@@ -129,7 +129,7 @@ class LightProbeGenerator {
 
 	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
-		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? -1 : 1;
+		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? - 1 : 1;
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
