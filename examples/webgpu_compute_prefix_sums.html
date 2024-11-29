@@ -172,6 +172,38 @@
 					},
 					// BASIC SCANS
 					// https://github.com/b0nes164/GPUPrefixSums/discussions/15#discussioncomment-11332960
+					'Sklansky (No Partition)': {
+						threads: [ 32 ],
+						runMethod: ( currentElements ) => {
+
+							const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
+
+							const offset = uint( 0 ).toVar( 'offset' );
+							LoopThroughBinary( 1, ( { shiftIndex } ) => {
+
+								LoopThroughWorkgroup( invocationLocalIndex, ( { workloadIndex } ) => {
+
+									If( ( shiftIndex.bitAnd( workloadIndex ) ), () => {
+
+										const offsetIndex = workloadIndex.shiftRight( offset );
+										const offsetOffset = offsetIndex.shiftLeft( offset );
+										const acquireIndex = offsetOffset.sub( 1 );
+
+										currentElements.element( workloadIndex ).addAssign( currentElements.element( acquireIndex ) );
+
+			
+									} );
+
+			
+								} );
+								workgroupBarrier();
+								offset.addAssign( 1 );
+
+							} );
+
+						}
+
+					},
 					'Sklansky': {
 						threads: [ 32 ],
 						runMethod: ( currentElements ) => {
