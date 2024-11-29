@@ -355,7 +355,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
 
-		if ( depthSnippet ) {
+		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
+
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
+
+		} else if ( depthSnippet ) {
 
 			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
