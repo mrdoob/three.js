@@ -1,6 +1,13 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
+/**
+ * This node can be used as a cache management component for another node.
+ * Caching is in general used by default in {@link NodeBuilder} but this node
+ * allows the usage of a shared parent cache during the build process.
+ *
+ * @augments Node
+ */
 class CacheNode extends Node {
 
 	static get type() {
@@ -9,13 +16,38 @@ class CacheNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new cache node.
+	 *
+	 * @param {Node} node - The node that should be cached.
+	 * @param {Boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
+	 */
 	constructor( node, parent = true ) {
 
 		super();
 
+		/**
+		 * The node that should be cached.
+		 *
+		 * @type {Node}
+		 */
 		this.node = node;
+
+		/**
+		 * Whether this node refers to a shared parent cache or not.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.parent = parent;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCacheNode = true;
 
 	}

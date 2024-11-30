@@ -1,4 +1,9 @@
-
+/**
+ * Possible shader stages.
+ *
+ * @property {string} VERTEX The vertex shader stage.
+ * @property {string} FRAGMENT The fragment shader stage.
+ */
 export const NodeShaderStage = {
 	VERTEX: 'vertex',
 	FRAGMENT: 'fragment'
@@ -19,6 +24,19 @@ export const NodeUpdateType = {
 	OBJECT: 'object'
 };
 
+/**
+ * Data types of a node.
+ *
+ * @property {string} BOOLEAN Boolean type.
+ * @property {string} INTEGER Integer type.
+ * @property {string} FLOAT Float type.
+ * @property {string} VECTOR2 Two-dimensional vector type.
+ * @property {string} VECTOR3 Three-dimensional vector type.
+ * @property {string} VECTOR4 Four-dimensional vector type.
+ * @property {string} MATRIX2 2x2 matrix type.
+ * @property {string} MATRIX3 3x3 matrix type.
+ * @property {string} MATRIX4 4x4 matrix type.
+ */
 export const NodeType = {
 	BOOLEAN: 'bool',
 	INTEGER: 'int',
@@ -31,6 +49,13 @@ export const NodeType = {
 	MATRIX4: 'mat4'
 };
 
+/**
+ * Access types of a node. These are relevant for compute and storage usage.
+ *
+ * @property {string} READ_ONLY Read-only access
+ * @property {string} WRITE_ONLY Write-only access.
+ * @property {string} READ_WRITE Read and write access.
+ */
 export const NodeAccess = {
 	READ_ONLY: 'readOnly',
 	WRITE_ONLY: 'writeOnly',

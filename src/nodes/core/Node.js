@@ -80,7 +80,7 @@ class Node extends EventDispatcher {
 		/**
 		 * Whether this node is global or not. This property is relevant for the internal
 		 * node caching system. All nodes which should be declared just once should
-		 * set this flag to `true` (a typical example is `AttributeNode`).
+		 * set this flag to `true` (a typical example is {@link AttributeNode}).
 		 *
 		 * @type {Boolean}
 		 * @default false
@@ -88,7 +88,7 @@ class Node extends EventDispatcher {
 		this.global = false;
 
 		/**
-		 * This flag can be used for type testing (whether a given object is of type `Node` or not).
+		 * This flag can be used for type testing.
 		 *
 		 * @type {Boolean}
 		 * @readonly

@@ -1,6 +1,11 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/**
+ * TODO: Explain the purpose of this module.
+ *
+ * @augments Node
+ */
 class BypassNode extends Node {
 
 	static get type() {
@@ -9,13 +14,30 @@ class BypassNode extends Node {
 
 	}
 
-	constructor( returnNode, callNode ) {
+	/**
+	 * Constructs a new bypass node.
+	 *
+	 * @param {Node} outputNode - The output node.
+	 * @param {Node} callNode - The call node.
+	 */
+	constructor( outputNode, callNode ) {
 
 		super();
 
 		this.isBypassNode = true;
 
-		this.outputNode = returnNode;
+		/**
+		 * The output node.
+		 *
+		 * @type {Node}
+		 */
+		this.outputNode = outputNode;
+
+		/**
+		 * The call node.
+		 *
+		 * @type {Node}
+		 */
 		this.callNode = callNode;
 
 	}
