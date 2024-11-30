@@ -21,9 +21,10 @@ class NodeVarying extends NodeVar {
 		super( name, type );
 
 		/**
-		 * Whether this varying requires interpolation or not.
+		 * Whether this varying requires interpolation or not. This property can be used
+		 * to check if the varying can be optimized for a variable
 		 *
-		 * @type {String}
+		 * @type {Boolean}
 		 * @default false
 		 */
 		this.needsInterpolation = false;
