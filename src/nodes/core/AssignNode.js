@@ -4,7 +4,7 @@ import { vectorComponents } from '../core/constants.js';
 
 /**
  * These node represents an assing operation. Meaning a node is assigned
- * to anohter node.
+ * to another node.
  *
  * @augments TempNode
  */
