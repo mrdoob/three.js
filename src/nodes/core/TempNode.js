@@ -1,8 +1,10 @@
 import Node from './Node.js';
 
 /**
- * TODO: Explain the purpose of this module. Especially why some nodes are derived
- * from TempNode and not from Node directly.
+ * This module uses cache management to create temporary variables
+ * if the node is used more than once to prevent duplicate calculations.
+ *
+ * The class acts as a base class for many other nodes types.
  *
  * @augments Node
  */
