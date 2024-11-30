@@ -61,8 +61,19 @@ const toFloat = ( value ) => {
 
 };
 
+/**
+ * Base class for builders which generate a shader program based
+ * on a 3D object and its node material definition.
+ */
 class NodeBuilder {
 
+	/**
+	 * Constructs a new node builder.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Renderer} renderer - The current renderer.
+	 * @param {NodeParser} parser - A reference to a node parser.
+	 */
 	constructor( object, renderer, parser ) {
 
 		this.object = object;
@@ -101,8 +112,21 @@ class NodeBuilder {
 		this.bindGroups = null;
 		this.attributes = [];
 		this.bufferAttributes = [];
+
+		/**
+		 * This array holds the node varyings of this builder.
+		 *
+		 * @type {Array<NodeVarying>}
+		 */
 		this.varyings = [];
 		this.codes = {};
+
+		/**
+		 * This dictionary holds the node variables of this builder.
+		 * The variables are maintained in an array for each shader stage.
+		 *
+		 * @type {Object}
+		 */
 		this.vars = {};
 		this.flow = { code: '' };
 		this.chaining = [];

@@ -24,6 +24,13 @@ class BypassNode extends Node {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isBypassNode = true;
 
 		/**
