@@ -22,7 +22,7 @@ class NodeVarying extends NodeVar {
 
 		/**
 		 * Whether this varying requires interpolation or not. This property can be used
-		 * to check if the varying can be optimized for a variable
+		 * to check if the varying can be optimized for a variable.
 		 *
 		 * @type {Boolean}
 		 * @default false
