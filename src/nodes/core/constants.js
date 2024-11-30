@@ -1,8 +1,17 @@
+
 export const NodeShaderStage = {
 	VERTEX: 'vertex',
 	FRAGMENT: 'fragment'
 };
 
+/**
+ * Update types of a node.
+ *
+ * @property {string} NONE The update method is not executed.
+ * @property {string} FRAME The update method is executed per frame.
+ * @property {string} RENDER The update method is executed per render. A frame might be produced by multiple render calls so this value allows more detailed updates than FRAME.
+ * @property {string} OBJECT The update method is executed per {@link Object3D} that uses the node for rendering.
+ */
 export const NodeUpdateType = {
 	NONE: 'none',
 	FRAME: 'frame',
