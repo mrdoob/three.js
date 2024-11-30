@@ -1,6 +1,6 @@
 /**
  * {@link NodeBuilder} is going to create instances of this class during the build process
- * of nodes. They are representing the final shader variables that are going to be generated
+ * of nodes. They represent the final shader variables that are going to be generated
  * by the builder. A dictionary of node variables is maintained in {@link NodeBuilder#vars} for
  * this purpose.
  */

@@ -110,7 +110,21 @@ class NodeBuilder {
 		this.bindings = { vertex: {}, fragment: {}, compute: {} };
 		this.bindingsIndexes = {};
 		this.bindGroups = null;
+
+		/**
+		 * This array holds the node attributes of this builder
+		 * created via {@link AttributeNode}.
+		 *
+		 * @type {Array<NodeAttribute>}
+		 */
 		this.attributes = [];
+
+		/**
+		 * This array holds the node attributes of this builder
+		 * created via {@link BufferAttributeNode}.
+		 *
+		 * @type {Array<NodeAttribute>}
+		 */
 		this.bufferAttributes = [];
 
 		/**
