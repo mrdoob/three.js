@@ -12,17 +12,37 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This light globally illuminates all objects in the scene equally.<br /><br />
+			This light globally illuminates all objects in the scene equally without considering 
+			their position or orientation.<br /><br />
 
-			This light cannot be used to cast shadows as it does not have a direction.
-		</p>
+			This light cannot be used to cast shadows as it does not have a direction.<br /><br />
+
+			This type of light can be used to simulate indirect light or 
+			light bouncing. It affects every side of an object uniformly, 
+			illuminating it from all directions.
+		</p><br />
 
 		<h2>Code Example</h2>
 
 		<code>
 		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
 		scene.add( light );
-		</code>
+		</code><br />
+
+
+		<p>
+			In the example below, you can see the effect of AmbientLight on an object.
+			The object appears flat, similar to a 2D image.
+			This occurs because AmbientLight illuminates every surface equally without casting any shadows.
+		</p>
+
+		<img src="resources/lights/ambient-light-on-an-object.png" alt="The effect of AmbientLight on an object" width="650px" height="100%" /><br /><br />
+
+		<p>
+			By adding another light to the scene, the effectiveness of this light in simulating indirect lighting becomes more apparent.
+		</p>
+
+		<img src="resources/lights/ambient-light-with-point-light.png" alt="The effect of AmbientLight and a PointLight" width="650px" height="100%" /><br /><br />
 
 		<h2>Constructor</h2>
 

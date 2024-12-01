@@ -17,7 +17,10 @@
 			lightbulb.<br /><br />
 
 			This light can cast shadows - see [page:PointLightShadow] page for
-			details.
+			details. <br /><br />
+
+			The intensity of this light diminishes as the distance from the source increases.
+			Both the rate of decay and the maximum effective distance can be adjusted.
 		</p>
 
 		<h2>Code Example</h2>
@@ -53,7 +56,52 @@ scene.add( light );
 			light. Default is `2`.<br /><br />
 
 			Creates a new [name].
+		</p><br />
+
+		<p>
+			The decay property determines how the light intensity fades over distance and interacts 
+			with the distance property. However, the two are independent. The decay property does 
+			not alter the maximum physical distance the light can reach but instead controls the
+			rate at which its intensity diminishes within the specified range. Decay follows this formula: <br />
 		</p>
+
+		<p>Intensity = Initial Intensity / (Distance)<sup>decay</sup></p><br />
+
+
+		<img src="resources/lights/decay-over-distance.png" alt="Decay over distance" width="650px" height="100%" />
+		<p>
+			The distances are not exact.
+		</p><br />
+
+
+		<p>
+			Below you can see the effect of decay in similar situations.<br /><br />
+			decay = 0
+		</p>
+		<img src="resources/lights/example-decay-0.png" alt="Decay of zero" width="650px" height="100%" /><br />
+
+		<p>
+			decay = 1
+		</p>
+		<img src="resources/lights/example-decay-1.png" alt="Decay of one" width="650px" height="100%" /><br /><br />
+
+
+		<p>
+			The decay property in can also take negative values, This can be used for
+			creating some interesting results. Example:
+		</p>
+
+		<code>
+			const pointLight = new THREE.PointLight("#079", 8, 6, -3);
+pointLight.position.set(-2, 0.1, 2); // Very close to the floor
+pointLight.castShadow = true;
+scene.add(pointLight);
+
+scene.add(new THREE.PointLightHelper(pointLight, 0.2));
+		</code><br />
+
+		<img src="resources/lights/negative-decay.png" alt="Negative decay" width="650px" height="100%" /><br />
+
 
 		<h2>Properties</h2>
 		<p>See the base [page:Light Light] class for common properties.</p>
