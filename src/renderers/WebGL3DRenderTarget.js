@@ -12,6 +12,7 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 		this.depth = depth;
 
 		this.texture = new Data3DTexture( null, width, height, depth );
+		this.texture.setValues( options );
 
 		this.texture.isRenderTargetTexture = true;
 
