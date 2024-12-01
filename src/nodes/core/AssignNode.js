@@ -3,7 +3,7 @@ import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
 /**
- * These node represents an assing operation. Meaning a node is assigned
+ * These node represents an assign operation. Meaning a node is assigned
  * to another node.
  *
  * @augments TempNode
