@@ -133,6 +133,13 @@ class NodeBuilder {
 		 * @type {Array<NodeVarying>}
 		 */
 		this.varyings = [];
+
+		/**
+		 * This dictionary holds the (native) node codes of this builder.
+		 * The codes are maintained in an array for each shader stage.
+		 *
+		 * @type {Object}
+		 */
 		this.codes = {};
 
 		/**

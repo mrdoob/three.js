@@ -1,6 +1,13 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
+/**
+ * This class represent native code sections. It is the base
+ * class for modules like {@link FunctionNode} which allows to implement
+ * functions with native shader languages.
+ *
+ * @augments Node
+ */
 class CodeNode extends Node {
 
 	static get type() {
@@ -9,25 +16,69 @@ class CodeNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new code node.
+	 *
+	 * @param {String} [code=''] - The native code.
+	 * @param {Array<Node>} [includes=[]] - An array of includes.
+	 * @param {('js'|'wgsl'|'glsl')} [language=''] - The used language.
+	 */
 	constructor( code = '', includes = [], language = '' ) {
 
 		super( 'code' );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCodeNode = true;
 
+		/**
+		 * The native code.
+		 *
+		 * @type {String}
+		 * @default ''
+		 */
 		this.code = code;
-		this.language = language;
 
+		/**
+		 * An array of includes
+		 *
+		 * @type {Array<Node>}
+		 * @default []
+		 */
 		this.includes = includes;
+
+		/**
+		 * The used language.
+		 *
+		 * @type {('js'|'wgsl'|'glsl')}
+		 * @default ''
+		 */
+		this.language = language;
 
 	}
 
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @return {Boolean} Whether this node is global or not.
+	 */
 	isGlobal() {
 
 		return true;
 
 	}
 
+	/**
+	 * Sets the includes of this code node.
+	 *
+	 * @param {Array<Node>} includes - The includes to set.
+	 * @return {CodeNode} A reference to this node.
+	 */
 	setIncludes( includes ) {
 
 		this.includes = includes;
@@ -36,6 +87,12 @@ class CodeNode extends Node {
 
 	}
 
+	/**
+	 * Returns the includes of this code node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Array<Node>} The includes.
+	 */
 	getIncludes( /*builder*/ ) {
 
 		return this.includes;

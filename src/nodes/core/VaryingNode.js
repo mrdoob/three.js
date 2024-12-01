@@ -2,6 +2,16 @@ import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/**
+ * Class for representing shader varyings as nodes. Varyings are create from
+ * existing nodes like the following:
+ *
+ * ```js
+ * const positionLocal = positionGeometry.varying( 'vPositionLocal' );
+ * ```
+ *
+ * @augments Node
+ */
 class VaryingNode extends Node {
 
 	static get type() {
@@ -10,17 +20,48 @@ class VaryingNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new varying node.
+	 *
+	 * @param {Node} node - The node for which a varying should be created.
+	 * @param {String?} name - The name of the varying in the shader.
+	 */
 	constructor( node, name = null ) {
 
 		super();
 
+		/**
+		 * The node for which a varying should be created.
+		 *
+		 * @type {Node}
+		 */
 		this.node = node;
+
+		/**
+		 * The name of the varying in the shader. If no name is defined,
+		 * the node system auto-generates one.
+		 *
+		 * @type {String?}
+		 * @default null
+		 */
 		this.name = name;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVaryingNode = true;
 
 	}
 
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @return {Boolean} Whether this node is global or not.
+	 */
 	isGlobal() {
 
 		return true;
@@ -41,6 +82,12 @@ class VaryingNode extends Node {
 
 	}
 
+	/**
+	 * This method performs the setup of a varying node with the current node builder.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {NodeVarying} The node varying from the node builder.
+	 */
 	setupVarying( builder ) {
 
 		const properties = builder.getNodeProperties( this );
