@@ -140,8 +140,18 @@ const parse = ( source ) => {
 
 };
 
+/**
+ * This class represents a WSL node function.
+ *
+ * @augments NodeFunction
+ */
 class WGSLNodeFunction extends NodeFunction {
 
+	/**
+	 * Constructs a new WGSL node function.
+	 *
+	 * @param {String} source - The WGSL source.
+	 */
 	constructor( source ) {
 
 		const { type, inputs, name, inputsCode, blockCode, outputType } = parse( source );
@@ -154,6 +164,12 @@ class WGSLNodeFunction extends NodeFunction {
 
 	}
 
+	/**
+	 * This method returns the WGSL code of the node function.
+	 *
+	 * @param {String} [name=this.name] - The function's name.
+	 * @return {String} The shader code.
+	 */
 	getCode( name = this.name ) {
 
 		const outputType = this.outputType !== 'void' ? '-> ' + this.outputType : '';
