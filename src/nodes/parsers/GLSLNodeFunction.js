@@ -101,8 +101,18 @@ const parse = ( source ) => {
 
 };
 
+/**
+ * This class represents a GLSL node function.
+ *
+ * @augments NodeFunction
+ */
 class GLSLNodeFunction extends NodeFunction {
 
+	/**
+	 * Constructs a new GLSL node function.
+	 *
+	 * @param {String} source - The GLSL source.
+	 */
 	constructor( source ) {
 
 		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = parse( source );
@@ -115,6 +125,12 @@ class GLSLNodeFunction extends NodeFunction {
 
 	}
 
+	/**
+	 * This method returns the GLSL code of the node function.
+	 *
+	 * @param {String} [name=this.name] - The function's name.
+	 * @return {String} The shader code.
+	 */
 	getCode( name = this.name ) {
 
 		let code;

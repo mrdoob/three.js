@@ -76,12 +76,53 @@ class NodeBuilder {
 	 */
 	constructor( object, renderer, parser ) {
 
+		/**
+		 * The 3D object.
+		 *
+		 * @type {Object3D}
+		 */
 		this.object = object;
+
+		/**
+		 * The material of the 3D object.
+		 *
+		 * @type {Material?}
+		 */
 		this.material = ( object && object.material ) || null;
+
+		/**
+		 * The geometry of the 3D object.
+		 *
+		 * @type {BufferGeometry?}
+		 */
 		this.geometry = ( object && object.geometry ) || null;
+
+		/**
+		 * The current renderer.
+		 *
+		 * @type {Renderer}
+		 */
 		this.renderer = renderer;
+
+		/**
+		 * A reference to a node parser.
+		 *
+		 * @type {NodeParser}
+		 */
 		this.parser = parser;
+
+		/**
+		 * The scene the 3D object belongs to.
+		 *
+		 * @type {Scene?}
+		 */
 		this.scene = null;
+
+		/**
+		 * The camera the 3D object is rendered with.
+		 *
+		 * @type {Camera?}
+		 */
 		this.camera = null;
 
 		this.nodes = [];
@@ -105,6 +146,13 @@ class NodeBuilder {
 
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
 		this.flowCode = { vertex: '', fragment: '', compute: '' };
+
+		/**
+		 * This dictionary holds the node uniforms of the builder.
+		 * The uniforms are maintained in an array for each shader stage.
+		 *
+		 * @type {Object}
+		 */
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.bindings = { vertex: {}, fragment: {}, compute: {} };
@@ -138,7 +186,7 @@ class NodeBuilder {
 		 * This dictionary holds the (native) node codes of this builder.
 		 * The codes are maintained in an array for each shader stage.
 		 *
-		 * @type {Object}
+		 * @type {Object<String,Array<NodeCode>>}
 		 */
 		this.codes = {};
 
@@ -146,7 +194,7 @@ class NodeBuilder {
 		 * This dictionary holds the node variables of this builder.
 		 * The variables are maintained in an array for each shader stage.
 		 *
-		 * @type {Object}
+		 * @type {Object<String,Array<NodeVar>>}
 		 */
 		this.vars = {};
 		this.flow = { code: '' };
