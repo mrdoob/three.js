@@ -3,7 +3,7 @@ import { nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * This class can be used to implement basic expressions in shader code.
- * Basic examples for that are `return`, `continue` or `discard` statement.
+ * Basic examples for that are `return`, `continue` or `discard` statements.
  *
  * @augments Node
  */
