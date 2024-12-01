@@ -2,7 +2,7 @@ import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 /**
- * This class represent native code sections. It is the base
+ * This class represents native code sections. It is the base
  * class for modules like {@link FunctionNode} which allows to implement
  * functions with native shader languages.
  *
