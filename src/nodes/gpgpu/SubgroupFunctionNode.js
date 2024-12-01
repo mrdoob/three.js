@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { sub, mul, div } from './OperatorNode.js';
-import { nodeProxy, vec3, vec4 } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class SubgroupFunctionNode extends TempNode {
 
@@ -104,6 +103,8 @@ class SubgroupFunctionNode extends TempNode {
 
 		}
 
+		console.log( builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output ) );
+
 		return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output );
 
 
@@ -151,8 +152,6 @@ SubgroupFunctionNode.QUAD_SWAP_X = 'quadSwapX';
 SubgroupFunctionNode.QUAD_SWAP_Y = 'quadSwapY';
 SubgroupFunctionNode.QUAD_SWAP_DIAGONAL = 'quadSwapDiagonal';
 
-
-
 // 2 inputs
 SubgroupFunctionNode.SUBGROUP_BROADCAST = 'subgroupBroadcast';
 SubgroupFunctionNode.SUBGROUP_SHUFFLE = 'subgroupShuffle';
@@ -163,7 +162,7 @@ SubgroupFunctionNode.QUAD_BROADCAST = 'quadBroadcast';
 
 export default SubgroupFunctionNode;
 
-export const subgroupElect = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ELECT );
+export const subgroupElect = nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ELECT );
 export const subgroupBallot = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BALLOT );
 export const subgroupAdd = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ADD );
 export const subgroupInclusiveAdd = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_INCLUSIVE_ADD );
@@ -188,3 +187,5 @@ export const subgroupShuffleXor = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode,
 export const subgroupShuffleUp = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_UP );
 export const subgroupShuffleDown = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_DOWN );
 export const quadBroadcast = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST );
+
+addMethodChaining( 'subgroupElect', subgroupElect );
