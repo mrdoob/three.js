@@ -2,6 +2,7 @@
 
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
 
 function matrixEquals3( b, a, tolerance ) {
 
@@ -448,7 +449,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'makeTranslation', ( assert ) => {
+		QUnit.test( 'makeTranslation', ( assert ) => {
 
 			const a = new Matrix3();
 			const b = new Vector2( 1, 2 );
