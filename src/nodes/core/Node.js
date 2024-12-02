@@ -98,7 +98,22 @@ class Node extends EventDispatcher {
 
 		// private
 
+		/**
+		 * The cache key of this node.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
 		this._cacheKey = null;
+
+		/**
+		 * The cache key 's version.
+		 *
+		 * @private
+		 * @type {Number}
+		 * @default 0
+		 */
 		this._cacheKeyVersion = 0;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
@@ -244,9 +259,10 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Returns a generator that can be used to iterate over the child nodes.
+	 * Generator function that can be used to iterate over the child nodes.
 	 *
-	 * @return {Generator} The generator.
+	 * @generator
+	 * @yields {Node} A child node.
 	 */
 	* getChildren() {
 
