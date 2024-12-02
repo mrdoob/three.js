@@ -87,7 +87,7 @@ function makeSendPropertiesHandler( properties ) {
 function touchEventHandler( event, sendFn ) {
 	
 	// preventDefault() fixes mousemove, mouseup and mousedown 
-	//	firing at touch events when doing a simple touchup touchdown
+	// firing at touch events when doing a simple touchup touchdown
 	// Happens only at offscreen canvas
 	event.preventDefault(); 
 	const touches = [];
