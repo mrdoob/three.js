@@ -106,7 +106,7 @@ class LightsNode extends Node {
 
 				if ( previousLightNodes !== null ) {
 
-					lightNode = getLightNodeById( light.id, previousLightNodes ); // resuse existing light node
+					lightNode = getLightNodeById( light.id, previousLightNodes ); // reuse existing light node
 
 				}
 

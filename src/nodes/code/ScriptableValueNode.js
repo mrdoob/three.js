@@ -20,7 +20,7 @@ class ScriptableValueNode extends Node {
 		this._cache = null;
 
 		this.inputType = null;
-		this.outpuType = null;
+		this.outputType = null;
 
 		this.events = new EventDispatcher();
 
