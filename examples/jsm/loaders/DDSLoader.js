@@ -135,7 +135,7 @@ class DDSLoader extends CompressedTextureLoader {
 			return byteArray;
 
 		}
-		
+
 		const FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
 		const FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
 		const FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
@@ -264,15 +264,15 @@ class DDSLoader extends CompressedTextureLoader {
 					blockBytes = 64;
 					dds.format = RGBAFormat;
 
-				} else if( header[ off_RGBBitCount ] === 24
+				} else if ( header[ off_RGBBitCount ] === 24
 					&& header[ off_RBitMask ] & 0xff0000
 					&& header[ off_GBitMask ] & 0xff00
 					&& header[ off_BBitMask ] & 0xff ) {
-					
+
 				    	isRGBUncompressed = true;
                     			blockBytes = 64;
                     			dds.format = RGBAFormat;
-					
+
 				} else {
 
 					console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
@@ -327,11 +327,11 @@ class DDSLoader extends CompressedTextureLoader {
 					byteArray = loadARGBMip( buffer, dataOffset, width, height );
 					dataLength = byteArray.length;
 
-				} else if( isRGBUncompressed ) {
+				} else if ( isRGBUncompressed ) {
 
 					byteArray = loadRGBMip( buffer, dataOffset, width, height );
 					dataLength = width * height * 3;
-					
+
 				} else {
 
 					dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
