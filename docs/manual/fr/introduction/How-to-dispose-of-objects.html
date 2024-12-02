@@ -15,7 +15,7 @@
 		Un des aspects importants dans l'amélioration des performances et qui permet d'éviter les fuites de mémoire dans votre application est la suppression des entités non-utilisées de la librairie.
 		Dès que vous créez une instance d'un type *three.js*, vous allouez une certaine quantité de mémoire. Toutefois, *three.js* crée pour certains objets
 		comme les formes ou les matériaux, des entités WebGL associées comme des buffers ou des programmes de shaders qui sont nécessaires au rendu. Il est important de
-		souligner que ces objets ne sont pas automatiquement débarassés. Au contraire, l'application doit utiliser une API particulière pour libérer ce genre de ressources.
+		souligner que ces objets ne sont pas automatiquement débarrassés. Au contraire, l'application doit utiliser une API particulière pour libérer ce genre de ressources.
 		Ce guide vous fournit une brève vue d'ensemble du fonctionnement de cette API et des objets considérés comme pertinents dans ce contexte.
 	</p>
 
@@ -32,7 +32,7 @@
 	<p>
 		Un matériau définit comment un objet est rendu. *three.js* utilise les informations de la définition du matériau pour construire un programme de shader pour le rendu.
 		Les programmes de shader peuvent être supprimés seulement si leur matériau respectif est supprimé. Dans un souci de performances, *three.js* essaye de réutiliser des
-		programmes de shaders existants si possible. Donc un programme de shader est supprimé uniquement si tous les matériaux associés sont supprimés. Vous pouvez indiquer la suppression d'un matériau en 
+		programmes de shaders existants si possible. Donc un programme de shader est supprimé uniquement si tous les matériaux associés sont supprimés. Vous pouvez indiquer la suppression d'un matériau en
 		exécutant [page:Material.dispose]().
 	</p>
 
@@ -85,7 +85,7 @@
 
 	<p>
 		Oui. Il est possible d'interroger [page:WebGLRenderer.info], qui est une propriété spéciale du moteur de rendu avec une série d'informations et de statistiques à propos de l'usage graphique
-		et du proccessus de rendu. Entre autres, cela peut vous donner des informations comme le nombre de textures, de formes et de programmes de shaders stockés en interne. Si vous remarquez des problèmes de performance
+		et du processus de rendu. Entre autres, cela peut vous donner des informations comme le nombre de textures, de formes et de programmes de shaders stockés en interne. Si vous remarquez des problèmes de performance
 		dans votre application, une bonne idée serait de débugger cette propriété pour facilement identifier une fuite de mémoire.
 	</p>
 
@@ -107,7 +107,7 @@
 
 	<p>
 		En général, il n'y a pas de recommandation universelle pour cette question. Savoir si l'utilisation de `dispose()` est appropriée dépend grandement des cas d'utilisation. Il est important de souligner qu'il
-		n'est pas nécessaire de toujours se débarasser des objets. Un bon exemple serait un jeu avec de multiple niveaux. Le bon moment pour supprimer les objets serait à un changement
+		n'est pas nécessaire de toujours se débarrasser des objets. Un bon exemple serait un jeu avec de multiple niveaux. Le bon moment pour supprimer les objets serait à un changement
 		de niveau. L'application devrait traverser les anciennes scènes et supprimer tous les matériaux, les formes et les textures obsolètes. Comme mentionné dans la section précédente, supprimer des
 		objets toujours utilisés ne produit pas d'erreur d'exécution. La pire chose qui pourrait se produire serait une baisse de la performance à un seul frame.
 	</p>
