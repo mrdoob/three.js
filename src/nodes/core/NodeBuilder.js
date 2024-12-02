@@ -1024,7 +1024,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns integer type pendant for the given type.
+	 * Returns the integer type pendant for the given type.
 	 *
 	 * @param {String} type - The type.
 	 * @return {String} The integer type.
