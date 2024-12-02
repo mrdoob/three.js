@@ -1622,7 +1622,7 @@ function Strings( config ) {
 			'prompt/history/preserve': '기록은 세션을 통해 저장됩니다. 이는 텍스처를 조작할 때 성능에 영향을 미칠 수 있습니다.',
 			'prompt/history/forbid': '씬을 재생하는 동안 되돌리기/다시하기는 비활성화됩니다.',
 			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC 셰이딩: MeshStandardmaterial 및 MeshPhysicalmaterial만 지원됩니다',
-	
+
 			'command/AddObject': '객체 추가',
 			'command/AddScript': '스크립트 추가',
 			'command/MoveObject': '객체 이동',
@@ -1646,7 +1646,7 @@ function Strings( config ) {
 			'command/SetShadowValue': '그림자 값 설정',
 			'command/SetUuid': 'UUID 설정',
 			'command/SetValue': '값 설정',
-	
+
 			'menubar/file': '파일',
 			'menubar/file/new': '새 프로젝트',
 			'menubar/file/new/empty': '비어 있음',
@@ -1659,17 +1659,17 @@ function Strings( config ) {
 			'menubar/file/save': '저장',
 			'menubar/file/import': '가져오기',
 			'menubar/file/export': '내보내기',
-	
+
 			'menubar/edit': '편집',
 			'menubar/edit/undo': '되돌리기',
 			'menubar/edit/redo': '다시하기',
 			'menubar/edit/center': '중앙으로 옮기기',
 			'menubar/edit/clone': '복제',
 			'menubar/edit/delete': '삭제',
-	
+
 			'menubar/add': '추가',
 			'menubar/add/group': '그룹',
-	
+
 			'menubar/add/mesh': '메시',
 			'menubar/add/mesh/plane': '평면',
 			'menubar/add/mesh/box': '직육면체',
@@ -1687,48 +1687,48 @@ function Strings( config ) {
 			'menubar/add/mesh/torusknot': '토러스 매듭',
 			'menubar/add/mesh/lathe': '선반형',
 			'menubar/add/mesh/sprite': '스프라이트',
-	
+
 			'menubar/add/light': '조명',
 			'menubar/add/light/ambient': '환경광',
 			'menubar/add/light/directional': '방향광',
 			'menubar/add/light/hemisphere': '반구광',
 			'menubar/add/light/point': '포인트',
 			'menubar/add/light/spot': '스포트',
-	
+
 			'menubar/add/camera': '카메라',
 			'menubar/add/camera/perspective': '투시 투영',
 			'menubar/add/camera/orthographic': '정사영',
-	
+
 			'menubar/status/autosave': '자동 저장',
-	
+
 			'menubar/view': '보기',
 			'menubar/view/fullscreen': '전체 화면',
 			'menubar/view/gridHelper': '그리드 도우미',
 			'menubar/view/cameraHelpers': '카메라 도우미',
 			'menubar/view/lightHelpers': '조명 도우미',
 			'menubar/view/skeletonHelpers': '골격 도우미',
-	
+
 			'menubar/help': '도움말',
 			'menubar/help/source_code': '소스 코드',
 			'menubar/help/icons': '아이콘 팩',
 			'menubar/help/about': 'Three.js 알아보기',
 			'menubar/help/manual': '매뉴얼',
-	
+
 			'sidebar/animations': '애니메이션',
 			'sidebar/animations/play': '재생',
 			'sidebar/animations/stop': '정지',
 			'sidebar/animations/timescale': '시간 스케일',
-	
+
 			'sidebar/scene': '장면',
 			'sidebar/scene/background': '배경',
 			'sidebar/scene/environment': '환경',
 			'sidebar/scene/fog': '안개',
-	
+
 			'sidebar/properties/object': '객체',
 			'sidebar/properties/geometry': '지오메트리',
 			'sidebar/properties/material': '머티리얼',
 			'sidebar/properties/script': '스크립트',
-	
+
 			'sidebar/object/type': '타입',
 			'sidebar/object/new': '새로 만들기',
 			'sidebar/object/uuid': 'UUID',
@@ -1762,7 +1762,7 @@ function Strings( config ) {
 			'sidebar/object/renderorder': '렌더 순서',
 			'sidebar/object/userdata': '사용자 데이터',
 			'sidebar/object/export': 'JSON으로 내보내기',
-	
+
 			'sidebar/geometry/type': '타입',
 			'sidebar/geometry/new': '새로 만들기',
 			'sidebar/geometry/uuid': 'UUID',
@@ -1774,36 +1774,36 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '접선 계산',
 			'sidebar/geometry/center': '중앙',
 			'sidebar/geometry/export': 'JSON으로 내보내기',
-	
+
 			'sidebar/geometry/box_geometry/width': '너비',
 			'sidebar/geometry/box_geometry/height': '높이',
 			'sidebar/geometry/box_geometry/depth': '깊이',
 			'sidebar/geometry/box_geometry/widthseg': '너비 분할 수',
 			'sidebar/geometry/box_geometry/heightseg': '높이 분할 수',
 			'sidebar/geometry/box_geometry/depthseg': '깊이 분할 수',
-	
+
 			'sidebar/geometry/buffer_geometry/attributes': '속성',
 			'sidebar/geometry/buffer_geometry/index': '인덱스',
 			'sidebar/geometry/buffer_geometry/morphAttributes': '모프 속성',
 			'sidebar/geometry/buffer_geometry/morphRelative': '상대적 모프',
-	
+
 			'sidebar/geometry/capsule_geometry/radius': '반지름',
 			'sidebar/geometry/capsule_geometry/length': '길이',
 			'sidebar/geometry/capsule_geometry/capseg': '캡 분할 수',
 			'sidebar/geometry/capsule_geometry/radialseg': '방사 분할 수',
-	
+
 			'sidebar/geometry/circle_geometry/radius': '반지름',
 			'sidebar/geometry/circle_geometry/segments': '세그먼트',
 			'sidebar/geometry/circle_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/circle_geometry/thetalength': '각도 길이',
-	
+
 			'sidebar/geometry/cylinder_geometry/radiustop': '상단 반지름',
 			'sidebar/geometry/cylinder_geometry/radiusbottom': '하단 반지름',
 			'sidebar/geometry/cylinder_geometry/height': '높이',
 			'sidebar/geometry/cylinder_geometry/radialsegments': '방사 분할 수',
 			'sidebar/geometry/cylinder_geometry/heightsegments': '높이 분할 수',
 			'sidebar/geometry/cylinder_geometry/openended': '끝 열림',
-	
+
 			'sidebar/geometry/extrude_geometry/curveSegments': '곡선 분할 수',
 			'sidebar/geometry/extrude_geometry/steps': '단계',
 			'sidebar/geometry/extrude_geometry/depth': '깊이',
@@ -1813,39 +1813,39 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': '베벨 오프셋',
 			'sidebar/geometry/extrude_geometry/bevelSegments': '베벨 분할 수',
 			'sidebar/geometry/extrude_geometry/shape': '형상으로 변환',
-	
+
 			'sidebar/geometry/dodecahedron_geometry/radius': '반지름',
 			'sidebar/geometry/dodecahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/icosahedron_geometry/radius': '반지름',
 			'sidebar/geometry/icosahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/octahedron_geometry/radius': '반지름',
 			'sidebar/geometry/octahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/tetrahedron_geometry/radius': '반지름',
 			'sidebar/geometry/tetrahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/lathe_geometry/segments': '분할 수',
 			'sidebar/geometry/lathe_geometry/phistart': '시작 각도',
 			'sidebar/geometry/lathe_geometry/philength': '각도 길이',
 			'sidebar/geometry/lathe_geometry/points': '포인트',
-	
+
 			'sidebar/geometry/plane_geometry/width': '너비',
 			'sidebar/geometry/plane_geometry/height': '높이',
 			'sidebar/geometry/plane_geometry/widthsegments': '너비 분할 수',
 			'sidebar/geometry/plane_geometry/heightsegments': '깊이 분할 수',
-	
+
 			'sidebar/geometry/ring_geometry/innerRadius': '내부 반지름',
 			'sidebar/geometry/ring_geometry/outerRadius': '외부 반지름',
 			'sidebar/geometry/ring_geometry/thetaSegments': '원 분할 수',
 			'sidebar/geometry/ring_geometry/phiSegments': '링 분할 수',
 			'sidebar/geometry/ring_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/ring_geometry/thetalength': '각도 길이',
-	
+
 			'sidebar/geometry/shape_geometry/curveSegments': '곡선 분할 수',
 			'sidebar/geometry/shape_geometry/extrude': '압출',
-	
+
 			'sidebar/geometry/sphere_geometry/radius': '반지름',
 			'sidebar/geometry/sphere_geometry/widthsegments': '원 분할 수',
 			'sidebar/geometry/sphere_geometry/heightsegments': '링 분할 수',
@@ -1853,20 +1853,20 @@ function Strings( config ) {
 			'sidebar/geometry/sphere_geometry/philength': '각도 길이',
 			'sidebar/geometry/sphere_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/sphere_geometry/thetalength': '각도 길이',
-	
+
 			'sidebar/geometry/torus_geometry/radius': '반지름',
 			'sidebar/geometry/torus_geometry/tube': '튜브 두께',
 			'sidebar/geometry/torus_geometry/radialsegments': '소 분할 수',
 			'sidebar/geometry/torus_geometry/tubularsegments': '대 분할 수',
 			'sidebar/geometry/torus_geometry/arc': '호',
-	
+
 			'sidebar/geometry/torusKnot_geometry/radius': '반지름',
 			'sidebar/geometry/torusKnot_geometry/tube': '튜브 두께',
 			'sidebar/geometry/torusKnot_geometry/tubularsegments': '소 분할 수',
 			'sidebar/geometry/torusKnot_geometry/radialsegments': '대 분할 수',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
-	
+
 			'sidebar/geometry/tube_geometry/path': '경로',
 			'sidebar/geometry/tube_geometry/radius': '반지름',
 			'sidebar/geometry/tube_geometry/tube': '튜브 두께',
@@ -1875,7 +1875,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/closed': '닫기',
 			'sidebar/geometry/tube_geometry/curvetype': '곡선 타입',
 			'sidebar/geometry/tube_geometry/tension': '텐션',
-	
+
 			'sidebar/material/new': '새로 만들기',
 			'sidebar/material/copy': '복사',
 			'sidebar/material/paste': '붙여넣기',
@@ -1947,56 +1947,56 @@ function Strings( config ) {
 			'sidebar/material/wireframe': '와이어프레임',
 			'sidebar/material/userdata': '사용자 데이터',
 			'sidebar/material/export': 'JSON으로 내보내기',
-	
+
 			'sidebar/script/new': '새로 만들기',
 			'sidebar/script/edit': '편집',
 			'sidebar/script/remove': '삭제',
-	
+
 			'sidebar/project': '프로젝트',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
 			'sidebar/project/toneMapping': '톤 매핑',
 			'sidebar/project/materials': '머티리얼',
 			'sidebar/project/Assign': '할당',
-	
+
 			'sidebar/project/app': '앱',
 			'sidebar/project/app/play': '재생',
 			'sidebar/project/app/stop': '정지',
 			'sidebar/project/app/title': '제목',
 			'sidebar/project/app/editable': '편집 가능',
 			'sidebar/project/app/publish': '앱 파일로 저장',
-	
+
 			'sidebar/project/image': '이미지',
 			'sidebar/project/image/samples': '샘플',
 			'sidebar/project/video': '비디오',
-	
+
 			'sidebar/project/shading': '셰이딩',
 			'sidebar/project/resolution': '해상도',
 			'sidebar/project/duration': '길이',
 			'sidebar/project/render': '렌더',
-	
+
 			'sidebar/settings': '설정',
 			'sidebar/settings/language': '언어',
-	
+
 			'sidebar/settings/shortcuts': '단축키',
 			'sidebar/settings/shortcuts/translate': '이동',
 			'sidebar/settings/shortcuts/rotate': '회전',
 			'sidebar/settings/shortcuts/scale': '스케일',
 			'sidebar/settings/shortcuts/undo': '되돌리기',
 			'sidebar/settings/shortcuts/focus': '포커스',
-	
+
 			'sidebar/history': '기록',
 			'sidebar/history/clear': '지우기',
 			'sidebar/history/persistent': '영구적',
-	
+
 			'toolbar/translate': '이동',
 			'toolbar/rotate': '회전',
 			'toolbar/scale': '스케일',
 			'toolbar/local': '로컬',
-	
+
 			'viewport/controls/grid': '그리드',
 			'viewport/controls/helpers': '도우미 보기',
-	
+
 			'viewport/info/object': '객체',
 			'viewport/info/objects': '객체',
 			'viewport/info/vertex': '버텍스',
@@ -2006,7 +2006,7 @@ function Strings( config ) {
 			'viewport/info/sample': '샘플',
 			'viewport/info/samples': '샘플',
 			'viewport/info/rendertime': '렌더링 시간',
-	
+
 			'script/title/vertexShader': '버텍스 셰이더',
 			'script/title/fragmentShader': '프래그먼트 셰이더',
 			'script/title/programInfo': '프로그램 속성'

@@ -1,8 +1,6 @@
 /* global QUnit */
-
-import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
-
 import {
+	BufferAttribute,
 	Int8BufferAttribute,
 	Uint8BufferAttribute,
 	Uint8ClampedBufferAttribute,

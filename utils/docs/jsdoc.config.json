@@ -1,0 +1,10 @@
+{
+    "opts": {
+            "destination": "docs_new",
+            "encoding": "utf8",
+            "package": "package.json",
+            "recurse": true,
+            "template": "node_modules/clean-jsdoc-theme"
+    },
+    "plugins": [ "plugins/markdown" ]
+}

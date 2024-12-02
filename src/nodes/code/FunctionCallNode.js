@@ -1,6 +1,13 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeArray, nodeObject, nodeObjects } from '../tsl/TSLCore.js';
 
+/**
+ * This module represents the call of a {@link FunctionNode}. Developers are usually not confronted
+ * with this module since they use the predefined TSL syntax `wgslFn` and `glslFn` which encapsulate
+ * this logic.
+ *
+ * @augments TempNode
+ */
 class FunctionCallNode extends TempNode {
 
 	static get type() {
@@ -9,15 +16,40 @@ class FunctionCallNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new function call node.
+	 *
+	 * @param {FunctionNode?} functionNode - The function node.
+	 * @param {Object<String, Node>} [parameters={}] - The parameters for the function call.
+	 */
 	constructor( functionNode = null, parameters = {} ) {
 
 		super();
 
+		/**
+		 * The function node.
+		 *
+		 * @type {FunctionNode}
+		 * @default null
+		 */
 		this.functionNode = functionNode;
+
+		/**
+		 * The parameters of the function call.
+		 *
+		 * @type {Object<String, Node>}
+		 * @default {}
+		 */
 		this.parameters = parameters;
 
 	}
 
+	/**
+	 * Sets the parameters of the function call node.
+	 *
+	 * @param {Object<String, Node>} parameters - The parameters to set.
+	 * @return {FunctionCallNode} A reference to this node.
+	 */
 	setParameters( parameters ) {
 
 		this.parameters = parameters;
@@ -26,6 +58,11 @@ class FunctionCallNode extends TempNode {
 
 	}
 
+	/**
+	 * Returns the parameters of the function call node.
+	 *
+	 * @return {Object<String, Node>} The parameters of this node.
+	 */
 	getParameters() {
 
 		return this.parameters;

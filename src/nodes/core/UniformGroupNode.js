@@ -1,5 +1,18 @@
 import Node from './Node.js';
 
+/**
+ * This node can be used to group single instances of {@link UniformNode}
+ * and manage them as a uniform buffer.
+ *
+ * In most cases, the predefined nodes `objectGroup`, `renderGroup` and `frameGroup`
+ * will be used when defining the {@link UniformNode#groupNode} property.
+ *
+ * - `objectGroup`: Uniform buffer per object.
+ * - `renderGroup`: Shared uniform buffer, updated once per render call.
+ * - `frameGroup`: Shared uniform buffer, updated once per frame.
+ *
+ * @augments Node
+ */
 class UniformGroupNode extends Node {
 
 	static get type() {
@@ -8,22 +21,49 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new uniform group node.
+	 *
+	 * @param {String} name - The name of the uniform group node.
+	 * @param {Boolean} [shared=false] - Whether this uniform group node is shared or not.
+	 * @param {Number} [order=1] - Influences the internal sorting.
+	 */
 	constructor( name, shared = false, order = 1 ) {
 
 		super( 'string' );
 
+		/**
+		 * The name of the uniform group node.
+		 *
+		 * @type {String}
+		 */
 		this.name = name;
-		this.version = 0;
 
+		/**
+		 * Whether this uniform group node is shared or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.shared = shared;
+
+		/**
+		 * Influences the internal sorting.
+		 * TODO: Add details when this property should be changed.
+		 *
+		 * @type {Number}
+		 * @default 1
+		 */
 		this.order = order;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isUniformGroup = true;
-
-	}
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
 
 	}
 

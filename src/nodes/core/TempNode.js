@@ -1,5 +1,13 @@
 import Node from './Node.js';
 
+/**
+ * This module uses cache management to create temporary variables
+ * if the node is used more than once to prevent duplicate calculations.
+ *
+ * The class acts as a base class for many other nodes types.
+ *
+ * @augments Node
+ */
 class TempNode extends Node {
 
 	static get type() {
@@ -8,14 +16,31 @@ class TempNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a temp node.
+	 *
+	 * @param {String} nodeType - The node type.
+	 */
 	constructor( type ) {
 
 		super( type );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isTempNode = true;
 
 	}
 
+	/**
+	 * Whether this node is used more than once in context of other nodes.
+	 *
+	 * @return {Boolean} A flag that inidiactes if there is more than one dependency to other nodes.
+	 */
 	hasDependencies( builder ) {
 
 		return builder.getDataFromNode( this ).usageCount > 1;

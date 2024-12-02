@@ -1,6 +1,16 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/**
+ * Class for representing shader variables as nodes. Variables are create from
+ * existing nodes like the following:
+ *
+ * ```js
+ * const depth = sampleDepth( uvNode ).toVar( 'depth' );
+ * ```
+ *
+ * @augments Node
+ */
 class VarNode extends Node {
 
 	static get type() {
@@ -9,15 +19,47 @@ class VarNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new variable node.
+	 *
+	 * @param {Node} node - The node for which a variable should be created.
+	 * @param {String?} name - The name of the variable in the shader.
+	 */
 	constructor( node, name = null ) {
 
 		super();
 
+		/**
+		 * The node for which a variable should be created.
+		 *
+		 * @type {Node}
+		 */
 		this.node = node;
+
+		/**
+		 * The name of the variable in the shader. If no name is defined,
+		 * the node system auto-generates one.
+		 *
+		 * @type {String?}
+		 * @default null
+		 */
 		this.name = name;
 
+		/**
+		 * `VarNonde` sets this property to `true` by default.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.global = true;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVarNode = true;
 
 	}

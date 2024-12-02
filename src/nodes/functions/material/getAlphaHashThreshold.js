@@ -1,8 +1,6 @@
 import { abs, add, ceil, clamp, dFdx, dFdy, exp2, float, floor, Fn, fract, length, log2, max, min, mul, sin, sub, vec2, vec3 } from '../../tsl/TSLBase.js';
 
-/**
- * See: https://casual-effects.com/research/Wyman2017Hashed/index.html
- */
+// See: https://casual-effects.com/research/Wyman2017Hashed/index.html
 
 const ALPHA_HASH_SCALE = 0.05; // Derived from trials only, and may be changed.
 

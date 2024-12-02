@@ -1,13 +1,12 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
+import { float, nodeProxy, Fn, ivec2, int } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './Position.js';
 import { normalLocal } from './Normal.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
-import { ivec2, int } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';

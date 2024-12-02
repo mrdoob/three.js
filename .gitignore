@@ -18,3 +18,4 @@ test/e2e/chromium
 test/e2e/output-screenshots
 
 **/node_modules
+**/docs_new

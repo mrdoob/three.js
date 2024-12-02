@@ -25,14 +25,13 @@ import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
-import { REVISION } from '../../constants.js';
+import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
-import { IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
 
 const rendererCache = new WeakMap();
 
@@ -62,16 +61,68 @@ const toFloat = ( value ) => {
 
 };
 
+/**
+ * Base class for builders which generate a shader program based
+ * on a 3D object and its node material definition.
+ */
 class NodeBuilder {
 
+	/**
+	 * Constructs a new node builder.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Renderer} renderer - The current renderer.
+	 * @param {NodeParser} parser - A reference to a node parser.
+	 */
 	constructor( object, renderer, parser ) {
 
+		/**
+		 * The 3D object.
+		 *
+		 * @type {Object3D}
+		 */
 		this.object = object;
+
+		/**
+		 * The material of the 3D object.
+		 *
+		 * @type {Material?}
+		 */
 		this.material = ( object && object.material ) || null;
+
+		/**
+		 * The geometry of the 3D object.
+		 *
+		 * @type {BufferGeometry?}
+		 */
 		this.geometry = ( object && object.geometry ) || null;
+
+		/**
+		 * The current renderer.
+		 *
+		 * @type {Renderer}
+		 */
 		this.renderer = renderer;
+
+		/**
+		 * A reference to a node parser.
+		 *
+		 * @type {NodeParser}
+		 */
 		this.parser = parser;
+
+		/**
+		 * The scene the 3D object belongs to.
+		 *
+		 * @type {Scene?}
+		 */
 		this.scene = null;
+
+		/**
+		 * The camera the 3D object is rendered with.
+		 *
+		 * @type {Camera?}
+		 */
 		this.camera = null;
 
 		this.nodes = [];
@@ -95,15 +146,56 @@ class NodeBuilder {
 
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
 		this.flowCode = { vertex: '', fragment: '', compute: '' };
+
+		/**
+		 * This dictionary holds the node uniforms of the builder.
+		 * The uniforms are maintained in an array for each shader stage.
+		 *
+		 * @type {Object}
+		 */
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.bindings = { vertex: {}, fragment: {}, compute: {} };
 		this.bindingsIndexes = {};
 		this.bindGroups = null;
+
+		/**
+		 * This array holds the node attributes of this builder
+		 * created via {@link AttributeNode}.
+		 *
+		 * @type {Array<NodeAttribute>}
+		 */
 		this.attributes = [];
+
+		/**
+		 * This array holds the node attributes of this builder
+		 * created via {@link BufferAttributeNode}.
+		 *
+		 * @type {Array<NodeAttribute>}
+		 */
 		this.bufferAttributes = [];
+
+		/**
+		 * This array holds the node varyings of this builder.
+		 *
+		 * @type {Array<NodeVarying>}
+		 */
 		this.varyings = [];
+
+		/**
+		 * This dictionary holds the (native) node codes of this builder.
+		 * The codes are maintained in an array for each shader stage.
+		 *
+		 * @type {Object<String,Array<NodeCode>>}
+		 */
 		this.codes = {};
+
+		/**
+		 * This dictionary holds the node variables of this builder.
+		 * The variables are maintained in an array for each shader stage.
+		 *
+		 * @type {Object<String,Array<NodeVar>>}
+		 */
 		this.vars = {};
 		this.flow = { code: '' };
 		this.chaining = [];

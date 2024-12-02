@@ -16,9 +16,7 @@ import {
 	HalfFloatType,
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { SSRShader } from '../shaders/SSRShader.js';
-import { SSRBlurShader } from '../shaders/SSRShader.js';
-import { SSRDepthShader } from '../shaders/SSRShader.js';
+import { SSRBlurShader, SSRDepthShader, SSRShader } from '../shaders/SSRShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSRPass extends Pass {
