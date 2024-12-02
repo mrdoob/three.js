@@ -5,6 +5,7 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
+import StructTypeNode from './StructTypeNode.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { getTypeFromLength } from './NodeUtils.js';
@@ -154,6 +155,13 @@ class NodeBuilder {
 		 * @type {Object}
 		 */
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
+
+		/**
+		 * This dictionary holds the output structs of the builder.
+		 * The structs are maintained in an array for each shader stage.
+		 *
+		 * @type {Object}
+		 */
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.bindings = { vertex: {}, fragment: {}, compute: {} };
 		this.bindingsIndexes = {};
@@ -214,13 +222,29 @@ class NodeBuilder {
 
 		this.flowsData = new WeakMap();
 
+		/**
+		 * The current shader stage.
+		 *
+		 * @type {('vertex'|'fragment'|'compute')?}
+		 */
 		this.shaderStage = null;
+
+		/**
+		 * The current build stage.
+		 *
+		 * @type {('setup'|'analyze'|'generate')?}
+		 */
 		this.buildStage = null;
 
 		this.useComparisonMethod = false;
 
 	}
 
+	/**
+	 * Returns the bind groups of the current renderer.
+	 *
+	 * @return {ChainMap} The cache.
+	 */
 	getBindGroupsCache() {
 
 		let bindGroupsCache = rendererCache.get( this.renderer );
@@ -237,18 +261,40 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of {@link RenderTarget} with the given
+	 * dimensions and options.
+	 *
+	 * @param {Number} width - The width of the render target.
+	 * @param {Number} height - The height of the render target.
+	 * @param {Object} options - The options of the render target.
+	 * @return {RenderTarget} The render target.
+	 */
 	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
 
 	}
 
+	/**
+	 * Factory method for creating an instance of {@link CubeRenderTarget} with the given
+	 * dimensions and options.
+	 *
+	 * @param {Number} size - The size of the cube render target.
+	 * @param {Object} options - The options of the cube render target.
+	 * @return {CubeRenderTarget} The cube render target.
+	 */
 	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
 
 	}
 
+	/**
+	 * Factory method for creating an instance of {@link PMREMGenerator}.
+	 *
+	 * @return {PMREMGenerator} The PMREM generator.
+	 */
 	createPMREMGenerator() {
 
 		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
@@ -257,6 +303,12 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Whether the given node is included in the internal array of nodes or not.
+	 *
+	 * @param {Node} node - The node to test.
+	 * @return {Boolean} Whether the given node is included in the internal array of nodes or not.
+	 */
 	includes( node ) {
 
 		return this.nodes.includes( node );
@@ -667,6 +719,13 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * It might be necessary to convert certain data types to different ones
+	 * so this method can be used to hide the conversion.
+	 *
+	 * @param {String} type - The type.
+	 * @return {String} The updated type.
+	 */
 	getType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
@@ -675,12 +734,25 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Whether the given attribute name is defined in the geometry or not.
+	 *
+	 * @param {String} name - The attribute name.
+	 * @return {Boolean} Whether the given attribute name is defined in the geometry.
+	 */
 	hasGeometryAttribute( name ) {
 
 		return this.geometry && this.geometry.getAttribute( name ) !== undefined;
 
 	}
 
+	/**
+	 * Returns a node attribute for the given name and type.
+	 *
+	 * @param {String} name - The attribute's name.
+	 * @param {String} type - The attribute's type.
+	 * @return {NodeAttribute} The node attribute.
+	 */
 	getAttribute( name, type ) {
 
 		const attributes = this.attributes;
@@ -707,36 +779,74 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns for the given node and shader stage the property name for the shader.
+	 *
+	 * @param {Node} node - The node.
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The current shader stage.
+	 * @return {String} The property name.
+	 */
 	getPropertyName( node/*, shaderStage*/ ) {
 
 		return node.name;
 
 	}
 
+	/**
+	 * Whether the given type is a vector type or not.
+	 *
+	 * @param {String} type - The type to check.
+	 * @return {Boolean} Whether the given type is a vector type or not.
+	 */
 	isVector( type ) {
 
 		return /vec\d/.test( type );
 
 	}
 
+	/**
+	 * Whether the given type is a matrix type or not.
+	 *
+	 * @param {String} type - The type to check.
+	 * @return {Boolean} Whether the given type is a matrix type or not.
+	 */
 	isMatrix( type ) {
 
 		return /mat\d/.test( type );
 
 	}
 
+	/**
+	 * Whether the given type is a reference type or not.
+	 *
+	 * @param {String} type - The type to check.
+	 * @return {Boolean} Whether the given type is a reference type or not.
+	 */
 	isReference( type ) {
 
 		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'depthTexture' || type === 'texture3D';
 
 	}
 
+	/**
+	 * Whether the given texture needs a conversion to working color space.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to check.
+	 * @return {Boolean} Whether a color space conversion is required or not.
+	 */
 	needsToWorkingColorSpace( /*texture*/ ) {
 
 		return false;
 
 	}
 
+	/**
+	 * Returns the component type of a given texutre.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {String} The component type.
+	 */
 	getComponentTypeFromTexture( texture ) {
 
 		const type = texture.type;
@@ -752,6 +862,12 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the element type for a given type.
+	 *
+	 * @param {String} type - The type.
+	 * @return {String} The element type.
+	 */
 	getElementType( type ) {
 
 		if ( type === 'mat2' ) return 'vec2';
@@ -762,6 +878,12 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the component type for a given type.
+	 *
+	 * @param {String} type - The type.
+	 * @return {String} The component type.
+	 */
 	getComponentType( type ) {
 
 		type = this.getVectorType( type );
@@ -780,6 +902,12 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the vector type for a given type.
+	 *
+	 * @param {String} type - The type.
+	 * @return {String} The vector type.
+	 */
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
@@ -789,6 +917,13 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the data type for the given the length and component type.
+	 *
+	 * @param {Number} length - The length.
+	 * @param {String} [componentType='float'] - The component type.
+	 * @return {String} The type.
+	 */
 	getTypeFromLength( length, componentType = 'float' ) {
 
 		if ( length === 1 ) return componentType;
@@ -800,12 +935,24 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the type for a given typed array.
+	 *
+	 * @param {TypedArray} type - The typed array.
+	 * @return {String} The type.
+	 */
 	getTypeFromArray( array ) {
 
 		return typeFromArray.get( array.constructor );
 
 	}
 
+	/**
+	 * Returns the type for a given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @return {String} The type.
+	 */
 	getTypeFromAttribute( attribute ) {
 
 		let dataAttribute = attribute;
@@ -828,6 +975,12 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the length for the given data type.
+	 *
+	 * @param {String} type - The data type.
+	 * @return {Number} The length.
+	 */
 	getTypeLength( type ) {
 
 		const vecType = this.getVectorType( type );
@@ -843,18 +996,39 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the vector type for a given matrix type.
+	 *
+	 * @param {String} type - The matrix type.
+	 * @return {String} The vector type.
+	 */
 	getVectorFromMatrix( type ) {
 
 		return type.replace( 'mat', 'vec' );
 
 	}
 
+	/**
+	 * For a given type this method changes the component type to the
+	 * given value. E.g. `vec4` should be changed to the new component type
+	 * `uint` which results in `uvec4`.
+	 *
+	 * @param {String} type - The type.
+	 * @param {String} newComponentType - The new component type.
+	 * @return {String} The new type.
+	 */
 	changeComponentType( type, newComponentType ) {
 
 		return this.getTypeFromLength( this.getTypeLength( type ), newComponentType );
 
 	}
 
+	/**
+	 * Returns integer type pendant for the given type.
+	 *
+	 * @param {String} type - The type.
+	 * @return {String} The integer type.
+	 */
 	getIntegerType( type ) {
 
 		const componentType = this.getComponentType( type );
@@ -937,22 +1111,25 @@ class NodeBuilder {
 
 	}
 
-	getStructTypeFromNode( node, shaderStage = this.shaderStage ) {
+	getStructTypeFromNode( node, types, shaderStage = this.shaderStage ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		if ( nodeData.structType === undefined ) {
+		let structType = nodeData.structType;
+
+		if ( structType === undefined ) {
 
 			const index = this.structs.index ++;
 
-			node.name = `StructType${ index }`;
-			this.structs[ shaderStage ].push( node );
+			structType = new StructTypeNode( 'StructType' + index, types );
 
-			nodeData.structType = node;
+			this.structs[ shaderStage ].push( structType );
+
+			nodeData.structType = structType;
 
 		}
 
-		return node;
+		return structType;
 
 	}
 
@@ -1297,30 +1474,62 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns an array holding all node attributes of this node builder.
+	 *
+	 * @return {Array<NodeAttribute>} The node attributes of this builder.
+	 */
 	getAttributesArray() {
 
 		return this.attributes.concat( this.bufferAttributes );
 
 	}
 
+	/**
+	 * Returns the attribute definitions as a shader string for the given shader stage.
+	 *
+	 * @abstract
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The current shader stage.
+	 * @return {String} The attribute code section.
+	 */
 	getAttributes( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
+	/**
+	 * Returns the varying definitions as a shader string for the given shader stage.
+	 *
+	 * @abstract
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The current shader stage.
+	 * @return {String} The varying code section.
+	 */
 	getVaryings( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
+	/**
+	 * Returns a single variable definition as a shader string for the given variable type and name.
+	 *
+	 * @param {String} type - The variable's type.
+	 * @param {String} name - The variable's name.
+	 * @return {String} The shader string.
+	 */
 	getVar( type, name ) {
 
 		return `${ this.getType( type ) } ${ name }`;
 
 	}
 
+	/**
+	 * Returns the variable definitions as a shader string for the given shader stage.
+	 *
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The current shader stage.
+	 * @return {String} The variable code section.
+	 */
 	getVars( shaderStage ) {
 
 		let snippet = '';
@@ -1341,12 +1550,25 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the uniform definitions as a shader string for the given shader stage.
+	 *
+	 * @abstract
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The current shader stage.
+	 * @return {String} The uniform code section.
+	 */
 	getUniforms( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
+	/**
+	 * Returns the native code definitions as a shader string for the given shader stage.
+	 *
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The current shader stage.
+	 * @return {String} The native code section.
+	 */
 	getCodes( shaderStage ) {
 
 		const codes = this.codes[ shaderStage ];
@@ -1373,36 +1595,66 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Sets the current shader stage.
+	 *
+	 * @param {('vertex'|'fragment'|'compute')?} shaderStage - The shader stage to set.
+	 */
 	setShaderStage( shaderStage ) {
 
 		this.shaderStage = shaderStage;
 
 	}
 
+	/**
+	 * Returns the current shader stage.
+	 *
+	 * @return {('vertex'|'fragment'|'compute')?} The current shader stage.
+	 */
 	getShaderStage() {
 
 		return this.shaderStage;
 
 	}
 
+	/**
+	 * Sets the current build stage.
+	 *
+	 * @param {('setup'|'analyze'|'generate')?} buildStage - The build stage to set.
+	 */
 	setBuildStage( buildStage ) {
 
 		this.buildStage = buildStage;
 
 	}
 
+	/**
+	 * Returns the current build stage.
+	 *
+	 * @return {('setup'|'analyze'|'generate')?} The current build stage.
+	 */
 	getBuildStage() {
 
 		return this.buildStage;
 
 	}
 
+	/**
+	 * Controls the code build of the shader stages.
+	 *
+	 * @abstract
+	 */
 	buildCode() {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
+	/**
+	 * Central build method which controls the build for the given object.
+	 *
+	 * @return {NodeBuilder} A reference to this node builder.
+	 */
 	build() {
 
 		const { object, material, renderer } = this;
@@ -1577,6 +1829,11 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns a signature with the engine's current revision.
+	 *
+	 * @return {String} The signature.
+	 */
 	getSignature() {
 
 		return `// Three.js r${ REVISION } - Node System\n`;

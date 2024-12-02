@@ -1,5 +1,4 @@
 import Node from './Node.js';
-import StructTypeNode from './StructTypeNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 /**
@@ -56,7 +55,7 @@ class OutputStructNode extends Node {
 
 		}
 
-		this.nodeType = builder.getStructTypeFromNode( new StructTypeNode( types ) ).name;
+		this.nodeType = builder.getStructTypeFromNode( this, types ).name;
 
 	}
 
