@@ -109,7 +109,7 @@ class DDSLoader extends CompressedTextureLoader {
 
 		}
 
-		function loadRGBMip( buffer: ArrayBuffer, dataOffset: number, width: number, height: number ) {
+		function loadRGBMip( buffer, dataOffset, width, height ) {
 
 			const dataLength = width * height * 3;
 			const srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
