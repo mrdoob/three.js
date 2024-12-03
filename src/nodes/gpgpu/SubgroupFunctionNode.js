@@ -103,9 +103,9 @@ class SubgroupFunctionNode extends TempNode {
 
 		}
 
-		console.log( builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output ) );
+		const paramsString = params.length === 0 ? '()' : `( ${params.join( ', ' )} )`;
 
-		return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output );
+		return builder.format( `${ builder.getMethod( method, type ) }${paramsString}`, type, output );
 
 
 
@@ -162,7 +162,7 @@ SubgroupFunctionNode.QUAD_BROADCAST = 'quadBroadcast';
 
 export default SubgroupFunctionNode;
 
-export const subgroupElect = nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ELECT );
+export const subgroupElect = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ELECT );
 export const subgroupBallot = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BALLOT );
 export const subgroupAdd = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ADD );
 export const subgroupInclusiveAdd = /*@__PURE__*/ nodeProxy( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_INCLUSIVE_ADD );

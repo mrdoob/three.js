@@ -395,6 +395,7 @@ export const rtt = TSL.rtt;
 export const quadBroadcast = TSL.quadBroadcast;
 export const quadSwapDiagonal = TSL.quadSwapDiagonal;
 export const quadSwapX = TSL.quadSwapX;
+export const quadSwapY = TSL.quadSwapY;
 export const sRGBTransferEOTF = TSL.sRGBTransferEOTF;
 export const sRGBTransferOETF = TSL.sRGBTransferOETF;
 export const sampler = TSL.sampler;
