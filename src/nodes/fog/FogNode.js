@@ -4,7 +4,7 @@ import { nodeProxy } from '../tsl/TSLBase.js';
 
 /**
  * This class can be used to configure a fog for the scene.
- * Nodes of this type are usually assigned to `Scene.fogNode`.
+ * Nodes of this type are assigned to `Scene.fogNode`.
  *
  * @augments Node
  */

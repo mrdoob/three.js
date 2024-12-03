@@ -3,13 +3,13 @@ import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 
 /**
  * This class represents a shader property. It can be used on
- * to explicitely define a property and assign value to it.
+ * to explicitely define a property and assign a value to it.
  *
  * ```js
  * const threshold = property( 'float', 'threshold' ).assign( THRESHOLD );
  *```
- * It's used by the engine to predefined common material properties
- * used in TSL code.
+ * `PropertyNode` is used by the engine to predefined common material properties
+ * for TSL code.
  *
  * @augments Node
  */
