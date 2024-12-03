@@ -146,11 +146,7 @@ class WebGPUTextureUtils {
 
 		textureData.format = format;
 
-		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
-
-		sampleCount = backend.utils.getSampleCount( sampleCount );
-
-		const primarySampleCount = texture.isRenderTargetTexture && ! texture.isMultisampleRenderTargetTexture ? 1 : sampleCount;
+		const { samples, primarySamples, isMSAA } = backend.utils.getTextureSampleData( texture );
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
@@ -174,7 +170,7 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: depth,
 			},
 			mipLevelCount: levels,
-			sampleCount: primarySampleCount,
+			sampleCount: primarySamples,
 			dimension: dimension,
 			format: format,
 			usage: usage
@@ -208,12 +204,12 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.isRenderTargetTexture && sampleCount > 1 && ! texture.isMultisampleRenderTargetTexture ) {
+		if ( isMSAA ) {
 
 			const msaaTextureDescriptorGPU = Object.assign( {}, textureDescriptorGPU );
 
 			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
-			msaaTextureDescriptorGPU.sampleCount = sampleCount;
+			msaaTextureDescriptorGPU.sampleCount = samples;
 
 			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
 
@@ -336,7 +332,7 @@ class WebGPUTextureUtils {
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
 
-		this.createTexture( depthTexture, { sampleCount: backend.utils.getSampleCount( backend.renderer.samples ), width, height } );
+		this.createTexture( depthTexture, { width, height } );
 
 		return backend.get( depthTexture ).texture;
 

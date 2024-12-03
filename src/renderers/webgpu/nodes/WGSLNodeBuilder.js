@@ -311,7 +311,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			let textureDimensionsParams;
 
-			if ( texture.isMultisampleRenderTargetTexture === true ) {
+			const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+			if ( primarySamples > 1 ) {
 
 				textureDimensionsParams = textureProperty;
 
@@ -388,7 +390,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) ||
 			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
-			texture.isMultisampleRenderTargetTexture === true;
+			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
 
 	}
 
@@ -1120,7 +1122,9 @@ ${ flowData.code }
 
 				let multisampled = '';
 
-				if ( texture.isMultisampleRenderTargetTexture === true ) {
+				const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+				if ( primarySamples > 1 ) {
 
 					multisampled = '_multisampled';
 
