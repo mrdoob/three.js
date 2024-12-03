@@ -61,6 +61,7 @@
 
 			// Max number of elements in each display.
 			const maxElements = 16384;
+			const WORKGROUP_SIZE = 64;
 
 			const effectController = {
 				// Sqr root of 16834
@@ -118,14 +119,12 @@
 
 				const LoopThroughWorkgroup = ( startValue, callback ) => {
 
-					const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
-
 					Loop( {
 						start: uint( startValue ),
 						type: 'uint',
 						end: uint( maxElements ),
 						condition: '<',
-						update: '+= WORKGROUP_SIZE',
+						update: `+= ${WORKGROUP_SIZE}`,
 						name: 'workloadIndex'
 					}, callback );
 
@@ -175,8 +174,6 @@
 					'Sklansky (No Partition)': {
 						threads: [ 32 ],
 						runMethod: ( currentElements ) => {
-
-							const WORKGROUP_SIZE = uint( 64 ).toVar( 'WORKGROUP_SIZE' );
 
 							const offset = uint( 0 ).toVar( 'offset' );
 							LoopThroughBinary( 1, ( { shiftIndex } ) => {
