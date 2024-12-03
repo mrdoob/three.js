@@ -8,7 +8,7 @@ class NodeFunctionInput {
 	 *
 	 * @param {String} type - The input type.
 	 * @param {String} name - The input name.
-	 * @param {Number?} [count=null] - TODO (only relevant for GLSL).
+	 * @param {Number?} [count=null] - If the input is an Array, count will be the length.
 	 * @param {('in'|'out'|'inout')} [qualifier=''] - The parameter qualifier (only relevant for GLSL).
 	 * @param {Boolean} [isConst=false] - Whether the input uses a const qualifier or not (only relevant for GLSL).
 	 */
@@ -29,7 +29,7 @@ class NodeFunctionInput {
 		this.name = name;
 
 		/**
-		 * TODO (only relevant for GLSL).
+		 * If the input is an Array, count will be the length.
 		 *
 		 * @type {Number?}
 		 * @default null
