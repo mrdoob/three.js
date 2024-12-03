@@ -2,6 +2,11 @@ import Node from './Node.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 
+/**
+ * TODO
+ *
+ * @augments Node
+ */
 class StackNode extends Node {
 
 	static get type() {
@@ -10,17 +15,54 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new stack node.
+	 *
+	 * @param {StackNode?} [parent=null] - The parent stack node.
+	 */
 	constructor( parent = null ) {
 
 		super();
 
+		/**
+		 * List of nodes.
+		 *
+		 * @type {Array<Node>}
+		 */
 		this.nodes = [];
+
+		/**
+		 * The output node.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.outputNode = null;
 
+		/**
+		 * The parent stack node.
+		 *
+		 * @type {StackNode}
+		 * @default null
+		 */
 		this.parent = parent;
 
+		/**
+		 * The current conditional node.
+		 *
+		 * @private
+		 * @type {ConditionalNode}
+		 * @default null
+		 */
 		this._currentCond = null;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isStackNode = true;
 
 	}
@@ -31,6 +73,12 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * Adds a node to this stack.
+	 *
+	 * @param {Node} node - The node to add.
+	 * @return {StackNode} A reference to this stack node.
+	 */
 	add( node ) {
 
 		this.nodes.push( node );
@@ -39,6 +87,13 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * Represent an `if` statement in TSL.
+	 *
+	 * @param {Node} boolNode - Represents the condition.
+	 * @param {Function} method - TSL code which is executed if the condition evaluates to `true`.
+	 * @return {StackNode} A reference to this stack node.
+	 */
 	If( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
@@ -48,6 +103,13 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * Represent an `elseif` statement in TSL.
+	 *
+	 * @param {Node} boolNode - Represents the condition.
+	 * @param {Function} method - TSL code which is executed if the condition evaluates to `true`.
+	 * @return {StackNode} A reference to this stack node.
+	 */
 	ElseIf( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
@@ -60,6 +122,12 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * Represent an `else` statement in TSL.
+	 *
+	 * @param {Function} method - TSL code which is executed in the `else` case.
+	 * @return {StackNode} A reference to this stack node.
+	 */
 	Else( method ) {
 
 		this._currentCond.elseNode = new ShaderNode( method );
