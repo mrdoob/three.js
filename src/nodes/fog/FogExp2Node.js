@@ -17,7 +17,7 @@ class FogExp2Node extends FogNode {
 	}
 
 	/**
-	 * Constructs a new fog node.
+	 * Constructs a new exponential squared fog node.
 	 *
 	 * @param {Node} colorNode - Defines the color of the fog.
 	 * @param {Node} densityNode - Defines the fog densitiy.
@@ -36,7 +36,7 @@ class FogExp2Node extends FogNode {
 		this.isFogExp2Node = true;
 
 		/**
-		 *  Defines the fog densitiy.
+		 * Defines the fog densitiy.
 		 *
 		 * @type {Node}
 		 */

@@ -38,7 +38,7 @@ class FogNode extends Node {
 		/**
 		 * Defines the color of the fog.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
 		 */
 		this.colorNode = colorNode;
 
