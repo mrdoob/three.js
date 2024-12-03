@@ -107,9 +107,17 @@ class WebGPUBindingUtils {
 
 				const texture = {}; // GPUTextureBindingLayout
 
-				if ( binding.texture.isMultisampleRenderTargetTexture === true ) {
+				const { primarySamples } = backend.utils.getTextureSampleData( binding.texture );
+
+				if ( primarySamples > 1 ) {
 
 					texture.multisampled = true;
+
+					if ( ! binding.texture.isDepthTexture ) {
+
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+					}
 
 				}
 
