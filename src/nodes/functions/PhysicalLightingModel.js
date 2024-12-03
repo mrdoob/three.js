@@ -341,31 +341,140 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = float( 1 );
 
-//
 
+/**
+ * Represents the lighting model for a PBR material.
+ *
+ * @augments LightingModel
+ */
 class PhysicalLightingModel extends LightingModel {
 
+	/**
+	 * Constructs a new physical lighting model.
+	 *
+	 * @param {Boolean} [clearcoat=false] - Whether clearcoat is supported or not.
+	 * @param {Boolean} [sheen=false] - Whether sheen is supported or not.
+	 * @param {Boolean} [iridescence=false] - Whether iridescence is supported or not.
+	 * @param {Boolean} [anisotropy=false] - Whether anisotropy is supported or not.
+	 * @param {Boolean} [transmission=false] - Whether transmission is supported or not.
+	 * @param {Boolean} [dispersion=false] - Whether dispersion is supported or not.
+	 */
 	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false ) {
 
 		super();
 
+		/**
+		 * Whether clearcoat is supported or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.clearcoat = clearcoat;
+
+		/**
+		 * Whether sheen is supported or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.sheen = sheen;
+
+		/**
+		 * Whether iridescence is supported or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.iridescence = iridescence;
+
+		/**
+		 * Whether anisotropy is supported or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.anisotropy = anisotropy;
+
+		/**
+		 * Whether transmission is supported or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.transmission = transmission;
+
+		/**
+		 * Whether dispersion is supported or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.dispersion = dispersion;
 
+		/**
+		 * The clear coat radiance.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.clearcoatRadiance = null;
+
+		/**
+		 * The clear coat specular direct.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.clearcoatSpecularDirect = null;
+
+		/**
+		 * The clear coat specular indirect.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.clearcoatSpecularIndirect = null;
+
+		/**
+		 * The sheen specular direct.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.sheenSpecularDirect = null;
+
+		/**
+		 * The sheen specular indirect.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.sheenSpecularIndirect = null;
+
+		/**
+		 * The iridescence Fresnel.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.iridescenceFresnel = null;
+
+		/**
+		 * The iridescence F0.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.iridescenceF0 = null;
 
 	}
 
+	/**
+	 * Depending on what features are requested, the method prepares certain node variables
+	 * which are later used for lighting computations.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 */
 	start( context ) {
 
 		if ( this.clearcoat === true ) {
@@ -456,6 +565,13 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	/**
+	 * Implements the direct light.
+	 *
+	 * @param {Object} input - The input data.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	direct( { lightDirection, lightColor, reflectedLight } ) {
 
 		const dotNL = transformedNormalView.dot( lightDirection ).clamp();
@@ -482,6 +598,14 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	/**
+	 * This method is intended for implementing the direct light term for
+	 * rect area light nodes.
+	 *
+	 * @param {Object} input - The input data.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 } ) {
 
 		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
@@ -514,6 +638,13 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	/**
+	 * Implements the indirect lighting.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	indirect( context, stack, builder ) {
 
 		this.indirectDiffuse( context, stack, builder );
@@ -522,12 +653,26 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	/**
+	 * Implements the indirect diffuse term.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	indirectDiffuse( { irradiance, reflectedLight } ) {
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
 	}
 
+	/**
+	 * Implements the indirect specular term.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	indirectSpecular( { radiance, iblIrradiance, reflectedLight } ) {
 
 		if ( this.sheen === true ) {
@@ -577,6 +722,13 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	/**
+	 * Implements the ambient occlusion term.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	ambientOcclusion( { ambientOcclusion, reflectedLight } ) {
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
@@ -603,6 +755,13 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	/**
+	 * Used for final lighting accumulations depending on the requested features.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	finish( context ) {
 
 		const { outgoingLight } = context;
