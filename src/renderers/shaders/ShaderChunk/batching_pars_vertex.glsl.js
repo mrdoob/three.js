@@ -1,5 +1,5 @@
 export default /* glsl */`
-#ifdef USE_BATCHING
+#ifdef USE_BATCHING_MATRIX
 	#if ! defined( GL_ANGLE_multi_draw )
 	#define gl_DrawID _gl_DrawID
 	uniform int _gl_DrawID;
