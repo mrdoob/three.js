@@ -37,6 +37,15 @@ const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 } );
 
+/**
+ * This class can be used for applying normals maps to materials.
+ *
+ * ```js
+ * material.normalNode = normalMap( texture( normalTex ) );
+ * ```
+ *
+ * @augments TempNode
+ */
 class NormalMapNode extends TempNode {
 
 	static get type() {
@@ -45,13 +54,37 @@ class NormalMapNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new normal map node.
+	 *
+	 * @param {Node} textureNode - Represents the normal map data.
+	 * @param {Node?} [scaleNode=null] - Controls the intensity of the effect.
+	 */
 	constructor( node, scaleNode = null ) {
 
 		super( 'vec3' );
 
+		/**
+		 * Represents the normal map data.
+		 *
+		 * @type {Node}
+		 */
 		this.node = node;
+
+		/**
+		 * Controls the intensity of the effect.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.scaleNode = scaleNode;
 
+		/**
+		 * The normal map type.
+		 *
+		 * @type {(TangentSpaceNormalMap|ObjectSpaceNormalMap)}
+		 * @default TangentSpaceNormalMap
+		 */
 		this.normalMapType = TangentSpaceNormalMap;
 
 	}
