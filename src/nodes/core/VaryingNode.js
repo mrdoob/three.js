@@ -60,9 +60,10 @@ class VaryingNode extends Node {
 	/**
 	 * The method is overwritten so it always returns `true`.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Boolean} Whether this node is global or not.
 	 */
-	isGlobal() {
+	isGlobal( /*builder*/ ) {
 
 		return true;
 

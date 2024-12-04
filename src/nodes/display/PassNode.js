@@ -169,7 +169,6 @@ class PassNode extends TempNode {
 			const refTexture = this.renderTarget.texture;
 
 			texture = refTexture.clone();
-			texture.isRenderTargetTexture = true;
 			texture.name = name;
 
 			this._textures[ name ] = texture;
@@ -189,7 +188,6 @@ class PassNode extends TempNode {
 		if ( texture === undefined ) {
 
 			texture = this.getTexture( name ).clone();
-			texture.isRenderTargetTexture = true;
 
 			this._previousTextures[ name ] = texture;
 
@@ -301,8 +299,6 @@ class PassNode extends TempNode {
 			this.renderTarget.samples = 0;
 
 		}
-
-		this.renderTarget.depthTexture.isMultisampleRenderTargetTexture = this.renderTarget.samples > 1;
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 

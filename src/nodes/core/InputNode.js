@@ -66,7 +66,7 @@ class InputNode extends Node {
 	 * Returns the input type of the node which is by default the node type. Derived modules
 	 * might overwrite this method and use a fixed type or compute one analytically.
 	 *
-	 * A typical example for differnt input and node types are textures. The input type of a
+	 * A typical example for different input and node types are textures. The input type of a
 	 * normal RGBA texture is `texture` whereas its node type is `vec4`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

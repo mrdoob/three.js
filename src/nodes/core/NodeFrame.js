@@ -93,7 +93,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current 3D object.
 		 *
-		 * @type {Obbject3D?}
+		 * @type {Object3D?}
 		 * @default null
 		 */
 		this.object = null;

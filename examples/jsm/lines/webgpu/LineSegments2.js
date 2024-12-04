@@ -9,9 +9,9 @@ import {
 	Sphere,
 	Vector3,
 	Vector4,
-	Line2NodeMaterial
+	Line2NodeMaterial,
+	Vector2
 } from 'three/webgpu';
-
 import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 
 const _start = new Vector3();
@@ -29,6 +29,7 @@ const _closestPoint = new Vector3();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _clipToWorldVector = new Vector4();
+const _viewport = new Vector4();
 
 let _ray, _lineWidth;
 
@@ -93,8 +94,7 @@ function raycastWorldUnits( lineSegments, intersects ) {
 function raycastScreenSpace( lineSegments, camera, intersects ) {
 
 	const projectionMatrix = camera.projectionMatrix;
-	const material = lineSegments.material;
-	const resolution = material.resolution;
+	const resolution = lineSegments.resolution;
 	const matrixWorld = lineSegments.matrixWorld;
 
 	const geometry = lineSegments.geometry;
@@ -233,6 +233,8 @@ class LineSegments2 extends Mesh {
 
 		this.type = 'LineSegments2';
 
+		this.resolution = new Vector2();
+
 	}
 
 	// for backwards-compatibility, but could be a method of LineSegmentsGeometry...
@@ -261,6 +263,13 @@ class LineSegments2 extends Mesh {
 		geometry.setAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
 		return this;
+
+	}
+
+	onBeforeRender( renderer ) {
+
+		renderer.getViewport( _viewport );
+		this.resolution.set( _viewport.z, _viewport.w );
 
 	}
 
@@ -303,7 +312,7 @@ class LineSegments2 extends Mesh {
 		} else {
 
 			const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( _ray.origin ) );
-			sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, material.resolution );
+			sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, this.resolution );
 
 		}
 
@@ -333,7 +342,7 @@ class LineSegments2 extends Mesh {
 		} else {
 
 			const distanceToBox = Math.max( camera.near, _box.distanceToPoint( _ray.origin ) );
-			boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, material.resolution );
+			boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, this.resolution );
 
 		}
 

@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '171';
+const REVISION = '172dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -36944,26 +36944,6 @@ const TextureUtils = {
 	getByteLength
 };
 
-class WebGLMultipleRenderTargets extends WebGLRenderTarget { // @deprecated, r162
-
-	constructor( width = 1, height = 1, count = 1, options = {} ) {
-
-		console.warn( 'THREE.WebGLMultipleRenderTargets has been deprecated and will be removed in r172. Use THREE.WebGLRenderTarget and set the "count" parameter to enable MRT.' );
-
-		super( width, height, { ...options, count } );
-
-		this.isWebGLMultipleRenderTargets = true;
-
-	}
-
-	get texture() {
-
-		return this.textures;
-
-	}
-
-}
-
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
@@ -54961,7 +54941,6 @@ exports.WebGL3DRenderTarget = WebGL3DRenderTarget;
 exports.WebGLArrayRenderTarget = WebGLArrayRenderTarget;
 exports.WebGLCoordinateSystem = WebGLCoordinateSystem;
 exports.WebGLCubeRenderTarget = WebGLCubeRenderTarget;
-exports.WebGLMultipleRenderTargets = WebGLMultipleRenderTargets;
 exports.WebGLRenderTarget = WebGLRenderTarget;
 exports.WebGLRenderer = WebGLRenderer;
 exports.WebGLUtils = WebGLUtils;

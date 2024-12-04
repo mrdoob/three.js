@@ -10,6 +10,7 @@ class LightingModel {
 	 * This method is intended for setting up lighting model and context data
 	 * which are later used in the evaluation process.
 	 *
+	 * @abstract
 	 * @param {ContextNode} input - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -20,6 +21,7 @@ class LightingModel {
 	 * This method is intended for executing final tasks like final updates
 	 * to the outgoing light.
 	 *
+	 * @abstract
 	 * @param {ContextNode} input - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -30,6 +32,7 @@ class LightingModel {
 	 * This method is intended for implementing the direct light term and
 	 * executed during the build process of directional, point and spot light nodes.
 	 *
+	 * @abstract
 	 * @param {Object} input - The input data.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -40,6 +43,7 @@ class LightingModel {
 	 * This method is intended for implementing the direct light term for
 	 * rect area light nodes.
 	 *
+	 * @abstract
 	 * @param {Object} input - The input data.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -49,6 +53,7 @@ class LightingModel {
 	/**
 	 * This method is intended for implementing the indirect light term.
 	 *
+	 * @abstract
 	 * @param {ContextNode} input - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -60,6 +65,7 @@ class LightingModel {
 	 * Unlike other methods, this method must be called manually by the lighting
 	 * model in its indirect term.
 	 *
+	 * @abstract
 	 * @param {ContextNode} input - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
