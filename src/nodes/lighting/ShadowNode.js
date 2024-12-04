@@ -488,11 +488,15 @@ class ShadowNode extends Node {
 
 		renderer.setMRT( null );
 
-		renderer.setRenderObjectFunction( ( object, ...params ) => {
+		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
-				renderer.renderObject( object, ...params );
+				object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
