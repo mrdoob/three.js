@@ -29,6 +29,7 @@ const _closestPoint = new Vector3();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _clipToWorldVector = new Vector4();
+const _viewport = new Vector4();
 
 let _ray, _lineWidth;
 
@@ -232,7 +233,7 @@ class LineSegments2 extends Mesh {
 
 		this.type = 'LineSegments2';
 
-		this.resolution = new Vector2()
+		this.resolution = new Vector2();
 
 	}
 
@@ -267,7 +268,9 @@ class LineSegments2 extends Mesh {
 
 	onBeforeRender( renderer ) {
 
-		renderer.getViewport( this.resolution );
+		renderer.getViewport( _viewport );
+		this.resolution.set( _viewport.z, _viewport.w );
+
 	}
 
 	raycast( raycaster, intersects ) {
