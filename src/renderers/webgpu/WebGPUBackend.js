@@ -1243,8 +1243,6 @@ class WebGPUBackend extends Backend {
 
 		const { resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
-		await this.device.queue.onSubmittedWorkDone();
-
 		if ( resultBuffer.mapState === 'unmapped' ) {
 
 			resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
