@@ -74,7 +74,6 @@ const wgslTypeLib = {
 	mat2: 'mat2x2<f32>',
 	mat3: 'mat3x3<f32>',
 	mat4: 'mat4x4<f32>'
-
 };
 
 const wgslCodeCache = {};
