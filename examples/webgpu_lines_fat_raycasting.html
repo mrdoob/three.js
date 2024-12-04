@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lines - fat</title>
+		<title>three.js webgpu - lines - fat</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -16,7 +16,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/",
 					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 				}
@@ -31,11 +32,11 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
-			import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+			import { LineSegments2 } from 'three/addons/lines/webgpu/LineSegments2.js';
 			import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
-			import { Line2 } from 'three/addons/lines/Line2.js';
+			import { Line2 } from 'three/addons/lines/webgpu/Line2.js';
 			import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
 
 			let line, thresholdLine, segments, thresholdSegments;
 			let renderer, scene, camera, controls;
@@ -53,7 +54,7 @@
 			raycaster.params.Line2 = {};
 			raycaster.params.Line2.threshold = 0;
 
-			const matLine = new LineMaterial( {
+			const matLine = new THREE.Line2NodeMaterial( {
 
 				color: 0xffffff,
 				linewidth: 1, // in world units with size attenuation, pixels otherwise
@@ -64,7 +65,7 @@
 
 			} );
 
-			const matThresholdLine = new LineMaterial( {
+			const matThresholdLine = new THREE.Line2NodeMaterial( {
 
 				color: 0xffffff,
 				linewidth: matLine.linewidth, // in world units with size attenuation, pixels otherwise
@@ -96,7 +97,7 @@
 
 				clock = new THREE.Clock();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000, 0.0 );
@@ -218,7 +219,7 @@
 
 			}
 
-			function animate() {
+			async function animate() {
 
 				const delta = clock.getDelta();
 
@@ -266,7 +267,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				await renderer.renderAsync( scene, camera );
 
 				stats.update();
 
