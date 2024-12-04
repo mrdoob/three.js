@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils } from 'three/webgpu';
-import { nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, vec2, vec3, Loop, threshold } from 'three/tsl';
+import { nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, vec2, vec3, Loop, mix, luminance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -91,6 +91,8 @@ class AnamorphicNode extends TempNode {
 		const uvNode = textureNode.uvNode || uv();
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
+
+		const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
 
 		const anamorph = Fn( () => {
 
