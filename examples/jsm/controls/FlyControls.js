@@ -167,9 +167,6 @@ function onKeyDown( event ) {
 
 	switch ( event.code ) {
 
-		case 'ShiftLeft':
-		case 'ShiftRight': this.movementSpeedMultiplier = .1; break;
-
 		case 'KeyW': this._moveState.forward = 1; break;
 		case 'KeyS': this._moveState.back = 1; break;
 
@@ -200,9 +197,6 @@ function onKeyUp( event ) {
 	if ( this.enabled === false ) return;
 
 	switch ( event.code ) {
-
-		case 'ShiftLeft':
-		case 'ShiftRight': this.movementSpeedMultiplier = 1; break;
 
 		case 'KeyW': this._moveState.forward = 0; break;
 		case 'KeyS': this._moveState.back = 0; break;
