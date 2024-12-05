@@ -82,17 +82,6 @@ export default QUnit.module( 'Maths', () => {
 			a.x = 10;
 			assert.ok( a.x === 10, 'Passed!' );
 
-			a = new Euler( 11, 12, 13, 'XYZ' );
-			let b = false;
-			a._onChange( function () {
-
-				b = true;
-
-			} );
-			a.x = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.x === 14, 'Passed!' );
-
 		} );
 
 		QUnit.test( 'y', ( assert ) => {
@@ -110,17 +99,6 @@ export default QUnit.module( 'Maths', () => {
 			a = new Euler( 7, 8, 9, 'XYZ' );
 			a.y = 10;
 			assert.ok( a.y === 10, 'Passed!' );
-
-			a = new Euler( 11, 12, 13, 'XYZ' );
-			let b = false;
-			a._onChange( function () {
-
-				b = true;
-
-			} );
-			a.y = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.y === 14, 'Passed!' );
 
 		} );
 
@@ -140,17 +118,6 @@ export default QUnit.module( 'Maths', () => {
 			a.z = 10;
 			assert.ok( a.z === 10, 'Passed!' );
 
-			a = new Euler( 11, 12, 13, 'XYZ' );
-			let b = false;
-			a._onChange( function () {
-
-				b = true;
-
-			} );
-			a.z = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.z === 14, 'Passed!' );
-
 		} );
 
 		QUnit.test( 'order', ( assert ) => {
@@ -168,18 +135,6 @@ export default QUnit.module( 'Maths', () => {
 			a = new Euler( 7, 8, 9, 'YZX' );
 			a.order = 'ZXY';
 			assert.ok( a.order === 'ZXY', 'Passed!' );
-
-			a = new Euler( 11, 12, 13, 'YZX' );
-			let b = false;
-			a._onChange( function () {
-
-				b = true;
-
-			} );
-			a.order = 'ZXY';
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.order === 'ZXY', 'Passed!' );
-
 
 		} );
 
@@ -242,7 +197,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.todo( 'Euler.setFromVector3', ( assert ) => {
 
-			// setFromVector3( v, order = this._order )
+			// setFromVector3( v, order = this.order )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
@@ -264,62 +219,6 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( quatEquals( q, q3 ), 'Passed!' );
 
 			}
-
-		} );
-
-		QUnit.test( 'set/get properties, check callbacks', ( assert ) => {
-
-			const a = new Euler();
-			a._onChange( function () {
-
-				assert.step( 'set: onChange called' );
-
-			} );
-
-			a.x = 1;
-			a.y = 2;
-			a.z = 3;
-			a.order = 'ZYX';
-
-			assert.strictEqual( a.x, 1, 'get: check x' );
-			assert.strictEqual( a.y, 2, 'get: check y' );
-			assert.strictEqual( a.z, 3, 'get: check z' );
-			assert.strictEqual( a.order, 'ZYX', 'get: check order' );
-
-			assert.verifySteps( Array( 4 ).fill( 'set: onChange called' ) );
-
-		} );
-
-		QUnit.test( 'clone/copy, check callbacks', ( assert ) => {
-
-			let a = new Euler( 1, 2, 3, 'ZXY' );
-			const b = new Euler( 4, 5, 6, 'XZY' );
-			const cbSucceed = function () {
-
-				assert.ok( true );
-				assert.step( 'onChange called' );
-
-			};
-
-			const cbFail = function () {
-
-				assert.ok( false );
-
-			};
-
-			a._onChange( cbFail );
-			b._onChange( cbFail );
-
-			// clone doesn't trigger onChange
-			a = b.clone();
-			assert.ok( a.equals( b ), 'clone: check if a equals b' );
-
-			// copy triggers onChange once
-			a = new Euler( 1, 2, 3, 'ZXY' );
-			a._onChange( cbSucceed );
-			a.copy( b );
-			assert.ok( a.equals( b ), 'copy: check if a equals b' );
-			assert.verifySteps( [ 'onChange called' ] );
 
 		} );
 
@@ -355,13 +254,6 @@ export default QUnit.module( 'Maths', () => {
 
 			let a = new Euler();
 			let array = [ x, y, z ];
-			const cb = function () {
-
-				assert.step( 'onChange called' );
-
-			};
-
-			a._onChange( cb );
 
 			a.fromArray( array );
 			assert.strictEqual( a.x, x, 'No order: check x' );
@@ -371,46 +263,11 @@ export default QUnit.module( 'Maths', () => {
 
 			a = new Euler();
 			array = [ x, y, z, 'ZXY' ];
-			a._onChange( cb );
 			a.fromArray( array );
 			assert.strictEqual( a.x, x, 'With order: check x' );
 			assert.strictEqual( a.y, y, 'With order: check y' );
 			assert.strictEqual( a.z, z, 'With order: check z' );
 			assert.strictEqual( a.order, 'ZXY', 'With order: check order' );
-
-			assert.verifySteps( Array( 2 ).fill( 'onChange called' ) );
-
-		} );
-
-		QUnit.test( '_onChange', ( assert ) => {
-
-			const f = function () {
-
-			};
-
-			const a = new Euler( 11, 12, 13, 'XYZ' );
-			a._onChange( f );
-			assert.ok( a._onChangeCallback === f, 'Passed!' );
-
-		} );
-
-		QUnit.test( '_onChangeCallback', ( assert ) => {
-
-			let b = false;
-			const a = new Euler( 11, 12, 13, 'XYZ' );
-			const f = function () {
-
-				b = true;
-				assert.ok( a === this, 'Passed!' );
-
-			};
-
-			a._onChangeCallback = f;
-			assert.ok( a._onChangeCallback === f, 'Passed!' );
-
-
-			a._onChangeCallback();
-			assert.ok( b, 'Passed!' );
 
 		} );
 

@@ -82,6 +82,13 @@
       ridimensiona ogni fotogramma ed inoltre ricalcola la  proprietà matrixWorld. L'impostazione predefinita è [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true).
 		</p>
 
+		<h3>[property:Boolean matrixNeedsUpdate]</h3>
+		<p>
+			When this is set, it calculates the matrix of position, (rotation or
+			quaternion) and scale in that frame, matrixWorld for itself and descendants,
+			and resets this property to false. Default is `false`.
+		</p>
+
 		<h3>[property:Matrix4 matrixWorld]</h3>
 		<p>
       La trasformazione globale dell'oggetto. Se l'Object3D non ha un genitore, è identico al [page:.matrix] della trasformazione locale.

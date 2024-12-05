@@ -107,8 +107,8 @@ class CameraHelper extends LineSegments {
 		this.camera = camera;
 		if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
-		this.matrix = camera.matrixWorld;
-		this.matrixAutoUpdate = false;
+		this.matrixWorld = camera.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
 
 		this.pointMap = pointMap;
 

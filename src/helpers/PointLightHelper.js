@@ -17,8 +17,8 @@ class PointLightHelper extends Mesh {
 
 		this.type = 'PointLightHelper';
 
-		this.matrix = this.light.matrixWorld;
-		this.matrixAutoUpdate = false;
+		this.matrixWorld = this.light.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
 
 		this.update();
 
