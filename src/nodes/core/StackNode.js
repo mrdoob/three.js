@@ -3,7 +3,8 @@ import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 
 /**
- * TODO
+ * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
+ * They are usually needed in cases like `If`, `Else`.
  *
  * @augments Node
  */
