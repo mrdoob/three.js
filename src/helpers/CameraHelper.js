@@ -28,14 +28,14 @@ class CameraHelper extends LineSegments {
 
 		const pointMap = {};
 
-		// near
+		// far
 
 		addLine( 'n1', 'n2' );
 		addLine( 'n2', 'n4' );
 		addLine( 'n4', 'n3' );
 		addLine( 'n3', 'n1' );
 
-		// far
+		// near
 
 		addLine( 'f1', 'f2' );
 		addLine( 'f2', 'f4' );
@@ -132,14 +132,14 @@ class CameraHelper extends LineSegments {
 
 		const colorAttribute = geometry.getAttribute( 'color' );
 
-		// near
+		// far
 
 		colorAttribute.setXYZ( 0, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 1, frustum.r, frustum.g, frustum.b ); // n1, n2
 		colorAttribute.setXYZ( 2, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 3, frustum.r, frustum.g, frustum.b ); // n2, n4
 		colorAttribute.setXYZ( 4, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 5, frustum.r, frustum.g, frustum.b ); // n4, n3
 		colorAttribute.setXYZ( 6, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 7, frustum.r, frustum.g, frustum.b ); // n3, n1
 
-		// far
+		// near
 
 		colorAttribute.setXYZ( 8, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 9, frustum.r, frustum.g, frustum.b ); // f1, f2
 		colorAttribute.setXYZ( 10, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 11, frustum.r, frustum.g, frustum.b ); // f2, f4
@@ -169,7 +169,7 @@ class CameraHelper extends LineSegments {
 		// target
 
 		colorAttribute.setXYZ( 38, target.r, target.g, target.b ); colorAttribute.setXYZ( 39, target.r, target.g, target.b ); // c, t
-		colorAttribute.setXYZ( 40, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 41, cross.r, cross.g, cross.b ); // p, c
+		colorAttribute.setXYZ( 40, target.r, target.g, target.b ); colorAttribute.setXYZ( 41, target.r, target.g, target.b ); // p, c
 
 		// cross
 
@@ -200,14 +200,14 @@ class CameraHelper extends LineSegments {
 		setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
 		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
 
-		// near
+		// far
 
 		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
 		setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
 		setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
 		setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
 
-		// far
+		// near
 
 		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
 		setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
