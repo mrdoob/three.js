@@ -7,7 +7,7 @@ import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 let _sharedFramebuffer = null;
 
 /**
- * `ViewportTextureNode` creates an internal texture for each texture instance. This module
+ * `ViewportTextureNode` creates an internal texture for each node instance. This module
  * shares a texture across all instances of `ViewportSharedTextureNode`. It should
  * be the first choice when using data of the default/screen framebuffer for performance reasons.
  *
