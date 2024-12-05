@@ -326,7 +326,7 @@ class PassNode extends TempNode {
 		this.isPassNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `FRAME` since the pass render the
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
 		 * scene once per frame in its {@link PassNode#updateBefore} method.
 		 *
 		 * @type {String}
