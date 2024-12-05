@@ -8,6 +8,13 @@ import { Vector4 } from '../../math/Vector4.js';
 
 let screenSizeVec, viewportVec;
 
+/**
+ * This node provides a collection of screen related metrics.
+ * Depending on {@link ScreenNode#scope}, the nodes can represent
+ * resolution or viewport data as well as fragment or uv coordinates.
+ *
+ * @augments Node
+ */
 class ScreenNode extends Node {
 
 	static get type() {
@@ -16,16 +23,43 @@ class ScreenNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new screen node.
+	 *
+	 * @param {('coordinate'|'viewport'|'size'|'uv')} scope - The node's scope.
+	 */
 	constructor( scope ) {
 
 		super();
 
+		/**
+		 * The node represents different metric depending on which scope is selected.
+		 *
+		 * - `ScreenNode.COORDINATE`: Window-relative coordinates of the current fragment according to WebGPU standards.
+		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimnesional vector.
+		 * - `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
+		 * - `ScreenNode.UV`: Normalized screen coordinates.
+		 *
+		 * @type {('coordinate'|'viewport'|'size'|'uv')}
+		 */
 		this.scope = scope;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isViewportNode = true;
 
 	}
 
+	/**
+	 * This method is overwritten since the node type depends on the selected scope.
+	 *
+	 * @return {('vec2'|'vec4')} The node type.
+	 */
 	getNodeType() {
 
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
@@ -33,6 +67,11 @@ class ScreenNode extends Node {
 
 	}
 
+	/**
+	 * This method is overwritten since the node's update type depends on the selected scope.
+	 *
+	 * @return {NodeUpdateType} The update type.
+	 */
 	getUpdateType() {
 
 		let updateType = NodeUpdateType.NONE;
@@ -49,6 +88,13 @@ class ScreenNode extends Node {
 
 	}
 
+	/**
+	 * `ScreenNode` implements {@link Node#update} to retrieve viewport and size information
+	 * from the current renderer.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 */
 	update( { renderer } ) {
 
 		const renderTarget = renderer.getRenderTarget();
