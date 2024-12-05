@@ -194,7 +194,7 @@ class WebGLRenderer {
 		let _localClippingEnabled = false;
 
 		// transmission render target scale
-		this.transmissionRenderTargetScale = 1.0;
+		this.transmissionResolutionScale = 1.0;
 
 		// camera matrices cache
 
@@ -1500,7 +1500,7 @@ class WebGLRenderer {
 			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[ camera.id ];
 
 			const activeViewport = camera.viewport || _currentViewport;
-			transmissionRenderTarget.setSize( activeViewport.z * _this.transmissionRenderTargetScale, activeViewport.w * _this.transmissionRenderTargetScale );
+			transmissionRenderTarget.setSize( activeViewport.z * _this.transmissionResolutionScale, activeViewport.w * _this.transmissionResolutionScale );
 
 			//
 
