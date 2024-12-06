@@ -19,11 +19,11 @@ export const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 )
 } );
 
 /**
- * Applies a spherical warping effect to the given uv coordinats.
+ * Applies a spherical warping effect to the given uv coordinates.
  *
  * @method
  * @param {Node<vec2>} uv - The uv coordinates.
- * @param {Node<float>} strength - The stength of the effect.
+ * @param {Node<float>} strength - The strength of the effect.
  * @param {Node<vec2>} center - The center point
  * @return {Node<vec2>} The updated uv coordinates.
  */

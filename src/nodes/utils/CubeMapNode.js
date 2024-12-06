@@ -61,7 +61,7 @@ class CubeMapNode extends TempNode {
 		/**
 		 * A default cube texture that acts as a placeholder.
 		 * It is used when the conversion from equirectangular to cube
-		 * map has not finished yet for a givent texture.
+		 * map has not finished yet for a given texture.
 		 *
 		 * @private
 		 * @type {CubeTexture}
