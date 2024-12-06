@@ -24,8 +24,9 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 		const snippet = super.generate( builder );
 		const type = this.getNodeType();
+		const paddedType = this.node.getPaddedType();
 
-		return builder.format( snippet, 'vec4', type );
+		return builder.format( snippet, paddedType, type );
 
 	}
 
@@ -41,13 +42,10 @@ class UniformArrayNode extends BufferNode {
 
 	constructor( value, elementType = null ) {
 
-		super( null, 'vec4' );
+		super( null );
 
 		this.array = value;
-		this.elementType = elementType;
-
-		this._elementType = null;
-		this._elementLength = 0;
+		this.elementType = elementType === null ? getValueType( value[ 0 ] ) : elementType;
 
 		this.updateType = NodeUpdateType.RENDER;
 
@@ -57,13 +55,34 @@ class UniformArrayNode extends BufferNode {
 
 	getElementType() {
 
-		return this.elementType || this._elementType;
+		return this.elementType;
 
 	}
 
-	getElementLength() {
+	getPaddedType() {
 
-		return this._elementLength;
+		const elementType = this.getElementType();
+		let paddedType = 'vec4';
+
+		if ( elementType === 'mat2' ) {
+
+			paddedType = 'mat2';
+
+		} else if ( /mat/.test( elementType ) === true ) {
+
+			paddedType = 'mat4';
+
+		} else if ( elementType.charAt( 0 ) === 'i' ) {
+
+			paddedType = 'ivec4';
+
+		} else if ( elementType.charAt( 0 ) === 'u' ) {
+
+			paddedType = 'uvec4';
+
+		}
+
+		return paddedType;
 
 	}
 
@@ -71,10 +90,9 @@ class UniformArrayNode extends BufferNode {
 
 		const { array, value } = this;
 
-		const elementLength = this.getElementLength();
 		const elementType = this.getElementType();
 
-		if ( elementLength === 1 ) {
+		if ( elementType === 'float' || elementType === 'int' || elementType === 'uint' ) {
 
 			for ( let i = 0; i < array.length; i ++ ) {
 
@@ -95,6 +113,58 @@ class UniformArrayNode extends BufferNode {
 				value[ index + 1 ] = vector.g;
 				value[ index + 2 ] = vector.b || 0;
 				//value[ index + 3 ] = vector.a || 0;
+
+			}
+
+		} else if ( elementType === 'mat2' ) {
+
+			for ( let i = 0; i < array.length; i ++ ) {
+
+				const index = i * 4;
+				const matrix = array[ i ];
+
+				value[ index ] = matrix.elements[ 0 ];
+				value[ index + 1 ] = matrix.elements[ 1 ];
+				value[ index + 2 ] = matrix.elements[ 2 ];
+				value[ index + 3 ] = matrix.elements[ 3 ];
+
+			}
+
+		} else if ( elementType === 'mat3' ) {
+
+			for ( let i = 0; i < array.length; i ++ ) {
+
+				const index = i * 16;
+				const matrix = array[ i ];
+
+				value[ index ] = matrix.elements[ 0 ];
+				value[ index + 1 ] = matrix.elements[ 1 ];
+				value[ index + 2 ] = matrix.elements[ 2 ];
+
+				value[ index + 4 ] = matrix.elements[ 3 ];
+				value[ index + 5 ] = matrix.elements[ 4 ];
+				value[ index + 6 ] = matrix.elements[ 5 ];
+
+				value[ index + 8 ] = matrix.elements[ 6 ];
+				value[ index + 9 ] = matrix.elements[ 7 ];
+				value[ index + 10 ] = matrix.elements[ 8 ];
+
+				value[ index + 15 ] = 1;
+
+			}
+
+		} else if ( elementType === 'mat4' ) {
+
+			for ( let i = 0; i < array.length; i ++ ) {
+
+				const index = i * 16;
+				const matrix = array[ i ];
+
+				for ( let i = 0; i < matrix.elements.length; i ++ ) {
+
+					value[ index + i ] = matrix.elements[ i ];
+
+				}
 
 			}
 
@@ -120,17 +190,18 @@ class UniformArrayNode extends BufferNode {
 
 		const length = this.array.length;
 
-		this._elementType = this.elementType === null ? getValueType( this.array[ 0 ] ) : this.elementType;
-		this._elementLength = builder.getTypeLength( this._elementType );
-
+		const elementType = this.getElementType();
 		let arrayType = Float32Array;
 
-		if ( this._elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
-		else if ( this._elementType.charAt( 0 ) === 'u' ) arrayType = Uint32Array;
+		const paddedType = this.getPaddedType();
+		const paddedElementLength = builder.getTypeLength( paddedType );
 
-		this.value = new arrayType( length * 4 );
+		if ( elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
+		if ( elementType.charAt( 0 ) === 'u' ) arrayType = Uint32Array;
+
+		this.value = new arrayType( length * paddedElementLength );
 		this.bufferCount = length;
-		this.bufferType = builder.changeComponentType( 'vec4', builder.getComponentType( this._elementType ) );
+		this.bufferType = paddedType;
 
 		return super.setup( builder );
 
