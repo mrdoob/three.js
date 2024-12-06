@@ -49,6 +49,7 @@ export * from './tsl/TSLBase.js';
 export * from './accessors/AccessorsUtils.js';
 export * from './accessors/Arrays.js';
 export * from './accessors/UniformArrayNode.js';
+export * from './accessors/HardwareClipDistancesNode.js';
 export * from './accessors/Bitangent.js';
 export * from './accessors/BufferAttributeNode.js';
 export * from './accessors/BufferNode.js';
