@@ -13,8 +13,8 @@ import { linearDepth } from '../display/ViewportDepthNode.js';
  * which is incorrect.
  *
  * @method
- * @param {vec2?} uv - Optional uv coordinates. By default `screenUV` is used.
- * @return {vec2} The update uv coordinates.
+ * @param {Node<vec2>?} uv - Optional uv coordinates. By default `screenUV` is used.
+ * @return {Node<vec2>} The update uv coordinates.
  */
 export const viewportSafeUV = /*@__PURE__*/ Fn( ( [ uv = null ] ) => {
 

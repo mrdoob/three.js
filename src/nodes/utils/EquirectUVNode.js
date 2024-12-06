@@ -2,6 +2,17 @@ import TempNode from '../core/TempNode.js';
 import { positionWorldDirection } from '../accessors/Position.js';
 import { nodeProxy, vec2 } from '../tsl/TSLBase.js';
 
+/**
+ * Can be used to compute texture coordinates for projecting an
+ * equirectangular texture onto a mesh for using it as the scene's
+ * background.
+ *
+ * ```js
+ * scene.backgroundNode = texture( equirectTexture, equirectUV() );
+ * ```
+ *
+ * @augments TempNode
+ */
 class EquirectUVNode extends TempNode {
 
 	static get type() {
@@ -10,10 +21,20 @@ class EquirectUVNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new equirect uv node.
+	 *
+	 * @param {Node<vec3>} [dirNode=positionWorldDirection] - A direction vector for sampling why is by default `positionWorldDirection`.
+	 */
 	constructor( dirNode = positionWorldDirection ) {
 
 		super( 'vec2' );
 
+		/**
+		 * A direction vector for sampling why is by default `positionWorldDirection`.
+		 *
+		 * @type {Node<vec3>}
+		 */
 		this.dirNode = dirNode;
 
 	}
