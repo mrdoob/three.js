@@ -28,9 +28,9 @@ class TriplanarTexturesNode extends Node {
 	 * @param {Node} textureXNode - First texture node.
 	 * @param {Node?} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.
 	 * @param {Node?} [textureZNode=null] - Third texture node. When not set, the shader will sample from `textureXNode` instead.
-	 * @param {Node?} [scaleNode=float(1)] - The scale node.
-	 * @param {Node?} [positionNode=positionLocal] - Vertex positions in local space.
-	 * @param {Node?} [normalNode=normalLocal] - Normals in local space.
+	 * @param {Node<float>?} [scaleNode=float(1)] - The scale node.
+	 * @param {Node<vec3>?} [positionNode=positionLocal] - Vertex positions in local space.
+	 * @param {Node<vec3>?} [normalNode=normalLocal] - Normals in local space.
 	 */
 	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionLocal, normalNode = normalLocal ) {
 
@@ -62,7 +62,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * The scale node.
 		 *
-		 * @type {Node}
+		 * @type {Node<float>}
 		 * @default float(1)
 		 */
 		this.scaleNode = scaleNode;
@@ -70,7 +70,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Vertex positions in local space.
 		 *
-		 * @type {Node}
+		 * @type {Node<vec3>}
 		 * @default positionLocal
 		 */
 		this.positionNode = positionNode;
@@ -78,7 +78,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Normals in local space.
 		 *
-		 * @type {Node}
+		 * @type {Node<vec3>}
 		 * @default normalLocal
 		 */
 		this.normalNode = normalNode;
