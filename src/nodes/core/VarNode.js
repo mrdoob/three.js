@@ -2,7 +2,7 @@ import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
- * Class for representing shader variables as nodes. Variables are create from
+ * Class for representing shader variables as nodes. Variables are created from
  * existing nodes like the following:
  *
  * ```js
@@ -46,7 +46,7 @@ class VarNode extends Node {
 		this.name = name;
 
 		/**
-		 * `VarNonde` sets this property to `true` by default.
+		 * `VarNode` sets this property to `true` by default.
 		 *
 		 * @type {Boolean}
 		 * @default true

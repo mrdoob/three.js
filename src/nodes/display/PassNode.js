@@ -520,7 +520,7 @@ class PassNode extends TempNode {
 	 * Returns a linear depth node of this pass.
 	 *
 	 * @param {String} [name='depth'] - The output name to get the linear depth node for. In most cases the default `'depth'` can be used however the parameter exists for custom depth outputs.
-	 * @return {Node} The lienar depth node.
+	 * @return {Node} The linear depth node.
 	 */
 	getLinearDepthNode( name = 'depth' ) {
 

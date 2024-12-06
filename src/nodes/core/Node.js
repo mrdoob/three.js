@@ -469,7 +469,7 @@ class Node extends EventDispatcher {
 
 	/**
 	 * Represents the analyze stage which is the second step of the build process, see {@link Node#build} method.
-	 * This stage anaylzes the node hierarchy and ensures descendent nodes are built.
+	 * This stage analyzes the node hierarchy and ensures descendent nodes are built.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

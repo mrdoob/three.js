@@ -16,7 +16,7 @@ class RotateNode extends TempNode {
 	}
 
 	/**
-	 * Constructs a new rorate node.
+	 * Constructs a new rotate node.
 	 *
 	 * @param {Node} positionNode - The position node.
 	 * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending

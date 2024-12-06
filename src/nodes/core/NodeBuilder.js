@@ -794,7 +794,7 @@ class NodeBuilder {
 	/**
 	 * Returns the native shader method name for a given generic name. E.g.
 	 * the method name `textureDimensions` matches the WGSL name but must be
-	 * resolved to `texureSize` in GLSL.
+	 * resolved to `textureSize` in GLSL.
 	 *
 	 * @abstract
 	 * @param {String} name - The method name to resolve.
@@ -972,7 +972,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns thefragCoord input variable as a native shader string.
+	 * Returns the fragCoord input variable as a native shader string.
 	 *
 	 * @abstract
 	 * @return {String} The fragCoord shader string.
@@ -985,7 +985,7 @@ class NodeBuilder {
 
 	/**
 	 * Whether to flip texture data along its vertical axis or not. WebGL needs
-	 * this method evalaute to `true`, WebGPU to `false`.
+	 * this method evaluate to `true`, WebGPU to `false`.
 	 *
 	 * @abstract
 	 * @return {Boolean} Whether to flip texture data along its vertical axis or not.
@@ -997,7 +997,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Calling this mehod increases the usage count for the given node by one.
+	 * Calling this method increases the usage count for the given node by one.
 	 *
 	 * @param {Node} Node - The node to increase the usage count for.
 	 * @return {Number} The updated usage count.
@@ -1223,7 +1223,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the component type of a given texutre.
+	 * Returns the component type of a given texture.
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @return {String} The component type.

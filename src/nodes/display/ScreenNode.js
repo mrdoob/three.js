@@ -36,7 +36,7 @@ class ScreenNode extends Node {
 		 * The node represents different metric depending on which scope is selected.
 		 *
 		 * - `ScreenNode.COORDINATE`: Window-relative coordinates of the current fragment according to WebGPU standards.
-		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimnesional vector.
+		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimensional vector.
 		 * - `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
 		 * - `ScreenNode.UV`: Normalized screen coordinates.
 		 *

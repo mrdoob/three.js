@@ -42,7 +42,7 @@ class ConvertNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten since the implementation tries to infere the best
+	 * This method is overwritten since the implementation tries to infer the best
 	 * matching type from the {@link ConvertNode#convertTo} property.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

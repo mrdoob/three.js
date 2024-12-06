@@ -36,7 +36,7 @@ class JoinNode extends TempNode {
 
 	/**
 	 * This method is overwritten since the node type must be inferred from the
-	 * joined data length if not explicitely defined.
+	 * joined data length if not explicitly defined.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.
