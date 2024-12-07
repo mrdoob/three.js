@@ -46,10 +46,17 @@ class UniformArrayNode extends BufferNode {
 
 		this.array = value;
 		this.elementType = elementType === null ? getValueType( value[ 0 ] ) : elementType;
+		this.paddedType = this.getPaddedType();
 
 		this.updateType = NodeUpdateType.RENDER;
 
 		this.isArrayBufferNode = true;
+
+	}
+
+	getNodeType() {
+
+		return this.paddedType;
 
 	}
 
@@ -61,7 +68,8 @@ class UniformArrayNode extends BufferNode {
 
 	getPaddedType() {
 
-		const elementType = this.getElementType();
+		const elementType = this.elementType;
+
 		let paddedType = 'vec4';
 
 		if ( elementType === 'mat2' ) {
@@ -90,7 +98,7 @@ class UniformArrayNode extends BufferNode {
 
 		const { array, value } = this;
 
-		const elementType = this.getElementType();
+		const elementType = this.elementType;
 
 		if ( elementType === 'float' || elementType === 'int' || elementType === 'uint' ) {
 
@@ -189,11 +197,11 @@ class UniformArrayNode extends BufferNode {
 	setup( builder ) {
 
 		const length = this.array.length;
+		const elementType = this.elementType;
 
-		const elementType = this.getElementType();
 		let arrayType = Float32Array;
 
-		const paddedType = this.getPaddedType();
+		const paddedType = this.paddedType;
 		const paddedElementLength = builder.getTypeLength( paddedType );
 
 		if ( elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
