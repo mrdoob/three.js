@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeObject, vec3 } from '../tsl/TSLBase.js';
-import { hash } from '../core/NodeUtils.js';
+import { hashArray } from '../core/NodeUtils.js';
 
 const sortLights = ( lights ) => {
 
@@ -25,7 +25,6 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
-const _lightIDs = /*@__PURE__*/ new Set();
 
 class LightsNode extends Node {
 
@@ -55,15 +54,24 @@ class LightsNode extends Node {
 
 	getCacheKey( force ) {
 
-		_lightIDs.clear();
+		force = force || this.version !== this._cacheKeyVersion;
 
-		for ( let i = 0; i < this._lights.length; i ++ ) {
+		if ( force === true || this._cacheKey === null ) {
 
-			_lightIDs.add( this._lights[ i ].id );
+			const lightIDs = [];
+
+			for ( let i = 0; i < this._lights.length; i ++ ) {
+
+				lightIDs.push( this._lights[ i ].id );
+
+			}
+
+			this._cacheKey = hashArray( lightIDs );
+			this._cacheKeyVersion = this.version;
 
 		}
 
-		return hash( super.getCacheKey( force ), ... _lightIDs );
+		return this._cacheKey;
 
 	}
 
