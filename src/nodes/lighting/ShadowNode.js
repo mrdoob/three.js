@@ -1,5 +1,4 @@
-import Node from '../core/Node.js';
-import { NodeUpdateType } from '../core/constants.js';
+import ShadowBaseNode, { shadowWorldPosition } from './ShadowBaseNode.js';
 import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -19,8 +18,6 @@ import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
-const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
-
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
 	let dist = positionWorld.sub( position ).length();
@@ -250,7 +247,7 @@ const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilt
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
-class ShadowNode extends Node {
+class ShadowNode extends ShadowBaseNode {
 
 	static get type() {
 
@@ -260,9 +257,8 @@ class ShadowNode extends Node {
 
 	constructor( light, shadow = null ) {
 
-		super();
+		super( light );
 
-		this.light = light;
 		this.shadow = shadow || light.shadow;
 
 		this.shadowMap = null;
@@ -273,7 +269,6 @@ class ShadowNode extends Node {
 		this.vsmMaterialVertical = null;
 		this.vsmMaterialHorizontal = null;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
 		this._node = null;
 
 		this.isShadowNode = true;
@@ -425,11 +420,11 @@ class ShadowNode extends Node {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		return Fn( ( { material } ) => {
-
-			shadowWorldPosition.assign( material.shadowPositionNode || positionWorld );
+		return Fn( () => {
 
 			let node = this._node;
+
+			this.setupShadowPosition( builder );
 
 			if ( node === null ) {
 
@@ -566,7 +561,7 @@ class ShadowNode extends Node {
 
 		}
 
-		this.updateBeforeType = NodeUpdateType.NONE;
+		super.dispose();
 
 	}
 
