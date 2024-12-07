@@ -1633,7 +1633,7 @@ class Renderer {
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
 		let overridePositionNode;
-		let overrideColorNode;
+		let overrideFragmentNode;
 		let overrideDepthNode;
 
 		//
@@ -1653,9 +1653,6 @@ class Renderer {
 
 			}
 
-			overrideMaterial.alphaTest = material.alphaTest;
-			overrideMaterial.alphaMap = material.alphaMap;
-
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
@@ -1667,10 +1664,11 @@ class Renderer {
 
 				}
 
+
 				if ( material.castShadowNode && material.castShadowNode.isNode ) {
 
-					overrideColorNode = overrideMaterial.colorNode;
-					overrideMaterial.colorNode = material.castShadowNode;
+					overrideFragmentNode = overrideMaterial.fragmentNode;
+					overrideMaterial.fragmentNode = material.castShadowNode;
 
 				}
 
@@ -1712,9 +1710,9 @@ class Renderer {
 
 		}
 
-		if ( overrideColorNode !== undefined ) {
+		if ( overrideFragmentNode !== undefined ) {
 
-			scene.overrideMaterial.colorNode = overrideColorNode;
+			scene.overrideMaterial.fragmentNode = overrideFragmentNode;
 
 		}
 

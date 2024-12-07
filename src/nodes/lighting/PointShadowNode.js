@@ -127,8 +127,8 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	const lightToPosition = shadowCoord.xyz.toVar();
 	const lightToPositionLength = lightToPosition.length();
 
-	const cameraNearLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
-	const cameraFarLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
+	const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
+	const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
 	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = uniform( shadow.mapSize ).setGroup( renderGroup );
 
