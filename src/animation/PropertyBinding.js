@@ -569,11 +569,11 @@ class PropertyBinding {
 
 		this.targetObject = targetObject;
 
-		if ( targetObject.needsUpdate !== undefined ) { // material
+		if ( targetObject.isMaterial === true ) {
 
 			versioning = this.Versioning.NeedsUpdate;
 
-		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+		} else if ( targetObject.isObject3D === true ) {
 
 			versioning = this.Versioning.MatrixWorldNeedsUpdate;
 
