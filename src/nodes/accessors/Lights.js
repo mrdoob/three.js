@@ -2,7 +2,6 @@ import { uniform } from '../core/UniformNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { cameraViewMatrix } from './Camera.js';
-import { positionWorld } from './Position.js';
 
 let uniformsLib;
 
@@ -15,37 +14,6 @@ function getLightData( light ) {
 	if ( uniforms === undefined ) uniformsLib.set( light, uniforms = {} );
 
 	return uniforms;
-
-}
-
-export function lightShadowMatrix( light ) {
-
-	const data = getLightData( light );
-
-	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => {
-
-		light.shadow.updateMatrices( light );
-
-		return light.shadow.matrix;
-
-	} ) );
-
-}
-
-export function lightProjectionUV( light ) {
-
-	const data = getLightData( light );
-
-	if ( data.projectionUV === undefined ) {
-
-		const spotLightCoord = lightShadowMatrix( light ).mul( positionWorld );
-
-		data.projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
-
-
-	}
-
-	return data.projectionUV;
 
 }
 

@@ -19,10 +19,12 @@ class AnalyticLightNode extends LightingNode {
 
 		super();
 
+		this.updateType = NodeUpdateType.FRAME;
+
 		this.light = light;
 
 		this.color = new Color();
-		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
+		this.colorNode = uniform( this.color ).setGroup( renderGroup );
 
 		this.baseColorNode = null;
 
@@ -30,8 +32,6 @@ class AnalyticLightNode extends LightingNode {
 		this.shadowColorNode = null;
 
 		this.isAnalyticLightNode = true;
-
-		this.updateType = NodeUpdateType.FRAME;
 
 	}
 

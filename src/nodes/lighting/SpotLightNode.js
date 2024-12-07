@@ -4,8 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { positionView } from '../accessors/Position.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { lightViewPosition, lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
-import { texture } from '../accessors/TextureNode.js';
+import { lightViewPosition, lightTargetDirection } from '../accessors/Lights.js';
 
 class SpotLightNode extends AnalyticLightNode {
 
@@ -71,18 +70,7 @@ class SpotLightNode extends AnalyticLightNode {
 			decayExponent: decayExponentNode
 		} );
 
-		let lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
-
-		if ( light.map ) {
-
-			const spotLightCoord = lightProjectionUV( light );
-			const projectedTexture = texture( light.map, spotLightCoord.xy ).onRenderUpdate( () => light.map );
-
-			const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
-
-			lightColor = inSpotLightMap.select( lightColor.mul( projectedTexture ), lightColor );
-
-		}
+		const lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
 
 		const reflectedLight = builder.context.reflectedLight;
 
