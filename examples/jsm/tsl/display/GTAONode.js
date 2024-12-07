@@ -111,7 +111,7 @@ class GTAONode extends TempNode {
 
 		const sampleDepth = ( uv ) => {
 
-			const depth = this.depthNode.uv( uv ).r;
+			const depth = this.depthNode.sample( uv ).r;
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
@@ -125,8 +125,8 @@ class GTAONode extends TempNode {
 
 		};
 
-		const sampleNoise = ( uv ) => this._noiseNode.uv( uv );
-		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
+		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
 		const ao = Fn( () => {
 

@@ -48,10 +48,10 @@ class DenoiseNode extends TempNode {
 
 		const uvNode = uv();
 
-		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
-		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
-		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
+		const sampleTexture = ( uv ) => this.textureNode.sample( uv );
+		const sampleDepth = ( uv ) => this.depthNode.sample( uv ).x;
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
+		const sampleNoise = ( uv ) => this.noiseNode.sample( uv );
 
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
 

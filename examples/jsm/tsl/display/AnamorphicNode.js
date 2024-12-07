@@ -90,7 +90,7 @@ class AnamorphicNode extends TempNode {
 		const textureNode = this.textureNode;
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.sample( uv );
 
 		const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
 

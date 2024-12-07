@@ -75,7 +75,7 @@ const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ],
 
 	const vTexture = material.side == BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
 
-	const transmissionSample = vTexture.uv( fragCoord );
+	const transmissionSample = vTexture.sample( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
 	const lod = log2( screenSize.x ).mul( applyIorToRoughness( roughness, ior ) );
@@ -619,8 +619,8 @@ class PhysicalLightingModel extends LightingModel {
 
 		const uv = LTC_Uv( { N, V, roughness } );
 
-		const t1 = ltc_1.uv( uv ).toVar();
-		const t2 = ltc_2.uv( uv ).toVar();
+		const t1 = ltc_1.sample( uv ).toVar();
+		const t2 = ltc_2.sample( uv ).toVar();
 
 		const mInv = mat3(
 			vec3( t1.x, 0, t1.y ),

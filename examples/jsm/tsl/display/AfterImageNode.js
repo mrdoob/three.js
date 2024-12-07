@@ -101,7 +101,7 @@ class AfterImageNode extends TempNode {
 
 		textureNodeOld.uvNode = uvNode;
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.sample( uv );
 
 		const when_gt = Fn( ( [ x_immutable, y_immutable ] ) => {
 

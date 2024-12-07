@@ -128,7 +128,7 @@ class LensflareNode extends TempNode {
 
 				// accumulate
 
-				let sample = this.textureNode.uv( sampleUv ).rgb;
+				let sample = this.textureNode.sample( sampleUv ).rgb;
 
 				sample = max( sample.sub( this.thresholdNode ), vec3( 0 ) ).mul( this.ghostTintNode );
 

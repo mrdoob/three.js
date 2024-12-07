@@ -260,12 +260,12 @@ class TRAAPassNode extends PassNode {
 				Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'y' }, ( { y } ) => {
 
 					const uvNeighbor = uvNode.add( vec2( float( x ), float( y ) ).mul( this._invSize ) ).toVar();
-					const colorNeighbor = max( vec4( 0 ), sampleTexture.uv( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
+					const colorNeighbor = max( vec4( 0 ), sampleTexture.sample( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
 
 					minColor.assign( min( minColor, colorNeighbor ) );
 					maxColor.assign( max( maxColor, colorNeighbor ) );
 
-					const currentDepth = depthTexture.uv( uvNeighbor ).r.toVar();
+					const currentDepth = depthTexture.sample( uvNeighbor ).r.toVar();
 
 					// find the sample position of the closest depth in the neighborhood (used for velocity)
 
@@ -282,10 +282,10 @@ class TRAAPassNode extends PassNode {
 
 			// sampling/reprojection
 
-			const offset = velocityTexture.uv( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
+			const offset = velocityTexture.sample( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
 
-			const currentColor = sampleTexture.uv( uvNode );
-			const historyColor = historyTexture.uv( uvNode.sub( offset ) );
+			const currentColor = sampleTexture.sample( uvNode );
+			const historyColor = historyTexture.sample( uvNode.sub( offset ) );
 
 			// clamping
 

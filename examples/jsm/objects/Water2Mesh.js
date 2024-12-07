@@ -122,8 +122,8 @@ class WaterNode extends TempNode {
 			const normalUv0 = uvs.mul( this.scale ).add( flow.mul( flowMapOffset0 ) );
 			const normalUv1 = uvs.mul( this.scale ).add( flow.mul( flowMapOffset1 ) );
 
-			const normalColor0 = this.normalMap0.uv( normalUv0 );
-			const normalColor1 = this.normalMap1.uv( normalUv1 );
+			const normalColor0 = this.normalMap0.sample( normalUv0 );
+			const normalColor1 = this.normalMap1.sample( normalUv1 );
 
 			// linear interpolate to get the final normal color
 			const flowLerp = abs( halfCycle.sub( flowMapOffset0 ) ).div( halfCycle );
