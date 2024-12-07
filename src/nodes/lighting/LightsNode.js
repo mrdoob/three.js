@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeObject, vec3 } from '../tsl/TSLBase.js';
+import { hashArray } from '../core/NodeUtils.js';
 
 const sortLights = ( lights ) => {
 
@@ -48,6 +49,29 @@ class LightsNode extends Node {
 		this._lightNodesHash = null;
 
 		this.global = true;
+
+	}
+
+	getCacheKey( force ) {
+
+		force = force || this.version !== this._cacheKeyVersion;
+
+		if ( force === true || this._cacheKey === null ) {
+
+			const lightIDs = [];
+
+			for ( let i = 0; i < this._lights.length; i ++ ) {
+
+				lightIDs.push( this._lights[ i ].id );
+
+			}
+
+			this._cacheKey = hashArray( lightIDs );
+			this._cacheKeyVersion = this.version;
+
+		}
+
+		return this._cacheKey;
 
 	}
 
