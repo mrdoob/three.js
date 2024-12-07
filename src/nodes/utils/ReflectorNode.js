@@ -35,6 +35,19 @@ _defaultRT.depthTexture = new DepthTexture( 1, 1 );
 
 let _inReflector = false;
 
+/**
+ * This node can be used to implement mirror-like flat reflective surfaces.
+ *
+ * ```js
+ * const groundReflector = reflector();
+ * material.colorNode = groundReflector;
+ *
+ * const plane = new Mesh( geometry, material );
+ * plane.add( groundReflector.target );
+ * ```
+ *
+ * @augments TextureNode
+ */
 class ReflectorNode extends TextureNode {
 
 	static get type() {
@@ -43,29 +56,70 @@ class ReflectorNode extends TextureNode {
 
 	}
 
+	/**
+	 * Constructs a new reflector node.
+	 *
+	 * @param {Object} [parameters={}] - An object holding configuration parameters.
+	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
+	 * @param {Number} [parameters.resolution=1] - The resolution scale.
+	 * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+	 * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
+	 * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 */
 	constructor( parameters = {} ) {
 
 		super( parameters.defaultTexture || _defaultRT.texture, _defaultUV );
 
+		/**
+		 * A reference to the internal reflector base node which holds the actual implementation.
+		 *
+		 * @private
+		 * @type {Node?}
+		 * @default null
+		 */
 		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
+
+		/**
+		 * A reference to the internal depth node.
+		 *
+		 * @private
+		 * @type {Node?}
+		 * @default null
+		 */
 		this._depthNode = null;
 
 		this.setUpdateMatrix( false );
 
 	}
 
+	/**
+	 * A reference to the internal reflector node.
+	 *
+	 * @type {Node}
+	 */
 	get reflector() {
 
 		return this._reflectorBaseNode;
 
 	}
 
+	/**
+	 * A reference to 3D object the reflector is linked to.
+	 *
+	 * @type {Object3D}
+	 */
 	get target() {
 
 		return this._reflectorBaseNode.target;
 
 	}
 
+	/**
+	 * Returns a node representing the mirror's depth. That can be used
+	 * to implement more advanced reflection effects like distance attenuation.
+	 *
+	 * @return {Node} The depth node.
+	 */
 	getDepthNode() {
 
 		if ( this._depthNode === null ) {
@@ -107,7 +161,15 @@ class ReflectorNode extends TextureNode {
 
 }
 
-
+/**
+ * Holds the actual implementation of the reflector.
+ *
+ * TOOD: Explain why `ReflectorBaseNode`. Originally the entire logic was implemented
+ * in `ReflectorNode`, see #29619.
+ *
+ * @private
+ * @augments Node
+ */
 class ReflectorBaseNode extends Node {
 
 	static get type() {
@@ -116,6 +178,17 @@ class ReflectorBaseNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new reflector base node.
+	 *
+	 * @param {TextureNode} textureNode - Represents the rendered reflections as a texture node.
+	 * @param {Object} [parameters={}] - An object holding configuration parameters.
+	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
+	 * @param {Number} [parameters.resolution=1] - The resolution scale.
+	 * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+	 * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
+	 * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 */
 	constructor( textureNode, parameters = {} ) {
 
 		super();
@@ -128,23 +201,85 @@ class ReflectorBaseNode extends Node {
 			depth = false
 		} = parameters;
 
-		//
-
+		/**
+		 * Represents the rendered reflections as a texture node.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNode = textureNode;
 
+		/**
+		 * The 3D object the reflector is linked to.
+		 *
+		 * @type {Object3D}
+		 * @default {new Object3D()}
+		 */
 		this.target = target;
+
+		/**
+		 * The resolution scale.
+		 *
+		 * @type {Number}
+		 * @default {1}
+		 */
 		this.resolution = resolution;
+
+		/**
+		 * Whether mipmaps should be generated or not.
+		 *
+		 * @type {Boolean}
+		 * @default {false}
+		 */
 		this.generateMipmaps = generateMipmaps;
+
+		/**
+		 * Whether reflectors can render other reflector nodes or not.
+		 *
+		 * @type {Boolean}
+		 * @default {true}
+		 */
 		this.bounces = bounces;
+
+		/**
+		 * Whether depth data should be generated or not.
+		 *
+		 * @type {Boolean}
+		 * @default {false}
+		 */
 		this.depth = depth;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` when {@link ReflectorBaseNode#bounces}
+		 * is `true`. Otherwise it's `NodeUpdateType.FRAME`.
+		 *
+		 * @type {String}
+		 * @default 'render'
+		 */
 		this.updateBeforeType = bounces ? NodeUpdateType.RENDER : NodeUpdateType.FRAME;
 
+		/**
+		 * Weak map for managing virtual cameras.
+		 *
+		 * @type {WeakMap<Camera,Camera>}
+		 */
 		this.virtualCameras = new WeakMap();
+
+		/**
+		 * Weak map for managing render targets.
+		 *
+		 * @type {WeakMap}
+		 */
 		this.renderTargets = new WeakMap();
 
 	}
 
+	/**
+	 * Updates the resolution of the internal render target.
+	 *
+	 * @private
+	 * @param {RenderTarget} renderTarget - The render target to resize.
+	 * @param {Renderer} renderer - The renderer that is used to determine the new size.
+	 */
 	_updateResolution( renderTarget, renderer ) {
 
 		const resolution = this.resolution;
@@ -163,6 +298,13 @@ class ReflectorBaseNode extends Node {
 
 	}
 
+	/**
+	 * Returns a virtual camera for the given camera. The virutal camera is used to
+	 * render the scene from the reflector's view so correct reflections can be produced.
+	 *
+	 * @param {Camera} camera - The scene's camera.
+	 * @return {Camera} The corresponding virtual camera.
+	 */
 	getVirtualCamera( camera ) {
 
 		let virtualCamera = this.virtualCameras.get( camera );
@@ -179,6 +321,13 @@ class ReflectorBaseNode extends Node {
 
 	}
 
+	/**
+	 * Returns a render target for the given camera. The reflections are rendered
+	 * into this render target.
+	 *
+	 * @param {Camera} camera - The scene's camera.
+	 * @return {RenderTarget} The render target.
+	 */
 	getRenderTarget( camera ) {
 
 		let renderTarget = this.renderTargets.get( camera );

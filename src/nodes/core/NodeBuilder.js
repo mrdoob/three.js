@@ -1819,7 +1819,7 @@ class NodeBuilder {
 	 *
 	 * @param {Node} node - Node that the flow was started.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
-	 * @return {Object}
+	 * @return {Object} The flow data.
 	 */
 	getFlowData( node/*, shaderStage*/ ) {
 
@@ -1831,7 +1831,7 @@ class NodeBuilder {
 	 * Executes the node flow based on a root node to generate the final shader code.
 	 *
 	 * @param {Node} node - The node to execute.
-	 * @return {Object}
+	 * @return {Object} The code flow.
 	 */
 	flowNode( node ) {
 
@@ -1976,7 +1976,7 @@ class NodeBuilder {
 	 *
 	 * @param {Node} node - The node to execute.
 	 * @param {String?} output - Expected output type. For example 'vec3'.
-	 * @return {Object}
+	 * @return {Object} The code flow.
 	 */
 	flowChildNode( node, output = null ) {
 

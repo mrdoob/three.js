@@ -8,8 +8,8 @@ import { vectorComponents } from '../core/constants.js';
  * ```
  * x = 1 - x;
  * ```
- * `FlipNode` is internally used to implement any `flip*()` method invocations
- * on node objects. E.g.
+ * `FlipNode` is internally used to implement any `flipXYZW()`, `flipRGBA()` and
+ * `flipSTPQ()` method invocations on node objects. For example:
  * ```js
  * uvNode = uvNode.flipY();
  * ```
