@@ -4,7 +4,7 @@ import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/
 
 export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), repeats = float( 45 ) ] ) => {
 
-	const draw = ( uv ) => textureNode.uv( uv );
+	const draw = ( uv ) => textureNode.sample( uv );
 
 	const targetUV = textureNode.uvNode || uv();
 	const blurred_image = vec4( 0. ).toVar();

@@ -192,14 +192,14 @@ class SMAANode extends TempNode {
 
 			// Calculate color deltas:
 			const delta = vec4().toVar();
-			const C = this.textureNode.uv( uvNode ).rgb.toVar();
+			const C = this.textureNode.sample( uvNode ).rgb.toVar();
 
 			// Calculate left and top deltas:
-			const Cleft = this.textureNode.uv( vOffset0.xy ).rgb.toVar();
+			const Cleft = this.textureNode.sample( vOffset0.xy ).rgb.toVar();
 			let t = abs( C.sub( Cleft ) );
 			delta.x = max( max( t.r, t.g ), t.b );
 
-			const Ctop = this.textureNode.uv( vOffset0.zw ).rgb.toVar();
+			const Ctop = this.textureNode.sample( vOffset0.zw ).rgb.toVar();
 			t = abs( C.sub( Ctop ) );
 			delta.y = max( max( t.r, t.g ), t.b );
 
@@ -210,11 +210,11 @@ class SMAANode extends TempNode {
 			dot( edges, vec2( 1.0, 1.0 ) ).equal( 0 ).discard();
 
 			// Calculate right and bottom deltas:
-			const Cright = this.textureNode.uv( vOffset1.xy ).rgb.toVar();
+			const Cright = this.textureNode.sample( vOffset1.xy ).rgb.toVar();
 			t = abs( C.sub( Cright ) );
 			delta.z = max( max( t.r, t.g ), t.b );
 
-			const Cbottom = this.textureNode.uv( vOffset1.zw ).rgb.toVar();
+			const Cbottom = this.textureNode.sample( vOffset1.zw ).rgb.toVar();
 			t = abs( C.sub( Cbottom ) );
 			delta.w = max( max( t.r, t.g ), t.b );
 
@@ -222,11 +222,11 @@ class SMAANode extends TempNode {
 			let maxDelta = max( max( max( delta.x, delta.y ), delta.z ), delta.w ).toVar();
 
 			// Calculate left-left and top-top deltas:
-			const Cleftleft = this.textureNode.uv( vOffset2.xy ).rgb.toVar();
+			const Cleftleft = this.textureNode.sample( vOffset2.xy ).rgb.toVar();
 			t = abs( C.sub( Cleftleft ) );
 			delta.z = max( max( t.r, t.g ), t.b );
 
-			const Ctoptop = this.textureNode.uv( vOffset2.zw ).rgb.toVar();
+			const Ctoptop = this.textureNode.sample( vOffset2.zw ).rgb.toVar();
 			t = abs( C.sub( Ctoptop ) );
 			delta.w = max( max( t.r, t.g ), t.b );
 
@@ -249,7 +249,7 @@ class SMAANode extends TempNode {
 			// e = float2(bias, 0.0) + 0.5 * SEARCH_TEX_PIXEL_SIZE + e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
 			const coord = vec2( e ).toVar();
 			coord.r = bias.add( coord.r.mul( scale ) );
-			return float( 255 ).mul( searchTex.uv( coord ) ).r;
+			return float( 255 ).mul( searchTex.sample( coord ) ).r;
 
 		} );
 
@@ -264,7 +264,7 @@ class SMAANode extends TempNode {
 			// Move to proper place, according to the subpixel offset:
 			texcoord.y.addAssign( float( SMAA_AREATEX_SUBTEX_SIZE ).mul( offset ) );
 
-			return areaTex.uv( texcoord ).rg;
+			return areaTex.sample( texcoord ).rg;
 
 		} );
 
@@ -283,7 +283,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.assign( edgesTex.sample( coord ).rg );
 				coord.subAssign( vec2( 2, 0 ).mul( this._invSize ) );
 
 				If( coord.x.lessThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
@@ -315,7 +315,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.assign( edgesTex.sample( coord ).rg );
 				coord.addAssign( vec2( 2, 0 ).mul( this._invSize ) );
 
 				If( coord.x.greaterThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
@@ -342,7 +342,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.assign( edgesTex.sample( coord ).rg );
 				coord.addAssign( vec2( 0, - 2 ).mul( this._invSize ) );
 
 				If( coord.y.lessThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
@@ -369,7 +369,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.assign( edgesTex.sample( coord ).rg );
 				coord.subAssign( vec2( 0, - 2 ).mul( this._invSize ) );
 
 				If( coord.y.greaterThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
@@ -419,7 +419,7 @@ class SMAANode extends TempNode {
 			const weights = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
 			const subsampleIndices = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
 
-			const e = this._edgesTextureUniform.uv( uvNode ).rg.toVar();
+			const e = this._edgesTextureUniform.sample( uvNode ).rg.toVar();
 
 			If( e.g.greaterThan( float( 0 ) ), () => { // Edge at north
 
@@ -435,7 +435,7 @@ class SMAANode extends TempNode {
 				// Now fetch the left crossing edges, two at a time using bilinear
 				// filtering. Sampling at -0.25 (see @CROSSING_OFFSET) enables to
 				// discern what value each edge has:
-				const e1 = this._edgesTextureUniform.uv( coordsLeft ).r.toVar();
+				const e1 = this._edgesTextureUniform.sample( coordsLeft ).r.toVar();
 
 				// Find the distance to the right:
 				const coordsRight = vec2().toVar();
@@ -451,7 +451,7 @@ class SMAANode extends TempNode {
 				const sqrt_d = sqrt( abs( d ) );
 
 				// Fetch the right crossing edges:
-				const e2 = this._edgesTextureUniform.uv( coordsRight.add( vec2( 1, 0 ).mul( this._invSize ) ) ).r.toVar();
+				const e2 = this._edgesTextureUniform.sample( coordsRight.add( vec2( 1, 0 ).mul( this._invSize ) ) ).r.toVar();
 				weights.r = e2;
 
 				// Get the area for this direction:
@@ -471,7 +471,7 @@ class SMAANode extends TempNode {
 				d.x = coordsUp.y;
 
 				// Fetch the top crossing edges:
-				const e1 = this._edgesTextureUniform.uv( coordsUp ).g.toVar();
+				const e1 = this._edgesTextureUniform.sample( coordsUp ).g.toVar();
 
 				// Find the distance to the bottom:
 				const coordsDown = vec2().toVar();
@@ -486,7 +486,7 @@ class SMAANode extends TempNode {
 				const sqrt_d = sqrt( abs( d ) );
 
 				// Fetch the bottom crossing edges:
-				const e2 = this._edgesTextureUniform.uv( coordsDown.add( vec2( 0, 1 ).mul( this._invSize ) ) ).g.toVar();
+				const e2 = this._edgesTextureUniform.sample( coordsDown.add( vec2( 0, 1 ).mul( this._invSize ) ) ).g.toVar();
 
 				// Get the area for this direction:
 				weights.ba = SMAAArea( this._areaTextureUniform, sqrt_d, e1, e2, float( subsampleIndices.x ) );
@@ -520,15 +520,15 @@ class SMAANode extends TempNode {
 			// Fetch the blending weights for current pixel:
 
 			const a = vec4().toVar();
-			a.xz = this._weightsTextureUniform.uv( uvNode ).xz;
-			a.y = this._weightsTextureUniform.uv( vOffset1.zw ).g;
-			a.w = this._weightsTextureUniform.uv( vOffset1.xy ).a;
+			a.xz = this._weightsTextureUniform.sample( uvNode ).xz;
+			a.y = this._weightsTextureUniform.sample( vOffset1.zw ).g;
+			a.w = this._weightsTextureUniform.sample( vOffset1.xy ).a;
 
 			// Is there any blending weight with a value greater than 0.0?
 
 			If( dot( a, vec4( 1.0 ) ).lessThan( 1e-5 ), () => { // Edge at north
 
-				result.assign( this.textureNode.uv( uvNode ) );
+				result.assign( this.textureNode.sample( uvNode ) );
 
 			} ).Else( () => {
 
@@ -555,10 +555,10 @@ class SMAANode extends TempNode {
 
 				// Fetch the opposite color and lerp by hand:
 
-				const C = this.textureNode.uv( uvNode ).toVar();
+				const C = this.textureNode.sample( uvNode ).toVar();
 				const texcoord = vec2( uvNode ).toVar();
 				texcoord.addAssign( sign( offset ).mul( this._invSize ) );
-				const Cop = this.textureNode.uv( texcoord ).toVar();
+				const Cop = this.textureNode.sample( texcoord ).toVar();
 				const s = abs( offset.x ).greaterThan( abs( offset.y ) ).select( abs( offset.x ), abs( offset.y ) ).toVar();
 
 				const mixed = mix( C, Cop, s );

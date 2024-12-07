@@ -153,7 +153,7 @@ class SSRNode extends TempNode {
 
 		const sampleDepth = ( uv ) => {
 
-			const depth = this.depthNode.uv( uv ).r;
+			const depth = this.depthNode.sample( uv ).r;
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
@@ -169,7 +169,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const metalness = this.metalnessNode.uv( uvNode ).r;
+			const metalness = this.metalnessNode.sample( uvNode ).r;
 
 			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
@@ -295,7 +295,7 @@ class SSRNode extends TempNode {
 
 					If( away.lessThanEqual( tk ), () => { // hit
 
-						const vN = this.normalNode.uv( uvNode ).rgb.normalize().toVar();
+						const vN = this.normalNode.sample( uvNode ).rgb.normalize().toVar();
 
 						If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
 
@@ -328,7 +328,7 @@ class SSRNode extends TempNode {
 						op.mulAssign( fresnelCoe );
 
 						// output
-						const reflectColor = this.colorNode.uv( uvNode );
+						const reflectColor = this.colorNode.sample( uvNode );
 						output.assign( vec4( reflectColor.rgb, op ) );
 						Break();
 

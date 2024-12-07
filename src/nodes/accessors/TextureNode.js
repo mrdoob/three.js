@@ -315,7 +315,15 @@ class TextureNode extends UniformNode {
 
 	// @TODO: Move to TSL
 
-	uv( uvNode ) {
+	uv( uvNode ) { // @deprecated, r172
+
+		console.warn( 'THREE.TextureNode: .uv() has been renamed. Use .sample() instead.' );
+
+		return this.sample( uvNode );
+
+	}
+
+	sample( uvNode ) {
 
 		const textureNode = this.clone();
 		textureNode.uvNode = nodeObject( uvNode );

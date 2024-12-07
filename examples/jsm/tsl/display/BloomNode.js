@@ -268,7 +268,7 @@ class BloomNode extends TempNode {
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
 		const uvNode = uv();
-		const sampleTexel = ( uv ) => colorTexture.uv( uv );
+		const sampleTexel = ( uv ) => colorTexture.sample( uv );
 
 		const seperableBlurPass = Fn( () => {
 

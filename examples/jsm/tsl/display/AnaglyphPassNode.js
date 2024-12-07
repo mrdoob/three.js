@@ -38,8 +38,8 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		const anaglyph = Fn( () => {
 
-			const colorL = this._mapLeft.uv( uvNode );
-			const colorR = this._mapRight.uv( uvNode );
+			const colorL = this._mapLeft.sample( uvNode );
+			const colorR = this._mapRight.sample( uvNode );
 
 			const color = clamp( this._colorMatrixLeft.mul( colorL.rgb ).add( this._colorMatrixRight.mul( colorR.rgb ) ) );
 

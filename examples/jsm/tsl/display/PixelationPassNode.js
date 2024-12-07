@@ -52,11 +52,11 @@ class PixelationNode extends TempNode {
 		const uvNodeDepth = depthNode.uvNode || uv();
 		const uvNodeNormal = normalNode.uvNode || uv();
 
-		const sampleTexture = () => textureNode.uv( uvNodeTexture );
+		const sampleTexture = () => textureNode.sample( uvNodeTexture );
 
-		const sampleDepth = ( x, y ) => depthNode.uv( uvNodeDepth.add( vec2( x, y ).mul( this._resolution.zw ) ) ).r;
+		const sampleDepth = ( x, y ) => depthNode.sample( uvNodeDepth.add( vec2( x, y ).mul( this._resolution.zw ) ) ).r;
 
-		const sampleNormal = ( x, y ) => normalNode.uv( uvNodeNormal.add( vec2( x, y ).mul( this._resolution.zw ) ) ).rgb.normalize();
+		const sampleNormal = ( x, y ) => normalNode.sample( uvNodeNormal.add( vec2( x, y ).mul( this._resolution.zw ) ) ).rgb.normalize();
 
 		const depthEdgeIndicator = ( depth ) => {
 

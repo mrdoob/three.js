@@ -34,7 +34,7 @@ class TransitionNode extends TempNode {
 		const sampleTexture = ( textureNode ) => {
 
 			const uvNodeTexture = textureNode.uvNode || uv();
-			return textureNode.uv( uvNodeTexture );
+			return textureNode.sample( uvNodeTexture );
 
 		};
 

@@ -24,7 +24,7 @@ class Lut3DNode extends TempNode {
 
 		const { inputNode, lutNode } = this;
 
-		const sampleLut = ( uv ) => lutNode.uv( uv );
+		const sampleLut = ( uv ) => lutNode.sample( uv );
 
 		const lut3D = Fn( () => {
 

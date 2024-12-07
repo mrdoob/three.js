@@ -25,7 +25,7 @@ class RGBShiftNode extends TempNode {
 
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.sample( uv );
 
 		const rgbShift = Fn( () => {
 
