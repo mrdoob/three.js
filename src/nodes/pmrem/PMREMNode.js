@@ -191,6 +191,8 @@ class PMREMNode extends TempNode {
 
 		}
 
+		uvNode = vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
+
 		//
 
 		let levelNode = this.levelNode;
