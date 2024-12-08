@@ -78,7 +78,7 @@ const _faceLib = [
 ];
 
 const direction = getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
-const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
+const outputDirection = vec3( direction.x, direction.y, direction.z );
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
