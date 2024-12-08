@@ -52,6 +52,12 @@ class LightsNode extends Node {
 
 	}
 
+	/**
+	 * Overwrites the default `customCacheKey()` implementation by including the
+	 * light IDs into the cache key.
+	 *
+	 * @return {Number} The hash.
+	 */
 	customCacheKey() {
 
 		const lightIDs = [];

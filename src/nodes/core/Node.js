@@ -330,7 +330,7 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Generate a custom the cache key for this node.
+	 * Generate a custom cache key for this node.
 	 *
 	 * @return {Number} The cache key of the node.
 	 */

@@ -35,6 +35,12 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * Overwrites the default `customCacheKey()` implementation by including the
+	 * light.id and light.castShadow into the cache key.
+	 *
+	 * @return {Number} The hash.
+	 */
 	customCacheKey() {
 
 		return hash( this.light.id, this.light.castShadow ? 1 : 0 );

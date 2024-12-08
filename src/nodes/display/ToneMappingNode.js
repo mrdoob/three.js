@@ -55,7 +55,7 @@ class ToneMappingNode extends TempNode {
 	}
 
 	/**
-	 * Overwrites the default `generateCacheKey()` implementation by including the tone
+	 * Overwrites the default `customCacheKey()` implementation by including the tone
 	 * mapping type into the cache key.
 	 *
 	 * @return {Number} The hash.
