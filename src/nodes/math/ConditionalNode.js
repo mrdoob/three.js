@@ -2,6 +2,19 @@ import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/**
+ * Represents a logical `if/else` statement. Can be used as an alternative
+ * to the `If()`/`Else()` syntax.
+ *
+ * The corresponding TSL `select()` looks like so:
+ * ```js
+ * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+ * ```
+ * The `select()` method is called in a chaining fashion on a codition. The parameter nodes of `select()`
+ * determine the outcome of the entire statement.
+ *
+ * @augments Node
+ */
 class ConditionalNode extends Node {
 
 	static get type() {
@@ -10,17 +23,47 @@ class ConditionalNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new conditional node.
+	 *
+	 * @param {Node} condNode - The node that defines the condition.
+	 * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
+	 * @param {Node?} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
+	 */
 	constructor( condNode, ifNode, elseNode = null ) {
 
 		super();
 
+		/**
+		 * The node that defines the condition.
+		 *
+		 * @type {Node}
+		 */
 		this.condNode = condNode;
 
+		/**
+		 * The node that is evaluate when the condition ends up `true`.
+		 *
+		 * @type {Node}
+		 */
 		this.ifNode = ifNode;
+
+		/**
+		 * The node that is evaluate when the condition ends up `false`.
+		 *
+		 * @type {Node}
+		 */
 		this.elseNode = elseNode;
 
 	}
 
+	/**
+	 * This method is overwritten since the node type is inferred from the if/else
+	 * nodes.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder ) {
 
 		const ifType = this.ifNode.getNodeType( builder );

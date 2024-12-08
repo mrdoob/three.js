@@ -12,6 +12,13 @@ let _generator = null;
 
 const _cache = new WeakMap();
 
+/**
+ * Generates the cubeUV size based on the given image height.
+ *
+ * @private
+ * @param {Number} imageHeight - The image height.
+ * @return {{texelWidth: Number,texelHeight: Number, maxMip: Number}} The result object.
+ */
 function _generateCubeUVSize( imageHeight ) {
 
 	const maxMip = Math.log2( imageHeight ) - 2;
@@ -24,6 +31,13 @@ function _generateCubeUVSize( imageHeight ) {
 
 }
 
+/**
+ * Generates a PMREM from the given texture .
+ *
+ * @private
+ * @param {Texture} texture - The texture to create the PMREM for.
+ * @return {Texture} The PMREM.
+ */
 function _getPMREMFromTexture( texture ) {
 
 	let cacheTexture = _cache.get( texture );
@@ -71,6 +85,17 @@ function _getPMREMFromTexture( texture ) {
 
 }
 
+/**
+ * This node represents a PMREM which is a special type of preprocessed
+ * environment map intended for PBR materials.
+ *
+ * ```js
+ * const material = new MeshStandardNodeMaterial();
+ * material.envNode = pmremTexture( envMap );
+ * ```
+ *
+ * @augments TempNode
+ */
 class PMREMNode extends TempNode {
 
 	static get type() {
@@ -79,31 +104,107 @@ class PMREMNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new function overloading node.
+	 *
+	 * @param {Texture} texture - The input texture.
+	 * @param {Node<vec2>} [uvNode=null] - The uv node.
+	 * @param {Node<float>} [levelNode=null] - The level node.
+	 */
 	constructor( value, uvNode = null, levelNode = null ) {
 
 		super( 'vec3' );
 
+		/**
+		 * Reference to the input texture.
+		 *
+		 * @private
+		 * @type {Texture}
+		 */
 		this._value = value;
+
+		/**
+		 * Reference to the generated PMREM.
+		 *
+		 * @private
+		 * @type {Texture}
+		 * @default null
+		 */
 		this._pmrem = null;
 
+		/**
+		 *  The uv node.
+		 *
+		 * @type {Node<vec2>}
+		 */
 		this.uvNode = uvNode;
+
+		/**
+		 *  The level node.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.levelNode = levelNode;
 
+		/**
+		 * Reference to a PMREM generator.
+		 *
+		 * @private
+		 * @type {PMREMGenerator}
+		 * @default null
+		 */
 		this._generator = null;
 
 		const defaultTexture = new Texture();
 		defaultTexture.isRenderTargetTexture = true;
 
+		/**
+		 * The texture node holding the generated PMREM.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._texture = texture( defaultTexture );
 
+		/**
+		 * A uniform representing the PMREM's width.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
 		this._width = uniform( 0 );
+
+		/**
+		 * A uniform representing the PMREM's height.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
 		this._height = uniform( 0 );
+
+		/**
+		 * A uniform representing the PMREM's max Mip.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
 		this._maxMip = uniform( 0 );
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER`.
+		 *
+		 * @type {String}
+		 * @default 'render'
+		 */
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
+	/**
+	 * The node's texture value.
+	 *
+	 * @type {Texture}
+	 */
 	set value( value ) {
 
 		this._value = value;
@@ -117,6 +218,11 @@ class PMREMNode extends TempNode {
 
 	}
 
+	/**
+	 * Uses the given PMREM texture to update internal values.
+	 *
+	 * @param {Texture} texture - The PMREM texture.
+	 */
 	updateFromTexture( texture ) {
 
 		const cubeUVSize = _generateCubeUVSize( texture.image.height );
@@ -211,6 +317,13 @@ class PMREMNode extends TempNode {
 
 export default PMREMNode;
 
+/**
+ * Returns `true` if the given cube map image has been fully loaded.
+ *
+ * @private
+ * @param {Array<(Image|Object)>} image - The cube map image.
+ * @return {Boolean} Whether the given cube map is ready or not.
+ */
 function isCubeMapReady( image ) {
 
 	if ( image === null || image === undefined ) return false;
@@ -229,6 +342,13 @@ function isCubeMapReady( image ) {
 
 }
 
+/**
+ * Returns `true` if the given equirectangular image has been fully loaded.
+ *
+ * @private
+ * @param {(Image|Object)} image - The equirectangular image.
+ * @return {Boolean} Whether the given cube map is ready or not.
+ */
 function isEquirectangularMapReady( image ) {
 
 	if ( image === null || image === undefined ) return false;

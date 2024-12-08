@@ -7,8 +7,8 @@ import { Fn } from '../tsl/TSLCore.js';
  * Converts the given color value from sRGB to linear-sRGB color space.
  *
  * @method
- * @param {vec3} color - The sRGB color.
- * @return {vec3} The linear-sRGB color.
+ * @param {Node<vec3>} color - The sRGB color.
+ * @return {Node<vec3>} The linear-sRGB color.
  */
 export const sRGBTransferEOTF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
@@ -32,8 +32,8 @@ export const sRGBTransferEOTF = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * Converts the given color value from linear-sRGB to sRGB color space.
  *
  * @method
- * @param {vec3} color - The linear-sRGB color.
- * @return {vec3} The sRGB color.
+ * @param {Node<vec3>} color - The linear-sRGB color.
+ * @return {Node<vec3>} The sRGB color.
  */
 export const sRGBTransferOETF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
