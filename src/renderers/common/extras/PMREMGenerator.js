@@ -406,6 +406,7 @@ class PMREMGenerator {
 		cubeCamera.far = far;
 
 		// px, py, pz, nx, ny, nz
+		const upSign = [ 1, 1, 1, 1, - 1, 1 ];
 		const forwardSign = [ 1, - 1, 1, - 1, 1, - 1 ];
 
 		const renderer = this._renderer;
@@ -467,17 +468,17 @@ class PMREMGenerator {
 
 			if ( col === 0 ) {
 
-				cubeCamera.up.set( 0, 1, 0 );
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
 				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
 
 			} else if ( col === 1 ) {
 
-				cubeCamera.up.set( 0, - 1, 0 );
+				cubeCamera.up.set( 0, 0, upSign[ i ] );
 				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
 
 			} else {
 
-				cubeCamera.up.set( 0, 1, 0 );
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
 				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
