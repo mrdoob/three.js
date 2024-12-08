@@ -73,7 +73,28 @@ const wgslTypeLib = {
 
 	mat2: 'mat2x2<f32>',
 	mat3: 'mat3x3<f32>',
-	mat4: 'mat4x4<f32>'
+	mat4: 'mat4x4<f32>',
+
+	//because arrays with their two degrees of freedom are special
+	array( elementType, count ) {
+
+		const isValidType = ( type ) => !! this[ type ];
+
+		if ( ! isValidType( elementType ) ) {
+
+			throw new Error( `Unknown type: ${elementType}` );
+
+		}
+
+		if ( typeof count !== 'number' || ! Number.isInteger( count ) || count < 1 ) {
+
+			throw new Error( `Invalid size: ${count}. Size must be a positive integer` );
+
+		}
+
+		return `array<${this[ elementType ]}, ${count}>`;
+
+	}
 };
 
 const wgslCodeCache = {};
