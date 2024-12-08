@@ -452,8 +452,10 @@ class ShadowNode extends ShadowBaseNode {
 
 	renderShadow( frame ) {
 
-		const { shadow, shadowMap } = this;
+		const { shadow, shadowMap, light } = this;
 		const { renderer, scene } = frame;
+
+		shadow.updateMatrices( light );
 
 		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height );
 
