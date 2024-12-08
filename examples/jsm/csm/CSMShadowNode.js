@@ -75,6 +75,8 @@ class CSMShadowNode extends ShadowBaseNode {
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
 			const lwLight = new LwLight();
+			lwLight.castShadow = true;
+
 			const lShadow = light.shadow.clone();
 			lShadow.bias = lShadow.bias * ( i + 1 );
 

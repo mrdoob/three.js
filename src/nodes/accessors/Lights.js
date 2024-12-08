@@ -24,7 +24,11 @@ export function lightShadowMatrix( light ) {
 
 	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => {
 
-		light.shadow.updateMatrices( light );
+		if ( light.castShadow !== true ) {
+
+			light.shadow.updateMatrices( light );
+
+		}
 
 		return light.shadow.matrix;
 
