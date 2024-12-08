@@ -55,14 +55,14 @@ class ToneMappingNode extends TempNode {
 	}
 
 	/**
-	 * Overwrites the default `getCacheKey()` implementation by including the tone
+	 * Overwrites the default `generateCacheKey()` implementation by including the tone
 	 * mapping type into the cache key.
 	 *
 	 * @return {Number} The hash.
 	 */
-	getCacheKey() {
+	customCacheKey() {
 
-		return hash( super.getCacheKey(), this.toneMapping );
+		return hash( this.toneMapping );
 
 	}
 

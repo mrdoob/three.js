@@ -52,26 +52,17 @@ class LightsNode extends Node {
 
 	}
 
-	getCacheKey( force ) {
+	customCacheKey() {
 
-		force = force || this.version !== this._cacheKeyVersion;
+		const lightIDs = [];
 
-		if ( force === true || this._cacheKey === null ) {
+		for ( let i = 0; i < lights.length; i ++ ) {
 
-			const lightIDs = [];
-
-			for ( let i = 0; i < this._lights.length; i ++ ) {
-
-				lightIDs.push( this._lights[ i ].id );
-
-			}
-
-			this._cacheKey = hashArray( lightIDs );
-			this._cacheKeyVersion = this.version;
+			lightIDs.push( lights[ i ].id );
 
 		}
 
-		return this._cacheKey;
+		return hashArray( lightIDs );
 
 	}
 

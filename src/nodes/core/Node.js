@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodeChildren, getCacheKey } from './NodeUtils.js';
+import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
@@ -320,12 +320,23 @@ class Node extends EventDispatcher {
 
 		if ( force === true || this._cacheKey === null ) {
 
-			this._cacheKey = getCacheKey( this, force );
+			this._cacheKey = hash( getCacheKey( this, force ), this.customCacheKey() );
 			this._cacheKeyVersion = this.version;
 
 		}
 
 		return this._cacheKey;
+
+	}
+
+	/**
+	 * Generate a custom the cache key for this node.
+	 *
+	 * @return {Number} The cache key of the node.
+	 */
+	customCacheKey() {
+
+		return 0;
 
 	}
 
