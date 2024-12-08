@@ -11,8 +11,8 @@ import { LinearSRGBColorSpace } from '../../constants.js';
  * Computes a grayscale value for the given RGB color value.
  *
  * @method
- * @param {vec3} color - The color value to compute the grayscale for.
- * @return {vec3} The grayscale color.
+ * @param {Node<vec3>} color - The color value to compute the grayscale for.
+ * @return {Node<vec3>} The grayscale color.
  */
 export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
@@ -24,9 +24,9 @@ export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * Super-saturates or desaturates the given RGB color.
  *
  * @method
- * @param {vec3} color - The input color.
- * @param {float} [adjustment=1] - Specifies the amount of the conversion. A value under `1` desaturates the color, a value over `1` super-saturates it.
- * @return {vec3} The saturated color.
+ * @param {Node<vec3>} color - The input color.
+ * @param {Node<float>} [adjustment=1] - Specifies the amount of the conversion. A value under `1` desaturates the color, a value over `1` super-saturates it.
+ * @return {Node<vec3>} The saturated color.
  */
 export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
@@ -40,9 +40,9 @@ export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ]
  * compared to {@link ColorAdjustment#saturation}.
  *
  * @method
- * @param {vec3} color - The input color.
- * @param {float} [adjustment=1] - Controls the intensity of the vibrance effect.
- * @return {vec3} The updated color.
+ * @param {Node<vec3>} color - The input color.
+ * @param {Node<float>} [adjustment=1] - Controls the intensity of the vibrance effect.
+ * @return {Node<vec3>} The updated color.
  */
 export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
@@ -59,9 +59,9 @@ export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] )
  * Updates the hue component of the given RGB color while preserving its luminance and saturation.
  *
  * @method
- * @param {vec3} color - The input color.
- * @param {float} [adjustment=1] - Defines the degree of hue rotation in radians. A positive value rotates the hue clockwise, while a negative value rotates it counterclockwise.
- * @return {vec3} The updated color.
+ * @param {Node<vec3>} color - The input color.
+ * @param {Node<float>} [adjustment=1] - Defines the degree of hue rotation in radians. A positive value rotates the hue clockwise, while a negative value rotates it counterclockwise.
+ * @return {Node<vec3>} The updated color.
  */
 export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
@@ -77,9 +77,9 @@ export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
  * Computes the luminance for the given RGB color value.
  *
  * @method
- * @param {vec3} color - The color value to compute the luminance for.
- * @param {vec3?} luminanceCoefficients - The luminance coefficients. By default predefined values of the current working color space are used.
- * @return {vec3} The luminance.
+ * @param {Node<vec3>} color - The color value to compute the luminance for.
+ * @param {Node<vec3>?} luminanceCoefficients - The luminance coefficients. By default predefined values of the current working color space are used.
+ * @return {Node<vec3>} The luminance.
  */
 export const luminance = (
 	color,
@@ -94,13 +94,13 @@ export const luminance = (
  * or AgX Log), and will return output in the same space. Output may require clamping >=0.
  *
  * @method
- * @param {vec4} color Input (-Infinity < input < +Infinity)
- * @param {number | vec3} slope Slope (0 ≤ slope < +Infinity)
- * @param {number | vec3} offset Offset (-Infinity < offset < +Infinity; typically -1 < offset < 1)
- * @param {number | vec3} power Power (0 < power < +Infinity)
- * @param {number} saturation Saturation (0 ≤ saturation < +Infinity; typically 0 ≤ saturation < 4)
- * @param {vec3} luminanceCoefficients Luminance coefficients for saturation term, typically Rec. 709
- * @return Output, -Infinity < output < +Infinity
+ * @param {Node<vec4>} color Input (-Infinity < input < +Infinity)
+ * @param {Node<vec3>} slope Slope (0 ≤ slope < +Infinity)
+ * @param {Node<vec3>} offset Offset (-Infinity < offset < +Infinity; typically -1 < offset < 1)
+ * @param {Node<vec3>} power Power (0 < power < +Infinity)
+ * @param {Node<float>} saturation Saturation (0 ≤ saturation < +Infinity; typically 0 ≤ saturation < 4)
+ * @param {Node<vec3>} luminanceCoefficients Luminance coefficients for saturation term, typically Rec. 709
+ * @return {Node<vec4>} Output, -Infinity < output < +Infinity
  *
  * References:
  * - ASC CDL v1.2
