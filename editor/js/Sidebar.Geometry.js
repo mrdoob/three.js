@@ -300,7 +300,7 @@ function SidebarGeometry( editor ) {
 
 			const helper = editor.helpers[ object.id ];
 
-			if ( helper !== undefined ) {
+			if ( helper !== undefined && helper.isVertexNormalsHelper === true ) {
 
 				editor.removeHelper( object );
 				editor.addHelper( object, new VertexNormalsHelper( object ) );
