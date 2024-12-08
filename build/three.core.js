@@ -2110,6 +2110,7 @@ class Texture extends EventDispatcher {
 		this.version = 0;
 		this.onUpdate = null;
 
+		this.renderTarget = null; // assign texture to a render target
 		this.isRenderTargetTexture = false; // indicates whether a texture belongs to a render target or not
 		this.pmremVersion = 0; // indicates whether this texture should be processed by PMREMGenerator or not (only relevant for render target textures)
 
@@ -2174,6 +2175,9 @@ class Texture extends EventDispatcher {
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
 		this.colorSpace = source.colorSpace;
+
+		this.renderTarget = source.renderTarget;
+		this.isRenderTargetTexture = source.isRenderTargetTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -3075,6 +3079,7 @@ class RenderTarget extends EventDispatcher {
 
 			this.textures[ i ] = texture.clone();
 			this.textures[ i ].isRenderTargetTexture = true;
+			this.textures[ i ].renderTarget = this;
 
 		}
 
@@ -3084,6 +3089,7 @@ class RenderTarget extends EventDispatcher {
 		this.resolveDepthBuffer = options.resolveDepthBuffer;
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
+		this._depthTexture = null;
 		this.depthTexture = options.depthTexture;
 
 		this.samples = options.samples;
@@ -3099,6 +3105,21 @@ class RenderTarget extends EventDispatcher {
 	set texture( value ) {
 
 		this.textures[ 0 ] = value;
+
+	}
+
+	set depthTexture( current ) {
+
+		if ( this._depthTexture !== null ) this._depthTexture.renderTarget = null;
+		if ( current !== null ) current.renderTarget = this;
+
+		this._depthTexture = current;
+
+	}
+
+	get depthTexture() {
+
+		return this._depthTexture;
 
 	}
 
@@ -3150,6 +3171,7 @@ class RenderTarget extends EventDispatcher {
 
 			this.textures[ i ] = source.textures[ i ].clone();
 			this.textures[ i ].isRenderTargetTexture = true;
+			this.textures[ i ].renderTarget = this;
 
 		}
 
@@ -32357,11 +32379,11 @@ class PropertyBinding {
 
 		this.targetObject = targetObject;
 
-		if ( targetObject.needsUpdate !== undefined ) { // material
+		if ( targetObject.isMaterial === true ) {
 
 			versioning = this.Versioning.NeedsUpdate;
 
-		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+		} else if ( targetObject.isObject3D === true ) {
 
 			versioning = this.Versioning.MatrixWorldNeedsUpdate;
 
