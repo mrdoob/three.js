@@ -267,7 +267,7 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * Weak map for managing render targets.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Camera, RenderTarget>}
 		 */
 		this.renderTargets = new WeakMap();
 
@@ -299,7 +299,7 @@ class ReflectorBaseNode extends Node {
 	}
 
 	/**
-	 * Returns a virtual camera for the given camera. The virutal camera is used to
+	 * Returns a virtual camera for the given camera. The virtual camera is used to
 	 * render the scene from the reflector's view so correct reflections can be produced.
 	 *
 	 * @param {Camera} camera - The scene's camera.
