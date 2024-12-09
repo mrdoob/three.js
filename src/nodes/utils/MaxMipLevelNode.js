@@ -23,7 +23,7 @@ class MaxMipLevelNode extends UniformNode {
 	/**
 	 * Constructs a new max mip level node.
 	 *
-	 * @param {TextureNode} node - The texture node to compute the max mip level for.
+	 * @param {TextureNode} textureNode - The texture node to compute the max mip level for.
 	 */
 	constructor( textureNode ) {
 

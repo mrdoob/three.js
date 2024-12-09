@@ -797,7 +797,7 @@ class NodeBuilder {
 	 * resolved to `textureSize` in GLSL.
 	 *
 	 * @abstract
-	 * @param {String} name - The method name to resolve.
+	 * @param {String} method - The method name to resolve.
 	 * @return {String} The resolved method name.
 	 */
 	getMethod( method ) {
@@ -896,7 +896,7 @@ class NodeBuilder {
 	/**
 	 * Returns a cache for the given node.
 	 *
-	 * @param {Node} Node - The node.
+	 * @param {Node} node - The node.
 	 * @param {Boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
 	 * @return {NodeCache} The cache.
 	 */
@@ -999,7 +999,7 @@ class NodeBuilder {
 	/**
 	 * Calling this method increases the usage count for the given node by one.
 	 *
-	 * @param {Node} Node - The node to increase the usage count for.
+	 * @param {Node} node - The node to increase the usage count for.
 	 * @return {Number} The updated usage count.
 	 */
 	increaseUsage( node ) {
@@ -1319,7 +1319,7 @@ class NodeBuilder {
 	/**
 	 * Returns the type for a given typed array.
 	 *
-	 * @param {TypedArray} type - The typed array.
+	 * @param {TypedArray} array - The typed array.
 	 * @return {String} The type.
 	 */
 	getTypeFromArray( array ) {
@@ -1871,7 +1871,7 @@ class NodeBuilder {
 	/**
 	 * Generates a code flow based on a TSL function: Fn().
 	 *
-	 * @param {ShaderNodeInternal} node - A function code will be generated based on the input.
+	 * @param {ShaderNodeInternal} shaderNode - A function code will be generated based on the input.
 	 * @return {Object}
 	 */
 	flowShaderNode( shaderNode ) {

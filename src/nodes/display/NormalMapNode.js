@@ -57,7 +57,7 @@ class NormalMapNode extends TempNode {
 	/**
 	 * Constructs a new normal map node.
 	 *
-	 * @param {Node} textureNode - Represents the normal map data.
+	 * @param {Node} node - Represents the normal map data.
 	 * @param {Node?} [scaleNode=null] - Controls the intensity of the effect.
 	 */
 	constructor( node, scaleNode = null ) {

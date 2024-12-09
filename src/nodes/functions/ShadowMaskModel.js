@@ -39,7 +39,7 @@ class ShadowMaskModel extends LightingModel {
 	/**
 	 * Uses the shadow mask to produce the final color.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 */
 	finish( context ) {
 

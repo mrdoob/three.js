@@ -15,7 +15,7 @@ export const directionToColor = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0
  * Unpacks a color value into a direction vector.
  *
  * @method
- * @param {Node<vec3>} color - The color to unpack.
+ * @param {Node<vec3>} node - The color to unpack.
  * @return {Node<vec3>} The direction.
  */
 export const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );

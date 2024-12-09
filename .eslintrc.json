@@ -63,6 +63,16 @@
     ],
     "no-duplicate-imports": [
       "error"
+    ],
+    "valid-jsdoc": [
+      "error",
+      {
+        "requireReturn": false,
+        "requireReturnType": true,
+        "requireParamDescription": false,
+        "requireReturnDescription": false,
+        "requireParamType": true
+      }
     ]
   }
 }

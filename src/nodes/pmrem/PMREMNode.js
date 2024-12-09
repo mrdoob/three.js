@@ -107,7 +107,7 @@ class PMREMNode extends TempNode {
 	/**
 	 * Constructs a new function overloading node.
 	 *
-	 * @param {Texture} texture - The input texture.
+	 * @param {Texture} value - The input texture.
 	 * @param {Node<vec2>} [uvNode=null] - The uv node.
 	 * @param {Node<float>} [levelNode=null] - The level node.
 	 */
@@ -203,6 +203,7 @@ class PMREMNode extends TempNode {
 	/**
 	 * The node's texture value.
 	 *
+	 * @param {Texture} value
 	 * @type {Texture}
 	 */
 	set value( value ) {

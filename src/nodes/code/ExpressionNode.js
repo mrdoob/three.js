@@ -19,7 +19,7 @@ class ExpressionNode extends Node {
 	 * Constructs a new expression node.
 	 *
 	 * @param {String} [snippet=''] - The native code snippet.
-	 * @param {String} [includes='void'] - The node type.
+	 * @param {String} [nodeType='void'] - The node type.
 	 */
 	constructor( snippet = '', nodeType = 'void' ) {
 
