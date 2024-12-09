@@ -200,12 +200,6 @@ class PMREMNode extends TempNode {
 
 	}
 
-	/**
-	 * The node's texture value.
-	 *
-	 * @param {Texture} value
-	 * @type {Texture}
-	 */
 	set value( value ) {
 
 		this._value = value;
@@ -213,6 +207,11 @@ class PMREMNode extends TempNode {
 
 	}
 
+	/**
+	 * The node's texture value.
+	 *
+	 * @type {Texture}
+	 */
 	get value() {
 
 		return this._value;
