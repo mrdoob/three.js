@@ -7,6 +7,11 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { lightViewPosition, lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
 import { texture } from '../accessors/TextureNode.js';
 
+/**
+ * Module for representing spot lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
 class SpotLightNode extends AnalyticLightNode {
 
 	static get type() {
@@ -15,18 +20,50 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
+	/**
+	 * Constructs a new spot light node.
+	 *
+	 * @param {SpotLight?} [light=null] - The spot light source.
+	 */
 	constructor( light = null ) {
 
 		super( light );
 
+		/**
+		 * Uniform node representing the cone cosinus.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.coneCosNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the penumbra cosinus.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.penumbraCosNode = uniform( 0 ).setGroup( renderGroup );
 
+		/**
+		 * Uniform node representing the cutoff distance.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the decay exponent.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
 
 	}
 
+	/**
+	 * Overwritten to updated spot light specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( frame ) {
 
 		super.update( frame );
@@ -41,6 +78,12 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
+	/**
+	 * Computes the spot attenuation for the given angle.
+	 *
+	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @return {Node<float>} The spot attenuation.
+	 */
 	getSpotAttenuation( angleCosine ) {
 
 		const { coneCosNode, penumbraCosNode } = this;

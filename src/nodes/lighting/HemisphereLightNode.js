@@ -7,6 +7,11 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 
 import { Color } from '../../math/Color.js';
 
+/**
+ * Module for representing hemisphere lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
 class HemisphereLightNode extends AnalyticLightNode {
 
 	static get type() {
@@ -15,17 +20,43 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 	}
 
+	/**
+	 * Constructs a new hemisphere light node.
+	 *
+	 * @param {HemisphereLight?} [light=null] - The hemisphere light source.
+	 */
 	constructor( light = null ) {
 
 		super( light );
 
+		/**
+		 * Uniform node representing the light's position.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.lightPositionNode = lightPosition( light );
+
+		/**
+		 * A node representing the light's direction.
+		 *
+		 * @type {Node<vec3>}
+		 */
 		this.lightDirectionNode = this.lightPositionNode.normalize();
 
+		/**
+		 * Uniform node representing the light's ground color.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.groundColorNode = uniform( new Color() ).setGroup( renderGroup );
 
 	}
 
+	/**
+	 * Overwritten to updated hemisphere light specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( frame ) {
 
 		const { light } = this;
