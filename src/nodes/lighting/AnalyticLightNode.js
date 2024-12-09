@@ -7,6 +7,11 @@ import { hash } from '../core/NodeUtils.js';
 import { shadow } from './ShadowNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
+/**
+ * Base class for analytic light nodes.
+ *
+ * @augments LightingNode
+ */
 class AnalyticLightNode extends LightingNode {
 
 	static get type() {
@@ -15,31 +20,85 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * Constructs a new analytic light node.
+	 *
+	 * @param {Light?} [light=null] - The light source.
+	 */
 	constructor( light = null ) {
 
 		super();
 
+		/**
+		 * The light source.
+		 *
+		 * @type {Light}
+		 * @default null
+		 */
 		this.light = light;
 
+		/**
+		 * The light's color value.
+		 *
+		 * @type {Color}
+		 */
 		this.color = new Color();
+
+		/**
+		 * The light's color node. Points to `colorNode` of the light source, if set. Otherwise
+		 * it creates a uniform node based on {@link AnalyticLightNode#color}.
+		 *
+		 * @type {Node}
+		 */
 		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
 
+		/**
+		 * This property is used to retain a reference to the original value of {@link AnalyticLightNode#colorNode}.
+		 * The final color node is represented by a differnt node when using shadows.
+		 *
+		 * @type {Node}
+		 */
 		this.baseColorNode = null;
 
+		/**
+		 * Represents the light's shadow.
+		 *
+		 * @type {ShadowNode}
+		 */
 		this.shadowNode = null;
+
+		/**
+		 * Represents the light's shadow color.
+		 *
+		 * @type {Node}
+		 */
 		this.shadowColorNode = null;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isAnalyticLightNode = true;
 
+		/**
+		 * Overwritten since analytic light nodes are updated
+		 * once per frame.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
 	/**
-	 * Overwrites the default `customCacheKey()` implementation by including the
-	 * light.id and light.castShadow into the cache key.
+	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
+	 * `light.id` and `light.castShadow` into the cache key.
 	 *
-	 * @return {Number} The hash.
+	 * @return {Number} The custom cache key.
 	 */
 	customCacheKey() {
 
@@ -53,12 +112,24 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * Setups the shadow node for this light. The method exists so concrete light classes
+	 * can setup different types of shadow nodes.
+	 *
+	 * @return {ShadowNode} The created shadow node.
+	 */
 	setupShadowNode() {
 
 		return shadow( this.light );
 
 	}
 
+	/**
+	 * Setups the shadow for this light. This method is only executed if the light
+	 * cast shadows and the current build object receives shadows.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupShadow( builder ) {
 
 		const { renderer } = builder;
@@ -97,6 +168,13 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * Unlike most other nodes, lighting nodes do not return a output node in {@link Node#setup}.
+	 * The main purpose of lighting nodes is to configure the current {@link LightingModel} and/or
+	 * invocate the respecitve interface methods.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
 		this.colorNode = this.baseColorNode || this.colorNode;
@@ -119,6 +197,13 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * The update method is used to update light uniforms per frame.
+	 * Potentially overwritten in concrete light nodes to update light
+	 * specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( /*frame*/ ) {
 
 		const { light } = this;

@@ -2,6 +2,11 @@ import SpotLightNode from './SpotLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { vec2 } from '../tsl/TSLBase.js';
 
+/**
+ * An IES version of the default spot light node.
+ *
+ * @augments SpotLightNode
+ */
 class IESSpotLightNode extends SpotLightNode {
 
 	static get type() {
@@ -10,6 +15,12 @@ class IESSpotLightNode extends SpotLightNode {
 
 	}
 
+	/**
+	 * Overwrites the default implementation to compute an IES conform spot attenuation.
+	 *
+	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @return {Node<float>} The spot attenuation.
+	 */
 	getSpotAttenuation( angleCosine ) {
 
 		const iesMap = this.light.iesMap;
