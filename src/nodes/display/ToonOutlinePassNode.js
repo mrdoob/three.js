@@ -68,7 +68,7 @@ class ToonOutlinePassNode extends PassNode {
 		 * An internal material cache.
 		 *
 		 * @private
-		 * @type {WeakMap}
+		 * @type {WeakMap<Material, NodeMaterial>}
 		 */
 		this._materialCache = new WeakMap();
 

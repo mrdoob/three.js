@@ -127,7 +127,7 @@ class PMREMNode extends TempNode {
 		 * Reference to the generated PMREM.
 		 *
 		 * @private
-		 * @type {Texture}
+		 * @type {Texture | null}
 		 * @default null
 		 */
 		this._pmrem = null;

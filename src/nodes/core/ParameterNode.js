@@ -51,4 +51,10 @@ class ParameterNode extends PropertyNode {
 
 export default ParameterNode;
 
+/**
+ *
+ * @param {string} type
+ * @param {string?} [name=null]
+ * @returns {ShaderNodeObject}
+ */
 export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
