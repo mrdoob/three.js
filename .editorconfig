@@ -1,5 +1,3 @@
-# http://editorconfig.org
-
 root = true
 
 [*]
@@ -12,3 +10,4 @@ indent_style = tab
 
 [*.{js,ts}]
 trim_trailing_whitespace = true
+
