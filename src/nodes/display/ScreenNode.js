@@ -93,7 +93,6 @@ class ScreenNode extends Node {
 	 * from the current renderer.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	update( { renderer } ) {
 

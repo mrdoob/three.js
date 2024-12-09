@@ -23,7 +23,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 	/**
 	 * Constructs storage buffer element node.
 	 *
-	 * @param {StorageBufferNode} node - The storage buffer node.
+	 * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( storageBufferNode, indexNode ) {
@@ -44,6 +44,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 	/**
 	 * The storage buffer node.
 	 *
+	 * @param {Node} value
 	 * @type {StorageBufferNode}
 	 */
 	set storageBufferNode( value ) {

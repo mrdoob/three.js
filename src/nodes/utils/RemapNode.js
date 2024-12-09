@@ -21,7 +21,7 @@ class RemapNode extends Node {
 	 *
 	 * @param {Node} node - The node that should be remapped.
 	 * @param {Node} inLowNode - The source or current lower bound of the range.
-	 * @param {Node} inLowNode - The source or current upper bound of the range.
+	 * @param {Node} inHighNode - The source or current upper bound of the range.
 	 * @param {Node} [outLowNode=float(0)] - The target lower bound of the range.
 	 * @param {Node} [outHighNode=float(1)] - The target upper bound of the range.
 	 */

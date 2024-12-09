@@ -473,7 +473,7 @@ class PhysicalLightingModel extends LightingModel {
 	 * Depending on what features are requested, the method prepares certain node variables
 	 * which are later used for lighting computations.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 */
 	start( context ) {
 
@@ -641,7 +641,7 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
@@ -758,7 +758,7 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Used for final lighting accumulations depending on the requested features.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

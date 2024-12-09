@@ -42,7 +42,7 @@ class SplitNode extends Node {
 		/**
 		 * The components that should be accessed.
 		 *
-		 * @type {Node}
+		 * @type {string}
 		 */
 		this.components = components;
 
