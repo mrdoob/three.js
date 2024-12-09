@@ -47,7 +47,7 @@
     "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
-    "build-docs": "jsdoc src/nodes -c utils/docs/jsdoc.config.json",
+    "build-docs": "jsdoc -c jsdoc.config.json",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "dev-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
     "lint-core": "eslint src",
