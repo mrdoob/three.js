@@ -53,7 +53,6 @@ const getShadowMaterial = ( light ) => {
 		material.colorNode = vec4( 0, 0, 0, 1 );
 		material.depthNode = depthNode;
 		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
-		material.blending = NoBlending;
 		material.name = 'ShadowMaterial';
 
 		shadowMaterialLib.set( light, material );

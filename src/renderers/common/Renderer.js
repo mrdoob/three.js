@@ -1655,6 +1655,7 @@ class Renderer {
 
 			overrideMaterial.alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
+			overrideMaterial.transparent = material.transparent || material.transmission > 0;
 
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
