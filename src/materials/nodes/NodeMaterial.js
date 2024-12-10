@@ -110,6 +110,8 @@ class NodeMaterial extends Material {
 
 		builder.stack.outputNode = this.vertexNode || this.setupPosition( builder );
 
+		this.setupHardwareClipping( builder );
+
 		if ( this.geometryNode !== null ) {
 
 			builder.stack.outputNode = builder.stack.outputNode.bypass( this.geometryNode );
@@ -353,8 +355,6 @@ class NodeMaterial extends Material {
 			positionLocal.assign( this.positionNode );
 
 		}
-
-		this.setupHardwareClipping( builder );
 
 		const mvp = modelViewProjection();
 
