@@ -1,46 +1,20 @@
 /* global QUnit */
 
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
-
-import { Light } from '../../../../src/lights/Light.js';
-import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'DirectionalLight', ( hooks ) => {
-
-		let lights = undefined;
-		hooks.beforeEach( function () {
-
-			const parameters = {
-				color: 0xaaaaaa,
-				intensity: 0.8
-			};
-
-			lights = [
-				new DirectionalLight(),
-				new DirectionalLight( parameters.color ),
-				new DirectionalLight( parameters.color, parameters.intensity )
-			];
-
-		} );
+	QUnit.module( 'DirectionalLight', () => {
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
 			const object = new DirectionalLight();
 			assert.strictEqual(
-				object instanceof Light, true,
-				'DirectionalLight extends from Light'
+				object instanceof Object3D, true,
+				'DirectionalLight extends from Object3D'
 			);
-
-		} );
-
-		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
-
-			const object = new DirectionalLight();
-			assert.ok( object, 'Can instantiate a DirectionalLight.' );
 
 		} );
 
@@ -55,56 +29,49 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'position', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'colorContribution', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'target', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'shadow', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.test( 'isDirectionalLight', ( assert ) => {
-
-			const object = new DirectionalLight();
+			const light = new DirectionalLight();
 			assert.ok(
-				object.isDirectionalLight,
-				'DirectionalLight.isDirectionalLight should be true'
+				light.colorContribution === true,
+				'DirectionalLight.colorContribution should be true by default'
+			);
+
+			light.colorContribution = false;
+			assert.ok(
+				light.colorContribution === false,
+				'DirectionalLight.colorContribution can be set to false'
 			);
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		// COPY
+		QUnit.test( 'copy', ( assert ) => {
 
-			assert.expect( 0 );
+			const a = new DirectionalLight( 0xaaaaaa, 0.5 );
+			a.colorContribution = false;
+			const b = new DirectionalLight();
+			b.copy( a );
 
-			const object = new DirectionalLight();
-			object.dispose();
-
-			// ensure calls dispose() on shadow
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok(
+				b.colorContribution === false,
+				'DirectionalLight.colorContribution is copied'
+			);
 
 		} );
 
-		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		// JSON
+		QUnit.test( 'toJSON', ( assert ) => {
 
-			runStdLightTests( assert, lights );
+			const light = new DirectionalLight( 0xaaaaaa, 0.5 );
+			light.colorContribution = false;
+			const json = light.toJSON();
+
+			assert.ok(
+				json.object.colorContribution === false,
+				'DirectionalLight.colorContribution is included in JSON'
+			);
 
 		} );
 
