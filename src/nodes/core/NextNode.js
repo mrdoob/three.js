@@ -1,8 +1,15 @@
 import Node from './Node.js';
-import { addMethodChaining, nodeObject, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
- * Class for representing a uniform.
+ * Adds the Node to the event list but does not generate the code, useful for PostProcessing.
+ * It will execute the events of the first node and then the events of the next node.
+ *
+ * ```js
+ * const depthPassNode = depthPass( scene, camera );
+ *
+ * postProcessing.outputNode = depthPassNode.next( myFunction() );
+ *```
  *
  * @augments Node
  */
@@ -14,20 +21,20 @@ class NextNode extends Node {
 
 	}
 
-	constructor( parentNode, nextNode ) {
+	constructor( firstNode, nextNode ) {
 
 		super( 'void' );
 
 		this.isUniformNode = true;
 
-		this.parentNode = parentNode;
+		this.firstNode = firstNode;
 		this.nextNode = nextNode;
 
 	}
 
 	setup( builder ) {
 
-		this.parentNode.build( builder );
+		this.firstNode.build( builder );
 
 		return this.nextNode;
 
