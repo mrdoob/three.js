@@ -2,6 +2,8 @@ import { positionView } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 
+/** @module Fog **/
+
 /**
  * Returns a node that represents the `z` coordinate in view space
  * for the current fragment. It's a different representation of the
@@ -75,7 +77,7 @@ export const fog = Fn( ( [ color, factor ] ) => {
 
 export function rangeFog( color, near, far ) { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFog( near, far ) )" instead.' );
+	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
 	return fog( color, rangeFogFactor( near, far ) );
 
 }

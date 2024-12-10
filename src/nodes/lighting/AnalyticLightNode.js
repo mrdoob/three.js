@@ -126,7 +126,8 @@ class AnalyticLightNode extends LightingNode {
 
 	/**
 	 * Setups the shadow for this light. This method is only executed if the light
-	 * cast shadows and the current build object receives shadows.
+	 * cast shadows and the current build object receives shadows. It incorporates
+	 * shadows into the lighting computation.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
