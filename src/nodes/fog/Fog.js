@@ -1,6 +1,6 @@
 import { positionView } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
-import { Fn, vec4 } from '../tsl/TSLBase.js';
+import { Fn, output, vec4 } from '../tsl/TSLBase.js';
 
 /** @module Fog **/
 
@@ -69,7 +69,7 @@ export const densityFogFactor = Fn( ( [ density ], builder ) => {
  */
 export const fog = Fn( ( [ color, factor ] ) => {
 
-	return vec4( color.toVec3(), factor.toFloat() );
+	return vec4( factor.toFloat().mix( output.rgb, color.toVec3() ), output.a );
 
 } );
 
