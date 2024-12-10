@@ -51,7 +51,9 @@ const _center = {
 
 };
 
-//transformation matrices for gizmos and camera
+/** Transformation matrices for gizmos and camera
+ * @type {{ camera: Matrix4 | null, gizmos: Matrix4 | null }}
+*/
 const _transformation = {
 
 	camera: new Matrix4(),
@@ -70,14 +72,16 @@ const _offset = new Vector3();
 const _gizmoMatrixStateTemp = new Matrix4();
 const _cameraMatrixStateTemp = new Matrix4();
 const _scalePointTemp = new Vector3();
-/**
- *
- * @param {Camera} camera Virtual camera used in the scene
- * @param {HTMLElement} domElement Renderer's dom element
- * @param {Scene} scene The scene to be rendered
- */
+
+
 class ArcballControls extends Controls {
 
+	/**
+	 *
+	 * @param {Camera} camera Virtual camera used in the scene
+	 * @param {HTMLElement} [domElement=null] Renderer's dom element
+	 * @param {Scene} [scene=null] The scene to be rendered
+	 */
 	constructor( camera, domElement = null, scene = null ) {
 
 		super( camera, domElement );
@@ -1204,8 +1208,8 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Return the operation associated to a mouse/keyboard combination
-	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
-	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
+	 * @param {0|1|2} mouse
+	 * @param {'CTRL'|'SHIFT'|null} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns {string|null} The operation if it has been found, null otherwise
 	 */
 	getOpFromAction( mouse, key ) {
@@ -1244,8 +1248,8 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
-	 * @param {Number} mouse Mouse button
-	 * @param {String} key Keyboard modifier
+	 * @param {0|1|2|'WHEEL'} mouse Mouse button
+	 * @param {'CTRL'|'SHIFT'|null} key Keyboard modifier
 	 * @returns {STATE|null} The FSA state obtained from the operation associated to mouse/keyboard combination
 	 */
 	getOpStateFromAction( mouse, key ) {
@@ -2240,8 +2244,8 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Set values in transformation object
-	 * @param {Matrix4} camera Transformation to be applied to the camera
-	 * @param {Matrix4} gizmos Transformation to be applied to gizmos
+	 * @param {Matrix4} [camera=null] Transformation to be applied to the camera
+	 * @param {Matrix4} [gizmos=null] Transformation to be applied to gizmos
 	 */
 	setTransformationMatrices( camera = null, gizmos = null ) {
 
@@ -2320,9 +2324,10 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Unproject the cursor on the 3D object surface
+	 *
 	 * @param {Vector2} cursor Cursor coordinates in NDC
 	 * @param {Camera} camera Virtual camera
-	 * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
+	 * @returns {Vector3|null} The point of intersection with the model, if exist, null otherwise
 	 */
 	unprojectOnObj( cursor, camera ) {
 

@@ -533,7 +533,7 @@ class SVGRenderer {
 
 		function getPathNode( id ) {
 
-			if ( _svgPathPool[ id ] === null ) {
+			if ( _svgPathPool[ id ] === null || _svgPathPool[ id ] === undefined ) {
 
 				_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 

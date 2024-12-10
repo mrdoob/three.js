@@ -64,7 +64,7 @@ class EdgeSplitModifier {
 
 				const index = indexes[ i ];
 
-				if ( pointToIndexMap[ index ] === null ) {
+				if ( pointToIndexMap[ index ] === null || pointToIndexMap[ index ] === undefined ) {
 
 					pointToIndexMap[ index ] = [];
 
