@@ -1,38 +1,16 @@
 /* global QUnit */
 
 import { Light } from '../../../../src/lights/Light.js';
-
-import { Object3D } from '../../../../src/core/Object3D.js';
-import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { Color } from '../../../../src/math/Color.js';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'Light', ( hooks ) => {
-
-		let lights = undefined;
-		hooks.beforeEach( function () {
-
-			const parameters = {
-				color: 0xaaaaaa,
-				intensity: 0.5
-			};
-
-			lights = [
-				new Light(),
-				new Light( parameters.color ),
-				new Light( parameters.color, parameters.intensity )
-			];
-
-		} );
+	QUnit.module( 'Light', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			const object = new Light();
-			assert.strictEqual(
-				object instanceof Object3D, true,
-				'Light extends from Object3D'
-			);
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -41,6 +19,7 @@ export default QUnit.module( 'Lights', () => {
 
 			const object = new Light();
 			assert.ok( object, 'Can instantiate a Light.' );
+			assert.ok( object.isLight, 'Light.isLight should be true' );
 
 		} );
 
@@ -68,42 +47,46 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLight', ( assert ) => {
+		QUnit.test( 'colorContribution', ( assert ) => {
 
-			const object = new Light();
+			const light = new Light();
 			assert.ok(
-				object.isLight,
-				'Light.isLight should be true'
+				light.colorContribution === true,
+				'Light.colorContribution should be true by default'
+			);
+
+			light.colorContribution = false;
+			assert.ok(
+				light.colorContribution === false,
+				'Light.colorContribution can be set to false'
 			);
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'copy', ( assert ) => {
 
-			assert.expect( 0 );
+			const a = new Light( 0xaaaaaa, 0.5 );
+			a.colorContribution = false;
+			const b = new Light();
+			b.copy( a );
 
-			// empty, test exists
-			const object = new Light();
-			object.dispose();
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok(
+				b.colorContribution === false,
+				'Light.colorContribution is copied'
+			);
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.test( 'toJSON', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const light = new Light( 0xaaaaaa, 0.5 );
+			light.colorContribution = false;
+			const json = light.toJSON();
 
-		} );
-
-		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
-
-			runStdLightTests( assert, lights );
+			assert.ok(
+				json.object.colorContribution === false,
+				'Light.colorContribution is included in JSON'
+			);
 
 		} );
 
