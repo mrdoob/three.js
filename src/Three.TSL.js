@@ -310,6 +310,7 @@ export const mx_worley_noise_vec2 = TSL.mx_worley_noise_vec2;
 export const mx_worley_noise_vec3 = TSL.mx_worley_noise_vec3;
 export const negate = TSL.negate;
 export const neutralToneMapping = TSL.neutralToneMapping;
+export const next = TSL.next;
 export const nodeArray = TSL.nodeArray;
 export const nodeImmutable = TSL.nodeImmutable;
 export const nodeObject = TSL.nodeObject;
