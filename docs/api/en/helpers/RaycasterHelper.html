@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      A 3D object for visualizing a [page:Raycaster Raycaster].
+    </p>
+
+		<h2>Code Example</h2>
+
+		<code>
+    const origin = new THREE.Vector3( - 4, 0, 0 );
+    const direction = new THREE.Vector3( 1, 0, 0 );
+    const raycaster = new THREE.Raycaster( origin, direction );
+    raycaster.near = 1;
+    raycaster.far = 8;
+
+    const raycasterHelper = new THREE.RaycasterHelper( raycaster );
+    scene.add( raycasterHelper );
+
+    function render() {
+    
+      const intersects = raycaster.intersectObjects( scene.children );
+    
+      raycasterHelper.hits = intersects;
+      raycasterHelper.update();
+    
+      renderer.render( scene, camera );
+    
+    }
+    
+    window.requestAnimationFrame(render);
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_raycaster_helper WebGL / raycaster / helper]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]([param:Raycaster raycaster], [param:Number numberOfHitsToVisualize], [param:Number sphereRadius],
+			[param:Number nearFarSize], [param:Array colors])
+		</h3>
+		<p>
+			[page:Raycaster raycaster] -- Raycaster to visualize. <br />
+			[page:Number numberOfHitsToVisualize] -- Maximum hits to visualize. Default is `20`.<br />
+			[page:Number sphereRadius] -- Origin sphere radius. Default is `0.04`.<br />
+			[page:Number nearFarSize] -- Near/Far plane size. Default is `0.1`.<br />
+      [page:Array colors] -- Colors for the helper elements. Default is `{ near: 0xffffff, far: 0xffffff, originToNear: 0x333333, nearToFar: 0xffffff, origin: [ 0x0eec82, 0xff005b ] }`<br />
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:Array hits]</h3>
+		<p>An array of [page:Raycaster Raycaster]'s intersections.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:undefined setColors]([param:Array colors])</h3>
+		<p>
+			colors -- A partial array of `colors`, as defined in the constructor's params.
+		</p>
+
+		<h3>
+			[method:undefined update]()
+		</h3>
+		<p>
+			Updates the helper's geometries based on the helper's `hits`.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
