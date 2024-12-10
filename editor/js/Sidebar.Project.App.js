@@ -94,7 +94,7 @@ function SidebarProjectApp( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		toZip[ 'app.json' ] = strToU8( output );
+		toZip[ 'public/app.json' ] = strToU8( output );
 
 		//
 
@@ -120,29 +120,35 @@ function SidebarProjectApp( editor ) {
 			if ( config.getKey( 'project/editable' ) ) {
 
 				editButton = [
-					'			let button = document.createElement( \'a\' );',
-					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
-					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
-					'			button.target = \'_blank\';',
-					'			button.textContent = \'EDIT\';',
-					'			document.body.appendChild( button );',
+					'				let button = document.createElement( \'a\' );',
+					'				button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
+					'				button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
+					'				button.target = \'_blank\';',
+					'				button.textContent = \'EDIT\';',
+					'				document.body.appendChild( button );',
 				].join( '\n' );
 
 			}
 
-			content = content.replace( '\t\t\t/* edit button */', editButton );
+			content = content.replace( '\t\t\t\t/* edit button */', editButton );
 
 			toZip[ 'index.html' ] = strToU8( content );
 
 		} );
-		loader.load( 'js/libs/app.js', function ( content ) {
+		loader.load( 'js/libs/app/package.json', function ( content ) {
 
-			toZip[ 'js/app.js' ] = strToU8( content );
+			if ( THREE.REVISION.endsWith( 'dev' ) === false ) {
+
+				content = content.replace( 'github:mrdoob/three.js#dev', `~0.${ THREE.REVISION }.0` );
+
+			}
+
+			toZip[ 'package.json' ] = strToU8( content );
 
 		} );
-		loader.load( '../build/three.module.js', function ( content ) {
+		loader.load( 'js/libs/app.js', function ( content ) {
 
-			toZip[ 'js/three.module.js' ] = strToU8( content );
+			toZip[ 'src/app.js' ] = strToU8( content );
 
 		} );
 
