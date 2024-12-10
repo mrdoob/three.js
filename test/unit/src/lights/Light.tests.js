@@ -1,7 +1,6 @@
 /* global QUnit */
 
 import { Light } from '../../../../src/lights/Light.js';
-import { Color } from '../../../../src/math/Color.js';
 
 export default QUnit.module( 'Lights', () => {
 
