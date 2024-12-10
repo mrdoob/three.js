@@ -1,14 +1,14 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param attributeName string
- * @param newValue integer representing a hex color value
- * @constructor
- */
 class SetColorCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {String} attributeName
+	 * @param {Number|null} [newValue=null] Integer representing a hex color value
+	 * @constructor
+	 */
 	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );

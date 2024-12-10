@@ -1,15 +1,16 @@
 import { Command } from '../Command.js';
 import { ObjectLoader } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param mapName string
- * @param newMap THREE.Texture
- * @constructor
- */
 class SetMaterialMapCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {String} [mapName='']
+	 * @param {THREE.Texture|null} [newMap=null]
+	 * @param {Number} [materialSlot=-1]
+	 * @constructor
+	 */
 	constructor( editor, object = null, mapName = '', newMap = null, materialSlot = - 1 ) {
 
 		super( editor );
