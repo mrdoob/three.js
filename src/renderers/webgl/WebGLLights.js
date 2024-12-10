@@ -261,7 +261,7 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				uniforms.color.copy( light.color ).multiplyScalar( light.colorContribution ? light.intensity : 0 );
 
 				if ( light.castShadow ) {
 
@@ -293,7 +293,7 @@ function WebGLLights( extensions ) {
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.color.copy( color ).multiplyScalar( light.colorContribution ? intensity : 0 );
 				uniforms.distance = distance;
 
 				uniforms.coneCos = Math.cos( light.angle );
@@ -342,7 +342,7 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.color.copy( color ).multiplyScalar( light.colorContribution ? intensity : 0 );
 
 				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
 				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
@@ -355,7 +355,7 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				uniforms.color.copy( light.color ).multiplyScalar( light.colorContribution ? light.intensity : 0 );
 				uniforms.distance = light.distance;
 				uniforms.decay = light.decay;
 
@@ -389,8 +389,8 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
-				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
+				uniforms.skyColor.copy( light.color ).multiplyScalar( light.colorContribution ? intensity : 0 );
+				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( light.colorContribution ? intensity : 0 );
 
 				state.hemi[ hemiLength ] = uniforms;
 
