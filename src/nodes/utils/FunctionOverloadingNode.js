@@ -20,7 +20,7 @@ class FunctionOverloadingNode extends Node {
 	 * Constructs a new function overloading node.
 	 *
 	 * @param {Array<Function>} functionNodes - Array of `Fn` function definitions.
-	 * @param {...Node} parametersNodes - A list of paramater nodes.
+	 * @param {...Node} parametersNodes - A list of parameter nodes.
 	 */
 	constructor( functionNodes = [], ...parametersNodes ) {
 
@@ -34,9 +34,9 @@ class FunctionOverloadingNode extends Node {
 		this.functionNodes = functionNodes;
 
 		/**
-		 * A list of paramater nodes.
+		 * A list of parameter nodes.
 		 *
-		 * @type {Array<Nodes>}
+		 * @type {Array<Node>}
 		 */
 		this.parametersNodes = parametersNodes;
 
