@@ -12699,7 +12699,7 @@ class PerspectiveCamera extends Camera {
 	 * The default film gauge is 35, so that the focal length can be specified for
 	 * a 35mm (full frame) camera.
 	 *
-	 * Values for focal length and film gauge must have the same unit.
+	 * @param {number} focalLength - Values for focal length and film gauge must have the same unit.
 	 */
 	setFocalLength( focalLength ) {
 
@@ -12713,6 +12713,8 @@ class PerspectiveCamera extends Camera {
 
 	/**
 	 * Calculates the focal length from the current .fov and .filmGauge.
+	 *
+	 * @returns {number}
 	 */
 	getFocalLength() {
 
@@ -12746,6 +12748,10 @@ class PerspectiveCamera extends Camera {
 	/**
 	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
 	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
+	 *
+	 * @param {number} distance
+	 * @param {number} minTarget
+	 * @param {number} maxTarget
 	 */
 	getViewBounds( distance, minTarget, maxTarget ) {
 
@@ -12761,7 +12767,10 @@ class PerspectiveCamera extends Camera {
 
 	/**
 	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
-	 * Copies the result into the target Vector2, where x is width and y is height.
+	 *
+	 * @param {number} distance
+	 * @param {Vector2} target - Vector2 target used to store result where x is width and y is height.
+	 * @returns {Vector2}
 	 */
 	getViewSize( distance, target ) {
 
@@ -12805,6 +12814,13 @@ class PerspectiveCamera extends Camera {
 	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 	 *
 	 *   Note there is no reason monitors have to be the same size or in a grid.
+	 *
+	 * @param {number} fullWidth
+	 * @param {number} fullHeight
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} width
+	 * @param {number} height
 	 */
 	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
 
@@ -36828,6 +36844,12 @@ function fill( texture ) {
 /**
  * Given the width, height, format, and type of a texture. Determines how many
  * bytes must be used to represent the texture.
+ *
+ * @param {Number} width
+ * @param {Number} height
+ * @param {Number} format
+ * @param {Number} type
+ * @return {Number} The number of bytes required to represent the texture.
  */
 function getByteLength( width, height, format, type ) {
 
@@ -39718,6 +39740,12 @@ class PMREMGenerator {
 	 * in radians to be applied to the scene before PMREM generation. Optional near
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
+	 *
+	 * @param {Scene} scene
+	 * @param {number} sigma
+	 * @param {number} near
+	 * @param {number} far
+	 * @return {WebGLRenderTarget}
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
@@ -39753,6 +39781,10 @@ class PMREMGenerator {
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 * The smallest supported equirectangular image size is 64 x 32.
+	 *
+	 * @param {Texture} equirectangular
+	 * @param {WebGLRenderTarget} [renderTarget=null] - Optional render target.
+	 * @return {WebGLRenderTarget}
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
@@ -39765,6 +39797,10 @@ class PMREMGenerator {
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 * The smallest supported cube size is 16 x 16.
+	 *
+	 * @param {Texture} cubemap
+	 * @param {null} [renderTarget=null] - Optional render target.
+	 * @return {WebGLRenderTarget}
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
@@ -40082,6 +40118,12 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
+	 *
+	 * @param {WebGLRenderTarget} cubeUVRenderTarget
+	 * @param {number} lodIn
+	 * @param {number} lodOut
+	 * @param {number} sigma
+	 * @param {Vector3} [poleAxis]
 	 */
 	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
@@ -49829,7 +49871,7 @@ class WebXRDepthSensing {
 			const texProps = renderer.properties.get( texture );
 			texProps.__webglTexture = depthData.texture;
 
-			if ( ( depthData.depthNear != renderState.depthNear ) || ( depthData.depthFar != renderState.depthFar ) ) {
+			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
 				this.depthNear = depthData.depthNear;
 				this.depthFar = depthData.depthFar;
@@ -50329,6 +50371,10 @@ class WebXRManager extends EventDispatcher {
 		 * the cameras' projection and world matrices have already been set.
 		 * And that near and far planes are identical for both cameras.
 		 * Visualization of this technique: https://computergraphics.stackexchange.com/a/4765
+		 *
+		 * @param {ArrayCamera} camera - The camera to update.
+		 * @param {PerspectiveCamera} cameraL - The left camera.
+		 * @param {PerspectiveCamera} cameraR - The right camera.
 		 */
 		function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
@@ -51821,6 +51867,9 @@ class WebGLRenderer {
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
 
+		// transmission render target scale
+		this.transmissionResolutionScale = 1.0;
+
 		// camera matrices cache
 
 		const _currentProjectionMatrix = new Matrix4();
@@ -53125,7 +53174,7 @@ class WebGLRenderer {
 			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[ camera.id ];
 
 			const activeViewport = camera.viewport || _currentViewport;
-			transmissionRenderTarget.setSize( activeViewport.z, activeViewport.w );
+			transmissionRenderTarget.setSize( activeViewport.z * _this.transmissionResolutionScale, activeViewport.w * _this.transmissionResolutionScale );
 
 			//
 
