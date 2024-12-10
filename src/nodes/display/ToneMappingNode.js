@@ -5,6 +5,11 @@ import { rendererReference } from '../accessors/RendererReferenceNode.js';
 import { NoToneMapping } from '../../constants.js';
 import { hash } from '../core/NodeUtils.js';
 
+/**
+ * This node represents a tone mapping operation.
+ *
+ * @augments TempNode
+ */
 class ToneMappingNode extends TempNode {
 
 	static get type() {
@@ -13,20 +18,51 @@ class ToneMappingNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new tone mapping node.
+	 *
+	 * @param {Number} toneMapping - The tone mapping type.
+	 * @param {Node} exposureNode - The tone mapping exposure.
+	 * @param {Node} [colorNode=null] - The color node to process.
+	 */
 	constructor( toneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
 
 		super( 'vec3' );
 
+		/**
+		 * The tone mapping type.
+		 *
+		 * @type {Number}
+		 */
 		this.toneMapping = toneMapping;
 
+		/**
+		 * The tone mapping exposure.
+		 *
+		 * @type {Node}
+		 * @default null
+		 */
 		this.exposureNode = exposureNode;
+
+		/**
+		 * Represents the color to process.
+		 *
+		 * @type {Node}
+		 * @default null
+		 */
 		this.colorNode = colorNode;
 
 	}
 
-	getCacheKey() {
+	/**
+	 * Overwrites the default `customCacheKey()` implementation by including the tone
+	 * mapping type into the cache key.
+	 *
+	 * @return {Number} The hash.
+	 */
+	customCacheKey() {
 
-		return hash( super.getCacheKey(), this.toneMapping );
+		return hash( this.toneMapping );
 
 	}
 

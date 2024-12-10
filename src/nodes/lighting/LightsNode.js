@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeObject, vec3 } from '../tsl/TSLBase.js';
+import { hashArray } from '../core/NodeUtils.js';
 
 const sortLights = ( lights ) => {
 
@@ -48,6 +49,26 @@ class LightsNode extends Node {
 		this._lightNodesHash = null;
 
 		this.global = true;
+
+	}
+
+	/**
+	 * Overwrites the default `customCacheKey()` implementation by including the
+	 * light IDs into the cache key.
+	 *
+	 * @return {Number} The hash.
+	 */
+	customCacheKey() {
+
+		const lightIDs = [];
+
+		for ( let i = 0; i < lights.length; i ++ ) {
+
+			lightIDs.push( lights[ i ].id );
+
+		}
+
+		return hashArray( lightIDs );
 
 	}
 

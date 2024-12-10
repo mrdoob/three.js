@@ -2110,6 +2110,7 @@ class Texture extends EventDispatcher {
 		this.version = 0;
 		this.onUpdate = null;
 
+		this.renderTarget = null; // assign texture to a render target
 		this.isRenderTargetTexture = false; // indicates whether a texture belongs to a render target or not
 		this.pmremVersion = 0; // indicates whether this texture should be processed by PMREMGenerator or not (only relevant for render target textures)
 
@@ -2174,6 +2175,9 @@ class Texture extends EventDispatcher {
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
 		this.colorSpace = source.colorSpace;
+
+		this.renderTarget = source.renderTarget;
+		this.isRenderTargetTexture = source.isRenderTargetTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -3075,6 +3079,7 @@ class RenderTarget extends EventDispatcher {
 
 			this.textures[ i ] = texture.clone();
 			this.textures[ i ].isRenderTargetTexture = true;
+			this.textures[ i ].renderTarget = this;
 
 		}
 
@@ -3084,6 +3089,7 @@ class RenderTarget extends EventDispatcher {
 		this.resolveDepthBuffer = options.resolveDepthBuffer;
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
+		this._depthTexture = null;
 		this.depthTexture = options.depthTexture;
 
 		this.samples = options.samples;
@@ -3099,6 +3105,21 @@ class RenderTarget extends EventDispatcher {
 	set texture( value ) {
 
 		this.textures[ 0 ] = value;
+
+	}
+
+	set depthTexture( current ) {
+
+		if ( this._depthTexture !== null ) this._depthTexture.renderTarget = null;
+		if ( current !== null ) current.renderTarget = this;
+
+		this._depthTexture = current;
+
+	}
+
+	get depthTexture() {
+
+		return this._depthTexture;
 
 	}
 
@@ -3150,6 +3171,7 @@ class RenderTarget extends EventDispatcher {
 
 			this.textures[ i ] = source.textures[ i ].clone();
 			this.textures[ i ].isRenderTargetTexture = true;
+			this.textures[ i ].renderTarget = this;
 
 		}
 
@@ -12675,7 +12697,7 @@ class PerspectiveCamera extends Camera {
 	 * The default film gauge is 35, so that the focal length can be specified for
 	 * a 35mm (full frame) camera.
 	 *
-	 * Values for focal length and film gauge must have the same unit.
+	 * @param {number} focalLength - Values for focal length and film gauge must have the same unit.
 	 */
 	setFocalLength( focalLength ) {
 
@@ -12689,6 +12711,8 @@ class PerspectiveCamera extends Camera {
 
 	/**
 	 * Calculates the focal length from the current .fov and .filmGauge.
+	 *
+	 * @returns {number}
 	 */
 	getFocalLength() {
 
@@ -12722,6 +12746,10 @@ class PerspectiveCamera extends Camera {
 	/**
 	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
 	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
+	 *
+	 * @param {number} distance
+	 * @param {number} minTarget
+	 * @param {number} maxTarget
 	 */
 	getViewBounds( distance, minTarget, maxTarget ) {
 
@@ -12737,7 +12765,10 @@ class PerspectiveCamera extends Camera {
 
 	/**
 	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
-	 * Copies the result into the target Vector2, where x is width and y is height.
+	 *
+	 * @param {number} distance
+	 * @param {Vector2} target - Vector2 target used to store result where x is width and y is height.
+	 * @returns {Vector2}
 	 */
 	getViewSize( distance, target ) {
 
@@ -12781,6 +12812,13 @@ class PerspectiveCamera extends Camera {
 	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 	 *
 	 *   Note there is no reason monitors have to be the same size or in a grid.
+	 *
+	 * @param {number} fullWidth
+	 * @param {number} fullHeight
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} width
+	 * @param {number} height
 	 */
 	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
 
@@ -32357,11 +32395,11 @@ class PropertyBinding {
 
 		this.targetObject = targetObject;
 
-		if ( targetObject.needsUpdate !== undefined ) { // material
+		if ( targetObject.isMaterial === true ) {
 
 			versioning = this.Versioning.NeedsUpdate;
 
-		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+		} else if ( targetObject.isObject3D === true ) {
 
 			versioning = this.Versioning.MatrixWorldNeedsUpdate;
 
@@ -36804,6 +36842,12 @@ function fill( texture ) {
 /**
  * Given the width, height, format, and type of a texture. Determines how many
  * bytes must be used to represent the texture.
+ *
+ * @param {Number} width
+ * @param {Number} height
+ * @param {Number} format
+ * @param {Number} type
+ * @return {Number} The number of bytes required to represent the texture.
  */
 function getByteLength( width, height, format, type ) {
 

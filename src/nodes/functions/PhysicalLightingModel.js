@@ -73,9 +73,9 @@ const viewportFrontSideTexture = /*@__PURE__*/ viewportMipTexture();
 
 const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
 
-	const vTexture = material.side == BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
+	const vTexture = material.side === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
 
-	const transmissionSample = vTexture.uv( fragCoord );
+	const transmissionSample = vTexture.sample( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
 	const lod = log2( screenSize.x ).mul( applyIorToRoughness( roughness, ior ) );
@@ -473,7 +473,7 @@ class PhysicalLightingModel extends LightingModel {
 	 * Depending on what features are requested, the method prepares certain node variables
 	 * which are later used for lighting computations.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 */
 	start( context ) {
 
@@ -619,8 +619,8 @@ class PhysicalLightingModel extends LightingModel {
 
 		const uv = LTC_Uv( { N, V, roughness } );
 
-		const t1 = ltc_1.uv( uv ).toVar();
-		const t2 = ltc_2.uv( uv ).toVar();
+		const t1 = ltc_1.sample( uv ).toVar();
+		const t2 = ltc_2.sample( uv ).toVar();
 
 		const mInv = mat3(
 			vec3( t1.x, 0, t1.y ),
@@ -641,7 +641,7 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
@@ -758,7 +758,7 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Used for final lighting accumulations depending on the requested features.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

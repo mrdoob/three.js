@@ -19,11 +19,11 @@ class TempNode extends Node {
 	/**
 	 * Constructs a temp node.
 	 *
-	 * @param {String} nodeType - The node type.
+	 * @param {String?} nodeType - The node type.
 	 */
-	constructor( type ) {
+	constructor( nodeType = null ) {
 
-		super( type );
+		super( nodeType );
 
 		/**
 		 * This flag can be used for type testing.
@@ -39,6 +39,7 @@ class TempNode extends Node {
 	/**
 	 * Whether this node is used more than once in context of other nodes.
 	 *
+	 * @param {NodeBuilder} builder - The node builder.
 	 * @return {Boolean} A flag that indicates if there is more than one dependency to other nodes.
 	 */
 	hasDependencies( builder ) {

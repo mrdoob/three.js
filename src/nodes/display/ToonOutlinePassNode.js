@@ -8,6 +8,20 @@ import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { BackSide } from '../../constants.js';
 import PassNode from './PassNode.js';
 
+/**
+ * Represents a render pass for producing a toon outline effect on compatible objects.
+ * Only 3D objects with materials of type `MeshToonMaterial` and `MeshToonNodeMaterial`
+ * will receive the outline.
+ *
+ * ```js
+ * const postProcessing = new PostProcessing( renderer );
+ *
+ * const scenePass = toonOutlinePass( scene, camera );
+ *
+ * postProcessing.outputNode = scenePass;
+ * ```
+ * @augments PassNode
+ */
 class ToonOutlinePassNode extends PassNode {
 
 	static get type() {
@@ -16,14 +30,46 @@ class ToonOutlinePassNode extends PassNode {
 
 	}
 
+	/**
+	 * Constructs a new outline pass node.
+	 *
+	 * @param {Scene} scene - A reference to the scene.
+	 * @param {Camera} camera - A reference to the camera.
+	 * @param {Node} colorNode - Defines the outline's color.
+	 * @param {Node} thicknessNode - Defines the outline's thickness.
+	 * @param {Node} alphaNode - Defines the outline's alpha.
+	 */
 	constructor( scene, camera, colorNode, thicknessNode, alphaNode ) {
 
 		super( PassNode.COLOR, scene, camera );
 
+		/**
+		 * Defines the outline's color.
+		 *
+		 * @type {Node}
+		 */
 		this.colorNode = colorNode;
+
+		/**
+		 * Defines the outline's thickness.
+		 *
+		 * @type {Node}
+		 */
 		this.thicknessNode = thicknessNode;
+
+		/**
+		 * Defines the outline's alpha.
+		 *
+		 * @type {Node}
+		 */
 		this.alphaNode = alphaNode;
 
+		/**
+		 * An internal material cache.
+		 *
+		 * @private
+		 * @type {WeakMap<Material, NodeMaterial>}
+		 */
 		this._materialCache = new WeakMap();
 
 	}
@@ -61,6 +107,12 @@ class ToonOutlinePassNode extends PassNode {
 
 	}
 
+	/**
+	 * Creates the material used for outline rendering.
+	 *
+	 * @private
+	 * @return {NodeMaterial} The outline material.
+	 */
 	_createMaterial() {
 
 		const material = new NodeMaterial();
@@ -88,6 +140,14 @@ class ToonOutlinePassNode extends PassNode {
 
 	}
 
+	/**
+	 * For the given toon material, this method returns a correspoding
+	 * outline material.
+	 *
+	 * @private
+	 * @param {(MeshToonMaterial|MeshToonNodeMaterial)} originalMaterial - The toon material.
+	 * @return {NodeMaterial} The outline material.
+	 */
 	_getOutlineMaterial( originalMaterial ) {
 
 		let outlineMaterial = this._materialCache.get( originalMaterial );

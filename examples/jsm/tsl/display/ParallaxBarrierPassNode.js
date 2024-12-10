@@ -28,11 +28,11 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 			If( mod( screenCoordinate.y, 2 ).greaterThan( 1 ), () => {
 
-				color.assign( this._mapLeft.uv( uvNode ) );
+				color.assign( this._mapLeft.sample( uvNode ) );
 
 			} ).Else( () => {
 
-				color.assign( this._mapRight.uv( uvNode ) );
+				color.assign( this._mapRight.sample( uvNode ) );
 
 			} );
 

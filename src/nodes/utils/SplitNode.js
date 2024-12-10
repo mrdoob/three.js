@@ -1,8 +1,19 @@
 import Node from '../core/Node.js';
 import { vectorComponents } from '../core/constants.js';
 
-const stringVectorComponents = vectorComponents.join( '' );
+const _stringVectorComponents = vectorComponents.join( '' );
 
+/**
+ * This module is part of the TSL core and usually not used in app level code.
+ * `SplitNode` represents a property access operation which means it is
+ * used to implement any `.xyzw`, `.rgba` and `stpq` usage on node objects.
+ * For example:
+ * ```js
+ * const redValue = color.r;
+ * ```
+ *
+ * @augments Node
+ */
 class SplitNode extends Node {
 
 	static get type() {
@@ -11,17 +22,46 @@ class SplitNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new split node.
+	 *
+	 * @param {Node} node - The node that should be accessed.
+	 * @param {String} [components='x'] - The components that should be accessed.
+	 */
 	constructor( node, components = 'x' ) {
 
 		super();
 
+		/**
+		 * The node that should be accessed.
+		 *
+		 * @type {Node}
+		 */
 		this.node = node;
+
+		/**
+		 * The components that should be accessed.
+		 *
+		 * @type {string}
+		 */
 		this.components = components;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSplitNode = true;
 
 	}
 
+	/**
+	 * Returns the vector length which is computed based on the requested components.
+	 *
+	 * @return {Number} The vector length.
+	 */
 	getVectorLength() {
 
 		let vectorLength = this.components.length;
@@ -36,12 +76,24 @@ class SplitNode extends Node {
 
 	}
 
+	/**
+	 * Returns the component type of the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The component type.
+	 */
 	getComponentType( builder ) {
 
 		return builder.getComponentType( this.node.getNodeType( builder ) );
 
 	}
 
+	/**
+	 * This method is overwritten since the node type is inferred from requested components.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.components.length, this.getComponentType( builder ) );
@@ -71,7 +123,7 @@ class SplitNode extends Node {
 
 			const nodeSnippet = node.build( builder, type );
 
-			if ( this.components.length === nodeTypeLength && this.components === stringVectorComponents.slice( 0, this.components.length ) ) {
+			if ( this.components.length === nodeTypeLength && this.components === _stringVectorComponents.slice( 0, this.components.length ) ) {
 
 				// unnecessary swizzle
 

@@ -576,7 +576,13 @@ class NodeMaterial extends Material {
 
 			const fogNode = builder.fogNode;
 
-			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+			if ( fogNode ) {
+
+				const fog = vec4( fogNode );
+
+				outputNode = vec4( fog.a.mix( outputNode.rgb, fog.rgb ), outputNode.a );
+
+			}
 
 		}
 

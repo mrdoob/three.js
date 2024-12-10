@@ -3,7 +3,7 @@ import { Fn, float, uv, Loop, int } from 'three/tsl';
 
 export const motionBlur = /*@__PURE__*/ Fn( ( [ inputNode, velocity, numSamples = int( 16 ) ] ) => {
 
-	const sampleColor = ( uv ) => inputNode.uv( uv );
+	const sampleColor = ( uv ) => inputNode.sample( uv );
 
 	const uvs = uv();
 

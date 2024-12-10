@@ -5,6 +5,15 @@ import { positionLocal } from '../accessors/Position.js';
 import { texture } from '../accessors/TextureNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
+/**
+ * Can be used for triplanar texture mapping.
+ *
+ * ```js
+ * material.colorNode = triplanarTexture( texture( diffuseMap ) );
+ * ```
+ *
+ * @augments Node
+ */
 class TriplanarTexturesNode extends Node {
 
 	static get type() {
@@ -13,17 +22,65 @@ class TriplanarTexturesNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new triplanar textures node.
+	 *
+	 * @param {Node} textureXNode - First texture node.
+	 * @param {Node?} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.
+	 * @param {Node?} [textureZNode=null] - Third texture node. When not set, the shader will sample from `textureXNode` instead.
+	 * @param {Node<float>?} [scaleNode=float(1)] - The scale node.
+	 * @param {Node<vec3>?} [positionNode=positionLocal] - Vertex positions in local space.
+	 * @param {Node<vec3>?} [normalNode=normalLocal] - Normals in local space.
+	 */
 	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionLocal, normalNode = normalLocal ) {
 
 		super( 'vec4' );
 
+		/**
+		 * First texture node.
+		 *
+		 * @type {Node}
+		 */
 		this.textureXNode = textureXNode;
+
+		/**
+		 * Second texture node. When not set, the shader will sample from `textureXNode` instead.
+		 *
+		 * @type {Node}
+		 * @default null
+		 */
 		this.textureYNode = textureYNode;
+
+		/**
+		 * Third texture node. When not set, the shader will sample from `textureXNode` instead.
+		 *
+		 * @type {Node}
+		 * @default null
+		 */
 		this.textureZNode = textureZNode;
 
+		/**
+		 * The scale node.
+		 *
+		 * @type {Node<float>}
+		 * @default float(1)
+		 */
 		this.scaleNode = scaleNode;
 
+		/**
+		 * Vertex positions in local space.
+		 *
+		 * @type {Node<vec3>}
+		 * @default positionLocal
+		 */
 		this.positionNode = positionNode;
+
+		/**
+		 * Normals in local space.
+		 *
+		 * @type {Node<vec3>}
+		 * @default normalLocal
+		 */
 		this.normalNode = normalNode;
 
 	}

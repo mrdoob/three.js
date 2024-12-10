@@ -1,6 +1,17 @@
 import { nodeProxy } from '../tsl/TSLBase.js';
 import ArrayElementNode from './ArrayElementNode.js';
 
+/**
+ * This class enables element access on instances of {@link StorageBufferNode}.
+ * In most cases, it is indirectly used when accessing elements with the
+ * {@link StorageBufferNode#element} method.
+ *
+ * ```js
+ * const position = positionStorage.element( instanceIndex );
+ * ```
+ *
+ * @augments ArrayElementNode
+ */
 class StorageArrayElementNode extends ArrayElementNode {
 
 	static get type() {
@@ -9,14 +20,33 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
+	/**
+	 * Constructs storage buffer element node.
+	 *
+	 * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
+	 * @param {Node} indexNode - The index node that defines the element access.
+	 */
 	constructor( storageBufferNode, indexNode ) {
 
 		super( storageBufferNode, indexNode );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isStorageArrayElementNode = true;
 
 	}
 
+	/**
+	 * The storage buffer node.
+	 *
+	 * @param {Node} value
+	 * @type {StorageBufferNode}
+	 */
 	set storageBufferNode( value ) {
 
 		this.node = value;

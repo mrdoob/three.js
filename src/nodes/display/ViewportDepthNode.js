@@ -4,6 +4,13 @@ import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
 
+/**
+ * This node offers a collection of features in context of the depth logic in the fragment shader.
+ * Depending on {@link ViewportDepthNode#scope}, it can be used to define a depth value for the current
+ * fragment or for depth evaluation purposes.
+ *
+ * @augments Node
+ */
 class ViewportDepthNode extends Node {
 
 	static get type() {
@@ -12,13 +19,44 @@ class ViewportDepthNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new viewport depth node.
+	 *
+	 * @param {('depth'|'depthBase'|'linearDepth')} scope - The node's scope.
+	 * @param {Node?} [valueNode=null] - The value node.
+	 */
 	constructor( scope, valueNode = null ) {
 
 		super( 'float' );
 
+		/**
+		 * The node behaves differently depending on which scope is selected.
+		 *
+		 * - `ViewportDepthNode.DEPTH_BASE`: Allows to define a value for the current fragment's depth.
+		 * - `ViewportDepthNode.DEPTH`: Represents the depth value for the current fragment (`valueNode` is ignored).
+		 * - `ViewportDepthNode.LINEAR_DEPTH`: Represents the linear (orthographic) depth value of the current fragment.
+		 * If a `valueNode` is set, the scope can be used to convert perspective depth data to linear data.
+		 *
+		 * @type {('depth'|'depthBase'|'linearDepth')}
+		 */
 		this.scope = scope;
+
+		/**
+		 * Can be used to define a custom depth value.
+		 * The property is ignored in the `ViewportDepthNode.DEPTH` scope.
+		 *
+		 * @type {Node}
+		 * @default null
+		 */
 		this.valueNode = valueNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isViewportDepthNode = true;
 
 	}

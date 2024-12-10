@@ -10,10 +10,10 @@ import { WebGPUCoordinateSystem } from '../../constants.js';
  * depth value and the camera's inverse projection matrix.
  *
  * @method
- * @param {vec2} screenPosition - The fragment's screen position expressed as uv coordinates.
- * @param {float} depth - The fragment's depth value.
- * @param {mat4} projectionMatrixInverse - The camera's inverse projection matrix.
- * @return {vec3} The fragments position in view space.
+ * @param {Node<vec2>} screenPosition - The fragment's screen position expressed as uv coordinates.
+ * @param {Node<float>} depth - The fragment's depth value.
+ * @param {Node<mat4>} projectionMatrixInverse - The camera's inverse projection matrix.
+ * @return {Node<vec3>} The fragments position in view space.
  */
 export const getViewPosition = /*@__PURE__*/ Fn( ( [ screenPosition, depth, projectionMatrixInverse ], builder ) => {
 
@@ -41,9 +41,9 @@ export const getViewPosition = /*@__PURE__*/ Fn( ( [ screenPosition, depth, proj
  * and the camera's projection matrix
  *
  * @method
- * @param {vec3} viewPosition - The fragments position in view space.
- * @param {mat4} projectionMatrix - The camera's projection matrix.
- * @return {vec2} The fragment's screen position expressed as uv coordinates.
+ * @param {Node<vec3>} viewPosition - The fragments position in view space.
+ * @param {Node<mat4>} projectionMatrix - The camera's projection matrix.
+ * @return {Node<vec2>} The fragment's screen position expressed as uv coordinates.
  */
 export const getScreenPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatrix ] ) => {
 
@@ -58,10 +58,10 @@ export const getScreenPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionM
  * target is available or if flat surface normals are required.
  *
  * @method
- * @param {vec2} uv - The texture coordinate.
+ * @param {Node<vec2>} uv - The texture coordinate.
  * @param {DepthTexture} depthTexture - The depth texture.
- * @param {mat4} projectionMatrixInverse - The camera's inverse projection matrix.
- * @return {vec3} The computed normal vector.
+ * @param {Node<mat4>} projectionMatrixInverse - The camera's inverse projection matrix.
+ * @return {Node<vec3>} The computed normal vector.
  */
 export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projectionMatrixInverse ] ) => {
 

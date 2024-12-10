@@ -265,7 +265,7 @@ class OutlineNode extends TempNode {
 
 		const prepareMask = () => {
 
-			const depth = this._depthTextureUniform.uv( screenUV );
+			const depth = this._depthTextureUniform.sample( screenUV );
 
 			let viewZNode;
 
@@ -301,10 +301,10 @@ class OutlineNode extends TempNode {
 			const uvOffset = vec4( 1.0, 0.0, 0.0, 1.0 ).mul( vec4( invSize, invSize ) );
 
 			const uvNode = uv();
-			const c1 = this._maskTextureDownsSampleUniform.uv( uvNode.add( uvOffset.xy ) ).toVar();
-			const c2 = this._maskTextureDownsSampleUniform.uv( uvNode.sub( uvOffset.xy ) ).toVar();
-			const c3 = this._maskTextureDownsSampleUniform.uv( uvNode.add( uvOffset.yw ) ).toVar();
-			const c4 = this._maskTextureDownsSampleUniform.uv( uvNode.sub( uvOffset.yw ) ).toVar();
+			const c1 = this._maskTextureDownsSampleUniform.sample( uvNode.add( uvOffset.xy ) ).toVar();
+			const c2 = this._maskTextureDownsSampleUniform.sample( uvNode.sub( uvOffset.xy ) ).toVar();
+			const c3 = this._maskTextureDownsSampleUniform.sample( uvNode.add( uvOffset.yw ) ).toVar();
+			const c4 = this._maskTextureDownsSampleUniform.sample( uvNode.sub( uvOffset.yw ) ).toVar();
 
 			const diff1 = mul( c1.r.sub( c2.r ), 0.5 );
 			const diff2 = mul( c3.r.sub( c4.r ), 0.5 );
@@ -338,7 +338,7 @@ class OutlineNode extends TempNode {
 
 			const sigma = kernelRadius.div( 2 ).toVar();
 			const weightSum = gaussianPdf( 0, sigma ).toVar();
-			const diffuseSum = this._blurColorTextureUniform.uv( uvNode ).mul( weightSum ).toVar();
+			const diffuseSum = this._blurColorTextureUniform.sample( uvNode ).mul( weightSum ).toVar();
 			const delta = this._blurDirection.mul( invSize ).mul( kernelRadius ).div( MAX_RADIUS ).toVar();
 
 			const uvOffset = delta.toVar();
@@ -347,8 +347,8 @@ class OutlineNode extends TempNode {
 
 				const x = kernelRadius.mul( float( i ) ).div( MAX_RADIUS );
 				const w = gaussianPdf( x, sigma );
-				const sample1 = this._blurColorTextureUniform.uv( uvNode.add( uvOffset ) );
-				const sample2 = this._blurColorTextureUniform.uv( uvNode.sub( uvOffset ) );
+				const sample1 = this._blurColorTextureUniform.sample( uvNode.add( uvOffset ) );
+				const sample2 = this._blurColorTextureUniform.sample( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
 				weightSum.addAssign( w.mul( 2 ) );

@@ -1,6 +1,12 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/**
+ * This node represents basic mathematical and logical operations like addition,
+ * subtraction or comparisons (e.g. `equal()`).
+ *
+ * @augments TempNode
+ */
 class OperatorNode extends TempNode {
 
 	static get type() {
@@ -9,6 +15,14 @@ class OperatorNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new operator node.
+	 *
+	 * @param {String} op - The operator.
+	 * @param {Node} aNode - The first input.
+	 * @param {Node} bNode - The second input.
+	 * @param {...Node} params - Additional input parameters.
+	 */
 	constructor( op, aNode, bNode, ...params ) {
 
 		super();
@@ -28,12 +42,37 @@ class OperatorNode extends TempNode {
 
 		}
 
+		/**
+		 * The operator.
+		 *
+		 * @type {String}
+		 */
 		this.op = op;
+
+		/**
+		 * The first input.
+		 *
+		 * @type {Node}
+		 */
 		this.aNode = aNode;
+
+		/**
+		 * The second input.
+		 *
+		 * @type {Node}
+		 */
 		this.bNode = bNode;
 
 	}
 
+	/**
+	 * This method is overwritten since the node type is inferred from the operator
+	 * and the input node types.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {String} output - The current output string.
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder, output ) {
 
 		const op = this.op;

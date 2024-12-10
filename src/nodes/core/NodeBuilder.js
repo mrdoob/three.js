@@ -232,14 +232,14 @@ class NodeBuilder {
 		this.computeShader = null;
 
 		/**
-		 * TODO
+		 * Nodes used in the primary flow of code generation.
 		 *
-		 * @type {Object}
+		 * @type {Object<String,Array<Node>>}
 		 */
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
 
 		/**
-		 * TODO
+		 * Nodes code from `.flowNodes`.
 		 *
 		 * @type {Object<String,String>}
 		 */
@@ -322,7 +322,8 @@ class NodeBuilder {
 		this.vars = {};
 
 		/**
-		 * TODO
+		 * Current code flow.
+		 * All code generated in this stack will be stored in `.flow`.
 		 *
 		 * @type {{code: String}}
 		 */
@@ -330,8 +331,7 @@ class NodeBuilder {
 
 		/**
 		 * A chain of nodes.
-		 *
-		 * TODO: Explains purpose of this property.
+		 * Used to check recursive calls in node-graph.
 		 *
 		 * @type {Array<Node>}
 		 */
@@ -339,8 +339,8 @@ class NodeBuilder {
 
 		/**
 		 * The current stack.
-		 *
-		 * TODO: Explains purpose of this property.
+		 * This reflects the current process in the code block hierarchy,
+		 * it is useful to know if the current process is inside a conditional for example.
 		 *
 		 * @type {StackNode}
 		 */
@@ -348,8 +348,7 @@ class NodeBuilder {
 
 		/**
 		 * List of stack nodes.
-		 *
-		 * TODO: Explains purpose of this property.
+		 * The current stack hierarchy is stored in an array.
 		 *
 		 * @type {Array<StackNode>}
 		 */
@@ -580,9 +579,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns a list bindings.
-	 *
-	 * TODO: Add more details.
+	 * Returns a list bindings of all shader stages separated by groups.
 	 *
 	 * @return {Array<BindGroup>} The list of bindings.
 	 */
@@ -679,7 +676,8 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO: Describe the difference to `addNode()`.
+	 * It is used to add Nodes that will be used as FRAME and RENDER events,
+	 * and need to follow a certain sequence in the calls to work correctly.
 	 *
 	 * @param {Node} node - The node to add.
 	 */
@@ -758,8 +756,7 @@ class NodeBuilder {
 
 	/**
 	 * Adds the given node to the internal node chain.
-	 *
-	 * TODO: Describe the difference to `addNode()`.
+	 * This is used to check recursive calls in node-graph.
 	 *
 	 * @param {Node} node - The node to add.
 	 */
@@ -797,10 +794,10 @@ class NodeBuilder {
 	/**
 	 * Returns the native shader method name for a given generic name. E.g.
 	 * the method name `textureDimensions` matches the WGSL name but must be
-	 * resolved to `texureSize` in GLSL.
+	 * resolved to `textureSize` in GLSL.
 	 *
 	 * @abstract
-	 * @param {String} name - The method name to resolve.
+	 * @param {String} method - The method name to resolve.
 	 * @return {String} The resolved method name.
 	 */
 	getMethod( method ) {
@@ -822,11 +819,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Adds the Node to a target flow so that it can generate code in the 'generate' process.
 	 *
 	 * @param {('vertex'|'fragment'|'compute')} shaderStage - The shader stage.
-	 * @param {Node} node - The node.
-	 * @return {Node} The node
+	 * @param {Node} node - The node to add.
+	 * @return {Node} The node.
 	 */
 	addFlow( shaderStage, node ) {
 
@@ -859,9 +856,10 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Gets a context used in shader construction that can be shared across different materials.
+	 * This is necessary since the renderer cache can reuse shaders generated in one material and use them in another.
 	 *
-	 * @return {Object} TODO.
+	 * @return {Object} The builder's current context without material.
 	 */
 	getSharedContext() {
 
@@ -898,7 +896,7 @@ class NodeBuilder {
 	/**
 	 * Returns a cache for the given node.
 	 *
-	 * @param {Node} Node - The node.
+	 * @param {Node} node - The node.
 	 * @param {Boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
 	 * @return {NodeCache} The cache.
 	 */
@@ -974,7 +972,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns thefragCoord input variable as a native shader string.
+	 * Returns the fragCoord input variable as a native shader string.
 	 *
 	 * @abstract
 	 * @return {String} The fragCoord shader string.
@@ -987,7 +985,7 @@ class NodeBuilder {
 
 	/**
 	 * Whether to flip texture data along its vertical axis or not. WebGL needs
-	 * this method evalaute to `true`, WebGPU to `false`.
+	 * this method evaluate to `true`, WebGPU to `false`.
 	 *
 	 * @abstract
 	 * @return {Boolean} Whether to flip texture data along its vertical axis or not.
@@ -999,9 +997,9 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Calling this mehod increases the usage count for the given node by one.
+	 * Calling this method increases the usage count for the given node by one.
 	 *
-	 * @param {Node} Node - The node to increase the usage count for.
+	 * @param {Node} node - The node to increase the usage count for.
 	 * @return {Number} The updated usage count.
 	 */
 	increaseUsage( node ) {
@@ -1225,7 +1223,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the component type of a given texutre.
+	 * Returns the component type of a given texture.
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @return {String} The component type.
@@ -1321,7 +1319,7 @@ class NodeBuilder {
 	/**
 	 * Returns the type for a given typed array.
 	 *
-	 * @param {TypedArray} type - The typed array.
+	 * @param {TypedArray} array - The typed array.
 	 * @return {String} The type.
 	 */
 	getTypeFromArray( array ) {
@@ -1686,10 +1684,13 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Adds a code flow based on the code-block hierarchy.
+
+	 * This is used so that code-blocks like If,Else create their variables locally if the Node
+	 * is only used inside one of these conditionals in the current shader stage.
 	 *
-	 * @param {Node} node - TODO.
-	 * @param {Node} nodeBlock - TODO.
+	 * @param {Node} node - The node to add.
+	 * @param {Node} nodeBlock - Node-based code-block. Usually 'ConditionalNode'.
 	 */
 	addFlowCodeHierarchy( node, nodeBlock ) {
 
@@ -1724,11 +1725,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Add a inline-code to the current flow code-block.
 	 *
-	 * @param {Node} node - TODO.
-	 * @param {String} code - TODO.
-	 * @param {Node} nodeBlock - TODO.
+	 * @param {Node} node - The node to add.
+	 * @param {String} code - The code to add.
+	 * @param {Node} nodeBlock - Current ConditionalNode
 	 */
 	addLineFlowCodeBlock( node, code, nodeBlock ) {
 
@@ -1742,10 +1743,10 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Add a inline-code to the current flow.
 	 *
-	 * @param {String} code - TODO.
-	 * @param {Node?} [node= null] - TODO.
+	 * @param {String} code - The code to add.
+	 * @param {Node?} [node= null] - Optional Node, can help the system understand if the Node is part of a code-block.
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
 	addLineFlowCode( code, node = null ) {
@@ -1773,9 +1774,9 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Adds a code to the current code flow.
 	 *
-	 * @param {String} code - TODO.
+	 * @param {String} code - Shader code.
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
 	addFlowCode( code ) {
@@ -1787,7 +1788,8 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Add tab in the code that will be generated so that other snippets respect the current tabulation.
+	 * Typically used in codes with If,Else.
 	 *
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
@@ -1800,7 +1802,7 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Removes a tab.
 	 *
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
@@ -1813,11 +1815,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Gets the current flow data based on a Node.
 	 *
-	 * @param {Node} node - TODO.
+	 * @param {Node} node - Node that the flow was started.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
-	 * @return {Object}
+	 * @return {Object} The flow data.
 	 */
 	getFlowData( node/*, shaderStage*/ ) {
 
@@ -1826,10 +1828,10 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Executes the node flow based on a root node to generate the final shader code.
 	 *
-	 * @param {Node} node - TODO.
-	 * @return {Object}
+	 * @param {Node} node - The node to execute.
+	 * @return {Object} The code flow.
 	 */
 	flowNode( node ) {
 
@@ -1867,9 +1869,9 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Generates a code flow based on a TSL function: Fn().
 	 *
-	 * @param {ShaderNodeInternal} node - TODO.
+	 * @param {ShaderNodeInternal} shaderNode - A function code will be generated based on the input.
 	 * @return {Object}
 	 */
 	flowShaderNode( shaderNode ) {
@@ -1911,10 +1913,10 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Runs the node flow through all the steps of creation, 'setup', 'analyze', 'generate'.
 	 *
-	 * @param {Node} node - TODO.
-	 * @param {String?} output - TODO.
+	 * @param {Node} node - The node to execute.
+	 * @param {String?} output - Expected output type. For example 'vec3'.
 	 * @return {Object}
 	 */
 	flowStagesNode( node, output = null ) {
@@ -1970,11 +1972,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Generates a code flow based on a child Node.
 	 *
-	 * @param {Node} node - TODO.
-	 * @param {String?} output - TODO.
-	 * @return {Object}
+	 * @param {Node} node - The node to execute.
+	 * @param {String?} output - Expected output type. For example 'vec3'.
+	 * @return {Object} The code flow.
 	 */
 	flowChildNode( node, output = null ) {
 
@@ -1995,12 +1997,15 @@ class NodeBuilder {
 	}
 
 	/**
-	 * TODO
+	 * Executes a flow of code in a different stage.
+	 *
+	 * Some nodes like `varying()` have the ability to compute code in vertex-stage and
+	 * return the value in fragment-stage even if it is being executed in an input fragment.
 	 *
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
-	 * @param {Node} node - TODO.
-	 * @param {String?} output - TODO.
-	 * @param {String?} propertyName - TODO.
+	 * @param {Node} node - The node to execute.
+	 * @param {String?} output - Expected output type. For example 'vec3'.
+	 * @param {String?} propertyName - The property name to assign the result.
 	 * @return {Object}
 	 */
 	flowNodeFromShaderStage( shaderStage, node, output = null, propertyName = null ) {

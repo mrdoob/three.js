@@ -26,7 +26,7 @@ class BasicLightingModel extends LightingModel {
 	/**
 	 * Implements the baked indirect lighting with its modulation.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
@@ -61,7 +61,7 @@ class BasicLightingModel extends LightingModel {
 	/**
 	 * Implements the environment mapping.
 	 *
-	 * @param {ContextNode} input - The current node context.
+	 * @param {ContextNode} context - The current node context.
 	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

@@ -44,7 +44,7 @@ class FXAANode extends TempNode {
 
 		const Sample = Fn( ( [ uv ] ) => {
 
-			return textureNode.uv( uv );
+			return textureNode.sample( uv );
 
 		} );
 

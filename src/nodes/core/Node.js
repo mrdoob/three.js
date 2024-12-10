@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodeChildren, getCacheKey } from './NodeUtils.js';
+import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
@@ -125,6 +125,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @type {Boolean}
 	 * @default false
+	 * @param {boolean} value
 	 */
 	set needsUpdate( value ) {
 
@@ -320,12 +321,23 @@ class Node extends EventDispatcher {
 
 		if ( force === true || this._cacheKey === null ) {
 
-			this._cacheKey = getCacheKey( this, force );
+			this._cacheKey = hash( getCacheKey( this, force ), this.customCacheKey() );
 			this._cacheKeyVersion = this.version;
 
 		}
 
 		return this._cacheKey;
+
+	}
+
+	/**
+	 * Generate a custom cache key for this node.
+	 *
+	 * @return {Number} The cache key of the node.
+	 */
+	customCacheKey() {
+
+		return 0;
 
 	}
 
@@ -469,7 +481,7 @@ class Node extends EventDispatcher {
 
 	/**
 	 * Represents the analyze stage which is the second step of the build process, see {@link Node#build} method.
-	 * This stage anaylzes the node hierarchy and ensures descendent nodes are built.
+	 * This stage analyzes the node hierarchy and ensures descendent nodes are built.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
@@ -521,7 +533,9 @@ class Node extends EventDispatcher {
 	 * The method can be implemented to update the node's internal state before it is used to render an object.
 	 * The {@link Node#updateBeforeType} property defines how often the update is executed.
 	 *
+	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	updateBefore( /*frame*/ ) {
 
@@ -533,7 +547,9 @@ class Node extends EventDispatcher {
 	 * The method can be implemented to update the node's internal state after it was used to render an object.
 	 * The {@link Node#updateAfterType} property defines how often the update is executed.
 	 *
+	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	updateAfter( /*frame*/ ) {
 
@@ -545,7 +561,9 @@ class Node extends EventDispatcher {
 	 * The method can be implemented to update the node's internal state when it is used to render an object.
 	 * The {@link Node#updateType} property defines how often the update is executed.
 	 *
+	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	update( /*frame*/ ) {
 

@@ -9,6 +9,12 @@ import { Matrix3 } from '../../math/Matrix3.js';
 const WORKING_COLOR_SPACE = 'WorkingColorSpace';
 const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
 
+/**
+ * This node represents a color space conversion. Meaning it converts
+ * a color value from a source to a target color space.
+ *
+ * @augments TempNode
+ */
 class ColorSpaceNode extends TempNode {
 
 	static get type() {
@@ -17,16 +23,49 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new color space node.
+	 *
+	 * @param {Node} colorNode - Represents the color to convert.
+	 * @param {String} source - The source color space.
+	 * @param {String} target - The target color space.
+	 */
 	constructor( colorNode, source, target ) {
 
 		super( 'vec4' );
 
+		/**
+		 * Represents the color to convert.
+		 *
+		 * @type {Node}
+		 */
 		this.colorNode = colorNode;
+
+		/**
+		 * The source color space.
+		 *
+		 * @type {Node}
+		 */
 		this.source = source;
+
+		/**
+		 * The target color space.
+		 *
+		 * @type {Node}
+		 */
 		this.target = target;
 
 	}
 
+	/**
+	 * This method resolves the constants `WORKING_COLOR_SPACE` and
+	 * `OUTPUT_COLOR_SPACE` based on the current configuration of the
+	 * color management and renderer.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {String} colorSpace - The color space to resolve.
+	 * @return {String} The resolved color space.
+	 */
 	resolveColorSpace( builder, colorSpace ) {
 
 		if ( colorSpace === WORKING_COLOR_SPACE ) {

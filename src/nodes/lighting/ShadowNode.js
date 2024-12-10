@@ -1,5 +1,4 @@
-import Node from '../core/Node.js';
-import { NodeUpdateType } from '../core/constants.js';
+import ShadowBaseNode, { shadowWorldPosition } from './ShadowBaseNode.js';
 import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -12,15 +11,13 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { HalfFloatType, LessCompare, NoBlending, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
-const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
-
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
 	let dist = positionWorld.sub( position ).length();
@@ -56,7 +53,6 @@ const getShadowMaterial = ( light ) => {
 		material.colorNode = vec4( 0, 0, 0, 1 );
 		material.depthNode = depthNode;
 		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
-		material.blending = NoBlending;
 		material.name = 'ShadowMaterial';
 
 		shadowMaterialLib.set( light, material );
@@ -174,7 +170,7 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord }
 
 	const occlusion = float( 1 ).toVar();
 
-	const distribution = texture( depthTexture ).uv( shadowCoord.xy ).rg;
+	const distribution = texture( depthTexture ).sample( shadowCoord.xy ).rg;
 
 	const hardShadow = step( shadowCoord.z, distribution.x );
 
@@ -204,7 +200,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass 
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const depth = shadowPass.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
+		const depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
 		mean.addAssign( depth );
 		squaredMean.addAssign( depth.mul( depth ) );
 
@@ -230,7 +226,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const distribution = shadowPass.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		const distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
 		mean.addAssign( distribution.x );
 		squaredMean.addAssign( add( distribution.y.mul( distribution.y ), distribution.x.mul( distribution.x ) ) );
 
@@ -250,7 +246,7 @@ const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilt
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
-class ShadowNode extends Node {
+class ShadowNode extends ShadowBaseNode {
 
 	static get type() {
 
@@ -260,9 +256,8 @@ class ShadowNode extends Node {
 
 	constructor( light, shadow = null ) {
 
-		super();
+		super( light );
 
-		this.light = light;
 		this.shadow = shadow || light.shadow;
 
 		this.shadowMap = null;
@@ -273,7 +268,6 @@ class ShadowNode extends Node {
 		this.vsmMaterialVertical = null;
 		this.vsmMaterialHorizontal = null;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
 		this._node = null;
 
 		this.isShadowNode = true;
@@ -425,11 +419,11 @@ class ShadowNode extends Node {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		return Fn( ( { material } ) => {
-
-			shadowWorldPosition.assign( material.shadowPositionNode || positionWorld );
+		return Fn( () => {
 
 			let node = this._node;
+
+			this.setupShadowPosition( builder );
 
 			if ( node === null ) {
 
@@ -457,8 +451,10 @@ class ShadowNode extends Node {
 
 	renderShadow( frame ) {
 
-		const { shadow, shadowMap } = this;
+		const { shadow, shadowMap, light } = this;
 		const { renderer, scene } = frame;
+
+		shadow.updateMatrices( light );
 
 		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height );
 
@@ -488,11 +484,15 @@ class ShadowNode extends Node {
 
 		renderer.setMRT( null );
 
-		renderer.setRenderObjectFunction( ( object, ...params ) => {
+		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
-				renderer.renderObject( object, ...params );
+				object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
@@ -562,7 +562,7 @@ class ShadowNode extends Node {
 
 		}
 
-		this.updateBeforeType = NodeUpdateType.NONE;
+		super.dispose();
 
 	}
 
