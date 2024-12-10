@@ -43,7 +43,7 @@ class GlitchPass extends Pass {
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
 		this.uniforms[ 'byp' ].value = 0;
 
-		if ( this.curF % this.randX == 0 || this.goWild == true ) {
+		if ( this.curF % this.randX === 0 || this.goWild === true ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 30;
 			this.uniforms[ 'angle' ].value = MathUtils.randFloat( - Math.PI, Math.PI );
@@ -63,7 +63,7 @@ class GlitchPass extends Pass {
 			this.uniforms[ 'seed_x' ].value = MathUtils.randFloat( - 0.3, 0.3 );
 			this.uniforms[ 'seed_y' ].value = MathUtils.randFloat( - 0.3, 0.3 );
 
-		} else if ( this.goWild == false ) {
+		} else if ( this.goWild === false ) {
 
 			this.uniforms[ 'byp' ].value = 1;
 

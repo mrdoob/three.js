@@ -53,7 +53,7 @@ class RenderPass extends Pass {
 
 		}
 
-		if ( this.clearDepth == true ) {
+		if ( this.clearDepth === true ) {
 
 			renderer.clearDepth();
 

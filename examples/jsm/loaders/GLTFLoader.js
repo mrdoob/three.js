@@ -2780,7 +2780,7 @@ class GLTFParser {
 		const updateMappings = ( original, clone ) => {
 
 			const mappings = this.associations.get( original );
-			if ( mappings != null ) {
+			if ( mappings !== null ) {
 
 				this.associations.set( clone, mappings );
 
@@ -2924,7 +2924,7 @@ class GLTFParser {
 				default:
 					dependency = this._invokeOne( function ( ext ) {
 
-						return ext != this && ext.getDependency && ext.getDependency( type, index );
+						return ext !== this && ext.getDependency && ext.getDependency( type, index );
 
 					} );
 
@@ -3340,9 +3340,11 @@ class GLTFParser {
 
 	/**
 	 * Asynchronously assigns a texture to the given material parameters.
+	 *
 	 * @param {Object} materialParams
 	 * @param {string} mapName
 	 * @param {Object} mapDef
+	 * @param {string} colorSpace
 	 * @return {Promise<Texture>}
 	 */
 	assignTexture( materialParams, mapName, mapDef, colorSpace ) {
@@ -4386,7 +4388,7 @@ class GLTFParser {
 
 					const mappings = parser.associations.get( node );
 
-					if ( mappings != null ) {
+					if ( mappings !== null ) {
 
 						reducedAssociations.set( node, mappings );
 

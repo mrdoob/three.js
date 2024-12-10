@@ -419,7 +419,7 @@ class SVGLoader extends Loader {
 						for ( let j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
 							// skip command if start point == end point
-							if ( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue;
+							if ( numbers[ j + 5 ] === point.x && numbers[ j + 6 ] === point.y ) continue;
 
 							const start = point.clone();
 							point.x = numbers[ j + 5 ];
@@ -611,7 +611,7 @@ class SVGLoader extends Loader {
 						for ( let j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
 							// skip command if no displacement
-							if ( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue;
+							if ( numbers[ j + 5 ] === 0 && numbers[ j + 6 ] === 0 ) continue;
 
 							const start = point.clone();
 							point.x += numbers[ j + 5 ];
@@ -702,7 +702,7 @@ class SVGLoader extends Loader {
 
 		function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
 
-			if ( rx == 0 || ry == 0 ) {
+			if ( rx === 0 || ry === 0 ) {
 
 				// draw a line if either of the radii == 0
 				path.lineTo( end.x, end.y );
@@ -1969,12 +1969,12 @@ class SVGLoader extends Loader {
 
 					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
 					//find position of this endpoints relatively to edge1
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
+					if ( classifyResult.loc === IntersectionLocationType.ORIGIN ) {
 
 						const point = ( i === 0 ? b0 : b1 );
 						return { x: point.x, y: point.y, t: classifyResult.t };
 
-					} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
+					} else if ( classifyResult.loc === IntersectionLocationType.BETWEEN ) {
 
 						const x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
 						const y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
@@ -1994,7 +1994,7 @@ class SVGLoader extends Loader {
 
 					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
 
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
+					if ( classifyResult.loc === IntersectionLocationType.ORIGIN ) {
 
 						const point = ( i === 0 ? b0 : b1 );
 						return { x: point.x, y: point.y, t: classifyResult.t };

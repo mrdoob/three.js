@@ -36,7 +36,7 @@ class IESLoader extends Loader {
 
 			for ( let i = 0; i < iesLamp.numHorAngles - 1; ++ i ) { // numHorAngles = horAngles.length-1 because of extra padding, so this wont cause an out of bounds error
 
-				if ( theta < iesLamp.horAngles[ i + 1 ] || i == iesLamp.numHorAngles - 2 ) {
+				if ( theta < iesLamp.horAngles[ i + 1 ] || i === iesLamp.numHorAngles - 2 ) {
 
 					thetaIndex = i;
 					startTheta = iesLamp.horAngles[ i ];
@@ -50,7 +50,7 @@ class IESLoader extends Loader {
 
 			for ( let i = 0; i < iesLamp.numVerAngles - 1; ++ i ) {
 
-				if ( phi < iesLamp.verAngles[ i + 1 ] || i == iesLamp.numVerAngles - 2 ) {
+				if ( phi < iesLamp.verAngles[ i + 1 ] || i === iesLamp.numVerAngles - 2 ) {
 
 					phiIndex = i;
 					startPhi = iesLamp.verAngles[ i ];

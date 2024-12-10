@@ -125,7 +125,7 @@ class NRRDLoader extends Loader {
 				_dataPointer += chunks * _chunkSize ) );
 
 			// if required, flip the endianness of the bytes
-			if ( _nativeLittleEndian != _littleEndian ) {
+			if ( _nativeLittleEndian !== _littleEndian ) {
 
 				// we need to flip here since the format doesn't match the native endianness
 				_bytes = flipEndianness( _bytes, _chunkSize );
@@ -303,7 +303,7 @@ class NRRDLoader extends Loader {
 		let i;
 		for ( i = 1; i < _length; i ++ ) {
 
-			if ( _bytes[ i - 1 ] == 10 && _bytes[ i ] == 10 ) {
+			if ( _bytes[ i - 1 ] === 10 && _bytes[ i ] === 10 ) {
 
 				// we found two line breaks in a row
 				// now we know what the header is

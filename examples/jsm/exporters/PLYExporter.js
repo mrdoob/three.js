@@ -246,7 +246,7 @@ class PLYExporter {
 					// Normal information
 					if ( includeNormals === true ) {
 
-						if ( normals != null ) {
+						if ( normals !== null ) {
 
 							vertex.fromBufferAttribute( normals, i );
 
@@ -279,7 +279,7 @@ class PLYExporter {
 					// UV information
 					if ( includeUVs === true ) {
 
-						if ( uvs != null ) {
+						if ( uvs !== null ) {
 
 							output.setFloat32( vOffset, uvs.getX( i ), options.littleEndian );
 							vOffset += 4;
@@ -302,7 +302,7 @@ class PLYExporter {
 					// Color information
 					if ( includeColors === true ) {
 
-						if ( colors != null ) {
+						if ( colors !== null ) {
 
 							tempColor.fromBufferAttribute( colors, i );
 
@@ -422,7 +422,7 @@ class PLYExporter {
 					// Normal information
 					if ( includeNormals === true ) {
 
-						if ( normals != null ) {
+						if ( normals !== null ) {
 
 							vertex.fromBufferAttribute( normals, i );
 
@@ -444,7 +444,7 @@ class PLYExporter {
 					// UV information
 					if ( includeUVs === true ) {
 
-						if ( uvs != null ) {
+						if ( uvs !== null ) {
 
 							line += ' ' +
 								uvs.getX( i ) + ' ' +
@@ -461,7 +461,7 @@ class PLYExporter {
 					// Color information
 					if ( includeColors === true ) {
 
-						if ( colors != null ) {
+						if ( colors !== null ) {
 
 							tempColor.fromBufferAttribute( colors, i );
 

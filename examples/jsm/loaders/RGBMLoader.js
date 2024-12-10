@@ -148,10 +148,10 @@ var UPNG = {};
 UPNG.toRGBA8 = function ( out ) {
 
 	var w = out.width, h = out.height;
-	if ( out.tabs.acTL == null ) return [ UPNG.toRGBA8.decodeImage( out.data, w, h, out ).buffer ];
+	if ( out.tabs.acTL === null ) return [ UPNG.toRGBA8.decodeImage( out.data, w, h, out ).buffer ];
 
 	var frms = [];
-	if ( out.frames[ 0 ].data == null ) out.frames[ 0 ].data = out.data;
+	if ( out.frames[ 0 ].data === null ) out.frames[ 0 ].data = out.data;
 
 	var len = w * h * 4, img = new Uint8Array( len ), empty = new Uint8Array( len ), prev = new Uint8Array( len );
 	for ( var i = 0; i < out.frames.length; i ++ ) {
@@ -160,15 +160,15 @@ UPNG.toRGBA8 = function ( out ) {
 		var fx = frm.rect.x, fy = frm.rect.y, fw = frm.rect.width, fh = frm.rect.height;
 		var fdata = UPNG.toRGBA8.decodeImage( frm.data, fw, fh, out );
 
-		if ( i != 0 ) for ( var j = 0; j < len; j ++ ) prev[ j ] = img[ j ];
+		if ( i !== 0 ) for ( var j = 0; j < len; j ++ ) prev[ j ] = img[ j ];
 
-		if ( frm.blend == 0 ) UPNG._copyTile( fdata, fw, fh, img, w, h, fx, fy, 0 );
-		else if ( frm.blend == 1 ) UPNG._copyTile( fdata, fw, fh, img, w, h, fx, fy, 1 );
+		if ( frm.blend === 0 ) UPNG._copyTile( fdata, fw, fh, img, w, h, fx, fy, 0 );
+		else if ( frm.blend === 1 ) UPNG._copyTile( fdata, fw, fh, img, w, h, fx, fy, 1 );
 
 		frms.push( img.buffer.slice( 0 ) );
 
-		if ( frm.dispose == 1 ) UPNG._copyTile( empty, fw, fh, img, w, h, fx, fy, 0 );
-		else if ( frm.dispose == 2 ) for ( var j = 0; j < len; j ++ ) img[ j ] = prev[ j ];
+		if ( frm.dispose === 1 ) UPNG._copyTile( empty, fw, fh, img, w, h, fx, fy, 0 );
+		else if ( frm.dispose === 2 ) for ( var j = 0; j < len; j ++ ) img[ j ] = prev[ j ];
 
 	}
 
@@ -185,33 +185,33 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 	var ctype = out.ctype, depth = out.depth;
 	var rs = UPNG._bin.readUshort;
 
-	if ( ctype == 6 ) { // RGB + alpha
+	if ( ctype === 6 ) { // RGB + alpha
 
 		var qarea = area << 2;
-		if ( depth == 8 ) for ( var i = 0; i < qarea; i += 4 ) {
+		if ( depth === 8 ) for ( var i = 0; i < qarea; i += 4 ) {
 
 			bf[ i ] = data[ i ]; bf[ i + 1 ] = data[ i + 1 ]; bf[ i + 2 ] = data[ i + 2 ]; bf[ i + 3 ] = data[ i + 3 ];
 
 		}
 
-		if ( depth == 16 ) for ( var i = 0; i < qarea; i ++ ) {
+		if ( depth === 16 ) for ( var i = 0; i < qarea; i ++ ) {
 
 			bf[ i ] = data[ i << 1 ];
 
 		}
 
-	} else if ( ctype == 2 ) {	// RGB
+	} else if ( ctype === 2 ) {	// RGB
 
 		var ts = out.tabs[ 'tRNS' ];
-		if ( ts == null ) {
+		if ( ts === null ) {
 
-			if ( depth == 8 ) for ( var i = 0; i < area; i ++ ) {
+			if ( depth === 8 ) for ( var i = 0; i < area; i ++ ) {
 
 				var ti = i * 3; bf32[ i ] = ( 255 << 24 ) | ( data[ ti + 2 ] << 16 ) | ( data[ ti + 1 ] << 8 ) | data[ ti ];
 
 			}
 
-			if ( depth == 16 ) for ( var i = 0; i < area; i ++ ) {
+			if ( depth === 16 ) for ( var i = 0; i < area; i ++ ) {
 
 				var ti = i * 6; bf32[ i ] = ( 255 << 24 ) | ( data[ ti + 4 ] << 16 ) | ( data[ ti + 2 ] << 8 ) | data[ ti ];
 
@@ -220,27 +220,27 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 		} else {
 
 			var tr = ts[ 0 ], tg = ts[ 1 ], tb = ts[ 2 ];
-			if ( depth == 8 ) for ( var i = 0; i < area; i ++ ) {
+			if ( depth === 8 ) for ( var i = 0; i < area; i ++ ) {
 
 				var qi = i << 2, ti = i * 3; bf32[ i ] = ( 255 << 24 ) | ( data[ ti + 2 ] << 16 ) | ( data[ ti + 1 ] << 8 ) | data[ ti ];
-				if ( data[ ti ] == tr && data[ ti + 1 ] == tg && data[ ti + 2 ] == tb ) bf[ qi + 3 ] = 0;
+				if ( data[ ti ] === tr && data[ ti + 1 ] === tg && data[ ti + 2 ] === tb ) bf[ qi + 3 ] = 0;
 
 			}
 
-			if ( depth == 16 ) for ( var i = 0; i < area; i ++ ) {
+			if ( depth === 16 ) for ( var i = 0; i < area; i ++ ) {
 
 				var qi = i << 2, ti = i * 6; bf32[ i ] = ( 255 << 24 ) | ( data[ ti + 4 ] << 16 ) | ( data[ ti + 2 ] << 8 ) | data[ ti ];
-				if ( rs( data, ti ) == tr && rs( data, ti + 2 ) == tg && rs( data, ti + 4 ) == tb ) bf[ qi + 3 ] = 0;
+				if ( rs( data, ti ) === tr && rs( data, ti + 2 ) === tg && rs( data, ti + 4 ) === tb ) bf[ qi + 3 ] = 0;
 
 			}
 
 		}
 
-	} else if ( ctype == 3 ) {	// palette
+	} else if ( ctype === 3 ) {	// palette
 
 		var p = out.tabs[ 'PLTE' ], ap = out.tabs[ 'tRNS' ], tl = ap ? ap.length : 0;
 		//console.log(p, ap);
-		if ( depth == 1 ) for ( var y = 0; y < h; y ++ ) {
+		if ( depth === 1 ) for ( var y = 0; y < h; y ++ ) {
 
 			var s0 = y * bpl, t0 = y * w;
 			for ( var i = 0; i < w; i ++ ) {
@@ -251,7 +251,7 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 
 		}
 
-		if ( depth == 2 ) for ( var y = 0; y < h; y ++ ) {
+		if ( depth === 2 ) for ( var y = 0; y < h; y ++ ) {
 
 			var s0 = y * bpl, t0 = y * w;
 			for ( var i = 0; i < w; i ++ ) {
@@ -262,7 +262,7 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 
 		}
 
-		if ( depth == 4 ) for ( var y = 0; y < h; y ++ ) {
+		if ( depth === 4 ) for ( var y = 0; y < h; y ++ ) {
 
 			var s0 = y * bpl, t0 = y * w;
 			for ( var i = 0; i < w; i ++ ) {
@@ -273,55 +273,55 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 
 		}
 
-		if ( depth == 8 ) for ( var i = 0; i < area; i ++ ) {
+		if ( depth === 8 ) for ( var i = 0; i < area; i ++ ) {
 
 			var qi = i << 2, j = data[ i ], cj = 3 * j; bf[ qi ] = p[ cj ]; bf[ qi + 1 ] = p[ cj + 1 ]; bf[ qi + 2 ] = p[ cj + 2 ]; bf[ qi + 3 ] = ( j < tl ) ? ap[ j ] : 255;
 
 		}
 
-	} else if ( ctype == 4 ) {	// gray + alpha
+	} else if ( ctype === 4 ) {	// gray + alpha
 
-		if ( depth == 8 ) for ( var i = 0; i < area; i ++ ) {
+		if ( depth === 8 ) for ( var i = 0; i < area; i ++ ) {
 
 			var qi = i << 2, di = i << 1, gr = data[ di ]; bf[ qi ] = gr; bf[ qi + 1 ] = gr; bf[ qi + 2 ] = gr; bf[ qi + 3 ] = data[ di + 1 ];
 
 		}
 
-		if ( depth == 16 ) for ( var i = 0; i < area; i ++ ) {
+		if ( depth === 16 ) for ( var i = 0; i < area; i ++ ) {
 
 			var qi = i << 2, di = i << 2, gr = data[ di ]; bf[ qi ] = gr; bf[ qi + 1 ] = gr; bf[ qi + 2 ] = gr; bf[ qi + 3 ] = data[ di + 2 ];
 
 		}
 
-	} else if ( ctype == 0 ) {	// gray
+	} else if ( ctype === 0 ) {	// gray
 
 		var tr = out.tabs[ 'tRNS' ] ? out.tabs[ 'tRNS' ] : - 1;
 		for ( var y = 0; y < h; y ++ ) {
 
 			var off = y * bpl, to = y * w;
-			if ( depth == 1 ) for ( var x = 0; x < w; x ++ ) {
+			if ( depth === 1 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( x & 7 ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
-
-			}
-			else if ( depth == 2 ) for ( var x = 0; x < w; x ++ ) {
-
-				var gr = 85 * ( ( data[ off + ( x >>> 2 ) ] >>> ( 6 - ( ( x & 3 ) << 1 ) ) ) & 3 ), al = ( gr == tr * 85 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( x & 7 ) ) ) & 1 ), al = ( gr === tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
-			else if ( depth == 4 ) for ( var x = 0; x < w; x ++ ) {
+			else if ( depth === 2 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = 17 * ( ( data[ off + ( x >>> 1 ) ] >>> ( 4 - ( ( x & 1 ) << 2 ) ) ) & 15 ), al = ( gr == tr * 17 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
-
-			}
-			else if ( depth == 8 ) for ( var x = 0; x < w; x ++ ) {
-
-				var gr = data[ off + x ], al = ( gr == tr ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = 85 * ( ( data[ off + ( x >>> 2 ) ] >>> ( 6 - ( ( x & 3 ) << 1 ) ) ) & 3 ), al = ( gr === tr * 85 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
-			else if ( depth == 16 ) for ( var x = 0; x < w; x ++ ) {
+			else if ( depth === 4 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = data[ off + ( x << 1 ) ], al = ( rs( data, off + ( x << 1 ) ) == tr ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = 17 * ( ( data[ off + ( x >>> 1 ) ] >>> ( 4 - ( ( x & 1 ) << 2 ) ) ) & 15 ), al = ( gr === tr * 17 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+
+			}
+			else if ( depth === 8 ) for ( var x = 0; x < w; x ++ ) {
+
+				var gr = data[ off + x ], al = ( gr === tr ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+
+			}
+			else if ( depth === 16 ) for ( var x = 0; x < w; x ++ ) {
+
+				var gr = data[ off + ( x << 1 ) ], al = ( rs( data, off + ( x << 1 ) ) === tr ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
 
@@ -345,7 +345,7 @@ UPNG.decode = function ( buff ) {
 	var text, keyw, bfr;
 
 	var mgck = [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ];
-	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] != mgck[ i ] ) throw new Error( 'The input is not a PNG file!' );
+	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] !== mgck[ i ] ) throw new Error( 'The input is not a PNG file!' );
 
 	while ( offset < data.length ) {
 
@@ -353,27 +353,27 @@ UPNG.decode = function ( buff ) {
 		var type = bin.readASCII( data, offset, 4 ); offset += 4;
 		//console.log(type,len);
 
-		if ( type == 'IHDR' ) {
+		if ( type === 'IHDR' ) {
 
 			UPNG.decode._IHDR( data, offset, out );
 
-		} else if ( type == 'CgBI' ) {
+		} else if ( type === 'CgBI' ) {
 
 			out.tabs[ type ] = data.slice( offset, offset + 4 );
 
-		} else if ( type == 'IDAT' ) {
+		} else if ( type === 'IDAT' ) {
 
 			for ( var i = 0; i < len; i ++ ) dd[ doff + i ] = data[ offset + i ];
 			doff += len;
 
-		} else if ( type == 'acTL' ) {
+		} else if ( type === 'acTL' ) {
 
 			out.tabs[ type ] = { num_frames: rUi( data, offset ), num_plays: rUi( data, offset + 4 ) };
 			fd = new Uint8Array( data.length );
 
-		} else if ( type == 'fcTL' ) {
+		} else if ( type === 'fcTL' ) {
 
-			if ( foff != 0 ) {
+			if ( foff !== 0 ) {
 
 				var fr = out.frames[ out.frames.length - 1 ];
 				fr.data = UPNG.decode._decompress( out, fd.slice( 0, foff ), fr.rect.width, fr.rect.height ); foff = 0;
@@ -381,32 +381,32 @@ UPNG.decode = function ( buff ) {
 			}
 
 			var rct = { x: rUi( data, offset + 12 ), y: rUi( data, offset + 16 ), width: rUi( data, offset + 4 ), height: rUi( data, offset + 8 ) };
-			var del = rUs( data, offset + 22 ); del = rUs( data, offset + 20 ) / ( del == 0 ? 100 : del );
+			var del = rUs( data, offset + 22 ); del = rUs( data, offset + 20 ) / ( del === 0 ? 100 : del );
 			var frm = { rect: rct, delay: Math.round( del * 1000 ), dispose: data[ offset + 24 ], blend: data[ offset + 25 ] };
 			//console.log(frm);
 			out.frames.push( frm );
 
-		} else if ( type == 'fdAT' ) {
+		} else if ( type === 'fdAT' ) {
 
 			for ( var i = 0; i < len - 4; i ++ ) fd[ foff + i ] = data[ offset + i + 4 ];
 			foff += len - 4;
 
-		} else if ( type == 'pHYs' ) {
+		} else if ( type === 'pHYs' ) {
 
 			out.tabs[ type ] = [ bin.readUint( data, offset ), bin.readUint( data, offset + 4 ), data[ offset + 8 ] ];
 
-		} else if ( type == 'cHRM' ) {
+		} else if ( type === 'cHRM' ) {
 
 			out.tabs[ type ] = [];
 			for ( var i = 0; i < 8; i ++ ) out.tabs[ type ].push( bin.readUint( data, offset + i * 4 ) );
 
-		} else if ( type == 'tEXt' || type == 'zTXt' ) {
+		} else if ( type === 'tEXt' || type === 'zTXt' ) {
 
-			if ( out.tabs[ type ] == null ) out.tabs[ type ] = {};
+			if ( out.tabs[ type ] === null ) out.tabs[ type ] = {};
 			var nz = bin.nextZero( data, offset );
 			keyw = bin.readASCII( data, offset, nz - offset );
 			var tl = offset + len - nz - 1;
-			if ( type == 'tEXt' ) text = bin.readASCII( data, nz + 1, tl );
+			if ( type === 'tEXt' ) text = bin.readASCII( data, nz + 1, tl );
 			else {
 
 				bfr = UPNG.decode._inflate( data.slice( nz + 2, nz + 2 + tl ) );
@@ -416,9 +416,9 @@ UPNG.decode = function ( buff ) {
 
 			out.tabs[ type ][ keyw ] = text;
 
-		} else if ( type == 'iTXt' ) {
+		} else if ( type === 'iTXt' ) {
 
-			if ( out.tabs[ type ] == null ) out.tabs[ type ] = {};
+			if ( out.tabs[ type ] === null ) out.tabs[ type ] = {};
 			var nz = 0, off = offset;
 			nz = bin.nextZero( data, off );
 			keyw = bin.readASCII( data, off, nz - off ); off = nz + 1;
@@ -428,7 +428,7 @@ UPNG.decode = function ( buff ) {
 			nz = bin.nextZero( data, off );
 			bin.readUTF8( data, off, nz - off ); off = nz + 1;
 			var tl = len - ( off - offset );
-			if ( cflag == 0 ) text = bin.readUTF8( data, off, tl );
+			if ( cflag === 0 ) text = bin.readUTF8( data, off, tl );
 			else {
 
 				bfr = UPNG.decode._inflate( data.slice( off, off + tl ) );
@@ -438,31 +438,31 @@ UPNG.decode = function ( buff ) {
 
 			out.tabs[ type ][ keyw ] = text;
 
-		} else if ( type == 'PLTE' ) {
+		} else if ( type === 'PLTE' ) {
 
 			out.tabs[ type ] = bin.readBytes( data, offset, len );
 
-		} else if ( type == 'hIST' ) {
+		} else if ( type === 'hIST' ) {
 
 			var pl = out.tabs[ 'PLTE' ].length / 3;
 			out.tabs[ type ] = []; for ( var i = 0; i < pl; i ++ ) out.tabs[ type ].push( rUs( data, offset + i * 2 ) );
 
-		} else if ( type == 'tRNS' ) {
+		} else if ( type === 'tRNS' ) {
 
-			if ( out.ctype == 3 ) out.tabs[ type ] = bin.readBytes( data, offset, len );
-			else if ( out.ctype == 0 ) out.tabs[ type ] = rUs( data, offset );
-			else if ( out.ctype == 2 ) out.tabs[ type ] = [ rUs( data, offset ), rUs( data, offset + 2 ), rUs( data, offset + 4 ) ];
+			if ( out.ctype === 3 ) out.tabs[ type ] = bin.readBytes( data, offset, len );
+			else if ( out.ctype === 0 ) out.tabs[ type ] = rUs( data, offset );
+			else if ( out.ctype === 2 ) out.tabs[ type ] = [ rUs( data, offset ), rUs( data, offset + 2 ), rUs( data, offset + 4 ) ];
 			//else console.log("tRNS for unsupported color type",out.ctype, len);
 
-		} else if ( type == 'gAMA' ) out.tabs[ type ] = bin.readUint( data, offset ) / 100000;
-		else if ( type == 'sRGB' ) out.tabs[ type ] = data[ offset ];
-		else if ( type == 'bKGD' ) {
+		} else if ( type === 'gAMA' ) out.tabs[ type ] = bin.readUint( data, offset ) / 100000;
+		else if ( type === 'sRGB' ) out.tabs[ type ] = data[ offset ];
+		else if ( type === 'bKGD' ) {
 
-			if ( out.ctype == 0 || out.ctype == 4 ) out.tabs[ type ] = [ rUs( data, offset ) ];
-			else if ( out.ctype == 2 || out.ctype == 6 ) out.tabs[ type ] = [ rUs( data, offset ), rUs( data, offset + 2 ), rUs( data, offset + 4 ) ];
-			else if ( out.ctype == 3 ) out.tabs[ type ] = data[ offset ];
+			if ( out.ctype === 0 || out.ctype === 4 ) out.tabs[ type ] = [ rUs( data, offset ) ];
+			else if ( out.ctype === 2 || out.ctype === 6 ) out.tabs[ type ] = [ rUs( data, offset ), rUs( data, offset + 2 ), rUs( data, offset + 4 ) ];
+			else if ( out.ctype === 3 ) out.tabs[ type ] = data[ offset ];
 
-		} else if ( type == 'IEND' ) {
+		} else if ( type === 'IEND' ) {
 
 			break;
 
@@ -474,7 +474,7 @@ UPNG.decode = function ( buff ) {
 
 	}
 
-	if ( foff != 0 ) {
+	if ( foff !== 0 ) {
 
 		var fr = out.frames[ out.frames.length - 1 ];
 		fr.data = UPNG.decode._decompress( out, fd.slice( 0, foff ), fr.rect.width, fr.rect.height );
@@ -494,8 +494,8 @@ UPNG.decode._decompress = function ( out, dd, w, h ) {
 	if ( out.tabs[ 'CgBI' ] ) dd = UPNG.inflateRaw( dd, buff );
 	else dd = UPNG.decode._inflate( dd, buff );
 
-	if ( out.interlace == 0 ) dd = UPNG.decode._filterZero( dd, out, 0, w, h );
-	else if ( out.interlace == 1 ) dd = UPNG.decode._readInterlace( dd, out );
+	if ( out.interlace === 0 ) dd = UPNG.decode._filterZero( dd, out, 0, w, h );
+	else if ( out.interlace === 1 ) dd = UPNG.decode._readInterlace( dd, out );
 
 	return dd;
 
@@ -512,25 +512,25 @@ UPNG.inflateRaw = function () {
 	var H = {}; H.H = {}; H.H.N = function ( N, W ) {
 
 		var R = Uint8Array, i = 0, m = 0, J = 0, h = 0, Q = 0, X = 0, u = 0, w = 0, d = 0, v, C;
-		if ( N[ 0 ] == 3 && N[ 1 ] == 0 ) return W ? W : new R( 0 ); var V = H.H, n = V.b, A = V.e, l = V.R, M = V.n, I = V.A, e = V.Z, b = V.m, Z = W == null;
-		if ( Z )W = new R( N.length >>> 2 << 5 ); while ( i == 0 ) {
+		if ( N[ 0 ] === 3 && N[ 1 ] === 0 ) return W ? W : new R( 0 ); var V = H.H, n = V.b, A = V.e, l = V.R, M = V.n, I = V.A, e = V.Z, b = V.m, Z = W === null;
+		if ( Z )W = new R( N.length >>> 2 << 5 ); while ( i === 0 ) {
 
-			i = n( N, d, 1 ); m = n( N, d + 1, 2 ); d += 3; if ( m == 0 ) {
+			i = n( N, d, 1 ); m = n( N, d + 1, 2 ); d += 3; if ( m === 0 ) {
 
-				if ( ( d & 7 ) != 0 )d += 8 - ( d & 7 );
+				if ( ( d & 7 ) !== 0 )d += 8 - ( d & 7 );
 				var D = ( d >>> 3 ) + 4, q = N[ D - 4 ] | N[ D - 3 ] << 8; if ( Z )W = H.H.W( W, w + q ); W.set( new R( N.buffer, N.byteOffset + D, q ), w ); d = D + q << 3;
 				w += q; continue
 				;
 
 			}
 
-			if ( Z )W = H.H.W( W, w + ( 1 << 17 ) ); if ( m == 1 ) {
+			if ( Z )W = H.H.W( W, w + ( 1 << 17 ) ); if ( m === 1 ) {
 
 				v = b.J; C = b.h; X = ( 1 << 9 ) - 1; u = ( 1 << 5 ) - 1;
 
 			}
 
-			if ( m == 2 ) {
+			if ( m === 2 ) {
 
 				J = A( N, d, 5 ) + 257;
 				h = A( N, d + 5, 5 ) + 1; Q = A( N, d + 10, 4 ) + 4; d += 14; var j = 1; for ( var c = 0; c < 38; c += 2 ) {
@@ -556,11 +556,11 @@ UPNG.inflateRaw = function () {
 
 			while ( ! 0 ) {
 
-				var T = v[ e( N, d ) & X ]; d += T & 15; var p = T >>> 4; if ( p >>> 8 == 0 ) {
+				var T = v[ e( N, d ) & X ]; d += T & 15; var p = T >>> 4; if ( p >>> 8 === 0 ) {
 
 					W[ w ++ ] = p;
 
-				} else if ( p == 256 ) {
+				} else if ( p === 256 ) {
 
 					break;
 
@@ -589,7 +589,7 @@ UPNG.inflateRaw = function () {
 
 		}
 
-		return W.length == w ? W : W.slice( 0, w )
+		return W.length === w ? W : W.slice( 0, w )
 		;
 
 	};
@@ -611,17 +611,17 @@ UPNG.inflateRaw = function () {
 
 			} else {
 
-				var Z = 0, m = 0; if ( b == 16 ) {
+				var Z = 0, m = 0; if ( b === 16 ) {
 
 					m = 3 + l( V, n, 2 ); n += 2; Z = A[ I - 1 ];
 
-				} else if ( b == 17 ) {
+				} else if ( b === 17 ) {
 
 					m = 3 + l( V, n, 3 );
 					n += 3
 					;
 
-				} else if ( b == 18 ) {
+				} else if ( b === 18 ) {
 
 					m = 11 + l( V, n, 7 ); n += 7;
 
@@ -673,7 +673,7 @@ UPNG.inflateRaw = function () {
 
 		for ( l = 0; l < V; l += 2 ) {
 
-			I = N[ l + 1 ]; if ( I != 0 ) {
+			I = N[ l + 1 ]; if ( I !== 0 ) {
 
 				N[ l ] = b[ I ];
 				b[ I ] ++
@@ -687,10 +687,10 @@ UPNG.inflateRaw = function () {
 
 	H.H.A = function ( N, W, R ) {
 
-		var V = N.length, n = H.H.m, A = n.r; for ( var l = 0; l < V; l += 2 ) if ( N[ l + 1 ] != 0 ) {
+		var V = N.length, n = H.H.m, A = n.r; for ( var l = 0; l < V; l += 2 ) if ( N[ l + 1 ] !== 0 ) {
 
 			var M = l >> 1, I = N[ l + 1 ], e = M << 4 | I, b = W - I, Z = N[ l ] << b, m = Z + ( 1 << b );
-			while ( Z != m ) {
+			while ( Z !== m ) {
 
 				var J = A[ Z ] >>> 15 - W; R[ J ] = e; Z ++;
 
@@ -767,7 +767,7 @@ UPNG.inflateRaw = function () {
 
 		function n( A, l, M ) {
 
-			while ( l -- != 0 )A.push( 0, M )
+			while ( l -- !== 0 )A.push( 0, M )
 			;
 
 		}
@@ -835,21 +835,21 @@ UPNG.decode._readInterlace = function ( data, out ) {
 
 			while ( col < w ) {
 
-				if ( bpp == 1 ) {
+				if ( bpp === 1 ) {
 
 					val = data[ cdi >> 3 ]; val = ( val >> ( 7 - ( cdi & 7 ) ) ) & 1;
 					img[ row * bpl + ( col >> 3 ) ] |= ( val << ( 7 - ( ( col & 7 ) << 0 ) ) );
 
 				}
 
-				if ( bpp == 2 ) {
+				if ( bpp === 2 ) {
 
 					val = data[ cdi >> 3 ]; val = ( val >> ( 6 - ( cdi & 7 ) ) ) & 3;
 					img[ row * bpl + ( col >> 2 ) ] |= ( val << ( 6 - ( ( col & 3 ) << 1 ) ) );
 
 				}
 
-				if ( bpp == 4 ) {
+				if ( bpp === 4 ) {
 
 					val = data[ cdi >> 3 ]; val = ( val >> ( 4 - ( cdi & 7 ) ) ) & 15;
 					img[ row * bpl + ( col >> 1 ) ] |= ( val << ( 4 - ( ( col & 1 ) << 2 ) ) );
@@ -871,7 +871,7 @@ UPNG.decode._readInterlace = function ( data, out ) {
 
 		}
 
-		if ( sw * sh != 0 ) di += sh * ( 1 + bpll );
+		if ( sw * sh !== 0 ) di += sh * ( 1 + bpll );
 		pass = pass + 1;
 
 	}
@@ -895,24 +895,24 @@ UPNG.decode._filterZero = function ( data, out, off, w, h ) {
 	var i, di, type = data[ off ], x = 0;
 
 	if ( type > 1 ) data[ off ] = [ 0, 0, 1 ][ type - 2 ];
-	if ( type == 3 ) for ( x = bpp; x < bpl; x ++ ) data[ x + 1 ] = ( data[ x + 1 ] + ( data[ x + 1 - bpp ] >>> 1 ) ) & 255;
+	if ( type === 3 ) for ( x = bpp; x < bpl; x ++ ) data[ x + 1 ] = ( data[ x + 1 ] + ( data[ x + 1 - bpp ] >>> 1 ) ) & 255;
 
 	for ( var y = 0; y < h; y ++ ) {
 
 		i = off + y * bpl; di = i + y + 1;
 		type = data[ di - 1 ]; x = 0;
 
-		if ( type == 0 ) for ( ; x < bpl; x ++ ) data[ i + x ] = data[ di + x ];
-		else if ( type == 1 ) {
+		if ( type === 0 ) for ( ; x < bpl; x ++ ) data[ i + x ] = data[ di + x ];
+		else if ( type === 1 ) {
 
 			for ( ; x < bpp; x ++ ) data[ i + x ] = data[ di + x ];
 						   for ( ; x < bpl; x ++ ) data[ i + x ] = ( data[ di + x ] + data[ i + x - bpp ] );
 
-		} else if ( type == 2 ) {
+		} else if ( type === 2 ) {
 
 			for ( ; x < bpl; x ++ ) data[ i + x ] = ( data[ di + x ] + data[ i + x - bpl ] );
 
-		} else if ( type == 3 ) {
+		} else if ( type === 3 ) {
 
 			for ( ; x < bpp; x ++ ) data[ i + x ] = ( data[ di + x ] + ( data[ i + x - bpl ] >>> 1 ) );
 			               for ( ; x < bpl; x ++ ) data[ i + x ] = ( data[ di + x ] + ( ( data[ i + x - bpl ] + data[ i + x - bpp ] ) >>> 1 ) );
@@ -955,7 +955,7 @@ UPNG.decode._IHDR = function ( data, offset, out ) {
 UPNG._bin = {
 	nextZero: function ( data, p ) {
 
-		while ( data[ p ] != 0 ) p ++; return p;
+		while ( data[ p ] !== 0 ) p ++; return p;
 
 	},
 	readUshort: function ( buff, p ) {
@@ -1033,26 +1033,26 @@ UPNG._copyTile = function ( sb, sw, sh, tb, tw, th, xoff, yoff, mode ) {
 
 			}
 
-			if ( mode == 0 ) {
+			if ( mode === 0 ) {
 
 				tb[ ti ] = sb[ si ]; tb[ ti + 1 ] = sb[ si + 1 ]; tb[ ti + 2 ] = sb[ si + 2 ]; tb[ ti + 3 ] = sb[ si + 3 ];
 
-			} else if ( mode == 1 ) {
+			} else if ( mode === 1 ) {
 
 				var fa = sb[ si + 3 ] * ( 1 / 255 ), fr = sb[ si ] * fa, fg = sb[ si + 1 ] * fa, fb = sb[ si + 2 ] * fa;
 				var ba = tb[ ti + 3 ] * ( 1 / 255 ), br = tb[ ti ] * ba, bg = tb[ ti + 1 ] * ba, bb = tb[ ti + 2 ] * ba;
 
-				var ifa = 1 - fa, oa = fa + ba * ifa, ioa = ( oa == 0 ? 0 : 1 / oa );
+				var ifa = 1 - fa, oa = fa + ba * ifa, ioa = ( oa === 0 ? 0 : 1 / oa );
 				tb[ ti + 3 ] = 255 * oa;
 				tb[ ti + 0 ] = ( fr + br * ifa ) * ioa;
 				tb[ ti + 1 ] = ( fg + bg * ifa ) * ioa;
 				tb[ ti + 2 ] = ( fb + bb * ifa ) * ioa;
 
-			} else if ( mode == 2 ) {	// copy only differences, otherwise zero
+			} else if ( mode === 2 ) {	// copy only differences, otherwise zero
 
 				var fa = sb[ si + 3 ], fr = sb[ si ], fg = sb[ si + 1 ], fb = sb[ si + 2 ];
 				var ba = tb[ ti + 3 ], br = tb[ ti ], bg = tb[ ti + 1 ], bb = tb[ ti + 2 ];
-				if ( fa == ba && fr == br && fg == bg && fb == bb ) {
+				if ( fa === ba && fr === br && fg === bg && fb === bb ) {
 
 					tb[ ti ] = 0; tb[ ti + 1 ] = 0; tb[ ti + 2 ] = 0; tb[ ti + 3 ] = 0;
 
@@ -1062,11 +1062,11 @@ UPNG._copyTile = function ( sb, sw, sh, tb, tw, th, xoff, yoff, mode ) {
 
 				}
 
-			} else if ( mode == 3 ) {	// check if can be blended
+			} else if ( mode === 3 ) {	// check if can be blended
 
 				var fa = sb[ si + 3 ], fr = sb[ si ], fg = sb[ si + 1 ], fb = sb[ si + 2 ];
 				var ba = tb[ ti + 3 ], br = tb[ ti ], bg = tb[ ti + 1 ], bb = tb[ ti + 2 ];
-				if ( fa == ba && fr == br && fg == bg && fb == bb ) continue;
+				if ( fa === ba && fr === br && fg === bg && fb === bb ) continue;
 				//if(fa!=255 && ba!=0) return false;
 				if ( fa < 220 && ba > 20 ) return false;
 

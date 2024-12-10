@@ -226,7 +226,7 @@ class TransformControls extends Controls {
 
 	pointerDown( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || ( pointer != null && pointer.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true || ( pointer !== null && pointer.button !== 0 ) ) return;
 
 		if ( this.axis !== null ) {
 

@@ -219,7 +219,7 @@ class ArcballControls extends Controls {
 
 		this.setCamera( camera );
 
-		if ( this.scene != null ) {
+		if ( this.scene !== null ) {
 
 			this.scene.add( this._gizmos );
 
@@ -291,7 +291,7 @@ class ArcballControls extends Controls {
 
 					}
 
-					if ( this._animationId != - 1 ) {
+					if ( this._animationId !== - 1 ) {
 
 						cancelAnimationFrame( this._animationId );
 						this._animationId = - 1;
@@ -321,7 +321,7 @@ class ArcballControls extends Controls {
 
 					}
 
-					if ( this._animationId != - 1 ) {
+					if ( this._animationId !== - 1 ) {
 
 						cancelAnimationFrame( this._animationId );
 						this._animationId = - 1;
@@ -354,7 +354,7 @@ class ArcballControls extends Controls {
 
 					}
 
-					if ( this._animationId != - 1 ) {
+					if ( this._animationId !== - 1 ) {
 
 						cancelAnimationFrame( this._animationId );
 						this._animationId = - 1;
@@ -378,7 +378,7 @@ class ArcballControls extends Controls {
 
 					}
 
-					if ( this._animationId != - 1 ) {
+					if ( this._animationId !== - 1 ) {
 
 						cancelAnimationFrame( this._animationId );
 						this._animationId = - 1;
@@ -404,7 +404,7 @@ class ArcballControls extends Controls {
 
 		if ( this.enabled ) {
 
-			const restart = opState != this._state;
+			const restart = opState !== this._state;
 			this.setCenter( event.clientX, event.clientY );
 
 			switch ( opState ) {
@@ -632,7 +632,7 @@ class ArcballControls extends Controls {
 
 	onSinglePanEnd() {
 
-		if ( this._state == STATE.ROTATE ) {
+		if ( this._state === STATE.ROTATE ) {
 
 
 			if ( ! this.enableRotate ) {
@@ -676,7 +676,7 @@ class ArcballControls extends Controls {
 
 			}
 
-		} else if ( this._state == STATE.PAN || this._state == STATE.IDLE ) {
+		} else if ( this._state === STATE.PAN || this._state === STATE.IDLE ) {
 
 			this.updateTbState( STATE.IDLE, false );
 
@@ -698,17 +698,17 @@ class ArcballControls extends Controls {
 
 	onDoubleTap( event ) {
 
-		if ( this.enabled && this.enablePan && this.enableFocus && this.scene != null ) {
+		if ( this.enabled && this.enablePan && this.enableFocus && this.scene !== null ) {
 
 			this.dispatchEvent( _startEvent );
 
 			this.setCenter( event.clientX, event.clientY );
 			const hitP = this.unprojectOnObj( this.getCursorNDC( _center.x, _center.y, this.domElement ), this.object );
 
-			if ( hitP != null && this.enableAnimations ) {
+			if ( hitP !== null && this.enableAnimations ) {
 
 				const self = this;
-				if ( this._animationId != - 1 ) {
+				if ( this._animationId !== - 1 ) {
 
 					window.cancelAnimationFrame( this._animationId );
 
@@ -722,7 +722,7 @@ class ArcballControls extends Controls {
 
 				} );
 
-			} else if ( hitP != null && ! this.enableAnimations ) {
+			} else if ( hitP !== null && ! this.enableAnimations ) {
 
 				this.updateTbState( STATE.FOCUS, true );
 				this.focus( hitP, this.scaleFactor );
@@ -761,7 +761,7 @@ class ArcballControls extends Controls {
 
 			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
 
-			if ( this._state != STATE.PAN ) {
+			if ( this._state !== STATE.PAN ) {
 
 				this.updateTbState( STATE.PAN, true );
 				this._startCursorPosition.copy( this._currentCursorPosition );
@@ -815,7 +815,7 @@ class ArcballControls extends Controls {
 			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
 			let rotationPoint;
 
-			if ( this._state != STATE.ZROTATE ) {
+			if ( this._state !== STATE.ZROTATE ) {
 
 				this.updateTbState( STATE.ZROTATE, true );
 				this._startFingerRotation = this._currentFingerRotation;
@@ -876,7 +876,7 @@ class ArcballControls extends Controls {
 			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
 			const minDistance = 12; //minimum distance between fingers (in css pixels)
 
-			if ( this._state != STATE.SCALE ) {
+			if ( this._state !== STATE.SCALE ) {
 
 				this._startFingerDistance = this._currentFingerDistance;
 				this.updateTbState( STATE.SCALE, true );
@@ -1078,9 +1078,9 @@ class ArcballControls extends Controls {
 	 */
 	compareMouseAction( action1, action2 ) {
 
-		if ( action1.operation == action2.operation ) {
+		if ( action1.operation === action2.operation ) {
 
-			if ( action1.mouse == action2.mouse && action1.key == action2.key ) {
+			if ( action1.mouse === action2.mouse && action1.key === action2.key ) {
 
 				return true;
 
@@ -1119,9 +1119,9 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( mouse == 'WHEEL' ) {
+		if ( mouse === 'WHEEL' ) {
 
-			if ( operation != 'ZOOM' && operation != 'FOV' ) {
+			if ( operation !== 'ZOOM' && operation !== 'FOV' ) {
 
 				//cannot associate 2D operation to 1D input
 				return false;
@@ -1165,7 +1165,7 @@ class ArcballControls extends Controls {
 
 		for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
-			if ( this.mouseActions[ i ].mouse == action.mouse && this.mouseActions[ i ].key == action.key ) {
+			if ( this.mouseActions[ i ].mouse === action.mouse && this.mouseActions[ i ].key === action.key ) {
 
 				this.mouseActions.splice( i, 1, action );
 				return true;
@@ -1189,7 +1189,7 @@ class ArcballControls extends Controls {
 
 		for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
-			if ( this.mouseActions[ i ].mouse == mouse && this.mouseActions[ i ].key == key ) {
+			if ( this.mouseActions[ i ].mouse === mouse && this.mouseActions[ i ].key === key ) {
 
 				this.mouseActions.splice( i, 1 );
 				return true;
@@ -1206,7 +1206,7 @@ class ArcballControls extends Controls {
 	 * Return the operation associated to a mouse/keyboard combination
 	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
-	 * @returns The operation if it has been found, null otherwise
+	 * @returns {string|null} The operation if it has been found, null otherwise
 	 */
 	getOpFromAction( mouse, key ) {
 
@@ -1215,7 +1215,7 @@ class ArcballControls extends Controls {
 		for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 			action = this.mouseActions[ i ];
-			if ( action.mouse == mouse && action.key == key ) {
+			if ( action.mouse === mouse && action.key === key ) {
 
 				return action.operation;
 
@@ -1223,12 +1223,12 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( key != null ) {
+		if ( key !== null ) {
 
 			for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 				action = this.mouseActions[ i ];
-				if ( action.mouse == mouse && action.key == null ) {
+				if ( action.mouse === mouse && action.key === null ) {
 
 					return action.operation;
 
@@ -1246,7 +1246,7 @@ class ArcballControls extends Controls {
 	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
 	 * @param {Number} mouse Mouse button
 	 * @param {String} key Keyboard modifier
-	 * @returns The FSA state obtained from the operation associated to mouse/keyboard combination
+	 * @returns {STATE|null} The FSA state obtained from the operation associated to mouse/keyboard combination
 	 */
 	getOpStateFromAction( mouse, key ) {
 
@@ -1255,7 +1255,7 @@ class ArcballControls extends Controls {
 		for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 			action = this.mouseActions[ i ];
-			if ( action.mouse == mouse && action.key == key ) {
+			if ( action.mouse === mouse && action.key === key ) {
 
 				return action.state;
 
@@ -1263,12 +1263,12 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( key != null ) {
+		if ( key !== null ) {
 
 			for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 				action = this.mouseActions[ i ];
-				if ( action.mouse == mouse && action.key == null ) {
+				if ( action.mouse === mouse && action.key === null ) {
 
 					return action.state;
 
@@ -1302,7 +1302,7 @@ class ArcballControls extends Controls {
 
 		for ( let i = 0; i < this._touchCurrent.length; i ++ ) {
 
-			if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
+			if ( this._touchCurrent[ i ].pointerId === event.pointerId ) {
 
 				this._touchCurrent.splice( i, 1, event );
 				break;
@@ -1319,14 +1319,14 @@ class ArcballControls extends Controls {
 	 */
 	applyTransformMatrix( transformation ) {
 
-		if ( transformation.camera != null ) {
+		if ( transformation.camera !== null ) {
 
 			this._m4_1.copy( this._cameraMatrixState ).premultiply( transformation.camera );
 			this._m4_1.decompose( this.object.position, this.object.quaternion, this.object.scale );
 			this.object.updateMatrix();
 
 			//update camera up vector
-			if ( this._state == STATE.ROTATE || this._state == STATE.ZROTATE || this._state == STATE.ANIMATION_ROTATE ) {
+			if ( this._state === STATE.ROTATE || this._state === STATE.ZROTATE || this._state === STATE.ANIMATION_ROTATE ) {
 
 				this.object.up.copy( this._upState ).applyQuaternion( this.object.quaternion );
 
@@ -1334,7 +1334,7 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( transformation.gizmos != null ) {
+		if ( transformation.gizmos !== null ) {
 
 			this._m4_1.copy( this._gizmoMatrixState ).premultiply( transformation.gizmos );
 			this._m4_1.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
@@ -1342,7 +1342,7 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( this._state == STATE.SCALE || this._state == STATE.FOCUS || this._state == STATE.ANIMATION_FOCUS ) {
+		if ( this._state === STATE.SCALE || this._state === STATE.FOCUS || this._state === STATE.ANIMATION_FOCUS ) {
 
 			this._tbRadius = this.calculateTbRadius( this.object );
 
@@ -1374,14 +1374,14 @@ class ArcballControls extends Controls {
 
 				let update = false;
 
-				if ( this.object.near != this._initialNear ) {
+				if ( this.object.near !== this._initialNear ) {
 
 					this.object.near = this._initialNear;
 					update = true;
 
 				}
 
-				if ( this.object.far != this._initialFar ) {
+				if ( this.object.far !== this._initialFar ) {
 
 					this.object.far = this._initialFar;
 					update = true;
@@ -1402,16 +1402,18 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Calculate the angular speed
+	 *
 	 * @param {Number} p0 Position at t0
 	 * @param {Number} p1 Position at t1
 	 * @param {Number} t0 Initial time in milliseconds
 	 * @param {Number} t1 Ending time in milliseconds
+	 * @returns {Number}
 	 */
 	calculateAngularSpeed( p0, p1, t0, t1 ) {
 
 		const s = p1 - p0;
 		const t = ( t1 - t0 ) / 1000;
-		if ( t == 0 ) {
+		if ( t === 0 ) {
 
 			return 0;
 
@@ -1458,13 +1460,13 @@ class ArcballControls extends Controls {
 
 		const distance = camera.position.distanceTo( this._gizmos.position );
 
-		if ( camera.type == 'PerspectiveCamera' ) {
+		if ( camera.type === 'PerspectiveCamera' ) {
 
 			const halfFovV = MathUtils.DEG2RAD * camera.fov * 0.5; //vertical fov/2 in radians
 			const halfFovH = Math.atan( ( camera.aspect ) * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
 			return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
-		} else if ( camera.type == 'OrthographicCamera' ) {
+		} else if ( camera.type === 'OrthographicCamera' ) {
 
 			return Math.min( camera.top, camera.right ) * this.radiusFactor;
 
@@ -1509,7 +1511,7 @@ class ArcballControls extends Controls {
 	 */
 	drawGrid() {
 
-		if ( this.scene != null ) {
+		if ( this.scene !== null ) {
 
 			const color = 0x888888;
 			const multiplier = 3;
@@ -1540,7 +1542,7 @@ class ArcballControls extends Controls {
 
 			}
 
-			if ( this._grid == null ) {
+			if ( this._grid === null ) {
 
 				this._grid = new GridHelper( size, divisions, color, color );
 				this._grid.position.copy( this._gizmos.position );
@@ -1561,7 +1563,7 @@ class ArcballControls extends Controls {
 	 */
 	dispose() {
 
-		if ( this._animationId != - 1 ) {
+		if ( this._animationId !== - 1 ) {
 
 			window.cancelAnimationFrame( this._animationId );
 
@@ -1579,7 +1581,7 @@ class ArcballControls extends Controls {
 	 */
 	disposeGrid() {
 
-		if ( this._grid != null && this.scene != null ) {
+		if ( this._grid !== null && this.scene !== null ) {
 
 			this.scene.remove( this._grid );
 			this._grid = null;
@@ -1627,8 +1629,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Calculate the cursor position in NDC
-	 * @param {number} x Cursor horizontal coordinate within the canvas
-	 * @param {number} y Cursor vertical coordinate within the canvas
+	 *
+	 * @param {number} cursorX Cursor horizontal coordinate within the canvas
+	 * @param {number} cursorY Cursor vertical coordinate within the canvas
 	 * @param {HTMLElement} canvas The canvas where the renderer draws its output
 	 * @returns {Vector2} Cursor normalized position inside the canvas
 	 */
@@ -1643,8 +1646,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Calculate the cursor position inside the canvas x/y coordinates with the origin being in the center of the canvas
-	 * @param {Number} x Cursor horizontal coordinate within the canvas
-	 * @param {Number} y Cursor vertical coordinate within the canvas
+	 *
+	 * @param {Number} cursorX Cursor horizontal coordinate within the canvas
+	 * @param {Number} cursorY Cursor vertical coordinate within the canvas
 	 * @param {HTMLElement} canvas The canvas where the renderer draws its output
 	 * @returns {Vector2} Cursor position inside the canvas
 	 */
@@ -1667,7 +1671,7 @@ class ArcballControls extends Controls {
 		camera.updateMatrix();
 
 		//setting state
-		if ( camera.type == 'PerspectiveCamera' ) {
+		if ( camera.type === 'PerspectiveCamera' ) {
 
 			this._fov0 = camera.fov;
 			this._fovState = camera.fov;
@@ -1814,14 +1818,14 @@ class ArcballControls extends Controls {
 	 */
 	onFocusAnim( time, point, cameraMatrix, gizmoMatrix ) {
 
-		if ( this._timeStart == - 1 ) {
+		if ( this._timeStart === - 1 ) {
 
 			//animation start
 			this._timeStart = time;
 
 		}
 
-		if ( this._state == STATE.ANIMATION_FOCUS ) {
+		if ( this._state === STATE.ANIMATION_FOCUS ) {
 
 			const deltaTime = time - this._timeStart;
 			const animTime = deltaTime / this.focusAnimationTime;
@@ -1879,7 +1883,7 @@ class ArcballControls extends Controls {
 	 */
 	onRotationAnim( time, rotationAxis, w0 ) {
 
-		if ( this._timeStart == - 1 ) {
+		if ( this._timeStart === - 1 ) {
 
 			//animation start
 			this._anglePrev = 0;
@@ -1888,7 +1892,7 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( this._state == STATE.ANIMATION_ROTATE ) {
+		if ( this._state === STATE.ANIMATION_ROTATE ) {
 
 			//w = w0 + alpha * t
 			const deltaTime = ( time - this._timeStart ) / 1000;
@@ -1926,7 +1930,7 @@ class ArcballControls extends Controls {
 			this._animationId = - 1;
 			this._timeStart = - 1;
 
-			if ( this._state != STATE.ROTATE ) {
+			if ( this._state !== STATE.ROTATE ) {
 
 				this.activateGizmos( false );
 				this.dispatchEvent( _changeEvent );
@@ -1940,9 +1944,11 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Perform pan operation moving camera between two points
+	 *
 	 * @param {Vector3} p0 Initial point
 	 * @param {Vector3} p1 Ending point
-	 * @param {Boolean} adjust If movement should be adjusted considering camera distance (Perspective only)
+	 * @param {Boolean} [adjust=false] If movement should be adjusted considering camera distance (Perspective only)
+	 * @returns {Object}
 	 */
 	pan( p0, p1, adjust = false ) {
 
@@ -2239,9 +2245,9 @@ class ArcballControls extends Controls {
 	 */
 	setTransformationMatrices( camera = null, gizmos = null ) {
 
-		if ( camera != null ) {
+		if ( camera !== null ) {
 
-			if ( _transformation.camera != null ) {
+			if ( _transformation.camera !== null ) {
 
 				_transformation.camera.copy( camera );
 
@@ -2257,9 +2263,9 @@ class ArcballControls extends Controls {
 
 		}
 
-		if ( gizmos != null ) {
+		if ( gizmos !== null ) {
 
-			if ( _transformation.gizmos != null ) {
+			if ( _transformation.gizmos !== null ) {
 
 				_transformation.gizmos.copy( gizmos );
 
@@ -2279,9 +2285,10 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Rotate camera around its direction axis passing by a given point by a given angle
+	 *
 	 * @param {Vector3} point The point where the rotation axis is passing trough
 	 * @param {Number} angle Angle in radians
-	 * @returns The computed transormation matix
+	 * @returns {Object} The computed transformation matrix
 	 */
 	zRotate( point, angle ) {
 
@@ -2328,7 +2335,7 @@ class ArcballControls extends Controls {
 
 		for ( let i = 0; i < intersect.length; i ++ ) {
 
-			if ( intersect[ i ].object.uuid != this._gizmos.uuid && intersect[ i ].face != null ) {
+			if ( intersect[ i ].object.uuid !== this._gizmos.uuid && intersect[ i ].face !== null ) {
 
 				return intersect[ i ].point.clone();
 
@@ -2351,7 +2358,7 @@ class ArcballControls extends Controls {
 	 */
 	unprojectOnTbSurface( camera, cursorX, cursorY, canvas, tbRadius ) {
 
-		if ( camera.type == 'OrthographicCamera' ) {
+		if ( camera.type === 'OrthographicCamera' ) {
 
 			this._v2_1.copy( this.getCursorPosition( cursorX, cursorY, canvas ) );
 			this._v3_1.set( this._v2_1.x, this._v2_1.y, 0 );
@@ -2374,7 +2381,7 @@ class ArcballControls extends Controls {
 
 			return this._v3_1;
 
-		} else if ( camera.type == 'PerspectiveCamera' ) {
+		} else if ( camera.type === 'PerspectiveCamera' ) {
 
 			//unproject cursor on the near plane
 			this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
@@ -2399,7 +2406,7 @@ class ArcballControls extends Controls {
 			const h = this._v3_1.z;
 			const l = Math.sqrt( Math.pow( this._v3_1.x, 2 ) + Math.pow( this._v3_1.y, 2 ) );
 
-			if ( l == 0 ) {
+			if ( l === 0 ) {
 
 				//ray aligned with camera
 				rayDir.set( this._v3_1.x, this._v3_1.y, tbRadius );
@@ -2481,14 +2488,14 @@ class ArcballControls extends Controls {
 	 */
 	unprojectOnTbPlane( camera, cursorX, cursorY, canvas, initialDistance = false ) {
 
-		if ( camera.type == 'OrthographicCamera' ) {
+		if ( camera.type === 'OrthographicCamera' ) {
 
 			this._v2_1.copy( this.getCursorPosition( cursorX, cursorY, canvas ) );
 			this._v3_1.set( this._v2_1.x, this._v2_1.y, 0 );
 
 			return this._v3_1.clone();
 
-		} else if ( camera.type == 'PerspectiveCamera' ) {
+		} else if ( camera.type === 'PerspectiveCamera' ) {
 
 			this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
 
@@ -2529,7 +2536,7 @@ class ArcballControls extends Controls {
 			 *
 			 * x = -q/m
 			*/
-			if ( l == 0 ) {
+			if ( l === 0 ) {
 
 				//ray aligned with camera
 				rayDir.set( 0, 0, 0 );
@@ -2663,7 +2670,7 @@ class ArcballControls extends Controls {
 
 		const state = JSON.parse( json );
 
-		if ( state.arcballState != undefined ) {
+		if ( state.arcballState !== undefined ) {
 
 			this._cameraMatrixState.fromArray( state.arcballState.cameraMatrix.elements );
 			this._cameraMatrixState.decompose( this.object.position, this.object.quaternion, this.object.scale );
@@ -2737,7 +2744,7 @@ function onContextMenu( event ) {
 
 	for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
-		if ( this.mouseActions[ i ].mouse == 2 ) {
+		if ( this.mouseActions[ i ].mouse === 2 ) {
 
 			//prevent only if button 2 is actually used
 			event.preventDefault();
@@ -2759,7 +2766,7 @@ function onPointerCancel() {
 
 function onPointerDown( event ) {
 
-	if ( event.button == 0 && event.isPrimary ) {
+	if ( event.button === 0 && event.isPrimary ) {
 
 		this._downValid = true;
 		this._downEvents.push( event );
@@ -2771,7 +2778,7 @@ function onPointerDown( event ) {
 
 	}
 
-	if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+	if ( event.pointerType === 'touch' && this._input !== INPUT.CURSOR ) {
 
 		this._touchStart.push( event );
 		this._touchCurrent.push( event );
@@ -2810,7 +2817,7 @@ function onPointerDown( event ) {
 
 		}
 
-	} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ) {
+	} else if ( event.pointerType !== 'touch' && this._input === INPUT.NONE ) {
 
 		let modifier = null;
 
@@ -2825,7 +2832,7 @@ function onPointerDown( event ) {
 		}
 
 		this._mouseOp = this.getOpFromAction( event.button, modifier );
-		if ( this._mouseOp != null ) {
+		if ( this._mouseOp !== null ) {
 
 			window.addEventListener( 'pointermove', this._onPointerMove );
 			window.addEventListener( 'pointerup', this._onPointerUp );
@@ -2843,7 +2850,7 @@ function onPointerDown( event ) {
 
 function onPointerMove( event ) {
 
-	if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+	if ( event.pointerType === 'touch' && this._input !== INPUT.CURSOR ) {
 
 		switch ( this._input ) {
 
@@ -2893,7 +2900,7 @@ function onPointerMove( event ) {
 
 		}
 
-	} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
+	} else if ( event.pointerType !== 'touch' && this._input === INPUT.CURSOR ) {
 
 		let modifier = null;
 
@@ -2909,7 +2916,7 @@ function onPointerMove( event ) {
 
 		const mouseOpState = this.getOpStateFromAction( this._button, modifier );
 
-		if ( mouseOpState != null ) {
+		if ( mouseOpState !== null ) {
 
 			this.onSinglePanMove( event, mouseOpState );
 
@@ -2933,13 +2940,13 @@ function onPointerMove( event ) {
 
 function onPointerUp( event ) {
 
-	if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+	if ( event.pointerType === 'touch' && this._input !== INPUT.CURSOR ) {
 
 		const nTouch = this._touchCurrent.length;
 
 		for ( let i = 0; i < nTouch; i ++ ) {
 
-			if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
+			if ( this._touchCurrent[ i ].pointerId === event.pointerId ) {
 
 				this._touchCurrent.splice( i, 1 );
 				this._touchStart.splice( i, 1 );
@@ -2977,7 +2984,7 @@ function onPointerUp( event ) {
 
 			case INPUT.MULT_FINGER:
 
-				if ( this._touchCurrent.length == 0 ) {
+				if ( this._touchCurrent.length === 0 ) {
 
 					window.removeEventListener( 'pointermove', this._onPointerMove );
 					window.removeEventListener( 'pointerup', this._onPointerUp );
@@ -2992,7 +2999,7 @@ function onPointerUp( event ) {
 
 		}
 
-	} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
+	} else if ( event.pointerType !== 'touch' && this._input === INPUT.CURSOR ) {
 
 		window.removeEventListener( 'pointermove', this._onPointerMove );
 		window.removeEventListener( 'pointerup', this._onPointerUp );
@@ -3011,7 +3018,7 @@ function onPointerUp( event ) {
 
 			if ( downTime <= this._maxDownTime ) {
 
-				if ( this._nclicks == 0 ) {
+				if ( this._nclicks === 0 ) {
 
 					//first valid click detected
 					this._nclicks = 1;
@@ -3078,7 +3085,7 @@ function onWheel( event ) {
 
 		const mouseOp = this.getOpFromAction( 'WHEEL', modifier );
 
-		if ( mouseOp != null ) {
+		if ( mouseOp !== null ) {
 
 			event.preventDefault();
 			this.dispatchEvent( _startEvent );
@@ -3136,7 +3143,7 @@ function onWheel( event ) {
 
 					}
 
-					if ( this._grid != null ) {
+					if ( this._grid !== null ) {
 
 						this.disposeGrid();
 						this.drawGrid();
@@ -3170,7 +3177,7 @@ function onWheel( event ) {
 						//			y
 
 						//check for iOs shift shortcut
-						if ( event.deltaX != 0 ) {
+						if ( event.deltaX !== 0 ) {
 
 							sgn = event.deltaX / notchDeltaY;
 
@@ -3219,7 +3226,7 @@ function onWheel( event ) {
 
 					}
 
-					if ( this._grid != null ) {
+					if ( this._grid !== null ) {
 
 						this.disposeGrid();
 						this.drawGrid();

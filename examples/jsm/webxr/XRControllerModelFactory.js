@@ -29,7 +29,7 @@ class XRControllerModel extends Object3D {
 
 	setEnvironmentMap( envMap ) {
 
-		if ( this.envMap == envMap ) {
+		if ( this.envMap === envMap ) {
 
 			return this;
 

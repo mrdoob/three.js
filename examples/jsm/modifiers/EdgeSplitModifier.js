@@ -64,7 +64,7 @@ class EdgeSplitModifier {
 
 				const index = indexes[ i ];
 
-				if ( pointToIndexMap[ index ] == null ) {
+				if ( pointToIndexMap[ index ] === null ) {
 
 					pointToIndexMap[ index ] = [];
 
@@ -136,7 +136,7 @@ class EdgeSplitModifier {
 			}
 
 
-			if ( original != null ) {
+			if ( original !== null ) {
 
 				splitIndexes.push( {
 					original: original,
@@ -172,7 +172,7 @@ class EdgeSplitModifier {
 
 		}
 
-		if ( geometry.index == null ) {
+		if ( geometry.index === null ) {
 
 			geometry = BufferGeometryUtils.mergeVertices( geometry );
 

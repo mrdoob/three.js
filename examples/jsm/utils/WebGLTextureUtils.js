@@ -27,12 +27,12 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 				gl_Position = vec4(position.xy * 1.0,0.,.999999);
 			}`,
 		fragmentShader: `
-			uniform sampler2D blitTexture; 
+			uniform sampler2D blitTexture;
 			varying vec2 vUv;
 
-			void main(){ 
+			void main(){
 				gl_FragColor = vec4(vUv.xy, 0, 1);
-				
+
 				#ifdef IS_SRGB
 				gl_FragColor = sRGBTransferOETF( texture2D( blitTexture, vUv) );
 				#else
@@ -42,7 +42,7 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	} );
 
 	fullscreenQuadMaterial.uniforms.blitTexture.value = texture;
-	fullscreenQuadMaterial.defines.IS_SRGB = texture.colorSpace == SRGBColorSpace;
+	fullscreenQuadMaterial.defines.IS_SRGB = texture.colorSpace === SRGBColorSpace;
 	fullscreenQuadMaterial.needsUpdate = true;
 
 	if ( ! fullscreenQuad ) {

@@ -379,7 +379,7 @@ class OrbitControls extends Controls {
 
 			const prevRadius = this._spherical.radius;
 			this._spherical.radius = this._clampDistance( this._spherical.radius * this._scale );
-			zoomChanged = prevRadius != this._spherical.radius;
+			zoomChanged = prevRadius !== this._spherical.radius;
 
 		}
 
@@ -956,7 +956,7 @@ class OrbitControls extends Controls {
 
 	_handleTouchMoveRotate( event ) {
 
-		if ( this._pointers.length == 1 ) {
+		if ( this._pointers.length === 1 ) {
 
 			this._rotateEnd.set( event.pageX, event.pageY );
 
@@ -1062,7 +1062,7 @@ class OrbitControls extends Controls {
 
 		for ( let i = 0; i < this._pointers.length; i ++ ) {
 
-			if ( this._pointers[ i ] == event.pointerId ) {
+			if ( this._pointers[ i ] === event.pointerId ) {
 
 				this._pointers.splice( i, 1 );
 				return;
@@ -1077,7 +1077,7 @@ class OrbitControls extends Controls {
 
 		for ( let i = 0; i < this._pointers.length; i ++ ) {
 
-			if ( this._pointers[ i ] == event.pointerId ) return true;
+			if ( this._pointers[ i ] === event.pointerId ) return true;
 
 		}
 

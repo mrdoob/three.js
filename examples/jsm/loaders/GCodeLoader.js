@@ -154,7 +154,7 @@ class GCodeLoader extends Loader {
 
 					state.extruding = delta( state.e, line.e ) > 0;
 
-					if ( currentLayer == undefined || line.z != currentLayer.z ) {
+					if ( currentLayer === undefined || line.z !== currentLayer.z ) {
 
 						newLayer( line );
 

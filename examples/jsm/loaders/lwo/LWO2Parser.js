@@ -393,7 +393,7 @@ class LWO2Parser {
 
 		}
 
-		if ( blockID != 'FORM' ) {
+		if ( blockID !== 'FORM' ) {
 
 			this.IFF.debugger.node = 1;
 			this.IFF.debugger.nodeID = blockID;

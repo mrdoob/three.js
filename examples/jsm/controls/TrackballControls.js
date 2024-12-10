@@ -442,7 +442,7 @@ class TrackballControls extends Controls {
 
 		for ( let i = 0; i < this._pointers.length; i ++ ) {
 
-			if ( this._pointers[ i ].pointerId == event.pointerId ) {
+			if ( this._pointers[ i ].pointerId === event.pointerId ) {
 
 				this._pointers.splice( i, 1 );
 				return;

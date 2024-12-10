@@ -127,7 +127,7 @@ class AsciiEffect {
 
 		let fLetterSpacing = 0;
 
-		if ( strResolution == 'low' ) {
+		if ( strResolution === 'low' ) {
 
 			switch ( iScale ) {
 
@@ -141,7 +141,7 @@ class AsciiEffect {
 
 		}
 
-		if ( strResolution == 'medium' ) {
+		if ( strResolution === 'medium' ) {
 
 			switch ( iScale ) {
 
@@ -155,7 +155,7 @@ class AsciiEffect {
 
 		}
 
-		if ( strResolution == 'high' ) {
+		if ( strResolution === 'high' ) {
 
 			switch ( iScale ) {
 
@@ -203,7 +203,7 @@ class AsciiEffect {
 					fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
 					// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
 
-					if ( iAlpha == 0 ) {
+					if ( iAlpha === 0 ) {
 
 						// should calculate alpha instead, but quick hack :)
 						//fBrightness *= (iAlpha / 255);
@@ -225,7 +225,7 @@ class AsciiEffect {
 
 					let strThisChar = aCharList[ iCharIdx ];
 
-					if ( strThisChar === undefined || strThisChar == ' ' )
+					if ( strThisChar === undefined || strThisChar === ' ' )
 						strThisChar = '&nbsp;';
 
 					if ( bColor ) {

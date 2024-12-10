@@ -137,7 +137,7 @@ class FlyControls extends Controls {
 
 	_getContainerDimensions() {
 
-		if ( this.domElement != document ) {
+		if ( this.domElement !== document ) {
 
 			return {
 				size: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],

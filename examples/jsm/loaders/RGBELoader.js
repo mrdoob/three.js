@@ -255,7 +255,7 @@ class RGBELoader extends DataTextureLoader {
 					rgbeStart[ 2 ] = buffer[ pos ++ ];
 					rgbeStart[ 3 ] = buffer[ pos ++ ];
 
-					if ( ( 2 != rgbeStart[ 0 ] ) || ( 2 != rgbeStart[ 1 ] ) || ( ( ( rgbeStart[ 2 ] << 8 ) | rgbeStart[ 3 ] ) != scanline_width ) ) {
+					if ( ( 2 !== rgbeStart[ 0 ] ) || ( 2 !== rgbeStart[ 1 ] ) || ( ( ( rgbeStart[ 2 ] << 8 ) | rgbeStart[ 3 ] ) !== scanline_width ) ) {
 
 						rgbe_error( rgbe_format_error, 'bad rgbe scanline format' );
 

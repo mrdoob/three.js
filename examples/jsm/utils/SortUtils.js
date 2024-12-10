@@ -52,7 +52,7 @@ export const radixSort = ( arr, opt ) => {
 			for ( let j = BIN_MAX; j >= 0; j -- ) {
 
 				const cur = cache[ j ], diff = cur - prev;
-				if ( diff != 0 ) {
+				if ( diff !== 0 ) {
 
 					if ( diff > 32 )
 						radixSortBlock( depth + 1, start + prev, diff );
@@ -82,7 +82,7 @@ export const radixSort = ( arr, opt ) => {
 			for ( let j = 0; j < BIN_SIZE; j ++ ) {
 
 				const cur = cache[ j ], diff = cur - prev;
-				if ( diff != 0 ) {
+				if ( diff !== 0 ) {
 
 					if ( diff > 32 )
 						radixSortBlock( depth + 1, start + prev, diff );
@@ -120,7 +120,7 @@ export const radixSort = ( arr, opt ) => {
 
 		}
 
-		if ( ( depth & 1 ) == 1 ) {
+		if ( ( depth & 1 ) === 1 ) {
 
 			for ( let i = start; i < start + len; i ++ )
 				b[ i ] = a[ i ];
@@ -152,7 +152,7 @@ export const radixSort = ( arr, opt ) => {
 		for ( let j = end - 1; j >= start; j -- )
 			b[ start + -- bin[ ( get( a[ j ] ) >>> shift ) & BIN_MAX ] ] = a[ j ];
 
-		if ( depth == ITERATIONS - 1 ) return;
+		if ( depth === ITERATIONS - 1 ) return;
 
 		recurse( cache, depth, start );
 

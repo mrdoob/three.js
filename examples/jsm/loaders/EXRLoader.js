@@ -135,7 +135,7 @@ class EXRLoader extends DataTextureLoader {
 
 			for ( let i = 0; i < USHORT_RANGE; ++ i ) {
 
-				if ( ( i == 0 ) || ( bitmap[ i >> 3 ] & ( 1 << ( i & 7 ) ) ) ) {
+				if ( ( i === 0 ) || ( bitmap[ i >> 3 ] & ( 1 << ( i & 7 ) ) ) ) {
 
 					lut[ k ++ ] = i;
 
@@ -227,7 +227,7 @@ class EXRLoader extends DataTextureLoader {
 
 				hcode[ im ] = l;
 
-				if ( l == LONG_ZEROCODE_RUN ) {
+				if ( l === LONG_ZEROCODE_RUN ) {
 
 					if ( p.value - inOffset.value > ni ) {
 
@@ -374,7 +374,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function getCode( po, rlc, c, lc, uInt8Array, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
 
-			if ( po == rlc ) {
+			if ( po === rlc ) {
 
 				if ( lc < 8 ) {
 
@@ -649,7 +649,7 @@ class EXRLoader extends DataTextureLoader {
 
 							if ( lc >= l ) {
 
-								if ( hufCode( encodingTable[ pl.p[ j ] ] ) == ( ( c >> ( lc - l ) ) & ( ( 1 << l ) - 1 ) ) ) {
+								if ( hufCode( encodingTable[ pl.p[ j ] ] ) === ( ( c >> ( lc - l ) ) & ( ( 1 << l ) - 1 ) ) ) {
 
 									lc -= l;
 
@@ -666,7 +666,7 @@ class EXRLoader extends DataTextureLoader {
 
 						}
 
-						if ( j == pl.lit ) {
+						if ( j === pl.lit ) {
 
 							throw new Error( 'hufDecode issues' );
 
@@ -870,14 +870,14 @@ class EXRLoader extends DataTextureLoader {
 
 				let maxY = 8;
 
-				if ( blocky == numBlocksY - 1 )
+				if ( blocky === numBlocksY - 1 )
 					maxY = leftoverY;
 
 				let maxX = 8;
 
 				for ( let blockx = 0; blockx < numBlocksX; ++ blockx ) {
 
-					if ( blockx == numBlocksX - 1 )
+					if ( blockx === numBlocksX - 1 )
 						maxX = leftoverX;
 
 					for ( let comp = 0; comp < numComp; ++ comp ) {
@@ -896,7 +896,7 @@ class EXRLoader extends DataTextureLoader {
 
 					}
 
-					if ( numComp == 3 ) {
+					if ( numComp === 3 ) {
 
 						csc709Inverse( dctData );
 
@@ -941,7 +941,7 @@ class EXRLoader extends DataTextureLoader {
 					}
 
 					// handle partial X blocks
-					if ( numFullBlocksX != numBlocksX ) {
+					if ( numFullBlocksX !== numBlocksX ) {
 
 						for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
@@ -971,7 +971,7 @@ class EXRLoader extends DataTextureLoader {
 				channelData[ cscSet.idx[ comp ] ].decoded = true;
 				const type = channelData[ cscSet.idx[ comp ] ].type;
 
-				if ( channelData[ comp ].type != 2 ) continue;
+				if ( channelData[ comp ].type !== 2 ) continue;
 
 				for ( let y = 0; y < height; ++ y ) {
 
@@ -1004,11 +1004,11 @@ class EXRLoader extends DataTextureLoader {
 
 				acValue = acBuffer[ currAcComp.value ];
 
-				if ( acValue == 0xff00 ) {
+				if ( acValue === 0xff00 ) {
 
 					dctComp = 64;
 
-				} else if ( acValue >> 8 == 0xff ) {
+				} else if ( acValue >> 8 === 0xff ) {
 
 					dctComp += acValue & 0xff;
 
@@ -1519,7 +1519,7 @@ class EXRLoader extends DataTextureLoader {
 
 					const rule = channelRules[ i ];
 
-					if ( cd.name == rule.name ) {
+					if ( cd.name === rule.name ) {
 
 						cd.compression = rule.compression;
 
@@ -1664,7 +1664,7 @@ class EXRLoader extends DataTextureLoader {
 			const uintBuffer = new Uint8Array( buffer );
 			let endOffset = 0;
 
-			while ( uintBuffer[ offset.value + endOffset ] != 0 ) {
+			while ( uintBuffer[ offset.value + endOffset ] !== 0 ) {
 
 				endOffset += 1;
 
@@ -2044,7 +2044,7 @@ class EXRLoader extends DataTextureLoader {
 		function roundLog2( x, mode ) {
 
 			const log2 = Math.log2( x );
-			return mode == 'ROUND_DOWN' ? Math.floor( log2 ) : Math.ceil( log2 );
+			return mode === 'ROUND_DOWN' ? Math.floor( log2 ) : Math.ceil( log2 );
 
 		}
 
@@ -2080,7 +2080,7 @@ class EXRLoader extends DataTextureLoader {
 				const b = ( 1 << i );
 				let s = ( dataSize / b ) | 0;
 
-				if ( roundingMode == 'ROUND_UP' && s * b < dataSize ) s += 1;
+				if ( roundingMode === 'ROUND_UP' && s * b < dataSize ) s += 1;
 
 				const l = Math.max( s, 1 );
 
@@ -2202,7 +2202,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const EXRHeader = {};
 
-			if ( dataView.getUint32( 0, true ) != 20000630 ) { // magic
+			if ( dataView.getUint32( 0, true ) !== 20000630 ) { // magic
 
 				throw new Error( 'THREE.EXRLoader: Provided file doesn\'t appear to be in OpenEXR format.' );
 
@@ -2229,7 +2229,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const attributeName = parseNullTerminatedString( buffer, offset );
 
-				if ( attributeName == 0 ) {
+				if ( attributeName === 0 ) {
 
 					keepReading = false;
 
@@ -2253,7 +2253,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( ( spec & ~ 0x06 ) != 0 ) { // unsupported deep-image, multi-part
+			if ( ( spec & ~ 0x06 ) !== 0 ) { // unsupported deep-image, multi-part
 
 				console.error( 'THREE.EXRHeader:', EXRHeader );
 				throw new Error( 'THREE.EXRLoader: Provided file is currently unsupported.' );
@@ -2370,7 +2370,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( EXRDecoder.type == 1 ) {
+			if ( EXRDecoder.type === 1 ) {
 
 				// half
 				switch ( outputType ) {
@@ -2385,7 +2385,7 @@ class EXRLoader extends DataTextureLoader {
 
 				}
 
-			} else if ( EXRDecoder.type == 2 ) {
+			} else if ( EXRDecoder.type === 2 ) {
 
 				// float
 				switch ( outputType ) {
@@ -2459,7 +2459,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( EXRDecoder.outputChannels == 4 ) {
+			if ( EXRDecoder.outputChannels === 4 ) {
 
 				EXRDecoder.format = RGBAFormat;
 				EXRDecoder.colorSpace = LinearSRGBColorSpace;

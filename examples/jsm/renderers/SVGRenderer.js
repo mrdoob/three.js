@@ -361,9 +361,9 @@ class SVGRenderer {
 
 					if ( amount <= 0 ) continue;
 
-					amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
+					amount *= light.distance === 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
 
-					if ( amount == 0 ) continue;
+					if ( amount === 0 ) continue;
 
 					amount *= light.intensity;
 
@@ -533,11 +533,11 @@ class SVGRenderer {
 
 		function getPathNode( id ) {
 
-			if ( _svgPathPool[ id ] == null ) {
+			if ( _svgPathPool[ id ] === null ) {
 
 				_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 
-				if ( _quality == 0 ) {
+				if ( _quality === 0 ) {
 
 					_svgPathPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
 

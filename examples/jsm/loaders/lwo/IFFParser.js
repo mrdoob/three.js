@@ -1154,12 +1154,12 @@ class Debugger {
 			nodeType,
 			this.nodeID,
 			`( ${this.offset} ) -> ( ${this.dataOffset + this.length} )`,
-			( ( this.node == 0 ) ? ' {' : '' ),
+			( ( this.node === 0 ) ? ' {' : '' ),
 			( ( this.skipped ) ? 'SKIPPED' : '' ),
-			( ( this.node == 0 && this.skipped ) ? '}' : '' )
+			( ( this.node === 0 && this.skipped ) ? '}' : '' )
 		);
 
-		if ( this.node == 0 && ! this.skipped ) {
+		if ( this.node === 0 && ! this.skipped ) {
 
 			this.depth += 1;
 			this.formList.push( this.dataOffset + this.length );

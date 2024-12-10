@@ -33,7 +33,7 @@ function compressNormals( geometry, encodeMethod ) {
 
 	if ( normal.isPacked ) return;
 
-	if ( normal.itemSize != 3 ) {
+	if ( normal.itemSize !== 3 ) {
 
 		console.error( 'normal.itemSize is not 3, which cannot be encoded. ' );
 
@@ -43,7 +43,7 @@ function compressNormals( geometry, encodeMethod ) {
 	const count = normal.count;
 
 	let result;
-	if ( encodeMethod == 'DEFAULT' ) {
+	if ( encodeMethod === 'DEFAULT' ) {
 
 		// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
 		result = new Uint8Array( count * 3 );
@@ -61,7 +61,7 @@ function compressNormals( geometry, encodeMethod ) {
 		geometry.setAttribute( 'normal', new BufferAttribute( result, 3, true ) );
 		geometry.attributes.normal.bytes = result.length * 1;
 
-	} else if ( encodeMethod == 'OCT1Byte' ) {
+	} else if ( encodeMethod === 'OCT1Byte' ) {
 
 		/**
 		* It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
@@ -83,7 +83,7 @@ function compressNormals( geometry, encodeMethod ) {
 		geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 		geometry.attributes.normal.bytes = result.length * 1;
 
-	} else if ( encodeMethod == 'OCT2Byte' ) {
+	} else if ( encodeMethod === 'OCT2Byte' ) {
 
 		result = new Int16Array( count * 2 );
 
@@ -99,7 +99,7 @@ function compressNormals( geometry, encodeMethod ) {
 		geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 		geometry.attributes.normal.bytes = result.length * 2;
 
-	} else if ( encodeMethod == 'ANGLES' ) {
+	} else if ( encodeMethod === 'ANGLES' ) {
 
 		result = new Uint16Array( count * 2 );
 
@@ -146,7 +146,7 @@ function compressPositions( geometry ) {
 
 	if ( position.isPacked ) return;
 
-	if ( position.itemSize != 3 ) {
+	if ( position.itemSize !== 3 ) {
 
 		console.error( 'position.itemSize is not 3, which cannot be packed. ' );
 
@@ -160,8 +160,8 @@ function compressPositions( geometry ) {
 	const quantized = result.quantized;
 
 	// IMPORTANT: calculate original geometry bounding info first, before updating packed positions
-	if ( geometry.boundingBox == null ) geometry.computeBoundingBox();
-	if ( geometry.boundingSphere == null ) geometry.computeBoundingSphere();
+	if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
+	if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 	geometry.setAttribute( 'position', new BufferAttribute( quantized, 3 ) );
 	geometry.attributes.position.isPacked = true;
@@ -239,14 +239,14 @@ function compressUvs( geometry ) {
 
 function defaultEncode( x, y, z, bytes ) {
 
-	if ( bytes == 1 ) {
+	if ( bytes === 1 ) {
 
 		const tmpx = Math.round( ( x + 1 ) * 0.5 * 255 );
 		const tmpy = Math.round( ( y + 1 ) * 0.5 * 255 );
 		const tmpz = Math.round( ( z + 1 ) * 0.5 * 255 );
 		return new Uint8Array( [ tmpx, tmpy, tmpz ] );
 
-	} else if ( bytes == 2 ) {
+	} else if ( bytes === 2 ) {
 
 		const tmpx = Math.round( ( x + 1 ) * 0.5 * 65535 );
 		const tmpy = Math.round( ( y + 1 ) * 0.5 * 65535 );
@@ -339,7 +339,7 @@ function octEncodeBest( x, y, z, bytes ) {
 
 		}
 
-		if ( bytes == 1 ) {
+		if ( bytes === 1 ) {
 
 			return new Int8Array( [
 				Math[ xfunc ]( x * 127.5 + ( x < 0 ? 1 : 0 ) ),
@@ -348,7 +348,7 @@ function octEncodeBest( x, y, z, bytes ) {
 
 		}
 
-		if ( bytes == 2 ) {
+		if ( bytes === 2 ) {
 
 			return new Int16Array( [
 				Math[ xfunc ]( x * 32767.5 + ( x < 0 ? 1 : 0 ) ),
@@ -365,12 +365,12 @@ function octEncodeBest( x, y, z, bytes ) {
 		let x = oct[ 0 ];
 		let y = oct[ 1 ];
 
-		if ( bytes == 1 ) {
+		if ( bytes === 1 ) {
 
 			x /= x < 0 ? 127 : 128;
 			y /= y < 0 ? 127 : 128;
 
-		} else if ( bytes == 2 ) {
+		} else if ( bytes === 2 ) {
 
 			x /= x < 0 ? 32767 : 32768;
 			y /= y < 0 ? 32767 : 32768;
@@ -410,12 +410,12 @@ function quantizedEncode( array, bytes ) {
 
 	let quantized, segments;
 
-	if ( bytes == 1 ) {
+	if ( bytes === 1 ) {
 
 		quantized = new Uint8Array( array.length );
 		segments = 255;
 
-	} else if ( bytes == 2 ) {
+	} else if ( bytes === 2 ) {
 
 		quantized = new Uint16Array( array.length );
 		segments = 65535;
@@ -483,12 +483,12 @@ function quantizedEncodeUV( array, bytes ) {
 
 	let quantized, segments;
 
-	if ( bytes == 1 ) {
+	if ( bytes === 1 ) {
 
 		quantized = new Uint8Array( array.length );
 		segments = 255;
 
-	} else if ( bytes == 2 ) {
+	} else if ( bytes === 2 ) {
 
 		quantized = new Uint16Array( array.length );
 		segments = 65535;

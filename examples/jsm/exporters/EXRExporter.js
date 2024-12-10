@@ -223,9 +223,9 @@ function reorganizeDataBuffer( inBuffer, info ) {
 		h = info.height,
 		dec = { r: 0, g: 0, b: 0, a: 0 },
 		offset = { value: 0 },
-		cOffset = ( info.numOutputChannels == 4 ) ? 1 : 0,
-		getValue = ( info.type == FloatType ) ? getFloat32 : getFloat16,
-		setValue = ( info.dataType == 1 ) ? setFloat16 : setFloat32,
+		cOffset = ( info.numOutputChannels === 4 ) ? 1 : 0,
+		getValue = ( info.type === FloatType ) ? getFloat32 : getFloat16,
+		setValue = ( info.dataType === 1 ) ? setFloat16 : setFloat32,
 		outBuffer = new Uint8Array( info.width * info.height * info.numOutputChannels * info.dataSize ),
 		dv = new DataView( outBuffer.buffer );
 
