@@ -73,9 +73,6 @@
         "requireReturnDescription": false,
         "requireParamType": true
       }
-    ],
-    "eqeqeq": [
-      "error"
     ]
   }
 }
