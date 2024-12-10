@@ -620,9 +620,9 @@ class ShadowNode extends ShadowBaseNode {
 	 * Renders the shadow. The logic of this function could be included
 	 * into {@link ShadowNode#updateShadow} however more specialized shadow
 	 * nodes might require a custom shadow map rendering. By having a
-	 * dedicated method, it's easier to overwrite the default beavior.
+	 * dedicated method, it's easier to overwrite the default behavior.
 	 *
-	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	renderShadow( frame ) {
 
@@ -757,7 +757,7 @@ class ShadowNode extends ShadowBaseNode {
 	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
-	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	updateBefore( frame ) {
 
