@@ -1766,9 +1766,11 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, clippingContext, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
+		renderObject.drawRange = object.geometry.drawRange;
+		renderObject.group = group;
 
 		//
 
