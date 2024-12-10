@@ -27,9 +27,10 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.lights = false;
 
-		this.useAlphaToCoverage = true;
+		this._useSizeAttenuation = true;
+		this._useAlphaToCoverage = true;
 
-		this.useColor = params.vertexColors;
+		this._useColor = params.vertexColors;
 
 		this.pointWidth = 1;
 
@@ -51,27 +52,46 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupShaders( { renderer } ) {
+	setupShaders( { renderer, camera } ) {
 
-		const useAlphaToCoverage = this.alphaToCoverage;
-		const useColor = this.useColor;
+		const alphaToCoverage = this.alphaToCoverage;
+		const sizeAttenuation = this.sizeAttenuation;
+
+		const color = this._useColor;
 
 		this.vertexNode = Fn( () => {
 
 			const instancePosition = attribute( 'instancePosition' ).xyz;
 
 			// camera space
-			const mvPos = vec4( modelViewMatrix.mul( vec4( instancePosition, 1.0 ) ) );
+			const mvPosition = vec4( modelViewMatrix.mul( vec4( instancePosition, 1.0 ) ) );
 
 			const aspect = viewport.z.div( viewport.w );
 
 			// clip space
-			const clipPos = cameraProjectionMatrix.mul( mvPos );
+			const clipPos = cameraProjectionMatrix.mul( mvPosition );
 
 			// offset in ndc space
 			const offset = positionGeometry.xy.toVar();
 
 			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
+
+
+			const pixelRatio = renderer.getPixelRatio();
+			const scale = float( 1.0 ).toVar();
+
+			if ( sizeAttenuation && camera.isPerspectiveCamera ) {
+
+				const fovAdjustment = cameraProjectionMatrix[ 1 ][ 1 ];
+				scale.assign( viewport.w.mul( 0.5 ).mul( pixelRatio ).div( mvPosition.z.negate() ).div( fovAdjustment.mul( pixelRatio ) ) );
+
+			} else {
+
+				scale.assign( pixelRatio );
+
+			}
+
+			offset.mulAssign( scale );
 
 			offset.assign( offset.div( viewport.z ) );
 			offset.y.assign( offset.y.mul( aspect ) );
@@ -92,7 +112,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 			const len2 = lengthSq( uv().mul( 2 ).sub( 1 ) );
 
-			if ( useAlphaToCoverage && renderer.samples > 1 ) {
+			if ( alphaToCoverage && renderer.samples > 1 ) {
 
 				const dlen = float( len2.fwidth() ).toVar();
 
@@ -112,7 +132,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 			} else {
 
-				if ( useColor ) {
+				if ( color ) {
 
 					const instanceColor = attribute( 'instanceColor' );
 
@@ -136,15 +156,32 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	get alphaToCoverage() {
 
-		return this.useAlphaToCoverage;
+		return this._useAlphaToCoverage;
 
 	}
 
 	set alphaToCoverage( value ) {
 
-		if ( this.useAlphaToCoverage !== value ) {
+		if ( this._useAlphaToCoverage !== value ) {
 
-			this.useAlphaToCoverage = value;
+			this._useAlphaToCoverage = value;
+			this.needsUpdate = true;
+
+		}
+
+	}
+
+	get sizeAttenuation() {
+
+		return this._useSizeAttenuation;
+
+	}
+
+	set sizeAttenuation( value ) {
+
+		if ( this._useSizeAttenuation !== value ) {
+
+			this._useSizeAttenuation = value;
 			this.needsUpdate = true;
 
 		}
