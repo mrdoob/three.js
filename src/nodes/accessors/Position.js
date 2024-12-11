@@ -30,21 +30,21 @@ export const positionPrevious = /*@__PURE__*/ positionGeometry.varying( 'positio
  *
  * @type {VaryingNode<vec3>}
  */
-export const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.varying( 'v_positionWorld' );
+export const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.varying( 'v_positionWorld' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position world direction of the current rendered object.
  *
  * @type {Node<vec3>}
  */
-export const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).varying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' );
+export const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).varying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the vertex position in view space of the current rendered object.
  *
  * @type {VaryingNode<vec3>}
  */
-export const positionView = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).xyz.varying( 'v_positionView' );
+export const positionView = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).xyz.varying( 'v_positionView' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
