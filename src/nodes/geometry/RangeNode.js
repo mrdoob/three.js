@@ -9,6 +9,8 @@ import { Vector4 } from '../../math/Vector4.js';
 import { MathUtils } from '../../math/MathUtils.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 
+/** @module RangeNode **/
+
 let min = null;
 let max = null;
 
@@ -160,4 +162,12 @@ class RangeNode extends Node {
 
 export default RangeNode;
 
+/**
+ * TSL function for creating a range node with the given paramters.
+ *
+ * @function
+ * @param {Node<any>} [minNode=float()] - A node defining the lower bound of the range.
+ * @param {Node<any>} [maxNode=float()] - A node defining the upper bound of the range.
+ * @returns {RangeNode}
+ */
 export const range = /*@__PURE__*/ nodeProxy( RangeNode );

@@ -1,14 +1,15 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param attributeName string
- * @param newValue number, string, boolean or object
- * @constructor
- */
 class SetMaterialValueCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {String} [attributeName='']
+	 * @param {Number|String|Boolean|Object|null} [newValue=null]
+	 * @param {Number} [materialSlot=-1]
+	 * @constructor
+	 */
 	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {
 
 		super( editor );

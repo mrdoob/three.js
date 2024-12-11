@@ -3,6 +3,8 @@ import { nodeImmutable, float } from '../tsl/TSLBase.js';
 
 import { BackSide, WebGLCoordinateSystem } from '../../constants.js';
 
+/** @module FrontFacingNode **/
+
 /**
  * This node can be used to evaluate whether a primitive is front or back facing.
  *
@@ -56,5 +58,17 @@ class FrontFacingNode extends Node {
 
 export default FrontFacingNode;
 
+/**
+ * TSL object that represents whether a primitive is front or back facing
+ *
+ * @type {FrontFacingNode<bool>}
+ */
 export const frontFacing = /*@__PURE__*/ nodeImmutable( FrontFacingNode );
+
+/**
+ * TSL object that represents the front facing status as a number instead of a bool.
+ * `1` means front facing, `-1` means back facing.
+ *
+ * @type {Node<float>}
+ */
 export const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 1.0 );

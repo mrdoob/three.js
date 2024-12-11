@@ -1,14 +1,15 @@
 import { Command } from '../Command.js';
 import { ObjectLoader } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newMaterial THREE.Material
- * @constructor
- */
 class SetMaterialCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {THREE.Material|null} newMaterial
+	 * @param {Number} [materialSlot=-1]
+	 * @constructor
+	 */
 	constructor( editor, object = null, newMaterial = null, materialSlot = - 1 ) {
 
 		super( editor );
