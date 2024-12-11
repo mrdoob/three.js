@@ -150,9 +150,9 @@ class VaryingNode extends Node {
 				// once reassign varying in fragment stage
 				properties.reassignPosition = false;
 
-			} else {
+			} else if ( properties.reassignPosition === undefined && builder.context.isPositionNodeInput ) {
 
-				properties.reassignPosition = properties.reassignPosition || ( properties.reassignPosition = builder.context.isPositionNodeInput );
+				properties.reassignPosition = true;
 
 			}
 
