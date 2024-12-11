@@ -60,7 +60,7 @@ class ShadowBaseNode extends Node {
 	/**
 	 * Setups the shadow position node which is by default the predefined TSL node object `shadowWorldPosition`.
 	 *
-	 * @param {(NodeBuilder|{material})} object - A configuration object that must at least hold a material reference.
+	 * @param {(NodeBuilder|{Material})} object - A configuration object that must at least hold a material reference.
 	 */
 	setupShadowPosition( { material } ) {
 
