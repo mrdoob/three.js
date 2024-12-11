@@ -665,6 +665,7 @@ export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode(
  * @function
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - A reference to the camera.
+ * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
+export const depthPass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera, options ) );
