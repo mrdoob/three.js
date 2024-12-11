@@ -45,7 +45,7 @@ class ViewportDepthNode extends Node {
 		 * Can be used to define a custom depth value.
 		 * The property is ignored in the `ViewportDepthNode.DEPTH` scope.
 		 *
-		 * @type {Node}
+		 * @type {Node|null}
 		 * @default null
 		 */
 		this.valueNode = valueNode;

@@ -362,7 +362,7 @@ function isEquirectangularMapReady( image ) {
 }
 
 /**
- * TSL function for creating a PMREM node with the given paramters.
+ * TSL function for creating a PMREM node with the given parameters.
  *
  * @function
  * @param {Texture} value - The input texture.

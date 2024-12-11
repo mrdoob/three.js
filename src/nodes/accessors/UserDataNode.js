@@ -67,7 +67,7 @@ class UserDataNode extends ReferenceNode {
 export default UserDataNode;
 
 /**
- * TSL function for creating a user data node with the given paramters.
+ * TSL function for creating a user data node with the given parameters.
  *
  * @function
  * @param {String} name - The property name that should be referenced by the node.

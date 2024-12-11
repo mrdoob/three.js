@@ -58,7 +58,7 @@ class RenderOutputNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
-		 * @type {Number?}
+		 * @type {String?}
 		 */
 		this.toneMapping = toneMapping;
 
@@ -112,7 +112,7 @@ class RenderOutputNode extends TempNode {
 export default RenderOutputNode;
 
 /**
- * TSL function for creating a posterize node with the given paramters.
+ * TSL function for creating a posterize node with the given parameters.
  *
  * @function
  * @param {Node} color - The color node to process.
