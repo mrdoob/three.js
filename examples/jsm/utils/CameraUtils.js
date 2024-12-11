@@ -18,13 +18,10 @@ const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
  * to exactly frame the corners of an arbitrary rectangle.
  * NOTE: This function ignores the standard parameters;
  * do not call updateProjectionMatrix() after this!
- *
- * @param {PerspectiveCamera} camera
  * @param {Vector3} bottomLeftCorner
  * @param {Vector3} bottomRightCorner
  * @param {Vector3} topLeftCorner
- * @param {boolean} [estimateViewFrustum=false]
- */
+ * @param {boolean} estimateViewFrustum */
 function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorner, estimateViewFrustum = false ) {
 
 	const pa = bottomLeftCorner, pb = bottomRightCorner, pc = topLeftCorner;

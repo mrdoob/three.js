@@ -19,11 +19,11 @@ class TempNode extends Node {
 	/**
 	 * Constructs a temp node.
 	 *
-	 * @param {String?} nodeType - The node type.
+	 * @param {String} type - The node type.
 	 */
-	constructor( nodeType = null ) {
+	constructor( type ) {
 
-		super( nodeType );
+		super( type );
 
 		/**
 		 * This flag can be used for type testing.

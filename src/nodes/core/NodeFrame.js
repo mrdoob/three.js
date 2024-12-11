@@ -48,21 +48,21 @@ class NodeFrame {
 		/**
 		 * Used to control the {@link Node#update} call.
 		 *
-		 * @type {WeakMap<Node, Object>}
+		 * @type {WeakMap}
 		 */
 		this.updateMap = new WeakMap();
 
 		/**
 		 * Used to control the {@link Node#updateBefore} call.
 		 *
-		 * @type {WeakMap<Node, Object>}
+		 * @type {WeakMap}
 		 */
 		this.updateBeforeMap = new WeakMap();
 
 		/**
 		 * Used to control the {@link Node#updateAfter} call.
 		 *
-		 * @type {WeakMap<Node, Object>}
+		 * @type {WeakMap}
 		 */
 		this.updateAfterMap = new WeakMap();
 
@@ -113,7 +113,7 @@ class NodeFrame {
 	 * is used to correctly call node update methods per frame or render.
 	 *
 	 * @private
-	 * @param {WeakMap<Node, Object>} referenceMap - The reference weak map.
+	 * @param {WeakMap} referenceMap - The reference weak map.
 	 * @param {Node} nodeRef - The reference to the current node.
 	 * @return {Object<String,WeakMap>} The dictionary.
 	 */

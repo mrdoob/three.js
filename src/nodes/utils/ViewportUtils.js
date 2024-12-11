@@ -7,7 +7,7 @@ import { linearDepth } from '../display/ViewportDepthNode.js';
 
 /**
  * A special version of a screen uv function that involves a depth comparison
- * when computing the final uvs. The function mitigates visual errors when
+ * when computing the final uvs. The function mitigates visual erros when
  * using viewport texture nodes for refraction purposes. Without this function
  * objects in front of a refractive surface might appear on the refractive surface
  * which is incorrect.

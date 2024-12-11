@@ -2,8 +2,6 @@ import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module VaryingNode **/
-
 /**
  * Class for representing shader varyings as nodes. Varyings are create from
  * existing nodes like the following:
@@ -153,14 +151,6 @@ class VaryingNode extends Node {
 
 export default VaryingNode;
 
-/**
- * TSL function for creating a varying node with the given paramters.
- *
- * @function
- * @param {Node} node - The node for which a varying should be created.
- * @param {String?} name - The name of the varying in the shader.
- * @returns {VaryingNode}
- */
 export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 
 addMethodChaining( 'varying', varying );

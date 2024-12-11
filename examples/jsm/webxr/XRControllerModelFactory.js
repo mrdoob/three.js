@@ -107,7 +107,7 @@ class XRControllerModel extends Object3D {
 
 /**
  * Walks the model's tree to find the nodes needed to animate the components and
- * saves them to the motionController components for use in the frame loop. When
+ * saves them to the motionContoller components for use in the frame loop. When
  * touchpads are found, attaches a touch dot to them.
  */
 function findNodes( motionController, scene ) {

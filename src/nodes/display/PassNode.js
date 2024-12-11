@@ -10,14 +10,13 @@ import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-/** @module PassNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 /**
  * Represents the texture of a pass node.
  *
  * @augments TextureNode
+ * @private
  */
 class PassTextureNode extends TextureNode {
 
@@ -69,6 +68,7 @@ class PassTextureNode extends TextureNode {
  * internal texture. Relevant for the `getPreviousTexture()` related API.
  *
  * @augments PassTextureNode
+ * @private
  */
 class PassMultipleTextureNode extends PassTextureNode {
 
@@ -638,34 +638,6 @@ PassNode.DEPTH = 'depth';
 
 export default PassNode;
 
-/**
- * TSL function for creating a pass node with the given paramters.
- *
- * @function
- * @param {Scene} scene - A reference to the scene.
- * @param {Camera} camera - A reference to the camera.
- * @param {Object} options - Options for the internal render target.
- * @returns {PassNode}
- */
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
-
-/**
- * TSL function for creating a pass texture node with the given paramters.
- *
- * @function
- * @param {PassNode} pass - The pass node.
- * @param {Texture} texture - The output texture.
- * @returns {PassTextureNode}
- */
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
-
-/**
- * TSL function for creating a depth pass node with the given paramters.
- *
- * @function
- * @param {Scene} scene - A reference to the scene.
- * @param {Camera} camera - A reference to the camera.
- * @param {Object} options - Options for the internal render target.
- * @returns {PassNode}
- */
 export const depthPass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera, options ) );

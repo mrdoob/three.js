@@ -10,7 +10,7 @@ import { PI, pow, sin } from './MathNode.js';
  *
  * @method
  * @param {Node<float>} x - The value to remap.
- * @param {Node<float>} k - Allows to control the remapping functions shape by rising the parabola to a power `k`.
+ * @param {Node<float>} k - Allows to control the remapping functions shape by rising the parabolar to a power `k`.
  * @return {Node<float>} The remapped value.
  */
 export const parabola = ( x, k ) => pow( mul( 4.0, x.mul( sub( 1.0, x ) ) ), k );
@@ -34,8 +34,8 @@ export const gain = ( x, k ) => x.lessThan( 0.5 ) ? parabola( x.mul( 2.0 ), k ).
  *
  * @method
  * @param {Node<float>} x - The value to remap.
- * @param {Node<float>} a - First control parameter.
- * @param {Node<float>} b - Second control parameter.
+ * @param {Node<float>} a - First control paramter.
+ * @param {Node<float>} b - Second control paramter.
  * @return {Node<float>} The remapped value.
  */
 export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), pow( sub( 1.0, x ), b ) ) ), 1.0 / a );

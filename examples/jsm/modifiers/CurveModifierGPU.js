@@ -19,8 +19,7 @@ import { modelWorldMatrix, normalLocal, vec2, vec3, vec4, mat3, varyingProperty,
 /**
  * Make a new DataTexture to store the descriptions of the curves.
  *
- * @param { number } [numberOfCurves=1] the number of curves needed to be described by this texture.
- * @returns { DataTexture } The new DataTexture
+ * @param { number } numberOfCurves the number of curves needed to be described by this texture.
  */
 export function initSplineTexture( numberOfCurves = 1 ) {
 
@@ -95,8 +94,7 @@ function setTextureValue( texture, index, x, y, z, o ) {
 /**
  * Create a new set of uniforms for describing the curve modifier
  *
- * @param { DataTexture } splineTexture which holds the curve description
- * @returns { Object } The uniforms object
+ * @param { DataTexture } Texture which holds the curve description
  */
 export function getUniforms( splineTexture ) {
 

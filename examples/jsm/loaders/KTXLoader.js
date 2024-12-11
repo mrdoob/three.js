@@ -46,10 +46,10 @@ const COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
 class KhronosTextureContainer {
 
 	/**
-	 * @param {ArrayBuffer} arrayBuffer - contents of the KTX container file
-	 * @param {number} facesExpected - should be either 1 or 6, based whether a cube texture or or
-	 * @param {boolean} threeDExpected - provision for indicating that data should be a 3D texture, not implemented
-	 * @param {boolean} textureArrayExpected - provision for indicating that data should be a texture array, not implemented
+	 * @param {ArrayBuffer} arrayBuffer- contents of the KTX container file
+	 * @param {number} facesExpected- should be either 1 or 6, based whether a cube texture or or
+	 * @param {boolean} threeDExpected- provision for indicating that data should be a 3D texture, not implemented
+	 * @param {boolean} textureArrayExpected- provision for indicating that data should be a texture array, not implemented
 	 */
 	constructor( arrayBuffer, facesExpected /*, threeDExpected, textureArrayExpected */ ) {
 

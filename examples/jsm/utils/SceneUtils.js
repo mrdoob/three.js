@@ -174,8 +174,8 @@ function reduceVertices( object, func, initialValue ) {
 }
 
 /**
- * @param {InstancedMesh} mesh
- * @param {function(int, int):int} compareFn
+ * @param {InstancedMesh}
+ * @param {function(int, int):int}
  */
 function sortInstancedMesh( mesh, compareFn ) {
 

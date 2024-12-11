@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 
-/** @module AttributeNode **/
-
 /**
  * Base class for representing shader attributes as nodes.
  *
@@ -157,12 +155,4 @@ class AttributeNode extends Node {
 
 export default AttributeNode;
 
-/**
- * TSL function for creating an attribute node with the given parameters.
- *
- * @function
- * @param {String} name - The name of the attribute.
- * @param {String?} nodeType - The node type.
- * @returns {AttributeNode}
- */
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );

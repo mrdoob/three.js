@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
-/** @module CacheNode **/
-
 /**
  * This node can be used as a cache management component for another node.
  * Caching is in general used by default in {@link NodeBuilder} but this node
@@ -79,14 +77,6 @@ class CacheNode extends Node {
 
 export default CacheNode;
 
-/**
- * TSL function for creating a cache node with the given parameters.
- *
- * @function
- * @param {Node} node - The node that should be cached.
- * @param {Boolean} parent - Whether this node refers to a shared parent cache or not.
- * @returns {CacheNode}
- */
-export const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
+export const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 
 addMethodChaining( 'cache', cache );

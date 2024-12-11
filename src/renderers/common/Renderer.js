@@ -1655,7 +1655,6 @@ class Renderer {
 
 			overrideMaterial.alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
-			overrideMaterial.transparent = material.transparent || material.transmission > 0;
 
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
@@ -1766,11 +1765,9 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, clippingContext, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
-		renderObject.drawRange = object.geometry.drawRange;
-		renderObject.group = group;
 
 		//
 

@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module VarNode **/
-
 /**
  * Class for representing shader variables as nodes. Variables are created from
  * existing nodes like the following:
@@ -98,14 +96,6 @@ class VarNode extends Node {
 
 export default VarNode;
 
-/**
- * TSL function for creating a var node with the given paramters.
- *
- * @function
- * @param {Node} node - The node for which a variable should be created.
- * @param {String?} name - The name of the variable in the shader.
- * @returns {VarNode}
- */
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );

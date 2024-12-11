@@ -29,6 +29,8 @@ const tri3 = /*@__PURE__*/ Fn( ( [ p ] ) => {
 	]
 } );
 
+/** @module Hash **/
+
 /**
  * Generates a noise value from the given position, speed and time parameters.
  *

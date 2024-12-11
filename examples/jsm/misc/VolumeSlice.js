@@ -103,7 +103,7 @@ class VolumeSlice {
 	}
 
 	/**
-	 * Refresh the texture and the geometry if geometryNeedsUpdate is set to true
+	 * @member {Function} repaint Refresh the texture and the geometry if geometryNeedsUpdate is set to true
 	 * @memberof VolumeSlice
 	 */
 	repaint() {
@@ -189,7 +189,7 @@ class VolumeSlice {
 	}
 
 	/**
-	 * Refresh the geometry according to axis and index
+	 * @member {Function} Refresh the geometry according to axis and index
 	 * @see Volume.extractPerpendicularPlane
 	 * @memberof VolumeSlice
 	 */

@@ -269,7 +269,7 @@ class WebGPUAttributeUtils {
 
 		let format;
 
-		if ( itemSize === 1 ) {
+		if ( itemSize == 1 ) {
 
 			format = typeArraysToVertexFormatPrefixForItemSize1.get( ArrayType );
 

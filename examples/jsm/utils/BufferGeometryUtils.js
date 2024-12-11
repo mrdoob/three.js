@@ -389,7 +389,7 @@ function mergeAttributes( attributes ) {
 }
 
 /**
- * @param {BufferAttribute} attribute
+ * @param {BufferAttribute}
  * @return {BufferAttribute}
  */
 export function deepCloneAttribute( attribute ) {

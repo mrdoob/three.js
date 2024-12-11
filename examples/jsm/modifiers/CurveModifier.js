@@ -20,7 +20,6 @@ import {
  * Make a new DataTexture to store the descriptions of the curves.
  *
  * @param { number } numberOfCurves the number of curves needed to be described by this texture.
- * @returns { DataTexture }
  */
 export function initSplineTexture( numberOfCurves = 1 ) {
 
@@ -94,8 +93,7 @@ function setTextureValue( texture, index, x, y, z, o ) {
 /**
  * Create a new set of uniforms for describing the curve modifier
  *
- * @param { DataTexture } splineTexture which holds the curve description
- * @returns { Object } The uniforms object to be used in the shader
+ * @param { DataTexture } Texture which holds the curve description
  */
 export function getUniforms( splineTexture ) {
 

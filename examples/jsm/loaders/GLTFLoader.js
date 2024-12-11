@@ -3340,11 +3340,9 @@ class GLTFParser {
 
 	/**
 	 * Asynchronously assigns a texture to the given material parameters.
-	 *
 	 * @param {Object} materialParams
 	 * @param {string} mapName
 	 * @param {Object} mapDef
-	 * @param {string} colorSpace
 	 * @return {Promise<Texture>}
 	 */
 	assignTexture( materialParams, mapName, mapDef, colorSpace ) {

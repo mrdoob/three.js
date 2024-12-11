@@ -73,7 +73,7 @@ const viewportFrontSideTexture = /*@__PURE__*/ viewportMipTexture();
 
 const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
 
-	const vTexture = material.side === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
+	const vTexture = material.side == BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
 
 	const transmissionSample = vTexture.sample( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );

@@ -4,8 +4,6 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
-/** @module RenderOutputNode **/
-
 /**
  * Normally, tone mapping and color conversion happens automatically
  * before outputting pixel too the default (screen) framebuffer. In certain
@@ -111,15 +109,6 @@ class RenderOutputNode extends TempNode {
 
 export default RenderOutputNode;
 
-/**
- * TSL function for creating a posterize node with the given paramters.
- *
- * @function
- * @param {Node} color - The color node to process.
- * @param {String?} [toneMapping=null] - The tone mapping type.
- * @param {String?} [outputColorSpace=null] - The output color space.
- * @returns {RenderOutputNode}
- */
 export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 
 addMethodChaining( 'renderOutput', renderOutput );

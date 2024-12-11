@@ -1,8 +1,6 @@
 import OutputStructNode from './OutputStructNode.js';
 import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
 
-/** @module MRTNode **/
-
 /**
  * Returns the MRT texture index for the given name.
  *
@@ -141,11 +139,4 @@ class MRTNode extends OutputStructNode {
 
 export default MRTNode;
 
-/**
- * TSL function for creating a MRT node with the given parameters.
- *
- * @function
- * @param {Object<String, Node>} outputNodes - The MRT outputs.
- * @returns {MRTNode}
- */
 export const mrt = /*@__PURE__*/ nodeProxy( MRTNode );

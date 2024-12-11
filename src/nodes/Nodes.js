@@ -104,6 +104,11 @@ export { default as FunctionNode } from './code/FunctionNode.js';
 export { default as ScriptableNode } from './code/ScriptableNode.js';
 export { default as ScriptableValueNode } from './code/ScriptableValueNode.js';
 
+// fog
+export { default as FogNode } from './fog/FogNode.js';
+export { default as FogRangeNode } from './fog/FogRangeNode.js';
+export { default as FogExp2Node } from './fog/FogExp2Node.js';
+
 // geometry
 export { default as RangeNode } from './geometry/RangeNode.js';
 
