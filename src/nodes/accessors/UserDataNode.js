@@ -12,10 +12,10 @@ import { nodeObject } from '../tsl/TSLBase.js';
  * const material = new THREE.SpriteNodeMaterial();
  * material.rotationNode = userData( 'rotation', 'float' );
  * ```
- * Since `UserDataNode` is extended from {@link ReferenceNode}, the node value
+ * Since `UserDataNode` is extended from {@link module:ReferenceNode~ReferenceNode}, the node value
  * will automatically be updated when the `rotation` user data field changes.
  *
- * @augments ReferenceNode
+ * @augments module:ReferenceNode~ReferenceNode
  */
 class UserDataNode extends ReferenceNode {
 
@@ -48,7 +48,7 @@ class UserDataNode extends ReferenceNode {
 	}
 
 	/**
-	 * Overwritten to make sure {@link ReferenceNode#reference} points to the correct
+	 * Overwritten to make sure {@link module:ReferenceNode~ReferenceNode#reference} points to the correct
 	 * `userData` field.
 	 *
 	 * @param {(NodeFrame|NodeBuilder)} state - The current state to evaluate.

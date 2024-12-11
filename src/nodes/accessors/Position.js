@@ -19,7 +19,7 @@ export const positionLocal = /*@__PURE__*/ positionGeometry.varying( 'positionLo
 
 /**
  * TSL object that represents the previous vertex position in local space of the current rendered object.
- * Used in context of {@link VelocityNode} for rendering motion vectors.
+ * Used in context of {@link module:VelocityNode~VelocityNode} for rendering motion vectors.
  *
  * @type {AttributeNode<vec3>}
  */

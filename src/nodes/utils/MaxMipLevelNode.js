@@ -10,7 +10,7 @@ import { nodeProxy } from '../tsl/TSLBase.js';
  * const level = maxMipLevel( textureNode );
  * ```
  *
- * @augments UniformNode
+ * @augments module:UniformNode~UniformNode
  */
 class MaxMipLevelNode extends UniformNode {
 

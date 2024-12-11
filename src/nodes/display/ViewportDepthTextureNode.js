@@ -4,6 +4,8 @@ import { screenUV } from './ScreenNode.js';
 
 import { DepthTexture } from '../../textures/DepthTexture.js';
 
+/** @module ViewportDepthTextureNode **/
+
 let sharedDepthbuffer = null;
 
 /**
@@ -11,7 +13,7 @@ let sharedDepthbuffer = null;
  * can be used in combination with viewport texture to achieve effects
  * that require depth evaluation.
  *
- * @augments ViewportTextureNode
+ * @augments module:ViewportTextureNode~ViewportTextureNode
  */
 class ViewportDepthTextureNode extends ViewportTextureNode {
 
@@ -22,7 +24,7 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 	}
 
 	/**
-	 * Constructs a new viewport shared texture node.
+	 * Constructs a new viewport depth texture node.
 	 *
 	 * @param {Node} [uvNode=screenUV] - The uv node.
 	 * @param {Node?} [levelNode=null] - The level node.
@@ -43,4 +45,12 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 
 export default ViewportDepthTextureNode;
 
+/**
+ * TSL function for a viewport depth texture node.
+ *
+ * @function
+ * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {Node?} [levelNode=null] - The level node.
+ * @returns {ViewportDepthTextureNode}
+ */
 export const viewportDepthTexture = /*@__PURE__*/ nodeProxy( ViewportDepthTextureNode );

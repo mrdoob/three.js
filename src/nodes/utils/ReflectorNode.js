@@ -46,7 +46,7 @@ let _inReflector = false;
  * plane.add( groundReflector.target );
  * ```
  *
- * @augments TextureNode
+ * @augments module:TextureNode~TextureNode
  */
 class ReflectorNode extends TextureNode {
 

@@ -163,7 +163,7 @@ const _shadowMapSize = /*@__PURE__*/ new Vector2();
 /**
  * Represents the shadow implementation for point light nodes.
  *
- * @augments ShadowNode
+ * @augments module:ShadowNode~ShadowNode
  */
 class PointShadowNode extends ShadowNode {
 

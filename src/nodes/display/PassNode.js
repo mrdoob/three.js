@@ -17,7 +17,7 @@ const _size = /*@__PURE__*/ new Vector2();
 /**
  * Represents the texture of a pass node.
  *
- * @augments TextureNode
+ * @augments module:TextureNode~TextureNode
  */
 class PassTextureNode extends TextureNode {
 
@@ -68,7 +68,7 @@ class PassTextureNode extends TextureNode {
  * An extension of `PassTextureNode` which allows to manage more than one
  * internal texture. Relevant for the `getPreviousTexture()` related API.
  *
- * @augments PassTextureNode
+ * @augments module:PassTextureNode~PassTextureNode
  */
 class PassMultipleTextureNode extends PassTextureNode {
 
