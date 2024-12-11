@@ -242,7 +242,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {Record<string, Texture>}
+		 * @type {Object<string, Texture>}
 		 */
 		this._textures = {
 			output: renderTarget.texture,
@@ -253,7 +253,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal texture nodes.
 		 *
 		 * @private
-		 * @type {Record<string, TextureNode>}
+		 * @type {Object<string, TextureNode>}
 		 */
 		this._textureNodes = {};
 
@@ -278,7 +278,7 @@ class PassNode extends TempNode {
 		 * Used for computing velocity/motion vectors.
 		 *
 		 * @private
-		 * @type {Record<string, Texture>}
+		 * @type {Object<string, Texture>}
 		 */
 		this._previousTextures = {};
 
@@ -287,7 +287,7 @@ class PassNode extends TempNode {
 		 * Used for computing velocity/motion vectors.
 		 *
 		 * @private
-		 * @type {Record<string, TextureNode>}
+		 * @type {Object<string, TextureNode>}
 		 */
 		this._previousTextureNodes = {};
 

@@ -41,7 +41,7 @@ class RenderOutputNode extends TempNode {
 	 * Constructs a new render output node.
 	 *
 	 * @param {Node} colorNode - The color node to process.
-	 * @param {String} toneMapping - The tone mapping type.
+	 * @param {Number} toneMapping - The tone mapping type.
 	 * @param {String} outputColorSpace - The output color space.
 	 */
 	constructor( colorNode, toneMapping, outputColorSpace ) {
@@ -58,7 +58,7 @@ class RenderOutputNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
-		 * @type {String?}
+		 * @type {Number?}
 		 */
 		this.toneMapping = toneMapping;
 
@@ -116,7 +116,7 @@ export default RenderOutputNode;
  *
  * @function
  * @param {Node} color - The color node to process.
- * @param {String?} [toneMapping=null] - The tone mapping type.
+ * @param {Number?} [toneMapping=null] - The tone mapping type.
  * @param {String?} [outputColorSpace=null] - The output color space.
  * @returns {RenderOutputNode}
  */

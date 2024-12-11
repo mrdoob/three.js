@@ -35,7 +35,7 @@ class MathNode extends TempNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {String}
 		 * @readonly
 		 * @default true
 		 */
