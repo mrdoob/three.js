@@ -330,6 +330,8 @@ class CCDIKHelper extends Object3D {
 
 	/**
 	 * Updates IK bones visualization.
+	 *
+	 * @param {Boolean} force
 	 */
 	updateMatrixWorld( force ) {
 
