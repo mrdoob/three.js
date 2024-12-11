@@ -218,6 +218,7 @@ class PointShadowNode extends ShadowNode {
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
 	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
+	 * @param {Texture} inputs.shadowTexture - A reference to the shadow map's texture.
 	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
 	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
 	 * @param {LightShadow} inputs.shadow - The light shadow.

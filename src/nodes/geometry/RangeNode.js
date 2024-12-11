@@ -163,7 +163,7 @@ class RangeNode extends Node {
 export default RangeNode;
 
 /**
- * TSL function for creating a range node with the given paramters.
+ * TSL function for creating a range node with the given parameters.
  *
  * @function
  * @param {Node<any>} [minNode=float()] - A node defining the lower bound of the range.

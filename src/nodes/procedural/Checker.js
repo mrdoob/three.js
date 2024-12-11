@@ -7,7 +7,7 @@ import { Fn } from '../tsl/TSLBase.js';
  * Creates a 2x2 checkerboard pattern that can be used as procedural texture data.
  *
  * @method
- * @param {Node<vec2>} uv - The uv coordinates.
+ * @param {Node<vec2>} coord - The uv coordinates.
  * @return {Node<float>} The result data.
  */
 export const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {

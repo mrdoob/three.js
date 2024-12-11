@@ -15,7 +15,7 @@ import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
  *
  * } );
  *```
- * Nested loops can be definde in a compacted form:
+ * Nested loops can be defined in a compacted form:
  * ```js
  * Loop( 10, 5, ( { i, j } ) => {
  *

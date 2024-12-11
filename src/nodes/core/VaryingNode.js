@@ -167,7 +167,7 @@ class VaryingNode extends Node {
 export default VaryingNode;
 
 /**
- * TSL function for creating a varying node with the given paramters.
+ * TSL function for creating a varying node with the given parameters.
  *
  * @function
  * @param {Node} node - The node for which a varying should be created.

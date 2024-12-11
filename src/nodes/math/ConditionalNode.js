@@ -10,7 +10,7 @@ import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
  * ```
- * The `select()` method is called in a chaining fashion on a codition. The parameter nodes of `select()`
+ * The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()`
  * determine the outcome of the entire statement.
  *
  * @augments Node

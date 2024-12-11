@@ -186,7 +186,7 @@ class PassNode extends TempNode {
 		/**
 		 * A reference to the camera.
 		 *
-		 * @type {camera}
+		 * @type {Camera}
 		 */
 		this.camera = camera;
 
@@ -242,7 +242,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, Texture>}
 		 */
 		this._textures = {
 			output: renderTarget.texture,
@@ -253,7 +253,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal texture nodes.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, TextureNode>}
 		 */
 		this._textureNodes = {};
 
@@ -278,7 +278,7 @@ class PassNode extends TempNode {
 		 * Used for computing velocity/motion vectors.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, Texture>}
 		 */
 		this._previousTextures = {};
 
@@ -287,7 +287,7 @@ class PassNode extends TempNode {
 		 * Used for computing velocity/motion vectors.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, TextureNode>}
 		 */
 		this._previousTextureNodes = {};
 
@@ -639,7 +639,7 @@ PassNode.DEPTH = 'depth';
 export default PassNode;
 
 /**
- * TSL function for creating a pass node with the given paramters.
+ * TSL function for creating a pass node with the given parameters.
  *
  * @function
  * @param {Scene} scene - A reference to the scene.
@@ -650,7 +650,7 @@ export default PassNode;
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 
 /**
- * TSL function for creating a pass texture node with the given paramters.
+ * TSL function for creating a pass texture node with the given parameters.
  *
  * @function
  * @param {PassNode} pass - The pass node.
@@ -660,7 +660,7 @@ export const pass = ( scene, camera, options ) => nodeObject( new PassNode( Pass
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 
 /**
- * TSL function for creating a depth pass node with the given paramters.
+ * TSL function for creating a depth pass node with the given parameters.
  *
  * @function
  * @param {Scene} scene - A reference to the scene.

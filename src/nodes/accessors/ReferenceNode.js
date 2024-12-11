@@ -172,7 +172,7 @@ class ReferenceNode extends Node {
 		this.group = null;
 
 		/**
-		 * An optinal label of the internal uniform node.
+		 * An optional label of the internal uniform node.
 		 *
 		 * @type {String?}
 		 * @default null
@@ -383,7 +383,7 @@ class ReferenceNode extends Node {
 export default ReferenceNode;
 
 /**
- * TSL function for creating a reference node with the given paramters.
+ * TSL function for creating a reference node with the given parameters.
  *
  * @function
  * @param {String} name - The name of the property the node refers to.
@@ -394,7 +394,7 @@ export default ReferenceNode;
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 
 /**
- * TSL function for creating a reference node with the given paramters.
+ * TSL function for creating a reference node with the given parameters.
  *
  * @function
  * @param {String} name - The name of the property the node refers to.
