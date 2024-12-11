@@ -113,8 +113,8 @@ class PerspectiveCamera extends Camera {
 	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
 	 *
 	 * @param {number} distance
-	 * @param {Vector2} minTarget
-	 * @param {Vector2} maxTarget
+	 * @param {number} minTarget
+	 * @param {number} maxTarget
 	 */
 	getViewBounds( distance, minTarget, maxTarget ) {
 
