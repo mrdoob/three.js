@@ -57,6 +57,7 @@ class AnalyticLightNode extends LightingNode {
 		 * The final color node is represented by a different node when using shadows.
 		 *
 		 * @type {Node?}
+		 * @default null
 		 */
 		this.baseColorNode = null;
 
@@ -64,6 +65,7 @@ class AnalyticLightNode extends LightingNode {
 		 * Represents the light's shadow.
 		 *
 		 * @type {ShadowNode?}
+   		 * @default null
 		 */
 		this.shadowNode = null;
 
@@ -71,6 +73,7 @@ class AnalyticLightNode extends LightingNode {
 		 * Represents the light's shadow color.
 		 *
 		 * @type {Node?}
+   		 * @default null
 		 */
 		this.shadowColorNode = null;
 
