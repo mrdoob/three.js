@@ -1,15 +1,15 @@
 import { Command } from '../Command.js';
 import { Euler } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newRotation THREE.Euler
- * @param optionalOldRotation THREE.Euler
- * @constructor
- */
 class SetRotationCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {THREE.Euler|null} newRotation
+	 * @param {THREE.Euler|null} optionalOldRotation
+	 * @constructor
+	 */
 	constructor( editor, object = null, newRotation = null, optionalOldRotation = null ) {
 
 		super( editor );

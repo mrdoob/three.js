@@ -1,15 +1,16 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param attributeName string
- * @param newMinValue number
- * @param newMaxValue number
- * @constructor
- */
 class SetMaterialRangeCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {String} [attributeName='']
+	 * @param {Number} [newMinValue=-Infinity]
+	 * @param {Number} [newMaxValue=Infinity]
+	 * @param {Number} [materialSlot=-1]
+	 * @constructor
+	 */
 	constructor( editor, object = null, attributeName = '', newMinValue = - Infinity, newMaxValue = Infinity, materialSlot = - 1 ) {
 
 		super( editor );

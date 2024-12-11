@@ -141,7 +141,7 @@ class ToonOutlinePassNode extends PassNode {
 	}
 
 	/**
-	 * For the given toon material, this method returns a correspoding
+	 * For the given toon material, this method returns a corresponding
 	 * outline material.
 	 *
 	 * @private
