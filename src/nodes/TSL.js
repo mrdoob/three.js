@@ -115,9 +115,7 @@ export * from './code/ScriptableNode.js';
 export * from './code/ScriptableValueNode.js';
 
 // fog
-export * from './fog/FogNode.js';
-export * from './fog/FogRangeNode.js';
-export * from './fog/FogExp2Node.js';
+export * from './fog/Fog.js';
 
 // geometry
 export * from './geometry/RangeNode.js';

@@ -976,14 +976,20 @@ class WebGPUBackend extends Backend {
 			const drawCount = object._multiDrawCount;
 			const drawInstances = object._multiDrawInstances;
 
-			const bytesPerElement = hasIndex ? index.array.BYTES_PER_ELEMENT : 1;
-
 			for ( let i = 0; i < drawCount; i ++ ) {
 
 				const count = drawInstances ? drawInstances[ i ] : 1;
 				const firstInstance = count > 1 ? 0 : i;
 
-				passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
+				if ( hasIndex === true ) {
+
+					passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+
+				} else {
+
+					passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+
+				}
 
 			}
 

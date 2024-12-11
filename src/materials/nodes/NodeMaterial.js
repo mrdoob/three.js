@@ -110,6 +110,8 @@ class NodeMaterial extends Material {
 
 		builder.stack.outputNode = this.vertexNode || this.setupPosition( builder );
 
+		this.setupHardwareClipping( builder );
+
 		if ( this.geometryNode !== null ) {
 
 			builder.stack.outputNode = builder.stack.outputNode.bypass( this.geometryNode );
@@ -354,8 +356,6 @@ class NodeMaterial extends Material {
 
 		}
 
-		this.setupHardwareClipping( builder );
-
 		const mvp = modelViewProjection();
 
 		builder.context.vertex = builder.removeStack();
@@ -576,7 +576,13 @@ class NodeMaterial extends Material {
 
 			const fogNode = builder.fogNode;
 
-			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+			if ( fogNode ) {
+
+				const fog = vec4( fogNode );
+
+				outputNode = vec4( fog.a.mix( outputNode.rgb, fog.rgb ), outputNode.a );
+
+			}
 
 		}
 

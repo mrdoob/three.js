@@ -24,7 +24,7 @@ class NodeCache {
 		/**
 		 * A weak map for managing node data.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Node, Object>}
 		 */
 		this.nodesData = new WeakMap();
 

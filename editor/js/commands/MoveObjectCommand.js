@@ -1,14 +1,14 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newParent THREE.Object3D
- * @param newBefore THREE.Object3D
- * @constructor
- */
 class MoveObjectCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {THREE.Object3D|null} [newParent=null]
+	 * @param {THREE.Object3D|null} [newBefore=null]
+	 * @constructor
+	 */
 	constructor( editor, object = null, newParent = null, newBefore = null ) {
 
 		super( editor );
