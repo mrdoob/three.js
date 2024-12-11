@@ -382,10 +382,10 @@ class LightsNode extends Node {
 export default LightsNode;
 
 /**
- * Factory method for creating an instance of `LightsNode` and configuring
+ * TSL function for creating an instance of `LightsNode` and configuring
  * it with the given array of lights.
  *
- * @method
+ * @function
  * @param {Array<Light>} lights - An array of lights.
  * @return {LightsNode} The created lights node.
  */

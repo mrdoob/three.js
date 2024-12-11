@@ -1,3 +1,5 @@
+/** @module NodeConstants **/
+
 /**
  * Possible shader stages.
  *

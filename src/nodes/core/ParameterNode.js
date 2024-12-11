@@ -1,6 +1,8 @@
 import { nodeObject } from '../tsl/TSLBase.js';
 import PropertyNode from './PropertyNode.js';
 
+/** @module ParameterNode **/
+
 /**
  * Special version of {@link PropertyNode} which is used for parameters.
  *
@@ -52,9 +54,11 @@ class ParameterNode extends PropertyNode {
 export default ParameterNode;
 
 /**
+ * TSL function for creating a parameter node with the given paramters.
  *
- * @param {string} type
- * @param {string?} [name=null]
- * @returns {ShaderNodeObject}
+ * @function
+ * @param {String} type - The type of the node.
+ * @param {String?} name - The name of the parameter in the shader.
+ * @returns {ParameterNode}
  */
 export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );

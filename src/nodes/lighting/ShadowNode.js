@@ -17,6 +17,8 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 
+/** @module ShadowNode **/
+
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
@@ -62,8 +64,6 @@ const getShadowMaterial = ( light ) => {
 	return material;
 
 };
-
-/** @module ShadowNode **/
 
 /**
  * A shadow filtering function performing basic filtering. This is in fact an unfiltered version of the shadow map
@@ -784,9 +784,9 @@ class ShadowNode extends ShadowBaseNode {
 export default ShadowNode;
 
 /**
- * Factory method for creating an instance of `ShadowNode`.
+ * TSL function for creating an instance of `ShadowNode`.
  *
- * @method
+ * @function
  * @param {Light} light - The shadow casting light.
  * @param {LightShadow} shadow - The light shadow.
  * @return {ShadowNode} The created shadow node.
