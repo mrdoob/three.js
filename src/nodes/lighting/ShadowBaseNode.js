@@ -84,7 +84,7 @@ class ShadowBaseNode extends Node {
 }
 
 /**
- * Represents the vertex position in world space during the shadow pass.
+ * TSLS object that represents the vertex position in world space during the shadow pass.
  *
  * @type {Node<vec3>}
  */
