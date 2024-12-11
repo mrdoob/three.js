@@ -33,11 +33,9 @@ class MathNode extends TempNode {
 		super();
 
 		/**
-		 * This flag can be used for type testing.
+		 * The method name.
 		 *
-		 * @type {Boolean}
-		 * @readonly
-		 * @default true
+		 * @type {String}
 		 */
 		this.method = method;
 
