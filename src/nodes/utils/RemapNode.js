@@ -1,6 +1,8 @@
 import Node from '../core/Node.js';
 import { float, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/** @module RemapNode **/
+
 /**
  * This node allows to remap a node value from one range into another. E.g a value of
  * `0.4` in the range `[ 0.3, 0.5 ]` should be remapped into the normalized range `[ 0, 1 ]`.
@@ -93,7 +95,30 @@ class RemapNode extends Node {
 
 export default RemapNode;
 
+/**
+ * TSL function for creating a remap node.
+ *
+ * @function
+ * @param {Node} node - The node that should be remapped.
+ * @param {Node} inLowNode - The source or current lower bound of the range.
+ * @param {Node} inHighNode - The source or current upper bound of the range.
+ * @param {Node} [outLowNode=float(0)] - The target lower bound of the range.
+ * @param {Node} [outHighNode=float(1)] - The target upper bound of the range.
+ * @returns {RemapNode}
+ */
 export const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } );
+
+/**
+ * TSL function for creating a remap node, but with enabled clamping.
+ *
+ * @function
+ * @param {Node} node - The node that should be remapped.
+ * @param {Node} inLowNode - The source or current lower bound of the range.
+ * @param {Node} inHighNode - The source or current upper bound of the range.
+ * @param {Node} [outLowNode=float(0)] - The target lower bound of the range.
+ * @param {Node} [outHighNode=float(1)] - The target upper bound of the range.
+ * @returns {RemapNode}
+ */
 export const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
 addMethodChaining( 'remap', remap );

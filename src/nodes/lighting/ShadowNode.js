@@ -310,7 +310,7 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 /**
  * Represents the default shadow implementation for lighting nodes.
  *
- * @augments ShadowBaseNode
+ * @augments module:ShadowBaseNode~ShadowBaseNode
  */
 class ShadowNode extends ShadowBaseNode {
 

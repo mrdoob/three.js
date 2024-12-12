@@ -85,7 +85,7 @@ class OutputStructNode extends Node {
 export default OutputStructNode;
 
 /**
- * TSL function for creating an output struct node with the given parameters.
+ * TSL function for creating an output struct node.
  *
  * @function
  * @param {...Node} members - A parameter list of nodes.

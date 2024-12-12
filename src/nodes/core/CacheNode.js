@@ -80,7 +80,7 @@ class CacheNode extends Node {
 export default CacheNode;
 
 /**
- * TSL function for creating a cache node with the given parameters.
+ * TSL function for creating a cache node.
  *
  * @function
  * @param {Node} node - The node that should be cached.

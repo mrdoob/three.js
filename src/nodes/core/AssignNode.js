@@ -165,7 +165,7 @@ class AssignNode extends TempNode {
 export default AssignNode;
 
 /**
- * TSL function for creating an assign node with the given parameters.
+ * TSL function for creating an assign node.
  *
  * @function
  * @param {Node} targetNode - The target node.

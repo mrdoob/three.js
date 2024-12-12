@@ -2,6 +2,8 @@ import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
 
+/** @module LoopNode **/
+
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
  * ```js
@@ -247,8 +249,29 @@ class LoopNode extends Node {
 
 export default LoopNode;
 
+/**
+ * TSL function for creating a loop node.
+ *
+ * @function
+ * @param {...Any} params - A list of parameters.
+ * @returns {LoopNode}
+ */
 export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+
+/**
+ * TSL function for creating a `Continue()` expression.
+ *
+ * @function
+ * @returns {ExpressionNode}
+ */
 export const Continue = () => expression( 'continue' ).append();
+
+/**
+ * TSL function for creating a `Break()` expression.
+ *
+ * @function
+ * @returns {ExpressionNode}
+ */
 export const Break = () => expression( 'break' ).append();
 
 //

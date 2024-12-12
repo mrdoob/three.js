@@ -54,7 +54,7 @@ class ParameterNode extends PropertyNode {
 export default ParameterNode;
 
 /**
- * TSL function for creating a parameter node with the given parameters.
+ * TSL function for creating a parameter node.
  *
  * @function
  * @param {String} type - The type of the node.

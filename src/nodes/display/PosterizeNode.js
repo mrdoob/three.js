@@ -56,7 +56,7 @@ class PosterizeNode extends TempNode {
 export default PosterizeNode;
 
 /**
- * TSL function for creating a posterize node with the given parameters.
+ * TSL function for creating a posterize node.
  *
  * @function
  * @param {Node} sourceNode - The input color.

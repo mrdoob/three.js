@@ -6,6 +6,8 @@ import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
 
+/** @module CubeMapNode **/
+
 const _cache = new WeakMap();
 
 /**
@@ -226,4 +228,11 @@ function mapTextureMapping( texture, mapping ) {
 
 }
 
+/**
+ * TSL function for creating a cube map node.
+ *
+ * @function
+ * @param {Node} envNode - The node representing the environment map.
+ * @returns {CubeMapNode}
+ */
 export const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );

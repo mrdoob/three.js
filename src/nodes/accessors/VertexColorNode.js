@@ -7,7 +7,7 @@ import { Vector4 } from '../../math/Vector4.js';
 /**
  * An attribute node for representing vertex colors.
  *
- * @augments AttributeNode
+ * @augments module:AttributeNode~AttributeNode
  */
 class VertexColorNode extends AttributeNode {
 
@@ -102,7 +102,7 @@ class VertexColorNode extends AttributeNode {
 export default VertexColorNode;
 
 /**
- * TSL function for creating a reference node with the given parameters.
+ * TSL function for creating a reference node.
  *
  * @function
  * @param {Number} index - The attribute index.

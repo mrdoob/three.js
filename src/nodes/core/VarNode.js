@@ -99,7 +99,7 @@ class VarNode extends Node {
 export default VarNode;
 
 /**
- * TSL function for creating a var node with the given parameters.
+ * TSL function for creating a var node.
  *
  * @function
  * @param {Node} node - The node for which a variable should be created.

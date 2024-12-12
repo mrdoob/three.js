@@ -2,6 +2,8 @@ import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/** @module ConditionalNode **/
+
 /**
  * Represents a logical `if/else` statement. Can be used as an alternative
  * to the `If()`/`Else()` syntax.
@@ -183,6 +185,15 @@ class ConditionalNode extends Node {
 
 export default ConditionalNode;
 
+/**
+ * TSL function for creating a conditional node.
+ *
+ * @function
+ * @param {Node} condNode - The node that defines the condition.
+ * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
+ * @param {Node?} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
+ * @returns {ConditionalNode}
+ */
 export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );

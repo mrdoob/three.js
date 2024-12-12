@@ -5,6 +5,8 @@ import { rendererReference } from '../accessors/RendererReferenceNode.js';
 import { NoToneMapping } from '../../constants.js';
 import { hash } from '../core/NodeUtils.js';
 
+/** @module ToneMappingNode **/
+
 /**
  * This node represents a tone mapping operation.
  *
@@ -97,7 +99,22 @@ class ToneMappingNode extends TempNode {
 
 export default ToneMappingNode;
 
+/**
+ * TSL function for creating a tone mapping node.
+ *
+ * @function
+ * @param {Number} mapping - The tone mapping type.
+ * @param {Node<float> | Number} exposure - The tone mapping exposure.
+ * @param {Node<vec3> | Color} color - The color node to process.
+ * @returns {ToneMappingNode<vec3>}
+ */
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
+
+/**
+ * TSL object that represents the global tone mapping exposure of the renderer.
+ *
+ * @type {RendererReferenceNode<vec3>}
+ */
 export const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );
 
 addMethodChaining( 'toneMapping', ( color, mapping, exposure ) => toneMapping( mapping, exposure, color ) );

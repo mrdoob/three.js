@@ -59,7 +59,7 @@ class ExpressionNode extends Node {
 export default ExpressionNode;
 
 /**
- * TSL function for creating an expression node with the given parameters.
+ * TSL function for creating an expression node.
  *
  * @function
  * @param {String} [snippet=''] - The native code snippet.

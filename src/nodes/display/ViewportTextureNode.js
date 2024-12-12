@@ -7,6 +7,8 @@ import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { LinearMipmapLinearFilter } from '../../constants.js';
 
+/** @module ViewportTextureNode **/
+
 const _size = /*@__PURE__*/ new Vector2();
 
 /**
@@ -16,7 +18,7 @@ const _size = /*@__PURE__*/ new Vector2();
  * (which is good for performance). `ViewportTextureNode` can be used as an input for a
  * variety of effects like refractive or transmissive materials.
  *
- * @augments TextureNode
+ * @augments module:TextureNode~TextureNode
  */
 class ViewportTextureNode extends TextureNode {
 
@@ -113,5 +115,24 @@ class ViewportTextureNode extends TextureNode {
 
 export default ViewportTextureNode;
 
+/**
+ * TSL function for creating a viewport texture node.
+ *
+ * @function
+ * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {Node?} [levelNode=null] - The level node.
+ * @param {Texture?} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
+ * @returns {ViewportTextureNode}
+ */
 export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+
+/**
+ * TSL function for creating a viewport texture node with enabled mipmap generation.
+ *
+ * @function
+ * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {Node?} [levelNode=null] - The level node.
+ * @param {Texture?} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
+ * @returns {ViewportTextureNode}
+ */
 export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
