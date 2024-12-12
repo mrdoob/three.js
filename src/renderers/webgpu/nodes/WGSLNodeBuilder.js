@@ -400,6 +400,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	isSampleCompare( texture ) {
+
+		return texture.isDepthTexture === true && texture.compareFunction !== null;
+
+	}
+
 	isUnfilterable( texture ) {
 
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
