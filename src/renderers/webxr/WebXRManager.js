@@ -10,7 +10,7 @@ import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
-import { WebXRDepthSensing } from './WebXRDepthSensing.js';
+import { WebXRDepthSensing, WebXRDepthSensingCpu } from './WebXRDepthSensing.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -37,6 +37,7 @@ class WebXRManager extends EventDispatcher {
 		let xrFrame = null;
 
 		const depthSensing = new WebXRDepthSensing();
+		const depthSensingCpu = new WebXRDepthSensingCpu();
 		const attributes = gl.getContextAttributes();
 
 		let initialRenderTarget = null;
@@ -165,6 +166,7 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthFar = null;
 
 			depthSensing.reset();
+			depthSensingCpu.reset();
 
 			// restore framebuffer/rendering state
 
@@ -275,6 +277,12 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
+				if ( typeof XRWebGLBinding !== 'undefined' ) {
+
+					glBinding = new XRWebGLBinding( session, gl );
+
+				}
+
 				if ( session.renderState.layers === undefined ) {
 
 					const layerInit = {
@@ -322,8 +330,6 @@ class WebXRManager extends EventDispatcher {
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
-
-					glBinding = new XRWebGLBinding( session, gl );
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
@@ -378,6 +384,12 @@ class WebXRManager extends EventDispatcher {
 		this.getDepthTexture = function () {
 
 			return depthSensing.getDepthTexture();
+
+		};
+
+		this.getDepthDataCpu = function () {
+
+			return depthSensingCpu.getDepthData();
 
 		};
 
@@ -785,13 +797,28 @@ class WebXRManager extends EventDispatcher {
 
 				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
 
-					const depthData = glBinding.getDepthInformation( views[ 0 ] );
+					if ( session.depthUsage === 'gpu-optimized' ) {
 
-					if ( depthData && depthData.isValid && depthData.texture ) {
+						const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
-						depthSensing.init( renderer, depthData, session.renderState );
+						if ( depthData && depthData.isValid && depthData.texture ) {
+
+							depthSensing.init( renderer, depthData, session.renderState );
+
+						}
+
+					} else {
+
+						const depthSensingCpuInfo = frame.getDepthInformation( views[ 0 ] );
+
+						if ( depthSensingCpuInfo ) {
+
+							depthSensingCpu.init( session, frame, depthSensingCpuInfo );
+
+						}
 
 					}
+
 
 				}
 
@@ -834,7 +861,7 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this.dispose = function () {};
+		this.dispose = function () { };
 
 	}
 

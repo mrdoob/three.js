@@ -107,4 +107,42 @@ class WebXRDepthSensing {
 
 }
 
-export { WebXRDepthSensing };
+class WebXRDepthSensingCpu {
+
+	init( session, frame, depthSensingCpuInfo ) {
+
+		this.session = session;
+		this.frame = frame;
+		this.depthSensingCpuInfo = depthSensingCpuInfo;
+
+	}
+
+	getDepthData() {
+
+		if ( ! this.session || ! this.depthSensingCpuInfo || ! this.frame ) return undefined;
+
+		if ( this.session.depthDataFormat === 'luminance-alpha' ) {
+
+			return { depthSensingCpuInfo: this.depthSensingCpuInfo, type: 'uint16' };
+
+		} else if ( this.session.depthDataFormat === 'float32' ) {
+
+			return { depthSensingCpuInfo: this.depthSensingCpuInfo, type: 'float32' };
+
+		}
+
+		return undefined;
+
+	}
+
+	reset() {
+
+		this.session = null;
+		this.depthSensingCpuInfo = null;
+		this.frame = null;
+
+	}
+
+}
+
+export { WebXRDepthSensing, WebXRDepthSensingCpu };
