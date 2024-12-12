@@ -223,6 +223,7 @@ export const log2 = TSL.log2;
 export const logarithmicDepthToViewZ = TSL.logarithmicDepthToViewZ;
 export const loop = TSL.loop;
 export const luminance = TSL.luminance;
+export const lowPrecisionModelViewMatrix = TSL.lowPrecisionModelViewMatrix;
 export const mat2 = TSL.mat2;
 export const mat3 = TSL.mat3;
 export const mat4 = TSL.mat4;
