@@ -23,6 +23,7 @@ import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
+import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 
 class NodeMaterial extends Material {
 
@@ -100,6 +101,7 @@ class NodeMaterial extends Material {
 	setup( builder ) {
 
 		builder.context.setupNormal = () => this.setupNormal( builder );
+		builder.context.setupPositionView = () => this.setupPositionView( builder );
 
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
@@ -108,7 +110,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		builder.stack.outputNode = this.vertexNode || this.setupPosition( builder );
+		const vertexNode = this.vertexNode || this.setupVertex( builder );
+
+		builder.stack.outputNode = vertexNode;
 
 		this.setupHardwareClipping( builder );
 
@@ -307,14 +311,27 @@ class NodeMaterial extends Material {
 
 	}
 
-	setupPosition( builder ) {
+	setupPositionView() {
 
-		const { object } = builder;
-		const geometry = object.geometry;
+		return modelViewMatrix.mul( positionLocal ).xyz;
+
+	}
+
+	setupVertex( builder ) {
 
 		builder.addStack();
 
-		// Vertex
+		this.setupPosition( builder );
+
+		builder.context.vertex = builder.removeStack();
+
+		return modelViewProjection;
+
+	}
+
+	setupPosition( builder ) {
+
+		const { object, geometry } = builder;
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
@@ -356,12 +373,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		const mvp = modelViewProjection();
-
-		builder.context.vertex = builder.removeStack();
-		builder.context.mvp = mvp;
-
-		return mvp;
+		return positionLocal;
 
 	}
 

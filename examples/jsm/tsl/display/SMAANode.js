@@ -178,7 +178,7 @@ class SMAANode extends TempNode {
 			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
 			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
 
-			return modelViewProjection();
+			return modelViewProjection;
 
 		} );
 
@@ -405,7 +405,7 @@ class SMAANode extends TempNode {
 			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
 			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
 
-			return modelViewProjection();
+			return modelViewProjection;
 
 		} );
 
@@ -507,7 +507,7 @@ class SMAANode extends TempNode {
 			//varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
 			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
 
-			return modelViewProjection();
+			return modelViewProjection;
 
 		} );
 

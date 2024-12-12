@@ -2,9 +2,9 @@ import NodeMaterial from './NodeMaterial.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionLocal } from '../../nodes/accessors/Position.js';
+import { positionGeometry, positionLocal } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, vec2, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
 import { reference } from '../../nodes/accessors/ReferenceBaseNode.js';
@@ -38,17 +38,17 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupPosition( { object, camera, context } ) {
+	setupPositionView( builder ) {
+
+		const { object, camera } = builder;
 
 		const sizeAttenuation = this.sizeAttenuation;
 
 		// < VERTEX STAGE >
 
-		const { positionNode, rotationNode, scaleNode } = this;
+		const { rotationNode, scaleNode } = this;
 
-		const vertex = positionLocal;
-
-		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		const mvPosition = modelViewMatrix.mul( positionLocal );
 
 		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
@@ -74,7 +74,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		let alignedPosition = vertex.xy;
+		let alignedPosition = positionGeometry.xy;
 
 		if ( object.center && object.center.isVector2 === true ) {
 
@@ -90,13 +90,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const rotatedPosition = rotate( alignedPosition, rotation );
 
-		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
-
-		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
-
-		context.vertex = vertex;
-
-		return modelViewProjection;
+		return vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
 
 	}
 
