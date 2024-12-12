@@ -42,17 +42,17 @@ export const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).on
 
 export const modelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.renderer.nodes.modelViewMatrix || lowPrecisionModelViewMatrix;
+	return builder.renderer.nodes.modelViewMatrix || mediumpModelViewMatrix;
 
 } ).once() )().toVar( 'modelViewMatrix' );
 
 // GPU Precision
 
-export const lowPrecisionModelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix );
+export const mediumpModelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix );
 
 // CPU Precision
 
-export const highPrecisionModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+export const highpModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	builder.context.isHighPrecisionModelViewMatrix = true;
 
@@ -62,9 +62,9 @@ export const highPrecisionModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} );
 
-} ).once() )().toVar( 'highPrecisionModelViewMatrix' );
+} ).once() )().toVar( 'highpModelViewMatrix' );
 
-export const highPrecisionModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+export const highpModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	const isHighPrecisionModelViewMatrix = builder.context.isHighPrecisionModelViewMatrix;
 
@@ -80,4 +80,4 @@ export const highPrecisionModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder 
 
 	} );
 
-} ).once() )().toVar( 'highPrecisionModelNormalMatrix' );
+} ).once() )().toVar( 'highpModelNormalViewMatrix' );
