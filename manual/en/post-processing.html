@@ -173,7 +173,7 @@ this.uniforms.grayscale.value = grayscale;
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 {
   const folder = gui.addFolder('BloomPass');
-  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
+  folder.add(bloomPass.combineUniforms.strength, 'value', 0, 2).name('strength');
   folder.open();
 }
 {
