@@ -400,17 +400,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	isSampleCompare( texture ) {
-
-		return texture.isDepthTexture === true && texture.compareFunction !== null;
-
-	}
-
 	isUnfilterable( texture ) {
 
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) ||
-			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
 			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
 
 	}
