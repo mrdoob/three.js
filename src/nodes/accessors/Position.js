@@ -1,5 +1,6 @@
 import { attribute } from '../core/AttributeNode.js';
-import { modelWorldMatrix, modelViewMatrix } from './ModelNode.js';
+import { Fn } from '../tsl/TSLCore.js';
+import { modelWorldMatrix } from './ModelNode.js';
 
 /** @module Position **/
 
@@ -44,7 +45,11 @@ export const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirec
  *
  * @type {VaryingNode<vec3>}
  */
-export const positionView = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).xyz.varying( 'v_positionView' ).context( { needsPositionReassign: true } );
+export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	return builder.context.setupPositionView();
+
+}, 'vec3' ).once() )().varying( 'v_positionView' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.

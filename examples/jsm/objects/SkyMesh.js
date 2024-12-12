@@ -98,7 +98,7 @@ class SkyMesh extends Mesh {
 
 			// position
 
-			const position = modelViewProjection();
+			const position = modelViewProjection;
 			position.z.assign( position.w ); // set z to camera.far
 
 			return position;

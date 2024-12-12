@@ -39,7 +39,18 @@ export const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCAL
 export const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 export const modelNormalMatrix = /*@__PURE__*/ uniform( new Matrix3() ).onObjectUpdate( ( { object }, self ) => self.value.getNormalMatrix( object.matrixWorld ) );
 export const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
-export const modelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix ).toVar( 'modelViewMatrix' );
+
+export const modelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	return builder.renderer.nodes.modelViewMatrix || lowPrecisionModelViewMatrix;
+
+} ).once() )().toVar( 'modelViewMatrix' );
+
+// GPU Precision
+
+export const lowPrecisionModelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix );
+
+// CPU Precision
 
 export const highPrecisionModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
