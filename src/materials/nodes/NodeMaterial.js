@@ -590,9 +590,9 @@ class NodeMaterial extends Material {
 
 			if ( fogNode ) {
 
-				const fog = vec4( fogNode );
+				output.assign( outputNode );
 
-				outputNode = vec4( fog.a.mix( outputNode.rgb, fog.rgb ), outputNode.a );
+				outputNode = vec4( fogNode );
 
 			}
 
