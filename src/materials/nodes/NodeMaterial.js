@@ -110,10 +110,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const mvp = this.vertexNode || this.setupVertex( builder );
+		const vertexNode = this.vertexNode || this.setupVertex( builder );
 
-		builder.stack.outputNode = mvp;
-		builder.context.mvp = mvp.varying( 'v_modelViewProjection' );
+		builder.stack.outputNode = vertexNode;
 
 		this.setupHardwareClipping( builder );
 
