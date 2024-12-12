@@ -2,6 +2,8 @@ import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
+/** @module MatcapUVNode **/
+
 /**
  * A special type of uniform node that computes the
  * maximum mipmap level for a given texture node.
@@ -92,4 +94,11 @@ class MaxMipLevelNode extends UniformNode {
 
 export default MaxMipLevelNode;
 
+/**
+ * TSL function for creating a max mip level node.
+ *
+ * @function
+ * @param {TextureNode} textureNode - The texture node to compute the max mip level for.
+ * @returns {MaxMipLevelNode}
+ */
 export const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode );
