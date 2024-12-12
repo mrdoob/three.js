@@ -2,6 +2,8 @@ import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/** @module ConditionalNode **/
+
 /**
  * Represents a logical `if/else` statement. Can be used as an alternative
  * to the `If()`/`Else()` syntax.
@@ -10,7 +12,7 @@ import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
  * ```
- * The `select()` method is called in a chaining fashion on a codition. The parameter nodes of `select()`
+ * The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()`
  * determine the outcome of the entire statement.
  *
  * @augments Node
@@ -51,7 +53,8 @@ class ConditionalNode extends Node {
 		/**
 		 * The node that is evaluate when the condition ends up `false`.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
+		 * @default null
 		 */
 		this.elseNode = elseNode;
 
@@ -183,6 +186,15 @@ class ConditionalNode extends Node {
 
 export default ConditionalNode;
 
+/**
+ * TSL function for creating a conditional node.
+ *
+ * @function
+ * @param {Node} condNode - The node that defines the condition.
+ * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
+ * @param {Node?} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
+ * @returns {ConditionalNode}
+ */
 export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );

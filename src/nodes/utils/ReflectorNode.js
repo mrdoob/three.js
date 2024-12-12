@@ -14,6 +14,8 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 
+/** @module ReflectorNode **/
+
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();
 const _reflectorWorldPosition = new Vector3();
@@ -46,7 +48,7 @@ let _inReflector = false;
  * plane.add( groundReflector.target );
  * ```
  *
- * @augments TextureNode
+ * @augments module:TextureNode~TextureNode
  */
 class ReflectorNode extends TextureNode {
 
@@ -65,6 +67,8 @@ class ReflectorNode extends TextureNode {
 	 * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
 	 * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
 	 * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
+	 * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
 	 */
 	constructor( parameters = {} ) {
 
@@ -74,7 +78,7 @@ class ReflectorNode extends TextureNode {
 		 * A reference to the internal reflector base node which holds the actual implementation.
 		 *
 		 * @private
-		 * @type {Node?}
+		 * @type {ReflectorBaseNode?}
 		 * @default null
 		 */
 		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
@@ -95,7 +99,7 @@ class ReflectorNode extends TextureNode {
 	/**
 	 * A reference to the internal reflector node.
 	 *
-	 * @type {Node}
+	 * @type {ReflectorBaseNode}
 	 */
 	get reflector() {
 
@@ -164,7 +168,7 @@ class ReflectorNode extends TextureNode {
 /**
  * Holds the actual implementation of the reflector.
  *
- * TOOD: Explain why `ReflectorBaseNode`. Originally the entire logic was implemented
+ * TODO: Explain why `ReflectorBaseNode`. Originally the entire logic was implemented
  * in `ReflectorNode`, see #29619.
  *
  * @private
@@ -260,7 +264,7 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * Weak map for managing virtual cameras.
 		 *
-		 * @type {WeakMap<Camera,Camera>}
+		 * @type {WeakMap<Camera, Camera>}
 		 */
 		this.virtualCameras = new WeakMap();
 
@@ -473,6 +477,20 @@ class ReflectorBaseNode extends Node {
 
 }
 
+/**
+ * TSL function for creating a reflector node.
+ *
+ * @function
+ * @param {Object} [parameters={}] - An object holding configuration parameters.
+ * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
+ * @param {Number} [parameters.resolution=1] - The resolution scale.
+ * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+ * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
+ * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+ * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
+ * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
+ * @returns {ReflectorNode}
+ */
 export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
 
 export default ReflectorNode;

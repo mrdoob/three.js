@@ -1,6 +1,8 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/** @module ContextNode **/
+
 /**
  * This node can be used as a context management component for another node.
  * {@link NodeBuilder} performs its node building process in a specific context and
@@ -56,9 +58,9 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
+	 * This method is overwritten to ensure it returns the reference to {@link module:ContextNode~ContextNode#node}.
 	 *
-	 * @return {Node} A reference to {@link ContextNode#node}.
+	 * @return {Node} A reference to {@link module:ContextNode~ContextNode#node}.
 	 */
 	getScope() {
 
@@ -67,10 +69,10 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the type to {@link ContextNode#node}.
+	 * This method is overwritten to ensure it returns the type of {@link module:ContextNode~ContextNode#node}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The type of {@link ContextNode#node}.
+	 * @return {String} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -116,7 +118,24 @@ class ContextNode extends Node {
 
 export default ContextNode;
 
+/**
+ * TSL function for creating a context node.
+ *
+ * @function
+ * @param {Node} node - The node whose context should be modified.
+ * @param {Object} [value={}] - The modified context data.
+ * @returns {ContextNode}
+ */
 export const context = /*@__PURE__*/ nodeProxy( ContextNode );
+
+/**
+ * TSL function for defining a label context value for a given node.
+ *
+ * @function
+ * @param {Node} node - The node whose context should be modified.
+ * @param {String} name - The name/label to set.
+ * @returns {ContextNode}
+ */
 export const label = ( node, name ) => context( node, { label: name } );
 
 addMethodChaining( 'context', context );

@@ -17,6 +17,8 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 
+/** @module ShadowNode **/
+
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
@@ -62,8 +64,6 @@ const getShadowMaterial = ( light ) => {
 	return material;
 
 };
-
-/** @module ShadowNode **/
 
 /**
  * A shadow filtering function performing basic filtering. This is in fact an unfiltered version of the shadow map
@@ -310,7 +310,7 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 /**
  * Represents the default shadow implementation for lighting nodes.
  *
- * @augments ShadowBaseNode
+ * @augments module:ShadowBaseNode~ShadowBaseNode
  */
 class ShadowNode extends ShadowBaseNode {
 
@@ -620,9 +620,9 @@ class ShadowNode extends ShadowBaseNode {
 	 * Renders the shadow. The logic of this function could be included
 	 * into {@link ShadowNode#updateShadow} however more specialized shadow
 	 * nodes might require a custom shadow map rendering. By having a
-	 * dedicated method, it's easier to overwrite the default beavior.
+	 * dedicated method, it's easier to overwrite the default behavior.
 	 *
-	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	renderShadow( frame ) {
 
@@ -757,7 +757,7 @@ class ShadowNode extends ShadowBaseNode {
 	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
-	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	updateBefore( frame ) {
 
@@ -784,9 +784,9 @@ class ShadowNode extends ShadowBaseNode {
 export default ShadowNode;
 
 /**
- * Factory method for creating an instance of `ShadowNode`.
+ * TSL function for creating an instance of `ShadowNode`.
  *
- * @method
+ * @function
  * @param {Light} light - The shadow casting light.
  * @param {LightShadow} shadow - The light shadow.
  * @return {ShadowNode} The created shadow node.

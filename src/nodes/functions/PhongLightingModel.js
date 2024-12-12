@@ -33,7 +33,7 @@ const BRDF_BlinnPhong = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 /**
  * Represents the lighting model for a phong material. Used in {@link MeshPhongNodeMaterial}.
  *
- * @augments LightingModel
+ * @augments BasicLightingModel
  */
 class PhongLightingModel extends BasicLightingModel {
 
@@ -48,7 +48,7 @@ class PhongLightingModel extends BasicLightingModel {
 
 		/**
 		 * Whether specular is supported or not. Set this to `false` if you are
-		 * lookking for a Lambert-like material meaning a material for non-shiny
+		 * looking for a Lambert-like material meaning a material for non-shiny
 		 * surfaces, without specular highlights.
 		 *
 		 * @type {Boolean}

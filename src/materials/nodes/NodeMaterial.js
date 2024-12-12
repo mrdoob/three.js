@@ -352,7 +352,7 @@ class NodeMaterial extends Material {
 
 		if ( this.positionNode !== null ) {
 
-			positionLocal.assign( this.positionNode );
+			positionLocal.assign( this.positionNode.context( { isPositionNodeInput: true } ) );
 
 		}
 

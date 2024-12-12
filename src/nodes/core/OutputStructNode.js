@@ -1,6 +1,8 @@
 import Node from './Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
+/** @module OutputStructNode **/
+
 /**
  * This node can be used to define multiple outputs in a shader programs.
  *
@@ -82,4 +84,11 @@ class OutputStructNode extends Node {
 
 export default OutputStructNode;
 
+/**
+ * TSL function for creating an output struct node.
+ *
+ * @function
+ * @param {...Node} members - A parameter list of nodes.
+ * @returns {OutputStructNode}
+ */
 export const outputStruct = /*@__PURE__*/ nodeProxy( OutputStructNode );

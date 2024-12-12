@@ -11,6 +11,8 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Color } from '../../math/Color.js';
 import { BasicShadowMap } from '../../constants.js';
 
+/** @module PointShadowNode **/
+
 const _clearColor = /*@__PURE__*/ new Color();
 
 // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
@@ -157,8 +159,12 @@ const _viewport = /*@__PURE__*/ new Vector4();
 const _viewportSize = /*@__PURE__*/ new Vector2();
 const _shadowMapSize = /*@__PURE__*/ new Vector2();
 
-//
 
+/**
+ * Represents the shadow implementation for point light nodes.
+ *
+ * @augments module:ShadowNode~ShadowNode
+ */
 class PointShadowNode extends ShadowNode {
 
 	static get type() {
@@ -167,30 +173,69 @@ class PointShadowNode extends ShadowNode {
 
 	}
 
+	/**
+	 * Constructs a new point shadow node.
+	 *
+	 * @param {PointLight} light - The shadow casting point light.
+	 * @param {PointLightShadow?} [shadow=null] - An optional point light shadow.
+	 */
 	constructor( light, shadow = null ) {
 
 		super( light, shadow );
 
 	}
 
+	/**
+	 * Overwrites the default implementation to return point light shadow specific
+	 * filtering functions.
+	 *
+	 * @param {Number} type - The shadow type.
+	 * @return {Function} The filtering function.
+	 */
 	getShadowFilterFn( type ) {
 
 		return type === BasicShadowMap ? BasicPointShadowFilter : PointShadowFilter;
 
 	}
 
+	/**
+	 * Overwrites the default implementation so the unaltered shadow position is used.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Node<vec3>} shadowPosition - A node representing the shadow position.
+	 * @return {Node<vec3>} The shadow coordinates.
+	 */
 	setupShadowCoord( builder, shadowPosition ) {
 
 		return shadowPosition;
 
 	}
 
+	/**
+	 * Overwrites the default implementation to only use point light specific
+	 * shadow filter functions.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
+	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
+	 * @param {Texture} inputs.shadowTexture - A reference to the shadow map's texture.
+	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
+	 * @param {LightShadow} inputs.shadow - The light shadow.
+	 * @return {Node<float>} The result node of the shadow filtering.
+	 */
 	setupShadowFilter( builder, { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } ) {
 
 		return pointShadowFilter( { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } );
 
 	}
 
+	/**
+	 * Overwrites the default implementation with point light specific
+	 * rendering code.
+	 *
+	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 */
 	renderShadow( frame ) {
 
 		const { shadow, shadowMap, light } = this;
@@ -251,4 +296,12 @@ class PointShadowNode extends ShadowNode {
 
 export default PointShadowNode;
 
+/**
+ * TSL function for creating an instance of `PointShadowNode`.
+ *
+ * @function
+ * @param {PointLight} light - The shadow casting point light.
+ * @param {PointLightShadow?} [shadow=null] - An optional point light shadow.
+ * @return {PointShadowNode} The created point shadow node.
+ */
 export const pointShadow = ( light, shadow ) => nodeObject( new PointShadowNode( light, shadow ) );

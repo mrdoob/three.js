@@ -2,6 +2,8 @@ import InputNode from './InputNode.js';
 import { objectGroup } from './UniformGroupNode.js';
 import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
 
+/** @module UniformNode **/
+
 /**
  * Class for representing a uniform.
  *
@@ -156,6 +158,14 @@ class UniformNode extends InputNode {
 
 export default UniformNode;
 
+/**
+ * TSL function for creating a uniform node.
+ *
+ * @function
+ * @param {Any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+ * @param {String?} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @returns {UniformNode}
+ */
 export const uniform = ( arg1, arg2 ) => {
 
 	const nodeType = getConstNodeType( arg2 || arg1 );

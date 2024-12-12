@@ -10,13 +10,14 @@ import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
+/** @module PassNode **/
+
 const _size = /*@__PURE__*/ new Vector2();
 
 /**
  * Represents the texture of a pass node.
  *
- * @augments TextureNode
- * @private
+ * @augments module:TextureNode~TextureNode
  */
 class PassTextureNode extends TextureNode {
 
@@ -67,8 +68,7 @@ class PassTextureNode extends TextureNode {
  * An extension of `PassTextureNode` which allows to manage more than one
  * internal texture. Relevant for the `getPreviousTexture()` related API.
  *
- * @augments PassTextureNode
- * @private
+ * @augments module:PassTextureNode~PassTextureNode
  */
 class PassMultipleTextureNode extends PassTextureNode {
 
@@ -186,7 +186,7 @@ class PassNode extends TempNode {
 		/**
 		 * A reference to the camera.
 		 *
-		 * @type {camera}
+		 * @type {Camera}
 		 */
 		this.camera = camera;
 
@@ -242,7 +242,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, Texture>}
 		 */
 		this._textures = {
 			output: renderTarget.texture,
@@ -253,7 +253,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal texture nodes.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, TextureNode>}
 		 */
 		this._textureNodes = {};
 
@@ -278,7 +278,7 @@ class PassNode extends TempNode {
 		 * Used for computing velocity/motion vectors.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, Texture>}
 		 */
 		this._previousTextures = {};
 
@@ -287,7 +287,7 @@ class PassNode extends TempNode {
 		 * Used for computing velocity/motion vectors.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Object<String, TextureNode>}
 		 */
 		this._previousTextureNodes = {};
 
@@ -638,6 +638,34 @@ PassNode.DEPTH = 'depth';
 
 export default PassNode;
 
+/**
+ * TSL function for creating a pass node.
+ *
+ * @function
+ * @param {Scene} scene - A reference to the scene.
+ * @param {Camera} camera - A reference to the camera.
+ * @param {Object} options - Options for the internal render target.
+ * @returns {PassNode}
+ */
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
+
+/**
+ * TSL function for creating a pass texture node.
+ *
+ * @function
+ * @param {PassNode} pass - The pass node.
+ * @param {Texture} texture - The output texture.
+ * @returns {PassTextureNode}
+ */
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
-export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
+
+/**
+ * TSL function for creating a depth pass node.
+ *
+ * @function
+ * @param {Scene} scene - A reference to the scene.
+ * @param {Camera} camera - A reference to the camera.
+ * @param {Object} options - Options for the internal render target.
+ * @returns {PassNode}
+ */
+export const depthPass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera, options ) );

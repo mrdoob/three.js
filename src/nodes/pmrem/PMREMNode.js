@@ -8,6 +8,8 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
 import { Texture } from '../../textures/Texture.js';
 
+/** @module PMREMNode **/
+
 let _generator = null;
 
 const _cache = new WeakMap();
@@ -359,4 +361,13 @@ function isEquirectangularMapReady( image ) {
 
 }
 
+/**
+ * TSL function for creating a PMREM node.
+ *
+ * @function
+ * @param {Texture} value - The input texture.
+ * @param {Node<vec2>} [uvNode=null] - The uv node.
+ * @param {Node<float>} [levelNode=null] - The level node.
+ * @returns {PMREMNode}
+ */
 export const pmremTexture = /*@__PURE__*/ nodeProxy( PMREMNode );

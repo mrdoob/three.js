@@ -190,7 +190,8 @@ class GLTFExporter {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
+	 *
+	 * @param  {Scene|THREE.Scenes} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Function} onError  Callback on errors
 	 * @param  {Object} options options
@@ -543,9 +544,10 @@ class GLTFWriter {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
-	 * @param  {Function} onDone  Callback on completed
-	 * @param  {Object} options options
+	 *
+	 * @param {Scene|THREE.Scenes} input   Scene or Array of THREE.Scenes
+	 * @param {Function} onDone  Callback on completed
+	 * @param {Object} options options
 	 */
 	async writeAsync( input, onDone, options = {} ) {
 
@@ -709,7 +711,9 @@ class GLTFWriter {
 
 	/**
 	 * Returns ids for buffer attributes.
-	 * @param  {Object} object
+	 *
+	 * @param  {Object} attribute
+	 * @param {boolean} [isRelativeCopy=false]
 	 * @return {Integer}
 	 */
 	getUID( attribute, isRelativeCopy = false ) {
@@ -2262,7 +2266,7 @@ class GLTFWriter {
 
 	/**
 	 * Process Object3D node
-	 * @param  {THREE.Object3D} node Object3D to processNodeAsync
+	 * @param  {THREE.Object3D} object Object3D to processNodeAsync
 	 * @return {Integer} Index of the node in the nodes list
 	 */
 	async processNodeAsync( object ) {
@@ -2370,7 +2374,7 @@ class GLTFWriter {
 
 	/**
 	 * Process Scene
-	 * @param  {Scene} node Scene to process
+	 * @param  {Scene} scene Scene to process
 	 */
 	async processSceneAsync( scene ) {
 

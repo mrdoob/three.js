@@ -32,7 +32,7 @@ class AnalyticLightNode extends LightingNode {
 		/**
 		 * The light source.
 		 *
-		 * @type {Light}
+		 * @type {Light?}
 		 * @default null
 		 */
 		this.light = light;
@@ -54,23 +54,26 @@ class AnalyticLightNode extends LightingNode {
 
 		/**
 		 * This property is used to retain a reference to the original value of {@link AnalyticLightNode#colorNode}.
-		 * The final color node is represented by a differnt node when using shadows.
+		 * The final color node is represented by a different node when using shadows.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
+		 * @default null
 		 */
 		this.baseColorNode = null;
 
 		/**
 		 * Represents the light's shadow.
 		 *
-		 * @type {ShadowNode}
+		 * @type {ShadowNode?}
+   		 * @default null
 		 */
 		this.shadowNode = null;
 
 		/**
 		 * Represents the light's shadow color.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
+   		 * @default null
 		 */
 		this.shadowColorNode = null;
 
@@ -172,7 +175,7 @@ class AnalyticLightNode extends LightingNode {
 	/**
 	 * Unlike most other nodes, lighting nodes do not return a output node in {@link Node#setup}.
 	 * The main purpose of lighting nodes is to configure the current {@link LightingModel} and/or
-	 * invocate the respecitve interface methods.
+	 * invocate the respective interface methods.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

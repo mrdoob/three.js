@@ -1,6 +1,8 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
+/** @module ExpressionNode **/
+
 /**
  * This class can be used to implement basic expressions in shader code.
  * Basic examples for that are `return`, `continue` or `discard` statements.
@@ -56,4 +58,12 @@ class ExpressionNode extends Node {
 
 export default ExpressionNode;
 
+/**
+ * TSL function for creating an expression node.
+ *
+ * @function
+ * @param {String} [snippet=''] - The native code snippet.
+ * @param {String} [nodeType='void'] - The node type.
+ * @returns {ExpressionNode}
+ */
 export const expression = /*@__PURE__*/ nodeProxy( ExpressionNode );

@@ -2,7 +2,7 @@ import ContextNode from '../core/ContextNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
 /**
- * `LightingContextNode` represents an extension of the {@link ContextNode} module
+ * `LightingContextNode` represents an extension of the {@link module:ContextNode~ContextNode} module
  * by adding lighting specific context data. It represents the runtime context of
  * {@link LightsNode}.
  *
@@ -20,9 +20,9 @@ class LightingContextNode extends ContextNode {
 	 * Constructs a new lighting context node.
 	 *
 	 * @param {LightsNode} node - The lights node.
-	 * @param {LightingModel} [lightingModel=null] - The current lighting model.
-	 * @param {Node<vec3>} [backdropNode=null] - A backdrop node.
-	 * @param {Node<float>} [backdropAlphaNode=null] - A backdrop alpha node.
+	 * @param {LightingModel?} [lightingModel=null] - The current lighting model.
+	 * @param {Node<vec3>?} [backdropNode=null] - A backdrop node.
+	 * @param {Node<float>?} [backdropAlphaNode=null] - A backdrop alpha node.
 	 */
 	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
@@ -31,7 +31,7 @@ class LightingContextNode extends ContextNode {
 		/**
 		 * The current lighting model.
 		 *
-		 * @type {LightingModel}
+		 * @type {LightingModel?}
 		 * @default null
 		 */
 		this.lightingModel = lightingModel;
@@ -39,7 +39,7 @@ class LightingContextNode extends ContextNode {
 		/**
 		 * A backdrop node.
 		 *
-		 * @type {Node<vec3>}
+		 * @type {Node<vec3>?}
 		 * @default null
 		 */
 		this.backdropNode = backdropNode;
@@ -47,7 +47,7 @@ class LightingContextNode extends ContextNode {
 		/**
 		 * A backdrop alpha node.
 		 *
-		 * @type {Node<float>}
+		 * @type {Node<float>?}
 		 * @default null
 		 */
 		this.backdropAlphaNode = backdropAlphaNode;

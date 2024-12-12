@@ -2,6 +2,8 @@ import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
+/** @module AssignNode **/
+
 /**
  * These node represents an assign operation. Meaning a node is assigned
  * to another node.
@@ -162,6 +164,14 @@ class AssignNode extends TempNode {
 
 export default AssignNode;
 
+/**
+ * TSL function for creating an assign node.
+ *
+ * @function
+ * @param {Node} targetNode - The target node.
+ * @param {Node} sourceNode - The source type.
+ * @returns {AssignNode}
+ */
 export const assign = /*@__PURE__*/ nodeProxy( AssignNode );
 
 addMethodChaining( 'assign', assign );

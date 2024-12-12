@@ -1,6 +1,8 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
+/** @module FunctionOverloadingNode **/
+
 /**
  * This class allows to define multiple overloaded versions
  * of the same function. Depending on the parameters of the function
@@ -20,7 +22,7 @@ class FunctionOverloadingNode extends Node {
 	 * Constructs a new function overloading node.
 	 *
 	 * @param {Array<Function>} functionNodes - Array of `Fn` function definitions.
-	 * @param {...Node} parametersNodes - A list of paramater nodes.
+	 * @param {...Node} parametersNodes - A list of parameter nodes.
 	 */
 	constructor( functionNodes = [], ...parametersNodes ) {
 
@@ -34,9 +36,9 @@ class FunctionOverloadingNode extends Node {
 		this.functionNodes = functionNodes;
 
 		/**
-		 * A list of paramater nodes.
+		 * A list of parameter nodes.
 		 *
-		 * @type {Array<Nodes>}
+		 * @type {Array<Node>}
 		 */
 		this.parametersNodes = parametersNodes;
 
@@ -141,4 +143,11 @@ export default FunctionOverloadingNode;
 
 const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 
+/**
+ * TSL function for creating a function overloading node.
+ *
+ * @function
+ * @param {Array<Function>} functionNodes - Array of `Fn` function definitions.
+ * @returns {FunctionOverloadingNode}
+ */
 export const overloadingFn = ( functionNodes ) => ( ...params ) => overloadingBaseFn( functionNodes, ...params );
