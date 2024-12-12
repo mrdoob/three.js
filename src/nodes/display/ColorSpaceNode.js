@@ -46,14 +46,14 @@ class ColorSpaceNode extends TempNode {
 		/**
 		 * The source color space.
 		 *
-		 * @type {Node}
+		 * @type {String}
 		 */
 		this.source = source;
 
 		/**
 		 * The target color space.
 		 *
-		 * @type {Node}
+		 * @type {String}
 		 */
 		this.target = target;
 
