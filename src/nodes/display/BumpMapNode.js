@@ -108,7 +108,7 @@ class BumpMapNode extends TempNode {
 export default BumpMapNode;
 
 /**
- * TSL function for creating a bump map node with the given parameters.
+ * TSL function for creating a bump map node.
  *
  * @function
  * @param {Node} textureNode - Represents the bump map data.

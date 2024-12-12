@@ -100,7 +100,7 @@ class ToneMappingNode extends TempNode {
 export default ToneMappingNode;
 
 /**
- * TSL function for creating a tone mapping node with the given parameters.
+ * TSL function for creating a tone mapping node.
  *
  * @function
  * @param {Number} mapping - The tone mapping type.

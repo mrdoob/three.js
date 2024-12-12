@@ -112,7 +112,7 @@ class RenderOutputNode extends TempNode {
 export default RenderOutputNode;
 
 /**
- * TSL function for creating a posterize node with the given parameters.
+ * TSL function for creating a posterize node.
  *
  * @function
  * @param {Node} color - The color node to process.

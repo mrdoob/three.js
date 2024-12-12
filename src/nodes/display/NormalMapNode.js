@@ -139,7 +139,7 @@ class NormalMapNode extends TempNode {
 export default NormalMapNode;
 
 /**
- * TSL function for creating a normal map node with the given parameters.
+ * TSL function for creating a normal map node.
  *
  * @function
  * @param {Node} node - Represents the normal map data.

@@ -82,7 +82,7 @@ class BypassNode extends Node {
 export default BypassNode;
 
 /**
- * TSL function for creating a bypass node with the given parameters.
+ * TSL function for creating a bypass node.
  *
  * @function
  * @param {Node} outputNode - The output node.

@@ -91,7 +91,7 @@ class BufferNode extends UniformNode {
 export default BufferNode;
 
 /**
- * TSL function for creating a buffer node with the given parameters.
+ * TSL function for creating a buffer node.
  *
  * @function
  * @param {Array} value - Array-like buffer data.

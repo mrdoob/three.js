@@ -119,7 +119,7 @@ class ContextNode extends Node {
 export default ContextNode;
 
 /**
- * TSL function for creating a context node with the given parameters.
+ * TSL function for creating a context node.
  *
  * @function
  * @param {Node} node - The node whose context should be modified.

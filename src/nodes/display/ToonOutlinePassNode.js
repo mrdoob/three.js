@@ -171,7 +171,7 @@ class ToonOutlinePassNode extends PassNode {
 export default ToonOutlinePassNode;
 
 /**
- * TSL function for creating a toon outline pass node with the given parameters.
+ * TSL function for creating a toon outline pass node.
  *
  * @function
  * @param {Scene} scene - A reference to the scene.

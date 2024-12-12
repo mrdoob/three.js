@@ -68,7 +68,7 @@ class TextureSizeNode extends Node {
 export default TextureSizeNode;
 
 /**
- * TSL function for creating a texture size node with the given parameters.
+ * TSL function for creating a texture size node.
  *
  * @function
  * @param {TextureNode} textureNode - A texture node which size should be retrieved.

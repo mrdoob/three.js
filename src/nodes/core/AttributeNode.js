@@ -158,7 +158,7 @@ class AttributeNode extends Node {
 export default AttributeNode;
 
 /**
- * TSL function for creating an attribute node with the given parameters.
+ * TSL function for creating an attribute node.
  *
  * @function
  * @param {String} name - The name of the attribute.

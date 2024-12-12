@@ -178,7 +178,7 @@ class StackNode extends Node {
 export default StackNode;
 
 /**
- * TSL function for creating a stack node with the given parameters.
+ * TSL function for creating a stack node.
  *
  * @function
  * @param {StackNode?} [parent=null] - The parent stack node.

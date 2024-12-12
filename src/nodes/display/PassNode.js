@@ -639,7 +639,7 @@ PassNode.DEPTH = 'depth';
 export default PassNode;
 
 /**
- * TSL function for creating a pass node with the given parameters.
+ * TSL function for creating a pass node.
  *
  * @function
  * @param {Scene} scene - A reference to the scene.
@@ -650,7 +650,7 @@ export default PassNode;
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 
 /**
- * TSL function for creating a pass texture node with the given parameters.
+ * TSL function for creating a pass texture node.
  *
  * @function
  * @param {PassNode} pass - The pass node.
@@ -660,7 +660,7 @@ export const pass = ( scene, camera, options ) => nodeObject( new PassNode( Pass
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 
 /**
- * TSL function for creating a depth pass node with the given parameters.
+ * TSL function for creating a depth pass node.
  *
  * @function
  * @param {Scene} scene - A reference to the scene.
