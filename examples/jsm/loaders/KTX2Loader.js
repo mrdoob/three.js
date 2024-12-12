@@ -790,7 +790,12 @@ KTX2Loader.BasisWorker = function () {
 
 	}
 
-	/** Concatenates N byte arrays. */
+	/**
+	 * Concatenates N byte arrays.
+	 *
+	 * @param {Uint8Array[]} arrays
+	 * @return {Uint8Array}
+	 */
 	function concat( arrays ) {
 
 		if ( arrays.length === 1 ) return arrays[ 0 ];

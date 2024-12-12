@@ -84,6 +84,10 @@ class OBB {
 	/**
 	* Reference: Closest Point on OBB to Point in Real-Time Collision Detection
 	* by Christer Ericson (chapter 5.1.4)
+	*
+	* @param {Vector3} point
+	* @param {Vector3} result
+	* @returns {Vector3}
 	*/
 	clampPoint( point, result ) {
 
@@ -146,6 +150,9 @@ class OBB {
 	* Reference: OBB-OBB Intersection in Real-Time Collision Detection
 	* by Christer Ericson (chapter 4.4.1)
 	*
+	* @param {OBB} obb
+	* @param {Number} [epsilon=Number.EPSILON] - A small value to prevent arithmetic errors
+	* @returns {Boolean}
 	*/
 	intersectsOBB( obb, epsilon = Number.EPSILON ) {
 
@@ -285,6 +292,9 @@ class OBB {
 	/**
 	* Reference: Testing Box Against Plane in Real-Time Collision Detection
 	* by Christer Ericson (chapter 5.2.3)
+	*
+	* @param {Plane} plane
+	* @returns {Boolean}
 	*/
 	intersectsPlane( plane ) {
 
@@ -309,6 +319,10 @@ class OBB {
 	/**
 	* Performs a ray/OBB intersection test and stores the intersection point
 	* to the given 3D vector. If no intersection is detected, *null* is returned.
+	*
+	* @param {Ray} ray
+	* @param {Vector3} result
+	* @return {Vector3?}
 	*/
 	intersectRay( ray, result ) {
 
@@ -347,6 +361,9 @@ class OBB {
 	/**
 	* Performs a ray/OBB intersection test. Returns either true or false if
 	* there is a intersection or not.
+	*
+	* @param {Ray} ray
+	* @returns {Boolean}
 	*/
 	intersectsRay( ray ) {
 
