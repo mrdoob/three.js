@@ -38,7 +38,7 @@ class EnvironmentNode extends LightingNode {
 		/**
 		 * A node representing the environment.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
 		 * @default null
 		 */
 		this.envNode = envNode;

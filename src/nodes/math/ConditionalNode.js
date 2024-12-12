@@ -53,7 +53,8 @@ class ConditionalNode extends Node {
 		/**
 		 * The node that is evaluate when the condition ends up `false`.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
+		 * @default null
 		 */
 		this.elseNode = elseNode;
 
