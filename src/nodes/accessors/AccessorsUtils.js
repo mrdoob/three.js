@@ -33,7 +33,7 @@ export const parallaxDirection = /*@__PURE__*/ positionViewDirection.mul( TBNVie
 export const parallaxUV = ( uv, scale ) => uv.sub( parallaxDirection.mul( scale ) );
 
 /**
- * TSL function for computing bent normals
+ * TSL function for computing bent normals.
  *
  * @function
  * @returns {Node<vec3>} Bent normals.
