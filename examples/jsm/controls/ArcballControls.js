@@ -1183,7 +1183,7 @@ class ArcballControls extends Controls {
 	 * Remove a mouse action by specifying its mouse/key combination
 	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
-	 * @returns {Boolean} True if the operation has been succesfully removed, false otherwise
+	 * @returns {Boolean} True if the operation has been successfully removed, false otherwise
 	 */
 	unsetMouseAction( mouse, key = null ) {
 
@@ -1452,7 +1452,7 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Calculate the trackball radius so that gizmo's diamater will be 2/3 of the minimum side of the camera frustum
+	 * Calculate the trackball radius so that gizmo's diameter will be 2/3 of the minimum side of the camera frustum
 	 * @param {Camera} camera
 	 * @returns {Number} The trackball radius
 	 */
@@ -2225,7 +2225,7 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Set camera fov
-	 * @param {Number} value fov to be setted
+	 * @param {Number} value fov to be set
 	 */
 	setFov( value ) {
 
@@ -2585,7 +2585,7 @@ class ArcballControls extends Controls {
 	/**
 	 * Update the trackball FSA
 	 * @param {STATE} newState New state of the FSA
-	 * @param {Boolean} updateMatrices If matriices state should be updated
+	 * @param {Boolean} updateMatrices If matrices state should be updated
 	 */
 	updateTbState( newState, updateMatrices ) {
 

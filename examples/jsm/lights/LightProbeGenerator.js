@@ -99,7 +99,7 @@ class LightProbeGenerator {
 				// evaluate SH basis functions in direction dir
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
-				// accummuulate
+				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;
@@ -242,7 +242,7 @@ class LightProbeGenerator {
 				// evaluate SH basis functions in direction dir
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
-				// accummuulate
+				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;

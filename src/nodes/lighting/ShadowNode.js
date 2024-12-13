@@ -640,7 +640,7 @@ class ShadowNode extends ShadowBaseNode {
 	/**
 	 * Updates the shadow.
 	 *
-	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	updateShadow( frame ) {
 

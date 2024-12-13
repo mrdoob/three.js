@@ -29,7 +29,7 @@ class SimplifyModifier {
 		delete geometry.morphAttributes.normal;
 		const attributes = geometry.attributes;
 
-		// this modifier can only process indexed and non-indexed geomtries with at least a position attribute
+		// this modifier can only process indexed and non-indexed geometries with at least a position attribute
 
 		for ( const name in attributes ) {
 
@@ -584,7 +584,7 @@ class Vertex {
 
 		// these will be computed in computeEdgeCostAtVertex()
 		this.collapseCost = 0; // cost of collapsing this vertex, the less the better. aka objdist
-		this.collapseNeighbor = null; // best candinate for collapsing
+		this.collapseNeighbor = null; // best candidate for collapsing
 
 	}
 

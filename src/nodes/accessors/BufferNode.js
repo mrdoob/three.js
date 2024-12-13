@@ -12,7 +12,7 @@ import { nodeObject } from '../tsl/TSLBase.js';
  * const bufferNode = buffer( array, 'mat4', count );
  * const matrixNode = bufferNode.element( index ); // access a matrix from the buffer
  * ```
- * In general, it is recommened to use the more managed {@link UniformArrayNode}
+ * In general, it is recommended to use the more managed {@link UniformArrayNode}
  * since it handles more input types and automatically cares about buffer paddings.
  *
  * @augments module:UniformNode~UniformNode

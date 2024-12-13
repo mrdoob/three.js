@@ -64,7 +64,7 @@ export default QUnit.module( 'Animation', () => {
 			const clip = new AnimationClip( 'nonname', - 1, [] );
 
 			const animationAction = new AnimationAction( mixer, clip );
-			assert.ok( animationAction, 'animationAction instanciated' );
+			assert.ok( animationAction, 'animationAction instantiated' );
 
 		} );
 

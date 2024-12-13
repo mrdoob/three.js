@@ -141,7 +141,7 @@ class WebGLAttributeUtils {
 
 		if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) {
 
-			// create buffer for tranform feedback use
+			// create buffer for transform feedback use
 			const bufferGPUDual = this._createBuffer( gl, bufferType, array, usage );
 			attributeData = new DualAttributeData( attributeData, bufferGPUDual );
 

@@ -123,7 +123,7 @@ class GCodeLoader extends Loader {
 			const tokens = lines[ i ].split( ' ' );
 			const cmd = tokens[ 0 ].toUpperCase();
 
-			//Argumments
+			//Arguments
 			const args = {};
 			tokens.splice( 1 ).forEach( function ( token ) {
 

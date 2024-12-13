@@ -204,7 +204,7 @@ class BVHLoader extends Loader {
 		}
 
 		/*
-		 Recursively parses the HIERACHY section of the BVH file
+		 Recursively parses the HIERARCHY section of the BVH file
 
 		 - lines: all lines of the file. lines are consumed as we go along.
 		 - firstline: line containing the node type and name e.g. 'JOINT hip'

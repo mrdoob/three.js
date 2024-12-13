@@ -71,7 +71,7 @@ class BloomPass extends Pass {
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
 
-		// Render quad with blured scene into texture (convolution pass 1)
+		// Render quad with blurred scene into texture (convolution pass 1)
 
 		this.fsQuad.material = this.materialConvolution;
 
@@ -83,7 +83,7 @@ class BloomPass extends Pass {
 		this.fsQuad.render( renderer );
 
 
-		// Render quad with blured scene into texture (convolution pass 2)
+		// Render quad with blurred scene into texture (convolution pass 2)
 
 		this.convolutionUniforms[ 'tDiffuse' ].value = this.renderTargetX.texture;
 		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurY;

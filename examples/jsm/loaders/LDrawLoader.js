@@ -2266,7 +2266,7 @@ class LDrawLoader extends Loader {
 
 			if ( this.ConditionalLineMaterial === null ) {
 
-				throw new Error( 'THREE.LDrawLoader: ConditionalLineMaterial type must be specificed via .setConditionalLineMaterial().' );
+				throw new Error( 'THREE.LDrawLoader: ConditionalLineMaterial type must be specified via .setConditionalLineMaterial().' );
 
 			}
 

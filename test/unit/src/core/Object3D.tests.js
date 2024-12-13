@@ -723,7 +723,7 @@ export default QUnit.module( 'Core', () => {
 			parent.add( childName, childNothing );
 
 			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Count the number of children with name "foo"' );
-			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some( obj => obj.name !== 'foo' ), false, 'Get all childs by name "foo"' );
+			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some( obj => obj.name !== 'foo' ), false, 'Get all children with name "foo"' );
 
 		} );
 
@@ -1323,7 +1323,7 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a, undefined, 'Undefined pre-clone()' );
 
 			a = b.clone();
-			assert.notStrictEqual( a, b, 'Defined but seperate instances post-clone()' );
+			assert.notStrictEqual( a, b, 'Defined but separate instances post-clone()' );
 
 			a.uuid = b.uuid;
 			assert.deepEqual( a, b, 'But identical properties' );

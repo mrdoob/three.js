@@ -7,7 +7,7 @@ import { VolumeSlice } from '../misc/VolumeSlice.js';
 
 /**
  * This class had been written to handle the output of the NRRD loader.
- * It contains a volume of data and informations about it.
+ * It contains a volume of data and information about it.
  * For now it only handles 3 dimensional data.
  * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
  * @class

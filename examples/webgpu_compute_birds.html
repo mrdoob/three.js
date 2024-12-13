@@ -179,7 +179,7 @@
 				controls.connect( /* renderer.domElement */ );
 
 				// Initialize position, velocity, and phase values
-			
+
 				const positionArray = new Float32Array( BIRDS * 3 );
 				const velocityArray = new Float32Array( BIRDS * 3 );
 				const phaseArray = new Float32Array( BIRDS );
@@ -220,7 +220,7 @@
 				phaseStorage.setPBO( true );
 
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
-			
+
 				effectController = {
 					separation: uniform( 15.0 ).label( 'separation' ),
 					alignment: uniform( 20.0 ).label( 'alignment' ),
@@ -233,12 +233,12 @@
 				};
 
 				// Create geometry
-			
+
 				const birdGeometry = new BirdGeometry();
 				const birdMaterial = new THREE.NodeMaterial();
 
 				// Animate bird mesh within vertex shader, then apply position offset to vertices.
-			
+
 				const birdVertexTSL = Fn( () => {
 
 					const reference = attribute( 'reference' );
@@ -247,12 +247,12 @@
 					const position = positionLocal.toVar();
 					const newPhase = phaseStorage.element( reference ).toVar();
 					const newVelocity = normalize( velocityStorage.element( reference ) ).toVar();
-			
+
 					If( birdVertex.equal( 4 ).or( birdVertex.equal( 7 ) ), () => {
 
 						// flap wings
 						position.y = sin( newPhase ).mul( 5.0 );
-			
+
 					} );
 
 					const newPosition = modelWorldMatrix.mul( position );
@@ -267,7 +267,7 @@
 
 					const cosrz = x.div( xyz );
 					const sinrz = newVelocity.y.div( xyz ).toVar();
-			
+
 					// Nodes must be negated with negate(). Using '-', their values will resolve to NaN.
 					const maty = mat3(
 						cosry, 0, negate( sinry ),
@@ -301,7 +301,7 @@
 				// Shaders are computationally identical to their GLSL counterparts outside of texture destructuring.
 
 				computeVelocity = Fn( () => {
-			
+
 					// Define consts
 					const PI = float( 3.141592653589793 );
 					const PI_2 = PI.mul( 2.0 );
@@ -351,7 +351,7 @@
 						const dirToBird = birdPosition.sub( position );
 						const distToBird = length( dirToBird );
 
-						// Don't apply any changes to velocity if the distance to this bird is negligable.
+						// Don't apply any changes to velocity if the distance to this bird is negligible.
 						If( distToBird.lessThan( 0.0001 ), () => {
 
 							Continue();
@@ -372,7 +372,7 @@
 						const percent = distToBirdSq.div( zoneRadiusSq );
 
 						If( percent.lessThan( separationThresh ), () => {
-			
+
 							// Separation - Move apart for comfort
 							const velocityAdjust = ( separationThresh.div( percent ).sub( 1.0 ) ).mul( deltaTime );
 							velocity.subAssign( normalize( dirToBird ).mul( velocityAdjust ) );
@@ -404,13 +404,13 @@
 							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
 						} );
-			
+
 					} );
 
 					If( length( velocity ).greaterThan( limit ), () => {
 
 						velocity.assign( normalize( velocity ).mul( limit ) );
-			
+
 					} );
 
 				} )().compute( BIRDS );

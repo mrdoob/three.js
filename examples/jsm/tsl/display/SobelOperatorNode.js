@@ -97,7 +97,7 @@ class SobelOperatorNode extends TempNode {
 				Gy[ 2 ][ 2 ].mul( tx2y2 )
 			);
 
-			// magnitute of the total gradient
+			// magnitude of the total gradient
 
 			const G = valueGx.mul( valueGx ).add( valueGy.mul( valueGy ) ).sqrt();
 

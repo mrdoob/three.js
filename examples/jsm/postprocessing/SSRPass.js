@@ -335,7 +335,7 @@ class SSRPass extends Pass {
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
 
-		// dipsose full screen quad
+		// dispose full screen quad
 
 		this.fsQuad.dispose();
 
