@@ -8,7 +8,7 @@ import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTa
 const getBitangent = ( crossNormalTangent ) => crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
 /**
- * TSL object that represents the tangent attribute of the current rendered object.
+ * TSL object that represents the bitangent attribute of the current rendered object.
  *
  * @type {Node<vec3>}
  */
