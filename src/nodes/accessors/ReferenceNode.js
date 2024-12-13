@@ -394,7 +394,8 @@ export default ReferenceNode;
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 
 /**
- * TSL function for creating a reference node.
+ * TSL function for creating a reference node. Use this function if you want need a reference
+ * to an array-like property that should be represented as a uniform buffer.
  *
  * @function
  * @param {String} name - The name of the property the node refers to.
