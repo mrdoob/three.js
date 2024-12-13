@@ -12,8 +12,8 @@ import { varyingProperty } from '../core/PropertyNode.js';
 
 /**
  * This node implements the vertex shader logic which is required
- * when rendering 3D objects via batching. It requires the usage
- * of {@link BatchedMesh}.
+ * when rendering 3D objects via batching. `BatchNode` must be used
+ * with instances of {@link BatchedMesh}.
  *
  * @augments Node
  */

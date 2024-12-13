@@ -16,9 +16,8 @@ import { DynamicDrawUsage } from '../../constants.js';
 
 /**
  * This node implements the vertex shader logic which is required
- * when rendering 3D objects via instanced rendering. The code
- * makes sure vertex position, normal and color data can influenced
- * via instanced data.
+ * when rendering 3D objects via instancing. The code makes sure
+ * vertex position, normal and color data can influenced via instanced data.
  *
  * @augments Node
  */
