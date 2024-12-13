@@ -54,7 +54,7 @@ class SkinningNode extends Node {
 		this.useReference = useReference;
 
 		/**
-		 * The update type overwritten sind skinning nodes are updated per object.
+		 * The update type overwritten since skinning nodes are updated per object.
 		 *
 		 * @type {String}
 		 */
@@ -223,7 +223,7 @@ class SkinningNode extends Node {
 	}
 
 	/**
-	 * Setups texture node by assigning the transformed vertex data to predefined node variables.
+	 * Setups the skinning node by assigning the transformed vertex data to predefined node variables.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
