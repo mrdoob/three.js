@@ -8,6 +8,8 @@ import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
+// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+
 /** @module ReferenceNode **/
 
 /**
@@ -28,7 +30,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {Node} referenceNode - The reference node.
+	 * @param {Node?} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -39,7 +41,7 @@ class ReferenceElementNode extends ArrayElementNode {
 		 * Similar to {@link module:ReferenceNode~ReferenceNode#reference}, an additional
 		 * property references to the current node.
 		 *
-		 * @type {Node}
+		 * @type {Node?}
 		 * @default null
 		 */
 		this.referenceNode = referenceNode;
@@ -180,7 +182,7 @@ class ReferenceNode extends Node {
 		this.name = null;
 
 		/**
-		 * Overwritten since velocity nodes are updated per object.
+		 * Overwritten since reference nodes are updated per object.
 		 *
 		 * @type {String}
 		 * @default 'object'
