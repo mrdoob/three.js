@@ -1,11 +1,18 @@
 import { RenderTarget, Vector2, QuadMesh, NodeMaterial, PostProcessingUtils, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, vec4, uv, texture, passTexture, uniform, sign, max, convertToTexture } from 'three/tsl';
 
+/** @module AfterImageNode **/
+
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
+/**
+ * Post processing node for creating an after image effect.
+ *
+ * @augments TempNode
+ */
 class AfterImageNode extends TempNode {
 
 	static get type() {
@@ -14,32 +21,91 @@ class AfterImageNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new after image node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the pass.
+	 * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+	 */
 	constructor( textureNode, damp = 0.96 ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The texture node that represents the input of the pass.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNode = textureNode;
+
+		/**
+		 * The texture represents the pervious frame.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNodeOld = texture();
+
+		/**
+		 * The damping intensity as a uniform node.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.damp = uniform( damp );
 
+		/**
+		 * The render target used for compositing the effect.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._compRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._compRT.texture.name = 'AfterImageNode.comp';
 
+		/**
+		 * The render target that represents the previous frame.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._oldRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
+		/**
+		 * The result of the pass is represented as a as
+		 * separate texture node.
+		 *
+		 * @type {PassTextureNode}
+		 */
 		this._textureNode = passTexture( this, this._compRT.texture );
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
+		 * its effect once per frame in `updateBefore()`.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
+	/**
+	 * Returns the result of the pass as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the result of the pass.
+	 */
 	getTextureNode() {
 
 		return this._textureNode;
 
 	}
 
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {Number} width - The width of the pass.
+	 * @param {Number} height - The height of the pass.
+	 */
 	setSize( width, height ) {
 
 		this._compRT.setSize( width, height );
@@ -47,6 +113,11 @@ class AfterImageNode extends TempNode {
 
 	}
 
+	/**
+	 * This method is used to render the effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
@@ -90,6 +161,12 @@ class AfterImageNode extends TempNode {
 
 	}
 
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {PassTextureNode}
+	 */
 	setup( builder ) {
 
 		const textureNode = this.textureNode;
@@ -141,6 +218,10 @@ class AfterImageNode extends TempNode {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the pass is no longer required.
+	 */
 	dispose() {
 
 		this._compRT.dispose();
@@ -150,6 +231,14 @@ class AfterImageNode extends TempNode {
 
 }
 
+/**
+ * TSL function for creating an after image node for post processing.
+ *
+ * @function
+ * @param {TextureNode} node - The texture node that represents the input of the pass.
+ * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+ * @returns {AfterImageNode}
+ */
 export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );
 
 export default AfterImageNode;
