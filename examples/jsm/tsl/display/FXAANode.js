@@ -4,9 +4,8 @@ import { nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, c
 /** @module FXAANode **/
 
 /**
- * Post processing node for applying FXAA. This node
- * requires sRGB input so tone mapping and color space
- * conversion must happen before the anti-aliasing.
+ * Post processing node for applying FXAA. This node requires sRGB input
+ * so tone mapping and color space conversion must happen before the anti-aliasing.
  *
  * @augments TempNode
  */
