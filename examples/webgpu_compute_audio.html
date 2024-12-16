@@ -35,9 +35,9 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
-			let computeNode;
+			let computeNode, computeResetNode;
 			let waveBuffer, sampleRate;
-			let waveArray;
+			let waveArray, originalWaveBuffer;
 			let currentAudio, currentAnalyser;
 			const analyserBuffer = new Uint8Array( 1024 );
 			let analyserTexture;
@@ -49,10 +49,9 @@
 
 				if ( currentAudio ) currentAudio.stop();
 
+				await renderer.computeAsync( computeResetNode );
 				// compute audio
-
 				await renderer.computeAsync( computeNode );
-
 				const wave = new Float32Array( await renderer.getArrayBufferAsync( waveArray.value ) );
 
 				// play result
@@ -94,12 +93,14 @@
 
 				// adding extra silence to delay and pitch
 				waveBuffer = new Float32Array( [ ...waveBuffer, ...new Float32Array( 200000 ) ] );
-
+				originalWaveBuffer = waveBuffer.slice();
+			
 				sampleRate = audioBuffer.sampleRate / audioBuffer.numberOfChannels;
 
 				// create webgpu buffers
 
 				waveArray = instancedArray( waveBuffer );
+				const originalWave = instancedArray( originalWaveBuffer ).toReadOnly();
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
 				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
@@ -113,9 +114,9 @@
 				const delayOffset = uniform( .55 );
 
 
-				// compute (shader-node)
+				// compute
 
-				const computeShaderFn = Fn( () => {
+				computeNode = Fn( () => {
 
 					const index = float( instanceIndex );
 
@@ -144,12 +145,14 @@
 
 					waveStorageElementNode.assign( wave );
 
-				} );
+				} )().compute( waveBuffer.length );
 
+				computeResetNode = Fn( () => {
 
-				// compute
+					waveArray.element( instanceIndex ).assign( originalWave.element( instanceIndex ) );
 
-				computeNode = computeShaderFn().compute( waveBuffer.length );
+				} )().compute( waveBuffer.length );
+
 
 
 				// gui
@@ -194,6 +197,9 @@
 
 				playAudioBuffer();
 
+				// on click replay
+				renderer.domElement.addEventListener( 'click', playAudioBuffer );
+			
 			}
 
 			function onWindowResize() {
