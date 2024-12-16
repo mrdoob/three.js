@@ -69,30 +69,6 @@ class TiledLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
-	 * light IDs into the cache key.
-	 *
-	 * @return {Number} The custom cache key.
-	 */
-	customCacheKey() {
-
-		const lightIDs = [];
-		const lights = this._lights;
-
-		for ( let i = 0; i < lights.length; i ++ ) {
-
-			// There's no need to recreate the shader when adding or removing PointLights in Tiled Lights.
-			if ( lights[ i ].isPointLight === true ) continue;
-
-			lightIDs.push( lights[ i ].id );
-
-		}
-
-		return NodeUtils.hashArray( lightIDs );
-
-	}
-
-	/**
 	 * Optimized method for computing the cache key of the tiled lights.
 	 *
 	 * @param {Boolean} [force=false] - When set to `true`, a recomputation of the cache key is forced.
