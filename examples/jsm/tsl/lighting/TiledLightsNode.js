@@ -1,4 +1,4 @@
-import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType, NodeUtils } from 'three/webgpu';
+import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
 
 import {
 	attributeArray, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop,
