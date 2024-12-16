@@ -261,7 +261,6 @@ class WebGPUAttributeUtils {
 
 		return dstBuffer.buffer;
 
-
 	}
 
 	_getVertexFormat( geometryAttribute ) {
