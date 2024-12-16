@@ -103,7 +103,7 @@
 
 				// read-only buffer
 
-				const originalWave = instancedArray( waveBuffer );
+				const originalWave = instancedArray( waveBuffer ).toReadOnly();
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
 				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
