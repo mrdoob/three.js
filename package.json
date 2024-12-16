@@ -93,7 +93,7 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
     "clean-jsdoc-theme": "^4.3.0",
