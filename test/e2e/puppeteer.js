@@ -50,7 +50,7 @@ const exceptionList = [
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 
-	// WebXR also isn't determinstic enough?
+	// WebXR also isn't deterministic enough?
 	'webxr_ar_lighting',
 	'webxr_vr_sandbox',
 	'webxr_vr_video',
@@ -328,11 +328,11 @@ async function main() {
 
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
-		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated succesfully.` );
+		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated successfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
 
-		console.green( `${ files.length } screenshots succesfully generated.` );
+		console.green( `${ files.length } screenshots successfully generated.` );
 
 	} else if ( failedScreenshots.length ) {
 

@@ -232,7 +232,7 @@ class NRRDLoader extends Loader {
 
 		}
 
-		//parse the data when registred as one of this type : 'text', 'ascii', 'txt'
+		//parse the data when registered as one of this type : 'text', 'ascii', 'txt'
 		function parseDataAsText( data, start, end ) {
 
 			let number = '';

@@ -1633,7 +1633,7 @@ class SVGLoader extends Loader {
 					( curve.aEndAngle - curve.aStartAngle ) % ( 2 * Math.PI ) < Number.EPSILON;
 
 				// Do not touch angles of a full ellipse because after transformation they
-				// would converge to a sinle value effectively removing the whole curve
+				// would converge to a single value effectively removing the whole curve
 
 				if ( ! isFullEllipse ) {
 
@@ -2124,7 +2124,7 @@ class SVGLoader extends Loader {
 
 				// check if the center of the bounding box is in the bounding box of the paths.
 				// this is a pruning method to limit the search of intersections in paths that can't envelop of the current path.
-				// if a path envelops another path. The center of that oter path, has to be inside the bounding box of the enveloping path.
+				// if a path envelops another path. The center of that other path, has to be inside the bounding box of the enveloping path.
 				if ( path.boundingBox.containsPoint( center ) ) {
 
 					const intersections = getIntersections( scanline, path.points );

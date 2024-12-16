@@ -248,7 +248,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Transforms the given uv node with the texture transformation matrix.
 	 *
-	 * @param {Node} uvNode - The uv node to transfrom.
+	 * @param {Node} uvNode - The uv node to transform.
 	 * @return {Node} The transformed uv node.
 	 */
 	getTransformedUV( uvNode ) {

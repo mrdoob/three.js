@@ -463,7 +463,7 @@ class IFFParser {
 	}
 
 	// holds various data about texture node image state
-	// Data other thanmipMapLevel unknown
+	// Data other than mipMapLevel unknown
 	parseImageStateForm() {
 
 		this.reader.skip( 8 ); // unknown
@@ -577,7 +577,7 @@ class IFFParser {
 			fileName: ''
 		};
 
-		// seach STIL block
+		// search STIL block
 		while ( true ) {
 
 			var tag = this.reader.getIDTag();
@@ -653,11 +653,11 @@ class IFFParser {
 
 		var number = this.reader.getUint16();
 		var flags = this.reader.getUint16(); // If the least significant bit of flags is set, the layer is hidden.
-		var pivot = this.reader.getFloat32Array( 3 ); // Note: this seems to be superflous, as the geometry is translated when pivot is present
+		var pivot = this.reader.getFloat32Array( 3 ); // Note: this seems to be superfluous, as the geometry is translated when pivot is present
 		var layer = {
 			number: number,
 			flags: flags, // If the least significant bit of flags is set, the layer is hidden.
-			pivot: [ - pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] ], // Note: this seems to be superflous, as the geometry is translated when pivot is present
+			pivot: [ - pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] ], // Note: this seems to be superfluous, as the geometry is translated when pivot is present
 			name: this.reader.getString(),
 		};
 

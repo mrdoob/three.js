@@ -234,7 +234,7 @@ class PointShadowNode extends ShadowNode {
 	 * Overwrites the default implementation with point light specific
 	 * rendering code.
 	 *
-	 * @param {NodeFrme} frame - A reference to the current node frame.
+	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	renderShadow( frame ) {
 

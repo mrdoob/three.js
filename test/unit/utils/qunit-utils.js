@@ -141,7 +141,7 @@ function checkGeometryJsonWriting( geom, json ) {
 
 	}
 
-	// All parameters from json should be transfered to the geometry.
+	// All parameters from json should be transferred to the geometry.
 	// json is flat. Ignore first level json properties that are not parameters.
 	const notParameters = [ 'metadata', 'uuid', 'type' ];
 	keys = Object.keys( json );

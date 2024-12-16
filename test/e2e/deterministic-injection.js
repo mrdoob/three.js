@@ -59,7 +59,7 @@
 
 	};
 
-	/* Semi-determitistic video */
+	/* Semi-deterministic video */
 
 	const play = HTMLVideoElement.prototype.play;
 

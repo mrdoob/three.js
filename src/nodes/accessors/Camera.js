@@ -54,7 +54,7 @@ export const cameraWorldMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraW
 export const cameraNormalMatrix = /*@__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
 
 /**
- * TSL object that represents the positon in world space of the camera used for the current render.
+ * TSL object that represents the position in world space of the camera used for the current render.
  *
  * @type {UniformNode<vec3>}
  */

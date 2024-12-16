@@ -33,7 +33,7 @@ class LottieLoader extends Loader {
 
 			const data = JSON.parse( text );
 
-			// lottie uses container.offetWidth and offsetHeight
+			// lottie uses container.offsetWidth and offsetHeight
 			// to define width/height
 
 			const container = document.createElement( 'div' );

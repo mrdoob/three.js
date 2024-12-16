@@ -160,7 +160,7 @@ function _parseV2( pvrDatas ) {
 	pvrDatas.numMipmaps = numMipmaps + 1;
 
 	// guess cubemap type seems tricky in v2
-	// it juste a pvr containing 6 surface (no explicit cubemap type)
+	// it's just a pvr containing 6 surface (no explicit cubemap type)
 	pvrDatas.isCubemap 	= ( numSurfs === 6 );
 
 	return _extract( pvrDatas );

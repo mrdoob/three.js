@@ -13,7 +13,7 @@ export default QUnit.module( 'Extras', () => {
 
 			assert.ok( DataUtils.toHalfFloat( 0 ) === 0, 'Passed!' );
 
-			// surpress the following console message during testing
+			// suppress the following console message during testing
 			// THREE.DataUtils.toHalfFloat(): Value out of range.
 
 			console.level = CONSOLE_LEVEL.OFF;

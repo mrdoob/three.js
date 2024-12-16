@@ -317,7 +317,7 @@ export default OperatorNode;
 export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
 
 /**
- * Returns the subraction of two or more value.
+ * Returns the subtraction of two or more value.
  *
  * @function
  * @param {Node} aNode - The first input.

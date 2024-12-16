@@ -590,7 +590,7 @@ export const materialSheen = /*@__PURE__*/ nodeImmutable( MaterialNode, Material
 export const materialSheenRoughness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SHEEN_ROUGHNESS );
 
 /**
- * TSL object that represents the anisotriopy of the current material.
+ * TSL object that represents the anisotropy of the current material.
  *
  * @type {Node<vec2>}
  */
@@ -720,7 +720,7 @@ export const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, Mater
 export const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
 
 /**
- * TSL object that represents the anisotriopy vector of the current material.
+ * TSL object that represents the anisotropy vector of the current material.
  *
  * @type {Node<vec2>}
  */
