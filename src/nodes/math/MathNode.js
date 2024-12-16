@@ -1,6 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
 /** @module MathNode **/
 
@@ -140,7 +141,7 @@ class MathNode extends TempNode {
 
 	generate( builder, output ) {
 
-		const method = this.method;
+		let method = this.method;
 
 		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
@@ -149,7 +150,7 @@ class MathNode extends TempNode {
 		const b = this.bNode;
 		const c = this.cNode;
 
-		const isWebGL = builder.renderer.isWebGLRenderer === true;
+		const coordinateSystem = builder.renderer.coordinateSystem;
 
 		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
@@ -200,14 +201,14 @@ class MathNode extends TempNode {
 					b.build( builder, type )
 				);
 
-			} else if ( isWebGL && method === MathNode.STEP ) {
+			} else if ( coordinateSystem === WebGLCoordinateSystem && method === MathNode.STEP ) {
 
 				params.push(
 					a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
 					b.build( builder, inputType )
 				);
 
-			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
+			} else if ( ( coordinateSystem === WebGLCoordinateSystem && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
 
 				params.push(
 					a.build( builder, inputType ),
@@ -231,6 +232,12 @@ class MathNode extends TempNode {
 				);
 
 			} else {
+
+				if ( coordinateSystem === WebGPUCoordinateSystem && method === MathNode.ATAN && b !== null ) {
+
+					method = 'atan2';
+
+				}
 
 				params.push( a.build( builder, inputType ) );
 				if ( b !== null ) params.push( b.build( builder, inputType ) );
@@ -302,7 +309,6 @@ MathNode.TRANSPOSE = 'transpose';
 
 MathNode.BITCAST = 'bitcast';
 MathNode.EQUALS = 'equals';
-MathNode.ATAN2 = 'atan2';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
 MathNode.MOD = 'mod';
@@ -666,16 +672,6 @@ export const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST );
 export const equals = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EQUALS );
 
 /**
- * Returns the arc-tangent of the quotient of its parameters.
- *
- * @function
- * @param {Node | Number} x - The y parameter.
- * @param {Node | Number} y - The x parameter.
- * @returns {Node}
- */
-export const atan2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN2 );
-
-/**
  * Returns the lesser of two values.
  *
  * @function
@@ -931,6 +927,21 @@ export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
  * @returns {Node}
  */
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
+
+/**
+ * Returns the arc-tangent of the quotient of its parameters.
+ *
+ * @function
+ * @param {Node | Number} y - The y parameter.
+ * @param {Node | Number} x - The x parameter.
+ * @returns {Node}
+ */
+export const atan2 = ( y, x ) => { // @deprecated, r172
+
+	console.warn( 'THREE.TSL: "atan2" is overloaded. Use "atan" instead.' );
+	return atan( y, x );
+
+};
 
 addMethodChaining( 'all', all );
 addMethodChaining( 'any', any );
