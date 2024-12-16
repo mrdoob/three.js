@@ -355,7 +355,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( object.isBatchedMesh ) {
+		if ( object.isBatchedMesh && object._matricesTexture ) {
 
 			batch( object ).append();
 
