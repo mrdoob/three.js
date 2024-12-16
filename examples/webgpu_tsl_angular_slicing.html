@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, PI2, atan2, color, frontFacing, output, positionLocal, Fn, uniform, vec4 } from 'three/tsl';
+			import { If, PI2, atan, color, frontFacing, output, positionLocal, Fn, uniform, vec4 } from 'three/tsl';
 
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -80,7 +80,7 @@
 			
 				const inAngle = Fn( ( [ position, angleStart, angleArc ] ) => {
 
-					const angle = atan2( position.y, position.x ).sub( angleStart ).mod( PI2 ).toVar();
+					const angle = atan( position.y, position.x ).sub( angleStart ).mod( PI2 ).toVar();
 					return angle.greaterThan( 0 ).and( angle.lessThan( angleArc ) );
 
 				} );
