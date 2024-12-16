@@ -9,7 +9,6 @@ import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat,
 import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
-	atan2: 'atan',
 	textureDimensions: 'textureSize',
 	equals: 'equal'
 };

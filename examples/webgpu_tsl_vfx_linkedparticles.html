@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { atan2, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
+			import { atan, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -127,7 +127,7 @@
 				particleMaterial.depthWrite = false;
 				particleMaterial.positionNode = particlePositions.toAttribute();
 				particleMaterial.scaleNode = vec2( particleSize );
-				particleMaterial.rotationNode = atan2( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
+				particleMaterial.rotationNode = atan( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
 
 				particleMaterial.colorNode = /*#__PURE__*/ Fn( () => {
 
@@ -396,7 +396,7 @@
 
 			}
 
-			function onWindowResize( e ) {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -419,11 +419,11 @@
 
 			}
 
-			async function animate() {
+			function animate() {
 
 				// compute particles
-				await renderer.computeAsync( updateParticles );
-				await renderer.computeAsync( spawnParticles );
+				renderer.compute( updateParticles );
+				renderer.compute( spawnParticles );
 
 				// update particle index for next spawn
 				spawnIndex.value = ( spawnIndex.value + nbToSpawn.value ) % nbParticles;
@@ -448,7 +448,7 @@
 
 				controls.update();
 
-				postProcessing.renderAsync();
+				postProcessing.render();
 
 			}
 
