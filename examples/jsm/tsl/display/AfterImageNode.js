@@ -24,7 +24,7 @@ class AfterImageNode extends TempNode {
 	/**
 	 * Constructs a new after image node.
 	 *
-	 * @param {TextureNode} textureNode - The texture node that represents the input of the pass.
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
 	 * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
 	 */
 	constructor( textureNode, damp = 0.96 ) {
@@ -32,7 +32,7 @@ class AfterImageNode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * The texture node that represents the input of the pass.
+		 * The texture node that represents the input of the effect.
 		 *
 		 * @type {TextureNode}
 		 */
@@ -71,9 +71,9 @@ class AfterImageNode extends TempNode {
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
 		/**
-		 * The result of the pass is represented as a as
-		 * separate texture node.
+		 * The result of the effect is represented as a separate texture node.
 		 *
+		 * @private
 		 * @type {PassTextureNode}
 		 */
 		this._textureNode = passTexture( this, this._compRT.texture );
@@ -90,9 +90,9 @@ class AfterImageNode extends TempNode {
 	}
 
 	/**
-	 * Returns the result of the pass as a texture node.
+	 * Returns the result of the effect as a texture node.
 	 *
-	 * @return {PassTextureNode} A texture node that represents the result of the pass.
+	 * @return {PassTextureNode} A texture node that represents the result of the effect.
 	 */
 	getTextureNode() {
 
@@ -101,10 +101,10 @@ class AfterImageNode extends TempNode {
 	}
 
 	/**
-	 * Sets the size of the pass.
+	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the pass.
-	 * @param {Number} height - The height of the pass.
+	 * @param {Number} width - The width of the effect.
+	 * @param {Number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -220,7 +220,7 @@ class AfterImageNode extends TempNode {
 
 	/**
 	 * Frees internal resources. This method should be called
-	 * when the pass is no longer required.
+	 * when the effect is no longer required.
 	 */
 	dispose() {
 
@@ -235,7 +235,7 @@ class AfterImageNode extends TempNode {
  * TSL function for creating an after image node for post processing.
  *
  * @function
- * @param {TextureNode} node - The texture node that represents the input of the pass.
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */

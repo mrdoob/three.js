@@ -19,7 +19,7 @@ class DotScreenNode extends TempNode {
 	/**
 	 * Constructs a new dot screen node.
 	 *
-	 * @param {Node} inputNode - The node that represents the input of the pass.
+	 * @param {Node} inputNode - The node that represents the input of the effect.
 	 * @param {Number} [angle=1.57] - The rotation of the effect in radians.
 	 * @param {Number} [scale=1] - The scale of the effect. A higher value means smaller dots.
 	 */
@@ -28,7 +28,7 @@ class DotScreenNode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * The node that represents the input of the pass.
+		 * The node that represents the input of the effect.
 		 *
 		 * @type {Node}
 		 */
@@ -96,7 +96,7 @@ export default DotScreenNode;
  * TSL function for creating a dot-screen node for post processing.
  *
  * @function
- * @param {Node} node - The node that represents the input of the pass.
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Number} [angle=1.57] - The rotation of the effect in radians.
  * @param {Number} [scale=1] - The scale of the effect. A higher value means smaller dots.
  * @returns {DotScreenNode}

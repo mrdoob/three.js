@@ -20,14 +20,14 @@ class FXAANode extends TempNode {
 	/**
 	 * Constructs a new FXAA node.
 	 *
-	 * @param {TextureNode} textureNode - The texture node that represents the input of the pass.
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
 	 */
 	constructor( textureNode ) {
 
 		super( 'vec4' );
 
 		/**
-		 * The texture node that represents the input of the pass.
+		 * The texture node that represents the input of the effect.
 		 *
 		 * @type {TextureNode}
 		 */
@@ -35,7 +35,7 @@ class FXAANode extends TempNode {
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
-		 * its uniforms once per frame in `updateBefore()`.
+		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
 		 * @type {String}
 		 * @default 'frame'
@@ -45,6 +45,7 @@ class FXAANode extends TempNode {
 		/**
 		 * A uniform node holding the inverse resolution value.
 		 *
+		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
 		this._invSize = uniform( new Vector2() );
@@ -358,7 +359,7 @@ export default FXAANode;
  * TSL function for creating a FXAA node for anti-aliasing via post processing.
  *
  * @function
- * @param {TextureNode} node - The texture node that represents the input of the pass.
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {FXAANode}
  */
 export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );

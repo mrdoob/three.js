@@ -19,7 +19,7 @@ class FilmNode extends TempNode {
 	/**
 	 * Constructs a new film node.
 	 *
-	 * @param {Node} inputNode - The node that represents the input of the pass.
+	 * @param {Node} inputNode - The node that represents the input of the effect.
 	 * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.
 	 * @param {Node<vec2>?} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
 	 */
@@ -28,7 +28,7 @@ class FilmNode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * The node that represents the input of the pass.
+		 * The node that represents the input of the effect.
 		 *
 		 * @type {Node}
 		 */
@@ -91,7 +91,7 @@ export default FilmNode;
  * TSL function for creating a film node for post processing.
  *
  * @function
- * @param {Node} inputNode - The node that represents the input of the pass.
+ * @param {Node<vec4>} inputNode - The node that represents the input of the effect.
  * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.
  * @param {Node<vec2>?} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
  * @returns {FilmNode}

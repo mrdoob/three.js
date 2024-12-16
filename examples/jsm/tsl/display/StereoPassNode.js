@@ -8,8 +8,7 @@ const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
 /**
- * A special render pass node that renders the scene
- * as a stereoscopic image.
+ * A special render pass node that renders the scene as a stereoscopic image.
  *
  * @augments PassNode
  */
