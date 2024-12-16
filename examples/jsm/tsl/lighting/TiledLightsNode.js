@@ -68,6 +68,12 @@ class TiledLightsNode extends LightsNode {
 
 	}
 
+	customCacheKey() {
+
+		return this._compute.getCacheKey() + super.customCacheKey();
+
+	}
+
 	updateLightsTexture() {
 
 		const { _lightsTexture: lightsTexture, tiledLights } = this;
