@@ -118,9 +118,6 @@
 
 				computeNode = Fn( () => {
 
-					//  reset wave buffer
-
-			
 					const index = float( instanceIndex );
 
 					// pitch
@@ -152,11 +149,7 @@
 
 				computeResetNode = Fn( () => {
 
-					const index = float( instanceIndex );
-
-					const waveStorageElementNode = waveArray.element( index );
-
-					waveStorageElementNode.assign( originalWave.element( index ) );
+					waveArray.element( instanceIndex ).assign( originalWave.element( instanceIndex ) );
 
 				} )().compute( waveBuffer.length );
 
