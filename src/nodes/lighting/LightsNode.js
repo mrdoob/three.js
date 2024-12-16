@@ -117,6 +117,7 @@ class LightsNode extends Node {
 	customCacheKey() {
 
 		const lightIDs = [];
+		const lights = this._lights;
 
 		for ( let i = 0; i < lights.length; i ++ ) {
 
