@@ -14,7 +14,7 @@ let _rendererState;
  * This node produces a high-quality anti-aliased output but is also extremely expensive because of
  * its brute-force approach of re-rendering the entire scene multiple times.
  *
- * References: https://en.wikipedia.org/wiki/Supersampling
+ * Reference: {@link https://en.wikipedia.org/wiki/Supersampling}
  *
  * @augments PassNode
  */

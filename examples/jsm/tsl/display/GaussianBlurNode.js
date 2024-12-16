@@ -371,7 +371,7 @@ class GaussianBlurNode extends TempNode {
 export default GaussianBlurNode;
 
 /**
- * TSL function for creating gaussian blur node for post processing.
+ * TSL function for creating a gaussian blur node for post processing.
  *
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
@@ -382,7 +382,7 @@ export default GaussianBlurNode;
 export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
 
 /**
- * TSL function for creating gaussian blur node for post processing with enabled premultiplied alpha.
+ * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.
  *
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
