@@ -35,7 +35,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
-			let computeNode, computeShaderFn;
+			let computeNode, computeResetNode;
 			let waveBuffer, sampleRate;
 			let waveArray, originalWaveBuffer;
 			let currentAudio, currentAnalyser;
@@ -49,14 +49,7 @@
 
 				if ( currentAudio ) currentAudio.stop();
 
-				// Reset the wave buffer to original state before computing
-				waveBuffer.set( originalWaveBuffer );
-				waveArray = instancedArray( waveBuffer );
-				waveArray.setPBO( true );
-
-				// Recreate compute node with reset buffer
-				computeNode = computeShaderFn().compute( waveBuffer.length );
-
+				await renderer.computeAsync( computeResetNode );
 				// compute audio
 				await renderer.computeAsync( computeNode );
 				const wave = new Float32Array( await renderer.getArrayBufferAsync( waveArray.value ) );
@@ -107,6 +100,7 @@
 				// create webgpu buffers
 
 				waveArray = instancedArray( waveBuffer );
+				const originalWave = instancedArray( originalWaveBuffer ).toReadOnly();
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
 				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
@@ -120,10 +114,13 @@
 				const delayOffset = uniform( .55 );
 
 
-				// compute (shader-node)
+				// compute
 
-				computeShaderFn = Fn( () => {
+				computeNode = Fn( () => {
 
+					//  reset wave buffer
+
+			
 					const index = float( instanceIndex );
 
 					// pitch
@@ -151,12 +148,18 @@
 
 					waveStorageElementNode.assign( wave );
 
-				} );
+				} )().compute( waveBuffer.length );
 
+				computeResetNode = Fn( () => {
 
-				// compute
+					const index = float( instanceIndex );
 
-				computeNode = computeShaderFn().compute( waveBuffer.length );
+					const waveStorageElementNode = waveArray.element( index );
+
+					waveStorageElementNode.assign( originalWave.element( index ) );
+
+				} )().compute( waveBuffer.length );
+
 
 
 				// gui
