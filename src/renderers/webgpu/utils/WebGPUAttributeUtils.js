@@ -231,13 +231,13 @@ class WebGPUAttributeUtils {
 		const size = bufferGPU.size;
 
 		const readBufferGPU = device.createBuffer( {
-			label: `${attribute.name}_readback`,
+			label: `${ attribute.name }_readback`,
 			size,
 			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 		} );
 
 		const cmdEncoder = device.createCommandEncoder( {
-			label: `readback_encoder_${attribute.name}`
+			label: `readback_encoder_${ attribute.name }`
 		} );
 
 		cmdEncoder.copyBufferToBuffer(
