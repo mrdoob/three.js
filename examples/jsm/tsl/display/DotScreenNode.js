@@ -1,6 +1,13 @@
-import { Vector2, TempNode } from 'three/webgpu';
+import { TempNode } from 'three/webgpu';
 import { nodeObject, Fn, uv, uniform, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
 
+/** @module DotScreenNode **/
+
+/**
+ * Post processing node for creating dot-screen effect.
+ *
+ * @augments TempNode
+ */
 class DotScreenNode extends TempNode {
 
 	static get type() {
@@ -9,17 +16,46 @@ class DotScreenNode extends TempNode {
 
 	}
 
-	constructor( inputNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
+	/**
+	 * Constructs a new dot screen node.
+	 *
+	 * @param {Node} inputNode - The node that represents the input of the effect.
+	 * @param {Number} [angle=1.57] - The rotation of the effect in radians.
+	 * @param {Number} [scale=1] - The scale of the effect. A higher value means smaller dots.
+	 */
+	constructor( inputNode, angle = 1.57, scale = 1 ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The node that represents the input of the effect.
+		 *
+		 * @type {Node}
+		 */
 		this.inputNode = inputNode;
-		this.center = uniform( center );
+
+		/**
+		 * A uniform node that represents the rotation of the effect in radians.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.angle = uniform( angle );
+
+		/**
+		 * A uniform node that represents the scale of the effect. A higher value means smaller dots.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.scale = uniform( scale );
 
 	}
 
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ShaderCallNodeInternal}
+	 */
 	setup() {
 
 		const inputNode = this.inputNode;
@@ -29,7 +65,7 @@ class DotScreenNode extends TempNode {
 			const s = sin( this.angle );
 			const c = cos( this.angle );
 
-			const tex = uv().mul( screenSize ).sub( this.center );
+			const tex = uv().mul( screenSize );
 			const point = vec2( c.mul( tex.x ).sub( s.mul( tex.y ) ), s.mul( tex.x ).add( c.mul( tex.y ) ) ).mul( this.scale );
 
 			return sin( point.x ).mul( sin( point.y ) ).mul( 4 );
@@ -56,4 +92,13 @@ class DotScreenNode extends TempNode {
 
 export default DotScreenNode;
 
-export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );
+/**
+ * TSL function for creating a dot-screen node for post processing.
+ *
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @param {Number} [angle=1.57] - The rotation of the effect in radians.
+ * @param {Number} [scale=1] - The scale of the effect. A higher value means smaller dots.
+ * @returns {DotScreenNode}
+ */
+export const dotScreen = ( node, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), angle, scale ) );
