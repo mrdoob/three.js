@@ -66,7 +66,7 @@ class ShadowBaseNode extends Node {
 
 		// Use assign inside an Fn()
 
-		shadowWorldPosition.assign( material.shadowPositionNode || positionWorld );
+		shadowPositionWorld.assign( material.shadowPositionNode || positionWorld );
 
 	}
 
@@ -88,6 +88,6 @@ class ShadowBaseNode extends Node {
  *
  * @type {Node<vec3>}
  */
-export const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
+export const shadowPositionWorld = /*@__PURE__*/ vec3().toVar( 'shadowPositionWorld' );
 
 export default ShadowBaseNode;
