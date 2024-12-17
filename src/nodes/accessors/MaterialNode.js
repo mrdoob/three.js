@@ -384,7 +384,7 @@ class MaterialNode extends Node {
 
 			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
 
-		} else if ( scope === MaterialNode.AO_MAP ) {
+		} else if ( scope === MaterialNode.AO ) {
 
 			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
 
@@ -438,7 +438,7 @@ MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_WIDTH = 'pointWidth';
 MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
-MaterialNode.AO_MAP = 'ao';
+MaterialNode.AO = 'ao';
 
 export default MaterialNode;
 
@@ -717,7 +717,7 @@ export const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, Mater
  *
  * @type {Node<float>}
  */
-export const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
+export const materialAO = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO );
 
 /**
  * TSL object that represents the anisotropy vector of the current material.
