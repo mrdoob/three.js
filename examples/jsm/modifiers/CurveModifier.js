@@ -139,10 +139,10 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		// chunk import moved in front of modified shader below
 			.replace( '#include <beginnormal_vertex>', '' )
 
-			// vec3 transformedNormal declaration overriden below
+			// vec3 transformedNormal declaration overridden below
 			.replace( '#include <defaultnormal_vertex>', '' )
 
-			// vec3 transformed declaration overriden below
+			// vec3 transformed declaration overridden below
 			.replace( '#include <begin_vertex>', '' )
 
 			// shader override
@@ -198,7 +198,7 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 }
 
 /**
- * A helper class for making meshes bend aroudn curves
+ * A helper class for making meshes bend around curves
  */
 export class Flow {
 

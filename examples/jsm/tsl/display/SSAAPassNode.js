@@ -55,7 +55,7 @@ class SSAAPassNode extends PassNode {
 		this.sampleLevel = 4;
 
 		/**
-		 * Whether rounding erros should be mitigated or not.
+		 * Whether rounding errors should be mitigated or not.
 		 *
 		 * @type {Boolean}
 		 * @default true
@@ -81,7 +81,7 @@ class SSAAPassNode extends PassNode {
 		/**
 		 * A uniform node representing the sample weight.
 		 *
-		 * @type {UnifornNode<float>}
+		 * @type {UniformNode<float>}
 		 * @default 1
 		 */
 		this.sampleWeight = uniform( 1 );

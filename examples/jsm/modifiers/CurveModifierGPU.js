@@ -157,7 +157,7 @@ export function modifyShader( material, uniforms, numberOfCurves ) {
 }
 
 /**
- * A helper class for making meshes bend aroudn curves
+ * A helper class for making meshes bend around curves
  */
 export class Flow {
 

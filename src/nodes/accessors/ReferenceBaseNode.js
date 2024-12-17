@@ -79,7 +79,7 @@ class ReferenceElementNode extends ArrayElementNode {
 }
 
 /**
- * Base class for nodes which establishe a reference to a property of another object.
+ * Base class for nodes which establishes a reference to a property of another object.
  * In this way, the value of the node is automatically linked to the value of
  * referenced object. Reference nodes internally represent the linked value
  * as a uniform.

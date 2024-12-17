@@ -15,7 +15,7 @@ const _propertyCache = new Map();
 /**
  * This class should simplify the node access to material properties.
  * It internal uses reference nodes to make sure  changes to material
- * properties are automatically reflected to prefdefined TSL objects
+ * properties are automatically reflected to predefined TSL objects
  * like e.g. `materialColor`.
  *
  * @augments Node
