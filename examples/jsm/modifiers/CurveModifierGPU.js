@@ -157,7 +157,7 @@ export function modifyShader( material, uniforms, numberOfCurves ) {
 }
 
 /**
- * A helper class for making meshes bend aroudn curves
+ * A helper class for making meshes bend around curves
  */
 export class Flow {
 
@@ -168,8 +168,8 @@ export class Flow {
 	constructor( mesh, numberOfCurves = 1 ) {
 
 		const obj3D = mesh.clone();
-		const splineTexure = initSplineTexture( numberOfCurves );
-		const uniforms = getUniforms( splineTexure );
+		const splineTexture = initSplineTexture( numberOfCurves );
+		const uniforms = getUniforms( splineTexture );
 
 		obj3D.traverse( function ( child ) {
 
@@ -207,7 +207,7 @@ export class Flow {
 		this.curveLengthArray = new Array( numberOfCurves );
 
 		this.object3D = obj3D;
-		this.splineTexure = splineTexure;
+		this.splineTexture = splineTexture;
 		this.uniforms = uniforms;
 
 	}
@@ -222,7 +222,7 @@ export class Flow {
 		this.curveLengthArray[ index ] = curveLength;
 		this.curveArray[ index ] = curve;
 
-		updateSplineTexture( this.splineTexure, curve, index );
+		updateSplineTexture( this.splineTexture, curve, index );
 
 	}
 
