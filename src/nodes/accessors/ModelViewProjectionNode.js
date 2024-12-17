@@ -1,11 +1,14 @@
-import { cameraProjectionMatrix } from './Camera.js';
-import { positionView } from './Position.js';
+import { Fn } from '../tsl/TSLCore.js';
 
 /** @module ModelViewProjectionNode **/
 
 /**
  * TSL object that represents the position in clip space after the model-view-projection transform of the current rendered object.
  *
- * @type {VaryingNode<vec3>}
+ * @type {VaryingNode<vec4>}
  */
-export const modelViewProjection = /*@__PURE__*/ cameraProjectionMatrix.mul( positionView ).varying( 'v_modelViewProjection' );
+export const modelViewProjection = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	return builder.context.setupModelViewProjection();
+
+}, 'vec4' ).once() )().varying( 'v_modelViewProjection' );

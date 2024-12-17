@@ -19,7 +19,7 @@ import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
-import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
+import { cameraFar, cameraNear, cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
@@ -102,6 +102,7 @@ class NodeMaterial extends Material {
 
 		builder.context.setupNormal = () => this.setupNormal( builder );
 		builder.context.setupPositionView = () => this.setupPositionView( builder );
+		builder.context.setupModelViewProjection = () => this.setupModelViewProjection( builder );
 
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
@@ -314,6 +315,12 @@ class NodeMaterial extends Material {
 	setupPositionView() {
 
 		return modelViewMatrix.mul( positionLocal ).xyz;
+
+	}
+
+	setupModelViewProjection() {
+
+		return cameraProjectionMatrix.mul( positionView );
 
 	}
 
