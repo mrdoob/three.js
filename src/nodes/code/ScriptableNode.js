@@ -73,7 +73,7 @@ export const ScriptableNodeResources = new Resources();
 /**
  * This type of node allows to implement nodes with custom scripts. The script
  * section is represented as an instance of `CodeNode` written with JavaScript.
- * The script itself must adhere to a specific strcture.
+ * The script itself must adhere to a specific structure.
  *
  * - main(): Executed once by default and every time `node.needsUpdate` is set.
  * - layout: The layout object defines the script's interface (inputs and outputs).
