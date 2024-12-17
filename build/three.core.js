@@ -12748,8 +12748,8 @@ class PerspectiveCamera extends Camera {
 	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
 	 *
 	 * @param {number} distance
-	 * @param {number} minTarget
-	 * @param {number} maxTarget
+	 * @param {Vector2} minTarget
+	 * @param {Vector2} maxTarget
 	 */
 	getViewBounds( distance, minTarget, maxTarget ) {
 
@@ -21410,7 +21410,7 @@ function pointInTriangle( ax, ay, bx, by, cx, cy, px, py ) {
 // check if a diagonal between two polygon nodes is valid (lies in polygon interior)
 function isValidDiagonal( a, b ) {
 
-	return a.next.i !== b.i && a.prev.i !== b.i && ! intersectsPolygon( a, b ) && // dones't intersect other edges
+	return a.next.i !== b.i && a.prev.i !== b.i && ! intersectsPolygon( a, b ) && // doesn't intersect other edges
            ( locallyInside( a, b ) && locallyInside( b, a ) && middleInside( a, b ) && // locally visible
             ( area( a.prev, a, b.prev ) || area( a, b.prev, b ) ) || // does not create opposite-facing sectors
             equals( a, b ) && area( a.prev, a, a.next ) > 0 && area( b.prev, b, b.next ) > 0 ); // special zero-length case
@@ -36018,17 +36018,19 @@ class CameraHelper extends LineSegments {
 
 		_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
-		// center / target
+		// Adjust z values based on coordinate system
+		const nearZ = this.camera.coordinateSystem === WebGLCoordinateSystem ? - 1 : 0;
 
-		setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
+		// center / target
+		setPoint( 'c', pointMap, geometry, _camera, 0, 0, nearZ );
 		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
-		setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
-		setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
-		setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
+		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
+		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
@@ -36039,9 +36041,9 @@ class CameraHelper extends LineSegments {
 
 		// up
 
-		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
+		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
@@ -36050,10 +36052,10 @@ class CameraHelper extends LineSegments {
 		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
-		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
-		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
+		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
+		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
+		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
 
