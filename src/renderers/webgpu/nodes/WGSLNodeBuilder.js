@@ -16,7 +16,7 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 
-import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
+import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
@@ -389,7 +389,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) ||
-			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
 			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
 
 	}
