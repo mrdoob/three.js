@@ -49,7 +49,7 @@ class ComputeBuiltinNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten since the node type is simply dervied from `nodeType`..
+	 * This method is overwritten since the node type is simply derived from `nodeType`..
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.

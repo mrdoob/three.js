@@ -74,7 +74,7 @@ class StorageBufferNode extends BufferNode {
 		this.isStorageBufferNode = true;
 
 		/**
-		 * The acces type of the texture node.
+		 * The access type of the texture node.
 		 *
 		 * @type {String}
 		 * @default 'readWrite'
@@ -82,7 +82,7 @@ class StorageBufferNode extends BufferNode {
 		this.access = NodeAccess.READ_WRITE;
 
 		/**
-		 * Whether the node is atmoic or not.
+		 * Whether the node is atomic or not.
 		 *
 		 * @type {Boolean}
 		 * @default false
@@ -239,7 +239,7 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	/**
-	 * Defines whether the node is amotic or not.
+	 * Defines whether the node is atomic or not.
 	 *
 	 * @param {Boolean} value - The atomic flag.
 	 * @return {StorageBufferNode} A reference to this node.
@@ -253,7 +253,7 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	/**
-	 * Convenience method for making this node atmoic.
+	 * Convenience method for making this node atomic.
 	 *
 	 * @return {StorageBufferNode} A reference to this node.
 	 */

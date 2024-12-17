@@ -128,7 +128,7 @@ class GTAONode extends TempNode {
 
 		/**
 		 * The distance fall off value of the ambient occlusion.
-		 * A lower value leads to a larget AO effect. The value
+		 * A lower value leads to a larger AO effect. The value
 		 * should lie in the range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}

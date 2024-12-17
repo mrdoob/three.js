@@ -94,7 +94,7 @@ class ComputeNode extends Node {
 	}
 
 	/**
-	 * Executes the `dispose` event for this noode.
+	 * Executes the `dispose` event for this node.
 	 */
 	dispose() {
 

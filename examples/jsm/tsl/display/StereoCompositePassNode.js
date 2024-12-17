@@ -9,7 +9,7 @@ let _rendererState;
 /**
  * A special (abstract) render pass node that renders the scene
  * as a stereoscopic image. Unlike {@link StereoPassNode}, this
- * node composits the image for the left and right eye
+ * node merges the image for the left and right eye
  * into a single one. That is required for effects like
  * anaglyph or parallax barrier.
  *
