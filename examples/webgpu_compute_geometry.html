@@ -137,10 +137,10 @@
 				// background
 
 				const bgColor = screenUV.y.mix( color( 0x9f87f7 ), color( 0xf2cdcd ) );
-				const bgVignet = screenUV.distance( .5 ).remapClamp( 0.3, .8 ).oneMinus();
+				const bgVignette = screenUV.distance( .5 ).remapClamp( 0.3, .8 ).oneMinus();
 				const bgIntensity = 4;
 
-				scene.backgroundNode = bgColor.mul( bgVignet.mul( color( 0xa78ff6 ).mul( bgIntensity ) ) );
+				scene.backgroundNode = bgColor.mul( bgVignette.mul( color( 0xa78ff6 ).mul( bgIntensity ) ) );
 
 				// model
 
