@@ -250,7 +250,7 @@ class VRMLLoader extends Loader {
 
 		function createVisitor( BaseVRMLVisitor ) {
 
-			// the visitor is created dynmaically based on the given base class
+			// the visitor is created dynamically based on the given base class
 
 			class VRMLToASTVisitor extends BaseVRMLVisitor {
 
@@ -1890,7 +1890,7 @@ class VRMLLoader extends Loader {
 
 						// if the colorIndex field is not empty, then one color is used for each polyline of the IndexedLineSet.
 
-						const expandedColorIndex = expandLineIndex( colorIndex ); // compute colors for each line segment (rendering primitve)
+						const expandedColorIndex = expandLineIndex( colorIndex ); // compute colors for each line segment (rendering primitive)
 						colorAttribute = computeAttributeFromIndexedData( expandedLineIndex, expandedColorIndex, color, 3 ); // compute data on vertex level
 
 					} else {
@@ -1907,8 +1907,8 @@ class VRMLLoader extends Loader {
 
 						// if the colorIndex field is not empty, then colors are applied to each vertex of the IndexedLineSet
 
-						const flattenLineColors = flattenData( color, colorIndex ); // compute colors for each VRML primitve
-						const expandedLineColors = expandLineData( flattenLineColors, coordIndex ); // compute colors for each line segment (rendering primitve)
+						const flattenLineColors = flattenData( color, colorIndex ); // compute colors for each VRML primitive
+						const expandedLineColors = expandLineData( flattenLineColors, coordIndex ); // compute colors for each line segment (rendering primitive)
 						colorAttribute = computeAttributeFromLineData( expandedLineIndex, expandedLineColors ); // compute data on vertex level
 
 
@@ -1916,7 +1916,7 @@ class VRMLLoader extends Loader {
 
 						// if the colorIndex field is empty, then the coordIndex field is used to choose colors from the Color node
 
-						const expandedLineColors = expandLineData( color, coordIndex ); // compute colors for each line segment (rendering primitve)
+						const expandedLineColors = expandLineData( color, coordIndex ); // compute colors for each line segment (rendering primitive)
 						colorAttribute = computeAttributeFromLineData( expandedLineIndex, expandedLineColors ); // compute data on vertex level
 
 					}
@@ -2748,7 +2748,7 @@ class VRMLLoader extends Loader {
 
 			const indices = [];
 
-			// since face defintions can have more than three vertices, it's necessary to
+			// since face definitions can have more than three vertices, it's necessary to
 			// perform a simple triangulation
 
 			let start = 0;
@@ -3123,7 +3123,7 @@ class VRMLLoader extends Loader {
 		 * node, but could be applied to other nodes with multiple faces as well.
 		 *
 		 * When used with the Background node, default is directionIsDown is true if
-		 * interpolating the skyColor down from the Zenith. When interpolationg up from
+		 * interpolating the skyColor down from the Zenith. When interpolating up from
 		 * the Nadir i.e. interpolating the groundColor, the directionIsDown is false.
 		 *
 		 * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
