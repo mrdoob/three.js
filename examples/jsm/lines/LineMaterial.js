@@ -14,7 +14,11 @@ UniformsLib.line = {
 	dashOffset: { value: 0 },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
-	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
+	gapSize: { value: 1 }, // todo FIX - maybe change to totalSize
+	arrowVertexId: { value: [] },
+	arrowStep: { value: 1 },
+	arrowSize: { value: 1 },
+	arrowReverse: { value: false },
 
 };
 
@@ -36,6 +40,16 @@ ShaderLib[ 'line' ] = {
 
 		uniform float linewidth;
 		uniform vec2 resolution;
+
+		#ifdef USE_ARROW
+
+			uniform ivec2 arrowVertexId;
+			uniform float arrowStep;
+			uniform float arrowSize;
+			uniform bool arrowReverse;
+			varying float vIsArrow;
+
+		#endif
 
 		attribute vec3 instanceStart;
 		attribute vec3 instanceEnd;
@@ -114,6 +128,43 @@ ShaderLib[ 'line' ] = {
 			#else
 
 				vUv = uv;
+
+			#endif
+
+			#ifdef USE_ARROW
+
+				bool isArrow = gl_VertexID >= arrowVertexId.x && gl_VertexID <= arrowVertexId.y && mod( float( gl_InstanceID ), arrowStep ) == 0.0 ;
+				vIsArrow = isArrow ? 1.0 : 0.0;
+
+				if ( isArrow ) {
+
+					vec3 arrowPosition = mix(instanceStart, instanceEnd, 0.5);
+					vec3 lineDir = ( arrowReverse ? 1.0 : -1.0 ) * normalize(instanceStart - instanceEnd);
+					// always look at camera
+					vec3 cameraDir = normalize(cameraPosition - arrowPosition);
+					vec3 perpDir = normalize(cross(lineDir, cameraDir));
+
+					#ifdef WORLD_UNITS
+
+						float arrowHeight = linewidth * 0.5 * arrowSize * 20.0; // simple handling world units
+
+					#else
+
+						float arrowHeight = linewidth * 0.5 * arrowSize;
+
+					#endif
+
+					vec3 arrowOffset = -lineDir * arrowHeight;
+
+					vec3 trianglePosition = arrowPosition + arrowOffset * 2.0;
+					trianglePosition += position.x * perpDir * arrowHeight;
+					trianglePosition += position.y * lineDir * arrowHeight;
+
+					gl_Position = projectionMatrix * modelViewMatrix * vec4(trianglePosition, 1.0);
+
+					return;
+
+				}
 
 			#endif
 
@@ -246,6 +297,12 @@ ShaderLib[ 'line' ] = {
 		uniform float opacity;
 		uniform float linewidth;
 
+		#ifdef USE_ARROW
+
+			varying float vIsArrow;
+
+		#endif
+
 		#ifdef USE_DASH
 
 			uniform float dashOffset;
@@ -315,9 +372,20 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef USE_DASH
 
-				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
+				bool isArrow = false;
 
-				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+				#ifdef USE_ARROW
+
+					isArrow = (vIsArrow == 1.0);
+
+				#endif
+
+				if (!isArrow) {
+
+					if (vUv.y < -1.0 || vUv.y > 1.0) discard; // discard endcaps
+
+					if (mod(vLineDistance + dashOffset, dashSize + gapSize) > dashSize) discard; // todo - FIX
+				}
 
 			#endif
 
@@ -594,6 +662,74 @@ class LineMaterial extends ShaderMaterial {
 			delete this.defines.USE_ALPHA_TO_COVERAGE;
 
 		}
+
+	}
+
+	get arrow() {
+
+		return 'USE_ARROW' in this.defines;
+
+	}
+
+	set arrow( value ) {
+
+		if ( value === true ) {
+
+			this.defines.USE_ARROW = '';
+
+		} else {
+
+			delete this.defines.USE_ARROW;
+
+		}
+
+	}
+
+	get arrowStep() {
+
+		return this.uniforms.arrowStep.value;
+
+	}
+
+	set arrowStep( value ) {
+
+		this.uniforms.arrowStep.value = value;
+
+	}
+
+	get arrowVertexId() {
+
+		return this.uniforms.arrowVertexId.value;
+
+	}
+
+	set arrowVertexId( value ) {
+
+		this.uniforms.arrowVertexId.value = value;
+
+	}
+
+	get arrowSize() {
+
+		return this.uniforms.arrowSize.value;
+
+	}
+
+	set arrowSize( value ) {
+
+		this.uniforms.arrowSize.value = value;
+
+	}
+
+	get arrowReverse() {
+
+		return this.uniforms.arrowReverse.value;
+
+	}
+
+	set arrowReverse( value ) {
+
+		this.uniforms.arrowReverse.value = value;
 
 	}
 

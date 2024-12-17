@@ -2,6 +2,8 @@ import {
 	Box3,
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
+	Float32BufferAttribute,
+	Uint16BufferAttribute,
 	Line3,
 	MathUtils,
 	Matrix4,
@@ -260,6 +262,42 @@ class LineSegments2 extends Mesh {
 
 		geometry.setAttribute( 'instanceDistanceStart', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
 		geometry.setAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+
+		return this;
+
+	}
+
+	computeArrow( ) {
+
+		const geometry = this.geometry;
+		const material = this.material;
+
+		const positionArray = geometry.getAttribute( 'position' ).array;
+		const uvArray = geometry.getAttribute( 'uv' ).array;
+		const indexArray = geometry.getIndex().array;
+
+		const positionCount = positionArray.length / 3;
+
+		// arrow vertex coordinates
+		const newPositions = [ 0, 2.0, 0, - 0.1, 1.8, 0, 0, 1.9, 0, 0.1, 1.8, 0 ];
+
+		const newUvs = [ 0, 2.0, 0.1, 1.6, 0, 1.8, - 0.1, 1.6 ];
+
+		const newIndices = [
+			positionCount, positionCount + 1, positionCount + 2,
+			positionCount + 2, positionCount + 3, positionCount
+		];
+
+		const updatedPositions = new Float32Array( [ ...positionArray, ...newPositions ] );
+		const updatedUvs = new Float32Array( [ ...uvArray, ...newUvs ] );
+		const updatedIndices = new Uint16Array( [ ...indexArray, ...newIndices ] );
+
+		geometry.setIndex( new Uint16BufferAttribute( updatedIndices, 1 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( updatedPositions, 3 ) );
+		geometry.setAttribute( 'uv', new Float32BufferAttribute( updatedUvs, 2 ) );
+
+		// start and end of arrow vertex Id use in shader
+		material.arrowVertexId = [ positionCount, positionCount + 3 ];
 
 		return this;
 

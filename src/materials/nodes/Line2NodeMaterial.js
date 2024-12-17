@@ -1,12 +1,13 @@
 import NodeMaterial from './NodeMaterial.js';
 import { dashSize, gapSize, varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { instanceIndex, vertexIndex } from '../../nodes/core/IndexNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
+import { cameraProjectionMatrix, cameraPosition } from '../../nodes/accessors/Camera.js';
 import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth, materialOpacity } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
-import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
+import { Fn, float, vec2, vec3, vec4, If, not } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ScreenNode.js';
 import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
@@ -36,6 +37,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.useColor = params.vertexColors;
 		this.useDash = params.dashed;
 		this.useWorldUnits = false;
+		this.useArrow = params.arrow;
 
 		this.dashOffset = 0;
 		this.lineWidth = 1;
@@ -46,6 +48,11 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashScaleNode = null;
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
+
+		this.arrowVertexId = [];
+		this.arrowStep = 1;
+		this.arrowSize = 1;
+		this.arrowReverse = false;
 
 		this.blending = NoBlending;
 
@@ -67,6 +74,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		const useColor = this.useColor;
 		const useDash = this.dashed;
 		const useWorldUnits = this.worldUnits;
+		const useArrow = this.arrow;
 
 		const trimSegment = Fn( ( { start, end } ) => {
 
@@ -138,7 +146,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					start.assign( trimSegment( { start: end, end: start } ) );
 
-			 	} );
+				} );
 
 			} );
 
@@ -159,7 +167,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const clip = vec4().toVar();
 
-			if ( useWorldUnits ) {
+			const renderWorldUnits = ()=> {
 
 				// get the offset direction as perpendicular to the view vector
 
@@ -205,7 +213,9 @@ class Line2NodeMaterial extends NodeMaterial {
 				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
 				clip.z.assign( clipPose.z.mul( clip.w ) );
 
-			} else {
+			};
+
+			const renderLine = ()=> {
 
 				const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
 
@@ -240,6 +250,70 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( offset.mul( clip.w ) );
 
 				clip.assign( clip.add( vec4( offset, 0, 0 ) ) );
+
+			};
+
+			const renderArrow = () =>{
+
+				const arrowSize = this.arrowSize;
+				const arrowReverse = this.arrowReverse;
+
+				const arrowPosition = mix( instanceStart, instanceEnd, 0.5 );
+				const lineDir = arrowReverse ? instanceStart.sub( instanceEnd ).normalize() : instanceEnd.sub( instanceStart ).normalize();
+				const cameraDir = cameraPosition.sub( arrowPosition ).normalize();
+				const perpDir = lineDir.cross( cameraDir ).normalize();
+
+				const arrowHeight = useWorldUnits
+					? materialLineWidth.mul( arrowSize ).mul( 0.5 ).mul( 20.0 )
+					: materialLineWidth.mul( arrowSize ).mul( 0.5 );
+
+				const arrowOffset = lineDir.mul( arrowHeight.negate() );
+				const trianglePosition = arrowPosition
+					.add( arrowOffset.mul( 2.0 ) )
+					.add( positionGeometry.x.mul( perpDir ).mul( arrowHeight ) )
+					.add( positionGeometry.y.mul( lineDir ).mul( arrowHeight ) );
+
+
+				clip.assign( cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( trianglePosition, 1.0 ) ) ) );
+
+			};
+
+			if ( useArrow ) {
+
+				const vertexID = vertexIndex;
+				const arrowVertexId = this.arrowVertexId;
+				const arrowStep = this.arrowStep;
+				const isArrow = vertexID.greaterThanEqual( arrowVertexId[ 0 ] )
+					.and( vertexID.lessThanEqual( arrowVertexId[ 1 ] ) )
+					.and( float( instanceIndex ).mod( arrowStep ).equal( 0.0 ) );
+
+				varyingProperty( 'float', 'isArrow' ).assign( isArrow );
+
+				If( isArrow, () => {
+
+					renderArrow();
+
+				} ).Else( () => {
+
+					if ( useWorldUnits ) {
+
+						renderWorldUnits();
+
+					} else {
+
+						renderLine();
+
+					}
+
+				} );
+
+			} else if ( useWorldUnits ) {
+
+				renderWorldUnits();
+
+			} else {
+
+				renderLine();
 
 			}
 
@@ -276,16 +350,27 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			if ( useDash ) {
 
-				const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
-				const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
+				let isArrow = false;
+				if ( useArrow ) {
 
-				dashSize.assign( dashSizeNode );
-				gapSize.assign( gapSizeNode );
+					isArrow = varyingProperty( 'float', 'isArrow' );
 
-				const vLineDistance = varyingProperty( 'float', 'lineDistance' );
+				}
 
-				vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
-				vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
+				If( not( isArrow ), () => {
+
+					const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
+					const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
+
+					dashSize.assign( dashSizeNode );
+					gapSize.assign( gapSizeNode );
+
+					const vLineDistance = varyingProperty( 'float', 'lineDistance' );
+
+					vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
+					vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
+
+				} );
 
 			}
 
@@ -444,6 +529,23 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useAlphaToCoverage !== value ) {
 
 			this.useAlphaToCoverage = value;
+			this.needsUpdate = true;
+
+		}
+
+	}
+
+	get arrow() {
+
+		return this.useArrow;
+
+	}
+
+	set arrow( value ) {
+
+		if ( this.useArrow !== value ) {
+
+			this.useArrow = value;
 			this.needsUpdate = true;
 
 		}

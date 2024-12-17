@@ -112,9 +112,15 @@
 					dashed: false,
 					alphaToCoverage: true,
 
+					arrow: false,
+					arrowSize: 1,
+					arrowStep: 1,
+					arrowReverse: false,
+
 				} );
 
 				line = new Line2( geometry, matLine );
+				line.computeArrow();
 				line.computeLineDistances();
 				line.scale.set( 1, 1, 1 );
 				scene.add( line );
@@ -213,7 +219,11 @@
 					'dashed': false,
 					'dash offset': 0,
 					'dash scale': 1,
-					'dash / gap': 1
+					'dash / gap': 1,
+					'arrow': false,
+					'arrow step': 1,
+					'arrow size': 1,
+					'arrow reverse': false,
 				};
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, '"line-strip"': 1 } ).onChange( function ( val ) {
@@ -310,6 +320,34 @@
 							break;
 
 					}
+
+				} );
+
+				gui.add( param, 'arrow' ).onChange( function ( val ) {
+
+					matLine.arrow = val;
+					matLine.needsUpdate = true;
+
+				} );
+
+				gui.add( param, 'arrow step', 1, 10, 1 ).onChange( function ( val ) {
+
+					matLine.arrowStep = val;
+					matLine.needsUpdate = true;
+
+				} );
+
+				gui.add( param, 'arrow size', 0.5, 3, 0.1 ).onChange( function ( val ) {
+
+					matLine.arrowSize = val;
+					matLine.needsUpdate = true;
+
+				} );
+
+				gui.add( param, 'arrow reverse' ).onChange( function ( val ) {
+
+					matLine.arrowReverse = val;
+					matLine.needsUpdate = true;
 
 				} );
 
