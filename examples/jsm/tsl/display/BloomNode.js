@@ -99,7 +99,7 @@ class BloomNode extends TempNode {
 		this.smoothWidth = uniform( 0.01 );
 
 		/**
-		 * An array that holds the render targets for the horizonal blur passes.
+		 * An array that holds the render targets for the horizontal blur passes.
 		 *
 		 * @private
 		 * @type {Array<RenderTarget>}
@@ -369,7 +369,7 @@ class BloomNode extends TempNode {
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
-			this._separableBlurMaterials.push( this._getSeperableBlurMaterial( builder, kernelSizeArray[ i ] ) );
+			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( builder, kernelSizeArray[ i ] ) );
 
 		}
 
@@ -441,13 +441,13 @@ class BloomNode extends TempNode {
 	}
 
 	/**
-	 * Create a seperable blur material for the given kernel radius.
+	 * Create a separable blur material for the given kernel radius.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}
 	 */
-	_getSeperableBlurMaterial( builder, kernelRadius ) {
+	_getSeparableBlurMaterial( builder, kernelRadius ) {
 
 		const coefficients = [];
 
@@ -467,7 +467,7 @@ class BloomNode extends TempNode {
 		const uvNode = uv();
 		const sampleTexel = ( uv ) => colorTexture.sample( uv );
 
-		const seperableBlurPass = Fn( () => {
+		const separableBlurPass = Fn( () => {
 
 			const weightSum = gaussianCoefficients.element( 0 ).toVar();
 			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
@@ -488,17 +488,17 @@ class BloomNode extends TempNode {
 
 		} );
 
-		const seperableBlurMaterial = new NodeMaterial();
-		seperableBlurMaterial.fragmentNode = seperableBlurPass().context( builder.getSharedContext() );
-		seperableBlurMaterial.name = 'Bloom_seperable';
-		seperableBlurMaterial.needsUpdate = true;
+		const separableBlurMaterial = new NodeMaterial();
+		separableBlurMaterial.fragmentNode = separableBlurPass().context( builder.getSharedContext() );
+		separableBlurMaterial.name = 'Bloom_separable';
+		separableBlurMaterial.needsUpdate = true;
 
 		// uniforms
-		seperableBlurMaterial.colorTexture = colorTexture;
-		seperableBlurMaterial.direction = direction;
-		seperableBlurMaterial.invSize = invSize;
+		separableBlurMaterial.colorTexture = colorTexture;
+		separableBlurMaterial.direction = direction;
+		separableBlurMaterial.invSize = invSize;
 
-		return seperableBlurMaterial;
+		return separableBlurMaterial;
 
 	}
 

@@ -255,7 +255,7 @@ class CSMShadowNode extends ShadowBaseNode {
 	setupFade() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
@@ -311,7 +311,7 @@ class CSMShadowNode extends ShadowBaseNode {
 
 					if ( i === 0 ) {
 
-						// dont fade at nearest edge
+						// don't fade at nearest edge
 						ratio = linearDepth.greaterThan( cascadeCenter ).select( ratio, 1 );
 
 					}
@@ -331,7 +331,7 @@ class CSMShadowNode extends ShadowBaseNode {
 	setupStandard() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );

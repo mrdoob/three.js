@@ -617,7 +617,7 @@ class OutlineNode extends TempNode {
 		this._edgeDetectionMaterial.fragmentNode = edgeDetection();
 		this._edgeDetectionMaterial.needsUpdate = true;
 
-		// seperable blur material
+		// separable blur material
 
 		const MAX_RADIUS = 4;
 
@@ -627,7 +627,7 @@ class OutlineNode extends TempNode {
 
 		} );
 
-		const seperableBlur = Fn( ( [ kernelRadius ] ) => {
+		const separableBlur = Fn( ( [ kernelRadius ] ) => {
 
 			const resolution = textureSize( this._maskTextureDownsSampleUniform );
 			const invSize = vec2( 1 ).div( resolution ).toVar();
@@ -657,10 +657,10 @@ class OutlineNode extends TempNode {
 
 		} );
 
-		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThicknessNode );
+		this._separableBlurMaterial.fragmentNode = separableBlur( this.edgeThicknessNode );
 		this._separableBlurMaterial.needsUpdate = true;
 
-		this._separableBlurMaterial2.fragmentNode = seperableBlur( MAX_RADIUS );
+		this._separableBlurMaterial2.fragmentNode = separableBlur( MAX_RADIUS );
 		this._separableBlurMaterial2.needsUpdate = true;
 
 		// composite material
