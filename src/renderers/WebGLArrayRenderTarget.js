@@ -13,6 +13,8 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 		this.texture = new DataArrayTexture( null, width, height, depth );
 
+		this.textures = this.textures.map( () => this.texture );
+
 		this.texture.isRenderTargetTexture = true;
 
 	}

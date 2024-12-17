@@ -276,6 +276,7 @@
 		"webgl_multiple_rendertargets",
 		"webgl_multisampled_renderbuffers",
 		"webgl_rendertarget_texture2darray",
+		"webgl_rendertarget_texture3D_mrt",
 		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
 		"webgl_shadowmap_progressive",
