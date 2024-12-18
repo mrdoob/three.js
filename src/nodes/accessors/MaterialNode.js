@@ -536,7 +536,7 @@ export const materialMetalness = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
 
 /**
  * TSL object that represents the normal of the current material.
- * The value will be either `normalMap`, `bumpMap` or `normalView`.
+ * The value will be either `normalMap` * `normalScale`, `bumpMap` * `bumpScale` or `normalView`.
  *
  * @type {Node<vec3>}
  */
