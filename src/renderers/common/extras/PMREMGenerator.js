@@ -4,7 +4,7 @@ import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
 import { userData } from '../../../nodes/accessors/UserDataNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, vec3 } from '../../../nodes/tsl/TSLBase.js';
+import { float, int, vec3 } from '../../../nodes/tsl/TSLBase.js';
 import { uv } from '../../../nodes/accessors/UV.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
@@ -848,9 +848,9 @@ function _getBlurShader( lodMax, width, height ) {
 	const poleAxis = userData( 'poleAxis', 'vec3' );
 	const dTheta = userData( 'dTheta', 'float' );
 	const n = float( MAX_SAMPLES );
-	const latitudinal = userData( 'latitudinal', 'float' ); // false, bool
-	const samples = userData( 'samples', 'float' ); // int
-	const mipInt = userData( 'mipInt', 'float' ); // int
+	const latitudinal = userData( 'latitudinal', 'int' ); // bool
+	const samples = userData( 'samples', 'int' );
+	const mipInt = userData( 'mipInt', 'int' );
 	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
 	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
 	const CUBEUV_MAX_MIP = float( lodMax );
@@ -874,7 +874,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 	material._envMap = materialUniforms.envMap;
 
-	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( int( 1 ) ) } );
 
 	return material;
 
