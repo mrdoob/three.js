@@ -6,9 +6,6 @@ import { nodeProxy } from '../tsl/TSLCore.js';
 /**
  * Represents a GPU control barrier that synchronizes compute operations within a given scope.
  *
- *
- *
- *
  * @augments Node
  */
 class BarrierNode extends Node {
