@@ -56,6 +56,8 @@
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				new OrbitControls( camera, renderer.domElement );
 
 				const size = 32;
@@ -123,7 +125,7 @@
 				const quadMesh = new THREE.QuadMesh( materialQuad );
 				let j = 0;
 
-				const render = () => {
+				const loop = () => {
 
 					if ( j === 32 ) {
 
@@ -147,9 +149,9 @@
 
 				};
 
-				const interval = setInterval( render, 100 );
+				const interval = setInterval( loop, 100 );
 
-				render();
+				loop();
 			
 				fboHelper.position.x = - 6;
 				fbo3DHelper.position.x = 6;
