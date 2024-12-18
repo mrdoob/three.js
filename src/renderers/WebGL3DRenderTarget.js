@@ -1,19 +1,12 @@
-import { WebGLRenderTarget } from './WebGLRenderTarget.js';
-import { Data3DTexture } from '../textures/Data3DTexture.js';
+import { RenderTarget3D } from '../core/RenderTarget3D.js';
 
-class WebGL3DRenderTarget extends WebGLRenderTarget {
+class WebGL3DRenderTarget extends RenderTarget3D {
 
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-		super( width, height, options );
+		super( width, height, depth, options );
 
 		this.isWebGL3DRenderTarget = true;
-
-		this.depth = depth;
-
-		this.texture = new Data3DTexture( null, width, height, depth );
-
-		this.texture.isRenderTargetTexture = true;
 
 	}
 
