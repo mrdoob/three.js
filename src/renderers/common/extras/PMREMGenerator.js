@@ -159,8 +159,6 @@ class PMREMGenerator {
 
 		if ( this._userData === null ) this._userData = { longitudinal: [], latitudinal: [] };
 
-		this._setSize( 256 );
-
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
