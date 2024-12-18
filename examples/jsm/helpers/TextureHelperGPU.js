@@ -33,7 +33,7 @@ class TextureHelper extends Mesh {
 
 		} else if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
-			colorNode = textureNode( texture, uvw.xy ).sample( uvw.xy ).depth( uvw.z );
+			colorNode = textureNode( texture ).sample( uvw.xy ).depth( uvw.z );
 
 		} else {
 
