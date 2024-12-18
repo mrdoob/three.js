@@ -27,12 +27,12 @@
 
 			import * as THREE from 'three';
 
-			import { uniform, screenCoordinate, vec3, vec4 } from 'three/tsl';
+			import { uniform, vec2, texture, diffuseColor, screenCoordinate, vec3, vec4 } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { TextureHelper } from 'three/addons/helpers/TextureHelperGPU.js';
-			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { unzipSync } from 'three/addons/libs/fflate.module.js';
 
 			let camera, scene, renderer, stats;
 
@@ -44,7 +44,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
-				camera.position.set( 50, 25, 50 );
+				camera.position.set( - 25, 0, 50 );
 
 				scene = new THREE.Scene();
 
@@ -60,103 +60,119 @@
 
 				new OrbitControls( camera, renderer.domElement );
 
-				const size = 32;
-				const data = new Uint8Array( size * size * size );
-
-				let i = 0;
-				const scale = 0.05;
-				const perlin = new ImprovedNoise();
-				const vector = new THREE.Vector3();
-
-				for ( let z = 0; z < size; z ++ ) {
-
-					for ( let y = 0; y < size; y ++ ) {
-
-						for ( let x = 0; x < size; x ++ ) {
-
-							const d = 1.0 - vector.set( x, y, z ).subScalar( size / 2 ).divideScalar( size ).length();
-							data[ i ] = ( 128 + 128 * perlin.noise( x * scale / 1.5, y * scale, z * scale / 1.5 ) ) * d * d;
-							i ++;
-
-						}
-
-					}
-
-				}
-
-				const texture3D = new THREE.Data3DTexture( data, size, size, size );
-				texture3D.format = THREE.RedFormat;
-				texture3D.minFilter = THREE.LinearFilter;
-				texture3D.magFilter = THREE.LinearFilter;
-				texture3D.unpackAlignment = 1;
-				texture3D.needsUpdate = true;
-
-				//
-				const helper3D = new TextureHelper( texture3D, 10, 10, 32 );
-				helper3D.position.x = - 20;
-				scene.add( helper3D );
-
-				const helperArray = new TextureHelper( texture3D, 10, 10, 32 );
-				helperArray.position.x = 20;
-
-				scene.add( helperArray );
-
-				const depth = 32;
-				const materialQuad = new THREE.NodeMaterial();
-				const uZCoord = uniform( 0 );
-				materialQuad.depthTest = false;
-				materialQuad.outputNode = vec4( vec3(
-					screenCoordinate.x.div( depth ),
-					screenCoordinate.y.div( depth ),
-					uZCoord
-				), 1 );
-
-
-				const fboArray = new THREE.RenderTargetArray( 128, 128, depth, {
-					depthBuffer: false,
-				} );
-				const fbo3D = new THREE.RenderTarget3D( 128, 128, depth, {
-					depthBuffer: false,
-				} );
-				const fboHelper = new TextureHelper( fboArray.texture, 10, 10, depth );
-			
-				const fbo3DHelper = new TextureHelper( fbo3D.texture, 10, 10, depth );
-
-				const quadMesh = new THREE.QuadMesh( materialQuad );
-				let j = 0;
-
-				const loop = () => {
-
-					if ( j === 32 ) {
-
-						clearInterval( interval );
-						return;
-
-					}
-
-					uZCoord.value = j / ( depth - 1 );
-					renderer.setRenderTarget( fboArray, j );
-					quadMesh.render( renderer );
-
-					renderer.setRenderTarget( fbo3D, j );
-					quadMesh.render( renderer );
-
-
-					renderer.setRenderTarget( null );
-					renderer.render( scene, camera );
-
-					j = ( j + 1 ) % depth;
-
+				const size = {
+					width: 256,
+					height: 256,
+					depth: 109
 				};
 
-				const interval = setInterval( loop, 100 );
+				new THREE.FileLoader()
+					.setResponseType( 'arraybuffer' )
+					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
-				loop();
+						const zip = unzipSync( new Uint8Array( data ) );
+						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
+
+
+						const texture3D = new THREE.Data3DTexture( array, size.width, size.height, size.depth );
+						texture3D.format = THREE.RedFormat;
+						texture3D.minFilter = THREE.LinearFilter;
+						texture3D.magFilter = THREE.LinearFilter;
+						texture3D.unpackAlignment = 1;
+						texture3D.needsUpdate = true;
+
+						const textureArray = new THREE.DataArrayTexture( array, size.width, size.height, size.depth );
+						textureArray.format = THREE.RedFormat;
+						textureArray.minFilter = THREE.LinearFilter;
+						textureArray.magFilter = THREE.LinearFilter;
+						textureArray.unpackAlignment = 1;
+						textureArray.needsUpdate = true;
+
+						const depth = size.depth / 20;
+
+						//
+						const helper3D = new TextureHelper( texture3D, 10, 10, depth );
+						helper3D.material.outputNode = vec4(
+							vec3( diffuseColor.r ),
+							diffuseColor.r.mul( diffuseColor.a )
+						);
+						helper3D.position.x = - 20;
+						scene.add( helper3D );
+
+						const helperArray = new TextureHelper( textureArray, 10, 10, depth );
+						helperArray.material.outputNode = vec4(
+							vec3( diffuseColor.r ),
+							diffuseColor.r.mul( diffuseColor.a )
+						);
+						helperArray.position.x = 20;
+
+						scene.add( helperArray );
+
+
+						const materialQuad = new THREE.NodeMaterial();
+						const uZCoord = uniform( 0 );
+						materialQuad.depthTest = false;
+						materialQuad.outputNode = vec4( texture(
+							textureArray
+							 ).depth( uZCoord ).rgb
 			
-				fboHelper.position.x = - 6;
-				fbo3DHelper.position.x = 6;
-				scene.add( fboHelper );
-				scene.add( fbo3DHelper );
+						, 1 );
+
+
+						const fboArray = new THREE.RenderTargetArray( size.width, size.height, size.depth, {
+							depthBuffer: false,
+						} );
+						const fbo3D = new THREE.RenderTarget3D( size.width, size.height, size.depth, {
+							depthBuffer: false,
+						} );
+						const fboHelper = new TextureHelper( fboArray.texture, 10, 10, depth );
+						fboHelper.material.outputNode = vec4(
+							vec3( diffuseColor.r ),
+							diffuseColor.r.mul( diffuseColor.a )
+						);
+						const fbo3DHelper = new TextureHelper( fbo3D.texture, 10, 10, depth );
+						fbo3DHelper.material.outputNode = vec4(
+							vec3( diffuseColor.r ),
+							diffuseColor.r.mul( diffuseColor.a )
+						);
+						const quadMesh = new THREE.QuadMesh( materialQuad );
+						let j = 0;
+
+						const loop = () => {
+
+							if ( j === size.depth ) {
+
+								clearInterval( interval );
+								return;
+
+							}
+
+							uZCoord.value = j;
+							renderer.setRenderTarget( fboArray, j );
+							quadMesh.render( renderer );
+
+							renderer.setRenderTarget( fbo3D, j );
+							quadMesh.render( renderer );
+
+
+							renderer.setRenderTarget( null );
+							renderer.render( scene, camera );
+
+							j = ( j + 1 ) % size.depth;
+
+						};
+
+						const interval = setInterval( loop, 50 );
+
+						loop();
+			
+			
+						fboHelper.position.x = - 6;
+						fbo3DHelper.position.x = 6;
+						scene.add( fboHelper );
+						scene.add( fbo3DHelper );
+			
+					} );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
