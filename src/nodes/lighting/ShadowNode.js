@@ -662,7 +662,7 @@ class ShadowNode extends ShadowBaseNode {
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 		const currentMRT = renderer.getMRT();
 
-		const useVelocity = currentMRT.has( 'velocity' );
+		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
 
 		renderer.setMRT( null );
 
