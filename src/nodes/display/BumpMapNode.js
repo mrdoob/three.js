@@ -5,6 +5,8 @@ import { positionView } from '../accessors/Position.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
+/** @module BumpMapNode **/
+
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
@@ -44,6 +46,15 @@ const perturbNormalArb = Fn( ( inputs ) => {
 
 } );
 
+/**
+ * This class can be used for applying bump maps to materials.
+ *
+ * ```js
+ * material.normalNode = bumpMap( texture( bumpTex ) );
+ * ```
+ *
+ * @augments TempNode
+ */
 class BumpMapNode extends TempNode {
 
 	static get type() {
@@ -52,11 +63,29 @@ class BumpMapNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new bump map node.
+	 *
+	 * @param {Node} textureNode - Represents the bump map data.
+	 * @param {Node?} [scaleNode=null] - Controls the intensity of the bump effect.
+	 */
 	constructor( textureNode, scaleNode = null ) {
 
 		super( 'vec3' );
 
+		/**
+		 * Represents the bump map data.
+		 *
+		 * @type {Node}
+		 */
 		this.textureNode = textureNode;
+
+		/**
+		 * Controls the intensity of the bump effect.
+		 *
+		 * @type {Node?}
+		 * @default null
+		 */
 		this.scaleNode = scaleNode;
 
 	}
@@ -78,4 +107,12 @@ class BumpMapNode extends TempNode {
 
 export default BumpMapNode;
 
+/**
+ * TSL function for creating a bump map node.
+ *
+ * @function
+ * @param {Node} textureNode - Represents the bump map data.
+ * @param {Node?} [scaleNode=null] - Controls the intensity of the bump effect.
+ * @returns {BumpMapNode}
+ */
 export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode );

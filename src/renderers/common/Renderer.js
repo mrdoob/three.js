@@ -1309,6 +1309,34 @@ class Renderer {
 
 	}
 
+	hasInitialized() {
+
+		return this._initialized;
+
+	}
+
+	async initTextureAsync( texture ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		this._textures.updateTexture( texture );
+
+	}
+
+	initTexture( texture ) {
+
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+
+			return false;
+
+		}
+
+		this._textures.updateTexture( texture );
+
+	}
+
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
 		if ( rectangle !== null ) {
@@ -1605,7 +1633,7 @@ class Renderer {
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
 		let overridePositionNode;
-		let overrideFragmentNode;
+		let overrideColorNode;
 		let overrideDepthNode;
 
 		//
@@ -1625,6 +1653,10 @@ class Renderer {
 
 			}
 
+			overrideMaterial.alphaTest = material.alphaTest;
+			overrideMaterial.alphaMap = material.alphaMap;
+			overrideMaterial.transparent = material.transparent || material.transmission > 0;
+
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
@@ -1636,11 +1668,10 @@ class Renderer {
 
 				}
 
-
 				if ( material.castShadowNode && material.castShadowNode.isNode ) {
 
-					overrideFragmentNode = overrideMaterial.fragmentNode;
-					overrideMaterial.fragmentNode = material.castShadowNode;
+					overrideColorNode = overrideMaterial.colorNode;
+					overrideMaterial.colorNode = material.castShadowNode;
 
 				}
 
@@ -1682,9 +1713,9 @@ class Renderer {
 
 		}
 
-		if ( overrideFragmentNode !== undefined ) {
+		if ( overrideColorNode !== undefined ) {
 
-			scene.overrideMaterial.fragmentNode = overrideFragmentNode;
+			scene.overrideMaterial.colorNode = overrideColorNode;
 
 		}
 
@@ -1735,9 +1766,11 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, clippingContext, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
+		renderObject.drawRange = object.geometry.drawRange;
+		renderObject.group = group;
 
 		//
 

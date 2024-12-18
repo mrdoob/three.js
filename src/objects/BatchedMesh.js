@@ -1,10 +1,9 @@
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { DataTexture } from '../textures/DataTexture.js';
-import { FloatType, RedIntegerFormat, UnsignedIntType } from '../constants.js';
+import { FloatType, RedIntegerFormat, UnsignedIntType, RGBAFormat } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Mesh } from './Mesh.js';
-import { RGBAFormat } from '../constants.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';

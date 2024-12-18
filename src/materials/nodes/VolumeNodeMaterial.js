@@ -75,7 +75,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 			Loop( { type: 'float', start: bounds.x, end: bounds.y, update: '+= delta' }, () => {
 
-				const d = property( 'float', 'd' ).assign( map.uv( p.add( 0.5 ) ).r );
+				const d = property( 'float', 'd' ).assign( map.sample( p.add( 0.5 ) ).r );
 
 				if ( this.testNode !== null ) {
 

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as Nodes from 'three/tsl';
+import * as TSL from 'three/tsl';
 import { Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search, Loader, Node, TreeViewNode, TreeViewInput, Element } from 'flow';
 import { FileEditor } from './editors/FileEditor.js';
 import { exportJSON } from './NodeEditorUtils.js';
@@ -24,10 +24,10 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this.scene = scene;
 		this.renderer = renderer;
 
-		const { ScriptableNodeResources } = Nodes;
+		const { ScriptableNodeResources } = TSL;
 
 		ScriptableNodeResources.set( 'THREE', THREE );
-		ScriptableNodeResources.set( 'TSL', Nodes );
+		ScriptableNodeResources.set( 'TSL', TSL );
 
 		ScriptableNodeResources.set( 'scene', scene );
 		ScriptableNodeResources.set( 'renderer', renderer );

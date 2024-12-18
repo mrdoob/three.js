@@ -12,9 +12,11 @@ import {
 	UnsignedByteType,
 	Vector2,
 	Vector3,
-	Vector4 } from 'three';
+	Vector4,
+	Node
+} from 'three/webgpu';
 
-import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn, Node } from 'three/tsl';
+import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn } from 'three/tsl';
 
 class LensflareMesh extends Mesh {
 

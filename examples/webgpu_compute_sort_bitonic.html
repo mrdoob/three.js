@@ -45,7 +45,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -54,7 +55,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
+			import { storage, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -140,17 +141,17 @@
 
 				const nextAlgoBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL ), 1 );
 
-				const nextAlgoStorage = storageObject( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).label( 'NextAlgo' );
+				const nextAlgoStorage = storage( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).setPBO( true ).label( 'NextAlgo' );
 
 				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const nextBlockHeightStorage = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' );
-				const nextBlockHeightRead = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' ).toReadOnly();
+				const nextBlockHeightStorage = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).label( 'NextBlockHeight' );
+				const nextBlockHeightRead = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).label( 'NextBlockHeight' ).toReadOnly();
 
 				const highestBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const highestBlockHeightStorage = storageObject( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).label( 'HighestBlockHeight' );
+				const highestBlockHeightStorage = storage( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).setPBO( true ).label( 'HighestBlockHeight' );
 
 				const counterBuffer = new THREE.StorageBufferAttribute( 1, 1 );
-				const counterStorage = storageObject( counterBuffer, 'uint', counterBuffer.count ).toAtomic().label( 'Counter' );
+				const counterStorage = storage( counterBuffer, 'uint', counterBuffer.count ).setPBO( true ).toAtomic().label( 'Counter' );
 
 				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
 
@@ -178,11 +179,11 @@
 				randomizeDataArray();
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storageObject( currentElementsBuffer, 'uint', size ).label( 'Elements' );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint', size ).setPBO( true ).label( 'Elements' );
 				const tempBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const tempStorage = storageObject( tempBuffer, 'uint', size ).label( 'Temp' );
+				const tempStorage = storage( tempBuffer, 'uint', size ).setPBO( true ).label( 'Temp' );
 				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
-				const randomizedElementsStorage = storageObject( randomizedElementsBuffer, 'uint', size ).label( 'RandomizedElements' );
+				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint', size ).setPBO( true ).label( 'RandomizedElements' );
 
 				const getFlipIndices = ( index, blockHeight ) => {
 

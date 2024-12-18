@@ -790,7 +790,12 @@ KTX2Loader.BasisWorker = function () {
 
 	}
 
-	/** Concatenates N byte arrays. */
+	/**
+	 * Concatenates N byte arrays.
+	 *
+	 * @param {Uint8Array[]} arrays
+	 * @return {Uint8Array}
+	 */
 	function concat( arrays ) {
 
 		if ( arrays.length === 1 ) return arrays[ 0 ];
@@ -987,6 +992,9 @@ async function createRawTexture( container ) {
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
 
 		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
+
+		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		texture.magFilter = LinearFilter;
 
 	}
 

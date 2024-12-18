@@ -1,15 +1,15 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param script javascript object
- * @param attributeName string
- * @param newValue string, object
- * @constructor
- */
 class SetScriptValueCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {String} script
+	 * @param {String} attributeName
+	 * @param {String} newValue
+	 * @constructor
+	 */
 	constructor( editor, object = null, script = '', attributeName = '', newValue = null ) {
 
 		super( editor );

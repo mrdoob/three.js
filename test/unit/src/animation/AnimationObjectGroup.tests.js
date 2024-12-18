@@ -27,7 +27,7 @@ export default QUnit.module( 'Animation', () => {
 			const groupA = new AnimationObjectGroup();
 			assert.ok(
 				groupA instanceof AnimationObjectGroup,
-				'AnimationObjectGroup can be instanciated'
+				'AnimationObjectGroup can be instantiated'
 			);
 
 		} );

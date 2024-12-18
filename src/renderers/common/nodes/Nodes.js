@@ -3,7 +3,7 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame } from '../../../nodes/Nodes.js';
-import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
+import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
@@ -327,37 +327,37 @@ class Nodes extends DataMap {
 	updateFog( scene ) {
 
 		const sceneData = this.get( scene );
-		const fog = scene.fog;
+		const sceneFog = scene.fog;
 
-		if ( fog ) {
+		if ( sceneFog ) {
 
-			if ( sceneData.fog !== fog ) {
+			if ( sceneData.fog !== sceneFog ) {
 
 				let fogNode = null;
 
-				if ( fog.isFogExp2 ) {
+				if ( sceneFog.isFogExp2 ) {
 
-					const color = reference( 'color', 'color', fog ).setGroup( renderGroup );
-					const density = reference( 'density', 'float', fog ).setGroup( renderGroup );
+					const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
+					const density = reference( 'density', 'float', sceneFog ).setGroup( renderGroup );
 
-					fogNode = densityFog( color, density );
+					fogNode = fog( color, densityFogFactor( density ) );
 
-				} else if ( fog.isFog ) {
+				} else if ( sceneFog.isFog ) {
 
-					const color = reference( 'color', 'color', fog ).setGroup( renderGroup );
-					const near = reference( 'near', 'float', fog ).setGroup( renderGroup );
-					const far = reference( 'far', 'float', fog ).setGroup( renderGroup );
+					const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
+					const near = reference( 'near', 'float', sceneFog ).setGroup( renderGroup );
+					const far = reference( 'far', 'float', sceneFog ).setGroup( renderGroup );
 
-					fogNode = rangeFog( color, near, far );
+					fogNode = fog( color, rangeFogFactor( near, far ) );
 
 				} else {
 
-					console.error( 'WebGPUNodes: Unsupported fog configuration.', fog );
+					console.error( 'WebGPUNodes: Unsupported fog configuration.', sceneFog );
 
 				}
 
 				sceneData.fogNode = fogNode;
-				sceneData.fog = fog;
+				sceneData.fog = sceneFog;
 
 			}
 

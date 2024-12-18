@@ -15,7 +15,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -43,7 +44,6 @@
 				camera.position.set( 1300, 500, 0 );
 
 				scene = new THREE.Scene();
-				//scene.fogNode = rangeFog( color( 0x0000ff ), 1500, 2100 );
 
 				// textures
 

@@ -20,7 +20,7 @@
 			Différentes animations sur le même objet peuvent-être
 			synchronisées.<br /><br />
 
-			Pour effectuer tout cela dans un système homogène, le système d'animation three.js 
+			Pour effectuer tout cela dans un système homogène, le système d'animation three.js
 			[link:https://github.com/mrdoob/three.js/issues/6881 a complètement changé en 2015]
 			(attention aux informations dépassées!), et a maintenant une architecture similaire à
 			Unity/Unreal Engine 4. Cette page offre un bref aperçu des principaux composants du système
@@ -32,7 +32,7 @@
 
 		<p class="desc">
 
-			Si vous aveez réussi à importer un modèle 3D (peu importe qu'il ait
+			Si vous avez réussi à importer un modèle 3D (peu importe qu'il ait
 			des os ou une morph targets ou les deux) — par exemple en l'exportant depuis Blender avec le
 			[link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter] et
 			en le chargeant dans la scène three.js en utilisant [page:GLTFLoader] — un des champs doit-être
@@ -52,7 +52,7 @@
 			A l'intérieur d'un `AnimationClip` les données pour chaque propriétés animées sont stockées
 			dans un [page:KeyframeTrack] séparé. En considérant que l'objet personnage a un [page:Skeleton skeleton],
 			un keyframe track pourrait stocker les changements de valeur de la position de l'os inférieur d'un bras
-			à travers le temps, un track différent stockerait les changements de valeur de la rotation du même bras, un troisème
+			à travers le temps, un track différent stockerait les changements de valeur de la rotation du même bras, un troisième
 			pourrait stocker la position, la rotation ou l'échelle d'un autre os, ainsi de suite. Il doit-être clair qu'un,
 			AnimationClip peut-être composé de beaucoup de ce genre de tracks.<br /><br />
 
@@ -81,7 +81,7 @@
 			L'`AnimationMixer` en lui-même a seulement quelques propriétés (générales) et méthodes, car il
 			peut-être contrôlé par l'[page:AnimationAction AnimationActions]. En configurant un
 			`AnimationAction` vous pouvez déterminer qu'un certain `AnimationClip` doit-être joué, mis en pause
-			ou stoppé sur un des mixers, si et à quelle fréquence le clip doit-être répeté, si il
+			ou stoppé sur un des mixers, si et à quelle fréquence le clip doit-être répété, si il
 			doit-être joué avec un fade, une mise à l'échelle temporelle, et d'autres choses, comme le fondu
 			ou la synchronisation.
 
@@ -110,7 +110,6 @@
 				<li>THREE.ColladaLoader</li>
 				<li>THREE.FBXLoader</li>
 				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
-				<li>THREE.MMDLoader</li>
 			</ul>
 
 		<p class="desc">

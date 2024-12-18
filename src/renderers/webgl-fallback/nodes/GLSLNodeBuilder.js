@@ -9,7 +9,6 @@ import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat,
 import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
-	atan2: 'atan',
 	textureDimensions: 'textureSize',
 	equals: 'equal'
 };
@@ -61,7 +60,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinearSRGB( texture ) {
+	needsToWorkingColorSpace( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
@@ -123,7 +122,6 @@ ${ flowData.code }
 			const isInteger = attribute.array.constructor.name.toLowerCase().includes( 'int' );
 
 			let format = isInteger ? RedIntegerFormat : RedFormat;
-
 
 			if ( itemSize === 2 ) {
 
@@ -201,7 +199,6 @@ ${ flowData.code }
 			attributeData.pbo = attribute.pbo;
 
 		}
-
 
 		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 		const textureName = this.getPropertyName( nodeUniform );
@@ -572,7 +569,7 @@ ${ flowData.code }
 			for ( const varying of varyings ) {
 
 				if ( shaderStage === 'compute' ) varying.needsInterpolation = true;
-				const type = varying.type;
+				const type = this.getType( varying.type );
 				const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
 				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
@@ -585,7 +582,7 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					const type = varying.type;
+					const type = this.getType( varying.type );
 					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
 					snippet += `${flat}in ${type} ${varying.name};\n`;

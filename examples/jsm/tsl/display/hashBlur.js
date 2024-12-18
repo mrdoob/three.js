@@ -1,10 +1,21 @@
 import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
 
-// https://www.shadertoy.com/view/4lXXWn
+/** @module HashBlur **/
 
+/**
+ * Applies a hash blur effect to the given texture node.
+ *
+ * Reference: {@link https://www.shadertoy.com/view/4lXXWn}.
+ *
+ * @function
+ * @param {Node<vec4>} textureNode - The texture node that should be blurred.
+ * @param {Node<float>} [bluramount=float(0.1)] - This node determines the amount of blur.
+ * @param {Node<float>} [repeats=float(45)] - This node determines the quality of the blur. A higher value produces a less grainy result but is also more expensive.
+ * @return {Node<vec4>} The blurred texture node.
+ */
 export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), repeats = float( 45 ) ] ) => {
 
-	const draw = ( uv ) => textureNode.uv( uv );
+	const draw = ( uv ) => textureNode.sample( uv );
 
 	const targetUV = textureNode.uvNode || uv();
 	const blurred_image = vec4( 0. ).toVar();

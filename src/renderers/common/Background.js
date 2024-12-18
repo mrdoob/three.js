@@ -60,7 +60,7 @@ class Background extends DataMap {
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
-				let viewProj = modelViewProjection();
+				let viewProj = modelViewProjection;
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();

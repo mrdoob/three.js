@@ -20,7 +20,8 @@
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-				"three/tsl": "../build/three.webgpu.js",
+				"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
 				"three/addons/": "./jsm/"
 			}
 		}
@@ -28,7 +29,7 @@
 
 	<script type="module">
 		import * as THREE from 'three';
-		import { pass, mrt, output, transformedNormalView, metalness, blendNormal, screenUV, color } from 'three/tsl';
+		import { pass, mrt, output, transformedNormalView, metalness, blendColor, screenUV, color } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -107,7 +108,7 @@
 
 			// blend SSR over beauty
 		
-			const outputNode = blendNormal( scenePassColor, ssrPass );
+			const outputNode = blendColor( scenePassColor, ssrPass );
 
 			postProcessing.outputNode = outputNode;
 

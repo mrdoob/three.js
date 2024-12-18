@@ -104,7 +104,7 @@ const BokehShader = {
 
 		float vignout = 1.3; // vignetting outer border
 		float vignin = 0.0; // vignetting inner border
-		float vignfade = 22.0; // f-stops till vignete fades
+		float vignfade = 22.0; // f-stops till vignette fades
 
 		uniform bool shaderFocus;
 		// disable if you use external focalDepth value

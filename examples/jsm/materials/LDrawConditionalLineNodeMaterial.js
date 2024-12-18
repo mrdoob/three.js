@@ -50,7 +50,7 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 
 			varyingProperty( 'float', 'discardFlag' ).assign( discardFlag );
 
-			return modelViewProjection();
+			return modelViewProjection;
 
 		} )();
 

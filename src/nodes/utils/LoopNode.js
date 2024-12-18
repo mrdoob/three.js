@@ -2,6 +2,34 @@ import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
 
+/** @module LoopNode **/
+
+/**
+ * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
+ * ```js
+ * Loop( count, ( { i } ) => {
+ *
+ * } );
+ * ```
+ * However, it is also possible to define a start and end ranges, data types and loop conditions:
+ * ```js
+ * Loop( { start: int( 0 ), end: int( 10 ), type: 'int', condition: '<' }, ( { i } ) => {
+ *
+ * } );
+ *```
+ * Nested loops can be defined in a compacted form:
+ * ```js
+ * Loop( 10, 5, ( { i, j } ) => {
+ *
+ * } );
+ * ```
+ * Loops that should run backwards can be defined like so:
+ * ```js
+ * Loop( { start: 10 }, () => {} );
+ * ```
+ * The module also provides `Break()` and `Continue()` TSL expression for loop control.
+ * @augments Node
+ */
 class LoopNode extends Node {
 
 	static get type() {
@@ -10,6 +38,11 @@ class LoopNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new loop node.
+	 *
+	 * @param {Array<Any>} params - Depending on the loop type, array holds different parameterization values for the loop.
+	 */
 	constructor( params = [] ) {
 
 		super();
@@ -18,12 +51,25 @@ class LoopNode extends Node {
 
 	}
 
+	/**
+	 * Returns a loop variable name based on an index. The pattern is
+	 * `0` = `i`, `1`= `j`, `2`= `k` and so on.
+	 *
+	 * @param {Number} index - The index.
+	 * @return {String} The loop variable name.
+	 */
 	getVarName( index ) {
 
-		return String.fromCharCode( 'i'.charCodeAt() + index );
+		return String.fromCharCode( 'i'.charCodeAt( 0 ) + index );
 
 	}
 
+	/**
+	 * Returns properties about this node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Object} The node properties.
+	 */
 	getProperties( builder ) {
 
 		const properties = builder.getNodeProperties( this );
@@ -56,6 +102,12 @@ class LoopNode extends Node {
 
 	}
 
+	/**
+	 * This method is overwritten since the node type is inferred based on the loop configuration.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder ) {
 
 		const { returnsNode } = this.getProperties( builder );
@@ -197,8 +249,29 @@ class LoopNode extends Node {
 
 export default LoopNode;
 
+/**
+ * TSL function for creating a loop node.
+ *
+ * @function
+ * @param {...Any} params - A list of parameters.
+ * @returns {LoopNode}
+ */
 export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+
+/**
+ * TSL function for creating a `Continue()` expression.
+ *
+ * @function
+ * @returns {ExpressionNode}
+ */
 export const Continue = () => expression( 'continue' ).append();
+
+/**
+ * TSL function for creating a `Break()` expression.
+ *
+ * @function
+ * @returns {ExpressionNode}
+ */
 export const Break = () => expression( 'break' ).append();
 
 //

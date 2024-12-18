@@ -3,7 +3,7 @@
 
 export * from './TSLCore.js'; // float(), vec2(), vec3(), vec4(), mat3(), mat4(), Fn(), If(), element(), nodeObject(), nodeProxy(), ...
 export * from '../core/UniformNode.js'; // uniform()
-export * from '../core/PropertyNode.js'; // property()  <-> TODO: Seperate Material Properties in other file
+export * from '../core/PropertyNode.js'; // property()  <-> TODO: Separate Material Properties in other file
 export * from '../core/AssignNode.js'; // .assign()
 export * from '../code/FunctionCallNode.js'; // .call()
 export * from '../math/OperatorNode.js'; // .add(), .sub(), ...

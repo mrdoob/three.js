@@ -1,5 +1,5 @@
 import { Matrix4 } from '../math/Matrix4.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { DEG2RAD } from '../math/MathUtils.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 const _eyeRight = /*@__PURE__*/ new Matrix4();
@@ -60,7 +60,7 @@ class StereoCamera {
 			_projectionMatrix.copy( camera.projectionMatrix );
 			const eyeSepHalf = cache.eyeSep / 2;
 			const eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
-			const ymax = ( cache.near * Math.tan( MathUtils.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
+			const ymax = ( cache.near * Math.tan( DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
 			let xmin, xmax;
 
 			// translate xOffset

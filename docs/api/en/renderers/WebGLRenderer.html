@@ -201,7 +201,12 @@ document.body.appendChild( renderer.domElement );
 			<li>`WEBGL_compressed_texture_s3tc`</li>
 			<li>`WEBGL_compressed_texture_pvrtc`</li>
 			<li>`WEBGL_compressed_texture_etc1`</li>
+			<li>See more: <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Using_Extensions#extension_list" target="_blank">Extension list</a></li>
 		</ul>
+
+		<p>
+			- [page:Boolean has]( [param:String extensionName] ): `true` if the extension is supported.
+		</p>
 
 		<h3>[property:string outputColorSpace]</h3>
 		<p>
@@ -317,6 +322,9 @@ document.body.appendChild( renderer.domElement );
 
 		<h3>[property:Number toneMappingExposure]</h3>
 		<p>Exposure level of tone mapping. Default is `1`.</p>
+
+		<h3>[property:Number transmissionResolutionScale]</h3>
+		<p>The normalized resolution scale for the transmission render target, measured in percentage of viewport dimensions. Lowering this value can result in significant improvements to [page:MeshPhysicalMaterial MeshPhysicalMaterial] transmission performance. Default is `1`.</p>
 
 		<h3>[property:WebXRManager xr]</h3>
 		<p>

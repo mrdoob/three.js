@@ -30,7 +30,7 @@ function bufferAttributeEquals( a, b, tolerance ) {
 
 	for ( let i = 0, il = a.count * a.itemSize; i < il; i ++ ) {
 
-		const delta = a[ i ] - b[ i ];
+		const delta = Math.abs( a.array[ i ] - b.array[ i ] );
 		if ( delta > tolerance ) {
 
 			return false;
@@ -390,7 +390,7 @@ export default QUnit.module( 'Core', () => {
 			a.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 			const sqrt = Math.sqrt( 2 );
-			const expected = new Float32Array( [
+			const expected = new BufferAttribute( new Float32Array( [
 				1, 0, - sqrt,
 				- 1, 0, - sqrt,
 				- 1, sqrt, 0,
@@ -398,11 +398,11 @@ export default QUnit.module( 'Core', () => {
 				- 1, sqrt, 0,
 				1, sqrt, 0,
 				1, 0, - sqrt
-			] );
+			] ), 3 );
 
 			a.lookAt( new Vector3( 0, 1, - 1 ) );
 
-			assert.ok( bufferAttributeEquals( a.attributes.position.array, expected ), 'Rotation is correct' );
+			assert.ok( bufferAttributeEquals( a.attributes.position, expected ), 'Rotation is correct' );
 
 		} );
 
@@ -463,14 +463,20 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		const toHalfFloatArray = ( f32Array ) => {
+
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
+
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
+
 			}
+
 			return f16Array;
+
 		};
 
 		QUnit.test( 'computeBoundingBox - Float16', ( assert ) => {
+
 			const vertices = [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ];
 			const geometry = new BufferGeometry();
 
@@ -490,6 +496,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		QUnit.test( 'computeBoundingSphere - Float16', ( assert ) => {
+
 			const vertices = [ - 10, 0, 0, 10, 0, 0 ];
 			const geometry = new BufferGeometry();
 
@@ -568,16 +575,17 @@ export default QUnit.module( 'Core', () => {
 			const sqrt = 0.5 * Math.sqrt( 2 );
 			const normal = new BufferAttribute( new Float32Array( [
 				- 1, 0, 0, - 1, 0, 0, - 1, 0, 0,
-				sqrt, sqrt, 0, sqrt, sqrt, 0, sqrt, sqrt, 0,
-				- 1, 0, 0
+				sqrt, sqrt, 0, sqrt, sqrt, 0, sqrt, sqrt, 0
 			] ), 3 );
 			const position = new BufferAttribute( new Float32Array( [
 				0.5, 0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, - 0.5, 0.5,
-				0.5, - 0.5, - 0.5, - 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5,
-				- 0.5, - 0.5, - 0.5
+				0.5, - 0.5, - 0.5, - 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5
 			] ), 3 );
+			// the index buffer defines the same two triangles but in counter-clockwise order,
+			// which should result in flipped normals.
+			const flippedNormals = normal.clone().applyMatrix4( new Matrix4().makeScale( - 1, - 1, - 1 ) );
 			const index = new BufferAttribute( new Uint16Array( [
-				0, 2, 1, 2, 3, 1, 4, 6, 5, 6, 7, 5
+				0, 2, 1, 3, 5, 4
 			] ), 1 );
 
 			let a = new BufferGeometry();
@@ -600,7 +608,7 @@ export default QUnit.module( 'Core', () => {
 			a.setAttribute( 'position', position );
 			a.setIndex( index );
 			a.computeVertexNormals();
-			assert.ok( bufferAttributeEquals( normal, a.getAttribute( 'normal' ) ), 'Indexed geometry: computed normals are correct' );
+			assert.ok( bufferAttributeEquals( flippedNormals, a.getAttribute( 'normal' ) ), 'Indexed geometry: computed normals are correct' );
 
 		} );
 

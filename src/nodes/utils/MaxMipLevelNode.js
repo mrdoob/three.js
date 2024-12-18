@@ -2,6 +2,18 @@ import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
+/** @module MatcapUVNode **/
+
+/**
+ * A special type of uniform node that computes the
+ * maximum mipmap level for a given texture node.
+ *
+ * ```js
+ * const level = maxMipLevel( textureNode );
+ * ```
+ *
+ * @augments module:UniformNode~UniformNode
+ */
 class MaxMipLevelNode extends UniformNode {
 
 	static get type() {
@@ -10,22 +22,52 @@ class MaxMipLevelNode extends UniformNode {
 
 	}
 
+	/**
+	 * Constructs a new max mip level node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node to compute the max mip level for.
+	 */
 	constructor( textureNode ) {
 
 		super( 0 );
 
+		/**
+		 * The texture node to compute the max mip level for.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNode = textureNode;
 
+		/**
+		 * The `updateType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * the texture once per frame in its {@link MaxMipLevelNode#update} method.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
+	/**
+	 * The texture node to compute the max mip level for.
+	 *
+	 * @readonly
+	 * @type {TextureNode}
+	 */
 	get textureNode() {
 
 		return this._textureNode;
 
 	}
 
+	/**
+	 * The texture.
+	 *
+	 * @readonly
+	 * @type {Texture}
+	 */
 	get texture() {
 
 		return this._textureNode.value;
@@ -52,4 +94,11 @@ class MaxMipLevelNode extends UniformNode {
 
 export default MaxMipLevelNode;
 
+/**
+ * TSL function for creating a max mip level node.
+ *
+ * @function
+ * @param {TextureNode} textureNode - The texture node to compute the max mip level for.
+ * @returns {MaxMipLevelNode}
+ */
 export const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode );

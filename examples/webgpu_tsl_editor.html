@@ -42,7 +42,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -50,7 +51,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
+			import { vec4 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -58,7 +60,7 @@
 
 			function init() {
 
-				// add the depedencies
+				// add the dependencies
 
 				const width = 200;
 				const height = 200;
@@ -78,7 +80,7 @@
 				rendererDOM.appendChild( renderer.domElement );
 
 				const material = new THREE.NodeMaterial();
-				material.fragmentNode = THREE.vec4( 0, 0, 0, 1 );
+				material.fragmentNode = vec4( 0, 0, 0, 1 );
 
 				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( mesh );
@@ -116,7 +118,7 @@
 
 					const tslCode = `// Simple uv.x animation
 
-const { texture, uniform, vec2, vec4, uv, oscSine, time, grayscale } = THREE;
+const { texture, uniform, vec2, vec4, uv, oscSine, time, grayscale } = await import( 'three/tsl' );
 
 const samplerTexture = new THREE.TextureLoader().load( './textures/uv_grid_opengl.jpg' );
 samplerTexture.wrapS = THREE.RepeatWrapping;
@@ -168,8 +170,10 @@ output = vec4( finalColor, opacity );
 
 						try {
 
+							const AsyncFunction = async function () {}.constructor;
+
 							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
-							const nodes = new Function( 'THREE', tslCode )( THREE );
+							const nodes = await ( new AsyncFunction( 'THREE', tslCode )( THREE ) );
 
 							mesh.material.fragmentNode = nodes.output;
 							mesh.material.needsUpdate = true;

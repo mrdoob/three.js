@@ -66,7 +66,7 @@ function header() {
 const builds = [
 	{
 		input: {
-			'three.core.js': 'src/Three.core.js',
+			'three.core.js': 'src/Three.Core.js',
 			'three.webgpu.nodes.js': 'src/Three.WebGPU.Nodes.js',
 		},
 		plugins: [
@@ -85,7 +85,7 @@ const builds = [
 	},
 	{
 		input: {
-			'three.core.js': 'src/Three.core.js',
+			'three.core.js': 'src/Three.Core.js',
 			'three.module.js': 'src/Three.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
 		},
@@ -105,7 +105,25 @@ const builds = [
 	},
 	{
 		input: {
-			'three.core.min.js': 'src/Three.core.js',
+			'three.tsl.js': 'src/Three.TSL.js',
+		},
+		plugins: [
+			header()
+		],
+		preserveEntrySignatures: 'allow-extension',
+		output: [
+			{
+				format: 'esm',
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
+			}
+		],
+		external: [ 'three/webgpu' ]
+	},
+	{
+		input: {
+			'three.core.min.js': 'src/Three.Core.js',
 			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.Nodes.js',
 		},
 		plugins: [
@@ -125,7 +143,7 @@ const builds = [
 	},
 	{
 		input: {
-			'three.core.min.js': 'src/Three.core.js',
+			'three.core.min.js': 'src/Three.Core.js',
 			'three.module.min.js': 'src/Three.js',
 			'three.webgpu.min.js': 'src/Three.WebGPU.js',
 		},
@@ -143,6 +161,25 @@ const builds = [
 				entryFileNames: '[name]',
 			}
 		]
+	},
+	{
+		input: {
+			'three.tsl.min.js': 'src/Three.TSL.js'
+		},
+		plugins: [
+			header(),
+			terser()
+		],
+		preserveEntrySignatures: 'allow-extension',
+		output: [
+			{
+				format: 'esm',
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
+			}
+		],
+		external: [ 'three/webgpu' ]
 	},
 	{
 		input: 'src/Three.js',

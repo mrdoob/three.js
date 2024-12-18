@@ -1,6 +1,18 @@
 import Node from './Node.js';
 import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 
+/**
+ * This class represents a shader property. It can be used on
+ * to explicitly define a property and assign a value to it.
+ *
+ * ```js
+ * const threshold = property( 'float', 'threshold' ).assign( THRESHOLD );
+ *```
+ * `PropertyNode` is used by the engine to predefined common material properties
+ * for TSL code.
+ *
+ * @augments Node
+ */
 class PropertyNode extends Node {
 
 	static get type() {
@@ -9,13 +21,41 @@ class PropertyNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new property node.
+	 *
+	 * @param {String} nodeType - The type of the node.
+	 * @param {String?} [name=null] - The name of the property in the shader.
+	 * @param {Boolean} [varying=false] - Whether this property is a varying or not.
+	 */
 	constructor( nodeType, name = null, varying = false ) {
 
 		super( nodeType );
 
+		/**
+		 * The name of the property in the shader. If no name is defined,
+		 * the node system auto-generates one.
+		 *
+		 * @type {String?}
+		 * @default null
+		 */
 		this.name = name;
+
+		/**
+		 * Whether this property is a varying or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.varying = varying;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPropertyNode = true;
 
 	}
@@ -26,6 +66,12 @@ class PropertyNode extends Node {
 
 	}
 
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Boolean} Whether this node is global or not.
+	 */
 	isGlobal( /*builder*/ ) {
 
 		return true;

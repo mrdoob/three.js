@@ -26,7 +26,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -35,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, storage, storageObject, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, attributeArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -167,7 +168,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialiasing: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -178,7 +179,7 @@
 				controls.connect( /* renderer.domElement */ );
 
 				// Initialize position, velocity, and phase values
-			
+
 				const positionArray = new Float32Array( BIRDS * 3 );
 				const velocityArray = new Float32Array( BIRDS * 3 );
 				const phaseArray = new Float32Array( BIRDS );
@@ -205,29 +206,21 @@
 
 				}
 
-				// Create storage buffer attributes.
-			
-				const positionBufferAttribute = new THREE.StorageBufferAttribute( positionArray, 3 );
-				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 3 );
-				const phaseBufferAttribute = new THREE.StorageBufferAttribute( phaseArray, 1 );
-
 				// Labels applied to storage nodes and uniform nodes are reflected within the shader output,
 				// and are useful for debugging purposes.
 
-				// Access storage buffer attribute data from within shaders with a StorageNode.
-			
-				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).label( 'positionStorage' );
-				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).label( 'velocityStorage' );
-				const phaseStorage = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).label( 'phaseStorage' );
-			
-				// Create read-only storage nodes. Storage nodes can only be accessed outside of compute shaders in a read-only state.
-			
-				const positionRead = storageObject( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
-				const velocityRead = storageObject( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).toReadOnly();
-				const phaseRead = storageObject( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).toReadOnly();
+				const positionStorage = attributeArray( positionArray, 'vec3' ).label( 'positionStorage' );
+				const velocityStorage = attributeArray( velocityArray, 'vec3' ).label( 'velocityStorage' );
+				const phaseStorage = attributeArray( phaseArray, 'float' ).label( 'phaseStorage' );
+
+				// The Pixel Buffer Object (PBO) is required to get the GPU computed data in the WebGL2 fallback.
+
+				positionStorage.setPBO( true );
+				velocityStorage.setPBO( true );
+				phaseStorage.setPBO( true );
 
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
-			
+
 				effectController = {
 					separation: uniform( 15.0 ).label( 'separation' ),
 					alignment: uniform( 20.0 ).label( 'alignment' ),
@@ -240,26 +233,26 @@
 				};
 
 				// Create geometry
-			
+
 				const birdGeometry = new BirdGeometry();
 				const birdMaterial = new THREE.NodeMaterial();
 
 				// Animate bird mesh within vertex shader, then apply position offset to vertices.
-			
+
 				const birdVertexTSL = Fn( () => {
 
 					const reference = attribute( 'reference' );
 					const birdVertex = attribute( 'birdVertex' );
 
 					const position = positionLocal.toVar();
-					const newPhase = phaseRead.element( reference ).toVar();
-					const newVelocity = normalize( velocityRead.element( reference ) ).toVar();
-			
+					const newPhase = phaseStorage.element( reference ).toVar();
+					const newVelocity = normalize( velocityStorage.element( reference ) ).toVar();
+
 					If( birdVertex.equal( 4 ).or( birdVertex.equal( 7 ) ), () => {
 
 						// flap wings
 						position.y = sin( newPhase ).mul( 5.0 );
-			
+
 					} );
 
 					const newPosition = modelWorldMatrix.mul( position );
@@ -274,7 +267,7 @@
 
 					const cosrz = x.div( xyz );
 					const sinrz = newVelocity.y.div( xyz ).toVar();
-			
+
 					// Nodes must be negated with negate(). Using '-', their values will resolve to NaN.
 					const maty = mat3(
 						cosry, 0, negate( sinry ),
@@ -289,7 +282,7 @@
 					);
 
 					const finalVert = maty.mul( matz ).mul( newPosition );
-					finalVert.addAssign( positionRead.element( reference ) );
+					finalVert.addAssign( positionStorage.element( reference ) );
 
 					return cameraProjectionMatrix.mul( cameraViewMatrix ).mul( finalVert );
 
@@ -297,16 +290,18 @@
 
 				birdMaterial.vertexNode = birdVertexTSL();
 				birdMaterial.side = THREE.DoubleSide;
+
 				const birdMesh = new THREE.Mesh( birdGeometry, birdMaterial );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
+				birdMesh.frustumCulled = false;
 				birdMesh.updateMatrix();
 
 				// Define GPU Compute shaders.
 				// Shaders are computationally identical to their GLSL counterparts outside of texture destructuring.
 
 				computeVelocity = Fn( () => {
-			
+
 					// Define consts
 					const PI = float( 3.141592653589793 );
 					const PI_2 = PI.mul( 2.0 );
@@ -356,7 +351,7 @@
 						const dirToBird = birdPosition.sub( position );
 						const distToBird = length( dirToBird );
 
-						// Don't apply any changes to velocity if the distance to this bird is negligable.
+						// Don't apply any changes to velocity if the distance to this bird is negligible.
 						If( distToBird.lessThan( 0.0001 ), () => {
 
 							Continue();
@@ -377,7 +372,7 @@
 						const percent = distToBirdSq.div( zoneRadiusSq );
 
 						If( percent.lessThan( separationThresh ), () => {
-			
+
 							// Separation - Move apart for comfort
 							const velocityAdjust = ( separationThresh.div( percent ).sub( 1.0 ) ).mul( deltaTime );
 							velocity.subAssign( normalize( dirToBird ).mul( velocityAdjust ) );
@@ -409,15 +404,15 @@
 							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
 						} );
-			
+
 					} );
 
 					If( length( velocity ).greaterThan( limit ), () => {
 
 						velocity.assign( normalize( velocity ).mul( limit ) );
-			
+
 					} );
-			
+
 				} )().compute( BIRDS );
 
 				computePosition = Fn( () => {

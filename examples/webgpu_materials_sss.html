@@ -18,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -26,7 +27,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
+			import { texture, uniform, vec3 } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -105,12 +107,12 @@
 				const material = new THREE.MeshSSSNodeMaterial();
 				material.color = new THREE.Color( 1.0, 0.2, 0.2 );
 				material.roughness = 0.3;
-				material.thicknessColorNode = THREE.texture( thicknessTexture ).mul( THREE.vec3( 0.5, 0.3, 0.0 ) );
-				material.thicknessDistortionNode = THREE.uniform( 0.1 );
-				material.thicknessAmbientNode = THREE.uniform( 0.4 );
-				material.thicknessAttenuationNode = THREE.uniform( 0.8 );
-				material.thicknessPowerNode = THREE.uniform( 2.0 );
-				material.thicknessScaleNode = THREE.uniform( 16.0 );
+				material.thicknessColorNode = texture( thicknessTexture ).mul( vec3( 0.5, 0.3, 0.0 ) );
+				material.thicknessDistortionNode = uniform( 0.1 );
+				material.thicknessAmbientNode = uniform( 0.4 );
+				material.thicknessAttenuationNode = uniform( 0.8 );
+				material.thicknessPowerNode = uniform( 2.0 );
+				material.thicknessScaleNode = uniform( 16.0 );
 
 				// LOADER
 
