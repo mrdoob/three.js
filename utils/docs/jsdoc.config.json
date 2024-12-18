@@ -6,5 +6,8 @@
             "recurse": true,
             "template": "node_modules/clean-jsdoc-theme"
     },
-    "plugins": [ "plugins/markdown" ]
+    "plugins": [ "plugins/markdown" ],
+    "source": {
+        "include": [ "src/nodes", "src/loaders/nodes", "src/materials/nodes", "examples/jsm/tsl" ]
+    }
 }
