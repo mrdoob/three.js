@@ -147,7 +147,7 @@ export default AtomicFunctionNode;
 const atomicNode = nodeProxy( AtomicFunctionNode );
 
 /**
- * TODO
+ * TSL function for appending an atomic function call into the programmatic flow of a compute shader.
  *
  * @function
  * @param {String} method - The signature of the atomic function to construct.
