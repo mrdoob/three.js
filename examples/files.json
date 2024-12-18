@@ -408,6 +408,7 @@
 		"webgpu_procedural_texture",
 		"webgpu_reflection",
 		"webgpu_refraction",
+		"webgpu_rendertarget_2d-array-3d",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
