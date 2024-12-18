@@ -276,7 +276,7 @@ class ScriptableNode extends Node {
 	 * Returns a script output for the given name.
 	 *
 	 * @param {String} name - The name of the output.
-	 * @return {Node} The node value.
+	 * @return {ScriptableValueNode} The node value.
 	 */
 	getOutput( name ) {
 
@@ -444,7 +444,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Refreshes the script node.
 	 *
-	 * @param {String?} [output=null] - An optinal output.
+	 * @param {String?} [output=null] - An optional output.
 	 */
 	refresh( output = null ) {
 
@@ -480,7 +480,7 @@ class ScriptableNode extends Node {
 		const THREE = ScriptableNodeResources.get( 'THREE' );
 		const TSL = ScriptableNodeResources.get( 'TSL' );
 
-		const method = this.getMethod( this.codeNode );
+		const method = this.getMethod();
 		const params = [ parameters, this._local, ScriptableNodeResources, refresh, setOutput, THREE, TSL ];
 
 		this._object = method( ...params );
