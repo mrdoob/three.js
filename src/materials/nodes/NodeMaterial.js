@@ -255,7 +255,7 @@ class NodeMaterial extends Material {
 		 * The idea is to assign a `Fn` definition that holds the geometry modification logic. A typical example
 		 * would be a GPU based particle system that provides a node material for usage on app level. The particle
 		 * simulation would be implemented as compute shaders and managed inside a `Fn` function. This function is
-		 * eventually assigned to `ParticleNodeMaterial.geometryNode`.
+		 * eventually assigned to `geometryNode`.
 		 *
 		 * @type {Function}
 		 * @default null
@@ -635,12 +635,13 @@ class NodeMaterial extends Material {
 	}
 
 	/**
-	 * Setups the position in view space of. This method exists
+	 * Setups the position node in view space. This method exists
 	 * so derived node materials can modifiy the implementation e.g. sprite materials.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Node<vec3>} The position in view space.
 	 */
-	setupPositionView() {
+	setupPositionView( /*builder*/ ) {
 
 		return modelViewMatrix.mul( positionLocal ).xyz;
 
@@ -649,9 +650,10 @@ class NodeMaterial extends Material {
 	/**
 	 * Setups the position in clip space.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Node<vec4>} The position in view space.
 	 */
-	setupModelViewProjection() {
+	setupModelViewProjection( /*builder*/ ) {
 
 		return cameraProjectionMatrix.mul( positionView );
 
@@ -934,6 +936,7 @@ class NodeMaterial extends Material {
 	 *
 	 * @abstract
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {LightingModel} The lighting model.
 	 */
 	setupLightingModel( /*builder*/ ) {
 
@@ -1018,9 +1021,9 @@ class NodeMaterial extends Material {
 	/**
 	 * Most classic material types have a node pendant e.g. for `MeshBasicMaterial`
 	 * there is `MeshBasicNodeMaterial`. This utility method is intended for
-	 * define all material property of the classic type in the node type.
+	 * defining all material properties of the classic type in the node type.
 	 *
-	 * @param {Material} material - The material to copy properties with their values over to this node material.
+	 * @param {Material} material - The material to copy properties with their values to this node material.
 	 */
 	setDefaultValues( material ) {
 

@@ -9,6 +9,11 @@ import { MeshPhongMaterial } from '../MeshPhongMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshPhongMaterial();
 
+/**
+ * Node material version of `MeshPhongMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshPhongNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -17,15 +22,56 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh lambert node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshPhongNodeMaterial = true;
 
+		/**
+		 * Set to `true` because phong materials react on lights.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
+		/**
+		 * The shininess of phong materials is by default inferred from the `shininess`
+		 * property. This node property allows to overwrite the default
+		 * and define the shininess with a node instead.
+		 *
+		 * If you don't want to overwrite the shininess but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialShininess}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.shininessNode = null;
+
+		/**
+		 * The specular color of phong materials is by default inferred from the
+		 * `specular` property. This node property allows to overwrite the default
+		 * and define the specular color with a node instead.
+		 *
+		 * If you don't want to overwrite the specular color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSpecular}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.specularNode = null;
 
 		this.setDefaultValues( _defaultValues );
@@ -34,6 +80,13 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Overwritten since this type of material uses {@link BasicEnvironmentNode}
+	 * to implement the default environment mapping.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 */
 	setupEnvironment( builder ) {
 
 		const envNode = super.setupEnvironment( builder );
@@ -42,13 +95,23 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {PhongLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel();
 
 	}
 
-	setupVariants() {
+	/**
+	 * Setups the phong specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setupVariants( /*builder*/ ) {
 
 		// SHININESS
 
