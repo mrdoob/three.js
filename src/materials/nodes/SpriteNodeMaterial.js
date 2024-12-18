@@ -165,7 +165,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	/**
 	 * Whether to use size attenuation or not.
 	 *
-	 * @private {Boolean}
+	 * @type {Boolean}
 	 * @default true
 	 */
 	get sizeAttenuation() {
