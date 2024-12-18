@@ -1,4 +1,4 @@
-import ShadowBaseNode, { shadowWorldPosition } from './ShadowBaseNode.js';
+import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
 import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -548,7 +548,7 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = lightShadowMatrix( light ).mul( shadowWorldPosition.add( transformedNormalWorld.mul( normalBias ) ) );
+		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( transformedNormalWorld.mul( normalBias ) ) );
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//

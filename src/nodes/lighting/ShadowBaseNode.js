@@ -58,7 +58,7 @@ class ShadowBaseNode extends Node {
 	}
 
 	/**
-	 * Setups the shadow position node which is by default the predefined TSL node object `shadowWorldPosition`.
+	 * Setups the shadow position node which is by default the predefined TSL node object `shadowPositionWorld`.
 	 *
 	 * @param {(NodeBuilder|{Material})} object - A configuration object that must at least hold a material reference.
 	 */
@@ -66,7 +66,7 @@ class ShadowBaseNode extends Node {
 
 		// Use assign inside an Fn()
 
-		shadowWorldPosition.assign( material.shadowPositionNode || positionWorld );
+		shadowPositionWorld.assign( material.shadowPositionNode || positionWorld );
 
 	}
 
@@ -88,6 +88,6 @@ class ShadowBaseNode extends Node {
  *
  * @type {Node<vec3>}
  */
-export const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
+export const shadowPositionWorld = /*@__PURE__*/ vec3().toVar( 'shadowPositionWorld' );
 
 export default ShadowBaseNode;
