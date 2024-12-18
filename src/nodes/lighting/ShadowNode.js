@@ -662,11 +662,20 @@ class ShadowNode extends ShadowBaseNode {
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 		const currentMRT = renderer.getMRT();
 
+		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
+
 		renderer.setMRT( null );
 
 		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( useVelocity ) {
+
+					object.userData = object.userData || {};
+					object.userData.useVelocity = true;
+
+				}
 
 				object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
 

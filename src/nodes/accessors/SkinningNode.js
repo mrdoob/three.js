@@ -218,7 +218,7 @@ class SkinningNode extends Node {
 
 		const mrt = builder.renderer.getMRT();
 
-		return mrt && mrt.has( 'velocity' );
+		return ( mrt && mrt.has( 'velocity' ) ) || builder.object.userData.useVelocity === true;
 
 	}
 
