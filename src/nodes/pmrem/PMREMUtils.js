@@ -241,7 +241,7 @@ export const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable,
 
 } );
 
-const getSample = /*@__PURE__*/ Fn( ( { envMap, outputDirection, theta, axis, sampler } ) => {
+const getSample = /*@__PURE__*/ Fn( ( { outputDirection, theta, axis, sampler } ) => {
 
 	const cosTheta = cos( theta );
 
@@ -250,11 +250,11 @@ const getSample = /*@__PURE__*/ Fn( ( { envMap, outputDirection, theta, axis, sa
 		.add( axis.cross( outputDirection ).mul( sin( theta ) ) )
 		.add( axis.mul( axis.dot( outputDirection ).mul( cosTheta.oneMinus() ) ) );
 
-	return sampler( envMap, sampleDirection );
+	return sampler( sampleDirection );
 
 } );
 
-export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, envMap, sampler } ) => {
+export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, sampler } ) => {
 
 	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
@@ -267,7 +267,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 	axis.assign( normalize( axis ) );
 
 	const gl_FragColor = vec3().toVar();
-	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, envMap, sampler } ) ) );
+	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, sampler } ) ) );
 
 	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
 
@@ -278,8 +278,8 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 		} );
 
 		const theta = float( dTheta.mul( float( i ) ) ).toVar();
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, envMap, sampler } ) ) );
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, envMap, sampler } ) ) );
+		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, sampler } ) ) );
+		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, sampler } ) ) );
 
 	} );
 
