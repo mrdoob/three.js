@@ -1,11 +1,10 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
-import { uniform } from '../../../nodes/core/UniformNode.js';
-import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
+import { userData } from '../../../nodes/accessors/UserDataNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, vec3 } from '../../../nodes/tsl/TSLBase.js';
+import { float, int, vec3 } from '../../../nodes/tsl/TSLBase.js';
 import { uv } from '../../../nodes/accessors/UV.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
@@ -113,6 +112,8 @@ class PMREMGenerator {
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 		this._backgroundBox = null;
+		this._userDataMap = new WeakMap();
+		this._userData = null;
 
 	}
 
@@ -155,6 +156,8 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
+
+		if ( this._userData === null ) this._userData = { longitudinal: [], latitudinal: [] };
 
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
@@ -355,6 +358,17 @@ class PMREMGenerator {
 	_fromTexture( texture, renderTarget ) {
 
 		this._setSizeFromTexture( texture );
+
+		let userData = this._userDataMap.get( texture );
+
+		if ( userData === undefined ) {
+
+			userData = { longitudinal: [], latitudinal: [] };
+			this._userDataMap.set( texture, userData );
+
+		}
+
+		this._userData = userData;
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
@@ -559,11 +573,7 @@ class PMREMGenerator {
 
 		for ( let i = 1; i < n; i ++ ) {
 
-			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
-
-			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
-
-			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			this._blur( cubeUVRenderTarget, i - 1, i );
 
 		}
 
@@ -584,7 +594,7 @@ class PMREMGenerator {
 	 * @param {Number} sigma - The blur radius in radians.
 	 * @param {Vector3} [poleAxis] - The pole axis.
 	 */
-	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	_blur( cubeUVRenderTarget, lodIn, lodOut ) {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
@@ -593,39 +603,65 @@ class PMREMGenerator {
 			pingPongRenderTarget,
 			lodIn,
 			lodOut,
-			sigma,
-			'latitudinal',
-			poleAxis );
+			'latitudinal' );
 
 		this._halfBlur(
 			pingPongRenderTarget,
 			cubeUVRenderTarget,
 			lodOut,
 			lodOut,
-			sigma,
-			'longitudinal',
-			poleAxis );
+			'longitudinal' );
 
 	}
 
-	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	_halfBlur( targetIn, targetOut, lodIn, lodOut, direction ) {
 
 		const renderer = this._renderer;
 		const blurMaterial = this._blurMaterial;
 
-		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
+		const blurMesh = this._lodMeshes[ lodOut ];
+
+		blurMesh.material = blurMaterial;
+		blurMesh.userData = this._getUserDataBlur( targetIn, lodIn, lodOut, direction );
+
+		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
+
+		blurMaterial._envMap.value = targetIn.texture;
+
+		const { _lodMax } = this;
+
+		const outputSize = this._sizeLods[ lodOut ];
+		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const y = 4 * ( this._cubeSize - outputSize );
+
+		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( targetOut );
+		renderer.render( blurMesh, _flatCamera );
+
+	}
+
+	_getUserDataBlur( targetIn, lodIn, lodOut, direction ) {
+
+		const cache = this._userData[ direction ];
+
+		if ( cache === undefined ) {
 
 			console.error( 'blur direction must be either latitudinal or longitudinal!' );
 
 		}
 
+		const u = cache[ lodIn ];
+
+		if ( u !== undefined ) return u;
+
+		// populate data for this pass
+
+		const { _lodMax } = this;
+
+		const sigmaRadians = Math.sqrt( this._sigmas[ lodOut ] * this._sigmas[ lodOut ] - this._sigmas[ lodOut - 1 ] * this._sigmas[ lodOut - 1 ] );
+
 		// Number of standard deviations at which to cut off the discrete approximation.
 		const STANDARD_DEVIATIONS = 3;
-
-		const blurMesh = this._lodMeshes[ lodOut ];
-		blurMesh.material = blurMaterial;
-
-		const blurUniforms = blurMaterial.uniforms;
 
 		const pixels = this._sizeLods[ lodIn ] - 1;
 		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
@@ -640,14 +676,15 @@ class PMREMGenerator {
 
 		}
 
-		const weights = [];
+		const weights = new Array( MAX_SAMPLES ).fill( 0 );
+
 		let sum = 0;
 
 		for ( let i = 0; i < MAX_SAMPLES; ++ i ) {
 
 			const x = i / sigmaPixels;
 			const weight = Math.exp( - x * x / 2 );
-			weights.push( weight );
+			weights[ i ] = weight;
 
 			if ( i === 0 ) {
 
@@ -667,30 +704,23 @@ class PMREMGenerator {
 
 		}
 
-		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
+		const n = this._lodPlanes.length;
+		const poleAxis = _axisDirections[ ( n - lodOut - 1 ) % _axisDirections.length ];
 
-		blurUniforms.envMap.value = targetIn.texture;
-		blurUniforms.samples.value = samples;
-		blurUniforms.weights.array = weights;
-		blurUniforms.latitudinal.value = direction === 'latitudinal' ? 1 : 0;
+		const userData = {
+			latitudinal: direction === 'latitudinal' ? 1 : 0,
+			weights,
+			poleAxis,
+			outputDirection,
+			dTheta: radiansPerPixel,
+			samples,
+			envMap: targetIn.texture,
+			mipInt: _lodMax - lodIn
+		};
 
-		if ( poleAxis ) {
+		cache[ lodIn ] = userData;
 
-			blurUniforms.poleAxis.value = poleAxis;
-
-		}
-
-		const { _lodMax } = this;
-		blurUniforms.dTheta.value = radiansPerPixel;
-		blurUniforms.mipInt.value = _lodMax - lodIn;
-
-		const outputSize = this._sizeLods[ lodOut ];
-		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
-		const y = 4 * ( this._cubeSize - outputSize );
-
-		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
-		renderer.setRenderTarget( targetOut );
-		renderer.render( blurMesh, _flatCamera );
+		return userData;
 
 	}
 
@@ -812,17 +842,18 @@ function _getMaterial( type ) {
 
 function _getBlurShader( lodMax, width, height ) {
 
-	const weights = uniformArray( new Array( MAX_SAMPLES ).fill( 0 ) );
-	const poleAxis = uniform( new Vector3( 0, 1, 0 ) );
-	const dTheta = uniform( 0 );
+	const weights = userData( 'weights', 'float' );
+	const poleAxis = userData( 'poleAxis', 'vec3' );
+	const dTheta = userData( 'dTheta', 'float' );
 	const n = float( MAX_SAMPLES );
-	const latitudinal = uniform( 0 ); // false, bool
-	const samples = uniform( 1 ); // int
-	const envMap = texture( null );
-	const mipInt = uniform( 0 ); // int
+	const latitudinal = userData( 'latitudinal', 'int' ); // bool
+	const samples = userData( 'samples', 'int' );
+	const mipInt = userData( 'mipInt', 'int' );
 	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
 	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
 	const CUBEUV_MAX_MIP = float( lodMax );
+
+	const material = _getMaterial( 'blur' );
 
 	const materialUniforms = {
 		n,
@@ -832,16 +863,16 @@ function _getBlurShader( lodMax, width, height ) {
 		outputDirection,
 		dTheta,
 		samples,
-		envMap,
+		envMap: texture( null ),
 		mipInt,
 		CUBEUV_TEXEL_WIDTH,
 		CUBEUV_TEXEL_HEIGHT,
 		CUBEUV_MAX_MIP
 	};
 
-	const material = _getMaterial( 'blur' );
-	material.uniforms = materialUniforms; // TODO: Move to outside of the material
-	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+	material._envMap = materialUniforms.envMap;
+
+	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( int( 1 ) ) } );
 
 	return material;
 
