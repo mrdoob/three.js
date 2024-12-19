@@ -50,11 +50,10 @@ export function restoreRendererState( renderer, state ) {
 
 }
 
-// renderer and scene state
+// scene state
 
-export function saveRendererAndSceneState( renderer, scene, state = {} ) {
+export function saveSceneState( scene, state = {} ) {
 
-	state = saveRendererState( renderer, state );
 	state.background = scene.background;
 	state.backgroundNode = scene.backgroundNode;
 	state.overrideMaterial = scene.overrideMaterial;
@@ -63,9 +62,9 @@ export function saveRendererAndSceneState( renderer, scene, state = {} ) {
 
 }
 
-export function resetRendererAndSceneState( renderer, scene, state ) {
+export function resetSceneState( scene, state ) {
 
-	state = saveRendererAndSceneState( renderer, scene, state );
+	state = saveSceneState( scene, state );
 
 	scene.background = null;
 	scene.backgroundNode = null;
@@ -75,12 +74,37 @@ export function resetRendererAndSceneState( renderer, scene, state ) {
 
 }
 
-export function restoreRendererAndSceneState( renderer, scene, state ) {
-
-	restoreRendererState( renderer, state );
+export function restoreSceneState( scene, state ) {
 
 	scene.background = state.background;
 	scene.backgroundNode = state.backgroundNode;
 	scene.overrideMaterial = state.overrideMaterial;
+
+}
+
+// renderer and scene state
+
+export function saveRendererAndSceneState( renderer, scene, state = {} ) {
+
+	state = saveRendererState( renderer, state );
+	state = saveSceneState( scene, state );
+
+	return state;
+
+}
+
+export function resetRendererAndSceneState( renderer, scene, state ) {
+
+	state = resetRendererState( renderer, state );
+	state = resetSceneState( scene, state );
+
+	return state;
+
+}
+
+export function restoreRendererAndSceneState( renderer, scene, state ) {
+
+	restoreRendererState( renderer, state );
+	restoreSceneState( scene, state );
 
 }
