@@ -1,11 +1,11 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
-import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
+import { getDirection, blur, bilinearCubeUV } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, vec3 } from '../../../nodes/tsl/TSLBase.js';
+import { float, vec3, Fn } from '../../../nodes/tsl/TSLBase.js';
 import { uv } from '../../../nodes/accessors/UV.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
@@ -736,15 +736,15 @@ function _getBlurShader( lodMax, width, height ) {
 		dTheta,
 		samples,
 		envMap,
-		mipInt,
-		CUBEUV_TEXEL_WIDTH,
-		CUBEUV_TEXEL_HEIGHT,
-		CUBEUV_MAX_MIP
+		mipInt
 	};
 
 	const material = _getMaterial( 'blur' );
 	material.uniforms = materialUniforms; // TODO: Move to outside of the material
-	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+	const cubeUVsampler=Fn((envMap, sampleDirection)=>{
+		return bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+	});
+	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ), sampler: cubeUVsampler } );
 
 	return material;
 

@@ -9,6 +9,7 @@ import { CubeCamera } from '../../cameras/CubeCamera.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
+import {cubeTexture as TSL_CubeTexture} from '../../nodes/accessors/CubeTextureNode.js';
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -70,6 +71,34 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		return this;
 
+	}
+
+	fromBlur(renderer, cubeMap, sigma){
+		const blurTarget1=new CubeRenderTarget(this.width);
+
+		const geometry = new BoxGeometry( 5, 5, 5 );
+
+		const blurMaterial = new NodeMaterial();
+		blurMaterial.colorNode = TSL_CubeTexture(cubeMap, positionWorldDirection, 0);
+		blurMaterial.side = BackSide;
+		blurMaterial.depthTest = false;
+		blurMaterial.depthWrite = false;
+		blurMaterial.blending = NoBlending;
+
+		const mesh = new Mesh( geometry, blurMaterial );
+
+		const scene = new Scene();
+		scene.add( mesh );
+
+		const camera = new CubeCamera( 1, 10, blurTarget1 );
+
+		camera.update( renderer, scene );
+
+		camera.renderTarget=this;
+
+		camera.update( renderer, scene );
+
+		blurTarget1.dispose();
 	}
 
 }
