@@ -11,6 +11,11 @@ import { MeshPhysicalMaterial } from '../MeshPhysicalMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshPhysicalMaterial();
 
+/**
+ * Node material version of `MeshPhysicalMaterial`.
+ *
+ * @augments MeshStandardNodeMaterial
+ */
 class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	static get type() {
@@ -19,33 +24,243 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh physical node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshPhysicalNodeMaterial = true;
 
+		/**
+		 * The clearcoat of physical materials is by default inferred from the `clearcoat`
+		 * and `clearcoatMap` properties. This node property allows to overwrite the default
+		 * and define the clearcoat with a node instead.
+		 *
+		 * If you don't want to overwrite the clearcoat but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialClearcoat}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.clearcoatNode = null;
+
+		/**
+		 * The clearcoat roughness of physical materials is by default inferred from the `clearcoatRoughness`
+		 * and `clearcoatRoughnessMap` properties. This node property allows to overwrite the default
+		 * and define the clearcoat roughness with a node instead.
+		 *
+		 * If you don't want to overwrite the clearcoat roughness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialClearcoatRoughness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.clearcoatRoughnessNode = null;
+
+		/**
+		 * The clearcoat normal of physical materials is by default inferred from the `clearcoatNormalMap`
+		 * property. This node property allows to overwrite the default
+		 * and define the clearcoat normal with a node instead.
+		 *
+		 * If you don't want to overwrite the clearcoat normal but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialClearcoatNormal}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.clearcoatNormalNode = null;
 
+		/**
+		 * The sheen of physical materials is by default inferred from the `sheen`, `sheenColor`
+		 * and `sheenColorMap` properties. This node property allows to overwrite the default
+		 * and define the sheen with a node instead.
+		 *
+		 * If you don't want to overwrite the sheen but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSheen}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.sheenNode = null;
+
+		/**
+		 * The sheen roughness of physical materials is by default inferred from the `sheenRoughness` and
+		 * `sheenRoughnessMap` properties. This node property allows to overwrite the default
+		 * and define the sheen roughness with a node instead.
+		 *
+		 * If you don't want to overwrite the sheen roughness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSheenRoughness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.sheenRoughnessNode = null;
 
+		/**
+		 * The iridescence of physical materials is by default inferred from the `iridescence`
+		 * property. This node property allows to overwrite the default
+		 * and define the iridescence with a node instead.
+		 *
+		 * If you don't want to overwrite the iridescence but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIridescence}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iridescenceNode = null;
+
+		/**
+		 * The iridescence IOR of physical materials is by default inferred from the `iridescenceIOR`
+		 * property. This node property allows to overwrite the default
+		 * and define the iridescence IOR with a node instead.
+		 *
+		 * If you don't want to overwrite the iridescence IOR but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIridescenceIOR}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iridescenceIORNode = null;
+
+		/**
+		 * The iridescence thickness of physical materials is by default inferred from the `iridescenceThicknessRange`
+		 * and `iridescenceThicknessMap` properties. This node property allows to overwrite the default
+		 * and define the iridescence thickness with a node instead.
+		 *
+		 * If you don't want to overwrite the iridescence thickness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIridescenceThickness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iridescenceThicknessNode = null;
 
+		/**
+		 * The specular intensity of physical materials is by default inferred from the `specularIntensity`
+		 * and `specularIntensityMap` properties. This node property allows to overwrite the default
+		 * and define the specular intensity with a node instead.
+		 *
+		 * If you don't want to overwrite the specular intensity but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSpecularIntensity}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.specularIntensityNode = null;
+
+		/**
+		 * The specular color of physical materials is by default inferred from the `specularColor`
+		 * and `specularColorMap` properties. This node property allows to overwrite the default
+		 * and define the specular color with a node instead.
+		 *
+		 * If you don't want to overwrite the specular color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSpecularColor}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.specularColorNode = null;
 
+		/**
+		 * The ior of physical materials is by default inferred from the `ior`
+		 * property. This node property allows to overwrite the default
+		 * and define the ior with a node instead.
+		 *
+		 * If you don't want to overwrite the ior but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIOR}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iorNode = null;
+
+		/**
+		 * The transmission of physical materials is by default inferred from the `transmission` and
+		 * `transmissionMap` properties. This node property allows to overwrite the default
+		 * and define the transmission with a node instead.
+		 *
+		 * If you don't want to overwrite the transmission but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialTransmission}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.transmissionNode = null;
+
+		/**
+		 * The thickness of physical materials is by default inferred from the `thickness` and
+		 * `thicknessMap` properties. This node property allows to overwrite the default
+		 * and define the thickness with a node instead.
+		 *
+		 * If you don't want to overwrite the thickness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialThickness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.thicknessNode = null;
+
+		/**
+		 * The attenuation distance of physical materials is by default inferred from the
+		 * `attenuationDistance` property. This node property allows to overwrite the default
+		 * and define the attenuation distance with a node instead.
+		 *
+		 * If you don't want to overwrite the attenuation distance but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAttenuationDistance}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.attenuationDistanceNode = null;
+
+		/**
+		 * The attenuation color of physical materials is by default inferred from the
+		 * `attenuationColor` property. This node property allows to overwrite the default
+		 * and define the attenuation color with a node instead.
+		 *
+		 * If you don't want to overwrite the attenuation color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAttenuationColor}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.attenuationColorNode = null;
+
+		/**
+		 * The dispersion of physical materials is by default inferred from the
+		 * `dispersion` property. This node property allows to overwrite the default
+		 * and define the dispersion with a node instead.
+		 *
+		 * If you don't want to overwrite the dispersion but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialDispersion}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dispersionNode = null;
 
+		/**
+		 * The anisotropy of physical materials is by default inferred from the
+		 * `anisotropy` property. This node property allows to overwrite the default
+		 * and define the anisotropy with a node instead.
+		 *
+		 * If you don't want to overwrite the anisotropy but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAnisotropy}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.anisotropyNode = null;
 
 		this.setDefaultValues( _defaultValues );
@@ -54,42 +269,81 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Whether the lighting model should use clearcoat or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useClearcoat() {
 
 		return this.clearcoat > 0 || this.clearcoatNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use iridescence or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useIridescence() {
 
 		return this.iridescence > 0 || this.iridescenceNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use sheen or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useSheen() {
 
 		return this.sheen > 0 || this.sheenNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use anisotropy or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useAnisotropy() {
 
 		return this.anisotropy > 0 || this.anisotropyNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use transmission or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useTransmission() {
 
 		return this.transmission > 0 || this.transmissionNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use dispersion or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useDispersion() {
 
 		return this.dispersion > 0 || this.dispersionNode !== null;
 
 	}
 
+	/**
+	 * Setups the specular related node variables.
+	 */
 	setupSpecular() {
 
 		const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
@@ -100,12 +354,22 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {PhysicalLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion );
 
 	}
 
+	/**
+	 * Setups the physical specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupVariants( builder ) {
 
 		super.setupVariants( builder );
@@ -201,6 +465,11 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Setups the clearcoat normal node.
+	 *
+	 * @return {Node<vec3>} The clearcoat noraml.
+	 */
 	setupClearcoatNormal() {
 
 		return this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
