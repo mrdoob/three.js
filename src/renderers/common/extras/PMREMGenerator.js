@@ -1,11 +1,10 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { getDirection, blur, bilinearCubeUV, getBlurParams } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
-import { uniform } from '../../../nodes/core/UniformNode.js';
-import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
+import { userData } from '../../../nodes/accessors/UserDataNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, vec3, Fn } from '../../../nodes/tsl/TSLBase.js';
+import { float, int, vec3, Fn } from '../../../nodes/tsl/TSLBase.js';
 import { uv } from '../../../nodes/accessors/UV.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
@@ -622,26 +621,20 @@ class PMREMGenerator {
 		const blurMesh = this._lodMeshes[ lodOut ];
 		blurMesh.material = blurMaterial;
 
-		const blurUniforms = blurMaterial.uniforms;
-
-		const {radiansPerPixel, samples, weights}=getBlurParams(sigmaRadians, this._sizeLods[ lodIn ] - 1, MAX_SAMPLES);
-
 		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
-
-		blurUniforms.envMap.value = targetIn.texture;
-		blurUniforms.samples.value = samples;
-		blurUniforms.weights.array = weights;
-		blurUniforms.latitudinal.value = direction === 'latitudinal' ? 1 : 0;
-
-		if ( poleAxis ) {
-
-			blurUniforms.poleAxis.value = poleAxis;
-
-		}
+		blurMaterial._envMap.value = targetIn.texture
 
 		const { _lodMax } = this;
-		blurUniforms.dTheta.value = radiansPerPixel;
-		blurUniforms.mipInt.value = _lodMax - lodIn;
+		const {radiansPerPixel, samples, weights}=getBlurParams(sigmaRadians, this._sizeLods[ lodIn ] - 1, MAX_SAMPLES);
+		
+		blurMesh.userData={
+			samples,
+			weights,
+			poleAxis,
+			latitudinal: direction === 'latitudinal' ? 1 : 0,
+			dTheta: radiansPerPixel,
+			mipInt: _lodMax - lodIn
+		};
 
 		const outputSize = this._sizeLods[ lodOut ];
 		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
@@ -771,36 +764,26 @@ function _getMaterial( type ) {
 
 function _getBlurShader( lodMax, width, height ) {
 
-	const weights = uniformArray( new Array( MAX_SAMPLES ).fill( 0 ) );
-	const poleAxis = uniform( new Vector3( 0, 1, 0 ) );
-	const dTheta = uniform( 0 );
+	const weights = userData( 'weights', 'float' );
+	const poleAxis = userData( 'poleAxis', 'vec3' );
+	const dTheta = userData( 'dTheta', 'float' );
 	const n = float( MAX_SAMPLES );
-	const latitudinal = uniform( 0 ); // false, bool
-	const samples = uniform( 1 ); // int
+	const latitudinal = userData( 'latitudinal', 'int' ); // bool
+	const samples = userData( 'samples', 'int' );
+	const mipInt = userData( 'mipInt', 'int' );
+
 	const envMap = texture( null );
-	const mipInt = uniform( 0 ); // int
 	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
 	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
 	const CUBEUV_MAX_MIP = float( lodMax );
 
-	const materialUniforms = {
-		n,
-		latitudinal,
-		weights,
-		poleAxis,
-		outputDirection,
-		dTheta,
-		samples,
-		envMap,
-		mipInt
-	};
-
 	const material = _getMaterial( 'blur' );
-	material.uniforms = materialUniforms; // TODO: Move to outside of the material
+	material._envMap = envMap;
+	
 	const cubeUVsampler=Fn(( [ sampleDirection ] )=>{
 		return bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
 	});
-	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ), sampler: cubeUVsampler } );
+	material.fragmentNode = blur( { n, latitudinal: latitudinal.equal( int ( 1 ) ), poleAxis, outputDirection, weights, samples, dTheta, sampler: cubeUVsampler } );
 
 	return material;
 

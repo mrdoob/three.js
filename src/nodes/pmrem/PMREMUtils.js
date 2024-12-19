@@ -303,19 +303,14 @@ export const getBlurParams=(sigmaRadians, cubeRes, maxSamples)=>{
 
 	}
 
-	const weights = [];
+	const weights = new Array( maxSamples ).fill( 0 );
 	let sum = 0;
 
-	for ( let i = 0; i < maxSamples; ++ i ) {
-
-		if(i>=samples){
-			weights.push(0);
-			continue;
-		}
+	for ( let i = 0; i < samples; ++ i ) {
 
 		const x = i / sigmaPixels;
 		const weight = Math.exp( - x * x / 2 );
-		weights.push( weight );
+		weights[i]= weight;
 
 		if ( i === 0 ) {
 

@@ -2,7 +2,7 @@ import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
 import { positionWorldDirection } from '../../nodes/accessors/Position.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { blur, getBlurParams } from '../../../nodes/pmrem/PMREMUtils.js';
+import { blur, getBlurParams } from '../../nodes/pmrem/PMREMUtils.js';
 
 import { WebGLCubeRenderTarget } from '../../renderers/WebGLCubeRenderTarget.js';
 import { Scene } from '../../scenes/Scene.js';
