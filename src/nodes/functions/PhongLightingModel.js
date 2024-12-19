@@ -1,10 +1,9 @@
 import BasicLightingModel from './BasicLightingModel.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
-import { diffuseColor } from '../core/PropertyNode.js';
+import { diffuseColor, shininess, specularColor } from '../core/PropertyNode.js';
 import { transformedNormalView } from '../accessors/Normal.js';
 import { materialSpecularStrength } from '../accessors/MaterialNode.js';
-import { shininess, specularColor } from '../core/PropertyNode.js';
 import { positionViewDirection } from '../accessors/Position.js';
 import { Fn, float } from '../tsl/TSLBase.js';
 
@@ -31,16 +30,42 @@ const BRDF_BlinnPhong = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 
 } );
 
+/**
+ * Represents the lighting model for a phong material. Used in {@link MeshPhongNodeMaterial}.
+ *
+ * @augments BasicLightingModel
+ */
 class PhongLightingModel extends BasicLightingModel {
 
+	/**
+	 * Constructs a new phong lighting model.
+	 *
+	 * @param {Boolean} [specular=true] - Whether specular is supported or not.
+	 */
 	constructor( specular = true ) {
 
 		super();
 
+		/**
+		 * Whether specular is supported or not. Set this to `false` if you are
+		 * looking for a Lambert-like material meaning a material for non-shiny
+		 * surfaces, without specular highlights.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.specular = specular;
 
 	}
 
+	/**
+	 * Implements the direct lighting. The specular portion is optional an can be controlled
+	 * with the {@link PhongLightingModel#specular} flag.
+	 *
+	 * @param {Object} input - The input data.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	direct( { lightDirection, lightColor, reflectedLight } ) {
 
 		const dotNL = transformedNormalView.dot( lightDirection ).clamp();
@@ -56,6 +81,13 @@ class PhongLightingModel extends BasicLightingModel {
 
 	}
 
+	/**
+	 * Implements the indirect lighting.
+	 *
+	 * @param {ContextNode} input - The current node context.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );

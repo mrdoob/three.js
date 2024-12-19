@@ -36,6 +36,36 @@ class WebGPUUtils {
 
 	}
 
+	getTextureSampleData( texture ) {
+
+		let samples;
+
+		if ( texture.isFramebufferTexture ) {
+
+			samples = 1;
+
+		} else if ( texture.isDepthTexture && ! texture.renderTarget ) {
+
+			const renderer = this.backend.renderer;
+			const renderTarget = renderer.getRenderTarget();
+
+			samples = renderTarget ? renderTarget.samples : renderer.samples;
+
+		} else if ( texture.renderTarget ) {
+
+			samples = texture.renderTarget.samples;
+
+		}
+
+		samples = samples || 1;
+
+		const isMSAA = samples > 1 && texture.renderTarget !== null && ( texture.isDepthTexture !== true && texture.isFramebufferTexture !== true );
+		const primarySamples = isMSAA ? 1 : samples;
+
+		return { samples, primarySamples, isMSAA };
+
+	}
+
 	getCurrentColorFormat( renderContext ) {
 
 		let format;

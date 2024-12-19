@@ -1,4 +1,4 @@
-export * from './Three.core.js';
+export * from './Three.Core.js';
 
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nodes.js';
@@ -19,4 +19,5 @@ export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js
 export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
-export * from './nodes/TSL.js';
+import * as TSL from './nodes/TSL.js';
+export { TSL };

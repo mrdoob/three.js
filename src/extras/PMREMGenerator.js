@@ -102,6 +102,12 @@ class PMREMGenerator {
 	 * in radians to be applied to the scene before PMREM generation. Optional near
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
+	 *
+	 * @param {Scene} scene
+	 * @param {number} sigma
+	 * @param {number} near
+	 * @param {number} far
+	 * @return {WebGLRenderTarget}
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
@@ -137,6 +143,10 @@ class PMREMGenerator {
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 * The smallest supported equirectangular image size is 64 x 32.
+	 *
+	 * @param {Texture} equirectangular
+	 * @param {WebGLRenderTarget} [renderTarget=null] - Optional render target.
+	 * @return {WebGLRenderTarget}
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
@@ -149,6 +159,10 @@ class PMREMGenerator {
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 * The smallest supported cube size is 16 x 16.
+	 *
+	 * @param {Texture} cubemap
+	 * @param {null} [renderTarget=null] - Optional render target.
+	 * @return {WebGLRenderTarget}
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
@@ -466,6 +480,12 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
+	 *
+	 * @param {WebGLRenderTarget} cubeUVRenderTarget
+	 * @param {number} lodIn
+	 * @param {number} lodOut
+	 * @param {number} sigma
+	 * @param {Vector3} [poleAxis]
 	 */
 	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 

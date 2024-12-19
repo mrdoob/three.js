@@ -379,6 +379,8 @@ export default class RenderObject {
 
 		}
 
+		cacheKey += object.receiveShadow + ',';
+
 		return hashString( cacheKey );
 
 	}

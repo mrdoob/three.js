@@ -9,6 +9,11 @@ import { MeshMatcapMaterial } from '../MeshMatcapMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
+/**
+ * Node material version of `MeshMatcapMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshMatcapNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -17,12 +22,22 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh normal node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
-		this.lights = false;
-
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshMatcapNodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues );
@@ -31,6 +46,11 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the matcap specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupVariants( builder ) {
 
 		const uv = matcapUV;

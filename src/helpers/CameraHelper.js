@@ -5,6 +5,7 @@ import { Color } from '../math/Color.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { WebGLCoordinateSystem } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _camera = /*@__PURE__*/ new Camera();
@@ -195,17 +196,19 @@ class CameraHelper extends LineSegments {
 
 		_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
-		// center / target
+		// Adjust z values based on coordinate system
+		const nearZ = this.camera.coordinateSystem === WebGLCoordinateSystem ? - 1 : 0;
 
-		setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
+		// center / target
+		setPoint( 'c', pointMap, geometry, _camera, 0, 0, nearZ );
 		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
-		setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
-		setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
-		setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
+		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
+		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
@@ -216,9 +219,9 @@ class CameraHelper extends LineSegments {
 
 		// up
 
-		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
+		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
@@ -227,10 +230,10 @@ class CameraHelper extends LineSegments {
 		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
-		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
-		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
+		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
+		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
+		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
 

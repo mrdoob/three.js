@@ -120,7 +120,7 @@ const KHR_DF_CHANNEL_SAMPLE_LOWER_UPPER = {
 	[ HalfFloatType ]: [ 0xbf800000, 0x3f800000 ],
 	[ UnsignedByteType ]: [ 0, 255 ],
 
-}
+};
 
 const ERROR_INPUT = 'THREE.KTX2Exporter: Supported inputs are DataTexture, Data3DTexture, or WebGLRenderer and WebGLRenderTarget.';
 const ERROR_FORMAT = 'THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFormat, or RedFormat.';

@@ -9,6 +9,11 @@ import { MeshNormalMaterial } from '../MeshNormalMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshNormalMaterial();
 
+/**
+ * Node material version of `MeshNormalMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshNormalNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -17,12 +22,22 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh normal node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
-		this.lights = false;
-
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshNormalNodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues );
@@ -31,6 +46,10 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Overwrites the default implementation by computing the diffuse color
+	 * based on the normal data.
+	 */
 	setupDiffuseColor() {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;

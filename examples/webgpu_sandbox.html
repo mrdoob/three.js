@@ -15,8 +15,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
-					"three/debug": "../src/Three.WebGPU.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -75,6 +75,7 @@
 				const materialBox = new THREE.MeshBasicNodeMaterial();
 
 				// birection speed
+
 				const timerScaleNode = time.mul( vec2( - 0.5, 0.1 ) );
 				const animateUV = uv().add( timerScaleNode );
 

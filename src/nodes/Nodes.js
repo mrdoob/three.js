@@ -67,7 +67,6 @@ export { default as MaterialReferenceNode } from './accessors/MaterialReferenceN
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode } from './accessors/MorphNode.js';
 export { default as ModelNode } from './accessors/ModelNode.js';
-export { default as ModelViewProjectionNode } from './accessors/ModelViewProjectionNode.js';
 export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
@@ -104,11 +103,6 @@ export { default as FunctionNode } from './code/FunctionNode.js';
 export { default as ScriptableNode } from './code/ScriptableNode.js';
 export { default as ScriptableValueNode } from './code/ScriptableValueNode.js';
 
-// fog
-export { default as FogNode } from './fog/FogNode.js';
-export { default as FogRangeNode } from './fog/FogRangeNode.js';
-export { default as FogExp2Node } from './fog/FogExp2Node.js';
-
 // geometry
 export { default as RangeNode } from './geometry/RangeNode.js';
 
@@ -132,6 +126,7 @@ export { default as BasicEnvironmentNode } from './lighting/BasicEnvironmentNode
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
 export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
+export { default as ShadowBaseNode } from './lighting/ShadowBaseNode.js';
 export { default as ShadowNode } from './lighting/ShadowNode.js';
 
 // pmrem

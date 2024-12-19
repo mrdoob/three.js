@@ -19,6 +19,12 @@ class NumberNodeUniform extends NumberUniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Vector2NodeUniform extends Vector2Uniform {
@@ -34,6 +40,12 @@ class Vector2NodeUniform extends Vector2Uniform {
 	getValue() {
 
 		return this.nodeUniform.value;
+
+	}
+
+	getType() {
+
+		return this.nodeUniform.type;
 
 	}
 
@@ -55,6 +67,12 @@ class Vector3NodeUniform extends Vector3Uniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Vector4NodeUniform extends Vector4Uniform {
@@ -70,6 +88,12 @@ class Vector4NodeUniform extends Vector4Uniform {
 	getValue() {
 
 		return this.nodeUniform.value;
+
+	}
+
+	getType() {
+
+		return this.nodeUniform.type;
 
 	}
 
@@ -91,6 +115,12 @@ class ColorNodeUniform extends ColorUniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Matrix3NodeUniform extends Matrix3Uniform {
@@ -109,6 +139,12 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 
 	}
 
+	getType() {
+
+		return this.nodeUniform.type;
+
+	}
+
 }
 
 class Matrix4NodeUniform extends Matrix4Uniform {
@@ -124,6 +160,12 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 	getValue() {
 
 		return this.nodeUniform.value;
+
+	}
+
+	getType() {
+
+		return this.nodeUniform.type;
 
 	}
 

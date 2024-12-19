@@ -16,7 +16,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -61,7 +62,7 @@
 
 				// attributes
 
-				const positionAttribute = storage( positionBaseAttribute, 'vec3', count ).toReadOnly();
+				const positionAttribute = storage( positionBaseAttribute, 'vec3', count );
 				const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec3', count );
 
 				const speedAttribute = storage( speedBufferAttribute, 'vec3', count );
@@ -136,10 +137,10 @@
 				// background
 
 				const bgColor = screenUV.y.mix( color( 0x9f87f7 ), color( 0xf2cdcd ) );
-				const bgVignet = screenUV.distance( .5 ).remapClamp( 0.3, .8 ).oneMinus();
+				const bgVignette = screenUV.distance( .5 ).remapClamp( 0.3, .8 ).oneMinus();
 				const bgIntensity = 4;
 
-				scene.backgroundNode = bgColor.mul( bgVignet.mul( color( 0xa78ff6 ).mul( bgIntensity ) ) );
+				scene.backgroundNode = bgColor.mul( bgVignette.mul( color( 0xa78ff6 ).mul( bgIntensity ) ) );
 
 				// model
 

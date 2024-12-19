@@ -1,8 +1,20 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
+/** @module BarrierNode **/
+
+/**
+ * Represents a GPU control barrier that synchronizes compute operations within a given scope.
+ *
+ * @augments Node
+ */
 class BarrierNode extends Node {
 
+	/**
+	 * Constructs a new barrier node.
+	 *
+	 * @param {String} scope - The scope defines the behavior of the node.
+	 */
 	constructor( scope ) {
 
 		super();
@@ -32,9 +44,42 @@ class BarrierNode extends Node {
 
 export default BarrierNode;
 
+/**
+ * TSL function for creating a barrier node.
+ *
+ * @function
+ * @param {String} scope - The scope defines the behavior of the node..
+ * @returns {BarrierNode}
+ */
 const barrier = nodeProxy( BarrierNode );
 
+/**
+ * TSL function for creating a workgroup barrier. All compute shader
+ * invocations must wait for each invocation within a workgroup to
+ * complete before the barrier can be surpassed.
+ *
+ * @function
+ * @returns {BarrierNode}
+ */
 export const workgroupBarrier = () => barrier( 'workgroup' ).append();
+
+/**
+ * TSL function for creating a storage barrier. All invocations must
+ * wait for each access to variables within the 'storage' address space
+ * to complete before the barrier can be passed.
+ *
+ * @function
+ * @returns {BarrierNode}
+ */
 export const storageBarrier = () => barrier( 'storage' ).append();
+
+/**
+ * TSL function for creating a texture barrier. All invocations must
+ * wait for each access to variables within the 'texture' address space
+ * to complete before the barrier can be passed.
+ *
+ * @function
+ * @returns {BarrierNode}
+ */
 export const textureBarrier = () => barrier( 'texture' ).append();
 

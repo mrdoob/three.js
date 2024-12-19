@@ -1,6 +1,15 @@
 import { mix } from '../math/MathNode.js';
 import { Fn } from '../tsl/TSLCore.js';
 
+/** @module ColorSpaceFunctions **/
+
+/**
+ * Converts the given color value from sRGB to linear-sRGB color space.
+ *
+ * @method
+ * @param {Node<vec3>} color - The sRGB color.
+ * @return {Node<vec3>} The linear-sRGB color.
+ */
 export const sRGBTransferEOTF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.mul( 0.9478672986 ).add( 0.0521327014 ).pow( 2.4 );
@@ -19,6 +28,13 @@ export const sRGBTransferEOTF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 	]
 } );
 
+/**
+ * Converts the given color value from linear-sRGB to sRGB color space.
+ *
+ * @method
+ * @param {Node<vec3>} color - The linear-sRGB color.
+ * @return {Node<vec3>} The sRGB color.
+ */
 export const sRGBTransferOETF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.pow( 0.41666 ).mul( 1.055 ).sub( 0.055 );

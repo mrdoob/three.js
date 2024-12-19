@@ -5,6 +5,7 @@ import { lightViewPosition } from '../accessors/Lights.js';
 import { positionView } from '../accessors/Position.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
+import { pointShadow } from './PointShadowNode.js';
 
 export const directPointLight = Fn( ( { color, lightViewPosition, cutoffDistance, decayExponent }, builder ) => {
 
@@ -33,6 +34,11 @@ export const directPointLight = Fn( ( { color, lightViewPosition, cutoffDistance
 
 } );
 
+/**
+ * Module for representing point lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
 class PointLightNode extends AnalyticLightNode {
 
 	static get type() {
@@ -41,15 +47,36 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
+	/**
+	 * Constructs a new point light node.
+	 *
+	 * @param {PointLight?} [light=null] - The point light source.
+	 */
 	constructor( light = null ) {
 
 		super( light );
 
+		/**
+		 * Uniform node representing the cutoff distance.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
-		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the decay exponent.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.decayExponentNode = uniform( 2 ).setGroup( renderGroup );
 
 	}
 
+	/**
+	 * Overwritten to updated point light specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( frame ) {
 
 		const { light } = this;
@@ -61,7 +88,20 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
-	setup() {
+	/**
+	 * Overwritten to setup point light specific shadow.
+	 *
+	 * @return {PointShadowNode}
+	 */
+	setupShadowNode() {
+
+		return pointShadow( this.light );
+
+	}
+
+	setup( builder ) {
+
+		super.setup( builder );
 
 		directPointLight( {
 			color: this.colorNode,

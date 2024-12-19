@@ -1,5 +1,5 @@
 import { Camera } from './Camera.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { RAD2DEG, DEG2RAD } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
@@ -62,24 +62,26 @@ class PerspectiveCamera extends Camera {
 	 * The default film gauge is 35, so that the focal length can be specified for
 	 * a 35mm (full frame) camera.
 	 *
-	 * Values for focal length and film gauge must have the same unit.
+	 * @param {number} focalLength - Values for focal length and film gauge must have the same unit.
 	 */
 	setFocalLength( focalLength ) {
 
 		/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 		const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
-		this.fov = MathUtils.RAD2DEG * 2 * Math.atan( vExtentSlope );
+		this.fov = RAD2DEG * 2 * Math.atan( vExtentSlope );
 		this.updateProjectionMatrix();
 
 	}
 
 	/**
 	 * Calculates the focal length from the current .fov and .filmGauge.
+	 *
+	 * @returns {number}
 	 */
 	getFocalLength() {
 
-		const vExtentSlope = Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov );
+		const vExtentSlope = Math.tan( DEG2RAD * 0.5 * this.fov );
 
 		return 0.5 * this.getFilmHeight() / vExtentSlope;
 
@@ -87,8 +89,8 @@ class PerspectiveCamera extends Camera {
 
 	getEffectiveFOV() {
 
-		return MathUtils.RAD2DEG * 2 * Math.atan(
-			Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+		return RAD2DEG * 2 * Math.atan(
+			Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 	}
 
@@ -109,6 +111,10 @@ class PerspectiveCamera extends Camera {
 	/**
 	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
 	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
+	 *
+	 * @param {number} distance
+	 * @param {Vector2} minTarget
+	 * @param {Vector2} maxTarget
 	 */
 	getViewBounds( distance, minTarget, maxTarget ) {
 
@@ -124,7 +130,10 @@ class PerspectiveCamera extends Camera {
 
 	/**
 	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
-	 * Copies the result into the target Vector2, where x is width and y is height.
+	 *
+	 * @param {number} distance
+	 * @param {Vector2} target - Vector2 target used to store result where x is width and y is height.
+	 * @returns {Vector2}
 	 */
 	getViewSize( distance, target ) {
 
@@ -168,6 +177,13 @@ class PerspectiveCamera extends Camera {
 	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 	 *
 	 *   Note there is no reason monitors have to be the same size or in a grid.
+	 *
+	 * @param {number} fullWidth
+	 * @param {number} fullHeight
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} width
+	 * @param {number} height
 	 */
 	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
 
@@ -214,7 +230,7 @@ class PerspectiveCamera extends Camera {
 	updateProjectionMatrix() {
 
 		const near = this.near;
-		let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+		let top = near * Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom;
 		let height = 2 * top;
 		let width = this.aspect * height;
 		let left = - 0.5 * width;

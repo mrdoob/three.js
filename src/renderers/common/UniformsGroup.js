@@ -149,10 +149,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset ] !== v ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset ] = a[ offset ] = v;
 			updated = true;
@@ -170,10 +171,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
@@ -193,10 +195,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
@@ -217,10 +220,11 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
+		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
 
-			const b = this.buffer;
+			const b = this._getBufferForType( type );
 
 			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
@@ -309,6 +313,14 @@ class UniformsGroup extends UniformBuffer {
 		}
 
 		return updated;
+
+	}
+
+	_getBufferForType( type ) {
+
+		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) return new Int32Array( this.buffer.buffer );
+		if ( type === 'uint' || type === 'uvec2' || type === 'uvec3' || type === 'uvec4' ) return new Uint32Array( this.buffer.buffer );
+		return this.buffer;
 
 	}
 

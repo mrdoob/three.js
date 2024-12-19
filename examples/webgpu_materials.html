@@ -16,7 +16,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -240,7 +241,6 @@
 
 				// Scriptable
 
-				ScriptableNodeResources.set( 'THREE', THREE );
 				ScriptableNodeResources.set( 'TSL', TSL );
 
 				const asyncNode = scriptable( js( `
@@ -419,7 +419,7 @@
 			function testSerialization( mesh ) {
 
 				const json = mesh.toJSON();
-				const loader = new THREE.NodeObjectLoader().setNodes( moduleToLib( TSL ) ).setNodeMaterials( moduleToLib( THREE ) );
+				const loader = new THREE.NodeObjectLoader().setNodes( moduleToLib( THREE ) ).setNodeMaterials( moduleToLib( THREE ) );
 				const serializedMesh = loader.parse( json );
 
 				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;

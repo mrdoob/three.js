@@ -11,7 +11,7 @@ import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
-import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
+import { NodeAccess } from '../../../nodes/core/constants.js';
 
 import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
@@ -19,7 +19,13 @@ import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
-const GPUShaderStage = self.GPUShaderStage;
+const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+
+const accessNames = {
+	[ NodeAccess.READ_ONLY ]: 'read',
+	[ NodeAccess.WRITE_ONLY ]: 'write',
+	[ NodeAccess.READ_WRITE ]: 'read_write'
+};
 
 const wrapNames = {
 	[ RepeatWrapping ]: 'repeat',
@@ -127,7 +133,7 @@ const wgslMethods = {
 
 // WebGPU issue: does not support pow() with negative base on Windows
 
-if ( /Windows/g.test( navigator.userAgent ) ) {
+if ( typeof navigator !== 'undefined' && /Windows/g.test( navigator.userAgent ) ) {
 
 	wgslPolyfill.pow_float = new CodeNode( 'fn tsl_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
 	wgslPolyfill.pow_vec2 = new CodeNode( 'fn tsl_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
@@ -145,7 +151,7 @@ if ( /Windows/g.test( navigator.userAgent ) ) {
 
 let diagnostics = '';
 
-if ( /Firefox|Deno/g.test( navigator.userAgent ) !== true ) {
+if ( ( typeof navigator !== 'undefined' && /Firefox|Deno/g.test( navigator.userAgent ) ) !== true ) {
 
 	diagnostics += 'diagnostic( off, derivative_uniformity );\n';
 
@@ -217,7 +223,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
-		if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false ) {
+		if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false ) {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
@@ -305,7 +311,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			let textureDimensionsParams;
 
-			if ( texture.isMultisampleRenderTargetTexture === true ) {
+			const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+			if ( primarySamples > 1 ) {
 
 				textureDimensionsParams = textureProperty;
 
@@ -349,7 +357,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
 
-		if ( depthSnippet ) {
+		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
+
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
+
+		} else if ( depthSnippet ) {
 
 			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
@@ -378,7 +390,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) ||
 			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
-			texture.isMultisampleRenderTargetTexture === true;
+			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
 
 	}
 
@@ -528,46 +540,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getStorageAccess( node ) {
+	getNodeAccess( node, shaderStage ) {
 
-		if ( node.isStorageTextureNode ) {
+		if ( shaderStage !== 'compute' )
+			return NodeAccess.READ_ONLY;
 
-			switch ( node.access ) {
+		return node.access;
 
-				case GPUStorageTextureAccess.ReadOnly:
+	}
 
-					return 'read';
+	getStorageAccess( node, shaderStage ) {
 
-				case GPUStorageTextureAccess.WriteOnly:
-
-					return 'write';
-
-				default:
-
-					return 'read_write';
-
-			}
-
-		} else {
-
-			switch ( node.access ) {
-
-				case GPUBufferBindingType.Storage:
-
-					return 'read_write';
-
-
-				case GPUBufferBindingType.ReadOnlyStorage:
-
-					return 'read';
-
-				default:
-
-					return 'write';
-
-			}
-
-		}
+		return accessNames[ this.getNodeAccess( node, shaderStage ) ];
 
 	}
 
@@ -589,24 +573,26 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				let texture = null;
 
+				const access = this.getNodeAccess( node, shaderStage );
+
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, access );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group, access );
 
 				} else if ( type === 'texture3D' ) {
 
-					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, access );
 
 				}
 
 				texture.store = node.isStorageTextureNode === true;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
+				if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
 					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -1118,7 +1104,7 @@ ${ flowData.code }
 
 				const texture = uniform.node.value;
 
-				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
+				if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
 
 					if ( this.isSampleCompare( texture ) ) {
 
@@ -1136,7 +1122,9 @@ ${ flowData.code }
 
 				let multisampled = '';
 
-				if ( texture.isMultisampleRenderTargetTexture === true ) {
+				const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+				if ( primarySamples > 1 ) {
 
 					multisampled = '_multisampled';
 
@@ -1165,7 +1153,7 @@ ${ flowData.code }
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
-					const access = this.getStorageAccess( uniform.node );
+					const access = this.getStorageAccess( uniform.node, shaderStage );
 
 					textureType = `texture_storage_2d<${ format }, ${ access }>`;
 
@@ -1188,7 +1176,7 @@ ${ flowData.code }
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
 				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${bufferType}>` : `${bufferType}`;
 				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
-				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
+				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode, shaderStage ) }` : 'uniform';
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 

@@ -698,7 +698,7 @@ class ConvexHull {
 
 			let eyeVertex, maxDistance = 0;
 
-			// grap the first available face and start with the first visible vertex of that face
+			// grab the first available face and start with the first visible vertex of that face
 
 			const eyeFace = this.assigned.first().face;
 			let vertex = eyeFace.outside;

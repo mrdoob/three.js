@@ -12,6 +12,16 @@ import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffe
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
+/** @module InstanceNode **/
+
+/**
+ * This node implements the vertex shader logic which is required
+ * when rendering 3D objects via instancing. The code makes sure
+ * vertex positions, normals and colors can be modified via instanced
+ * data.
+ *
+ * @augments Node
+ */
 class InstanceNode extends Node {
 
 	static get type() {
@@ -20,25 +30,84 @@ class InstanceNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new instance node.
+	 *
+	 * @param {Number} count - The number of instances.
+	 * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
+	 * @param {InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
+	 */
 	constructor( count, instanceMatrix, instanceColor ) {
 
 		super( 'void' );
 
+		/**
+		 * The number of instances.
+		 *
+		 * @type {Number}
+		 */
 		this.count = count;
+
+		/**
+		 * Instanced buffer attribute representing the transformation of instances.
+		 *
+		 * @type {InstancedBufferAttribute}
+		 */
 		this.instanceMatrix = instanceMatrix;
+
+		/**
+		 * Instanced buffer attribute representing the color of instances.
+		 *
+		 * @type {InstancedBufferAttribute}
+		 */
 		this.instanceColor = instanceColor;
 
+		/**
+		 * The node that represents the instance matrix data.
+		 *
+		 * @type {Node}
+		 */
 		this.instanceMatrixNode = null;
 
+		/**
+		 * The node that represents the instance color data.
+		 *
+		 * @type {Node}
+		 */
 		this.instanceColorNode = null;
 
+		/**
+		 * The update type is set to `frame` since an update
+		 * of instanced buffer data must be checked per frame.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateType = NodeUpdateType.FRAME;
 
+		/**
+		 * A reference to a buffer that is used by `instanceMatrixNode`.
+		 *
+		 * @type {InstancedInterleavedBuffer}
+		 */
 		this.buffer = null;
+
+		/**
+		 * A reference to a buffer that is used by `instanceColorNode`.
+		 *
+		 * @type {InstancedInterleavedBuffer}
+		 */
 		this.bufferColor = null;
 
 	}
 
+	/**
+	 * Setups the internal buffers and nodes and assigns the transformed vertex data
+	 * to predefined node variables for accumulation. That follows the same patterns
+	 * like with morph and skinning nodes.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
 		const { count, instanceMatrix, instanceColor } = this;
@@ -118,15 +187,20 @@ class InstanceNode extends Node {
 
 	}
 
+	/**
+	 * Checks if the internal buffers required an update.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	update( /*frame*/ ) {
 
-		if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.buffer != null && this.instanceMatrix.version !== this.buffer.version ) {
+		if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.buffer !== null && this.instanceMatrix.version !== this.buffer.version ) {
 
 			this.buffer.version = this.instanceMatrix.version;
 
 		}
 
-		if ( this.instanceColor && this.instanceColor.usage !== DynamicDrawUsage && this.bufferColor != null && this.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceColor && this.instanceColor.usage !== DynamicDrawUsage && this.bufferColor !== null && this.instanceColor.version !== this.bufferColor.version ) {
 
 			this.bufferColor.version = this.instanceColor.version;
 
@@ -138,4 +212,13 @@ class InstanceNode extends Node {
 
 export default InstanceNode;
 
+/**
+ * TSL function for creating an instance node.
+ *
+ * @function
+ * @param {Number} count - The number of instances.
+ * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
+ * @param {InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
+ * @returns {InstanceNode}
+ */
 export const instance = /*@__PURE__*/ nodeProxy( InstanceNode );

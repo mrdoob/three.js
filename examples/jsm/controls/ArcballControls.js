@@ -1183,7 +1183,7 @@ class ArcballControls extends Controls {
 	 * Remove a mouse action by specifying its mouse/key combination
 	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
-	 * @returns {Boolean} True if the operation has been succesfully removed, false otherwise
+	 * @returns {Boolean} True if the operation has been successfully removed, false otherwise
 	 */
 	unsetMouseAction( mouse, key = null ) {
 
@@ -1204,9 +1204,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Return the operation associated to a mouse/keyboard combination
-	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
-	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
-	 * @returns The operation if it has been found, null otherwise
+	 * @param {0|1|2|'WHEEL'} mouse Mouse button index (0, 1, 2) or 'WHEEL' for wheel notches
+	 * @param {'CTRL'|'SHIFT'|null} key Keyboard modifier
+	 * @returns {string|null} The operation if it has been found, null otherwise
 	 */
 	getOpFromAction( mouse, key ) {
 
@@ -1244,9 +1244,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
-	 * @param {Number} mouse Mouse button
-	 * @param {String} key Keyboard modifier
-	 * @returns The FSA state obtained from the operation associated to mouse/keyboard combination
+	 * @param {0|1|2} mouse Mouse button index (0, 1, 2)
+	 * @param {'CTRL'|'SHIFT'|null} key Keyboard modifier
+	 * @returns {STATE|null} The FSA state obtained from the operation associated to mouse/keyboard combination
 	 */
 	getOpStateFromAction( mouse, key ) {
 
@@ -1402,10 +1402,12 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Calculate the angular speed
+	 *
 	 * @param {Number} p0 Position at t0
 	 * @param {Number} p1 Position at t1
 	 * @param {Number} t0 Initial time in milliseconds
 	 * @param {Number} t1 Ending time in milliseconds
+	 * @returns {Number}
 	 */
 	calculateAngularSpeed( p0, p1, t0, t1 ) {
 
@@ -1450,7 +1452,7 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Calculate the trackball radius so that gizmo's diamater will be 2/3 of the minimum side of the camera frustum
+	 * Calculate the trackball radius so that gizmo's diameter will be 2/3 of the minimum side of the camera frustum
 	 * @param {Camera} camera
 	 * @returns {Number} The trackball radius
 	 */
@@ -1627,8 +1629,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Calculate the cursor position in NDC
-	 * @param {number} x Cursor horizontal coordinate within the canvas
-	 * @param {number} y Cursor vertical coordinate within the canvas
+	 *
+	 * @param {number} cursorX Cursor horizontal coordinate within the canvas
+	 * @param {number} cursorY Cursor vertical coordinate within the canvas
 	 * @param {HTMLElement} canvas The canvas where the renderer draws its output
 	 * @returns {Vector2} Cursor normalized position inside the canvas
 	 */
@@ -1643,8 +1646,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Calculate the cursor position inside the canvas x/y coordinates with the origin being in the center of the canvas
-	 * @param {Number} x Cursor horizontal coordinate within the canvas
-	 * @param {Number} y Cursor vertical coordinate within the canvas
+	 *
+	 * @param {Number} cursorX Cursor horizontal coordinate within the canvas
+	 * @param {Number} cursorY Cursor vertical coordinate within the canvas
 	 * @param {HTMLElement} canvas The canvas where the renderer draws its output
 	 * @returns {Vector2} Cursor position inside the canvas
 	 */
@@ -1940,9 +1944,11 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Perform pan operation moving camera between two points
+	 *
 	 * @param {Vector3} p0 Initial point
 	 * @param {Vector3} p1 Ending point
-	 * @param {Boolean} adjust If movement should be adjusted considering camera distance (Perspective only)
+	 * @param {Boolean} [adjust=false] If movement should be adjusted considering camera distance (Perspective only)
+	 * @returns {Object}
 	 */
 	pan( p0, p1, adjust = false ) {
 
@@ -2219,7 +2225,7 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Set camera fov
-	 * @param {Number} value fov to be setted
+	 * @param {Number} value fov to be set
 	 */
 	setFov( value ) {
 
@@ -2234,8 +2240,9 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Set values in transformation object
-	 * @param {Matrix4} camera Transformation to be applied to the camera
-	 * @param {Matrix4} gizmos Transformation to be applied to gizmos
+	 *
+	 * @param {Matrix4} [camera=null] Transformation to be applied to the camera
+	 * @param {Matrix4} [gizmos=null] Transformation to be applied to gizmos
 	 */
 	setTransformationMatrices( camera = null, gizmos = null ) {
 
@@ -2279,9 +2286,10 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Rotate camera around its direction axis passing by a given point by a given angle
+	 *
 	 * @param {Vector3} point The point where the rotation axis is passing trough
 	 * @param {Number} angle Angle in radians
-	 * @returns The computed transormation matix
+	 * @returns {Object} The computed transformation matrix
 	 */
 	zRotate( point, angle ) {
 
@@ -2313,9 +2321,10 @@ class ArcballControls extends Controls {
 
 	/**
 	 * Unproject the cursor on the 3D object surface
+	 *
 	 * @param {Vector2} cursor Cursor coordinates in NDC
 	 * @param {Camera} camera Virtual camera
-	 * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
+	 * @returns {Vector3|null} The point of intersection with the model, if exist, null otherwise
 	 */
 	unprojectOnObj( cursor, camera ) {
 
@@ -2576,7 +2585,7 @@ class ArcballControls extends Controls {
 	/**
 	 * Update the trackball FSA
 	 * @param {STATE} newState New state of the FSA
-	 * @param {Boolean} updateMatrices If matriices state should be updated
+	 * @param {Boolean} updateMatrices If matrices state should be updated
 	 */
 	updateTbState( newState, updateMatrices ) {
 

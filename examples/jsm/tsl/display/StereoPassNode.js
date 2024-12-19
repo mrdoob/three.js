@@ -1,10 +1,17 @@
-import { StereoCamera, Vector2 } from 'three';
-import { PassNode, nodeObject, PostProcessingUtils } from 'three/tsl';
+import { StereoCamera, Vector2, PassNode, PostProcessingUtils } from 'three/webgpu';
+import { nodeObject } from 'three/tsl';
+
+/** @module StereoPassNode **/
 
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
+/**
+ * A special render pass node that renders the scene as a stereoscopic image.
+ *
+ * @augments PassNode
+ */
 class StereoPassNode extends PassNode {
 
 	static get type() {
@@ -13,17 +20,40 @@ class StereoPassNode extends PassNode {
 
 	}
 
+	/**
+	 * Constructs a new stereo pass node.
+	 *
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Camera} camera - The camera to render the scene with.
+	 */
 	constructor( scene, camera ) {
 
 		super( PassNode.COLOR, scene, camera );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isStereoPassNode = true;
 
+		/**
+		 * The internal stereo camera that is used to render the scene.
+		 *
+		 * @type {StereoCamera}
+		 */
 		this.stereo = new StereoCamera();
 		this.stereo.aspect = 0.5;
 
 	}
 
+	/**
+	 * This method is used to render the stereo effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
@@ -79,4 +109,12 @@ class StereoPassNode extends PassNode {
 
 export default StereoPassNode;
 
+/**
+ * TSL function for creating a stereo pass node for stereoscopic rendering.
+ *
+ * @function
+ * @param {Scene} scene - The scene to render.
+ * @param {Camera} camera - The camera to render the scene with.
+ * @returns {StereoPassNode}
+ */
 export const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );

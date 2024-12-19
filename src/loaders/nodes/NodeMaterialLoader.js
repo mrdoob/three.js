@@ -1,16 +1,43 @@
 import { MaterialLoader } from '../../loaders/MaterialLoader.js';
 
+/**
+ * A special type of material loader for loading node materials.
+ *
+ * @augments MaterialLoader
+ */
 class NodeMaterialLoader extends MaterialLoader {
 
+	/**
+	 * Constructs a new node material loader.
+	 *
+	 * @param {LoadingManager?} manager - A reference to a loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * Represents a dictionary of node types.
+		 *
+		 * @type {Object<String,Node.constructor>}
+		 */
 		this.nodes = {};
+
+		/**
+		 * Represents a dictionary of node material types.
+		 *
+		 * @type {Object<String,NodeMaterial.constructor>}
+		 */
 		this.nodeMaterials = {};
 
 	}
 
+	/**
+	 * Parses the node material from the given JSON.
+	 *
+	 * @param {Object} json - The JSON definition
+	 * @return {NodeMaterial}. The parsed material.
+	 */
 	parse( json ) {
 
 		const material = super.parse( json );
@@ -30,6 +57,12 @@ class NodeMaterialLoader extends MaterialLoader {
 
 	}
 
+	/**
+	 * Defines the dictionary of node types.
+	 *
+	 * @param {Object<String,Node.constructor>} value - The node library defined as `<classname,class>`.
+	 * @return {NodeLoader} A reference to this loader.
+	 */
 	setNodes( value ) {
 
 		this.nodes = value;
@@ -37,6 +70,12 @@ class NodeMaterialLoader extends MaterialLoader {
 
 	}
 
+	/**
+	 * Defines the dictionary of node material types.
+	 *
+	 * @param {Object<String,NodeMaterial.constructor>} value - The node material library defined as `<classname,class>`.
+	 * @return {NodeLoader} A reference to this loader.
+	 */
 	setNodeMaterials( value ) {
 
 		this.nodeMaterials = value;
@@ -44,6 +83,12 @@ class NodeMaterialLoader extends MaterialLoader {
 
 	}
 
+	/**
+	 * Creates a node material from the given type.
+	 *
+	 * @param {String} type - The node material type.
+	 * @return {Node} The created node material instance.
+	 */
 	createMaterialFromType( type ) {
 
 		const materialClass = this.nodeMaterials[ type ];

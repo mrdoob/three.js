@@ -15,7 +15,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -24,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, texture, uv, uint, positionWorld, billboarding, time, hash, deltaTime, vec2, instanceIndex, positionGeometry, storage, If } from 'three/tsl';
+			import { Fn, texture, uv, uint, instancedArray, positionWorld, billboarding, time, hash, deltaTime, vec2, instanceIndex, positionGeometry, If } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -94,12 +95,10 @@
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new THREE.StorageInstancedBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
-
-				const positionBuffer = createBuffer();
-				const velocityBuffer = createBuffer();
-				const ripplePositionBuffer = createBuffer();
-				const rippleTimeBuffer = createBuffer();
+				const positionBuffer = instancedArray( maxParticleCount, 'vec3' );
+				const velocityBuffer = instancedArray( maxParticleCount, 'vec3' );
+				const ripplePositionBuffer = instancedArray( maxParticleCount, 'vec3' );
+				const rippleTimeBuffer = instancedArray( maxParticleCount, 'vec3' );
 
 				// compute
 

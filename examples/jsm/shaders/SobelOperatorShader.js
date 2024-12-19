@@ -79,7 +79,7 @@ const SobelOperatorShader = {
 				Gy[0][1] * tx0y1 + Gy[1][1] * tx1y1 + Gy[2][1] * tx2y1 +
 				Gy[0][2] * tx0y2 + Gy[1][2] * tx1y2 + Gy[2][2] * tx2y2;
 
-		// magnitute of the total gradient
+		// magnitude of the total gradient
 
 			float G = sqrt( ( valueGx * valueGx ) + ( valueGy * valueGy ) );
 

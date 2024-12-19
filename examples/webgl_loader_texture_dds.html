@@ -35,8 +35,9 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.z = 15;
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.y = - 2;
+				camera.position.z = 16;
 
 				scene = new THREE.Scene();
 
@@ -90,6 +91,8 @@
 				const map10 = loader.load( 'textures/compressed/disturb_dx10_bc6h_unsigned_mip.dds' );
 				map10.anisotropy = 4;
 
+				const map11 = loader.load( 'textures/wave_normals_24bit_uncompressed.dds' );
+				map11.anisotropy = 4;
 
 				const cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
 
@@ -133,6 +136,7 @@
 				const material10 = new THREE.MeshBasicMaterial( { map: map8 } );
 				const material11 = new THREE.MeshBasicMaterial( { map: map9 } );
 				const material12 = new THREE.MeshBasicMaterial( { map: map10 } );
+				const material13 = new THREE.MeshBasicMaterial( { map: map11 } );
 
 				let mesh = new THREE.Mesh( new THREE.TorusGeometry(), material1 );
 				mesh.position.x = - 10;
@@ -203,6 +207,12 @@
 				mesh = new THREE.Mesh( geometry, material12 );
 				mesh.position.x = 10;
 				mesh.position.y = 2;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material13 );
+				mesh.position.x = - 10;
+				mesh.position.y = - 6;
 				scene.add( mesh );
 				meshes.push( mesh );
 

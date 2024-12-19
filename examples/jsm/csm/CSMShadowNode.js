@@ -5,11 +5,12 @@ import {
 	Matrix4,
 	Box3,
 	Object3D,
-	WebGLCoordinateSystem
-} from 'three';
+	WebGLCoordinateSystem,
+	ShadowBaseNode
+} from 'three/webgpu';
 
 import { CSMFrustum } from './CSMFrustum.js';
-import { viewZToOrthographicDepth, reference, uniform, float, vec4, vec2, If, Fn, min, renderGroup, positionView, Node, NodeUpdateType, shadow } from 'three/tsl';
+import { viewZToOrthographicDepth, reference, uniform, float, vec4, vec2, If, Fn, min, renderGroup, positionView, shadow } from 'three/tsl';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new CSMFrustum();
@@ -34,13 +35,12 @@ class LwLight extends Object3D {
 
 }
 
-class CSMShadowNode extends Node {
+class CSMShadowNode extends ShadowBaseNode {
 
 	constructor( light, data = {} ) {
 
-		super();
+		super( light );
 
-		this.light = light;
 		this.camera = null;
 		this.cascades = data.cascades || 3;
 		this.maxFar = data.maxFar || 100000;
@@ -55,7 +55,6 @@ class CSMShadowNode extends Node {
 		this._cascades = [];
 		this.mainFrustum = null;
 		this.frustums = [];
-		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this.lights = [];
 
@@ -76,6 +75,8 @@ class CSMShadowNode extends Node {
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
 			const lwLight = new LwLight();
+			lwLight.castShadow = true;
+
 			const lShadow = light.shadow.clone();
 			lShadow.bias = lShadow.bias * ( i + 1 );
 
@@ -254,7 +255,7 @@ class CSMShadowNode extends Node {
 	setupFade() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
@@ -262,7 +263,9 @@ class CSMShadowNode extends Node {
 		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
 		const lastCascade = this.cascades - 1;
 
-		return Fn( () => {
+		return Fn( ( builder ) => {
+
+			this.setupShadowPosition( builder );
 
 			const ret = vec4( 1, 1, 1, 1 ).toVar( 'shadowValue' );
 
@@ -308,7 +311,7 @@ class CSMShadowNode extends Node {
 
 					if ( i === 0 ) {
 
-						// dont fade at nearest edge
+						// don't fade at nearest edge
 						ratio = linearDepth.greaterThan( cascadeCenter ).select( ratio, 1 );
 
 					}
@@ -328,14 +331,16 @@ class CSMShadowNode extends Node {
 	setupStandard() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
 		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
 
-		return Fn( () => {
+		return Fn( ( builder ) => {
+
+			this.setupShadowPosition( builder );
 
 			const ret = vec4( 1, 1, 1, 1 ).toVar( 'shadowValue' );
 			const cascade = vec2().toVar( 'cascade' );
@@ -427,6 +432,8 @@ class CSMShadowNode extends Node {
 			parent.remove( light );
 
 		}
+
+		super.dispose();
 
 	}
 

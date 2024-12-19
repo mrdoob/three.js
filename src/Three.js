@@ -1,4 +1,4 @@
-export * from './Three.core.js';
+export * from './Three.Core.js';
 
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
 export { ShaderLib } from './renderers/shaders/ShaderLib.js';
