@@ -838,7 +838,8 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const material = _getMaterial( 'blur' );
 	material.uniforms = materialUniforms; // TODO: Move to outside of the material
-	const cubeUVsampler=Fn((envMap, sampleDirection)=>{
+	const cubeUVsampler=Fn(( [ envMap, sampleDirection ] )=>{
+
 		return bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
 	});
 	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ), sampler: cubeUVsampler } );
