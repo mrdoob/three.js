@@ -127,6 +127,7 @@ export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
 export { ColorManagement } from './math/ColorManagement.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
+export { RaycasterHelper } from './helpers/RaycasterHelper.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
