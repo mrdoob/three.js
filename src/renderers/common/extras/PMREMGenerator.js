@@ -1,5 +1,5 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
-import { getDirection, blur, bilinearCubeUV } from '../../../nodes/pmrem/PMREMUtils.js';
+import { getDirection, blur, bilinearCubeUV, getBlurParams } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
@@ -619,53 +619,12 @@ class PMREMGenerator {
 
 		}
 
-		// Number of standard deviations at which to cut off the discrete approximation.
-		const STANDARD_DEVIATIONS = 3;
-
 		const blurMesh = this._lodMeshes[ lodOut ];
 		blurMesh.material = blurMaterial;
 
 		const blurUniforms = blurMaterial.uniforms;
 
-		const pixels = this._sizeLods[ lodIn ] - 1;
-		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
-		const sigmaPixels = sigmaRadians / radiansPerPixel;
-		const samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
-
-		if ( samples > MAX_SAMPLES ) {
-
-			console.warn( `sigmaRadians, ${
-				sigmaRadians}, is too large and will clip, as it requested ${
-				samples} samples when the maximum is set to ${MAX_SAMPLES}` );
-
-		}
-
-		const weights = [];
-		let sum = 0;
-
-		for ( let i = 0; i < MAX_SAMPLES; ++ i ) {
-
-			const x = i / sigmaPixels;
-			const weight = Math.exp( - x * x / 2 );
-			weights.push( weight );
-
-			if ( i === 0 ) {
-
-				sum += weight;
-
-			} else if ( i < samples ) {
-
-				sum += 2 * weight;
-
-			}
-
-		}
-
-		for ( let i = 0; i < weights.length; i ++ ) {
-
-			weights[ i ] = weights[ i ] / sum;
-
-		}
+		const {radiansPerPixel, samples, weights}=getBlurParams(sigmaRadians, this._sizeLods[ lodIn ] - 1, MAX_SAMPLES);
 
 		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
 
