@@ -16,6 +16,7 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
+import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/PostProcessingUtils.js';
 
 /** @module ShadowNode **/
 
@@ -305,6 +306,7 @@ const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilt
 
 //
 
+let _rendererState;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 /**
@@ -652,19 +654,16 @@ class ShadowNode extends ShadowBaseNode {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 
-		const currentOverrideMaterial = scene.overrideMaterial;
-
-		scene.overrideMaterial = getShadowMaterial( light );
-
 		shadow.camera.layers.mask = camera.layers.mask;
 
-		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
-		const currentMRT = renderer.getMRT();
 
+		const currentMRT = renderer.getMRT();
 		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
 
-		renderer.setMRT( null );
+		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
+
+		scene.overrideMaterial = getShadowMaterial( light );
 
 		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
@@ -701,11 +700,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		}
 
-		renderer.setRenderTarget( currentRenderTarget );
-
-		renderer.setMRT( currentMRT );
-
-		scene.overrideMaterial = currentOverrideMaterial;
+		restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
