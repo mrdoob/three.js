@@ -342,7 +342,7 @@ function WebGLBindingStates( gl, attributes ) {
 
 					// check for integer attributes
 
-					const integer = ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType );
+					const integer = ( type === gl.INT || type === gl.UNSIGNED_INT || type === gl.SHORT || type === gl.BYTE || type === gl.UNSIGNED_BYTE || geometryAttribute.gpuType === IntType );
 
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
