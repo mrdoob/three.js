@@ -13,6 +13,15 @@ import { PointsMaterial } from '../PointsMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
+/**
+ * Unlike WebGL, WebGPU can render point primitives only with a size
+ * of one pixel. This type node material can be used to mimic the WebGL
+ * points rendering by rendering small planes via instancing.
+ *
+ * This material should be used with {@link InstancedPointsGeometry}.
+ *
+ * @augments NodeMaterial
+ */
 class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -21,39 +30,75 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructor( params = {} ) {
+	/**
+	 * Constructs a new instanced points node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
+	constructor( parameters = {} ) {
 
 		super();
 
-		this.lights = false;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInstancedPointsNodeMaterial = true;
 
-		this.useAlphaToCoverage = true;
+		/**
+		 * Whether vertex colors should be used or not. If set to `true`,
+		 * each point instance can receive a custom color value.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.useColor = parameters.vertexColors;
 
-		this.useColor = params.vertexColors;
-
+		/**
+		 * The points width in pixels.
+		 *
+		 * @type {Number}
+		 * @default 1
+		 */
 		this.pointWidth = 1;
 
+		/**
+		 * This node can be used to define the colors for each instance.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.pointColorNode = null;
 
+		/**
+		 * This node can be used to define the width for each point instance.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.pointWidthNode = null;
+
+		this._useAlphaToCoverage = true;
 
 		this.setDefaultValues( _defaultValues );
 
-		this.setValues( params );
+		this.setValues( parameters );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
-		this.setupShaders( builder );
+		const { renderer } = builder;
 
-		super.setup( builder );
-
-	}
-
-	setupShaders( { renderer } ) {
-
-		const useAlphaToCoverage = this.alphaToCoverage;
+		const useAlphaToCoverage = this._useAlphaToCoverage;
 		const useColor = this.useColor;
 
 		this.vertexNode = Fn( () => {
@@ -132,19 +177,27 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		} )();
 
+		super.setup( builder );
+
 	}
 
+	/**
+	 * Whether alpha to coverage should be used or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get alphaToCoverage() {
 
-		return this.useAlphaToCoverage;
+		return this._useAlphaToCoverage;
 
 	}
 
 	set alphaToCoverage( value ) {
 
-		if ( this.useAlphaToCoverage !== value ) {
+		if ( this._useAlphaToCoverage !== value ) {
 
-			this.useAlphaToCoverage = value;
+			this._useAlphaToCoverage = value;
 			this.needsUpdate = true;
 
 		}
