@@ -216,6 +216,7 @@ class WebGPUBackend extends Backend {
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
+			renderTargetData.dimensions !== renderTarget.dimensions ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
 			renderTargetData.samples !== renderTarget.samples
 		) {
@@ -247,16 +248,36 @@ class WebGPUBackend extends Backend {
 			const textures = renderContext.textures;
 			const colorAttachments = [];
 
+			let sliceIndex = undefined;
+
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
 
-				const textureView = textureData.texture.createView( {
+				const viewDescriptor = {
 					baseMipLevel: renderContext.activeMipmapLevel,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
+					arrayLayerCount: 1,
 					dimension: GPUTextureViewDimension.TwoD
-				} );
+				};
+
+				if ( renderTarget.isRenderTarget3D ) {
+
+					sliceIndex = renderContext.activeCubeFace;
+
+					viewDescriptor.baseArrayLayer = 0;
+					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
+					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+				} else if ( renderTarget.isRenderTargetArray ) {
+
+					viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
+					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+				}
+
+				const textureView = textureData.texture.createView( viewDescriptor );
 
 				let view, resolveTarget;
 
@@ -274,6 +295,7 @@ class WebGPUBackend extends Backend {
 
 				colorAttachments.push( {
 					view,
+					depthSlice: sliceIndex,
 					resolveTarget,
 					loadOp: GPULoadOp.Load,
 					storeOp: GPUStoreOp.Store
@@ -303,6 +325,7 @@ class WebGPUBackend extends Backend {
 			renderTargetData.height = renderTarget.height;
 			renderTargetData.samples = renderTarget.samples;
 			renderTargetData.activeMipmapLevel = renderTarget.activeMipmapLevel;
+			renderTargetData.dimensions = renderTarget.dimensions;
 
 		}
 
