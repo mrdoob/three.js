@@ -199,13 +199,49 @@ class Nodes extends DataMap {
 
 	getEnvironmentNode( scene ) {
 
-		return scene.environmentNode || this.get( scene ).environmentNode || null;
+		let environmentNode = null;
+
+		if ( scene.environmentNode && scene.environmentNode.isNode ) {
+
+			environmentNode = scene.environmentNode;
+
+		} else {
+
+			const sceneData = this.get( scene );
+
+			if ( sceneData.environmentNode ) {
+
+				environmentNode = sceneData.environmentNode;
+
+			}
+
+		}
+
+		return environmentNode;
 
 	}
 
 	getBackgroundNode( scene ) {
 
-		return scene.backgroundNode || this.get( scene ).backgroundNode || null;
+		let backgroundNode = null;
+
+		if ( scene.backgroundNode && scene.backgroundNode.isNode ) {
+
+			backgroundNode = scene.backgroundNode;
+
+		} else {
+
+			const sceneData = this.get( scene );
+
+			if ( sceneData.backgroundNode ) {
+
+				backgroundNode = sceneData.backgroundNode;
+
+			}
+
+		}
+
+		return backgroundNode;
 
 	}
 
