@@ -161,15 +161,15 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR_INTENSITY ) {
 
-			const specularIntensity = this.getFloat( scope );
+			const specularIntensityNode = this.getFloat( scope );
 
-			if ( material.specularMap ) {
+			if ( material.specularIntensityMap && material.specularIntensityMap.isTexture === true ) {
 
-				node = specularIntensity.mul( this.getTexture( scope ).a );
+				node = specularIntensityNode.mul( this.getTexture( scope ).a );
 
 			} else {
 
-				node = specularIntensity;
+				node = specularIntensityNode;
 
 			}
 
@@ -499,7 +499,7 @@ export const materialSpecularIntensity = /*@__PURE__*/ nodeImmutable( MaterialNo
  * TSL object that represents the specular color of the current material.
  * The value is composed via `specularColor` * `specularMap.rgb`.
  *
- * @type {Node<float>}
+ * @type {Node<vec3>}
  */
 export const materialSpecularColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
 
@@ -544,7 +544,7 @@ export const materialNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, Materia
 
 /**
  * TSL object that represents the clearcoat of the current material.
- * The value is composed via `clearcoat` * `clearcoat.r`
+ * The value is composed via `clearcoat` * `clearcoatMap.r`
  *
  * @type {Node<float>}
  */

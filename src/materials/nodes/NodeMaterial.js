@@ -400,7 +400,7 @@ class NodeMaterial extends Material {
 	}
 
 	/**
-	 * Setups the vertex and fragment stahge of this node material.
+	 * Setups the vertex and fragment stage of this node material.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

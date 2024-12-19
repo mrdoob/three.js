@@ -16,6 +16,12 @@ import { NoBlending } from '../../constants.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
+/**
+ * This node material can be used to render lines with a size larger than one
+ * by representing them as instanced meshes.
+ *
+ * @augments NodeMaterial
+ */
 class Line2NodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -24,49 +30,120 @@ class Line2NodeMaterial extends NodeMaterial {
 
 	}
 
-	constructor( params = {} ) {
+	/**
+	 * Constructs a new node material for wide line rendering.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
+	constructor( parameters = {} ) {
 
 		super();
 
-		this.lights = false;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLine2NodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues );
 
-		this.useAlphaToCoverage = true;
-		this.useColor = params.vertexColors;
-		this.useDash = params.dashed;
-		this.useWorldUnits = false;
+		/**
+		 * Whether vertex colors should be used or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.useColor = parameters.vertexColors;
 
+		/**
+		 * The dash offset.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.dashOffset = 0;
+
+		/**
+		 * The line width.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.lineWidth = 1;
 
+		/**
+		 * Defines the lines color.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.lineColorNode = null;
 
+		/**
+		 * Defines the offset.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.offsetNode = null;
+
+		/**
+		 * Defines the dash scale.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashScaleNode = null;
+
+		/**
+		 * Defines the dash size.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashSizeNode = null;
+
+		/**
+		 * Defines the gap size.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.gapSizeNode = null;
 
+		/**
+		 * Blending is set to `NoBlending` since transparency
+		 * is not supported, yet.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.blending = NoBlending;
 
-		this.setValues( params );
+		this._useDash = parameters.dashed;
+		this._useAlphaToCoverage = true;
+		this._useWorldUnits = false;
+
+		this.setValues( parameters );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
-		this.setupShaders( builder );
+		const { renderer } = builder;
 
-		super.setup( builder );
-
-	}
-
-	setupShaders( { renderer } ) {
-
-		const useAlphaToCoverage = this.alphaToCoverage;
+		const useAlphaToCoverage = this._useAlphaToCoverage;
 		const useColor = this.useColor;
-		const useDash = this.dashed;
-		const useWorldUnits = this.worldUnits;
+		const useDash = this._useDash;
+		const useWorldUnits = this._useWorldUnits;
 
 		const trimSegment = Fn( ( { start, end } ) => {
 
@@ -394,56 +471,74 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		}
 
+		super.setup( builder );
+
 	}
 
-
+	/**
+	 * Whether the lines should sized in world units or not.
+	 * When set to `false` the unit is pixel.
+	 *
+	 * @type {Boolean}
+	 * @default false
+	 */
 	get worldUnits() {
 
-		return this.useWorldUnits;
+		return this._useWorldUnits;
 
 	}
 
 	set worldUnits( value ) {
 
-		if ( this.useWorldUnits !== value ) {
+		if ( this._useWorldUnits !== value ) {
 
-			this.useWorldUnits = value;
+			this._useWorldUnits = value;
 			this.needsUpdate = true;
 
 		}
 
 	}
 
-
+	/**
+	 * Whether the lines should be dashed or not.
+	 *
+	 * @type {Boolean}
+	 * @default false
+	 */
 	get dashed() {
 
-		return this.useDash;
+		return this._useDash;
 
 	}
 
 	set dashed( value ) {
 
-		if ( this.useDash !== value ) {
+		if ( this._useDash !== value ) {
 
-			this.useDash = value;
+			this._useDash = value;
 			this.needsUpdate = true;
 
 		}
 
 	}
 
-
+	/**
+	 * Whether alpha to coverage should be used or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get alphaToCoverage() {
 
-		return this.useAlphaToCoverage;
+		return this._useAlphaToCoverage;
 
 	}
 
 	set alphaToCoverage( value ) {
 
-		if ( this.useAlphaToCoverage !== value ) {
+		if ( this._useAlphaToCoverage !== value ) {
 
-			this.useAlphaToCoverage = value;
+			this._useAlphaToCoverage = value;
 			this.needsUpdate = true;
 
 		}
