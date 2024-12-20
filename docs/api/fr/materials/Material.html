@@ -350,7 +350,9 @@
 		<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 		<p>
 			Un callback facultatif qui est exécuté immédiatement avant la compilation du programme shader.
-			Cette fonction est appelée avec le code source du shader comme paramètre. Utile pour la modification des matériaux intégrés.
+			Cette fonction est appelée avec le code source du shader comme paramètre. Utile pour la modification des matériaux intégrés, 
+			bien que la nouvelle méthode recommandée soit d'utiliser `WebGPURenderer` avec le nouveau système de Node Material et
+			[link:https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language TSL].
 		</p>
 		<p>
 			Contrairement aux propriétés, le callback n'est pas pris en charge par [page:Material.clone .clone](), [page:Material.copy .copy]() et [page:Material.toJSON .toJSON]().
