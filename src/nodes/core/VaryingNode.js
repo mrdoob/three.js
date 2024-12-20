@@ -176,4 +176,14 @@ export default VaryingNode;
  */
 export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 
+/**
+ * Computes a node in the vertex stage.
+ *
+ * @function
+ * @param {Node} node - The node which should be executed in the vertex stage.
+ * @returns {VaryingNode}
+ */
+export const vertexStage = ( node ) => varying( node );
+
 addMethodChaining( 'varying', varying );
+addMethodChaining( 'vertexStage', vertexStage );
