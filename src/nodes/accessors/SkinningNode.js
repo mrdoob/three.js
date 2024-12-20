@@ -9,6 +9,7 @@ import { positionLocal, positionPrevious } from './Position.js';
 import { tangentLocal } from './Tangent.js';
 import { uniform } from '../core/UniformNode.js';
 import { buffer } from './BufferNode.js';
+import { getDataFromObject } from '../core/NodeUtils.js';
 
 /** @module SkinningNode **/
 
@@ -218,7 +219,7 @@ class SkinningNode extends Node {
 
 		const mrt = builder.renderer.getMRT();
 
-		return ( mrt && mrt.has( 'velocity' ) ) || builder.object.userData.useVelocity === true;
+		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( builder.object ).useVelocity === true;
 
 	}
 
