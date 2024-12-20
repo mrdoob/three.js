@@ -1,4 +1,4 @@
-import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils, NodeUpdateType } from 'three/webgpu';
+import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
 import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference } from 'three/tsl';
 
 /** @module OutlineNode **/
@@ -443,7 +443,7 @@ class OutlineNode extends TempNode {
 		const { renderer } = frame;
 		const { camera, scene } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
 
 		//
 
@@ -546,7 +546,7 @@ class OutlineNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
+		RendererUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 

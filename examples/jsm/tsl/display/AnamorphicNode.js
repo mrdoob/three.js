@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils } from 'three/webgpu';
+import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
 import { nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, vec2, vec3, Loop, mix, luminance } from 'three/tsl';
 
 /** @module AnamorphicNode **/
@@ -147,7 +147,7 @@ class AnamorphicNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -172,7 +172,7 @@ class AnamorphicNode extends TempNode {
 
 		textureNode.value = currentTexture;
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

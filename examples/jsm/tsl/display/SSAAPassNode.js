@@ -1,4 +1,4 @@
-import { AdditiveBlending, Color, Vector2, PostProcessingUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
+import { AdditiveBlending, Color, Vector2, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
 import { nodeObject, uniform, mrt, texture, getTextureIndex } from 'three/tsl';
 
 /** @module SSAAPassNode **/
@@ -114,7 +114,7 @@ class SSAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
 
 		//
 
@@ -230,7 +230,7 @@ class SSAAPassNode extends PassNode {
 
 		//
 
-		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
+		RendererUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
