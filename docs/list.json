@@ -166,6 +166,7 @@
 				"HemisphereLightHelper": "api/en/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/en/helpers/PlaneHelper",
 				"PointLightHelper": "api/en/helpers/PointLightHelper",
+				"RaycasterHelper": "api/en/helpers/RaycasterHelper",
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/en/helpers/SpotLightHelper"
 			},
