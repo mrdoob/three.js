@@ -112,7 +112,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 	 */
 	setupVariants( /* builder */ ) {
 
-		const offsetNode = this.offsetNode ? float( this.offsetNodeNode ) : materialLineDashOffset;
+		const offsetNode = this.offsetNode ? float( this.offsetNode ) : materialLineDashOffset;
 		const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
 		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 		const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
