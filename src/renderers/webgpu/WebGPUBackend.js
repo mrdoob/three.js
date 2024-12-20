@@ -248,13 +248,14 @@ class WebGPUBackend extends Backend {
 			const textures = renderContext.textures;
 			const colorAttachments = [];
 
-			let sliceIndex = undefined;
+			let sliceIndex;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
 
 				const viewDescriptor = {
+					label: `colorAttachment_${ i }`,
 					baseMipLevel: renderContext.activeMipmapLevel,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
@@ -635,7 +636,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	clear( color, depth, stencil, renderTargetData = null ) {
+	clear( color, depth, stencil, renderTargetContext = null ) {
 
 		const device = this.device;
 		const renderer = this.renderer;
@@ -668,7 +669,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderTargetData === null ) {
+		if ( renderTargetContext === null ) {
 
 			supportsDepth = renderer.depth;
 			supportsStencil = renderer.stencil;
@@ -695,45 +696,20 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			supportsDepth = renderTargetData.depth;
-			supportsStencil = renderTargetData.stencil;
+			supportsDepth = renderTargetContext.depth;
+			supportsStencil = renderTargetContext.stencil;
 
 			if ( color ) {
 
-				for ( const texture of renderTargetData.textures ) {
+				const descriptor = this._getRenderPassDescriptor( renderTargetContext );
 
-					const textureData = this.get( texture );
-					const textureView = textureData.texture.createView();
-
-					let view, resolveTarget;
-
-					if ( textureData.msaaTexture !== undefined ) {
-
-						view = textureData.msaaTexture.createView();
-						resolveTarget = textureView;
-
-					} else {
-
-						view = textureView;
-						resolveTarget = undefined;
-
-					}
-
-					colorAttachments.push( {
-						view,
-						resolveTarget,
-						clearValue,
-						loadOp: GPULoadOp.Clear,
-						storeOp: GPUStoreOp.Store
-					} );
-
-				}
+				colorAttachments = descriptor.colorAttachments;
 
 			}
 
 			if ( supportsDepth || supportsStencil ) {
 
-				const depthTextureData = this.get( renderTargetData.depthTexture );
+				const depthTextureData = this.get( renderTargetContext.depthTexture );
 
 				depthStencilAttachment = {
 					view: depthTextureData.texture.createView()
