@@ -69,11 +69,16 @@
 			loader.load( 'models/gltf/steampunk_camera.glb', function ( gltf ) {
 
 				gltf.scene.traverse( function ( object ) {
+
 					if ( object.material ) {
+
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
+		
 					}
+		
 				} );
+		
 				gltf.scene.position.y = 0.1;
 				scene.add( gltf.scene );
 
@@ -118,10 +123,9 @@
 
 			// blend SSR over beauty
 		
-			const outputNode = blendColor( scenePassColor, ssrPass );
+			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
 
-			postProcessing.outputNode = smaa( outputNode );
-
+			postProcessing.outputNode = outputNode;
 
 			//
 
