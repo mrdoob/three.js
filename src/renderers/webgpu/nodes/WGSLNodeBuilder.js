@@ -241,7 +241,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${texture.isData3DTexture ? '3d' : '2d'}T`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -249,7 +249,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const includes = [];
 
-			let code = `fn ${ functionName }( coord : vec2f ) -> vec2f {\n\n\treturn vec2f(\n`;
+			// For 3D textures, use vec3f; for texture arrays, keep vec2f since array index is separate
+			const coordType = texture.isData3DTexture ? 'vec3f' : 'vec2f';
+			let code = `fn ${functionName}( coord : ${coordType} ) -> ${coordType} {\n\n\treturn ${coordType}(\n`;
 
 			const addWrapSnippet = ( wrap, axis ) => {
 
@@ -287,6 +289,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			addWrapSnippet( texture.wrapT, 'y' );
 
+			if ( texture.isData3DTexture ) {
+
+				code += ',\n';
+				addWrapSnippet( texture.wrapR, 'z' );
+
+			}
+
 			code += '\n\t);\n\n}\n';
 
 			wgslCodeCache[ functionName ] = nodeCode = new CodeNode( code, includes );
@@ -310,22 +319,56 @@ class WGSLNodeBuilder extends NodeBuilder {
 		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
 
 			let textureDimensionsParams;
+			let dimensionType;
 
 			const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+			const isMultisampled = primarySamples > 1;
 
-			if ( primarySamples > 1 ) {
+			if ( texture.isData3DTexture ) {
+
+				dimensionType = 'vec3<u32>';
+
+			} else {
+
+				// Regular 2D textures, depth textures, etc.
+				dimensionType = 'vec2<u32>';
+
+			}
+
+			// Build parameters string based on texture type and multisampling
+			if ( isMultisampled || texture.isVideoTexture || texture.isStorageTexture ) {
 
 				textureDimensionsParams = textureProperty;
 
 			} else {
 
-				textureDimensionsParams = `${ textureProperty }, u32( ${ levelSnippet } )`;
+				textureDimensionsParams = `${textureProperty}${levelSnippet ? `, u32( ${ levelSnippet } )` : ''}`;
 
 			}
 
-			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, 'uvec2' ) );
+			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, dimensionType ) );
 
 			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
+
+			if ( texture.isDataArrayTexture || texture.isData3DTexture ) {
+
+				textureData.arrayLayerCount = new VarNode(
+					new ExpressionNode(
+						`textureNumLayers(${textureProperty})`,
+						'u32'
+					)
+				);
+
+			}
+
+			// For cube textures, we know it's always 6 faces
+			if ( texture.isTextureCube ) {
+
+				textureData.cubeFaceCount = new VarNode(
+					new ExpressionNode( '6u', 'u32' )
+				);
+
+			}
 
 		}
 
@@ -349,7 +392,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
-		const coordSnippet = `vec2u( ${ wrapFunction }( ${ uvSnippet } ) * vec2f( ${ textureDimension } ) )`;
+		const vecType = texture.isData3DTexture ? 'vec3' : 'vec2';
+		const coordSnippet = `${vecType}<u32>(${wrapFunction}(${uvSnippet}) * ${vecType}<f32>(${textureDimension}))`;
 
 		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, levelSnippet );
 
