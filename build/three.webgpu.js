@@ -59,18 +59,65 @@ const refreshUniforms = [
 	'transmissionMap'
 ];
 
+/**
+ * This class is used by {@link WebGPURenderer} as management component.
+ * It's primary purpose is to determine whether render objects require a
+ * refresh right before they are going to be rendered or not.
+ */
 class NodeMaterialObserver {
 
+	/**
+	 * Constructs a new node material observer.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 */
 	constructor( builder ) {
 
+		/**
+		 * A node material can be used by more than one render object so the
+		 * monitor must maintain a list of render objects.
+		 *
+		 * @type {WeakMap<RenderObject,Object>}
+		 */
 		this.renderObjects = new WeakMap();
+
+		/**
+		 * Whether the material uses node objects or not.
+		 *
+		 * @type {Boolean}
+		 */
 		this.hasNode = this.containsNode( builder );
+
+		/**
+		 * Whether the node builder's 3D object is animated or not.
+		 *
+		 * @type {Boolean}
+		 */
 		this.hasAnimation = builder.object.isSkinnedMesh === true;
+
+		/**
+		 * A list of all possible material uniforms
+		 *
+		 * @type {Array<String>}
+		 */
 		this.refreshUniforms = refreshUniforms;
+
+		/**
+		 * Holds the current render ID from the node frame.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.renderId = 0;
 
 	}
 
+	/**
+	 * Returns `true` if the given render object is verified for the first time of this observer.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the given render object is verified for the first time of this observer.
+	 */
 	firstInitialization( renderObject ) {
 
 		const hasInitialized = this.renderObjects.has( renderObject );
@@ -87,6 +134,12 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns monitoring data for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Object} The monitoring data.
+	 */
 	getRenderObjectData( renderObject ) {
 
 		let data = this.renderObjects.get( renderObject );
@@ -140,6 +193,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns an attribute data structure holding the attributes versions for
+	 * monitoring.
+	 *
+	 * @param {Object} attributes - The geometry attributes.
+	 * @return {Object} An object for monitoring the versions of attributes.
+	 */
 	getAttributesData( attributes ) {
 
 		const attributesData = {};
@@ -158,6 +218,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns `true` if the node builder's material uses
+	 * node properties.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Boolean} Whether the node builder's material uses node properties or not.
+	 */
 	containsNode( builder ) {
 
 		const material = builder.material;
@@ -176,6 +243,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns a material data structure holding the material property values for
+	 * monitoring.
+	 *
+	 * @param {Material} material - The material.
+	 * @return {Object} An object for monitoring material properties.
+	 */
 	getMaterialData( material ) {
 
 		const data = {};
@@ -210,6 +284,12 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns `true` if the given render object has not changed its state.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the given render object has changed its state or not.
+	 */
 	equals( renderObject ) {
 
 		const { object, material, geometry } = renderObject;
@@ -390,6 +470,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Checks if the given render object requires a refresh.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {NodeFrame} nodeFrame - The current node frame.
+	 * @return {Boolean} Whether the given render object requires a refresh or not.
+	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
 		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) )
@@ -582,6 +669,8 @@ const typeFromLength = /*@__PURE__*/ new Map( [
 	[ 16, 'mat4' ]
 ] );
 
+const dataFromObject = /*@__PURE__*/ new WeakMap();
+
 /**
  * Returns the data type for the given the length.
  *
@@ -749,6 +838,27 @@ function getValueFromType( type, ...params ) {
 }
 
 /**
+ * Gets the object data that can be shared between different rendering steps.
+ *
+ * @param {Object} object - The object to get the data for.
+ * @return {Object} The object data.
+ */
+function getDataFromObject( object ) {
+
+	let data = dataFromObject.get( object );
+
+	if ( data === undefined ) {
+
+		data = {};
+		dataFromObject.set( object, data );
+
+	}
+
+	return data;
+
+}
+
+/**
  * Converts the given array buffer to a Base64 string.
  *
  * @method
@@ -789,6 +899,7 @@ var NodeUtils = /*#__PURE__*/Object.freeze({
 	arrayBufferToBase64: arrayBufferToBase64,
 	base64ToArrayBuffer: base64ToArrayBuffer,
 	getCacheKey: getCacheKey$1,
+	getDataFromObject: getDataFromObject,
 	getLengthFromType: getLengthFromType,
 	getNodeChildren: getNodeChildren,
 	getTypeFromLength: getTypeFromLength,
@@ -3569,8 +3680,10 @@ const uniform = ( arg1, arg2 ) => {
 
 };
 
+/** @module PropertyNode **/
+
 /**
- * This class represents a shader property. It can be used on
+ * This class represents a shader property. It can be used
  * to explicitly define a property and assign a value to it.
  *
  * ```js
@@ -3667,36 +3780,220 @@ class PropertyNode extends Node {
 
 }
 
+/**
+ * TSL function for creating a property node.
+ *
+ * @function
+ * @param {String} type - The type of the node.
+ * @param {String?} [name=null] - The name of the property in the shader.
+ * @returns {PropertyNode}
+ */
 const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
+
+/**
+ * TSL function for creating a varying property node.
+ *
+ * @function
+ * @param {String} type - The type of the node.
+ * @param {String?} [name=null] - The name of the varying in the shader.
+ * @returns {PropertyNode}
+ */
 const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
 
+/**
+ * TSL object that represents the shader variable `DiffuseColor`.
+ *
+ * @type {PropertyNode<vec4>}
+ */
 const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
+
+/**
+ * TSL object that represents the shader variable `EmissiveColor`.
+ *
+ * @type {PropertyNode<vec3>}
+ */
 const emissive = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'EmissiveColor' );
+
+/**
+ * TSL object that represents the shader variable `Roughness`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const roughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Roughness' );
+
+/**
+ * TSL object that represents the shader variable `Metalness`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const metalness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Metalness' );
+
+/**
+ * TSL object that represents the shader variable `Clearcoat`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const clearcoat = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
+
+/**
+ * TSL object that represents the shader variable `ClearcoatRoughness`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const clearcoatRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'ClearcoatRoughness' );
+
+/**
+ * TSL object that represents the shader variable `Sheen`.
+ *
+ * @type {PropertyNode<vec3>}
+ */
 const sheen = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
+
+/**
+ * TSL object that represents the shader variable `SheenRoughness`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const sheenRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
+
+/**
+ * TSL object that represents the shader variable `Iridescence`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const iridescence = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Iridescence' );
+
+/**
+ * TSL object that represents the shader variable `IridescenceIOR`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const iridescenceIOR = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
+
+/**
+ * TSL object that represents the shader variable `IridescenceThickness`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const iridescenceThickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
+
+/**
+ * TSL object that represents the shader variable `AlphaT`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const alphaT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AlphaT' );
+
+/**
+ * TSL object that represents the shader variable `Anisotropy`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const anisotropy = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Anisotropy' );
+
+/**
+ * TSL object that represents the shader variable `AnisotropyT`.
+ *
+ * @type {PropertyNode<vec3>}
+ */
 const anisotropyT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'AnisotropyT' );
+
+/**
+ * TSL object that represents the shader variable `AnisotropyB`.
+ *
+ * @type {PropertyNode<vec3>}
+ */
 const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'AnisotropyB' );
+
+/**
+ * TSL object that represents the shader variable `SpecularColor`.
+ *
+ * @type {PropertyNode<color>}
+ */
 const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+
+/**
+ * TSL object that represents the shader variable `SpecularF90`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const specularF90 = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'SpecularF90' );
+
+/**
+ * TSL object that represents the shader variable `Shininess`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const shininess = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Shininess' );
+
+/**
+ * TSL object that represents the shader variable `Output`.
+ *
+ * @type {PropertyNode<vec4>}
+ */
 const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'Output' );
+
+/**
+ * TSL object that represents the shader variable `dashSize`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const dashSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'dashSize' );
+
+/**
+ * TSL object that represents the shader variable `gapSize`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const gapSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'gapSize' );
+
+/**
+ * TSL object that represents the shader variable `pointWidth`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const pointWidth = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'pointWidth' );
+
+/**
+ * TSL object that represents the shader variable `IOR`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const ior = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IOR' );
+
+/**
+ * TSL object that represents the shader variable `Transmission`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const transmission = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Transmission' );
+
+/**
+ * TSL object that represents the shader variable `Thickness`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const thickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Thickness' );
+
+/**
+ * TSL object that represents the shader variable `AttenuationDistance`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const attenuationDistance = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
+
+/**
+ * TSL object that represents the shader variable `AttenuationColor`.
+ *
+ * @type {PropertyNode<color>}
+ */
 const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
+
+/**
+ * TSL object that represents the shader variable `Dispersion`.
+ *
+ * @type {PropertyNode<float>}
+ */
 const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
 
 /** @module AssignNode **/
@@ -5500,6 +5797,13 @@ const atan2 = ( y, x ) => { // @deprecated, r172
 
 };
 
+// GLSL alias function
+
+const faceforward = faceForward;
+const inversesqrt = inverseSqrt;
+
+// Method chaining
+
 addMethodChaining( 'all', all );
 addMethodChaining( 'any', any );
 addMethodChaining( 'equals', equals );
@@ -6194,7 +6498,17 @@ class VaryingNode extends Node {
  */
 const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 
+/**
+ * Computes a node in the vertex stage.
+ *
+ * @function
+ * @param {Node} node - The node which should be executed in the vertex stage.
+ * @returns {VaryingNode}
+ */
+const vertexStage = ( node ) => varying( node );
+
 addMethodChaining( 'varying', varying );
+addMethodChaining( 'vertexStage', vertexStage );
 
 /** @module ColorSpaceFunctions **/
 
@@ -11402,15 +11716,15 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR_INTENSITY ) {
 
-			const specularIntensity = this.getFloat( scope );
+			const specularIntensityNode = this.getFloat( scope );
 
-			if ( material.specularMap ) {
+			if ( material.specularIntensityMap && material.specularIntensityMap.isTexture === true ) {
 
-				node = specularIntensity.mul( this.getTexture( scope ).a );
+				node = specularIntensityNode.mul( this.getTexture( scope ).a );
 
 			} else {
 
-				node = specularIntensity;
+				node = specularIntensityNode;
 
 			}
 
@@ -11625,7 +11939,7 @@ class MaterialNode extends Node {
 
 			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
 
-		} else if ( scope === MaterialNode.AO_MAP ) {
+		} else if ( scope === MaterialNode.AO ) {
 
 			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
 
@@ -11679,7 +11993,7 @@ MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_WIDTH = 'pointWidth';
 MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
-MaterialNode.AO_MAP = 'ao';
+MaterialNode.AO = 'ao';
 
 /**
  * TSL object that represents alpha test of the current material.
@@ -11738,7 +12052,7 @@ const materialSpecularIntensity = /*@__PURE__*/ nodeImmutable( MaterialNode, Mat
  * TSL object that represents the specular color of the current material.
  * The value is composed via `specularColor` * `specularMap.rgb`.
  *
- * @type {Node<float>}
+ * @type {Node<vec3>}
  */
 const materialSpecularColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
 
@@ -11775,7 +12089,7 @@ const materialMetalness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNod
 
 /**
  * TSL object that represents the normal of the current material.
- * The value will be either `normalMap`, `bumpMap` or `normalView`.
+ * The value will be either `normalMap` * `normalScale`, `bumpMap` * `bumpScale` or `normalView`.
  *
  * @type {Node<vec3>}
  */
@@ -11783,7 +12097,7 @@ const materialNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.N
 
 /**
  * TSL object that represents the clearcoat of the current material.
- * The value is composed via `clearcoat` * `clearcoat.r`
+ * The value is composed via `clearcoat` * `clearcoatMap.r`
  *
  * @type {Node<float>}
  */
@@ -11956,7 +12270,7 @@ const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode
  *
  * @type {Node<float>}
  */
-const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
+const materialAO = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO );
 
 /**
  * TSL object that represents the anisotropy vector of the current material.
@@ -12759,7 +13073,7 @@ class SkinningNode extends Node {
 
 		const mrt = builder.renderer.getMRT();
 
-		return mrt && mrt.has( 'velocity' );
+		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( builder.object ).useVelocity === true;
 
 	}
 
@@ -14733,6 +15047,11 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	]
 } );
 
+/**
+ * Base class for all node materials.
+ *
+ * @augments Material
+ */
 class NodeMaterial extends Material {
 
 	static get type() {
@@ -14741,6 +15060,11 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Represents the type of the node material.
+	 *
+	 * @type {String}
+	 */
 	get type() {
 
 		return this.constructor.type;
@@ -14749,63 +15073,359 @@ class NodeMaterial extends Material {
 
 	set type( _value ) { /* */ }
 
+	/**
+	 * Constructs a new node material.
+	 */
 	constructor() {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isNodeMaterial = true;
 
-		this.forceSinglePass = false;
-
+		/**
+		 * Whether this material is affected by fog or not.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.fog = true;
+
+		/**
+		 * Whether this material is affected by lights or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.lights = false;
+
+		/**
+		 * Whether this material uses hardware clipping or not.
+		 * This property is managed by the engine and should not be
+		 * modified by apps.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.hardwareClipping = false;
 
+		/**
+		 * Node materials which set their `lights` property to `true`
+		 * are affected by all lights of the scene. Sometimes selective
+		 * lighting is wanted which means only _some_ lights in the scene
+		 * affect a material. This can be achieved by creating an instance
+		 * of {@link module:LightsNode~LightsNode} with a list of selective
+		 * lights and assign the node to this property.
+		 *
+		 * ```js
+		 * const customLightsNode = lights( [ light1, light2 ] );
+		 * material.lightsNode = customLightsNode;
+		 * ```
+		 *
+		 * @type {LightsNode?}
+		 * @default null
+		 */
 		this.lightsNode = null;
+
+		/**
+		 * The environment of node materials can be defined by an environment
+		 * map assigned to the `envMap` property or by `Scene.environment`
+		 * if the node material is a PBR material. This node property allows to overwrite
+		 * the default behavior and define the environment with a custom node.
+		 *
+		 * ```js
+		 * material.envNode = pmremTexture( renderTarget.texture );
+		 * ```
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.envNode = null;
+
+		/**
+		 * The lighting of node materials might be influenced by ambient occlusion.
+		 * The default AO is inferred from an ambient occlusion map assigned to `aoMap`
+		 * and the respective `aoMapIntensity`. This node property allows to overwrite
+		 * the default and define the ambient occlusion with a custom node instead.
+		 *
+		 * If you don't want to overwrite the diffuse color but modify the existing
+		 * values instead, use {@link module:MaterialNode.materialAO}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.aoNode = null;
 
+		/**
+		 * The diffuse color of node materials is by default inferred from the
+		 * `color` and `map` properties. This node property allows to overwrite the default
+		 * and define the diffuse color with a node instead.
+		 *
+		 * ```js
+		 * material.colorNode = color( 0xff0000 ); // define red color
+		 * ```
+		 *
+		 * If you don't want to overwrite the diffuse color but modify the existing
+		 * values instead, use {@link module:MaterialNode.materialColor}.
+		 *
+		 * ```js
+		 * material.colorNode = materialColor.mul( color( 0xff0000 ) ); // give diffuse colors a red tint
+		 * ```
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.colorNode = null;
+
+		/**
+		 * The normals of node materials are by default inferred from the `normalMap`/`normalScale`
+		 * or `bumpMap`/`bumpScale` properties. This node property allows to overwrite the default
+		 * and define the normals with a node instead.
+		 *
+		 * If you don't want to overwrite the normals but modify the existing values instead,
+		 * use {@link module:MaterialNode.materialNormal}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.normalNode = null;
+
+		/**
+		 * The opacity of node materials is by default inferred from the `opacity`
+		 * and `alphaMap` properties. This node property allows to overwrite the default
+		 * and define the opacity with a node instead.
+		 *
+		 * If you don't want to overwrite the normals but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialOpacity}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.opacityNode = null;
+
+		/**
+		 * This node can be used to to implement a variety of filter-like effects. The idea is
+		 * to store the current rendering into a texture e.g. via `viewportSharedTexture()`, use it
+		 * to create an arbitrary effect and then assign the node composition to this property.
+		 * Everything behind the object using this material will now be affected by a filter.
+		 *
+		 * ```js
+		 * const material = new NodeMaterial()
+		 * material.transparent = true;
+		 *
+		 * // everything behind the object will be monochromatic
+		 * material.backdropNode = viewportSharedTexture().rgb.saturation( 0 );
+		 * ```
+		 *
+		 * Backdrop computations are part of the lighting so only lit materials can use this property.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.backdropNode = null;
+
+		/**
+		 * This node allows to modulate the influence of `backdropNode` to the outgoing light.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.backdropAlphaNode = null;
+
+		/**
+		 * The alpha test of node materials is by default inferred from the `alphaTest`
+		 * property. This node property allows to overwrite the default and define the
+		 * alpha test with a node instead.
+		 *
+		 * If you don't want to overwrite the alpha test but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAlphaTest}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.alphaTestNode = null;
 
+		/**
+		 * The local vertex positions are computed based on multiple factors like the
+		 * attribute data, morphing or skinning. This node property allows to overwrite
+		 * the default and define local vertex positions with nodes instead.
+		 *
+		 * If you don't want to overwrite the vertex positions but modify the existing
+		 * values instead, use {@link module:Position.positionLocal}.
+		 *
+		 *```js
+		 * material.positionNode = positionLocal.add( displace );
+		 * ```
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.positionNode = null;
+
+		/**
+		 * This node property is intended for logic which modifies geometry data once or per animation step.
+		 * Apps usually place such logic randomly in initialization routines or in the animation loop.
+		 * `geometryNode` is intended as a dedicated API so there is an intended spot where goemetry modiciations
+		 * can be implemented.
+		 *
+		 * The idea is to assign a `Fn` definition that holds the geometry modification logic. A typical example
+		 * would be a GPU based particle system that provides a node material for usage on app level. The particle
+		 * simulation would be implemented as compute shaders and managed inside a `Fn` function. This function is
+		 * eventually assigned to `geometryNode`.
+		 *
+		 * @type {Function}
+		 * @default null
+		 */
 		this.geometryNode = null;
 
+		/**
+		 * Allows to overwrite depth values in the fragment shader.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.depthNode = null;
+
+		/**
+		 * Allows to overwrite the position used for shadow map rendering which
+		 * is by default {@link module:Position.positionWorld}, the vertex position
+		 * in world space.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.shadowPositionNode = null;
+
+		/**
+		 * This node can be used to influence how an object using this node material
+		 * receive shadows.
+		 *
+		 * ```js
+		 * const totalShadows = float( 1 ).toVar();
+		 * material.receivedShadowNode = Fn( ( [ shadow ] ) => {
+		 * 	totalShadows.mulAssign( shadow );
+		 * 	//return float( 1 ); // bypass received shadows
+		 * 	return shadow.mix( color( 0xff0000 ), 1 ); // modify shadow color
+		 * } );
+		 *
+		 * @type {Node<vec4>?}
+		 * @default null
+		 */
 		this.receivedShadowNode = null;
+
+		/**
+		 * This node can be used to influence how an object using this node material
+		 * casts shadows. To apply a color to shadows, you can simply do:
+		 *
+		 * ```js
+		 * material.castShadowNode = vec4( 1, 0, 0, 1 );
+		 * ```
+		 *
+		 * Which can be nice to fake colored shadows of semi-transparent objects. It
+		 * is also common to use the property with `Fn` function so checks are performed
+		 * per fragment.
+		 *
+		 * ```js
+		 * materialCustomShadow.castShadowNode = Fn( () => {
+		 * 	hash( vertexIndex ).greaterThan( 0.5 ).discard();
+		 * 	return materialColor;
+		 * } )();
+		 *  ```
+		 *
+		 * @type {Node<vec4>?}
+		 * @default null
+		 */
 		this.castShadowNode = null;
 
+		/**
+		 * This node can be used to define the final output of the material.
+		 *
+		 * TODO: Explain the differences to `fragmentNode`.
+		 *
+		 * @type {Node<vec4>?}
+		 * @default null
+		 */
 		this.outputNode = null;
+
+		/**
+		 * MRT configuration is done on renderer or pass level. This node allows to
+		 * overwrite what values are written into MRT targets on material level. This
+		 * can be useful for implementing selective FX features that should only affect
+		 * specific objects.
+		 *
+		 * @type {MRTNode?}
+		 * @default null
+		 */
 		this.mrtNode = null;
 
+		/**
+		 * This node property can be used if you need complete freedom in implementing
+		 * the fragment shader. Assigning a node will replace the built-in material
+		 * logic used in the fragment stage.
+		 *
+		 * @type {Node<vec4>?}
+		 * @default null
+		 */
 		this.fragmentNode = null;
+
+		/**
+		 * This node property can be used if you need complete freedom in implementing
+		 * the vertex shader. Assigning a node will replace the built-in material logic
+		 * used in the vertex stage.
+		 *
+		 * @type {Node<vec4>?}
+		 * @default null
+		 */
 		this.vertexNode = null;
 
 	}
 
+	/**
+	 * Allows to define a custom cache key that influence the material key computation
+	 * for render objects.
+	 *
+	 * @return {String} The custom cache key.
+	 */
 	customProgramCacheKey() {
 
 		return this.type + getCacheKey$1( this );
 
 	}
 
+	/**
+	 * Builds this material with the given node builder.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	build( builder ) {
 
 		this.setup( builder );
 
 	}
 
+	/**
+	 * Setups a node material observer with the given builder.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {NodeMaterialObserver} The node material observer.
+	 */
 	setupObserver( builder ) {
 
 		return new NodeMaterialObserver( builder );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
 		builder.context.setupNormal = () => this.setupNormal( builder );
@@ -14929,6 +15549,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the clipping node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ClippingNode} The clipping node.
+	 */
 	setupClipping( builder ) {
 
 		if ( builder.clippingContext === null ) return null;
@@ -14958,6 +15584,11 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the hardware clipping if available on the current device.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupHardwareClipping( builder ) {
 
 		this.hardwareClipping = false;
@@ -14980,6 +15611,11 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the depth of this material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupDepth( builder ) {
 
 		const { renderer, camera } = builder;
@@ -15020,18 +15656,37 @@ class NodeMaterial extends Material {
 
 	}
 
-	setupPositionView() {
+	/**
+	 * Setups the position node in view space. This method exists
+	 * so derived node materials can modifiy the implementation e.g. sprite materials.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec3>} The position in view space.
+	 */
+	setupPositionView( /*builder*/ ) {
 
 		return modelViewMatrix.mul( positionLocal ).xyz;
 
 	}
 
-	setupModelViewProjection() {
+	/**
+	 * Setups the position in clip space.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec4>} The position in view space.
+	 */
+	setupModelViewProjection( /*builder*/ ) {
 
 		return cameraProjectionMatrix.mul( positionView );
 
 	}
 
+	/**
+	 * Setups the logic for the vertex stage.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec4>} The position in clip space.
+	 */
 	setupVertex( builder ) {
 
 		builder.addStack();
@@ -15044,6 +15699,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the computation of the position in local space.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec3>} The position in local space.
+	 */
 	setupPosition( builder ) {
 
 		const { object, geometry } = builder;
@@ -15092,6 +15753,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the computation of the material's diffuse color.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 */
 	setupDiffuseColor( { object, geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
@@ -15158,24 +15825,47 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Abstract interface method that can be implemented by derived materials
+	 * to setup material-specific node variables.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupVariants( /*builder*/ ) {
 
 		// Interface function.
 
 	}
 
+	/**
+	 * Setups the outgoing light node variable
+	 *
+	 * @return {Node<vec3>} The outgoing light node.
+	 */
 	setupOutgoingLight() {
 
 		return ( this.lights === true ) ? vec3( 0 ) : diffuseColor.rgb;
 
 	}
 
+	/**
+	 * Setups the normal node from the material.
+	 *
+	 * @return {Node<vec3>} The normal node.
+	 */
 	setupNormal() {
 
 		return this.normalNode ? vec3( this.normalNode ) : materialNormal;
 
 	}
 
+	/**
+	 * Setups the environment node from the material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec4>} The environment node.
+	 */
 	setupEnvironment( /*builder*/ ) {
 
 		let node = null;
@@ -15194,6 +15884,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the light map node from the material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec3>} The light map node.
+	 */
 	setupLightMap( builder ) {
 
 		let node = null;
@@ -15208,6 +15904,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the lights node based on the scene, environment and material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {LightsNode} The lights node.
+	 */
 	setupLights( builder ) {
 
 		const materialLightsNode = [];
@@ -15232,7 +15934,7 @@ class NodeMaterial extends Material {
 
 		if ( this.aoNode !== null || builder.material.aoMap ) {
 
-			const aoNode = this.aoNode !== null ? this.aoNode : materialAOMap;
+			const aoNode = this.aoNode !== null ? this.aoNode : materialAO;
 
 			materialLightsNode.push( new AONode( aoNode ) );
 
@@ -15250,12 +15952,26 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * This method should be implemented by most derived materials
+	 * since it defines the material's lighting model.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {LightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		// Interface function.
 
 	}
 
+	/**
+	 * Setups the outgoing light node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec3>} The outgoing light node.
+	 */
 	setupLighting( builder ) {
 
 		const { material } = builder;
@@ -15295,6 +16011,13 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Setups the output node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node<vec4>} outputNode - The existing output node.
+	 * @return {Node<vec4>} The output node.
+	 */
 	setupOutput( builder, outputNode ) {
 
 		// FOG
@@ -15317,6 +16040,13 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Most classic material types have a node pendant e.g. for `MeshBasicMaterial`
+	 * there is `MeshBasicNodeMaterial`. This utility method is intended for
+	 * defining all material properties of the classic type in the node type.
+	 *
+	 * @param {Material} material - The material to copy properties with their values to this node material.
+	 */
 	setDefaultValues( material ) {
 
 		// This approach is to reuse the native refreshUniforms*
@@ -15351,6 +16081,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Serializes this material to JSON.
+	 *
+	 * @param {(Object|String)?} meta - The meta information for serialization.
+	 * @return {Object} The serialized node.
+	 */
 	toJSON( meta ) {
 
 		const isRoot = ( meta === undefined || typeof meta === 'string' );
@@ -15410,6 +16146,12 @@ class NodeMaterial extends Material {
 
 	}
 
+	/**
+	 * Copies the properties of the given node material to this instance.
+	 *
+	 * @param {NodeMaterial} source - The material to copy.
+	 * @return {NodeMaterial} A reference to this node material.
+	 */
 	copy( source ) {
 
 		this.lightsNode = source.lightsNode;
@@ -15444,6 +16186,15 @@ class NodeMaterial extends Material {
 
 const _defaultValues$e = /*@__PURE__*/ new PointsMaterial();
 
+/**
+ * Unlike WebGL, WebGPU can render point primitives only with a size
+ * of one pixel. This type node material can be used to mimic the WebGL
+ * points rendering by rendering small planes via instancing.
+ *
+ * This material should be used with {@link InstancedPointsGeometry}.
+ *
+ * @augments NodeMaterial
+ */
 class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -15452,39 +16203,75 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructor( params = {} ) {
+	/**
+	 * Constructs a new instanced points node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
+	constructor( parameters = {} ) {
 
 		super();
 
-		this.lights = false;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInstancedPointsNodeMaterial = true;
 
-		this.useAlphaToCoverage = true;
+		/**
+		 * Whether vertex colors should be used or not. If set to `true`,
+		 * each point instance can receive a custom color value.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.useColor = parameters.vertexColors;
 
-		this.useColor = params.vertexColors;
-
+		/**
+		 * The points width in pixels.
+		 *
+		 * @type {Number}
+		 * @default 1
+		 */
 		this.pointWidth = 1;
 
+		/**
+		 * This node can be used to define the colors for each instance.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.pointColorNode = null;
 
+		/**
+		 * This node can be used to define the width for each point instance.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.pointWidthNode = null;
+
+		this._useAlphaToCoverage = true;
 
 		this.setDefaultValues( _defaultValues$e );
 
-		this.setValues( params );
+		this.setValues( parameters );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
-		this.setupShaders( builder );
+		const { renderer } = builder;
 
-		super.setup( builder );
-
-	}
-
-	setupShaders( { renderer } ) {
-
-		const useAlphaToCoverage = this.alphaToCoverage;
+		const useAlphaToCoverage = this._useAlphaToCoverage;
 		const useColor = this.useColor;
 
 		this.vertexNode = Fn( () => {
@@ -15563,19 +16350,27 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		} )();
 
+		super.setup( builder );
+
 	}
 
+	/**
+	 * Whether alpha to coverage should be used or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get alphaToCoverage() {
 
-		return this.useAlphaToCoverage;
+		return this._useAlphaToCoverage;
 
 	}
 
 	set alphaToCoverage( value ) {
 
-		if ( this.useAlphaToCoverage !== value ) {
+		if ( this._useAlphaToCoverage !== value ) {
 
-			this.useAlphaToCoverage = value;
+			this._useAlphaToCoverage = value;
 			this.needsUpdate = true;
 
 		}
@@ -15586,6 +16381,11 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 const _defaultValues$d = /*@__PURE__*/ new LineBasicMaterial();
 
+/**
+ * Node material version of `LineBasicMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class LineBasicNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -15594,13 +16394,23 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new line basic node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLineBasicNodeMaterial = true;
-
-		this.lights = false;
 
 		this.setDefaultValues( _defaultValues$d );
 
@@ -15612,6 +16422,11 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 const _defaultValues$c = /*@__PURE__*/ new LineDashedMaterial();
 
+/**
+ * Node material version of `LineDashedMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class LineDashedNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -15620,33 +16435,101 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new line dashed node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLineDashedNodeMaterial = true;
-
-		this.lights = false;
 
 		this.setDefaultValues( _defaultValues$c );
 
+		/**
+		 * The dash offset.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.dashOffset = 0;
 
+		/**
+		 * The offset of dash materials is by default inferred from the `dashOffset`
+		 * property. This node property allows to overwrite the default
+		 * and define the offset with a node instead.
+		 *
+		 * If you don't want to overwrite the offset but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialLineDashOffset}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.offsetNode = null;
+
+		/**
+		 * The scale of dash materials is by default inferred from the `scale`
+		 * property. This node property allows to overwrite the default
+		 * and define the scale with a node instead.
+		 *
+		 * If you don't want to overwrite the scale but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialLineScale}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashScaleNode = null;
+
+		/**
+		 * The dash size of dash materials is by default inferred from the `dashSize`
+		 * property. This node property allows to overwrite the default
+		 * and define the dash size with a node instead.
+		 *
+		 * If you don't want to overwrite the dash size but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialLineDashSize}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashSizeNode = null;
+
+		/**
+		 * The gap size of dash materials is by default inferred from the `gapSize`
+		 * property. This node property allows to overwrite the default
+		 * and define the gap size with a node instead.
+		 *
+		 * If you don't want to overwrite the gap size but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialLineGapSize}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.gapSizeNode = null;
 
 		this.setValues( parameters );
 
 	}
 
-	setupVariants() {
+	/**
+	 * Setups the dash specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setupVariants( /* builder */ ) {
 
 		const offsetNode = this.offsetNode ? float( this.offsetNodeNode ) : materialLineDashOffset;
 		const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
 		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
-		const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
+		const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
 
 		dashSize.assign( dashSizeNode );
 		gapSize.assign( gapSizeNode );
@@ -15717,6 +16600,12 @@ const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode
 
 const _defaultValues$b = /*@__PURE__*/ new LineDashedMaterial();
 
+/**
+ * This node material can be used to render lines with a size larger than one
+ * by representing them as instanced meshes.
+ *
+ * @augments NodeMaterial
+ */
 class Line2NodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -15725,49 +16614,120 @@ class Line2NodeMaterial extends NodeMaterial {
 
 	}
 
-	constructor( params = {} ) {
+	/**
+	 * Constructs a new node material for wide line rendering.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
+	constructor( parameters = {} ) {
 
 		super();
 
-		this.lights = false;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLine2NodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues$b );
 
-		this.useAlphaToCoverage = true;
-		this.useColor = params.vertexColors;
-		this.useDash = params.dashed;
-		this.useWorldUnits = false;
+		/**
+		 * Whether vertex colors should be used or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.useColor = parameters.vertexColors;
 
+		/**
+		 * The dash offset.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.dashOffset = 0;
+
+		/**
+		 * The line width.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.lineWidth = 1;
 
+		/**
+		 * Defines the lines color.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.lineColorNode = null;
 
+		/**
+		 * Defines the offset.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.offsetNode = null;
+
+		/**
+		 * Defines the dash scale.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashScaleNode = null;
+
+		/**
+		 * Defines the dash size.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashSizeNode = null;
+
+		/**
+		 * Defines the gap size.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.gapSizeNode = null;
 
+		/**
+		 * Blending is set to `NoBlending` since transparency
+		 * is not supported, yet.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.blending = NoBlending;
 
-		this.setValues( params );
+		this._useDash = parameters.dashed;
+		this._useAlphaToCoverage = true;
+		this._useWorldUnits = false;
+
+		this.setValues( parameters );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
-		this.setupShaders( builder );
+		const { renderer } = builder;
 
-		super.setup( builder );
-
-	}
-
-	setupShaders( { renderer } ) {
-
-		const useAlphaToCoverage = this.alphaToCoverage;
+		const useAlphaToCoverage = this._useAlphaToCoverage;
 		const useColor = this.useColor;
-		const useDash = this.dashed;
-		const useWorldUnits = this.worldUnits;
+		const useDash = this._useDash;
+		const useWorldUnits = this._useWorldUnits;
 
 		const trimSegment = Fn( ( { start, end } ) => {
 
@@ -16095,56 +17055,74 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		}
 
+		super.setup( builder );
+
 	}
 
-
+	/**
+	 * Whether the lines should sized in world units or not.
+	 * When set to `false` the unit is pixel.
+	 *
+	 * @type {Boolean}
+	 * @default false
+	 */
 	get worldUnits() {
 
-		return this.useWorldUnits;
+		return this._useWorldUnits;
 
 	}
 
 	set worldUnits( value ) {
 
-		if ( this.useWorldUnits !== value ) {
+		if ( this._useWorldUnits !== value ) {
 
-			this.useWorldUnits = value;
+			this._useWorldUnits = value;
 			this.needsUpdate = true;
 
 		}
 
 	}
 
-
+	/**
+	 * Whether the lines should be dashed or not.
+	 *
+	 * @type {Boolean}
+	 * @default false
+	 */
 	get dashed() {
 
-		return this.useDash;
+		return this._useDash;
 
 	}
 
 	set dashed( value ) {
 
-		if ( this.useDash !== value ) {
+		if ( this._useDash !== value ) {
 
-			this.useDash = value;
+			this._useDash = value;
 			this.needsUpdate = true;
 
 		}
 
 	}
 
-
+	/**
+	 * Whether alpha to coverage should be used or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get alphaToCoverage() {
 
-		return this.useAlphaToCoverage;
+		return this._useAlphaToCoverage;
 
 	}
 
 	set alphaToCoverage( value ) {
 
-		if ( this.useAlphaToCoverage !== value ) {
+		if ( this._useAlphaToCoverage !== value ) {
 
-			this.useAlphaToCoverage = value;
+			this._useAlphaToCoverage = value;
 			this.needsUpdate = true;
 
 		}
@@ -16175,6 +17153,11 @@ const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
 
 const _defaultValues$a = /*@__PURE__*/ new MeshNormalMaterial();
 
+/**
+ * Node material version of `MeshNormalMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshNormalNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -16183,12 +17166,22 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh normal node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
-		this.lights = false;
-
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshNormalNodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues$a );
@@ -16197,6 +17190,10 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Overwrites the default implementation by computing the diffuse color
+	 * based on the normal data.
+	 */
 	setupDiffuseColor() {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
@@ -16823,6 +17820,11 @@ class BasicLightingModel extends LightingModel {
 
 const _defaultValues$9 = /*@__PURE__*/ new MeshBasicMaterial();
 
+/**
+ * Node material version of `MeshBasicMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshBasicNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -16831,12 +17833,32 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh basic node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshBasicNodeMaterial = true;
 
+		/**
+		 * Although the basic material is by definition unlit, we set
+		 * this property to `true` since we use a lighting model to compute
+		 * the outgoing light of the fragment shader.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
 		this.setDefaultValues( _defaultValues$9 );
@@ -16845,12 +17867,25 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Basic materials are not affected by normal and bump maps so we
+	 * return by default {@link module:Normal.normalView}.
+	 *
+	 * @return {Node<vec3>} The normal node.
+	 */
 	setupNormal() {
 
 		return normalView; // see #28839
 
 	}
 
+	/**
+	 * Overwritten since this type of material uses {@link BasicEnvironmentNode}
+	 * to implement the default environment mapping.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 */
 	setupEnvironment( builder ) {
 
 		const envNode = super.setupEnvironment( builder );
@@ -16859,6 +17894,13 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * This method must be overwriten since light maps are evaluated
+	 * with a special scaling factor for basic materials.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {BasicLightMapNode<vec3>?} The light map node.
+	 */
 	setupLightMap( builder ) {
 
 		let node = null;
@@ -16873,12 +17915,23 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * The material overwrites this method because `lights` is set to `true` but
+	 * we still want to return the diffuse color as the outgoing light.
+	 *
+	 * @return {Node<vec3>} The outgoing light node.
+	 */
 	setupOutgoingLight() {
 
 		return diffuseColor.rgb;
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {BasicLightingModel} The lighting model.
+	 */
 	setupLightingModel() {
 
 		return new BasicLightingModel();
@@ -16999,6 +18052,11 @@ class PhongLightingModel extends BasicLightingModel {
 
 const _defaultValues$8 = /*@__PURE__*/ new MeshLambertMaterial();
 
+/**
+ * Node material version of `MeshLambertMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshLambertNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -17007,12 +18065,30 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh lambert node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshLambertNodeMaterial = true;
 
+		/**
+		 * Set to `true` because lambert materials react on lights.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
 		this.setDefaultValues( _defaultValues$8 );
@@ -17021,6 +18097,13 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Overwritten since this type of material uses {@link BasicEnvironmentNode}
+	 * to implement the default environment mapping.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 */
 	setupEnvironment( builder ) {
 
 		const envNode = super.setupEnvironment( builder );
@@ -17029,6 +18112,11 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {PhongLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel( false ); // ( specular ) -> force lambert
@@ -17039,6 +18127,11 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 const _defaultValues$7 = /*@__PURE__*/ new MeshPhongMaterial();
 
+/**
+ * Node material version of `MeshPhongMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshPhongNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -17047,15 +18140,56 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh lambert node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshPhongNodeMaterial = true;
 
+		/**
+		 * Set to `true` because phong materials react on lights.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
+		/**
+		 * The shininess of phong materials is by default inferred from the `shininess`
+		 * property. This node property allows to overwrite the default
+		 * and define the shininess with a node instead.
+		 *
+		 * If you don't want to overwrite the shininess but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialShininess}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.shininessNode = null;
+
+		/**
+		 * The specular color of phong materials is by default inferred from the
+		 * `specular` property. This node property allows to overwrite the default
+		 * and define the specular color with a node instead.
+		 *
+		 * If you don't want to overwrite the specular color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSpecular}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.specularNode = null;
 
 		this.setDefaultValues( _defaultValues$7 );
@@ -17064,6 +18198,13 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Overwritten since this type of material uses {@link BasicEnvironmentNode}
+	 * to implement the default environment mapping.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 */
 	setupEnvironment( builder ) {
 
 		const envNode = super.setupEnvironment( builder );
@@ -17072,13 +18213,23 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {PhongLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel();
 
 	}
 
-	setupVariants() {
+	/**
+	 * Setups the phong specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setupVariants( /*builder*/ ) {
 
 		// SHININESS
 
@@ -19140,6 +20291,11 @@ const createIrradianceContext = ( normalWorldNode ) => {
 
 const _defaultValues$6 = /*@__PURE__*/ new MeshStandardMaterial();
 
+/**
+ * Node material version of `MeshStandardMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshStandardNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -19148,17 +20304,69 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh standard node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshStandardNodeMaterial = true;
 
+		/**
+		 * Set to `true` because standard materials react on lights.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
+		/**
+		 * The emissive color of standard materials is by default inferred from the `emissive`,
+		 * `emissiveIntensity` and `emissiveMap` properties. This node property allows to
+		 * overwrite the default and define the emissive color with a node instead.
+		 *
+		 * If you don't want to overwrite the emissive color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialEmissive}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.emissiveNode = null;
 
+		/**
+		 * The metalness of standard materials is by default inferred from the `metalness`,
+		 * and `metalnessMap` properties. This node property allows to
+		 * overwrite the default and define the metalness with a node instead.
+		 *
+		 * If you don't want to overwrite the metalness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialMetalness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.metalnessNode = null;
+
+		/**
+		 * The roughness of standard materials is by default inferred from the `roughness`,
+		 * and `roughnessMap` properties. This node property allows to
+		 * overwrite the default and define the roughness with a node instead.
+		 *
+		 * If you don't want to overwrite the roughness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialRoughness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.roughnessNode = null;
 
 		this.setDefaultValues( _defaultValues$6 );
@@ -19167,6 +20375,14 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Overwritten since this type of material uses {@link EnvironmentNode}
+	 * to implement the PBR (PMREM based) environment mapping. Besides, the
+	 * method honors `Scene.environment`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {EnvironmentNode<vec3>?} The environment node.
+	 */
 	setupEnvironment( builder ) {
 
 		let envNode = super.setupEnvironment( builder );
@@ -19181,12 +20397,20 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {PhysicalLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhysicalLightingModel();
 
 	}
 
+	/**
+	 * Setups the specular related node variables.
+	 */
 	setupSpecular() {
 
 		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalness );
@@ -19196,6 +20420,11 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the standard specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupVariants() {
 
 		// METALNESS
@@ -19236,6 +20465,11 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 const _defaultValues$5 = /*@__PURE__*/ new MeshPhysicalMaterial();
 
+/**
+ * Node material version of `MeshPhysicalMaterial`.
+ *
+ * @augments MeshStandardNodeMaterial
+ */
 class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	static get type() {
@@ -19244,33 +20478,243 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh physical node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshPhysicalNodeMaterial = true;
 
+		/**
+		 * The clearcoat of physical materials is by default inferred from the `clearcoat`
+		 * and `clearcoatMap` properties. This node property allows to overwrite the default
+		 * and define the clearcoat with a node instead.
+		 *
+		 * If you don't want to overwrite the clearcoat but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialClearcoat}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.clearcoatNode = null;
+
+		/**
+		 * The clearcoat roughness of physical materials is by default inferred from the `clearcoatRoughness`
+		 * and `clearcoatRoughnessMap` properties. This node property allows to overwrite the default
+		 * and define the clearcoat roughness with a node instead.
+		 *
+		 * If you don't want to overwrite the clearcoat roughness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialClearcoatRoughness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.clearcoatRoughnessNode = null;
+
+		/**
+		 * The clearcoat normal of physical materials is by default inferred from the `clearcoatNormalMap`
+		 * property. This node property allows to overwrite the default
+		 * and define the clearcoat normal with a node instead.
+		 *
+		 * If you don't want to overwrite the clearcoat normal but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialClearcoatNormal}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.clearcoatNormalNode = null;
 
+		/**
+		 * The sheen of physical materials is by default inferred from the `sheen`, `sheenColor`
+		 * and `sheenColorMap` properties. This node property allows to overwrite the default
+		 * and define the sheen with a node instead.
+		 *
+		 * If you don't want to overwrite the sheen but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSheen}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.sheenNode = null;
+
+		/**
+		 * The sheen roughness of physical materials is by default inferred from the `sheenRoughness` and
+		 * `sheenRoughnessMap` properties. This node property allows to overwrite the default
+		 * and define the sheen roughness with a node instead.
+		 *
+		 * If you don't want to overwrite the sheen roughness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSheenRoughness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.sheenRoughnessNode = null;
 
+		/**
+		 * The iridescence of physical materials is by default inferred from the `iridescence`
+		 * property. This node property allows to overwrite the default
+		 * and define the iridescence with a node instead.
+		 *
+		 * If you don't want to overwrite the iridescence but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIridescence}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iridescenceNode = null;
+
+		/**
+		 * The iridescence IOR of physical materials is by default inferred from the `iridescenceIOR`
+		 * property. This node property allows to overwrite the default
+		 * and define the iridescence IOR with a node instead.
+		 *
+		 * If you don't want to overwrite the iridescence IOR but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIridescenceIOR}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iridescenceIORNode = null;
+
+		/**
+		 * The iridescence thickness of physical materials is by default inferred from the `iridescenceThicknessRange`
+		 * and `iridescenceThicknessMap` properties. This node property allows to overwrite the default
+		 * and define the iridescence thickness with a node instead.
+		 *
+		 * If you don't want to overwrite the iridescence thickness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIridescenceThickness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iridescenceThicknessNode = null;
 
+		/**
+		 * The specular intensity of physical materials is by default inferred from the `specularIntensity`
+		 * and `specularIntensityMap` properties. This node property allows to overwrite the default
+		 * and define the specular intensity with a node instead.
+		 *
+		 * If you don't want to overwrite the specular intensity but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSpecularIntensity}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.specularIntensityNode = null;
+
+		/**
+		 * The specular color of physical materials is by default inferred from the `specularColor`
+		 * and `specularColorMap` properties. This node property allows to overwrite the default
+		 * and define the specular color with a node instead.
+		 *
+		 * If you don't want to overwrite the specular color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialSpecularColor}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.specularColorNode = null;
 
+		/**
+		 * The ior of physical materials is by default inferred from the `ior`
+		 * property. This node property allows to overwrite the default
+		 * and define the ior with a node instead.
+		 *
+		 * If you don't want to overwrite the ior but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialIOR}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.iorNode = null;
+
+		/**
+		 * The transmission of physical materials is by default inferred from the `transmission` and
+		 * `transmissionMap` properties. This node property allows to overwrite the default
+		 * and define the transmission with a node instead.
+		 *
+		 * If you don't want to overwrite the transmission but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialTransmission}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.transmissionNode = null;
+
+		/**
+		 * The thickness of physical materials is by default inferred from the `thickness` and
+		 * `thicknessMap` properties. This node property allows to overwrite the default
+		 * and define the thickness with a node instead.
+		 *
+		 * If you don't want to overwrite the thickness but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialThickness}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.thicknessNode = null;
+
+		/**
+		 * The attenuation distance of physical materials is by default inferred from the
+		 * `attenuationDistance` property. This node property allows to overwrite the default
+		 * and define the attenuation distance with a node instead.
+		 *
+		 * If you don't want to overwrite the attenuation distance but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAttenuationDistance}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.attenuationDistanceNode = null;
+
+		/**
+		 * The attenuation color of physical materials is by default inferred from the
+		 * `attenuationColor` property. This node property allows to overwrite the default
+		 * and define the attenuation color with a node instead.
+		 *
+		 * If you don't want to overwrite the attenuation color but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAttenuationColor}.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.attenuationColorNode = null;
+
+		/**
+		 * The dispersion of physical materials is by default inferred from the
+		 * `dispersion` property. This node property allows to overwrite the default
+		 * and define the dispersion with a node instead.
+		 *
+		 * If you don't want to overwrite the dispersion but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialDispersion}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dispersionNode = null;
 
+		/**
+		 * The anisotropy of physical materials is by default inferred from the
+		 * `anisotropy` property. This node property allows to overwrite the default
+		 * and define the anisotropy with a node instead.
+		 *
+		 * If you don't want to overwrite the anisotropy but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialAnisotropy}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.anisotropyNode = null;
 
 		this.setDefaultValues( _defaultValues$5 );
@@ -19279,42 +20723,81 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Whether the lighting model should use clearcoat or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useClearcoat() {
 
 		return this.clearcoat > 0 || this.clearcoatNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use iridescence or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useIridescence() {
 
 		return this.iridescence > 0 || this.iridescenceNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use sheen or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useSheen() {
 
 		return this.sheen > 0 || this.sheenNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use anisotropy or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useAnisotropy() {
 
 		return this.anisotropy > 0 || this.anisotropyNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use transmission or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useTransmission() {
 
 		return this.transmission > 0 || this.transmissionNode !== null;
 
 	}
 
+	/**
+	 * Whether the lighting model should use dispersion or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useDispersion() {
 
 		return this.dispersion > 0 || this.dispersionNode !== null;
 
 	}
 
+	/**
+	 * Setups the specular related node variables.
+	 */
 	setupSpecular() {
 
 		const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
@@ -19325,12 +20808,22 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {PhysicalLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion );
 
 	}
 
+	/**
+	 * Setups the physical specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupVariants( builder ) {
 
 		super.setupVariants( builder );
@@ -19426,6 +20919,11 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	/**
+	 * Setups the clearcoat normal node.
+	 *
+	 * @return {Node<vec3>} The clearcoat noraml.
+	 */
 	setupClearcoatNormal() {
 
 		return this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
@@ -19470,16 +20968,49 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 }
 
+/** @module MeshSSSNodeMaterial **/
+
+/**
+ * Represents the lighting model for {@link MeshSSSNodeMaterial}.
+ *
+ * @augments PhysicalLightingModel
+ */
 class SSSLightingModel extends PhysicalLightingModel {
 
-	constructor( useClearcoat, useSheen, useIridescence, useSSS ) {
+	/**
+	 * Constructs a new physical lighting model.
+	 *
+	 * @param {Boolean} [clearcoat=false] - Whether clearcoat is supported or not.
+	 * @param {Boolean} [sheen=false] - Whether sheen is supported or not.
+	 * @param {Boolean} [iridescence=false] - Whether iridescence is supported or not.
+	 * @param {Boolean} [anisotropy=false] - Whether anisotropy is supported or not.
+	 * @param {Boolean} [transmission=false] - Whether transmission is supported or not.
+	 * @param {Boolean} [dispersion=false] - Whether dispersion is supported or not.
+	 * @param {Boolean} [sss=false] - Whether SSS is supported or not.
+	 */
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, sss = false ) {
 
-		super( useClearcoat, useSheen, useIridescence );
+		super( clearcoat, sheen, iridescence, anisotropy, transmission, dispersion );
 
-		this.useSSS = useSSS;
+		/**
+		 * Whether the lighting model should use SSS or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.useSSS = sss;
 
 	}
 
+	/**
+	 * Extends the default implementation with a SSS term.
+	 *
+	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
+	 *
+	 * @param {Object} input - The input data.
+	 * @param {StackNode} stack - The current stack.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	direct( { lightDirection, lightColor, reflectedLight }, stack, builder ) {
 
 		if ( this.useSSS === true ) {
@@ -19502,6 +21033,12 @@ class SSSLightingModel extends PhysicalLightingModel {
 
 }
 
+/**
+ * This node material is an experimental extension of {@link MeshPhysicalNodeMaterial}
+ * that implements a Subsurface scattering (SSS) term.
+ *
+ * @augments MeshPhysicalNodeMaterial
+ */
 class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	static get type() {
@@ -19510,28 +21047,80 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh SSS node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super( parameters );
 
+		/**
+		 * Represents the thickness color.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.thicknessColorNode = null;
+
+		/**
+		 * Represents the distortion factor.
+		 *
+		 * @type {Node<float>?}
+		 */
 		this.thicknessDistortionNode = float( 0.1 );
+
+		/**
+		 * Represents the thickness ambient factor.
+		 *
+		 * @type {Node<float>?}
+		 */
 		this.thicknessAmbientNode = float( 0.0 );
+
+		/**
+		 * Represents the thickness attenuation.
+		 *
+		 * @type {Node<float>?}
+		 */
 		this.thicknessAttenuationNode = float( .1 );
+
+		/**
+		 * Represents the thickness power.
+		 *
+		 * @type {Node<float>?}
+		 */
 		this.thicknessPowerNode = float( 2.0 );
+
+		/**
+		 * Represents the thickness scale.
+		 *
+		 * @type {Node<float>?}
+		 */
 		this.thicknessScaleNode = float( 10.0 );
 
 	}
 
+	/**
+	 * Whether the lighting model should use SSS or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get useSSS() {
 
 		return this.thicknessColorNode !== null;
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {SSSLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new SSSLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useSSS );
+		return new SSSLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useSSS );
 
 	}
 
@@ -19614,6 +21203,11 @@ class ToonLightingModel extends LightingModel {
 
 const _defaultValues$4 = /*@__PURE__*/ new MeshToonMaterial();
 
+/**
+ * Node material version of `MeshToonMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshToonNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -19622,12 +21216,30 @@ class MeshToonNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh toon node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshToonNodeMaterial = true;
 
+		/**
+		 * Set to `true` because toon materials react on lights.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
 		this.setDefaultValues( _defaultValues$4 );
@@ -19636,6 +21248,11 @@ class MeshToonNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {ToonLightingModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new ToonLightingModel();
@@ -19690,6 +21307,11 @@ const matcapUV = /*@__PURE__*/ nodeImmutable( MatcapUVNode );
 
 const _defaultValues$3 = /*@__PURE__*/ new MeshMatcapMaterial();
 
+/**
+ * Node material version of `MeshMatcapMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class MeshMatcapNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -19698,12 +21320,22 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new mesh normal node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
-		this.lights = false;
-
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMeshMatcapNodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues$3 );
@@ -19712,6 +21344,11 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the matcap specific node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupVariants( builder ) {
 
 		const uv = matcapUV;
@@ -19736,6 +21373,16 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 const _defaultValues$2 = /*@__PURE__*/ new PointsMaterial();
 
+/**
+ * Node material version of `PointsMaterial`.
+ *
+ * Since WebGPU can render point primitives only with a size of one pixel,
+ * this material type does not evaluate the `size` and `sizeAttenuation`
+ * property of `PointsMaterial`. Use {@link InstancedPointsNodeMaterial}
+ * instead if you need points with a size larger than one pixel.
+ *
+ * @augments NodeMaterial
+ */
 class PointsNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -19744,28 +21391,27 @@ class PointsNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new points node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPointsNodeMaterial = true;
-
-		this.lights = false;
-		this.transparent = true;
-
-		this.sizeNode = null;
 
 		this.setDefaultValues( _defaultValues$2 );
 
 		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		this.sizeNode = source.sizeNode;
-
-		return super.copy( source );
 
 	}
 
@@ -19872,6 +21518,11 @@ const rotate = /*@__PURE__*/ nodeProxy( RotateNode );
 
 const _defaultValues$1 = /*@__PURE__*/ new SpriteMaterial();
 
+/**
+ * Node material version of `SpriteMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class SpriteNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -19880,17 +21531,66 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new sprite node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSpriteNodeMaterial = true;
 
-		this.lights = false;
 		this._useSizeAttenuation = true;
 
+		/**
+		 * This property makes it possible to define the position of the sprite with a
+		 * node. That can be useful when the material is used with instanced rendering
+		 * and node data are defined with an instanced attribute node:
+		 * ```js
+		 * const positionAttribute = new InstancedBufferAttribute( new Float32Array( positions ), 3 );
+		 * material.positionNode = instancedBufferAttribute( positionAttribute );
+		 * ```
+		 * Another possibility is to compute the instanced data with a compute shader:
+		 * ```js
+		 * const positionBuffer = instancedArray( particleCount, 'vec3' );
+		 * particleMaterial.positionNode = positionBuffer.toAttribute();
+		 * ```
+		 *
+		 * @type {Node<vec2>?}
+		 * @default null
+		 */
 		this.positionNode = null;
+
+		/**
+		 * The rotation of sprite materials is by default inferred from the `rotation`,
+		 * property. This node property allows to overwrite the default and define
+		 * the rotation with a node instead.
+		 *
+		 * If you don't want to overwrite the rotation but modify the existing
+		 * value instead, use {@link module:MaterialNode.materialRotation}.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.rotationNode = null;
+
+		/**
+		 * This node property provides an additional way to scale sprites next to
+		 * `Object3D.scale`. The scale transformation based in `Object3D.scale`
+		 * is multiplied with the scale value of this node in the vertex shader.
+		 *
+		 * @type {Node<vec2>?}
+		 * @default null
+		 */
 		this.scaleNode = null;
 
 		this.setDefaultValues( _defaultValues$1 );
@@ -19899,13 +21599,18 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the position node in view space. This method implements
+	 * the sprite specific vertex shader.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec3>} The position in view space.
+	 */
 	setupPositionView( builder ) {
 
 		const { object, camera } = builder;
 
 		const sizeAttenuation = this.sizeAttenuation;
-
-		// < VERTEX STAGE >
 
 		const { positionNode, rotationNode, scaleNode } = this;
 
@@ -19919,7 +21624,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		if ( ! sizeAttenuation ) {
+		if ( sizeAttenuation === false ) {
 
 			if ( camera.isPerspectiveCamera ) {
 
@@ -19938,7 +21643,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( object.center && object.center.isVector2 === true ) {
 
-			const center = reference$1( 'center', 'vec2' );
+			const center = reference$1( 'center', 'vec2', object );
 
 			alignedPosition = alignedPosition.sub( center.sub( 0.5 ) );
 
@@ -19964,6 +21669,12 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Whether to use size attenuation or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get sizeAttenuation() {
 
 		return this._useSizeAttenuation;
@@ -20034,6 +21745,11 @@ class ShadowMaskModel extends LightingModel {
 
 const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
+/**
+ * Node material version of `ShadowMaterial`.
+ *
+ * @augments NodeMaterial
+ */
 class ShadowNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -20042,12 +21758,31 @@ class ShadowNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Constructs a new shadow node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
 	constructor( parameters ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isShadowNodeMaterial = true;
 
+		/**
+		 * Set to `true` because so it's possible to implement
+		 * the shadow mask effect.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.lights = true;
 
 		this.setDefaultValues( _defaultValues );
@@ -20056,6 +21791,11 @@ class ShadowNodeMaterial extends NodeMaterial {
 
 	}
 
+	/**
+	 * Setups the lighting model.
+	 *
+	 * @return {ShadowMaskModel} The lighting model.
+	 */
 	setupLightingModel( /*builder*/ ) {
 
 		return new ShadowMaskModel();
@@ -20230,6 +21970,12 @@ class Texture3DNode extends TextureNode {
  */
 const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );
 
+/**
+ * Node material intended for volume rendering. The volumetic data are
+ * defined with an instance of {@link Data3DTexture}.
+ *
+ * @augments NodeMaterial
+ */
 class VolumeNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -20238,18 +21984,85 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructor( params = {} ) {
+	/**
+	 * Constructs a new volume node material.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
+	constructor( parameters ) {
 
 		super();
 
-		this.lights = false;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVolumeNodeMaterial = true;
+
+		/**
+		 * The base color of the volume.
+		 *
+		 * @type {Color}
+		 * @default 100
+		 */
+		this.base = new Color( 0xffffff );
+
+		/**
+		 * A 3D data texture holding the volumetric data.
+		 *
+		 * @type {Data3DTexture?}
+		 * @default null
+		 */
+		this.map = null;
+
+		/**
+		 * This number of samples for each ray that hits the mesh's surface
+		 * and travels through the volume.
+		 *
+		 * @type {Number}
+		 * @default 100
+		 */
+		this.steps = 100;
+
+		/**
+		 * Callback for {@link VolumeNodeMaterial#testNode}.
+		 *
+		 * @callback testNodeCallback
+		 * @param {Data3DTexture<float>} map - The 3D texture.
+		 * @param {Node<float>} mapValue - The sampled value inside the volume.
+		 * @param {Node<vec3>} probe - The probe which is the entry point of the ray on the mesh's surface.
+		 * @param {Node<vec4>} finalColor - The final color.
+		 */
+
+		/**
+		 * The volume rendering of this material works by shooting rays
+		 * from the camera position through each fragment of the mesh's
+		 * surface and sample the inner volume in a raymarching fashion
+		 * mutiple times.
+		 *
+		 * This node can be used to assign a callback function of type `Fn`
+		 * that will be exexuted per sample. The callback receives the
+		 * texture, the sampled texture value as well as position on the surface
+		 * where the rays enters the volume. The last parameter is a color
+		 * that allows the callback to determine the final color.
+		 *
+		 * @type {testNodeCallback?}
+		 * @default null
+		 */
 		this.testNode = null;
 
-		this.setValues( params );
+		this.setValues( parameters );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
 		const map = texture3D( this.map, null, 0 );
@@ -28494,7 +30307,7 @@ class ScriptableNode extends Node {
 	 * Returns a script output for the given name.
 	 *
 	 * @param {String} name - The name of the output.
-	 * @return {Node} The node value.
+	 * @return {ScriptableValueNode} The node value.
 	 */
 	getOutput( name ) {
 
@@ -28662,7 +30475,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Refreshes the script node.
 	 *
-	 * @param {String?} [output=null] - An optinal output.
+	 * @param {String?} [output=null] - An optional output.
 	 */
 	refresh( output = null ) {
 
@@ -28698,7 +30511,7 @@ class ScriptableNode extends Node {
 		const THREE = ScriptableNodeResources.get( 'THREE' );
 		const TSL = ScriptableNodeResources.get( 'TSL' );
 
-		const method = this.getMethod( this.codeNode );
+		const method = this.getMethod();
 		const params = [ parameters, this._local, ScriptableNodeResources, refresh, setOutput, THREE, TSL ];
 
 		this._object = method( ...params );
@@ -29367,7 +31180,7 @@ const subgroupSize = /*@__PURE__*/ computeBuiltin( 'subgroupSize', 'uint' );
 /** @module BarrierNode **/
 
 /**
- * TODO
+ * Represents a GPU control barrier that synchronizes compute operations within a given scope.
  *
  * @augments Node
  */
@@ -29415,7 +31228,9 @@ class BarrierNode extends Node {
 const barrier = nodeProxy( BarrierNode );
 
 /**
- * TSL function for creating a workgroup barrier.
+ * TSL function for creating a workgroup barrier. All compute shader
+ * invocations must wait for each invocation within a workgroup to
+ * complete before the barrier can be surpassed.
  *
  * @function
  * @returns {BarrierNode}
@@ -29423,7 +31238,9 @@ const barrier = nodeProxy( BarrierNode );
 const workgroupBarrier = () => barrier( 'workgroup' ).append();
 
 /**
- * TSL function for creating a storage barrier.
+ * TSL function for creating a storage barrier. All invocations must
+ * wait for each access to variables within the 'storage' address space
+ * to complete before the barrier can be passed.
  *
  * @function
  * @returns {BarrierNode}
@@ -29431,7 +31248,9 @@ const workgroupBarrier = () => barrier( 'workgroup' ).append();
 const storageBarrier = () => barrier( 'storage' ).append();
 
 /**
- * TSL function for creating a texture barrier.
+ * TSL function for creating a texture barrier. All invocations must
+ * wait for each access to variables within the 'texture' address space
+ * to complete before the barrier can be passed.
  *
  * @function
  * @returns {BarrierNode}
@@ -29616,7 +31435,11 @@ const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Wo
 /** @module AtomicFunctionNode **/
 
 /**
- * TODO
+ * `AtomicFunctionNode` represents any function that can operate on atomic variable types
+ * within a shader. In an atomic function, any modifiation to an atomic variable will
+ * occur as an indivisble step with a defined order relative to other modifications.
+ * Accordingly, even if multiple atomic functions are modifying an atomic variable at once
+ * atomic operations will not interfer with each other.
  *
  * @augments TempNode
  */
@@ -29631,38 +31454,38 @@ class AtomicFunctionNode extends TempNode {
 	/**
 	 * Constructs a new atomic function node.
 	 *
-	 * @param {String} method - TODO.
-	 * @param {Node} pointerNode - TODO.
-	 * @param {Node} valueNode - TODO.
-	 * @param {Node?} [storeNode=null] - TODO.
+	 * @param {String} method - The signature of the atomic function to construct.
+	 * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+	 * @param {Node} valueNode - The value that mutates the atomic variable.
+	 * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
 	 */
 	constructor( method, pointerNode, valueNode, storeNode = null ) {
 
 		super( 'uint' );
 
 		/**
-		 * TODO
+		 * The signature of the atomic function to construct.
 		 *
 		 * @type {String}
 		 */
 		this.method = method;
 
 		/**
-		 * TODO
+		 * An atomic variable or element of an atomic buffer.
 		 *
 		 * @type {Node}
 		 */
 		this.pointerNode = pointerNode;
 
 		/**
-		 * TODO
+		 * A value that modifies the atomic variable.
 		 *
 		 * @type {Node}
 		 */
 		this.valueNode = valueNode;
 
 		/**
-		 * TODO
+		 * A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
 		 *
 		 * @type {Node?}
 		 * @default null
@@ -29743,22 +31566,22 @@ AtomicFunctionNode.ATOMIC_XOR = 'atomicXor';
  * TSL function for creating an atomic function node.
  *
  * @function
- * @param {String} method - TODO.
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {String} method - The signature of the atomic function to construct.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicNode = nodeProxy( AtomicFunctionNode );
 
 /**
- * TODO
+ * TSL function for appending an atomic function call into the programmatic flow of a compute shader.
  *
  * @function
- * @param {String} method - TODO.
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {String} method - The signature of the atomic function to construct.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicFunc = ( method, pointerNode, valueNode, storeNode = null ) => {
@@ -29771,89 +31594,89 @@ const atomicFunc = ( method, pointerNode, valueNode, storeNode = null ) => {
 };
 
 /**
- * TODO
+ * Stores a value in the atomic variable.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicStore = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_STORE, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Increments the value stored in the atomic variable.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicAdd = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_ADD, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Decrements the value stored in the atomic variable.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicSub = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_SUB, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Stores in an atomic variable the maximum between its current value and a parameter.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicMax = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_MAX, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Stores in an atomic variable the minimum between its current value and a parameter.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicMin = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_MIN, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Stores in an atomic variable the bitwise AND of its value with a parameter.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicAnd = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_AND, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Stores in an atomic variable the bitwise OR of its value with a parameter.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicOr = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_OR, pointerNode, valueNode, storeNode );
 
 /**
- * TODO
+ * Stores in an atomic variable the bitwise XOR of its value with a parameter.
  *
  * @function
- * @param {Node} pointerNode - TODO.
- * @param {Node} valueNode - TODO.
- * @param {Node?} [storeNode=null] - TODO.
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicXor = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_XOR, pointerNode, valueNode, storeNode );
@@ -30428,7 +32251,7 @@ class ShadowBaseNode extends Node {
 	}
 
 	/**
-	 * Setups the shadow position node which is by default the predefined TSL node object `shadowWorldPosition`.
+	 * Setups the shadow position node which is by default the predefined TSL node object `shadowPositionWorld`.
 	 *
 	 * @param {(NodeBuilder|{Material})} object - A configuration object that must at least hold a material reference.
 	 */
@@ -30436,7 +32259,7 @@ class ShadowBaseNode extends Node {
 
 		// Use assign inside an Fn()
 
-		shadowWorldPosition.assign( material.shadowPositionNode || positionWorld );
+		shadowPositionWorld.assign( material.shadowPositionNode || positionWorld );
 
 	}
 
@@ -30458,7 +32281,129 @@ class ShadowBaseNode extends Node {
  *
  * @type {Node<vec3>}
  */
-const shadowWorldPosition = /*@__PURE__*/ vec3().toVar( 'shadowWorldPosition' );
+const shadowPositionWorld = /*@__PURE__*/ vec3().toVar( 'shadowPositionWorld' );
+
+// renderer state
+
+function saveRendererState( renderer, state = {} ) {
+
+	state.toneMapping = renderer.toneMapping;
+	state.toneMappingExposure = renderer.toneMappingExposure;
+	state.outputColorSpace = renderer.outputColorSpace;
+	state.renderTarget = renderer.getRenderTarget();
+	state.activeCubeFace = renderer.getActiveCubeFace();
+	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
+	state.renderObjectFunction = renderer.getRenderObjectFunction();
+	state.pixelRatio = renderer.getPixelRatio();
+	state.mrt = renderer.getMRT();
+	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
+	state.clearAlpha = renderer.getClearAlpha();
+	state.autoClear = renderer.autoClear;
+	state.scissorTest = renderer.getScissorTest();
+
+	return state;
+
+}
+
+function resetRendererState( renderer, state ) {
+
+	state = saveRendererState( renderer, state );
+
+	renderer.setMRT( null );
+	renderer.setRenderObjectFunction( null );
+	renderer.setClearColor( 0x000000, 1 );
+	renderer.autoClear = true;
+
+	return state;
+
+}
+
+function restoreRendererState( renderer, state ) {
+
+	renderer.toneMapping = state.toneMapping;
+	renderer.toneMappingExposure = state.toneMappingExposure;
+	renderer.outputColorSpace = state.outputColorSpace;
+	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
+	renderer.setRenderObjectFunction( state.renderObjectFunction );
+	renderer.setPixelRatio( state.pixelRatio );
+	renderer.setMRT( state.mrt );
+	renderer.setClearColor( state.clearColor, state.clearAlpha );
+	renderer.autoClear = state.autoClear;
+	renderer.setScissorTest( state.scissorTest );
+
+}
+
+// scene state
+
+function saveSceneState( scene, state = {} ) {
+
+	state.background = scene.background;
+	state.backgroundNode = scene.backgroundNode;
+	state.overrideMaterial = scene.overrideMaterial;
+
+	return state;
+
+}
+
+function resetSceneState( scene, state ) {
+
+	state = saveSceneState( scene, state );
+
+	scene.background = null;
+	scene.backgroundNode = null;
+	scene.overrideMaterial = null;
+
+	return state;
+
+}
+
+function restoreSceneState( scene, state ) {
+
+	scene.background = state.background;
+	scene.backgroundNode = state.backgroundNode;
+	scene.overrideMaterial = state.overrideMaterial;
+
+}
+
+// renderer and scene state
+
+function saveRendererAndSceneState( renderer, scene, state = {} ) {
+
+	state = saveRendererState( renderer, state );
+	state = saveSceneState( scene, state );
+
+	return state;
+
+}
+
+function resetRendererAndSceneState( renderer, scene, state ) {
+
+	state = resetRendererState( renderer, state );
+	state = resetSceneState( scene, state );
+
+	return state;
+
+}
+
+function restoreRendererAndSceneState( renderer, scene, state ) {
+
+	restoreRendererState( renderer, state );
+	restoreSceneState( scene, state );
+
+}
+
+var RendererUtils = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	resetRendererAndSceneState: resetRendererAndSceneState,
+	resetRendererState: resetRendererState,
+	resetSceneState: resetSceneState,
+	restoreRendererAndSceneState: restoreRendererAndSceneState,
+	restoreRendererState: restoreRendererState,
+	restoreSceneState: restoreSceneState,
+	saveRendererAndSceneState: saveRendererAndSceneState,
+	saveRendererState: saveRendererState,
+	saveSceneState: saveSceneState
+});
 
 /** @module ShadowNode **/
 
@@ -30748,6 +32693,7 @@ const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilt
 
 //
 
+let _rendererState;
 const _quadMesh$1 = /*@__PURE__*/ new QuadMesh();
 
 /**
@@ -30991,7 +32937,7 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = lightShadowMatrix( light ).mul( shadowWorldPosition.add( transformedNormalWorld.mul( normalBias ) ) );
+		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( transformedNormalWorld.mul( normalBias ) ) );
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -31095,21 +33041,26 @@ class ShadowNode extends ShadowBaseNode {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 
-		const currentOverrideMaterial = scene.overrideMaterial;
-
-		scene.overrideMaterial = getShadowMaterial( light );
-
 		shadow.camera.layers.mask = camera.layers.mask;
 
-		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
-		const currentMRT = renderer.getMRT();
 
-		renderer.setMRT( null );
+		const currentMRT = renderer.getMRT();
+		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
+
+		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
+
+		scene.overrideMaterial = getShadowMaterial( light );
 
 		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( useVelocity ) {
+
+					getDataFromObject( object ).useVelocity = true;
+
+				}
 
 				object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
@@ -31135,11 +33086,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		}
 
-		renderer.setRenderTarget( currentRenderTarget );
-
-		renderer.setMRT( currentMRT );
-
-		scene.overrideMaterial = currentOverrideMaterial;
+		restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
@@ -33634,6 +35581,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	expression: expression,
 	faceDirection: faceDirection,
 	faceForward: faceForward,
+	faceforward: faceforward,
 	float: float,
 	floor: floor,
 	fog: fog,
@@ -33673,6 +35621,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	instancedMesh: instancedMesh,
 	int: int,
 	inverseSqrt: inverseSqrt,
+	inversesqrt: inversesqrt,
 	invocationLocalIndex: invocationLocalIndex,
 	invocationSubgroupIndex: invocationSubgroupIndex,
 	ior: ior,
@@ -33708,7 +35657,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mat3: mat3,
 	mat4: mat4,
 	matcapUV: matcapUV,
-	materialAOMap: materialAOMap,
+	materialAO: materialAO,
 	materialAlphaTest: materialAlphaTest,
 	materialAnisotropy: materialAnisotropy,
 	materialAnisotropyVector: materialAnisotropyVector,
@@ -33891,7 +35840,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	setCurrentStack: setCurrentStack,
 	shaderStages: shaderStages,
 	shadow: shadow,
-	shadowWorldPosition: shadowWorldPosition,
+	shadowPositionWorld: shadowPositionWorld,
 	sharedUniformGroup: sharedUniformGroup,
 	sheen: sheen,
 	sheenRoughness: sheenRoughness,
@@ -33982,6 +35931,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	velocity: velocity,
 	vertexColor: vertexColor,
 	vertexIndex: vertexIndex,
+	vertexStage: vertexStage,
 	vibrance: vibrance,
 	viewZToLogarithmicDepth: viewZToLogarithmicDepth,
 	viewZToOrthographicDepth: viewZToOrthographicDepth,
@@ -39500,13 +41450,49 @@ class Nodes extends DataMap {
 
 	getEnvironmentNode( scene ) {
 
-		return scene.environmentNode || this.get( scene ).environmentNode || null;
+		let environmentNode = null;
+
+		if ( scene.environmentNode && scene.environmentNode.isNode ) {
+
+			environmentNode = scene.environmentNode;
+
+		} else {
+
+			const sceneData = this.get( scene );
+
+			if ( sceneData.environmentNode ) {
+
+				environmentNode = sceneData.environmentNode;
+
+			}
+
+		}
+
+		return environmentNode;
 
 	}
 
 	getBackgroundNode( scene ) {
 
-		return scene.backgroundNode || this.get( scene ).backgroundNode || null;
+		let backgroundNode = null;
+
+		if ( scene.backgroundNode && scene.backgroundNode.isNode ) {
+
+			backgroundNode = scene.backgroundNode;
+
+		} else {
+
+			const sceneData = this.get( scene );
+
+			if ( sceneData.backgroundNode ) {
+
+				backgroundNode = sceneData.backgroundNode;
+
+			}
+
+		}
+
+		return backgroundNode;
 
 	}
 
@@ -54795,101 +56781,6 @@ class PostProcessing {
 
 }
 
-// renderer state
-
-function saveRendererState( renderer, state = {} ) {
-
-	state.toneMapping = renderer.toneMapping;
-	state.toneMappingExposure = renderer.toneMappingExposure;
-	state.outputColorSpace = renderer.outputColorSpace;
-	state.renderTarget = renderer.getRenderTarget();
-	state.activeCubeFace = renderer.getActiveCubeFace();
-	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
-	state.renderObjectFunction = renderer.getRenderObjectFunction();
-	state.pixelRatio = renderer.getPixelRatio();
-	state.mrt = renderer.getMRT();
-	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
-	state.clearAlpha = renderer.getClearAlpha();
-	state.autoClear = renderer.autoClear;
-	state.scissorTest = renderer.getScissorTest();
-
-	return state;
-
-}
-
-function resetRendererState( renderer, state ) {
-
-	state = saveRendererState( renderer, state );
-
-	renderer.setMRT( null );
-	renderer.setRenderObjectFunction( null );
-	renderer.setClearColor( 0x000000, 1 );
-	renderer.autoClear = true;
-
-	return state;
-
-}
-
-function restoreRendererState( renderer, state ) {
-
-	renderer.toneMapping = state.toneMapping;
-	renderer.toneMappingExposure = state.toneMappingExposure;
-	renderer.outputColorSpace = state.outputColorSpace;
-	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
-	renderer.setRenderObjectFunction( state.renderObjectFunction );
-	renderer.setPixelRatio( state.pixelRatio );
-	renderer.setMRT( state.mrt );
-	renderer.setClearColor( state.clearColor, state.clearAlpha );
-	renderer.autoClear = state.autoClear;
-	renderer.setScissorTest( state.scissorTest );
-
-}
-
-// renderer and scene state
-
-function saveRendererAndSceneState( renderer, scene, state = {} ) {
-
-	state = saveRendererState( renderer, state );
-	state.background = scene.background;
-	state.backgroundNode = scene.backgroundNode;
-	state.overrideMaterial = scene.overrideMaterial;
-
-	return state;
-
-}
-
-function resetRendererAndSceneState( renderer, scene, state ) {
-
-	state = saveRendererAndSceneState( renderer, scene, state );
-
-	scene.background = null;
-	scene.backgroundNode = null;
-	scene.overrideMaterial = null;
-
-	return state;
-
-}
-
-function restoreRendererAndSceneState( renderer, scene, state ) {
-
-	restoreRendererState( renderer, state );
-
-	scene.background = state.background;
-	scene.backgroundNode = state.backgroundNode;
-	scene.overrideMaterial = state.overrideMaterial;
-
-}
-
-var PostProcessingUtils = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	resetRendererAndSceneState: resetRendererAndSceneState,
-	resetRendererState: resetRendererState,
-	restoreRendererAndSceneState: restoreRendererAndSceneState,
-	restoreRendererState: restoreRendererState,
-	saveRendererAndSceneState: saveRendererAndSceneState,
-	saveRendererState: saveRendererState
-});
-
 class StorageTexture extends Texture {
 
 	constructor( width = 1, height = 1 ) {
@@ -55368,4 +57259,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayElementNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, InstancedPointsNodeMaterial, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PostProcessingUtils, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayElementNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, InstancedPointsNodeMaterial, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
