@@ -34,6 +34,7 @@ function getViewZNode( builder ) {
 /**
  * Constructs a new range factor node.
  *
+ * @function
  * @param {Node} near - Defines the near value.
  * @param {Node} far - Defines the far value.
  */
@@ -50,6 +51,7 @@ export const rangeFogFactor = Fn( ( [ near, far ], builder ) => {
  * a clear view near the camera and a faster than exponentially
  * densening fog farther from the camera.
  *
+ * @function
  * @param {Node} density - Defines the fog density.
  */
 export const densityFogFactor = Fn( ( [ density ], builder ) => {
@@ -64,6 +66,7 @@ export const densityFogFactor = Fn( ( [ density ], builder ) => {
  * This class can be used to configure a fog for the scene.
  * Nodes of this type are assigned to `Scene.fogNode`.
  *
+ * @function
  * @param {Node} color - Defines the color of the fog.
  * @param {Node} factor - Defines how the fog is factored in the scene.
  */
