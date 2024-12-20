@@ -17,6 +17,7 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
+import { getDataFromObject } from '../core/NodeUtils.js';
 
 /** @module ShadowNode **/
 
@@ -671,8 +672,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				if ( useVelocity ) {
 
-					object.userData = object.userData || {};
-					object.userData.useVelocity = true;
+					getDataFromObject( object ).useVelocity = true;
 
 				}
 

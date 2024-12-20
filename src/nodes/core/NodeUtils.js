@@ -168,6 +168,8 @@ const typeFromLength = /*@__PURE__*/ new Map( [
 	[ 16, 'mat4' ]
 ] );
 
+const dataFromObject = /*@__PURE__*/ new WeakMap();
+
 /**
  * Returns the data type for the given the length.
  *
@@ -331,6 +333,27 @@ export function getValueFromType( type, ...params ) {
 	}
 
 	return null;
+
+}
+
+/**
+ * Gets the object data that can be shared between different rendering steps.
+ *
+ * @param {Object} object - The object to get the data for.
+ * @return {Object} The object data.
+ */
+export function getDataFromObject( object ) {
+
+	let data = dataFromObject.get( object );
+
+	if ( data === undefined ) {
+
+		data = {};
+		dataFromObject.set( object, data );
+
+	}
+
+	return data;
 
 }
 
