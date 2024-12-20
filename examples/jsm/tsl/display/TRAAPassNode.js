@@ -1,4 +1,4 @@
-import { Color, Vector2, NearestFilter, Matrix4, PostProcessingUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
+import { Color, Vector2, NearestFilter, Matrix4, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
 import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
 
 /** @module TRAAPassNode **/
@@ -153,7 +153,7 @@ class TRAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
 
 		//
 
@@ -291,7 +291,7 @@ class TRAAPassNode extends PassNode {
 
 		velocityOutput.setProjectionMatrix( null );
 
-		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
+		RendererUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 

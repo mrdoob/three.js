@@ -1,4 +1,4 @@
-import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
+import { NearestFilter, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
 import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 
 /** @module SSRNode **/
@@ -235,7 +235,7 @@ class SSRNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		const size = renderer.getDrawingBufferSize( _size );
 
@@ -255,7 +255,7 @@ class SSRNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

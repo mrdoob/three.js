@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, NodeMaterial, PostProcessingUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
+import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, If, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul } from 'three/tsl';
 
 /** @module GaussianBlurNode **/
@@ -201,7 +201,7 @@ class GaussianBlurNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -240,7 +240,7 @@ class GaussianBlurNode extends TempNode {
 
 		textureNode.value = currentTexture;
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

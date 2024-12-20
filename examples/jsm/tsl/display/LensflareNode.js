@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, TempNode, NodeUpdateType, QuadMesh, PostProcessingUtils, NodeMaterial } from 'three/webgpu';
+import { RenderTarget, Vector2, TempNode, NodeUpdateType, QuadMesh, RendererUtils, NodeMaterial } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, passTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
 
 /** @module LensflareNode **/
@@ -174,7 +174,7 @@ class LensflareNode extends TempNode {
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		_quadMesh.material = this._material;
 
@@ -189,7 +189,7 @@ class LensflareNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
