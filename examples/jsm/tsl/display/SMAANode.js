@@ -1,4 +1,4 @@
-import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, PostProcessingUtils } from 'three/webgpu';
+import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
 import { abs, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
 /** @module SMAANode **/
@@ -240,7 +240,7 @@ class SMAANode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -270,7 +270,7 @@ class SMAANode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, QuadMesh, NodeMaterial, PostProcessingUtils, TempNode, NodeUpdateType } from 'three/webgpu';
+import { RenderTarget, Vector2, QuadMesh, NodeMaterial, RendererUtils, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, vec4, uv, texture, passTexture, uniform, sign, max, convertToTexture } from 'three/tsl';
 
 /** @module AfterImageNode **/
@@ -122,7 +122,7 @@ class AfterImageNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -157,7 +157,7 @@ class AfterImageNode extends TempNode {
 
 		textureNode.value = currentTexture;
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

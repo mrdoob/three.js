@@ -1,4 +1,4 @@
-import { StereoCamera, Vector2, PassNode, PostProcessingUtils } from 'three/webgpu';
+import { StereoCamera, Vector2, PassNode, RendererUtils } from 'three/webgpu';
 import { nodeObject } from 'three/tsl';
 
 /** @module StereoPassNode **/
@@ -59,7 +59,7 @@ class StereoPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera, stereo, renderTarget } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -101,7 +101,7 @@ class StereoPassNode extends PassNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

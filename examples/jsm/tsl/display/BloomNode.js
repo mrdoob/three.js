@@ -1,4 +1,4 @@
-import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils, NodeUpdateType } from 'three/webgpu';
+import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
 
 /** @module BloomNode **/
@@ -290,7 +290,7 @@ class BloomNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -333,7 +333,7 @@ class BloomNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
