@@ -11,7 +11,7 @@ export * from '../math/MathNode.js'; // abs(), floor(), ...
 export * from '../math/ConditionalNode.js'; // select(), ...
 export * from '../core/ContextNode.js'; // .context()
 export * from '../core/VarNode.js'; // .var() -> TODO: Maybe rename .toVar() -> .var()
-export * from '../core/VaryingNode.js'; // varying() -> TODO: Add vertexStage()
+export * from '../core/VaryingNode.js'; // varying(), vertexStage()
 export * from '../display/ColorSpaceNode.js'; // .toColorSpace()
 export * from '../display/ToneMappingNode.js'; // .toToneMapping()
 export * from '../accessors/BufferAttributeNode.js'; // .toAttribute()
