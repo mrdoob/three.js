@@ -10,6 +10,8 @@ import { nodeProxy } from '../tsl/TSLCore.js';
  * Accordingly, even if multiple atomic functions are modifying an atomic variable at once
  * atomic operations will not interfer with each other.
  *
+ * This node can only be used with a WebGPU backend.
+ *
  * @augments TempNode
  */
 class AtomicFunctionNode extends TempNode {
