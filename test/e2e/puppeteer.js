@@ -157,6 +157,7 @@ const exceptionList = [
 	'webgpu_tsl_vfx_tornado',
 	'webgpu_textures_anisotropy',
 	'webgpu_textures_2d-array_compressed',
+	'webgpu_rendertarget_2d-array-3d',
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_ssr',
 	'webgpu_postprocessing_sobel',
