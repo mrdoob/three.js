@@ -77,7 +77,7 @@ class SSRNode extends TempNode {
 		 * computational overhead.
 		 *
 		 * @type {Number}
-		 * @default
+		 * @default 0.5
 		 */
 		this.resolutionScale = 0.5;
 
