@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - WebGPU - RenderTarget3D and RenderTargetArray Comparison</title>
+		<title>three.js webgpu - RenderTargetArray and RenderTarget3D</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -22,7 +22,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - RenderTarget3D and RenderTargetArray Comparison<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - RenderTargetArray and RenderTarget3D<br />
 		</div>
 		<div class="viewport-label" style="bottom: 2%; left: 2%;">DataArrayTexture</div>
 		<div class="viewport-label" style="bottom: 2%; left: 52%;">DataTexture3D</div>
@@ -65,7 +65,7 @@
 
 					// Set up perspective camera
 					this.camera = new THREE.PerspectiveCamera( 50, aspect, 0.1, 100 );
-					this.camera.position.set( - 10, 0, 10 );
+					this.camera.position.set( - 7, 0, 10 );
 					this.camera.lookAt( 0, 0, 0 );
 					this.camera.updateProjectionMatrix();
 
@@ -229,14 +229,18 @@
 
 
 
-						// In WebGPU we need to clear all the layers of the 3D render target before rendering to it
-						const materialClear = new THREE.NodeMaterial();
-						materialClear.outputNode = vec4( 0 );
-						const clearQuadMesh = new THREE.QuadMesh( materialClear );
-						for ( let i = 0; i < size.depth; i ++ ) {
+						// In WebGPU we need to clear all the layers of the 3D render target before rendering to it (WebGPU limitation?)
+						if ( renderer.backend.isWebGPUBackend ) {
+
+							const materialClear = new THREE.NodeMaterial();
+							materialClear.outputNode = vec4( 0 );
+							const clearQuadMesh = new THREE.QuadMesh( materialClear );
+							for ( let i = 0; i < size.depth; i ++ ) {
 			
-							renderer.setRenderTarget( fbo3D, i );
-							clearQuadMesh.render( renderer );
+								renderer.setRenderTarget( fbo3D, i );
+								clearQuadMesh.render( renderer );
+
+							}
 
 						}
 
