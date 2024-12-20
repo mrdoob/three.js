@@ -8,6 +8,13 @@
     },
     "plugins": [ "plugins/markdown" ],
     "source": {
-        "include": [ "src/nodes", "src/loaders/nodes", "src/materials/nodes", "examples/jsm/tsl" ]
+        "include": [
+            "examples/jsm/tsl",
+            "src/loaders/nodes", 
+            "src/materials/nodes", 
+            "src/nodes", 
+            "src/renderers/common", 
+            "src/renderers/webgpu" 
+        ]
     }
 }
