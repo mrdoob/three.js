@@ -110,9 +110,7 @@
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new THREE.WebGPURenderer( {
-					forceWebGL: false
-				} );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
@@ -156,32 +154,52 @@
 						const zip = unzipSync( new Uint8Array( data ) );
 						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
-						const texture3D = new THREE.Data3DTexture( array, size.width, size.height, size.depth );
-						texture3D.format = THREE.RedFormat;
-						texture3D.minFilter = THREE.LinearFilter;
-						texture3D.magFilter = THREE.LinearFilter;
-						texture3D.unpackAlignment = 1;
-						texture3D.needsUpdate = true;
+						const map3D = new THREE.Data3DTexture( array, size.width, size.height, size.depth );
+						map3D.name = 'Data3DTexture';
+						map3D.format = THREE.RedFormat;
+						map3D.minFilter = THREE.LinearFilter;
+						map3D.magFilter = THREE.LinearFilter;
+						map3D.unpackAlignment = 1;
+						map3D.needsUpdate = true;
 
-						const textureArray = new THREE.DataArrayTexture( array, size.width, size.height, size.depth );
-						textureArray.format = THREE.RedFormat;
-						textureArray.minFilter = THREE.LinearFilter;
-						textureArray.magFilter = THREE.LinearFilter;
-						textureArray.unpackAlignment = 1;
-						textureArray.needsUpdate = true;
 
 						const depth = size.depth / 20;
 
-						// Setup Data3DTexture view
-						const helper3D = new TextureHelper( texture3D, 10, 10, depth );
+						// 3D
+						const helper3D = new TextureHelper( map3D, 10, 10, depth );
 						helper3D.material.outputNode = vec4(
 							vec3( diffuseColor.r.mul( attribute( 'uvw' ).z.mul( diffuseColor.r ) ) ),
 							diffuseColor.r.mul( diffuseColor.a )
 						);
 						views[ 1 ].scene.add( helper3D );
 
-						// Setup DataArrayTexture view
-						const helperArray = new TextureHelper( textureArray, 10, 10, depth );
+						const fbo3D = new THREE.RenderTarget3D( size.width, size.height, size.depth, {
+							depthBuffer: false,
+						} );
+						fbo3D.texture.name = 'RenderTarget3D';
+
+
+						const fbo3DHelper = new TextureHelper( fbo3D.texture, 10, 10, depth );
+						fbo3DHelper.material.outputNode = vec4(
+							vec3( diffuseColor.r ),
+							diffuseColor.r
+						);
+						views[ 3 ].scene.add( fbo3DHelper );
+
+
+
+
+						// 2D Array
+
+						const mapArray = new THREE.DataArrayTexture( array, size.width, size.height, size.depth );
+						mapArray.name = 'DataArrayTexture';
+						mapArray.format = THREE.RedFormat;
+						mapArray.minFilter = THREE.LinearFilter;
+						mapArray.magFilter = THREE.LinearFilter;
+						mapArray.unpackAlignment = 1;
+						mapArray.needsUpdate = true;
+
+						const helperArray = new TextureHelper( mapArray, 10, 10, depth );
 						helperArray.material.outputNode = vec4(
 							vec3( diffuseColor.r.mul( attribute( 'uvw' ).z.div( size.depth ).mul( diffuseColor.r ) ) ),
 							diffuseColor.r.mul( diffuseColor.a )
@@ -192,15 +210,12 @@
 						const materialQuad = new THREE.NodeMaterial();
 						const uZCoord = uniform( 0 );
 						materialQuad.depthTest = false;
-						materialQuad.outputNode = vec4( texture( textureArray ).depth( uZCoord ).rgb, 1 );
+						materialQuad.outputNode = vec4( texture( mapArray ).depth( uZCoord ).rgb, 1 );
 
 						const fboArray = new THREE.RenderTargetArray( size.width, size.height, size.depth, {
 							depthBuffer: false,
 						} );
-
-						const fbo3D = new THREE.RenderTarget3D( size.width, size.height, size.depth, {
-							depthBuffer: false,
-						} );
+						fboArray.texture.name = 'RenderTargetArray';
 
 						const fboArrayHelper = new TextureHelper( fboArray.texture, 10, 10, depth );
 						fboArrayHelper.material.outputNode = vec4(
@@ -209,14 +224,22 @@
 						);
 						views[ 2 ].scene.add( fboArrayHelper );
 
-						const fbo3DHelper = new TextureHelper( fbo3D.texture, 10, 10, depth );
-						fbo3DHelper.material.outputNode = vec4(
-							vec3( diffuseColor.r ),
-							diffuseColor.r
-						);
-						views[ 3 ].scene.add( fbo3DHelper );
 
 						const quadMesh = new THREE.QuadMesh( materialQuad );
+
+
+
+						// In WebGPU we need to clear all the layers of the 3D render target before rendering to it
+						const materialClear = new THREE.NodeMaterial();
+						materialClear.outputNode = vec4( 0 );
+						const clearQuadMesh = new THREE.QuadMesh( materialClear );
+						for ( let i = 0; i < size.depth; i ++ ) {
+			
+							renderer.setRenderTarget( fbo3D, i );
+							clearQuadMesh.render( renderer );
+
+						}
+
 						let j = 0;
 
 						const loop = () => {
