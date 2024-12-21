@@ -10,6 +10,8 @@ import { Loop, Break } from '../../nodes/utils/LoopNode.js';
 import { texture3D } from '../../nodes/accessors/Texture3DNode.js';
 import { Color } from '../../math/Color.js';
 
+/** @module VolumeNodeMaterial **/
+
 /**
  * Node material intended for volume rendering. The volumetic data are
  * defined with an instance of {@link Data3DTexture}.
