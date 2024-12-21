@@ -2058,13 +2058,13 @@ class Renderer {
 	/**
 	 * Sets the given render object function. Calling this method overwrites the default implementation
 	 * which is {@link module:Renderer~Renderer#renderObject}. Defining a custom function can be useful
-	 * if you want to modify the way objects are rendered. The custom function must have the same signature
-	 * as {@link module:Renderer~Renderer#renderObject} and must always call `renderObject()` in its
-	 * implementation.
+	 * if you want to modify the way objects are rendered. For example you can define things like "every
+	 * object that has material of a certain type should perform a pre-pass with a special overwrite material".
+	 * The custom function must always call `renderObject()` in its implementation.
 	 *
 	 * Use `null` as the first argument to reset the state.
 	 *
-	 * @param {renderObjectFunction?} renderObjectFunction - The render object function.
+	 * @param {module:Renderer~renderObjectFunction?} renderObjectFunction - The render object function.
 	 */
 	setRenderObjectFunction( renderObjectFunction ) {
 
