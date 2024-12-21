@@ -22,6 +22,7 @@ class Nodes extends DataMap {
 		this.nodeBuilderCache = new Map();
 		this.callHashCache = new ChainMap();
 		this.groupsData = new ChainMap();
+		this.cacheLib = {};
 
 	}
 
@@ -199,6 +200,8 @@ class Nodes extends DataMap {
 
 	getEnvironmentNode( scene ) {
 
+		this.updateEnvironment( scene );
+
 		let environmentNode = null;
 
 		if ( scene.environmentNode && scene.environmentNode.isNode ) {
@@ -223,6 +226,8 @@ class Nodes extends DataMap {
 
 	getBackgroundNode( scene ) {
 
+		this.updateBackground( scene );
+
 		let backgroundNode = null;
 
 		if ( scene.backgroundNode && scene.backgroundNode.isNode ) {
@@ -246,6 +251,8 @@ class Nodes extends DataMap {
 	}
 
 	getFogNode( scene ) {
+
+		this.updateFog( scene );
 
 		return scene.fogNode || this.get( scene ).fogNode || null;
 
@@ -284,14 +291,6 @@ class Nodes extends DataMap {
 
 	}
 
-	updateScene( scene ) {
-
-		this.updateEnvironment( scene );
-		this.updateFog( scene );
-		this.updateBackground( scene );
-
-	}
-
 	get isToneMappingState() {
 
 		return this.renderer.getRenderTarget() ? false : true;
@@ -309,41 +308,43 @@ class Nodes extends DataMap {
 
 			if ( sceneData.background !== background || forceUpdate ) {
 
-				let backgroundNode = null;
+				const backgroundNode = this.getCacheNode( 'background', background, () => {
 
-				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
+					if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
 
-					if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
+						if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
-						backgroundNode = pmremTexture( background );
-
-					} else {
-
-						let envMap;
-
-						if ( background.isCubeTexture === true ) {
-
-							envMap = cubeTexture( background );
+							return pmremTexture( background );
 
 						} else {
 
-							envMap = texture( background );
+							let envMap;
+
+							if ( background.isCubeTexture === true ) {
+
+								envMap = cubeTexture( background );
+
+							} else {
+
+								envMap = texture( background );
+
+							}
+
+							return cubeMapNode( envMap );
 
 						}
 
-						backgroundNode = cubeMapNode( envMap );
+					} else if ( background.isTexture === true ) {
+
+						return texture( background, screenUV.flipY() ).setUpdateMatrix( true );
+
+					} else if ( background.isColor !== true ) {
+
+						console.error( 'WebGPUNodes: Unsupported background configuration.', background );
 
 					}
 
-				} else if ( background.isTexture === true ) {
-
-					backgroundNode = texture( background, screenUV.flipY() ).setUpdateMatrix( true );
-
-				} else if ( background.isColor !== true ) {
-
-					console.error( 'WebGPUNodes: Unsupported background configuration.', background );
-
-				}
+				}, forceUpdate );
 
 				sceneData.backgroundNode = backgroundNode;
 				sceneData.background = background;
@@ -360,6 +361,23 @@ class Nodes extends DataMap {
 
 	}
 
+	getCacheNode( type, object, callback, forceUpdate = false ) {
+
+		const nodeCache = this.cacheLib[ type ] || ( this.cacheLib[ type ] = new WeakMap() );
+
+		let node = nodeCache.get( object );
+
+		if ( node === undefined || forceUpdate ) {
+
+			node = callback();
+			nodeCache.set( object, node );
+
+		}
+
+		return node;
+
+	}
+
 	updateFog( scene ) {
 
 		const sceneData = this.get( scene );
@@ -369,28 +387,30 @@ class Nodes extends DataMap {
 
 			if ( sceneData.fog !== sceneFog ) {
 
-				let fogNode = null;
+				const fogNode = this.getCacheNode( 'fog', sceneFog, () => {
 
-				if ( sceneFog.isFogExp2 ) {
+					if ( sceneFog.isFogExp2 ) {
 
-					const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
-					const density = reference( 'density', 'float', sceneFog ).setGroup( renderGroup );
+						const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
+						const density = reference( 'density', 'float', sceneFog ).setGroup( renderGroup );
 
-					fogNode = fog( color, densityFogFactor( density ) );
+						return fog( color, densityFogFactor( density ) );
 
-				} else if ( sceneFog.isFog ) {
+					} else if ( sceneFog.isFog ) {
 
-					const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
-					const near = reference( 'near', 'float', sceneFog ).setGroup( renderGroup );
-					const far = reference( 'far', 'float', sceneFog ).setGroup( renderGroup );
+						const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
+						const near = reference( 'near', 'float', sceneFog ).setGroup( renderGroup );
+						const far = reference( 'far', 'float', sceneFog ).setGroup( renderGroup );
 
-					fogNode = fog( color, rangeFogFactor( near, far ) );
+						return fog( color, rangeFogFactor( near, far ) );
 
-				} else {
+					} else {
 
-					console.error( 'WebGPUNodes: Unsupported fog configuration.', sceneFog );
+						console.error( 'THREE.Renderer: Unsupported fog configuration.', sceneFog );
 
-				}
+					}
+
+				} );
 
 				sceneData.fogNode = fogNode;
 				sceneData.fog = sceneFog;
@@ -415,21 +435,23 @@ class Nodes extends DataMap {
 
 			if ( sceneData.environment !== environment ) {
 
-				let environmentNode = null;
+				const environmentNode = this.getCacheNode( 'environment', environment, () => {
 
-				if ( environment.isCubeTexture === true ) {
+					if ( environment.isCubeTexture === true ) {
 
-					environmentNode = cubeTexture( environment );
+						return cubeTexture( environment );
 
-				} else if ( environment.isTexture === true ) {
+					} else if ( environment.isTexture === true ) {
 
-					environmentNode = texture( environment );
+						return texture( environment );
 
-				} else {
+					} else {
 
-					console.error( 'Nodes: Unsupported environment configuration.', environment );
+						console.error( 'Nodes: Unsupported environment configuration.', environment );
 
-				}
+					}
+
+				} );
 
 				sceneData.environmentNode = environmentNode;
 				sceneData.environment = environment;
