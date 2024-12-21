@@ -35,7 +35,7 @@ class WebGPURenderer extends Renderer {
 	 * @param {Boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
+	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0
 	 * to overwrite the default.
 	 * @param {Function} [parameters.getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it
