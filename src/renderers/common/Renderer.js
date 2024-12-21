@@ -361,10 +361,6 @@ class Renderer {
 
 		//
 
-		this._nodes.updateScene( sceneRef );
-
-		//
-
 		this._background.update( sceneRef, renderList, renderContext );
 
 		// process render lists
@@ -734,10 +730,6 @@ class Renderer {
 		renderContext.activeCubeFace = activeCubeFace;
 		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
-
-		//
-
-		this._nodes.updateScene( sceneRef );
 
 		//
 
