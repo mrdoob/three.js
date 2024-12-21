@@ -222,9 +222,9 @@ class Renderer {
 		};
 
 		/**
-		 * The node libray defines how certain library objects like materials, lights
+		 * The node library defines how certain library objects like materials, lights
 		 * or tone mapping functions are mapped to node types. This is required since
-		 * although instaces of classes like `MeshBasicMaterial` or `PointLight` can
+		 * although instances of classes like `MeshBasicMaterial` or `PointLight` can
 		 * be part of the scene graph, they are internally represented as nodes for
 		 * further processing.
 		 *
@@ -1086,8 +1086,8 @@ class Renderer {
 	 * Renders the scene or 3D object with the given camera. This method can only be called
 	 * if the renderer has been initialized.
 	 *
-	 * The target output of the method is the default framebuffer (meaning the canvas)
-	 * or alternativley a render target when specified via `setRenderTarget()`.
+	 * The target of the method is the default framebuffer (meaning the canvas)
+	 * or alternatively a render target when specified via `setRenderTarget()`.
 	 *
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera to render the scene with.
@@ -1435,7 +1435,7 @@ class Renderer {
 	}
 
 	/**
-	 * Applications are adviced to always define the animation loop
+	 * Applications are advised to always define the animation loop
 	 * with this method and not manually with `requestAnimationFrame()`
 	 * for best compatibility.
 	 *
@@ -1527,7 +1527,7 @@ class Renderer {
 	}
 
 	/**
-	 * This method allows to define the drawing buffer size by specifing
+	 * This method allows to define the drawing buffer size by specifying
 	 * width, height and pixel ratio all at once. The size of the drawing
 	 * buffer is computed with this formula:
 	 * ````
@@ -1808,7 +1808,7 @@ class Renderer {
 	}
 
 	/**
-	 * This method perfoms an occlusion query for the given 3D object.
+	 * This method performs an occlusion query for the given 3D object.
 	 * It returns `true` if the given 3D object is fully occluded by other
 	 * 3D objects in the scene.
 	 *
@@ -2382,8 +2382,8 @@ class Renderer {
 	}
 
 	/**
-	 * Analyzes the given 3D object's hierachy and builds render lists from the
-	 * processed hierachy.
+	 * Analyzes the given 3D object's hierarchy and builds render lists from the
+	 * processed hierarchy.
 	 *
 	 * @param {Object3D} object - The 3D object to process (usually a scene).
 	 * @param {Camera} camera - The camera the object is rendered with.
