@@ -1717,9 +1717,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const textures = renderTarget.textures;
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const is3DRenderTarget = ( renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget );
 		const isMultipleRenderTargets = ( textures.length > 1 );
 
-		if ( ! isMultipleRenderTargets ) {
+		if ( ! isMultipleRenderTargets || is3DRenderTarget ) {
 
 			if ( textureProperties.__webglTexture === undefined ) {
 
@@ -1776,7 +1777,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			if ( isMultipleRenderTargets ) {
+			if ( isMultipleRenderTargets && ! is3DRenderTarget ) {
 
 				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
@@ -1866,7 +1867,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			state.unbindTexture();
 
-		} else if ( isMultipleRenderTargets ) {
+		} else if ( isMultipleRenderTargets && ! is3DRenderTarget ) {
 
 			for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
