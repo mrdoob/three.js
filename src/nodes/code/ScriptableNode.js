@@ -3,6 +3,8 @@ import { scriptableValue } from './ScriptableValueNode.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 import { hashArray, hashString } from '../core/NodeUtils.js';
 
+/** @module ScriptableNode **/
+
 /**
  * A Map-like data structure for managing resources of scriptable nodes.
  *
