@@ -9,9 +9,18 @@ class RenderContexts {
 
 	}
 
-	get( scene, camera, renderTarget = null ) {
+	get( scene = null, camera = null, renderTarget = null ) {
 
-		const chainKey = [ scene, camera ];
+		const chainKey = [];
+		if ( scene !== null ) chainKey.push( scene );
+		if ( camera !== null ) chainKey.push( camera );
+
+		if ( chainKey.length === 0 ) {
+
+			chainKey.push( { id: 'default' } );
+
+		}
+
 
 		let attachmentState;
 

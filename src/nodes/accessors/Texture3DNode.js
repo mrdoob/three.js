@@ -1,5 +1,6 @@
 import TextureNode from './TextureNode.js';
-import { nodeProxy, vec3, Fn, If } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, Fn, If, int } from '../tsl/TSLBase.js';
+import { textureSize } from './TextureSizeNode.js';
 
 /** @module Texture3DNode **/
 
@@ -124,6 +125,22 @@ class Texture3DNode extends TextureNode {
 	 * @return {Node} The unmodified uv node.
 	 */
 	setupUV( builder, uvNode ) {
+
+		const texture = this.value;
+
+		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) ) {
+
+			if ( this.sampler ) {
+
+				uvNode = uvNode.flipY();
+
+			} else {
+
+				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
+
+			}
+
+		}
 
 		return uvNode;
 

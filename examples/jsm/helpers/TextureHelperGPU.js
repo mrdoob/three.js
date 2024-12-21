@@ -1,11 +1,13 @@
 import {
+	NodeMaterial,
 	BoxGeometry,
 	BufferAttribute,
 	Mesh,
 	PlaneGeometry,
+	DoubleSide,
 	Vector3,
 } from 'three';
-import { NodeMaterial, texture as textureNode, cubeTexture, texture3D, float, vec4 } from 'three/tsl';
+import { texture as textureNode, cubeTexture, texture3D, float, vec4, attribute } from 'three/tsl';
 import { mergeGeometries } from '../utils/BufferGeometryUtils.js';
 
 class TextureHelper extends Mesh {
@@ -13,17 +15,25 @@ class TextureHelper extends Mesh {
 	constructor( texture, width = 1, height = 1, depth = 1 ) {
 
 		const material = new NodeMaterial();
+		material.side = DoubleSide;
+		material.transparent = true;
 		material.name = 'TextureHelper';
 
 		let colorNode;
 
+		const uvw = attribute( 'uvw' );
+
 		if ( texture.isCubeTexture ) {
 
-			colorNode = cubeTexture( texture );
+			colorNode = cubeTexture( texture ).sample( uvw );
 
 		} else if ( texture.isData3DTexture || texture.isCompressed3DTexture ) {
 
-			colorNode = texture3D( texture );
+			colorNode = texture3D( texture ).sample( uvw );
+
+		} else if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+
+			colorNode = textureNode( texture ).sample( uvw.xy ).depth( uvw.z );
 
 		} else {
 
@@ -122,7 +132,7 @@ function createCubeGeometry( width, height, depth ) {
 	}
 
 	geometry.deleteAttribute( 'uv' );
-	geometry.setAttribute( 'uv', uvw );
+	geometry.setAttribute( 'uvw', uvw );
 
 	return geometry;
 
@@ -162,7 +172,7 @@ function createSliceGeometry( texture, width, height, depth ) {
 		}
 
 		geometry.deleteAttribute( 'uv' );
-		geometry.setAttribute( 'uv', uvw );
+		geometry.setAttribute( 'uvw', uvw );
 
 		geometries.push( geometry );
 
