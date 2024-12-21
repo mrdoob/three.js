@@ -206,7 +206,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	_getRenderPassDescriptor( renderContext ) {
+	_getRenderPassDescriptor( renderContext, colorAttachmentsConfig = {} ) {
 
 		const renderTarget = renderContext.renderTarget;
 		const renderTargetData = this.get( renderTarget );
@@ -218,7 +218,9 @@ class WebGPUBackend extends Backend {
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.dimensions !== renderTarget.dimensions ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
-			renderTargetData.samples !== renderTarget.samples
+			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
+			renderTargetData.samples !== renderTarget.samples ||
+			renderTargetData.loadOp !== colorAttachmentsConfig.loadOp
 		) {
 
 			descriptors = {};
@@ -299,7 +301,8 @@ class WebGPUBackend extends Backend {
 					depthSlice: sliceIndex,
 					resolveTarget,
 					loadOp: GPULoadOp.Load,
-					storeOp: GPUStoreOp.Store
+					storeOp: GPUStoreOp.Store,
+					...colorAttachmentsConfig
 				} );
 
 			}
@@ -325,8 +328,11 @@ class WebGPUBackend extends Backend {
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
 			renderTargetData.samples = renderTarget.samples;
-			renderTargetData.activeMipmapLevel = renderTarget.activeMipmapLevel;
+			renderTargetData.activeMipmapLevel = renderContext.activeMipmapLevel;
+			renderTargetData.activeCubeFace = renderContext.activeCubeFace;
 			renderTargetData.dimensions = renderTarget.dimensions;
+			renderTargetData.depthSlice = sliceIndex;
+			renderTargetData.loadOp = colorAttachments[ 0 ].loadOp;
 
 		}
 
@@ -374,7 +380,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			descriptor = this._getRenderPassDescriptor( renderContext );
+			descriptor = this._getRenderPassDescriptor( renderContext, { loadOp: GPULoadOp.Load } );
 
 		}
 
@@ -701,7 +707,7 @@ class WebGPUBackend extends Backend {
 
 			if ( color ) {
 
-				const descriptor = this._getRenderPassDescriptor( renderTargetContext );
+				const descriptor = this._getRenderPassDescriptor( renderTargetContext, { loadOp: GPULoadOp.Clear } );
 
 				colorAttachments = descriptor.colorAttachments;
 
