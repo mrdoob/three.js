@@ -19,8 +19,8 @@ const debugHandler = {
 
 /**
  * This renderer is the new alternative of `WebGLRenderer`. `WebGPURenderer` has the ability
- * to target different backends. By default, the renderer tries to use its WebGPU backend the
- * current browser supports WebGPU. If not, `WebGPURenderer` falls backs to a WebGL 2 backend.
+ * to target different backends. By default, the renderer tries to use a WebGPU backend if the
+ * browser supports WebGPU. If not, `WebGPURenderer` falls backs to a WebGL 2 backend.
  *
  * @augments module:Renderer~Renderer
  */
