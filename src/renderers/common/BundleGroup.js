@@ -10,8 +10,6 @@ import { Group } from '../../objects/Group.js';
  * With a WebGL backend, the group can technically be rendered but without
  * any performance improvements.
  *
- * Reference: {@link https://toji.dev/webgpu-best-practices/render-bundles.html}
- *
  * @augments Group
  */
 class BundleGroup extends Group {
