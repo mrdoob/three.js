@@ -1,35 +1,58 @@
 import ChainMap from './ChainMap.js';
 import RenderBundle from './RenderBundle.js';
 
+/**
+ * This renderer module manages render bundles.
+ *
+ * @private
+ */
 class RenderBundles {
 
+	/**
+	 * Constructs a new render bundle management component.
+	 */
 	constructor() {
 
-		this.lists = new ChainMap();
+		/**
+		 * A chain map for maintaining the render bundles.
+		 *
+		 * @type {ChainMap}
+		 */
+		this.bundles = new ChainMap();
 
 	}
 
-	get( scene, camera ) {
+	/**
+	 * Returns a render bundle for the given bundle group and camera.
+	 *
+	 * @param {BundleGroup} bundleGroup - The bundle group.
+	 * @param {Camera} camera - The camera the bundle group is rendered with.
+	 * @return {RenderBundle} The render bundle.
+	 */
+	get( bundleGroup, camera ) {
 
-		const lists = this.lists;
-		const keys = [ scene, camera ];
+		const bundles = this.bundles;
+		const keys = [ bundleGroup, camera ];
 
-		let list = lists.get( keys );
+		let bundle = bundles.get( keys );
 
-		if ( list === undefined ) {
+		if ( bundle === undefined ) {
 
-			list = new RenderBundle( scene, camera );
-			lists.set( keys, list );
+			bundle = new RenderBundle( bundleGroup, camera );
+			bundles.set( keys, bundle );
 
 		}
 
-		return list;
+		return bundle;
 
 	}
 
+	/**
+	 * Frees all internal resources.
+	 */
 	dispose() {
 
-		this.lists = new ChainMap();
+		this.bundles = new ChainMap();
 
 	}
 
