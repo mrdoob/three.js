@@ -1337,6 +1337,8 @@ class WebGLBackend extends Backend {
 			const { samples, depthBuffer, stencilBuffer } = renderTarget;
 
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
+			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
+			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
@@ -1390,7 +1392,19 @@ class WebGLBackend extends Backend {
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+						if ( isRenderTarget3D || isRenderTargetArray ) {
+
+							const layer = this.renderer._activeCubeFace;
+
+							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, layer );
+
+						} else {
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+						}
+
+
 
 					}
 

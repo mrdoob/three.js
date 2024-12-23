@@ -206,7 +206,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	_getRenderPassDescriptor( renderContext ) {
+	_getRenderPassDescriptor( renderContext, colorAttachmentsConfig = {} ) {
 
 		const renderTarget = renderContext.renderTarget;
 		const renderTargetData = this.get( renderTarget );
@@ -216,8 +216,11 @@ class WebGPUBackend extends Backend {
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
+			renderTargetData.dimensions !== renderTarget.dimensions ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
-			renderTargetData.samples !== renderTarget.samples
+			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
+			renderTargetData.samples !== renderTarget.samples ||
+			renderTargetData.loadOp !== colorAttachmentsConfig.loadOp
 		) {
 
 			descriptors = {};
@@ -247,16 +250,37 @@ class WebGPUBackend extends Backend {
 			const textures = renderContext.textures;
 			const colorAttachments = [];
 
+			let sliceIndex;
+
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
 
-				const textureView = textureData.texture.createView( {
+				const viewDescriptor = {
+					label: `colorAttachment_${ i }`,
 					baseMipLevel: renderContext.activeMipmapLevel,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
+					arrayLayerCount: 1,
 					dimension: GPUTextureViewDimension.TwoD
-				} );
+				};
+
+				if ( renderTarget.isRenderTarget3D ) {
+
+					sliceIndex = renderContext.activeCubeFace;
+
+					viewDescriptor.baseArrayLayer = 0;
+					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
+					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+				} else if ( renderTarget.isRenderTargetArray ) {
+
+					viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
+					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+				}
+
+				const textureView = textureData.texture.createView( viewDescriptor );
 
 				let view, resolveTarget;
 
@@ -274,9 +298,11 @@ class WebGPUBackend extends Backend {
 
 				colorAttachments.push( {
 					view,
+					depthSlice: sliceIndex,
 					resolveTarget,
 					loadOp: GPULoadOp.Load,
-					storeOp: GPUStoreOp.Store
+					storeOp: GPUStoreOp.Store,
+					...colorAttachmentsConfig
 				} );
 
 			}
@@ -302,7 +328,11 @@ class WebGPUBackend extends Backend {
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
 			renderTargetData.samples = renderTarget.samples;
-			renderTargetData.activeMipmapLevel = renderTarget.activeMipmapLevel;
+			renderTargetData.activeMipmapLevel = renderContext.activeMipmapLevel;
+			renderTargetData.activeCubeFace = renderContext.activeCubeFace;
+			renderTargetData.dimensions = renderTarget.dimensions;
+			renderTargetData.depthSlice = sliceIndex;
+			renderTargetData.loadOp = colorAttachments[ 0 ].loadOp;
 
 		}
 
@@ -350,7 +380,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			descriptor = this._getRenderPassDescriptor( renderContext );
+			descriptor = this._getRenderPassDescriptor( renderContext, { loadOp: GPULoadOp.Load } );
 
 		}
 
@@ -612,7 +642,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	clear( color, depth, stencil, renderTargetData = null ) {
+	clear( color, depth, stencil, renderTargetContext = null ) {
 
 		const device = this.device;
 		const renderer = this.renderer;
@@ -645,7 +675,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderTargetData === null ) {
+		if ( renderTargetContext === null ) {
 
 			supportsDepth = renderer.depth;
 			supportsStencil = renderer.stencil;
@@ -672,45 +702,20 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			supportsDepth = renderTargetData.depth;
-			supportsStencil = renderTargetData.stencil;
+			supportsDepth = renderTargetContext.depth;
+			supportsStencil = renderTargetContext.stencil;
 
 			if ( color ) {
 
-				for ( const texture of renderTargetData.textures ) {
+				const descriptor = this._getRenderPassDescriptor( renderTargetContext, { loadOp: GPULoadOp.Clear } );
 
-					const textureData = this.get( texture );
-					const textureView = textureData.texture.createView();
-
-					let view, resolveTarget;
-
-					if ( textureData.msaaTexture !== undefined ) {
-
-						view = textureData.msaaTexture.createView();
-						resolveTarget = textureView;
-
-					} else {
-
-						view = textureView;
-						resolveTarget = undefined;
-
-					}
-
-					colorAttachments.push( {
-						view,
-						resolveTarget,
-						clearValue,
-						loadOp: GPULoadOp.Clear,
-						storeOp: GPUStoreOp.Store
-					} );
-
-				}
+				colorAttachments = descriptor.colorAttachments;
 
 			}
 
 			if ( supportsDepth || supportsStencil ) {
 
-				const depthTextureData = this.get( renderTargetData.depthTexture );
+				const depthTextureData = this.get( renderTargetContext.depthTexture );
 
 				depthStencilAttachment = {
 					view: depthTextureData.texture.createView()
