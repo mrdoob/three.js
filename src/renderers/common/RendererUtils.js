@@ -1,7 +1,17 @@
 import { Color } from '../../math/Color.js';
 
-// renderer state
+/** @module RendererUtils **/
 
+/**
+ * Saves the state of the given renderer and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
 export function saveRendererState( renderer, state = {} ) {
 
 	state.toneMapping = renderer.toneMapping;
@@ -22,6 +32,17 @@ export function saveRendererState( renderer, state = {} ) {
 
 }
 
+/**
+ * Saves the state of the given renderer and stores it into the given state object.
+ * Besides, the function also resets the state of the renderer to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
 export function resetRendererState( renderer, state ) {
 
 	state = saveRendererState( renderer, state );
@@ -35,6 +56,13 @@ export function resetRendererState( renderer, state ) {
 
 }
 
+/**
+ * Restores the state of the given renderer from the given state object.
+ *
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} state - The state to restore.
+ */
 export function restoreRendererState( renderer, state ) {
 
 	renderer.toneMapping = state.toneMapping;
@@ -50,8 +78,16 @@ export function restoreRendererState( renderer, state ) {
 
 }
 
-// scene state
-
+/**
+ * Saves the state of the given scene and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
 export function saveSceneState( scene, state = {} ) {
 
 	state.background = scene.background;
@@ -64,6 +100,17 @@ export function saveSceneState( scene, state = {} ) {
 
 }
 
+/**
+ * Saves the state of the given scene and stores it into the given state object.
+ * Besides, the function also resets the state of the scene to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
 export function resetSceneState( scene, state ) {
 
 	state = saveSceneState( scene, state );
@@ -78,6 +125,13 @@ export function resetSceneState( scene, state ) {
 
 }
 
+/**
+ * Restores the state of the given scene from the given state object.
+ *
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} state - The state to restore.
+ */
 export function restoreSceneState( scene, state ) {
 
 	scene.background = state.background;
@@ -88,8 +142,17 @@ export function restoreSceneState( scene, state ) {
 
 }
 
-// renderer and scene state
-
+/**
+ * Saves the state of the given renderer and scene and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
 export function saveRendererAndSceneState( renderer, scene, state = {} ) {
 
 	state = saveRendererState( renderer, state );
@@ -99,6 +162,18 @@ export function saveRendererAndSceneState( renderer, scene, state = {} ) {
 
 }
 
+/**
+ * Saves the state of the given renderer and scene and stores it into the given state object.
+ * Besides, the function also resets the state of the renderer and scene to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
 export function resetRendererAndSceneState( renderer, scene, state ) {
 
 	state = resetRendererState( renderer, state );
@@ -108,6 +183,14 @@ export function resetRendererAndSceneState( renderer, scene, state ) {
 
 }
 
+/**
+ * Restores the state of the given renderer and scene from the given state object.
+ *
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} state - The state to restore.
+ */
 export function restoreRendererAndSceneState( renderer, scene, state ) {
 
 	restoreRendererState( renderer, state );
