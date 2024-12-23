@@ -88,7 +88,6 @@
 
 				}
 
-
 				// Method to handle viewport resize
 				updateSize( left, top, width, height ) {
 
@@ -298,15 +297,14 @@
 
 				views.forEach( view => {
 
-					// Maintain the original viewport proportions
 					view.updateSize(
-						view.left, // Preserve original left position
-						view.top, // Preserve original top position
-						view.width, // Preserve original width proportion
-						view.height // Preserve original height proportion
+						view.left,
+						view.top,
+						view.width,
+						view.height
 					);
-			
-	} );
+
+				} );
 
 			}
 
