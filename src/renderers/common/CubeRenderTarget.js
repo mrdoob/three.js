@@ -3,6 +3,9 @@ import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
 import { positionWorldDirection } from '../../nodes/accessors/Position.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { blur, getBlurParams } from '../../nodes/pmrem/PMREMUtils.js';
+import { uniform } from '../../nodes/core/UniformNode.js';
+import { uniformArray } from '../../nodes/accessors/UniformArrayNode.js';
+import { float, vec3, Fn } from '../../nodes/tsl/TSLBase.js';
 
 import { WebGLCubeRenderTarget } from '../../renderers/WebGLCubeRenderTarget.js';
 import { Scene } from '../../scenes/Scene.js';
@@ -11,6 +14,7 @@ import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
 import {cubeTexture as TSL_CubeTexture} from '../../nodes/accessors/CubeTextureNode.js';
+import { Vector3 } from '../../math/Vector3.js';
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -101,10 +105,10 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		const n = float( MAX_SAMPLES );
 		const latitudinal = uniform( 0 ); // false, bool
 		const samples = uniform( 1 ); // int
-		const envMap = texture( null );
+		const envMap = TSL_CubeTexture( null );
 
 		const cubeSampler=Fn(( [ sampleDirection ] )=>{
-				return TSL_CubeTexture(envMap, sampleDirection, 0);
+				return envMap.sample( sampleDirection );
 			});
 		blurMaterial.fragmentNode = blur( { n, latitudinal: latitudinal.equal( 1 ), poleAxis: vec3(poleAxis), outputDirection: positionWorldDirection, weights, samples, dTheta, sampler: cubeSampler } );
 
