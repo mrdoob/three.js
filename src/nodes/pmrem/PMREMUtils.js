@@ -287,13 +287,14 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 
 } );
 
-export const getBlurParams=(sigmaRadians, cubeRes, maxSamples)=>{
+export const getBlurParams = ( sigmaRadians, cubeRes, maxSamples )=>{
+
 	// Number of standard deviations at which to cut off the discrete approximation.
 	const STANDARD_DEVIATIONS = 3;
 
 	const radiansPerPixel = Math.PI / ( 2 * cubeRes );
 	const sigmaPixels = sigmaRadians / radiansPerPixel;
-	const samples =1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels );
+	const samples = 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels );
 
 	if ( samples > maxSamples ) {
 
@@ -310,7 +311,7 @@ export const getBlurParams=(sigmaRadians, cubeRes, maxSamples)=>{
 
 		const x = i / sigmaPixels;
 		const weight = Math.exp( - x * x / 2 );
-		weights[i]= weight;
+		weights[ i ] = weight;
 
 		if ( i === 0 ) {
 
@@ -330,6 +331,6 @@ export const getBlurParams=(sigmaRadians, cubeRes, maxSamples)=>{
 
 	}
 
-	return {radiansPerPixel, samples, weights};
-	
+	return { radiansPerPixel, samples, weights };
+
 };

@@ -13,7 +13,7 @@ import { CubeCamera } from '../../cameras/CubeCamera.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
-import {cubeTexture as TSL_CubeTexture} from '../../nodes/accessors/CubeTextureNode.js';
+import { cubeTexture as TSL_CubeTexture } from '../../nodes/accessors/CubeTextureNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
@@ -78,7 +78,8 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	}
 
-	fromCubeTexture(renderer, cubeTexture, sigmaRadians=0, poleAxis=new Vector3(0, 1, 0)){
+	fromCubeTexture( renderer, cubeTexture, sigmaRadians = 0, poleAxis = new Vector3( 0, 1, 0 ) ) {
+
 		const currentGenerateMipmaps = cubeTexture.generateMipmaps;
 
 		cubeTexture.generateMipmaps = true;
@@ -107,10 +108,12 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		const samples = uniform( 1 ); // int
 		const envMap = TSL_CubeTexture( null );
 
-		const cubeSampler=Fn(( [ sampleDirection ] )=>{
-				return envMap.sample( sampleDirection );
-			});
-		blurMaterial.fragmentNode = blur( { n, latitudinal: latitudinal.equal( 1 ), poleAxis: vec3(poleAxis), outputDirection: positionWorldDirection, weights, samples, dTheta, sampler: cubeSampler } );
+		const cubeSampler = Fn( ( [ sampleDirection ] )=>{
+
+			return envMap.sample( sampleDirection );
+
+		} );
+		blurMaterial.fragmentNode = blur( { n, latitudinal: latitudinal.equal( 1 ), poleAxis: vec3( poleAxis ), outputDirection: positionWorldDirection, weights, samples, dTheta, sampler: cubeSampler } );
 
 		const geometry = new BoxGeometry( 5, 5, 5 );
 		const mesh = new Mesh( geometry, blurMaterial );
@@ -119,38 +122,43 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		scene.add( mesh );
 
 		const camera = new CubeCamera( 1, 10, this );
-			
-		envMap.value=cubeTexture;
-		latitudinal.value=1;
-		const blurParams1=getBlurParams(sigmaRadians, cubeTexture.width, MAX_SAMPLES);
-		weights.value=blurParams1.weights;
-		samples.value=blurParams1.samples;
-		dTheta.value=blurParams1.radiansPerPixel;
 
-		if(sigmaRadians<=0){
-			camera.update( renderer, scene );
-		}else{
-			const blurTarget=new CubeRenderTarget(Math.min(this.width, cubeTexture.width));
-			camera.renderTarget=blurTarget;
+		envMap.value = cubeTexture;
+		latitudinal.value = 1;
+		const blurParams1 = getBlurParams( sigmaRadians, cubeTexture.width, MAX_SAMPLES );
+		weights.value = blurParams1.weights;
+		samples.value = blurParams1.samples;
+		dTheta.value = blurParams1.radiansPerPixel;
+
+		if ( sigmaRadians <= 0 ) {
 
 			camera.update( renderer, scene );
 
-			camera.renderTarget=this;
-			envMap.value=blurTarget.texture;
-			latitudinal.value=0;
-			const blurParams2=getBlurParams(sigmaRadians, blurTarget.width, MAX_SAMPLES);
-			weights.value=blurParams2.weights;
-			samples.value=blurParams2.samples;
-			dTheta.value=blurParams2.radiansPerPixel;
+		} else {
+
+			const blurTarget = new CubeRenderTarget( Math.min( this.width, cubeTexture.width ) );
+			camera.renderTarget = blurTarget;
+
+			camera.update( renderer, scene );
+
+			camera.renderTarget = this;
+			envMap.value = blurTarget.texture;
+			latitudinal.value = 0;
+			const blurParams2 = getBlurParams( sigmaRadians, blurTarget.width, MAX_SAMPLES );
+			weights.value = blurParams2.weights;
+			samples.value = blurParams2.samples;
+			dTheta.value = blurParams2.radiansPerPixel;
 
 			camera.update( renderer, scene );
 
 			blurTarget.dispose();
+
 		}
 
 		cubeTexture.currentGenerateMipmaps = currentGenerateMipmaps;
 		geometry.dispose();
 		blurMaterial.dispose();
+
 	}
 
 }

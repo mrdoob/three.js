@@ -622,12 +622,12 @@ class PMREMGenerator {
 		blurMesh.material = blurMaterial;
 
 		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
-		blurMaterial._envMap.value = targetIn.texture
+		blurMaterial._envMap.value = targetIn.texture;
 
 		const { _lodMax } = this;
-		const {radiansPerPixel, samples, weights}=getBlurParams(sigmaRadians, this._sizeLods[ lodIn ] - 1, MAX_SAMPLES);
-		
-		blurMesh.userData={
+		const { radiansPerPixel, samples, weights } = getBlurParams( sigmaRadians, this._sizeLods[ lodIn ] - 1, MAX_SAMPLES );
+
+		blurMesh.userData = {
 			samples,
 			weights,
 			poleAxis,
@@ -779,11 +779,13 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const material = _getMaterial( 'blur' );
 	material._envMap = envMap;
-	
-	const cubeUVsampler=Fn(( [ sampleDirection ] )=>{
+
+	const cubeUVsampler = Fn( ( [ sampleDirection ] )=>{
+
 		return bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
-	});
-	material.fragmentNode = blur( { n, latitudinal: latitudinal.equal( int ( 1 ) ), poleAxis, outputDirection, weights, samples, dTheta, sampler: cubeUVsampler } );
+
+	} );
+	material.fragmentNode = blur( { n, latitudinal: latitudinal.equal( int( 1 ) ), poleAxis, outputDirection, weights, samples, dTheta, sampler: cubeUVsampler } );
 
 	return material;
 
