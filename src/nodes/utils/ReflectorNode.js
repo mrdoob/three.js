@@ -460,14 +460,17 @@ class ReflectorBaseNode extends Node {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentAutoClear = renderer.autoClear;
 
 		renderer.setMRT( null );
 		renderer.setRenderTarget( renderTarget );
+		renderer.autoClear = true;
 
 		renderer.render( scene, virtualCamera );
 
 		renderer.setMRT( currentMRT );
 		renderer.setRenderTarget( currentRenderTarget );
+		renderer.autoClear = currentAutoClear;
 
 		material.visible = true;
 
