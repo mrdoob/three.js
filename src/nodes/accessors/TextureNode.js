@@ -268,7 +268,7 @@ class TextureNode extends UniformNode {
 	setUpdateMatrix( value ) {
 
 		this.updateMatrix = value;
-		this.updateType = value ? NodeUpdateType.FRAME : NodeUpdateType.NONE;
+		this.updateType = value ? NodeUpdateType.RENDER : NodeUpdateType.NONE;
 
 		return this;
 
