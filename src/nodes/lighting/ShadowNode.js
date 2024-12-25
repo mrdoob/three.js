@@ -58,6 +58,7 @@ const getShadowMaterial = ( light ) => {
 		material.depthNode = depthNode;
 		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
 		material.name = 'ShadowMaterial';
+		material.fog = false;
 
 		shadowMaterialLib.set( light, material );
 
