@@ -2795,6 +2795,8 @@ class Renderer {
 
 			renderBundleData.renderObjects.push( renderObject );
 
+			renderObject.bundle = this._currentRenderBundle.bundleGroup;
+
 		}
 
 		this.backend.draw( renderObject, this.info );

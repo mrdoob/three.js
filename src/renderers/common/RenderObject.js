@@ -198,6 +198,15 @@ export default class RenderObject {
 		this.drawParams = null;
 
 		/**
+		 * If this render object is used inside a render bundle,
+		 * this property points to the respective bundle group.
+		 *
+		 * @type {BundleGroup?}
+		 * @default null
+		 */
+		this.bundle = null;
+
+		/**
 		 * The clipping context.
 		 *
 		 * @type {ClippingContext}
