@@ -92,8 +92,6 @@ export function saveSceneState( scene, state = {} ) {
 
 	state.background = scene.background;
 	state.backgroundNode = scene.backgroundNode;
-	state.fog = scene.fog;
-	state.fogNode = scene.fogNode;
 	state.overrideMaterial = scene.overrideMaterial;
 
 	return state;
@@ -117,8 +115,6 @@ export function resetSceneState( scene, state ) {
 
 	scene.background = null;
 	scene.backgroundNode = null;
-	scene.fog = null;
-	scene.fogNode = null;
 	scene.overrideMaterial = null;
 
 	return state;
@@ -136,8 +132,6 @@ export function restoreSceneState( scene, state ) {
 
 	scene.background = state.background;
 	scene.backgroundNode = state.backgroundNode;
-	scene.fog = state.fog;
-	scene.fogNode = state.fogNode;
 	scene.overrideMaterial = state.overrideMaterial;
 
 }

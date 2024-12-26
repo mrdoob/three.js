@@ -103,7 +103,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
 
-				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
+				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', computeNode.name, nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
 				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
@@ -169,6 +169,8 @@ class Pipelines extends DataMap {
 
 			const nodeBuilderState = renderObject.getNodeBuilderState();
 
+			const name = renderObject.material ? renderObject.material.name : '';
+
 			// programmable stages
 
 			let stageVertex = this.programs.vertex.get( nodeBuilderState.vertexShader );
@@ -177,7 +179,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.vertexProgram );
 
-				stageVertex = new ProgrammableStage( nodeBuilderState.vertexShader, 'vertex' );
+				stageVertex = new ProgrammableStage( nodeBuilderState.vertexShader, 'vertex', name );
 				this.programs.vertex.set( nodeBuilderState.vertexShader, stageVertex );
 
 				backend.createProgram( stageVertex );
@@ -190,7 +192,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.fragmentProgram );
 
-				stageFragment = new ProgrammableStage( nodeBuilderState.fragmentShader, 'fragment' );
+				stageFragment = new ProgrammableStage( nodeBuilderState.fragmentShader, 'fragment', name );
 				this.programs.fragment.set( nodeBuilderState.fragmentShader, stageFragment );
 
 				backend.createProgram( stageFragment );

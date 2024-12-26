@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodsChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /** @module OperatorNode **/
 
@@ -519,29 +519,6 @@ export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' );
  */
 export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' );
 
-addMethodChaining( 'add', add );
-addMethodChaining( 'sub', sub );
-addMethodChaining( 'mul', mul );
-addMethodChaining( 'div', div );
-addMethodChaining( 'modInt', modInt );
-addMethodChaining( 'equal', equal );
-addMethodChaining( 'notEqual', notEqual );
-addMethodChaining( 'lessThan', lessThan );
-addMethodChaining( 'greaterThan', greaterThan );
-addMethodChaining( 'lessThanEqual', lessThanEqual );
-addMethodChaining( 'greaterThanEqual', greaterThanEqual );
-addMethodChaining( 'and', and );
-addMethodChaining( 'or', or );
-addMethodChaining( 'not', not );
-addMethodChaining( 'xor', xor );
-addMethodChaining( 'bitAnd', bitAnd );
-addMethodChaining( 'bitNot', bitNot );
-addMethodChaining( 'bitOr', bitOr );
-addMethodChaining( 'bitXor', bitXor );
-addMethodChaining( 'shiftLeft', shiftLeft );
-addMethodChaining( 'shiftRight', shiftRight );
-
-
 export const remainder = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.OperatorNode: .remainder() has been renamed to .modInt().' );
@@ -549,4 +526,27 @@ export const remainder = ( ...params ) => { // @deprecated, r168
 
 };
 
-addMethodChaining( 'remainder', remainder );
+addMethodsChaining( {
+	add: add,
+	sub: sub,
+	mul: mul,
+	div: div,
+	modInt: modInt,
+	equal: equal,
+	notEqual: notEqual,
+	lessThan: lessThan,
+	greaterThan: greaterThan,
+	lessThanEqual: lessThanEqual,
+	greaterThanEqual: greaterThanEqual,
+	and: and,
+	or: or,
+	not: not,
+	xor: xor,
+	bitAnd: bitAnd,
+	bitNot: bitNot,
+	bitOr: bitOr,
+	bitXor: bitXor,
+	shiftLeft: shiftLeft,
+	shiftRight: shiftRight,
+	remainder: remainder
+} );
