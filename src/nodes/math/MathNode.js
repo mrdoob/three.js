@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
-import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
+import { addMethodsChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
 /** @module MathNode **/
@@ -950,61 +950,62 @@ export const inversesqrt = inverseSqrt;
 
 // Method chaining
 
-addMethodChaining( 'all', all );
-addMethodChaining( 'any', any );
-addMethodChaining( 'equals', equals );
-
-addMethodChaining( 'radians', radians );
-addMethodChaining( 'degrees', degrees );
-addMethodChaining( 'exp', exp );
-addMethodChaining( 'exp2', exp2 );
-addMethodChaining( 'log', log );
-addMethodChaining( 'log2', log2 );
-addMethodChaining( 'sqrt', sqrt );
-addMethodChaining( 'inverseSqrt', inverseSqrt );
-addMethodChaining( 'floor', floor );
-addMethodChaining( 'ceil', ceil );
-addMethodChaining( 'normalize', normalize );
-addMethodChaining( 'fract', fract );
-addMethodChaining( 'sin', sin );
-addMethodChaining( 'cos', cos );
-addMethodChaining( 'tan', tan );
-addMethodChaining( 'asin', asin );
-addMethodChaining( 'acos', acos );
-addMethodChaining( 'atan', atan );
-addMethodChaining( 'abs', abs );
-addMethodChaining( 'sign', sign );
-addMethodChaining( 'length', length );
-addMethodChaining( 'lengthSq', lengthSq );
-addMethodChaining( 'negate', negate );
-addMethodChaining( 'oneMinus', oneMinus );
-addMethodChaining( 'dFdx', dFdx );
-addMethodChaining( 'dFdy', dFdy );
-addMethodChaining( 'round', round );
-addMethodChaining( 'reciprocal', reciprocal );
-addMethodChaining( 'trunc', trunc );
-addMethodChaining( 'fwidth', fwidth );
-addMethodChaining( 'atan2', atan2 );
-addMethodChaining( 'min', min );
-addMethodChaining( 'max', max );
-addMethodChaining( 'mod', mod );
-addMethodChaining( 'step', step );
-addMethodChaining( 'reflect', reflect );
-addMethodChaining( 'distance', distance );
-addMethodChaining( 'dot', dot );
-addMethodChaining( 'cross', cross );
-addMethodChaining( 'pow', pow );
-addMethodChaining( 'pow2', pow2 );
-addMethodChaining( 'pow3', pow3 );
-addMethodChaining( 'pow4', pow4 );
-addMethodChaining( 'transformDirection', transformDirection );
-addMethodChaining( 'mix', mixElement );
-addMethodChaining( 'clamp', clamp );
-addMethodChaining( 'refract', refract );
-addMethodChaining( 'smoothstep', smoothstepElement );
-addMethodChaining( 'faceForward', faceForward );
-addMethodChaining( 'difference', difference );
-addMethodChaining( 'saturate', saturate );
-addMethodChaining( 'cbrt', cbrt );
-addMethodChaining( 'transpose', transpose );
-addMethodChaining( 'rand', rand );
+addMethodsChaining( {
+	all: all,
+	any: any,
+	equals: equals,
+	radians: radians,
+	degrees: degrees,
+	exp: exp,
+	exp2: exp2,
+	log: log,
+	log2: log2,
+	sqrt: sqrt,
+	inverseSqrt: inverseSqrt,
+	floor: floor,
+	ceil: ceil,
+	normalize: normalize,
+	fract: fract,
+	sin: sin,
+	cos: cos,
+	tan: tan,
+	asin: asin,
+	acos: acos,
+	atan: atan,
+	abs: abs,
+	sign: sign,
+	length: length,
+	lengthSq: lengthSq,
+	negate: negate,
+	oneMinus: oneMinus,
+	dFdx: dFdx,
+	dFdy: dFdy,
+	round: round,
+	reciprocal: reciprocal,
+	trunc: trunc,
+	fwidth: fwidth,
+	atan2: atan2,
+	min: min,
+	max: max,
+	mod: mod,
+	step: step,
+	reflect: reflect,
+	distance: distance,
+	dot: dot,
+	cross: cross,
+	pow: pow,
+	pow2: pow2,
+	pow3: pow3,
+	pow4: pow4,
+	transformDirection: transformDirection,
+	mix: mixElement,
+	clamp: clamp,
+	refract: refract,
+	smoothstep: smoothstepElement,
+	faceForward: faceForward,
+	difference: difference,
+	saturate: saturate,
+	cbrt: cbrt,
+	transpose: transpose,
+	rand: rand
+} );

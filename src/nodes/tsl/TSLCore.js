@@ -29,6 +29,16 @@ export function addMethodChaining( name, nodeElement ) {
 
 }
 
+export function addMethodsChaining( object ) {
+
+	for ( const key in object ) {
+
+		addMethodChaining( key, object[ key ] );
+
+	}
+
+}
+
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
 
@@ -629,32 +639,33 @@ export const mat4 = new ConvertType( 'mat4' );
 export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
 export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
 
-addMethodChaining( 'toColor', color );
-addMethodChaining( 'toFloat', float );
-addMethodChaining( 'toInt', int );
-addMethodChaining( 'toUint', uint );
-addMethodChaining( 'toBool', bool );
-addMethodChaining( 'toVec2', vec2 );
-addMethodChaining( 'toIVec2', ivec2 );
-addMethodChaining( 'toUVec2', uvec2 );
-addMethodChaining( 'toBVec2', bvec2 );
-addMethodChaining( 'toVec3', vec3 );
-addMethodChaining( 'toIVec3', ivec3 );
-addMethodChaining( 'toUVec3', uvec3 );
-addMethodChaining( 'toBVec3', bvec3 );
-addMethodChaining( 'toVec4', vec4 );
-addMethodChaining( 'toIVec4', ivec4 );
-addMethodChaining( 'toUVec4', uvec4 );
-addMethodChaining( 'toBVec4', bvec4 );
-addMethodChaining( 'toMat2', mat2 );
-addMethodChaining( 'toMat3', mat3 );
-addMethodChaining( 'toMat4', mat4 );
-
 // basic nodes
 
 export const element = /*@__PURE__*/ nodeProxy( ArrayElementNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
-addMethodChaining( 'element', element );
-addMethodChaining( 'convert', convert );
+addMethodsChaining( {
+	toColor: color,
+	toFloat: float,
+	toInt: int,
+	toUint: uint,
+	toBool: bool,
+	toVec2: vec2,
+	toIVec2: ivec2,
+	toUVec2: uvec2,
+	toBVec2: bvec2,
+	toVec3: vec3,
+	toIVec3: ivec3,
+	toUVec3: uvec3,
+	toBVec3: bvec3,
+	toVec4: vec4,
+	toIVec4: ivec4,
+	toUVec4: uvec4,
+	toBVec4: bvec4,
+	toMat2: mat2,
+	toMat3: mat3,
+	toMat4: mat4,
+	element: element,
+	convert: convert
+} );
