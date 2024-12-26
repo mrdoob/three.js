@@ -438,8 +438,9 @@ class NodeMaterial extends Material {
 		let resultNode;
 
 		const clippingNode = this.setupClipping( builder );
+		const needsDepthWrite = this.depthWrite === true || ( this.depthTest === true && ( this.depthNode !== null || renderer.logarithmicDepthBuffer === true ) );
 
-		if ( this.depthWrite === true ) {
+		if ( needsDepthWrite ) {
 
 			// only write depth if depth buffer is configured
 
