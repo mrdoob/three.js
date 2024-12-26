@@ -1007,5 +1007,5 @@ addMethodsChaining( {
 	saturate: saturate,
 	cbrt: cbrt,
 	transpose: transpose,
-	rand: rand,
+	rand: rand
 } );
