@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, addMethodsChaining, mat3, nodeObject, vec4 } from '../tsl/TSLCore.js';
+import { addMethodsChaining, mat3, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
 import { SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -177,7 +177,7 @@ export const colorSpaceToWorking = ( node, colorSpace ) => nodeObject( new Color
  */
 export const convertColorSpace = ( node, sourceColorSpace, targetColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), sourceColorSpace, targetColorSpace ) );
 
-addMethodChaining( {
+addMethodsChaining( {
 	toOutputColorSpace: toOutputColorSpace,
 	toWorkingColorSpace: toWorkingColorSpace,
 	workingToColorSpace: workingToColorSpace,
