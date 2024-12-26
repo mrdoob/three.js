@@ -89,7 +89,7 @@ class RenderObjects {
 	 */
 	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
 
-		const chainMap = this.getChainMap( passId || 'default' );
+		const chainMap = this.getChainMap( passId );
 
 		// reuse chainArray
 		_chainArray[ 0 ] = object;
@@ -140,10 +140,10 @@ class RenderObjects {
 	/**
 	 * Returns a chain map for the given pass ID.
 	 *
-	 * @param {String} passId - The pass ID.
+	 * @param {String} [passId='default'] - The pass ID.
 	 * @return {ChainMap} The chain map.
 	 */
-	getChainMap( passId ) {
+	getChainMap( passId = 'default' ) {
 
 		return this.chainMaps[ passId ] || ( this.chainMaps[ passId ] = new ChainMap() );
 
