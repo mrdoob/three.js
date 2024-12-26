@@ -108,9 +108,6 @@ export default VarNode;
  */
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
-
-// Deprecated
-
 export const temp = ( node ) => { // @deprecated, r170
 
 	console.warn( 'TSL: "temp" is deprecated. Use ".toVar()" instead.' );
@@ -123,4 +120,3 @@ addMethodsChaining( {
 	toVar: ( ...params ) => createVar( ...params ).append(),
 	temp: temp
 } );
-
