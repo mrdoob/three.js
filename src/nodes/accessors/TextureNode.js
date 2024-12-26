@@ -316,6 +316,16 @@ class TextureNode extends UniformNode {
 
 		//
 
+		const texture = this.value;
+
+		if ( ! texture || texture.isTexture !== true ) {
+
+			throw new Error( 'THREE.TSL: `texture( value )` function expects a valid instance of THREE.Texture().' );
+
+		}
+
+		//
+
 		let uvNode = this.uvNode;
 
 		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
@@ -426,16 +436,9 @@ class TextureNode extends UniformNode {
 	 */
 	generate( builder, output ) {
 
-		const properties = builder.getNodeProperties( this );
-
 		const texture = this.value;
 
-		if ( ! texture || texture.isTexture !== true ) {
-
-			throw new Error( 'TextureNode: Need a three.js texture.' );
-
-		}
-
+		const properties = builder.getNodeProperties( this );
 		const textureProperty = super.generate( builder, 'property' );
 
 		if ( output === 'sampler' ) {
