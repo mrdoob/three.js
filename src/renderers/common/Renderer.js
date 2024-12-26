@@ -209,8 +209,8 @@ class Renderer {
 		this.stencil = stencil;
 
 		/**
-		 * Holds a series of statistical information about the graphics board memory
-		 * and the rendering process. Useful for debugging or monitoring.
+		 * Holds a series of statistical information about the GPU memory
+		 * and the rendering process. Useful for debugging and monitoring.
 		 *
 		 * @type {Boolean}
 		 */
@@ -2795,8 +2795,6 @@ class Renderer {
 
 			renderBundleData.renderObjects.push( renderObject );
 
-			renderObject.bundle = this._currentRenderBundle.scene;
-
 		}
 
 		this.backend.draw( renderObject, this.info );
@@ -2806,7 +2804,7 @@ class Renderer {
 	}
 
 	/**
-	 * A different implementation for `_handleObjectFunction` which only creates the creates the render object pipeline.
+	 * A different implementation for `_handleObjectFunction` which only makes sure the object is ready for rendering.
 	 * Used in `compileAsync()`.
 	 *
 	 * @private

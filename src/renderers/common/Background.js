@@ -21,7 +21,7 @@ class Background extends DataMap {
 	 * Constructs a new background management component.
 	 *
 	 * @param {Renderer} renderer - The renderer.
-	 * @param {Nodes} nodes - Renderer component for managing nodes relatd logic.
+	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
 	 */
 	constructor( renderer, nodes ) {
 
@@ -35,7 +35,7 @@ class Background extends DataMap {
 		this.renderer = renderer;
 
 		/**
-		 * Renderer component for managing nodes relatd logic.
+		 * Renderer component for managing nodes related logic.
 		 *
 		 * @type {Nodes}
 		 */
