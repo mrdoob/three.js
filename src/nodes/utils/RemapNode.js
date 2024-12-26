@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { float, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { float, addMethodsChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /** @module RemapNode **/
 
@@ -121,5 +121,7 @@ export const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: 
  */
 export const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
-addMethodChaining( 'remap', remap );
-addMethodChaining( 'remapClamp', remapClamp );
+addMethodsChaining( {
+	remap: remap,
+	remapClamp: remapClamp
+} );

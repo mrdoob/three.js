@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodsChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /** @module ConditionalNode **/
 
@@ -197,7 +197,6 @@ export default ConditionalNode;
  */
 export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
-addMethodChaining( 'select', select );
 
 //
 
@@ -208,4 +207,7 @@ export const cond = ( ...params ) => { // @deprecated, r168
 
 };
 
-addMethodChaining( 'cond', cond );
+addMethodsChaining( {
+	select: select,
+	cond: cond
+} );

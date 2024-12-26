@@ -572,16 +572,6 @@ export const tslFn = ( ...params ) => { // @deprecated, r168
 
 //
 
-addMethodChaining( 'toGlobal', ( node ) => {
-
-	node.global = true;
-
-	return node;
-
-} );
-
-//
-
 export const setCurrentStack = ( stack ) => {
 
 	if ( currentStack === stack ) {
@@ -605,8 +595,6 @@ export function append( node ) {
 	return node;
 
 }
-
-addMethodChaining( 'append', append );
 
 // types
 
@@ -646,6 +634,14 @@ export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObjec
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
 addMethodsChaining( {
+	toGlobal: ( node ) => {
+
+		node.global = true;
+
+		return node;
+
+	},
+	append: append,
 	toColor: color,
 	toFloat: float,
 	toInt: int,

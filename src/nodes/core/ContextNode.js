@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodsChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /** @module ContextNode **/
 
@@ -138,5 +138,7 @@ export const context = /*@__PURE__*/ nodeProxy( ContextNode );
  */
 export const label = ( node, name ) => context( node, { label: name } );
 
-addMethodChaining( 'context', context );
-addMethodChaining( 'label', label );
+addMethodsChaining( {
+	context: context,
+	label: label
+} );

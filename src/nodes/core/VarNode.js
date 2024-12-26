@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodsChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /** @module VarNode **/
 
@@ -108,7 +108,6 @@ export default VarNode;
  */
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
-addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
 
 // Deprecated
 
@@ -120,5 +119,8 @@ export const temp = ( node ) => { // @deprecated, r170
 
 };
 
-addMethodChaining( 'temp', temp );
+addMethodsChaining( {
+	toVar: ( ...params ) => createVar( ...params ).append(),
+	temp: temp
+} );
 

@@ -1,6 +1,6 @@
 import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodsChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /** @module VaryingNode **/
 
@@ -185,5 +185,7 @@ export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
  */
 export const vertexStage = ( node ) => varying( node );
 
-addMethodChaining( 'varying', varying );
-addMethodChaining( 'vertexStage', vertexStage );
+addMethodsChaining( {
+	varying: varying,
+	vertexStage: vertexStage
+} );
