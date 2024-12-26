@@ -34,6 +34,7 @@ export const acesFilmicToneMapping = TSL.acesFilmicToneMapping;
 export const acos = TSL.acos;
 export const add = TSL.add;
 export const addMethodChaining = TSL.addMethodChaining;
+export const addMethodsChaining = TSL.addMethodsChaining;
 export const addNodeElement = TSL.addNodeElement;
 export const agxToneMapping = TSL.agxToneMapping;
 export const all = TSL.all;
