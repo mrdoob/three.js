@@ -1288,7 +1288,7 @@ class WebGPUBackend extends Backend {
 		const programGPU = this.get( program );
 
 		programGPU.module = {
-			module: this.device.createShaderModule( { code: program.code, label: program.stage } ),
+			module: this.device.createShaderModule( { code: program.code, label: program.stage + ( program.name !== '' ? `_${ program.name }` : '' ) } ),
 			entryPoint: 'main'
 		};
 

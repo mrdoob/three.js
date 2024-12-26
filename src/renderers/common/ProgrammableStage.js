@@ -14,10 +14,11 @@ class ProgrammableStage {
 	 *
 	 * @param {String} code - The shader code.
 	 * @param {('vertex'|'fragment'|'compute')} stage - The type of stage.
+	 * @param {String} name - The name of the shader.
 	 * @param {Array<Object>?} [transforms=null] - The transforms (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
 	 * @param {Array<Object>?} [attributes=null] - The attributes (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
 	 */
-	constructor( code, stage, transforms = null, attributes = null ) {
+	constructor( code, stage, name, transforms = null, attributes = null ) {
 
 		/**
 		 * The id of the programmable stage.
@@ -39,6 +40,14 @@ class ProgrammableStage {
 		 * @type {String}
 		 */
 		this.stage = stage;
+
+		/**
+		 * The name of the stage.
+		 * This is used for debugging purposes.
+		 *
+		 * @type {String}
+		 */
+		this.name = name;
 
 		/**
 		 * The transforms (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
