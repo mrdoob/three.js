@@ -190,7 +190,6 @@ export function getTypeFromLength( length ) {
  * @param {String} type - The data type.
  * @return {TypedArray} The typed array.
  */
-
 export function getTypedArrayFromType( type ) {
 
 	// Handle component type for vectors and matrices
@@ -213,7 +212,7 @@ export function getTypedArrayFromType( type ) {
 	if ( /uint/.test( type ) ) return Uint32Array;
 	if ( /int/.test( type ) ) return Int32Array;
 
-	throw new Error( `Unsupported type: ${type}` );
+	throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
 
 }
 
