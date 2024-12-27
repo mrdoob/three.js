@@ -12,7 +12,7 @@ import { getTypeFromLength } from '../core/NodeUtils.js';
  * storage buffer for data. A typical workflow is to create instances of
  * this node with the convenience functions `attributeArray()` or `instancedArray()`,
  * setup up a compute shader that writes into the buffers and then convert
- * the storage buffers to attributes for rendering.
+ * the storage buffers to attribute nodes for rendering.
  *
  * ```js
  * const positionBuffer = instancedArray( particleCount, 'vec3' ); // the storage buffer node
@@ -49,7 +49,7 @@ class StorageBufferNode extends BufferNode {
 	/**
 	 * Constructs a new storage buffer node.
 	 *
-	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute} value - The buffer data.
+	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
 	 * @param {String?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
 	 * @param {Number} [bufferCount=0] - The buffer count.
 	 */
@@ -337,7 +337,7 @@ export default StorageBufferNode;
  * TSL function for creating a storage buffer node.
  *
  * @function
- * @param {StorageBufferAttribute|StorageInstancedBufferAttribute} value - The buffer data.
+ * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
  * @param {String?} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {Number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
