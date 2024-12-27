@@ -5,7 +5,7 @@ import { LinearFilter } from '../../constants.js';
  * This special type of texture is intended for compute shaders.
  * It can be used to compute the data of a texture with a compute shader.
  *
- * Note: This type of buffer attribute can only be used with `WebGPURenderer`
+ * Note: This type of texture can only be used with `WebGPURenderer`
  * and a WebGPU backend.
  *
  * @augments Texture
