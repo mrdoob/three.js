@@ -28,6 +28,36 @@ const _removedEvent = { type: 'removed' };
 const _childaddedEvent = { type: 'childadded', child: null };
 const _childremovedEvent = { type: 'childremoved', child: null };
 
+function listenToProperties( object, properties, onReadCallback, onWriteCallback ) {
+
+	for ( let i = 0; i < properties.length; i ++ ) {
+
+		const property = properties[ i ];
+		let _value = object[ property ];
+
+		Object.defineProperty( object, property, {
+
+			get() {
+
+				onReadCallback();
+
+				return _value;
+
+			},
+			set( value ) {
+
+				_value = value;
+
+				onWriteCallback();
+
+			}
+
+		} );
+
+	}
+
+}
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -53,20 +83,47 @@ class Object3D extends EventDispatcher {
 		const quaternion = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
 
-		function onRotationChange() {
+		let rotationNeedsUpdate = true;
+		let quaternionNeedsUpdate = true;
 
-			quaternion.setFromEuler( rotation, false );
+		function onRotationWrite() {
 
-		}
-
-		function onQuaternionChange() {
-
-			rotation.setFromQuaternion( quaternion, undefined, false );
+			rotationNeedsUpdate = true;
 
 		}
 
-		rotation._onChange( onRotationChange );
-		quaternion._onChange( onQuaternionChange );
+		function onRotationRead() {
+
+			if ( quaternionNeedsUpdate === true ) {
+
+				quaternionNeedsUpdate = false;
+				rotation.setFromQuaternion( quaternion, undefined );
+				rotationNeedsUpdate = false;
+
+			}
+
+		}
+
+		function onQuaternionWrite() {
+
+			quaternionNeedsUpdate = true;
+
+		}
+
+		function onQuaternionRead() {
+
+			if ( rotationNeedsUpdate === true ) {
+
+				rotationNeedsUpdate = false;
+				quaternion.setFromEuler( rotation );
+				quaternionNeedsUpdate = false;
+
+			}
+
+		}
+
+		listenToProperties( rotation, [ 'x', 'y', 'z', 'order' ], onRotationRead, onRotationWrite );
+		listenToProperties( quaternion, [ 'x', 'y', 'z', 'w' ], onQuaternionRead, onQuaternionWrite );
 
 		Object.defineProperties( this, {
 			position: {
