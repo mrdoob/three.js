@@ -7,8 +7,8 @@ import { BufferAttribute } from '../../core/BufferAttribute.js';
  * new material system and renderer it is now possible to use compute shaders
  * to compute the data for an attribute more efficiently on the GPU.
  *
- * The idea is to create an instance of this class and provide to as an input
- * for {@link module:StorageBufferNode}.
+ * The idea is to create an instance of this class and provide it as an input
+ * to {@link module:StorageBufferNode}.
  *
  * Note: This type of buffer attribute can only be used with `WebGPURenderer`.
  *
