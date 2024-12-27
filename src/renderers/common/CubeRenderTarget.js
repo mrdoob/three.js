@@ -78,18 +78,18 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	}
 
-	fromCubeTexture( renderer, cubeTexture, sigmaRadians = 0, poleAxis = new Vector3( 0, 1, 0 ) ) {
+	fromCubeTexture( renderer, cubeTex, sigmaRadians = 0, poleAxis = new Vector3( 0, 1, 0 ) ) {
 
-		const currentGenerateMipmaps = cubeTexture.generateMipmaps;
+		const currentGenerateMipmaps = cubeTex.generateMipmaps;
 
-		cubeTexture.generateMipmaps = true;
+		cubeTex.generateMipmaps = true;
 
-		this.texture.type = cubeTexture.type;
-		this.texture.colorSpace = cubeTexture.colorSpace;
+		this.texture.type = cubeTex.type;
+		this.texture.colorSpace = cubeTex.colorSpace;
 
-		this.texture.generateMipmaps = cubeTexture.generateMipmaps;
-		this.texture.minFilter = cubeTexture.minFilter;
-		this.texture.magFilter = cubeTexture.magFilter;
+		this.texture.generateMipmaps = cubeTex.generateMipmaps;
+		this.texture.minFilter = cubeTex.minFilter;
+		this.texture.magFilter = cubeTex.magFilter;
 
 		// The maximum length of the blur for loop. Smaller sigmas will use fewer
 		// samples and exit early, but not recompile the shader.
@@ -123,9 +123,11 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		const camera = new CubeCamera( 1, 10, this );
 
-		envMap.value = cubeTexture;
+		const width = cubeTex.source.data[0].width;
+
+		envMap.value = cubeTex;
 		latitudinal.value = 1;
-		const blurParams1 = getBlurParams( sigmaRadians, cubeTexture.width, MAX_SAMPLES );
+		const blurParams1 = getBlurParams( sigmaRadians, width, MAX_SAMPLES );
 		weights.value = blurParams1.weights;
 		samples.value = blurParams1.samples;
 		dTheta.value = blurParams1.radiansPerPixel;
@@ -136,7 +138,7 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		} else {
 
-			const blurTarget = new CubeRenderTarget( Math.min( this.width, cubeTexture.width ) );
+			const blurTarget = new CubeRenderTarget( Math.min( this.width, width ) );
 			camera.renderTarget = blurTarget;
 
 			camera.update( renderer, scene );
@@ -155,7 +157,7 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		}
 
-		cubeTexture.currentGenerateMipmaps = currentGenerateMipmaps;
+		cubeTex.currentGenerateMipmaps = currentGenerateMipmaps;
 		geometry.dispose();
 		blurMaterial.dispose();
 
