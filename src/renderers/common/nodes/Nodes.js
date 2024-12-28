@@ -115,13 +115,15 @@ class Nodes extends DataMap {
 			if ( nodeBuilderState === undefined ) {
 
 				const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
-				nodeBuilder.scene = renderObject.scene;
-				nodeBuilder.material = renderObject.material;
+				const scene = renderObject.scene;
+				const material = renderObject.material;
+				nodeBuilder.scene = scene;
+				nodeBuilder.material = material;
 				nodeBuilder.camera = renderObject.camera;
-				nodeBuilder.context.material = renderObject.material;
+				nodeBuilder.context.material = material;
 				nodeBuilder.lightsNode = renderObject.lightsNode;
-				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
-				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
+				nodeBuilder.environmentNode = this.getEnvironmentNode( scene );
+				nodeBuilder.fogNode = this.getFogNode( scene );
 				nodeBuilder.clippingContext = renderObject.clippingContext;
 				nodeBuilder.build();
 
