@@ -5,26 +5,79 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+/**
+ * Abstract base class for uniforms.
+ *
+ * @abstract
+ * @private
+ */
 class Uniform {
 
+	/**
+	 * Constructs a new uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Any} value - The uniform's value.
+	 */
 	constructor( name, value ) {
 
+		/**
+		 * The uniform's name.
+		 *
+		 * @type {String}
+		 */
 		this.name = name;
+
+		/**
+		 * The uniform's value.
+		 *
+		 * @type {Any}
+		 */
 		this.value = value;
 
-		this.boundary = 0; // used to build the uniform buffer according to the STD140 layout
+		/**
+		 * Used to build the uniform buffer according to the STD140 layout.
+		 * Derived uniforms will set this property to a data type specific
+		 * value.
+		 *
+		 * @type {Number}
+		 */
+		this.boundary = 0;
+
+		/**
+		 * The item size. Derived uniforms will set this property to a data
+		 * type specific value.
+		 *
+		 * @type {Number}
+		 */
 		this.itemSize = 0;
 
-		this.offset = 0; // this property is set by WebGPUUniformsGroup and marks the start position in the uniform buffer
+		/**
+		 * This property is set by {@link UniformsGroup} and marks
+		 * the start position in the uniform buffer.
+		 *
+		 * @type {Number}
+		 */
+		this.offset = 0;
 
 	}
 
+	/**
+	 * Sets the uniform's value.
+	 *
+	 * @param {Any} value - The value to set.
+	 */
 	setValue( value ) {
 
 		this.value = value;
 
 	}
 
+	/**
+	 * Returns the uniform's value.
+	 *
+	 * @return {Any} The value.
+	 */
 	getValue() {
 
 		return this.value;
@@ -33,12 +86,31 @@ class Uniform {
 
 }
 
+/**
+ * Represents a Number uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class NumberUniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Number} value - The uniform's value.
+	 */
 	constructor( name, value = 0 ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isNumberUniform = true;
 
 		this.boundary = 4;
@@ -48,12 +120,31 @@ class NumberUniform extends Uniform {
 
 }
 
+/**
+ * Represents a Vector2 uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class Vector2Uniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Vector2} value - The uniform's value.
+	 */
 	constructor( name, value = new Vector2() ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVector2Uniform = true;
 
 		this.boundary = 8;
@@ -63,12 +154,31 @@ class Vector2Uniform extends Uniform {
 
 }
 
+/**
+ * Represents a Vector3 uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class Vector3Uniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Vector3} value - The uniform's value.
+	 */
 	constructor( name, value = new Vector3() ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVector3Uniform = true;
 
 		this.boundary = 16;
@@ -78,12 +188,31 @@ class Vector3Uniform extends Uniform {
 
 }
 
+/**
+ * Represents a Vector4 uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class Vector4Uniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Vector4} value - The uniform's value.
+	 */
 	constructor( name, value = new Vector4() ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVector4Uniform = true;
 
 		this.boundary = 16;
@@ -93,12 +222,31 @@ class Vector4Uniform extends Uniform {
 
 }
 
+/**
+ * Represents a Color uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class ColorUniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Color} value - The uniform's value.
+	 */
 	constructor( name, value = new Color() ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isColorUniform = true;
 
 		this.boundary = 16;
@@ -108,12 +256,31 @@ class ColorUniform extends Uniform {
 
 }
 
+/**
+ * Represents a Matrix3 uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class Matrix3Uniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Matrix3} value - The uniform's value.
+	 */
 	constructor( name, value = new Matrix3() ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMatrix3Uniform = true;
 
 		this.boundary = 48;
@@ -123,12 +290,31 @@ class Matrix3Uniform extends Uniform {
 
 }
 
+/**
+ * Represents a Matrix4 uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
 class Matrix4Uniform extends Uniform {
 
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Matrix4} value - The uniform's value.
+	 */
 	constructor( name, value = new Matrix4() ) {
 
 		super( name, value );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMatrix4Uniform = true;
 
 		this.boundary = 64;

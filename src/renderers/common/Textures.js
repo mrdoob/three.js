@@ -10,6 +10,7 @@ const _size = /*@__PURE__*/ new Vector3();
  * This module manages the textures of the renderer.
  *
  * @private
+ * @augments DataMap
  */
 class Textures extends DataMap {
 

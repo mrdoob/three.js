@@ -7,6 +7,7 @@ import ProgrammableStage from './ProgrammableStage.js';
  * This renderer module manages the pipelines of the renderer.
  *
  * @private
+ * @augments DataMap
  */
 class Pipelines extends DataMap {
 
