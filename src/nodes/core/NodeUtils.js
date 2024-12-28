@@ -184,6 +184,39 @@ export function getTypeFromLength( length ) {
 }
 
 /**
+ * Returns the typed array for the given data type.
+ *
+ * @method
+ * @param {String} type - The data type.
+ * @return {TypedArray} The typed array.
+ */
+export function getTypedArrayFromType( type ) {
+
+	// Handle component type for vectors and matrices
+	if ( /[iu]?vec\d/.test( type ) ) {
+
+		// Handle int vectors
+		if ( type.startsWith( 'ivec' ) ) return Int32Array;
+		// Handle uint vectors
+		if ( type.startsWith( 'uvec' ) ) return Uint32Array;
+		// Default to float vectors
+		return Float32Array;
+
+	}
+
+	// Handle matrices (always float)
+	if ( /mat\d/.test( type ) ) return Float32Array;
+
+	// Basic types
+	if ( /float/.test( type ) ) return Float32Array;
+	if ( /uint/.test( type ) ) return Uint32Array;
+	if ( /int/.test( type ) ) return Int32Array;
+
+	throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
+
+}
+
+/**
  * Returns the length for the given data type.
  *
  * @method
