@@ -61,7 +61,7 @@ class Buffer extends Binding {
 	/**
 	 * A reference to the internal buffer.
 	 *
-	 * @type {Number}
+	 * @type {Float32Array}
 	 * @readonly
 	 */
 	get buffer() {

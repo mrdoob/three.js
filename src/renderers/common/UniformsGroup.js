@@ -3,10 +3,10 @@ import { GPU_CHUNK_BYTES } from './Constants.js';
 
 /**
  * This class represents a uniform buffer binding but with
- * an API that allows to maintain individual uniform values.
+ * an API that allows to maintain individual uniform objects.
  *
  * @private
- * @augments Buffer
+ * @augments UniformBuffer
  */
 class UniformsGroup extends UniformBuffer {
 
