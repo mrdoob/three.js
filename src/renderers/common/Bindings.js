@@ -2,7 +2,7 @@ import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
 
 /**
- * This renderer module manages the pipelines of the renderer.
+ * This renderer module manages the bindings of the renderer.
  *
  * @private
  * @augments DataMap
