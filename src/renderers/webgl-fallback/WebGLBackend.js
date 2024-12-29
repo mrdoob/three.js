@@ -1154,7 +1154,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	createBindings( bindGroup, bindings ) {
+	createBindings( bindGroup, bindings /*, cacheIndex, version*/ ) {
 
 		if ( this._knownBindings.has( bindings ) === false ) {
 
@@ -1185,7 +1185,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateBindings( bindGroup /*, bindings*/ ) {
+	updateBindings( bindGroup /*, bindings, cacheIndex, version*/ ) {
 
 		const { gl } = this;
 
