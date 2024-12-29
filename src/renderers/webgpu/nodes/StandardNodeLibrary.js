@@ -43,8 +43,19 @@ import {
 import { LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../../constants.js';
 import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping } from '../../../nodes/display/ToneMappingFunctions.js';
 
+/**
+ * This version of a node library represents the standard version
+ * used in {@link WebGPURenderer}. It maps lights, tone mapping
+ * techniques and materials to node-based implementations.
+ *
+ * @private
+ * @augments NodeLibrary
+ */
 class StandardNodeLibrary extends NodeLibrary {
 
+	/**
+	 * Constructs a new standard node library.
+	 */
 	constructor() {
 
 		super();
