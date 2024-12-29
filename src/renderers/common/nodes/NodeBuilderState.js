@@ -3,7 +3,7 @@ import BindGroup from '../BindGroup.js';
 /**
  * This module represents the state of a node builder after it was
  * used to build the nodes for a render object. The state holds the
- * results of the build for further processing.
+ * results of the build for further processing in the renderer.
  *
  * Render objects with identical cache keys share the same node builder state.
  *

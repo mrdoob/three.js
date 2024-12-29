@@ -2,8 +2,8 @@ let _id = 0;
 
 /**
  * A bind group represents a collection of bindings and thus a collection
- * or resources. Bind groups are asssigned to pipelines to provide them
- * with the required resources (like uniform buffers or textures.)
+ * or resources. Bind groups are assigned to pipelines to provide them
+ * with the required resources (like uniform buffers or textures).
  *
  * @private
  */
