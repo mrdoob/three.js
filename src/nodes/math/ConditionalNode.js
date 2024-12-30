@@ -71,6 +71,16 @@ class ConditionalNode extends Node {
 
 		const { ifNode, elseNode } = builder.getNodeProperties( this );
 
+		if ( ifNode === undefined ) {
+
+			// fallback setup
+
+			this.setup( builder );
+
+			return this.getNodeType( builder );
+
+		}
+
 		const ifType = ifNode.getNodeType( builder );
 
 		if ( elseNode !== null ) {
