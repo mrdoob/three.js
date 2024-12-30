@@ -613,14 +613,15 @@ class Node extends EventDispatcher {
 
 				properties.initialized = true;
 
-				const outputNode = this.setup( builder ) || null; // return a node or null
+				const outputNode = this.setup( builder ); // return a node or null
+				const isNodeOutput = outputNode && outputNode.isNode === true;
 
-				if ( outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
+				/*if ( isNodeOutput && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
 					// !! no outputNode !!
 					//outputNode = builder.stack;
 
-				}
+				}*/
 
 				for ( const childNode of Object.values( properties ) ) {
 
@@ -632,7 +633,7 @@ class Node extends EventDispatcher {
 
 				}
 
-				if ( outputNode && outputNode.isNode === true ) {
+				if ( isNodeOutput ) {
 
 					outputNode.build( builder );
 
