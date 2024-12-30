@@ -124,7 +124,7 @@ class Backend {
 	 * @abstract
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishRender( /*computeGroup*/ ) {}
+	finishCompute( /*computeGroup*/ ) {}
 
 	// render object
 
