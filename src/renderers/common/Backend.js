@@ -75,6 +75,57 @@ class Backend {
 
 	}
 
+	/**
+	 * The coordinate system of the backend.
+	 *
+	 * @abstract
+	 * @type {Number}
+	 * @readonly
+	 */
+	get coordinateSystem() {}
+
+	// render context
+
+	/**
+	 * This method is executed at the beginning of a render call and
+	 * can be used by the backend to prepare the state for upcoming
+	 * draw calls.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	beginRender( /*renderContext*/ ) {}
+
+	/**
+	 * This method is executed at the end of a render call and
+	 * can be used by the backend to finalize work after draw
+	 * calls.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	finishRender( /*renderContext*/ ) {}
+
+	/**
+	 * This method is executed at the beginning of a compute call and
+	 * can be used by the backend to prepare the state for upcoming
+	 * compute tasks.
+	 *
+	 * @abstract
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
+	beginCompute( /*computeGroup*/ ) {}
+
+	/**
+	 * This method is executed at the end of a compute call and
+	 * can be used by the backend to finalize work after compute
+	 * tasks.
+	 *
+	 * @abstract
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
+	finishRender( /*computeGroup*/ ) {}
+
 	// render object
 
 	/**
@@ -85,6 +136,19 @@ class Backend {
 	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
 	 */
 	draw( /*renderObject, info*/ ) { }
+
+	// compute node
+
+	/**
+	 * Executes a compute command for the given compute node.
+	 *
+	 * @abstract
+	 * @param {Node|Array<Node>} computeGroup - The group of compute nodes of a compute call. Can be a single compute node.
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
+	 */
+	compute( /*computeGroup, computeNode, computeBindings, computePipeline*/ ) { }
 
 	// program
 
@@ -110,23 +174,31 @@ class Backend {
 	 * Creates bindings from the given bind group definition.
 	 *
 	 * @abstract
-	 * @param {BindGroup} bingGroup - The bind group.
+	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
 	 * @param {Number} cacheIndex - The cache index.
 	 * @param {Number} version - The version.
 	 */
-	createBindings( /*bingGroup, bindings, cacheIndex, version*/ ) { }
+	createBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
 
 	/**
 	 * Updates the given bind group definition.
 	 *
 	 * @abstract
-	 * @param {BindGroup} bingGroup - The bind group.
+	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
 	 * @param {Number} cacheIndex - The cache index.
 	 * @param {Number} version - The version.
 	 */
-	updateBindings( /*bingGroup, bindings, cacheIndex, version*/ ) { }
+	updateBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
+
+	/**
+	 * Updates a buffer binding.
+	 *
+	 * @abstract
+	 * @param {Buffer} binding - The buffer binding to update.
+	 */
+	updateBinding( /*binding*/ ) { }
 
 	// pipeline
 
@@ -143,10 +215,10 @@ class Backend {
 	 * Creates a compute pipeline for the given compute node.
 	 *
 	 * @abstract
-	 * @param {Node} computeNode - The compute node.
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 */
-	createComputePipeline( /*computeNode, bindings*/ ) { }
+	createComputePipeline( /*computePipeline, bindings*/ ) { }
 
 	// cache key
 
@@ -191,6 +263,14 @@ class Backend {
 	createSampler( /*texture*/ ) { }
 
 	/**
+	 * Destroys the sampler for the given texture.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to destroy the sampler for.
+	 */
+	destroySampler( /*texture*/ ) {}
+
+	/**
 	 * Creates a default texture for the given texture that can be used
 	 * as a placeholder until the actual texture is ready for usage.
 	 *
@@ -218,6 +298,22 @@ class Backend {
 	updateTexture( /*texture, options = {}*/ ) { }
 
 	/**
+	 * Generates mipmaps for the given texture
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 */
+	generateMipmaps( /*texture*/ ) { }
+
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 */
+	destroyTexture( /*texture*/ ) { }
+
+	/**
 	 * Returns texture data as a typed array.
 	 *
 	 * @abstract
@@ -226,9 +322,32 @@ class Backend {
 	 * @param {Number} y - The y coordinate of the copy origin.
 	 * @param {Number} width - The width of the copy.
 	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
 	 * @return {TypedArray} The texture data as a typed array.
 	 */
-	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {}
+	copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
+
+	/**
+	 * Copies data of the given source texture to the given destination texture.
+	 *
+	 * @abstract
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {Number} [level=0] - The mip level to copy.
+	 */
+	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0*/ ) {}
+
+	/**
+	* Copies the current bound framebuffer to the given texture.
+	*
+	* @abstract
+	* @param {Texture} texture - The destination texture.
+	* @param {RenderContext} renderContext - The render context.
+	* @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	*/
+	copyFramebufferToTexture( /*texture, renderContext, rectangle*/ ) {}
 
 	// attributes
 
@@ -247,6 +366,14 @@ class Backend {
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
 	 */
 	createIndexAttribute( /*attribute*/ ) { }
+
+	/**
+	 * Creates the buffer of a storage attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
+	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
 	 * Updates the buffer of a shader attribute.
@@ -282,7 +409,27 @@ class Backend {
 	 */
 	updateSize() { }
 
+	/**
+	 * Updates the viewport with the values from the given render context.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	updateViewport( /*renderContext*/ ) {}
+
 	// utils
+
+	/**
+	 * Returns `true` if the given 3D object is fully occluded by other
+	 * 3D objects in the scene. Backends must implement this method by using
+	 * a Occlusion Query API.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object3D} object - The 3D object to test.
+	 * @return {Boolean} Whether the 3D object is fully occluded or not.
+	 */
+	isOccluded( /*renderContext, object*/ ) {}
 
 	/**
 	 * Resolves the time stamp for the given render context and type.
@@ -294,6 +441,16 @@ class Backend {
 	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
 	 */
 	async resolveTimestampAsync( /*renderContext, type*/ ) { }
+
+	/**
+	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
+	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
+	 *
+	 * @async
+	 * @abstract
+	 * @return {Promise} A Promise that resolves when synchronization has been finished.
+	 */
+	async waitForGPU() {}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -313,6 +470,14 @@ class Backend {
 	 * @return {Boolean} Whether the feature is supported or not.
 	 */
 	hasFeature( /*name*/ ) {}
+
+	/**
+	 * Returns the maximum anisotropy texture filtering value.
+	 *
+	 * @abstract
+	 * @return {Number} The maximum anisotropy texture filtering value.
+	 */
+	getMaxAnisotropy() {}
 
 	/**
 	 * Returns the drawing buffer size.
