@@ -632,7 +632,7 @@ class Node extends EventDispatcher {
 
 				}
 
-				if ( outputNode && outputNode.isNode === true ) {
+				if ( outputNode !== null && outputNode.isNode === true ) {
 
 					properties.outputNode = outputNode;
 
