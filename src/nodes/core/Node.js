@@ -609,7 +609,7 @@ class Node extends EventDispatcher {
 
 			if ( properties.initialized !== true ) {
 
-				const stackNodesBeforeSetup = builder.stack.nodes.length;
+				//const stackNodesBeforeSetup = builder.stack.nodes.length;
 
 				properties.initialized = true;
 
