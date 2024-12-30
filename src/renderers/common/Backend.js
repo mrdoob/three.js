@@ -11,8 +11,8 @@ import { REVISION } from '../../constants.js';
  * {@link module:Renderer} module and related management components.
  * Sometimes it is required though to execute commands which are
  * specific to the current 3D backend (which is WebGPU or WebGL 2).
- * This abstract base class defines an interface that encapsulate
- * all backend-related logic. Dervide classes for each backend must
+ * This abstract base class defines an interface that encapsulates
+ * all backend-related logic. Derived classes for each backend must
  * implement the interface.
  *
  * @abstract
@@ -151,7 +151,7 @@ class Backend {
 	// cache key
 
 	/**
-	 * Returns `true` if the render pipleine requires an update.
+	 * Returns `true` if the render pipeline requires an update.
 	 *
 	 * @abstract
 	 * @param {RenderObject} renderObject - The render object.
@@ -171,7 +171,7 @@ class Backend {
 	// node builder
 
 	/**
-	 * Returns a node builder for the given render obeject.
+	 * Returns a node builder for the given render object.
 	 *
 	 * @abstract
 	 * @param {RenderObject} renderObject - The render object.
