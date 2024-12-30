@@ -69,11 +69,13 @@ class ConditionalNode extends Node {
 	 */
 	getNodeType( builder ) {
 
-		const ifType = this.ifNode.getNodeType( builder );
+		const { ifNode, elseNode } = builder.getNodeProperties( this );
+console.log( ifNode );
+		const ifType = ifNode.getNodeType( builder );
 
-		if ( this.elseNode !== null ) {
+		if ( elseNode !== null ) {
 
-			const elseType = this.elseNode.getNodeType( builder );
+			const elseType = elseNode.getNodeType( builder );
 
 			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
 
@@ -106,8 +108,6 @@ class ConditionalNode extends Node {
 		properties.condNode = condNode;
 		properties.ifNode = ifNode.context( { nodeBlock: ifNode } );
 		properties.elseNode = elseNode ? elseNode.context( { nodeBlock: elseNode } ) : null;
-
-		super.setup( builder );
 
 	}
 
