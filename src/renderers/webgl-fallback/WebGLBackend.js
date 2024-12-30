@@ -158,7 +158,7 @@ class WebGLBackend extends Backend {
 		* @type {KHRParallelShaderCompile?}
 		* @default null
 		*/
-	   this.parallel = null;
+		this.parallel = null;
 
 		/**
 		 * Whether to track timestamps with a Timestamp Query API or not.
