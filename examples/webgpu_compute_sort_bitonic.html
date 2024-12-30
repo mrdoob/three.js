@@ -494,22 +494,22 @@
 
 					if ( currentStep !== MAX_STEPS ) {
 
-						renderer.compute( computeBitonicStep );
+						await renderer.computeAsync( computeBitonicStep );
 
 						if ( nextStepGlobal ) {
 
-							renderer.compute( computeAlignCurrent );
+							await renderer.computeAsync( computeAlignCurrent );
 			
 						}
 			
-						renderer.compute( computeSetAlgo );
+						await renderer.computeAsync( computeSetAlgo );
 
 						currentStep ++;
 
 					} else {
 
-						renderer.compute( computeResetBuffers );
-						renderer.compute( computeResetAlgo );
+						await renderer.computeAsync( computeResetBuffers );
+						await renderer.computeAsync( computeResetAlgo );
 
 						currentStep = 0;
 			
