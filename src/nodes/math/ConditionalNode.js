@@ -70,7 +70,7 @@ class ConditionalNode extends Node {
 	getNodeType( builder ) {
 
 		const { ifNode, elseNode } = builder.getNodeProperties( this );
-console.log( ifNode );
+
 		const ifType = ifNode.getNodeType( builder );
 
 		if ( elseNode !== null ) {
