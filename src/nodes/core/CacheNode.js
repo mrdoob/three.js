@@ -56,7 +56,16 @@ class CacheNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.node.getNodeType( builder );
+		const previousCache = builder.getCache();
+		const cache = builder.getCacheFromNode( this, this.parent );
+
+		builder.setCache( cache );
+
+		const nodeType = this.node.getNodeType( builder );
+
+		builder.setCache( previousCache );
+
+		return nodeType;
 
 	}
 
