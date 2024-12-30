@@ -8,30 +8,91 @@ import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, fog, rangeF
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
 
-const outputNodeMap = new WeakMap();
+const _outputNodeMap = new WeakMap();
 
+/**
+ * This renderer module manages node-related objects and is the
+ * primary interface between the renderer and the node system.
+ *
+ * @private
+ * @augments DataMap
+ */
 class Nodes extends DataMap {
 
+	/**
+	 * Constructs a new nodes management component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 * @param {Backend} backend - The renderer's backend.
+	 */
 	constructor( renderer, backend ) {
 
 		super();
 
+		/**
+		 * The renderer.
+		 *
+		 * @type {Renderer}
+		 */
 		this.renderer = renderer;
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
 		this.backend = backend;
+
+		/**
+		 * The node frame.
+		 *
+		 * @type {Renderer}
+		 */
 		this.nodeFrame = new NodeFrame();
+
+		/**
+		 * A cache for managing node builder states.
+		 *
+		 * @type {Map<Number,NodeBuilderState>}
+		 */
 		this.nodeBuilderCache = new Map();
+
+		/**
+		 * A cache for managing data cache key data.
+		 *
+		 * @type {ChainMap}
+		 */
 		this.callHashCache = new ChainMap();
+
+		/**
+		 * A cache for managing node uniforms group data.
+		 *
+		 * @type {ChainMap}
+		 */
 		this.groupsData = new ChainMap();
+
+		/**
+		 * A cache for managing node objects of
+		 * scene properties like fog or environments.
+		 *
+		 * @type {Object<String,WeakMap>}
+		 */
 		this.cacheLib = {};
 
 	}
 
+	/**
+	 * Returns `true` if the given node uniforms group must be updated or not.
+	 *
+	 * @param {NodeUniformsGroup} nodeUniformsGroup - The node uniforms group.
+	 * @return {Boolean} Whether the node uniforms group requires an update or not.
+	 */
 	updateGroup( nodeUniformsGroup ) {
 
 		const groupNode = nodeUniformsGroup.groupNode;
 		const name = groupNode.name;
 
-		// objectGroup is every updated
+		// objectGroup is always updated
 
 		if ( name === objectGroup.name ) return true;
 
@@ -92,12 +153,24 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns the cache key for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Number} The cache key.
+	 */
 	getForRenderCacheKey( renderObject ) {
 
 		return renderObject.initialCacheKey;
 
 	}
 
+	/**
+	 * Returns a node builder state for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
 	getForRender( renderObject ) {
 
 		const renderObjectData = this.get( renderObject );
@@ -141,6 +214,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Deletes the given object from the internal data map
+	 *
+	 * @param {Any} object - The object to delete.
+	 * @return {Object?} The deleted dictionary.
+	 */
 	delete( object ) {
 
 		if ( object.isRenderObject ) {
@@ -160,6 +239,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a node builder state for the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
 	getForCompute( computeNode ) {
 
 		const computeData = this.get( computeNode );
@@ -181,6 +266,13 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Creates a node builder state for the given node builder.
+	 *
+	 * @private
+	 * @param {NodeBuilder} nodeBuilder - The node builder.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
 	_createNodeBuilderState( nodeBuilder ) {
 
 		return new NodeBuilderState(
@@ -198,6 +290,13 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns an environment node for the current configured
+	 * scene environment.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @return {Node} A node representing the current scene environment.
+	 */
 	getEnvironmentNode( scene ) {
 
 		this.updateEnvironment( scene );
@@ -224,6 +323,13 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a background node for the current configured
+	 * scene background.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @return {Node} A node representing the current scene background.
+	 */
 	getBackgroundNode( scene ) {
 
 		this.updateBackground( scene );
@@ -250,6 +356,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a fog node for the current configured scene fog.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @return {Node} A node representing the current scene fog.
+	 */
 	getFogNode( scene ) {
 
 		this.updateFog( scene );
@@ -258,6 +370,16 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a cache key for the given scene and lights node.
+	 * This key is used by `RenderObject` as a part of the dynamic
+	 * cache key (a key that must be checked every time the render
+	 * objects is drawn).
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @param {LightsNode} lightsNode - The lights node.
+	 * @return {Number} The cache key.
+	 */
 	getCacheKey( scene, lightsNode ) {
 
 		const chain = [ scene, lightsNode ];
@@ -291,12 +413,24 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * A boolean that indicates whether tone mapping should be enabled
+	 * or not.
+	 *
+	 * @type {Boolean}
+	 */
 	get isToneMappingState() {
 
 		return this.renderer.getRenderTarget() ? false : true;
 
 	}
 
+	/**
+	 * If a scene background is configured, this method makes sure to
+	 * represent the background with a corresponding node-based implementation.
+	 *
+	 * @param {Scene} scene - The scene.
+	 */
 	updateBackground( scene ) {
 
 		const sceneData = this.get( scene );
@@ -361,6 +495,16 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * This method is part of the caching of nodes which are used to represents the
+	 * scene's background, fog or environment.
+	 *
+	 * @param {String} type - The type of object to cache.
+	 * @param {Object} object - The object.
+	 * @param {Function} callback - A callback that produces a node representation for the given object.
+	 * @param {Boolean} [forceUpdate=false] - Whether an update should be enforced or not.
+	 * @return {Node} The node representation.
+	 */
 	getCacheNode( type, object, callback, forceUpdate = false ) {
 
 		const nodeCache = this.cacheLib[ type ] || ( this.cacheLib[ type ] = new WeakMap() );
@@ -378,6 +522,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * If a scene fog is configured, this method makes sure to
+	 * represent the fog with a corresponding node-based implementation.
+	 *
+	 * @param {Scene} scene - The scene.
+	 */
 	updateFog( scene ) {
 
 		const sceneData = this.get( scene );
@@ -426,6 +576,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * If a scene environment is configured, this method makes sure to
+	 * represent the environment with a corresponding node-based implementation.
+	 *
+	 * @param {Scene} scene - The scene.
+	 */
 	updateEnvironment( scene ) {
 
 		const sceneData = this.get( scene );
@@ -486,6 +642,11 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns the current output cache key.
+	 *
+	 * @return {String} The output cache key.
+	 */
 	getOutputCacheKey() {
 
 		const renderer = this.renderer;
@@ -494,27 +655,47 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Checks if the output configuration (tone mapping and color space) for
+	 * the given target has changed.
+	 *
+	 * @param {Texture} outputTarget - The output target.
+	 * @return {Boolean} Whether the output configuration has changed or not.
+	 */
 	hasOutputChange( outputTarget ) {
 
-		const cacheKey = outputNodeMap.get( outputTarget );
+		const cacheKey = _outputNodeMap.get( outputTarget );
 
 		return cacheKey !== this.getOutputCacheKey();
 
 	}
 
-	getOutputNode( outputTexture ) {
+	/**
+	 * Returns a node that represents the output configuration (tone mapping and
+	 * color space) for the current target.
+	 *
+	 * @param {Texture} outputTarget - The output target.
+	 * @return {Node} The output node.
+	 */
+	getOutputNode( outputTarget ) {
 
 		const renderer = this.renderer;
 		const cacheKey = this.getOutputCacheKey();
 
-		const output = texture( outputTexture, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+		const output = texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
-		outputNodeMap.set( outputTexture, cacheKey );
+		_outputNodeMap.set( outputTarget, cacheKey );
 
 		return output;
 
 	}
 
+	/**
+	 * Triggers the call of `updateBefore()` methods
+	 * for all nodes of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
 	updateBefore( renderObject ) {
 
 		const nodeBuilder = renderObject.getNodeBuilderState();
@@ -529,6 +710,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Triggers the call of `updateAfter()` methods
+	 * for all nodes of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
 	updateAfter( renderObject ) {
 
 		const nodeBuilder = renderObject.getNodeBuilderState();
@@ -543,6 +730,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Triggers the call of `update()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
 	updateForCompute( computeNode ) {
 
 		const nodeFrame = this.getNodeFrame();
@@ -556,6 +749,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Triggers the call of `update()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
 	updateForRender( renderObject ) {
 
 		const nodeFrame = this.getNodeFrameForRender( renderObject );
@@ -569,6 +768,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns `true` if the given render object requires a refresh.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the given render object requires a refresh or not.
+	 */
 	needsRefresh( renderObject ) {
 
 		const nodeFrame = this.getNodeFrameForRender( renderObject );
@@ -578,12 +783,16 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Frees the intenral resources.
+	 */
 	dispose() {
 
 		super.dispose();
 
 		this.nodeFrame = new NodeFrame();
 		this.nodeBuilderCache = new Map();
+		this.cacheLib = {};
 
 	}
 

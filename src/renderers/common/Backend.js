@@ -1,144 +1,366 @@
-let vector2 = null;
-let vector4 = null;
-let color4 = null;
+let _vector2 = null;
+let _color4 = null;
 
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { Vector4 } from '../../math/Vector4.js';
 import { createCanvasElement } from '../../utils.js';
 import { REVISION } from '../../constants.js';
 
+/**
+ * Most of the rendering related logic is implemented in the
+ * {@link module:Renderer} module and related management components.
+ * Sometimes it is required though to execute commands which are
+ * specific to the current 3D backend (which is WebGPU or WebGL 2).
+ * This abstract base class defines an interface that encapsulates
+ * all backend-related logic. Derived classes for each backend must
+ * implement the interface.
+ *
+ * @abstract
+ * @private
+ */
 class Backend {
 
+	/**
+	 * Constructs a new backend.
+	 *
+	 * @param {Object} parameters - An object holding parameters for the backend.
+	 */
 	constructor( parameters = {} ) {
 
+		/**
+		 * The parameters of the backend.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = Object.assign( {}, parameters );
+
+		/**
+		 * This weak map holds backend-specific data of objects
+		 * like textures, attributes or render targets.
+		 *
+		 * @type {WeakMap}
+		 */
 		this.data = new WeakMap();
+
+		/**
+		 * A reference to the renderer.
+		 *
+		 * @type {Renderer?}
+		 * @default null
+		 */
 		this.renderer = null;
+
+		/**
+		 * A reference to the canvas element the renderer is drawing to.
+		 *
+		 * @type {(HTMLCanvasElement|OffscreenCanvas)?}
+		 * @default null
+		 */
 		this.domElement = null;
 
 	}
 
+	/**
+	 * Initializes the backend so it is ready for usage. Concrete backends
+	 * are supposed to implement their rendering context creation and related
+	 * operations in this method.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the backend has been initialized.
+	 */
 	async init( renderer ) {
 
 		this.renderer = renderer;
 
 	}
 
-	// render context
-
-	begin( /*renderContext*/ ) { }
-
-	finish( /*renderContext*/ ) { }
-
 	// render object
 
+	/**
+	 * Executes a draw command for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object to draw.
+	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
+	 */
 	draw( /*renderObject, info*/ ) { }
 
 	// program
 
+	/**
+	 * Creates a shader program from the given programmable stage.
+	 *
+	 * @abstract
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	createProgram( /*program*/ ) { }
 
+	/**
+	 * Destroys the shader program of the given programmable stage.
+	 *
+	 * @abstract
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	destroyProgram( /*program*/ ) { }
 
 	// bindings
 
-	createBindings( /*bingGroup, bindings*/ ) { }
+	/**
+	 * Creates bindings from the given bind group definition.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bingGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
+	createBindings( /*bingGroup, bindings, cacheIndex, version*/ ) { }
 
-	updateBindings( /*bingGroup, bindings*/ ) { }
+	/**
+	 * Updates the given bind group definition.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bingGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
+	updateBindings( /*bingGroup, bindings, cacheIndex, version*/ ) { }
 
 	// pipeline
 
-	createRenderPipeline( /*renderObject*/ ) { }
+	/**
+	 * Creates a render pipeline for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 */
+	createRenderPipeline( /*renderObject, promises*/ ) { }
 
-	createComputePipeline( /*computeNode, pipeline*/ ) { }
-
-	destroyPipeline( /*pipeline*/ ) { }
+	/**
+	 * Creates a compute pipeline for the given compute node.
+	 *
+	 * @abstract
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 */
+	createComputePipeline( /*computeNode, bindings*/ ) { }
 
 	// cache key
 
-	needsRenderUpdate( /*renderObject*/ ) { } // return Boolean ( fast test )
+	/**
+	 * Returns `true` if the render pipeline requires an update.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the render pipeline requires an update or not.
+	 */
+	needsRenderUpdate( /*renderObject*/ ) { }
 
-	getRenderCacheKey( /*renderObject*/ ) { } // return String
+	/**
+	 * Returns a cache key that is used to identify render pipelines.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {String} The cache key.
+	 */
+	getRenderCacheKey( /*renderObject*/ ) { }
 
 	// node builder
 
-	createNodeBuilder( /*renderObject*/ ) { } // return NodeBuilder (ADD IT)
+	/**
+	 * Returns a node builder for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {NodeBuilder} The node builder.
+	 */
+	createNodeBuilder( /*renderObject, renderer*/ ) { }
 
 	// textures
 
+	/**
+	 * Creates a sampler for the given texture.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to create the sampler for.
+	 */
 	createSampler( /*texture*/ ) { }
 
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( /*texture*/ ) { }
 
-	createTexture( /*texture*/ ) { }
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
+	createTexture( /*texture, options={}*/ ) { }
 
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
+	updateTexture( /*texture, options = {}*/ ) { }
+
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @return {TypedArray} The texture data as a typed array.
+	 */
 	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {}
 
 	// attributes
 
+	/**
+	 * Creates the buffer of a shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Creates the buffer of an indexed shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
+	 */
 	createIndexAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Updates the buffer of a shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute to update.
+	 */
 	updateAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Destroys the buffer of a shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
+	 */
 	destroyAttribute( /*attribute*/ ) { }
 
 	// canvas
 
+	/**
+	 * Returns the backend's rendering context.
+	 *
+	 * @abstract
+	 * @return {Object} The rendering context.
+	 */
 	getContext() { }
 
+	/**
+	 * Backends can use this method if they have to run
+	 * logic when the renderer gets resized.
+	 *
+	 * @abstract
+	 */
 	updateSize() { }
 
 	// utils
 
-	resolveTimestampAsync( /*renderContext, type*/ ) { }
+	/**
+	 * Resolves the time stamp for the given render context and type.
+	 *
+	 * @async
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {String} type - The render context.
+	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
+	 */
+	async resolveTimestampAsync( /*renderContext, type*/ ) { }
 
-	hasFeatureAsync( /*name*/ ) { } // return Boolean
+	/**
+	 * Checks if the given feature is supported by the backend.
+	 *
+	 * @async
+	 * @abstract
+	 * @param {String} name - The feature's name.
+	 * @return {Promise<Boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
+	 */
+	async hasFeatureAsync( /*name*/ ) { }
 
-	hasFeature( /*name*/ ) { } // return Boolean
+	/**
+	 * Checks if the given feature is supported  by the backend.
+	 *
+	 * @abstract
+	 * @param {String} name - The feature's name.
+	 * @return {Boolean} Whether the feature is supported or not.
+	 */
+	hasFeature( /*name*/ ) {}
 
-	getInstanceCount( renderObject ) {
-
-		const { object, geometry } = renderObject;
-
-		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count > 1 ? object.count : 1 );
-
-	}
-
+	/**
+	 * Returns the drawing buffer size.
+	 *
+	 * @return {Vector2} The drawing buffer size.
+	 */
 	getDrawingBufferSize() {
 
-		vector2 = vector2 || new Vector2();
+		_vector2 = _vector2 || new Vector2();
 
-		return this.renderer.getDrawingBufferSize( vector2 );
-
-	}
-
-	getScissor() {
-
-		vector4 = vector4 || new Vector4();
-
-		return this.renderer.getScissor( vector4 );
+		return this.renderer.getDrawingBufferSize( _vector2 );
 
 	}
 
+	/**
+	 * Defines the scissor test.
+	 *
+	 * @abstract
+	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 */
 	setScissorTest( /*boolean*/ ) { }
 
+	/**
+	 * Returns the clear color and alpha into a single
+	 * color object.
+	 *
+	 * @return {Color4} The clear color.
+	 */
 	getClearColor() {
 
 		const renderer = this.renderer;
 
-		color4 = color4 || new Color4();
+		_color4 = _color4 || new Color4();
 
-		renderer.getClearColor( color4 );
+		renderer.getClearColor( _color4 );
 
-		color4.getRGB( color4, this.renderer.currentColorSpace );
+		_color4.getRGB( _color4, this.renderer.currentColorSpace );
 
-		return color4;
+		return _color4;
 
 	}
 
+	/**
+	 * Returns the DOM element. If no DOM element exists, the backend
+	 * creates a new one.
+	 *
+	 * @return {HTMLCanvasElement} The DOM element.
+	 */
 	getDomElement() {
 
 		let domElement = this.domElement;
@@ -158,14 +380,25 @@ class Backend {
 
 	}
 
-	// resource properties
-
+	/**
+	 * Sets a dictionary for the given object into the
+	 * internal data structure.
+	 *
+	 * @param {Object} object - The object.
+	 * @param {Object} value - The dictionary to set.
+	 */
 	set( object, value ) {
 
 		this.data.set( object, value );
 
 	}
 
+	/**
+	 * Returns the dictionary for the given object.
+	 *
+	 * @param {Object} object - The object.
+	 * @return {Object} The object's dictionary.
+	 */
 	get( object ) {
 
 		let map = this.data.get( object );
@@ -181,18 +414,35 @@ class Backend {
 
 	}
 
+	/**
+	 * Checks if the given object has a dictionary
+	 * with data defined.
+	 *
+	 * @param {Object} object - The object.
+	 * @return {Boolean} Whether a dictionary for the given object as been defined or not.
+	 */
 	has( object ) {
 
 		return this.data.has( object );
 
 	}
 
+	/**
+	 * Deletes an object from the internal data structure.
+	 *
+	 * @param {Object} object - The object to delete.
+	 */
 	delete( object ) {
 
 		this.data.delete( object );
 
 	}
 
+	/**
+	 * Frees internal resources.
+	 *
+	 * @abstract
+	 */
 	dispose() { }
 
 }

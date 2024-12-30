@@ -24,8 +24,18 @@ import {
 import { LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../../constants.js';
 import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping } from '../../../nodes/display/ToneMappingFunctions.js';
 
+/**
+ * This version of a node library represents a basic version
+ * just focusing on lights and tone mapping techniques.
+ *
+ * @private
+ * @augments NodeLibrary
+ */
 class BasicNodeLibrary extends NodeLibrary {
 
+	/**
+	 * Constructs a new basic node library.
+	 */
 	constructor() {
 
 		super();
