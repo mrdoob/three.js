@@ -678,6 +678,7 @@ class NodeBuilder {
 	/**
 	 * It is used to add Nodes that will be used as FRAME and RENDER events,
 	 * and need to follow a certain sequence in the calls to work correctly.
+	 * This function should be called after 'setup()' in the 'build()' process to ensure that the child nodes are processed first.
 	 *
 	 * @param {Node} node - The node to add.
 	 */
