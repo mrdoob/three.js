@@ -267,7 +267,7 @@ class GaussianBlurNode extends TempNode {
 
 		//
 
-		const uvNode = textureNode.uvNode || uv();
+		const uvNode = uv();
 		const directionNode = vec2( this.directionNode || 1 );
 
 		let sampleTexture, output;
