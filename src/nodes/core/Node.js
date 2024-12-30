@@ -474,8 +474,9 @@ class Node extends EventDispatcher {
 
 		}
 
-		// return a outputNode if exists
-		return null;
+		// return a outputNode if exists or null
+
+		return nodeProperties.outputNode || null;
 
 	}
 
