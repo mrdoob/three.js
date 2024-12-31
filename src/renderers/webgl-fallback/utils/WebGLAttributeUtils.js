@@ -69,7 +69,7 @@ class WebGLAttributeUtils {
 	constructor( backend ) {
 
 		/**
-		 * A reference to the WebGPU backend.
+		 * A reference to the WebGL 2 backend.
 		 *
 		 * @type {WebGLBackend}
 		 */
