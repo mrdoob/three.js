@@ -77,7 +77,15 @@ ShaderLib[ 'line' ] = {
 			// conservative estimate of the near plane
 			float a = projectionMatrix[ 2 ][ 2 ]; // 3nd entry in 3th column
 			float b = projectionMatrix[ 3 ][ 2 ]; // 3nd entry in 4th column
-			float nearEstimate = - 0.5 * b / a;
+
+			#ifdef USE_REVERSEDEPTHBUF
+				// - 0.5 * ( - far * near ) / ( far - near )
+				float nearEstimate = - 0.5 * b;
+			#else
+				// - 0.5 * ( ( - 2 * far * near ) / ( far - near ) ) / ( - ( far + near ) / ( far - near ) )
+				// ( - far * near ) / ( far + near )
+				float nearEstimate = - 0.5 * b / a;
+			#endif
 
 			float alpha = ( nearEstimate - start.z ) / ( end.z - start.z );
 
