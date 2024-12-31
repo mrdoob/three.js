@@ -504,7 +504,7 @@ class WebGPUTextureUtils {
 	 * @param {Number} width - The width of the copy.
 	 * @param {Number} height - The height of the copy.
 	 * @param {Number} faceIndex - The face index.
-	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operations has finished.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
