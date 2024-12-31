@@ -255,7 +255,7 @@ class Backend {
 	// textures
 
 	/**
-	 * Creates a sampler for the given texture.
+	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to create the sampler for.
@@ -263,7 +263,7 @@ class Backend {
 	createSampler( /*texture*/ ) { }
 
 	/**
-	 * Destroys the sampler for the given texture.
+	 * Destroys the GPU sampler for the given texture.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to destroy the sampler for.
@@ -298,7 +298,7 @@ class Backend {
 	updateTexture( /*texture, options = {}*/ ) { }
 
 	/**
-	 * Generates mipmaps for the given texture
+	 * Generates mipmaps for the given texture.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture.
@@ -352,7 +352,7 @@ class Backend {
 	// attributes
 
 	/**
-	 * Creates the buffer of a shader attribute.
+	 * Creates the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute.
@@ -360,7 +360,7 @@ class Backend {
 	createAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Creates the buffer of an indexed shader attribute.
+	 * Creates the GPU buffer of an indexed shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
@@ -368,7 +368,7 @@ class Backend {
 	createIndexAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Creates the buffer of a storage attribute.
+	 * Creates the GPU buffer of a storage attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute.
@@ -376,7 +376,7 @@ class Backend {
 	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Updates the buffer of a shader attribute.
+	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
@@ -384,7 +384,7 @@ class Backend {
 	updateAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Destroys the buffer of a shader attribute.
+	 * Destroys the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
