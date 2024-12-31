@@ -25084,7 +25084,10 @@ class Bindings extends DataMap {
 
 				const updated = this.nodes.updateGroup( binding );
 
-				if ( ! updated ) continue;
+				// every uniforms group is a uniform buffer. So if no update is required,
+				// we move one with the next binding. Otherwise the next if block will update the group.
+
+				if ( updated === false ) continue;
 
 			}
 
@@ -38207,7 +38210,9 @@ class Background extends DataMap {
 let _id$6 = 0;
 
 /**
- * Represents a bind group.
+ * A bind group represents a collection of bindings and thus a collection
+ * or resources. Bind groups are assigned to pipelines to provide them
+ * with the required resources (like uniform buffers or textures).
  *
  * @private
  */
@@ -38262,35 +38267,129 @@ class BindGroup {
 
 }
 
+/**
+ * This module represents the state of a node builder after it was
+ * used to build the nodes for a render object. The state holds the
+ * results of the build for further processing in the renderer.
+ *
+ * Render objects with identical cache keys share the same node builder state.
+ *
+ * @private
+ */
 class NodeBuilderState {
 
+	/**
+	 * Constructs a new node builder state.
+	 *
+	 * @param {String?} vertexShader - The native vertex shader code.
+	 * @param {String?} fragmentShader - The native fragment shader code.
+	 * @param {String?} computeShader - The native compute shader code.
+	 * @param {Array<NodeAttribute>} nodeAttributes - An array of node attributes.
+	 * @param {Array<BindGroup>} bindings - An array of bind groups.
+	 * @param {Array<Node>} updateNodes - An array of nodes that implement their `update()` method.
+	 * @param {Array<Node>} updateBeforeNodes - An array of nodes that implement their `updateBefore()` method.
+	 * @param {Array<Node>} updateAfterNodes - An array of nodes that implement their `updateAfter()` method.
+	 * @param {NodeMaterialObserver} monitor - A node material observer.
+	 * @param {Array<Object>} transforms - An array with transform attribute objects. Only relevant when using compute shaders with WebGL 2.
+	 */
 	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, transforms = [] ) {
 
+		/**
+		 * The native vertex shader code.
+		 *
+		 * @type {String}
+		 */
 		this.vertexShader = vertexShader;
+
+		/**
+		 * The native fragment shader code.
+		 *
+		 * @type {String}
+		 */
 		this.fragmentShader = fragmentShader;
+
+		/**
+		 * The native compute shader code.
+		 *
+		 * @type {String}
+		 */
 		this.computeShader = computeShader;
+
+		/**
+		 * An array with transform attribute objects.
+		 * Only relevant when using compute shaders with WebGL 2.
+		 *
+		 * @type {Array<Object>}
+		 */
 		this.transforms = transforms;
 
+		/**
+		 * An array of node attributes representing
+		 * the attributes of the shaders.
+		 *
+		 * @type {Array<NodeAttribute>}
+		 */
 		this.nodeAttributes = nodeAttributes;
+
+		/**
+		 * An array of bind groups representing the uniform or storage
+		 * buffers, texture or samplers of the shader.
+		 *
+		 * @type {Array<BindGroup>}
+		 */
 		this.bindings = bindings;
 
+		/**
+		 * An array of nodes that implement their `update()` method.
+		 *
+		 * @type {Array<Node>}
+		 */
 		this.updateNodes = updateNodes;
+
+		/**
+		 * An array of nodes that implement their `updateBefore()` method.
+		 *
+		 * @type {Array<Node>}
+		 */
 		this.updateBeforeNodes = updateBeforeNodes;
+
+		/**
+		 * An array of nodes that implement their `updateAfter()` method.
+		 *
+		 * @type {Array<Node>}
+		 */
 		this.updateAfterNodes = updateAfterNodes;
 
+		/**
+		 * A node material observer.
+		 *
+		 * @type {NodeMaterialObserver}
+		 */
 		this.monitor = monitor;
 
+		/**
+		 * How often this state is used by render objects.
+		 *
+		 * @type {Number}
+		 */
 		this.usedTimes = 0;
 
 	}
 
+	/**
+	 * This method is used to create a array of bind groups based
+	 * on the existing bind groups of this state. Shared groups are
+	 * not cloned.
+	 *
+	 * @return {Array<BindGroup>} A array of bind groups.
+	 */
 	createBindings() {
 
 		const bindings = [];
 
 		for ( const instanceGroup of this.bindings ) {
 
-			const shared = instanceGroup.bindings[ 0 ].groupNode.shared;
+			const shared = instanceGroup.bindings[ 0 ].groupNode.shared; // TODO: Is it safe to always check the first binding in the group?
 
 			if ( shared !== true ) {
 
@@ -43780,30 +43879,91 @@ class GLSLNodeParser extends NodeParser {
 
 }
 
-const outputNodeMap = new WeakMap();
+const _outputNodeMap = new WeakMap();
 
+/**
+ * This renderer module manages node-related objects and is the
+ * primary interface between the renderer and the node system.
+ *
+ * @private
+ * @augments DataMap
+ */
 class Nodes extends DataMap {
 
+	/**
+	 * Constructs a new nodes management component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 * @param {Backend} backend - The renderer's backend.
+	 */
 	constructor( renderer, backend ) {
 
 		super();
 
+		/**
+		 * The renderer.
+		 *
+		 * @type {Renderer}
+		 */
 		this.renderer = renderer;
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
 		this.backend = backend;
+
+		/**
+		 * The node frame.
+		 *
+		 * @type {Renderer}
+		 */
 		this.nodeFrame = new NodeFrame();
+
+		/**
+		 * A cache for managing node builder states.
+		 *
+		 * @type {Map<Number,NodeBuilderState>}
+		 */
 		this.nodeBuilderCache = new Map();
+
+		/**
+		 * A cache for managing data cache key data.
+		 *
+		 * @type {ChainMap}
+		 */
 		this.callHashCache = new ChainMap();
+
+		/**
+		 * A cache for managing node uniforms group data.
+		 *
+		 * @type {ChainMap}
+		 */
 		this.groupsData = new ChainMap();
+
+		/**
+		 * A cache for managing node objects of
+		 * scene properties like fog or environments.
+		 *
+		 * @type {Object<String,WeakMap>}
+		 */
 		this.cacheLib = {};
 
 	}
 
+	/**
+	 * Returns `true` if the given node uniforms group must be updated or not.
+	 *
+	 * @param {NodeUniformsGroup} nodeUniformsGroup - The node uniforms group.
+	 * @return {Boolean} Whether the node uniforms group requires an update or not.
+	 */
 	updateGroup( nodeUniformsGroup ) {
 
 		const groupNode = nodeUniformsGroup.groupNode;
 		const name = groupNode.name;
 
-		// objectGroup is every updated
+		// objectGroup is always updated
 
 		if ( name === objectGroup.name ) return true;
 
@@ -43864,12 +44024,24 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns the cache key for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Number} The cache key.
+	 */
 	getForRenderCacheKey( renderObject ) {
 
 		return renderObject.initialCacheKey;
 
 	}
 
+	/**
+	 * Returns a node builder state for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
 	getForRender( renderObject ) {
 
 		const renderObjectData = this.get( renderObject );
@@ -43913,6 +44085,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Deletes the given object from the internal data map
+	 *
+	 * @param {Any} object - The object to delete.
+	 * @return {Object?} The deleted dictionary.
+	 */
 	delete( object ) {
 
 		if ( object.isRenderObject ) {
@@ -43932,6 +44110,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a node builder state for the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
 	getForCompute( computeNode ) {
 
 		const computeData = this.get( computeNode );
@@ -43953,6 +44137,13 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Creates a node builder state for the given node builder.
+	 *
+	 * @private
+	 * @param {NodeBuilder} nodeBuilder - The node builder.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
 	_createNodeBuilderState( nodeBuilder ) {
 
 		return new NodeBuilderState(
@@ -43970,6 +44161,13 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns an environment node for the current configured
+	 * scene environment.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @return {Node} A node representing the current scene environment.
+	 */
 	getEnvironmentNode( scene ) {
 
 		this.updateEnvironment( scene );
@@ -43996,6 +44194,13 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a background node for the current configured
+	 * scene background.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @return {Node} A node representing the current scene background.
+	 */
 	getBackgroundNode( scene ) {
 
 		this.updateBackground( scene );
@@ -44022,6 +44227,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a fog node for the current configured scene fog.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @return {Node} A node representing the current scene fog.
+	 */
 	getFogNode( scene ) {
 
 		this.updateFog( scene );
@@ -44030,6 +44241,16 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns a cache key for the given scene and lights node.
+	 * This key is used by `RenderObject` as a part of the dynamic
+	 * cache key (a key that must be checked every time the render
+	 * objects is drawn).
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @param {LightsNode} lightsNode - The lights node.
+	 * @return {Number} The cache key.
+	 */
 	getCacheKey( scene, lightsNode ) {
 
 		const chain = [ scene, lightsNode ];
@@ -44063,12 +44284,24 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * A boolean that indicates whether tone mapping should be enabled
+	 * or not.
+	 *
+	 * @type {Boolean}
+	 */
 	get isToneMappingState() {
 
 		return this.renderer.getRenderTarget() ? false : true;
 
 	}
 
+	/**
+	 * If a scene background is configured, this method makes sure to
+	 * represent the background with a corresponding node-based implementation.
+	 *
+	 * @param {Scene} scene - The scene.
+	 */
 	updateBackground( scene ) {
 
 		const sceneData = this.get( scene );
@@ -44133,6 +44366,16 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * This method is part of the caching of nodes which are used to represents the
+	 * scene's background, fog or environment.
+	 *
+	 * @param {String} type - The type of object to cache.
+	 * @param {Object} object - The object.
+	 * @param {Function} callback - A callback that produces a node representation for the given object.
+	 * @param {Boolean} [forceUpdate=false] - Whether an update should be enforced or not.
+	 * @return {Node} The node representation.
+	 */
 	getCacheNode( type, object, callback, forceUpdate = false ) {
 
 		const nodeCache = this.cacheLib[ type ] || ( this.cacheLib[ type ] = new WeakMap() );
@@ -44150,6 +44393,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * If a scene fog is configured, this method makes sure to
+	 * represent the fog with a corresponding node-based implementation.
+	 *
+	 * @param {Scene} scene - The scene.
+	 */
 	updateFog( scene ) {
 
 		const sceneData = this.get( scene );
@@ -44198,6 +44447,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * If a scene environment is configured, this method makes sure to
+	 * represent the environment with a corresponding node-based implementation.
+	 *
+	 * @param {Scene} scene - The scene.
+	 */
 	updateEnvironment( scene ) {
 
 		const sceneData = this.get( scene );
@@ -44258,6 +44513,11 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns the current output cache key.
+	 *
+	 * @return {String} The output cache key.
+	 */
 	getOutputCacheKey() {
 
 		const renderer = this.renderer;
@@ -44266,27 +44526,47 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Checks if the output configuration (tone mapping and color space) for
+	 * the given target has changed.
+	 *
+	 * @param {Texture} outputTarget - The output target.
+	 * @return {Boolean} Whether the output configuration has changed or not.
+	 */
 	hasOutputChange( outputTarget ) {
 
-		const cacheKey = outputNodeMap.get( outputTarget );
+		const cacheKey = _outputNodeMap.get( outputTarget );
 
 		return cacheKey !== this.getOutputCacheKey();
 
 	}
 
-	getOutputNode( outputTexture ) {
+	/**
+	 * Returns a node that represents the output configuration (tone mapping and
+	 * color space) for the current target.
+	 *
+	 * @param {Texture} outputTarget - The output target.
+	 * @return {Node} The output node.
+	 */
+	getOutputNode( outputTarget ) {
 
 		const renderer = this.renderer;
 		const cacheKey = this.getOutputCacheKey();
 
-		const output = texture( outputTexture, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+		const output = texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
-		outputNodeMap.set( outputTexture, cacheKey );
+		_outputNodeMap.set( outputTarget, cacheKey );
 
 		return output;
 
 	}
 
+	/**
+	 * Triggers the call of `updateBefore()` methods
+	 * for all nodes of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
 	updateBefore( renderObject ) {
 
 		const nodeBuilder = renderObject.getNodeBuilderState();
@@ -44301,6 +44581,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Triggers the call of `updateAfter()` methods
+	 * for all nodes of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
 	updateAfter( renderObject ) {
 
 		const nodeBuilder = renderObject.getNodeBuilderState();
@@ -44315,6 +44601,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Triggers the call of `update()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
 	updateForCompute( computeNode ) {
 
 		const nodeFrame = this.getNodeFrame();
@@ -44328,6 +44620,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Triggers the call of `update()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
 	updateForRender( renderObject ) {
 
 		const nodeFrame = this.getNodeFrameForRender( renderObject );
@@ -44341,6 +44639,12 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Returns `true` if the given render object requires a refresh.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the given render object requires a refresh or not.
+	 */
 	needsRefresh( renderObject ) {
 
 		const nodeFrame = this.getNodeFrameForRender( renderObject );
@@ -44350,12 +44654,16 @@ class Nodes extends DataMap {
 
 	}
 
+	/**
+	 * Frees the intenral resources.
+	 */
 	dispose() {
 
 		super.dispose();
 
 		this.nodeFrame = new NodeFrame();
 		this.nodeBuilderCache = new Map();
+		this.cacheLib = {};
 
 	}
 
@@ -44698,16 +45006,55 @@ class RenderBundles {
 
 }
 
+/**
+ * The purpose of a node library is to assign node implementations
+ * to existing library features. In `WebGPURenderer` lights, materials
+ * which are not based on `NodeMaterial` as well as tone mapping techniques
+ * are implemented with node-based modules.
+ *
+ * @private
+ */
 class NodeLibrary {
 
+	/**
+	 * Constructs a new node library.
+	 */
 	constructor() {
 
+		/**
+		 * A weak map that maps lights to light nodes.
+		 *
+		 * @type {WeakMap<Light.constructor,AnalyticLightNode.constructor>}
+		 */
 		this.lightNodes = new WeakMap();
+
+		/**
+		 * A map that maps materials to node materials.
+		 *
+		 * @type {WeakMap<String,NodeMaterial.constructor>}
+		 */
 		this.materialNodes = new Map();
+
+		/**
+		 * A map that maps tone mapping techniques (constants)
+		 * to tone mapping node functions.
+		 *
+		 * @type {WeakMap<Number,Function>}
+		 */
 		this.toneMappingNodes = new Map();
 
 	}
 
+	/**
+	 * Returns a matching node material instance for the given material object.
+	 *
+	 * This method also assigns/copies the properties of the given material object
+	 * to the node material. This is done to make sure the current material
+	 * configuration carries over to the node version.
+	 *
+	 * @param {Material} material - A material.
+	 * @return {NodeMaterial} The corresponding node material.
+	 */
 	fromMaterial( material ) {
 
 		if ( material.isNodeMaterial ) return material;
@@ -44732,42 +45079,85 @@ class NodeLibrary {
 
 	}
 
+	/**
+	 * Adds a tone mapping node function for a tone mapping technique (constant).
+	 *
+	 * @param {Function} toneMappingNode - The tone mapping node function.
+	 * @param {Number} toneMapping - The tone mapping.
+	 */
 	addToneMapping( toneMappingNode, toneMapping ) {
 
 		this.addType( toneMappingNode, toneMapping, this.toneMappingNodes );
 
 	}
 
+	/**
+	 * Returns a tone mapping node function for a tone mapping technique (constant).
+	 *
+	 * @param {Number} toneMapping - The tone mapping.
+	 * @return {Function?} The tone mapping node function. Returns `null` if no node function is found.
+	 */
 	getToneMappingFunction( toneMapping ) {
 
 		return this.toneMappingNodes.get( toneMapping ) || null;
 
 	}
 
+	/**
+	 * Returns a node material class definition for a material type.
+	 *
+	 * @param {Sring} materialType - The material type.
+	 * @return {NodeMaterial.constructor?} The node material class definition. Returns `null` if no node material is found.
+	 */
 	getMaterialNodeClass( materialType ) {
 
 		return this.materialNodes.get( materialType ) || null;
 
 	}
 
+	/**
+	 * Adds a node material class definition for a given material type.
+	 *
+	 * @param {NodeMaterial.constructor} materialNodeClass - The node material class definition.
+	 * @param {Sring} materialClassType - The material type.
+	 */
 	addMaterial( materialNodeClass, materialClassType ) {
 
 		this.addType( materialNodeClass, materialClassType, this.materialNodes );
 
 	}
 
+	/**
+	 * Returns a light node class definition for a light class definition.
+	 *
+	 * @param {Light.constructor} light - The light class definition.
+	 * @return {AnalyticLightNode.constructor?} The light node class definition. Returns `null` if no light node is found.
+	 */
 	getLightNodeClass( light ) {
 
 		return this.lightNodes.get( light ) || null;
 
 	}
 
+	/**
+	 * Adds a light node class definition for a given light class definition.
+	 *
+	 * @param {AnalyticLightNode.constructor} lightNodeClass - The light node class definition.
+	 * @param {Light.constructor} lightClass - The light class definition.
+	 */
 	addLight( lightNodeClass, lightClass ) {
 
 		this.addClass( lightNodeClass, lightClass, this.lightNodes );
 
 	}
 
+	/**
+	 * Adds a node class definition for the given type to the provided type library.
+	 *
+	 * @param {Any} nodeClass - The node class definition.
+	 * @param {String} type - The object type.
+	 * @param {Map} library - The type library.
+	 */
 	addType( nodeClass, type, library ) {
 
 		if ( library.has( type ) ) {
@@ -44784,6 +45174,13 @@ class NodeLibrary {
 
 	}
 
+	/**
+	 * Adds a node class definition for the given class definition to the provided type library.
+	 *
+	 * @param {Any} nodeClass - The node class definition.
+	 * @param {Any} baseClass - The class definition.
+	 * @param {WeakMap} library - The type library.
+	 */
 	addClass( nodeClass, baseClass, library ) {
 
 		if ( library.has( baseClass ) ) {
@@ -49763,141 +50160,529 @@ void main() {
 
 }
 
-let vector2 = null;
-let vector4 = null;
-let color4 = null;
+let _vector2 = null;
+let _color4 = null;
 
+/**
+ * Most of the rendering related logic is implemented in the
+ * {@link module:Renderer} module and related management components.
+ * Sometimes it is required though to execute commands which are
+ * specific to the current 3D backend (which is WebGPU or WebGL 2).
+ * This abstract base class defines an interface that encapsulates
+ * all backend-related logic. Derived classes for each backend must
+ * implement the interface.
+ *
+ * @abstract
+ * @private
+ */
 class Backend {
 
+	/**
+	 * Constructs a new backend.
+	 *
+	 * @param {Object} parameters - An object holding parameters for the backend.
+	 */
 	constructor( parameters = {} ) {
 
+		/**
+		 * The parameters of the backend.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = Object.assign( {}, parameters );
+
+		/**
+		 * This weak map holds backend-specific data of objects
+		 * like textures, attributes or render targets.
+		 *
+		 * @type {WeakMap}
+		 */
 		this.data = new WeakMap();
+
+		/**
+		 * A reference to the renderer.
+		 *
+		 * @type {Renderer?}
+		 * @default null
+		 */
 		this.renderer = null;
+
+		/**
+		 * A reference to the canvas element the renderer is drawing to.
+		 *
+		 * @type {(HTMLCanvasElement|OffscreenCanvas)?}
+		 * @default null
+		 */
 		this.domElement = null;
 
 	}
 
+	/**
+	 * Initializes the backend so it is ready for usage. Concrete backends
+	 * are supposed to implement their rendering context creation and related
+	 * operations in this method.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the backend has been initialized.
+	 */
 	async init( renderer ) {
 
 		this.renderer = renderer;
 
 	}
 
+	/**
+	 * The coordinate system of the backend.
+	 *
+	 * @abstract
+	 * @type {Number}
+	 * @readonly
+	 */
+	get coordinateSystem() {}
+
 	// render context
 
-	begin( /*renderContext*/ ) { }
+	/**
+	 * This method is executed at the beginning of a render call and
+	 * can be used by the backend to prepare the state for upcoming
+	 * draw calls.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	beginRender( /*renderContext*/ ) {}
 
-	finish( /*renderContext*/ ) { }
+	/**
+	 * This method is executed at the end of a render call and
+	 * can be used by the backend to finalize work after draw
+	 * calls.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	finishRender( /*renderContext*/ ) {}
+
+	/**
+	 * This method is executed at the beginning of a compute call and
+	 * can be used by the backend to prepare the state for upcoming
+	 * compute tasks.
+	 *
+	 * @abstract
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
+	beginCompute( /*computeGroup*/ ) {}
+
+	/**
+	 * This method is executed at the end of a compute call and
+	 * can be used by the backend to finalize work after compute
+	 * tasks.
+	 *
+	 * @abstract
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
+	finishCompute( /*computeGroup*/ ) {}
 
 	// render object
 
+	/**
+	 * Executes a draw command for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object to draw.
+	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
+	 */
 	draw( /*renderObject, info*/ ) { }
+
+	// compute node
+
+	/**
+	 * Executes a compute command for the given compute node.
+	 *
+	 * @abstract
+	 * @param {Node|Array<Node>} computeGroup - The group of compute nodes of a compute call. Can be a single compute node.
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
+	 */
+	compute( /*computeGroup, computeNode, computeBindings, computePipeline*/ ) { }
 
 	// program
 
+	/**
+	 * Creates a shader program from the given programmable stage.
+	 *
+	 * @abstract
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	createProgram( /*program*/ ) { }
 
+	/**
+	 * Destroys the shader program of the given programmable stage.
+	 *
+	 * @abstract
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	destroyProgram( /*program*/ ) { }
 
 	// bindings
 
-	createBindings( /*bingGroup, bindings*/ ) { }
+	/**
+	 * Creates bindings from the given bind group definition.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
+	createBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
 
-	updateBindings( /*bingGroup, bindings*/ ) { }
+	/**
+	 * Updates the given bind group definition.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
+	updateBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
+
+	/**
+	 * Updates a buffer binding.
+	 *
+	 * @abstract
+	 * @param {Buffer} binding - The buffer binding to update.
+	 */
+	updateBinding( /*binding*/ ) { }
 
 	// pipeline
 
-	createRenderPipeline( /*renderObject*/ ) { }
+	/**
+	 * Creates a render pipeline for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 */
+	createRenderPipeline( /*renderObject, promises*/ ) { }
 
-	createComputePipeline( /*computeNode, pipeline*/ ) { }
-
-	destroyPipeline( /*pipeline*/ ) { }
+	/**
+	 * Creates a compute pipeline for the given compute node.
+	 *
+	 * @abstract
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 */
+	createComputePipeline( /*computePipeline, bindings*/ ) { }
 
 	// cache key
 
-	needsRenderUpdate( /*renderObject*/ ) { } // return Boolean ( fast test )
+	/**
+	 * Returns `true` if the render pipeline requires an update.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the render pipeline requires an update or not.
+	 */
+	needsRenderUpdate( /*renderObject*/ ) { }
 
-	getRenderCacheKey( /*renderObject*/ ) { } // return String
+	/**
+	 * Returns a cache key that is used to identify render pipelines.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {String} The cache key.
+	 */
+	getRenderCacheKey( /*renderObject*/ ) { }
 
 	// node builder
 
-	createNodeBuilder( /*renderObject*/ ) { } // return NodeBuilder (ADD IT)
+	/**
+	 * Returns a node builder for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {NodeBuilder} The node builder.
+	 */
+	createNodeBuilder( /*renderObject, renderer*/ ) { }
 
 	// textures
 
+	/**
+	 * Creates a sampler for the given texture.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to create the sampler for.
+	 */
 	createSampler( /*texture*/ ) { }
 
+	/**
+	 * Destroys the sampler for the given texture.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to destroy the sampler for.
+	 */
+	destroySampler( /*texture*/ ) {}
+
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( /*texture*/ ) { }
 
-	createTexture( /*texture*/ ) { }
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
+	createTexture( /*texture, options={}*/ ) { }
 
-	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {}
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
+	updateTexture( /*texture, options = {}*/ ) { }
+
+	/**
+	 * Generates mipmaps for the given texture
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 */
+	generateMipmaps( /*texture*/ ) { }
+
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture.
+	 */
+	destroyTexture( /*texture*/ ) { }
+
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @abstract
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
+	 * @return {TypedArray} The texture data as a typed array.
+	 */
+	copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
+
+	/**
+	 * Copies data of the given source texture to the given destination texture.
+	 *
+	 * @abstract
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {Number} [level=0] - The mip level to copy.
+	 */
+	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0*/ ) {}
+
+	/**
+	* Copies the current bound framebuffer to the given texture.
+	*
+	* @abstract
+	* @param {Texture} texture - The destination texture.
+	* @param {RenderContext} renderContext - The render context.
+	* @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	*/
+	copyFramebufferToTexture( /*texture, renderContext, rectangle*/ ) {}
 
 	// attributes
 
+	/**
+	 * Creates the buffer of a shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Creates the buffer of an indexed shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
+	 */
 	createIndexAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Creates the buffer of a storage attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
+	createStorageAttribute( /*attribute*/ ) { }
+
+	/**
+	 * Updates the buffer of a shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute to update.
+	 */
 	updateAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Destroys the buffer of a shader attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
+	 */
 	destroyAttribute( /*attribute*/ ) { }
 
 	// canvas
 
+	/**
+	 * Returns the backend's rendering context.
+	 *
+	 * @abstract
+	 * @return {Object} The rendering context.
+	 */
 	getContext() { }
 
+	/**
+	 * Backends can use this method if they have to run
+	 * logic when the renderer gets resized.
+	 *
+	 * @abstract
+	 */
 	updateSize() { }
+
+	/**
+	 * Updates the viewport with the values from the given render context.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	updateViewport( /*renderContext*/ ) {}
 
 	// utils
 
-	resolveTimestampAsync( /*renderContext, type*/ ) { }
+	/**
+	 * Returns `true` if the given 3D object is fully occluded by other
+	 * 3D objects in the scene. Backends must implement this method by using
+	 * a Occlusion Query API.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object3D} object - The 3D object to test.
+	 * @return {Boolean} Whether the 3D object is fully occluded or not.
+	 */
+	isOccluded( /*renderContext, object*/ ) {}
 
-	hasFeatureAsync( /*name*/ ) { } // return Boolean
+	/**
+	 * Resolves the time stamp for the given render context and type.
+	 *
+	 * @async
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {String} type - The render context.
+	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
+	 */
+	async resolveTimestampAsync( /*renderContext, type*/ ) { }
 
-	hasFeature( /*name*/ ) { } // return Boolean
+	/**
+	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
+	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
+	 *
+	 * @async
+	 * @abstract
+	 * @return {Promise} A Promise that resolves when synchronization has been finished.
+	 */
+	async waitForGPU() {}
 
-	getInstanceCount( renderObject ) {
+	/**
+	 * Checks if the given feature is supported by the backend.
+	 *
+	 * @async
+	 * @abstract
+	 * @param {String} name - The feature's name.
+	 * @return {Promise<Boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
+	 */
+	async hasFeatureAsync( /*name*/ ) { }
 
-		const { object, geometry } = renderObject;
+	/**
+	 * Checks if the given feature is supported  by the backend.
+	 *
+	 * @abstract
+	 * @param {String} name - The feature's name.
+	 * @return {Boolean} Whether the feature is supported or not.
+	 */
+	hasFeature( /*name*/ ) {}
 
-		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count > 1 ? object.count : 1 );
+	/**
+	 * Returns the maximum anisotropy texture filtering value.
+	 *
+	 * @abstract
+	 * @return {Number} The maximum anisotropy texture filtering value.
+	 */
+	getMaxAnisotropy() {}
 
-	}
-
+	/**
+	 * Returns the drawing buffer size.
+	 *
+	 * @return {Vector2} The drawing buffer size.
+	 */
 	getDrawingBufferSize() {
 
-		vector2 = vector2 || new Vector2();
+		_vector2 = _vector2 || new Vector2();
 
-		return this.renderer.getDrawingBufferSize( vector2 );
-
-	}
-
-	getScissor() {
-
-		vector4 = vector4 || new Vector4();
-
-		return this.renderer.getScissor( vector4 );
+		return this.renderer.getDrawingBufferSize( _vector2 );
 
 	}
 
+	/**
+	 * Defines the scissor test.
+	 *
+	 * @abstract
+	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 */
 	setScissorTest( /*boolean*/ ) { }
 
+	/**
+	 * Returns the clear color and alpha into a single
+	 * color object.
+	 *
+	 * @return {Color4} The clear color.
+	 */
 	getClearColor() {
 
 		const renderer = this.renderer;
 
-		color4 = color4 || new Color4();
+		_color4 = _color4 || new Color4();
 
-		renderer.getClearColor( color4 );
+		renderer.getClearColor( _color4 );
 
-		color4.getRGB( color4, this.renderer.currentColorSpace );
+		_color4.getRGB( _color4, this.renderer.currentColorSpace );
 
-		return color4;
+		return _color4;
 
 	}
 
+	/**
+	 * Returns the DOM element. If no DOM element exists, the backend
+	 * creates a new one.
+	 *
+	 * @return {HTMLCanvasElement} The DOM element.
+	 */
 	getDomElement() {
 
 		let domElement = this.domElement;
@@ -49917,14 +50702,25 @@ class Backend {
 
 	}
 
-	// resource properties
-
+	/**
+	 * Sets a dictionary for the given object into the
+	 * internal data structure.
+	 *
+	 * @param {Object} object - The object.
+	 * @param {Object} value - The dictionary to set.
+	 */
 	set( object, value ) {
 
 		this.data.set( object, value );
 
 	}
 
+	/**
+	 * Returns the dictionary for the given object.
+	 *
+	 * @param {Object} object - The object.
+	 * @return {Object} The object's dictionary.
+	 */
 	get( object ) {
 
 		let map = this.data.get( object );
@@ -49940,18 +50736,35 @@ class Backend {
 
 	}
 
+	/**
+	 * Checks if the given object has a dictionary
+	 * with data defined.
+	 *
+	 * @param {Object} object - The object.
+	 * @return {Boolean} Whether a dictionary for the given object as been defined or not.
+	 */
 	has( object ) {
 
 		return this.data.has( object );
 
 	}
 
+	/**
+	 * Deletes an object from the internal data structure.
+	 *
+	 * @param {Object} object - The object to delete.
+	 */
 	delete( object ) {
 
 		this.data.delete( object );
 
 	}
 
+	/**
+	 * Frees internal resources.
+	 *
+	 * @abstract
+	 */
 	dispose() { }
 
 }
@@ -51984,7 +52797,7 @@ class WebGLTextureUtils {
 
 		const requireDrawFrameBuffer = texture.isDepthTexture === true || ( renderContext.renderTarget && renderContext.renderTarget.samples > 0 );
 
-		const srcHeight = renderContext.renderTarget ? renderContext.renderTarget.height : this.backend.gerDrawingBufferSize().y;
+		const srcHeight = renderContext.renderTarget ? renderContext.renderTarget.height : this.backend.getDrawingBufferSize().y;
 
 		if ( requireDrawFrameBuffer ) {
 
@@ -52424,18 +53237,184 @@ class WebGLBufferRenderer {
 
 }
 
-//
-
+/**
+ * A backend implementation targeting WebGL 2.
+ *
+ * @private
+ * @augments Backend
+ */
 class WebGLBackend extends Backend {
 
+	/**
+	 * Constructs a new WebGPU backend.
+	 *
+	 * @param {Object} parameters - The configuration parameter.
+	 * @param {Boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @param {Boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @param {Boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {WebGL2RenderingContext} [parameters.context=undefined] - A WebGL 2 rendering context.
+	 */
 	constructor( parameters = {} ) {
 
 		super( parameters );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isWebGLBackend = true;
+
+		/**
+		 * A reference to a backend module holding shader attribute-related
+		 * utility functions.
+		 *
+		 * @type {WebGLAttributeUtils?}
+		 * @default null
+		 */
+		this.attributeUtils = null;
+
+		/**
+		 * A reference to a backend module holding extension-related
+		 * utility functions.
+		 *
+		 * @type {WebGLExtensions?}
+		 * @default null
+		 */
+		this.extensions = null;
+
+		/**
+		 * A reference to a backend module holding capability-related
+		 * utility functions.
+		 *
+		 * @type {WebGLCapabilities?}
+		 * @default null
+		 */
+		this.capabilities = null;
+
+		/**
+		 * A reference to a backend module holding texture-related
+		 * utility functions.
+		 *
+		 * @type {WebGLTextureUtils?}
+		 * @default null
+		 */
+		this.textureUtils = null;
+
+		/**
+		 * A reference to a backend module holding renderer-related
+		 * utility functions.
+		 *
+		 * @type {WebGLBufferRenderer?}
+		 * @default null
+		 */
+		this.bufferRenderer = null;
+
+		/**
+		 * A reference to the rendering context.
+		 *
+		 * @type {WebGL2RenderingContext?}
+		 * @default null
+		 */
+		this.gl = null;
+
+		/**
+		 * A reference to a backend module holding state-related
+		 * utility functions.
+		 *
+		 * @type {WebGLState?}
+		 * @default null
+		 */
+		this.state = null;
+
+		/**
+		 * A reference to a backend module holding common
+		 * utility functions.
+		 *
+		 * @type {WebGLUtils?}
+		 * @default null
+		 */
+		this.utils = null;
+
+		/**
+		 * Dictionary for caching VAOs.
+		 *
+		 * @type {Object<String,WebGLVertexArrayObject>}
+		 */
+		this.vaoCache = {};
+
+		/**
+		 * Dictionary for caching transform feedback objects.
+		 *
+		 * @type {Object<String,WebGLTransformFeedback>}
+		 */
+		this.transformFeedbackCache = {};
+
+		/**
+		 * Controls if `gl.RASTERIZER_DISCARD` should be enabled or not.
+		 * Only relevant when using compute shaders.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.discard = false;
+
+		/**
+		 * A reference to the `EXT_disjoint_timer_query_webgl2` extension. `null` if the
+		 * device does not support the extension.
+		 *
+		 * @type {EXTDisjointTimerQueryWebGL2?}
+		 * @default null
+		 */
+		this.disjoint = null;
+
+		/**
+		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
+		* device does not support the extension.
+		*
+		* @type {KHRParallelShaderCompile?}
+		* @default null
+		*/
+		this.parallel = null;
+
+		/**
+		 * Whether to track timestamps with a Timestamp Query API or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.trackTimestamp = ( parameters.trackTimestamp === true );
+
+		/**
+		 * A reference to the current render context.
+		 *
+		 * @private
+		 * @type {RenderContext}
+		 * @default null
+		 */
+		this._currentContext = null;
+
+		/**
+		 * A unique collection of bindings.
+		 *
+		 * @private
+		 * @type {WeakSet}
+		 */
+		this._knownBindings = new WeakSet();
 
 	}
 
+	/**
+	 * Initializes the backend so it is ready for usage.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	init( renderer ) {
 
 		super.init( renderer );
@@ -52476,11 +53455,6 @@ class WebGLBackend extends Backend {
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
 
-		this.vaoCache = {};
-		this.transformFeedbackCache = {};
-		this.discard = false;
-		this.trackTimestamp = ( parameters.trackTimestamp === true );
-
 		this.extensions.get( 'EXT_color_buffer_float' );
 		this.extensions.get( 'WEBGL_clip_cull_distance' );
 		this.extensions.get( 'OES_texture_float_linear' );
@@ -52492,30 +53466,52 @@ class WebGLBackend extends Backend {
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 
-		this._knownBindings = new WeakSet();
-
-		this._currentContext = null;
-
 	}
 
+	/**
+	 * The coordinate system of the backend.
+	 *
+	 * @type {Number}
+	 * @readonly
+	 */
 	get coordinateSystem() {
 
 		return WebGLCoordinateSystem;
 
 	}
 
+	/**
+	 * Transfers buffer data from a storage buffer attribute
+	 * from the GPU to the CPU in context of compute shaders.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
 	async getArrayBufferAsync( attribute ) {
 
 		return await this.attributeUtils.getArrayBufferAsync( attribute );
 
 	}
 
+	/**
+	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
+	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolves when synchronization has been finished.
+	 */
 	async waitForGPU() {
 
 		await this.utils._clientWaitAsync();
 
 	}
 
+	/**
+	 * Inits a time stamp query for the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	initTimestampQuery( renderContext ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
@@ -52550,6 +53546,11 @@ class WebGLBackend extends Backend {
 
 	// timestamp utils
 
+	/**
+	 * Prepares the timestamp buffer.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	prepareTimestampBuffer( renderContext ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
@@ -52576,6 +53577,14 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Resolves the time stamp for the given render context and type.
+	 *
+	 * @async
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {String} type - The render context.
+	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
+	 */
 	async resolveTimestampAsync( renderContext, type = 'render' ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
@@ -52605,12 +53614,23 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Returns the backend's rendering context.
+	 *
+	 * @return {WebGL2RenderingContext} The rendering context.
+	 */
 	getContext() {
 
 		return this.gl;
 
 	}
 
+	/**
+	 * This method is executed at the beginning of a render call and prepares
+	 * the WebGL state for upcoming render calls
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	beginRender( renderContext ) {
 
 		const { gl } = this;
@@ -52666,6 +53686,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * This method is executed at the end of a render call and finalizes work
+	 * after draw calls.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	finishRender( renderContext ) {
 
 		const { gl, state } = this;
@@ -52772,6 +53798,13 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * This method processes the result of occlusion queries and writes it
+	 * into render context data.
+	 *
+	 * @async
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	resolveOccludedAsync( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
@@ -52830,6 +53863,14 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Returns `true` if the given 3D object is fully occluded by other
+	 * 3D objects in the scene.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object3D} object - The 3D object to test.
+	 * @return {Boolean} Whether the 3D object is fully occluded or not.
+	 */
 	isOccluded( renderContext, object ) {
 
 		const renderContextData = this.get( renderContext );
@@ -52838,6 +53879,11 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Updates the viewport with the values from the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	updateViewport( renderContext ) {
 
 		const gl = this.gl;
@@ -52847,6 +53893,11 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Defines the scissor test.
+	 *
+	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 */
 	setScissorTest( boolean ) {
 
 		const gl = this.gl;
@@ -52863,6 +53914,15 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Performs a clear operation.
+	 *
+	 * @param {Boolean} color - Whether the color buffer should be cleared or not.
+	 * @param {Boolean} depth - Whether the depth buffer should be cleared or not.
+	 * @param {Boolean} stencil - Whether the stencil buffer should be cleared or not.
+	 * @param {Object?} [descriptor=null] - The render context of the current set render target.
+	 * @param {Boolean} [setFrameBuffer=true] - TODO.
+	 */
 	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
 
 		const { gl } = this;
@@ -52953,6 +54013,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * This method is executed at the beginning of a compute call and
+	 * prepares the state for upcoming compute tasks.
+	 *
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
 	beginCompute( computeGroup ) {
 
 		const { state, gl } = this;
@@ -52962,11 +54028,19 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Executes a compute command for the given compute node.
+	 *
+	 * @param {Node|Array<Node>} computeGroup - The group of compute nodes of a compute call. Can be a single compute node.
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 */
 	compute( computeGroup, computeNode, bindings, pipeline ) {
 
 		const { state, gl } = this;
 
-		if ( ! this.discard ) {
+		if ( this.discard === false ) {
 
 			// required here to handle async behaviour of render.compute()
 			gl.enable( gl.RASTERIZER_DISCARD );
@@ -53031,6 +54105,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * This method is executed at the end of a compute call and
+	 * finalizes work after compute tasks.
+	 *
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
 	finishCompute( computeGroup ) {
 
 		const gl = this.gl;
@@ -53049,6 +54129,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Executes a draw command for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object to draw.
+	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
+	 */
 	draw( renderObject/*, info*/ ) {
 
 		const { object, pipeline, material, context, hardwareClippingPlanes } = renderObject;
@@ -53211,12 +54297,24 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Explain why always null is returned.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the render pipeline requires an update or not.
+	 */
 	needsRenderUpdate( /*renderObject*/ ) {
 
 		return false;
 
 	}
 
+	/**
+	 * Explain why no cache key is computed.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {String} The cache key.
+	 */
 	getRenderCacheKey( /*renderObject*/ ) {
 
 		return '';
@@ -53225,53 +54323,108 @@ class WebGLBackend extends Backend {
 
 	// textures
 
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( texture ) {
 
 		this.textureUtils.createDefaultTexture( texture );
 
 	}
 
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	createTexture( texture, options ) {
 
 		this.textureUtils.createTexture( texture, options );
 
 	}
 
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	updateTexture( texture, options ) {
 
 		this.textureUtils.updateTexture( texture, options );
 
 	}
 
+	/**
+	 * Generates mipmaps for the given texture
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	generateMipmaps( texture ) {
 
 		this.textureUtils.generateMipmaps( texture );
 
 	}
 
-
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	destroyTexture( texture ) {
 
 		this.textureUtils.destroyTexture( texture );
 
 	}
 
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
+	 * @return {TypedArray} The texture data as a typed array.
+	 */
 	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
 	}
 
+	/**
+	 * This method does nothing since WebGL 2 has no concept of samplers.
+	 *
+	 * @param {Texture} texture - The texture to create the sampler for.
+	 */
 	createSampler( /*texture*/ ) {
 
 		//console.warn( 'Abstract class.' );
 
 	}
 
-	destroySampler() {}
+	/**
+	 * This method does nothing since WebGL 2 has no concept of samplers.
+	 *
+	 * @param {Texture} texture - The texture to destroy the sampler for.
+	 */
+	destroySampler( /*texture*/ ) {}
 
 	// node builder
 
+	/**
+	 * Returns a node builder for the given render object.
+	 *
+	 * @param {RenderObject} object - The render object.
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {GLSLNodeBuilder} The node builder.
+	 */
 	createNodeBuilder( object, renderer ) {
 
 		return new GLSLNodeBuilder( object, renderer );
@@ -53280,6 +54433,11 @@ class WebGLBackend extends Backend {
 
 	// program
 
+	/**
+	 * Creates a shader program from the given programmable stage.
+	 *
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	createProgram( program ) {
 
 		const gl = this.gl;
@@ -53296,12 +54454,23 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroyProgram( /*program*/ ) {
+	/**
+	 * Destroys the shader program of the given programmable stage.
+	 *
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
+	destroyProgram( program ) {
 
-		console.warn( 'Abstract class.' );
+		this.delete( program );
 
 	}
 
+	/**
+	 * Creates a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 */
 	createRenderPipeline( renderObject, promises ) {
 
 		const gl = this.gl;
@@ -53360,6 +54529,14 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Formats the source code of error messages.
+	 *
+	 * @private
+	 * @param {String} string - The code.
+	 * @param {Number} errorLine - The error line.
+	 * @return {String} The formatted code.
+	 */
 	_handleSource( string, errorLine ) {
 
 		const lines = string.split( '\n' );
@@ -53379,6 +54556,15 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Gets the shader compilation errors from the info log.
+	 *
+	 * @private
+	 * @param {WebGL2RenderingContext} gl - The rendering context.
+	 * @param {WebGLShader} shader - The WebGL shader object.
+	 * @param {String} type - The shader type.
+	 * @return {String} The shader errors.
+	 */
 	_getShaderErrors( gl, shader, type ) {
 
 		const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
@@ -53400,6 +54586,14 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Logs shader compilation errors.
+	 *
+	 * @private
+	 * @param {WebGLProgram} programGPU - The WebGL program.
+	 * @param {WebGLShader} glFragmentShader - The fragment shader as a native WebGL shader object.
+	 * @param {WebGLShader} glVertexShader - The vertex shader as a native WebGL shader object.
+	 */
 	_logProgramError( programGPU, glFragmentShader, glVertexShader ) {
 
 		if ( this.renderer.debug.checkShaderErrors ) {
@@ -53442,6 +54636,13 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Completes the shader program setup for the given render object.
+	 *
+	 * @private
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {RenderPipeline} pipeline - The render pipeline.
+	 */
 	_completeCompile( renderObject, pipeline ) {
 
 		const { state, gl } = this;
@@ -53470,6 +54671,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Creates a compute pipeline for the given compute node.
+	 *
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 */
 	createComputePipeline( computePipeline, bindings ) {
 
 		const { state, gl } = this;
@@ -53564,7 +54771,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	createBindings( bindGroup, bindings ) {
+	/**
+	 * Creates bindings from the given bind group definition.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
+	createBindings( bindGroup, bindings /*, cacheIndex, version*/ ) {
 
 		if ( this._knownBindings.has( bindings ) === false ) {
 
@@ -53595,7 +54810,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateBindings( bindGroup /*, bindings*/ ) {
+	/**
+	 * Updates the given bind group definition.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
+	updateBindings( bindGroup /*, bindings, cacheIndex, version*/ ) {
 
 		const { gl } = this;
 
@@ -53635,6 +54858,11 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Updates a buffer binding.
+	 *
+	 *  @param {Buffer} binding - The buffer binding to update.
+	 */
 	updateBinding( binding ) {
 
 		const gl = this.gl;
@@ -53654,6 +54882,11 @@ class WebGLBackend extends Backend {
 
 	// attributes
 
+	/**
+	 * Creates the buffer of an indexed shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
+	 */
 	createIndexAttribute( attribute ) {
 
 		const gl = this.gl;
@@ -53662,6 +54895,11 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Creates the buffer of a shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createAttribute( attribute ) {
 
 		if ( this.has( attribute ) ) return;
@@ -53672,6 +54910,11 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Creates the buffer of a storage attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createStorageAttribute( attribute ) {
 
 		if ( this.has( attribute ) ) return;
@@ -53682,24 +54925,34 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Updates the buffer of a shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute to update.
+	 */
 	updateAttribute( attribute ) {
 
 		this.attributeUtils.updateAttribute( attribute );
 
 	}
 
+	/**
+	 * Destroys the buffer of a shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
+	 */
 	destroyAttribute( attribute ) {
 
 		this.attributeUtils.destroyAttribute( attribute );
 
 	}
 
-	updateSize() {
-
-		//console.warn( 'Abstract class.' );
-
-	}
-
+	/**
+	 * Checks if the given feature is supported  by the backend.
+	 *
+	 * @param {String} name - The feature's name.
+	 * @return {Boolean} Whether the feature is supported or not.
+	 */
 	hasFeature( name ) {
 
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
@@ -53716,24 +54969,51 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Returns the maximum anisotropy texture filtering value.
+	 *
+	 * @return {Number} The maximum anisotropy texture filtering value.
+	 */
 	getMaxAnisotropy() {
 
 		return this.capabilities.getMaxAnisotropy();
 
 	}
 
-	copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level ) {
+	/**
+	 * Copies data of the given source texture to the given destination texture.
+	 *
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {Number} [level=0] - The mip level to copy.
+	 */
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 		this.textureUtils.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 	}
 
+	/**
+	 * Copies the current bound framebuffer to the given texture.
+	 *
+	 * @param {Texture} texture - The destination texture.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	 */
 	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		this.textureUtils.copyFramebufferToTexture( texture, renderContext, rectangle );
 
 	}
 
+	/**
+	 * Configures the active framebuffer from the given render context.
+	 *
+	 * @private
+	 * @param {RenderContext} descriptor - The render context.
+	 */
 	_setFramebuffer( descriptor ) {
 
 		const { gl, state } = this;
@@ -53906,10 +55186,17 @@ class WebGLBackend extends Backend {
 
 	}
 
-
+	/**
+	 * Computes the VAO key for the given index and attributes.
+	 *
+	 * @private
+	 * @param {BufferAttribute?} index - The index. `null` for non-indexed geometries.
+	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @return {String} The VAO key.
+	 */
 	_getVaoKey( index, attributes ) {
 
-		let key = [];
+		let key = '';
 
 		if ( index !== null ) {
 
@@ -53931,6 +55218,14 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Creates a VAO from the index and attributes.
+	 *
+	 * @private
+	 * @param {BufferAttribute?} index - The index. `null` for non-indexed geometries.
+	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @return {Object} The VAO data.
+	 */
 	_createVao( index, attributes ) {
 
 		const { gl } = this;
@@ -54008,6 +55303,13 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Creates a tranform feedback from the given transform buffers.
+	 *
+	 * @private
+	 * @param {Array<DualAttributeData>} transformBuffers - The tranform buffers.
+	 * @return {WebGLTransformFeedback} The tranform feedback.
+	 */
 	_getTransformFeedback( transformBuffers ) {
 
 		let key = '';
@@ -54048,7 +55350,13 @@ class WebGLBackend extends Backend {
 
 	}
 
-
+	/**
+	 * Setups the given bindings.
+	 *
+	 * @private
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {WebGLProgram} programGPU - The WebGL program.
+	 */
 	_setupBindings( bindings, programGPU ) {
 
 		const gl = this.gl;
@@ -54078,6 +55386,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Binds the given uniforms.
+	 *
+	 * @private
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 */
 	_bindUniforms( bindings ) {
 
 		const { gl, state } = this;
@@ -54106,6 +55420,9 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Frees internal resources.
+	 */
 	dispose() {
 
 		this.renderer.domElement.removeEventListener( 'webglcontextlost', this._onContextLost );
@@ -59353,14 +60670,42 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
 //*/
 
 
-//
 
+/**
+ * A backend implementation targeting WebGPU.
+ *
+ * @private
+ * @augments Backend
+ */
 class WebGPUBackend extends Backend {
 
+	/**
+	 * Constructs a new WebGPU backend.
+	 *
+	 * @param {Object} parameters - The configuration parameter.
+	 * @param {Boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @param {Boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @param {Boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {Boolean} [parameters.trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
+	 * @param {String?} [parameters.powerPreference=null] - The power preference.
+	 * @param {String?} [parameters.requiredLimits={}] - Specifies the limits that are required by the device request.
+	 * The request will fail if the adapter cannot provide these limits.
+	 */
 	constructor( parameters = {} ) {
 
 		super( parameters );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isWebGPUBackend = true;
 
 		// some parameters require default values other than "undefined"
@@ -59368,22 +60713,101 @@ class WebGPUBackend extends Backend {
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
+		/**
+		 * Whether to track timestamps with a Timestamp Query API or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
+		/**
+		 * A reference to the device.
+		 *
+		 * @type {GPUDevice?}
+		 * @default null
+		 */
 		this.device = null;
+
+		/**
+		 * A reference to the context.
+		 *
+		 * @type {GPUCanvasContext?}
+		 * @default null
+		 */
 		this.context = null;
+
+		/**
+		 * A reference to the color attachment of the default framebuffer.
+		 *
+		 * @type {GPUTexture?}
+		 * @default null
+		 */
 		this.colorBuffer = null;
+
+		/**
+		 * A reference to the default render pass descriptor.
+		 *
+		 * @type {Object?}
+		 * @default null
+		 */
 		this.defaultRenderPassdescriptor = null;
 
+		/**
+		 * A reference to a backend module holding common utility functions.
+		 *
+		 * @type {WebGPUUtils}
+		 */
 		this.utils = new WebGPUUtils( this );
+
+		/**
+		 * A reference to a backend module holding shader attribute-related
+		 * utility functions.
+		 *
+		 * @type {WebGPUAttributeUtils}
+		 */
 		this.attributeUtils = new WebGPUAttributeUtils( this );
+
+		/**
+		 * A reference to a backend module holding shader binding-related
+		 * utility functions.
+		 *
+		 * @type {WebGPUBindingUtils}
+		 */
 		this.bindingUtils = new WebGPUBindingUtils( this );
+
+		/**
+		 * A reference to a backend module holding shader pipeline-related
+		 * utility functions.
+		 *
+		 * @type {WebGPUPipelineUtils}
+		 */
 		this.pipelineUtils = new WebGPUPipelineUtils( this );
+
+		/**
+		 * A reference to a backend module holding shader texture-related
+		 * utility functions.
+		 *
+		 * @type {WebGPUTextureUtils}
+		 */
 		this.textureUtils = new WebGPUTextureUtils( this );
+
+		/**
+		 * A map that manages the resolve buffers for occlusion queries.
+		 *
+		 * @type {Map<Number,GPUBuffer>}
+		 */
 		this.occludedResolveCache = new Map();
 
 	}
 
+	/**
+	 * Initializes the backend so it is ready for usage.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the backend has been initialized.
+	 */
 	async init( renderer ) {
 
 		await super.init( renderer );
@@ -59472,24 +60896,53 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * The coordinate system of the backend.
+	 *
+	 * @type {Number}
+	 * @readonly
+	 */
 	get coordinateSystem() {
 
 		return WebGPUCoordinateSystem;
 
 	}
 
+	/**
+	 * Transfers buffer data from a storage buffer attribute
+	 * from the GPU to the CPU in context of compute shaders.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
 	async getArrayBufferAsync( attribute ) {
 
 		return await this.attributeUtils.getArrayBufferAsync( attribute );
 
 	}
 
+	/**
+	 * Returns the backend's rendering context.
+	 *
+	 * @return {GPUCanvasContext} The rendering context.
+	 */
 	getContext() {
 
 		return this.context;
 
 	}
 
+	/**
+	 * Returns the default render pass descriptor.
+	 *
+	 * In WebGPU, the default framebuffer must be configured
+	 * like custom fraemebuffers so the backend needs a render
+	 * pass descriptor even when rendering directly to screen.
+	 *
+	 * @private
+	 * @return {Object} The render pass descriptor.
+	 */
 	_getDefaultRenderPassDescriptor() {
 
 		let descriptor = this.defaultRenderPassdescriptor;
@@ -59544,6 +60997,14 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Returns the render pass descriptor for the given render context.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} colorAttachmentsConfig - Configuration object for the color attachments.
+	 * @return {Object} The render pass descriptor.
+	 */
 	_getRenderPassDescriptor( renderContext, colorAttachmentsConfig = {} ) {
 
 		const renderTarget = renderContext.renderTarget;
@@ -59678,6 +61139,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * This method is executed at the beginning of a render call and prepares
+	 * the WebGPU state for upcoming render calls
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	beginRender( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
@@ -59837,6 +61304,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * This method is executed at the end of a render call and finalizes work
+	 * after draw calls.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	finishRender( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
@@ -59925,6 +61398,14 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Returns `true` if the given 3D object is fully occluded by other
+	 * 3D objects in the scene.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object3D} object - The 3D object to test.
+	 * @return {Boolean} Whether the 3D object is fully occluded or not.
+	 */
 	isOccluded( renderContext, object ) {
 
 		const renderContextData = this.get( renderContext );
@@ -59933,6 +61414,13 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * This method processes the result of occlusion queries and writes it
+	 * into render context data.
+	 *
+	 * @async
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	async resolveOccludedAsync( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
@@ -59971,6 +61459,11 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Updates the viewport with the values from the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	updateViewport( renderContext ) {
 
 		const { currentPass } = this.get( renderContext );
@@ -59980,6 +61473,14 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Performs a clear operation.
+	 *
+	 * @param {Boolean} color - Whether the color buffer should be cleared or not.
+	 * @param {Boolean} depth - Whether the depth buffer should be cleared or not.
+	 * @param {Boolean} stencil - Whether the stencil buffer should be cleared or not.
+	 * @param {RenderContext?} [renderTargetContext=null] - The render context of the current set render target.
+	 */
 	clear( color, depth, stencil, renderTargetContext = null ) {
 
 		const device = this.device;
@@ -60117,6 +61618,12 @@ class WebGPUBackend extends Backend {
 
 	// compute
 
+	/**
+	 * This method is executed at the beginning of a compute call and
+	 * prepares the state for upcoming compute tasks.
+	 *
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
 	beginCompute( computeGroup ) {
 
 		const groupGPU = this.get( computeGroup );
@@ -60132,6 +61639,14 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Executes a compute command for the given compute node.
+	 *
+	 * @param {Node|Array<Node>} computeGroup - The group of compute nodes of a compute call. Can be a single compute node.
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 */
 	compute( computeGroup, computeNode, bindings, pipeline ) {
 
 		const { passEncoderGPU } = this.get( computeGroup );
@@ -60179,6 +61694,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * This method is executed at the end of a compute call and
+	 * finalizes work after compute tasks.
+	 *
+	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
+	 */
 	finishCompute( computeGroup ) {
 
 		const groupData = this.get( computeGroup );
@@ -60191,6 +61712,13 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
+	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolves when synchronization has been finished.
+	 */
 	async waitForGPU() {
 
 		await this.device.queue.onSubmittedWorkDone();
@@ -60199,6 +61727,12 @@ class WebGPUBackend extends Backend {
 
 	// render object
 
+	/**
+	 * Executes a draw command for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object to draw.
+	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
+	 */
 	draw( renderObject, info ) {
 
 		const { object, context, pipeline } = renderObject;
@@ -60382,6 +61916,12 @@ class WebGPUBackend extends Backend {
 
 	// cache key
 
+	/**
+	 * Returns `true` if the render pipeline requires an update.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the render pipeline requires an update or not.
+	 */
 	needsRenderUpdate( renderObject ) {
 
 		const data = this.get( renderObject );
@@ -60438,6 +61978,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Returns a cache key that is used to identify render pipelines.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {String} The cache key.
+	 */
 	getRenderCacheKey( renderObject ) {
 
 		const { object, material } = renderObject;
@@ -60466,55 +62012,109 @@ class WebGPUBackend extends Backend {
 
 	// textures
 
+	/**
+	 * Creates a sampler for the given texture.
+	 *
+	 * @param {Texture} texture - The texture to create the sampler for.
+	 */
 	createSampler( texture ) {
 
 		this.textureUtils.createSampler( texture );
 
 	}
 
+	/**
+	 * Destroys the sampler for the given texture.
+	 *
+	 * @param {Texture} texture - The texture to destroy the sampler for.
+	 */
 	destroySampler( texture ) {
 
 		this.textureUtils.destroySampler( texture );
 
 	}
 
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( texture ) {
 
 		this.textureUtils.createDefaultTexture( texture );
 
 	}
 
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	createTexture( texture, options ) {
 
 		this.textureUtils.createTexture( texture, options );
 
 	}
 
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	updateTexture( texture, options ) {
 
 		this.textureUtils.updateTexture( texture, options );
 
 	}
 
+	/**
+	 * Generates mipmaps for the given texture
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	generateMipmaps( texture ) {
 
 		this.textureUtils.generateMipmaps( texture );
 
 	}
 
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	destroyTexture( texture ) {
 
 		this.textureUtils.destroyTexture( texture );
 
 	}
 
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
+	 * @return {TypedArray} The texture data as a typed array.
+	 */
 	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
 	}
 
-
+	/**
+	 * Inits a time stamp query for the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} descriptor - The query descriptor.
+	 */
 	initTimestampQuery( renderContext, descriptor ) {
 
 		if ( ! this.trackTimestamp ) return;
@@ -60541,8 +62141,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	// timestamp utils
-
+	/**
+	 * Prepares the timestamp buffer.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {GPUCommandEncoder} encoder - The command encoder.
+	 */
 	prepareTimestampBuffer( renderContext, encoder ) {
 
 		if ( ! this.trackTimestamp ) return;
@@ -60582,6 +62186,14 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Resolves the time stamp for the given render context and type.
+	 *
+	 * @async
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {String} type - The render context.
+	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
+	 */
 	async resolveTimestampAsync( renderContext, type = 'render' ) {
 
 		if ( ! this.trackTimestamp ) return;
@@ -60613,6 +62225,13 @@ class WebGPUBackend extends Backend {
 
 	// node builder
 
+	/**
+	 * Returns a node builder for the given render object.
+	 *
+	 * @param {RenderObject} object - The render object.
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {WGSLNodeBuilder} The node builder.
+	 */
 	createNodeBuilder( object, renderer ) {
 
 		return new WGSLNodeBuilder( object, renderer );
@@ -60621,6 +62240,11 @@ class WebGPUBackend extends Backend {
 
 	// program
 
+	/**
+	 * Creates a shader program from the given programmable stage.
+	 *
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	createProgram( program ) {
 
 		const programGPU = this.get( program );
@@ -60632,6 +62256,11 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Destroys the shader program of the given programmable stage.
+	 *
+	 * @param {ProgrammableStage} program - The programmable stage.
+	 */
 	destroyProgram( program ) {
 
 		this.delete( program );
@@ -60640,18 +62269,35 @@ class WebGPUBackend extends Backend {
 
 	// pipelines
 
+	/**
+	 * Creates a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 */
 	createRenderPipeline( renderObject, promises ) {
 
 		this.pipelineUtils.createRenderPipeline( renderObject, promises );
 
 	}
 
+	/**
+	 * Creates a compute pipeline for the given compute node.
+	 *
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 */
 	createComputePipeline( computePipeline, bindings ) {
 
 		this.pipelineUtils.createComputePipeline( computePipeline, bindings );
 
 	}
 
+	/**
+	 * Prepares the state for encoding render bundles.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	beginBundle( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
@@ -60664,6 +62310,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * After processing render bundles this method finalizes related work.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {RenderBundle} bundle - The render bundle.
+	 */
 	finishBundle( renderContext, bundle ) {
 
 		const renderContextData = this.get( renderContext );
@@ -60680,6 +62332,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Adds a render bundle to the render context data.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {RenderBundle} bundle - The render bundle to add.
+	 */
 	addBundle( renderContext, bundle ) {
 
 		const renderContextData = this.get( renderContext );
@@ -60690,18 +62348,39 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
+	/**
+	 * Creates bindings from the given bind group definition.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
 	createBindings( bindGroup, bindings, cacheIndex, version ) {
 
 		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
 
 	}
 
+	/**
+	 * Updates the given bind group definition.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
 	updateBindings( bindGroup, bindings, cacheIndex, version ) {
 
 		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
 
 	}
 
+	/**
+	 * Updates a buffer binding.
+	 *
+	 *  @param {Buffer} binding - The buffer binding to update.
+	 */
 	updateBinding( binding ) {
 
 		this.bindingUtils.updateBinding( binding );
@@ -60710,36 +62389,66 @@ class WebGPUBackend extends Backend {
 
 	// attributes
 
+	/**
+	 * Creates the buffer of an indexed shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
+	 */
 	createIndexAttribute( attribute ) {
 
 		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.INDEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
 
 	}
 
+	/**
+	 * Creates the buffer of a shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createAttribute( attribute ) {
 
 		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
 
 	}
 
+	/**
+	 * Creates the buffer of a storage attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createStorageAttribute( attribute ) {
 
 		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
 
 	}
 
+	/**
+	 * Creates the buffer of an indirect storage attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	createIndirectStorageAttribute( attribute ) {
 
 		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
 
 	}
 
+	/**
+	 * Updates the buffer of a shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute to update.
+	 */
 	updateAttribute( attribute ) {
 
 		this.attributeUtils.updateAttribute( attribute );
 
 	}
 
+	/**
+	 * Destroys the buffer of a shader attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
+	 */
 	destroyAttribute( attribute ) {
 
 		this.attributeUtils.destroyAttribute( attribute );
@@ -60748,6 +62457,9 @@ class WebGPUBackend extends Backend {
 
 	// canvas
 
+	/**
+	 * Triggers an update of the default render pass descriptor.
+	 */
 	updateSize() {
 
 		this.colorBuffer = this.textureUtils.getColorBuffer();
@@ -60757,18 +62469,38 @@ class WebGPUBackend extends Backend {
 
 	// utils public
 
+	/**
+	 * Returns the maximum anisotropy texture filtering value.
+	 *
+	 * @return {Number} The maximum anisotropy texture filtering value.
+	 */
 	getMaxAnisotropy() {
 
 		return 16;
 
 	}
 
+	/**
+	 * Checks if the given feature is supported  by the backend.
+	 *
+	 * @param {String} name - The feature's name.
+	 * @return {Boolean} Whether the feature is supported or not.
+	 */
 	hasFeature( name ) {
 
 		return this.device.features.has( name );
 
 	}
 
+	/**
+	 * Copies data of the given source texture to the given destination texture.
+	 *
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {Number} [level=0] - The mip level to copy.
+	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 		let dstX = 0;
@@ -60827,6 +62559,13 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Copies the current bound framebuffer to the given texture.
+	 *
+	 * @param {Texture} texture - The destination texture.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	 */
 	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		const renderContextData = this.get( renderContext );
@@ -60961,8 +62700,18 @@ class IESSpotLight extends SpotLight {
 
 }
 
+/**
+ * This version of a node library represents a basic version
+ * just focusing on lights and tone mapping techniques.
+ *
+ * @private
+ * @augments NodeLibrary
+ */
 class BasicNodeLibrary extends NodeLibrary {
 
+	/**
+	 * Constructs a new basic node library.
+	 */
 	constructor() {
 
 		super();
