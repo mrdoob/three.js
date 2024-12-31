@@ -807,6 +807,14 @@ ${ flowData.code }
 
 	}
 
+	getClipDistances( numPlanes ) {
+
+		this.enableClipDistances();
+
+		return 'varyings.' + this.getBuiltin( 'clip_distances', 'clipDistances', `array<f32, ${numPlanes}>`, 'vertex' );
+
+	}
+
 	getDrawIndex() {
 
 		return null;
