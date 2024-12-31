@@ -15,7 +15,6 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem } from '../../constants.js';
 
-
 /**
  * A backend implementation targeting WebGPU.
  *
@@ -34,11 +33,11 @@ class WebGPUBackend extends Backend {
 	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 * @param {Boolean} [parameters.trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
-	 * @param {String?} [parameters.powerPreference=null] - The power preference.
-	 * @param {String?} [parameters.requiredLimits={}] - Specifies the limits that are required by the device request.
-	 * The request will fail if the adapter cannot provide these limits.
+	 * @param {String} [parameters.powerPreference=undefined] - The power preference.
+	 * @param {Object} [parameters.requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
+	 * @param {GPUDevice} [parameters.device=undefined] - If there is an exisitng GPU device on app level, it can be passed to the renderer as a parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -282,7 +281,7 @@ class WebGPUBackend extends Backend {
 	 * Returns the default render pass descriptor.
 	 *
 	 * In WebGPU, the default framebuffer must be configured
-	 * like custom fraemebuffers so the backend needs a render
+	 * like custom framebuffers so the backend needs a render
 	 * pass descriptor even when rendering directly to screen.
 	 *
 	 * @private
@@ -1358,7 +1357,7 @@ class WebGPUBackend extends Backend {
 	// textures
 
 	/**
-	 * Creates a sampler for the given texture.
+	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
 	 */
@@ -1369,7 +1368,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Destroys the sampler for the given texture.
+	 * Destroys the GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to destroy the sampler for.
 	 */
@@ -1416,7 +1415,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Generates mipmaps for the given texture
+	 * Generates mipmaps for the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
 	 */
@@ -1746,7 +1745,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of a shader attribute.
+	 * Creates the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -1757,7 +1756,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of a storage attribute.
+	 * Creates the GPU buffer of a storage attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -1768,7 +1767,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of an indirect storage attribute.
+	 * Creates the GPU buffer of an indirect storage attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -1779,7 +1778,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Updates the buffer of a shader attribute.
+	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
 	 */
@@ -1790,7 +1789,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Destroys the buffer of a shader attribute.
+	 * Destroys the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */

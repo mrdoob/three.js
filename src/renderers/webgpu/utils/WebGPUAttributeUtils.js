@@ -24,14 +24,35 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
+/**
+ * A WebGPU backend utility module for managing shader attributes.
+ *
+ * @private
+ */
 class WebGPUAttributeUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
 
 	}
 
+	/**
+	 * Creates the GPU buffer for the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @param {GPUBufferUsage} usage - A flag that indicates how the buffer may be used after its creation.
+	 */
 	createAttribute( attribute, usage ) {
 
 		const bufferAttribute = this._getBufferAttribute( attribute );
@@ -98,6 +119,11 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Updates the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	updateAttribute( attribute ) {
 
 		const bufferAttribute = this._getBufferAttribute( attribute );
@@ -149,6 +175,13 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * This method creates the vertex buffer layout data which are
+	 * require when creating a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Array<Object>} An array holding objects which describe the vertex buffer layout.
+	 */
 	createShaderVertexBuffers( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
@@ -210,6 +243,11 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
@@ -221,6 +259,14 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Transfers buffer data from a storage buffer attribute
+	 * from the GPU to the CPU in context of compute shaders.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
 	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;
@@ -263,6 +309,13 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Returns the vertex format of the given buffer attribute.
+	 *
+	 * @private
+	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
+	 * @return {String} The vertex format (e.g. 'float32x3').
+	 */
 	_getVertexFormat( geometryAttribute ) {
 
 		const { itemSize, normalized } = geometryAttribute;
@@ -308,12 +361,27 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Returns `true` if the given array is a typed array.
+	 *
+	 * @private
+	 * @param {Any} array - The array.
+	 * @return {Boolean} Whether the given array is a typed array or not.
+	 */
 	_isTypedArray( array ) {
 
 		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
 
 	}
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @private
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
 	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
