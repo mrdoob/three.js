@@ -1,5 +1,7 @@
-import { Color, DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils, NodeUpdateType } from 'three/webgpu';
-import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
+import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
+import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference } from 'three/tsl';
+
+/** @module OutlineNode **/
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -8,6 +10,39 @@ const _BLUR_DIRECTION_Y = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 let _rendererState;
 
+/**
+ * Post processing node for rendering outlines around selected objects. The node
+ * gives you great flexibility in composing the final outline look depending on
+ * your requirements.
+ * ```js
+ * const postProcessing = new THREE.PostProcessing( renderer );
+ *
+ * const scenePass = pass( scene, camera );
+ *
+ * // outline parameter
+ *
+ * const edgeStrength = uniform( 3.0 );
+ * const edgeGlow = uniform( 0.0 );
+ * const edgeThickness = uniform( 1.0 );
+ * const visibleEdgeColor = uniform( new THREE.Color( 0xffffff ) );
+ * const hiddenEdgeColor = uniform( new THREE.Color( 0x4e3636 ) );
+ *
+ * outlinePass = outline( scene, camera, {
+ * 	selectedObjects,
+ * 	edgeGlow,
+ * 	edgeThickness
+ * } );
+ *
+ * // compose custom outline
+ *
+ * const { visibleEdge, hiddenEdge } = outlinePass;
+ * const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
+ *
+ * postProcessing.outputNode = outlineColor.add( scenePass );
+ * ```
+ *
+ * @augments TempNode
+ */
 class OutlineNode extends TempNode {
 
 	static get type() {
@@ -16,6 +51,17 @@ class OutlineNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new outline node.
+	 *
+	 * @param {Scene} scene - A reference to the scene.
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {Object} params - The configuration parameters.
+	 * @param {Array<Object3D>} params.selectedObjects - An array of selected objects.
+	 * @param {Node<float>} [params.edgeThickness=float(1)] - The thickness of the edges.
+	 * @param {Node<float>} [params.edgeGlow=float(0)] - Can be used for an animated glow/pulse effects.
+	 * @param {Number} [params.downSampleRatio=2] - The downsample ratio.
+	 */
 	constructor( scene, camera, params = {} ) {
 
 		super( 'vec4' );
@@ -27,101 +73,341 @@ class OutlineNode extends TempNode {
 			downSampleRatio = 2
 		} = params;
 
+		/**
+		 * A reference to the scene.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
+
+		/**
+		 * An array of selected objects.
+		 *
+		 * @type {Array<Object3D>}
+		 */
 		this.selectedObjects = selectedObjects;
+
+		/**
+		 * The thickness of the edges.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.edgeThicknessNode = nodeObject( edgeThickness );
+
+		/**
+		 * Can be used for an animated glow/pulse effect.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.edgeGlowNode = nodeObject( edgeGlow );
+
+		/**
+		 * The downsample ratio.
+		 *
+		 * @type {Number}
+		 * @default 2
+		 */
 		this.downSampleRatio = downSampleRatio;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
+		 * its effect once per frame in `updateBefore()`.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		// render targets
 
+		/**
+		 * The render target for the depth pre-pass.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetDepthBuffer = new RenderTarget();
 		this._renderTargetDepthBuffer.depthTexture = new DepthTexture();
 		this._renderTargetDepthBuffer.depthTexture.type = FloatType;
 
+		/**
+		 * The render target for the mask pass.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetMaskBuffer = new RenderTarget();
+
+		/**
+		 * The render target for the mask downsample.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetMaskDownSampleBuffer = new RenderTarget( 1, 1, { depthBuffer: false } );
+
+		/**
+		 * The first render target for the edge detection.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetEdgeBuffer1 = new RenderTarget( 1, 1, { depthBuffer: false } );
+
+		/**
+		 * The second render target for the edge detection.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetEdgeBuffer2 = new RenderTarget( 1, 1, { depthBuffer: false } );
+
+		/**
+		 * The first render target for the blur pass.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetBlurBuffer1 = new RenderTarget( 1, 1, { depthBuffer: false } );
+
+		/**
+		 * The second render target for the blur pass.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetBlurBuffer2 = new RenderTarget( 1, 1, { depthBuffer: false } );
+
+		/**
+		 * The render target for the final composite.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetComposite = new RenderTarget( 1, 1, { depthBuffer: false } );
 
 		// uniforms
 
-		this._cameraNear = uniform( camera.near );
-		this._cameraFar = uniform( camera.far );
+		/**
+		 * Represents the near value of the scene's camera.
+		 *
+		 * @private
+		 * @type {ReferenceNode<float>}
+		 */
+		this._cameraNear = reference( 'near', 'float', camera );
+
+		/**
+		 * Represents the far value of the scene's camera.
+		 *
+		 * @private
+		 * @type {ReferenceNode<float>}
+		 */
+		this._cameraFar = reference( 'far', 'float', camera );
+
+		/**
+		 * Uniform that represents the blur direction of the pass.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
 		this._blurDirection = uniform( new Vector2() );
 
+		/**
+		 * Texture node that holds the data from the depth pre-pass.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._depthTextureUniform = texture( this._renderTargetDepthBuffer.depthTexture );
+
+		/**
+		 * Texture node that holds the data from the mask pass.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._maskTextureUniform = texture( this._renderTargetMaskBuffer.texture );
+
+		/**
+		 * Texture node that holds the data from the mask downsample pass.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._maskTextureDownsSampleUniform = texture( this._renderTargetMaskDownSampleBuffer.texture );
+
+		/**
+		 * Texture node that holds the data from the first edge detection pass.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._edge1TextureUniform = texture( this._renderTargetEdgeBuffer1.texture );
+
+		/**
+		 * Texture node that holds the data from the second edge detection pass.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._edge2TextureUniform = texture( this._renderTargetEdgeBuffer2.texture );
+
+		/**
+		 * Texture node that holds the current blurred color data.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._blurColorTextureUniform = texture( this._renderTargetEdgeBuffer1.texture );
 
 		// constants
 
+		/**
+		 * Visible edge color.
+		 *
+		 * @private
+		 * @type {Node<vec3>}
+		 */
 		this._visibleEdgeColor = vec3( 1, 0, 0 );
+
+		/**
+		 * Hidden edge color.
+		 *
+		 * @private
+		 * @type {Node<vec3>}
+		 */
 		this._hiddenEdgeColor = vec3( 0, 1, 0 );
 
 		// materials
 
+		/**
+		 * The material for the depth pre-pass.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._depthMaterial = new NodeMaterial();
 		this._depthMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
 		this._depthMaterial.name = 'OutlineNode.depth';
 
+		/**
+		 * The material for preparing the mask.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._prepareMaskMaterial = new NodeMaterial();
 		this._prepareMaskMaterial.name = 'OutlineNode.prepareMask';
 
+		/**
+		 * The copy material
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._materialCopy = new NodeMaterial();
 		this._materialCopy.name = 'OutlineNode.copy';
 
+		/**
+		 * The edge detection material.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._edgeDetectionMaterial = new NodeMaterial();
 		this._edgeDetectionMaterial.name = 'OutlineNode.edgeDetection';
 
+		/**
+		 * The material that is used to render in the blur pass.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._separableBlurMaterial = new NodeMaterial();
 		this._separableBlurMaterial.name = 'OutlineNode.separableBlur';
 
+		/**
+		 * The material that is used to render in the blur pass.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._separableBlurMaterial2 = new NodeMaterial();
 		this._separableBlurMaterial2.name = 'OutlineNode.separableBlur2';
 
+		/**
+		 * The final composite material.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._compositeMaterial = new NodeMaterial();
 		this._compositeMaterial.name = 'OutlineNode.composite';
 
-		//
-
+		/**
+		 * A set to cache selected objects in the scene.
+		 *
+		 * @private
+		 * @type {Set<Object3D>}
+		 */
 		this._selectionCache = new Set();
-		this._tempPulseColor1 = new Color();
-		this._tempPulseColor2 = new Color();
 
-		//
-
+		/**
+		 * The result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
 		this._textureNode = passTexture( this, this._renderTargetComposite.texture );
 
 	}
 
+	/**
+	 * A mask value that represents the visible edge.
+	 *
+	 * @return {Node<float>} The visible edge.
+	 */
 	get visibleEdge() {
 
 		return this.r;
 
 	}
 
+	/**
+	 * A mask value that represents the hidden edge.
+	 *
+	 * @return {Node<float>} The hidden edge.
+	 */
 	get hiddenEdge() {
 
 		return this.g;
 
 	}
 
+	/**
+	 * Returns the result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 */
 	getTextureNode() {
 
 		return this._textureNode;
 
 	}
 
+	/**
+	 * Sets the size of the effect.
+	 *
+	 * @param {Number} width - The width of the effect.
+	 * @param {Number} height - The height of the effect.
+	 */
 	setSize( width, height ) {
 
 		this._renderTargetDepthBuffer.setSize( width, height );
@@ -147,12 +433,17 @@ class OutlineNode extends TempNode {
 
 	}
 
+	/**
+	 * This method is used to render the effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
 		const { camera, scene } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
 
 		//
 
@@ -255,17 +546,23 @@ class OutlineNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
+		RendererUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {PassTextureNode}
+	 */
 	setup() {
 
 		// prepare mask material
 
 		const prepareMask = () => {
 
-			const depth = this._depthTextureUniform.uv( screenUV );
+			const depth = this._depthTextureUniform.sample( screenUV );
 
 			let viewZNode;
 
@@ -301,10 +598,10 @@ class OutlineNode extends TempNode {
 			const uvOffset = vec4( 1.0, 0.0, 0.0, 1.0 ).mul( vec4( invSize, invSize ) );
 
 			const uvNode = uv();
-			const c1 = this._maskTextureDownsSampleUniform.uv( uvNode.add( uvOffset.xy ) ).toVar();
-			const c2 = this._maskTextureDownsSampleUniform.uv( uvNode.sub( uvOffset.xy ) ).toVar();
-			const c3 = this._maskTextureDownsSampleUniform.uv( uvNode.add( uvOffset.yw ) ).toVar();
-			const c4 = this._maskTextureDownsSampleUniform.uv( uvNode.sub( uvOffset.yw ) ).toVar();
+			const c1 = this._maskTextureDownsSampleUniform.sample( uvNode.add( uvOffset.xy ) ).toVar();
+			const c2 = this._maskTextureDownsSampleUniform.sample( uvNode.sub( uvOffset.xy ) ).toVar();
+			const c3 = this._maskTextureDownsSampleUniform.sample( uvNode.add( uvOffset.yw ) ).toVar();
+			const c4 = this._maskTextureDownsSampleUniform.sample( uvNode.sub( uvOffset.yw ) ).toVar();
 
 			const diff1 = mul( c1.r.sub( c2.r ), 0.5 );
 			const diff2 = mul( c3.r.sub( c4.r ), 0.5 );
@@ -320,7 +617,7 @@ class OutlineNode extends TempNode {
 		this._edgeDetectionMaterial.fragmentNode = edgeDetection();
 		this._edgeDetectionMaterial.needsUpdate = true;
 
-		// seperable blur material
+		// separable blur material
 
 		const MAX_RADIUS = 4;
 
@@ -330,7 +627,7 @@ class OutlineNode extends TempNode {
 
 		} );
 
-		const seperableBlur = Fn( ( [ kernelRadius ] ) => {
+		const separableBlur = Fn( ( [ kernelRadius ] ) => {
 
 			const resolution = textureSize( this._maskTextureDownsSampleUniform );
 			const invSize = vec2( 1 ).div( resolution ).toVar();
@@ -338,7 +635,7 @@ class OutlineNode extends TempNode {
 
 			const sigma = kernelRadius.div( 2 ).toVar();
 			const weightSum = gaussianPdf( 0, sigma ).toVar();
-			const diffuseSum = this._blurColorTextureUniform.uv( uvNode ).mul( weightSum ).toVar();
+			const diffuseSum = this._blurColorTextureUniform.sample( uvNode ).mul( weightSum ).toVar();
 			const delta = this._blurDirection.mul( invSize ).mul( kernelRadius ).div( MAX_RADIUS ).toVar();
 
 			const uvOffset = delta.toVar();
@@ -347,8 +644,8 @@ class OutlineNode extends TempNode {
 
 				const x = kernelRadius.mul( float( i ) ).div( MAX_RADIUS );
 				const w = gaussianPdf( x, sigma );
-				const sample1 = this._blurColorTextureUniform.uv( uvNode.add( uvOffset ) );
-				const sample2 = this._blurColorTextureUniform.uv( uvNode.sub( uvOffset ) );
+				const sample1 = this._blurColorTextureUniform.sample( uvNode.add( uvOffset ) );
+				const sample2 = this._blurColorTextureUniform.sample( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
 				weightSum.addAssign( w.mul( 2 ) );
@@ -360,10 +657,10 @@ class OutlineNode extends TempNode {
 
 		} );
 
-		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThicknessNode );
+		this._separableBlurMaterial.fragmentNode = separableBlur( this.edgeThicknessNode );
 		this._separableBlurMaterial.needsUpdate = true;
 
-		this._separableBlurMaterial2.fragmentNode = seperableBlur( MAX_RADIUS );
+		this._separableBlurMaterial2.fragmentNode = separableBlur( MAX_RADIUS );
 		this._separableBlurMaterial2.needsUpdate = true;
 
 		// composite material
@@ -387,6 +684,10 @@ class OutlineNode extends TempNode {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
 	dispose() {
 
 		this.selectedObjects.length = 0;
@@ -410,8 +711,11 @@ class OutlineNode extends TempNode {
 
 	}
 
-	//
-
+	/**
+	 * Updates the selection cache based on the selected objects.
+	 *
+	 * @private
+	 */
 	_updateSelectionCache() {
 
 		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
@@ -431,4 +735,17 @@ class OutlineNode extends TempNode {
 
 export default OutlineNode;
 
+/**
+ * TSL function for creating an outline effect around selected objects.
+ *
+ * @function
+ * @param {Scene} scene - A reference to the scene.
+ * @param {Camera} camera - The camera the scene is rendered with.
+ * @param {Object} params - The configuration parameters.
+ * @param {Array<Object3D>} params.selectedObjects - An array of selected objects.
+ * @param {Node<float>} [params.edgeThickness=float(1)] - The thickness of the edges.
+ * @param {Node<float>} [params.edgeGlow=float(0)] - Can be used for animated glow/pulse effects.
+ * @param {Number} [params.downSampleRatio=2] - The downsample ratio.
+ * @returns {OutlineNode}
+ */
 export const outline = ( scene, camera, params ) => nodeObject( new OutlineNode( scene, camera, params ) );

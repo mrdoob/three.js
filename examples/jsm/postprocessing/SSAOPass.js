@@ -24,9 +24,7 @@ import {
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
-import { SSAOShader } from '../shaders/SSAOShader.js';
-import { SSAOBlurShader } from '../shaders/SSAOShader.js';
-import { SSAODepthShader } from '../shaders/SSAOShader.js';
+import { SSAOBlurShader, SSAODepthShader, SSAOShader } from '../shaders/SSAOShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSAOPass extends Pass {
@@ -169,7 +167,7 @@ class SSAOPass extends Pass {
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
 
-		// dipsose full screen quad
+		// dispose full screen quad
 
 		this.fsQuad.dispose();
 

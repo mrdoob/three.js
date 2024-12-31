@@ -398,7 +398,7 @@ class TDSLoader extends Loader {
 
 			} else if ( next.id === MESH_MATRIX ) {
 
-				this.debugMessage( '   Tranformation Matrix (TODO)' );
+				this.debugMessage( '   Transformation Matrix (TODO)' );
 
 				const values = [];
 				for ( let i = 0; i < 12; i ++ ) {

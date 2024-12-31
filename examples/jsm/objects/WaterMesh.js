@@ -47,10 +47,10 @@ class WaterMesh extends Mesh {
 			const uv2 = add( div( uv, vec2( 8907.0, 9803.0 ) ), vec2( div( offset, 101 ), div( offset, 97 ) ) ).toVar();
 			const uv3 = sub( div( uv, vec2( 1091.0, 1027.0 ) ), vec2( div( offset, 109 ), div( offset, - 113 ) ) ).toVar();
 
-			const sample0 = this.waterNormals.uv( uv0 );
-			const sample1 = this.waterNormals.uv( uv1 );
-			const sample2 = this.waterNormals.uv( uv2 );
-			const sample3 = this.waterNormals.uv( uv3 );
+			const sample0 = this.waterNormals.sample( uv0 );
+			const sample1 = this.waterNormals.sample( uv1 );
+			const sample2 = this.waterNormals.sample( uv2 );
+			const sample3 = this.waterNormals.sample( uv3 );
 
 			const noise = sample0.add( sample1 ).add( sample2 ).add( sample3 );
 

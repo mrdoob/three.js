@@ -249,7 +249,7 @@ Nous pouvons l'utiliser pour définir <code class="notranslate" translate="no">l
   }
 }
 </pre>
-<p>Utilisons aussi le <code class="notranslate" translate="no">MinMaxGUIHelper</code> que nous avons créé dans <a href="cameras.html">l'article sur les caméra</a> pour paramètrer <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>.</p>
+<p>Utilisons aussi le <code class="notranslate" translate="no">MinMaxGUIHelper</code> que nous avons créé dans <a href="cameras.html">l'article sur les caméra</a> pour paramétrer <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
@@ -281,7 +281,7 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 }
 updateCamera();
 </pre>
-<p>Et maintenant que nous avons accès aux propriètès de la caméra d'ombre, jouons avec.</p>
+<p>Et maintenant que nous avons accès aux propriétés de la caméra d'ombre, jouons avec.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadows-directional-light-with-camera-gui.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/shadows-directional-light-with-camera-gui.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -293,12 +293,12 @@ updateCamera();
 <div class="threejs_center"><img src="../resources/images/low-res-shadow-map.png" style="width: 369px"></div>
 
 <p>Que se passe-t-il avec ces ombres basse résolution ?!</p>
-<p>Ce problème est lié à un autre paramètres des ombres. Les textures d'ombre sont des textures dans lesquelles les ombres sont dessinées. Ces textures ont une taille. La zone de la caméra d'ombre que nous avons définie ci-dessus est étirée sur cette taille. Cela signifie que plus la zone que vous définissez est grande, plus vos ombres seront pixellisées.</p>
+<p>Ce problème est lié à un autre paramètres des ombres. Les textures d'ombre sont des textures dans lesquelles les ombres sont dessinées. Ces textures ont une taille. La zone de la caméra d'ombre que nous avons définie ci-dessus est étirée sur cette taille. Cela signifie que plus la zone que vous définissez est grande, plus vos ombres seront pixelisées.</p>
 <p>Vous pouvez définir la résolution de la texture de l'ombre en définissant <code class="notranslate" translate="no">light.shadow.mapSize.width</code> et <code class="notranslate" translate="no">light.shadow.mapSize.height</code>. Ils sont par défaut à 512x512. Plus vous les agrandissez, plus ils prennent de mémoire et plus ils sont lents à s'afficher, donc vous devrez les définir aussi petits que possible tout en faisant fonctionner votre scène. La même chose est vraie avec la zone d'ombre. Plus petite signifie des ombres plus belles, alors réduisez la zone autant que possible tout en couvrant votre scène. Sachez que la machine de chaque utilisateur a une taille de texture maximale autorisée qui est disponible sur le renderer en tant que <a href="/docs/#api/en/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>.</p>
 <!--
 Ok but what about `near` and `far` I hear you thinking. Can we set `near` to 0.00001 and far to `100000000`
 -->
-<p>En passant à une <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> la caméra d'ombre devient une <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Contrairement à la caméra d'ombre de la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> où nous pouvons régler manuellement la plupart de ses paramètres, celle de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>est auto-controlée. Le <code class="notranslate" translate="no">fov</code> de la caméra d'ombre est directement connecté au réglage de l'<code class="notranslate" translate="no">angle</code> de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.
+<p>En passant à une <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> la caméra d'ombre devient une <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Contrairement à la caméra d'ombre de la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> où nous pouvons régler manuellement la plupart de ses paramètres, celle de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>est auto-contrôlée. Le <code class="notranslate" translate="no">fov</code> de la caméra d'ombre est directement connecté au réglage de l'<code class="notranslate" translate="no">angle</code> de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.
 L'<code class="notranslate" translate="no">aspect</code> est directement définit en fonction de la taille de la zone d'ombre.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);

@@ -1,6 +1,14 @@
 import { TempNode } from 'three/webgpu';
 import { nodeObject, Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
 
+/** @module RGBShiftNode **/
+
+/**
+ * Post processing node for shifting/splitting RGB color channels. The effect
+ * separates color channels and offsets them from each other.
+ *
+ * @augments TempNode
+ */
 class RGBShiftNode extends TempNode {
 
 	static get type() {
@@ -9,23 +17,53 @@ class RGBShiftNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new RGB shift node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
+	 * @param {Number} [amount=0.005] - The amount of the RGB shift.
+	 * @param {Number} [angle=0] - Defines the orientation in which colors are shifted.
+	 */
 	constructor( textureNode, amount = 0.005, angle = 0 ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The texture node that represents the input of the effect.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNode = textureNode;
+
+		/**
+		 * The amount of the RGB shift.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.amount = uniform( amount );
+
+		/**
+		 * Defines in which direction colors are shifted.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.angle = uniform( angle );
 
 	}
 
-	setup() {
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ShaderCallNodeInternal}
+	 */
+	setup( /* builder */ ) {
 
 		const { textureNode } = this;
 
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.sample( uv );
 
 		const rgbShift = Fn( () => {
 
@@ -46,4 +84,13 @@ class RGBShiftNode extends TempNode {
 
 export default RGBShiftNode;
 
+/**
+ * TSL function for creating a RGB shift or split effect for post processing.
+ *
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @param {Number} [amount=0.005] - The amount of the RGB shift.
+ * @param {Number} [angle=0] - Defines in which direction colors are shifted.
+ * @returns {RGBShiftNode}
+ */
 export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( convertToTexture( node ), amount, angle ) );

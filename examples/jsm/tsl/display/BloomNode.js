@@ -1,5 +1,7 @@
-import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, PostProcessingUtils, NodeUpdateType } from 'three/webgpu';
+import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
+
+/** @module BloomNode **/
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -9,6 +11,38 @@ const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 let _rendererState;
 
+/**
+ * Post processing node for creating a bloom effect.
+ * ```js
+ * const postProcessing = new THREE.PostProcessing( renderer );
+ *
+ * const scenePass = pass( scene, camera );
+ * const scenePassColor = scenePass.getTextureNode( 'output' );
+ *
+ * const bloomPass = bloom( scenePassColor );
+ *
+ * postProcessing.outputNode = scenePassColor.add( bloomPass );
+ * ```
+ * By default, the node affects the entire image. For a selective bloom,
+ * use the `emissive` material property to control which objects should
+ * contribute to bloom or not. This can be achieved via MRT.
+ * ```js
+ * const postProcessing = new THREE.PostProcessing( renderer );
+ *
+ * const scenePass = pass( scene, camera );
+ * scenePass.setMRT( mrt( {
+ * 	output,
+ * 	emissive
+ * } ) );
+ *
+ * const scenePassColor = scenePass.getTextureNode( 'output' );
+ * const emissivePass = scenePass.getTextureNode( 'emissive' );
+ *
+ * const bloomPass = bloom( emissivePass );
+ * postProcessing.outputNode = scenePassColor.add( bloomPass );
+ * ```
+ * @augments TempNode
+ */
 class BloomNode extends TempNode {
 
 	static get type() {
@@ -17,28 +51,88 @@ class BloomNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new bloom node.
+	 *
+	 * @param {Node<vec4>} inputNode - The node that represents the input of the effect.
+	 * @param {Number} [strength=1] - The strength of the bloom.
+	 * @param {Number} [radius=0] - The radius of the bloom.
+	 * @param {Number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
+	 */
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The node that represents the input of the effect.
+		 *
+		 * @type {Node<vec4>}
+		 */
 		this.inputNode = inputNode;
+
+		/**
+		 * The strength of the bloom.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.strength = uniform( strength );
+
+		/**
+		 * The radius of the bloom.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.radius = uniform( radius );
+
+		/**
+		 * The luminance threshold limits which bright areas contribute to the bloom effect.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.threshold = uniform( threshold );
 
+		/**
+		 * Can be used to tweak the extracted luminance from the scene.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.smoothWidth = uniform( 0.01 );
 
-		//
-
+		/**
+		 * An array that holds the render targets for the horizontal blur passes.
+		 *
+		 * @private
+		 * @type {Array<RenderTarget>}
+		 */
 		this._renderTargetsHorizontal = [];
+
+		/**
+		 * An array that holds the render targets for the vertical blur passes.
+		 *
+		 * @private
+		 * @type {Array<RenderTarget>}
+		 */
 		this._renderTargetsVertical = [];
+
+		/**
+		 * The number if blur mips.
+		 *
+		 * @private
+		 * @type {Number}
+		 */
 		this._nMips = 5;
 
-		// render targets
-
+		/**
+		 * The render target for the luminance pass.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetBright = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 		this._renderTargetBright.texture.generateMipmaps = false;
+
+		//
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
@@ -58,33 +152,114 @@ class BloomNode extends TempNode {
 
 		}
 
-		// materials
-
+		/**
+		 * The material for the composite pass.
+		 *
+		 * @private
+		 * @type {NodeMaterial?}
+		 */
 		this._compositeMaterial = null;
+
+		/**
+		 * The material for the luminance pass.
+		 *
+		 * @private
+		 * @type {NodeMaterial?}
+		 */
 		this._highPassFilterMaterial = null;
+
+		/**
+		 * The materials for the blur pass.
+		 *
+		 * @private
+		 * @type {Array<NodeMaterial>}
+		 */
 		this._separableBlurMaterials = [];
 
-		// pass and texture nodes
-
+		/**
+		 * The result of the luminance pass as a texture node for further processing.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNodeBright = texture( this._renderTargetBright.texture );
+
+		/**
+		 * The result of the first blur pass as a texture node for further processing.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNodeBlur0 = texture( this._renderTargetsVertical[ 0 ].texture );
+
+		/**
+		 * The result of the second blur pass as a texture node for further processing.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNodeBlur1 = texture( this._renderTargetsVertical[ 1 ].texture );
+
+		/**
+		 * The result of the third blur pass as a texture node for further processing.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNodeBlur2 = texture( this._renderTargetsVertical[ 2 ].texture );
+
+		/**
+		 * The result of the fourth blur pass as a texture node for further processing.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNodeBlur3 = texture( this._renderTargetsVertical[ 3 ].texture );
+
+		/**
+		 * The result of the fifth blur pass as a texture node for further processing.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
 		this._textureNodeBlur4 = texture( this._renderTargetsVertical[ 4 ].texture );
 
+		/**
+		 * The result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
 		this._textureOutput = passTexture( this, this._renderTargetsHorizontal[ 0 ].texture );
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
+		 * its effect once per frame in `updateBefore()`.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
+	/**
+	 * Returns the result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 */
 	getTextureNode() {
 
 		return this._textureOutput;
 
 	}
 
+	/**
+	 * Sets the size of the effect.
+	 *
+	 * @param {Number} width - The width of the effect.
+	 * @param {Number} height - The height of the effect.
+	 */
 	setSize( width, height ) {
 
 		let resx = Math.round( width / 2 );
@@ -106,24 +281,29 @@ class BloomNode extends TempNode {
 
 	}
 
+	/**
+	 * This method is used to render the effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
 
-		// 1. Extract Bright Areas
+		// 1. Extract bright areas
 
 		renderer.setRenderTarget( this._renderTargetBright );
 		_quadMesh.material = this._highPassFilterMaterial;
 		_quadMesh.render( renderer );
 
-		// 2. Blur All the mips progressively
+		// 2. Blur all the mips progressively
 
 		let inputRenderTarget = this._renderTargetBright;
 
@@ -145,7 +325,7 @@ class BloomNode extends TempNode {
 
 		}
 
-		// 3. Composite All the mips
+		// 3. Composite all the mips
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
 		_quadMesh.material = this._compositeMaterial;
@@ -153,10 +333,16 @@ class BloomNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {PassTextureNode}
+	 */
 	setup( builder ) {
 
 		// luminosity high pass material
@@ -183,7 +369,7 @@ class BloomNode extends TempNode {
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
-			this._separableBlurMaterials.push( this._getSeperableBlurMaterial( builder, kernelSizeArray[ i ] ) );
+			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( builder, kernelSizeArray[ i ] ) );
 
 		}
 
@@ -232,6 +418,10 @@ class BloomNode extends TempNode {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
 	dispose() {
 
 		for ( let i = 0; i < this._renderTargetsHorizontal.length; i ++ ) {
@@ -250,7 +440,14 @@ class BloomNode extends TempNode {
 
 	}
 
-	_getSeperableBlurMaterial( builder, kernelRadius ) {
+	/**
+	 * Create a separable blur material for the given kernel radius.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Number} kernelRadius - The kernel radius.
+	 * @return {NodeMaterial}
+	 */
+	_getSeparableBlurMaterial( builder, kernelRadius ) {
 
 		const coefficients = [];
 
@@ -268,9 +465,9 @@ class BloomNode extends TempNode {
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
 		const uvNode = uv();
-		const sampleTexel = ( uv ) => colorTexture.uv( uv );
+		const sampleTexel = ( uv ) => colorTexture.sample( uv );
 
-		const seperableBlurPass = Fn( () => {
+		const separableBlurPass = Fn( () => {
 
 			const weightSum = gaussianCoefficients.element( 0 ).toVar();
 			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
@@ -291,22 +488,32 @@ class BloomNode extends TempNode {
 
 		} );
 
-		const seperableBlurMaterial = new NodeMaterial();
-		seperableBlurMaterial.fragmentNode = seperableBlurPass().context( builder.getSharedContext() );
-		seperableBlurMaterial.name = 'Bloom_seperable';
-		seperableBlurMaterial.needsUpdate = true;
+		const separableBlurMaterial = new NodeMaterial();
+		separableBlurMaterial.fragmentNode = separableBlurPass().context( builder.getSharedContext() );
+		separableBlurMaterial.name = 'Bloom_separable';
+		separableBlurMaterial.needsUpdate = true;
 
 		// uniforms
-		seperableBlurMaterial.colorTexture = colorTexture;
-		seperableBlurMaterial.direction = direction;
-		seperableBlurMaterial.invSize = invSize;
+		separableBlurMaterial.colorTexture = colorTexture;
+		separableBlurMaterial.direction = direction;
+		separableBlurMaterial.invSize = invSize;
 
-		return seperableBlurMaterial;
+		return separableBlurMaterial;
 
 	}
 
 }
 
+/**
+ * TSL function for creating a bloom effect.
+ *
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @param {Number} [strength=1] - The strength of the bloom.
+ * @param {Number} [radius=0] - The radius of the bloom.
+ * @param {Number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
+ * @returns {BloomNode}
+ */
 export const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode( nodeObject( node ), strength, radius, threshold ) );
 
 export default BloomNode;

@@ -1,13 +1,18 @@
-import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
+import { NearestFilter, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
 import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+
+/** @module SSRNode **/
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
 /**
- * References:
- * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
+ * Post processing node for computing screen space reflections (SSR).
+ *
+ * Reference: {@link https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html}
+ *
+ * @augments TempNode
  */
 class SSRNode extends TempNode {
 
@@ -17,56 +22,198 @@ class SSRNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new SSR node.
+	 *
+	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
+	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
+	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
+	 * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 */
 	constructor( colorNode, depthNode, normalNode, metalnessNode, camera ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The node that represents the beauty pass.
+		 *
+		 * @type {Node<vec4>}
+		 */
 		this.colorNode = colorNode;
+
+		/**
+		 * A node that represents the beauty pass's depth.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.depthNode = depthNode;
+
+		/**
+		 * A node that represents the beauty pass's normals.
+		 *
+		 * @type {Node<vec3>}
+		 */
 		this.normalNode = normalNode;
+
+		/**
+		 * A node that represents the beauty pass's metalness.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.metalnessNode = metalnessNode;
+
+		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
 
+		/**
+		 * The resolution scale. By default SSR reflections
+		 * are computed in half resolutions. Setting the value
+		 * to `1` improves quality but also results in more
+		 * computational overhead.
+		 *
+		 * @type {Number}
+		 * @default 0.5
+		 */
 		this.resolutionScale = 0.5;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
+		 * its effect once per frame in `updateBefore()`.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		// render targets
-
+		/**
+		 * The render target the SSR is rendered into.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, minFilter: NearestFilter, magFilter: NearestFilter } );
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
-		// uniforms
+		/**
+		 * Controls how far a fragment can reflect
+		 *
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.maxDistance = uniform( 1 );
 
-		this.maxDistance = uniform( 1 ); // controls how far a fragment can reflect
-		this.thickness = uniform( 0.1 ); // controls the cutoff between what counts as a possible reflection hit and what does not
-		this.opacity = uniform( 1 ); // controls the transparency of the reflected colors
+		/**
+		 * Controls the cutoff between what counts as a possible reflection hit and what does not.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.thickness = uniform( 0.1 );
 
+		/**
+		 * Controls the transparency of the reflected colors.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.opacity = uniform( 1 );
+
+		/**
+		 * Represents the projection matrix of the scene's camera.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
+
+		/**
+		 * Represents the inverse projection matrix of the scene's camera.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+
+		/**
+		 * Represents the near value of the scene's camera.
+		 *
+		 * @private
+		 * @type {ReferenceNode<float>}
+		 */
 		this._cameraNear = reference( 'near', 'float', camera );
+
+		/**
+		 * Represents the far value of the scene's camera.
+		 *
+		 * @private
+		 * @type {ReferenceNode<float>}
+		 */
 		this._cameraFar = reference( 'far', 'float', camera );
+
+		/**
+		 * Whether the scene's camera is perspective or orthographic.
+		 *
+		 * @private
+		 * @type {UniformNode<bool>}
+		 */
 		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera ? 1 : 0 );
+
+		/**
+		 * The resolution of the pass.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
 		this._resolution = uniform( new Vector2() );
+
+		/**
+		 * This value is derived from the resolution and restricts
+		 * the maximum raymarching steps in the fragment shader.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
 		this._maxStep = uniform( 0 );
 
-		// materials
-
+		/**
+		 * The material that is used to render the effect.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
 		this._material = new NodeMaterial();
 		this._material.name = 'SSRNode.SSR';
 
-		//
-
+		/**
+		 * The result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
 		this._textureNode = passTexture( this, this._ssrRenderTarget.texture );
 
 	}
 
+	/**
+	 * Returns the result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 */
 	getTextureNode() {
 
 		return this._textureNode;
 
 	}
 
+	/**
+	 * Sets the size of the effect.
+	 *
+	 * @param {Number} width - The width of the effect.
+	 * @param {Number} height - The height of the effect.
+	 */
 	setSize( width, height ) {
 
 		width = Math.round( this.resolutionScale * width );
@@ -79,11 +226,16 @@ class SSRNode extends TempNode {
 
 	}
 
+	/**
+	 * This method is used to render the effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		const size = renderer.getDrawingBufferSize( _size );
 
@@ -103,10 +255,16 @@ class SSRNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {PassTextureNode}
+	 */
 	setup( builder ) {
 
 		const uvNode = uv();
@@ -153,7 +311,7 @@ class SSRNode extends TempNode {
 
 		const sampleDepth = ( uv ) => {
 
-			const depth = this.depthNode.uv( uv ).r;
+			const depth = this.depthNode.sample( uv ).r;
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
@@ -169,7 +327,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const metalness = this.metalnessNode.uv( uvNode ).r;
+			const metalness = this.metalnessNode.sample( uvNode ).r;
 
 			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
@@ -295,7 +453,7 @@ class SSRNode extends TempNode {
 
 					If( away.lessThanEqual( tk ), () => { // hit
 
-						const vN = this.normalNode.uv( uvNode ).rgb.normalize().toVar();
+						const vN = this.normalNode.sample( uvNode ).rgb.normalize().toVar();
 
 						If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
 
@@ -328,7 +486,7 @@ class SSRNode extends TempNode {
 						op.mulAssign( fresnelCoe );
 
 						// output
-						const reflectColor = this.colorNode.uv( uvNode );
+						const reflectColor = this.colorNode.sample( uvNode );
 						output.assign( vec4( reflectColor.rgb, op ) );
 						Break();
 
@@ -351,6 +509,10 @@ class SSRNode extends TempNode {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
 	dispose() {
 
 		this._ssrRenderTarget.dispose();
@@ -363,4 +525,15 @@ class SSRNode extends TempNode {
 
 export default SSRNode;
 
+/**
+ * TSL function for creating screen space reflections (SSR).
+ *
+ * @function
+ * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
+ * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
+ * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
+ * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
+ * @param {Camera} camera - The camera the scene is rendered with.
+ * @returns {SSRNode}
+ */
 export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, camera ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), camera ) );

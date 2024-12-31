@@ -144,6 +144,7 @@
 	"webgpu_postprocessing_ssaa": [ "msaa", "multisampled" ],
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
+	"webgpu_rendertarget_2d-array_3d": [ "renderTarget", "2d-array", "3d" ],
 	"webgpu_sky": [ "sun" ],
 	"webgpu_tonemapping": [ "gltf" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],

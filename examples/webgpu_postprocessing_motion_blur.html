@@ -191,10 +191,10 @@
 
 				const mBlur = motionBlur( beauty, vel );
 
-				const vignet = screenUV.distance( .5 ).remap( .6, 1 ).mul( 2 ).clamp().oneMinus();
+				const vignette = screenUV.distance( .5 ).remap( .6, 1 ).mul( 2 ).clamp().oneMinus();
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = mix( mBlur, vel, showVelocity ).mul( vignet );
+				postProcessing.outputNode = mix( mBlur, vel, showVelocity ).mul( vignette );
 
 				//
 

@@ -326,9 +326,7 @@
 		"Addons": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/en/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver"
 			},
 
 			"Controls": {
@@ -380,7 +378,6 @@
 				"LDrawLoader": "examples/en/loaders/LDrawLoader",
 				"LUT3dlLoader": "examples/en/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/en/loaders/LUTCubeLoader",
-				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
@@ -1087,9 +1084,7 @@
 		"附加": {
 
 			"动画": {
-				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/zh/animations/MMDPhysics"
+				"CCDIKSolver": "examples/zh/animations/CCDIKSolver"
 			},
 
 			"控制": {
@@ -1133,7 +1128,6 @@
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
 				"LUT3dlLoader": "examples/zh/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
-				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
@@ -2262,9 +2256,7 @@
 		"Examples": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/en/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver"
 			},
 
 			"Controls": {
@@ -2304,7 +2296,6 @@
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"LDrawLoader": "examples/en/loaders/LDrawLoader",
-				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",

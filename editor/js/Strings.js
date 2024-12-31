@@ -3,7 +3,406 @@ function Strings( config ) {
 	const language = config.getKey( 'language' );
 
 	const values = {
+fa: {
+'prompt/file/open': 'تمام داده های ذخیره نشده پاک خواهند شد آیا مطمئنید؟',
+			'prompt/file/failedToOpenProject': 'خطایی در باز کردن پروژه پیش آمده',
+			'prompt/file/export/noMeshSelected': 'هیچ Mesh ای انتخاب نکردید',
+			'prompt/file/export/noObjectSelected': 'هیچ آبجکتی انتخاب نکردید!',
+			'prompt/script/remove': 'آیا اطمینان دارید؟',
+			'prompt/history/clear': 'هیستوری قبل و بعد (undo / redo) پاک خواهند شد آیا مطمئنید؟',
+			'prompt/history/preserve': 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.',
+			'prompt/history/forbid': 'Undo/Redo disabled while scene is playing.',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC Shading: Only MeshStandardMaterial and MeshPhysicalMaterial are supported',
 
+			'command/AddObject': 'افزودن آبجکت',
+			'command/AddScript': 'افزودن اسکریپت',
+			'command/MoveObject': 'جابجایی آبجکت',
+			'command/MultiCmds': 'تغییرات گروهی',
+			'command/RemoveObject': 'حذف آبجکت',
+			'command/RemoveScript': 'حذف اسکریپت',
+			'command/SetColor': 'تنظیم رنگ',
+			'command/SetGeometry': 'تنظیم ژئومتری',
+			'command/SetGeometryValue': 'تنظیم مقدار ژئومتری',
+			'command/SetMaterialColor': 'تنظیم رنگ متریال',
+			'command/SetMaterial': 'تنظیم متریال',
+			'command/SetMaterialMap': 'تنظیم مپ متریال',
+			'command/SetMaterialRange': 'تنظیم رنج متریال',
+			'command/SetMaterialValue': 'تنظیم مقدار متریال',
+			'command/SetMaterialVector': 'تنظیم وکتور متریال',
+			'command/SetPosition': 'تنظیم پوزیشن',
+			'command/SetRotation': 'تنظیم چرخش',
+			'command/SetScale': 'تنظیم اندازه',
+			'command/SetScene': 'تنظیم صحنه',
+			'command/SetScriptValue': 'تنظیم مقدار اسکریپت',
+			'command/SetShadowValue': 'تنظیم مقدار سایه',
+			'command/SetUuid': 'تنظیم UUID',
+			'command/SetValue': 'تنظیم مقدار',
+
+			'menubar/file': 'فایل',
+			'menubar/file/new': 'جدید',
+			'menubar/file/new/empty': 'پروژه خالی',
+			'menubar/file/new/Arkanoid': 'آرکانوید',
+			'menubar/file/new/Camera': 'دوربین',
+			'menubar/file/new/Particles': 'Particles',
+			'menubar/file/new/Pong': 'پونگ',
+			'menubar/file/new/Shaders': 'Shaders',
+			'menubar/file/open': 'باز کردن',
+			'menubar/file/save': 'ذخیره تغییرات',
+			'menubar/file/import': 'ایمپورت',
+			'menubar/file/export': 'اکسپورت',
+
+			'menubar/edit': 'تغییر',
+			'menubar/edit/undo': 'بازگشت',
+			'menubar/edit/redo': 'بازگشت به جلو',
+			'menubar/edit/center': 'وسط',
+			'menubar/edit/clone': 'شبیه سازی',
+			'menubar/edit/delete': 'حذف',
+
+			'menubar/add': 'افزودن',
+			'menubar/add/group': 'گروه',
+
+			'menubar/add/mesh': 'مش',
+			'menubar/add/mesh/plane': 'صفحه',
+			'menubar/add/mesh/box': 'باکس',
+			'menubar/add/mesh/capsule': 'کپسول',
+			'menubar/add/mesh/circle': 'دایره',
+			'menubar/add/mesh/cylinder': 'سیلندر',
+			'menubar/add/mesh/ring': 'حلقه',
+			'menubar/add/mesh/sphere': 'کره',
+			'menubar/add/mesh/dodecahedron': 'دوازده وجهی',
+			'menubar/add/mesh/icosahedron': 'بیست وجهی',
+			'menubar/add/mesh/octahedron': 'هشت وجهی',
+			'menubar/add/mesh/tetrahedron': 'چهار وجهی',
+			'menubar/add/mesh/torus': 'توروس (دونات)',
+			'menubar/add/mesh/tube': 'لوله',
+			'menubar/add/mesh/torusknot': 'torusknot',
+			'menubar/add/mesh/lathe': 'Lathe',
+			'menubar/add/mesh/sprite': 'Sprite',
+
+			'menubar/add/light': 'نور',
+			'menubar/add/light/ambient': 'محیط',
+			'menubar/add/light/directional': 'جهت دار',
+			'menubar/add/light/hemisphere': 'نیمکره',
+			'menubar/add/light/point': 'مستقیم',
+			'menubar/add/light/spot': 'نقطه ای',
+
+			'menubar/add/camera': 'دوربین',
+			'menubar/add/camera/perspective': 'پرسپکتیو',
+			'menubar/add/camera/orthographic': 'اورتوگرافیک',
+
+			'menubar/status/autosave': 'ذخیره اتوماتیک',
+
+			'menubar/view': 'نمایش',
+			'menubar/view/fullscreen': 'تمام صفحه',
+			'menubar/view/gridHelper': 'کمک کننده گرید',
+			'menubar/view/cameraHelpers': 'کمک کننده دوربین',
+			'menubar/view/lightHelpers': 'کمک کننده نور',
+			'menubar/view/skeletonHelpers': 'کمک کننده اسکلتون',
+
+			'menubar/help': 'کمک',
+			'menubar/help/source_code': 'سورس کد',
+			'menubar/help/icons': 'پک آیکون',
+			'menubar/help/about': 'درباره ما',
+			'menubar/help/manual': 'کتابچه راهنما',
+
+			'sidebar/animations': 'انیمیشن ها',
+			'sidebar/animations/play': 'نمایش',
+			'sidebar/animations/stop': 'توقف',
+			'sidebar/animations/timescale': 'مقیاس زمانی',
+
+			'sidebar/scene': 'صحنه',
+			'sidebar/scene/background': 'پس زمینه',
+			'sidebar/scene/environment': 'محیط',
+			'sidebar/scene/fog': 'مه',
+
+			'sidebar/properties/object': 'آبجکت',
+			'sidebar/properties/geometry': 'ژئومتری',
+			'sidebar/properties/material': 'متریال',
+			'sidebar/properties/script': 'اسکریپت',
+
+			'sidebar/object/type': 'انواع',
+			'sidebar/object/new': 'جدید',
+			'sidebar/object/uuid': 'UUID',
+			'sidebar/object/name': 'نام',
+			'sidebar/object/position': 'پوزیشن',
+			'sidebar/object/rotation': 'چرخش',
+			'sidebar/object/scale': 'مقیاس',
+			'sidebar/object/fov': 'زاویه دید',
+			'sidebar/object/left': 'چپ',
+			'sidebar/object/right': 'راست',
+			'sidebar/object/top': 'بالا',
+			'sidebar/object/bottom': 'پایین',
+			'sidebar/object/near': 'نزدیک',
+			'sidebar/object/far': 'دور',
+			'sidebar/object/intensity': 'شدت',
+			'sidebar/object/color': 'رنگ',
+			'sidebar/object/groundcolor': 'رنگ زمینه',
+			'sidebar/object/distance': 'مسافت',
+			'sidebar/object/angle': 'زاویه',
+			'sidebar/object/penumbra': 'نیم سایه',
+			'sidebar/object/decay': 'پوسیدگی',
+			'sidebar/object/shadow': 'سایه',
+			'sidebar/object/shadowIntensity': 'شدت سایه',
+			'sidebar/object/shadowBias': 'انحراف سایه',
+			'sidebar/object/shadowNormalBias': 'انحراف معمول سایه',
+			'sidebar/object/shadowRadius': 'شعاع سایه',
+			'sidebar/object/cast': 'سایه انداختن',
+			'sidebar/object/receive': 'دریافت',
+			'sidebar/object/visible': 'آشکار',
+			'sidebar/object/frustumcull': 'فروستوم کال',
+			'sidebar/object/renderorder': 'ترتیب رندر',
+			'sidebar/object/userdata': 'داده کاربر',
+			'sidebar/object/export': 'اکسپورت جیسون',
+
+			'sidebar/geometry/type': 'انواع',
+			'sidebar/geometry/new': 'جدید',
+			'sidebar/geometry/uuid': 'UUID',
+			'sidebar/geometry/name': 'نام',
+			'sidebar/geometry/bounds': 'محدوده',
+			'sidebar/geometry/userdata': 'داده کاربر',
+			'sidebar/geometry/show_vertex_normals': 'نمایش راس های معمول',
+			'sidebar/geometry/compute_vertex_normals': 'محاسبه راس های معمول',
+			'sidebar/geometry/compute_vertex_tangents': 'محاسبه مماس ها',
+			'sidebar/geometry/center': 'وسط',
+			'sidebar/geometry/export': 'اکسپورت جیسون',
+
+			'sidebar/geometry/box_geometry/width': 'عرض',
+			'sidebar/geometry/box_geometry/height': 'ارتفاع',
+			'sidebar/geometry/box_geometry/depth': 'عمق',
+			'sidebar/geometry/box_geometry/widthseg': 'ارجاع عرض',
+			'sidebar/geometry/box_geometry/heightseg': 'ارجاع ارتفاع',
+			'sidebar/geometry/box_geometry/depthseg': 'ارجاع عمق',
+
+			'sidebar/geometry/buffer_geometry/attributes': 'صفات',
+			'sidebar/geometry/buffer_geometry/index': 'شاخص',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'صفات شکل (مورف)',
+			'sidebar/geometry/buffer_geometry/morphRelative':  'صفات نسبی (رلتیو)',
+
+			'sidebar/geometry/capsule_geometry/radius': 'شعاع',
+			'sidebar/geometry/capsule_geometry/length': 'طول',
+			'sidebar/geometry/capsule_geometry/capseg': 'Cap Seg',
+			'sidebar/geometry/capsule_geometry/radialseg': 'Radial Seg',
+
+			'sidebar/geometry/circle_geometry/radius': 'شعاع',
+			'sidebar/geometry/circle_geometry/segments': 'بخش ها',
+			'sidebar/geometry/circle_geometry/thetastart': 'شروع تتا',
+			'sidebar/geometry/circle_geometry/thetalength': 'طول تتا',
+
+			'sidebar/geometry/cylinder_geometry/radiustop': 'شعاع بالا',
+			'sidebar/geometry/cylinder_geometry/radiusbottom': 'شعاع پایین',
+			'sidebar/geometry/cylinder_geometry/height': 'ارتفاع',
+			'sidebar/geometry/cylinder_geometry/radialsegments': 'بخش های شعاعی',
+			'sidebar/geometry/cylinder_geometry/heightsegments': 'بخش های ارتفاع',
+			'sidebar/geometry/cylinder_geometry/openended': 'پایان باز',
+
+			'sidebar/geometry/extrude_geometry/curveSegments': 'بخش های منحنی',
+			'sidebar/geometry/extrude_geometry/steps': 'گام ها',
+			'sidebar/geometry/extrude_geometry/depth': 'عمق',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': 'اریب',
+			'sidebar/geometry/extrude_geometry/bevelThickness': 'ضخامت',
+			'sidebar/geometry/extrude_geometry/bevelSize': 'سایز',
+			'sidebar/geometry/extrude_geometry/bevelOffset': 'افست',
+			'sidebar/geometry/extrude_geometry/bevelSegments': 'بخش ها',
+			'sidebar/geometry/extrude_geometry/shape': 'تبدیل به شکل',
+
+			'sidebar/geometry/dodecahedron_geometry/radius': 'شعاع',
+			'sidebar/geometry/dodecahedron_geometry/detail': 'جزییات',
+
+			'sidebar/geometry/icosahedron_geometry/radius': 'شعاع',
+			'sidebar/geometry/icosahedron_geometry/detail': 'جزییات',
+
+			'sidebar/geometry/octahedron_geometry/radius': 'شعاع',
+			'sidebar/geometry/octahedron_geometry/detail': 'جزییات',
+
+			'sidebar/geometry/tetrahedron_geometry/radius': 'شعاع',
+			'sidebar/geometry/tetrahedron_geometry/detail': 'جزییات',
+
+			'sidebar/geometry/lathe_geometry/segments': 'بخش ها',
+			'sidebar/geometry/lathe_geometry/phistart': 'شروع فی (°)',
+			'sidebar/geometry/lathe_geometry/philength': 'طول فی (°)',
+			'sidebar/geometry/lathe_geometry/points': 'امتیاز ها',
+
+			'sidebar/geometry/plane_geometry/width': 'عرض',
+			'sidebar/geometry/plane_geometry/height': 'ارتفاع',
+			'sidebar/geometry/plane_geometry/widthsegments': 'بخش عرض',
+			'sidebar/geometry/plane_geometry/heightsegments': 'بخش ارتفاع',
+
+			'sidebar/geometry/ring_geometry/innerRadius': 'شعاع داخلی',
+			'sidebar/geometry/ring_geometry/outerRadius': 'شعاع خارجی',
+			'sidebar/geometry/ring_geometry/thetaSegments': 'بخش های تتا',
+			'sidebar/geometry/ring_geometry/phiSegments': 'بخش های فی',
+			'sidebar/geometry/ring_geometry/thetastart': 'شروع تتا',
+			'sidebar/geometry/ring_geometry/thetalength': 'طول تتا',
+
+			'sidebar/geometry/shape_geometry/curveSegments': 'بخش های منحنی',
+			'sidebar/geometry/shape_geometry/extrude': 'اکسترود کردن',
+
+			'sidebar/geometry/sphere_geometry/radius': 'شعاع',
+			'sidebar/geometry/sphere_geometry/widthsegments': 'بخش عرض',
+			'sidebar/geometry/sphere_geometry/heightsegments':  'بخش ارتفاع',
+			'sidebar/geometry/sphere_geometry/phistart': 'شروع فی',
+			'sidebar/geometry/sphere_geometry/philength': ' طول فی',
+			'sidebar/geometry/sphere_geometry/thetastart': 'شروع تتا',
+			'sidebar/geometry/sphere_geometry/thetalength': 'طول تتا',
+
+			'sidebar/geometry/torus_geometry/radius': 'شعاع',
+			'sidebar/geometry/torus_geometry/tube': 'لوله',
+			'sidebar/geometry/torus_geometry/radialsegments': 'بخش های شعاعی',
+			'sidebar/geometry/torus_geometry/tubularsegments': 'بخش های لوله ای',
+			'sidebar/geometry/torus_geometry/arc': 'آرک',
+
+			'sidebar/geometry/torusKnot_geometry/radius': 'شعاع',
+			'sidebar/geometry/torusKnot_geometry/tube': 'لوله',
+			'sidebar/geometry/torusKnot_geometry/tubularsegments': 'بخش های لوله ای',
+			'sidebar/geometry/torusKnot_geometry/radialsegments': 'بخش های شعاعی',
+			'sidebar/geometry/torusKnot_geometry/p': 'P',
+			'sidebar/geometry/torusKnot_geometry/q': 'Q',
+
+			'sidebar/geometry/tube_geometry/path': 'مسیر',
+			'sidebar/geometry/tube_geometry/radius': 'شعاع',
+			'sidebar/geometry/tube_geometry/tube': 'لوله',
+			'sidebar/geometry/tube_geometry/tubularsegments': 'بخش های لوله ای',
+			'sidebar/geometry/tube_geometry/radialsegments': 'بخش های شعاعی',
+			'sidebar/geometry/tube_geometry/closed': 'بسته شده',
+			'sidebar/geometry/tube_geometry/curvetype': 'نوع انحنا',
+			'sidebar/geometry/tube_geometry/tension': 'تنش',
+
+			'sidebar/material/new': 'جدید',
+			'sidebar/material/copy': 'کپی',
+			'sidebar/material/paste': 'پیست',
+			'sidebar/material/slot': 'شکاف',
+			'sidebar/material/type': 'نوع',
+			'sidebar/material/uuid': 'UUID',
+			'sidebar/material/name': 'نام',
+			'sidebar/material/program': 'برنامه',
+			'sidebar/material/info': 'اطلاعات',
+			'sidebar/material/vertex': 'راس',
+			'sidebar/material/fragment': 'فرگ',
+			'sidebar/material/color': 'رنگ',
+			'sidebar/material/depthPacking': 'بسته بندی عمق',
+			'sidebar/material/roughness': 'زبری',
+			'sidebar/material/metalness': 'فلزی بودن',
+			'sidebar/material/reflectivity': 'انعکاس',
+			'sidebar/material/emissive': 'پرتاب کنندگی',
+			'sidebar/material/specular': 'اسپکولار',
+			'sidebar/material/shininess': 'درخشندگی',
+			'sidebar/material/clearcoat': 'کلیرکت',
+			'sidebar/material/clearcoatroughness': 'زبری کلیرکت',
+			'sidebar/material/dispersion': 'پراکندگی',
+			'sidebar/material/ior': 'IOR',
+			'sidebar/material/iridescence': 'رنگین کمانی',
+			'sidebar/material/iridescenceIOR': 'IOR تین فیلم',
+			'sidebar/material/iridescenceThicknessMax': 'زبری تین فیلم',
+			'sidebar/material/sheen': 'درخشش (شین)',
+			'sidebar/material/sheenroughness': 'زبری درخشش (شین)',
+			'sidebar/material/sheencolor': 'رنگ درخشش (شین)',
+			'sidebar/material/transmission': 'انتقال',
+			'sidebar/material/attenuationDistance': 'تضعیف فاصله',
+			'sidebar/material/attenuationColor': 'تضعیف رنگ',
+			'sidebar/material/thickness': 'ضخامت',
+			'sidebar/material/vertexcolors': 'رنگ راس ها',
+			'sidebar/material/matcap': 'متکپ',
+			'sidebar/material/map': 'مپ',
+			'sidebar/material/alphamap': 'مپ آلفا',
+			'sidebar/material/bumpmap': 'مپ بامپ',
+			'sidebar/material/normalmap': 'مپ نرمال',
+			'sidebar/material/clearcoatmap': 'مپ کلیرکت',
+			'sidebar/material/clearcoatnormalmap': 'مپ معمولی کلیرکت',
+			'sidebar/material/clearcoatroughnessmap': 'مپ زبری کلیرکت',
+			'sidebar/material/displacementmap': 'مپ جابجایی',
+			'sidebar/material/roughnessmap': 'مپ زبری',
+			'sidebar/material/metalnessmap': 'مپ فلزی بودن',
+			'sidebar/material/specularmap': 'مپ اسپکولار',
+			'sidebar/material/iridescencemap': 'مپ رنگین کمانی',
+			'sidebar/material/iridescencethicknessmap': 'مپ ضخامت تین فیلم',
+			'sidebar/material/sheencolormap': 'مپ رنگ درخشش (شین)',
+			'sidebar/material/sheenroughnessmap': 'مپ زبری شین',
+			'sidebar/material/envmap': 'مپ محیط',
+			'sidebar/material/lightmap': 'مپ نور',
+			'sidebar/material/aomap': 'AO مپ',
+			'sidebar/material/emissivemap': 'مپ پرتاب کننده',
+			'sidebar/material/gradientmap': 'مپ گردینت',
+			'sidebar/material/transmissionmap': 'مپ انتقال',
+			'sidebar/material/thicknessmap': 'مپ ضخامت',
+			'sidebar/material/side': 'سمت',
+			'sidebar/material/size': 'سایز',
+			'sidebar/material/sizeAttenuation': 'تضعیف سایز',
+			'sidebar/material/flatShading': 'سایه زنی تخت',
+			'sidebar/material/blending': 'مخلوط کردن',
+			'sidebar/material/opacity': 'کدر بودن',
+			'sidebar/material/transparent': 'شفاف',
+			'sidebar/material/forcesinglepass': 'فورس سینگل پس',
+			'sidebar/material/alphatest': 'تست آلفا',
+			'sidebar/material/depthtest': 'تست عمق',
+			'sidebar/material/depthwrite': 'نوشتن عمق',
+			'sidebar/material/wireframe': 'وایرفریم',
+			'sidebar/material/userdata': 'داده کاربر',
+			'sidebar/material/export': 'اکسپورت جیسون',
+
+			'sidebar/script/new': 'جدید',
+			'sidebar/script/edit': 'ویرایش',
+			'sidebar/script/remove': 'حذف',
+
+			'sidebar/project': 'پروژه ها',
+			'sidebar/project/antialias': 'آنتی الآیس',
+			'sidebar/project/shadows': 'سایه ها',
+			'sidebar/project/toneMapping': 'تون مپینگ',
+			'sidebar/project/materials': 'متریال ها',
+			'sidebar/project/Assign': 'اختصاص',
+
+			'sidebar/project/app': 'اپ',
+			'sidebar/project/app/play': 'پخش',
+			'sidebar/project/app/stop': 'توقف',
+			'sidebar/project/app/title': 'تیتر',
+			'sidebar/project/app/editable': 'قابل ویرایش',
+			'sidebar/project/app/publish': 'انتشار',
+
+			'sidebar/project/image': 'عکس',
+			'sidebar/project/image/samples': 'نمونه ها',
+			'sidebar/project/video': 'ویدیو',
+
+			'sidebar/project/shading': 'سایه زنی',
+			'sidebar/project/resolution': 'وضوح',
+			'sidebar/project/duration': 'مدت',
+			'sidebar/project/render': 'رندر',
+
+			'sidebar/settings': 'تنظیمات',
+			'sidebar/settings/language': 'زبان ها',
+
+			'sidebar/settings/shortcuts': 'شورت کات ها',
+			'sidebar/settings/shortcuts/translate': 'ترجمه',
+			'sidebar/settings/shortcuts/rotate': 'چرخش (دوران)',
+			'sidebar/settings/shortcuts/scale': 'مقیاس',
+			'sidebar/settings/shortcuts/undo': 'بازگشت به عقب',
+			'sidebar/settings/shortcuts/focus': 'فوکوس',
+
+			'sidebar/history': 'هیستوری',
+			'sidebar/history/clear': 'پاک کردن',
+			'sidebar/history/persistent': 'ماندگار',
+
+			'toolbar/translate': 'ترجمه',
+			'toolbar/rotate': 'چرخش (دوران)',
+			'toolbar/scale': 'مقیاس',
+			'toolbar/local': 'لوکال',
+
+			'viewport/controls/grid': 'گرید',
+			'viewport/controls/helpers': 'کمک کننده',
+
+			'viewport/info/object': 'آبجکت',
+			'viewport/info/objects': 'آبجکت ها',
+			'viewport/info/vertex': 'راس',
+			'viewport/info/vertices': 'رئوس',
+			'viewport/info/triangle': 'مثلث',
+			'viewport/info/triangles': 'مثلث ها',
+			'viewport/info/sample': 'نمونه',
+			'viewport/info/samples': 'نمونه ها',
+			'viewport/info/rendertime': 'زمان رندر',
+
+			'script/title/vertexShader': 'شیدر راس',
+			'script/title/fragmentShader': 'شیدر فرگمنت',
+			'script/title/programInfo': 'خواص برنامه'
+
+		},
 		en: {
 
 			'prompt/file/open': 'Any unsaved data will be lost. Are you sure?',
@@ -1622,7 +2021,7 @@ function Strings( config ) {
 			'prompt/history/preserve': '기록은 세션을 통해 저장됩니다. 이는 텍스처를 조작할 때 성능에 영향을 미칠 수 있습니다.',
 			'prompt/history/forbid': '씬을 재생하는 동안 되돌리기/다시하기는 비활성화됩니다.',
 			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC 셰이딩: MeshStandardmaterial 및 MeshPhysicalmaterial만 지원됩니다',
-	
+
 			'command/AddObject': '객체 추가',
 			'command/AddScript': '스크립트 추가',
 			'command/MoveObject': '객체 이동',
@@ -1646,7 +2045,7 @@ function Strings( config ) {
 			'command/SetShadowValue': '그림자 값 설정',
 			'command/SetUuid': 'UUID 설정',
 			'command/SetValue': '값 설정',
-	
+
 			'menubar/file': '파일',
 			'menubar/file/new': '새 프로젝트',
 			'menubar/file/new/empty': '비어 있음',
@@ -1659,17 +2058,17 @@ function Strings( config ) {
 			'menubar/file/save': '저장',
 			'menubar/file/import': '가져오기',
 			'menubar/file/export': '내보내기',
-	
+
 			'menubar/edit': '편집',
 			'menubar/edit/undo': '되돌리기',
 			'menubar/edit/redo': '다시하기',
 			'menubar/edit/center': '중앙으로 옮기기',
 			'menubar/edit/clone': '복제',
 			'menubar/edit/delete': '삭제',
-	
+
 			'menubar/add': '추가',
 			'menubar/add/group': '그룹',
-	
+
 			'menubar/add/mesh': '메시',
 			'menubar/add/mesh/plane': '평면',
 			'menubar/add/mesh/box': '직육면체',
@@ -1687,48 +2086,48 @@ function Strings( config ) {
 			'menubar/add/mesh/torusknot': '토러스 매듭',
 			'menubar/add/mesh/lathe': '선반형',
 			'menubar/add/mesh/sprite': '스프라이트',
-	
+
 			'menubar/add/light': '조명',
 			'menubar/add/light/ambient': '환경광',
 			'menubar/add/light/directional': '방향광',
 			'menubar/add/light/hemisphere': '반구광',
 			'menubar/add/light/point': '포인트',
 			'menubar/add/light/spot': '스포트',
-	
+
 			'menubar/add/camera': '카메라',
 			'menubar/add/camera/perspective': '투시 투영',
 			'menubar/add/camera/orthographic': '정사영',
-	
+
 			'menubar/status/autosave': '자동 저장',
-	
+
 			'menubar/view': '보기',
 			'menubar/view/fullscreen': '전체 화면',
 			'menubar/view/gridHelper': '그리드 도우미',
 			'menubar/view/cameraHelpers': '카메라 도우미',
 			'menubar/view/lightHelpers': '조명 도우미',
 			'menubar/view/skeletonHelpers': '골격 도우미',
-	
+
 			'menubar/help': '도움말',
 			'menubar/help/source_code': '소스 코드',
 			'menubar/help/icons': '아이콘 팩',
 			'menubar/help/about': 'Three.js 알아보기',
 			'menubar/help/manual': '매뉴얼',
-	
+
 			'sidebar/animations': '애니메이션',
 			'sidebar/animations/play': '재생',
 			'sidebar/animations/stop': '정지',
 			'sidebar/animations/timescale': '시간 스케일',
-	
+
 			'sidebar/scene': '장면',
 			'sidebar/scene/background': '배경',
 			'sidebar/scene/environment': '환경',
 			'sidebar/scene/fog': '안개',
-	
+
 			'sidebar/properties/object': '객체',
 			'sidebar/properties/geometry': '지오메트리',
 			'sidebar/properties/material': '머티리얼',
 			'sidebar/properties/script': '스크립트',
-	
+
 			'sidebar/object/type': '타입',
 			'sidebar/object/new': '새로 만들기',
 			'sidebar/object/uuid': 'UUID',
@@ -1762,7 +2161,7 @@ function Strings( config ) {
 			'sidebar/object/renderorder': '렌더 순서',
 			'sidebar/object/userdata': '사용자 데이터',
 			'sidebar/object/export': 'JSON으로 내보내기',
-	
+
 			'sidebar/geometry/type': '타입',
 			'sidebar/geometry/new': '새로 만들기',
 			'sidebar/geometry/uuid': 'UUID',
@@ -1774,36 +2173,36 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '접선 계산',
 			'sidebar/geometry/center': '중앙',
 			'sidebar/geometry/export': 'JSON으로 내보내기',
-	
+
 			'sidebar/geometry/box_geometry/width': '너비',
 			'sidebar/geometry/box_geometry/height': '높이',
 			'sidebar/geometry/box_geometry/depth': '깊이',
 			'sidebar/geometry/box_geometry/widthseg': '너비 분할 수',
 			'sidebar/geometry/box_geometry/heightseg': '높이 분할 수',
 			'sidebar/geometry/box_geometry/depthseg': '깊이 분할 수',
-	
+
 			'sidebar/geometry/buffer_geometry/attributes': '속성',
 			'sidebar/geometry/buffer_geometry/index': '인덱스',
 			'sidebar/geometry/buffer_geometry/morphAttributes': '모프 속성',
 			'sidebar/geometry/buffer_geometry/morphRelative': '상대적 모프',
-	
+
 			'sidebar/geometry/capsule_geometry/radius': '반지름',
 			'sidebar/geometry/capsule_geometry/length': '길이',
 			'sidebar/geometry/capsule_geometry/capseg': '캡 분할 수',
 			'sidebar/geometry/capsule_geometry/radialseg': '방사 분할 수',
-	
+
 			'sidebar/geometry/circle_geometry/radius': '반지름',
 			'sidebar/geometry/circle_geometry/segments': '세그먼트',
 			'sidebar/geometry/circle_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/circle_geometry/thetalength': '각도 길이',
-	
+
 			'sidebar/geometry/cylinder_geometry/radiustop': '상단 반지름',
 			'sidebar/geometry/cylinder_geometry/radiusbottom': '하단 반지름',
 			'sidebar/geometry/cylinder_geometry/height': '높이',
 			'sidebar/geometry/cylinder_geometry/radialsegments': '방사 분할 수',
 			'sidebar/geometry/cylinder_geometry/heightsegments': '높이 분할 수',
 			'sidebar/geometry/cylinder_geometry/openended': '끝 열림',
-	
+
 			'sidebar/geometry/extrude_geometry/curveSegments': '곡선 분할 수',
 			'sidebar/geometry/extrude_geometry/steps': '단계',
 			'sidebar/geometry/extrude_geometry/depth': '깊이',
@@ -1813,39 +2212,39 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': '베벨 오프셋',
 			'sidebar/geometry/extrude_geometry/bevelSegments': '베벨 분할 수',
 			'sidebar/geometry/extrude_geometry/shape': '형상으로 변환',
-	
+
 			'sidebar/geometry/dodecahedron_geometry/radius': '반지름',
 			'sidebar/geometry/dodecahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/icosahedron_geometry/radius': '반지름',
 			'sidebar/geometry/icosahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/octahedron_geometry/radius': '반지름',
 			'sidebar/geometry/octahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/tetrahedron_geometry/radius': '반지름',
 			'sidebar/geometry/tetrahedron_geometry/detail': '세부화',
-	
+
 			'sidebar/geometry/lathe_geometry/segments': '분할 수',
 			'sidebar/geometry/lathe_geometry/phistart': '시작 각도',
 			'sidebar/geometry/lathe_geometry/philength': '각도 길이',
 			'sidebar/geometry/lathe_geometry/points': '포인트',
-	
+
 			'sidebar/geometry/plane_geometry/width': '너비',
 			'sidebar/geometry/plane_geometry/height': '높이',
 			'sidebar/geometry/plane_geometry/widthsegments': '너비 분할 수',
 			'sidebar/geometry/plane_geometry/heightsegments': '깊이 분할 수',
-	
+
 			'sidebar/geometry/ring_geometry/innerRadius': '내부 반지름',
 			'sidebar/geometry/ring_geometry/outerRadius': '외부 반지름',
 			'sidebar/geometry/ring_geometry/thetaSegments': '원 분할 수',
 			'sidebar/geometry/ring_geometry/phiSegments': '링 분할 수',
 			'sidebar/geometry/ring_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/ring_geometry/thetalength': '각도 길이',
-	
+
 			'sidebar/geometry/shape_geometry/curveSegments': '곡선 분할 수',
 			'sidebar/geometry/shape_geometry/extrude': '압출',
-	
+
 			'sidebar/geometry/sphere_geometry/radius': '반지름',
 			'sidebar/geometry/sphere_geometry/widthsegments': '원 분할 수',
 			'sidebar/geometry/sphere_geometry/heightsegments': '링 분할 수',
@@ -1853,20 +2252,20 @@ function Strings( config ) {
 			'sidebar/geometry/sphere_geometry/philength': '각도 길이',
 			'sidebar/geometry/sphere_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/sphere_geometry/thetalength': '각도 길이',
-	
+
 			'sidebar/geometry/torus_geometry/radius': '반지름',
 			'sidebar/geometry/torus_geometry/tube': '튜브 두께',
 			'sidebar/geometry/torus_geometry/radialsegments': '소 분할 수',
 			'sidebar/geometry/torus_geometry/tubularsegments': '대 분할 수',
 			'sidebar/geometry/torus_geometry/arc': '호',
-	
+
 			'sidebar/geometry/torusKnot_geometry/radius': '반지름',
 			'sidebar/geometry/torusKnot_geometry/tube': '튜브 두께',
 			'sidebar/geometry/torusKnot_geometry/tubularsegments': '소 분할 수',
 			'sidebar/geometry/torusKnot_geometry/radialsegments': '대 분할 수',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
-	
+
 			'sidebar/geometry/tube_geometry/path': '경로',
 			'sidebar/geometry/tube_geometry/radius': '반지름',
 			'sidebar/geometry/tube_geometry/tube': '튜브 두께',
@@ -1875,7 +2274,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/closed': '닫기',
 			'sidebar/geometry/tube_geometry/curvetype': '곡선 타입',
 			'sidebar/geometry/tube_geometry/tension': '텐션',
-	
+
 			'sidebar/material/new': '새로 만들기',
 			'sidebar/material/copy': '복사',
 			'sidebar/material/paste': '붙여넣기',
@@ -1947,56 +2346,56 @@ function Strings( config ) {
 			'sidebar/material/wireframe': '와이어프레임',
 			'sidebar/material/userdata': '사용자 데이터',
 			'sidebar/material/export': 'JSON으로 내보내기',
-	
+
 			'sidebar/script/new': '새로 만들기',
 			'sidebar/script/edit': '편집',
 			'sidebar/script/remove': '삭제',
-	
+
 			'sidebar/project': '프로젝트',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
 			'sidebar/project/toneMapping': '톤 매핑',
 			'sidebar/project/materials': '머티리얼',
 			'sidebar/project/Assign': '할당',
-	
+
 			'sidebar/project/app': '앱',
 			'sidebar/project/app/play': '재생',
 			'sidebar/project/app/stop': '정지',
 			'sidebar/project/app/title': '제목',
 			'sidebar/project/app/editable': '편집 가능',
 			'sidebar/project/app/publish': '앱 파일로 저장',
-	
+
 			'sidebar/project/image': '이미지',
 			'sidebar/project/image/samples': '샘플',
 			'sidebar/project/video': '비디오',
-	
+
 			'sidebar/project/shading': '셰이딩',
 			'sidebar/project/resolution': '해상도',
 			'sidebar/project/duration': '길이',
 			'sidebar/project/render': '렌더',
-	
+
 			'sidebar/settings': '설정',
 			'sidebar/settings/language': '언어',
-	
+
 			'sidebar/settings/shortcuts': '단축키',
 			'sidebar/settings/shortcuts/translate': '이동',
 			'sidebar/settings/shortcuts/rotate': '회전',
 			'sidebar/settings/shortcuts/scale': '스케일',
 			'sidebar/settings/shortcuts/undo': '되돌리기',
 			'sidebar/settings/shortcuts/focus': '포커스',
-	
+
 			'sidebar/history': '기록',
 			'sidebar/history/clear': '지우기',
 			'sidebar/history/persistent': '영구적',
-	
+
 			'toolbar/translate': '이동',
 			'toolbar/rotate': '회전',
 			'toolbar/scale': '스케일',
 			'toolbar/local': '로컬',
-	
+
 			'viewport/controls/grid': '그리드',
 			'viewport/controls/helpers': '도우미 보기',
-	
+
 			'viewport/info/object': '객체',
 			'viewport/info/objects': '객체',
 			'viewport/info/vertex': '버텍스',
@@ -2006,7 +2405,7 @@ function Strings( config ) {
 			'viewport/info/sample': '샘플',
 			'viewport/info/samples': '샘플',
 			'viewport/info/rendertime': '렌더링 시간',
-	
+
 			'script/title/vertexShader': '버텍스 셰이더',
 			'script/title/fragmentShader': '프래그먼트 셰이더',
 			'script/title/programInfo': '프로그램 속성'

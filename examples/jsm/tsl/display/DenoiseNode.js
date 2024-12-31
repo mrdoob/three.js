@@ -2,6 +2,18 @@ import { DataTexture, RepeatWrapping, Vector2, Vector3, TempNode } from 'three/w
 import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 import { SimplexNoise } from '../../math/SimplexNoise.js';
 
+/** @module DenoiseNode **/
+
+/**
+ * Post processing node for denoising data like raw screen-space ambient occlusion output.
+ * Denoise can noticeably improve the quality of ambient occlusion but also add quite some
+ * overhead to the post processing setup. It's best to make its usage optional (e.g. via
+ * graphic settings).
+ *
+ * Reference: {@link https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf}.
+ *
+ * @augments TempNode
+ */
 class DenoiseNode extends TempNode {
 
 	static get type() {
@@ -10,32 +22,123 @@ class DenoiseNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new denoise node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect (e.g. AO).
+	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
+	 * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 */
 	constructor( textureNode, depthNode, normalNode, camera ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The texture node that represents the input of the effect (e.g. AO).
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNode = textureNode;
+
+		/**
+		 * A node that represents the scene's depth.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.depthNode = depthNode;
+
+		/**
+		 * A node that represents the scene's normals. If no normals are passed to the
+		 * constructor (because MRT is not available), normals can be automatically
+		 * reconstructed from depth values in the shader.
+		 *
+		 * @type {Node<vec3>?}
+		 */
 		this.normalNode = normalNode;
 
+		/**
+		 * The node represents the internal noise texture.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.noiseNode = texture( generateDefaultNoise() );
 
+		/**
+		 * The luma Phi value.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.lumaPhi = uniform( 5 );
+
+		/**
+		 * The depth Phi value.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.depthPhi = uniform( 5 );
+
+		/**
+		 * The normal Phi value.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.normalPhi = uniform( 5 );
+
+		/**
+		 * The radius.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.radius = uniform( 5 );
+
+		/**
+		 * The index.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.index = uniform( 0 );
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * its internal uniforms once per frame in `updateBefore()`.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		// uniforms
-
+		/**
+		 * The resolution of the effect.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
 		this._resolution = uniform( new Vector2() );
-		this._sampleVectors = uniformArray( generatePdSamplePointInitializer( 16, 2, 1 ) );
+
+		/**
+		 * An array of sample vectors.
+		 *
+		 * @private
+		 * @type {UniformArrayNode<vec3>}
+		 */
+		this._sampleVectors = uniformArray( generateDenoiseSamples( 16, 2, 1 ) );
+
+		/**
+		 * Represents the inverse projection matrix of the scene's camera.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 
 	}
 
+	/**
+	 * This method is used to update internal uniforms once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore() {
 
 		const map = this.textureNode.value;
@@ -44,14 +147,20 @@ class DenoiseNode extends TempNode {
 
 	}
 
-	setup() {
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ShaderCallNodeInternal}
+	 */
+	setup( /* builder */ ) {
 
 		const uvNode = uv();
 
-		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
-		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
-		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
+		const sampleTexture = ( uv ) => this.textureNode.sample( uv );
+		const sampleDepth = ( uv ) => this.depthNode.sample( uv ).x;
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
+		const sampleNoise = ( uv ) => this.noiseNode.sample( uv );
 
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
 
@@ -149,23 +258,14 @@ class DenoiseNode extends TempNode {
 
 export default DenoiseNode;
 
-function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
-
-	const poissonDisk = generateDenoiseSamples( samples, rings, radiusExponent );
-
-	const array = [];
-
-	for ( let i = 0; i < samples; i ++ ) {
-
-		const sample = poissonDisk[ i ];
-		array.push( sample );
-
-	}
-
-	return array;
-
-}
-
+/**
+ * Generates denoise samples based on the given parameters.
+ *
+ * @param {Number} numSamples - The number of samples.
+ * @param {Number} numRings - The number of rings.
+ * @param {Number} radiusExponent - The radius exponent.
+ * @return {Array<Vector3>} The denoise samples.
+ */
 function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 	const samples = [];
@@ -182,6 +282,12 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 }
 
+/**
+ * Generates a default noise texture for the given size.
+ *
+ * @param {Number} [size=64] - The texture size.
+ * @return {DataTexture} The generated noise texture.
+ */
 function generateDefaultNoise( size = 64 ) {
 
 	const simplex = new SimplexNoise();
@@ -214,4 +320,14 @@ function generateDefaultNoise( size = 64 ) {
 
 }
 
+/**
+ * TSL function for creating a denoise effect.
+ *
+ * @function
+ * @param {Node} node - The node that represents the input of the effect (e.g. AO).
+ * @param {Node<float>} depthNode - A node that represents the scene's depth.
+ * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+ * @param {Camera} camera - The camera the scene is rendered with.
+ * @returns {DenoiseNode}
+ */
 export const denoise = ( node, depthNode, normalNode, camera ) => nodeObject( new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
