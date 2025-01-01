@@ -50,7 +50,7 @@ precision lowp sampler2DShadow;
  *
  * This module generates GLSL shader code from node materials and also
  * generates the respective bindings and vertex buffer definitions. These
- * data are later used by the renderer to build render and compute pipelines
+ * data are later used by the renderer to create render and compute pipelines
  * for render objects.
  *
  * @augments NodeBuilder
