@@ -1439,15 +1439,16 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Returns texture data as a typed array.
 	 *
+	 * @async
 	 * @param {Texture} texture - The texture to copy.
 	 * @param {Number} x - The x coordinate of the copy origin.
 	 * @param {Number} y - The y coordinate of the copy origin.
 	 * @param {Number} width - The width of the copy.
 	 * @param {Number} height - The height of the copy.
 	 * @param {Number} faceIndex - The face index.
-	 * @return {TypedArray} The texture data as a typed array.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
