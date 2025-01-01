@@ -26,7 +26,7 @@ class WaterMesh extends Mesh {
 
 		this.resolution = options.resolution !== undefined ? options.resolution : 0.5;
 
-		// uniforms
+		// Uniforms
 
 		this.waterNormals = texture( options.waterNormals );
 		this.alpha = uniform( options.alpha !== undefined ? options.alpha : 1.0 );
@@ -73,7 +73,7 @@ class WaterMesh extends Mesh {
 
 		const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
-		//
+		// Material
 
 		material.transparent = true;
 
