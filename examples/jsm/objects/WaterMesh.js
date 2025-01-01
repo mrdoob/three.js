@@ -2,10 +2,10 @@ import {
 	Color,
 	Mesh,
 	Vector3,
-	NodeMaterial
+	MeshLambertNodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix, diffuseColor } from 'three/tsl';
 
 /**
  * Work based on :
@@ -18,7 +18,7 @@ class WaterMesh extends Mesh {
 
 	constructor( geometry, options ) {
 
-		const material = new NodeMaterial();
+		const material = new MeshLambertNodeMaterial();
 
 		super( geometry, material );
 
@@ -58,25 +58,28 @@ class WaterMesh extends Mesh {
 
 		} );
 
-		const fragmentNode = Fn( () => {
+		const noise = getNoise( positionWorld.xz.mul( this.size ) );
+		const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
 
-			const noise = getNoise( positionWorld.xz.mul( this.size ) );
-			const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
+		const worldToEye = cameraPosition.sub( positionWorld );
+		const eyeDirection = normalize( worldToEye );
 
-			const diffuseLight = vec3( 0 ).toVar();
-			const specularLight = vec3( 0 ).toVar();
+		const reflection = normalize( reflect( this.sunDirection.negate(), surfaceNormal ) );
+		const direction = max( 0.0, dot( eyeDirection, reflection ) );
+		const specularLight = pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 );
+		const diffuseLight = max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 );
 
-			const worldToEye = cameraPosition.sub( positionWorld );
-			const eyeDirection = normalize( worldToEye );
+		const distance = length( worldToEye );
 
-			const reflection = normalize( reflect( this.sunDirection.negate(), surfaceNormal ) );
-			const direction = max( 0.0, dot( eyeDirection, reflection ) );
-			specularLight.addAssign( pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 ) );
-			diffuseLight.addAssign( max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 ) );
+		const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
-			const distance = length( worldToEye );
+		//
 
-			const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
+		material.shadowPositionNode = positionWorld.add( distortion );
+
+		material.setupOutgoingLight = () => diffuseColor.rgb; // backwards compatibility
+
+		material.colorNode = Fn( () => {
 
 			const mirrorSampler = reflector();
 			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
@@ -93,8 +96,6 @@ class WaterMesh extends Mesh {
 			return vec4( albedo, this.alpha );
 
 		} )();
-
-		material.fragmentNode = fragmentNode;
 
 	}
 
