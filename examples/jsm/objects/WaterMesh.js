@@ -77,6 +77,8 @@ class WaterMesh extends Mesh {
 
 		material.transparent = true;
 
+		material.opacityNode = this.alpha;
+
 		material.shadowPositionNode = positionWorld.add( distortion );
 
 		material.setupOutgoingLight = () => diffuseColor.rgb; // backwards compatibility
@@ -95,7 +97,7 @@ class WaterMesh extends Mesh {
 			const scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ).mul( this.waterColor );
 			const albedo = mix( this.sunColor.mul( diffuseLight ).mul( 0.3 ).add( scatter ), mirrorSampler.rgb.mul( specularLight ).add( mirrorSampler.rgb.mul( 0.9 ) ).add( vec3( 0.1 ) ), reflectance );
 
-			return vec4( albedo, this.alpha );
+			return albedo;
 
 		} )();
 
