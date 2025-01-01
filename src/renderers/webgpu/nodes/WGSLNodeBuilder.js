@@ -180,7 +180,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new WGSLNodeParser() );
 
 		/**
-		 * A dictionary holds for each shader stage ('vertex', 'fragment', 'compute')
+		 * A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
 		 * another dictionary which manages UBOs per group ('render','frame','object').
 		 *
 		 * @type {Object<String,Object<String,NodeUniformsGroup>>}
@@ -188,14 +188,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.uniformGroups = {};
 
 		/**
-		 * A dictionary holds for each shader stage a Map for managing builtins.
+		 * A dictionary that holds for each shader stage a Map of builtins.
 		 *
 		 * @type {Object<String,Map<String,Object>>}
 		 */
 		this.builtins = {};
 
 		/**
-		 * A dictionary holds for each shader stage a Set for managing directives.
+		 * A dictionary thath holds for each shader stage a Set of directives.
 		 *
 		 * @type {Object<String,Set<String>>}
 		 */
@@ -230,7 +230,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -291,7 +291,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -493,7 +493,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -515,7 +515,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -585,7 +585,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -618,7 +618,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {Array<String>} gradSnippet - An array holding both gradient WGSL snippets.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -645,7 +645,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {String} compareSnippet -  A WGSL snippet that represents the reference value.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -670,7 +670,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -699,7 +699,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {String} textureProperty - The name of the texture uniform in the shader.
 	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {String} biasSnippet - A WGSL snippet that represents the bias to apply to the mip level before sampling.
-	 * @param {String?} depthSnippet - The 0-based texture array index to sample.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {String} The WGSL snippet.
 	 */
@@ -1062,7 +1062,7 @@ ${ flowData.code }
 	/**
 	 * Returns the invocation local index builtin.
 	 *
-	 * @return {String} The invocation loca index.
+	 * @return {String} The invocation local index.
 	 */
 	getInvocationLocalIndex() {
 
@@ -1167,7 +1167,7 @@ ${ flowData.code }
 	/**
 	 * Whether to flip texture data along its vertical axis or not.
 	 *
-	 * @return {Boolean} Whether to flip texture data along its vertical axis or not.
+	 * @return {Boolean} Returns always `false` in context of WGSL.
 	 */
 	isFlipY() {
 
@@ -2025,7 +2025,7 @@ fn main( ${shaderData.attributes} ) {
 	 *
 	 * @private
 	 * @param {String} name - The struct name.
-	 * @param {String} vars - Its variables.
+	 * @param {String} vars - The struct variables.
 	 * @return {String} The WGSL snippet representing a struct.
 	 */
 	_getWGSLStruct( name, vars ) {
@@ -2042,7 +2042,7 @@ ${vars}
 	 *
 	 * @private
 	 * @param {String} name - The struct name.
-	 * @param {String} vars - Its variables.
+	 * @param {String} vars - The struct variables.
 	 * @param {String} access - The access.
 	 * @param {Number} [binding=0] - The binding index.
 	 * @param {Number} [group=0] - The group index.

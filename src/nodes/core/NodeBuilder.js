@@ -498,6 +498,15 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the output struct name which is required by
+	 * {@link module:OutputStructNode}.
+	 *
+	 * @abstract
+	 * @return {String} The name of the output struct.
+	 */
+	getOutputStructName() {}
+
+	/**
 	 * Returns a bind group for the given group name and binding.
 	 *
 	 * @private
