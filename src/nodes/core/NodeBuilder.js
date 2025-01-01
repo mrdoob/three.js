@@ -1034,10 +1034,11 @@ class NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The texture property name.
 	 * @param {String} uvSnippet - Snippet defining the texture coordinates.
+	 * @param {String?} depthSnippet - Snippet defining the 0-based texture array index to sample.
 	 * @param {String} levelSnippet - Snippet defining the mip level.
 	 * @return {String} The generated shader string.
 	 */
-	generateTextureLod( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
+	generateTextureLod( /* texture, textureProperty, uvSnippet, depthSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -1211,11 +1212,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Whether the given texture needs a conversion to working color space.
+	 * Checks if the given texture requires a manual conversion to the working color space.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to check.
-	 * @return {Boolean} Whether a color space conversion is required or not.
+	 * @return {Boolean} Whether the given texture requires a conversion to working color space or not.
 	 */
 	needsToWorkingColorSpace( /*texture*/ ) {
 
