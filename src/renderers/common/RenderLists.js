@@ -1,6 +1,8 @@
 import ChainMap from './ChainMap.js';
 import RenderList from './RenderList.js';
 
+const _chainKeys = [];
+
 /**
  * This renderer module manages the render lists which are unique
  * per scene and camera combination.
@@ -42,16 +44,20 @@ class RenderLists {
 	get( scene, camera ) {
 
 		const lists = this.lists;
-		const keys = [ scene, camera ];
 
-		let list = lists.get( keys );
+		_chainKeys[ 0 ] = scene;
+		_chainKeys[ 1 ] = camera;
+
+		let list = lists.get( _chainKeys );
 
 		if ( list === undefined ) {
 
 			list = new RenderList( this.lighting, scene, camera );
-			lists.set( keys, list );
+			lists.set( _chainKeys, list );
 
 		}
+
+		_chainKeys.length = 0;
 
 		return list;
 

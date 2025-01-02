@@ -1,6 +1,8 @@
 import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
 
+const _chainKeys = [];
+
 /**
  * This module manages the render contexts of the renderer.
  *
@@ -33,13 +35,12 @@ class RenderContexts {
 	 */
 	get( scene = null, camera = null, renderTarget = null ) {
 
-		const chainKey = [];
-		if ( scene !== null ) chainKey.push( scene );
-		if ( camera !== null ) chainKey.push( camera );
+		if ( scene !== null ) _chainKeys.push( scene );
+		if ( camera !== null ) _chainKeys.push( camera );
 
-		if ( chainKey.length === 0 ) {
+		if ( _chainKeys.length === 0 ) {
 
-			chainKey.push( { id: 'default' } );
+			_chainKeys.push( { id: 'default' } );
 
 		}
 
@@ -61,15 +62,17 @@ class RenderContexts {
 
 		const chainMap = this.getChainMap( attachmentState );
 
-		let renderState = chainMap.get( chainKey );
+		let renderState = chainMap.get( _chainKeys );
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
 
-			chainMap.set( chainKey, renderState );
+			chainMap.set( _chainKeys, renderState );
 
 		}
+
+		_chainKeys.length = 0;
 
 		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
