@@ -454,6 +454,16 @@ class Backend {
 	async waitForGPU() {}
 
 	/**
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
+	async getArrayBufferAsync( /* attribute */ ) {}
+
+	/**
 	 * Checks if the given feature is supported by the backend.
 	 *
 	 * @async
