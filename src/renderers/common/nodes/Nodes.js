@@ -9,6 +9,7 @@ import { CubeUVReflectionMapping, EquirectangularReflectionMapping, Equirectangu
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
 
 const _outputNodeMap = new WeakMap();
+const _chainKeys = [];
 
 /**
  * This renderer module manages node-related objects and is the
@@ -136,10 +137,13 @@ class Nodes extends DataMap {
 
 		// other groups are updated just when groupNode.needsUpdate is true
 
-		const groupChain = [ groupNode, nodeUniformsGroup ];
+		_chainKeys[ 0 ] = groupNode;
+		_chainKeys[ 1 ] = nodeUniformsGroup;
 
-		let groupData = this.groupsData.get( groupChain );
-		if ( groupData === undefined ) this.groupsData.set( groupChain, groupData = {} );
+		let groupData = this.groupsData.get( _chainKeys );
+		if ( groupData === undefined ) this.groupsData.set( _chainKeys, groupData = {} );
+
+		_chainKeys.length = 0;
 
 		if ( groupData.version !== groupNode.version ) {
 
@@ -382,10 +386,12 @@ class Nodes extends DataMap {
 	 */
 	getCacheKey( scene, lightsNode ) {
 
-		const chain = [ scene, lightsNode ];
+		_chainKeys[ 0 ] = scene;
+		_chainKeys[ 1 ] = lightsNode;
+
 		const callId = this.renderer.info.calls;
 
-		let cacheKeyData = this.callHashCache.get( chain );
+		let cacheKeyData = this.callHashCache.get( _chainKeys );
 
 		if ( cacheKeyData === undefined || cacheKeyData.callId !== callId ) {
 
@@ -405,9 +411,11 @@ class Nodes extends DataMap {
 				cacheKey: hashArray( values )
 			};
 
-			this.callHashCache.set( chain, cacheKeyData );
+			this.callHashCache.set( _chainKeys, cacheKeyData );
 
 		}
+
+		_chainKeys.length = 0;
 
 		return cacheKeyData.cacheKey;
 
