@@ -26,8 +26,9 @@ class VarNode extends Node {
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
 	 * @param {String?} name - The name of the variable in the shader.
+	 * @param {String?} declarationType - The type of the declaration ('var' or 'let').
 	 */
-	constructor( node, name = null ) {
+	constructor( node, name = null, declarationType = 'var' ) {
 
 		super();
 
@@ -64,6 +65,29 @@ class VarNode extends Node {
 		 */
 		this.isVarNode = true;
 
+		/**
+		 *
+		 * The type of the declaration ('var' or 'let').
+		 *
+		 * @type {String}
+		 * @default 'var'
+		 */
+		this.declarationType = declarationType;
+
+	}
+
+
+	setDeclarationType( declarationType ) {
+
+		this.declarationType = declarationType;
+		return this;
+
+	}
+
+	getDeclarationType() {
+
+		return this.declarationType;
+
 	}
 
 	getHash( builder ) {
@@ -80,15 +104,23 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const { node, name } = this;
+		const { node, name, declarationType } = this;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, declarationType );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		const snippet = node.build( builder, nodeVar.type );
 
-		builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
+		if ( builder.renderer.backend.isWebGPUBackend === true && declarationType === 'let' ) {
+
+			builder.addLineFlowCode( `let ${propertyName} = ${snippet}`, this );
+
+		} else {
+
+			builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
+
+		}
 
 		return propertyName;
 
@@ -109,6 +141,8 @@ export default VarNode;
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
+
+addMethodChaining( 'toLet', ( ...params ) => createVar( ...params ).append().setDeclarationType( 'let' ) );
 
 // Deprecated
 

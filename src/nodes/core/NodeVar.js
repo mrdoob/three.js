@@ -11,8 +11,9 @@ class NodeVar {
 	 *
 	 * @param {String} name - The name of the variable.
 	 * @param {String} type - The type of the variable.
+	 * @param {String} declarationType - The declaration type of the variable.
 	 */
-	constructor( name, type ) {
+	constructor( name, type, declarationType = 'var' ) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -36,6 +37,13 @@ class NodeVar {
 		 * @type {String}
 		 */
 		this.type = type;
+
+		/**
+		 * The declaration type of the variable.
+		 *
+		 * @type {String}
+		 */
+		this.declarationType = declarationType;
 
 	}
 

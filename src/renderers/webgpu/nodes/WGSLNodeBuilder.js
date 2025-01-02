@@ -970,7 +970,7 @@ ${ flowData.code }
 
 		if ( shaderStage === 'compute' ) {
 
-			this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
+			this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'local_invocation_id', 'localId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
@@ -1067,6 +1067,12 @@ ${ flowData.code }
 		if ( vars !== undefined ) {
 
 			for ( const variable of vars ) {
+
+				if ( variable.declarationType === 'let' ) {
+
+					continue;
+
+				}
 
 				snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
 
@@ -1295,7 +1301,7 @@ ${ flowData.code }
 
 					if ( flow.length > 0 ) flow += '\n';
 
-					flow += `\t// flow -> ${ slotName }\n\t`;
+					flow += `\t// flow -> ${ slotName }\n`;
 
 				}
 
@@ -1517,7 +1523,7 @@ ${shaderData.codes}
 fn main( ${shaderData.attributes} ) {
 
 	// system
-	instanceIndex = id.x + id.y * numWorkgroups.x * u32(${workgroupSize}) + id.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
+	instanceIndex = globalId.x + globalId.y * numWorkgroups.x * u32(${workgroupSize}) + globalId.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
 
 	// vars
 	${shaderData.vars}

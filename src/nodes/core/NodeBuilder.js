@@ -1593,9 +1593,11 @@ class NodeBuilder {
 	 * @param {String?} name - The variable's name.
 	 * @param {String} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @param {String} [declarationType='var'] - The variable's declaration type.
+	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, declarationType ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -1607,7 +1609,7 @@ class NodeBuilder {
 
 			if ( name === null ) name = 'nodeVar' + vars.length;
 
-			nodeVar = new NodeVar( name, type );
+			nodeVar = new NodeVar( name, type, declarationType );
 
 			vars.push( nodeVar );
 
