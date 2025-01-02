@@ -253,8 +253,8 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Transfers buffer data from a storage buffer attribute
-	 * from the GPU to the CPU in context of compute shaders.
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
