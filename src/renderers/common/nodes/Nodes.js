@@ -10,6 +10,7 @@ import { hashArray } from '../../../nodes/core/NodeUtils.js';
 
 const _outputNodeMap = new WeakMap();
 const _chainKeys = [];
+const _cacheKeyValues = [];
 
 /**
  * This renderer module manages node-related objects and is the
@@ -391,27 +392,25 @@ class Nodes extends DataMap {
 
 		const callId = this.renderer.info.calls;
 
-		let cacheKeyData = this.callHashCache.get( _chainKeys );
+		const cacheKeyData = this.callHashCache.get( _chainKeys ) || {};
 
-		if ( cacheKeyData === undefined || cacheKeyData.callId !== callId ) {
+		if ( cacheKeyData.callId !== callId ) {
 
 			const environmentNode = this.getEnvironmentNode( scene );
 			const fogNode = this.getFogNode( scene );
 
-			const values = [];
+			if ( lightsNode ) _cacheKeyValues.push( lightsNode.getCacheKey( true ) );
+			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
+			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
-			if ( lightsNode ) values.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) values.push( environmentNode.getCacheKey() );
-			if ( fogNode ) values.push( fogNode.getCacheKey() );
+			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
-			values.push( this.renderer.shadowMap.enabled ? 1 : 0 );
-
-			cacheKeyData = {
-				callId,
-				cacheKey: hashArray( values )
-			};
+			cacheKeyData.callId = callId;
+			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
 
 			this.callHashCache.set( _chainKeys, cacheKeyData );
+
+			_cacheKeyValues.length = 0;
 
 		}
 
