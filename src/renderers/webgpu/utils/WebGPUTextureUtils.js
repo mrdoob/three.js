@@ -698,7 +698,8 @@ class WebGPUTextureUtils {
 
 		device.queue.copyExternalImageToTexture(
 			{
-				source: image
+				source: image,
+				flipY: flipY
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
@@ -709,12 +710,6 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: 1
 			}
 		);
-
-		if ( flipY === true ) {
-
-			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
-
-		}
 
 	}
 
