@@ -214,7 +214,7 @@ export const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, 
 
 } );
 
-const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+export const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );
@@ -241,7 +241,7 @@ const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt
 
 } );
 
-const getSample = /*@__PURE__*/ Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+const getSample = /*@__PURE__*/ Fn( ( { outputDirection, theta, axis, sampler } ) => {
 
 	const cosTheta = cos( theta );
 
@@ -250,11 +250,11 @@ const getSample = /*@__PURE__*/ Fn( ( { envMap, mipInt, outputDirection, theta, 
 		.add( axis.cross( outputDirection ).mul( sin( theta ) ) )
 		.add( axis.mul( axis.dot( outputDirection ).mul( cosTheta.oneMinus() ) ) );
 
-	return bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+	return sampler( sampleDirection );
 
 } );
 
-export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, sampler } ) => {
 
 	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
@@ -267,7 +267,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 	axis.assign( normalize( axis ) );
 
 	const gl_FragColor = vec3().toVar();
-	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
+	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, sampler } ) ) );
 
 	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
 
@@ -278,11 +278,59 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 		} );
 
 		const theta = float( dTheta.mul( float( i ) ) ).toVar();
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
+		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, sampler } ) ) );
+		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, sampler } ) ) );
 
 	} );
 
 	return vec4( gl_FragColor, 1 );
 
 } );
+
+export const getBlurParams = ( sigmaRadians, cubeRes, maxSamples )=>{
+
+	// Number of standard deviations at which to cut off the discrete approximation.
+	const STANDARD_DEVIATIONS = 3;
+
+	const radiansPerPixel = Math.PI / ( 2 * cubeRes );
+	const sigmaPixels = sigmaRadians / radiansPerPixel;
+	const samples = 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels );
+
+	if ( samples > maxSamples ) {
+
+		console.warn( `sigmaRadians, ${
+			sigmaRadians}, is too large and will clip, as it requested ${
+			samples} samples when the maximum is set to ${maxSamples}` );
+
+	}
+
+	const weights = new Array( maxSamples ).fill( 0 );
+	let sum = 0;
+
+	for ( let i = 0; i < samples; ++ i ) {
+
+		const x = i / sigmaPixels;
+		const weight = Math.exp( - x * x / 2 );
+		weights[ i ] = weight;
+
+		if ( i === 0 ) {
+
+			sum += weight;
+
+		} else {
+
+			sum += 2 * weight;
+
+		}
+
+	}
+
+	for ( let i = 0; i < weights.length; i ++ ) {
+
+		weights[ i ] = weights[ i ] / sum;
+
+	}
+
+	return { radiansPerPixel, samples, weights };
+
+};

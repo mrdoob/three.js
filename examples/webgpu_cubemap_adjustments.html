@@ -72,6 +72,12 @@
 				cube2Texture.generateMipmaps = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				await renderer.init();
+
+				const cube2Blur = new THREE.CubeRenderTarget(cube2Texture.source.data[0].width);
+				cube2Blur.fromCubeTexture(renderer, cube2Texture, 0.1);
+
 				// nodes and environment
 
 				const adjustments = {
@@ -95,7 +101,7 @@
 
 					const custom1UV = reflectNode.xyz.mul( uniform( rotateY1Matrix ) );
 					const custom2UV = reflectNode.xyz.mul( uniform( rotateY2Matrix ) );
-					const mixCubeMaps = mix( pmremTexture( cube1Texture, custom1UV ), pmremTexture( cube2Texture, custom2UV ), positionNode.y.add( mixNode ).clamp() );
+					const mixCubeMaps = mix( pmremTexture( cube1Texture, custom1UV ), pmremTexture( cube2Blur.texture, custom2UV ), positionNode.y.add( mixNode ).clamp() );
 
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
 
@@ -133,7 +139,6 @@
 
 				// renderer and controls
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.LinearToneMapping;
