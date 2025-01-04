@@ -26,8 +26,9 @@ class VarNode extends Node {
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
 	 * @param {String?} name - The name of the variable in the shader.
+	 * @param {String?} readOnly - The read-only flag.
 	 */
-	constructor( node, name = null ) {
+	constructor( node, name = null, readOnly = false ) {
 
 		super();
 
@@ -64,6 +65,24 @@ class VarNode extends Node {
 		 */
 		this.isVarNode = true;
 
+		/**
+		 *
+		 * The read-only flag.
+		 *
+		 * @type {String}
+		 * @default 'var'
+		 */
+		this.readOnly = readOnly;
+
+	}
+
+
+	toReadOnly() {
+
+		this.readOnly = true;
+
+		return this;
+
 	}
 
 	getHash( builder ) {
@@ -80,15 +99,27 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const { node, name } = this;
+		const { node, name, readOnly } = this;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, readOnly );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		const snippet = node.build( builder, nodeVar.type );
 
-		builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
+		if ( readOnly === true ) {
+
+			const isLet = builder.renderer.backend.isWebGPUBackend === true ? 'let' : 'const';
+
+			const type = builder.getType( nodeVar.type );
+
+			builder.addLineFlowCode( `const ${type} ${propertyName} = ${snippet}`, this );
+
+		} else {
+
+			builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
+
+		}
 
 		return propertyName;
 
@@ -109,6 +140,8 @@ export default VarNode;
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
+
+addMethodChaining( 'toConst', ( ...params ) => createVar( ...params ).append().toReadOnly() );
 
 // Deprecated
 

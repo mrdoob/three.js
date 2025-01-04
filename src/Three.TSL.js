@@ -219,6 +219,7 @@ export const lights = TSL.lights;
 export const linearDepth = TSL.linearDepth;
 export const linearToneMapping = TSL.linearToneMapping;
 export const localId = TSL.localId;
+export const globalId = TSL.globalId;
 export const log = TSL.log;
 export const log2 = TSL.log2;
 export const logarithmicDepthToViewZ = TSL.logarithmicDepthToViewZ;
