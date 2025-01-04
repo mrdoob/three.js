@@ -7,12 +7,12 @@ import {
 const _pointer = new Vector2();
 const _event = { type: '', data: _pointer };
 
-
 // TODO: Dispatch pointerevents too
+
 /**
  * The XR events that are mapped to "standard" pointer events
  */
-const events = {
+const _events = {
 	'move': 'mousemove',
 	'select': 'click',
 	'selectstart': 'mousedown',
@@ -23,15 +23,17 @@ const _raycaster = new Raycaster();
 
 class InteractiveGroup extends Group {
 
-	raycaster = new Raycaster();
-
-	element = undefined;
-	camera = undefined;
-	controllers = [];
-
 	constructor() {
 
 		super();
+
+		this.raycaster = new Raycaster();
+
+		this.element = null;
+		this.camera = null;
+
+		this.controllers = [];
+
 		this._onPointerEvent = this.onPointerEvent.bind( this );
 		this._onXRControllerEvent = this.onXRControllerEvent.bind( this );
 
@@ -66,6 +68,30 @@ class InteractiveGroup extends Group {
 
 	}
 
+	onXRControllerEvent( event ) {
+
+		const controller = event.target;
+
+		_raycaster.setFromXRController( controller );
+
+		const intersections = _raycaster.intersectObjects( this.children, false );
+
+		if ( intersections.length > 0 ) {
+
+			const intersection = intersections[ 0 ];
+
+			const object = intersection.object;
+			const uv = intersection.uv;
+
+			_event.type = _events[ event.type ];
+			_event.data.set( uv.x, 1 - uv.y );
+
+			object.dispatchEvent( _event );
+
+		}
+
+	}
+
 	listenToPointerEvents( renderer, camera ) {
 
 		this.camera = camera;
@@ -83,46 +109,15 @@ class InteractiveGroup extends Group {
 
 	disconnectionPointerEvents() {
 
-		this.element?.removeEventListener( 'pointerdown', this._onPointerEvent );
-		this.element?.removeEventListener( 'pointerup', this._onPointerEvent );
-		this.element?.removeEventListener( 'pointermove', this._onPointerEvent );
-		this.element?.removeEventListener( 'mousedown', this._onPointerEvent );
-		this.element?.removeEventListener( 'mouseup', this._onPointerEvent );
-		this.element?.removeEventListener( 'mousemove', this._onPointerEvent );
-		this.element?.removeEventListener( 'click', this._onPointerEvent );
+		if ( this.element !== null ) {
 
-	}
-
-	disconnect() {
-
-		this.disconnectionPointerEvents();
-		this.disconnectXrControllerEvents();
-
-		this.camera = undefined;
-		this.controllers = [];
-		this.element = undefined;
-
-	}
-
-	onXRControllerEvent( event ) {
-
-		const controller = event.target;
-
-		_raycaster.setFromXRController( controller );
-
-		const intersections = _raycaster.intersectObjects( this.children, false );
-
-		if ( intersections.length > 0 ) {
-
-			const intersection = intersections[ 0 ];
-
-			const object = intersection.object;
-			const uv = intersection.uv;
-
-			_event.type = events[ event.type ];
-			_event.data.set( uv.x, 1 - uv.y );
-
-			object.dispatchEvent( _event );
+			this.element.removeEventListener( 'pointerdown', this._onPointerEvent );
+			this.element.removeEventListener( 'pointerup', this._onPointerEvent );
+			this.element.removeEventListener( 'pointermove', this._onPointerEvent );
+			this.element.removeEventListener( 'mousedown', this._onPointerEvent );
+			this.element.removeEventListener( 'mouseup', this._onPointerEvent );
+			this.element.removeEventListener( 'mousemove', this._onPointerEvent );
+			this.element.removeEventListener( 'click', this._onPointerEvent );
 
 		}
 
@@ -150,6 +145,19 @@ class InteractiveGroup extends Group {
 		}
 
 	}
+
+	disconnect() {
+
+		this.disconnectionPointerEvents();
+		this.disconnectXrControllerEvents();
+
+		this.camera = null;
+		this.element = null;
+
+		this.controllers = [];
+
+	}
+
 
 }
 
