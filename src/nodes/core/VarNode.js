@@ -116,17 +116,11 @@ class VarNode extends Node {
 		}
 
 		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const snippet = node.build( builder, vectorType );
+
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
 
-		if ( shouldTreatAsReadOnly ) {
-
-			nodeVar.name += '_readOnly';
-
-		}
-
 		const propertyName = builder.getPropertyName( nodeVar );
-
-		const snippet = node.build( builder, nodeVar.type );
 
 		let declarationPrefix = propertyName;
 

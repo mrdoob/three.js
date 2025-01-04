@@ -1605,9 +1605,18 @@ class NodeBuilder {
 
 		if ( nodeVar === undefined ) {
 
-			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
+			const idNS = readOnly ? '_const' : '_var';
 
-			if ( name === null ) name = 'nodeVar' + vars.length;
+			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
+			const id = this.vars[ idNS ] || ( this.vars[ idNS ] = 0 );
+
+			if ( name === null ) {
+
+				name = ( readOnly ? 'nodeConst' : 'nodeVar' ) + id;
+
+				this.vars[ idNS ] ++;
+
+			}
 
 			nodeVar = new NodeVar( name, type, readOnly );
 
