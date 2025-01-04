@@ -100,31 +100,38 @@ class VarNode extends Node {
 	generate( builder ) {
 
 		const { node, name, readOnly } = this;
+		const { renderer } = builder;
 
-		// TODO: Is it enough to detect if a node is a constant and never reassigned?
-		const isWebGPUBackend = builder.renderer.backend.isWebGPUBackend === true;
-		const isConst = ( node.type === 'MathNode' || node.type === 'ConvertNode' || node.type === 'ConstNode' ) && readOnly === true;
-		const isReadOnly = readOnly === true;
+		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
+		const isConstantNode = [
+			'MathNode',
+			'ConvertNode',
+			'ConstNode'
+		].includes( node.type );
+		const isImmutableNode = isConstantNode && readOnly;
 
-		const read = isWebGPUBackend ? readOnly : isConst && isReadOnly;
+		const shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isImmutableNode && readOnly;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, read );
-
+		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		const snippet = node.build( builder, nodeVar.type );
 
-
-
-		if ( isReadOnly && ( isConst || isWebGPUBackend ) ) {
-
+		if ( readOnly && ( isImmutableNode || isWebGPUBackend ) ) {
 
 			const type = builder.getType( nodeVar.type );
-			let declaration = `const ${type} ${propertyName}`;
+			let declaration;
 
 			if ( isWebGPUBackend ) {
 
-				declaration = isConst ? `const ${propertyName}: ${type}` : `let ${propertyName}`;
+				declaration = isImmutableNode
+					? `const ${propertyName}: ${type}`
+					: `let ${propertyName}`;
+
+			} else {
+
+				declaration = `const ${type} ${propertyName}`;
 
 			}
 
