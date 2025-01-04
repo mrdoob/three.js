@@ -118,30 +118,27 @@ class VarNode extends Node {
 
 		const snippet = node.build( builder, nodeVar.type );
 
+		let declarationPrefix = propertyName;
+
 		if ( readOnly && ( isImmutableNode || isWebGPUBackend ) ) {
 
 			const type = builder.getType( nodeVar.type );
-			let declaration;
 
 			if ( isWebGPUBackend ) {
 
-				declaration = isImmutableNode
+				declarationPrefix = isImmutableNode
 					? `const ${propertyName}: ${type}`
 					: `let ${propertyName}`;
 
 			} else {
 
-				declaration = `const ${type} ${propertyName}`;
+				declarationPrefix = `const ${type} ${propertyName}`;
 
 			}
 
-			builder.addLineFlowCode( `${declaration} = ${snippet}`, this );
-
-		} else {
-
-			builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
-
 		}
+
+		builder.addLineFlowCode( `${declarationPrefix} = ${snippet}`, this );
 
 		return propertyName;
 
