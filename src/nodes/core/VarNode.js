@@ -102,9 +102,13 @@ class VarNode extends Node {
 		const { node, name, readOnly } = this;
 
 		// TODO: Is it enough to detect if a node is a constant and never reassigned?
+		const isWebGPUBackend = builder.renderer.backend.isWebGPUBackend === true;
 		const isConst = ( node.type === 'MathNode' || node.type === 'ConvertNode' || node.type === 'ConstNode' ) && readOnly === true;
+		const isReadOnly = readOnly === true;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, isConst );
+		const read = isWebGPUBackend ? readOnly : isConst && isReadOnly;
+
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, read );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
@@ -112,19 +116,19 @@ class VarNode extends Node {
 
 
 
-		if ( readOnly === true && ( isConst === true || builder.renderer.backend.isWebGPUBackend === true ) ) {
+		if ( isReadOnly && ( isConst || isWebGPUBackend ) ) {
 
 
 			const type = builder.getType( nodeVar.type );
-			let declarationType = `const ${type}`;
+			let declaration = `const ${type} ${propertyName}`;
 
-			if ( builder.renderer.backend.isWebGPUBackend === true ) {
+			if ( isWebGPUBackend ) {
 
-				declarationType = isConst ? `const ${type}` : 'let';
+				declaration = isConst ? `const ${propertyName}: ${type}` : `let ${propertyName}`;
 
 			}
 
-			builder.addLineFlowCode( `${declarationType} ${propertyName} = ${snippet}`, this );
+			builder.addLineFlowCode( `${declaration} = ${snippet}`, this );
 
 		} else {
 
