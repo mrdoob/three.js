@@ -158,7 +158,6 @@ class InteractiveGroup extends Group {
 
 	}
 
-
 }
 
 export { InteractiveGroup };
