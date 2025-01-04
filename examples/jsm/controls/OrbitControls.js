@@ -1327,6 +1327,25 @@ function onMouseDown( event ) {
 
 function onMouseMove( event ) {
 
+	// Check for state transitions in both directions
+	if (this.state === _STATE.PAN && !(event.ctrlKey || event.metaKey || event.shiftKey)) {
+		// Switch back to rotate state immediately when modifiers are released
+		if (this.enableRotate) {
+			this.state = _STATE.ROTATE;
+			this._handleMouseDownRotate(event);
+		} else {
+			this.state = _STATE.NONE;
+		}
+	} else if (this.state === _STATE.ROTATE && (event.ctrlKey || event.metaKey || event.shiftKey)) {
+		// Switch to pan state immediately when modifiers are pressed
+		if (this.enablePan) {
+			this.state = _STATE.PAN;
+			this._handleMouseDownPan(event);
+		} else {
+			this.state = _STATE.NONE;
+		}
+	}
+
 	switch ( this.state ) {
 
 		case _STATE.ROTATE:
