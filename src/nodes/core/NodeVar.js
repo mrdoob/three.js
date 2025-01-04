@@ -11,9 +11,9 @@ class NodeVar {
 	 *
 	 * @param {String} name - The name of the variable.
 	 * @param {String} type - The type of the variable.
-	 * @param {String} declarationType - The declaration type of the variable.
+	 * @param {Boolean} readOnly - The read-only flag.
 	 */
-	constructor( name, type, declarationType = 'var' ) {
+	constructor( name, type, readOnly = false ) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -39,11 +39,11 @@ class NodeVar {
 		this.type = type;
 
 		/**
-		 * The declaration type of the variable.
+		 *  The read-only flag.
 		 *
-		 * @type {String}
+		 * @type {boolean}
 		 */
-		this.declarationType = declarationType;
+		this.readOnly = readOnly;
 
 	}
 

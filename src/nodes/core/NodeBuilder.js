@@ -1593,11 +1593,11 @@ class NodeBuilder {
 	 * @param {String?} name - The variable's name.
 	 * @param {String} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
-	 * @param {String} [declarationType='var'] - The variable's declaration type.
+	 * @param {Boolean} [readOnly=false] - Whether the variable is read-only or not.
 	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, declarationType ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -1609,9 +1609,13 @@ class NodeBuilder {
 
 			if ( name === null ) name = 'nodeVar' + vars.length;
 
-			nodeVar = new NodeVar( name, type, declarationType );
+			nodeVar = new NodeVar( name, type, readOnly );
 
-			vars.push( nodeVar );
+			if ( ! readOnly ) {
+
+				vars.push( nodeVar );
+
+			}
 
 			nodeData.variable = nodeVar;
 

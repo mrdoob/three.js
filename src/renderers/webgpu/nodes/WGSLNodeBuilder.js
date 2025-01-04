@@ -1068,12 +1068,6 @@ ${ flowData.code }
 
 			for ( const variable of vars ) {
 
-				if ( variable.declarationType === 'let' ) {
-
-					continue;
-
-				}
-
 				snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
 
 			}

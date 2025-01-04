@@ -26,9 +26,9 @@ class VarNode extends Node {
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
 	 * @param {String?} name - The name of the variable in the shader.
-	 * @param {String?} declarationType - The type of the declaration ('var' or 'let').
+	 * @param {String?} readOnly - The read-only flag.
 	 */
-	constructor( node, name = null, declarationType = 'var' ) {
+	constructor( node, name = null, readOnly = false ) {
 
 		super();
 
@@ -67,26 +67,21 @@ class VarNode extends Node {
 
 		/**
 		 *
-		 * The type of the declaration ('var' or 'let').
+		 * The read-only flag.
 		 *
 		 * @type {String}
 		 * @default 'var'
 		 */
-		this.declarationType = declarationType;
+		this.readOnly = readOnly;
 
 	}
 
 
-	setDeclarationType( declarationType ) {
+	toReadOnly() {
 
-		this.declarationType = declarationType;
+		this.readOnly = true;
+
 		return this;
-
-	}
-
-	getDeclarationType() {
-
-		return this.declarationType;
 
 	}
 
@@ -104,17 +99,21 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const { node, name, declarationType } = this;
+		const { node, name, readOnly } = this;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, declarationType );
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, readOnly );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		const snippet = node.build( builder, nodeVar.type );
 
-		if ( builder.renderer.backend.isWebGPUBackend === true && declarationType === 'let' ) {
+		if ( readOnly === true ) {
 
-			builder.addLineFlowCode( `let ${propertyName} = ${snippet}`, this );
+			const isLet = builder.renderer.backend.isWebGPUBackend === true ? 'let' : 'const';
+
+			const type = builder.getType( nodeVar.type );
+
+			builder.addLineFlowCode( `const ${type} ${propertyName} = ${snippet}`, this );
 
 		} else {
 
@@ -142,7 +141,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
 
-addMethodChaining( 'toLet', ( ...params ) => createVar( ...params ).append().setDeclarationType( 'let' ) );
+addMethodChaining( 'toConst', ( ...params ) => createVar( ...params ).append().toReadOnly() );
 
 // Deprecated
 
