@@ -11,7 +11,7 @@ class NodeVar {
 	 *
 	 * @param {String} name - The name of the variable.
 	 * @param {String} type - The type of the variable.
-	 * @param {Boolean} readOnly - The read-only flag.
+	 * @param {Boolean} [readOnly=false] - The read-only flag.
 	 */
 	constructor( name, type, readOnly = false ) {
 

@@ -26,7 +26,7 @@ class VarNode extends Node {
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
 	 * @param {String?} name - The name of the variable in the shader.
-	 * @param {String?} readOnly - The read-only flag.
+	 * @param {Boolean?} readOnly - The read-only flag.
 	 */
 	constructor( node, name = null, readOnly = false ) {
 
@@ -69,8 +69,8 @@ class VarNode extends Node {
 		 *
 		 * The read-only flag.
 		 *
-		 * @type {String}
-		 * @default 'var'
+		 * @type {Boolean}
+		 * @default false
 		 */
 		this.readOnly = readOnly;
 
