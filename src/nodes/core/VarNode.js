@@ -101,19 +101,30 @@ class VarNode extends Node {
 
 		const { node, name, readOnly } = this;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, readOnly );
+		// TODO: Is it enough to detect if a node is a constant and never reassigned?
+		const isConst = ( node.type === 'MathNode' || node.type === 'ConvertNode' || node.type === 'ConstNode' ) && readOnly === true;
+
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ), undefined, isConst );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		const snippet = node.build( builder, nodeVar.type );
 
-		if ( readOnly === true ) {
 
-			const isLet = builder.renderer.backend.isWebGPUBackend === true ? 'let' : 'const';
+
+		if ( readOnly === true && ( isConst === true || builder.renderer.backend.isWebGPUBackend === true ) ) {
+
 
 			const type = builder.getType( nodeVar.type );
+			let declarationType = `const ${type}`;
 
-			builder.addLineFlowCode( `const ${type} ${propertyName} = ${snippet}`, this );
+			if ( builder.renderer.backend.isWebGPUBackend === true ) {
+
+				declarationType = isConst ? `const ${type}` : 'let';
+
+			}
+
+			builder.addLineFlowCode( `${declarationType} ${propertyName} = ${snippet}`, this );
 
 		} else {
 
