@@ -1626,6 +1626,35 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether a Node or its flow is deterministic, useful for use in `const`.
+	 *
+	 * @param {Node} node - The varying node.
+	 * @return {Boolean} Returns true if deterministic.
+	 */
+	isDeterministic( node ) {
+
+		if ( node.isMathNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true ) &&
+				( node.cNode ? this.isDeterministic( node.cNode ) : true );
+
+		} else if ( node.isOperatorNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true );
+
+		} else if ( node.isConstNode ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
 	 * Returns an instance of {@link NodeVarying} for the given varying node.
 	 *
 	 * @param {(VaryingNode|PropertyNode)} node - The varying node.

@@ -103,14 +103,17 @@ class VarNode extends Node {
 		const { renderer } = builder;
 
 		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
-		const isConstantNode = [
-			'MathNode',
-			'ConvertNode',
-			'ConstNode'
-		].includes( node.type );
-		const isImmutableNode = isConstantNode && readOnly;
 
-		const shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isImmutableNode && readOnly;
+		let isDeterministic = false;
+		let shouldTreatAsReadOnly = false;
+
+		if ( readOnly ) {
+
+			isDeterministic = builder.isDeterministic( node );
+
+			shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isDeterministic;
+
+		}
 
 		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
@@ -120,19 +123,19 @@ class VarNode extends Node {
 
 		let declarationPrefix = propertyName;
 
-		if ( readOnly && ( isImmutableNode || isWebGPUBackend ) ) {
+		if ( shouldTreatAsReadOnly ) {
 
 			const type = builder.getType( nodeVar.type );
 
 			if ( isWebGPUBackend ) {
 
-				declarationPrefix = isImmutableNode
-					? `const ${propertyName}: ${type}`
-					: `let ${propertyName}`;
+				declarationPrefix = isDeterministic
+					? `const ${ propertyName }`
+					: `let ${ propertyName }`;
 
 			} else {
 
-				declarationPrefix = `const ${type} ${propertyName}`;
+				declarationPrefix = `const ${ type } ${ propertyName }`;
 
 			}
 
