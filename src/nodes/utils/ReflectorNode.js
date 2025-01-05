@@ -363,7 +363,7 @@ class ReflectorBaseNode extends Node {
 
 	updateBefore( frame ) {
 
-		if ( this.bounces === false && _inReflector ) return;
+		if ( this.bounces === false && _inReflector ) return false;
 
 		_inReflector = true;
 

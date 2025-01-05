@@ -1,7 +1,7 @@
 import ChainMap from './ChainMap.js';
 import RenderObject from './RenderObject.js';
 
-const _chainArray = [];
+const _chainKeys = [];
 
 /**
  * This module manages the render objects of the renderer.
@@ -92,18 +92,18 @@ class RenderObjects {
 		const chainMap = this.getChainMap( passId );
 
 		// reuse chainArray
-		_chainArray[ 0 ] = object;
-		_chainArray[ 1 ] = material;
-		_chainArray[ 2 ] = renderContext;
-		_chainArray[ 3 ] = lightsNode;
+		_chainKeys[ 0 ] = object;
+		_chainKeys[ 1 ] = material;
+		_chainKeys[ 2 ] = renderContext;
+		_chainKeys[ 3 ] = lightsNode;
 
-		let renderObject = chainMap.get( _chainArray );
+		let renderObject = chainMap.get( _chainKeys );
 
 		if ( renderObject === undefined ) {
 
 			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
-			chainMap.set( _chainArray, renderObject );
+			chainMap.set( _chainKeys, renderObject );
 
 		} else {
 
@@ -132,6 +132,8 @@ class RenderObjects {
 			}
 
 		}
+
+		_chainKeys.length = 0;
 
 		return renderObject;
 

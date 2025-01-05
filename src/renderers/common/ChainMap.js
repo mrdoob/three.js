@@ -32,7 +32,7 @@ export default class ChainMap {
 
 		let map = this.weakMap;
 
-		for ( let i = 0; i < keys.length; i ++ ) {
+		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
 			map = map.get( keys[ i ] );
 
@@ -55,7 +55,7 @@ export default class ChainMap {
 
 		let map = this.weakMap;
 
-		for ( let i = 0; i < keys.length; i ++ ) {
+		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
 			const key = keys[ i ];
 
@@ -81,7 +81,7 @@ export default class ChainMap {
 
 		let map = this.weakMap;
 
-		for ( let i = 0; i < keys.length; i ++ ) {
+		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
 			map = map.get( keys[ i ] );
 

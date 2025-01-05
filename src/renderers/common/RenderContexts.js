@@ -1,5 +1,11 @@
 import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
+import { Scene } from '../../scenes/Scene.js';
+import { Camera } from '../../cameras/Camera.js';
+
+const _chainKeys = [];
+const _defaultScene = /*@__PURE__*/ new Scene();
+const _defaultCamera = /*@__PURE__*/ new Camera();
 
 /**
  * This module manages the render contexts of the renderer.
@@ -26,23 +32,15 @@ class RenderContexts {
 	/**
 	 * Returns a render context for the given scene, camera and render target.
 	 *
-	 * @param {Scene?} [scene=null] - The scene. The parameter can become `null` e.g. when the renderer clears a render target.
-	 * @param {Camera?} [camera=null] - The camera that is used to render the scene. The parameter can become `null` e.g. when the renderer clears a render target.
+	 * @param {Scene} scene - The scene.
+	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {RenderTarget?} [renderTarget=null] - The active render target.
 	 * @return {RenderContext} The render context.
 	 */
-	get( scene = null, camera = null, renderTarget = null ) {
+	get( scene, camera, renderTarget = null ) {
 
-		const chainKey = [];
-		if ( scene !== null ) chainKey.push( scene );
-		if ( camera !== null ) chainKey.push( camera );
-
-		if ( chainKey.length === 0 ) {
-
-			chainKey.push( { id: 'default' } );
-
-		}
-
+		_chainKeys[ 0 ] = scene;
+		_chainKeys[ 1 ] = camera;
 
 		let attachmentState;
 
@@ -59,17 +57,19 @@ class RenderContexts {
 
 		}
 
-		const chainMap = this.getChainMap( attachmentState );
+		const chainMap = this._getChainMap( attachmentState );
 
-		let renderState = chainMap.get( chainKey );
+		let renderState = chainMap.get( _chainKeys );
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
 
-			chainMap.set( chainKey, renderState );
+			chainMap.set( _chainKeys, renderState );
 
 		}
+
+		_chainKeys.length = 0;
 
 		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
@@ -78,12 +78,25 @@ class RenderContexts {
 	}
 
 	/**
+	 * Returns a render context intended for clear operations.
+	 *
+	 * @param {RenderTarget?} [renderTarget=null] - The active render target.
+	 * @return {RenderContext} The render context.
+	 */
+	getForClear( renderTarget = null ) {
+
+		return this.get( _defaultScene, _defaultCamera, renderTarget );
+
+	}
+
+	/**
 	 * Returns a chain map for the given attachment state.
 	 *
+	 * @private
 	 * @param {String} attachmentState - The attachment state.
 	 * @return {ChainMap} The chain map.
 	 */
-	getChainMap( attachmentState ) {
+	_getChainMap( attachmentState ) {
 
 		return this.chainMaps[ attachmentState ] || ( this.chainMaps[ attachmentState ] = new ChainMap() );
 

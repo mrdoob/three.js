@@ -5,6 +5,7 @@
 	"misc_controls_orbit": [ "rotation" ],
 	"misc_controls_trackball": [ "rotation" ],
 	"misc_controls_transform": [ "scale", "rotate", "translate" ],
+	"misc_raycaster_helper": [ "external" ],
 	"physics_ammo_cloth": [ "integration" ],
 	"physics_jolt_instancing": [ "external" ],
 	"physics_rapier_instancing": [ "external" ],

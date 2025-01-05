@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '172dev';
+const REVISION = '172';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -3276,9 +3276,9 @@ class Data3DTexture extends Texture {
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
 		// We're going to add .setXXX() methods for setting properties later.
-		// Users can still set in DataTexture3D directly.
+		// Users can still set in Data3DTexture directly.
 		//
-		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
+		//	const texture = new THREE.Data3DTexture( data, width, height, depth );
 		// 	texture.anisotropy = 16;
 		//
 		// See #14839
@@ -34381,6 +34381,42 @@ class AnimationMixer extends EventDispatcher {
 
 }
 
+class RenderTarget3D extends RenderTarget {
+
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
+
+		super( width, height, options );
+
+		this.isRenderTarget3D = true;
+
+		this.depth = depth;
+
+		this.texture = new Data3DTexture( null, width, height, depth );
+
+		this.texture.isRenderTargetTexture = true;
+
+	}
+
+}
+
+class RenderTargetArray extends RenderTarget {
+
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
+
+		super( width, height, options );
+
+		this.isRenderTargetArray = true;
+
+		this.depth = depth;
+
+		this.texture = new DataArrayTexture( null, width, height, depth );
+
+		this.texture.isRenderTargetTexture = true;
+
+	}
+
+}
+
 class Uniform {
 
 	constructor( value ) {
@@ -54949,6 +54985,8 @@ exports.RedFormat = RedFormat;
 exports.RedIntegerFormat = RedIntegerFormat;
 exports.ReinhardToneMapping = ReinhardToneMapping;
 exports.RenderTarget = RenderTarget;
+exports.RenderTarget3D = RenderTarget3D;
+exports.RenderTargetArray = RenderTargetArray;
 exports.RepeatWrapping = RepeatWrapping;
 exports.ReplaceStencilOp = ReplaceStencilOp;
 exports.ReverseSubtractEquation = ReverseSubtractEquation;

@@ -5,15 +5,47 @@ import {
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 
+/**
+ * A WebGPU backend utility module for managing bindings.
+ *
+ * When reading the documentation it's helpful to keep in mind that
+ * all class definitions starting with 'GPU*' are modules from the
+ * WebGPU API. So for example `BindGroup` is a class from the engine
+ * whereas `GPUBindGroup` is a class from WebGPU.
+ *
+ * @private
+ */
 class WebGPUBindingUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
+
+		/**
+		 * A cache for managing bind group layouts.
+		 *
+		 * @type {WeakMap<Array<Binding>,GPUBindGroupLayout>}
+		 */
 		this.bindGroupLayoutCache = new WeakMap();
 
 	}
 
+	/**
+	 * Creates a GPU bind group layout for the given bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @return {GPUBindGroupLayout} The GPU bind group layout.
+	 */
 	createBindingsLayout( bindGroup ) {
 
 		const backend = this.backend;
@@ -183,6 +215,14 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Creates bindings from the given bind group definition.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
 	createBindings( bindGroup, bindings, cacheIndex, version = 0 ) {
 
 		const { backend, bindGroupLayoutCache } = this;
@@ -236,6 +276,11 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Updates a buffer binding.
+	 *
+	 *  @param {Buffer} binding - The buffer binding to update.
+	 */
 	updateBinding( binding ) {
 
 		const backend = this.backend;
@@ -248,6 +293,13 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Creates a GPU bind group for the given bind group and GPU layout.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {GPUBindGroupLayout} layoutGPU - The GPU bind group layout.
+	 * @return {GPUBindGroup} The GPU bind group.
+	 */
 	createBindGroup( bindGroup, layoutGPU ) {
 
 		const backend = this.backend;

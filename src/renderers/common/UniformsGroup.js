@@ -1,22 +1,59 @@
 import UniformBuffer from './UniformBuffer.js';
 import { GPU_CHUNK_BYTES } from './Constants.js';
 
+/**
+ * This class represents a uniform buffer binding but with
+ * an API that allows to maintain individual uniform objects.
+ *
+ * @private
+ * @augments UniformBuffer
+ */
 class UniformsGroup extends UniformBuffer {
 
+	/**
+	 * Constructs a new uniforms group.
+	 *
+	 * @param {String} name - The group's name.
+	 */
 	constructor( name ) {
 
 		super( name );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isUniformsGroup = true;
 
+		/**
+		 * An array with the raw uniform values.
+		 *
+		 * @private
+		 * @type {Array<Number>?}
+		 * @default null
+		 */
 		this._values = null;
 
-		// the order of uniforms in this array must match the order of uniforms in the shader
-
+		/**
+		 * An array of uniform objects.
+		 *
+		 * The order of uniforms in this array must match the order of uniforms in the shader.
+		 *
+		 * @type {Array<Uniform>}
+		 */
 		this.uniforms = [];
 
 	}
 
+	/**
+	 * Adds a uniform to this group.
+	 *
+	 * @param {Uniform} uniform - The uniform to add.
+	 * @return {UniformsGroup} A reference to this group.
+	 */
 	addUniform( uniform ) {
 
 		this.uniforms.push( uniform );
@@ -25,6 +62,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Removes a uniform from this group.
+	 *
+	 * @param {Uniform} uniform - The uniform to remove.
+	 * @return {UniformsGroup} A reference to this group.
+	 */
 	removeUniform( uniform ) {
 
 		const index = this.uniforms.indexOf( uniform );
@@ -39,6 +82,11 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * An array with the raw uniform values.
+	 *
+	 * @type {Array<Number>}
+	 */
 	get values() {
 
 		if ( this._values === null ) {
@@ -51,6 +99,11 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * A Float32 array buffer with the uniform values.
+	 *
+	 * @type {Float32Array}
+	 */
 	get buffer() {
 
 		let buffer = this._buffer;
@@ -69,6 +122,11 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * The byte length of the buffer with correct buffer alignment.
+	 *
+	 * @type {Number}
+	 */
 	get byteLength() {
 
 		let offset = 0; // global buffer offset in bytes
@@ -110,6 +168,15 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates this group by updating each uniform object of
+	 * the internal uniform list. The uniform objects check if their
+	 * values has actually changed so this method only returns
+	 * `true` if there is a real value change.
+	 *
+	 * @return {Boolean} Whether the uniforms have been updated and
+	 * must be uploaded to the GPU.
+	 */
 	update() {
 
 		let updated = false;
@@ -128,6 +195,13 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given uniform by calling an update method matching
+	 * the uniforms type.
+	 *
+	 * @param {Uniform} uniform - The uniform to update.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateByType( uniform ) {
 
 		if ( uniform.isNumberUniform ) return this.updateNumber( uniform );
@@ -142,6 +216,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Number uniform.
+	 *
+	 * @param {NumberUniform} uniform - The Number uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateNumber( uniform ) {
 
 		let updated = false;
@@ -164,6 +244,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Vector2 uniform.
+	 *
+	 * @param {Vector2Uniform} uniform - The Vector2 uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateVector2( uniform ) {
 
 		let updated = false;
@@ -188,6 +274,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Vector3 uniform.
+	 *
+	 * @param {Vector3Uniform} uniform - The Vector3 uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateVector3( uniform ) {
 
 		let updated = false;
@@ -213,6 +305,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Vector4 uniform.
+	 *
+	 * @param {Vector4Uniform} uniform - The Vector4 uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateVector4( uniform ) {
 
 		let updated = false;
@@ -239,6 +337,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Color uniform.
+	 *
+	 * @param {ColorUniform} uniform - The Color uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateColor( uniform ) {
 
 		let updated = false;
@@ -263,6 +367,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Matrix3 uniform.
+	 *
+	 * @param {Matrix3Uniform} uniform - The Matrix3 uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateMatrix3( uniform ) {
 
 		let updated = false;
@@ -295,6 +405,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Updates a given Matrix4 uniform.
+	 *
+	 * @param {Matrix4Uniform} uniform - The Matrix4 uniform.
+	 * @return {Boolean} Whether the uniform has been updated or not.
+	 */
 	updateMatrix4( uniform ) {
 
 		let updated = false;
@@ -316,6 +432,12 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
+	/**
+	 * Returns a typed array that matches the given data type.
+	 *
+	 * @param {String} type - The data type.
+	 * @return {TypedArray} The typed array.
+	 */
 	_getBufferForType( type ) {
 
 		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) return new Int32Array( this.buffer.buffer );
@@ -326,6 +448,13 @@ class UniformsGroup extends UniformBuffer {
 
 }
 
+/**
+ * Sets the values of the second array to the first array.
+ *
+ * @param {TypedArray} a - The first array.
+ * @param {TypedArray} b - The second array.
+ * @param {Number} offset - An index offset for the first array.
+ */
 function setArray( a, b, offset ) {
 
 	for ( let i = 0, l = b.length; i < l; i ++ ) {
@@ -336,6 +465,14 @@ function setArray( a, b, offset ) {
 
 }
 
+/**
+ * Returns `true` if the given arrays are equal.
+ *
+ * @param {TypedArray} a - The first array.
+ * @param {TypedArray} b - The second array.
+ * @param {Number} offset - An index offset for the first array.
+ * @return {Boolean} Whether the given arrays are equal or not.
+ */
 function arraysEqual( a, b, offset ) {
 
 	for ( let i = 0, l = b.length; i < l; i ++ ) {

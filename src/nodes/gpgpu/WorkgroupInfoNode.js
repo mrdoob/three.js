@@ -105,6 +105,13 @@ class WorkgroupInfoNode extends Node {
 		this.isWorkgroupInfoNode = true;
 
 		/**
+		 * The data type of the array buffer.
+		 *
+		 * @type {String}
+		 */
+		this.elementType = bufferType;
+
+		/**
 		 * TODO.
 		 *
 		 * @type {String}
@@ -138,6 +145,18 @@ class WorkgroupInfoNode extends Node {
 		this.scope = scope;
 
 		return this;
+
+	}
+
+
+	/**
+	 * The data type of the array buffer.
+	 *
+	 * @return {String} The element type.
+	 */
+	getElementType() {
+
+		return this.elementType;
 
 	}
 
