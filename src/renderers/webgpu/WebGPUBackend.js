@@ -38,6 +38,7 @@ class WebGPUBackend extends Backend {
 	 * @param {String} [parameters.powerPreference=undefined] - The power preference.
 	 * @param {Object} [parameters.requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
 	 * @param {GPUDevice} [parameters.device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
+	 * @param {Number} [parameters.outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
 	 */
 	constructor( parameters = {} ) {
 
