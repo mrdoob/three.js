@@ -157,7 +157,7 @@
 			const postProcessScene = new THREE.Scene();
 			const postProcessCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-			const renderTarget = new THREE.WebGL3DRenderTarget( DIMENSIONS.width, DIMENSIONS.height, 4, { count: 4 } );
+			const renderTarget = new THREE.WebGL3DRenderTarget( DIMENSIONS.width, DIMENSIONS.height, 4 );
 			renderTarget.texture.format = THREE.RedFormat;
 
 			const postProcessMaterial = new THREE.RawShaderMaterial( {
@@ -281,7 +281,27 @@
 			function renderTo3DTexture() {
 
 				renderer.setRenderTarget( renderTarget );
+			
+				const gl = renderer.getContext();
+				const drawBuffersArray = [ gl.COLOR_ATTACHMENT0 ];
+				const glTexture = renderer.properties.get( renderTarget.texture ).__webglTexture;
+			
+				for ( let i = 1; i < 4; i ++ ) {
+
+					gl.framebufferTextureLayer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, glTexture, 0, i );
+			
+					drawBuffersArray.push( gl.COLOR_ATTACHMENT0 + i );
+			
+				}
+
+				// set draw buffers state for MRT
+				gl.drawBuffers( drawBuffersArray );
+
 				renderer.render( postProcessScene, postProcessCamera );
+			
+				// restore draw buffers state
+				gl.drawBuffers( [ gl.COLOR_ATTACHMENT0 ] );
+
 				renderer.setRenderTarget( null );
 
 			}
