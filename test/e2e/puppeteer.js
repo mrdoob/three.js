@@ -47,6 +47,7 @@ const exceptionList = [
 	'webgl_materials_video',
 	'webgl_video_kinect',
 	'webgl_video_panorama_equirectangular',
+	'webgpu_video_frame',
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 

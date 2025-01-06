@@ -41,7 +41,8 @@
     "CodeMirror": "readonly",
     "esprima": "readonly",
     "jsonlint": "readonly",
-    "VideoFrame": "readonly"
+    "VideoFrame": "readonly",
+    "VideoDecoder": "readonly"
   },
   "rules": {
     "no-throw-literal": [
