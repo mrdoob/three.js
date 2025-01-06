@@ -54,7 +54,7 @@ function getKeys( obj ) {
  *
  * @private
  */
-export default class RenderObject {
+class RenderObject {
 
 	/**
 	 * Constructs a new render object.
@@ -752,3 +752,5 @@ export default class RenderObject {
 	}
 
 }
+
+export default RenderObject;

@@ -451,6 +451,7 @@ class UniformsGroup extends UniformBuffer {
 /**
  * Sets the values of the second array to the first array.
  *
+ * @private
  * @param {TypedArray} a - The first array.
  * @param {TypedArray} b - The second array.
  * @param {Number} offset - An index offset for the first array.
@@ -468,6 +469,7 @@ function setArray( a, b, offset ) {
 /**
  * Returns `true` if the given arrays are equal.
  *
+ * @private
  * @param {TypedArray} a - The first array.
  * @param {TypedArray} b - The second array.
  * @param {Number} offset - An index offset for the first array.
