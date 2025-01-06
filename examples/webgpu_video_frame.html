@@ -5,11 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				touch-action: none;
-			}
-		</style>
 	</head>
 	<body>
 		<div id="info">
@@ -17,13 +12,6 @@
 			Decodes all frames from an MP4 file and renders them onto a plane as fast as possible.<br/>
 			<a href="https://github.com/gpac/mp4box.js/" target="_blank" rel="noopener">mp4box.js</a> used for MP4 parsing.
 		</div>
-
-		<div id="container"></div>
-
-		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
-			<source src="textures/pano.webm">
-			<source src="textures/pano.mp4">
-		</video>
 
 		<script type="importmap">
 			{
@@ -47,8 +35,6 @@
 			init();
 
 			function init() {
-
-				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, .25, 10 );
 				camera.position.set( 0, 0, 1 );
@@ -101,7 +87,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
