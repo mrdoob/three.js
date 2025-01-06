@@ -6,7 +6,7 @@
  *
  * @private
  */
-export default class ChainMap {
+class ChainMap {
 
 	/**
 	 * Constructs a new chained map.
@@ -94,3 +94,5 @@ export default class ChainMap {
 	}
 
 }
+
+export default ChainMap;
