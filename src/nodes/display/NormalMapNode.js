@@ -59,8 +59,8 @@ class NormalMapNode extends TempNode {
 	/**
 	 * Constructs a new normal map node.
 	 *
-	 * @param {Node} node - Represents the normal map data.
-	 * @param {Node?} [scaleNode=null] - Controls the intensity of the effect.
+	 * @param {Node<vec3>} node - Represents the normal map data.
+	 * @param {Node<vec2>?} [scaleNode=null] - Controls the intensity of the effect.
 	 */
 	constructor( node, scaleNode = null ) {
 
@@ -69,14 +69,14 @@ class NormalMapNode extends TempNode {
 		/**
 		 * Represents the normal map data.
 		 *
-		 * @type {Node}
+		 * @type {Node<vec3>}
 		 */
 		this.node = node;
 
 		/**
 		 * Controls the intensity of the effect.
 		 *
-		 * @type {Node?}
+		 * @type {Node<vec2>?}
 		 * @default null
 		 */
 		this.scaleNode = scaleNode;
@@ -142,8 +142,8 @@ export default NormalMapNode;
  * TSL function for creating a normal map node.
  *
  * @function
- * @param {Node} node - Represents the normal map data.
- * @param {Node?} [scaleNode=null] - Controls the intensity of the effect.
+ * @param {Node<vec3>} node - Represents the normal map data.
+ * @param {Node<vec2>?} [scaleNode=null] - Controls the intensity of the effect.
  * @returns {NormalMapNode}
  */
 export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );

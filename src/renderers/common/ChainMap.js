@@ -2,14 +2,14 @@
  * Data structure for the renderer. It allows defining values
  * with chained, hierarchical keys. Keys are meant to be
  * objects since the module internally works with Weak Maps
- * for perforamnce reasons.
+ * for performance reasons.
  *
  * @private
  */
 class ChainMap {
 
 	/**
-	 * Constructs a new chained map.
+	 * Constructs a new Chain Map.
 	 */
 	constructor() {
 
@@ -49,7 +49,7 @@ class ChainMap {
 	 *
 	 * @param {Array<Object>} keys - List of keys.
 	 * @param {Any} value - The value to set.
-	 * @return {ChainMap} A reference to this chain map.
+	 * @return {ChainMap} A reference to this Chain Map.
 	 */
 	set( keys, value ) {
 
