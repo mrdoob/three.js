@@ -1,5 +1,7 @@
 import MP4Box from 'https://cdn.jsdelivr.net/npm/mp4box@0.5.3/+esm';
 
+// From: https://w3c.github.io/webcodecs/samples/video-decode-display/
+
 // Wraps an MP4Box File as a WritableStream underlying sink.
 class MP4FileSink {
   #setStatus = null;
