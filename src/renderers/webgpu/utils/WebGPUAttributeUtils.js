@@ -83,7 +83,7 @@ class WebGPUAttributeUtils {
 
 						for ( let i = 0; i < array.length; i ++ ) {
 
-							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff;
+							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff; // use correct primitive restart index
 
 						}
 
