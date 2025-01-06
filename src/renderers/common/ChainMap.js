@@ -9,7 +9,7 @@
 class ChainMap {
 
 	/**
-	 * Constructs a new chained map.
+	 * Constructs a new chain map.
 	 */
 	constructor() {
 

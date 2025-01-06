@@ -520,7 +520,7 @@ export const materialReflectivity = /*@__PURE__*/ nodeImmutable( MaterialNode, M
 
 /**
  * TSL object that represents the roughness of the current material.
- * The value is composed via `roughness` * `roughnessMap.g`
+ * The value is composed via `roughness` * `roughnessMap.g`.
  *
  * @type {Node<float>}
  */
@@ -528,7 +528,7 @@ export const materialRoughness = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
 
 /**
  * TSL object that represents the metalness of the current material.
- * The value is composed via `metalness` * `metalnessMap.b`
+ * The value is composed via `metalness` * `metalnessMap.b`.
  *
  * @type {Node<float>}
  */
@@ -552,7 +552,7 @@ export const materialClearcoat = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
 
 /**
  * TSL object that represents the clearcoat roughness of the current material.
- * The value is composed via `clearcoatRoughness` * `clearcoatRoughnessMap.r`
+ * The value is composed via `clearcoatRoughness` * `clearcoatRoughnessMap.r`.
  *
  * @type {Node<float>}
  */
@@ -583,7 +583,7 @@ export const materialSheen = /*@__PURE__*/ nodeImmutable( MaterialNode, Material
 
 /**
  * TSL object that represents the sheen roughness of the current material.
- * The value is composed via `sheenRoughness` * `sheenRoughnessMap.a` .
+ * The value is composed via `sheenRoughness` * `sheenRoughnessMap.a`.
  *
  * @type {Node<float>}
  */
