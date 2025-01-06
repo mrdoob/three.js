@@ -21,6 +21,7 @@ export { Line } from './objects/Line.js';
 export { Points } from './objects/Points.js';
 export { Group } from './objects/Group.js';
 export { VideoTexture } from './textures/VideoTexture.js';
+export { VideoFrameTexture } from './textures/VideoFrameTexture.js';
 export { FramebufferTexture } from './textures/FramebufferTexture.js';
 export { Source } from './textures/Source.js';
 export { DataTexture } from './textures/DataTexture.js';

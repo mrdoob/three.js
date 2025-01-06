@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2010-2024 Three.js Authors
+ * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, BackSide, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, PointsMaterial, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, BackSide, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, PointsMaterial, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -22423,7 +22423,7 @@ class ChainMap {
 
 		let map = this.weakMap;
 
-		for ( let i = 0; i < keys.length; i ++ ) {
+		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
 			map = map.get( keys[ i ] );
 
@@ -22446,7 +22446,7 @@ class ChainMap {
 
 		let map = this.weakMap;
 
-		for ( let i = 0; i < keys.length; i ++ ) {
+		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
 			const key = keys[ i ];
 
@@ -22472,7 +22472,7 @@ class ChainMap {
 
 		let map = this.weakMap;
 
-		for ( let i = 0; i < keys.length; i ++ ) {
+		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
 			map = map.get( keys[ i ] );
 
@@ -23239,7 +23239,7 @@ class RenderObject {
 
 }
 
-const _chainArray = [];
+const _chainKeys$5 = [];
 
 /**
  * This module manages the render objects of the renderer.
@@ -23330,18 +23330,18 @@ class RenderObjects {
 		const chainMap = this.getChainMap( passId );
 
 		// reuse chainArray
-		_chainArray[ 0 ] = object;
-		_chainArray[ 1 ] = material;
-		_chainArray[ 2 ] = renderContext;
-		_chainArray[ 3 ] = lightsNode;
+		_chainKeys$5[ 0 ] = object;
+		_chainKeys$5[ 1 ] = material;
+		_chainKeys$5[ 2 ] = renderContext;
+		_chainKeys$5[ 3 ] = lightsNode;
 
-		let renderObject = chainMap.get( _chainArray );
+		let renderObject = chainMap.get( _chainKeys$5 );
 
 		if ( renderObject === undefined ) {
 
 			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
-			chainMap.set( _chainArray, renderObject );
+			chainMap.set( _chainKeys$5, renderObject );
 
 		} else {
 
@@ -23370,6 +23370,8 @@ class RenderObjects {
 			}
 
 		}
+
+		_chainKeys$5.length = 0;
 
 		return renderObject;
 
@@ -25577,6 +25579,8 @@ class RenderList {
 
 }
 
+const _chainKeys$4 = [];
+
 /**
  * This renderer module manages the render lists which are unique
  * per scene and camera combination.
@@ -25618,16 +25622,20 @@ class RenderLists {
 	get( scene, camera ) {
 
 		const lists = this.lists;
-		const keys = [ scene, camera ];
 
-		let list = lists.get( keys );
+		_chainKeys$4[ 0 ] = scene;
+		_chainKeys$4[ 1 ] = camera;
+
+		let list = lists.get( _chainKeys$4 );
 
 		if ( list === undefined ) {
 
 			list = new RenderList( this.lighting, scene, camera );
-			lists.set( keys, list );
+			lists.set( _chainKeys$4, list );
 
 		}
+
+		_chainKeys$4.length = 0;
 
 		return list;
 
@@ -25871,6 +25879,10 @@ function getCacheKey( renderContext ) {
 
 }
 
+const _chainKeys$3 = [];
+const _defaultScene = /*@__PURE__*/ new Scene();
+const _defaultCamera = /*@__PURE__*/ new Camera();
+
 /**
  * This module manages the render contexts of the renderer.
  *
@@ -25896,23 +25908,15 @@ class RenderContexts {
 	/**
 	 * Returns a render context for the given scene, camera and render target.
 	 *
-	 * @param {Scene?} [scene=null] - The scene. The parameter can become `null` e.g. when the renderer clears a render target.
-	 * @param {Camera?} [camera=null] - The camera that is used to render the scene. The parameter can become `null` e.g. when the renderer clears a render target.
+	 * @param {Scene} scene - The scene.
+	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {RenderTarget?} [renderTarget=null] - The active render target.
 	 * @return {RenderContext} The render context.
 	 */
-	get( scene = null, camera = null, renderTarget = null ) {
+	get( scene, camera, renderTarget = null ) {
 
-		const chainKey = [];
-		if ( scene !== null ) chainKey.push( scene );
-		if ( camera !== null ) chainKey.push( camera );
-
-		if ( chainKey.length === 0 ) {
-
-			chainKey.push( { id: 'default' } );
-
-		}
-
+		_chainKeys$3[ 0 ] = scene;
+		_chainKeys$3[ 1 ] = camera;
 
 		let attachmentState;
 
@@ -25929,17 +25933,19 @@ class RenderContexts {
 
 		}
 
-		const chainMap = this.getChainMap( attachmentState );
+		const chainMap = this._getChainMap( attachmentState );
 
-		let renderState = chainMap.get( chainKey );
+		let renderState = chainMap.get( _chainKeys$3 );
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
 
-			chainMap.set( chainKey, renderState );
+			chainMap.set( _chainKeys$3, renderState );
 
 		}
+
+		_chainKeys$3.length = 0;
 
 		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
@@ -25948,12 +25954,25 @@ class RenderContexts {
 	}
 
 	/**
+	 * Returns a render context intended for clear operations.
+	 *
+	 * @param {RenderTarget?} [renderTarget=null] - The active render target.
+	 * @return {RenderContext} The render context.
+	 */
+	getForClear( renderTarget = null ) {
+
+		return this.get( _defaultScene, _defaultCamera, renderTarget );
+
+	}
+
+	/**
 	 * Returns a chain map for the given attachment state.
 	 *
+	 * @private
 	 * @param {String} attachmentState - The attachment state.
 	 * @return {ChainMap} The chain map.
 	 */
-	getChainMap( attachmentState ) {
+	_getChainMap( attachmentState ) {
 
 		return this.chainMaps[ attachmentState ] || ( this.chainMaps[ attachmentState ] = new ChainMap() );
 
@@ -40799,6 +40818,15 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the output struct name which is required by
+	 * {@link module:OutputStructNode}.
+	 *
+	 * @abstract
+	 * @return {String} The name of the output struct.
+	 */
+	getOutputStructName() {}
+
+	/**
 	 * Returns a bind group for the given group name and binding.
 	 *
 	 * @private
@@ -41333,10 +41361,11 @@ class NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The texture property name.
 	 * @param {String} uvSnippet - Snippet defining the texture coordinates.
+	 * @param {String?} depthSnippet - Snippet defining the 0-based texture array index to sample.
 	 * @param {String} levelSnippet - Snippet defining the mip level.
 	 * @return {String} The generated shader string.
 	 */
-	generateTextureLod( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
+	generateTextureLod( /* texture, textureProperty, uvSnippet, depthSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -41510,11 +41539,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Whether the given texture needs a conversion to working color space.
+	 * Checks if the given texture requires a manual conversion to the working color space.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to check.
-	 * @return {Boolean} Whether a color space conversion is required or not.
+	 * @return {Boolean} Whether the given texture requires a conversion to working color space or not.
 	 */
 	needsToWorkingColorSpace( /*texture*/ ) {
 
@@ -43880,6 +43909,8 @@ class GLSLNodeParser extends NodeParser {
 }
 
 const _outputNodeMap = new WeakMap();
+const _chainKeys$2 = [];
+const _cacheKeyValues = [];
 
 /**
  * This renderer module manages node-related objects and is the
@@ -44007,10 +44038,13 @@ class Nodes extends DataMap {
 
 		// other groups are updated just when groupNode.needsUpdate is true
 
-		const groupChain = [ groupNode, nodeUniformsGroup ];
+		_chainKeys$2[ 0 ] = groupNode;
+		_chainKeys$2[ 1 ] = nodeUniformsGroup;
 
-		let groupData = this.groupsData.get( groupChain );
-		if ( groupData === undefined ) this.groupsData.set( groupChain, groupData = {} );
+		let groupData = this.groupsData.get( _chainKeys$2 );
+		if ( groupData === undefined ) this.groupsData.set( _chainKeys$2, groupData = {} );
+
+		_chainKeys$2.length = 0;
 
 		if ( groupData.version !== groupNode.version ) {
 
@@ -44253,32 +44287,34 @@ class Nodes extends DataMap {
 	 */
 	getCacheKey( scene, lightsNode ) {
 
-		const chain = [ scene, lightsNode ];
+		_chainKeys$2[ 0 ] = scene;
+		_chainKeys$2[ 1 ] = lightsNode;
+
 		const callId = this.renderer.info.calls;
 
-		let cacheKeyData = this.callHashCache.get( chain );
+		const cacheKeyData = this.callHashCache.get( _chainKeys$2 ) || {};
 
-		if ( cacheKeyData === undefined || cacheKeyData.callId !== callId ) {
+		if ( cacheKeyData.callId !== callId ) {
 
 			const environmentNode = this.getEnvironmentNode( scene );
 			const fogNode = this.getFogNode( scene );
 
-			const values = [];
+			if ( lightsNode ) _cacheKeyValues.push( lightsNode.getCacheKey( true ) );
+			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
+			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
-			if ( lightsNode ) values.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) values.push( environmentNode.getCacheKey() );
-			if ( fogNode ) values.push( fogNode.getCacheKey() );
+			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
-			values.push( this.renderer.shadowMap.enabled ? 1 : 0 );
+			cacheKeyData.callId = callId;
+			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
 
-			cacheKeyData = {
-				callId,
-				cacheKey: hashArray( values )
-			};
+			this.callHashCache.set( _chainKeys$2, cacheKeyData );
 
-			this.callHashCache.set( chain, cacheKeyData );
+			_cacheKeyValues.length = 0;
 
 		}
+
+		_chainKeys$2.length = 0;
 
 		return cacheKeyData.cacheKey;
 
@@ -44949,6 +44985,8 @@ class RenderBundle {
 
 }
 
+const _chainKeys$1 = [];
+
 /**
  * This renderer module manages render bundles.
  *
@@ -44980,16 +45018,20 @@ class RenderBundles {
 	get( bundleGroup, camera ) {
 
 		const bundles = this.bundles;
-		const keys = [ bundleGroup, camera ];
 
-		let bundle = bundles.get( keys );
+		_chainKeys$1[ 0 ] = bundleGroup;
+		_chainKeys$1[ 1 ] = camera;
+
+		let bundle = bundles.get( _chainKeys$1 );
 
 		if ( bundle === undefined ) {
 
 			bundle = new RenderBundle( bundleGroup, camera );
-			bundles.set( keys, bundle );
+			bundles.set( _chainKeys$1, bundle );
 
 		}
+
+		_chainKeys$1.length = 0;
 
 		return bundle;
 
@@ -45200,6 +45242,7 @@ class NodeLibrary {
 }
 
 const _defaultLights = /*@__PURE__*/ new LightsNode();
+const _chainKeys = [];
 
 /**
  * This renderer module manages the lights nodes which are unique
@@ -45247,18 +45290,19 @@ class Lighting extends ChainMap {
 
 		if ( scene.isQuadMesh ) return _defaultLights;
 
-		// tiled lighting
+		_chainKeys[ 0 ] = scene;
+		_chainKeys[ 1 ] = camera;
 
-		const keys = [ scene, camera ];
-
-		let node = this.get( keys );
+		let node = this.get( _chainKeys );
 
 		if ( node === undefined ) {
 
 			node = this.createNode();
-			this.set( keys, node );
+			this.set( _chainKeys, node );
 
 		}
+
+		_chainKeys.length = 0;
 
 		return node;
 
@@ -47083,7 +47127,7 @@ class Renderer {
 
 			const renderTargetData = this._textures.get( renderTarget );
 
-			renderContext = this._renderContexts.get( null, null, renderTarget );
+			renderContext = this._renderContexts.getForClear( renderTarget );
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
 			renderContext.width = renderTargetData.width;
@@ -49173,39 +49217,109 @@ precision highp isampler2DArray;
 precision lowp sampler2DShadow;
 `;
 
+/**
+ * A node builder targeting GLSL.
+ *
+ * This module generates GLSL shader code from node materials and also
+ * generates the respective bindings and vertex buffer definitions. These
+ * data are later used by the renderer to create render and compute pipelines
+ * for render objects.
+ *
+ * @augments NodeBuilder
+ */
 class GLSLNodeBuilder extends NodeBuilder {
 
+	/**
+	 * Constructs a new GLSL node builder renderer.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( object, renderer ) {
 
 		super( object, renderer, new GLSLNodeParser() );
 
+		/**
+		 * A dictionary holds for each shader stage ('vertex', 'fragment', 'compute')
+		 * another dictionary which manages UBOs per group ('render','frame','object').
+		 *
+		 * @type {Object<String,Object<String,NodeUniformsGroup>>}
+		 */
 		this.uniformGroups = {};
+
+		/**
+		 * An array that holds objects defining the varying and attribute data in
+		 * context of Transform Feedback.
+		 *
+		 * @type {Object<String,Map<String,Object>>}
+		 */
 		this.transforms = [];
+
+		/**
+		 * A dictionary that holds for each shader stage a Map of used extensions.
+		 *
+		 * @type {Object<String,Map<String,Object>>}
+		 */
 		this.extensions = {};
+
+		/**
+		 * A dictionary that holds for each shader stage an Array of used builtins.
+		 *
+		 * @type {Object<String,Array<String>>}
+		 */
 		this.builtins = { vertex: [], fragment: [], compute: [] };
 
+		/**
+		 * Whether comparison in shader code are generated with methods or not.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.useComparisonMethod = true;
 
 	}
 
+	/**
+	 * Checks if the given texture requires a manual conversion to the working color space.
+	 *
+	 * @param {Texture} texture - The texture to check.
+	 * @return {Boolean} Whether the given texture requires a conversion to working color space or not.
+	 */
 	needsToWorkingColorSpace( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 
+	/**
+	 * Returns the native shader method name for a given generic name.
+	 *
+	 * @param {String} method - The method name to resolve.
+	 * @return {String} The resolved GLSL method name.
+	 */
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
 
 	}
 
+	/**
+	 * Returns the output struct name. Not relevant for GLSL.
+	 *
+	 * @return {String}
+	 */
 	getOutputStructName() {
 
 		return '';
 
 	}
 
+	/**
+	 * Builds the given shader node.
+	 *
+	 * @param {ShaderNodeInternal} shaderNode - The shader node.
+	 * @return {String} The GLSL function code.
+	 */
 	buildFunctionCode( shaderNode ) {
 
 		const layout = shaderNode.layout;
@@ -49236,6 +49350,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Setups the Pixel Buffer Object (PBO) for the given storage
+	 * buffer node.
+	 *
+	 * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
+	 */
 	setupPBO( storageBufferNode ) {
 
 		const attribute = storageBufferNode.value;
@@ -49304,6 +49424,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns a GLSL snippet that represents the property name of the given node.
+	 *
+	 * @param {Node} node - The node.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The property name.
+	 */
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
 		if ( node.isNodeUniform && node.node.isTextureNode !== true && node.node.isBufferNode !== true ) {
@@ -49316,6 +49443,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Setups the Pixel Buffer Object (PBO) for the given storage
+	 * buffer node.
+	 *
+	 * @param {StorageArrayElementNode} storageArrayElementNode - The storage array element node.
+	 * @return {String} The property name.
+	 */
 	generatePBO( storageArrayElementNode ) {
 
 		const { node, indexNode } = storageArrayElementNode;
@@ -49398,6 +49532,16 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Generates the GLSL snippet that reads a single texel from a texture without sampling or filtering.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {String?} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {String} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {String} The GLSL snippet.
+	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0' ) {
 
 		if ( depthSnippet ) {
@@ -49412,6 +49556,15 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Generates the GLSL snippet for sampling/loading the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {String?} depthSnippet -  A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @return {String} The GLSL snippet.
+	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
 
 		if ( texture.isDepthTexture ) {
@@ -49428,24 +49581,63 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Generates the GLSL snippet when sampling textures with explicit mip level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} levelSnippet - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {String} The GLSL snippet.
+	 */
 	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet ) {
 
 		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
 
 	}
 
+	/**
+	 * Generates the GLSL snippet when sampling textures with a bias to the mip level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} biasSnippet - A GLSL snippet that represents the bias to apply to the mip level before sampling.
+	 * @return {String} The GLSL snippet.
+	 */
 	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		return `texture( ${ textureProperty }, ${ uvSnippet }, ${ biasSnippet } )`;
 
 	}
 
+	/**
+	 * Generates the GLSL snippet for sampling/loading the given texture using explicit gradients.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {Array<String>} gradSnippet - An array holding both gradient GLSL snippets.
+	 * @return {String} The GLSL snippet.
+	 */
 	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet ) {
 
 		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
 	}
 
+	/**
+	 * Generates the GLSL snippet for sampling a depth texture and comparing the sampled depth values
+	 * against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} compareSnippet -  A GLSL snippet that represents the reference value.
+	 * @param {String?} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The GLSL snippet.
+	 */
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -49460,6 +49652,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the variables of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the variables.
+	 */
 	getVars( shaderStage ) {
 
 		const snippets = [];
@@ -49480,6 +49678,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the uniforms of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the uniforms.
+	 */
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
@@ -49597,6 +49801,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the type for a given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @return {String} The type.
+	 */
 	getTypeFromAttribute( attribute ) {
 
 		let nodeType = super.getTypeFromAttribute( attribute );
@@ -49621,6 +49831,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the shader attributes of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the shader attributes.
+	 */
 	getAttributes( shaderStage ) {
 
 		let snippet = '';
@@ -49643,6 +49859,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the members of the given struct type node as a GLSL string.
+	 *
+	 * @param {StructTypeNode} struct - The struct type node.
+	 * @return {String} The GLSL snippet that defines the struct members.
+	 */
 	getStructMembers( struct ) {
 
 		const snippets = [];
@@ -49659,6 +49881,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the structs of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the structs.
+	 */
 	getStructs( shaderStage ) {
 
 		const snippets = [];
@@ -49686,6 +49914,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the varyings of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the varyings.
+	 */
 	getVaryings( shaderStage ) {
 
 		let snippet = '';
@@ -49731,18 +49965,33 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the vertex index builtin.
+	 *
+	 * @return {String} The vertex index.
+	 */
 	getVertexIndex() {
 
 		return 'uint( gl_VertexID )';
 
 	}
 
+	/**
+	 * Returns the instance index builtin.
+	 *
+	 * @return {String} The instance index.
+	 */
 	getInstanceIndex() {
 
 		return 'uint( gl_InstanceID )';
 
 	}
 
+	/**
+	 * Returns the invocation local index builtin.
+	 *
+	 * @return {String} The invocation local index.
+	 */
 	getInvocationLocalIndex() {
 
 		const workgroupSize = this.object.workgroupSize;
@@ -49753,6 +50002,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the draw index builtin.
+	 *
+	 * @return {String?} The drawIndex shader string. Returns `null` if `WEBGL_multi_draw` isn't supported by the device.
+	 */
 	getDrawIndex() {
 
 		const extensions = this.renderer.backend.extensions;
@@ -49767,24 +50021,46 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the front facing builtin.
+	 *
+	 * @return {String} The front facing builtin.
+	 */
 	getFrontFacing() {
 
 		return 'gl_FrontFacing';
 
 	}
 
+	/**
+	 * Returns the frag coord builtin.
+	 *
+	 * @return {String} The frag coord builtin.
+	 */
 	getFragCoord() {
 
 		return 'gl_FragCoord.xy';
 
 	}
 
+	/**
+	 * Returns the frag depth builtin.
+	 *
+	 * @return {String} The frag depth builtin.
+	 */
 	getFragDepth() {
 
 		return 'gl_FragDepth';
 
 	}
 
+	/**
+	 * Enables the given extension.
+	 *
+	 * @param {String} name - The extension name.
+	 * @param {String} behavior - The extension behavior.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage.
+	 */
 	enableExtension( name, behavior, shaderStage = this.shaderStage ) {
 
 		const map = this.extensions[ shaderStage ] || ( this.extensions[ shaderStage ] = new Map() );
@@ -49800,6 +50076,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the enabled extensions of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the enabled extensions.
+	 */
 	getExtensions( shaderStage ) {
 
 		const snippets = [];
@@ -49833,12 +50115,23 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the clip distances builtin.
+	 *
+	 * @return {String} The clip distances builtin.
+	 */
 	getClipDistance() {
 
 		return 'gl_ClipDistance';
 
 	}
 
+	/**
+	 * Whether the requested feature is available or not.
+	 *
+	 * @param {String} name - The requested feature.
+	 * @return {Boolean} Whether the requested feature is supported or not.
+	 */
 	isAvailable( name ) {
 
 		let result = supports$1[ name ];
@@ -49882,12 +50175,22 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Whether to flip texture data along its vertical axis or not.
+	 *
+	 * @return {Boolean} Returns always `true` in context of GLSL.
+	 */
 	isFlipY() {
 
 		return true;
 
 	}
 
+	/**
+	 * Enables hardware clipping.
+	 *
+	 * @param {String} planeCount - The clipping plane count.
+	 */
 	enableHardwareClipping( planeCount ) {
 
 		this.enableExtension( 'GL_ANGLE_clip_cull_distance', 'require' );
@@ -49896,12 +50199,24 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Registers a transform in context of Transform Feedback.
+	 *
+	 * @param {String} varyingName - The varying name.
+	 * @param {AttributeNode} attributeNode - The attribute node.
+	 */
 	registerTransform( varyingName, attributeNode ) {
 
 		this.transforms.push( { varyingName, attributeNode } );
 
 	}
 
+	/**
+	 * Returns the transforms of the given shader stage as a GLSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The GLSL snippet that defines the transforms.
+	 */
 	getTransforms( /* shaderStage  */ ) {
 
 		const transforms = this.transforms;
@@ -49922,6 +50237,14 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns a GLSL struct based on the given name and variables.
+	 *
+	 * @private
+	 * @param {String} name - The struct name.
+	 * @param {String} vars - The struct variables.
+	 * @return {String} The GLSL snippet representing a struct.
+	 */
 	_getGLSLUniformStruct( name, vars ) {
 
 		return `
@@ -49931,6 +50254,13 @@ ${vars}
 
 	}
 
+	/**
+	 * Returns a GLSL vertex shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @return {String} The vertex shader.
+	 */
 	_getGLSLVertexCode( shaderData ) {
 
 		return `#version 300 es
@@ -49973,6 +50303,13 @@ void main() {
 
 	}
 
+	/**
+	 * Returns a GLSL fragment shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @return {String} The vertex shader.
+	 */
 	_getGLSLFragmentCode( shaderData ) {
 
 		return `#version 300 es
@@ -50006,6 +50343,9 @@ void main() {
 
 	}
 
+	/**
+	 * Controls the code build of the shader stages.
+	 */
 	buildCode() {
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
@@ -50086,6 +50426,19 @@ void main() {
 
 	}
 
+	/**
+	 * This method is one of the more important ones since it's responsible
+	 * for generating a matching binding instance for the given uniform node.
+	 *
+	 * These bindings are later used in the renderer to create bind groups
+	 * and layouts.
+	 *
+	 * @param {UniformNode} node - The uniform node.
+	 * @param {String} type - The node data type.
+	 * @param {String} shaderStage - The shader stage.
+	 * @param {String?} [name=null] - An optional uniform name.
+	 * @return {NodeUniform} The node uniform object.
+	 */
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
@@ -50412,7 +50765,7 @@ class Backend {
 	// textures
 
 	/**
-	 * Creates a sampler for the given texture.
+	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to create the sampler for.
@@ -50420,7 +50773,7 @@ class Backend {
 	createSampler( /*texture*/ ) { }
 
 	/**
-	 * Destroys the sampler for the given texture.
+	 * Destroys the GPU sampler for the given texture.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to destroy the sampler for.
@@ -50455,7 +50808,7 @@ class Backend {
 	updateTexture( /*texture, options = {}*/ ) { }
 
 	/**
-	 * Generates mipmaps for the given texture
+	 * Generates mipmaps for the given texture.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture.
@@ -50474,15 +50827,16 @@ class Backend {
 	 * Returns texture data as a typed array.
 	 *
 	 * @abstract
+	 * @async
 	 * @param {Texture} texture - The texture to copy.
 	 * @param {Number} x - The x coordinate of the copy origin.
 	 * @param {Number} y - The y coordinate of the copy origin.
 	 * @param {Number} width - The width of the copy.
 	 * @param {Number} height - The height of the copy.
 	 * @param {Number} faceIndex - The face index.
-	 * @return {TypedArray} The texture data as a typed array.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
+	async copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
 
 	/**
 	 * Copies data of the given source texture to the given destination texture.
@@ -50509,7 +50863,7 @@ class Backend {
 	// attributes
 
 	/**
-	 * Creates the buffer of a shader attribute.
+	 * Creates the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute.
@@ -50517,7 +50871,7 @@ class Backend {
 	createAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Creates the buffer of an indexed shader attribute.
+	 * Creates the GPU buffer of an indexed shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
@@ -50525,7 +50879,7 @@ class Backend {
 	createIndexAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Creates the buffer of a storage attribute.
+	 * Creates the GPU buffer of a storage attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute.
@@ -50533,7 +50887,7 @@ class Backend {
 	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Updates the buffer of a shader attribute.
+	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
@@ -50541,7 +50895,7 @@ class Backend {
 	updateAttribute( /*attribute*/ ) { }
 
 	/**
-	 * Destroys the buffer of a shader attribute.
+	 * Destroys the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
@@ -50608,6 +50962,16 @@ class Backend {
 	 * @return {Promise} A Promise that resolves when synchronization has been finished.
 	 */
 	async waitForGPU() {}
+
+	/**
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
+	async getArrayBufferAsync( /* attribute */ ) {}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -50771,6 +51135,14 @@ class Backend {
 
 let _id$1 = 0;
 
+/**
+ * This module is internally used in context of compute shaders.
+ * This type of shader is not natively supported in WebGL 2 and
+ * thus implemented via Transform Feedback. `DualAttributeData`
+ * manages the related data.
+ *
+ * @private
+ */
 class DualAttributeData {
 
 	constructor( attributeData, dualBuffer ) {
@@ -50815,14 +51187,35 @@ class DualAttributeData {
 
 }
 
+/**
+ * A WebGL 2 backend utility module for managing shader attributes.
+ *
+ * @private
+ */
 class WebGLAttributeUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
 	}
 
+	/**
+	 * Creates the GPU buffer for the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @param {GLenum } bufferType - A flag that indicates the buffer type and thus binding point target.
+	 */
 	createAttribute( attribute, bufferType ) {
 
 		const backend = this.backend;
@@ -50920,6 +51313,11 @@ class WebGLAttributeUtils {
 
 	}
 
+	/**
+	 * Updates the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	updateAttribute( attribute ) {
 
 		const backend = this.backend;
@@ -50959,6 +51357,11 @@ class WebGLAttributeUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
@@ -50978,6 +51381,14 @@ class WebGLAttributeUtils {
 
 	}
 
+	/**
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
 	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;
@@ -51016,6 +51427,16 @@ class WebGLAttributeUtils {
 
 	}
 
+	/**
+	 * Creates a WebGL buffer with the given data.
+	 *
+	 * @private
+	 * @param {WebGL2RenderingContext} gl - The rendering context.
+	 * @param {GLenum } bufferType - A flag that indicates the buffer type and thus binding point target.
+	 * @param {TypedArray} array - The array of the buffer attribute.
+	 * @param {GLenum} usage - The usage.
+	 * @return {WebGLBuffer} The WebGL buffer.
+	 */
 	_createBuffer( gl, bufferType, array, usage ) {
 
 		const bufferGPU = gl.createBuffer();
@@ -51032,13 +51453,42 @@ class WebGLAttributeUtils {
 
 let initialized$1 = false, equationToGL, factorToGL;
 
+/**
+ * A WebGL 2 backend utility module for managing the WebGL state.
+ *
+ * The major goal of this module is to reduce the number of state changes
+ * by caching the WEbGL state with a series of variables. In this way, the
+ * renderer only executes state change commands when necessary which
+ * improves the overall performance.
+ *
+ * @private
+ */
 class WebGLState {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * A reference to the rendering context.
+		 *
+		 * @type {WebGL2RenderingContext}
+		 */
 		this.gl = this.backend.gl;
+
+		// Below properties are intended to cache
+		// the WebGL state and are not explicitly
+		// documented for convenience reasons.
 
 		this.enabled = {};
 		this.currentFlipSided = null;
@@ -51076,7 +51526,7 @@ class WebGLState {
 
 		if ( initialized$1 === false ) {
 
-			this._init( this.gl );
+			this._init();
 
 			initialized$1 = true;
 
@@ -51084,7 +51534,14 @@ class WebGLState {
 
 	}
 
-	_init( gl ) {
+	/**
+	 * Inits the state of the utility.
+	 *
+	 * @private
+	 */
+	_init() {
+
+		const gl = this.gl;
 
 		// Store only WebGL constants here.
 
@@ -51110,6 +51567,14 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Enables the given WebGL capability.
+	 *
+	 * This method caches the capability state so
+	 * `gl.enable()` is only called when necessary.
+	 *
+	 * @param {GLenum} id - The capability to enable.
+	 */
 	enable( id ) {
 
 		const { enabled } = this;
@@ -51123,6 +51588,14 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Disables the given WebGL capability.
+	 *
+	 * This method caches the capability state so
+	 * `gl.disable()` is only called when necessary.
+	 *
+	 * @param {GLenum} id - The capability to enable.
+	 */
 	disable( id ) {
 
 		const { enabled } = this;
@@ -51136,6 +51609,15 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether polygons are front- or back-facing
+	 * by setting the winding orientation.
+	 *
+	 * This method caches the state so `gl.frontFace()` is only
+	 * called when necessary.
+	 *
+	 * @param {Boolean} flipSided - Whether triangles flipped their sides or not.
+	 */
 	setFlipSided( flipSided ) {
 
 		if ( this.currentFlipSided !== flipSided ) {
@@ -51158,6 +51640,15 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether or not front- and/or back-facing
+	 * polygons can be culled.
+	 *
+	 * This method caches the state so `gl.cullFace()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} cullFace - Defines which polygons are candidates for culling.
+	 */
 	setCullFace( cullFace ) {
 
 		const { gl } = this;
@@ -51194,6 +51685,14 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies the width of line primitives.
+	 *
+	 * This method caches the state so `gl.lineWidth()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} width - The line width.
+	 */
 	setLineWidth( width ) {
 
 		const { currentLineWidth, gl } = this;
@@ -51208,7 +51707,21 @@ class WebGLState {
 
 	}
 
-
+	/**
+	 * Defines the blending.
+	 *
+	 * This method caches the state so `gl.blendEquation()`, `gl.blendEquationSeparate()`,
+	 * `gl.blendFunc()` and  `gl.blendFuncSeparate()` are only called when necessary.
+	 *
+	 * @param {Number} blending - The blending type.
+	 * @param {Number} blendEquation - The blending equation.
+	 * @param {Number} blendSrc - Only relevant for custuom blending. The RGB source blending factor.
+	 * @param {Number} blendDst - Only relevant for custuom blending. The RGB destination blending factor.
+	 * @param {Number} blendEquationAlpha - Only relevant for custuom blending. The blending equation for alpha.
+	 * @param {Number} blendSrcAlpha - Only relevant for custuom blending. The alpha source blending factor.
+	 * @param {Number} blendDstAlpha - Only relevant for custuom blending. The alpha destination blending factor.
+	 * @param {Boolean} premultipliedAlpha - Whether premultiplied alpha is enabled or not.
+	 */
 	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
 		const { gl } = this;
@@ -51345,6 +51858,15 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether colors can be written when rendering
+	 * into a framebuffer or not.
+	 *
+	 * This method caches the state so `gl.colorMask()` is only
+	 * called when necessary.
+	 *
+	 * @param {Boolean} colorMask - The color mask.
+	 */
 	setColorMask( colorMask ) {
 
 		if ( this.currentColorMask !== colorMask ) {
@@ -51356,6 +51878,11 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether the depth test is enabled or not.
+	 *
+	 * @param {Boolean} depthTest - Whether the depth test is enabled or not.
+	 */
 	setDepthTest( depthTest ) {
 
 		const { gl } = this;
@@ -51372,6 +51899,15 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether depth values can be written when rendering
+	 * into a framebuffer or not.
+	 *
+	 * This method caches the state so `gl.depthMask()` is only
+	 * called when necessary.
+	 *
+	 * @param {Boolean} depthMask - The depth mask.
+	 */
 	setDepthMask( depthMask ) {
 
 		if ( this.currentDepthMask !== depthMask ) {
@@ -51383,6 +51919,14 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies the depth compare function.
+	 *
+	 * This method caches the state so `gl.depthFunc()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} depthFunc - The depth compare function.
+	 */
 	setDepthFunc( depthFunc ) {
 
 		if ( this.currentDepthFunc !== depthFunc ) {
@@ -51443,6 +51987,11 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether the stencil test is enabled or not.
+	 *
+	 * @param {Boolean} stencilTest - Whether the stencil test is enabled or not.
+	 */
 	setStencilTest( stencilTest ) {
 
 		const { gl } = this;
@@ -51459,6 +52008,15 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether stencol values can be written when rendering
+	 * into a framebuffer or not.
+	 *
+	 * This method caches the state so `gl.stencilMask()` is only
+	 * called when necessary.
+	 *
+	 * @param {Boolean} stencilMask - The stencil mask.
+	 */
 	setStencilMask( stencilMask ) {
 
 		if ( this.currentStencilMask !== stencilMask ) {
@@ -51470,6 +52028,16 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether the stencil test functions.
+	 *
+	 * This method caches the state so `gl.stencilFunc()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} stencilFunc - The stencil compare function.
+	 * @param {Number} stencilRef - The reference value for the stencil test.
+	 * @param {Number} stencilMask - A bit-wise mask that is used to AND the reference value and the stored stencil value when the test is done.
+	 */
 	setStencilFunc( stencilFunc, stencilRef, stencilMask ) {
 
 		if ( this.currentStencilFunc !== stencilFunc ||
@@ -51486,6 +52054,17 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies whether the stencil test operation.
+	 *
+	 * This method caches the state so `gl.stencilOp()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} stencilFail - The function to use when the stencil test fails.
+	 * @param {Number} stencilZFail - The function to use when the stencil test passes, but the depth test fail.
+	 * @param {Number} stencilZPass - The function to use when both the stencil test and the depth test pass,
+	 * or when the stencil test passes and there is no depth buffer or depth testing is disabled.
+	 */
 	setStencilOp( stencilFail, stencilZFail, stencilZPass ) {
 
 		if ( this.currentStencilFail !== stencilFail ||
@@ -51502,6 +52081,13 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Configures the WebGL state for the given material.
+	 *
+	 * @param {Material} material - The material to configure the state for.
+	 * @param {Number} frontFaceCW - Whether the front faces are counter-clockwise or not.
+	 * @param {Number} hardwareClippingPlanes - The number of hardware clipping planes.
+	 */
 	setMaterial( material, frontFaceCW, hardwareClippingPlanes ) {
 
 		const { gl } = this;
@@ -51566,6 +52152,16 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Specifies the polygon offset.
+	 *
+	 * This method caches the state so `gl.polygonOffset()` is only
+	 * called when necessary.
+	 *
+	 * @param {Boolean} polygonOffset - Whether polygon offset is enabled or not.
+	 * @param {Number} factor - The scale factor for the variable depth offset for each polygon.
+	 * @param {Number} units - The multiplier by which an implementation-specific value is multiplied with to create a constant depth offset.
+	 */
 	setPolygonOffset( polygonOffset, factor, units ) {
 
 		const { gl } = this;
@@ -51591,6 +52187,15 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Defines the usage of the given WebGL program.
+	 *
+	 * This method caches the state so `gl.useProgram()` is only
+	 * called when necessary.
+	 *
+	 * @param {WebGLProgram} program - The WebGL program to use.
+	 * @return {Boolean} Whether a program change has been executed or not.
+	 */
 	useProgram( program ) {
 
 		if ( this.currentProgram !== program ) {
@@ -51610,6 +52215,16 @@ class WebGLState {
 	// framebuffer
 
 
+	/**
+	 * Binds the given framebuffer.
+	 *
+	 * This method caches the state so `gl.bindFramebuffer()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} target - The binding point (target).
+	 * @param {WebGLFramebuffer} framebuffer - The WebGL framebuffer to bind.
+	 * @return {Boolean} Whether a bind has been executed or not.
+	 */
 	bindFramebuffer( target, framebuffer ) {
 
 		const { gl, currentBoundFramebuffers } = this;
@@ -51642,6 +52257,16 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Defines draw buffers to which fragment colors are written into.
+	 * Configures the MRT setup of custom framebuffers.
+	 *
+	 * This method caches the state so `gl.drawBuffers()` is only
+	 * called when necessary.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {WebGLFramebuffer} framebuffer - The WebGL framebuffer.
+	 */
 	drawBuffers( renderContext, framebuffer ) {
 
 		const { gl } = this;
@@ -51702,6 +52327,14 @@ class WebGLState {
 
 	// texture
 
+	/**
+	 * Makes the given texture unit active.
+	 *
+	 * This method caches the state so `gl.activeTexture()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} webglSlot - The texture unit to make active.
+	 */
 	activeTexture( webglSlot ) {
 
 		const { gl, currentTextureSlot, maxTextures } = this;
@@ -51717,6 +52350,16 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Binds the given WebGL texture to a target.
+	 *
+	 * This method caches the state so `gl.bindTexture()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} webglType - The binding point (target).
+	 * @param {WebGLTexture} webglTexture - The WebGL texture to bind.
+	 * @param {Number} webglSlot - The texture.
+	 */
 	bindTexture( webglType, webglTexture, webglSlot ) {
 
 		const { gl, currentTextureSlot, currentBoundTextures, maxTextures } = this;
@@ -51762,6 +52405,17 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Binds a given WebGL buffer to a given binding point (target) at a given index.
+	 *
+	 * This method caches the state so `gl.bindBufferBase()` is only
+	 * called when necessary.
+	 *
+	 * @param {Number} target - The target for the bind operation.
+	 * @param {Number} index - The index of the target.
+	 * @param {WebGLBuffer} buffer - The WebGL buffer.
+	 * @return {Boolean} Whether a bind has been executed or not.
+	 */
 	bindBufferBase( target, index, buffer ) {
 
 		const { gl } = this;
@@ -51782,6 +52436,12 @@ class WebGLState {
 	}
 
 
+	/**
+	 * Unbinds the current bound texture.
+	 *
+	 * This method caches the state so `gl.bindTexture()` is only
+	 * called when necessary.
+	 */
 	unbindTexture() {
 
 		const { gl, currentTextureSlot, currentBoundTextures } = this;
@@ -51801,17 +52461,53 @@ class WebGLState {
 
 }
 
+/**
+ * A WebGL 2 backend utility module with common helpers.
+ *
+ * @private
+ */
 class WebGLUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * A reference to the rendering context.
+		 *
+		 * @type {WebGL2RenderingContext}
+		 */
 		this.gl = this.backend.gl;
+
+		/**
+		 * A reference to a backend module holding extension-related
+		 * utility functions.
+		 *
+		 * @type {WebGLExtensions}
+		 */
 		this.extensions = backend.extensions;
 
 	}
 
+	/**
+	 * Converts the given three.js constant into a WebGL constant.
+	 * The method currently supports the conversion of texture formats
+	 * and types.
+	 *
+	 * @param {Number} p - The three.js constant.
+	 * @param {String} [colorSpace=NoColorSpace] - The color space.
+	 * @return {Number} The corresponding WebGL constant.
+	 */
 	convert( p, colorSpace = NoColorSpace ) {
 
 		const { gl, extensions } = this;
@@ -52022,6 +52718,13 @@ class WebGLUtils {
 
 	}
 
+	/**
+	 * This method can be used to synchronize the CPU with the GPU by waiting until
+	 * ongoing GPU commands have been completed.
+	 *
+	 * @private
+	 * @return {Promise} A promise that resolves when all ongoing GPU commands have been completed.
+	 */
 	_clientWaitAsync() {
 
 		const { gl } = this;
@@ -52068,19 +52771,53 @@ class WebGLUtils {
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
+/**
+ * A WebGL 2 backend utility module for managing textures.
+ *
+ * @private
+ */
 class WebGLTextureUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * A reference to the rendering context.
+		 *
+		 * @type {WebGL2RenderingContext}
+		 */
 		this.gl = backend.gl;
+
+		/**
+		 * A reference to a backend module holding extension-related
+		 * utility functions.
+		 *
+		 * @type {WebGLExtensions}
+		 */
 		this.extensions = backend.extensions;
+
+		/**
+		 * A dictionary for managing default textures. The key
+		 * is the binding point (target), the value the WEbGL texture object.
+		 *
+		 * @type {Object<GLenum,WebGLTexture>}
+		 */
 		this.defaultTextures = {};
 
 		if ( initialized === false ) {
 
-			this._init( this.gl );
+			this._init();
 
 			initialized = true;
 
@@ -52088,7 +52825,14 @@ class WebGLTextureUtils {
 
 	}
 
-	_init( gl ) {
+	/**
+	 * Inits the state of the utility.
+	 *
+	 * @private
+	 */
+	_init() {
+
+		const gl = this.gl;
 
 		// Store only WebGL constants here.
 
@@ -52121,20 +52865,12 @@ class WebGLTextureUtils {
 
 	}
 
-	filterFallback( f ) {
-
-		const { gl } = this;
-
-		if ( f === NearestFilter || f === NearestMipmapNearestFilter || f === NearestMipmapLinearFilter ) {
-
-			return gl.NEAREST;
-
-		}
-
-		return gl.LINEAR;
-
-	}
-
+	/**
+	 * Returns the native texture type for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {GLenum} The native texture type.
+	 */
 	getGLTextureType( texture ) {
 
 		const { gl } = this;
@@ -52164,6 +52900,16 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns the native texture type for the given texture.
+	 *
+	 * @param {String?} internalFormatName - The internal format name. When `null`, the intenral format is derived from the subsequent parameters.
+	 * @param {GLenum} glFormat - The WebGL format.
+	 * @param {GLenum} glType - The WebGL type.
+	 * @param {String} colorSpace - The texture's color space.
+	 * @param {Boolean} [forceLinearTransfer=false] - Whether to force a linear transfer or not.
+	 * @return {GLenum} The internal format.
+	 */
 	getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
 
 		const { gl, extensions } = this;
@@ -52307,6 +53053,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Sets the texture parameters for the given texture.
+	 *
+	 * @param {GLenum} textureType - The texture type.
+	 * @param {Texture} texture - The texture.
+	 */
 	setTextureParameters( textureType, texture ) {
 
 		const { gl, extensions, backend } = this;
@@ -52360,6 +53112,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( texture ) {
 
 		const { gl, backend, defaultTextures } = this;
@@ -52391,6 +53149,13 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 * @return {undefined}
+	 */
 	createTexture( texture, options ) {
 
 		const { gl, backend } = this;
@@ -52431,6 +53196,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Uploads texture buffer data to the GPU memory.
+	 *
+	 * @param {WebGLBuffer} buffer - The buffer data.
+	 * @param {Texture} texture - The texture,
+	 */
 	copyBufferToTexture( buffer, texture ) {
 
 		const { gl, backend } = this;
@@ -52466,6 +53237,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	updateTexture( texture, options ) {
 
 		const { gl } = this;
@@ -52586,6 +53363,11 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Generates mipmaps for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	generateMipmaps( texture ) {
 
 		const { gl, backend } = this;
@@ -52596,6 +53378,11 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Deallocates the render buffers of the given render target.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target.
+	 */
 	deallocateRenderBuffers( renderTarget ) {
 
 		const { gl, backend } = this;
@@ -52656,6 +53443,11 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	destroyTexture( texture ) {
 
 		const { gl, backend } = this;
@@ -52668,6 +53460,15 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Copies data of the given source texture to the given destination texture.
+	 *
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {Number} [level=0] - The mip level to copy.
+	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 		const { gl, backend } = this;
@@ -52786,6 +53587,13 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Copies the current bound framebuffer to the given texture.
+	 *
+	 * @param {Texture} texture - The destination texture.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	 */
 	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		const { gl } = this;
@@ -52873,7 +53681,12 @@ class WebGLTextureUtils {
 
 	}
 
-	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
+	/**
+	 * SetupS storage for internal depth/stencil buffers and bind to correct framebuffer.
+	 *
+	 * @param {WebGLRenderbuffer} renderbuffer - The rendner buffer.
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	setupRenderBufferStorage( renderbuffer, renderContext ) {
 
 		const { gl } = this;
@@ -52928,6 +53741,18 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @async
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
+	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const { backend, gl } = this;
@@ -52969,6 +53794,13 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns the corresponding typed array type for the given WebGL data type.
+	 *
+	 * @private
+	 * @param {GLenum} glType - The WebGL data type.
+	 * @return {TypedArray.constructor} The typed array type.
+	 */
 	_getTypedArrayType( glType ) {
 
 		const { gl } = this;
@@ -52988,6 +53820,14 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns the bytes-per-texel value for the given WebGL data type and texture format.
+	 *
+	 * @private
+	 * @param {GLenum} glType - The WebGL data type.
+	 * @param {GLenum} glFormat - The WebGL texture format.
+	 * @return {Number} The bytes-per-texel.
+	 */
 	_getBytesPerTexel( glType, glFormat ) {
 
 		const { gl } = this;
@@ -53013,19 +53853,58 @@ class WebGLTextureUtils {
 
 }
 
+/**
+ * A WebGL 2 backend utility module for managing extensions.
+ *
+ * @private
+ */
 class WebGLExtensions {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * A reference to the rendering context.
+		 *
+		 * @type {WebGL2RenderingContext}
+		 */
 		this.gl = this.backend.gl;
+
+		/**
+		 * A list with all the supported WebGL extensions.
+		 *
+		 * @type {Array<String>}
+		 */
 		this.availableExtensions = this.gl.getSupportedExtensions();
 
+		/**
+		 * A dictionary with requested WebGL extensions.
+		 * The key is the name of the extension, the value
+		 * the requested extension object.
+		 *
+		 * @type {Object<String,Object>}
+		 */
 		this.extensions = {};
 
 	}
 
+	/**
+	 * Returns the extension object for the given extension name.
+	 *
+	 * @param {String} name - The extension name.
+	 * @return {Object} The extension object.
+	 */
 	get( name ) {
 
 		let extension = this.extensions[ name ];
@@ -53042,6 +53921,12 @@ class WebGLExtensions {
 
 	}
 
+	/**
+	 * Returns `true` if the requested extension is available.
+	 *
+	 * @param {String} name - The extension name.
+	 * @return {Boolean} Whether the given extension is available or not.
+	 */
 	has( name ) {
 
 		return this.availableExtensions.includes( name );
@@ -53050,16 +53935,44 @@ class WebGLExtensions {
 
 }
 
+/**
+ * A WebGL 2 backend utility module for managing the device's capabilities.
+ *
+ * @private
+ */
 class WebGLCapabilities {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * This value holds the cached max anisotropy value.
+		 *
+		 * @type {Number?}
+		 * @default null
+		 */
 		this.maxAnisotropy = null;
 
 	}
 
+	/**
+	 * Returns the maximum anisotropy texture filtering value. This value
+	 * depends on the device and is reported by the `EXT_texture_filter_anisotropic`
+	 * WebGL extension.
+	 *
+	 * @return {Number} The maximum anisotropy texture filtering value.
+	 */
 	getMaxAnisotropy() {
 
 		if ( this.maxAnisotropy !== null ) return this.maxAnisotropy;
@@ -53255,7 +54168,7 @@ class WebGLBackend extends Backend {
 	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 * @param {WebGL2RenderingContext} [parameters.context=undefined] - A WebGL 2 rendering context.
 	 */
 	constructor( parameters = {} ) {
@@ -53481,8 +54394,8 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Transfers buffer data from a storage buffer attribute
-	 * from the GPU to the CPU in context of compute shaders.
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
@@ -54360,7 +55273,7 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Generates mipmaps for the given texture
+	 * Generates mipmaps for the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
 	 */
@@ -54384,15 +55297,16 @@ class WebGLBackend extends Backend {
 	/**
 	 * Returns texture data as a typed array.
 	 *
+	 * @async
 	 * @param {Texture} texture - The texture to copy.
 	 * @param {Number} x - The x coordinate of the copy origin.
 	 * @param {Number} y - The y coordinate of the copy origin.
 	 * @param {Number} width - The width of the copy.
 	 * @param {Number} height - The height of the copy.
 	 * @param {Number} faceIndex - The face index.
-	 * @return {TypedArray} The texture data as a typed array.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
@@ -54883,7 +55797,7 @@ class WebGLBackend extends Backend {
 	// attributes
 
 	/**
-	 * Creates the buffer of an indexed shader attribute.
+	 * Creates the GPU buffer of an indexed shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
 	 */
@@ -54896,7 +55810,7 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of a shader attribute.
+	 * Creates the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -54911,7 +55825,7 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of a storage attribute.
+	 * Creates the GPU buffer of a storage attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -54926,7 +55840,7 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Updates the buffer of a shader attribute.
+	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
 	 */
@@ -54937,7 +55851,7 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Destroys the buffer of a shader attribute.
+	 * Destroys the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
@@ -55913,12 +56827,27 @@ class NodeStorageBuffer extends StorageBuffer {
 
 }
 
+/**
+ * A WebGPU backend utility module used by {@link WebGPUTextureUtils}.
+ *
+ * @private
+ */
 class WebGPUTexturePassUtils extends DataMap {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {GPUDevice} device - The WebGPU device.
+	 */
 	constructor( device ) {
 
 		super();
 
+		/**
+		 * The WebGPU device.
+		 *
+		 * @type {GPUDevice}
+		 */
 		this.device = device;
 
 		const mipmapVertexSource = `
@@ -55983,23 +56912,62 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 }
 `;
+
+		/**
+		 * The mipmap GPU sampler.
+		 *
+		 * @type {GPUSampler}
+		 */
 		this.mipmapSampler = device.createSampler( { minFilter: GPUFilterMode.Linear } );
+
+		/**
+		 * The flipY GPU sampler.
+		 *
+		 * @type {GPUSampler}
+		 */
 		this.flipYSampler = device.createSampler( { minFilter: GPUFilterMode.Nearest } ); //@TODO?: Consider using textureLoad()
 
-		// We'll need a new pipeline for every texture format used.
+		/**
+		 * A cache for GPU render pipelines used for copy/transfer passes.
+		 * Every texture format requires a unique pipeline.
+		 *
+		 * @type {Object<String,GPURenderPipeline>}
+		 */
 		this.transferPipelines = {};
+
+		/**
+		 * A cache for GPU render pipelines used for flipY passes.
+		 * Every texture format requires a unique pipeline.
+		 *
+		 * @type {Object<String,GPURenderPipeline>}
+		 */
 		this.flipYPipelines = {};
 
+		/**
+		 * The mipmap vertex shader module.
+		 *
+		 * @type {GPUShaderModule}
+		 */
 		this.mipmapVertexShaderModule = device.createShaderModule( {
 			label: 'mipmapVertex',
 			code: mipmapVertexSource
 		} );
 
+		/**
+		 * The mipmap fragment shader module.
+		 *
+		 * @type {GPUShaderModule}
+		 */
 		this.mipmapFragmentShaderModule = device.createShaderModule( {
 			label: 'mipmapFragment',
 			code: mipmapFragmentSource
 		} );
 
+		/**
+		 * The flipY fragment shader module.
+		 *
+		 * @type {GPUShaderModule}
+		 */
 		this.flipYFragmentShaderModule = device.createShaderModule( {
 			label: 'flipYFragment',
 			code: flipYFragmentSource
@@ -56007,6 +56975,13 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
+	/**
+	 * Returns a render pipeline for the internal copy render pass. The pass
+	 * requires a unique render pipeline for each texture format.
+	 *
+	 * @param {String} format - The GPU texture format
+	 * @return {GPURenderPipeline} The GPU render pipeline.
+	 */
 	getTransferPipeline( format ) {
 
 		let pipeline = this.transferPipelines[ format ];
@@ -56039,6 +57014,13 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
+	/**
+	 * Returns a render pipeline for the flipY render pass. The pass
+	 * requires a unique render pipeline for each texture format.
+	 *
+	 * @param {String} format - The GPU texture format
+	 * @return {GPURenderPipeline} The GPU render pipeline.
+	 */
 	getFlipYPipeline( format ) {
 
 		let pipeline = this.flipYPipelines[ format ];
@@ -56071,6 +57053,13 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
+	/**
+	 * Flip the contents of the given GPU texture along its vertical axis.
+	 *
+	 * @param {GPUTexture} textureGPU - The GPU texture object.
+	 * @param {Object} textureGPUDescriptor - The texture descriptor.
+	 * @param {Number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 */
 	flipY( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
 		const format = textureGPUDescriptor.format;
@@ -56141,6 +57130,13 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
+	/**
+	 * Generates mipmaps for the given GPU texture.
+	 *
+	 * @param {GPUTexture} textureGPU - The GPU texture object.
+	 * @param {Object} textureGPUDescriptor - The texture descriptor.
+	 * @param {Number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 */
 	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
 		const textureData = this.get( textureGPU );
@@ -56166,6 +57162,15 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
+	/**
+	 * Since multiple copy render passes are required to generate mipmaps, the passes
+	 * are managed as render bundles to improve performance.
+	 *
+	 * @param {GPUTexture} textureGPU - The GPU texture object.
+	 * @param {Object} textureGPUDescriptor - The texture descriptor.
+	 * @param {Number} baseArrayLayer - The index of the first array layer accessible to the texture view.
+	 * @return {Array} An array of render bundles.
+	 */
 	_mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer ) {
 
 		const pipeline = this.getTransferPipeline( textureGPUDescriptor.format );
@@ -56231,6 +57236,12 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
+	/**
+	 * Executes the render bundles.
+	 *
+	 * @param {GPUCommandEncoder} commandEncoder - The GPU command encoder.
+	 * @param {Array} passes - An array of render bundles.
+	 */
 	_mipmapRunBundles( commandEncoder, passes ) {
 
 		const levels = passes.length;
@@ -56264,25 +57275,82 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
+/**
+ * A WebGPU backend utility module for managing textures.
+ *
+ * @private
+ */
 class WebGPUTextureUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * A reference to the pass utils.
+		 *
+		 * @type {WebGPUTexturePassUtils?}
+		 * @default null
+		 */
 		this._passUtils = null;
 
+		/**
+		 * A dictionary for managing default textures. The key
+		 * is the texture format, the value the texture object.
+		 *
+		 * @type {Object<String,Texture>}
+		 */
 		this.defaultTexture = {};
+
+		/**
+		 * A dictionary for managing default cube textures. The key
+		 * is the texture format, the value the texture object.
+		 *
+		 * @type {Object<String,CubeTexture>}
+		 */
 		this.defaultCubeTexture = {};
+
+		/**
+		 * A default video frame.
+		 *
+		 * @type {VideoFrame?}
+		 * @default null
+		 */
 		this.defaultVideoFrame = null;
 
+		/**
+		 * Represents the color attachment of the default framebuffer.
+		 *
+		 * @type {GPUTexture?}
+		 * @default null
+		 */
 		this.colorBuffer = null;
 
+		/**
+		 * Represents the depth attachment of the default framebuffer.
+		 *
+		 * @type {DepthTexture}
+		 */
 		this.depthTexture = new DepthTexture();
 		this.depthTexture.name = 'depthBuffer';
 
 	}
 
+	/**
+	 * Creates a GPU sampler for the given texture.
+	 *
+	 * @param {Texture} texture - The texture to create the sampler for.
+	 */
 	createSampler( texture ) {
 
 		const backend = this.backend;
@@ -56318,6 +57386,12 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( texture ) {
 
 		let textureGPU;
@@ -56342,6 +57416,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 * @return {undefined}
+	 */
 	createTexture( texture, options = {} ) {
 
 		const backend = this.backend;
@@ -56453,6 +57534,11 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	destroyTexture( texture ) {
 
 		const backend = this.backend;
@@ -56466,6 +57552,11 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU sampler for the given texture.
+	 *
+	 * @param {Texture} texture - The texture to destroy the sampler for.
+	 */
 	destroySampler( texture ) {
 
 		const backend = this.backend;
@@ -56475,6 +57566,11 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Generates mipmaps for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	generateMipmaps( texture ) {
 
 		const textureData = this.backend.get( texture );
@@ -56501,6 +57597,12 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the color buffer representing the color
+	 * attachment of the default framebuffer.
+	 *
+	 * @return {GPUTexture} The color buffer.
+	 */
 	getColorBuffer() {
 
 		if ( this.colorBuffer ) this.colorBuffer.destroy();
@@ -56524,6 +57626,14 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the depth buffer representing the depth
+	 * attachment of the default framebuffer.
+	 *
+	 * @param {Boolean} [depth=true] - Whether depth is enabled or not.
+	 * @param {Boolean} [stencil=false] -  Whether stencil is enabled or not.
+	 * @return {GPUTexture} The depth buffer.
+	 */
 	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
@@ -56570,6 +57680,12 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	updateTexture( texture, options ) {
 
 		const textureData = this.backend.get( texture );
@@ -56621,6 +57737,18 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @async
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
+	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const device = this.backend.device;
@@ -56670,6 +57798,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns `true` if the given texture is an environment map.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @return {Boolean} Whether the given texture is an environment map or not.
+	 */
 	_isEnvironmentTexture( texture ) {
 
 		const mapping = texture.mapping;
@@ -56678,6 +57813,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the default GPU texture for the given format.
+	 *
+	 * @private
+	 * @param {String} format - The GPU format.
+	 * @return {GPUTexture} The GPU texture.
+	 */
 	_getDefaultTextureGPU( format ) {
 
 		let defaultTexture = this.defaultTexture[ format ];
@@ -56698,6 +57840,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the default GPU cube texture for the given format.
+	 *
+	 * @private
+	 * @param {String} format - The GPU format.
+	 * @return {GPUTexture} The GPU texture.
+	 */
 	_getDefaultCubeTextureGPU( format ) {
 
 		let defaultCubeTexture = this.defaultTexture[ format ];
@@ -56718,6 +57867,12 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the default video frame used as default data in context of video textures.
+	 *
+	 * @private
+	 * @return {VideoFrame} The video frame.
+	 */
 	_getDefaultVideoFrame() {
 
 		let defaultVideoFrame = this.defaultVideoFrame;
@@ -56739,6 +57894,15 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Uploads cube texture image data to the GPU memory.
+	 *
+	 * @private
+	 * @param {Array} images - The cube image data.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {Boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 */
 	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
@@ -56761,13 +57925,24 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Uploads texture image data to the GPU memory.
+	 *
+	 * @private
+	 * @param {HTMLImageElement|ImageBitmap|HTMLCanvasElement} image - The image data.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {Number} originDepth - The origin depth.
+	 * @param {Boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 */
 	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
 
 		const device = this.backend.device;
 
 		device.queue.copyExternalImageToTexture(
 			{
-				source: image
+				source: image,
+				flipY: flipY
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
@@ -56779,14 +57954,14 @@ class WebGPUTextureUtils {
 			}
 		);
 
-		if ( flipY === true ) {
-
-			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
-
-		}
-
 	}
 
+	/**
+	 * Returns the pass utils singleton.
+	 *
+	 * @private
+	 * @return {WebGPUTexturePassUtils} The utils instance.
+	 */
 	_getPassUtils() {
 
 		let passUtils = this._passUtils;
@@ -56801,18 +57976,45 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Generates mipmaps for the given GPU texture.
+	 *
+	 * @private
+	 * @param {GPUTexture} textureGPU - The GPU texture object.
+	 * @param {Object} textureDescriptorGPU - The texture descriptor.
+	 * @param {Number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 */
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
 		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
 
 	}
 
+	/**
+	 * Flip the contents of the given GPU texture along its vertical axis.
+	 *
+	 * @private
+	 * @param {GPUTexture} textureGPU - The GPU texture object.
+	 * @param {Object} textureDescriptorGPU - The texture descriptor.
+	 * @param {Number} [originDepth=0] - The origin depth.
+	 */
 	_flipY( textureGPU, textureDescriptorGPU, originDepth = 0 ) {
 
 		this._getPassUtils().flipY( textureGPU, textureDescriptorGPU, originDepth );
 
 	}
 
+	/**
+	 * Uploads texture buffer data to the GPU memory.
+	 *
+	 * @private
+	 * @param {Object} image - An object defining the image buffer data.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {Number} originDepth - The origin depth.
+	 * @param {Boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {Number} [depth=0] - TODO.
+	 */
 	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
@@ -56850,6 +58052,14 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Uploads compressed texture data to the GPU memory.
+	 *
+	 * @private
+	 * @param {Array<Object>} mipmaps - An array with mipmap data.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 */
 	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
@@ -56897,9 +58107,15 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * This method is only relevant for compressed texture formats. It returns a block
+	 * data descriptor for the given GPU compressed texture format.
+	 *
+	 * @private
+	 * @param {String} format - The GPU compressed texture format.
+	 * @return {Object} The block data descriptor.
+	 */
 	_getBlockData( format ) {
-
-		// this method is only relevant for compressed texture formats
 
 		if ( format === GPUTextureFormat.BC1RGBAUnorm || format === GPUTextureFormat.BC1RGBAUnormSRGB ) return { byteLength: 8, width: 4, height: 4 }; // DXT1
 		if ( format === GPUTextureFormat.BC2RGBAUnorm || format === GPUTextureFormat.BC2RGBAUnormSRGB ) return { byteLength: 16, width: 4, height: 4 }; // DXT3
@@ -56934,6 +58150,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Converts the three.js uv wrapping constants to GPU address mode constants.
+	 *
+	 * @private
+	 * @param {Number} value - The three.js constant defining a uv wrapping mode.
+	 * @return {String} The GPU address mode.
+	 */
 	_convertAddressMode( value ) {
 
 		let addressMode = GPUAddressMode.ClampToEdge;
@@ -56952,6 +58175,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Converts the three.js filter constants to GPU filter constants.
+	 *
+	 * @private
+	 * @param {Number} value - The three.js constant defining a filter mode.
+	 * @return {String} The GPU filter mode.
+	 */
 	_convertFilterMode( value ) {
 
 		let filterMode = GPUFilterMode.Linear;
@@ -56966,6 +58196,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the bytes-per-texel value for the given GPU texture format.
+	 *
+	 * @private
+	 * @param {String} format - The GPU texture format.
+	 * @return {Number} The bytes-per-texel.
+	 */
 	_getBytesPerTexel( format ) {
 
 		// 8-bit formats
@@ -57022,6 +58259,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the corresponding typed array type for the given GPU texture format.
+	 *
+	 * @private
+	 * @param {String} format - The GPU texture format.
+	 * @return {TypedArray.constructor} The typed array type.
+	 */
 	_getTypedArrayType( format ) {
 
 		if ( format === GPUTextureFormat.R8Uint ) return Uint8Array;
@@ -57072,6 +58316,13 @@ class WebGPUTextureUtils {
 
 	}
 
+	/**
+	 * Returns the GPU dimensions for the given texture.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @return {String} The GPU dimension.
+	 */
 	_getDimension( texture ) {
 
 		let dimension;
@@ -57092,6 +58343,14 @@ class WebGPUTextureUtils {
 
 }
 
+/**
+ * Returns the GPU format for the given texture.
+ *
+ * @param {Texture} texture - The texture.
+ * @param {GPUDevice?} [device=null] - The GPU device which is used for feature detection.
+ * It is not necessary to apply the device for most formats.
+ * @return {String} The GPU format.
+ */
 function getFormat( texture, device = null ) {
 
 	const format = texture.format;
@@ -57794,30 +59053,83 @@ if ( ( typeof navigator !== 'undefined' && /Firefox|Deno/g.test( navigator.userA
 
 }
 
-//
-
+/**
+ * A node builder targeting WGSL.
+ *
+ * This module generates WGSL shader code from node materials and also
+ * generates the respective bindings and vertex buffer definitions. These
+ * data are later used by the renderer to create render and compute pipelines
+ * for render objects.
+ *
+ * @augments NodeBuilder
+ */
 class WGSLNodeBuilder extends NodeBuilder {
 
+	/**
+	 * Constructs a new WGSL node builder renderer.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( object, renderer ) {
 
 		super( object, renderer, new WGSLNodeParser() );
 
+		/**
+		 * A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
+		 * another dictionary which manages UBOs per group ('render','frame','object').
+		 *
+		 * @type {Object<String,Object<String,NodeUniformsGroup>>}
+		 */
 		this.uniformGroups = {};
 
+		/**
+		 * A dictionary that holds for each shader stage a Map of builtins.
+		 *
+		 * @type {Object<String,Map<String,Object>>}
+		 */
 		this.builtins = {};
 
+		/**
+		 * A dictionary thath holds for each shader stage a Set of directives.
+		 *
+		 * @type {Object<String,Set<String>>}
+		 */
 		this.directives = {};
 
+		/**
+		 * A map for managing scope arrays. Only relevant for when using
+		 * {@link module:WorkgroupInfoNode} in context of compute shaders.
+		 *
+		 * @type {Map<String,Object>}
+		 */
 		this.scopedArrays = new Map();
 
 	}
 
+	/**
+	 * Checks if the given texture requires a manual conversion to the working color space.
+	 *
+	 * @param {Texture} texture - The texture to check.
+	 * @return {Boolean} Whether the given texture requires a conversion to working color space or not.
+	 */
 	needsToWorkingColorSpace( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampled textures.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -57844,6 +59156,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet when sampling video textures.
+	 *
+	 * @private
+	 * @param {String} textureProperty - The name of the video texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	_generateVideoSample( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -57858,6 +59179,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet when sampling textures with explicit mip level.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false ) {
@@ -57876,6 +59209,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates a wrap function used in context of textures.
+	 *
+	 * @param {Texture} texture - The texture to generate the function for.
+	 * @return {String} The name of the generated function.
+	 */
 	generateWrapFunction( texture ) {
 
 		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${texture.isData3DTexture ? '3d' : '2d'}T`;
@@ -57945,6 +59284,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates a WGSL variable that holds the texture dimension of the given texture.
+	 * It also returns information about the the number of layers (elements) of an arrayed
+	 * texture as well as the cube face count of cube textures.
+	 *
+	 * @param {Texture} texture - The texture to generate the function for.
+	 * @param {String} textureProperty - The name of the video texture uniform in the shader.
+	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {String} The name of the dimension variable.
+	 */
 	generateTextureDimension( texture, textureProperty, levelSnippet ) {
 
 		const textureData = this.getDataFromNode( texture, this.shaderStage, this.globalCache );
@@ -58013,6 +59362,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for a manual filtered texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0u' ) {
 
 		this._include( 'biquadraticTexture' );
@@ -58024,6 +59382,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for a texture lookup with explicit level-of-detail.
+	 * Since it's a lookup, no sampling or filtering is applied.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet = '0u' ) {
 
 		const wrapFunction = this.generateWrapFunction( texture );
@@ -58036,6 +59405,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet that reads a single texel from a texture without sampling or filtering.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
 
 		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
@@ -58054,18 +59433,39 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet that writes a single texel to a texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} valueSnippet - A WGSL snippet that represent the new texel value.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureStore( texture, textureProperty, uvIndexSnippet, valueSnippet ) {
 
 		return `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
 
 	}
 
+	/**
+	 * Returns `true` if the sampled values of the given texture should be compared against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Boolean} Whether the sampled values of the given texture should be compared against a reference value or not.
+	 */
 	isSampleCompare( texture ) {
 
 		return texture.isDepthTexture === true && texture.compareFunction !== null;
 
 	}
 
+	/**
+	 * Returns `true` if the given texture is unfilterable.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Boolean} Whether the given texture is unfilterable or not.
+	 */
 	isUnfilterable( texture ) {
 
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
@@ -58075,6 +59475,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampling/loading the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		let snippet = null;
@@ -58097,6 +59507,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampling/loading the given texture using explicit gradients.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {Array<String>} gradSnippet - An array holding both gradient WGSL snippets.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -58112,6 +59533,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampling a depth texture and comparing the sampled depth values
+	 * against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} compareSnippet -  A WGSL snippet that represents the reference value.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -58126,6 +59559,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet when sampling textures with explicit mip level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		let snippet = null;
@@ -58144,6 +59588,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet when sampling textures with a bias to the mip level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {String} textureProperty - The name of the texture uniform in the shader.
+	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {String} biasSnippet - A WGSL snippet that represents the bias to apply to the mip level before sampling.
+	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The WGSL snippet.
+	 */
 	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -58158,6 +59613,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns a WGSL snippet that represents the property name of the given node.
+	 *
+	 * @param {Node} node - The node.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The property name.
+	 */
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
 		if ( node.isNodeVarying === true && node.needsInterpolation === true ) {
@@ -58193,18 +59655,36 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the output struct name.
+	 *
+	 * @return {String} The name of the output struct.
+	 */
 	getOutputStructName() {
 
 		return 'output';
 
 	}
 
+	/**
+	 * Returns uniforms group count for the given shader stage.
+	 *
+	 * @private
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {Number} The uniforms group count for the given shader stage.
+	 */
 	_getUniformGroupCount( shaderStage ) {
 
 		return Object.keys( this.uniforms[ shaderStage ] ).length;
 
 	}
 
+	/**
+	 * Returns the native shader operator name for a given generic name.
+	 *
+	 * @param {String} op - The operator name to resolve.
+	 * @return {String} The resolved operator name.
+	 */
 	getFunctionOperator( op ) {
 
 		const fnOp = wgslFnOpLib[ op ];
@@ -58221,6 +59701,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the node access for the given node and shader stage.
+	 *
+	 * @param {StorageTextureNode|StorageBufferNode} node - The storage node.
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The node access.
+	 */
 	getNodeAccess( node, shaderStage ) {
 
 		if ( shaderStage !== 'compute' )
@@ -58230,12 +59717,32 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns A WGSL snippet representing the storage access.
+	 *
+	 * @param {StorageTextureNode|StorageBufferNode} node - The storage node.
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The WGSL snippet representing the storage access.
+	 */
 	getStorageAccess( node, shaderStage ) {
 
 		return accessNames[ this.getNodeAccess( node, shaderStage ) ];
 
 	}
 
+	/**
+	 * This method is one of the more important ones since it's responsible
+	 * for generating a matching binding instance for the given uniform node.
+	 *
+	 * These bindings are later used in the renderer to create bind groups
+	 * and layouts.
+	 *
+	 * @param {UniformNode} node - The uniform node.
+	 * @param {String} type - The node data type.
+	 * @param {String} shaderStage - The shader stage.
+	 * @param {String?} [name=null] - An optional uniform name.
+	 * @return {NodeUniform} The node uniform object.
+	 */
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
@@ -58332,6 +59839,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * This method should be used whenever builtins are required in nodes.
+	 * The internal builtins data structure will make sure builtins are
+	 * defined in the WGSL source.
+	 *
+	 * @param {String} name - The builtin name.
+	 * @param {String} property - The property name.
+	 * @param {String} type - The node data type.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} The property name.
+	 */
 	getBuiltin( name, property, type, shaderStage = this.shaderStage ) {
 
 		const map = this.builtins[ shaderStage ] || ( this.builtins[ shaderStage ] = new Map() );
@@ -58350,12 +59868,24 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns `true` if the given builtin is defined in the given shader stage.
+	 *
+	 * @param {String} name - The builtin name.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {String} Whether the given builtin is defined in the given shader stage or not.
+	 */
 	hasBuiltin( name, shaderStage = this.shaderStage ) {
 
 		return ( this.builtins[ shaderStage ] !== undefined && this.builtins[ shaderStage ].has( name ) );
 
 	}
 
+	/**
+	 * Returns the vertex index builtin.
+	 *
+	 * @return {String} The vertex index.
+	 */
 	getVertexIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {
@@ -58368,6 +59898,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Builds the given shader node.
+	 *
+	 * @param {ShaderNodeInternal} shaderNode - The shader node.
+	 * @return {String} The WGSL function code.
+	 */
 	buildFunctionCode( shaderNode ) {
 
 		const layout = shaderNode.layout;
@@ -58402,6 +59938,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the instance index builtin.
+	 *
+	 * @return {String} The instance index.
+	 */
 	getInstanceIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {
@@ -58414,12 +59955,22 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the invocation local index builtin.
+	 *
+	 * @return {String} The invocation local index.
+	 */
 	getInvocationLocalIndex() {
 
 		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
 
 	}
 
+	/**
+	 * Returns the subgroup size builtin.
+	 *
+	 * @return {String} The subgroup size.
+	 */
 	getSubgroupSize() {
 
 		this.enableSubGroups();
@@ -58428,6 +59979,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the invocation subgroup index builtin.
+	 *
+	 * @return {String} The invocation subgroup index.
+	 */
 	getInvocationSubgroupIndex() {
 
 		this.enableSubGroups();
@@ -58436,6 +59992,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the subgroup index builtin.
+	 *
+	 * @return {String} The subgroup index.
+	 */
 	getSubgroupIndex() {
 
 		this.enableSubGroups();
@@ -58444,42 +60005,78 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Overwritten as a NOP since this method is intended for the WebGL 2 backend.
+	 *
+	 * @return {null} Null.
+	 */
 	getDrawIndex() {
 
 		return null;
 
 	}
 
+	/**
+	 * Returns the front facing builtin.
+	 *
+	 * @return {String} The front facing builtin.
+	 */
 	getFrontFacing() {
 
 		return this.getBuiltin( 'front_facing', 'isFront', 'bool' );
 
 	}
 
+	/**
+	 * Returns the frag coord builtin.
+	 *
+	 * @return {String} The frag coord builtin.
+	 */
 	getFragCoord() {
 
 		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
 
 	}
 
+	/**
+	 * Returns the frag depth builtin.
+	 *
+	 * @return {String} The frag depth builtin.
+	 */
 	getFragDepth() {
 
 		return 'output.' + this.getBuiltin( 'frag_depth', 'depth', 'f32', 'output' );
 
 	}
 
+	/**
+	 * Returns the clip distances builtin.
+	 *
+	 * @return {String} The clip distances builtin.
+	 */
 	getClipDistance() {
 
 		return 'varyings.hw_clip_distances';
 
 	}
 
+	/**
+	 * Whether to flip texture data along its vertical axis or not.
+	 *
+	 * @return {Boolean} Returns always `false` in context of WGSL.
+	 */
 	isFlipY() {
 
 		return false;
 
 	}
 
+	/**
+	 * Enables the given directive for the given shader stage.
+	 *
+	 * @param {String} name - The directive name.
+	 * @param {String} [shaderStage=this.shaderStage] - The shader stage to enable the directive for.
+	 */
 	enableDirective( name, shaderStage = this.shaderStage ) {
 
 		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = new Set() );
@@ -58487,6 +60084,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the directives of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} A WGSL snippet that enables the directives of the given stage.
+	 */
 	getDirectives( shaderStage ) {
 
 		const snippets = [];
@@ -58506,36 +60109,56 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Enables the 'subgroups' directive.
+	 */
 	enableSubGroups() {
 
 		this.enableDirective( 'subgroups' );
 
 	}
 
+	/**
+	 * Enables the 'subgroups-f16' directive.
+	 */
 	enableSubgroupsF16() {
 
 		this.enableDirective( 'subgroups-f16' );
 
 	}
 
+	/**
+	 * Enables the 'clip_distances' directive.
+	 */
 	enableClipDistances() {
 
 		this.enableDirective( 'clip_distances' );
 
 	}
 
+	/**
+	 * Enables the 'f16' directive.
+	 */
 	enableShaderF16() {
 
 		this.enableDirective( 'f16' );
 
 	}
 
+	/**
+	 * Enables the 'dual_source_blending' directive.
+	 */
 	enableDualSourceBlending() {
 
 		this.enableDirective( 'dual_source_blending' );
 
 	}
 
+	/**
+	 * Enables hardware clipping.
+	 *
+	 * @param {String} planeCount - The clipping plane count.
+	 */
 	enableHardwareClipping( planeCount ) {
 
 		this.enableClipDistances();
@@ -58543,6 +60166,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the builtins of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} A WGSL snippet that represents the builtins of the given stage.
+	 */
 	getBuiltins( shaderStage ) {
 
 		const snippets = [];
@@ -58562,6 +60191,17 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * This method should be used when a new scoped buffer is used in context of
+	 * compute shaders. It adds the array to the internal data structure which is
+	 * later used to generate the respective WGSL.
+	 *
+	 * @param {String} name - The array name.
+	 * @param {String} scope - The scope.
+	 * @param {String} bufferType - The buffer type.
+	 * @param {String} bufferCount - The buffer count.
+	 * @return {String} The array name.
+	 */
 	getScopedArray( name, scope, bufferType, bufferCount ) {
 
 		if ( this.scopedArrays.has( name ) === false ) {
@@ -58579,6 +60219,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the scoped arrays of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String|undefined} The WGSL snippet that defines the scoped arrays.
+	 * Returns `undefined` when used in the vertex or fragment stage.
+	 */
 	getScopedArrays( shaderStage ) {
 
 		if ( shaderStage !== 'compute' ) {
@@ -58601,6 +60248,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the shader attributes of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The WGSL snippet that defines the shader attributes.
+	 */
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
@@ -58645,6 +60298,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the members of the given struct type node as a WGSL string.
+	 *
+	 * @param {StructTypeNode} struct - The struct type node.
+	 * @return {String} The WGSL snippet that defines the struct members.
+	 */
 	getStructMembers( struct ) {
 
 		const snippets = [];
@@ -58665,6 +60324,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the structs of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The WGSL snippet that defines the structs.
+	 */
 	getStructs( shaderStage ) {
 
 		const snippets = [];
@@ -58690,12 +60355,25 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns a WGSL string representing a variable.
+	 *
+	 * @param {String} type - The variable's type.
+	 * @param {String} name - The variable's name.
+	 * @return {String} The WGSL snippet that defines a variable.
+	 */
 	getVar( type, name ) {
 
 		return `var ${ name } : ${ this.getType( type ) }`;
 
 	}
 
+	/**
+	 * Returns the variables of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The WGSL snippet that defines the variables.
+	 */
 	getVars( shaderStage ) {
 
 		const snippets = [];
@@ -58715,6 +60393,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the varyings of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The WGSL snippet that defines the varyings.
+	 */
 	getVaryings( shaderStage ) {
 
 		const snippets = [];
@@ -58767,6 +60451,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the uniforms of the given shader stage as a WGSL string.
+	 *
+	 * @param {String} shaderStage - The shader stage.
+	 * @return {String} The WGSL snippet that defines the uniforms.
+	 */
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
@@ -58894,6 +60584,9 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Controls the code build of the shader stages.
+	 */
 	buildCode() {
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
@@ -58994,6 +60687,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the native shader method name for a given generic name.
+	 *
+	 * @param {String} method - The method name to resolve.
+	 * @param {String} [output=null] - An optional output.
+	 * @return {String} The resolved WGSL method name.
+	 */
 	getMethod( method, output = null ) {
 
 		let wgslMethod;
@@ -59014,12 +60714,24 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the WGSL type of the given node data type.
+	 *
+	 * @param {String} type - The node data type.
+	 * @return {String} The WGSL type.
+	 */
 	getType( type ) {
 
 		return wgslTypeLib[ type ] || type;
 
 	}
 
+	/**
+	 * Whether the requested feature is available or not.
+	 *
+	 * @param {String} name - The requested feature.
+	 * @return {Boolean} Whether the requested feature is supported or not.
+	 */
 	isAvailable( name ) {
 
 		let result = supports[ name ];
@@ -59044,6 +60756,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the native shader method name for a given generic name.
+	 *
+	 * @private
+	 * @param {String} method - The method name to resolve.
+	 * @return {String} The resolved WGSL method name.
+	 */
 	_getWGSLMethod( method ) {
 
 		if ( wgslPolyfill[ method ] !== undefined ) {
@@ -59056,6 +60775,14 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Includes the given method name into the current
+	 * function node.
+	 *
+	 * @private
+	 * @param {String} name - The method name to include.
+	 * @return {CodeNode} The respective code node.
+	 */
 	_include( name ) {
 
 		const codeNode = wgslPolyfill[ name ];
@@ -59071,6 +60798,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns a WGSL vertex shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @return {String} The vertex shader.
+	 */
 	_getWGSLVertexCode( shaderData ) {
 
 		return `${ this.getSignature() }
@@ -59103,6 +60837,13 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 
 	}
 
+	/**
+	 * Returns a WGSL fragment shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @return {String} The vertex shader.
+	 */
 	_getWGSLFragmentCode( shaderData ) {
 
 		return `${ this.getSignature() }
@@ -59132,6 +60873,14 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 
 	}
 
+	/**
+	 * Returns a WGSL compute shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @param {String} workgroupSize - The workgroup size.
+	 * @return {String} The vertex shader.
+	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
 		return `${ this.getSignature() }
@@ -59167,6 +60916,14 @@ fn main( ${shaderData.attributes} ) {
 
 	}
 
+	/**
+	 * Returns a WGSL struct based on the given name and variables.
+	 *
+	 * @private
+	 * @param {String} name - The struct name.
+	 * @param {String} vars - The struct variables.
+	 * @return {String} The WGSL snippet representing a struct.
+	 */
 	_getWGSLStruct( name, vars ) {
 
 		return `
@@ -59176,6 +60933,17 @@ ${vars}
 
 	}
 
+	/**
+	 * Returns a WGSL struct binding.
+	 *
+	 * @private
+	 * @param {String} name - The struct name.
+	 * @param {String} vars - The struct variables.
+	 * @param {String} access - The access.
+	 * @param {Number} [binding=0] - The binding index.
+	 * @param {Number} [group=0] - The group index.
+	 * @return {String} The WGSL snippet representing a struct binding.
+	 */
 	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
 
 		const structName = name + 'Struct';
@@ -59189,14 +60957,35 @@ var<${access}> ${name} : ${structName};`;
 
 }
 
+/**
+ * A WebGPU backend utility module with common helpers.
+ *
+ * @private
+ */
 class WebGPUUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
 
 	}
 
+	/**
+	 * Returns the depth/stencil GPU format for the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {String} The depth/stencil GPU texture format.
+	 */
 	getCurrentDepthStencilFormat( renderContext ) {
 
 		let format;
@@ -59219,12 +61008,24 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns the GPU format for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {String} The GPU texture format.
+	 */
 	getTextureFormatGPU( texture ) {
 
 		return this.backend.get( texture ).format;
 
 	}
 
+	/**
+	 * Returns an object that defines the multi-sampling state of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Object} The multi-sampling state.
+	 */
 	getTextureSampleData( texture ) {
 
 		let samples;
@@ -59255,6 +61056,12 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns the default color attachment's GPU format of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {String} The GPU texture format of the default color attachment.
+	 */
 	getCurrentColorFormat( renderContext ) {
 
 		let format;
@@ -59273,6 +61080,12 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns the output color space of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {String} The output color space.
+	 */
 	getCurrentColorSpace( renderContext ) {
 
 		if ( renderContext.textures !== null ) {
@@ -59285,6 +61098,13 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns GPU primitive topology for the given object and material.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Material} material - The material.
+	 * @return {String} The GPU primitive topology.
+	 */
 	getPrimitiveTopology( object, material ) {
 
 		if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
@@ -59294,6 +61114,14 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns a modified sample count from the given sample count value.
+	 *
+	 * That is required since WebGPU does not support arbitrary sample counts.
+	 *
+	 * @param {Number} sampleCount - The input sample count.
+	 * @return {Number} The (potentially updated) output sample count.
+	 */
 	getSampleCount( sampleCount ) {
 
 		let count = 1;
@@ -59315,6 +61143,12 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns the sample count of the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Number} The sample count.
+	 */
 	getSampleCountRenderContext( renderContext ) {
 
 		if ( renderContext.textures !== null ) {
@@ -59327,6 +61161,14 @@ class WebGPUUtils {
 
 	}
 
+	/**
+	 * Returns the preferred canvas format.
+	 *
+	 * There is a separate method for this so it's possible to
+	 * honor edge cases for specific devices.
+	 *
+	 * @return {String} The GPU texture format of the canvas.
+	 */
 	getPreferredCanvasFormat() {
 
 		// TODO: Remove this check when Quest 34.5 is out
@@ -59368,14 +61210,35 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
+/**
+ * A WebGPU backend utility module for managing shader attributes.
+ *
+ * @private
+ */
 class WebGPUAttributeUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
 
 	}
 
+	/**
+	 * Creates the GPU buffer for the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @param {GPUBufferUsage} usage - A flag that indicates how the buffer may be used after its creation.
+	 */
 	createAttribute( attribute, usage ) {
 
 		const bufferAttribute = this._getBufferAttribute( attribute );
@@ -59442,6 +61305,11 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Updates the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	updateAttribute( attribute ) {
 
 		const bufferAttribute = this._getBufferAttribute( attribute );
@@ -59493,6 +61361,13 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * This method creates the vertex buffer layout data which are
+	 * require when creating a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Array<Object>} An array holding objects which describe the vertex buffer layout.
+	 */
 	createShaderVertexBuffers( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
@@ -59554,6 +61429,11 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
@@ -59565,6 +61445,14 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
 	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;
@@ -59607,6 +61495,13 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Returns the vertex format of the given buffer attribute.
+	 *
+	 * @private
+	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
+	 * @return {String} The vertex format (e.g. 'float32x3').
+	 */
 	_getVertexFormat( geometryAttribute ) {
 
 		const { itemSize, normalized } = geometryAttribute;
@@ -59652,12 +61547,27 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Returns `true` if the given array is a typed array.
+	 *
+	 * @private
+	 * @param {Any} array - The array.
+	 * @return {Boolean} Whether the given array is a typed array or not.
+	 */
 	_isTypedArray( array ) {
 
 		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
 
 	}
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @private
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
 	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
@@ -59668,15 +61578,47 @@ class WebGPUAttributeUtils {
 
 }
 
+/**
+ * A WebGPU backend utility module for managing bindings.
+ *
+ * When reading the documentation it's helpful to keep in mind that
+ * all class definitions starting with 'GPU*' are modules from the
+ * WebGPU API. So for example `BindGroup` is a class from the engine
+ * whereas `GPUBindGroup` is a class from WebGPU.
+ *
+ * @private
+ */
 class WebGPUBindingUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
+
+		/**
+		 * A cache for managing bind group layouts.
+		 *
+		 * @type {WeakMap<Array<Binding>,GPUBindGroupLayout>}
+		 */
 		this.bindGroupLayoutCache = new WeakMap();
 
 	}
 
+	/**
+	 * Creates a GPU bind group layout for the given bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @return {GPUBindGroupLayout} The GPU bind group layout.
+	 */
 	createBindingsLayout( bindGroup ) {
 
 		const backend = this.backend;
@@ -59846,6 +61788,14 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Creates bindings from the given bind group definition.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 * @param {Number} cacheIndex - The cache index.
+	 * @param {Number} version - The version.
+	 */
 	createBindings( bindGroup, bindings, cacheIndex, version = 0 ) {
 
 		const { backend, bindGroupLayoutCache } = this;
@@ -59899,6 +61849,11 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Updates a buffer binding.
+	 *
+	 *  @param {Buffer} binding - The buffer binding to update.
+	 */
 	updateBinding( binding ) {
 
 		const backend = this.backend;
@@ -59911,6 +61866,13 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Creates a GPU bind group for the given bind group and GPU layout.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {GPUBindGroupLayout} layoutGPU - The GPU bind group layout.
+	 * @return {GPUBindGroup} The GPU bind group.
+	 */
 	createBindGroup( bindGroup, layoutGPU ) {
 
 		const backend = this.backend;
@@ -60031,20 +61993,48 @@ class WebGPUBindingUtils {
 
 }
 
+/**
+ * A WebGPU backend utility module for managing pipelines.
+ *
+ * @private
+ */
 class WebGPUPipelineUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
 
 	}
 
-	_getSampleCount( renderObjectContext ) {
+	/**
+	 * Returns the sample count derived from the given render context.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Number} The sample count.
+	 */
+	_getSampleCount( renderContext ) {
 
-		return this.backend.utils.getSampleCountRenderContext( renderObjectContext );
+		return this.backend.utils.getSampleCountRenderContext( renderContext );
 
 	}
 
+	/**
+	 * Creates a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 */
 	createRenderPipeline( renderObject, promises ) {
 
 		const { object, material, geometry, pipeline } = renderObject;
@@ -60204,6 +62194,12 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Creates GPU render bundle encoder for the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {GPURenderBundleEncoder} The GPU render bundle encoder.
+	 */
 	createBundleEncoder( renderContext ) {
 
 		const backend = this.backend;
@@ -60224,6 +62220,12 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Creates a compute pipeline for the given compute node.
+	 *
+	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 * @param {Array<BindGroup>} bindings - The bindings.
+	 */
 	createComputePipeline( pipeline, bindings ) {
 
 		const backend = this.backend;
@@ -60254,6 +62256,14 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Returns the blending state as a descriptor object required
+	 * for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Material} material - The material.
+	 * @return {Object} The blending state.
+	 */
 	_getBlending( material ) {
 
 		let color, alpha;
@@ -60361,7 +62371,13 @@ class WebGPUPipelineUtils {
 		}
 
 	}
-
+	/**
+	 * Returns the GPU blend factor which is required for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Number} blend - The blend factor as a three.js constant.
+	 * @return {String} The GPU blend factor.
+	 */
 	_getBlendFactor( blend ) {
 
 		let blendFactor;
@@ -60429,6 +62445,13 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Returns the GPU stencil compare function which is required for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Material} material - The material.
+	 * @return {String} The GPU stencil compare function.
+	 */
 	_getStencilCompare( material ) {
 
 		let stencilCompare;
@@ -60478,6 +62501,13 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Returns the GPU stencil operation which is required for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Number} op - A three.js constant defining the stencil operation.
+	 * @return {String} The GPU stencil operation.
+	 */
 	_getStencilOperation( op ) {
 
 		let stencilOperation;
@@ -60525,6 +62555,13 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Returns the GPU blend operation which is required for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Number} blendEquation - A three.js constant defining the blend equation.
+	 * @return {String} The GPU blend operation.
+	 */
 	_getBlendOperation( blendEquation ) {
 
 		let blendOperation;
@@ -60560,6 +62597,16 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Returns the primitive state as a descriptor object required
+	 * for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Object3D} object - The 3D object.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @param {Material} material - The material.
+	 * @return {Object} The primitive state.
+	 */
 	_getPrimitiveState( object, geometry, material ) {
 
 		const descriptor = {};
@@ -60600,12 +62647,26 @@ class WebGPUPipelineUtils {
 
 	}
 
+	/**
+	 * Returns the GPU color write mask which is required for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Material} material - The material.
+	 * @return {String} The GPU color write mask.
+	 */
 	_getColorWriteMask( material ) {
 
 		return ( material.colorWrite === true ) ? GPUColorWriteFlags.All : GPUColorWriteFlags.None;
 
 	}
 
+	/**
+	 * Returns the GPU depth compare function which is required for the pipeline creation.
+	 *
+	 * @private
+	 * @param {Material} material - The material.
+	 * @return {String} The GPU depth compare function.
+	 */
 	_getDepthCompare( material ) {
 
 		let depthCompare;
@@ -60670,7 +62731,6 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
 //*/
 
 
-
 /**
  * A backend implementation targeting WebGPU.
  *
@@ -60689,11 +62749,11 @@ class WebGPUBackend extends Backend {
 	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 * @param {Boolean} [parameters.trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
-	 * @param {String?} [parameters.powerPreference=null] - The power preference.
-	 * @param {String?} [parameters.requiredLimits={}] - Specifies the limits that are required by the device request.
-	 * The request will fail if the adapter cannot provide these limits.
+	 * @param {String} [parameters.powerPreference=undefined] - The power preference.
+	 * @param {Object} [parameters.requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
+	 * @param {GPUDevice} [parameters.device=undefined] - If there is an exisitng GPU device on app level, it can be passed to the renderer as a parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -60909,8 +62969,8 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Transfers buffer data from a storage buffer attribute
-	 * from the GPU to the CPU in context of compute shaders.
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
@@ -60937,7 +62997,7 @@ class WebGPUBackend extends Backend {
 	 * Returns the default render pass descriptor.
 	 *
 	 * In WebGPU, the default framebuffer must be configured
-	 * like custom fraemebuffers so the backend needs a render
+	 * like custom framebuffers so the backend needs a render
 	 * pass descriptor even when rendering directly to screen.
 	 *
 	 * @private
@@ -62013,7 +64073,7 @@ class WebGPUBackend extends Backend {
 	// textures
 
 	/**
-	 * Creates a sampler for the given texture.
+	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
 	 */
@@ -62024,7 +64084,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Destroys the sampler for the given texture.
+	 * Destroys the GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to destroy the sampler for.
 	 */
@@ -62071,7 +64131,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Generates mipmaps for the given texture
+	 * Generates mipmaps for the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
 	 */
@@ -62095,15 +64155,16 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Returns texture data as a typed array.
 	 *
+	 * @async
 	 * @param {Texture} texture - The texture to copy.
 	 * @param {Number} x - The x coordinate of the copy origin.
 	 * @param {Number} y - The y coordinate of the copy origin.
 	 * @param {Number} width - The width of the copy.
 	 * @param {Number} height - The height of the copy.
 	 * @param {Number} faceIndex - The face index.
-	 * @return {TypedArray} The texture data as a typed array.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
@@ -62401,7 +64462,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of a shader attribute.
+	 * Creates the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -62412,7 +64473,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of a storage attribute.
+	 * Creates the GPU buffer of a storage attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -62423,7 +64484,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates the buffer of an indirect storage attribute.
+	 * Creates the GPU buffer of an indirect storage attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
@@ -62434,7 +64495,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Updates the buffer of a shader attribute.
+	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
 	 */
@@ -62445,7 +64506,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Destroys the buffer of a shader attribute.
+	 * Destroys the GPU buffer of a shader attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
@@ -62784,10 +64845,8 @@ class WebGPURenderer extends Renderer {
 	 * @param {Boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0
-	 * to overwrite the default.
-	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it
-	 * WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 */
 	constructor( parameters = {} ) {
 
@@ -63661,4 +65720,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayElementNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, InstancedPointsNodeMaterial, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayElementNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, InstancedPointsNodeMaterial, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };

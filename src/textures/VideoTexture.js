@@ -14,39 +14,11 @@ class VideoTexture extends Texture {
 
 		this.generateMipmaps = false;
 
-		const scope = this;
-
-		function updateVideo() {
-
-			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
-		if ( 'requestVideoFrameCallback' in video ) {
-
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
 	}
 
 	clone() {
 
 		return new this.constructor( this.image ).copy( this );
-
-	}
-
-	update() {
-
-		const video = this.image;
-		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
-
-		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
-
-			this.needsUpdate = true;
-
-		}
 
 	}
 

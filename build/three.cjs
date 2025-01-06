@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2010-2024 Three.js Authors
+ * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 'use strict';
 
-const REVISION = '172';
+const REVISION = '173dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -17485,21 +17485,6 @@ class VideoTexture extends Texture {
 
 		this.generateMipmaps = false;
 
-		const scope = this;
-
-		function updateVideo() {
-
-			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
-		if ( 'requestVideoFrameCallback' in video ) {
-
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
 	}
 
 	clone() {
@@ -17508,18 +17493,39 @@ class VideoTexture extends Texture {
 
 	}
 
-	update() {
+}
 
-		const video = this.image;
-		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
+class VideoFrameTexture extends Texture {
 
-		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
+    constructor( videoFrame, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-			this.needsUpdate = true;
+        super( videoFrame, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-		}
+        this.isVideoTexture = true;
 
-	}
+        this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
+        this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
+
+        this.generateMipmaps = false;
+
+    }
+
+    clone() {
+
+        return new this.constructor( this.image ).copy( this );
+
+    }
+
+    update(  ) {
+
+    }
+
+    setFrame( videoFrame ) {
+
+        this.image = videoFrame;
+        this.needsUpdate = true;
+
+    }
 
 }
 
@@ -38577,12 +38583,16 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 			boxMesh.geometry.dispose();
 			boxMesh.material.dispose();
 
+			boxMesh = undefined;
+
 		}
 
 		if ( planeMesh !== undefined ) {
 
 			planeMesh.geometry.dispose();
 			planeMesh.material.dispose();
+
+			planeMesh = undefined;
 
 		}
 
@@ -50736,8 +50746,11 @@ class WebXRManager extends EventDispatcher {
 				//
 
 				const enabledFeatures = session.enabledFeatures;
+				const gpuDepthSensingEnabled = enabledFeatures &&
+					enabledFeatures.includes( 'depth-sensing' ) &&
+					session.depthUsage == 'gpu-optimized';
 
-				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
+				if ( gpuDepthSensingEnabled && glBinding ) {
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
@@ -55065,6 +55078,7 @@ exports.Vector2 = Vector2;
 exports.Vector3 = Vector3;
 exports.Vector4 = Vector4;
 exports.VectorKeyframeTrack = VectorKeyframeTrack;
+exports.VideoFrameTexture = VideoFrameTexture;
 exports.VideoTexture = VideoTexture;
 exports.WebGL3DRenderTarget = WebGL3DRenderTarget;
 exports.WebGLArrayRenderTarget = WebGLArrayRenderTarget;
