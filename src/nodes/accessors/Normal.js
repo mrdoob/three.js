@@ -77,7 +77,9 @@ export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection(
  */
 export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.context.setupNormal();
+	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
+
+	return builder.context.setupNormal().context( { getUV: null } );
 
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
 
@@ -95,7 +97,9 @@ export const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transf
  */
 export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.context.setupClearcoatNormal();
+	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
+
+	return builder.context.setupClearcoatNormal().context( { getUV: null } );
 
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedClearcoatNormalView' );
 
