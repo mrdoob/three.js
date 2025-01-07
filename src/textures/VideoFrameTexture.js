@@ -11,7 +11,7 @@ class VideoFrameTexture extends VideoTexture {
 	update() {
 
 		// overwrites `VideoTexture.update()` with an empty method since
-		// VideoTextureFrame are updated via `setFrame()`.
+		// this type of texture is updated via `setFrame()`.
 
 	}
 
