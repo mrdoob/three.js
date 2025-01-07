@@ -2072,10 +2072,18 @@ class WebGLRenderer {
 			if ( object.isBatchedMesh ) {
 
 				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
-				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+				if ( objects._matricesTexture !== null ) {
+
+					p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+
+				}
 
 				p_uniforms.setOptional( _gl, object, 'batchingIdTexture' );
-				p_uniforms.setValue( _gl, 'batchingIdTexture', object._indirectTexture, textures );
+				if ( object._indirectTexture !== null ) {
+
+					p_uniforms.setValue( _gl, 'batchingIdTexture', object._indirectTexture, textures );
+
+				}
 
 				p_uniforms.setOptional( _gl, object, 'batchingColorTexture' );
 				if ( object._colorsTexture !== null ) {
