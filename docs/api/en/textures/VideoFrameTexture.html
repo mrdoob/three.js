@@ -7,44 +7,37 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Texture] &rarr;
+		[page:VideoTexture] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates a texture for use with a video.</p>
-
-		<p>
-			Note: After the initial use of a texture, the video cannot be changed.
-			Instead, call [page:.dispose]() on the texture and instantiate a new one.
+		<p class="desc">
+			This class can be used as an alternative way to define video data. Instead of using
+			an instance of `HTMLVideoElement` like with `VideoTexture`, [name] expects each frame is 
+			defined manaully via [page:.setFrame setFrame](). A typical use case for this module is when
+			video frames are decoded with the WebCodecs API.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		// assuming you have created a HTML video element with id="video"
-		const video = document.getElementById( 'video' );
-		const texture = new THREE.VideoTexture( video );
+		const texture = new THREE.VideoFrameTexture();
+		texture.setFrame( frame );
 		</code>
 
 		<h2>Examples</h2>
 
 		<p>
-			[example:webgl_materials_video materials / video]<br />
-			[example:webgl_materials_video_webcam materials / video / webcam]<br />
-			[example:webgl_video_kinect video / kinect]<br />
-			[example:webgl_video_panorama_equirectangular video / panorama / equirectangular]<br />
-			[example:webxr_vr_video vr / video]
+			[example:webgpu_video_frame video / frame]
 		</p>
 
 		<h2>Constructor</h2>
 		<h3>
-			[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], 
+			[name]( [param:Constant mapping], [param:Constant wrapS], 
 			[param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], 
 			[param:Constant format], [param:Constant type], [param:Number anisotropy] )
 		</h3>
 		<p>
-			[page:Video video] -- The video element to use as the texture. <br />
-
 			[page:Constant mapping] -- How the image is applied to the object. An
 			object type of [page:Textures THREE.UVMapping]. 
 			See [page:Textures mapping constants] for other choices.<br />
@@ -84,28 +77,16 @@
 
 		<h2>Properties</h2>
 
-		<p>See the base [page:Texture Texture] class for common properties.</p>
-
-		<h3>[property:Boolean generateMipmaps]</h3>
-		<p>Whether to generate mipmaps. `false` by default.</p>
-
-		<h3>[property:Boolean isVideoTexture]</h3>
-		<p>Read-only flag to check if a given object is of type [name].</p>
-
-		<h3>[property:Boolean needsUpdate]</h3>
-		<p>
-			You will not need to set this manually here as it is handled by the
-			[page:VideoTexture.update update]() method.
-		</p>
+		<p>See the base [page:VideoTexture VideoTexture] class for common properties.</p>
 
 		<h2>Methods</h2>
 
-		<p>See the base [page:Texture Texture] class for common methods.</p>
+		<p>See the base [page:VideoTexture VideoTexture] class for common methods.</p>
 
-		<h3>[method:undefined update]()</h3>
+		<h3>[method:undefined setFrame]( [param:VideoFrame frame] )</h3>
 		<p>
-			This is called automatically and sets [page:VideoTexture.needsUpdate .needsUpdate] 
-			to `true` every time a new frame is available.
+			Sets the current frame of the video. This will automatically update the texture 
+			so the data can be used for rendering.
 		</p>
 
 		<h2>Source</h2>

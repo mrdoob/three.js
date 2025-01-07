@@ -318,6 +318,7 @@
 				"FramebufferTexture": "api/en/textures/FramebufferTexture",
 				"Source": "api/en/textures/Source",
 				"Texture": "api/en/textures/Texture",
+				"VideoFrameTexture": "api/en/textures/VideoFrameTexture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
 
