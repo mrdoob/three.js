@@ -93,11 +93,9 @@ class NormalMapNode extends TempNode {
 
 	setup( builder ) {
 
-		const { normalMapType, node, scaleNode } = this;
+		const { normalMapType, scaleNode } = this;
 
-		const normalNode = node.context( { getUV: () => node.uvNode || uv() } ); // avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
-
-		let normalMap = normalNode.mul( 2.0 ).sub( 1.0 );
+		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
 
 		if ( scaleNode !== null ) {
 
