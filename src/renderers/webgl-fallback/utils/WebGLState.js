@@ -271,11 +271,11 @@ class WebGLState {
 	 *
 	 * @param {Number} blending - The blending type.
 	 * @param {Number} blendEquation - The blending equation.
-	 * @param {Number} blendSrc - Only relevant for custuom blending. The RGB source blending factor.
-	 * @param {Number} blendDst - Only relevant for custuom blending. The RGB destination blending factor.
-	 * @param {Number} blendEquationAlpha - Only relevant for custuom blending. The blending equation for alpha.
-	 * @param {Number} blendSrcAlpha - Only relevant for custuom blending. The alpha source blending factor.
-	 * @param {Number} blendDstAlpha - Only relevant for custuom blending. The alpha destination blending factor.
+	 * @param {Number} blendSrc - Only relevant for custom blending. The RGB source blending factor.
+	 * @param {Number} blendDst - Only relevant for custom blending. The RGB destination blending factor.
+	 * @param {Number} blendEquationAlpha - Only relevant for custom blending. The blending equation for alpha.
+	 * @param {Number} blendSrcAlpha - Only relevant for custom blending. The alpha source blending factor.
+	 * @param {Number} blendDstAlpha - Only relevant for custom blending. The alpha destination blending factor.
 	 * @param {Boolean} premultipliedAlpha - Whether premultiplied alpha is enabled or not.
 	 */
 	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
@@ -565,7 +565,7 @@ class WebGLState {
 	}
 
 	/**
-	 * Specifies whether stencol values can be written when rendering
+	 * Specifies whether stencil values can be written when rendering
 	 * into a framebuffer or not.
 	 *
 	 * This method caches the state so `gl.stencilMask()` is only

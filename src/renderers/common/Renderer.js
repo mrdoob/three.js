@@ -353,7 +353,7 @@ class Renderer {
 		this._objects = null;
 
 		/**
-		 * A reference to a renderer module for managing render and cmopute pipelines.
+		 * A reference to a renderer module for managing render and compute pipelines.
 		 *
 		 * @private
 		 * @type {Pipelines?}
@@ -546,7 +546,7 @@ class Renderer {
 
 		/**
 		 * Next to `_renderObjectFunction()`, this function provides another hook
-		 * for influening the render process of a render object. It is meant for internal
+		 * for influencing the render process of a render object. It is meant for internal
 		 * use and only relevant for `compileAsync()` right now. Instead of using
 		 * the default logic of `_renderObjectDirect()` which actually draws the render object,
 		 * a different function might be used which performs no draw but just the node
@@ -656,7 +656,7 @@ class Renderer {
 		 * @typedef {Object} DebugConfig
 		 * @property {Boolean} checkShaderErrors - Whether shader errors should be checked or not.
 		 * @property {Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
-		 * @property {Function} getShaderAsync - Allows the get the raw shader code for the given scene, camerea and 3D object.
+		 * @property {Function} getShaderAsync - Allows the get the raw shader code for the given scene, camera and 3D object.
 		 */
 
 		/**
@@ -1433,7 +1433,7 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Function} callback - The application's animation loop.
-	 * @return {Promise} A Promise that resolves when the set has been exeucted.
+	 * @return {Promise} A Promise that resolves when the set has been executed.
 	 */
 	async setAnimationLoop( callback ) {
 

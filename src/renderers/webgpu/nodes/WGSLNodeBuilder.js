@@ -195,7 +195,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.builtins = {};
 
 		/**
-		 * A dictionary thath holds for each shader stage a Set of directives.
+		 * A dictionary that holds for each shader stage a Set of directives.
 		 *
 		 * @type {Object<String,Set<String>>}
 		 */

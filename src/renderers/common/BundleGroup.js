@@ -1,7 +1,7 @@
 import { Group } from '../../objects/Group.js';
 
 /**
- * A specialized group which eanbles applications access to the
+ * A specialized group which enables applications access to the
  * Render Bundle API of WebGPU. The group with all its descendant nodes
  * are considered as one render bundle and processed as such by
  * the renderer.

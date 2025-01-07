@@ -9,7 +9,7 @@ import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferA
  * @private
  * @function
  * @param {Array<Number>} array - The array to test.
- * @return {Booolean} Whether the given array has values that require an Uint32 array type or not.
+ * @return {Boolean} Whether the given array has values that require an Uint32 array type or not.
  */
 function arrayNeedsUint32( array ) {
 
@@ -31,7 +31,7 @@ function arrayNeedsUint32( array ) {
  * @private
  * @function
  * @param {BufferGeometry} geometry - The geometry.
- * @return {Number} The versio.
+ * @return {Number} The version.
  */
 function getWireframeVersion( geometry ) {
 

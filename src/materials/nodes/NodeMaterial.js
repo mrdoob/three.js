@@ -249,7 +249,7 @@ class NodeMaterial extends Material {
 		/**
 		 * This node property is intended for logic which modifies geometry data once or per animation step.
 		 * Apps usually place such logic randomly in initialization routines or in the animation loop.
-		 * `geometryNode` is intended as a dedicated API so there is an intended spot where goemetry modiciations
+		 * `geometryNode` is intended as a dedicated API so there is an intended spot where geometry modifications
 		 * can be implemented.
 		 *
 		 * The idea is to assign a `Fn` definition that holds the geometry modification logic. A typical example
@@ -636,7 +636,7 @@ class NodeMaterial extends Material {
 
 	/**
 	 * Setups the position node in view space. This method exists
-	 * so derived node materials can modifiy the implementation e.g. sprite materials.
+	 * so derived node materials can modify the implementation e.g. sprite materials.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Node<vec3>} The position in view space.

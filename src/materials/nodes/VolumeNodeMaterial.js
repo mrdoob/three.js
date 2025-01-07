@@ -13,7 +13,7 @@ import { Color } from '../../math/Color.js';
 /** @module VolumeNodeMaterial **/
 
 /**
- * Node material intended for volume rendering. The volumetic data are
+ * Node material intended for volume rendering. The volumetric data are
  * defined with an instance of {@link Data3DTexture}.
  *
  * @augments NodeMaterial
@@ -83,10 +83,10 @@ class VolumeNodeMaterial extends NodeMaterial {
 		 * The volume rendering of this material works by shooting rays
 		 * from the camera position through each fragment of the mesh's
 		 * surface and sample the inner volume in a raymarching fashion
-		 * mutiple times.
+		 * multiple times.
 		 *
 		 * This node can be used to assign a callback function of type `Fn`
-		 * that will be exexuted per sample. The callback receives the
+		 * that will be executed per sample. The callback receives the
 		 * texture, the sampled texture value as well as position on the surface
 		 * where the rays enters the volume. The last parameter is a color
 		 * that allows the callback to determine the final color.

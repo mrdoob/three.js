@@ -5,10 +5,10 @@ import { nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * `AtomicFunctionNode` represents any function that can operate on atomic variable types
- * within a shader. In an atomic function, any modifiation to an atomic variable will
- * occur as an indivisble step with a defined order relative to other modifications.
+ * within a shader. In an atomic function, any modification to an atomic variable will
+ * occur as an indivisible step with a defined order relative to other modifications.
  * Accordingly, even if multiple atomic functions are modifying an atomic variable at once
- * atomic operations will not interfer with each other.
+ * atomic operations will not interfere with each other.
  *
  * This node can only be used with a WebGPU backend.
  *

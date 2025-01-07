@@ -58,7 +58,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 /**
  * A node allowing the user to create a 'workgroup' scoped buffer within the
  * context of a compute shader. Typically, workgroup scoped buffers are
- * created to hold data that is transfered from a global storage scope into
+ * created to hold data that is transferred from a global storage scope into
  * a local workgroup scope. For invocations within a workgroup, data
  * access speeds on 'workgroup' scoped buffers can be significantly faster
  * than similar access operations on globally accessible storage buffers.

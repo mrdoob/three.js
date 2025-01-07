@@ -35,7 +35,7 @@ class NodeObjectLoader extends ObjectLoader {
 		this.nodeMaterials = {};
 
 		/**
-		 * A reference for holdng the `nodes` JSON property.
+		 * A reference to hold the `nodes` JSON property.
 		 *
 		 * @private
 		 * @type {Object?}
