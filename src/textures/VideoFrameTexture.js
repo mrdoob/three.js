@@ -15,6 +15,12 @@ class VideoFrameTexture extends VideoTexture {
 
 	}
 
+	clone() {
+
+		return new this.constructor().copy( this ); // restoring Texture.clone()
+
+	}
+
 	setFrame( frame ) {
 
 		this.image = frame;
