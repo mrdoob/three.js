@@ -41,10 +41,9 @@ class VideoTexture extends Texture {
 
 		const video = this.image;
 
-		const isVideoFrame = video instanceof VideoFrame;
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-		if ( isVideoFrame === false && hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
+		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			this.needsUpdate = true;
 
