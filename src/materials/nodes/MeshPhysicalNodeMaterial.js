@@ -468,7 +468,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Setups the clearcoat normal node.
 	 *
-	 * @return {Node<vec3>} The clearcoat noraml.
+	 * @return {Node<vec3>} The clearcoat normal.
 	 */
 	setupClearcoatNormal() {
 

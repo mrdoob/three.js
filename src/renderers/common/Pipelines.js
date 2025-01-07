@@ -55,7 +55,7 @@ class Pipelines extends DataMap {
 
 		/**
 		 * This dictionary maintains for each shader stage type (vertex,
-		 * fragment and compute) the progammable stage objects which
+		 * fragment and compute) the programmable stage objects which
 		 * represent the actual shader code.
 		 *
 		 * @type {Object<String,Map>}
@@ -419,7 +419,7 @@ class Pipelines extends DataMap {
 	 * Releases the shader program.
 	 *
 	 * @private
-	 * @param {Object} program - The shdaer program to release.
+	 * @param {Object} program - The shader program to release.
 	 */
 	_releaseProgram( program ) {
 

@@ -98,7 +98,7 @@ class NodeLibrary {
 	/**
 	 * Returns a node material class definition for a material type.
 	 *
-	 * @param {Sring} materialType - The material type.
+	 * @param {String} materialType - The material type.
 	 * @return {NodeMaterial.constructor?} The node material class definition. Returns `null` if no node material is found.
 	 */
 	getMaterialNodeClass( materialType ) {
@@ -111,7 +111,7 @@ class NodeLibrary {
 	 * Adds a node material class definition for a given material type.
 	 *
 	 * @param {NodeMaterial.constructor} materialNodeClass - The node material class definition.
-	 * @param {Sring} materialClassType - The material type.
+	 * @param {String} materialClassType - The material type.
 	 */
 	addMaterial( materialNodeClass, materialClassType ) {
 

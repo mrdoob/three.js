@@ -2082,11 +2082,11 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Creates a tranform feedback from the given transform buffers.
+	 * Creates a transform feedback from the given transform buffers.
 	 *
 	 * @private
-	 * @param {Array<DualAttributeData>} transformBuffers - The tranform buffers.
-	 * @return {WebGLTransformFeedback} The tranform feedback.
+	 * @param {Array<DualAttributeData>} transformBuffers - The transform buffers.
+	 * @return {WebGLTransformFeedback} The transform feedback.
 	 */
 	_getTransformFeedback( transformBuffers ) {
 

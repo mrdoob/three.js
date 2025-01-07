@@ -791,7 +791,7 @@ class Nodes extends DataMap {
 	}
 
 	/**
-	 * Frees the intenral resources.
+	 * Frees the internal resources.
 	 */
 	dispose() {
 

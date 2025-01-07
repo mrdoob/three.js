@@ -85,7 +85,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	}
 
 	/**
-	 * This method must be overwriten since light maps are evaluated
+	 * This method must be overwritten since light maps are evaluated
 	 * with a special scaling factor for basic materials.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

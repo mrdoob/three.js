@@ -134,7 +134,7 @@ class WebGLTextureUtils {
 	/**
 	 * Returns the native texture type for the given texture.
 	 *
-	 * @param {String?} internalFormatName - The internal format name. When `null`, the intenral format is derived from the subsequent parameters.
+	 * @param {String?} internalFormatName - The internal format name. When `null`, the internal format is derived from the subsequent parameters.
 	 * @param {GLenum} glFormat - The WebGL format.
 	 * @param {GLenum} glType - The WebGL type.
 	 * @param {String} colorSpace - The texture's color space.
@@ -915,7 +915,7 @@ class WebGLTextureUtils {
 	/**
 	 * SetupS storage for internal depth/stencil buffers and bind to correct framebuffer.
 	 *
-	 * @param {WebGLRenderbuffer} renderbuffer - The rendner buffer.
+	 * @param {WebGLRenderbuffer} renderbuffer - The render buffer.
 	 * @param {RenderContext} renderContext - The render context.
 	 */
 	setupRenderBufferStorage( renderbuffer, renderContext ) {
