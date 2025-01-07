@@ -540,7 +540,7 @@ export const materialMetalness = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
  *
  * @type {Node<vec3>}
  */
-export const materialNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.NORMAL ).context( { getUV: null } );
+export const materialNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.NORMAL );
 
 /**
  * TSL object that represents the clearcoat of the current material.
@@ -564,7 +564,7 @@ export const materialClearcoatRoughness = /*@__PURE__*/ nodeImmutable( MaterialN
  *
  * @type {Node<vec3>}
  */
-export const materialClearcoatNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_NORMAL ).context( { getUV: null } );
+export const materialClearcoatNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_NORMAL );
 
 /**
  * TSL object that represents the rotation of the current sprite material.
