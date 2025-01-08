@@ -211,8 +211,15 @@ export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
 
-//
+// deprecated
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link select} instead.
+ *
+ * @param  {...any} params
+ * @returns {ConditionalNode}
+ */
 export const cond = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.ConditionalNode: cond() has been renamed to select().' );
