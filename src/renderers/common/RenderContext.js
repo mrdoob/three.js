@@ -132,6 +132,14 @@ class RenderContext {
 		this.scissorValue = new Vector4();
 
 		/**
+		 * The active render target.
+		 *
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
+		this.renderTarget = null;
+
+		/**
 		 * The textures of the active render target.
 		 * `null` when no render target is set.
 		 *
@@ -167,7 +175,7 @@ class RenderContext {
 		this.sampleCount = 1;
 
 		/**
-		 * The framebuffers width in physical pixels.
+		 * The active render target's width in physical pixels.
 		 *
 		 * @type {Number}
 		 * @default 0
@@ -175,12 +183,28 @@ class RenderContext {
 		this.width = 0;
 
 		/**
-		 * The framebuffers height in physical pixels.
+		 * The active render target's height in physical pixels.
 		 *
 		 * @type {Number}
 		 * @default 0
 		 */
 		this.height = 0;
+
+		/**
+		 * The occlusion query count.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.occlusionQueryCount = 0;
+
+		/**
+		 * The current clipping context.
+		 *
+		 * @type {ClippingContext?}
+		 * @default null
+		 */
+		this.clippingContext = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -207,7 +231,9 @@ class RenderContext {
 }
 
 /**
- * Computes a cache key for the given render context.
+ * Computes a cache key for the given render context. This cache
+ * should identify the render target state so it is possible to
+ * configure the correct attachments in the respective backend.
  *
  * @param {RenderContext} renderContext - The render context.
  * @return {Number} The cache key.
