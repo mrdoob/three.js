@@ -65,6 +65,15 @@ class OperatorNode extends TempNode {
 		 */
 		this.bNode = bNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isOperatorNode = true;
+
 	}
 
 	/**

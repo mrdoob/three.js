@@ -1604,9 +1604,11 @@ class NodeBuilder {
 	 * @param {String?} name - The variable's name.
 	 * @param {String} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @param {Boolean} [readOnly=false] - Whether the variable is read-only or not.
+	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -1614,19 +1616,61 @@ class NodeBuilder {
 
 		if ( nodeVar === undefined ) {
 
+			const idNS = readOnly ? '_const' : '_var';
+
 			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
+			const id = this.vars[ idNS ] || ( this.vars[ idNS ] = 0 );
 
-			if ( name === null ) name = 'nodeVar' + vars.length;
+			if ( name === null ) {
 
-			nodeVar = new NodeVar( name, type );
+				name = ( readOnly ? 'nodeConst' : 'nodeVar' ) + id;
 
-			vars.push( nodeVar );
+				this.vars[ idNS ] ++;
+
+			}
+
+			nodeVar = new NodeVar( name, type, readOnly );
+
+			if ( ! readOnly ) {
+
+				vars.push( nodeVar );
+
+			}
 
 			nodeData.variable = nodeVar;
 
 		}
 
 		return nodeVar;
+
+	}
+
+	/**
+	 * Returns whether a Node or its flow is deterministic, useful for use in `const`.
+	 *
+	 * @param {Node} node - The varying node.
+	 * @return {Boolean} Returns true if deterministic.
+	 */
+	isDeterministic( node ) {
+
+		if ( node.isMathNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true ) &&
+				( node.cNode ? this.isDeterministic( node.cNode ) : true );
+
+		} else if ( node.isOperatorNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true );
+
+		} else if ( node.isConstNode ) {
+
+			return true;
+
+		}
+
+		return false;
 
 	}
 

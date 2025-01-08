@@ -65,6 +65,15 @@ class MathNode extends TempNode {
 		 */
 		this.cNode = cNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isMathNode = true;
+
 	}
 
 	/**
