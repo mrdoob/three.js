@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Как использовать постобработку ([name])</h1>
+
+		<p>
+		     Многие приложения three.js отображают свои 3D-объекты непосредственно на экране. Однако
+		     иногда вам нужно применить один или несколько графических эффектов, такие как глубина
+		     резкости, цветение, зернистость пленки или различные типы сглаживания. Постобработка —
+		     это широко используемый подход к реализации таких эффектов. Сначала сцена 
+		     визуализируется в целевой объект рендеринга, который представляет собой буфер в памяти 
+		     видеокарты. На следующем этапе один или несколько проходов постобработки применяют 
+		     фильтры и эффекты к буферу изображения, прежде чем оно в конечном итоге будет обработано
+		     на экран. 
+		</p>
+		<p>
+			three.js предоставляет комплексное решение для постобработки через [page:EffectComposer] для
+			реализации такого рабочего процесса. 
+		</p>
+
+		<h2>Рабочий процесс</h2>
+
+		<p> 
+		     Первым шагом в этом процессе является импорт всех необходимых файлов из каталога
+		     примеров. Руководство предполагает, что вы используете официальную [link:https://www.npmjs.com/package/three npm package] three.js. 
+		     Для нашей базовой демонстрации в этом руководстве нам нужны следующие файлы. 
+		</p>
+
+		<code>
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		</code>
+
+		<p>
+			После успешного импорта всех файлов мы можем создать наш composer,
+			передав экземпляр [page:WebGLRenderer].
+		</p>
+
+		<code>
+		const composer = new EffectComposer( renderer );
+		</code>
+
+		<p>
+			При использовании composer, необходимо изменить цикл анимации приложения. Вместо 
+			вызова метода рендеринга [page:WebGLRenderer], мы теперь используем соответствующий аналог
+			[page:EffectComposer].
+		</p>
+
+		<code>
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			composer.render();
+
+		}
+		</code>
+
+		<p>
+			Наш composer теперь готов, поэтому можно настроить цепочку проходов постобработки. Эти
+			проходы отвечают за создание окончательного визуального результата приложения. Они 
+			обрабатываются в порядке их добавления/вставки. В нашем примере сначала выполняется 
+			экземпляр `RenderPass`, затем экземпляр `GlitchPass` и наконец `OutputPass`. Последний 
+			включенный проход в цепочке автоматически отображается на экране. Настройка пропусков
+			выглядит так: 
+		</p>
+
+		<code>
+		const renderPass = new RenderPass( scene, camera );
+		composer.addPass( renderPass );
+
+		const glitchPass = new GlitchPass();
+		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
+		</code>
+
+		<p>
+			`RenderPass` обычно размещается в начале цепочки, чтобы предоставить визуализированную
+			сцену в качестве входных данных для следующего шага постобработки. В нашем случае 
+			`GlitchPass` собирается использовать эти данные изображения для применения эффекта диких 
+			сбоев. `OutputPass` обычно является последним этапом в цепочке, которая выполняет 
+			преобразование цветового пространства sRGB и отображение тонов. Посмотрите этот
+			[link:https://threejs.org/examples/webgl_postprocessing_glitch live example] чтобы увидеть его в действии.
+		</p>
+
+		<h2>Встроенные пропуска</h2>
+
+		<p>
+			Вы можете использовать широкий спектр предопределенных проходов постобработки,
+			предоставляемых движком. Они расположены в каталоге [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing].
+		</p>
+
+		<h2>Пользовательские пропуска</h2>
+
+		<p>
+		     Иногда вам нужно написать собственный шейдер постобработки и включить его в цепочку
+		     проходов постобработки. Для этого сценария вы можете использовать `ShaderPass`. После
+		     импорта файла и вашего пользовательского шейдера вы можете использовать следующий код
+		     для настройки прохода. 
+		</p>
+
+		<code>
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
+
+		// позже в вашей процедуре инициализации
+
+		const luminosityPass = new ShaderPass( LuminosityShader );
+		composer.addPass( luminosityPass );
+		</code>
+
+		<p>
+			В репозитории имеется файл [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/CopyShader.js CopyShader], который представляет собой хороший стартовый код 
+			для вашего собственного шейдера. `CopyShader` просто копирует содержимое изображения из 
+			[page:EffectComposer] буфера чтения в свой буфер записи без применения каких-либо эффектов.
+		</p>
+
+	</body>
+</html>
