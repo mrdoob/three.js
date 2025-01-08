@@ -1951,14 +1951,14 @@
 				"Полезные ссылки": "manual/ru/introduction/Useful-links"
 			},
 
-			"Next Steps": {
-				"How to update things": "manual/en/introduction/How-to-update-things",
-				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
-				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
-				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
-				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
-				"Animation system": "manual/en/introduction/Animation-system",
-				"Color management": "manual/en/introduction/Color-management"
+			"Следующие шаги": {
+				"Как обновить предметы": "manual/ru/introduction/How-to-update-things",
+				"Как избавиться от предметов": "manual/ru/introduction/How-to-dispose-of-objects",
+				"Как создавать VR-контент": "manual/ru/introduction/How-to-create-VR-content",
+				"Как использовать постобработку": "manual/ru/introduction/How-to-use-post-processing",
+				"Матричные преобразования": "manual/ru/introduction/Matrix-transformations",
+				"Анимационная система": "manual/ru/introduction/Animation-system",
+				"Управление цветом": "manual/ru/introduction/Color-management"
 			}
 
 		},
