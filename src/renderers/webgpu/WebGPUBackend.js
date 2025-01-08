@@ -1468,21 +1468,21 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		if ( ! renderContextData.timeStampQuerySet ) {
+		if ( ! renderContextData.timestampQuerySet ) {
 
 
 			const type = renderContext.isComputeNode ? 'compute' : 'render';
-			const timeStampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
+			const timestampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
 			const timestampWrites = {
-				querySet: timeStampQuerySet,
+				querySet: timestampQuerySet,
 				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
 				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
 			};
 
 			Object.assign( descriptor, { timestampWrites } );
 
-			renderContextData.timeStampQuerySet = timeStampQuerySet;
+			renderContextData.timestampQuerySet = timestampQuerySet;
 
 		}
 
@@ -1523,7 +1523,7 @@ class WebGPUBackend extends Backend {
 		const { resolveBuffer, resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
 
-		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
+		encoder.resolveQuerySet( renderContextData.timestampQuerySet, 0, 2, resolveBuffer, 0 );
 
 		if ( resultBuffer.mapState === 'unmapped' ) {
 
