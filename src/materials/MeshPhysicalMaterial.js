@@ -1,15 +1,9 @@
 import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { clamp } from '../math/MathUtils.js';
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
-
-	static get type() {
-
-		return 'MeshPhysicalMaterial';
-
-	}
 
 	constructor( parameters ) {
 
@@ -23,6 +17,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			'PHYSICAL': ''
 
 		};
+
+		this.type = 'MeshPhysicalMaterial';
 
 		this.anisotropyRotation = 0;
 		this.anisotropyMap = null;
@@ -38,7 +34,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		Object.defineProperty( this, 'reflectivity', {
 			get: function () {
 
-				return ( MathUtils.clamp( 2.5 * ( this.ior - 1 ) / ( this.ior + 1 ), 0, 1 ) );
+				return ( clamp( 2.5 * ( this.ior - 1 ) / ( this.ior + 1 ), 0, 1 ) );
 
 			},
 			set: function ( reflectivity ) {

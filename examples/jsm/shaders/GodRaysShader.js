@@ -12,7 +12,7 @@ import {
  * sample count to produce a blur filter with large support.
  *
  * My implementation performs 3 passes, similar to the implementation from Sousa. I found
- * just 6 samples per pass produced acceptible results. The blur is applied three times,
+ * just 6 samples per pass produced acceptable results. The blur is applied three times,
  * with decreasing filter support. The result is equivalent to a single pass with
  * 6*6*6 = 216 samples.
  *
@@ -136,12 +136,12 @@ const GodRaysGenerateShader = {
 		//	- see http://code.google.com/p/chromium/issues/detail?id=153105
 
 		/*
-		// Unrolling didnt do much on my hardware (ATI Mobility Radeon 3450),
+		// Unrolling didn't do much on my hardware (ATI Mobility Radeon 3450),
 		// so i've just left the loop
 
 		"for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {",
 
-		// Accumulate samples, making sure we dont walk past the light source.
+		// Accumulate samples, making sure we don't walk past the light source.
 
 		// The check for uv.y < 1 would not be necessary with "border" UV wrap
 		// mode, with a black border color. I don't think this is currently

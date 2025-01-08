@@ -12,7 +12,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -57,8 +58,9 @@
 				controls.update();
 
 				//
+				const loader = new THREE.CubeTextureLoader().setPath( './textures/cube/Park3Med/' );
 
-				scene.background = new THREE.Color( 0x006699 );
+				scene.background = await loader.loadAsync( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
 				let model;
 
@@ -90,8 +92,6 @@
 
 				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( scene );
 
-				scene.background = null;
-				scene.backgroundNode = null;
 
 				//
 

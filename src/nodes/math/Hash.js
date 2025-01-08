@@ -1,5 +1,14 @@
 import { Fn } from '../tsl/TSLBase.js';
 
+/** @module Hash **/
+
+/**
+ * Generates a hash value in the range `[0, 1]` from the given seed.
+ *
+ * @method
+ * @param {Node<float>} seed - The seed.
+ * @return {Node<float>} The hash value.
+ */
 export const hash = /*@__PURE__*/ Fn( ( [ seed ] ) => {
 
 	// Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org

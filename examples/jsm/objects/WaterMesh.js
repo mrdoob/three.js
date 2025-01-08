@@ -1,9 +1,11 @@
 import {
 	Color,
 	Mesh,
-	Vector3
-} from 'three';
-import { Fn, NodeMaterial, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+	Vector3,
+	MeshLambertNodeMaterial
+} from 'three/webgpu';
+
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix, diffuseColor } from 'three/tsl';
 
 /**
  * Work based on :
@@ -16,7 +18,7 @@ class WaterMesh extends Mesh {
 
 	constructor( geometry, options ) {
 
-		const material = new NodeMaterial();
+		const material = new MeshLambertNodeMaterial();
 
 		super( geometry, material );
 
@@ -24,7 +26,7 @@ class WaterMesh extends Mesh {
 
 		this.resolution = options.resolution !== undefined ? options.resolution : 0.5;
 
-		// uniforms
+		// Uniforms
 
 		this.waterNormals = texture( options.waterNormals );
 		this.alpha = uniform( options.alpha !== undefined ? options.alpha : 1.0 );
@@ -45,10 +47,10 @@ class WaterMesh extends Mesh {
 			const uv2 = add( div( uv, vec2( 8907.0, 9803.0 ) ), vec2( div( offset, 101 ), div( offset, 97 ) ) ).toVar();
 			const uv3 = sub( div( uv, vec2( 1091.0, 1027.0 ) ), vec2( div( offset, 109 ), div( offset, - 113 ) ) ).toVar();
 
-			const sample0 = this.waterNormals.uv( uv0 );
-			const sample1 = this.waterNormals.uv( uv1 );
-			const sample2 = this.waterNormals.uv( uv2 );
-			const sample3 = this.waterNormals.uv( uv3 );
+			const sample0 = this.waterNormals.sample( uv0 );
+			const sample1 = this.waterNormals.sample( uv1 );
+			const sample2 = this.waterNormals.sample( uv2 );
+			const sample3 = this.waterNormals.sample( uv3 );
 
 			const noise = sample0.add( sample1 ).add( sample2 ).add( sample3 );
 
@@ -56,25 +58,32 @@ class WaterMesh extends Mesh {
 
 		} );
 
-		const fragmentNode = Fn( () => {
+		const noise = getNoise( positionWorld.xz.mul( this.size ) );
+		const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
 
-			const noise = getNoise( positionWorld.xz.mul( this.size ) );
-			const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
+		const worldToEye = cameraPosition.sub( positionWorld );
+		const eyeDirection = normalize( worldToEye );
 
-			const diffuseLight = vec3( 0 ).toVar();
-			const specularLight = vec3( 0 ).toVar();
+		const reflection = normalize( reflect( this.sunDirection.negate(), surfaceNormal ) );
+		const direction = max( 0.0, dot( eyeDirection, reflection ) );
+		const specularLight = pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 );
+		const diffuseLight = max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 );
 
-			const worldToEye = cameraPosition.sub( positionWorld );
-			const eyeDirection = normalize( worldToEye );
+		const distance = length( worldToEye );
 
-			const reflection = normalize( reflect( this.sunDirection.negate(), surfaceNormal ) );
-			const direction = max( 0.0, dot( eyeDirection, reflection ) );
-			specularLight.addAssign( pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 ) );
-			diffuseLight.addAssign( max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 ) );
+		const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
-			const distance = length( worldToEye );
+		// Material
 
-			const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
+		material.transparent = true;
+
+		material.opacityNode = this.alpha;
+
+		material.shadowPositionNode = positionWorld.add( distortion );
+
+		material.setupOutgoingLight = () => diffuseColor.rgb; // backwards compatibility
+
+		material.colorNode = Fn( () => {
 
 			const mirrorSampler = reflector();
 			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
@@ -88,11 +97,9 @@ class WaterMesh extends Mesh {
 			const scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ).mul( this.waterColor );
 			const albedo = mix( this.sunColor.mul( diffuseLight ).mul( 0.3 ).add( scatter ), mirrorSampler.rgb.mul( specularLight ).add( mirrorSampler.rgb.mul( 0.9 ) ).add( vec3( 0.1 ) ), reflectance );
 
-			return vec4( albedo, this.alpha );
+			return albedo;
 
 		} )();
-
-		material.fragmentNode = fragmentNode;
 
 	}
 

@@ -125,6 +125,34 @@ function onDocumentLoad() {
 
 	}
 
+	// create copy button for copying code snippets
+
+	function addCopyButton( element ) {
+
+		const copyButton = document.createElement( 'button' );
+		copyButton.className = 'copy-btn';
+
+		element.appendChild( copyButton );
+
+		copyButton.addEventListener( 'click', function () {
+
+			const codeContent = element.textContent;
+			navigator.clipboard.writeText( codeContent ).then( () => {
+
+				copyButton.classList.add( 'copied' );
+
+				setTimeout( () => {
+
+					copyButton.classList.remove( 'copied' );
+
+				}, 1000 );
+
+			} );
+
+		} );
+
+	}
+
 	const elements = document.getElementsByTagName( 'code' );
 
 	for ( let i = 0; i < elements.length; i ++ ) {
@@ -132,6 +160,12 @@ function onDocumentLoad() {
 		const element = elements[ i ];
 
 		element.textContent = dedent( element.textContent );
+
+		if ( ! element.classList.contains( 'inline' ) ) {
+
+			addCopyButton( element );
+
+		}
 
 	}
 
@@ -171,12 +205,11 @@ function onDocumentLoad() {
 		for ( let i = 0; i < elements.length; i ++ ) {
 
 			const e = elements[ i ];
+			e.currentStyle = { 'whiteSpace': 'pre-wrap' }; // Workaround for Firefox, see #30008
 			e.className += ' prettyprint';
 			e.setAttribute( 'translate', 'no' );
 
 		}
-
-		prettyPrint(); // eslint-disable-line no-undef
 
 	};
 

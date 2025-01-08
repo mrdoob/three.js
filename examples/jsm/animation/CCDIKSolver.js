@@ -28,7 +28,7 @@ const _matrix = new Matrix4();
 
 /**
  * CCD Algorithm
- *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
+ *  - https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
  * // ik parameter example
  * //
@@ -111,8 +111,7 @@ class CCDIKSolver {
 
 				const link = bones[ links[ j ].index ];
 
-				// skip this link and following links.
-				// this skip is used for MMD performance optimization.
+				// skip this link and following links
 				if ( links[ j ].enabled === false ) break;
 
 				const limitation = links[ j ].limitation;
@@ -331,6 +330,8 @@ class CCDIKHelper extends Object3D {
 
 	/**
 	 * Updates IK bones visualization.
+	 *
+	 * @param {Boolean} force
 	 */
 	updateMatrixWorld( force ) {
 

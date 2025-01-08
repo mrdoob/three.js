@@ -6,9 +6,9 @@ class Data3DTexture extends Texture {
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
 		// We're going to add .setXXX() methods for setting properties later.
-		// Users can still set in DataTexture3D directly.
+		// Users can still set in Data3DTexture directly.
 		//
-		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
+		//	const texture = new THREE.Data3DTexture( data, width, height, depth );
 		// 	texture.anisotropy = 16;
 		//
 		// See #14839

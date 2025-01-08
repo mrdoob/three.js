@@ -43,8 +43,8 @@
 	</p>
 
 	<p>
-        If you use an *ImageBitmap* as the texture's data source, you have to call [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() at the application level to dispose of all CPU-side resources.
-        An automated call of *ImageBitmap.close()* in [page:Texture.dispose]() is not possible, since the image bitmap becomes unusable, and the engine has no way of knowing if the image bitmap is used elsewhere.
+	만약 *ImageBitmap*을 텍스처의 데이터 소스로 사용할 경우, 애플리케이션 레벨에서 [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]()를 호출하여 CPU 측 리소스를 모두 해제해야 합니다.
+	[page:Texture.dispose]()에서 *ImageBitmap.close()*를 자동으로 호출하는 것은 불가능한데, 이는 이미지 비트맵이 사용 불가능하게 되기 때문이며, 엔진은 해당 이미지 비트맵이 다른 곳에서 사용되고 있는지 여부를 알 수 없기 때문입니다.
 	</p>
 
 	<h2>렌더링 대상</h2>
@@ -59,7 +59,7 @@
 
 	<p>
         컨트롤러나 후기 처리 프로세스처럼 *dispose()* 메서드가 제공되어 내부 이벤트리스너나 렌더링 대상을 폐기하는 examples 폴더에서 가져온 것들이 있습니다.
-        일반적으로 API나 파일을 열람하고 *dispose()* 를 확인하는 것이 좋습니다. 만약 이 메서드가 존재한다면 당연히 그 메서드를 폐기 시에 사용해야 합니다.e it when cleaning things up.
+        일반적으로 API나 파일을 열람하고 *dispose()* 를 확인하는 것이 좋습니다. 만약 이 메서드가 존재한다면 당연히 그 메서드를 폐기 시에 사용해야 합니다.
 	</p>
 
 	<h2>FAQ</h2>

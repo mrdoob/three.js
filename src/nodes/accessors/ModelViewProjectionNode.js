@@ -1,42 +1,14 @@
-import TempNode from '../core/TempNode.js';
-import { cameraProjectionMatrix } from './Camera.js';
-import { positionLocal } from './Position.js';
-import { nodeProxy, varying } from '../tsl/TSLBase.js';
-import { modelViewMatrix } from './ModelNode.js';
+import { Fn } from '../tsl/TSLCore.js';
 
-class ModelViewProjectionNode extends TempNode {
+/** @module ModelViewProjectionNode **/
 
-	static get type() {
+/**
+ * TSL object that represents the position in clip space after the model-view-projection transform of the current rendered object.
+ *
+ * @type {VaryingNode<vec4>}
+ */
+export const modelViewProjection = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-		return 'ModelViewProjectionNode';
+	return builder.context.setupModelViewProjection();
 
-	}
-
-	constructor( positionNode = null ) {
-
-		super( 'vec4' );
-
-		this.positionNode = positionNode;
-
-	}
-
-	setup( builder ) {
-
-		if ( builder.shaderStage === 'fragment' ) {
-
-			return varying( builder.context.mvp );
-
-		}
-
-		const position = this.positionNode || positionLocal;
-		const viewMatrix = builder.renderer.nodes.modelViewMatrix || modelViewMatrix;
-
-		return cameraProjectionMatrix.mul( viewMatrix ).mul( position );
-
-	}
-
-}
-
-export default ModelViewProjectionNode;
-
-export const modelViewProjection = /*@__PURE__*/ nodeProxy( ModelViewProjectionNode );
+}, 'vec4' ).once() )().varying( 'v_modelViewProjection' );

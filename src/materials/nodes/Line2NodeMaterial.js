@@ -1,20 +1,27 @@
 import NodeMaterial from './NodeMaterial.js';
-import { varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { dashSize, gapSize, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
-import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
+import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth, materialOpacity } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
-import { Fn, varying, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
+import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ScreenNode.js';
-import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
+import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
+import { NoBlending } from '../../constants.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
+/**
+ * This node material can be used to render lines with a size larger than one
+ * by representing them as instanced meshes.
+ *
+ * @augments NodeMaterial
+ */
 class Line2NodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -23,47 +30,120 @@ class Line2NodeMaterial extends NodeMaterial {
 
 	}
 
-	constructor( params = {} ) {
+	/**
+	 * Constructs a new node material for wide line rendering.
+	 *
+	 * @param {Object?} parameters - The configuration parameter.
+	 */
+	constructor( parameters = {} ) {
 
 		super();
 
-		this.lights = false;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLine2NodeMaterial = true;
 
 		this.setDefaultValues( _defaultValues );
 
-		this.useAlphaToCoverage = true;
-		this.useColor = params.vertexColors;
-		this.useDash = params.dashed;
-		this.useWorldUnits = false;
+		/**
+		 * Whether vertex colors should be used or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.useColor = parameters.vertexColors;
 
+		/**
+		 * The dash offset.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.dashOffset = 0;
+
+		/**
+		 * The line width.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.lineWidth = 1;
 
+		/**
+		 * Defines the lines color.
+		 *
+		 * @type {Node<vec3>?}
+		 * @default null
+		 */
 		this.lineColorNode = null;
 
+		/**
+		 * Defines the offset.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.offsetNode = null;
+
+		/**
+		 * Defines the dash scale.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashScaleNode = null;
+
+		/**
+		 * Defines the dash size.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.dashSizeNode = null;
+
+		/**
+		 * Defines the gap size.
+		 *
+		 * @type {Node<float>?}
+		 * @default null
+		 */
 		this.gapSizeNode = null;
 
-		this.setValues( params );
+		/**
+		 * Blending is set to `NoBlending` since transparency
+		 * is not supported, yet.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.blending = NoBlending;
+
+		this._useDash = parameters.dashed;
+		this._useAlphaToCoverage = true;
+		this._useWorldUnits = false;
+
+		this.setValues( parameters );
 
 	}
 
+	/**
+	 * Setups the vertex and fragment stage of this node material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
-		this.setupShaders( builder );
+		const { renderer } = builder;
 
-		super.setup( builder );
-
-	}
-
-	setupShaders( { renderer } ) {
-
-		const useAlphaToCoverage = this.alphaToCoverage;
+		const useAlphaToCoverage = this._useAlphaToCoverage;
 		const useColor = this.useColor;
-		const useDash = this.dashed;
-		const useWorldUnits = this.worldUnits;
+		const useDash = this._useDash;
+		const useWorldUnits = this._useWorldUnits;
 
 		const trimSegment = Fn( ( { start, end } ) => {
 
@@ -93,6 +173,21 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const start = vec4( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ).toVar( 'start' );
 			const end = vec4( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( 'end' );
+
+			if ( useDash ) {
+
+				const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
+				const offsetNode = this.offsetNode ? float( this.offsetNode ) : materialLineDashOffset;
+
+				const instanceDistanceStart = attribute( 'instanceDistanceStart' );
+				const instanceDistanceEnd = attribute( 'instanceDistanceEnd' );
+
+				let lineDistance = positionGeometry.y.lessThan( 0.5 ).select( dashScaleNode.mul( instanceDistanceStart ), dashScaleNode.mul( instanceDistanceEnd ) );
+				lineDistance = lineDistance.add( offsetNode );
+
+				varyingProperty( 'float', 'lineDistance' ).assign( lineDistance );
+
+			}
 
 			if ( useWorldUnits ) {
 
@@ -252,30 +347,22 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.fragmentNode = Fn( () => {
+		this.colorNode = Fn( () => {
 
 			const vUv = uv();
 
 			if ( useDash ) {
 
-				const offsetNode = this.offsetNode ? float( this.offsetNodeNode ) : materialLineDashOffset;
-				const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
 				const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
-				const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
+				const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
 
 				dashSize.assign( dashSizeNode );
 				gapSize.assign( gapSizeNode );
 
-				const instanceDistanceStart = attribute( 'instanceDistanceStart' );
-				const instanceDistanceEnd = attribute( 'instanceDistanceEnd' );
-
-				const lineDistance = positionGeometry.y.lessThan( 0.5 ).select( dashScaleNode.mul( instanceDistanceStart ), materialLineScale.mul( instanceDistanceEnd ) );
-
-				const vLineDistance = varying( lineDistance.add( materialLineDashOffset ) );
-				const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
+				const vLineDistance = varyingProperty( 'float', 'lineDistance' );
 
 				vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
-				vLineDistanceOffset.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
+				vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
 
 			}
 
@@ -376,56 +463,82 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} )();
 
+		if ( this.transparent ) {
+
+			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+
+		}
+
+		super.setup( builder );
+
 	}
 
-
+	/**
+	 * Whether the lines should sized in world units or not.
+	 * When set to `false` the unit is pixel.
+	 *
+	 * @type {Boolean}
+	 * @default false
+	 */
 	get worldUnits() {
 
-		return this.useWorldUnits;
+		return this._useWorldUnits;
 
 	}
 
 	set worldUnits( value ) {
 
-		if ( this.useWorldUnits !== value ) {
+		if ( this._useWorldUnits !== value ) {
 
-			this.useWorldUnits = value;
+			this._useWorldUnits = value;
 			this.needsUpdate = true;
 
 		}
 
 	}
 
-
+	/**
+	 * Whether the lines should be dashed or not.
+	 *
+	 * @type {Boolean}
+	 * @default false
+	 */
 	get dashed() {
 
-		return this.useDash;
+		return this._useDash;
 
 	}
 
 	set dashed( value ) {
 
-		if ( this.useDash !== value ) {
+		if ( this._useDash !== value ) {
 
-			this.useDash = value;
+			this._useDash = value;
 			this.needsUpdate = true;
 
 		}
 
 	}
 
-
+	/**
+	 * Whether alpha to coverage should be used or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
 	get alphaToCoverage() {
 
-		return this.useAlphaToCoverage;
+		return this._useAlphaToCoverage;
 
 	}
 
 	set alphaToCoverage( value ) {
 
-		if ( this.useAlphaToCoverage !== value ) {
+		if ( this._useAlphaToCoverage !== value ) {
 
-			this.useAlphaToCoverage = value;
+			this._useAlphaToCoverage = value;
 			this.needsUpdate = true;
 
 		}

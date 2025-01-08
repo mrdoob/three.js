@@ -1,6 +1,13 @@
 import Node from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 
+/** @module AttributeNode **/
+
+/**
+ * Base class for representing shader attributes as nodes.
+ *
+ * @augments Node
+ */
 class AttributeNode extends Node {
 
 	static get type() {
@@ -9,10 +16,22 @@ class AttributeNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new attribute node.
+	 *
+	 * @param {String} attributeName - The name of the attribute.
+	 * @param {String?} nodeType - The node type.
+	 */
 	constructor( attributeName, nodeType = null ) {
 
 		super( nodeType );
 
+		/**
+		 * `AttributeNode` sets this property to `true` by default.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.global = true;
 
 		this._attributeName = attributeName;
@@ -51,6 +70,14 @@ class AttributeNode extends Node {
 
 	}
 
+	/**
+	 * Sets the attribute name to the given value. The method can be
+	 * overwritten in derived classes if the final name must be computed
+	 * analytically.
+	 *
+	 * @param {String} attributeName - The name of the attribute.
+	 * @return {AttributeNode} A reference to this node.
+	 */
 	setAttributeName( attributeName ) {
 
 		this._attributeName = attributeName;
@@ -59,6 +86,14 @@ class AttributeNode extends Node {
 
 	}
 
+	/**
+	 * Returns the attribute name of this node. The method can be
+	 * overwritten in derived classes if the final name must be computed
+	 * analytically.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The attribute name.
+	 */
 	getAttributeName( /*builder*/ ) {
 
 		return this._attributeName;
@@ -122,4 +157,12 @@ class AttributeNode extends Node {
 
 export default AttributeNode;
 
+/**
+ * TSL function for creating an attribute node.
+ *
+ * @function
+ * @param {String} name - The name of the attribute.
+ * @param {String?} nodeType - The node type.
+ * @returns {AttributeNode}
+ */
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );

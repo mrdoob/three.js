@@ -1,6 +1,4 @@
-import Node from '../core/Node.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
 import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -15,15 +13,88 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { perspectiveDepthToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { objectPosition } from '../accessors/Object3DNode.js';
+import { lightShadowMatrix } from '../accessors/Lights.js';
+import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
+import { getDataFromObject } from '../core/NodeUtils.js';
 
-const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
+/** @module ShadowNode **/
+
+const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
+const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
+
+	let dist = positionWorld.sub( position ).length();
+	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
+	dist = dist.saturate(); // clamp to [ 0, 1 ]
+
+	return dist;
+
+} );
+
+const linearShadowDistance = ( light ) => {
+
+	const camera = light.shadow.camera;
+
+	const nearDistance = reference( 'near', 'float', camera ).setGroup( renderGroup );
+	const farDistance = reference( 'far', 'float', camera ).setGroup( renderGroup );
+
+	const referencePosition = objectPosition( light );
+
+	return linearDistance( referencePosition, nearDistance, farDistance );
+
+};
+
+const getShadowMaterial = ( light ) => {
+
+	let material = shadowMaterialLib.get( light );
+
+	if ( material === undefined ) {
+
+		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
+
+		material = new NodeMaterial();
+		material.colorNode = vec4( 0, 0, 0, 1 );
+		material.depthNode = depthNode;
+		material.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
+		material.name = 'ShadowMaterial';
+		material.fog = false;
+
+		shadowMaterialLib.set( light, material );
+
+	}
+
+	return material;
+
+};
+
+/**
+ * A shadow filtering function performing basic filtering. This is in fact an unfiltered version of the shadow map
+ * with a binary `[0,1]` result.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+ * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
+ * @return {Node<float>} The filtering result.
+ */
+export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
 
 	return texture( depthTexture, shadowCoord.xy ).compare( shadowCoord.z );
 
 } );
 
-const PCFShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+/**
+ * A shadow filtering function performing PCF filtering.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+ * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
+ * @param {LightShadow} inputs.shadow - The light shadow.
+ * @return {Node<float>} The filtering result.
+ */
+export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -62,7 +133,17 @@ const PCFShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 } );
 
-const PCFSoftShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
+/**
+ * A shadow filtering function performing PCF soft filtering.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+ * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
+ * @param {LightShadow} inputs.shadow - The light shadow.
+ * @return {Node<float>} The filtering result.
+ */
+export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -118,13 +199,20 @@ const PCFSoftShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 } );
 
-// VSM
-
-const VSMShadowMapNode = Fn( ( { depthTexture, shadowCoord } ) => {
+/**
+ * A shadow filtering function performing VSM filtering.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+ * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
+ * @return {Node<float>} The filtering result.
+ */
+export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord } ) => {
 
 	const occlusion = float( 1 ).toVar();
 
-	const distribution = texture( depthTexture ).uv( shadowCoord.xy ).rg;
+	const distribution = texture( depthTexture ).sample( shadowCoord.xy ).rg;
 
 	const hardShadow = step( shadowCoord.z, distribution.x );
 
@@ -142,7 +230,18 @@ const VSMShadowMapNode = Fn( ( { depthTexture, shadowCoord } ) => {
 
 } );
 
-const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
+/**
+ * Represents the shader code for the first VSM render pass.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {Node<float>} inputs.samples - The number of samples
+ * @param {Node<float>} inputs.radius - The radius.
+ * @param {Node<float>} inputs.size - The size.
+ * @param {TextureNode} inputs.shadowPass - A reference to the render target's depth data.
+ * @return {Node<vec2>} The VSM output.
+ */
+const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -154,7 +253,7 @@ const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const depth = shadowPass.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
+		const depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
 		mean.addAssign( depth );
 		squaredMean.addAssign( depth.mul( depth ) );
 
@@ -168,7 +267,18 @@ const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 } );
 
-const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
+/**
+ * Represents the shader code for the second VSM render pass.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {Node<float>} inputs.samples - The number of samples
+ * @param {Node<float>} inputs.radius - The radius.
+ * @param {Node<float>} inputs.size - The size.
+ * @param {TextureNode} inputs.shadowPass - The result of the first VSM render pass.
+ * @return {Node<vec2>} The VSM output.
+ */
+const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -180,7 +290,7 @@ const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const distribution = shadowPass.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		const distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
 		mean.addAssign( distribution.x );
 		squaredMean.addAssign( add( distribution.y.mul( distribution.y ), distribution.x.mul( distribution.x ) ) );
 
@@ -194,14 +304,19 @@ const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 } );
 
-const _shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMapNode ];
+const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter ];
 
 //
 
-let _overrideMaterial = null;
+let _rendererState;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
-class ShadowNode extends Node {
+/**
+ * Represents the default shadow implementation for lighting nodes.
+ *
+ * @augments module:ShadowBaseNode~ShadowBaseNode
+ */
+class ShadowNode extends ShadowBaseNode {
 
 	static get type() {
 
@@ -209,42 +324,193 @@ class ShadowNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new shadow node.
+	 *
+	 * @param {Light} light - The shadow casting light.
+	 * @param {LightShadow?} [shadow=null] - An optional light shadow.
+	 */
 	constructor( light, shadow = null ) {
 
-		super();
+		super( light );
 
-		this.light = light;
+		/**
+		 * The light shadow which defines the properties light's
+		 * shadow.
+		 *
+		 * @type {LightShadow?}
+		 * @default null
+		 */
 		this.shadow = shadow || light.shadow;
 
+		/**
+		 * A reference to the shadow map which is a render target.
+		 *
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
 		this.shadowMap = null;
 
+		/**
+		 * Only relevant for VSM shadows. Render target for the
+		 * first VSM render pass.
+		 *
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
 		this.vsmShadowMapVertical = null;
+
+		/**
+		 * Only relevant for VSM shadows. Render target for the
+		 * second VSM render pass.
+		 *
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
 		this.vsmShadowMapHorizontal = null;
 
+		/**
+		 * Only relevant for VSM shadows. Node material which
+		 * is used to render the first VSM pass.
+		 *
+		 * @type {NodeMaterial?}
+		 * @default null
+		 */
 		this.vsmMaterialVertical = null;
+
+		/**
+		 * Only relevant for VSM shadows. Node material which
+		 * is used to render the second VSM pass.
+		 *
+		 * @type {NodeMaterial?}
+		 * @default null
+		 */
 		this.vsmMaterialHorizontal = null;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		/**
+		 * A reference to the output node which defines the
+		 * final result of this shadow node.
+		 *
+		 * @type {Node?}
+		 * @private
+		 * @default null
+		 */
 		this._node = null;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isShadowNode = true;
 
 	}
 
-	setupShadow( builder ) {
+	/**
+	 * Setups the shadow filtering.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
+	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
+	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
+	 * @param {LightShadow} inputs.shadow - The light shadow.
+	 * @return {Node<float>} The result node of the shadow filtering.
+	 */
+	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
 
-		const { object, renderer } = builder;
+		const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
+			.and( shadowCoord.x.lessThanEqual( 1 ) )
+			.and( shadowCoord.y.greaterThanEqual( 0 ) )
+			.and( shadowCoord.y.lessThanEqual( 1 ) )
+			.and( shadowCoord.z.lessThanEqual( 1 ) );
 
-		if ( _overrideMaterial === null ) {
+		const shadowNode = filterFn( { depthTexture, shadowCoord, shadow } );
 
-			_overrideMaterial = new NodeMaterial();
-			_overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
-			_overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
-			_overrideMaterial.name = 'ShadowMaterial';
+		return frustumTest.select( shadowNode, float( 1 ) );
+
+	}
+
+	/**
+	 * Setups the shadow coordinates.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Node<vec3>} shadowPosition - A node representing the shadow position.
+	 * @return {Node<vec3>} The shadow coordinates.
+	 */
+	setupShadowCoord( builder, shadowPosition ) {
+
+		const { shadow } = this;
+		const { renderer } = builder;
+
+		const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+
+		let shadowCoord = shadowPosition;
+		let coordZ;
+
+		if ( shadow.camera.isOrthographicCamera || renderer.logarithmicDepthBuffer !== true ) {
+
+			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
+
+			coordZ = shadowCoord.z;
+
+			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
+
+			}
+
+		} else {
+
+			const w = shadowCoord.w;
+			shadowCoord = shadowCoord.xy.div( w ); // <-- Only divide X/Y coords since we don't need Z
+
+			// The normally available "cameraNear" and "cameraFar" nodes cannot be used here because they do not get
+			// updated to use the shadow camera. So, we have to declare our own "local" ones here.
+			// TODO: How do we get the cameraNear/cameraFar nodes to use the shadow camera so we don't have to declare local ones here?
+			const cameraNearLocal = reference( 'near', 'float', shadow.camera ).setGroup( renderGroup );
+			const cameraFarLocal = reference( 'far', 'float', shadow.camera ).setGroup( renderGroup );
+
+			coordZ = viewZToLogarithmicDepth( w.negate(), cameraNearLocal, cameraFarLocal );
 
 		}
 
-		const shadow = this.shadow;
+		shadowCoord = vec3(
+			shadowCoord.x,
+			shadowCoord.y.oneMinus(), // follow webgpu standards
+			coordZ.add( bias )
+		);
+
+		return shadowCoord;
+
+	}
+
+	/**
+	 * Returns the shadow filtering function for the given shadow type.
+	 *
+	 * @param {Number} type - The shadow type.
+	 * @return {Function} The filtering function.
+	 */
+	getShadowFilterFn( type ) {
+
+		return _shadowFilterLib[ type ];
+
+	}
+
+	/**
+	 * Setups the shadow output node.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Node<vec3>} The shadow output node.
+	 */
+	setupShadow( builder ) {
+
+		const { renderer } = builder;
+
+		const { light, shadow } = this;
+
 		const shadowMapType = renderer.shadowMap.type;
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
@@ -284,57 +550,14 @@ class ShadowNode extends Node {
 		//
 
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
-		const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const position = object.material.shadowPositionNode || positionWorld;
-
-		let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( transformedNormalWorld.mul( normalBias ) ) );
-
-		let coordZ;
-
-		if ( shadow.camera.isOrthographicCamera || renderer.logarithmicDepthBuffer !== true ) {
-
-			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
-
-			coordZ = shadowCoord.z;
-
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
-
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
-
-			}
-
-		} else {
-
-			const w = shadowCoord.w;
-			shadowCoord = shadowCoord.xy.div( w ); // <-- Only divide X/Y coords since we don't need Z
-
-			// The normally available "cameraNear" and "cameraFar" nodes cannot be used here because they do not get
-			// updated to use the shadow camera. So, we have to declare our own "local" ones here.
-			// TODO: How do we get the cameraNear/cameraFar nodes to use the shadow camera so we don't have to declare local ones here?
-			const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
-			const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
-
-			coordZ = perspectiveDepthToLogarithmicDepth( w, cameraNearLocal, cameraFarLocal );
-
-		}
-
-		shadowCoord = vec3(
-			shadowCoord.x,
-			shadowCoord.y.oneMinus(), // follow webgpu standards
-			coordZ.add( bias )
-		);
-
-		const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
-			.and( shadowCoord.x.lessThanEqual( 1 ) )
-			.and( shadowCoord.y.greaterThanEqual( 0 ) )
-			.and( shadowCoord.y.lessThanEqual( 1 ) )
-			.and( shadowCoord.z.lessThanEqual( 1 ) );
+		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( transformedNormalWorld.mul( normalBias ) ) );
+		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
 
-		const filterFn = shadow.filterNode || _shadowFilterLib[ renderer.shadowMap.type ] || null;
+		const filterFn = shadow.filterNode || this.getShadowFilterFn( renderer.shadowMap.type ) || null;
 
 		if ( filterFn === null ) {
 
@@ -342,24 +565,87 @@ class ShadowNode extends Node {
 
 		}
 
+		const shadowDepthTexture = ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
+
+		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow } );
+
 		const shadowColor = texture( shadowMap.texture, shadowCoord );
-		const shadowNode = frustumTest.select( filterFn( { depthTexture: ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture, shadowCoord, shadow } ), float( 1 ) );
+		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
 
-		return mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) );
+		return shadowOutput;
 
 	}
 
+	/**
+	 * The implementation performs the setup of the output node. An output is only
+	 * produces if shadow mapping is globally enabled in the renderer.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {ShaderCallNodeInternal} The output node.
+	 */
 	setup( builder ) {
 
 		if ( builder.renderer.shadowMap.enabled === false ) return;
 
-		return this._node !== null ? this._node : ( this._node = this.setupShadow( builder ) );
+		return Fn( () => {
+
+			let node = this._node;
+
+			this.setupShadowPosition( builder );
+
+			if ( node === null ) {
+
+				this._node = node = this.setupShadow( builder );
+
+			}
+
+			if ( builder.material.shadowNode ) { // @deprecated, r171
+
+				console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
+
+			}
+
+			if ( builder.material.receivedShadowNode ) {
+
+				node = builder.material.receivedShadowNode( node );
+
+			}
+
+			return node;
+
+		} )();
 
 	}
 
+	/**
+	 * Renders the shadow. The logic of this function could be included
+	 * into {@link ShadowNode#updateShadow} however more specialized shadow
+	 * nodes might require a custom shadow map rendering. By having a
+	 * dedicated method, it's easier to overwrite the default behavior.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	renderShadow( frame ) {
+
+		const { shadow, shadowMap, light } = this;
+		const { renderer, scene } = frame;
+
+		shadow.updateMatrices( light );
+
+		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height );
+
+		renderer.render( scene, shadow.camera );
+
+	}
+
+	/**
+	 * Updates the shadow.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	updateShadow( frame ) {
 
 		const { shadowMap, light, shadow } = this;
@@ -370,30 +656,40 @@ class ShadowNode extends Node {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 
-		const currentOverrideMaterial = scene.overrideMaterial;
-
-		scene.overrideMaterial = _overrideMaterial;
-
-		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height );
-
-		shadow.updateMatrices( light );
 		shadow.camera.layers.mask = camera.layers.mask;
 
-		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
-		renderer.setRenderObjectFunction( ( object, ...params ) => {
+		const currentMRT = renderer.getMRT();
+		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
+
+		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
+
+		scene.overrideMaterial = getShadowMaterial( light );
+
+		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
-				renderer.renderObject( object, ...params );
+				if ( useVelocity ) {
+
+					getDataFromObject( object ).useVelocity = true;
+
+				}
+
+				object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
 		} );
 
 		renderer.setRenderTarget( shadowMap );
-		renderer.render( scene, shadow.camera );
+
+		this.renderShadow( frame );
 
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
@@ -405,12 +701,15 @@ class ShadowNode extends Node {
 
 		}
 
-		renderer.setRenderTarget( currentRenderTarget );
-
-		scene.overrideMaterial = currentOverrideMaterial;
+		restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
+	/**
+	 * For VSM additional render passes are required.
+	 *
+	 * @param {Renderer} renderer - A reference to the current renderer.
+	 */
 	vsmPass( renderer ) {
 
 		const { shadow } = this;
@@ -428,6 +727,9 @@ class ShadowNode extends Node {
 
 	}
 
+	/**
+	 * Frees the internal resources of this shadow node.
+	 */
 	dispose() {
 
 		this.shadowMap.dispose();
@@ -453,10 +755,15 @@ class ShadowNode extends Node {
 
 		}
 
-		this.updateBeforeType = NodeUpdateType.NONE;
+		super.dispose();
 
 	}
 
+	/**
+	 * The implementation performs the update of the shadow map if necessary.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { shadow } = this;
@@ -481,4 +788,12 @@ class ShadowNode extends Node {
 
 export default ShadowNode;
 
+/**
+ * TSL function for creating an instance of `ShadowNode`.
+ *
+ * @function
+ * @param {Light} light - The shadow casting light.
+ * @param {LightShadow} shadow - The light shadow.
+ * @return {ShadowNode} The created shadow node.
+ */
 export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );

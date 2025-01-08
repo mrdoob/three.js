@@ -1,5 +1,13 @@
-import { TempNode, rand, Fn, fract, timerLocal, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
+import { TempNode } from 'three/webgpu';
+import { rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
 
+/** @module FilmNode **/
+
+/**
+ * Post processing node for creating a film grain effect.
+ *
+ * @augments TempNode
+ */
 class FilmNode extends TempNode {
 
 	static get type() {
@@ -8,24 +16,54 @@ class FilmNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new film node.
+	 *
+	 * @param {Node} inputNode - The node that represents the input of the effect.
+	 * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.
+	 * @param {Node<vec2>?} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
+	 */
 	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
-		super();
+		super( 'vec4' );
 
+		/**
+		 * The node that represents the input of the effect.
+		 *
+		 * @type {Node}
+		 */
 		this.inputNode = inputNode;
+
+		/**
+		 * A node that represents the effect's intensity.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.intensityNode = intensityNode;
+
+		/**
+		 * A node that allows to pass custom (e.g. animated) uv data.
+		 *
+		 * @type {Node<vec2>}
+		 */
 		this.uvNode = uvNode;
 
 	}
 
-	setup() {
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ShaderCallNodeInternal}
+	 */
+	setup( /* builder */ ) {
 
 		const uvNode = this.uvNode || uv();
 
 		const film = Fn( () => {
 
 			const base = this.inputNode.rgb;
-			const noise = rand( fract( uvNode.add( timerLocal() ) ) );
+			const noise = rand( fract( uvNode.add( time ) ) );
 
 			let color = base.add( base.mul( clamp( noise.add( 0.1 ), 0, 1 ) ) );
 
@@ -49,4 +87,13 @@ class FilmNode extends TempNode {
 
 export default FilmNode;
 
+/**
+ * TSL function for creating a film node for post processing.
+ *
+ * @function
+ * @param {Node<vec4>} inputNode - The node that represents the input of the effect.
+ * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.
+ * @param {Node<vec2>?} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
+ * @returns {FilmNode}
+ */
 export const film = /*@__PURE__*/ nodeProxy( FilmNode );

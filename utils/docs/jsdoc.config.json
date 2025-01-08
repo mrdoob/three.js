@@ -1,0 +1,27 @@
+{
+    "opts": {
+            "destination": "docs_new",
+            "encoding": "utf8",
+            "package": "package.json",
+            "recurse": true,
+            "template": "node_modules/clean-jsdoc-theme",
+            "theme_opts": {
+                "homepageTitle": "three.js docs"
+           }
+    },
+    "plugins": [ "plugins/markdown" ],
+    "source": {
+        "include": [
+            "examples/jsm/tsl",
+            "src/loaders/nodes", 
+            "src/materials/nodes", 
+            "src/nodes", 
+            "src/renderers/common", 
+            "src/renderers/webgpu" 
+        ]
+    },
+    "markdown": {
+        "hardwrap": false,
+        "idInHeadings": true
+    }
+}

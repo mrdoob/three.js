@@ -5,12 +5,6 @@ import { Color } from '../math/Color.js';
 
 class MeshMatcapMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshMatcapMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
@@ -18,6 +12,8 @@ class MeshMatcapMaterial extends Material {
 		this.isMeshMatcapMaterial = true;
 
 		this.defines = { 'MATCAP': '' };
+
+		this.type = 'MeshMatcapMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 

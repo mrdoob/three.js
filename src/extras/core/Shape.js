@@ -1,5 +1,5 @@
 import { Path } from './Path.js';
-import * as MathUtils from '../../math/MathUtils.js';
+import { generateUUID } from '../../math/MathUtils.js';
 
 class Shape extends Path {
 
@@ -7,7 +7,7 @@ class Shape extends Path {
 
 		super( points );
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 		this.type = 'Shape';
 

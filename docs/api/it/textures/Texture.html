@@ -14,7 +14,7 @@
 		</p>
 
 		<p>
-			Nota: Dopo l'utilizzo iniziale di una texture, le sue dimensioni, formato, e il tipo non possono essere cambiati. 
+			Nota: Dopo l'utilizzo iniziale di una texture, le sue dimensioni, formato, e il tipo non possono essere cambiati.
 			Invece, chiama [page:.dispose]() sulla texture e creane una nuova.
 		</p>
 
@@ -61,8 +61,8 @@
 			Questo può essere qualsiasi tipo di immagine (e.g., PNG, JPG, GIF, DDS) o video (e.g., MP4, OGG/OGV) supportato da three.js.<br /><br />
 
 			Per utilizzare il video come texture è necessario disporre di un elemento video HTML5
-			in riproduzione come sorgente per l'immagine della texture e aggiornare 
-			continuamente questa texture finchè il video è in riproduzione - 
+			in riproduzione come sorgente per l'immagine della texture e aggiornare
+			continuamente questa texture finchè il video è in riproduzione -
 			la classe [page:VideoTexture VideoTexture] gestisce questa operazione automaticamente.
 		</p>
 
@@ -88,7 +88,7 @@
 		<p>
 			Questo definisce come la texture è wrappata orizzontalmente e corrisponde a *U* nel mapping UV.<br />
 			L'impostazione predefinita è [page:Textures THREE.ClampToEdgeWrapping], dove il bordo è fissato ai texel del bordo esterno.
-			Le altre due scelte sono [page:Textures THREE.RepeatWrapping] e [page:Textures THREE.MirroredRepeatWrapping]. 
+			Le altre due scelte sono [page:Textures THREE.RepeatWrapping] e [page:Textures THREE.MirroredRepeatWrapping].
 			Vedi la pagina [page:Textures texture constants] per i dettagli.
 		</p>
 
@@ -122,7 +122,7 @@
 		<h3>[property:number anisotropy]</h3>
 		<p>
 			Il numero di campioni prelevati lungo l'asse attravero il pixel che ha la densità di texel più alta.
-		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base, 
+		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base,
 		a costo di utilizzare più campioni di texture. Usa [page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]()
 		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.
 		</p>
@@ -160,7 +160,7 @@
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
-			Quante volte la texture è ripetuta sulla superficie, in ogni direzione U e V. Se la proprietà ripeat è 
+			Quante volte la texture è ripetuta sulla superficie, in ogni direzione U e V. Se la proprietà ripeat è
 			impostata su un valore maggiore di 1 in entrambe le direzioni, anche il parametro Wrap corrispondente
 			deve essere impostato su [page:Textures THREE.RepeatWrapping] o [page:Textures THREE.MirroredRepeatWrapping] per ottenere l'effetto
 			di piastrellatura desiderato.
@@ -174,14 +174,14 @@
 
 		<h3>[property:Vector2 center]</h3>
 		<p>
-			Il punto attorno al quale avviene la rotazione. Un valore (0.5, 0.5) che corrisponde al centro della texture. Il 
+			Il punto attorno al quale avviene la rotazione. Un valore (0.5, 0.5) che corrisponde al centro della texture. Il
 			valore predefinito è (0, 0), in basso a sinistra.
 		</p>
 
 		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 			Indica se aggiornare la [page:Texture.matrix .matrix] uv-transform della texture dalle proprietà della texture
-			[page:Texture.offset .offset], [page:Texture.repeat .repeat], [page:Texture.rotation .rotation], e [page:Texture.center .center]. 
+			[page:Texture.offset .offset], [page:Texture.repeat .repeat], [page:Texture.rotation .rotation], e [page:Texture.center .center].
 			Il valore predefinito è `true`.
 			Impostalo a `false` se stai specificando la matrice uv-transform direttamente.
 		</p>
@@ -196,13 +196,13 @@
 
 		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
-			Indica se generare mipmap (se possibile) per una texure. Il valore predefinito è `true`.
+			Indica se generare mipmap (se possibile) per una texture. Il valore predefinito è `true`.
 			Impostalo a false se stai creando il mipmap manualmente.
 		</p>
 
 		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
-		Se impostato a `true`, il canale alfa, se presente, viene moltiplicato nei canali del colore 
+		Se impostato a `true`, il canale alfa, se presente, viene moltiplicato nei canali del colore
 		quando la texture viene caricata sulla GPU. Il valore predefinito è `false`.<br /><br />
 
 		Si noti che questa proprietà non ha effetto per [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
@@ -220,7 +220,7 @@
 		<h3>[property:number unpackAlignment]</h3>
 		<p>
 			Il valore predefinito è 4. Specifica i requisiti di allineamento per l'inizio di ogni riga di pixel in memoria.
-			I valori consentiti sono 1 (allineamento di byte), 2 (righe allineate a byte pari), 4 (allineamento di parole) 
+			I valori consentiti sono 1 (allineamento di byte), 2 (righe allineate a byte pari), 4 (allineamento di parole)
 			e 8 (le righe iniziano su limiti di doppia parola).
 			Vedi [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei] per maggiori informazioni.
 		</p>
@@ -250,8 +250,8 @@
 
 		<h3>[property:Object userData]</h3>
 		<p>
-			Un oggetto che può essere utilizzato per memorizzare dati personalizzati della texture. 
-			Non deve contenere riferimenti a funzioni poiché queste non verranno clonate. 
+			Un oggetto che può essere utilizzato per memorizzare dati personalizzati della texture.
+			Non deve contenere riferimenti a funzioni poiché queste non verranno clonate.
 		</p>
 
 		<h3>[property:Source source]</h3>
@@ -286,7 +286,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-			Libera le risorse relative alla GPU allocate da questa istanza. 
+			Libera le risorse relative alla GPU allocate da questa istanza.
 			Chiama questo metodo ogni volta che questa istanza non viene più utilizzata dall'applicazione.
 		</p>
 

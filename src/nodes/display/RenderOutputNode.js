@@ -4,6 +4,31 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
+/** @module RenderOutputNode **/
+
+/**
+ * Normally, tone mapping and color conversion happens automatically
+ * before outputting pixel too the default (screen) framebuffer. In certain
+ * post processing setups this happens to late because certain effects
+ * require e.g. sRGB input. For such scenarios, `RenderOutputNode` can be used
+ * to apply tone mapping and color space conversion at an arbitrary point
+ * in the effect chain.
+ *
+ * When applying tone mapping and color space conversion manually with this node,
+ * you have to set {@link PostProcessing#outputColorTransform} to `false`.
+ *
+ * ```js
+ * const postProcessing = new PostProcessing( renderer );
+ * postProcessing.outputColorTransform = false;
+ *
+ * const scenePass = pass( scene, camera );
+ * const outputPass = renderOutput( scenePass );
+ *
+ * postProcessing.outputNode = outputPass;
+ * ```
+ *
+ * @augments TempNode
+ */
 class RenderOutputNode extends TempNode {
 
 	static get type() {
@@ -12,15 +37,46 @@ class RenderOutputNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new render output node.
+	 *
+	 * @param {Node} colorNode - The color node to process.
+	 * @param {Number} toneMapping - The tone mapping type.
+	 * @param {String} outputColorSpace - The output color space.
+	 */
 	constructor( colorNode, toneMapping, outputColorSpace ) {
 
 		super( 'vec4' );
 
+		/**
+		 * The color node to process.
+		 *
+		 * @type {Node}
+		 */
 		this.colorNode = colorNode;
+
+		/**
+		 * The tone mapping type.
+		 *
+		 * @type {Number?}
+		 */
 		this.toneMapping = toneMapping;
+
+		/**
+		 * The output color space.
+		 *
+		 * @type {String?}
+		 */
 		this.outputColorSpace = outputColorSpace;
 
-		this.isRenderOutput = true;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isRenderOutputNode = true;
 
 	}
 
@@ -55,6 +111,15 @@ class RenderOutputNode extends TempNode {
 
 export default RenderOutputNode;
 
+/**
+ * TSL function for creating a posterize node.
+ *
+ * @function
+ * @param {Node} color - The color node to process.
+ * @param {Number?} [toneMapping=null] - The tone mapping type.
+ * @param {String?} [outputColorSpace=null] - The output color space.
+ * @returns {RenderOutputNode}
+ */
 export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 
 addMethodChaining( 'renderOutput', renderOutput );

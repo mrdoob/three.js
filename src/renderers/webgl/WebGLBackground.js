@@ -242,6 +242,28 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 	}
 
+	function dispose() {
+
+		if ( boxMesh !== undefined ) {
+
+			boxMesh.geometry.dispose();
+			boxMesh.material.dispose();
+
+			boxMesh = undefined;
+
+		}
+
+		if ( planeMesh !== undefined ) {
+
+			planeMesh.geometry.dispose();
+			planeMesh.material.dispose();
+
+			planeMesh = undefined;
+
+		}
+
+	}
+
 	return {
 
 		getClearColor: function () {
@@ -268,7 +290,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		},
 		render: render,
-		addToRenderList: addToRenderList
+		addToRenderList: addToRenderList,
+		dispose: dispose
 
 	};
 

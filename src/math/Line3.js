@@ -1,5 +1,5 @@
 import { Vector3 } from './Vector3.js';
-import * as MathUtils from './MathUtils.js';
+import { clamp } from './MathUtils.js';
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
@@ -73,7 +73,7 @@ class Line3 {
 
 		if ( clampToLine ) {
 
-			t = MathUtils.clamp( t, 0, 1 );
+			t = clamp( t, 0, 1 );
 
 		}
 

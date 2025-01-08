@@ -7,8 +7,19 @@ import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { LinearMipmapLinearFilter } from '../../constants.js';
 
+/** @module ViewportTextureNode **/
+
 const _size = /*@__PURE__*/ new Vector2();
 
+/**
+ * A special type of texture node which represents the data of the current viewport
+ * as a texture. The module extracts data from the current bound framebuffer with
+ * a copy operation so no extra render pass is required to produce the texture data
+ * (which is good for performance). `ViewportTextureNode` can be used as an input for a
+ * variety of effects like refractive or transmissive materials.
+ *
+ * @augments module:TextureNode~TextureNode
+ */
 class ViewportTextureNode extends TextureNode {
 
 	static get type() {
@@ -17,6 +28,13 @@ class ViewportTextureNode extends TextureNode {
 
 	}
 
+	/**
+	 * Constructs a new viewport texture node.
+	 *
+	 * @param {Node} [uvNode=screenUV] - The uv node.
+	 * @param {Node?} [levelNode=null] - The level node.
+	 * @param {Texture?} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
+	 */
 	constructor( uvNode = screenUV, levelNode = null, framebufferTexture = null ) {
 
 		if ( framebufferTexture === null ) {
@@ -28,10 +46,30 @@ class ViewportTextureNode extends TextureNode {
 
 		super( framebufferTexture, uvNode, levelNode );
 
+		/**
+		 * Whether to generate mipmaps or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.generateMipmaps = false;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isOutputTextureNode = true;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
+		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
@@ -77,5 +115,24 @@ class ViewportTextureNode extends TextureNode {
 
 export default ViewportTextureNode;
 
+/**
+ * TSL function for creating a viewport texture node.
+ *
+ * @function
+ * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {Node?} [levelNode=null] - The level node.
+ * @param {Texture?} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
+ * @returns {ViewportTextureNode}
+ */
 export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+
+/**
+ * TSL function for creating a viewport texture node with enabled mipmap generation.
+ *
+ * @function
+ * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {Node?} [levelNode=null] - The level node.
+ * @param {Texture?} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
+ * @returns {ViewportTextureNode}
+ */
 export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );

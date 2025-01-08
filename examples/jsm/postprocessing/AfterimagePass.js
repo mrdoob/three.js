@@ -1,12 +1,13 @@
 import {
 	HalfFloatType,
-	MeshBasicMaterial,
 	NearestFilter,
+	NoBlending,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
+import { CopyShader } from '../shaders/CopyShader.js';
 import { AfterimageShader } from '../shaders/AfterimageShader.js';
 
 class AfterimagePass extends Pass {
@@ -41,7 +42,17 @@ class AfterimagePass extends Pass {
 
 		this.compFsQuad = new FullScreenQuad( this.compFsMaterial );
 
-		this.copyFsMaterial = new MeshBasicMaterial();
+		const copyShader = CopyShader;
+
+		this.copyFsMaterial = new ShaderMaterial( {
+			uniforms: UniformsUtils.clone( copyShader.uniforms ),
+			vertexShader: copyShader.vertexShader,
+			fragmentShader: copyShader.fragmentShader,
+			blending: NoBlending,
+			depthTest: false,
+			depthWrite: false
+		} );
+
 		this.copyFsQuad = new FullScreenQuad( this.copyFsMaterial );
 
 	}
@@ -54,7 +65,7 @@ class AfterimagePass extends Pass {
 		renderer.setRenderTarget( this.textureComp );
 		this.compFsQuad.render( renderer );
 
-		this.copyFsQuad.material.map = this.textureComp.texture;
+		this.copyFsQuad.material.uniforms.tDiffuse.value = this.textureComp.texture;
 
 		if ( this.renderToScreen ) {
 

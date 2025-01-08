@@ -2,9 +2,11 @@ import {
 	BackSide,
 	BoxGeometry,
 	Mesh,
-	Vector3
-} from 'three';
-import { Fn, NodeMaterial, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
+	Vector3,
+	NodeMaterial
+} from 'three/webgpu';
+
+import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
  * Based on "A Practical Analytic Model for Daylight"
@@ -45,7 +47,7 @@ class SkyMesh extends Mesh {
 
 			// wavelength of used primaries, according to preetham
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
-			// this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function:
+			// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 			// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
 			const totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
 
@@ -83,7 +85,7 @@ class SkyMesh extends Mesh {
 
 			const rayleighCoefficient = this.rayleigh.sub( float( 1.0 ).mul( float( 1.0 ).sub( vSunfade ) ) );
 
-			// extinction (absorbtion + out scattering)
+			// extinction (absorption + out scattering)
 			// rayleigh coefficients
 			varyingProperty( 'vec3', 'vBetaR' ).assign( totalRayleigh.mul( rayleighCoefficient ) );
 
@@ -96,7 +98,7 @@ class SkyMesh extends Mesh {
 
 			// position
 
-			const position = modelViewProjection();
+			const position = modelViewProjection;
 			position.z.assign( position.w ); // set z to camera.far
 
 			return position;

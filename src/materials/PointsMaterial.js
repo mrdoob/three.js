@@ -3,17 +3,13 @@ import { Color } from '../math/Color.js';
 
 class PointsMaterial extends Material {
 
-	static get type() {
-
-		return 'PointsMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isPointsMaterial = true;
+
+		this.type = 'PointsMaterial';
 
 		this.color = new Color( 0xffffff );
 

@@ -1,19 +1,20 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
+import { float, nodeProxy, Fn, ivec2, int } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './Position.js';
 import { normalLocal } from './Normal.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
-import { ivec2, int } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FloatType } from '../../constants.js';
+
+/** @module MorphNode **/
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
@@ -157,7 +158,12 @@ function getEntry( geometry ) {
 
 }
 
-
+/**
+ * This node implements the vertex transformation shader logic which is required
+ * for morph target animation.
+ *
+ * @augments Node
+ */
 class MorphNode extends Node {
 
 	static get type() {
@@ -166,17 +172,43 @@ class MorphNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new morph node.
+	 *
+	 * @param {Mesh} mesh - The mesh holding the morph targets.
+	 */
 	constructor( mesh ) {
 
 		super( 'void' );
 
+		/**
+		 * The mesh holding the morph targets.
+		 *
+		 * @type {Mesh}
+		 */
 		this.mesh = mesh;
+
+		/**
+		 * A uniform node which represents the morph base influence value.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.morphBaseInfluence = uniform( 1 );
 
+		/**
+		 * The update type overwritten since morph nodes are updated per object.
+		 *
+		 * @type {String}
+		 */
 		this.updateType = NodeUpdateType.OBJECT;
 
 	}
 
+	/**
+	 * Setups the morph node by assigning the transformed vertex data to predefined node variables.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
 
 		const { geometry } = builder;
@@ -240,7 +272,12 @@ class MorphNode extends Node {
 
 	}
 
-	update() {
+	/**
+	 * Updates the state of the morphed mesh by updating the base influence.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
+	update( /*frame*/ ) {
 
 		const morphBaseInfluence = this.morphBaseInfluence;
 
@@ -260,4 +297,11 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
+/**
+ * TSL function for creating a morph node.
+ *
+ * @function
+ * @param {Mesh} mesh - The mesh holding the morph targets.
+ * @returns {MorphNode}
+ */
 export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );

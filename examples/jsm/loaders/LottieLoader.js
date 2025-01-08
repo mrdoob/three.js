@@ -22,6 +22,7 @@ class LottieLoader extends Loader {
 
 		const texture = new CanvasTexture();
 		texture.minFilter = NearestFilter;
+		texture.generateMipmaps = false;
 		texture.colorSpace = SRGBColorSpace;
 
 		const loader = new FileLoader( this.manager );
@@ -32,7 +33,7 @@ class LottieLoader extends Loader {
 
 			const data = JSON.parse( text );
 
-			// lottie uses container.offetWidth and offsetHeight
+			// lottie uses container.offsetWidth and offsetHeight
 			// to define width/height
 
 			const container = document.createElement( 'div' );

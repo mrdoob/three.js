@@ -106,7 +106,7 @@
 
 		<h3>[property:Boolean adjustNearFar]</h3>
 		<p>
-			If true, camera's near and far values will be adjusted every time zoom is performed trying to mantain the same visible portion
+			If true, camera's near and far values will be adjusted every time zoom is performed trying to maintain the same visible portion
 			given by initial near and far values ( [page:PerspectiveCamera] only ).
 			Default is false.
 		</p>
@@ -130,6 +130,11 @@
 		<h3>[property:Boolean enableAnimations]</h3>
 		<p>
 			Set to true to enable animations for rotation (damping) and focus operation. Default is true.
+		</p>
+
+		<h3>[property:Boolean enableFocus]</h3>
+		<p>
+			Enable or disable camera focusing on double-tap (or click) operations. Default is true.
 		</p>
 
 		<h3>[property:Boolean enableGrid]</h3>
@@ -243,7 +248,7 @@
 
 		<h3>[method:undefined setTbRadius] ( [param:Float value] )</h3>
 		<p>
-			Update the `radiusFactor` value, redraw the gizmo and send a `changeEvent` to visualise the changes.
+			Update the `radiusFactor` value, redraw the gizmo and send a `changeEvent` to visualize the changes.
 		</p>
 
 		<h3>[method:Boolean setMouseAction] ( [param:String operation], mouse, key )</h3>

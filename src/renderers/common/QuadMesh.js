@@ -3,14 +3,23 @@ import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
 
-// Helper for passes that need to fill the viewport with a single quad.
-
 const _camera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-// https://github.com/mrdoob/three.js/pull/21358
-
+/**
+ * The purpose of this special geometry is to fill the entire viewport with a single triangle.
+ *
+ * Reference: {@link https://github.com/mrdoob/three.js/pull/21358}
+ *
+ * @private
+ * @augments BufferGeometry
+ */
 class QuadGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new quad geometry.
+	 *
+	 * @param {Boolean} [flipY=false] - Whether the uv coordinates should be flipped along the vertical axis or not.
+	 */
 	constructor( flipY = false ) {
 
 		super();
@@ -26,24 +35,64 @@ class QuadGeometry extends BufferGeometry {
 
 const _geometry = /*@__PURE__*/ new QuadGeometry();
 
+
+/**
+ * This module is a helper for passes which need to render a full
+ * screen effect which is quite common in context of post processing.
+ *
+ * The intended usage is to reuse a single quad mesh for rendering
+ * subsequent passes by just reassigning the `material` reference.
+ *
+ * @augments BufferGeometry
+ */
 class QuadMesh extends Mesh {
 
+	/**
+	 * Constructs a new quad mesh.
+	 *
+	 * @param {Material?} [material=null] - The material to render the quad mesh with.
+	 */
 	constructor( material = null ) {
 
 		super( _geometry, material );
 
+		/**
+		 * The camera to render the quad mesh with.
+		 *
+		 * @type {OrthographicCamera}
+		 * @readonly
+		 */
 		this.camera = _camera;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isQuadMesh = true;
 
 	}
 
-	renderAsync( renderer ) {
+	/**
+	 * Async version of `render()`.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the render has been finished.
+	 */
+	async renderAsync( renderer ) {
 
 		return renderer.renderAsync( this, _camera );
 
 	}
 
+	/**
+	 * Renders the quad mesh
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	render( renderer ) {
 
 		renderer.render( this, _camera );

@@ -2,6 +2,13 @@ import TempNode from '../core/TempNode.js';
 import { nodeProxy, vec4, mat2, mat4 } from '../tsl/TSLBase.js';
 import { cos, sin } from '../math/MathNode.js';
 
+/** @module RotateNode **/
+
+/**
+ * Applies a rotation to the given position node.
+ *
+ * @augments TempNode
+ */
 class RotateNode extends TempNode {
 
 	static get type() {
@@ -10,15 +17,40 @@ class RotateNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new rotate node.
+	 *
+	 * @param {Node} positionNode - The position node.
+	 * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending
+	 * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+	 */
 	constructor( positionNode, rotationNode ) {
 
 		super();
 
+		/**
+		 * The position node.
+		 *
+		 * @type {Node}
+		 */
 		this.positionNode = positionNode;
+
+		/**
+		 *  Represents the rotation that is applied to the position node.
+		 *  Depending on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+		 *
+		 * @type {Node}
+		 */
 		this.rotationNode = rotationNode;
 
 	}
 
+	/**
+	 * The type of the {@link RotateNode#positionNode} defines the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The node's type.
+	 */
 	getNodeType( builder ) {
 
 		return this.positionNode.getNodeType( builder );
@@ -60,4 +92,13 @@ class RotateNode extends TempNode {
 
 export default RotateNode;
 
+/**
+ * TSL function for creating a rotate node.
+ *
+ * @function
+ * @param {Node} positionNode - The position node.
+ * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending
+ * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+ * @returns {RotateNode}
+ */
 export const rotate = /*@__PURE__*/ nodeProxy( RotateNode );

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Texture } from 'three';
 
 function createText( message, height ) {
 
@@ -17,20 +17,20 @@ function createText( message, height ) {
 	context.fillStyle = '#ffffff';
 	context.fillText( message, textWidth / 2, textHeight / 2 );
 
-	const texture = new THREE.Texture( canvas );
+	const texture = new Texture( canvas );
 	texture.needsUpdate = true;
 
-	const material = new THREE.MeshBasicMaterial( {
+	const material = new MeshBasicMaterial( {
 		color: 0xffffff,
-		side: THREE.DoubleSide,
+		side: DoubleSide,
 		map: texture,
 		transparent: true,
 	} );
-	const geometry = new THREE.PlaneGeometry(
+	const geometry = new PlaneGeometry(
 		( height * textWidth ) / textHeight,
 		height
 	);
-	const plane = new THREE.Mesh( geometry, material );
+	const plane = new Mesh( geometry, material );
 	return plane;
 
 }

@@ -3,8 +3,16 @@ import { select } from '../math/ConditionalNode.js';
 import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
 import { mul, sub, div } from '../math/OperatorNode.js';
 
-// exposure only
+/** @module ToneMappingFunctions **/
 
+/**
+ * Linear tone mapping, exposure only.
+ *
+ * @method
+ * @param {Node<vec3>} color - The color that should be tone mapped.
+ * @param {Node<float>} exposure - The exposure.
+ * @return {Node<vec3>} The tone mapped color.
+ */
 export const linearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return color.mul( exposure ).clamp();
@@ -18,8 +26,16 @@ export const linearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	]
 } );
 
-// source: https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
-
+/**
+ * Reinhard tone mapping.
+ *
+ * Reference: {@link https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf}
+ *
+ * @method
+ * @param {Node<vec3>} color - The color that should be tone mapped.
+ * @param {Node<float>} exposure - The exposure.
+ * @return {Node<vec3>} The tone mapped color.
+ */
 export const reinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	color = color.mul( exposure );
@@ -35,8 +51,16 @@ export const reinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => 
 	]
 } );
 
-// source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
-
+/**
+ * Cineon tone mapping.
+ *
+ * Reference: {@link http://filmicworlds.com/blog/filmic-tonemapping-operators/}
+ *
+ * @method
+ * @param {Node<vec3>} color - The color that should be tone mapped.
+ * @param {Node<float>} exposure - The exposure.
+ * @return {Node<vec3>} The tone mapped color.
+ */
 export const cineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// filmic operator by Jim Hejl and Richard Burgess-Dawson
@@ -68,8 +92,16 @@ const RRTAndODTFit = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 } );
 
-// source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
-
+/**
+ * ACESFilmic tone mapping.
+ *
+ * Reference: {@link https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs}
+ *
+ * @method
+ * @param {Node<vec3>} color - The color that should be tone mapped.
+ * @param {Node<float>} exposure - The exposure.
+ * @return {Node<vec3>} The tone mapped color.
+ */
 export const acesFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
@@ -120,6 +152,14 @@ const agxDefaultContrastApprox = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 } );
 
+/**
+ * AgX tone mapping.
+ *
+ * @method
+ * @param {Node<vec3>} color - The color that should be tone mapped.
+ * @param {Node<float>} exposure - The exposure.
+ * @return {Node<vec3>} The tone mapped color.
+ */
 export const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const colortone = vec3( color ).toVar();
@@ -151,8 +191,16 @@ export const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	]
 } );
 
-// https://modelviewer.dev/examples/tone-mapping
-
+/**
+ * Neutral tone mapping.
+ *
+ * Reference: {@link https://modelviewer.dev/examples/tone-mapping}
+ *
+ * @method
+ * @param {Node<vec3>} color - The color that should be tone mapped.
+ * @param {Node<float>} exposure - The exposure.
+ * @return {Node<vec3>} The tone mapped color.
+ */
 export const neutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const StartCompression = float( 0.8 - 0.04 );

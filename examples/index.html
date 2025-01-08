@@ -60,15 +60,13 @@
 
 		const links = {};
 		const validRedirects = new Map();
-		const container = document.createElement( 'div' );
+		const fragment = document.createDocumentFragment();
 
 		let selected = null;
 
 		init();
 
 		async function init() {
-
-			content.appendChild( container );
 
 			viewSrcButton.style.display = 'none';
 
@@ -82,14 +80,14 @@
 				const header = document.createElement( 'h2' );
 				header.textContent = key;
 				header.setAttribute( 'data-category', key );
-				container.appendChild( header );
+				fragment.appendChild( header );
 
 				for ( let i = 0; i < category.length; i ++ ) {
 
 					const file = category[ i ];
 
 					const link = createLink( file, tags[ file ] );
-					container.appendChild( link );
+					fragment.appendChild( link );
 
 					links[ file ] = link;
 					validRedirects.set( file, file + '.html' );
@@ -97,6 +95,8 @@
 				}
 
 			}
+
+			content.appendChild( fragment );
 
 			if ( window.location.hash !== '' ) {
 

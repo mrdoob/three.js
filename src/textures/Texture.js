@@ -10,7 +10,7 @@ import {
 	UVMapping,
 	NoColorSpace,
 } from '../constants.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
@@ -27,7 +27,7 @@ class Texture extends EventDispatcher {
 
 		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 		this.name = '';
 
@@ -69,6 +69,7 @@ class Texture extends EventDispatcher {
 		this.version = 0;
 		this.onUpdate = null;
 
+		this.renderTarget = null; // assign texture to a render target
 		this.isRenderTargetTexture = false; // indicates whether a texture belongs to a render target or not
 		this.pmremVersion = 0; // indicates whether this texture should be processed by PMREMGenerator or not (only relevant for render target textures)
 
@@ -133,6 +134,9 @@ class Texture extends EventDispatcher {
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
 		this.colorSpace = source.colorSpace;
+
+		this.renderTarget = source.renderTarget;
+		this.isRenderTargetTexture = source.isRenderTargetTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

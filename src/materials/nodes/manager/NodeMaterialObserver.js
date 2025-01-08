@@ -51,18 +51,65 @@ const refreshUniforms = [
 	'transmissionMap'
 ];
 
+/**
+ * This class is used by {@link WebGPURenderer} as management component.
+ * It's primary purpose is to determine whether render objects require a
+ * refresh right before they are going to be rendered or not.
+ */
 class NodeMaterialObserver {
 
+	/**
+	 * Constructs a new node material observer.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 */
 	constructor( builder ) {
 
+		/**
+		 * A node material can be used by more than one render object so the
+		 * monitor must maintain a list of render objects.
+		 *
+		 * @type {WeakMap<RenderObject,Object>}
+		 */
 		this.renderObjects = new WeakMap();
+
+		/**
+		 * Whether the material uses node objects or not.
+		 *
+		 * @type {Boolean}
+		 */
 		this.hasNode = this.containsNode( builder );
+
+		/**
+		 * Whether the node builder's 3D object is animated or not.
+		 *
+		 * @type {Boolean}
+		 */
 		this.hasAnimation = builder.object.isSkinnedMesh === true;
+
+		/**
+		 * A list of all possible material uniforms
+		 *
+		 * @type {Array<String>}
+		 */
 		this.refreshUniforms = refreshUniforms;
+
+		/**
+		 * Holds the current render ID from the node frame.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
 		this.renderId = 0;
 
 	}
 
+	/**
+	 * Returns `true` if the given render object is verified for the first time of this observer.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the given render object is verified for the first time of this observer.
+	 */
 	firstInitialization( renderObject ) {
 
 		const hasInitialized = this.renderObjects.has( renderObject );
@@ -79,13 +126,19 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns monitoring data for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Object} The monitoring data.
+	 */
 	getRenderObjectData( renderObject ) {
 
 		let data = this.renderObjects.get( renderObject );
 
 		if ( data === undefined ) {
 
-			const { geometry, material } = renderObject;
+			const { geometry, material, object } = renderObject;
 
 			data = {
 				material: this.getMaterialData( material ),
@@ -94,24 +147,33 @@ class NodeMaterialObserver {
 					indexVersion: geometry.index ? geometry.index.version : null,
 					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
 				},
-				worldMatrix: renderObject.object.matrixWorld.clone()
+				worldMatrix: object.matrixWorld.clone()
 			};
 
-			if ( renderObject.object.center ) {
+			if ( object.center ) {
 
-				data.center = renderObject.object.center.clone();
+				data.center = object.center.clone();
 
 			}
 
-			if ( renderObject.object.morphTargetInfluences ) {
+			if ( object.morphTargetInfluences ) {
 
-				data.morphTargetInfluences = renderObject.object.morphTargetInfluences.slice();
+				data.morphTargetInfluences = object.morphTargetInfluences.slice();
 
 			}
 
 			if ( renderObject.bundle !== null ) {
 
 				data.version = renderObject.bundle.version;
+
+			}
+
+			if ( data.material.transmission > 0 ) {
+
+				const { width, height } = renderObject.context;
+
+				data.bufferWidth = width;
+				data.bufferHeight = height;
 
 			}
 
@@ -123,6 +185,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns an attribute data structure holding the attributes versions for
+	 * monitoring.
+	 *
+	 * @param {Object} attributes - The geometry attributes.
+	 * @return {Object} An object for monitoring the versions of attributes.
+	 */
 	getAttributesData( attributes ) {
 
 		const attributesData = {};
@@ -141,6 +210,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns `true` if the node builder's material uses
+	 * node properties.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Boolean} Whether the node builder's material uses node properties or not.
+	 */
 	containsNode( builder ) {
 
 		const material = builder.material;
@@ -159,6 +235,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns a material data structure holding the material property values for
+	 * monitoring.
+	 *
+	 * @param {Material} material - The material.
+	 * @return {Object} An object for monitoring material properties.
+	 */
 	getMaterialData( material ) {
 
 		const data = {};
@@ -193,6 +276,12 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Returns `true` if the given render object has not changed its state.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Boolean} Whether the given render object has changed its state or not.
+	 */
 	equals( renderObject ) {
 
 		const { object, material, geometry } = renderObject;
@@ -249,6 +338,21 @@ class NodeMaterialObserver {
 
 		}
 
+		if ( materialData.transmission > 0 ) {
+
+			const { width, height } = renderObject.context;
+
+			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+				renderObjectData.bufferWidth = width;
+				renderObjectData.bufferHeight = height;
+
+				return false;
+
+			}
+
+		}
+
 		// geometry
 
 		const storedGeometryData = renderObjectData.geometry;
@@ -265,7 +369,8 @@ class NodeMaterialObserver {
 
 		}
 
-		// Compare each attribute
+		// compare each attribute
+
 		for ( const name of storedAttributeNames ) {
 
 			const storedAttributeData = storedAttributes[ name ];
@@ -273,7 +378,7 @@ class NodeMaterialObserver {
 
 			if ( attribute === undefined ) {
 
-				// Attribute was removed
+				// attribute was removed
 				delete storedAttributes[ name ];
 				return false;
 
@@ -288,7 +393,8 @@ class NodeMaterialObserver {
 
 		}
 
-		// Check index
+		// check index
+
 		const index = geometry.index;
 		const storedIndexVersion = storedGeometryData.indexVersion;
 		const currentIndexVersion = index ? index.version : null;
@@ -300,7 +406,8 @@ class NodeMaterialObserver {
 
 		}
 
-		// Check drawRange
+		// check drawRange
+
 		if ( storedGeometryData.drawRange.start !== geometry.drawRange.start || storedGeometryData.drawRange.count !== geometry.drawRange.count ) {
 
 			storedGeometryData.drawRange.start = geometry.drawRange.start;
@@ -355,6 +462,13 @@ class NodeMaterialObserver {
 
 	}
 
+	/**
+	 * Checks if the given render object requires a refresh.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {NodeFrame} nodeFrame - The current node frame.
+	 * @return {Boolean} Whether the given render object requires a refresh or not.
+	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
 		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) )

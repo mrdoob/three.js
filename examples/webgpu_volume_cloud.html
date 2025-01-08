@@ -16,7 +16,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -131,7 +132,7 @@
 
 					mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
 
-					const shading = map.uv( probe.add( vec3( - 0.01 ) ) ).r.sub( map.uv( probe.add( vec3( 0.01 ) ) ).r );
+					const shading = map.sample( probe.add( vec3( - 0.01 ) ) ).r.sub( map.sample( probe.add( vec3( 0.01 ) ) ).r );
 
 					const col = shading.mul( 3.0 ).add( probe.x.add( probe.y ).mul( 0.25 ) ).add( 0.2 );
 

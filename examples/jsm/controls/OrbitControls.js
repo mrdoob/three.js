@@ -92,6 +92,7 @@ class OrbitControls extends Controls {
 		// Set to false to disable rotating
 		this.enableRotate = true;
 		this.rotateSpeed = 1.0;
+		this.keyRotateSpeed = 1.0;
 
 		// Set to false to disable panning
 		this.enablePan = true;
@@ -784,11 +785,19 @@ class OrbitControls extends Controls {
 
 				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-					this._rotateUp( _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+					if ( this.enableRotate ) {
+
+						this._rotateUp( _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
+
+					}
 
 				} else {
 
-					this._pan( 0, this.keyPanSpeed );
+					if ( this.enablePan ) {
+
+						this._pan( 0, this.keyPanSpeed );
+
+					}
 
 				}
 
@@ -799,11 +808,19 @@ class OrbitControls extends Controls {
 
 				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-					this._rotateUp( - _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+					if ( this.enableRotate ) {
+
+						this._rotateUp( - _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
+
+					}
 
 				} else {
 
-					this._pan( 0, - this.keyPanSpeed );
+					if ( this.enablePan ) {
+
+						this._pan( 0, - this.keyPanSpeed );
+
+					}
 
 				}
 
@@ -814,11 +831,19 @@ class OrbitControls extends Controls {
 
 				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-					this._rotateLeft( _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+					if ( this.enableRotate ) {
+
+						this._rotateLeft( _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
+
+					}
 
 				} else {
 
-					this._pan( this.keyPanSpeed, 0 );
+					if ( this.enablePan ) {
+
+						this._pan( this.keyPanSpeed, 0 );
+
+					}
 
 				}
 
@@ -829,11 +854,19 @@ class OrbitControls extends Controls {
 
 				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-					this._rotateLeft( - _twoPI * this.rotateSpeed / this.domElement.clientHeight );
+					if ( this.enableRotate ) {
+
+						this._rotateLeft( - _twoPI * this.keyRotateSpeed / this.domElement.clientHeight );
+
+					}
 
 				} else {
 
-					this._pan( - this.keyPanSpeed, 0 );
+					if ( this.enablePan ) {
+
+						this._pan( - this.keyPanSpeed, 0 );
+
+					}
 
 				}
 
@@ -1340,7 +1373,7 @@ function onMouseWheel( event ) {
 
 function onKeyDown( event ) {
 
-	if ( this.enabled === false || this.enablePan === false ) return;
+	if ( this.enabled === false ) return;
 
 	this._handleKeyDown( event );
 

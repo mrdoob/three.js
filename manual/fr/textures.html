@@ -86,7 +86,7 @@ const material = new THREE.MeshBasicMaterial({
   </div>
 </div>
 
-<p>Fabriquons juste 6 materiaux et passons-les sous forme de tableau lors de la création du <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
+<p>Fabriquons juste 6 matériaux et passons-les sous forme de tableau lors de la création du <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 -const texture = loader.load( 'resources/images/wall.jpg' );
 -texture.colorSpace = THREE.SRGBColorSpace;
@@ -118,9 +118,9 @@ const material = new THREE.MeshBasicMaterial({
 </div>
 
 <p></p>
-<p>Il convient de noter, cependant, que tous les types de géométries ne peuvent supporter la prise en charge de plusieurs matériaux. <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> ne peut utiliser que 6 materiaux,  un pour chaque face.
+<p>Il convient de noter, cependant, que tous les types de géométries ne peuvent supporter la prise en charge de plusieurs matériaux. <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> ne peut utiliser que 6 matériaux,  un pour chaque face.
 <a href="/docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>, seulement 2, un pour la base et un pour le cône.
-<a href="/docs/#api/en/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> peut recevoir 3 materiaux pour le bas, le haut et le côté.
+<a href="/docs/#api/en/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> peut recevoir 3 matériaux pour le bas, le haut et le côté.
 Dans les autres cas, vous devrez créer ou charger une géométrie personnalisée et/ou modifier les coordonnées de texture.</p>
 <p>Il est bien plus performant d'utiliser, comme dans bien d'autres moteurs 3D, un
 <a href="https://fr.wikipedia.org/wiki/Atlas_de_texture">atlas de texture</a>

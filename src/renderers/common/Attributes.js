@@ -3,16 +3,38 @@ import { AttributeType } from './Constants.js';
 
 import { DynamicDrawUsage } from '../../constants.js';
 
+/**
+ * This renderer module manages geometry attributes.
+ *
+ * @private
+ * @augments DataMap
+ */
 class Attributes extends DataMap {
 
+	/**
+	 * Constructs a new attribute management component.
+	 *
+	 * @param {Backend} backend - The renderer's backend.
+	 */
 	constructor( backend ) {
 
 		super();
 
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
 		this.backend = backend;
 
 	}
 
+	/**
+	 * Deletes the data for the given attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {Object} The deleted attribute data.
+	 */
 	delete( attribute ) {
 
 		const attributeData = super.delete( attribute );
@@ -27,6 +49,13 @@ class Attributes extends DataMap {
 
 	}
 
+	/**
+	 * Updates the given attribute. This method creates attribute buffers
+	 * for new attributes and updates data for existing ones.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute to update.
+	 * @param {Number} type - The attribute type.
+	 */
 	update( attribute, type ) {
 
 		const data = this.get( attribute );
@@ -69,6 +98,13 @@ class Attributes extends DataMap {
 
 	}
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
 	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;

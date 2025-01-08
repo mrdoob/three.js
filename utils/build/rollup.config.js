@@ -45,7 +45,7 @@ function header() {
 
 			code.prepend( `/**
  * @license
- * Copyright 2010-2024 Three.js Authors
+ * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */\n` );
 
@@ -60,83 +60,126 @@ function header() {
 
 }
 
+/**
+ * @type {Array<import('rollup').RollupOptions>}
+ */
 const builds = [
 	{
-		input: 'src/Three.js',
+		input: {
+			'three.core.js': 'src/Three.Core.js',
+			'three.webgpu.nodes.js': 'src/Three.WebGPU.Nodes.js',
+		},
 		plugins: [
 			glsl(),
 			header()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.js'
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
 			}
 		]
 	},
 	{
-		input: 'src/Three.WebGPU.js',
+		input: {
+			'three.core.js': 'src/Three.Core.js',
+			'three.module.js': 'src/Three.js',
+			'three.webgpu.js': 'src/Three.WebGPU.js',
+		},
+		plugins: [
+			glsl(),
+			header()
+		],
+		preserveEntrySignatures: 'allow-extension',
+		output: [
+			{
+				format: 'esm',
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
+			}
+		]
+	},
+	{
+		input: {
+			'three.tsl.js': 'src/Three.TSL.js',
+		},
 		plugins: [
 			header()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.webgpu.js'
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
 			}
-		]
-	},
-	{
-		input: 'src/Three.WebGPU.Nodes.js',
-		plugins: [
-			header()
 		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.webgpu.nodes.js'
-			}
-		]
+		external: [ 'three/webgpu' ]
 	},
 	{
-		input: 'src/Three.js',
+		input: {
+			'three.core.min.js': 'src/Three.Core.js',
+			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.Nodes.js',
+		},
 		plugins: [
 			glsl(),
 			header(),
 			terser()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.min.js'
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
 			}
 		]
 	},
 	{
-		input: 'src/Three.WebGPU.js',
+		input: {
+			'three.core.min.js': 'src/Three.Core.js',
+			'three.module.min.js': 'src/Three.js',
+			'three.webgpu.min.js': 'src/Three.WebGPU.js',
+		},
 		plugins: [
+			glsl(),
 			header(),
 			terser()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.webgpu.min.js'
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
 			}
 		]
 	},
 	{
-		input: 'src/Three.WebGPU.Nodes.js',
+		input: {
+			'three.tsl.min.js': 'src/Three.TSL.js'
+		},
 		plugins: [
 			header(),
 			terser()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.webgpu.nodes.min.js'
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
 			}
-		]
+		],
+		external: [ 'three/webgpu' ]
 	},
 	{
 		input: 'src/Three.js',
@@ -155,4 +198,4 @@ const builds = [
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds.slice( 0, 3 ) : builds;
+export default ( args ) => args.configOnlyModule ? builds.slice( 0, 4 ) : builds;

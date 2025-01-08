@@ -4,24 +4,24 @@
 <head>
 
 	<head>
-		<title>three.js webgpu - postprocessing - Screen Space Reflection</title>
+		<title>three.js webgpu - postprocessing - Screen Space Reflections (SSR)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 <body>
-	<div id="container"></div>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		SSR demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - screen space reflections<br />
+		<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by 
+		<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
 	</div>
-
 	<script type="importmap">
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-				"three/tsl": "../build/three.webgpu.js",
+				"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
 				"three/addons/": "./jsm/"
 			}
 		}
@@ -29,98 +29,68 @@
 
 	<script type="module">
 		import * as THREE from 'three';
-		import { pass, mrt, output, transformedNormalView, metalness, vec4/*, uniform*/ } from 'three/tsl';
+		import { pass, mrt, output, transformedNormalView, metalness, blendColor, screenUV, color } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import Stats from 'three/addons/libs/stats.module.js';
 
 		const params = {
-			maxDistance: 0.1,
+			maxDistance: 0.5,
 			opacity: 1,
-			thickness: 0.018,
-			enabled: true,
-			autoRotate: false
+			thickness: 0.015,
+			enabled: true
 		};
 
 		let camera, scene, renderer, postProcessing, ssrPass;
 		let gui, stats, controls;
 
-		// Configure and create Draco decoder.
-		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
-		dracoLoader.setDecoderConfig( { type: 'js' } );
-
 		init();
 
 		async function init() {
 
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
-			camera.position.set( 0.1, 0.2, 0.5 );
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 50 );
+			camera.position.set( 3, 2, 3 );
 
 			scene = new THREE.Scene();
-			scene.fog = new THREE.Fog( 0x666666, 1, 4 );
+			scene.backgroundNode = screenUV.distance( .5 ).remap( 0, 0.5 ).mix( color( 0x888877 ), color( 0x776666 ) );
 
-			// Ground
-			const plane = new THREE.Mesh(
-				new THREE.PlaneGeometry( 8, 8 ),
-				new THREE.MeshStandardNodeMaterial( { color: 0xcbcbcb } )
-			);
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
+			dracoLoader.setDecoderConfig( { type: 'js' } );
 		
-			// any node material can write custom MRT metalness values for controlling SSR
+			const loader = new GLTFLoader();
+			loader.setDRACOLoader( dracoLoader );
+			loader.load( 'models/gltf/steampunk_camera.glb', function ( gltf ) {
 
-			// plane.material.mrtNode = mrt( {
-			// 	output: output,
-			// 	normal: transformedNormalView,
-			// 	metalness: uniform( 0.5 )
-			// } );
+				gltf.scene.traverse( function ( object ) {
+
+					if ( object.material ) {
+
+						// Avoid overdrawing
+						object.material.side = THREE.FrontSide;
 		
-			plane.rotation.x = - Math.PI / 2;
-			plane.position.y = - 0.0001;
-			scene.add( plane );
-
-			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
-
-				geometry.computeVertexNormals();
-
-				const material = new THREE.MeshStandardNodeMaterial( { color: 0xa5a5a5, metalness: 1 } );
-				const mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = - 0.0365;
-				scene.add( mesh );
-
-				dracoLoader.dispose();
+					}
+		
+				} );
+		
+				gltf.scene.position.y = 0.1;
+				scene.add( gltf.scene );
 
 			} );
-
-			let geometry, material, mesh;
-
-			geometry = new THREE.BoxGeometry( 0.05, 0.05, 0.05 );
-			material = new THREE.MeshStandardNodeMaterial( { color: 'green', metalness: 0.3 } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - 0.12, 0.025, 0.015 );
-			scene.add( mesh );
-
-			geometry = new THREE.IcosahedronGeometry( .025, 4 );
-			material = new THREE.MeshStandardNodeMaterial( { color: 'cyan', metalness: 0.5 } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - 0.05, 0.025, 0.08 );
-			scene.add( mesh );
-		
-			geometry = new THREE.ConeGeometry( 0.025, 0.05, 64 );
-			material = new THREE.MeshStandardNodeMaterial( { color: 'yellow', metalness: 0.4 } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - 0.05, 0.025, - 0.055 );
-			scene.add( mesh );
 
 			//
 
 			renderer = new THREE.WebGPURenderer();
-			renderer.setPixelRatio( window.devicePixelRatio );
+			// renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			document.body.appendChild( renderer.domElement );
 
 			await renderer.init();
@@ -128,9 +98,8 @@
 			const environment = new RoomEnvironment();
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-			scene.background = new THREE.Color( 0x666666 );
 			scene.environment = pmremGenerator.fromScene( environment ).texture;
-			scene.environmentIntensity = 0.75;
+			scene.environmentIntensity = 1.25;
 			pmremGenerator.dispose();
 
 			//
@@ -150,19 +119,18 @@
 			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
 
 			ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
+			ssrPass.resolutionScale = 1.0;
 
 			// blend SSR over beauty
 		
-			const outputNode = vec4( scenePass.rgb.mul( ssrPass.a.oneMinus() ).add( ssrPass.rgb.mul( ssrPass.a ) ), scenePass.a );
+			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
 
 			postProcessing.outputNode = outputNode;
-
 
 			//
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
-			controls.target.set( 0, 0.05, 0 );
 			controls.update();
 
 			// stats
@@ -177,7 +145,7 @@
 			gui = new GUI();
 			gui.add( params, 'maxDistance' ).min( 0 ).max( 1 ).onChange( updateParameters );
 			gui.add( params, 'opacity' ).min( 0 ).max( 1 ).onChange( updateParameters );
-			gui.add( params, 'thickness' ).min( 0 ).max( 0.1 ).onChange( updateParameters );
+			gui.add( params, 'thickness' ).min( 0 ).max( 0.05 ).onChange( updateParameters );
 			gui.add( params, 'enabled' ).onChange( () => {
 
 				if ( params.enabled === true ) {
@@ -193,7 +161,6 @@
 				postProcessing.needsUpdate = true;
 
 			} );
-			gui.add( params, 'autoRotate' );
 		
 			updateParameters();
 
@@ -221,8 +188,6 @@
 
 			stats.begin();
 
-			controls.autoRotate = params.autoRotate;
-		
 			controls.update();
 
 			postProcessing.render();

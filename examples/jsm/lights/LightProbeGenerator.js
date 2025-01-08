@@ -99,7 +99,7 @@ class LightProbeGenerator {
 				// evaluate SH basis functions in direction dir
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
-				// accummuulate
+				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;
@@ -129,7 +129,7 @@ class LightProbeGenerator {
 
 	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
-		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? -1 : 1;
+		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? - 1 : 1;
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
@@ -242,7 +242,7 @@ class LightProbeGenerator {
 				// evaluate SH basis functions in direction dir
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
-				// accummuulate
+				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;

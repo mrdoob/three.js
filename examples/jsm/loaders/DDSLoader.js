@@ -109,6 +109,33 @@ class DDSLoader extends CompressedTextureLoader {
 
 		}
 
+		function loadRGBMip( buffer, dataOffset, width, height ) {
+
+			const dataLength = width * height * 3;
+			const srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
+			const byteArray = new Uint8Array( width * height * 4 );
+			let dst = 0;
+			let src = 0;
+			for ( let y = 0; y < height; y ++ ) {
+
+				for ( let x = 0; x < width; x ++ ) {
+
+					const b = srcBuffer[ src ]; src ++;
+					const g = srcBuffer[ src ]; src ++;
+					const r = srcBuffer[ src ]; src ++;
+					byteArray[ dst ] = r; dst ++;	//r
+					byteArray[ dst ] = g; dst ++;	//g
+					byteArray[ dst ] = b; dst ++;	//b
+                    			byteArray[ dst ] = 1.0; dst ++; //a
+
+				}
+
+			}
+
+			return byteArray;
+
+		}
+
 		const FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
 		const FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
 		const FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
@@ -161,6 +188,7 @@ class DDSLoader extends CompressedTextureLoader {
 		const fourCC = header[ off_pfFourCC ];
 
 		let isRGBAUncompressed = false;
+		let isRGBUncompressed = false;
 
 		let dataOffset = header[ off_size ] + 4;
 
@@ -236,6 +264,15 @@ class DDSLoader extends CompressedTextureLoader {
 					blockBytes = 64;
 					dds.format = RGBAFormat;
 
+				} else if ( header[ off_RGBBitCount ] === 24
+					&& header[ off_RBitMask ] & 0xff0000
+					&& header[ off_GBitMask ] & 0xff00
+					&& header[ off_BBitMask ] & 0xff ) {
+
+				    	isRGBUncompressed = true;
+                    			blockBytes = 64;
+                    			dds.format = RGBAFormat;
+
 				} else {
 
 					console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
@@ -289,6 +326,11 @@ class DDSLoader extends CompressedTextureLoader {
 
 					byteArray = loadARGBMip( buffer, dataOffset, width, height );
 					dataLength = byteArray.length;
+
+				} else if ( isRGBUncompressed ) {
+
+					byteArray = loadRGBMip( buffer, dataOffset, width, height );
+					dataLength = width * height * 3;
 
 				} else {
 

@@ -133,14 +133,14 @@ class CylinderGeometry extends BufferGeometry {
 
 					// faces
 
-					if ( radiusTop > 0 ) {
+					if ( radiusTop > 0 || y !== 0 ) {
 
 						indices.push( a, b, d );
 						groupCount += 3;
 
 					}
 
-					if ( radiusBottom > 0 ) {
+					if ( radiusBottom > 0 || y !== heightSegments - 1 ) {
 
 						indices.push( b, c, d );
 						groupCount += 3;

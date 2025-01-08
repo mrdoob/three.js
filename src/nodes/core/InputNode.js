@@ -1,6 +1,11 @@
 import Node from './Node.js';
 import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
 
+/**
+ * Base class for representing data input nodes.
+ *
+ * @augments Node
+ */
 class InputNode extends Node {
 
 	static get type() {
@@ -9,13 +14,38 @@ class InputNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new input node.
+	 *
+	 * @param {Any} value - The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+	 * @param {String?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 */
 	constructor( value, nodeType = null ) {
 
 		super( nodeType );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isInputNode = true;
 
+		/**
+		 * The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+		 *
+		 * @type {Any}
+		 */
 		this.value = value;
+
+		/**
+		 * The precision of the value in the shader.
+		 *
+		 * @type {('low'|'medium'|'high')?}
+		 * @default null
+		 */
 		this.precision = null;
 
 	}
@@ -32,12 +62,30 @@ class InputNode extends Node {
 
 	}
 
+	/**
+	 * Returns the input type of the node which is by default the node type. Derived modules
+	 * might overwrite this method and use a fixed type or compute one analytically.
+	 *
+	 * A typical example for different input and node types are textures. The input type of a
+	 * normal RGBA texture is `texture` whereas its node type is `vec4`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The input type.
+	 */
 	getInputType( builder ) {
 
 		return this.getNodeType( builder );
 
 	}
 
+	/**
+	 * Sets the precision to the given value. The method can be
+	 * overwritten in derived classes if the final precision must be computed
+	 * analytically.
+	 *
+	 * @param {('low'|'medium'|'high')} precision - The precision of the input value in the shader.
+	 * @return {InputNode} A reference to this node.
+	 */
 	setPrecision( precision ) {
 
 		this.precision = precision;

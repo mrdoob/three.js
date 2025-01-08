@@ -1,4 +1,4 @@
-import * as MathUtils from './MathUtils.js';
+import { clamp } from './MathUtils.js';
 
 /**
  * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
@@ -42,7 +42,7 @@ class Spherical {
 	makeSafe() {
 
 		const EPS = 0.000001;
-		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
+		this.phi = clamp( this.phi, EPS, Math.PI - EPS );
 
 		return this;
 
@@ -66,7 +66,7 @@ class Spherical {
 		} else {
 
 			this.theta = Math.atan2( x, z );
-			this.phi = Math.acos( MathUtils.clamp( y / this.radius, - 1, 1 ) );
+			this.phi = Math.acos( clamp( y / this.radius, - 1, 1 ) );
 
 		}
 

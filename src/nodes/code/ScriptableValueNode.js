@@ -4,6 +4,13 @@ import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
+/** @module ScriptableValueNode **/
+
+/**
+ * `ScriptableNode` uses this class to manage script inputs and outputs.
+ *
+ * @augments Node
+ */
 class ScriptableValueNode extends Node {
 
 	static get type() {
@@ -12,22 +19,72 @@ class ScriptableValueNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new scriptable node.
+	 *
+	 * @param {Any} [value=null] - The value.
+	 */
 	constructor( value = null ) {
 
 		super();
 
+		/**
+		 * A reference to the value.
+		 *
+		 * @private
+		 * @default null
+		 */
 		this._value = value;
+
+		/**
+		 * Depending on the type of `_value`, this property might cache parsed data.
+		 *
+		 * @private
+		 * @default null
+		 */
 		this._cache = null;
 
+		/**
+		 * If this node represents an input, this property represents the input type.
+		 *
+		 * @type {String?}
+		 * @default null
+		 */
 		this.inputType = null;
-		this.outpuType = null;
 
+		/**
+		 * If this node represents an output, this property represents the output type.
+		 *
+		 * @type {String?}
+		 * @default null
+		 */
+		this.outputType = null;
+
+		/**
+		 * An event dispatcher for managing events.
+		 *
+		 * @type {EventDispatcher}
+		 */
 		this.events = new EventDispatcher();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isScriptableValueNode = true;
 
 	}
 
+	/**
+	 * Whether this node represents an output or not.
+	 *
+	 * @type {Boolean}
+	 * @readonly
+	 * @default true
+	 */
 	get isScriptableOutputNode() {
 
 		return this.outputType !== null;
@@ -54,18 +111,32 @@ class ScriptableValueNode extends Node {
 
 	}
 
+	/**
+	 * The node's value.
+	 *
+	 * @type {Any}
+	 */
 	get value() {
 
 		return this._value;
 
 	}
 
+	/**
+	 * Dispatches the `refresh` event.
+	 */
 	refresh() {
 
 		this.events.dispatchEvent( { type: 'refresh' } );
 
 	}
 
+	/**
+	 * The `value` property usually represents a node or even binary data in form of array buffers.
+	 * In this case, this method tries to return the actual value behind the complex type.
+	 *
+	 * @return {Any} The value.
+	 */
 	getValue() {
 
 		const value = this.value;
@@ -93,6 +164,12 @@ class ScriptableValueNode extends Node {
 
 	}
 
+	/**
+	 * Overwritten since the node type is inferred from the value.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder ) {
 
 		return this.value && this.value.isNode ? this.value.getNodeType( builder ) : 'float';
@@ -167,4 +244,11 @@ class ScriptableValueNode extends Node {
 
 export default ScriptableValueNode;
 
+/**
+ * TSL function for creating a scriptable value node.
+ *
+ * @function
+ * @param {Any} [value=null] - The value.
+ * @returns {ScriptableValueNode}
+ */
 export const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );

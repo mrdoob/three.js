@@ -19,7 +19,8 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 	}
 
 	const material = new NodeMaterial();
-	material.fragmentNode = texture( blitTexture ).uv( uv().flipY() );
+
+	material.fragmentNode = texture( blitTexture, uv().flipY() );
 
 	const width = Math.min( blitTexture.image.width, maxTextureSize );
 	const height = Math.min( blitTexture.image.height, maxTextureSize );

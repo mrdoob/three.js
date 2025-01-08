@@ -36,8 +36,8 @@ body:
       value: |
         * [jsfiddle-latest-release WebGLRenderer](https://jsfiddle.net/3mrkqyea/)
         * [jsfiddle-dev WebGLRenderer](https://jsfiddle.net/gcqx26jv/)
-        * [jsfiddle-latest-release WebGPURenderer](https://jsfiddle.net/8L2jkmx7/)
-        * [jsfiddle-dev WebGPURenderer](https://jsfiddle.net/L3n1w4yh/)
+        * [jsfiddle-latest-release WebGPURenderer](https://jsfiddle.net/mnqr9oj0/)
+        * [jsfiddle-dev WebGPURenderer](https://jsfiddle.net/xno7bmw0/)
     validations:
       required: true
   - type: textarea

@@ -79,7 +79,7 @@ class SessionLightProbe {
 
 	onXRFrame( time, xrFrame ) {
 
-		// If either this obejct or the XREstimatedLight has been destroyed, stop
+		// If either this object or the XREstimatedLight has been destroyed, stop
 		// running the frame loop.
 		if ( ! this.xrLight ) {
 

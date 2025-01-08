@@ -26,9 +26,12 @@ class CSS2DObject extends Object3D {
 
 			this.traverse( function ( object ) {
 
-				if ( object.element instanceof Element && object.element.parentNode !== null ) {
+				if (
+					object.element instanceof object.element.ownerDocument.defaultView.Element &&
+					object.element.parentNode !== null
+				) {
 
-					object.element.parentNode.removeChild( object.element );
+					object.element.remove();
 
 				}
 
@@ -135,7 +138,7 @@ class CSS2DRenderer {
 				return;
 
 			}
-			
+
 			if ( object.isCSS2DObject ) {
 
 				_vector.setFromMatrixPosition( object.matrixWorld );

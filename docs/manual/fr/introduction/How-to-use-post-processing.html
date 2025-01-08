@@ -59,8 +59,7 @@
 
 		<p>
 			Notre composer est maintenant prêt, il est donc possible de configurer la chaîne d'effets de post-processing. Ces effets (passes) sont chargés de la création
-			de l'apparence visuelle finale de l'application. Ils sont traités dans l'ordre de leur ajout/insertion. In our example, the instance of `RenderPass`
-			is executed first, then the instance of `GlitchPass` and finally `OutputPass`. Le dernier effet activé de la chaîne est automatiquement rendu dans la scène. Le setup
+			de l'apparence visuelle finale de l'application. Ils sont traités dans l'ordre de leur ajout/insertion. Dans notre exemple, l'instance de `RenderPass` est exécutée en premier, puis l'instance de `GlitchPass` et enfin `OutputPass`. Le dernier effet activé de la chaîne est automatiquement rendu dans la scène. Le setup
 			des effets ressemble à ça:
 		</p>
 
@@ -77,7 +76,7 @@
 
 		<p>
 			`RenderPass` est normalement placé au début de la chaîne pour fournir la scène rendue en tant qu'entrée pour les prochaines étapes de post-processing. Dans notre cas,
-			`GlitchPass` va utiliser les données de l'image pour appliquer un effet de glitch.  `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+			`GlitchPass` va utiliser les données de l'image pour appliquer un effet de glitch.  `OutputPass` est généralement le dernier passage de la chaîne qui effectue la conversion de l'espace colorimétrique sRGB et le mappage tonal optionnel.
 			Regardez cet [link:https://threejs.org/examples/webgl_postprocessing_glitch exemple live] pour voir cela en action.
 		</p>
 

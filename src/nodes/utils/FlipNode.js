@@ -1,6 +1,21 @@
 import TempNode from '../core/TempNode.js';
 import { vectorComponents } from '../core/constants.js';
 
+/**
+ * This module is part of the TSL core and usually not used in app level code.
+ * It represents a flip operation during the shader generation process
+ * meaning it flips normalized values with the following formula:
+ * ```
+ * x = 1 - x;
+ * ```
+ * `FlipNode` is internally used to implement any `flipXYZW()`, `flipRGBA()` and
+ * `flipSTPQ()` method invocations on node objects. For example:
+ * ```js
+ * uvNode = uvNode.flipY();
+ * ```
+ *
+ * @augments TempNode
+ */
 class FlipNode extends TempNode {
 
 	static get type() {
@@ -9,15 +24,38 @@ class FlipNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new flip node.
+	 *
+	 * @param {Node} sourceNode - The node which component(s) should be flipped.
+	 * @param {String} components - The components that should be flipped e.g. `'x'` or `'xy'`.
+	 */
 	constructor( sourceNode, components ) {
 
 		super();
 
+		/**
+		 * The node which component(s) should be flipped.
+		 *
+		 * @type {Node}
+		 */
 		this.sourceNode = sourceNode;
+
+		/**
+		 * The components that should be flipped e.g. `'x'` or `'xy'`.
+		 *
+		 * @type {String}
+		 */
 		this.components = components;
 
 	}
 
+	/**
+	 * This method is overwritten since the node type is inferred from the source node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder ) {
 
 		return this.sourceNode.getNodeType( builder );

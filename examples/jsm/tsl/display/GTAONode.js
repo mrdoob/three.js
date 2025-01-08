@@ -1,11 +1,37 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, PostProcessingUtils } from 'three';
-import { getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
+
+/** @module GTAONode **/
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
+/**
+ * Post processing node for applying Ground Truth Ambient Occlusion (GTAO) to a scene.
+ * ```js
+ * const postProcessing = new THREE.PostProcessing( renderer );
+ *
+ * const scenePass = pass( scene, camera );
+ * scenePass.setMRT( mrt( {
+ * 	output: output,
+ * 	normal: normalView
+ * } ) );
+ *
+ * const scenePassColor = scenePass.getTextureNode( 'output' );
+ * const scenePassNormal = scenePass.getTextureNode( 'normal' );
+ * const scenePassDepth = scenePass.getTextureNode( 'depth' );
+ *
+ * const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+ *
+ * postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
+ * ```
+ *
+ * Reference: {@link https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf}.
+ *
+ * @augments TempNode
+ */
 class GTAONode extends TempNode {
 
 	static get type() {
@@ -14,54 +40,213 @@ class GTAONode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new GTAO node.
+	 *
+	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
+	 * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 */
 	constructor( depthNode, normalNode, camera ) {
 
-		super();
+		super( 'vec4' );
 
+		/**
+		 * A node that represents the scene's depth.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.depthNode = depthNode;
+
+		/**
+		 * A node that represents the scene's normals. If no normals are passed to the
+		 * constructor (because MRT is not available), normals can be automatically
+		 * reconstructed from depth values in the shader.
+		 *
+		 * @type {Node<vec3>?}
+		 */
 		this.normalNode = normalNode;
 
-		this.radius = uniform( 0.25 );
-		this.resolution = uniform( new Vector2() );
-		this.thickness = uniform( 1 );
-		this.distanceExponent = uniform( 1 );
-		this.distanceFallOff = uniform( 1 );
-		this.scale = uniform( 1 );
-		this.noiseNode = texture( generateMagicSquareNoise() );
+		/**
+		 * The resolution scale. By default the effect is rendered in full resolution
+		 * for best quality but a value of `0.5` should be sufficient for most scenes.
+		 *
+		 * @type {Number}
+		 * @default 1
+		 */
+		this.resolutionScale = 1;
 
-		this.cameraProjectionMatrix = uniform( camera.projectionMatrix );
-		this.cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
+		 * its effect once per frame in `updateBefore()`.
+		 *
+		 * @type {String}
+		 * @default 'frame'
+		 */
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		this.SAMPLES = uniform( 16 );
-
+		/**
+		 * The render target the ambient occlusion is rendered into.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
-		this._material = null;
-		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
+		// uniforms
 
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		/**
+		 * The radius of the ambient occlusion.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.radius = uniform( 0.25 );
+
+		/**
+		 * The resolution of the effect. Can be scaled via
+		 * `resolutionScale`.
+		 *
+		 * @type {UniformNode<vec2>}
+		 */
+		this.resolution = uniform( new Vector2() );
+
+		/**
+		 * The thickness of the ambient occlusion.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.thickness = uniform( 1 );
+
+		/**
+		 * Another option to tweak the occlusion. The recommended range is
+		 * `[1,2]` for attenuating the AO.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.distanceExponent = uniform( 1 );
+
+		/**
+		 * The distance fall off value of the ambient occlusion.
+		 * A lower value leads to a larger AO effect. The value
+		 * should lie in the range `[0,1]`.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.distanceFallOff = uniform( 1 );
+
+		/**
+		 * The scale of the ambient occlusion.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.scale = uniform( 1 );
+
+		/**
+		 * How many samples are used to compute the AO.
+		 * A higher value results in better quality but also
+		 * in a more expensive runtime behavior.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.samples = uniform( 16 );
+
+		/**
+		 * The node represents the internal noise texture used by the AO.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
+		this._noiseNode = texture( generateMagicSquareNoise() );
+
+		/**
+		 * Represents the projection matrix of the scene's camera.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
+
+		/**
+		 * Represents the inverse projection matrix of the scene's camera.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+
+		/**
+		 * Represents the near value of the scene's camera.
+		 *
+		 * @private
+		 * @type {ReferenceNode<float>}
+		 */
+		this._cameraNear = reference( 'near', 'float', camera );
+
+		/**
+		 * Represents the far value of the scene's camera.
+		 *
+		 * @private
+		 * @type {ReferenceNode<float>}
+		 */
+		this._cameraFar = reference( 'far', 'float', camera );
+
+		/**
+		 * The material that is used to render the effect.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._material = new NodeMaterial();
+		this._material.name = 'GTAO';
+
+		/**
+		 * The result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
+		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
 
 	}
 
+	/**
+	 * Returns the result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 */
 	getTextureNode() {
 
 		return this._textureNode;
 
 	}
 
+	/**
+	 * Sets the size of the effect.
+	 *
+	 * @param {Number} width - The width of the effect.
+	 * @param {Number} height - The height of the effect.
+	 */
 	setSize( width, height ) {
+
+		width = Math.round( this.resolutionScale * width );
+		height = Math.round( this.resolutionScale * height );
 
 		this.resolution.value.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 
 	}
 
+	/**
+	 * This method is used to render the effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -81,16 +266,38 @@ class GTAONode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {PassTextureNode}
+	 */
 	setup( builder ) {
 
 		const uvNode = uv();
 
-		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
+		const sampleDepth = ( uv ) => {
+
+			const depth = this.depthNode.sample( uv ).r;
+
+			if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
+
+				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
+
+			}
+
+			return depth;
+
+		};
+
+		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
 		const ao = Fn( () => {
 
@@ -98,12 +305,12 @@ class GTAONode extends TempNode {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse ).toVar();
-			const viewNormal = this.normalNode.rgb.normalize().toVar();
+			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
+			const viewNormal = sampleNormal( uvNode ).toVar();
 
 			const radiusToUse = this.radius;
 
-			const noiseResolution = textureSize( this.noiseNode, 0 );
+			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
 			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
 			const noiseTexel = sampleNoise( noiseUv );
@@ -112,8 +319,8 @@ class GTAONode extends TempNode {
 			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).select( 3, 5 ).toVar();
-			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
+			const DIRECTIONS = this.samples.lessThan( 30 ).select( 3, 5 ).toVar();
+			const STEPS = add( this.samples, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
 
 			const ao = float( 0 ).toVar();
 
@@ -137,9 +344,9 @@ class GTAONode extends TempNode {
 
 					// x
 
-					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this.cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
-					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this.cameraProjectionMatrixInverse ).toVar();
+					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
@@ -151,9 +358,9 @@ class GTAONode extends TempNode {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this.cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
-					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this.cameraProjectionMatrixInverse ).toVar();
+					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
@@ -182,10 +389,8 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const material = this._material || ( this._material = new NodeMaterial() );
-		material.fragmentNode = ao().context( builder.getSharedContext() );
-		material.name = 'GTAO';
-		material.needsUpdate = true;
+		this._material.fragmentNode = ao().context( builder.getSharedContext() );
+		this._material.needsUpdate = true;
 
 		//
 
@@ -193,9 +398,15 @@ class GTAONode extends TempNode {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
 	dispose() {
 
 		this._aoRenderTarget.dispose();
+
+		this._material.dispose();
 
 	}
 
@@ -203,6 +414,12 @@ class GTAONode extends TempNode {
 
 export default GTAONode;
 
+/**
+ * Generates the AO's noise texture for the given size.
+ *
+ * @param {Number} [size=5] - The noise size.
+ * @return {DataTexture} The generated noise texture.
+ */
 function generateMagicSquareNoise( size = 5 ) {
 
 	const noiseSize = Math.floor( size ) % 2 === 0 ? Math.floor( size ) + 1 : Math.floor( size );
@@ -235,6 +452,12 @@ function generateMagicSquareNoise( size = 5 ) {
 
 }
 
+/**
+ * Computes an array of magic square values required to generate the noise texture.
+ *
+ * @param {Number} size - The noise size.
+ * @return {Array<Number>} The magic square values.
+ */
 function generateMagicSquare( size ) {
 
 	const noiseSize = Math.floor( size ) % 2 === 0 ? Math.floor( size ) + 1 : Math.floor( size );
@@ -287,4 +510,13 @@ function generateMagicSquare( size ) {
 
 }
 
+/**
+ * TSL function for creating a Ground Truth Ambient Occlusion (GTAO) effect.
+ *
+ * @function
+ * @param {Node<float>} depthNode - A node that represents the scene's depth.
+ * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+ * @param {Camera} camera - The camera the scene is rendered with.
+ * @returns {GTAONode}
+ */
 export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );

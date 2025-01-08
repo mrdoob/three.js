@@ -267,6 +267,7 @@
 			"Objects": {
 				"BatchedMesh": "api/en/objects/BatchedMesh",
 				"Bone": "api/en/objects/Bone",
+				"ClippingGroup": "api/en/objects/ClippingGroup",
 				"Group": "api/en/objects/Group",
 				"InstancedMesh": "api/en/objects/InstancedMesh",
 				"Line": "api/en/objects/Line",
@@ -325,9 +326,7 @@
 		"Addons": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/en/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver"
 			},
 
 			"Controls": {
@@ -379,7 +378,6 @@
 				"LDrawLoader": "examples/en/loaders/LDrawLoader",
 				"LUT3dlLoader": "examples/en/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/en/loaders/LUTCubeLoader",
-				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
@@ -1086,9 +1084,7 @@
 		"附加": {
 
 			"动画": {
-				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/zh/animations/MMDPhysics"
+				"CCDIKSolver": "examples/zh/animations/CCDIKSolver"
 			},
 
 			"控制": {
@@ -1132,7 +1128,6 @@
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
 				"LUT3dlLoader": "examples/zh/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
-				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
@@ -1221,6 +1216,7 @@
 				"선 그리기": "manual/ko/introduction/Drawing-lines",
 				"텍스트 만들기": "manual/ko/introduction/Creating-text",
 				"3D 모델 불러오기": "manual/ko/introduction/Loading-3D-models",
+				"라이브러리 및 플러그인": "manual/en/introduction/Libraries-and-Plugins",
 				"FAQ": "manual/ko/introduction/FAQ",
 				"참고 링크": "manual/ko/introduction/Useful-links"
 			},
@@ -1231,7 +1227,8 @@
 				"VR 컨텐츠를 만드는 방법": "manual/ko/introduction/How-to-create-VR-content",
 				"후처리 사용 방법": "manual/ko/introduction/How-to-use-post-processing",
 				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
-				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
+				"애니메이션 시스템": "manual/ko/introduction/Animation-system",
+				"색상 관리": "manual/ko/introduction/Color-management"
 			}
 
 		},
@@ -2259,9 +2256,7 @@
 		"Examples": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/en/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver"
 			},
 
 			"Controls": {
@@ -2301,7 +2296,6 @@
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"LDrawLoader": "examples/en/loaders/LDrawLoader",
-				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",

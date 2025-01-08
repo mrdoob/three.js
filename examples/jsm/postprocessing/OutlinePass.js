@@ -81,10 +81,10 @@ class OutlinePass extends Pass {
 		const MAX_EDGE_THICKNESS = 4;
 		const MAX_EDGE_GLOW = 4;
 
-		this.separableBlurMaterial1 = this.getSeperableBlurMaterial( MAX_EDGE_THICKNESS );
+		this.separableBlurMaterial1 = this.getSeparableBlurMaterial( MAX_EDGE_THICKNESS );
 		this.separableBlurMaterial1.uniforms[ 'texSize' ].value.set( resx, resy );
 		this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = 1;
-		this.separableBlurMaterial2 = this.getSeperableBlurMaterial( MAX_EDGE_GLOW );
+		this.separableBlurMaterial2 = this.getSeparableBlurMaterial( MAX_EDGE_GLOW );
 		this.separableBlurMaterial2.uniforms[ 'texSize' ].value.set( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 		this.separableBlurMaterial2.uniforms[ 'kernelRadius' ].value = MAX_EDGE_GLOW;
 
@@ -241,7 +241,7 @@ class OutlinePass extends Pass {
 
 			} else if ( object.isPoints || object.isLine ) {
 
-				// the visibilty of points and lines is always set to false in order to
+				// the visibility of points and lines is always set to false in order to
 				// not affect the outline computation
 
 				if ( bVisible === true ) {
@@ -521,7 +521,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	getSeperableBlurMaterial( maxRadius ) {
+	getSeparableBlurMaterial( maxRadius ) {
 
 		return new ShaderMaterial( {
 
