@@ -214,13 +214,9 @@ THREE.ColorManagement.enabled = true;
 
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
-		Linear-sRGB working color space to another color space. This conversion may be performed in
-		the main render pass ([page:WebGLRenderer.outputColorSpace]), or during post-processing.
+		Linear-sRGB working color space to another color space. The conversion is defined by
+		([page:WebGLRenderer.outputColorSpace]). When using post-processing, this requires OutputPass.
 	</p>
-
-	<code>
-renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
-	</code>
 
 	<ul>
 		<li>
