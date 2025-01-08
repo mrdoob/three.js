@@ -76,15 +76,6 @@ class VarNode extends Node {
 
 	}
 
-
-	toReadOnly() {
-
-		this.readOnly = true;
-
-		return this;
-
-	}
-
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
@@ -162,15 +153,36 @@ export default VarNode;
  */
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
-addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
+/**
+ * TSL function for creating a var node.
+ *
+ * @function
+ * @param {Node} node - The node for which a variable should be created.
+ * @param {String?} name - The name of the variable in the shader.
+ * @returns {VarNode}
+ */
+export const Var = ( node, name = null ) => createVar( node, name ).append();
 
-addMethodChaining( 'toConst', ( ...params ) => createVar( ...params ).append().toReadOnly() );
+/**
+ * TSL function for creating a const node.
+ *
+ * @function
+ * @param {Node} node - The node for which a constant should be created.
+ * @param {String?} name - The name of the constant in the shader.
+ * @returns {VarNode}
+ */
+export const Const = ( node, name = null ) => createVar( node, name, true ).append();
+
+// Method chaining
+
+addMethodChaining( 'toVar', Var );
+addMethodChaining( 'toConst', Const );
 
 // Deprecated
 
 export const temp = ( node ) => { // @deprecated, r170
 
-	console.warn( 'TSL: "temp" is deprecated. Use ".toVar()" instead.' );
+	console.warn( 'TSL: "temp( node )" is deprecated. Use "Var( node )" or "node.toVar()" instead.' );
 
 	return createVar( node );
 
