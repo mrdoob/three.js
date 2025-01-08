@@ -543,9 +543,11 @@ export const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
 
 /**
  * Returns the arc-tangent of the parameter.
+ * If two parameters are provided, the result is `atan2(y/x)`.
  *
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | Number} y - The y parameter.
+ * @param {(Node | Number)?} x - The x parameter.
  * @returns {Node}
  */
 export const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );
