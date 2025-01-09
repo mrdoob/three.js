@@ -2622,6 +2622,7 @@ class Renderer {
 						viewportValue.copy( vp ).multiplyScalar( this._pixelRatio ).floor();
 						viewportValue.minDepth = minDepth;
 						viewportValue.maxDepth = maxDepth;
+						this._currentRenderContext.viewport = true;
 
 						this.backend.updateViewport( this._currentRenderContext );
 
