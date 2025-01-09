@@ -1553,18 +1553,15 @@ class WebGPUBackend extends Backend {
 
 		if ( resultBuffer.mapState === 'unmapped' ) {
 
-			return resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+			await resultBuffer.mapAsync( GPUMapMode.READ );
 
-				const times = new BigUint64Array( resultBuffer.getMappedRange() );
-				const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
-
-
-				this.renderer.info.updateTimestamp( type, duration );
-
-				resultBuffer.unmap();
+			const times = new BigUint64Array( resultBuffer.getMappedRange() );
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
 
 
-			} );
+			this.renderer.info.updateTimestamp( type, duration );
+
+			resultBuffer.unmap();
 
 		}
 
