@@ -142,6 +142,9 @@ export * from './pmrem/PMREMUtils.js';
 // procedural
 export * from './procedural/Checker.js';
 
+// shapes
+export * from './shapes/Shapes.js';
+
 // materialX
 export * from './materialx/MaterialXNodes.js';
 

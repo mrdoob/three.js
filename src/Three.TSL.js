@@ -415,6 +415,7 @@ export const shaderStages = TSL.shaderStages;
 export const shadow = TSL.shadow;
 export const shadowPositionWorld = TSL.shadowPositionWorld;
 export const sharedUniformGroup = TSL.sharedUniformGroup;
+export const shapeCircle = TSL.shapeCircle;
 export const sheen = TSL.sheen;
 export const sheenRoughness = TSL.sheenRoughness;
 export const shiftLeft = TSL.shiftLeft;

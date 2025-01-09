@@ -1,4 +1,8 @@
-import NodeMaterial from './NodeMaterial.js';
+import SpriteNodeMaterial from './SpriteNodeMaterial.js';
+import { viewport } from '../../nodes/display/ScreenNode.js';
+import { positionGeometry, positionView } from '../../nodes/accessors/Position.js';
+import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
+import { float, vec2, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
 
@@ -7,14 +11,9 @@ const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 /**
  * Node material version of `PointsMaterial`.
  *
- * Since WebGPU can render point primitives only with a size of one pixel,
- * this material type does not evaluate the `size` and `sizeAttenuation`
- * property of `PointsMaterial`. Use {@link InstancedPointsNodeMaterial}
- * instead if you need points with a size larger than one pixel.
- *
  * @augments NodeMaterial
  */
-class PointsNodeMaterial extends NodeMaterial {
+class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	static get type() {
 
@@ -32,6 +31,14 @@ class PointsNodeMaterial extends NodeMaterial {
 		super();
 
 		/**
+		 * This node property provides an additional way to set the point size.
+		 *
+		 * @type {Node<vec2>?}
+		 * @default null
+		 */
+		this.sizeNode = null;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {Boolean}
@@ -43,6 +50,84 @@ class PointsNodeMaterial extends NodeMaterial {
 		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	setupPositionView( builder ) {
+
+		const currentSizeAttenuation = this.sizeAttenuation;
+		const currentScale = this.scaleNode;
+
+		this.sizeAttenuation = false;
+		this.scaleNode = float( 0 );
+
+		const positionView = super.setupPositionView( builder );
+
+		this.currentSizeAttenuation = currentSizeAttenuation;
+		this.currentScale = currentScale;
+
+		return positionView;
+
+	}
+
+	setupVertex( builder ) {
+
+		const mvp = super.setupVertex( builder );
+
+		// offset in ndc space
+		const offset = positionGeometry.xy.toVar();
+
+		let pointSize = this.sizeNode !== null ? vec2( this.sizeNode ) : materialPointSize;
+
+		if ( this.sizeAttenuation === true ) {
+
+			pointSize = pointSize.mul( pointSize.div( positionView.z.negate() ) );
+
+			if ( this.scaleNode !== null ) {
+
+				pointSize = pointSize.mul( vec2( this.scaleNode ) );
+
+			}
+
+		}
+
+		offset.mulAssign( pointSize );
+
+		const aspect = viewport.z.div( viewport.w );
+
+		offset.assign( offset.div( viewport.z ) );
+		offset.y.assign( offset.y.mul( aspect ) );
+
+		// back to clip space
+		offset.assign( offset.mul( mvp.w ) );
+
+		//clipPos.xy += offset;
+		mvp.addAssign( vec4( offset, 0, 0 ) );
+
+		return mvp;
+
+	}
+
+	/**
+	 * Whether alpha to coverage should be used or not.
+	 *
+	 * @type {Boolean}
+	 * @default true
+	 */
+	get alphaToCoverage() {
+
+		return this._useAlphaToCoverage;
+
+	}
+
+	set alphaToCoverage( value ) {
+
+		if ( this._useAlphaToCoverage !== value ) {
+
+			this._useAlphaToCoverage = value;
+			this.needsUpdate = true;
+
+		}
 
 	}
 
