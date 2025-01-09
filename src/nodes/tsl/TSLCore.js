@@ -8,7 +8,7 @@ import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
-//
+/** @module TSLCore **/
 
 let currentStack = null;
 
