@@ -1468,23 +1468,23 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
+		// init query set if not exists
+
 		if ( ! renderContextData.timestampQuerySet ) {
 
-
 			const type = renderContext.isComputeNode ? 'compute' : 'render';
-			const timestampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
-			const timestampWrites = {
-				querySet: timestampQuerySet,
-				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
-				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
-			};
-
-			Object.assign( descriptor, { timestampWrites } );
-
-			renderContextData.timestampQuerySet = timestampQuerySet;
+			renderContextData.timestampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
 		}
+
+		// augment descriptor
+
+		descriptor.timestampWrites = {
+			querySet: renderContextData.timestampQuerySet,
+			beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
+			endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
+		};
 
 	}
 
@@ -1553,7 +1553,7 @@ class WebGPUBackend extends Backend {
 
 		if ( resultBuffer.mapState === 'unmapped' ) {
 
-			resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+			return resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
 
 				const times = new BigUint64Array( resultBuffer.getMappedRange() );
 				const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
