@@ -66,6 +66,7 @@
 				light.position.set( 0.5, 0.5, 1 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4; // tighter shadow map
+				light.shadow.bias = - 0.001;
 				scene.add( light );
 
 				const geometryBackground = new THREE.PlaneGeometry( 100, 100 );
@@ -76,7 +77,7 @@
 				background.position.set( 0, 0, - 1 );
 				scene.add( background );
 
-				const geometryCylinder = new THREE.CylinderGeometry( 0.5, 0.5, 1, 32 );
+				const geometryCylinder = new THREE.BoxGeometry();
 				const materialCylinder = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
 
 				mesh = new THREE.Mesh( geometryCylinder, materialCylinder );
@@ -84,7 +85,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -130,9 +131,6 @@
 			}
 
 			function animate() {
-
-				mesh.rotation.x += 0.005;
-				mesh.rotation.z += 0.01;
 
 				renderer.render( scene, camera );
 
