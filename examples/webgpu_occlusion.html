@@ -92,7 +92,7 @@
 				const plane = new THREE.Mesh( planeGeometry, new THREE.MeshPhongNodeMaterial( { color: 0x00ff00, side: THREE.DoubleSide } ) );
 				const sphere = new THREE.Mesh( sphereGeometry, new THREE.MeshPhongNodeMaterial( { color: 0xffff00 } ) );
 
-				const instanceUniform = nodeObject( new OcclusionNode( sphere, new THREE.Color( 0x00ff00 ), new THREE.Color( 0x0000ff ) ) );
+				const instanceUniform = nodeObject( new OcclusionNode( sphere, new THREE.Color( 0x0000ff ), new THREE.Color( 0x00ff00 ) ) );
 
 				plane.material.colorNode = instanceUniform;
 
@@ -107,11 +107,6 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				// ensure shaders/pipelines are all complete before rendering
-
-				await renderer.compileAsync( scene, camera );
-
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
