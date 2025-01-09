@@ -231,7 +231,7 @@ class RenderContext {
 }
 
 /**
- * Computes a cache key for the given render context. This cache
+ * Computes a cache key for the given render context. This key
  * should identify the render target state so it is possible to
  * configure the correct attachments in the respective backend.
  *
