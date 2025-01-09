@@ -277,8 +277,7 @@ class WebXRManager extends EventDispatcher {
 
 				// Check that the browser implements the necessary APIs to use an
 				// XRProjectionLayer rather than an XRWebGLLayer
-				const useLayers = XRWebGLBinding !== undefined &&
-													'createProjectionLayer' in XRWebGLBinding.prototype;
+				const useLayers = XRWebGLBinding !== undefined && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
 				if ( ! useLayers ) {
 
