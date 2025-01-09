@@ -78,6 +78,15 @@ export const fog = Fn( ( [ color, factor ] ) => {
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r171. Use `fog( color, rangeFogFactor( near, far ) )` instead.
+ *
+ * @param {Node} color
+ * @param {Node} near
+ * @param {Node} far
+ * @returns {Function}
+ */
 export function rangeFog( color, near, far ) { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
@@ -85,6 +94,14 @@ export function rangeFog( color, near, far ) { // @deprecated, r171
 
 }
 
+/**
+ * @function
+ * @deprecated since r171. Use `fog( color, densityFogFactor( density ) )` instead.
+ *
+ * @param {Node} color
+ * @param {Node} density
+ * @returns {Function}
+ */
 export function densityFog( color, density ) { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );

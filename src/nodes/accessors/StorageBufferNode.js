@@ -344,6 +344,15 @@ export default StorageBufferNode;
  */
 export const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBufferNode( value, type, count ) );
 
+/**
+ * @function
+ * @deprecated since r171. Use `storage().setPBO( true )` instead.
+ *
+ * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
+ * @param {String?} type - The buffer type (e.g. `'vec3'`).
+ * @param {Number} count - The buffer count.
+ * @returns {StorageBufferNode}
+ */
 export const storageObject = ( value, type, count ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );

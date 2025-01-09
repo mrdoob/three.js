@@ -521,6 +521,13 @@ class TextureNode extends UniformNode {
 
 	// @TODO: Move to TSL
 
+	/**
+	 * @function
+	 * @deprecated since r172. Use {@link TextureNode#sample} instead.
+	 *
+	 * @param {Node} uvNode - The uv node.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
 	uv( uvNode ) { // @deprecated, r172
 
 		console.warn( 'THREE.TextureNode: .uv() has been renamed. Use .sample() instead.' );

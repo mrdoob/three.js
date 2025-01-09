@@ -943,6 +943,8 @@ export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
  * Returns the arc-tangent of the quotient of its parameters.
  *
  * @function
+ * @deprecated since r172. Use {@link atan} instead.
+ *
  * @param {Node | Number} y - The y parameter.
  * @param {Node | Number} x - The x parameter.
  * @returns {Node}

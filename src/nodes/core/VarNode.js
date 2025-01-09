@@ -180,6 +180,13 @@ addMethodChaining( 'toConst', Const );
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r170. Use `Var( node )` or `node.toVar()` instead.
+ *
+ * @param {Any} node
+ * @returns {VarNode}
+ */
 export const temp = ( node ) => { // @deprecated, r170
 
 	console.warn( 'TSL: "temp( node )" is deprecated. Use "Var( node )" or "node.toVar()" instead.' );

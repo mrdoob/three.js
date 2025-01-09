@@ -274,8 +274,15 @@ export const Continue = () => expression( 'continue' ).append();
  */
 export const Break = () => expression( 'break' ).append();
 
-//
+// deprecated
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link Loop} instead.
+ *
+ * @param  {...any} params
+ * @returns {LoopNode}
+ */
 export const loop = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.LoopNode: loop() has been renamed to Loop().' );

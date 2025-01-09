@@ -8,7 +8,7 @@ import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
-//
+/** @module TSLCore **/
 
 let currentStack = null;
 
@@ -553,6 +553,13 @@ export const Fn = ( jsFunc, nodeType ) => {
 
 };
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link Fn} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 export const tslFn = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.ShaderNode: tslFn() has been renamed to Fn().' );

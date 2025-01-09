@@ -70,6 +70,13 @@ export const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 // deprecated
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendBurn} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 export const burn = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "burn" has been renamed. Use "blendBurn" instead.' );
@@ -77,6 +84,13 @@ export const burn = ( ...params ) => { // @deprecated, r171
 
 };
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendDodge} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 export const dodge = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
@@ -84,6 +98,13 @@ export const dodge = ( ...params ) => { // @deprecated, r171
 
 };
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendScreen} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 export const screen = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "screen" has been renamed. Use "blendScreen" instead.' );
@@ -91,6 +112,13 @@ export const screen = ( ...params ) => { // @deprecated, r171
 
 };
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendOverlay} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 export const overlay = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
