@@ -566,6 +566,8 @@ class RenderObject {
 
 			const targets = geometry.morphAttributes[ name ];
 
+			cacheKey += name + ',';
+
 			for ( let i = 0, l = targets.length; i < l; i ++ ) {
 
 				const attribute = targets[ i ];
@@ -656,12 +658,6 @@ class RenderObject {
 		if ( object.skeleton ) {
 
 			cacheKey += object.skeleton.bones.length + ',';
-
-		}
-
-		if ( object.morphTargetInfluences ) {
-
-			cacheKey += object.morphTargetInfluences.length + ',';
 
 		}
 
