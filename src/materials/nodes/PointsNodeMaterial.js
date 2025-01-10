@@ -1,6 +1,6 @@
 import SpriteNodeMaterial from './SpriteNodeMaterial.js';
 import { viewport } from '../../nodes/display/ScreenNode.js';
-import { positionGeometry, positionView } from '../../nodes/accessors/Position.js';
+import { positionGeometry, positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
@@ -59,19 +59,25 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		const { positionNode } = this;
 
-		const mvPosition = modelViewMatrix.mul( vec3( positionNode || positionGeometry ) );
-
-		return vec4( mvPosition.xy, mvPosition.zw );
+		return modelViewMatrix.mul( vec3( positionNode || positionLocal ) ).xyz;
 
 	}
 
 	setupVertex( builder ) {
 
-		const { rotationNode, scaleNode, sizeNode } = this;
-
 		const mvp = super.setupVertex( builder );
 
+		// skip further processing if the material is not a node material
+
+		if ( builder.material.isNodeMaterial !== true ) {
+
+			return mvp;
+
+		}
+
 		// ndc space
+
+		const { rotationNode, scaleNode, sizeNode } = this;
 
 		const alignedPosition = positionGeometry.xy.toVar();
 		const aspect = viewport.z.div( viewport.w );
