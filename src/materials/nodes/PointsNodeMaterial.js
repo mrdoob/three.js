@@ -59,7 +59,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		const { positionNode } = this;
 
-		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		const mvPosition = modelViewMatrix.mul( vec3( positionNode || positionGeometry ) );
 
 		return vec4( mvPosition.xy, mvPosition.zw );
 
