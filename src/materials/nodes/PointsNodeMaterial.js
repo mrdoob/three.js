@@ -1,8 +1,10 @@
 import SpriteNodeMaterial from './SpriteNodeMaterial.js';
 import { viewport } from '../../nodes/display/ScreenNode.js';
 import { positionGeometry, positionView } from '../../nodes/accessors/Position.js';
+import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
-import { float, vec2, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { rotate } from '../../nodes/utils/RotateNode.js';
+import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
 
@@ -53,56 +55,65 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	}
 
-	setupPositionView( builder ) {
+	setupPositionView() {
 
-		const currentSizeAttenuation = this.sizeAttenuation;
-		const currentScale = this.scaleNode;
+		const { positionNode } = this;
 
-		this.sizeAttenuation = false;
-		this.scaleNode = float( 0 );
+		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
-		const positionView = super.setupPositionView( builder );
-
-		this.currentSizeAttenuation = currentSizeAttenuation;
-		this.currentScale = currentScale;
-
-		return positionView;
+		return vec4( mvPosition.xy, mvPosition.zw );
 
 	}
 
 	setupVertex( builder ) {
 
+		const { rotationNode, scaleNode, sizeNode } = this;
+
 		const mvp = super.setupVertex( builder );
 
-		// offset in ndc space
-		const offset = positionGeometry.xy.toVar();
+		// ndc space
 
-		let pointSize = this.sizeNode !== null ? vec2( this.sizeNode ) : materialPointSize;
+		const alignedPosition = positionGeometry.xy.toVar();
+		const aspect = viewport.z.div( viewport.w );
+
+		// rotation
+
+		if ( rotationNode && rotationNode.isNode ) {
+
+			const rotation = float( rotationNode );
+
+			alignedPosition.assign( rotate( alignedPosition, rotation ) );
+
+		}
+
+		// point size
+
+		let pointSize = sizeNode !== null ? vec2( sizeNode ) : materialPointSize;
 
 		if ( this.sizeAttenuation === true ) {
 
 			pointSize = pointSize.mul( pointSize.div( positionView.z.negate() ) );
 
-			if ( this.scaleNode !== null ) {
+		}
 
-				pointSize = pointSize.mul( vec2( this.scaleNode ) );
+		// scale
 
-			}
+		if ( scaleNode && scaleNode.isNode ) {
+
+			pointSize = pointSize.mul( vec2( scaleNode ) );
 
 		}
 
-		offset.mulAssign( pointSize );
+		alignedPosition.mulAssign( pointSize.mul( 2 ) );
 
-		const aspect = viewport.z.div( viewport.w );
-
-		offset.assign( offset.div( viewport.z ) );
-		offset.y.assign( offset.y.mul( aspect ) );
+		alignedPosition.assign( alignedPosition.div( viewport.z ) );
+		alignedPosition.y.assign( alignedPosition.y.mul( aspect ) );
 
 		// back to clip space
-		offset.assign( offset.mul( mvp.w ) );
+		alignedPosition.assign( alignedPosition.mul( mvp.w ) );
 
 		//clipPos.xy += offset;
-		mvp.addAssign( vec4( offset, 0, 0 ) );
+		mvp.addAssign( vec4( alignedPosition, 0, 0 ) );
 
 		return mvp;
 

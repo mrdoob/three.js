@@ -66,8 +66,8 @@
 				effectController = {
 
 					pulseSpeed: uniform( 6 ),
-					minWidth: uniform( 10 ),
-					maxWidth: uniform( 30 ),
+					minWidth: uniform( 6 ),
+					maxWidth: uniform( 20 ),
 					alphaToCoverage: true
 
 				};
@@ -129,9 +129,11 @@
 					colorNode: pointColors,
 					opacityNode: shapeCircle(),
 					positionNode: instancedBufferAttribute( positionAttribute ),
+					// rotationNode: time,
 					sizeNode: instancedBufferAttribute( instanceSizeBufferAttribute ),
-					// size: 10, // in pixel units
+					// size: 40, // in pixels units
 					vertexColors: true,
+					sizeAttenuation: false,
 					alphaToCoverage: true
 
 				} );
@@ -146,6 +148,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				//renderer.logarithmicDepthBuffer = true;
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
