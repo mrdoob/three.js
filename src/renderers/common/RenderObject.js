@@ -566,7 +566,7 @@ class RenderObject {
 
 			const targets = geometry.morphAttributes[ name ];
 
-			cacheKey += name + ',';
+			cacheKey += 'morph-' + name + ',';
 
 			for ( let i = 0, l = targets.length; i < l; i ++ ) {
 
