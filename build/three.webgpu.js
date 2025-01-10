@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, BackSide, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, PointsMaterial, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -2781,7 +2781,7 @@ class ConstNode extends InputNode {
 
 }
 
-//
+/** @module TSLCore **/
 
 let currentStack = null;
 
@@ -3078,7 +3078,7 @@ class ShaderCallNodeInternal extends Node {
 		} else {
 
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
+			const outputNode = inputNodes !== null || jsFunc.length > 1 ? jsFunc( inputNodes || [], builder ) : jsFunc( builder );
 
 			result = nodeObject( outputNode );
 
@@ -3326,6 +3326,13 @@ const Fn = ( jsFunc, nodeType ) => {
 
 };
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link Fn} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 const tslFn = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.ShaderNode: tslFn() has been renamed to Fn().' );
@@ -4425,6 +4432,15 @@ class OperatorNode extends TempNode {
 		 */
 		this.bNode = bNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isOperatorNode = true;
+
 	}
 
 	/**
@@ -4899,7 +4915,13 @@ addMethodChaining( 'bitXor', bitXor );
 addMethodChaining( 'shiftLeft', shiftLeft );
 addMethodChaining( 'shiftRight', shiftRight );
 
-
+/**
+ * @function
+ * @deprecated since r168. Use {@link modInt} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 const remainder = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.OperatorNode: .remainder() has been renamed to .modInt().' );
@@ -4970,6 +4992,15 @@ class MathNode extends TempNode {
 		 * @default null
 		 */
 		this.cNode = cNode;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isMathNode = true;
 
 	}
 
@@ -5438,9 +5469,11 @@ const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
 
 /**
  * Returns the arc-tangent of the parameter.
+ * If two parameters are provided, the result is `atan2(y/x)`.
  *
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | Number} y - The y parameter.
+ * @param {(Node | Number)?} x - The x parameter.
  * @returns {Node}
  */
 const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );
@@ -5836,6 +5869,8 @@ const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
  * Returns the arc-tangent of the quotient of its parameters.
  *
  * @function
+ * @deprecated since r172. Use {@link atan} instead.
+ *
  * @param {Node | Number} y - The y parameter.
  * @param {Node | Number} x - The x parameter.
  * @returns {Node}
@@ -6120,8 +6155,15 @@ const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
 
-//
+// deprecated
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link select} instead.
+ *
+ * @param  {...any} params
+ * @returns {ConditionalNode}
+ */
 const cond = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.ConditionalNode: cond() has been renamed to select().' );
@@ -6294,8 +6336,9 @@ class VarNode extends Node {
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
 	 * @param {String?} name - The name of the variable in the shader.
+	 * @param {Boolean?} readOnly - The read-only flag.
 	 */
-	constructor( node, name = null ) {
+	constructor( node, name = null, readOnly = false ) {
 
 		super();
 
@@ -6332,6 +6375,15 @@ class VarNode extends Node {
 		 */
 		this.isVarNode = true;
 
+		/**
+		 *
+		 * The read-only flag.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.readOnly = readOnly;
+
 	}
 
 	getHash( builder ) {
@@ -6348,15 +6400,50 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const { node, name } = this;
+		const { node, name, readOnly } = this;
+		const { renderer } = builder;
 
-		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
+		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
+
+		let isDeterministic = false;
+		let shouldTreatAsReadOnly = false;
+
+		if ( readOnly ) {
+
+			isDeterministic = builder.isDeterministic( node );
+
+			shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isDeterministic;
+
+		}
+
+		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const snippet = node.build( builder, vectorType );
+
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
-		const snippet = node.build( builder, nodeVar.type );
+		let declarationPrefix = propertyName;
 
-		builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
+		if ( shouldTreatAsReadOnly ) {
+
+			const type = builder.getType( nodeVar.type );
+
+			if ( isWebGPUBackend ) {
+
+				declarationPrefix = isDeterministic
+					? `const ${ propertyName }`
+					: `let ${ propertyName }`;
+
+			} else {
+
+				declarationPrefix = `const ${ type } ${ propertyName }`;
+
+			}
+
+		}
+
+		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
 
 		return propertyName;
 
@@ -6374,13 +6461,43 @@ class VarNode extends Node {
  */
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
-addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
+/**
+ * TSL function for creating a var node.
+ *
+ * @function
+ * @param {Node} node - The node for which a variable should be created.
+ * @param {String?} name - The name of the variable in the shader.
+ * @returns {VarNode}
+ */
+const Var = ( node, name = null ) => createVar( node, name ).append();
+
+/**
+ * TSL function for creating a const node.
+ *
+ * @function
+ * @param {Node} node - The node for which a constant should be created.
+ * @param {String?} name - The name of the constant in the shader.
+ * @returns {VarNode}
+ */
+const Const = ( node, name = null ) => createVar( node, name, true ).append();
+
+// Method chaining
+
+addMethodChaining( 'toVar', Var );
+addMethodChaining( 'toConst', Const );
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r170. Use `Var( node )` or `node.toVar()` instead.
+ *
+ * @param {Any} node
+ * @returns {VarNode}
+ */
 const temp = ( node ) => { // @deprecated, r170
 
-	console.warn( 'TSL: "temp" is deprecated. Use ".toVar()" instead.' );
+	console.warn( 'TSL: "temp( node )" is deprecated. Use "Var( node )" or "node.toVar()" instead.' );
 
 	return createVar( node );
 
@@ -9232,6 +9349,13 @@ class TextureNode extends UniformNode {
 
 	// @TODO: Move to TSL
 
+	/**
+	 * @function
+	 * @deprecated since r172. Use {@link TextureNode#sample} instead.
+	 *
+	 * @param {Node} uvNode - The uv node.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
 	uv( uvNode ) { // @deprecated, r172
 
 		console.warn( 'THREE.TextureNode: .uv() has been renamed. Use .sample() instead.' );
@@ -10783,8 +10907,14 @@ class UniformArrayNode extends BufferNode {
  */
 const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
-//
-
+/**
+ * @function
+ * @deprecated since r168. Use {@link uniformArray} instead.
+ *
+ * @param {Array<Any>} values - Array-like data.
+ * @param {String} nodeType - The data type of the array elements.
+ * @returns {UniformArrayNode}
+ */
 const uniforms = ( values, nodeType ) => { // @deprecated, r168
 
 	console.warn( 'TSL.UniformArrayNode: uniforms() has been renamed to uniformArray().' );
@@ -13538,8 +13668,15 @@ const Continue = () => expression( 'continue' ).append();
  */
 const Break = () => expression( 'break' ).append();
 
-//
+// deprecated
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link Loop} instead.
+ *
+ * @param  {...any} params
+ * @returns {LoopNode}
+ */
 const loop = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.LoopNode: loop() has been renamed to Loop().' );
@@ -14299,6 +14436,9 @@ const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
 // Deprecated
 
+/**
+ * @deprecated since r169. Use {@link screenSize} instead.
+ */
 const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
 	console.warn( 'TSL.ViewportNode: "viewportResolution" is deprecated. Use "screenSize" instead.' );
@@ -14307,6 +14447,9 @@ const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
 }, 'vec2' ).once() )();
 
+/**
+ * @deprecated since r168. Use {@link screenUV} instead.
+ */
 const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 	console.warn( 'TSL.ViewportNode: "viewportTopLeft" is deprecated. Use "screenUV" instead.' );
@@ -14315,6 +14458,9 @@ const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 }, 'vec2' ).once() )();
 
+/**
+ * @deprecated since r168. Use `screenUV.flipY()` instead.
+ */
 const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "screenUV.flipY()" instead.' );
@@ -25787,6 +25933,14 @@ class RenderContext {
 		this.scissorValue = new Vector4();
 
 		/**
+		 * The active render target.
+		 *
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
+		this.renderTarget = null;
+
+		/**
 		 * The textures of the active render target.
 		 * `null` when no render target is set.
 		 *
@@ -25822,7 +25976,7 @@ class RenderContext {
 		this.sampleCount = 1;
 
 		/**
-		 * The framebuffers width in physical pixels.
+		 * The active render target's width in physical pixels.
 		 *
 		 * @type {Number}
 		 * @default 0
@@ -25830,12 +25984,28 @@ class RenderContext {
 		this.width = 0;
 
 		/**
-		 * The framebuffers height in physical pixels.
+		 * The active render target's height in physical pixels.
 		 *
 		 * @type {Number}
 		 * @default 0
 		 */
 		this.height = 0;
+
+		/**
+		 * The occlusion query count.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.occlusionQueryCount = 0;
+
+		/**
+		 * The current clipping context.
+		 *
+		 * @type {ClippingContext?}
+		 * @default null
+		 */
+		this.clippingContext = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -25862,7 +26032,9 @@ class RenderContext {
 }
 
 /**
- * Computes a cache key for the given render context.
+ * Computes a cache key for the given render context. This key
+ * should identify the render target state so it is possible to
+ * configure the correct attachments in the respective backend.
  *
  * @param {RenderContext} renderContext - The render context.
  * @return {Number} The cache key.
@@ -26722,8 +26894,15 @@ class StackNode extends Node {
 
 	}
 
-	//
+	// deprecated
 
+	/**
+	 * @function
+	 * @deprecated since r168. Use {@link StackNode#Else} instead.
+	 *
+	 * @param  {...any} params
+	 * @returns {StackNode}
+	 */
 	else( ...params ) { // @deprecated, r168
 
 		console.warn( 'TSL.StackNode: .else() has been renamed to .Else().' );
@@ -26731,6 +26910,12 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * @deprecated since r168. Use {@link StackNode#ElseIf} instead.
+	 *
+	 * @param  {...any} params
+	 * @returns {StackNode}
+	 */
 	elseif( ...params ) { // @deprecated, r168
 
 		console.warn( 'TSL.StackNode: .elseif() has been renamed to .ElseIf().' );
@@ -27302,6 +27487,13 @@ const frameId = /*@__PURE__*/ uniform( 0, 'uint' ).setGroup( renderGroup ).onRen
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r170. Use {@link time} instead.
+ *
+ * @param {Number} [timeScale=1] - The time scale.
+ * @returns {UniformNode<float>}
+ */
 const timerLocal = ( timeScale = 1 ) => { // @deprecated, r170
 
 	console.warn( 'TSL: timerLocal() is deprecated. Use "time" instead.' );
@@ -27309,6 +27501,13 @@ const timerLocal = ( timeScale = 1 ) => { // @deprecated, r170
 
 };
 
+/**
+ * @function
+ * @deprecated since r170. Use {@link time} instead.
+ *
+ * @param {Number} [timeScale=1] - The time scale.
+ * @returns {UniformNode<float>}
+ */
 const timerGlobal = ( timeScale = 1 ) => { // @deprecated, r170
 
 	console.warn( 'TSL: timerGlobal() is deprecated. Use "time" instead.' );
@@ -27316,6 +27515,13 @@ const timerGlobal = ( timeScale = 1 ) => { // @deprecated, r170
 
 };
 
+/**
+ * @function
+ * @deprecated since r170. Use {@link deltaTime} instead.
+ *
+ * @param {Number} [timeScale=1] - The time scale.
+ * @returns {UniformNode<float>}
+ */
 const timerDelta = ( timeScale = 1 ) => { // @deprecated, r170
 
 	console.warn( 'TSL: timerDelta() is deprecated. Use "deltaTime" instead.' );
@@ -29176,6 +29382,15 @@ class StorageBufferNode extends BufferNode {
  */
 const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBufferNode( value, type, count ) );
 
+/**
+ * @function
+ * @deprecated since r171. Use `storage().setPBO( true )` instead.
+ *
+ * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
+ * @param {String?} type - The buffer type (e.g. `'vec3'`).
+ * @param {Number} count - The buffer count.
+ * @returns {StorageBufferNode}
+ */
 const storageObject = ( value, type, count ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
@@ -30101,6 +30316,13 @@ const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 // deprecated
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendBurn} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 const burn = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "burn" has been renamed. Use "blendBurn" instead.' );
@@ -30108,6 +30330,13 @@ const burn = ( ...params ) => { // @deprecated, r171
 
 };
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendDodge} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 const dodge = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
@@ -30115,6 +30344,13 @@ const dodge = ( ...params ) => { // @deprecated, r171
 
 };
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendScreen} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 const screen = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "screen" has been renamed. Use "blendScreen" instead.' );
@@ -30122,6 +30358,13 @@ const screen = ( ...params ) => { // @deprecated, r171
 
 };
 
+/**
+ * @function
+ * @deprecated since r171. Use {@link blendOverlay} instead.
+ *
+ * @param  {...any} params
+ * @returns {Function}
+ */
 const overlay = ( ...params ) => { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
@@ -32765,6 +33008,15 @@ const fog = Fn( ( [ color, factor ] ) => {
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r171. Use `fog( color, rangeFogFactor( near, far ) )` instead.
+ *
+ * @param {Node} color
+ * @param {Node} near
+ * @param {Node} far
+ * @returns {Function}
+ */
 function rangeFog( color, near, far ) { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
@@ -32772,6 +33024,14 @@ function rangeFog( color, near, far ) { // @deprecated, r171
 
 }
 
+/**
+ * @function
+ * @deprecated since r171. Use `fog( color, densityFogFactor( density ) )` instead.
+ *
+ * @param {Node} color
+ * @param {Node} density
+ * @returns {Function}
+ */
 function densityFog( color, density ) { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );
@@ -33141,6 +33401,14 @@ const numWorkgroups = /*@__PURE__*/ computeBuiltin( 'numWorkgroups', 'uvec3' );
  */
 const workgroupId = /*@__PURE__*/ computeBuiltin( 'workgroupId', 'uvec3' );
 
+/**
+ * TSL function for creating a `globalId` builtin node. A non-linearized 3-dimensional
+ * representation of the current invocation's position within a 3D global grid.
+ *
+ * @function
+ * @returns {ComputeBuiltinNode<uvec3>}
+ */
+const globalId = /*@__PURE__*/ computeBuiltin( 'globalId', 'uvec3' );
 /**
  * TSL function for creating a `localId` builtin node. A non-linearized 3-dimensional
  * representation of the current invocation's position within a 3D workgroup grid.
@@ -37527,6 +37795,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	BRDF_Lambert: BRDF_Lambert,
 	BasicShadowFilter: BasicShadowFilter,
 	Break: Break,
+	Const: Const,
 	Continue: Continue,
 	DFGApprox: DFGApprox,
 	D_GGX: D_GGX,
@@ -37552,6 +37821,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	TBNViewMatrix: TBNViewMatrix,
 	VSMShadowFilter: VSMShadowFilter,
 	V_GGX_SmithCorrelated: V_GGX_SmithCorrelated,
+	Var: Var,
 	abs: abs,
 	acesFilmicToneMapping: acesFilmicToneMapping,
 	acos: acos,
@@ -37701,6 +37971,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	getShIrradianceAt: getShIrradianceAt,
 	getTextureIndex: getTextureIndex,
 	getViewPosition: getViewPosition,
+	globalId: globalId,
 	glsl: glsl,
 	glslFn: glslFn,
 	grayscale: grayscale,
@@ -38594,8 +38865,9 @@ class NodeVar {
 	 *
 	 * @param {String} name - The name of the variable.
 	 * @param {String} type - The type of the variable.
+	 * @param {Boolean} [readOnly=false] - The read-only flag.
 	 */
-	constructor( name, type ) {
+	constructor( name, type, readOnly = false ) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -38619,6 +38891,13 @@ class NodeVar {
 		 * @type {String}
 		 */
 		this.type = type;
+
+		/**
+		 *  The read-only flag.
+		 *
+		 * @type {boolean}
+		 */
+		this.readOnly = readOnly;
 
 	}
 
@@ -41926,9 +42205,11 @@ class NodeBuilder {
 	 * @param {String?} name - The variable's name.
 	 * @param {String} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @param {Boolean} [readOnly=false] - Whether the variable is read-only or not.
+	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -41936,19 +42217,61 @@ class NodeBuilder {
 
 		if ( nodeVar === undefined ) {
 
+			const idNS = readOnly ? '_const' : '_var';
+
 			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
+			const id = this.vars[ idNS ] || ( this.vars[ idNS ] = 0 );
 
-			if ( name === null ) name = 'nodeVar' + vars.length;
+			if ( name === null ) {
 
-			nodeVar = new NodeVar( name, type );
+				name = ( readOnly ? 'nodeConst' : 'nodeVar' ) + id;
 
-			vars.push( nodeVar );
+				this.vars[ idNS ] ++;
+
+			}
+
+			nodeVar = new NodeVar( name, type, readOnly );
+
+			if ( ! readOnly ) {
+
+				vars.push( nodeVar );
+
+			}
 
 			nodeData.variable = nodeVar;
 
 		}
 
 		return nodeVar;
+
+	}
+
+	/**
+	 * Returns whether a Node or its flow is deterministic, useful for use in `const`.
+	 *
+	 * @param {Node} node - The varying node.
+	 * @return {Boolean} Returns true if deterministic.
+	 */
+	isDeterministic( node ) {
+
+		if ( node.isMathNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true ) &&
+				( node.cNode ? this.isDeterministic( node.cNode ) : true );
+
+		} else if ( node.isOperatorNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true );
+
+		} else if ( node.isConstNode ) {
+
+			return true;
+
+		}
+
+		return false;
 
 	}
 
@@ -42747,6 +43070,13 @@ class NodeBuilder {
 
 	// deprecated
 
+	/**
+	 * @function
+	 * @deprecated since r168. Use `new NodeMaterial()` instead, with targeted node material name.
+	 *
+	 * @param {String} [type='NodeMaterial'] - The node material type.
+	 * @throws {Error}
+	 */
 	createNodeMaterial( type = 'NodeMaterial' ) { // @deprecated, r168
 
 		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );
@@ -47909,6 +48239,7 @@ class Renderer {
 						viewportValue.copy( vp ).multiplyScalar( this._pixelRatio ).floor();
 						viewportValue.minDepth = minDepth;
 						viewportValue.maxDepth = maxDepth;
+						this._currentRenderContext.viewport = true;
 
 						this.backend.updateViewport( this._currentRenderContext );
 
@@ -54753,7 +55084,7 @@ class WebGLBackend extends Backend {
 
 					if ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) ) {
 
-						if ( gl.getQueryParameter( query, gl.QUERY_RESULT ) > 0 ) occluded.add( currentOcclusionQueryObjects[ i ] );
+						if ( gl.getQueryParameter( query, gl.QUERY_RESULT ) === 0 ) occluded.add( currentOcclusionQueryObjects[ i ] );
 
 						currentOcclusionQueries[ i ] = null;
 						gl.deleteQuery( query );
@@ -60266,7 +60597,7 @@ ${ flowData.code }
 
 		if ( shaderStage === 'compute' ) {
 
-			this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
+			this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'local_invocation_id', 'localId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
@@ -60631,7 +60962,7 @@ ${ flowData.code }
 
 					if ( flow.length > 0 ) flow += '\n';
 
-					flow += `\t// flow -> ${ slotName }\n\t`;
+					flow += `\t// flow -> ${ slotName }\n`;
 
 				}
 
@@ -60909,7 +61240,7 @@ ${shaderData.codes}
 fn main( ${shaderData.attributes} ) {
 
 	// system
-	instanceIndex = id.x + id.y * numWorkgroups.x * u32(${workgroupSize}) + id.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
+	instanceIndex = globalId.x + globalId.y * numWorkgroups.x * u32(${workgroupSize}) + globalId.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
 
 	// vars
 	${shaderData.vars}
@@ -63520,7 +63851,7 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < currentOcclusionQueryObjects.length; i ++ ) {
 
-				if ( results[ i ] !== BigInt( 0 ) ) {
+				if ( results[ i ] === BigInt( 0 ) ) {
 
 					occluded.add( currentOcclusionQueryObjects[ i ] );
 
@@ -63681,7 +64012,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const encoder = device.createCommandEncoder( {} );
+		const encoder = device.createCommandEncoder( { label: 'clear' } );
 		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
 			depthStencilAttachment
@@ -63706,11 +64037,13 @@ class WebGPUBackend extends Backend {
 		const groupGPU = this.get( computeGroup );
 
 
-		const descriptor = {};
+		const descriptor = {
+			label: 'computeGroup_' + computeGroup.id
+		};
 
 		this.initTimestampQuery( computeGroup, descriptor );
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder();
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
 
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
 
@@ -64199,23 +64532,23 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		if ( ! renderContextData.timeStampQuerySet ) {
+		// init query set if not exists
 
+		if ( ! renderContextData.timestampQuerySet ) {
 
 			const type = renderContext.isComputeNode ? 'compute' : 'render';
-			const timeStampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
-			const timestampWrites = {
-				querySet: timeStampQuerySet,
-				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
-				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
-			};
-
-			Object.assign( descriptor, { timestampWrites } );
-
-			renderContextData.timeStampQuerySet = timeStampQuerySet;
+			renderContextData.timestampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2, label: `timestamp_${type}_${renderContext.id}` } );
 
 		}
+
+		// augment descriptor
+
+		descriptor.timestampWrites = {
+			querySet: renderContextData.timestampQuerySet,
+			beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
+			endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
+		};
 
 	}
 
@@ -64232,7 +64565,7 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 
 
-		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
+		const size = 2 * BigUint64Array.BYTES_PER_ELEMENT;
 
 		if ( renderContextData.currentTimestampQueryBuffers === undefined ) {
 
@@ -64254,7 +64587,7 @@ class WebGPUBackend extends Backend {
 		const { resolveBuffer, resultBuffer } = renderContextData.currentTimestampQueryBuffers;
 
 
-		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
+		encoder.resolveQuerySet( renderContextData.timestampQuerySet, 0, 2, resolveBuffer, 0 );
 
 		if ( resultBuffer.mapState === 'unmapped' ) {
 
@@ -64284,18 +64617,15 @@ class WebGPUBackend extends Backend {
 
 		if ( resultBuffer.mapState === 'unmapped' ) {
 
-			resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+			await resultBuffer.mapAsync( GPUMapMode.READ );
 
-				const times = new BigUint64Array( resultBuffer.getMappedRange() );
-				const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
-
-
-				this.renderer.info.updateTimestamp( type, duration );
-
-				resultBuffer.unmap();
+			const times = new BigUint64Array( resultBuffer.getMappedRange() );
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
 
 
-			} );
+			this.renderer.info.updateTimestamp( type, duration );
+
+			resultBuffer.unmap();
 
 		}
 

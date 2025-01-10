@@ -17523,6 +17523,36 @@ class VideoTexture extends Texture {
 
 }
 
+class VideoFrameTexture extends VideoTexture {
+
+	constructor( mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+		super( {}, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+	}
+
+	update() {
+
+		// overwrites `VideoTexture.update()` with an empty method since
+		// this type of texture is updated via `setFrame()`.
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this ); // restoring Texture.clone()
+
+	}
+
+	setFrame( frame ) {
+
+		this.image = frame;
+		this.needsUpdate = true;
+
+	}
+
+}
+
 class FramebufferTexture extends Texture {
 
 	constructor( width, height ) {
@@ -50231,7 +50261,9 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
-				const useLayers = session.enabledFeatures !== undefined && session.enabledFeatures.includes( 'layers' );
+				// Check that the browser implements the necessary APIs to use an
+				// XRProjectionLayer rather than an XRWebGLLayer
+				const useLayers = XRWebGLBinding !== undefined && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
 				if ( ! useLayers ) {
 
@@ -55072,6 +55104,7 @@ exports.Vector2 = Vector2;
 exports.Vector3 = Vector3;
 exports.Vector4 = Vector4;
 exports.VectorKeyframeTrack = VectorKeyframeTrack;
+exports.VideoFrameTexture = VideoFrameTexture;
 exports.VideoTexture = VideoTexture;
 exports.WebGL3DRenderTarget = WebGL3DRenderTarget;
 exports.WebGLArrayRenderTarget = WebGLArrayRenderTarget;
