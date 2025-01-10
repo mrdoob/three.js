@@ -558,6 +558,24 @@ class RenderObject {
 
 		}
 
+		// structural equality isn't sufficient for morph targets since the
+		// data are maintained in textures. only if the targets are all equal
+		// the texture and thus the instance of `MorphNode` can be shared.
+
+		for ( const name of Object.keys( geometry.morphAttributes ).sort() ) {
+
+			const targets = geometry.morphAttributes[ name ];
+
+			for ( let i = 0, l = targets.length; i < l; i ++ ) {
+
+				const attribute = targets[ i ];
+
+				cacheKey += attribute.id + ',';
+
+			}
+
+		}
+
 		if ( geometry.index ) {
 
 			cacheKey += 'index,';
