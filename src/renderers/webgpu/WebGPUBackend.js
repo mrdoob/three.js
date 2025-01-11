@@ -890,7 +890,7 @@ class WebGPUBackend extends Backend {
 
 			if ( color ) {
 
-				const descriptor = this._getRenderPassDescriptor( renderTargetContext, { loadOp: GPULoadOp.Clear } );
+				const descriptor = this._getRenderPassDescriptor( renderTargetContext, { loadOp: GPULoadOp.Clear, clearValue } );
 
 				colorAttachments = descriptor.colorAttachments;
 
