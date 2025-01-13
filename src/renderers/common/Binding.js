@@ -27,7 +27,7 @@ class Binding {
 		 * A bitmask that defines in what shader stages the
 		 * binding's resource is accessible.
 		 *
-		 * @type {String}
+		 * @type {Number}
 		 */
 		this.visibility = 0;
 

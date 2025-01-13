@@ -181,6 +181,16 @@ class RenderObject {
 		this.pipeline = null;
 
 		/**
+		 * Only relevant for objects using
+		 * multiple materials. This represents a group entry
+		 * from the respective `BufferGeometry`.
+		 *
+		 * @type {{start: Number, count: Number}?}
+		 * @default null
+		 */
+		this.group = null;
+
+		/**
 		 * An array holding the vertex buffers which can
 		 * be buffer attributes but also interleaved buffers.
 		 *
@@ -593,7 +603,7 @@ class RenderObject {
 	 *
 	 * The material cache key is part of the render object cache key.
 	 *
-	 * @return {String} The material cache key.
+	 * @return {Number} The material cache key.
 	 */
 	getMaterialCacheKey() {
 
@@ -725,7 +735,7 @@ class RenderObject {
 	/**
 	 * Returns the dynamic cache key which represents a key that is computed per draw command.
 	 *
-	 * @return {String} The cache key.
+	 * @return {Number} The cache key.
 	 */
 	getDynamicCacheKey() {
 
@@ -746,7 +756,7 @@ class RenderObject {
 	/**
 	 * Returns the render object's cache key.
 	 *
-	 * @return {String} The cache key.
+	 * @return {Number} The cache key.
 	 */
 	getCacheKey() {
 
