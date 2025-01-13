@@ -212,7 +212,7 @@ class Renderer {
 		 * Holds a series of statistical information about the GPU memory
 		 * and the rendering process. Useful for debugging and monitoring.
 		 *
-		 * @type {Boolean}
+		 * @type {Info}
 		 */
 		this.info = new Info();
 
@@ -294,7 +294,7 @@ class Renderer {
 		 * Whether the scissor test should be enabled or not.
 		 *
 		 * @private
-		 * @type {Vector4}
+		 * @type {Boolean}
 		 */
 		this._scissorTest = false;
 
@@ -2093,7 +2093,7 @@ class Renderer {
 	 */
 	compute( computeNodes ) {
 
-		if ( this.isDeviceLost === true ) return;
+		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) {
 
@@ -2758,7 +2758,7 @@ class Renderer {
 	 * @param {Scene} scene - The scene the 3D object belongs to.
 	 * @param {Camera} camera - The camera the object should be rendered with.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {{start: Number, count: Number}?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {String?} [passId=null] - An optional ID for identifying the pass.
 	 */
@@ -2813,7 +2813,7 @@ class Renderer {
 	 * @param {Scene} scene - The scene the 3D object belongs to.
 	 * @param {Camera} camera - The camera the object should be rendered with.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {{start: Number, count: Number}?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {String?} [passId=null] - An optional ID for identifying the pass.
 	 */

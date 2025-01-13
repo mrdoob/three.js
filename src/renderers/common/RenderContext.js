@@ -166,6 +166,14 @@ class RenderContext {
 		this.activeCubeFace = 0;
 
 		/**
+		 * The active mipmap level.
+		 *
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.activeMipmapLevel = 0;
+
+		/**
 		 * The number of MSAA samples. This value is always `1` when
 		 * MSAA isn't used.
 		 *
