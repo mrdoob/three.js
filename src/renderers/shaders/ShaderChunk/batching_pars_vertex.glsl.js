@@ -7,7 +7,7 @@ export default /* glsl */`
 
 	uniform highp sampler2D batchingTexture;
 	uniform highp usampler2D batchingIdTexture;
-	mat4 getBatchingMatrix( const in float i ) {
+	mat4 getBatchingMatrix( const in int i ) {
 
 		int size = textureSize( batchingTexture, 0 ).x;
 		int j = int( i ) * 4;
