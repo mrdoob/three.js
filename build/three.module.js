@@ -13835,9 +13835,9 @@ var aomap_fragment = "#ifdef USE_AOMAP\n\tfloat ambientOcclusion = ( texture2D( 
 
 var aomap_pars_fragment = "#ifdef USE_AOMAP\n\tuniform sampler2D aoMap;\n\tuniform float aoMapIntensity;\n#endif";
 
-var batching_pars_vertex = "#ifdef USE_BATCHING\n\t#if ! defined( GL_ANGLE_multi_draw )\n\t#define gl_DrawID _gl_DrawID\n\tuniform int _gl_DrawID;\n\t#endif\n\tuniform highp sampler2D batchingTexture;\n\tuniform highp usampler2D batchingIdTexture;\n\tmat4 getBatchingMatrix( const in float i ) {\n\t\tint size = textureSize( batchingTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n\tfloat getIndirectIndex( const in int i ) {\n\t\tint size = textureSize( batchingIdTexture, 0 ).x;\n\t\tint x = i % size;\n\t\tint y = i / size;\n\t\treturn float( texelFetch( batchingIdTexture, ivec2( x, y ), 0 ).r );\n\t}\n#endif\n#ifdef USE_BATCHING_COLOR\n\tuniform sampler2D batchingColorTexture;\n\tvec3 getBatchingColor( const in float i ) {\n\t\tint size = textureSize( batchingColorTexture, 0 ).x;\n\t\tint j = int( i );\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\treturn texelFetch( batchingColorTexture, ivec2( x, y ), 0 ).rgb;\n\t}\n#endif";
+var batching_pars_vertex = "#ifdef USE_BATCHING_MATRIX\n\t#if ! defined( GL_ANGLE_multi_draw )\n\t#define gl_DrawID _gl_DrawID\n\tuniform int _gl_DrawID;\n\t#endif\n\tuniform highp sampler2D batchingTexture;\n\tuniform highp usampler2D batchingIdTexture;\n\tmat4 getBatchingMatrix( const in int i ) {\n\t\tint size = textureSize( batchingTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n\tfloat getIndirectIndex( const in int i ) {\n\t\tint size = textureSize( batchingIdTexture, 0 ).x;\n\t\tint x = i % size;\n\t\tint y = i / size;\n\t\treturn float( texelFetch( batchingIdTexture, ivec2( x, y ), 0 ).r );\n\t}\n#endif\n#ifdef USE_BATCHING_COLOR\n\tuniform sampler2D batchingColorTexture;\n\tvec3 getBatchingColor( const in float i ) {\n\t\tint size = textureSize( batchingColorTexture, 0 ).x;\n\t\tint j = int( i );\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\treturn texelFetch( batchingColorTexture, ivec2( x, y ), 0 ).rgb;\n\t}\n#endif";
 
-var batching_vertex = "#ifdef USE_BATCHING\n\tmat4 batchingMatrix = getBatchingMatrix( getIndirectIndex( gl_DrawID ) );\n#endif";
+var batching_vertex = "#ifdef USE_BATCHING_MATRIX\n\tmat4 batchingMatrix = getBatchingMatrix( gl_DrawID );\n#elif defined ( USE_BATCHING )\n\tmat4 batchingMatrix = mat4( 1.0 );\n#endif";
 
 var begin_vertex = "vec3 transformed = vec3( position );\n#ifdef USE_ALPHAHASH\n\tvPosition = vec3( position );\n#endif";
 
@@ -19797,6 +19797,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.extensionClipCullDistance ? '#define USE_CLIP_DISTANCE' : '',
 			parameters.batching ? '#define USE_BATCHING' : '',
+			parameters.batchingMatrix ? '#define USE_BATCHING_MATRIX' : '',
 			parameters.batchingColor ? '#define USE_BATCHING_COLOR' : '',
 			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
@@ -20497,7 +20498,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	}
 
 	function getParameters( material, lights, shadows, scene, object ) {
-
 		const fog = scene.fog;
 		const geometry = object.geometry;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
@@ -20642,6 +20642,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			precision: precision,
 
 			batching: IS_BATCHEDMESH,
+			batchingMatrix: IS_BATCHEDMESH && object._matricesTexture !== null,
 			batchingColor: IS_BATCHEDMESH && object._colorsTexture !== null,
 			instancing: IS_INSTANCEDMESH,
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
@@ -20962,6 +20963,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 20 );
 		if ( parameters.batchingColor )
 			_programLayers.enable( 21 );
+		if ( parameters.batchingMatrix )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -30437,6 +30440,14 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
+				} else if (object.isBatchedMesh && materialProperties.batchingMatrix === false && object._matricesTexture !== null) {
+
+					needsProgramChange = true;
+
+				} else if (object.isBatchedMesh && materialProperties.batchingMatrix === true && object._matricesTexture === null) {
+
+					needsProgramChange = true;
+
 				} else if ( object.isInstancedMesh && materialProperties.instancing === false ) {
 
 					needsProgramChange = true;
@@ -30627,10 +30638,18 @@ class WebGLRenderer {
 			if ( object.isBatchedMesh ) {
 
 				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
-				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+				if ( objects._matricesTexture !== null ) {
+
+					p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+
+				}
 
 				p_uniforms.setOptional( _gl, object, 'batchingIdTexture' );
-				p_uniforms.setValue( _gl, 'batchingIdTexture', object._indirectTexture, textures );
+				if ( object._indirectTexture !== null ) {
+
+					p_uniforms.setValue( _gl, 'batchingIdTexture', object._indirectTexture, textures );
+
+				}
 
 				p_uniforms.setOptional( _gl, object, 'batchingColorTexture' );
 				if ( object._colorsTexture !== null ) {
@@ -47181,7 +47200,7 @@ class ObjectLoader extends Loader {
 			case 'DirectionalLight':
 
 				object = new DirectionalLight( data.color, data.intensity );
-				object.target = data.target || '';
+				object.target = data.target || '';
 
 				break;
 
@@ -47200,7 +47219,7 @@ class ObjectLoader extends Loader {
 			case 'SpotLight':
 
 				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
-				object.target = data.target || '';
+				object.target = data.target || '';
 
 				break;
 
@@ -47477,7 +47496,7 @@ class ObjectLoader extends Loader {
 
 		object.traverse( function ( child ) {
 
-			if ( child.isDirectionalLight || child.isSpotLight ) {
+			if ( child.isDirectionalLight || child.isSpotLight ) {
 
 				const uuid = child.target;
 
