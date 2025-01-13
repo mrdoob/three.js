@@ -416,7 +416,7 @@ class ScriptableNode extends Node {
 	 *
 	 * @param {String} name - The function name.
 	 * @param {...Any} params - A list of parameters.
-	 * @return {Any} The result of the function call.
+	 * @return {Promise<Any>} The result of the function call.
 	 */
 	async callAsync( name, ...params ) {
 
