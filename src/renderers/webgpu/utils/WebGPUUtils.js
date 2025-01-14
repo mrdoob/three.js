@@ -1,3 +1,4 @@
+import { HalfFloatType, UnsignedByteType } from '../../../constants.js';
 import { GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
 
 /**
@@ -214,16 +215,23 @@ class WebGPUUtils {
 	 */
 	getPreferredCanvasFormat() {
 
-		// TODO: Remove this check when Quest 34.5 is out
-		// https://github.com/mrdoob/three.js/pull/29221/files#r1731833949
+		const outputType = this.backend.parameters.outputType;
 
-		if ( navigator.userAgent.includes( 'Quest' ) ) {
+		if ( outputType === undefined ) {
+
+			return navigator.gpu.getPreferredCanvasFormat();
+
+		} else if ( outputType === UnsignedByteType ) {
 
 			return GPUTextureFormat.BGRA8Unorm;
 
+		} else if ( outputType === HalfFloatType ) {
+
+			return GPUTextureFormat.RGBA16Float;
+
 		} else {
 
-			return navigator.gpu.getPreferredCanvasFormat();
+			throw new Error( 'Unsupported outputType' );
 
 		}
 
