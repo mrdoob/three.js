@@ -43,7 +43,7 @@ const _geometry = /*@__PURE__*/ new QuadGeometry();
  * The intended usage is to reuse a single quad mesh for rendering
  * subsequent passes by just reassigning the `material` reference.
  *
- * @augments BufferGeometry
+ * @augments Mesh
  */
 class QuadMesh extends Mesh {
 

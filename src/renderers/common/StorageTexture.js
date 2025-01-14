@@ -25,7 +25,7 @@ class StorageTexture extends Texture {
 		/**
 		 * The image object which just represents the texture's dimension.
 		 *
-		 * @type {{width: Number, height:Number}}
+		 * @type {{width: Number, height: Number}}
 		 */
 		this.image = { width, height };
 

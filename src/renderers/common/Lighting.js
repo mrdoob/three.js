@@ -29,7 +29,7 @@ class Lighting extends ChainMap {
 	 * Creates a new lights node for the given array of lights.
 	 *
 	 * @param {Array<Light>} lights - The render object.
-	 * @return {Boolean} Whether if the given render object has an initialized geometry or not.
+	 * @return {LightsNode} Whether if the given render object has an initialized geometry or not.
 	 */
 	createNode( lights = [] ) {
 

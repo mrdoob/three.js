@@ -95,7 +95,7 @@ class InstanceNode extends Node {
 		/**
 		 * A reference to a buffer that is used by `instanceColorNode`.
 		 *
-		 * @type {InstancedInterleavedBuffer}
+		 * @type {InstancedBufferAttribute}
 		 */
 		this.bufferColor = null;
 
