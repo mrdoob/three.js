@@ -7,7 +7,7 @@ import { Mesh } from '../../objects/Mesh.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
 import { BackSide, LinearSRGBColorSpace } from '../../constants.js';
 
-const _clearColor = /*@__PURE__*/ new Color4( 0, 0, 0 );
+const _clearColor = /*@__PURE__*/ new Color4();
 
 /**
  * This renderer module manages the background.
