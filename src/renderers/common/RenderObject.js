@@ -739,9 +739,16 @@ class RenderObject {
 	 */
 	getDynamicCacheKey() {
 
-		// Environment Nodes Cache Key
+		let cacheKey = 0;
 
-		let cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+		// `Nodes.getCacheKey()` returns an environment cache key which is not relevant when
+		// the renderer is inside a shadow pass.
+
+		if ( this.material.isShadowPassMaterial !== true ) {
+
+			cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+
+		}
 
 		if ( this.object.receiveShadow ) {
 

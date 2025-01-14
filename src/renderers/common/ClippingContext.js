@@ -136,7 +136,7 @@ class ClippingContext {
 	 */
 	updateGlobal( scene, camera ) {
 
-		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowNodeMaterial );
+		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
 		this.viewMatrix = camera.matrixWorldInverse;
 
 		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
