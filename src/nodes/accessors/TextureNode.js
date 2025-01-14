@@ -384,11 +384,11 @@ class TextureNode extends UniformNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {String} textureProperty - The texture property.
 	 * @param {String} uvSnippet - The uv snippet.
-	 * @param {String} levelSnippet - The level snippet.
-	 * @param {String} biasSnippet - The bias snippet.
-	 * @param {String} depthSnippet - The depth snippet.
-	 * @param {String} compareSnippet - The compare snippet.
-	 * @param {String} gradSnippet - The grad snippet.
+	 * @param {String?} levelSnippet - The level snippet.
+	 * @param {String?} biasSnippet - The bias snippet.
+	 * @param {String?} depthSnippet - The depth snippet.
+	 * @param {String?} compareSnippet - The compare snippet.
+	 * @param {Array<String>?} gradSnippet - The grad snippet.
 	 * @return {String} The generated code snippet.
 	 */
 	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
