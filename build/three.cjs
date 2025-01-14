@@ -10002,6 +10002,8 @@ const DataUtils = {
 const _vector$9 = /*@__PURE__*/ new Vector3();
 const _vector2$1 = /*@__PURE__*/ new Vector2();
 
+let _id$3 = 0;
+
 class BufferAttribute {
 
 	constructor( array, itemSize, normalized = false ) {
@@ -10013,6 +10015,8 @@ class BufferAttribute {
 		}
 
 		this.isBufferAttribute = true;
+
+		Object.defineProperty( this, 'id', { value: _id$3 ++ } );
 
 		this.name = '';
 
@@ -16214,7 +16218,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
 
-			if ( instanceInfo[ i ].geometryIndex === geometryId ) {
+			if ( instanceInfo[ i ].active && instanceInfo[ i ].geometryIndex === geometryId ) {
 
 				this.deleteInstance( i );
 
@@ -50263,7 +50267,7 @@ class WebXRManager extends EventDispatcher {
 
 				// Check that the browser implements the necessary APIs to use an
 				// XRProjectionLayer rather than an XRWebGLLayer
-				const useLayers = XRWebGLBinding !== undefined && 'createProjectionLayer' in XRWebGLBinding.prototype;
+				const useLayers = typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
 				if ( ! useLayers ) {
 
