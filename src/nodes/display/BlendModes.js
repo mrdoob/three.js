@@ -81,7 +81,7 @@ export const blendScreen = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 /**
  * Represents a "Overlay" blend mode.
  *
- * It's designed to increase the contrast of the base layer based on the color of the top layer.
+ * It's designed to increase the contrast of the base layer based on the color of the blend layer.
  * It amplifies the existing colors and contrast in the base layer, making lighter areas lighter and darker areas darker.
  * The color of the blend layer significantly influences the resulting contrast and color shift in the base layer.
  *
