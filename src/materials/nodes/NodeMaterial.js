@@ -362,11 +362,6 @@ class NodeMaterial extends Material {
 		 */
 		this.vertexNode = null;
 
-		/**
-		 * Uniforms used to pass data to the material.
-		 */
-		this.uniforms = {};
-
 	}
 
 	/**
