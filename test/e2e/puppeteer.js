@@ -112,14 +112,12 @@ const exceptionList = [
 	'physics_jolt_instancing',
 
 	// Awaiting for WebGL backend support
-	'webgpu_clearcoat',
 	'webgpu_compute_audio',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
 	"webgpu_compute_water",
 	'webgpu_materials',
 	'webgpu_sandbox',
-	'webgpu_sprites',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_bloom_emissive',
 	'webgpu_lights_tiled',
@@ -132,7 +130,6 @@ const exceptionList = [
 	// WebGPURenderer: Unknown problem
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
-	'webgpu_clipping',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
@@ -159,7 +156,6 @@ const exceptionList = [
 	'webgpu_textures_2d-array_compressed',
 	'webgpu_rendertarget_2d-array_3d',
 	'webgpu_materials_envmaps_bpcem',
-	'webgpu_postprocessing_ssr',
 	'webgpu_postprocessing_sobel',
 
 	// WebGPU idleTime and parseTime too low
