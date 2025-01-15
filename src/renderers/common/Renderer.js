@@ -2593,49 +2593,11 @@ class Renderer {
 	 */
 	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
 
-		// process renderable objects
-
 		for ( let i = 0, il = renderList.length; i < il; i ++ ) {
 
-			const renderItem = renderList[ i ];
+			const { object, geometry, material, group, clippingContext } = renderList[ i ];
 
-			const { object, geometry, material, group, clippingContext } = renderItem;
-
-			if ( camera.isArrayCamera ) {
-
-				const cameras = camera.cameras;
-
-				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
-
-					const camera2 = cameras[ j ];
-
-					if ( object.layers.test( camera2.layers ) ) {
-
-						const vp = camera2.viewport;
-						const minDepth = ( vp.minDepth === undefined ) ? 0 : vp.minDepth;
-						const maxDepth = ( vp.maxDepth === undefined ) ? 1 : vp.maxDepth;
-
-						const viewportValue = this._currentRenderContext.viewportValue;
-						viewportValue.copy( vp ).multiplyScalar( this._pixelRatio ).floor();
-						viewportValue.minDepth = minDepth;
-						viewportValue.maxDepth = maxDepth;
-						this._currentRenderContext.viewport = true;
-
-						this.backend.updateViewport( this._currentRenderContext );
-
-						camera.index = j;
-
-						this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
-
-					}
-
-				}
-
-			} else {
-
-				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
-
-			}
+			this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
 
 		}
 

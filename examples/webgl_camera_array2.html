@@ -20,8 +20,11 @@
 
 			import * as THREE from 'three';
 
+			import Stats from 'three/addons/libs/stats.module.js';
+
 			let camera, scene, renderer;
 			let mesh;
+			let stats;
 			const AMOUNT = 6;
 
 			init();
@@ -30,8 +33,8 @@
 
 				const ASPECT_RATIO = window.innerWidth / window.innerHeight;
 
-				const WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio / 2;
-				const HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio / 2;
+				const WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				const HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
 
 				const cameras = [];
 
@@ -40,10 +43,10 @@
 					for ( let x = 0; x < AMOUNT; x ++ ) {
 
 						const subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
-						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
+						subcamera.viewport = new THREE.Vector4( x * WIDTH, y * HEIGHT, WIDTH, HEIGHT );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
-						subcamera.position.z = 1.5 + ( ( x + y ) * 1 );
+						subcamera.position.z = 1.5 + ( ( x + y ) * .5 );
 						subcamera.position.multiplyScalar( 2 );
 						subcamera.lookAt( 0, 0, 0 );
 						subcamera.updateMatrixWorld();
@@ -93,13 +96,18 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 			}
 
 			function onWindowResize() {
 
 				const ASPECT_RATIO = window.innerWidth / window.innerHeight;
-				const WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
-				const HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
+				const WIDTH = window.innerWidth / AMOUNT;
+				const HEIGHT = window.innerHeight / AMOUNT;
 
 				camera.aspect = ASPECT_RATIO;
 				camera.updateProjectionMatrix();
@@ -110,12 +118,7 @@
 
 						const subcamera = camera.cameras[ AMOUNT * y + x ];
 
-						subcamera.viewport.set(
-							Math.floor( x * WIDTH ),
-							Math.floor( y * HEIGHT ),
-							Math.ceil( WIDTH ),
-							Math.ceil( HEIGHT ) );
-
+						subcamera.viewport.set( x * WIDTH, y * HEIGHT, WIDTH, HEIGHT );
 						subcamera.aspect = ASPECT_RATIO;
 						subcamera.updateProjectionMatrix();
 
@@ -133,6 +136,8 @@
 				mesh.rotation.z += 0.01;
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

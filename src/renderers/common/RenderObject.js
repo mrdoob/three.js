@@ -367,6 +367,26 @@ class RenderObject {
 	}
 
 	/**
+	 * Returns a binding group by group name of this render object.
+	 *
+	 * @param {String} name - The name of the binding group.
+	 * @return {BindGroup?} The bindings.
+	 */
+	getBindingGroup( name ) {
+
+		for ( const bindingGroup of this.getBindings() ) {
+
+			if ( bindingGroup.name === name ) {
+
+				return bindingGroup;
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Returns the index of the render object's geometry.
 	 *
 	 * @return {BufferAttribute?} The index. Returns `null` for non-indexed geometries.

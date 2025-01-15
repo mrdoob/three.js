@@ -1,5 +1,5 @@
 import { uniform } from '../core/UniformNode.js';
-import { renderGroup } from '../core/UniformGroupNode.js';
+import { renderGroup, uniformGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
@@ -53,12 +53,10 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 		}
 
+		const cameraIndexGroup = uniformGroup( 'cameraIndex' );
+
 		const cameraViewMatrices = uniformArray( matrices ).label( 'cameraViewMatrices' );
-		const cameraIndex = uniform( 'uint' ).label( 'cameraIndex' ).onObjectUpdate( ( { camera } ) => {
-
-			return camera.index;
-
-		} );
+		const cameraIndex = uniform( 'uint' ).setGroup( cameraIndexGroup ).vertexStage();
 
 		cameraViewMatrix = cameraViewMatrices.element( cameraIndex ).toVar( 'cameraViewMatrix' );
 
