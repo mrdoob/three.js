@@ -1192,69 +1192,129 @@ class WebGPUBackend extends Backend {
 
 		// draw
 
-		if ( object.isBatchedMesh === true ) {
+		function draw() {
 
-			const starts = object._multiDrawStarts;
-			const counts = object._multiDrawCounts;
-			const drawCount = object._multiDrawCount;
-			const drawInstances = object._multiDrawInstances;
+			if ( object.isBatchedMesh === true ) {
 
-			for ( let i = 0; i < drawCount; i ++ ) {
+				const starts = object._multiDrawStarts;
+				const counts = object._multiDrawCounts;
+				const drawCount = object._multiDrawCount;
+				const drawInstances = object._multiDrawInstances;
 
-				const count = drawInstances ? drawInstances[ i ] : 1;
-				const firstInstance = count > 1 ? 0 : i;
+				for ( let i = 0; i < drawCount; i ++ ) {
 
-				if ( hasIndex === true ) {
+					const count = drawInstances ? drawInstances[ i ] : 1;
+					const firstInstance = count > 1 ? 0 : i;
 
-					passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+					if ( hasIndex === true ) {
 
-				} else {
+						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
 
-					passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+					} else {
+
+						passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+
+					}
 
 				}
 
-			}
+			} else if ( hasIndex === true ) {
 
-		} else if ( hasIndex === true ) {
+				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
 
-			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
+				const indirect = renderObject.getIndirect();
 
-			const indirect = renderObject.getIndirect();
+				if ( indirect !== null ) {
 
-			if ( indirect !== null ) {
+					const buffer = this.get( indirect ).buffer;
 
-				const buffer = this.get( indirect ).buffer;
+					passEncoderGPU.drawIndexedIndirect( buffer, 0 );
 
-				passEncoderGPU.drawIndexedIndirect( buffer, 0 );
+				} else {
+
+					passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+
+				}
+
+				info.update( object, indexCount, instanceCount );
 
 			} else {
 
-				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+				const { vertexCount, instanceCount, firstVertex } = drawParams;
+
+				const indirect = renderObject.getIndirect();
+
+				if ( indirect !== null ) {
+
+					const buffer = this.get( indirect ).buffer;
+
+					passEncoderGPU.drawIndirect( buffer, 0 );
+
+				} else {
+
+					passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+
+				}
+
+				info.update( object, vertexCount, instanceCount );
 
 			}
 
-			info.update( object, indexCount, instanceCount );
+		}
+
+		if ( renderObject.camera.isArrayCamera ) {
+
+			const cameraData = this.get( renderObject.camera );
+			const cameras = renderObject.camera.cameras;
+
+			if ( cameraData.indexesGPU === undefined ) {
+
+				const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' );
+				const bindingsData = this.get( cameraIndex );
+				const indexesGPU = [];
+
+				const data = new Uint32Array( [ 0, 0, 0, 0 ] );
+
+				for ( let i = 0, len = cameras.length; i < len; i ++ ) {
+
+					data[ 0 ] = i;
+
+					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, bindingsData.layout );
+
+					indexesGPU.push( bindGroupIndex );
+
+				}
+
+				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
+				cameraData.cameraIndex = cameraIndex;
+
+			}
+
+			const pixelRatio = this.renderer.getPixelRatio();
+
+			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
+
+				const subCamera = cameras[ i ];
+				const vp = subCamera.viewport;
+
+				passEncoderGPU.setViewport(
+					Math.floor( vp.x * pixelRatio ),
+					Math.floor( vp.y * pixelRatio ),
+					Math.floor( vp.width * pixelRatio ),
+					Math.floor( vp.height * pixelRatio ),
+					context.viewportValue.minDepth,
+					context.viewportValue.maxDepth
+				);
+
+				passEncoderGPU.setBindGroup( cameraData.cameraIndex.index, cameraData.indexesGPU[ i ] );
+
+				draw();
+
+			}
 
 		} else {
 
-			const { vertexCount, instanceCount, firstVertex } = drawParams;
-
-			const indirect = renderObject.getIndirect();
-
-			if ( indirect !== null ) {
-
-				const buffer = this.get( indirect ).buffer;
-
-				passEncoderGPU.drawIndirect( buffer, 0 );
-
-			} else {
-
-				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
-
-			}
-
-			info.update( object, vertexCount, instanceCount );
+			draw();
 
 		}
 

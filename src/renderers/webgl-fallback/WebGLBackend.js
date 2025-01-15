@@ -1107,7 +1107,6 @@ class WebGLBackend extends Backend {
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
-
 				const vp = subCamera.viewport;
 
 				gl.viewport(

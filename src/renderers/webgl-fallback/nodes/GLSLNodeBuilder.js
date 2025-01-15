@@ -1246,8 +1246,6 @@ void main() {
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
-			console.log( this.vertexShader );
-
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
