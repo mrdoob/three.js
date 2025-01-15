@@ -1855,6 +1855,7 @@ class Renderer {
 
 		}
 
+		// #30329
 		renderContext.clearColorValue = this._clearColor;
 
 		this.backend.clear( color, depth, stencil, renderContext );
