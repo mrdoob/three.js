@@ -28,7 +28,7 @@ const _matrix = new Matrix4();
 
 /**
  * CCD Algorithm
- *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
+ *  - https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
  * // ik parameter example
  * //
@@ -330,6 +330,8 @@ class CCDIKHelper extends Object3D {
 
 	/**
 	 * Updates IK bones visualization.
+	 *
+	 * @param {Boolean} force
 	 */
 	updateMatrixWorld( force ) {
 

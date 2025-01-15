@@ -2,19 +2,53 @@ import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, Near
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
+/**
+ * A WebGL 2 backend utility module for managing textures.
+ *
+ * @private
+ */
 class WebGLTextureUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
 		this.backend = backend;
 
+		/**
+		 * A reference to the rendering context.
+		 *
+		 * @type {WebGL2RenderingContext}
+		 */
 		this.gl = backend.gl;
+
+		/**
+		 * A reference to a backend module holding extension-related
+		 * utility functions.
+		 *
+		 * @type {WebGLExtensions}
+		 */
 		this.extensions = backend.extensions;
+
+		/**
+		 * A dictionary for managing default textures. The key
+		 * is the binding point (target), the value the WEbGL texture object.
+		 *
+		 * @type {Object<GLenum,WebGLTexture>}
+		 */
 		this.defaultTextures = {};
 
 		if ( initialized === false ) {
 
-			this._init( this.gl );
+			this._init();
 
 			initialized = true;
 
@@ -22,7 +56,14 @@ class WebGLTextureUtils {
 
 	}
 
-	_init( gl ) {
+	/**
+	 * Inits the state of the utility.
+	 *
+	 * @private
+	 */
+	_init() {
+
+		const gl = this.gl;
 
 		// Store only WebGL constants here.
 
@@ -55,20 +96,12 @@ class WebGLTextureUtils {
 
 	}
 
-	filterFallback( f ) {
-
-		const { gl } = this;
-
-		if ( f === NearestFilter || f === NearestMipmapNearestFilter || f === NearestMipmapLinearFilter ) {
-
-			return gl.NEAREST;
-
-		}
-
-		return gl.LINEAR;
-
-	}
-
+	/**
+	 * Returns the native texture type for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {GLenum} The native texture type.
+	 */
 	getGLTextureType( texture ) {
 
 		const { gl } = this;
@@ -98,6 +131,16 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns the native texture type for the given texture.
+	 *
+	 * @param {String?} internalFormatName - The internal format name. When `null`, the internal format is derived from the subsequent parameters.
+	 * @param {GLenum} glFormat - The WebGL format.
+	 * @param {GLenum} glType - The WebGL type.
+	 * @param {String} colorSpace - The texture's color space.
+	 * @param {Boolean} [forceLinearTransfer=false] - Whether to force a linear transfer or not.
+	 * @return {GLenum} The internal format.
+	 */
 	getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
 
 		const { gl, extensions } = this;
@@ -241,6 +284,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Sets the texture parameters for the given texture.
+	 *
+	 * @param {GLenum} textureType - The texture type.
+	 * @param {Texture} texture - The texture.
+	 */
 	setTextureParameters( textureType, texture ) {
 
 		const { gl, extensions, backend } = this;
@@ -294,6 +343,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Creates a default texture for the given texture that can be used
+	 * as a placeholder until the actual texture is ready for usage.
+	 *
+	 * @param {Texture} texture - The texture to create a default texture for.
+	 */
 	createDefaultTexture( texture ) {
 
 		const { gl, backend, defaultTextures } = this;
@@ -325,6 +380,13 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Defines a texture on the GPU for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 * @return {undefined}
+	 */
 	createTexture( texture, options ) {
 
 		const { gl, backend } = this;
@@ -365,6 +427,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Uploads texture buffer data to the GPU memory.
+	 *
+	 * @param {WebGLBuffer} buffer - The buffer data.
+	 * @param {Texture} texture - The texture,
+	 */
 	copyBufferToTexture( buffer, texture ) {
 
 		const { gl, backend } = this;
@@ -400,6 +468,12 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Uploads the updated texture data to the GPU.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
+	 */
 	updateTexture( texture, options ) {
 
 		const { gl } = this;
@@ -520,6 +594,11 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Generates mipmaps for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	generateMipmaps( texture ) {
 
 		const { gl, backend } = this;
@@ -530,6 +609,11 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Deallocates the render buffers of the given render target.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target.
+	 */
 	deallocateRenderBuffers( renderTarget ) {
 
 		const { gl, backend } = this;
@@ -590,6 +674,11 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU data for the given texture object.
+	 *
+	 * @param {Texture} texture - The texture.
+	 */
 	destroyTexture( texture ) {
 
 		const { gl, backend } = this;
@@ -602,6 +691,15 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Copies data of the given source texture to the given destination texture.
+	 *
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {Number} [level=0] - The mip level to copy.
+	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 		const { gl, backend } = this;
@@ -720,6 +818,13 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Copies the current bound framebuffer to the given texture.
+	 *
+	 * @param {Texture} texture - The destination texture.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	 */
 	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		const { gl } = this;
@@ -731,7 +836,7 @@ class WebGLTextureUtils {
 
 		const requireDrawFrameBuffer = texture.isDepthTexture === true || ( renderContext.renderTarget && renderContext.renderTarget.samples > 0 );
 
-		const srcHeight = renderContext.renderTarget ? renderContext.renderTarget.height : this.backend.gerDrawingBufferSize().y;
+		const srcHeight = renderContext.renderTarget ? renderContext.renderTarget.height : this.backend.getDrawingBufferSize().y;
 
 		if ( requireDrawFrameBuffer ) {
 
@@ -807,7 +912,12 @@ class WebGLTextureUtils {
 
 	}
 
-	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
+	/**
+	 * SetupS storage for internal depth/stencil buffers and bind to correct framebuffer.
+	 *
+	 * @param {WebGLRenderbuffer} renderbuffer - The render buffer.
+	 * @param {RenderContext} renderContext - The render context.
+	 */
 	setupRenderBufferStorage( renderbuffer, renderContext ) {
 
 		const { gl } = this;
@@ -862,6 +972,18 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns texture data as a typed array.
+	 *
+	 * @async
+	 * @param {Texture} texture - The texture to copy.
+	 * @param {Number} x - The x coordinate of the copy origin.
+	 * @param {Number} y - The y coordinate of the copy origin.
+	 * @param {Number} width - The width of the copy.
+	 * @param {Number} height - The height of the copy.
+	 * @param {Number} faceIndex - The face index.
+	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
+	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const { backend, gl } = this;
@@ -903,6 +1025,13 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns the corresponding typed array type for the given WebGL data type.
+	 *
+	 * @private
+	 * @param {GLenum} glType - The WebGL data type.
+	 * @return {TypedArray.constructor} The typed array type.
+	 */
 	_getTypedArrayType( glType ) {
 
 		const { gl } = this;
@@ -922,6 +1051,14 @@ class WebGLTextureUtils {
 
 	}
 
+	/**
+	 * Returns the bytes-per-texel value for the given WebGL data type and texture format.
+	 *
+	 * @private
+	 * @param {GLenum} glType - The WebGL data type.
+	 * @param {GLenum} glFormat - The WebGL texture format.
+	 * @return {Number} The bytes-per-texel.
+	 */
 	_getBytesPerTexel( glType, glFormat ) {
 
 		const { gl } = this;

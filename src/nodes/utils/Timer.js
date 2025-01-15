@@ -26,6 +26,13 @@ export const frameId = /*@__PURE__*/ uniform( 0, 'uint' ).setGroup( renderGroup 
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r170. Use {@link time} instead.
+ *
+ * @param {Number} [timeScale=1] - The time scale.
+ * @returns {UniformNode<float>}
+ */
 export const timerLocal = ( timeScale = 1 ) => { // @deprecated, r170
 
 	console.warn( 'TSL: timerLocal() is deprecated. Use "time" instead.' );
@@ -33,6 +40,13 @@ export const timerLocal = ( timeScale = 1 ) => { // @deprecated, r170
 
 };
 
+/**
+ * @function
+ * @deprecated since r170. Use {@link time} instead.
+ *
+ * @param {Number} [timeScale=1] - The time scale.
+ * @returns {UniformNode<float>}
+ */
 export const timerGlobal = ( timeScale = 1 ) => { // @deprecated, r170
 
 	console.warn( 'TSL: timerGlobal() is deprecated. Use "time" instead.' );
@@ -40,6 +54,13 @@ export const timerGlobal = ( timeScale = 1 ) => { // @deprecated, r170
 
 };
 
+/**
+ * @function
+ * @deprecated since r170. Use {@link deltaTime} instead.
+ *
+ * @param {Number} [timeScale=1] - The time scale.
+ * @returns {UniformNode<float>}
+ */
 export const timerDelta = ( timeScale = 1 ) => { // @deprecated, r170
 
 	console.warn( 'TSL: timerDelta() is deprecated. Use "deltaTime" instead.' );

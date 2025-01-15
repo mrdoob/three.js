@@ -41,7 +41,7 @@ class RenderOutputNode extends TempNode {
 	 * Constructs a new render output node.
 	 *
 	 * @param {Node} colorNode - The color node to process.
-	 * @param {String} toneMapping - The tone mapping type.
+	 * @param {Number} toneMapping - The tone mapping type.
 	 * @param {String} outputColorSpace - The output color space.
 	 */
 	constructor( colorNode, toneMapping, outputColorSpace ) {
@@ -112,11 +112,11 @@ class RenderOutputNode extends TempNode {
 export default RenderOutputNode;
 
 /**
- * TSL function for creating a posterize node with the given paramters.
+ * TSL function for creating a posterize node.
  *
  * @function
  * @param {Node} color - The color node to process.
- * @param {String?} [toneMapping=null] - The tone mapping type.
+ * @param {Number?} [toneMapping=null] - The tone mapping type.
  * @param {String?} [outputColorSpace=null] - The output color space.
  * @returns {RenderOutputNode}
  */

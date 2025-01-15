@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.171.0",
+  "version": "0.172.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.cjs",
@@ -47,7 +47,7 @@
     "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
-    "build-docs": "jsdoc src/nodes -c utils/docs/jsdoc.config.json",
+    "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "dev-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
     "lint-core": "eslint src",
@@ -93,7 +93,7 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
     "clean-jsdoc-theme": "^4.3.0",

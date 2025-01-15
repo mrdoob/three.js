@@ -92,7 +92,7 @@ class UnrealBloomPass extends Pass {
 
 		for ( let i = 0; i < this.nMips; i ++ ) {
 
-			this.separableBlurMaterials.push( this.getSeperableBlurMaterial( kernelSizeArray[ i ] ) );
+			this.separableBlurMaterials.push( this.getSeparableBlurMaterial( kernelSizeArray[ i ] ) );
 
 			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = new Vector2( 1 / resx, 1 / resy );
 
@@ -296,7 +296,7 @@ class UnrealBloomPass extends Pass {
 
 	}
 
-	getSeperableBlurMaterial( kernelRadius ) {
+	getSeparableBlurMaterial( kernelRadius ) {
 
 		const coefficients = [];
 

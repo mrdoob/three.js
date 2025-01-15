@@ -8,6 +8,16 @@ import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
 
+/** @module ClippingNode **/
+
+/**
+ * ```
+ * This node is used in {@link NodeMaterial} to setup the clipping
+ * which can happen hardware-accelerated (if supported) and optionally
+ * use alpha-to-coverage for anti-aliasing clipped edges.
+ * ```
+ * @augments Node
+ */
 class ClippingNode extends Node {
 
 	static get type() {
@@ -16,14 +26,32 @@ class ClippingNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new clipping node.
+	 *
+	 * @param {('default'|'hardware'|'alphaToCoverage')} [scope='default'] - The node's scope. Similar to other nodes,
+	 * the selected scope influences the behavior of the node and what type of code is generated.
+	 */
 	constructor( scope = ClippingNode.DEFAULT ) {
 
 		super();
 
+		/**
+		 * The node's scope. Similar to other nodes, the selected scope influences
+		 * the behavior of the node and what type of code is generated.
+		 *
+		 * @type {('default'|'hardware'|'alphaToCoverage')}
+		 */
 		this.scope = scope;
 
 	}
 
+	/**
+	 * Setups the node depending on the selected scope.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The result node.
+	 */
 	setup( builder ) {
 
 		super.setup( builder );
@@ -49,6 +77,13 @@ class ClippingNode extends Node {
 
 	}
 
+	/**
+	 * Setups alpha to coverage.
+	 *
+	 * @param {Array<Vector4>} intersectionPlanes - The intersection planes.
+	 * @param {Array<Vector4>} unionPlanes - The union planes.
+	 * @return {Node} The result node.
+	 */
 	setupAlphaToCoverage( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
@@ -60,7 +95,7 @@ class ClippingNode extends Node {
 
 			const numUnionPlanes = unionPlanes.length;
 
-			if ( ! this.hardwareClipping && numUnionPlanes > 0 ) {
+			if ( this.hardwareClipping === false && numUnionPlanes > 0 ) {
 
 				const clippingPlanes = uniformArray( unionPlanes );
 
@@ -107,13 +142,20 @@ class ClippingNode extends Node {
 
 	}
 
+	/**
+	 * Setups the default clipping.
+	 *
+	 * @param {Array<Vector4>} intersectionPlanes - The intersection planes.
+	 * @param {Array<Vector4>} unionPlanes - The union planes.
+	 * @return {Node} The result node.
+	 */
 	setupDefault( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
 			const numUnionPlanes = unionPlanes.length;
 
-			if ( ! this.hardwareClipping && numUnionPlanes > 0 ) {
+			if ( this.hardwareClipping === false && numUnionPlanes > 0 ) {
 
 				const clippingPlanes = uniformArray( unionPlanes );
 
@@ -148,6 +190,13 @@ class ClippingNode extends Node {
 
 	}
 
+	/**
+	 * Setups hardware clipping.
+	 *
+	 * @param {Array<Vector4>} unionPlanes - The union planes.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The result node.
+	 */
 	setupHardwareClipping( unionPlanes, builder ) {
 
 		const numUnionPlanes = unionPlanes.length;
@@ -180,6 +229,26 @@ ClippingNode.HARDWARE = 'hardware';
 
 export default ClippingNode;
 
+/**
+ * TSL function for setting up the default clipping logic.
+ *
+ * @function
+ * @returns {ClippingNode}
+ */
 export const clipping = () => nodeObject( new ClippingNode() );
+
+/**
+ * TSL function for setting up alpha to coverage.
+ *
+ * @function
+ * @returns {ClippingNode}
+ */
 export const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE ) );
+
+/**
+ * TSL function for setting up hardware-based clipping.
+ *
+ * @function
+ * @returns {ClippingNode}
+ */
 export const hardwareClipping = () => nodeObject( new ClippingNode( ClippingNode.HARDWARE ) );

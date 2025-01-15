@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { luminance, cos, float, min, time, atan2, uniform, pass, PI, PI2, color, positionLocal, oneMinus, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { luminance, cos, float, min, time, atan, uniform, pass, PI, PI2, color, positionLocal, oneMinus, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -58,7 +58,7 @@
 
 					const centeredUv = uv.sub( 0.5 ).toVar();
 					const distanceToCenter = centeredUv.length();
-					const angle = atan2( centeredUv.y, centeredUv.x );
+					const angle = atan( centeredUv.y, centeredUv.x );
 					const radialUv = vec2( angle.add( PI ).div( PI2 ), distanceToCenter ).toVar();
 					radialUv.mulAssign( multiplier );
 					radialUv.x.addAssign( rotation );
@@ -79,7 +79,7 @@
 
 				const twistedCylinder = Fn( ( [ position, parabolStrength, parabolOffset, parabolAmplitude, time ] ) => {
 
-					const angle = atan2( position.z, position.x ).toVar();
+					const angle = atan( position.z, position.x ).toVar();
 					const elevation = position.y;
 
 					// parabol
@@ -275,6 +275,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
 				// post processing

@@ -33,8 +33,6 @@ class VelocityNode extends TempNode {
 
 	/**
 	 * Constructs a new vertex color node.
-	 *
-	 * @param {Number} [index=0] - The attribute index.
 	 */
 	constructor() {
 

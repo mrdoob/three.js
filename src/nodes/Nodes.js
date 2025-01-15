@@ -67,7 +67,6 @@ export { default as MaterialReferenceNode } from './accessors/MaterialReferenceN
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode } from './accessors/MorphNode.js';
 export { default as ModelNode } from './accessors/ModelNode.js';
-export { default as ModelViewProjectionNode } from './accessors/ModelViewProjectionNode.js';
 export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';

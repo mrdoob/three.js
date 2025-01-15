@@ -1,6 +1,6 @@
 import { positionView } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
-import { Fn, vec4 } from '../tsl/TSLBase.js';
+import { Fn, output, vec4 } from '../tsl/TSLBase.js';
 
 /** @module Fog **/
 
@@ -34,6 +34,7 @@ function getViewZNode( builder ) {
 /**
  * Constructs a new range factor node.
  *
+ * @function
  * @param {Node} near - Defines the near value.
  * @param {Node} far - Defines the far value.
  */
@@ -50,6 +51,7 @@ export const rangeFogFactor = Fn( ( [ near, far ], builder ) => {
  * a clear view near the camera and a faster than exponentially
  * densening fog farther from the camera.
  *
+ * @function
  * @param {Node} density - Defines the fog density.
  */
 export const densityFogFactor = Fn( ( [ density ], builder ) => {
@@ -64,17 +66,27 @@ export const densityFogFactor = Fn( ( [ density ], builder ) => {
  * This class can be used to configure a fog for the scene.
  * Nodes of this type are assigned to `Scene.fogNode`.
  *
+ * @function
  * @param {Node} color - Defines the color of the fog.
  * @param {Node} factor - Defines how the fog is factored in the scene.
  */
 export const fog = Fn( ( [ color, factor ] ) => {
 
-	return vec4( color.toVec3(), factor.toFloat() );
+	return vec4( factor.toFloat().mix( output.rgb, color.toVec3() ), output.a );
 
 } );
 
 // Deprecated
 
+/**
+ * @function
+ * @deprecated since r171. Use `fog( color, rangeFogFactor( near, far ) )` instead.
+ *
+ * @param {Node} color
+ * @param {Node} near
+ * @param {Node} far
+ * @returns {Function}
+ */
 export function rangeFog( color, near, far ) { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
@@ -82,6 +94,14 @@ export function rangeFog( color, near, far ) { // @deprecated, r171
 
 }
 
+/**
+ * @function
+ * @deprecated since r171. Use `fog( color, densityFogFactor( density ) )` instead.
+ *
+ * @param {Node} color
+ * @param {Node} density
+ * @returns {Function}
+ */
 export function densityFog( color, density ) { // @deprecated, r171
 
 	console.warn( 'THREE.TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );

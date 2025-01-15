@@ -3,6 +3,13 @@ import { scriptableValue } from './ScriptableValueNode.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 import { hashArray, hashString } from '../core/NodeUtils.js';
 
+/** @module ScriptableNode **/
+
+/**
+ * A Map-like data structure for managing resources of scriptable nodes.
+ *
+ * @augments Map
+ */
 class Resources extends Map {
 
 	get( key, callback = null, ...params ) {
@@ -58,8 +65,49 @@ class Parameters {
 
 }
 
+/**
+ * Defines the resources (e.g. namespaces) of scriptable nodes.
+ *
+ * @type {Resources}
+ */
 export const ScriptableNodeResources = new Resources();
 
+/**
+ * This type of node allows to implement nodes with custom scripts. The script
+ * section is represented as an instance of `CodeNode` written with JavaScript.
+ * The script itself must adhere to a specific structure.
+ *
+ * - main(): Executed once by default and every time `node.needsUpdate` is set.
+ * - layout: The layout object defines the script's interface (inputs and outputs).
+ *
+ * ```js
+ * ScriptableNodeResources.set( 'TSL', TSL );
+ *
+ * const scriptableNode = scriptable( js( `
+ * 	layout = {
+ * 		outputType: 'node',
+ * 		elements: [
+ * 			{ name: 'source', inputType: 'node' },
+ * 		]
+ * 	};
+ *
+ * 	const { mul, oscSine } = TSL;
+ *
+ * 	function main() {
+ * 		const source = parameters.get( 'source' ) || float();
+ * 		return mul( source, oscSine() ) );
+ * 	}
+ *
+ * ` ) );
+ *
+ * scriptableNode.setParameter( 'source', color( 1, 0, 0 ) );
+ *
+ * const material = new THREE.MeshBasicNodeMaterial();
+ * material.colorNode = scriptableNode;
+ * ```
+ *
+ * @augments Node
+ */
 class ScriptableNode extends Node {
 
 	static get type() {
@@ -68,11 +116,30 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Constructs a new scriptable node.
+	 *
+	 * @param {CodeNode?} [codeNode=null] - The code node.
+	 * @param {Object} [parameters={}] - The parameters definition.
+	 */
 	constructor( codeNode = null, parameters = {} ) {
 
 		super();
 
+		/**
+		 * The code node.
+		 *
+		 * @type {CodeNode?}
+		 * @default null
+		 */
 		this.codeNode = codeNode;
+
+		/**
+		 * The parameters definition.
+		 *
+		 * @type {Object}
+		 * @default {}
+		 */
 		this.parameters = parameters;
 
 		this._local = new Resources();
@@ -86,34 +153,68 @@ class ScriptableNode extends Node {
 
 		this.onRefresh = this.onRefresh.bind( this );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isScriptableNode = true;
 
 	}
 
+	/**
+	 * The source code of the scriptable node.
+	 *
+	 * @type {String}
+	 */
 	get source() {
 
 		return this.codeNode ? this.codeNode.code : '';
 
 	}
 
+	/**
+	 * Sets the reference of a local script variable.
+	 *
+	 * @param {String} name - The variable name.
+	 * @param {Object} value - The reference to set.
+	 * @return {Resources} The resource map
+	 */
 	setLocal( name, value ) {
 
 		return this._local.set( name, value );
 
 	}
 
+	/**
+	 * Gets the value of a local script variable.
+	 *
+	 * @param {String} name - The variable name.
+	 * @return {Object} The value.
+	 */
 	getLocal( name ) {
 
 		return this._local.get( name );
 
 	}
 
+	/**
+	 * Event listener for the `refresh` event.
+	 */
 	onRefresh() {
 
 		this._refresh();
 
 	}
 
+	/**
+	 * Returns an input from the layout with the given id/name.
+	 *
+	 * @param {String} id - The id/name of the input.
+	 * @return {Object} The element entry.
+	 */
 	getInputLayout( id ) {
 
 		for ( const element of this.getLayout() ) {
@@ -128,6 +229,12 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Returns an output from the layout with the given id/name.
+	 *
+	 * @param {String} id - The id/name of the output.
+	 * @return {Object} The element entry.
+	 */
 	getOutputLayout( id ) {
 
 		for ( const element of this.getLayout() ) {
@@ -142,6 +249,13 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Defines a script output for the given name and value.
+	 *
+	 * @param {String} name - The name of the output.
+	 * @param {Node} value - The node value.
+	 * @return {ScriptableNode} A reference to this node.
+	 */
 	setOutput( name, value ) {
 
 		const outputs = this._outputs;
@@ -160,18 +274,37 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Returns a script output for the given name.
+	 *
+	 * @param {String} name - The name of the output.
+	 * @return {ScriptableValueNode} The node value.
+	 */
 	getOutput( name ) {
 
 		return this._outputs[ name ];
 
 	}
 
+	/**
+	 * Returns a parameter for the given name
+	 *
+	 * @param {String} name - The name of the parameter.
+	 * @return {ScriptableValueNode} The node value.
+	 */
 	getParameter( name ) {
 
 		return this.parameters[ name ];
 
 	}
 
+	/**
+	 * Sets a value for the given parameter name.
+	 *
+	 * @param {String} name - The parameter name.
+	 * @param {Any} value - The parameter value.
+	 * @return {ScriptableNode} A reference to this node.
+	 */
 	setParameter( name, value ) {
 
 		const parameters = this.parameters;
@@ -205,12 +338,24 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Returns the value of this node which is the value of
+	 * the default output.
+	 *
+	 * @return {Node} The value.
+	 */
 	getValue() {
 
 		return this.getDefaultOutput().getValue();
 
 	}
 
+	/**
+	 * Deletes a parameter from the script.
+	 *
+	 * @param {String} name - The parameter to remove.
+	 * @return {ScriptableNode} A reference to this node.
+	 */
 	deleteParameter( name ) {
 
 		let valueNode = this.parameters[ name ];
@@ -227,6 +372,11 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Deletes all parameters from the script.
+	 *
+	 * @return {ScriptableNode} A reference to this node.
+	 */
 	clearParameters() {
 
 		for ( const name of Object.keys( this.parameters ) ) {
@@ -241,6 +391,13 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Calls a function from the script.
+	 *
+	 * @param {String} name - The function name.
+	 * @param {...Any} params - A list of parameters.
+	 * @return {Any} The result of the function call.
+	 */
 	call( name, ...params ) {
 
 		const object = this.getObject();
@@ -254,6 +411,13 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Asynchronously calls a function from the script.
+	 *
+	 * @param {String} name - The function name.
+	 * @param {...Any} params - A list of parameters.
+	 * @return {Promise<Any>} The result of the function call.
+	 */
 	async callAsync( name, ...params ) {
 
 		const object = this.getObject();
@@ -267,12 +431,23 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Overwritten since the node types is inferred from the script's output.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder
+	 * @return {String} The node type.
+	 */
 	getNodeType( builder ) {
 
 		return this.getDefaultOutputNode().getNodeType( builder );
 
 	}
 
+	/**
+	 * Refreshes the script node.
+	 *
+	 * @param {String?} [output=null] - An optional output.
+	 */
 	refresh( output = null ) {
 
 		if ( output !== null ) {
@@ -287,6 +462,11 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Returns an object representation of the script.
+	 *
+	 * @return {Object} The result object.
+	 */
 	getObject() {
 
 		if ( this.needsUpdate ) this.dispose();
@@ -302,7 +482,7 @@ class ScriptableNode extends Node {
 		const THREE = ScriptableNodeResources.get( 'THREE' );
 		const TSL = ScriptableNodeResources.get( 'TSL' );
 
-		const method = this.getMethod( this.codeNode );
+		const method = this.getMethod();
 		const params = [ parameters, this._local, ScriptableNodeResources, refresh, setOutput, THREE, TSL ];
 
 		this._object = method( ...params );
@@ -368,12 +548,22 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Returns the layout of the script.
+	 *
+	 * @return {Object} The script's layout.
+	 */
 	getLayout() {
 
 		return this.getObject().layout;
 
 	}
 
+	/**
+	 * Returns default node output of the script.
+	 *
+	 * @return {Node} The default node output.
+	 */
 	getDefaultOutputNode() {
 
 		const output = this.getDefaultOutput().value;
@@ -388,12 +578,22 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Returns default output of the script.
+	 *
+	 * @return {ScriptableValueNode} The default output.
+	 */
 	getDefaultOutput()	{
 
 		return this._exec()._output;
 
 	}
 
+	/**
+	 * Returns a function created from the node's script.
+	 *
+	 * @return {Function} The function representing the node's code.
+	 */
 	getMethod() {
 
 		if ( this.needsUpdate ) this.dispose();
@@ -418,6 +618,9 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Frees all internal resources.
+	 */
 	dispose() {
 
 		if ( this._method === null ) return;
@@ -470,6 +673,12 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Executes the `main` function of the script.
+	 *
+	 * @private
+	 * @return {ScriptableNode} A reference to this node.
+	 */
 	_exec()	{
 
 		if ( this.codeNode === null ) return this;
@@ -488,6 +697,11 @@ class ScriptableNode extends Node {
 
 	}
 
+	/**
+	 * Executes the refresh.
+	 *
+	 * @private
+	 */
 	_refresh() {
 
 		this.needsUpdate = true;
@@ -502,4 +716,12 @@ class ScriptableNode extends Node {
 
 export default ScriptableNode;
 
+/**
+ * TSL function for creating a scriptable node.
+ *
+ * @function
+ * @param {CodeNode?} [codeNode=null] - The code node.
+ * @param {Object} [parameters={}] - The parameters definition.
+ * @returns {ScriptableNode}
+ */
 export const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode );

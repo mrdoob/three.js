@@ -56,7 +56,16 @@ class CacheNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.node.getNodeType( builder );
+		const previousCache = builder.getCache();
+		const cache = builder.getCacheFromNode( this, this.parent );
+
+		builder.setCache( cache );
+
+		const nodeType = this.node.getNodeType( builder );
+
+		builder.setCache( previousCache );
+
+		return nodeType;
 
 	}
 
@@ -80,7 +89,7 @@ class CacheNode extends Node {
 export default CacheNode;
 
 /**
- * TSL function for creating a cache node with the given parameters.
+ * TSL function for creating a cache node.
  *
  * @function
  * @param {Node} node - The node that should be cached.

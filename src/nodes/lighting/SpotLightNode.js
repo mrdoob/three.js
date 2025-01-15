@@ -30,14 +30,14 @@ class SpotLightNode extends AnalyticLightNode {
 		super( light );
 
 		/**
-		 * Uniform node representing the cone cosinus.
+		 * Uniform node representing the cone cosine.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.coneCosNode = uniform( 0 ).setGroup( renderGroup );
 
 		/**
-		 * Uniform node representing the penumbra cosinus.
+		 * Uniform node representing the penumbra cosine.
 		 *
 		 * @type {UniformNode<float>}
 		 */

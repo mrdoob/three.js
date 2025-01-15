@@ -498,6 +498,15 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the output struct name which is required by
+	 * {@link module:OutputStructNode}.
+	 *
+	 * @abstract
+	 * @return {String} The name of the output struct.
+	 */
+	getOutputStructName() {}
+
+	/**
 	 * Returns a bind group for the given group name and binding.
 	 *
 	 * @private
@@ -678,6 +687,7 @@ class NodeBuilder {
 	/**
 	 * It is used to add Nodes that will be used as FRAME and RENDER events,
 	 * and need to follow a certain sequence in the calls to work correctly.
+	 * This function should be called after 'setup()' in the 'build()' process to ensure that the child nodes are processed first.
 	 *
 	 * @param {Node} node - The node to add.
 	 */
@@ -1033,10 +1043,11 @@ class NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {String} textureProperty - The texture property name.
 	 * @param {String} uvSnippet - Snippet defining the texture coordinates.
+	 * @param {String?} depthSnippet - Snippet defining the 0-based texture array index to sample.
 	 * @param {String} levelSnippet - Snippet defining the mip level.
 	 * @return {String} The generated shader string.
 	 */
-	generateTextureLod( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
+	generateTextureLod( /* texture, textureProperty, uvSnippet, depthSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -1210,11 +1221,11 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Whether the given texture needs a conversion to working color space.
+	 * Checks if the given texture requires a manual conversion to the working color space.
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to check.
-	 * @return {Boolean} Whether a color space conversion is required or not.
+	 * @return {Boolean} Whether the given texture requires a conversion to working color space or not.
 	 */
 	needsToWorkingColorSpace( /*texture*/ ) {
 
@@ -1593,9 +1604,11 @@ class NodeBuilder {
 	 * @param {String?} name - The variable's name.
 	 * @param {String} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @param {Boolean} [readOnly=false] - Whether the variable is read-only or not.
+	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -1603,19 +1616,61 @@ class NodeBuilder {
 
 		if ( nodeVar === undefined ) {
 
+			const idNS = readOnly ? '_const' : '_var';
+
 			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
+			const id = this.vars[ idNS ] || ( this.vars[ idNS ] = 0 );
 
-			if ( name === null ) name = 'nodeVar' + vars.length;
+			if ( name === null ) {
 
-			nodeVar = new NodeVar( name, type );
+				name = ( readOnly ? 'nodeConst' : 'nodeVar' ) + id;
 
-			vars.push( nodeVar );
+				this.vars[ idNS ] ++;
+
+			}
+
+			nodeVar = new NodeVar( name, type, readOnly );
+
+			if ( ! readOnly ) {
+
+				vars.push( nodeVar );
+
+			}
 
 			nodeData.variable = nodeVar;
 
 		}
 
 		return nodeVar;
+
+	}
+
+	/**
+	 * Returns whether a Node or its flow is deterministic, useful for use in `const`.
+	 *
+	 * @param {Node} node - The varying node.
+	 * @return {Boolean} Returns true if deterministic.
+	 */
+	isDeterministic( node ) {
+
+		if ( node.isMathNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true ) &&
+				( node.cNode ? this.isDeterministic( node.cNode ) : true );
+
+		} else if ( node.isOperatorNode ) {
+
+			return this.isDeterministic( node.aNode ) &&
+				( node.bNode ? this.isDeterministic( node.bNode ) : true );
+
+		} else if ( node.isConstNode ) {
+
+			return true;
+
+		}
+
+		return false;
 
 	}
 
@@ -2414,6 +2469,13 @@ class NodeBuilder {
 
 	// deprecated
 
+	/**
+	 * @function
+	 * @deprecated since r168. Use `new NodeMaterial()` instead, with targeted node material name.
+	 *
+	 * @param {String} [type='NodeMaterial'] - The node material type.
+	 * @throws {Error}
+	 */
 	createNodeMaterial( type = 'NodeMaterial' ) { // @deprecated, r168
 
 		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );

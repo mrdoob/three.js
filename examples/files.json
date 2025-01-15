@@ -299,6 +299,8 @@
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_backdrop_water",
+		"webgpu_camera",
+		"webgpu_camera_array",
 		"webgpu_camera_logarithmicdepthbuffer",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
@@ -407,6 +409,7 @@
 		"webgpu_procedural_texture",
 		"webgpu_reflection",
 		"webgpu_refraction",
+		"webgpu_rendertarget_2d-array_3d",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
@@ -441,6 +444,7 @@
 		"webgpu_tsl_vfx_flames",
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
+		"webgpu_video_frame",
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin",
@@ -512,7 +516,8 @@
 		"misc_exporter_usdz",
 		"misc_exporter_exr",
 		"misc_exporter_ktx2",
-		"misc_lookat"
+		"misc_lookat",
+		"misc_raycaster_helper"
 	],
 	"css2d": [
 		"css2d_label"

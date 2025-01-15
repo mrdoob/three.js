@@ -4,6 +4,8 @@ import { Vector3 } from '../../math/Vector3.js';
 import { cameraViewMatrix } from './Camera.js';
 import { positionWorld } from './Position.js';
 
+/** @module Lights **/
+
 let uniformsLib;
 
 function getLightData( light ) {
@@ -18,6 +20,13 @@ function getLightData( light ) {
 
 }
 
+/**
+ * TSL function for getting a shadow matrix uniform node for the given light.
+ *
+ * @function
+ * @param {Light} light -The light source.
+ * @returns {UniformNode<mat4>} The shadow matrix uniform node.
+ */
 export function lightShadowMatrix( light ) {
 
 	const data = getLightData( light );
@@ -36,6 +45,14 @@ export function lightShadowMatrix( light ) {
 
 }
 
+/**
+ * TSL function for getting projected uv coordinates for the given light.
+ * Relevant when using maps with spot lights.
+ *
+ * @function
+ * @param {Light} light -The light source.
+ * @returns {Node<vec3>} The projected uvs.
+ */
 export function lightProjectionUV( light ) {
 
 	const data = getLightData( light );
@@ -53,6 +70,13 @@ export function lightProjectionUV( light ) {
 
 }
 
+/**
+ * TSL function for getting the position in world space for the given light.
+ *
+ * @function
+ * @param {Light} light -The light source.
+ * @returns {UniformNode<vec3>} The light's position in world space.
+ */
 export function lightPosition( light ) {
 
 	const data = getLightData( light );
@@ -61,6 +85,13 @@ export function lightPosition( light ) {
 
 }
 
+/**
+ * TSL function for getting the light target position in world space for the given light.
+ *
+ * @function
+ * @param {Light} light -The light source.
+ * @returns {UniformNode<vec3>} The light target position in world space.
+ */
 export function lightTargetPosition( light ) {
 
 	const data = getLightData( light );
@@ -69,6 +100,13 @@ export function lightTargetPosition( light ) {
 
 }
 
+/**
+ * TSL function for getting the position in view space for the given light.
+ *
+ * @function
+ * @param {Light} light -The light source.
+ * @returns {UniformNode<vec3>} The light's position in view space.
+ */
 export function lightViewPosition( light ) {
 
 	const data = getLightData( light );
@@ -84,4 +122,11 @@ export function lightViewPosition( light ) {
 
 }
 
+/**
+ * TSL function for getting the light target direction for the given light.
+ *
+ * @function
+ * @param {Light} light -The light source.
+ * @returns {Node<vec3>} The light's target direction.
+ */
 export const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightTargetPosition( light ) ) );

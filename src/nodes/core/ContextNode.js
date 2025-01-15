@@ -58,9 +58,9 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
+	 * This method is overwritten to ensure it returns the reference to {@link module:ContextNode~ContextNode#node}.
 	 *
-	 * @return {Node} A reference to {@link ContextNode#node}.
+	 * @return {Node} A reference to {@link module:ContextNode~ContextNode#node}.
 	 */
 	getScope() {
 
@@ -69,10 +69,10 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the type to {@link ContextNode#node}.
+	 * This method is overwritten to ensure it returns the type of {@link module:ContextNode~ContextNode#node}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The type of {@link ContextNode#node}.
+	 * @return {String} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -119,7 +119,7 @@ class ContextNode extends Node {
 export default ContextNode;
 
 /**
- * TSL function for creating a context node with the given parameters.
+ * TSL function for creating a context node.
  *
  * @function
  * @param {Node} node - The node whose context should be modified.

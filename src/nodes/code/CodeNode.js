@@ -141,7 +141,7 @@ class CodeNode extends Node {
 export default CodeNode;
 
 /**
- * TSL function for creating a code node with the given paramters.
+ * TSL function for creating a code node.
  *
  * @function
  * @param {String} [code=''] - The native code.
@@ -152,7 +152,7 @@ export default CodeNode;
 export const code = /*@__PURE__*/ nodeProxy( CodeNode );
 
 /**
- * TSL function for creating a JS code node with the given paramters.
+ * TSL function for creating a JS code node.
  *
  * @function
  * @param {String} src - The native code.
@@ -162,7 +162,7 @@ export const code = /*@__PURE__*/ nodeProxy( CodeNode );
 export const js = ( src, includes ) => code( src, includes, 'js' );
 
 /**
- * TSL function for creating a WGSL code node with the given paramters.
+ * TSL function for creating a WGSL code node.
  *
  * @function
  * @param {String} src - The native code.
@@ -172,7 +172,7 @@ export const js = ( src, includes ) => code( src, includes, 'js' );
 export const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );
 
 /**
- * TSL function for creating a GLSL code node with the given paramters.
+ * TSL function for creating a GLSL code node.
  *
  * @function
  * @param {String} src - The native code.

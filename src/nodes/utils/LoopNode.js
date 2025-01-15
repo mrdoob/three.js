@@ -2,6 +2,8 @@ import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
 
+/** @module LoopNode **/
+
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
  * ```js
@@ -15,7 +17,7 @@ import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
  *
  * } );
  *```
- * Nested loops can be definde in a compacted form:
+ * Nested loops can be defined in a compacted form:
  * ```js
  * Loop( 10, 5, ( { i, j } ) => {
  *
@@ -247,12 +249,40 @@ class LoopNode extends Node {
 
 export default LoopNode;
 
+/**
+ * TSL function for creating a loop node.
+ *
+ * @function
+ * @param {...Any} params - A list of parameters.
+ * @returns {LoopNode}
+ */
 export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+
+/**
+ * TSL function for creating a `Continue()` expression.
+ *
+ * @function
+ * @returns {ExpressionNode}
+ */
 export const Continue = () => expression( 'continue' ).append();
+
+/**
+ * TSL function for creating a `Break()` expression.
+ *
+ * @function
+ * @returns {ExpressionNode}
+ */
 export const Break = () => expression( 'break' ).append();
 
-//
+// deprecated
 
+/**
+ * @function
+ * @deprecated since r168. Use {@link Loop} instead.
+ *
+ * @param  {...any} params
+ * @returns {LoopNode}
+ */
 export const loop = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.LoopNode: loop() has been renamed to Loop().' );

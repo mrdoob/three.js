@@ -33,7 +33,7 @@ const BRDF_BlinnPhong = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 /**
  * Represents the lighting model for a phong material. Used in {@link MeshPhongNodeMaterial}.
  *
- * @augments LightingModel
+ * @augments BasicLightingModel
  */
 class PhongLightingModel extends BasicLightingModel {
 

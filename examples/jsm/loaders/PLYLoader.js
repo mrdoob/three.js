@@ -127,19 +127,19 @@ class PLYLoader extends Loader {
 			const lines = headerText.split( /\r\n|\r|\n/ );
 			let currentElement;
 
-			function make_ply_element_property( propertValues, propertyNameMapping ) {
+			function make_ply_element_property( propertyValues, propertyNameMapping ) {
 
-				const property = { type: propertValues[ 0 ] };
+				const property = { type: propertyValues[ 0 ] };
 
 				if ( property.type === 'list' ) {
 
-					property.name = propertValues[ 3 ];
-					property.countType = propertValues[ 1 ];
-					property.itemType = propertValues[ 2 ];
+					property.name = propertyValues[ 3 ];
+					property.countType = propertyValues[ 1 ];
+					property.itemType = propertyValues[ 2 ];
 
 				} else {
 
-					property.name = propertValues[ 1 ];
+					property.name = propertyValues[ 1 ];
 
 				}
 
@@ -576,7 +576,7 @@ class PLYLoader extends Loader {
 
 				switch ( type ) {
 
-					// corespondences for non-specific length types here match rply:
+					// correspondences for non-specific length types here match rply:
 					case 'int8':	case 'char':	return { read: ( at ) => {
 
 						return dataview.getInt8( at );

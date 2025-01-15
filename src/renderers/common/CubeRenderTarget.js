@@ -12,6 +12,12 @@ import { BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from '..
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
+/**
+ * This class represents a cube render target. It is a special version
+ * of `WebGLCubeRenderTarget` which is compatible with `WebGPURenderer`.
+ *
+ * @augments WebGLCubeRenderTarget
+ */
 class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	constructor( size = 1, options = {} ) {
@@ -22,6 +28,13 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	}
 
+	/**
+	 * Converts the given equirectangular texture to a cube map.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 * @param {Texture} texture - The equirectangular texture.
+	 * @return {CubeRenderTarget} A reference to this cube render target.
+	 */
 	fromEquirectangularTexture( renderer, texture ) {
 
 		const currentMinFilter = texture.minFilter;

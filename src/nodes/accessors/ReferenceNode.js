@@ -8,6 +8,8 @@ import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
+// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+
 /** @module ReferenceNode **/
 
 /**
@@ -28,7 +30,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {Node} referenceNode - The reference node.
+	 * @param {ReferenceNode?} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -36,10 +38,10 @@ class ReferenceElementNode extends ArrayElementNode {
 		super( referenceNode, indexNode );
 
 		/**
-		 * Similar to {@link ReferenceNode#reference}, an additional
+		 * Similar to {@link module:ReferenceNode~ReferenceNode#reference}, an additional
 		 * property references to the current node.
 		 *
-		 * @type {Node}
+		 * @type {ReferenceNode?}
 		 * @default null
 		 */
 		this.referenceNode = referenceNode;
@@ -59,7 +61,6 @@ class ReferenceElementNode extends ArrayElementNode {
 	 * This method is overwritten since the node type is inferred from
 	 * the uniform type of the reference node.
 	 *
-	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.
 	 */
 	getNodeType() {
@@ -83,7 +84,7 @@ class ReferenceElementNode extends ArrayElementNode {
 /**
  * This type of node establishes a reference to a property of another object.
  * In this way, the value of the node is automatically linked to the value of
- * referenced object. Reference nodes internally represents the linked value
+ * referenced object. Reference nodes internally represent the linked value
  * as a uniform.
  *
  * @augments Node
@@ -147,7 +148,7 @@ class ReferenceNode extends Node {
 		this.properties = property.split( '.' );
 
 		/**
-		 * Points to the current referred object. This property exists next to {@link ReferenceNode#object}
+		 * Points to the current referred object. This property exists next to {@link module:ReferenceNode~ReferenceNode#object}
 		 * since the final reference might be updated from calling code.
 		 *
 		 * @type {Object?}
@@ -172,7 +173,7 @@ class ReferenceNode extends Node {
 		this.group = null;
 
 		/**
-		 * An optinal label of the internal uniform node.
+		 * An optional label of the internal uniform node.
 		 *
 		 * @type {String?}
 		 * @default null
@@ -180,7 +181,7 @@ class ReferenceNode extends Node {
 		this.name = null;
 
 		/**
-		 * Overwritten since velocity nodes are updated per object.
+		 * Overwritten since reference nodes are updated per object.
 		 *
 		 * @type {String}
 		 * @default 'object'
@@ -318,7 +319,7 @@ class ReferenceNode extends Node {
 
 	/**
 	 * Allows to update the reference based on the given state. The state is only
-	 * evaluated {@link ReferenceNode#object} is not set.
+	 * evaluated {@link module:ReferenceNode~ReferenceNode#object} is not set.
 	 *
 	 * @param {(NodeFrame|NodeBuilder)} state - The current state.
 	 * @return {Object} The updated reference.
@@ -383,7 +384,7 @@ class ReferenceNode extends Node {
 export default ReferenceNode;
 
 /**
- * TSL function for creating a reference node with the given paramters.
+ * TSL function for creating a reference node.
  *
  * @function
  * @param {String} name - The name of the property the node refers to.
@@ -394,7 +395,8 @@ export default ReferenceNode;
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 
 /**
- * TSL function for creating a reference node with the given paramters.
+ * TSL function for creating a reference node. Use this function if you want need a reference
+ * to an array-like property that should be represented as a uniform buffer.
  *
  * @function
  * @param {String} name - The name of the property the node refers to.

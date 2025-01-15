@@ -8,6 +8,8 @@ import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { BackSide } from '../../constants.js';
 import PassNode from './PassNode.js';
 
+/** @module ToonOutlinePassNode **/
+
 /**
  * Represents a render pass for producing a toon outline effect on compatible objects.
  * Only 3D objects with materials of type `MeshToonMaterial` and `MeshToonNodeMaterial`
@@ -168,4 +170,15 @@ class ToonOutlinePassNode extends PassNode {
 
 export default ToonOutlinePassNode;
 
+/**
+ * TSL function for creating a toon outline pass node.
+ *
+ * @function
+ * @param {Scene} scene - A reference to the scene.
+ * @param {Camera} camera - A reference to the camera.
+ * @param {Color} color - Defines the outline's color.
+ * @param {Number} [thickness=0.003] - Defines the outline's thickness.
+ * @param {Number} [alpha=1] - Defines the outline's alpha.
+ * @returns {ToonOutlinePassNode}
+ */
 export const toonOutlinePass = ( scene, camera, color = new Color( 0, 0, 0 ), thickness = 0.003, alpha = 1 ) => nodeObject( new ToonOutlinePassNode( scene, camera, nodeObject( color ), nodeObject( thickness ), nodeObject( alpha ) ) );

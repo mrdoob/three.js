@@ -157,8 +157,15 @@ class StackNode extends Node {
 
 	}
 
-	//
+	// deprecated
 
+	/**
+	 * @function
+	 * @deprecated since r168. Use {@link StackNode#Else} instead.
+	 *
+	 * @param  {...any} params
+	 * @returns {StackNode}
+	 */
 	else( ...params ) { // @deprecated, r168
 
 		console.warn( 'TSL.StackNode: .else() has been renamed to .Else().' );
@@ -166,6 +173,12 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * @deprecated since r168. Use {@link StackNode#ElseIf} instead.
+	 *
+	 * @param  {...any} params
+	 * @returns {StackNode}
+	 */
 	elseif( ...params ) { // @deprecated, r168
 
 		console.warn( 'TSL.StackNode: .elseif() has been renamed to .ElseIf().' );
@@ -178,7 +191,7 @@ class StackNode extends Node {
 export default StackNode;
 
 /**
- * TSL function for creating a stack node with the given parameters.
+ * TSL function for creating a stack node.
  *
  * @function
  * @param {StackNode?} [parent=null] - The parent stack node.

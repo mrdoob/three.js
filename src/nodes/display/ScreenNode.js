@@ -6,11 +6,13 @@ import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+/** @module ScreenNode **/
+
 let screenSizeVec, viewportVec;
 
 /**
  * This node provides a collection of screen related metrics.
- * Depending on {@link ScreenNode#scope}, the nodes can represent
+ * Depending on {@link module:ScreenNode~ScreenNode#scope}, the nodes can represent
  * resolution or viewport data as well as fragment or uv coordinates.
  *
  * @augments Node
@@ -38,7 +40,7 @@ class ScreenNode extends Node {
 		 * - `ScreenNode.COORDINATE`: Window-relative coordinates of the current fragment according to WebGPU standards.
 		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimensional vector.
 		 * - `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
-		 * - `ScreenNode.UV`: Normalized screen coordinates.
+		 * - `ScreenNode.UV`: Normalized coordinates.
 		 *
 		 * @type {('coordinate'|'viewport'|'size'|'uv')}
 		 */
@@ -188,19 +190,62 @@ export default ScreenNode;
 
 // Screen
 
+/**
+ * TSL object that represents normalized screen coordinates, unitless in `[0, 1]`.
+ *
+ * @type {ScreenNode<vec2>}
+ */
 export const screenUV = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.UV );
+
+/**
+ * TSL object that represents the screen resolution in physical pixel units.
+ *
+ * @type {ScreenNode<vec2>}
+ */
 export const screenSize = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.SIZE );
+
+/**
+ * TSL object that represents the current `x`/`y` pixel position on the screen in physical pixel units.
+ *
+ * @type {ScreenNode<vec2>}
+ */
 export const screenCoordinate = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.COORDINATE );
 
 // Viewport
 
+/**
+ * TSL object that represents the viewport rectangle as `x`, `y`, `width` and `height` in physical pixel units.
+ *
+ * @type {ScreenNode<vec4>}
+ */
 export const viewport = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.VIEWPORT );
+
+/**
+ * TSL object that represents the viewport resolution in physical pixel units.
+ *
+ * @type {ScreenNode<vec2>}
+ */
 export const viewportSize = viewport.zw;
+
+/**
+ * TSL object that represents the current `x`/`y` pixel position on the viewport in physical pixel units.
+ *
+ * @type {ScreenNode<vec2>}
+ */
 export const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.xy );
+
+/**
+ * TSL object that represents normalized viewport coordinates, unitless in `[0, 1]`.
+ *
+ * @type {ScreenNode<vec2>}
+ */
 export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
 // Deprecated
 
+/**
+ * @deprecated since r169. Use {@link screenSize} instead.
+ */
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
 	console.warn( 'TSL.ViewportNode: "viewportResolution" is deprecated. Use "screenSize" instead.' );
@@ -209,6 +254,9 @@ export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r1
 
 }, 'vec2' ).once() )();
 
+/**
+ * @deprecated since r168. Use {@link screenUV} instead.
+ */
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 	console.warn( 'TSL.ViewportNode: "viewportTopLeft" is deprecated. Use "screenUV" instead.' );
@@ -217,6 +265,9 @@ export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 }, 'vec2' ).once() )();
 
+/**
+ * @deprecated since r168. Use `screenUV.flipY()` instead.
+ */
 export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "screenUV.flipY()" instead.' );

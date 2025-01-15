@@ -3,7 +3,7 @@ import { cubeMapNode } from '../utils/CubeMapNode.js';
 
 /**
  * Represents a basic model for Image-based lighting (IBL). The environment
- * is defined via environment maps in the equirectanular or cube map format.
+ * is defined via environment maps in the equirectangular or cube map format.
  * `BasicEnvironmentNode` is intended for non-PBR materials like {@link MeshBasicNodeMaterial}
  * or {@link MeshPhongNodeMaterial}.
  *

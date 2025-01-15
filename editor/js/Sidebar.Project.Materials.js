@@ -31,7 +31,7 @@ function SidebarProjectMaterials( editor ) {
 
 			const oldMaterial = selectedObject.material;
 
-			// only assing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
+			// only passing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
 
 			if ( oldMaterial !== undefined ) {
 

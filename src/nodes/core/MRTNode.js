@@ -142,7 +142,7 @@ class MRTNode extends OutputStructNode {
 export default MRTNode;
 
 /**
- * TSL function for creating a MRT node with the given parameters.
+ * TSL function for creating a MRT node.
  *
  * @function
  * @param {Object<String, Node>} outputNodes - The MRT outputs.

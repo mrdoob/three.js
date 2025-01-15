@@ -95,7 +95,7 @@ export function getCacheKey( object, force = false ) {
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		values.push( values, cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
+		values.push( cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
 
 	}
 
@@ -168,6 +168,8 @@ const typeFromLength = /*@__PURE__*/ new Map( [
 	[ 16, 'mat4' ]
 ] );
 
+const dataFromObject = /*@__PURE__*/ new WeakMap();
+
 /**
  * Returns the data type for the given the length.
  *
@@ -178,6 +180,39 @@ const typeFromLength = /*@__PURE__*/ new Map( [
 export function getTypeFromLength( length ) {
 
 	return typeFromLength.get( length );
+
+}
+
+/**
+ * Returns the typed array for the given data type.
+ *
+ * @method
+ * @param {String} type - The data type.
+ * @return {TypedArray} The typed array.
+ */
+export function getTypedArrayFromType( type ) {
+
+	// Handle component type for vectors and matrices
+	if ( /[iu]?vec\d/.test( type ) ) {
+
+		// Handle int vectors
+		if ( type.startsWith( 'ivec' ) ) return Int32Array;
+		// Handle uint vectors
+		if ( type.startsWith( 'uvec' ) ) return Uint32Array;
+		// Default to float vectors
+		return Float32Array;
+
+	}
+
+	// Handle matrices (always float)
+	if ( /mat\d/.test( type ) ) return Float32Array;
+
+	// Basic types
+	if ( /float/.test( type ) ) return Float32Array;
+	if ( /uint/.test( type ) ) return Uint32Array;
+	if ( /int/.test( type ) ) return Int32Array;
+
+	throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
 
 }
 
@@ -331,6 +366,27 @@ export function getValueFromType( type, ...params ) {
 	}
 
 	return null;
+
+}
+
+/**
+ * Gets the object data that can be shared between different rendering steps.
+ *
+ * @param {Object} object - The object to get the data for.
+ * @return {Object} The object data.
+ */
+export function getDataFromObject( object ) {
+
+	let data = dataFromObject.get( object );
+
+	if ( data === undefined ) {
+
+		data = {};
+		dataFromObject.set( object, data );
+
+	}
+
+	return data;
 
 }
 

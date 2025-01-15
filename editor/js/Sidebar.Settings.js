@@ -17,13 +17,11 @@ function SidebarSettings( editor ) {
 
 	// language
 
-	const options = {
-		en: 'English',
-		fr: 'Français',
-		zh: '中文',
-		ja: '日本語',
-		ko: '한국어',
-	};
+	const options = Object.fromEntries( [ 'en', 'fr', 'zh', 'ja', 'ko', 'fa' ].map( locale => {
+
+		return [ locale, new Intl.DisplayNames( locale, { type: 'language' } ).of( locale ) ];
+
+	} ) );
 
 	const languageRow = new UIRow();
 	const language = new UISelect().setWidth( '150px' );

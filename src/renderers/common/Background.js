@@ -9,17 +9,50 @@ import { BackSide, LinearSRGBColorSpace } from '../../constants.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
 
+/**
+ * This renderer module manages the background.
+ *
+ * @private
+ * @augments DataMap
+ */
 class Background extends DataMap {
 
+	/**
+	 * Constructs a new background management component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 */
 	constructor( renderer, nodes ) {
 
 		super();
 
+		/**
+		 * The renderer.
+		 *
+		 * @type {Renderer}
+		 */
 		this.renderer = renderer;
+
+		/**
+		 * Renderer component for managing nodes related logic.
+		 *
+		 * @type {Nodes}
+		 */
 		this.nodes = nodes;
 
 	}
 
+	/**
+	 * Updates the background for the given scene. Depending on how `Scene.background`
+	 * or `Scene.backgroundNode` are configured, this method might configure a simple clear
+	 * or add a mesh to the render list for rendering the background as a textured plane
+	 * or skybox.
+	 *
+	 * @param {Scene} scene - The scene.
+	 * @param {RenderList} renderList - The current render list.
+	 * @param {RenderContext} renderContext - The current render context.
+	 */
 	update( scene, renderList, renderContext ) {
 
 		const renderer = this.renderer;
@@ -60,7 +93,7 @@ class Background extends DataMap {
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
-				let viewProj = modelViewProjection();
+				let viewProj = modelViewProjection;
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();

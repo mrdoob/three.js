@@ -1,4 +1,4 @@
-import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PassNode, QuadMesh, PostProcessingUtils } from 'three/webgpu';
+import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PassNode, QuadMesh, RendererUtils } from 'three/webgpu';
 import { texture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
@@ -6,6 +6,16 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
+/**
+ * A special (abstract) render pass node that renders the scene
+ * as a stereoscopic image. Unlike {@link StereoPassNode}, this
+ * node merges the image for the left and right eye
+ * into a single one. That is required for effects like
+ * anaglyph or parallax barrier.
+ *
+ * @abstract
+ * @augments PassNode
+ */
 class StereoCompositePassNode extends PassNode {
 
 	static get type() {
@@ -14,25 +24,76 @@ class StereoCompositePassNode extends PassNode {
 
 	}
 
+	/**
+	 * Constructs a new stereo composite pass node.
+	 *
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Camera} camera - The camera to render the scene with.
+	 */
 	constructor( scene, camera ) {
 
 		super( PassNode.COLOR, scene, camera );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isStereoCompositePassNode = true;
 
+		/**
+		 * The internal stereo camera that is used to render the scene.
+		 *
+		 * @type {StereoCamera}
+		 */
 		this.stereo = new StereoCamera();
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, type: HalfFloatType };
 
+		/**
+		 * The render target for rendering the left eye's view.
+		 *
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetL = new RenderTarget( 1, 1, _params );
+
+		/**
+		 * The render target for rendering the right eye's view.
+		 *
+		 * @type {RenderTarget}
+		 */
 		this._renderTargetR = new RenderTarget( 1, 1, _params );
 
+		/**
+		 * A texture node representing the left's eye view.
+		 *
+		 * @type {TextureNode}
+		 */
 		this._mapLeft = texture( this._renderTargetL.texture );
+
+		/**
+		 * A texture node representing the right's eye view.
+		 *
+		 * @type {TextureNode}
+		 */
 		this._mapRight = texture( this._renderTargetR.texture );
 
+		/**
+		 * The node material that implements the composite. All
+		 * derived effect passes must provide an instance for rendering.
+		 *
+		 * @type {NodeMaterial}
+		 */
 		this._material = null;
 
 	}
 
+	/**
+	 * Updates the internal stereo camera.
+	 *
+	 * @param {Number} coordinateSystem - The current coordinate system.
+	 */
 	updateStereoCamera( coordinateSystem ) {
 
 		this.stereo.cameraL.coordinateSystem = coordinateSystem;
@@ -41,6 +102,12 @@ class StereoCompositePassNode extends PassNode {
 
 	}
 
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {Number} width - The width of the pass.
+	 * @param {Number} height - The height of the pass.
+	 */
 	setSize( width, height ) {
 
 		super.setSize( width, height );
@@ -50,12 +117,17 @@ class StereoCompositePassNode extends PassNode {
 
 	}
 
+	/**
+	 * This method is used to render the effect once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
 		const { scene, stereo, renderTarget } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -84,10 +156,14 @@ class StereoCompositePassNode extends PassNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the pass is no longer required.
+	 */
 	dispose() {
 
 		super.dispose();
