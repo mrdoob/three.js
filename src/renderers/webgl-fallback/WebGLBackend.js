@@ -1111,10 +1111,10 @@ class WebGLBackend extends Backend {
 				const vp = subCamera.viewport;
 
 				gl.viewport(
-					Math.round( vp.x * pixelRatio ),
-					Math.round( ( renderObject.context.height - vp.height - vp.y ) * pixelRatio ),
-					Math.round( vp.width * pixelRatio ),
-					Math.round( vp.height * pixelRatio )
+					Math.floor( vp.x * pixelRatio ),
+					Math.floor( ( renderObject.context.height - vp.height - vp.y ) * pixelRatio ),
+					Math.floor( vp.width * pixelRatio ),
+					Math.floor( vp.height * pixelRatio )
 				);
 
 				state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
