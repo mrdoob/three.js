@@ -25,6 +25,7 @@
 			let camera, scene, renderer;
 			let mesh;
 			let stats;
+
 			const AMOUNT = 6;
 
 			init();
@@ -43,7 +44,7 @@
 					for ( let x = 0; x < AMOUNT; x ++ ) {
 
 						const subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
-						subcamera.viewport = new THREE.Vector4( x * WIDTH, y * HEIGHT, WIDTH, HEIGHT );
+						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
 						subcamera.position.z = 1.5 + ( ( x + y ) * .5 );
@@ -85,7 +86,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer( { forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -118,7 +119,7 @@
 
 						const subcamera = camera.cameras[ AMOUNT * y + x ];
 
-						subcamera.viewport.set( x * WIDTH, y * HEIGHT, WIDTH, HEIGHT );
+						subcamera.viewport.set( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 						subcamera.aspect = ASPECT_RATIO;
 						subcamera.updateProjectionMatrix();
 
