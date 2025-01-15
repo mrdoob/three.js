@@ -552,9 +552,18 @@ class WebGLState {
 
 	}
 
-	scissor( x, y, z, w ) {
+	/**
+	 * Specifies the viewport.
+	 *
+	 * @param {Number} x - The x-coordinate of the lower left corner of the viewport.
+	 * @param {Number} y - The y-coordinate of the lower left corner of the viewport.
+	 * @param {Number} width - The width of the viewport.
+	 * @param {Number} height - The height of the viewport.
+	 *
+	 */
+	scissor( x, y, width, height ) {
 
-		const scissor = this._tempScissor.set( x, y, z, w );
+		const scissor = this._tempScissor.set( x, y, width, height );
 
 		if ( this.currentScissor.equals( scissor ) === false ) {
 
