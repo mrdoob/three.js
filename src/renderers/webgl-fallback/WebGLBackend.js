@@ -410,7 +410,7 @@ class WebGLBackend extends Backend {
 	 */
 	beginRender( renderContext ) {
 
-		const { gl } = this;
+		const { state, gl } = this;
 		const renderContextData = this.get( renderContext );
 
 		//
@@ -433,7 +433,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+			state.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
 
 		}
 
@@ -441,7 +441,7 @@ class WebGLBackend extends Backend {
 
 			const { x, y, width, height } = renderContext.scissorValue;
 
-			gl.scissor( x, renderContext.height - height - y, width, height );
+			state.scissor( x, renderContext.height - height - y, width, height );
 
 		}
 
@@ -565,7 +565,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+				state.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
 
 			}
 
@@ -663,10 +663,10 @@ class WebGLBackend extends Backend {
 	 */
 	updateViewport( renderContext ) {
 
-		const gl = this.gl;
+		const { state } = this;
 		const { x, y, width, height } = renderContext.viewportValue;
 
-		gl.viewport( x, renderContext.height - height - y, width, height );
+		state.viewport( x, renderContext.height - height - y, width, height );
 
 	}
 
@@ -677,17 +677,9 @@ class WebGLBackend extends Backend {
 	 */
 	setScissorTest( boolean ) {
 
-		const gl = this.gl;
+		const state = this.state;
 
-		if ( boolean ) {
-
-			gl.enable( gl.SCISSOR_TEST );
-
-		} else {
-
-			gl.disable( gl.SCISSOR_TEST );
-
-		}
+		state.setScissorTest( boolean );
 
 	}
 

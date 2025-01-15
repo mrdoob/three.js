@@ -1855,6 +1855,8 @@ class Renderer {
 
 		}
 
+		renderContext.clearColorValue = this._clearColor;
+
 		this.backend.clear( color, depth, stencil, renderContext );
 
 		if ( renderTarget !== null && this._renderTarget === null ) {
