@@ -6,6 +6,7 @@ import {
 	OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth
 } from '../../../constants.js';
+import { Vector4 } from '../../../math/Vector4.js';
 
 let initialized = false, equationToGL, factorToGL;
 
@@ -120,6 +121,14 @@ class WebGLState {
 			[ OneMinusDstColorFactor ]: gl.ONE_MINUS_DST_COLOR,
 			[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA
 		};
+
+		const scissorParam = gl.getParameter( gl.SCISSOR_BOX );
+		const viewportParam = gl.getParameter( gl.VIEWPORT );
+
+		this.currentScissor = new Vector4().fromArray( scissorParam );
+		this.currentViewport = new Vector4().fromArray( viewportParam );
+		this._tempScissor = new Vector4();
+		this._tempViewport = new Vector4();
 
 	}
 
@@ -538,6 +547,75 @@ class WebGLState {
 			}
 
 			this.currentDepthFunc = depthFunc;
+
+		}
+
+	}
+
+	/**
+	 * Specifies the viewport.
+	 *
+	 * @param {Number} x - The x-coordinate of the lower left corner of the viewport.
+	 * @param {Number} y - The y-coordinate of the lower left corner of the viewport.
+	 * @param {Number} width - The width of the viewport.
+	 * @param {Number} height - The height of the viewport.
+	 *
+	 */
+	scissor( x, y, width, height ) {
+
+		const scissor = this._tempScissor.set( x, y, width, height );
+
+		if ( this.currentScissor.equals( scissor ) === false ) {
+
+			const { gl } = this;
+
+			gl.scissor( scissor.x, scissor.y, scissor.z, scissor.w );
+			this.currentScissor.copy( scissor );
+
+		}
+
+	}
+
+	/**
+	 * Specifies the viewport.
+	 *
+	 * @param {Number} x - The x-coordinate of the lower left corner of the viewport.
+	 * @param {Number} y - The y-coordinate of the lower left corner of the viewport.
+	 * @param {Number} width - The width of the viewport.
+	 * @param {Number} height - The height of the viewport.
+	 *
+	 */
+	viewport( x, y, width, height ) {
+
+		const viewport = this._tempScissor.set( x, y, width, height );
+
+		if ( this.currentViewport.equals( viewport ) === false ) {
+
+			const { gl } = this;
+
+			gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
+			this.currentViewport.copy( viewport );
+
+		}
+
+	}
+
+	/**
+	 * Defines the scissor test.
+	 *
+	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 */
+	setScissorTest( boolean ) {
+
+		const gl = this.gl;
+
+		if ( boolean ) {
+
+			gl.enable( gl.SCISSOR_TEST );
+
+		} else {
+
+			gl.disable( gl.SCISSOR_TEST );
 
 		}
 
