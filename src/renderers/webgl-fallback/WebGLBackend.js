@@ -185,6 +185,16 @@ class WebGLBackend extends Backend {
 		 */
 		this._knownBindings = new WeakSet();
 
+		/**
+		 * The target framebuffer when rendering with
+		 * the WebXR device API.
+		 *
+		 * @private
+		 * @type {WebGLFramebuffer}
+		 * @default null
+		 */
+		this._xrFamebuffer = null;
+
 	}
 
 	/**
@@ -281,6 +291,34 @@ class WebGLBackend extends Backend {
 	async waitForGPU() {
 
 		await this.utils._clientWaitAsync();
+
+	}
+
+	/**
+	 * Ensures the backend is XR compatible.
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolve when the renderer is XR compatible.
+	 */
+	async makeXRCompatible() {
+
+		const attributes = this.gl.getContextAttributes();
+
+		if ( attributes.xrCompatible !== true ) {
+
+			await this.gl.makeXRCompatible();
+
+		}
+
+	}
+	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * @param {WebGLFramebuffer} xrFamebuffer - The XR framebuffer.
+	 */
+	setXRTarget( xrFamebuffer ) {
+
+		this._xrFamebuffer = xrFamebuffer;
 
 	}
 
@@ -1864,6 +1902,7 @@ class WebGLBackend extends Backend {
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
+			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
@@ -1877,6 +1916,10 @@ class WebGLBackend extends Backend {
 				renderTargetContextData.cubeFramebuffers || ( renderTargetContextData.cubeFramebuffers = {} );
 
 				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
+
+			} else if ( isXRRenderTarget ) {
+
+				fb = this._xrFamebuffer;
 
 			} else {
 

@@ -90,6 +90,17 @@ class Animation {
 	}
 
 	/**
+	 * Returns the user-level animation loop.
+	 *
+	 * @return {Function} The animation loop.
+	 */
+	getAnimationLoop() {
+
+		return this._animationLoop;
+
+	}
+
+	/**
 	 * Defines the user-level animation loop.
 	 *
 	 * @param {Function} callback - The animation loop.
@@ -97,6 +108,17 @@ class Animation {
 	setAnimationLoop( callback ) {
 
 		this._animationLoop = callback;
+
+	}
+
+	/**
+	 * Returns the animation context.
+	 *
+	 * @return {Window|XRSession} The animation context.
+	 */
+	getContext() {
+
+		return this._context;
 
 	}
 
