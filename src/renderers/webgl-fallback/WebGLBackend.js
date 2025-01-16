@@ -1107,18 +1107,23 @@ class WebGLBackend extends Backend {
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
-				const vp = subCamera.viewport;
 
-				gl.viewport(
-					Math.floor( vp.x * pixelRatio ),
-					Math.floor( ( renderObject.context.height - vp.height - vp.y ) * pixelRatio ),
-					Math.floor( vp.width * pixelRatio ),
-					Math.floor( vp.height * pixelRatio )
-				);
+				if ( object.layers.test( subCamera.layers ) ) {
 
-				state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
+					const vp = subCamera.viewport;
 
-				draw();
+					gl.viewport(
+						Math.floor( vp.x * pixelRatio ),
+						Math.floor( ( renderObject.context.height - vp.height - vp.y ) * pixelRatio ),
+						Math.floor( vp.width * pixelRatio ),
+						Math.floor( vp.height * pixelRatio )
+					);
+
+					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
+
+					draw();
+
+				}
 
 			}
 

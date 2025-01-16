@@ -1295,20 +1295,25 @@ class WebGPUBackend extends Backend {
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
-				const vp = subCamera.viewport;
 
-				passEncoderGPU.setViewport(
-					Math.floor( vp.x * pixelRatio ),
-					Math.floor( vp.y * pixelRatio ),
-					Math.floor( vp.width * pixelRatio ),
-					Math.floor( vp.height * pixelRatio ),
-					context.viewportValue.minDepth,
-					context.viewportValue.maxDepth
-				);
+				if ( object.layers.test( subCamera.layers ) ) {
 
-				passEncoderGPU.setBindGroup( cameraData.cameraIndex.index, cameraData.indexesGPU[ i ] );
+					const vp = subCamera.viewport;
 
-				draw();
+					passEncoderGPU.setViewport(
+						Math.floor( vp.x * pixelRatio ),
+						Math.floor( vp.y * pixelRatio ),
+						Math.floor( vp.width * pixelRatio ),
+						Math.floor( vp.height * pixelRatio ),
+						context.viewportValue.minDepth,
+						context.viewportValue.maxDepth
+					);
+
+					passEncoderGPU.setBindGroup( cameraData.cameraIndex.index, cameraData.indexesGPU[ i ] );
+
+					draw();
+
+				}
 
 			}
 
