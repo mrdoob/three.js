@@ -63,42 +63,55 @@
 				scene.background = await loader.loadAsync( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
 				let model;
+				let center = new THREE.Vector3( 1, 1, 1 );
+
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
+				model.position.copy( center );
 				model.position.z -= 1;
 				scene.add( model );
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
+				model.position.copy( center );
 				model.position.z += 1;
 				scene.add( model );
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0xff00ff } ) );
+				model.position.copy( center );
 				model.position.x += 1;
 				scene.add( model );
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x00ffff } ) );
+				model.position.copy( center );
 				model.position.x -= 1;
 				scene.add( model );
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0xffff00 } ) );
+				model.position.copy( center );
 				model.position.y -= 1;
 				scene.add( model );
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
+				model.position.copy( center );
 				model.position.y += 1;
 				scene.add( model );
 
 				//while ( scene.children.length > 0 ) scene.remove( scene.children[ 0 ] );
 
-				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( scene );
-
+				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( {
+				    scene: scene,
+				    size: 512,
+				    position: center
+				} );
 
 				//
 
 				const pmremRoughness = uniform( .5 );
 				const pmremNode = pmremTexture( sceneRT.texture, normalWorld, pmremRoughness );
 
-				scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
+				const mirror = new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) );
+				mirror.position.copy( center );
+				scene.add( mirror );
 
 				// gui
 
