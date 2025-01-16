@@ -127,8 +127,8 @@ class WebGLState {
 
 		this.currentScissor = new Vector4().fromArray( scissorParam );
 		this.currentViewport = new Vector4().fromArray( viewportParam );
-		this._tempScissor = new Vector4();
-		this._tempViewport = new Vector4();
+
+		this._tempVec4 = new Vector4();
 
 	}
 
@@ -563,7 +563,7 @@ class WebGLState {
 	 */
 	scissor( x, y, width, height ) {
 
-		const scissor = this._tempScissor.set( x, y, width, height );
+		const scissor = this._tempVec4.set( x, y, width, height );
 
 		if ( this.currentScissor.equals( scissor ) === false ) {
 
@@ -587,7 +587,7 @@ class WebGLState {
 	 */
 	viewport( x, y, width, height ) {
 
-		const viewport = this._tempScissor.set( x, y, width, height );
+		const viewport = this._tempVec4.set( x, y, width, height );
 
 		if ( this.currentViewport.equals( viewport ) === false ) {
 
