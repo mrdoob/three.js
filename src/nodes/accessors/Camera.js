@@ -11,7 +11,7 @@ import { uniformArray } from './UniformArrayNode.js';
  *
  * @type {UniformNode<uint>}
  */
-export const cameraIndex = uniform( 'uint' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).vertexStage();
+export const cameraIndex = /*@__PURE__*/ uniform( 'uint' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).vertexStage();
 
 /**
  * TSL object that represents the `near` value of the camera used for the current render.
