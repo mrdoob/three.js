@@ -1,10 +1,17 @@
 import { uniform } from '../core/UniformNode.js';
-import { renderGroup, uniformGroup } from '../core/UniformGroupNode.js';
+import { renderGroup, sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 
 /** @module Camera **/
+
+/**
+ * TSL object that represents the current `index` value of the camera if used ArrayCamera.
+ *
+ * @type {UniformNode<uint>}
+ */
+export const cameraIndex = uniform( 'uint' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).vertexStage();
 
 /**
  * TSL object that represents the `near` value of the camera used for the current render.
@@ -25,7 +32,33 @@ export const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).s
  *
  * @type {UniformNode<mat4>}
  */
-export const cameraProjectionMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
+export const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+
+	let cameraProjectionMatrix;
+
+	if ( camera.isArrayCamera ) {
+
+		const matrices = [];
+
+		for ( const subCamera of camera.cameras ) {
+
+			matrices.push( subCamera.projectionMatrix );
+
+		}
+
+		const cameraProjectionMatrices = uniformArray( matrices ).setGroup( renderGroup ).label( 'cameraProjectionMatrices' );
+
+		cameraProjectionMatrix = cameraProjectionMatrices.element( cameraIndex ).toVar( 'cameraProjectionMatrix' );
+
+	} else {
+
+		cameraProjectionMatrix = uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
+
+	}
+
+	return cameraProjectionMatrix;
+
+} ).once() )();
 
 /**
  * TSL object that represents the inverse projection matrix of the camera used for the current render.
@@ -47,16 +80,13 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 		const matrices = [];
 
-		for ( let i = 0; i < camera.cameras.length; i ++ ) {
+		for ( const subCamera of camera.cameras ) {
 
-			matrices.push( camera.cameras[ i ].matrixWorldInverse );
+			matrices.push( subCamera.matrixWorldInverse );
 
 		}
 
-		const cameraIndexGroup = uniformGroup( 'cameraIndex' );
-
-		const cameraViewMatrices = uniformArray( matrices ).label( 'cameraViewMatrices' );
-		const cameraIndex = uniform( 'uint' ).setGroup( cameraIndexGroup ).vertexStage();
+		const cameraViewMatrices = uniformArray( matrices ).setGroup( renderGroup ).label( 'cameraViewMatrices' );
 
 		cameraViewMatrix = cameraViewMatrices.element( cameraIndex ).toVar( 'cameraViewMatrix' );
 
@@ -69,7 +99,6 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 	return cameraViewMatrix;
 
 } ).once() )();
-
 
 /**
  * TSL object that represents the world matrix of the camera used for the current render.
