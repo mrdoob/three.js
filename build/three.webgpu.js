@@ -1702,7 +1702,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the child nodes as a JSON object.
 	 *
-	 * @return {Array<Object>} An iterable list of serialized child objects as JSON.
+	 * @return {Object} The serialized child objects as JSON.
 	 */
 	getSerializeChildren() {
 
@@ -6938,7 +6938,7 @@ let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {ReferenceBaseNode?} referenceNode - The reference node.
+	 * @param {Node?} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -6949,7 +6949,7 @@ let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode
 		 * Similar to {@link module:ReferenceBaseNode~ReferenceBaseNode#reference}, an additional
 		 * property references to the current node.
 		 *
-		 * @type {ReferenceBaseNode?}
+		 * @type {Node?}
 		 * @default null
 		 */
 		this.referenceNode = referenceNode;
@@ -6969,6 +6969,7 @@ let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode
 	 * This method is overwritten since the node type is inferred from
 	 * the uniform type of the reference node.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.
 	 */
 	getNodeType() {
@@ -7197,6 +7198,7 @@ class ReferenceBaseNode extends Node {
 	/**
 	 * The output of the reference node is the internal uniform node.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {UniformNode} The output node.
 	 */
 	setup() {
@@ -7705,7 +7707,7 @@ class BufferAttributeNode extends InputNode {
 	/**
 	 * Sets the `instanced` property to the given value.
 	 *
-	 * @param {Boolean} value - The value to set.
+	 * @param {Number} value - The value to set.
 	 * @return {BufferAttributeNode} A reference to this node.
 	 */
 	setInstanced( value ) {
@@ -9210,11 +9212,11 @@ class TextureNode extends UniformNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {String} textureProperty - The texture property.
 	 * @param {String} uvSnippet - The uv snippet.
-	 * @param {String?} levelSnippet - The level snippet.
-	 * @param {String?} biasSnippet - The bias snippet.
-	 * @param {String?} depthSnippet - The depth snippet.
-	 * @param {String?} compareSnippet - The compare snippet.
-	 * @param {Array<String>?} gradSnippet - The grad snippet.
+	 * @param {String} levelSnippet - The level snippet.
+	 * @param {String} biasSnippet - The bias snippet.
+	 * @param {String} depthSnippet - The depth snippet.
+	 * @param {String} compareSnippet - The compare snippet.
+	 * @param {String} gradSnippet - The grad snippet.
 	 * @return {String} The generated code snippet.
 	 */
 	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
@@ -9707,6 +9709,7 @@ class Object3DNode extends Node {
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.
 	 */
 	getNodeType() {
@@ -10899,7 +10902,7 @@ class UniformArrayNode extends BufferNode {
  *
  * @function
  * @param {Array<Any>} values - Array-like data.
- * @param {String?} nodeType - The data type of the array elements.
+ * @param {String} nodeType - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
 const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
@@ -10941,7 +10944,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {ReferenceNode?} referenceNode - The reference node.
+	 * @param {Node?} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -10952,7 +10955,7 @@ class ReferenceElementNode extends ArrayElementNode {
 		 * Similar to {@link module:ReferenceNode~ReferenceNode#reference}, an additional
 		 * property references to the current node.
 		 *
-		 * @type {ReferenceNode?}
+		 * @type {Node?}
 		 * @default null
 		 */
 		this.referenceNode = referenceNode;
@@ -10972,6 +10975,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	 * This method is overwritten since the node type is inferred from
 	 * the uniform type of the reference node.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.
 	 */
 	getNodeType() {
@@ -12765,7 +12769,7 @@ class InstanceNode extends Node {
 		/**
 		 * A reference to a buffer that is used by `instanceColorNode`.
 		 *
-		 * @type {InstancedBufferAttribute}
+		 * @type {InstancedInterleavedBuffer}
 		 */
 		this.bufferColor = null;
 
@@ -22073,7 +22077,7 @@ class Texture3DNode extends TextureNode {
 	 *
 	 * @param {Boolean} value - The update toggle.
 	 */
-	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
+	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for 3d TextureNode
 
 	/**
 	 * Overwrites the default implementation to return the unmodified uv node.
@@ -25612,8 +25616,8 @@ class RenderList {
 	/**
 	 * Sorts the internal render lists.
 	 *
-	 * @param {function(Any, Any): Number} customOpaqueSort - A custom sort function for opaque objects.
-	 * @param {function(Any, Any): Number} customTransparentSort -  A custom sort function for transparent objects.
+	 * @param {Function} customOpaqueSort - A custom sort function for opaque objects.
+	 * @param {Function} customTransparentSort -  A custom sort function for transparent objects.
 	 */
 	sort( customOpaqueSort, customTransparentSort ) {
 
@@ -26557,12 +26561,10 @@ class Color4 extends Color {
 
 	/**
 	 * Constructs a new four-component color.
-	 * You can also pass a single THREE.Color, hex or
-	 * string argument to this constructor.
 	 *
-	 * @param {Number|String} [r=1] - The red value.
-	 * @param {Number} [g=1] - The green value.
-	 * @param {Number} [b=1] - The blue value.
+	 * @param {Number|String} r - The red value.
+	 * @param {Number} g - The green value.
+	 * @param {Number} b - The blue value.
 	 * @param {Number} [a=1] - The alpha value.
 	 */
 	constructor( r, g, b, a = 1 ) {
@@ -26575,7 +26577,7 @@ class Color4 extends Color {
 
 	/**
 	 * Overwrites the default to honor alpha.
-	 * You can also pass a single THREE.Color, hex or
+	 * You can also passed a single THREE.Color, hex or
 	 * string argument to this method.
 	 *
 	 * @param {Number|String} r - The red value.
@@ -28375,7 +28377,7 @@ const _geometry = /*@__PURE__*/ new QuadGeometry();
  * The intended usage is to reuse a single quad mesh for rendering
  * subsequent passes by just reassigning the `material` reference.
  *
- * @augments Mesh
+ * @augments BufferGeometry
  */
 class QuadMesh extends Mesh {
 
@@ -29997,6 +29999,8 @@ class VelocityNode extends TempNode {
 
 	/**
 	 * Constructs a new vertex color node.
+	 *
+	 * @param {Number} [index=0] - The attribute index.
 	 */
 	constructor() {
 
@@ -30185,20 +30189,6 @@ function getPreviousMatrix( object, index = 0 ) {
  */
 const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );
 
-/** @module BlendModes **/
-
-/**
- * Represents a "Color Burn" blend mode.
- *
- * It's designed to darken the base layer's colors based on the color of the blend layer.
- * It significantly increases the contrast of the base layer, making the colors more vibrant and saturated.
- * The darker the color in the blend layer, the stronger the darkening and contrast effect on the base layer.
- *
- * @method
- * @param {Node<vec3>} base - The base color.
- * @param {Node<vec3>} blend - The blend color. A white (#ffffff) blend color does not alter the base color.
- * @return {Node<vec3>} The result.
- */
 const blendBurn = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return min$1( 1.0, base.oneMinus().div( blend ) ).oneMinus();
@@ -30212,18 +30202,6 @@ const blendBurn = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-/**
- * Represents a "Color Dodge" blend mode.
- *
- * It's designed to lighten the base layer's colors based on the color of the blend layer.
- * It significantly increases the brightness of the base layer, making the colors lighter and more vibrant.
- * The brighter the color in the blend layer, the stronger the lightening and contrast effect on the base layer.
- *
- * @method
- * @param {Node<vec3>} base - The base color.
- * @param {Node<vec3>} blend - The blend color. A black (#000000) blend color does not alter the base color.
- * @return {Node<vec3>} The result.
- */
 const blendDodge = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return min$1( base.div( blend.oneMinus() ), 1.0 );
@@ -30237,18 +30215,6 @@ const blendDodge = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-/**
- * Represents a "Screen" blend mode.
- *
- * Similar to `blendDodge()`, this mode also lightens the base layer's colors based on the color of the blend layer.
- * The "Screen" blend mode is better for general brightening whereas the "Dodge" results in more subtle and nuanced
- * effects.
- *
- * @method
- * @param {Node<vec3>} base - The base color.
- * @param {Node<vec3>} blend - The blend color. A black (#000000) blend color does not alter the base color.
- * @return {Node<vec3>} The result.
- */
 const blendScreen = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return base.oneMinus().mul( blend.oneMinus() ).oneMinus();
@@ -30262,18 +30228,6 @@ const blendScreen = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-/**
- * Represents a "Overlay" blend mode.
- *
- * It's designed to increase the contrast of the base layer based on the color of the blend layer.
- * It amplifies the existing colors and contrast in the base layer, making lighter areas lighter and darker areas darker.
- * The color of the blend layer significantly influences the resulting contrast and color shift in the base layer.
- *
- * @method
- * @param {Node<vec3>} base - The base color.
- * @param {Node<vec3>} blend - The blend color
- * @return {Node<vec3>} The result.
- */
 const blendOverlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return mix( base.mul( 2.0 ).mul( blend ), base.oneMinus().mul( 2.0 ).mul( blend.oneMinus() ).oneMinus(), step( 0.5, base ) );
@@ -30287,15 +30241,6 @@ const blendOverlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-/**
- * This function blends two color based on their alpha values by replicating the behavior of `THREE.NormalBlending`.
- * It assumes both input colors have non-preumiltiplied alpha.
- *
- * @method
- * @param {Node<vec4>} base - The base color.
- * @param {Node<vec4>} blend - The blend color
- * @return {Node<vec4>} The result.
- */
 const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	const outAlpha = blend.a.add( base.a.mul( blend.a.oneMinus() ) );
@@ -30342,7 +30287,7 @@ const dodge = ( ...params ) => { // @deprecated, r171
 };
 
 /**
- * @method
+ * @function
  * @deprecated since r171. Use {@link blendScreen} instead.
  *
  * @param  {...any} params
@@ -30356,7 +30301,7 @@ const screen = ( ...params ) => { // @deprecated, r171
 };
 
 /**
- * @method
+ * @function
  * @deprecated since r171. Use {@link blendOverlay} instead.
  *
  * @param  {...any} params
@@ -39869,9 +39814,7 @@ const _axisDirections = [
 	/*@__PURE__*/ new Vector3( 1, 1, 1 )
 ];
 
-// maps blur materials to their uniforms dictionary
-
-const _uniformsMap = new WeakMap();
+//
 
 // WebGPU Face indices
 const _faceLib = [
@@ -39879,8 +39822,8 @@ const _faceLib = [
 	0, 4, 2
 ];
 
-const _direction = /*@__PURE__*/ getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
-const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direction.z );
+const direction = getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
+const outputDirection = vec3( direction.x, direction.y, direction.z );
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
@@ -39935,15 +39878,13 @@ class PMREMGenerator {
 	 * @param {Number} [sigma=0] - The blur radius in radians.
 	 * @param {Number} [near=0.1] - The near plane distance.
 	 * @param {Number} [far=100] - The far plane distance.
-	 * @param {Number} [size=256] - The size (resolution) of the cube texture,
-	 * @param {Number} [position = new Vector3( 0, 0, 0 )] - The cubeCamera position
 	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromSceneAsync
 	 */
-	fromScene( { scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0 ), renderTarget = null } ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
 
-		this._setSize( size );
+		this._setSize( 256 );
 
 		if ( this._hasInitialized === false ) {
 
@@ -39964,7 +39905,7 @@ class PMREMGenerator {
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
-		this._sceneToCubeUV( scene, near, far, position, cubeUVRenderTarget );
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 
 		if ( sigma > 0 ) {
 
@@ -40260,7 +40201,7 @@ class PMREMGenerator {
 
 	}
 
-	_sceneToCubeUV( scene, near, far, position, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
 		const cubeCamera = _cubeCamera;
 		cubeCamera.near = near;
@@ -40330,23 +40271,17 @@ class PMREMGenerator {
 			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
-				//cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
+				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
 
 			} else if ( col === 1 ) {
 
 				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
-				//cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
+				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
 
 			} else {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
-				//cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
+				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
 
@@ -40477,7 +40412,7 @@ class PMREMGenerator {
 		const blurMesh = this._lodMeshes[ lodOut ];
 		blurMesh.material = blurMaterial;
 
-		const blurUniforms = _uniformsMap.get( blurMaterial );
+		const blurUniforms = blurMaterial.uniforms;
 
 		const pixels = this._sizeLods[ lodIn ] - 1;
 		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
@@ -40681,7 +40616,7 @@ function _getBlurShader( lodMax, width, height ) {
 		latitudinal,
 		weights,
 		poleAxis,
-		outputDirection: _outputDirection,
+		outputDirection,
 		dTheta,
 		samples,
 		envMap,
@@ -40692,9 +40627,8 @@ function _getBlurShader( lodMax, width, height ) {
 	};
 
 	const material = _getMaterial( 'blur' );
+	material.uniforms = materialUniforms; // TODO: Move to outside of the material
 	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
-
-	_uniformsMap.set( material, materialUniforms );
 
 	return material;
 
@@ -40703,7 +40637,7 @@ function _getBlurShader( lodMax, width, height ) {
 function _getCubemapMaterial( envTexture ) {
 
 	const material = _getMaterial( 'cubemap' );
-	material.fragmentNode = cubeTexture( envTexture, _outputDirection );
+	material.fragmentNode = cubeTexture( envTexture, outputDirection );
 
 	return material;
 
@@ -40712,7 +40646,7 @@ function _getCubemapMaterial( envTexture ) {
 function _getEquirectMaterial( envTexture ) {
 
 	const material = _getMaterial( 'equirect' );
-	material.fragmentNode = texture( envTexture, equirectUV( _outputDirection ), 0 );
+	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0 );
 
 	return material;
 
@@ -45488,7 +45422,7 @@ class NodeLibrary {
 		/**
 		 * A map that maps materials to node materials.
 		 *
-		 * @type {Map<String,NodeMaterial.constructor>}
+		 * @type {WeakMap<String,NodeMaterial.constructor>}
 		 */
 		this.materialNodes = new Map();
 
@@ -45496,7 +45430,7 @@ class NodeLibrary {
 		 * A map that maps tone mapping techniques (constants)
 		 * to tone mapping node functions.
 		 *
-		 * @type {Map<Number,Function>}
+		 * @type {WeakMap<Number,Function>}
 		 */
 		this.toneMappingNodes = new Map();
 
@@ -45612,7 +45546,7 @@ class NodeLibrary {
 	 * Adds a node class definition for the given type to the provided type library.
 	 *
 	 * @param {Any} nodeClass - The node class definition.
-	 * @param {Number|String} type - The object type.
+	 * @param {String} type - The object type.
 	 * @param {Map} library - The type library.
 	 */
 	addType( nodeClass, type, library ) {
@@ -45684,7 +45618,7 @@ class Lighting extends ChainMap {
 	 * Creates a new lights node for the given array of lights.
 	 *
 	 * @param {Array<Light>} lights - The render object.
-	 * @return {LightsNode} The lights node.
+	 * @return {Boolean} Whether if the given render object has an initialized geometry or not.
 	 */
 	createNode( lights = [] ) {
 
@@ -49423,6 +49357,7 @@ class SampledTexture extends Binding {
 	/**
 	 * Updates the binding.
 	 *
+	 * @param {Number} generation - The generation.
 	 * @return {Boolean} Whether the texture has been updated and must be
 	 * uploaded to the GPU.
 	 */
@@ -49504,6 +49439,7 @@ class NodeSampledTexture extends SampledTexture {
 	/**
 	 * Updates the binding.
 	 *
+	 * @param {Number} generation - The generation.
 	 * @return {Boolean} Whether the texture has been updated and must be
 	 * uploaded to the GPU.
 	 */
@@ -59382,28 +59318,7 @@ const wgslTypeLib = {
 
 	mat2: 'mat2x2<f32>',
 	mat3: 'mat3x3<f32>',
-	mat4: 'mat4x4<f32>',
-
-	//because arrays with their two degrees of freedom are special
-	array( elementType, count ) {
-
-		const isValidType = ( type ) => !! this[ type ];
-
-		if ( ! isValidType( elementType ) ) {
-
-			throw new Error( `Unknown type: ${elementType}` );
-
-		}
-
-		if ( typeof count !== 'number' || ! Number.isInteger( count ) || count < 1 ) {
-
-			throw new Error( `Invalid size: ${count}. Size must be a positive integer` );
-
-		}
-
-		return `array<${this[ elementType ]}, ${count}>`;
-
-	}
+	mat4: 'mat4x4<f32>'
 };
 
 const wgslCodeCache = {};
@@ -61605,23 +61520,16 @@ class WebGPUUtils {
 	 */
 	getPreferredCanvasFormat() {
 
-		const outputType = this.backend.parameters.outputType;
+		// TODO: Remove this check when Quest 34.5 is out
+		// https://github.com/mrdoob/three.js/pull/29221/files#r1731833949
 
-		if ( outputType === undefined ) {
-
-			return navigator.gpu.getPreferredCanvasFormat();
-
-		} else if ( outputType === UnsignedByteType ) {
+		if ( navigator.userAgent.includes( 'Quest' ) ) {
 
 			return GPUTextureFormat.BGRA8Unorm;
 
-		} else if ( outputType === HalfFloatType ) {
-
-			return GPUTextureFormat.RGBA16Float;
-
 		} else {
 
-			throw new Error( 'Unsupported outputType' );
+			return navigator.gpu.getPreferredCanvasFormat();
 
 		}
 
@@ -63206,7 +63114,6 @@ class WebGPUBackend extends Backend {
 	 * @param {String} [parameters.powerPreference=undefined] - The power preference.
 	 * @param {Object} [parameters.requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
 	 * @param {GPUDevice} [parameters.device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
-	 * @param {Number} [parameters.outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
 	 */
 	constructor( parameters = {} ) {
 
@@ -65300,7 +65207,6 @@ class WebGPURenderer extends Renderer {
 	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @param {Number} [parameters.outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
 	 */
 	constructor( parameters = {} ) {
 
@@ -65626,7 +65532,7 @@ class StorageTexture extends Texture {
 		/**
 		 * The image object which just represents the texture's dimension.
 		 *
-		 * @type {{width: Number, height: Number}}
+		 * @type {{width: Number, height:Number}}
 		 */
 		this.image = { width, height };
 

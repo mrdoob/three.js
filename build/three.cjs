@@ -245,9 +245,9 @@ class EventDispatcher {
 
 	hasEventListener( type, listener ) {
 
-		const listeners = this._listeners;
+		if ( this._listeners === undefined ) return false;
 
-		if ( listeners === undefined ) return false;
+		const listeners = this._listeners;
 
 		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
@@ -255,10 +255,9 @@ class EventDispatcher {
 
 	removeEventListener( type, listener ) {
 
+		if ( this._listeners === undefined ) return;
+
 		const listeners = this._listeners;
-
-		if ( listeners === undefined ) return;
-
 		const listenerArray = listeners[ type ];
 
 		if ( listenerArray !== undefined ) {
@@ -277,10 +276,9 @@ class EventDispatcher {
 
 	dispatchEvent( event ) {
 
+		if ( this._listeners === undefined ) return;
+
 		const listeners = this._listeners;
-
-		if ( listeners === undefined ) return;
-
 		const listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
