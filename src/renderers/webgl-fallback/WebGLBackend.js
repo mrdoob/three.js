@@ -698,17 +698,8 @@ class WebGLBackend extends Backend {
 
 		if ( descriptor === null ) {
 
-			const clearColor = this.getClearColor();
-
-			// premultiply alpha
-
-			clearColor.r *= clearColor.a;
-			clearColor.g *= clearColor.a;
-			clearColor.b *= clearColor.a;
-
 			descriptor = {
-				textures: null,
-				clearColorValue: clearColor
+				textures: null
 			};
 
 		}
@@ -723,23 +714,13 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			let clearColor;
+			const clearColor = this.getClearColor();
 
-			if ( descriptor.clearColorValue ) {
+			// premultiply alpha
 
-				clearColor = descriptor.clearColorValue;
-
-			} else {
-
-				clearColor = this.getClearColor();
-
-				// premultiply alpha
-
-				clearColor.r *= clearColor.a;
-				clearColor.g *= clearColor.a;
-				clearColor.b *= clearColor.a;
-
-			}
+			clearColor.r *= clearColor.a;
+			clearColor.g *= clearColor.a;
+			clearColor.b *= clearColor.a;
 
 			if ( depth ) this.state.setDepthMask( true );
 
