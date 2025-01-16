@@ -135,7 +135,7 @@ class PMREMGenerator {
 	 * @param {Number} [sigma=0] - The blur radius in radians.
 	 * @param {Number} [near=0.1] - The near plane distance.
 	 * @param {Number} [far=100] - The far plane distance.
-	 * @param {Number} [size=256] - The size (resolution) of the cube texture, 
+	 * @param {Number} [size=256] - The size (resolution) of the cube texture,
 	 * @param {Number} [position = new Vector3( 0, 0, 0 )] - The cubeCamera position
 	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
