@@ -63,7 +63,7 @@
 				scene.background = await loader.loadAsync( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
 				let model;
-				let center = new THREE.Vector3( 1, 1, 1 );
+				let center = new THREE.Vector3( 0.5, 0, 0 );
 
 
 				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
@@ -99,9 +99,9 @@
 				//while ( scene.children.length > 0 ) scene.remove( scene.children[ 0 ] );
 
 				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( {
-				    scene: scene,
-				    size: 512,
-				    position: center
+					scene: scene,
+					size: 512,
+					position: center
 				} );
 
 				//
