@@ -471,7 +471,7 @@ class NodeMaterialObserver {
 	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
-		if ( this.hasNode || this.hasAnimation || renderObject.camera.isArrayCamera === true || this.firstInitialization( renderObject ) )
+		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) )
 			return true;
 
 		const { renderId } = nodeFrame;
