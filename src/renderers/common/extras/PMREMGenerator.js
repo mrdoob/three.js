@@ -532,21 +532,18 @@ class PMREMGenerator {
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
 				cubeCamera.position.set( position.x, position.y, position.z );
 				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
-				//cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
 
 			} else if ( col === 1 ) {
 
 				cubeCamera.up.set( 0, 0, upSign[ i ] );
 				cubeCamera.position.set( position.x, position.y, position.z );
 				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
-				//cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
 
 			} else {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
 				cubeCamera.position.set( position.x, position.y, position.z );
 				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
-				//cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
 
