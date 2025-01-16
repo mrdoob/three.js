@@ -1104,7 +1104,7 @@ class WebGLBackend extends Backend {
 
 					const vp = subCamera.viewport;
 
-					gl.viewport(
+					state.viewport(
 						Math.floor( vp.x * pixelRatio ),
 						Math.floor( ( renderObject.context.height - vp.height - vp.y ) * pixelRatio ),
 						Math.floor( vp.width * pixelRatio ),
