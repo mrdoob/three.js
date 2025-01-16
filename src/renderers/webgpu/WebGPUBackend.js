@@ -1192,7 +1192,7 @@ class WebGPUBackend extends Backend {
 
 		// draw
 
-		function draw() {
+		const draw = () => {
 
 			if ( object.isBatchedMesh === true ) {
 
@@ -1260,7 +1260,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		}
+		};
 
 		if ( renderObject.camera.isArrayCamera ) {
 

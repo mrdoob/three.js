@@ -1043,7 +1043,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		function draw() {
+		const draw = () => {
 
 			if ( object.isBatchedMesh ) {
 
@@ -1071,7 +1071,7 @@ class WebGLBackend extends Backend {
 
 			}
 
-		}
+		};
 
 		if ( renderObject.camera.isArrayCamera ) {
 
