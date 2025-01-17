@@ -2046,7 +2046,7 @@ class Renderer {
 	 */
 	async makeXRCompatible() {
 
-		this.backend.makeXRCompatible();
+		await this.backend.makeXRCompatible();
 
 	}
 
