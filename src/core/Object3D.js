@@ -6,7 +6,6 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
-import { BufferGeometry } from './BufferGeometry.js';
 
 let _object3DId = 0;
 
