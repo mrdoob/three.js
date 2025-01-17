@@ -1120,7 +1120,7 @@ class WebGLBackend extends Backend {
 					data[ 0 ] = i;
 
 					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.STATIC_DRAW );
 
 					indexesGPU.push( bufferGPU );
 
