@@ -6,7 +6,7 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
-import { BufferGeometry} from './BufferGeometry.js';
+import { BufferGeometry } from './BufferGeometry.js';
 
 let _object3DId = 0;
 
@@ -1003,10 +1003,9 @@ class Object3D extends EventDispatcher {
 
 		if ( recursive === true ) {
 
-      // de-reference (value-copy / deep clone) BufferAttributes & Material
 			source.geometry = source.geometry.clone();
 			source.material = source.material.clone();
-      
+
 			for ( let i = 0; i < source.children.length; i ++ ) {
 
 				const child = source.children[ i ];
