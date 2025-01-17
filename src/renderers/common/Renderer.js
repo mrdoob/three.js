@@ -16,6 +16,7 @@ import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
 import NodeLibrary from './nodes/NodeLibrary.js';
 import Lighting from './Lighting.js';
+import XRManager from './XRManager.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -643,13 +644,11 @@ class Renderer {
 		 */
 
 		/**
-		 * The renderer's XR configuration.
+		 * The renderer's XR manager.
 		 *
-		 * @type {module:Renderer~XRConfig}
+		 * @type {XRManager}
 		 */
-		this.xr = {
-			enabled: false
-		};
+		this.xr = new XRManager( this );
 
 		/**
 		 * Debug configuration.
@@ -1225,8 +1224,9 @@ class Renderer {
 		//
 
 		const coordinateSystem = this.coordinateSystem;
+		const xr = this.xr;
 
-		if ( camera.coordinateSystem !== coordinateSystem ) {
+		if ( camera.coordinateSystem !== coordinateSystem && xr.isPresenting === false ) {
 
 			camera.coordinateSystem = coordinateSystem;
 			camera.updateProjectionMatrix();
@@ -1249,6 +1249,13 @@ class Renderer {
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+		if ( xr.enabled === true && xr.isPresenting === true ) {
+
+			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+			camera = xr.getCamera(); // use XR camera for rendering
+
+		}
 
 		//
 
@@ -1343,7 +1350,11 @@ class Renderer {
 
 		//
 
-		this._background.update( sceneRef, renderList, renderContext );
+		if ( xr.enabled === false || xr.isPresenting === false ) {
+
+			this._background.update( sceneRef, renderList, renderContext );
+
+		}
 
 		//
 
@@ -2023,6 +2034,29 @@ class Renderer {
 
 		this.setRenderTarget( null );
 		this.setAnimationLoop( null );
+
+	}
+
+	/**
+	 * Ensures the renderer is XR compatible.
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolve when the renderer is XR compatible.
+	 */
+	async makeXRCompatible() {
+
+		await this.backend.makeXRCompatible();
+
+	}
+
+	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * @param {WebGLFramebuffer} xrTarget - The XR target.
+	 */
+	setXRTarget( xrTarget ) {
+
+		this.backend.setXRTarget( xrTarget );
 
 	}
 
