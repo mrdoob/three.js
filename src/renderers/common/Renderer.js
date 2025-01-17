@@ -1224,6 +1224,7 @@ class Renderer {
 		//
 
 		const coordinateSystem = this.coordinateSystem;
+		const xr = this.xr;
 
 		if ( camera.coordinateSystem !== coordinateSystem && xr.isPresenting === false ) {
 
@@ -1248,8 +1249,6 @@ class Renderer {
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
-		const xr = this.xr;
 
 		if ( xr.enabled === true && xr.isPresenting === true ) {
 
