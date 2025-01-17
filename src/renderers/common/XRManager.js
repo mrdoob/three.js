@@ -17,6 +17,8 @@ const _cameraRPos = /*@__PURE__*/ new Vector3();
  * manage XR sessions with `WebGPURenderer`.
  *
  * XR is currently only supported with a WebGL 2 backend.
+ *
+ * @augments EventDispatcher
  */
 class XRManager extends EventDispatcher {
 
@@ -380,9 +382,9 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the frammebuffer scale factor.
+	 * Returns the framebuffer scale factor.
 	 *
-	 * @return {Number} The frammebuffer scale factor.
+	 * @return {Number} The framebuffer scale factor.
 	 */
 	getFramebufferScaleFactor() {
 
@@ -391,11 +393,11 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * Sets the frammebuffer scale factor.
+	 * Sets the framebuffer scale factor.
 	 *
 	 * This method can not be used during a XR session.
 	 *
-	 * @param {Number} factor - The frammebuffer scale factor.
+	 * @param {Number} factor - The framebuffer scale factor.
 	 */
 	setFramebufferScaleFactor( factor ) {
 
@@ -598,7 +600,7 @@ class XRManager extends EventDispatcher {
 
 	/**
 	 * This method is called by the renderer per frame and updates the XR camera
-	 * and it sub cameras based on the given camera. The given camera is the "normal"
+	 * and it sub cameras based on the given camera. The given camera is the "user"
 	 * camera created on application level and used for non-XR rendering.
 	 *
 	 * @param {PerspectiveCamera} camera - The camera.
