@@ -14,7 +14,7 @@ vec3 transformedNormal = objectNormal;
 
 	mat3 bm = mat3( batchingMatrix );
 	transformedNormal /= vec3( dot( bm[ 0 ], bm[ 0 ] ), dot( bm[ 1 ], bm[ 1 ] ), dot( bm[ 2 ], bm[ 2 ] ) );
-	transformedNormal = bm * transformedNormal;
+	transformedNormal = sign( determinant( bm ) ) * bm * transformedNormal;
 
 	#ifdef USE_TANGENT
 
@@ -31,7 +31,7 @@ vec3 transformedNormal = objectNormal;
 
 	mat3 im = mat3( instanceMatrix );
 	transformedNormal /= vec3( dot( im[ 0 ], im[ 0 ] ), dot( im[ 1 ], im[ 1 ] ), dot( im[ 2 ], im[ 2 ] ) );
-	transformedNormal = im * transformedNormal;
+	transformedNormal = sign( determinant( im ) ) * im * transformedNormal;
 
 	#ifdef USE_TANGENT
 
