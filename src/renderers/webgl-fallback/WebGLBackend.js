@@ -1127,11 +1127,11 @@ class WebGLBackend extends Backend {
 				}
 
 				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
-				cameraData.cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
 
 			}
 
-			const cameraIndexData = this.get( cameraData.cameraIndex );
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
+			const cameraIndexData = this.get( cameraIndex );
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
