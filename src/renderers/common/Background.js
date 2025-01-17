@@ -142,6 +142,20 @@ class Background extends DataMap {
 
 		//
 
+		const environmentBlendMode = renderer.xr.getEnvironmentBlendMode();
+
+		if ( environmentBlendMode === 'additive' ) {
+
+			_clearColor.set( 0, 0, 0, 1 );
+
+		} else if ( environmentBlendMode === 'alpha-blend' ) {
+
+			_clearColor.set( 0, 0, 0, 0 );
+
+		}
+
+		//
+
 		if ( renderer.autoClear === true || forceClear === true ) {
 
 			const clearColorValue = renderContext.clearColorValue;

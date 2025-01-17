@@ -1350,11 +1350,7 @@ class Renderer {
 
 		//
 
-		if ( xr.enabled === false || xr.isPresenting === false ) {
-
-			this._background.update( sceneRef, renderList, renderContext );
-
-		}
+		this._background.update( sceneRef, renderList, renderContext );
 
 		//
 
