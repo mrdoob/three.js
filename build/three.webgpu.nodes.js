@@ -3,8 +3,8 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, BackSide, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, BackSide, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, RenderTarget, Plane, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, CubeUVReflectionMapping, PerspectiveCamera, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, WebXRController, RAD2DEG, SRGBColorSpace, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, warnOnce, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Matrix2, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -22463,6 +22463,17 @@ class Animation {
 	}
 
 	/**
+	 * Returns the user-level animation loop.
+	 *
+	 * @return {Function} The animation loop.
+	 */
+	getAnimationLoop() {
+
+		return this._animationLoop;
+
+	}
+
+	/**
 	 * Defines the user-level animation loop.
 	 *
 	 * @param {Function} callback - The animation loop.
@@ -22470,6 +22481,17 @@ class Animation {
 	setAnimationLoop( callback ) {
 
 		this._animationLoop = callback;
+
+	}
+
+	/**
+	 * Returns the animation context.
+	 *
+	 * @return {Window|XRSession} The animation context.
+	 */
+	getContext() {
+
+		return this._context;
 
 	}
 
@@ -45797,6 +45819,1069 @@ class Lighting extends ChainMap {
 
 }
 
+const _cameraLPos = /*@__PURE__*/ new Vector3();
+const _cameraRPos = /*@__PURE__*/ new Vector3();
+
+/**
+ * The XR manager is built on top of the WebXR Device API to
+ * manage XR sessions with `WebGPURenderer`.
+ *
+ * XR is currently only supported with a WebGL 2 backend.
+ */
+class XRManager extends EventDispatcher {
+
+	/**
+	 * Constructs a new XR manager.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	constructor( renderer ) {
+
+		super();
+
+		/**
+		 * This flag globally enables XR rendering.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.enabled = false;
+
+		/**
+		 * Whether the XR device is currently presenting or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 * @readonly
+		 */
+		this.isPresenting = false;
+
+		/**
+		 * Whether the XR camera should automatically be updated or not.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
+		this.cameraAutoUpdate = true;
+
+		/**
+		 * The renderer.
+		 *
+		 * @private
+		 * @type {Renderer}
+		 */
+		this._renderer = renderer;
+
+		// camera
+
+		/**
+		 * Represents the camera for the left eye.
+		 *
+		 * @private
+		 * @type {PerspectiveCamera}
+		 */
+		this._cameraL = new PerspectiveCamera();
+		this._cameraL.viewport = new Vector4();
+
+		/**
+		 * Represents the camera for the right eye.
+		 *
+		 * @private
+		 * @type {PerspectiveCamera}
+		 */
+		this._cameraR = new PerspectiveCamera();
+		this._cameraR.viewport = new Vector4();
+
+		/**
+		 * A list of cameras used for rendering the XR views.
+		 *
+		 * @private
+		 * @type {Array<Camera>}
+		 */
+		this._cameras = [ this._cameraL, this._cameraR ];
+
+		/**
+		 * The main XR camera.
+		 *
+		 * @private
+		 * @type {ArrayCamera}
+		 */
+		this._cameraXR = new ArrayCamera();
+
+		/**
+		 * The current near value of the XR camera.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
+		this._currentDepthNear = null;
+
+		/**
+		 * The current far value of the XR camera.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
+		this._currentDepthFar = null;
+
+		/**
+		 * A list of WebXR controllers requested by the application.
+		 *
+		 * @private
+		 * @type {Array<WebXRController>}
+		 */
+		this._controllers = [];
+
+		/**
+		 * A list of XR input source. Each input source belongs to
+		 * an instance of WebXRController.
+		 *
+		 * @private
+		 * @type {Array<XRInputSource?>}
+		 */
+		this._controllerInputSources = [];
+
+		/**
+		 * The current render target of the renderer.
+		 *
+		 * @private
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
+		this._currentRenderTarget = null;
+
+		/**
+		 * The XR render target that represents the rendering destination
+		 * during an active XR session.
+		 *
+		 * @private
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
+		this._xrRenderTarget = null;
+
+		/**
+		 * The current animation context.
+		 *
+		 * @private
+		 * @type {Window?}
+		 * @default null
+		 */
+		this._currentAnimationContext = null;
+
+		/**
+		 * The current animation loop.
+		 *
+		 * @private
+		 * @type {Function?}
+		 * @default null
+		 */
+		this._currentAnimationLoop = null;
+
+		/**
+		 * The current pixel ratio.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
+		this._currentPixelRatio = null;
+
+		/**
+		 * The current size of the renderer's canvas
+		 * in logical pixel unit.
+		 *
+		 * @private
+		 * @type {Vector2}
+		 */
+		this._currentSize = new Vector2();
+
+		/**
+		 * The default event listener for handling events inside a XR session.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onSessionEvent = onSessionEvent.bind( this );
+
+		/**
+		 * The event listener for handling the end of a XR session.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onSessionEnd = onSessionEnd.bind( this );
+
+		/**
+		 * The event listener for handling the `inputsourceschange` event.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onInputSourcesChange = onInputSourcesChange.bind( this );
+
+		/**
+		 * The animation loop which is used as a replacement for the default
+		 * animation loop of the applicatio. It is only used when a XR session
+		 * is active.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onAnimationFrame = onAnimationFrame.bind( this );
+
+		/**
+		 * The current XR reference space.
+		 *
+		 * @private
+		 * @type {XRReferenceSpace?}
+		 * @default null
+		 */
+		this._referenceSpace = null;
+
+		/**
+		 * The current XR reference space type.
+		 *
+		 * @private
+		 * @type {String}
+		 * @default 'local-floor'
+		 */
+		this._referenceSpaceType = 'local-floor';
+
+		/**
+		 * A custom reference space defined by the application.
+		 *
+		 * @private
+		 * @type {XRReferenceSpace?}
+		 * @default null
+		 */
+		this._customReferenceSpace = null;
+
+		/**
+		 * The framebuffer scale factor.
+		 *
+		 * @private
+		 * @type {Number}
+		 * @default 1
+		 */
+		this._framebufferScaleFactor = 1;
+
+		/**
+		 * The foveation factor.
+		 *
+		 * @private
+		 * @type {Number}
+		 * @default 1
+		 */
+		this._foveation = 1.0;
+
+		/**
+		 * A reference to the current XR session.
+		 *
+		 * @private
+		 * @type {XRSession?}
+		 * @default null
+		 */
+		this._session = null;
+
+		/**
+		 * A reference to the current XR base layer.
+		 *
+		 * @private
+		 * @type {XRWebGLLayer?}
+		 * @default null
+		 */
+		this._glBaseLayer = null;
+
+		/**
+		 * A reference to the current XR frame.
+		 *
+		 * @private
+		 * @type {XRFrame?}
+		 * @default null
+		 */
+		this._xrFrame = null;
+
+	}
+
+	/**
+	 * Returns an instance of `THREE.Group` that represents the transformation
+	 * of a XR controller in target ray space. The requested controller is defined
+	 * by the given index.
+	 *
+	 * @param {Number} index - The index of the XR controller.
+	 * @return {Group} A group that represents the controller's transformation.
+	 */
+	getController( index ) {
+
+		const controller = this._getController( index );
+
+		return controller.getTargetRaySpace();
+
+	}
+
+	/**
+	 * Returns an instance of `THREE.Group` that represents the transformation
+	 * of a XR controller in grip space. The requested controller is defined
+	 * by the given index.
+	 *
+	 * @param {Number} index - The index of the XR controller.
+	 * @return {Group} A group that represents the controller's transformation.
+	 */
+	getControllerGrip( index ) {
+
+		const controller = this._getController( index );
+
+		return controller.getGripSpace();
+
+	}
+
+	/**
+	 * Returns an instance of `THREE.Group` that represents the transformation
+	 * of a XR controller in hand space. The requested controller is defined
+	 * by the given index.
+	 *
+	 * @param {Number} index - The index of the XR controller.
+	 * @return {Group} A group that represents the controller's transformation.
+	 */
+	getHand( index ) {
+
+		const controller = this._getController( index );
+
+		return controller.getHandSpace();
+
+	}
+
+	/**
+	 * Returns the foveation value.
+	 *
+	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base layer is defined.
+	 */
+	getFoveation() {
+
+		if ( this._glBaseLayer === null ) {
+
+			return undefined;
+
+		}
+
+		return this._foveation;
+
+	}
+
+	/**
+	 * Sets the foveation value.
+	 *
+	 * @param {Number} foveation - A number in the range `[0,1]` where `0` means no foveation (full resolution)
+	 * and `1` means maximum foveation (the edges render at lower resolution).
+	 */
+	setFoveation( foveation ) {
+
+		this._foveation = foveation;
+
+		if ( this._glBaseLayer !== null && this._glBaseLayer.fixedFoveation !== undefined ) {
+
+			this._glBaseLayer.fixedFoveation = foveation;
+
+		}
+
+	}
+
+	/**
+	 * Returns the frammebuffer scale factor.
+	 *
+	 * @return {Number} The frammebuffer scale factor.
+	 */
+	getFramebufferScaleFactor() {
+
+		return this._framebufferScaleFactor;
+
+	}
+
+	/**
+	 * Sets the frammebuffer scale factor.
+	 *
+	 * This method can not be used during a XR session.
+	 *
+	 * @param {Number} factor - The frammebuffer scale factor.
+	 */
+	setFramebufferScaleFactor( factor ) {
+
+		this._framebufferScaleFactor = factor;
+
+		if ( this.isPresenting === true ) {
+
+			console.warn( 'THREE.XRManager: Cannot change framebuffer scale while presenting.' );
+
+		}
+
+	}
+
+	/**
+	 * Returns the reference space type.
+	 *
+	 * @return {String} The reference space type.
+	 */
+	getReferenceSpaceType() {
+
+		return this._referenceSpaceType;
+
+	}
+
+	/**
+	 * Sets the reference space type.
+	 *
+	 * This method can not be used during a XR session.
+	 *
+	 * @param {String} type - The reference space type.
+	 */
+	setReferenceSpaceType( type ) {
+
+		this._referenceSpaceType = type;
+
+		if ( this.isPresenting === true ) {
+
+			console.warn( 'THREE.XRManager: Cannot change reference space type while presenting.' );
+
+		}
+
+	}
+
+	/**
+	 * Returns the XR reference space.
+	 *
+	 * @return {XRReferenceSpace} The XR reference space.
+	 */
+	getReferenceSpace() {
+
+		return this._customReferenceSpace || this._referenceSpace;
+
+	}
+
+	/**
+	 * Sets a custom XR reference space.
+	 *
+	 * @param {XRReferenceSpace} space - The XR reference space.
+	 */
+	setReferenceSpace( space ) {
+
+		this._customReferenceSpace = space;
+
+	}
+
+	/**
+	 * Returns the XR camera.
+	 *
+	 * @return {ArrayCamera} The XR camera.
+	 */
+	getCamera() {
+
+		return this._cameraXR;
+
+	}
+
+	/**
+	 * Returns the environment blend mode from the current XR session.
+	 *
+	 * @return {'opaque'|'additive'|'alpha-blend'} The environment blend mode.
+	 */
+	getEnvironmentBlendMode() {
+
+		if ( this._session !== null ) {
+
+			return this._session.environmentBlendMode;
+
+		}
+
+	}
+
+	/**
+	 * Returns the current XR frame.
+	 *
+	 * @return {XRFrame?} The XR frame. Returns `null` when used outside a XR session.
+	 */
+	getFrame() {
+
+		return this._xrFrame;
+
+	}
+
+	/**
+	 * Returns the current XR session.
+	 *
+	 * @return {XRSession?} The XR session. Returns `null` when used outside a XR session.
+	 */
+	getSession() {
+
+		return this._session;
+
+	}
+
+	/**
+	 * After a XR session has been requested usually with one of the `*Button` modules, it
+	 * is injected into the renderer with this method. This method triggers the start of
+	 * the actual XR rendering.
+	 *
+	 * @async
+	 * @param {XRSession} session - The XR session to set.
+	 * @return {Promise} A Promise that resolves when the session has been set.
+	 */
+	async setSession( session ) {
+
+		const renderer = this._renderer;
+		const gl = renderer.getContext();
+
+		this._session = session;
+
+		if ( session !== null ) {
+
+			if ( renderer.backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+
+			this._currentRenderTarget = renderer.getRenderTarget();
+
+			session.addEventListener( 'select', this._onSessionEvent );
+			session.addEventListener( 'selectstart', this._onSessionEvent );
+			session.addEventListener( 'selectend', this._onSessionEvent );
+			session.addEventListener( 'squeeze', this._onSessionEvent );
+			session.addEventListener( 'squeezestart', this._onSessionEvent );
+			session.addEventListener( 'squeezeend', this._onSessionEvent );
+			session.addEventListener( 'end', this._onSessionEnd );
+			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
+
+			await renderer.makeXRCompatible();
+
+			this._currentPixelRatio = renderer.getPixelRatio();
+			renderer.getSize( this._currentSize );
+
+			this._currentAnimationContext = renderer._animation.getContext();
+			this._currentAnimationLoop = renderer._animation.getAnimationLoop();
+			renderer._animation.stop();
+
+			const attributes = gl.getContextAttributes();
+
+			const layerInit = {
+				antialias: attributes.antialias,
+				alpha: true,
+				depth: attributes.depth,
+				stencil: attributes.stencil,
+				framebufferScaleFactor: this.getFramebufferScaleFactor()
+			};
+
+			const glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+			this._glBaseLayer = glBaseLayer;
+
+			session.updateRenderState( { baseLayer: glBaseLayer } );
+
+			renderer.setPixelRatio( 1 );
+			renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+
+			this._xrRenderTarget = new RenderTarget(
+				glBaseLayer.framebufferWidth,
+				glBaseLayer.framebufferHeight,
+				{
+					format: RGBAFormat,
+					type: UnsignedByteType,
+					colorSpace: renderer.outputColorSpace,
+					stencilBuffer: attributes.stencil
+				}
+			);
+
+			this._xrRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
+
+			this.setFoveation( this.getFoveation() );
+
+			this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
+			renderer._animation.setAnimationLoop( this._onAnimationFrame );
+			renderer._animation.setContext( session );
+			renderer._animation.start();
+
+			this.isPresenting = true;
+
+			this.dispatchEvent( { type: 'sessionstart' } );
+
+		}
+
+	}
+
+	/**
+	 * This method is called by the renderer per frame and updates the XR camera
+	 * and it sub cameras based on the given camera. The given camera is the "normal"
+	 * camera created on application level and used for non-XR rendering.
+	 *
+	 * @param {PerspectiveCamera} camera - The camera.
+	 */
+	updateCamera( camera ) {
+
+		const session = this._session;
+
+		if ( session === null ) return;
+
+		const depthNear = camera.near;
+		const depthFar = camera.far;
+
+		const cameraXR = this._cameraXR;
+		const cameraL = this._cameraL;
+		const cameraR = this._cameraR;
+
+		cameraXR.near = cameraR.near = cameraL.near = depthNear;
+		cameraXR.far = cameraR.far = cameraL.far = depthFar;
+
+		if ( this._currentDepthNear !== cameraXR.near || this._currentDepthFar !== cameraXR.far ) {
+
+			// Note that the new renderState won't apply until the next frame. See #18320
+
+			session.updateRenderState( {
+				depthNear: cameraXR.near,
+				depthFar: cameraXR.far
+			} );
+
+			this._currentDepthNear = cameraXR.near;
+			this._currentDepthFar = cameraXR.far;
+
+		}
+
+		cameraL.layers.mask = camera.layers.mask | 0b010;
+		cameraR.layers.mask = camera.layers.mask | 0b100;
+		cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
+
+		const parent = camera.parent;
+		const cameras = cameraXR.cameras;
+
+		updateCamera( cameraXR, parent );
+
+		for ( let i = 0; i < cameras.length; i ++ ) {
+
+			updateCamera( cameras[ i ], parent );
+
+		}
+
+		// update projection matrix for proper view frustum culling
+
+		if ( cameras.length === 2 ) {
+
+			setProjectionFromUnion( cameraXR, cameraL, cameraR );
+
+		} else {
+
+			// assume single camera setup (AR)
+
+			cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
+
+		}
+
+		// update user camera and its children
+
+		updateUserCamera( camera, cameraXR, parent );
+
+
+	}
+
+	/**
+	 * Returns a WebXR controller for the given controller index.
+	 *
+	 * @private
+	 * @param {Number} index - The controller index.
+	 * @return {WebXRController} The XR controller.
+	 */
+	_getController( index ) {
+
+		let controller = this._controllers[ index ];
+
+		if ( controller === undefined ) {
+
+			controller = new WebXRController();
+			this._controllers[ index ] = controller;
+
+		}
+
+		return controller;
+
+	}
+
+}
+
+/**
+ * Assumes 2 cameras that are parallel and share an X-axis, and that
+ * the cameras' projection and world matrices have already been set.
+ * And that near and far planes are identical for both cameras.
+ * Visualization of this technique: https://computergraphics.stackexchange.com/a/4765
+ *
+ * @param {ArrayCamera} camera - The camera to update.
+ * @param {PerspectiveCamera} cameraL - The left camera.
+ * @param {PerspectiveCamera} cameraR - The right camera.
+ */
+function setProjectionFromUnion( camera, cameraL, cameraR ) {
+
+	_cameraLPos.setFromMatrixPosition( cameraL.matrixWorld );
+	_cameraRPos.setFromMatrixPosition( cameraR.matrixWorld );
+
+	const ipd = _cameraLPos.distanceTo( _cameraRPos );
+
+	const projL = cameraL.projectionMatrix.elements;
+	const projR = cameraR.projectionMatrix.elements;
+
+	// VR systems will have identical far and near planes, and
+	// most likely identical top and bottom frustum extents.
+	// Use the left camera for these values.
+	const near = projL[ 14 ] / ( projL[ 10 ] - 1 );
+	const far = projL[ 14 ] / ( projL[ 10 ] + 1 );
+	const topFov = ( projL[ 9 ] + 1 ) / projL[ 5 ];
+	const bottomFov = ( projL[ 9 ] - 1 ) / projL[ 5 ];
+
+	const leftFov = ( projL[ 8 ] - 1 ) / projL[ 0 ];
+	const rightFov = ( projR[ 8 ] + 1 ) / projR[ 0 ];
+	const left = near * leftFov;
+	const right = near * rightFov;
+
+	// Calculate the new camera's position offset from the
+	// left camera. xOffset should be roughly half `ipd`.
+	const zOffset = ipd / ( - leftFov + rightFov );
+	const xOffset = zOffset * - leftFov;
+
+	// TODO: Better way to apply this offset?
+	cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
+	camera.translateX( xOffset );
+	camera.translateZ( zOffset );
+	camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
+	camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+
+	// Check if the projection uses an infinite far plane.
+	if ( projL[ 10 ] === - 1.0 ) {
+
+		// Use the projection matrix from the left eye.
+		// The camera offset is sufficient to include the view volumes
+		// of both eyes (assuming symmetric projections).
+		camera.projectionMatrix.copy( cameraL.projectionMatrix );
+		camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
+
+	} else {
+
+		// Find the union of the frustum values of the cameras and scale
+		// the values so that the near plane's position does not change in world space,
+		// although must now be relative to the new union camera.
+		const near2 = near + zOffset;
+		const far2 = far + zOffset;
+		const left2 = left - xOffset;
+		const right2 = right + ( ipd - xOffset );
+		const top2 = topFov * far / far2 * near2;
+		const bottom2 = bottomFov * far / far2 * near2;
+
+		camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
+		camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+
+	}
+
+}
+
+/**
+ * Updates the world matrices for the given camera based on the parent 3D object.
+ *
+ * @inner
+ * @param {Camera} camera - The camera to update.
+ * @param {Object3D} parent - The parent 3D object.
+ */
+function updateCamera( camera, parent ) {
+
+	if ( parent === null ) {
+
+		camera.matrixWorld.copy( camera.matrix );
+
+	} else {
+
+		camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+
+	}
+
+	camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+
+}
+
+/**
+ * Updates the given camera with the transfomration of the XR camera and parent object.
+ *
+ * @inner
+ * @param {Camera} camera - The camera to update.
+ * @param {ArrayCamera} cameraXR - The XR camera.
+ * @param {Object3D} parent - The parent 3D object.
+ */
+function updateUserCamera( camera, cameraXR, parent ) {
+
+	if ( parent === null ) {
+
+		camera.matrix.copy( cameraXR.matrixWorld );
+
+	} else {
+
+		camera.matrix.copy( parent.matrixWorld );
+		camera.matrix.invert();
+		camera.matrix.multiply( cameraXR.matrixWorld );
+
+	}
+
+	camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+	camera.updateMatrixWorld( true );
+
+	camera.projectionMatrix.copy( cameraXR.projectionMatrix );
+	camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
+
+	if ( camera.isPerspectiveCamera ) {
+
+		camera.fov = RAD2DEG * 2 * Math.atan( 1 / camera.projectionMatrix.elements[ 5 ] );
+		camera.zoom = 1;
+
+	}
+
+}
+
+function onSessionEvent( event ) {
+
+	const controllerIndex = this._controllerInputSources.indexOf( event.inputSource );
+
+	if ( controllerIndex === - 1 ) {
+
+		return;
+
+	}
+
+	const controller = this._controllers[ controllerIndex ];
+
+	if ( controller !== undefined ) {
+
+		const referenceSpace = this.getReferenceSpace();
+
+		controller.update( event.inputSource, event.frame, referenceSpace );
+		controller.dispatchEvent( { type: event.type, data: event.inputSource } );
+
+	}
+
+}
+
+function onSessionEnd() {
+
+	const session = this._session;
+	const renderer = this._renderer;
+
+	session.removeEventListener( 'select', this._onSessionEvent );
+	session.removeEventListener( 'selectstart', this._onSessionEvent );
+	session.removeEventListener( 'selectend', this._onSessionEvent );
+	session.removeEventListener( 'squeeze', this._onSessionEvent );
+	session.removeEventListener( 'squeezestart', this._onSessionEvent );
+	session.removeEventListener( 'squeezeend', this._onSessionEvent );
+	session.removeEventListener( 'end', this._onSessionEnd );
+	session.removeEventListener( 'inputsourceschange', this._onInputSourcesChange );
+
+	for ( let i = 0; i < this._controllers.length; i ++ ) {
+
+		const inputSource = this._controllerInputSources[ i ];
+
+		if ( inputSource === null ) continue;
+
+		this._controllerInputSources[ i ] = null;
+
+		this._controllers[ i ].disconnect( inputSource );
+
+	}
+
+	this._currentDepthNear = null;
+	this._currentDepthFar = null;
+
+	// restore framebuffer/rendering state
+
+	renderer.setRenderTarget( this._currentRenderTarget );
+
+	this._session = null;
+	this._xrRenderTarget = null;
+
+	//
+
+	this.isPresenting = false;
+
+	renderer._animation.stop();
+
+	renderer._animation.setAnimationLoop( this._currentAnimationLoop );
+	renderer._animation.setContext( this._currentAnimationContext );
+	renderer._animation.start();
+
+	renderer.setPixelRatio( this._currentPixelRatio );
+	renderer.setSize( this._currentSize.width, this._currentSize.height, false );
+
+	renderer.setXRTarget( null );
+
+	this.dispatchEvent( { type: 'sessionend' } );
+
+}
+
+function onInputSourcesChange( event ) {
+
+	const controllers = this._controllers;
+	const controllerInputSources = this._controllerInputSources;
+
+	// Notify disconnected
+
+	for ( let i = 0; i < event.removed.length; i ++ ) {
+
+		const inputSource = event.removed[ i ];
+		const index = controllerInputSources.indexOf( inputSource );
+
+		if ( index >= 0 ) {
+
+			controllerInputSources[ index ] = null;
+			controllers[ index ].disconnect( inputSource );
+
+		}
+
+	}
+
+	// Notify connected
+
+	for ( let i = 0; i < event.added.length; i ++ ) {
+
+		const inputSource = event.added[ i ];
+
+		let controllerIndex = controllerInputSources.indexOf( inputSource );
+
+		if ( controllerIndex === - 1 ) {
+
+			// Assign input source a controller that currently has no input source
+
+			for ( let i = 0; i < controllers.length; i ++ ) {
+
+				if ( i >= controllerInputSources.length ) {
+
+					controllerInputSources.push( inputSource );
+					controllerIndex = i;
+					break;
+
+				} else if ( controllerInputSources[ i ] === null ) {
+
+					controllerInputSources[ i ] = inputSource;
+					controllerIndex = i;
+					break;
+
+				}
+
+			}
+
+			// If all controllers do currently receive input we ignore new ones
+
+			if ( controllerIndex === - 1 ) break;
+
+		}
+
+		const controller = controllers[ controllerIndex ];
+
+		if ( controller ) {
+
+			controller.connect( inputSource );
+
+		}
+
+	}
+
+}
+
+function onAnimationFrame( time, frame ) {
+
+	if ( frame === undefined ) return;
+
+	const cameraXR = this._cameraXR;
+	const renderer = this._renderer;
+
+	const glBaseLayer = this._glBaseLayer;
+
+	const referenceSpace = this.getReferenceSpace();
+	const pose = frame.getViewerPose( referenceSpace );
+
+	this._xrFrame = frame;
+
+	if ( pose !== null ) {
+
+		const views = pose.views;
+
+		renderer.setXRTarget( glBaseLayer.framebuffer );
+		renderer.setRenderTarget( this._xrRenderTarget );
+
+		let cameraXRNeedsUpdate = false;
+
+		// check if it's necessary to rebuild cameraXR's camera list
+
+		if ( views.length !== cameraXR.cameras.length ) {
+
+			cameraXR.cameras.length = 0;
+			cameraXRNeedsUpdate = true;
+
+		}
+
+		for ( let i = 0; i < views.length; i ++ ) {
+
+			const view = views[ i ];
+
+			const viewport = glBaseLayer.getViewport( view );
+
+			let camera = this._cameras[ i ];
+
+			if ( camera === undefined ) {
+
+				camera = new PerspectiveCamera();
+				camera.layers.enable( i );
+				camera.viewport = new Vector4();
+				this._cameras[ i ] = camera;
+
+			}
+
+			camera.matrix.fromArray( view.transform.matrix );
+			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+			camera.projectionMatrix.fromArray( view.projectionMatrix );
+			camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+
+			if ( i === 0 ) {
+
+				cameraXR.matrix.copy( camera.matrix );
+				cameraXR.matrix.decompose( cameraXR.position, cameraXR.quaternion, cameraXR.scale );
+
+			}
+
+			if ( cameraXRNeedsUpdate === true ) {
+
+				cameraXR.cameras.push( camera );
+
+			}
+
+		}
+
+	}
+
+	//
+
+	for ( let i = 0; i < this._controllers.length; i ++ ) {
+
+		const inputSource = this._controllerInputSources[ i ];
+		const controller = this._controllers[ i ];
+
+		if ( inputSource !== null && controller !== undefined ) {
+
+			controller.update( inputSource, frame, referenceSpace );
+
+		}
+
+	}
+
+	if ( this._currentAnimationLoop ) this._currentAnimationLoop( time, frame );
+
+	if ( frame.detectedPlanes ) {
+
+		this.dispatchEvent( { type: 'planesdetected', data: frame } );
+
+	}
+
+	this._xrFrame = null;
+
+}
+
 /** @module Renderer **/
 
 const _scene = /*@__PURE__*/ new Scene();
@@ -46413,13 +47498,11 @@ class Renderer {
 		 */
 
 		/**
-		 * The renderer's XR configuration.
+		 * The renderer's XR manager.
 		 *
-		 * @type {module:Renderer~XRConfig}
+		 * @type {XRManager}
 		 */
-		this.xr = {
-			enabled: false
-		};
+		this.xr = new XRManager( this );
 
 		/**
 		 * Debug configuration.
@@ -46995,8 +48078,9 @@ class Renderer {
 		//
 
 		const coordinateSystem = this.coordinateSystem;
+		const xr = this.xr;
 
-		if ( camera.coordinateSystem !== coordinateSystem ) {
+		if ( camera.coordinateSystem !== coordinateSystem && xr.isPresenting === false ) {
 
 			camera.coordinateSystem = coordinateSystem;
 			camera.updateProjectionMatrix();
@@ -47019,6 +48103,13 @@ class Renderer {
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+		if ( xr.enabled === true && xr.isPresenting === true ) {
+
+			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+			camera = xr.getCamera(); // use XR camera for rendering
+
+		}
 
 		//
 
@@ -47113,7 +48204,11 @@ class Renderer {
 
 		//
 
-		this._background.update( sceneRef, renderList, renderContext );
+		if ( xr.enabled === false || xr.isPresenting === false ) {
+
+			this._background.update( sceneRef, renderList, renderContext );
+
+		}
 
 		//
 
@@ -47793,6 +48888,29 @@ class Renderer {
 
 		this.setRenderTarget( null );
 		this.setAnimationLoop( null );
+
+	}
+
+	/**
+	 * Ensures the renderer is XR compatible.
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolve when the renderer is XR compatible.
+	 */
+	async makeXRCompatible() {
+
+		await this.backend.makeXRCompatible();
+
+	}
+
+	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * @param {WebGLFramebuffer} xrTarget - The XR target.
+	 */
+	setXRTarget( xrTarget ) {
+
+		this.backend.setXRTarget( xrTarget );
 
 	}
 
@@ -52032,8 +53150,8 @@ class WebGLState {
 
 		this.currentScissor = new Vector4().fromArray( scissorParam );
 		this.currentViewport = new Vector4().fromArray( viewportParam );
-		this._tempScissor = new Vector4();
-		this._tempViewport = new Vector4();
+
+		this._tempVec4 = new Vector4();
 
 	}
 
@@ -52468,7 +53586,7 @@ class WebGLState {
 	 */
 	scissor( x, y, width, height ) {
 
-		const scissor = this._tempScissor.set( x, y, width, height );
+		const scissor = this._tempVec4.set( x, y, width, height );
 
 		if ( this.currentScissor.equals( scissor ) === false ) {
 
@@ -52492,7 +53610,7 @@ class WebGLState {
 	 */
 	viewport( x, y, width, height ) {
 
-		const viewport = this._tempScissor.set( x, y, width, height );
+		const viewport = this._tempVec4.set( x, y, width, height );
 
 		if ( this.currentViewport.equals( viewport ) === false ) {
 
@@ -54860,6 +55978,16 @@ class WebGLBackend extends Backend {
 		 */
 		this._knownBindings = new WeakSet();
 
+		/**
+		 * The target framebuffer when rendering with
+		 * the WebXR device API.
+		 *
+		 * @private
+		 * @type {WebGLFramebuffer}
+		 * @default null
+		 */
+		this._xrFamebuffer = null;
+
 	}
 
 	/**
@@ -54956,6 +56084,34 @@ class WebGLBackend extends Backend {
 	async waitForGPU() {
 
 		await this.utils._clientWaitAsync();
+
+	}
+
+	/**
+	 * Ensures the backend is XR compatible.
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolve when the renderer is XR compatible.
+	 */
+	async makeXRCompatible() {
+
+		const attributes = this.gl.getContextAttributes();
+
+		if ( attributes.xrCompatible !== true ) {
+
+			await this.gl.makeXRCompatible();
+
+		}
+
+	}
+	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * @param {WebGLFramebuffer} xrFamebuffer - The XR framebuffer.
+	 */
+	setXRTarget( xrFamebuffer ) {
+
+		this._xrFamebuffer = xrFamebuffer;
 
 	}
 
@@ -55757,18 +56913,18 @@ class WebGLBackend extends Backend {
 					data[ 0 ] = i;
 
 					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.STATIC_DRAW );
 
 					indexesGPU.push( bufferGPU );
 
 				}
 
 				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
-				cameraData.cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
 
 			}
 
-			const cameraIndexData = this.get( cameraData.cameraIndex );
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
+			const cameraIndexData = this.get( cameraIndex );
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
@@ -55779,11 +56935,16 @@ class WebGLBackend extends Backend {
 
 					const vp = subCamera.viewport;
 
-					gl.viewport(
-						Math.floor( vp.x * pixelRatio ),
-						Math.floor( ( renderObject.context.height - vp.height - vp.y ) * pixelRatio ),
-						Math.floor( vp.width * pixelRatio ),
-						Math.floor( vp.height * pixelRatio )
+					const x = vp.x * pixelRatio;
+					const y = vp.y * pixelRatio;
+					const width = vp.width * pixelRatio;
+					const height = vp.height * pixelRatio;
+
+					state.viewport(
+						Math.floor( x ),
+						Math.floor( renderObject.context.height - height - y ),
+						Math.floor( width ),
+						Math.floor( height )
 					);
 
 					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
@@ -56539,6 +57700,7 @@ class WebGLBackend extends Backend {
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
+			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
@@ -56552,6 +57714,10 @@ class WebGLBackend extends Backend {
 				renderTargetContextData.cubeFramebuffers || ( renderTargetContextData.cubeFramebuffers = {} );
 
 				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
+
+			} else if ( isXRRenderTarget ) {
+
+				fb = this._xrFamebuffer;
 
 			} else {
 
@@ -66420,4 +67586,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayElementNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
