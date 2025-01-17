@@ -1225,7 +1225,7 @@ class Renderer {
 
 		const coordinateSystem = this.coordinateSystem;
 
-		if ( camera.coordinateSystem !== coordinateSystem ) {
+		if ( camera.coordinateSystem !== coordinateSystem && xr.isPresenting === false ) {
 
 			camera.coordinateSystem = coordinateSystem;
 			camera.updateProjectionMatrix();
