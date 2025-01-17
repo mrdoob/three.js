@@ -6,6 +6,7 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { BufferGeometry } from './BufferGeometry.js';
 
 let _object3DId = 0;
 
@@ -1002,12 +1003,37 @@ class Object3D extends EventDispatcher {
 
 		if ( recursive === true ) {
 
-			if(typeof source.geometry != 'undefined'){
-				this.geometry = source?.geometry?.clone( true );
-			}
-			if(typeof source.material!= 'undefined'){
-				this.material = source?.material?.clone( true );
-			}
+			//if(typeof source.geometry != 'undefined'){
+			//	this.geometry = source.geometry.clone( true );
+			//}
+			//if(typeof source.material!= 'undefined'){
+			//	this.material = source.material.clone( true );
+			//}
+
+
+
+			//  Copy VALUES, not just references to the source Attribute array
+			//  This fixes e.g. 'cumulative rotations' etc, for clones which would
+			//  apply transformations to their predecessors, otherwise
+			let originalGeometry = source.geometry;
+			let newGeometry = new BufferGeometry();
+			// create new containers for attributes
+			Object.keys(originalGeometry.attributes).forEach((key, idx) => {
+				
+				// get, use the correct 'typed array', dimension it
+				var arrayType = (''+originalGeometry.attributes[key].array.constructor).split(' ')[1].split('(')[0];
+				newGeometry.attributes[key] = new BufferAttribute(new window[arrayType](
+					originalGeometry.attributes[key].array.length),
+					originalGeometry.attributes[key].itemSize,
+					originalGeometry.attributes[key].normalized )
+					
+				// ...and copy values into them
+				originalGeometry.attributes[key].array.forEach((v, i) => {
+					newGeometry.attributes[key].array[i] = originalGeometry.attributes[key].array[i];
+				});
+			})
+			this.geometry = newGeometry;
+
 
 			for ( let i = 0; i < source.children.length; i ++ ) {
 
