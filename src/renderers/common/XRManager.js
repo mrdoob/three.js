@@ -12,70 +12,298 @@ import { RGBAFormat, UnsignedByteType } from '../../constants.js';
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
 
+/**
+ * The XR manager is built on top of the WebXR Device API to
+ * manage XR sessions with `WebGPURenderer`.
+ *
+ * XR is currently only supported with a WebGL 2 backend.
+ */
 class XRManager extends EventDispatcher {
 
+	/**
+	 * Constructs a new XR manager.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		super();
 
-		this.renderer = renderer;
-
+		/**
+		 * This flag globally enables XR rendering.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.enabled = false;
+
+		/**
+		 * Whether the XR device is currently presenting or not.
+		 *
+		 * @type {Boolean}
+		 * @default false
+		 * @readonly
+		 */
 		this.isPresenting = false;
+
+		/**
+		 * Whether the XR camera should automatically be updated or not.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
 		this.cameraAutoUpdate = true;
+
+		/**
+		 * The renderer.
+		 *
+		 * @private
+		 * @type {Renderer}
+		 */
+		this._renderer = renderer;
 
 		// camera
 
+		/**
+		 * Represents the camera for the left eye.
+		 *
+		 * @private
+		 * @type {PerspectiveCamera}
+		 */
 		this._cameraL = new PerspectiveCamera();
 		this._cameraL.viewport = new Vector4();
 
+		/**
+		 * Represents the camera for the right eye.
+		 *
+		 * @private
+		 * @type {PerspectiveCamera}
+		 */
 		this._cameraR = new PerspectiveCamera();
 		this._cameraR.viewport = new Vector4();
 
+		/**
+		 * A list of cameras used for rendering the XR views.
+		 *
+		 * @private
+		 * @type {Array<Camera>}
+		 */
 		this._cameras = [ this._cameraL, this._cameraR ];
 
+		/**
+		 * The main XR camera.
+		 *
+		 * @private
+		 * @type {ArrayCamera}
+		 */
 		this._cameraXR = new ArrayCamera();
 
+		/**
+		 * The current near value of the XR camera.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
 		this._currentDepthNear = null;
+
+		/**
+		 * The current far value of the XR camera.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
 		this._currentDepthFar = null;
 
-		// controllers
-
+		/**
+		 * A list of WebXR controllers requested by the application.
+		 *
+		 * @private
+		 * @type {Array<WebXRController>}
+		 */
 		this._controllers = [];
+
+		/**
+		 * A list of XR input source. Each input source belongs to
+		 * an instance of WebXRController.
+		 *
+		 * @private
+		 * @type {Array<XRInputSource?>}
+		 */
 		this._controllerInputSources = [];
 
-		// render target and renderer settings
-
+		/**
+		 * The current render target of the renderer.
+		 *
+		 * @private
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
 		this._currentRenderTarget = null;
+
+		/**
+		 * The XR render target that represents the rendering destination
+		 * during an active XR session.
+		 *
+		 * @private
+		 * @type {RenderTarget?}
+		 * @default null
+		 */
 		this._xrRenderTarget = null;
 
+		/**
+		 * The current animation context.
+		 *
+		 * @private
+		 * @type {Window?}
+		 * @default null
+		 */
 		this._currentAnimationContext = null;
+
+		/**
+		 * The current animation loop.
+		 *
+		 * @private
+		 * @type {Function?}
+		 * @default null
+		 */
 		this._currentAnimationLoop = null;
+
+		/**
+		 * The current pixel ratio.
+		 *
+		 * @private
+		 * @type {Number?}
+		 * @default null
+		 */
 		this._currentPixelRatio = null;
+
+		/**
+		 * The current size of the renderer's canvas
+		 * in logical pixel unit.
+		 *
+		 * @private
+		 * @type {Vector2}
+		 */
 		this._currentSize = new Vector2();
 
-		// event listeners
-
+		/**
+		 * The default event listener for handling events inside a XR session.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
 		this._onSessionEvent = onSessionEvent.bind( this );
+
+		/**
+		 * The event listener for handling the end of a XR session.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
 		this._onSessionEnd = onSessionEnd.bind( this );
+
+		/**
+		 * The event listener for handling the `inputsourceschange` event.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
 		this._onInputSourcesChange = onInputSourcesChange.bind( this );
+
+		/**
+		 * The animation loop which is used as a replacement for the default
+		 * animation loop of the applicatio. It is only used when a XR session
+		 * is active.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
 		this._onAnimationFrame = onAnimationFrame.bind( this );
 
-		// WebXR
-
+		/**
+		 * The current XR reference space.
+		 *
+		 * @private
+		 * @type {XRReferenceSpace?}
+		 * @default null
+		 */
 		this._referenceSpace = null;
+
+		/**
+		 * The current XR reference space type.
+		 *
+		 * @private
+		 * @type {String}
+		 * @default 'local-floor'
+		 */
 		this._referenceSpaceType = 'local-floor';
+
+		/**
+		 * A custom reference space defined by the application.
+		 *
+		 * @private
+		 * @type {XRReferenceSpace?}
+		 * @default null
+		 */
 		this._customReferenceSpace = null;
 
+		/**
+		 * The framebuffer scale factor.
+		 *
+		 * @private
+		 * @type {Number}
+		 * @default 1
+		 */
 		this._framebufferScaleFactor = 1;
+
+		/**
+		 * The foveation factor.
+		 *
+		 * @private
+		 * @type {Number}
+		 * @default 1
+		 */
 		this._foveation = 1.0;
 
+		/**
+		 * A reference to the current XR session.
+		 *
+		 * @private
+		 * @type {XRSession?}
+		 * @default null
+		 */
 		this._session = null;
+
+		/**
+		 * A reference to the current XR base layer.
+		 *
+		 * @private
+		 * @type {XRWebGLLayer?}
+		 * @default null
+		 */
 		this._glBaseLayer = null;
+
+		/**
+		 * A reference to the current XR frame.
+		 *
+		 * @private
+		 * @type {XRFrame?}
+		 * @default null
+		 */
 		this._xrFrame = null;
 
 	}
 
+	/**
+	 * Returns an instance of `THREE.Group` that represents the transformation
+	 * of a XR controller in target ray space. The requested controller is defined
+	 * by the given index.
+	 *
+	 * @param {Number} index - The index of the XR controller.
+	 * @return {Group} A group that represents the controller's transformation.
+	 */
 	getController( index ) {
 
 		const controller = this._getController( index );
@@ -84,6 +312,14 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns an instance of `THREE.Group` that represents the transformation
+	 * of a XR controller in grip space. The requested controller is defined
+	 * by the given index.
+	 *
+	 * @param {Number} index - The index of the XR controller.
+	 * @return {Group} A group that represents the controller's transformation.
+	 */
 	getControllerGrip( index ) {
 
 		const controller = this._getController( index );
@@ -92,6 +328,14 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns an instance of `THREE.Group` that represents the transformation
+	 * of a XR controller in hand space. The requested controller is defined
+	 * by the given index.
+	 *
+	 * @param {Number} index - The index of the XR controller.
+	 * @return {Group} A group that represents the controller's transformation.
+	 */
 	getHand( index ) {
 
 		const controller = this._getController( index );
@@ -100,6 +344,11 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the foveation value.
+	 *
+	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base layer is defined.
+	 */
 	getFoveation() {
 
 		if ( this._glBaseLayer === null ) {
@@ -112,10 +361,13 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Sets the foveation value.
+	 *
+	 * @param {Number} foveation - A number in the range `[0,1]` where `0` means no foveation (full resolution)
+	 * and `1` means maximum foveation (the edges render at lower resolution).
+	 */
 	setFoveation( foveation ) {
-
-		// 0 = no foveation = full resolution
-		// 1 = maximum foveation = the edges render at lower resolution
 
 		this._foveation = foveation;
 
@@ -127,12 +379,24 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the frammebuffer scale factor.
+	 *
+	 * @return {Number} The frammebuffer scale factor.
+	 */
 	getFramebufferScaleFactor() {
 
 		return this._framebufferScaleFactor;
 
 	}
 
+	/**
+	 * Sets the frammebuffer scale factor.
+	 *
+	 * This method can not be used during a XR session.
+	 *
+	 * @param {Number} factor - The frammebuffer scale factor.
+	 */
 	setFramebufferScaleFactor( factor ) {
 
 		this._framebufferScaleFactor = factor;
@@ -145,12 +409,24 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the reference space type.
+	 *
+	 * @return {String} The reference space type.
+	 */
 	getReferenceSpaceType() {
 
 		return this._referenceSpaceType;
 
 	}
 
+	/**
+	 * Sets the reference space type.
+	 *
+	 * This method can not be used during a XR session.
+	 *
+	 * @param {String} type - The reference space type.
+	 */
 	setReferenceSpaceType( type ) {
 
 		this._referenceSpaceType = type;
@@ -163,24 +439,44 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the XR reference space.
+	 *
+	 * @return {XRReferenceSpace} The XR reference space.
+	 */
 	getReferenceSpace() {
 
 		return this._customReferenceSpace || this._referenceSpace;
 
 	}
 
+	/**
+	 * Sets a custom XR reference space.
+	 *
+	 * @param {XRReferenceSpace} space - The XR reference space.
+	 */
 	setReferenceSpace( space ) {
 
 		this._customReferenceSpace = space;
 
 	}
 
+	/**
+	 * Returns the XR camera.
+	 *
+	 * @return {ArrayCamera} The XR camera.
+	 */
 	getCamera() {
 
 		return this._cameraXR;
 
 	}
 
+	/**
+	 * Returns the environment blend mode from the current XR session.
+	 *
+	 * @return {'opaque'|'additive'|'alpha-blend'} The environment blend mode.
+	 */
 	getEnvironmentBlendMode() {
 
 		if ( this._session !== null ) {
@@ -191,26 +487,47 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the current XR frame.
+	 *
+	 * @return {XRFrame?} The XR frame. Returns `null` when used outside a XR session.
+	 */
 	getFrame() {
 
 		return this._xrFrame;
 
 	}
 
+	/**
+	 * Returns the current XR session.
+	 *
+	 * @return {XRSession?} The XR session. Returns `null` when used outside a XR session.
+	 */
 	getSession() {
 
 		return this._session;
 
 	}
 
+	/**
+	 * After a XR session has been requested usually with one of the `*Button` modules, it
+	 * is injected into the renderer with this method. This method triggers the start of
+	 * the actual XR rendering.
+	 *
+	 * @async
+	 * @param {XRSession} session - The XR session to set.
+	 * @return {Promise} A Promise that resolves when the session has been set.
+	 */
 	async setSession( session ) {
 
-		const renderer = this.renderer;
+		const renderer = this._renderer;
 		const gl = renderer.getContext();
 
 		this._session = session;
 
 		if ( session !== null ) {
+
+			if ( renderer.backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
 			this._currentRenderTarget = renderer.getRenderTarget();
 
@@ -279,6 +596,13 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * This method is called by the renderer per frame and updates the XR camera
+	 * and it sub cameras based on the given camera. The given camera is the "normal"
+	 * camera created on application level and used for non-XR rendering.
+	 *
+	 * @param {PerspectiveCamera} camera - The camera.
+	 */
 	updateCamera( camera ) {
 
 		const session = this._session;
@@ -345,6 +669,13 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns a WebXR controller for the given controller index.
+	 *
+	 * @private
+	 * @param {Number} index - The controller index.
+	 * @return {WebXRController} The XR controller.
+	 */
 	_getController( index ) {
 
 		let controller = this._controllers[ index ];
@@ -435,6 +766,13 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
 }
 
+/**
+ * Updates the world matrices for the given camera based on the parent 3D object.
+ *
+ * @inner
+ * @param {Camera} camera - The camera to update.
+ * @param {Object3D} parent - The parent 3D object.
+ */
 function updateCamera( camera, parent ) {
 
 	if ( parent === null ) {
@@ -451,6 +789,14 @@ function updateCamera( camera, parent ) {
 
 }
 
+/**
+ * Updates the given camera with the transfomration of the XR camera and parent object.
+ *
+ * @inner
+ * @param {Camera} camera - The camera to update.
+ * @param {ArrayCamera} cameraXR - The XR camera.
+ * @param {Object3D} parent - The parent 3D object.
+ */
 function updateUserCamera( camera, cameraXR, parent ) {
 
 	if ( parent === null ) {
@@ -506,7 +852,7 @@ function onSessionEvent( event ) {
 function onSessionEnd() {
 
 	const session = this._session;
-	const renderer = this.renderer;
+	const renderer = this._renderer;
 
 	session.removeEventListener( 'select', this._onSessionEvent );
 	session.removeEventListener( 'selectstart', this._onSessionEvent );
@@ -632,7 +978,7 @@ function onAnimationFrame( time, frame ) {
 	if ( frame === undefined ) return;
 
 	const cameraXR = this._cameraXR;
-	const renderer = this.renderer;
+	const renderer = this._renderer;
 
 	const glBaseLayer = this._glBaseLayer;
 
