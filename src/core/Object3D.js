@@ -974,32 +974,34 @@ class Object3D extends EventDispatcher {
 	copy( source, recursive = true ) {
     
     
-    if( recursivie ){
-      
-      //  Copy VALUES, not just references to the source Attribute array
-      //  This fixes e.g. 'cumulative rotations' etc, for clones which would
-      //  apply transformations to their predecessors, otherwise
-      
-      let originalGeometry = source.geometry;
-      let newGeometry = new BufferGeometry();
-      
-      // create new containers for attributes
-      Object.keys(originalGeometry.attributes).forEach((key, idx) => {
-        // get, use the correct 'typed array', dimension it
-        var arrayType = (''+originalGeometry.attributes[key].array.constructor).split(' ')[1].split('(')[0];
-        newGeometry.attributes[key] = new BufferAttribute(new window[arrayType](
-                                             originalGeometry.attributes[key].array.length),
-                                             originalGeometry.attributes[key].itemSize,
-                                             originalGeometry.attributes[key].normalized )
-        // ...and copy values into them
-        originalGeometry.attributes[key].array.forEach((v, i) => {
-          newGeometry.attributes[key].array[i] = originalGeometry.attributes[key].array[i];
-        });
-      })
+		if( recursivie ){
 
-      this.source.geometry = newGeometry;
-    }
-    
+			//  Copy VALUES, not just references to the source Attribute array
+			//  This fixes e.g. 'cumulative rotations' etc, for clones which would
+			//  apply transformations to their predecessors, otherwise
+
+			let originalGeometry = source.geometry;
+			let newGeometry = new BufferGeometry();
+
+			// create new containers for attributes
+			Object.keys(originalGeometry.attributes).forEach((key, idx) => {
+				
+				// get, use the correct 'typed array', dimension it
+				var arrayType = (''+originalGeometry.attributes[key].array.constructor).split(' ')[1].split('(')[0];
+				newGeometry.attributes[key] = new BufferAttribute(new window[arrayType](
+					originalGeometry.attributes[key].array.length),
+					originalGeometry.attributes[key].itemSize,
+					originalGeometry.attributes[key].normalized )
+					
+				// ...and copy values into them
+				originalGeometry.attributes[key].array.forEach((v, i) => {
+					newGeometry.attributes[key].array[i] = originalGeometry.attributes[key].array[i];
+				});
+			})
+
+			this.source.geometry = newGeometry;
+		}
+
 
 		this.name = source.name;
 
