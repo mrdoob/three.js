@@ -157,7 +157,7 @@ class StackNode extends Node {
 
 	}
 
-	// deprecated
+	// Deprecated
 
 	/**
 	 * @function
