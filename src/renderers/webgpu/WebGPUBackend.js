@@ -1264,14 +1264,14 @@ class WebGPUBackend extends Backend {
 
 		};
 
-		if ( renderObject.camera.isArrayCamera ) {
+		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
 			const cameraData = this.get( renderObject.camera );
 			const cameras = renderObject.camera.cameras;
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' );
 
-			if ( cameraData.indexesGPU === undefined ) {
+			if ( cameraData.indexesGPU === undefined || cameraData.indexesGPU.length !== cameras.length ) {
 
-				const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' );
 				const bindingsData = this.get( cameraIndex );
 				const indexesGPU = [];
 
@@ -1288,7 +1288,6 @@ class WebGPUBackend extends Backend {
 				}
 
 				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
-				cameraData.cameraIndex = cameraIndex;
 
 			}
 
@@ -1311,7 +1310,7 @@ class WebGPUBackend extends Backend {
 						context.viewportValue.maxDepth
 					);
 
-					passEncoderGPU.setBindGroup( cameraData.cameraIndex.index, cameraData.indexesGPU[ i ] );
+					passEncoderGPU.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
 
 					draw();
 

@@ -1103,12 +1103,13 @@ class WebGLBackend extends Backend {
 
 		};
 
-		if ( renderObject.camera.isArrayCamera ) {
+		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
 			const cameraData = this.get( renderObject.camera );
 			const cameras = renderObject.camera.cameras;
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
 
-			if ( cameraData.indexesGPU === undefined ) {
+			if ( cameraData.indexesGPU === undefined || cameraData.indexesGPU.length !== cameras.length ) {
 
 				const data = new Uint32Array( [ 0, 0, 0, 0 ] );
 				const indexesGPU = [];
@@ -1130,7 +1131,6 @@ class WebGLBackend extends Backend {
 
 			}
 
-			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
 			const cameraIndexData = this.get( cameraIndex );
 			const pixelRatio = this.renderer.getPixelRatio();
 
