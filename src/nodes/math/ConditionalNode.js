@@ -211,7 +211,7 @@ export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
 
-// deprecated
+// Deprecated
 
 /**
  * @function

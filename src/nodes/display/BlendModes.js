@@ -127,7 +127,7 @@ export const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-// deprecated
+// Deprecated
 
 /**
  * @function

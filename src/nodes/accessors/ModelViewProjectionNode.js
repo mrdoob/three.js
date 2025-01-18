@@ -11,4 +11,4 @@ export const modelViewProjection = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupModelViewProjection();
 
-}, 'vec4' ).once() )().varying( 'v_modelViewProjection' );
+}, 'vec4' ).once() )().toVarying( 'v_modelViewProjection' );

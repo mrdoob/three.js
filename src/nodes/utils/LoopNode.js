@@ -274,7 +274,7 @@ export const Continue = () => expression( 'continue' ).append();
  */
 export const Break = () => expression( 'break' ).append();
 
-// deprecated
+// Deprecated
 
 /**
  * @function

@@ -2467,7 +2467,7 @@ class NodeBuilder {
 
 	}
 
-	// deprecated
+	// Deprecated
 
 	/**
 	 * @function
