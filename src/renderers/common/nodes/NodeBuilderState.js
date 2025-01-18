@@ -122,7 +122,7 @@ class NodeBuilderState {
 
 		for ( const instanceGroup of this.bindings ) {
 
-			const shared = instanceGroup.bindings[ 0 ].groupNode.shared; // TODO: Is it safe to always check the first binding in the group?
+			const shared = instanceGroup.bindings[ 0 ].groupNode.shared; // All bindings in the group must have the same groupNode.
 
 			if ( shared !== true ) {
 
