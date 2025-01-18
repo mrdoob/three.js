@@ -882,6 +882,7 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
+	renderer.setXRTarget( null );
 	renderer.setRenderTarget( this._currentRenderTarget );
 
 	this._session = null;
@@ -899,8 +900,6 @@ function onSessionEnd() {
 
 	renderer.setPixelRatio( this._currentPixelRatio );
 	renderer.setSize( this._currentSize.width, this._currentSize.height, false );
-
-	renderer.setXRTarget( null );
 
 	this.dispatchEvent( { type: 'sessionend' } );
 
