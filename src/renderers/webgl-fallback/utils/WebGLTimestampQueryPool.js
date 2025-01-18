@@ -238,8 +238,6 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		this.queries = [];
 		this.queryStates.clear();
 		this.queryOffsets.clear();
-		this.activeQuery = null;
-		this.pendingResolve = false;
 
 	}
 

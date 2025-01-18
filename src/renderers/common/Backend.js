@@ -445,13 +445,9 @@ class Backend {
 	 *
 	 * @async
 	 * @abstract
-	 * @param {RenderContext} renderContext - The render context.
-	 * @param {String} type - The render context.
-	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
+	 * @param {String} [type='render'] - The type of the time stamp.
+	 * @return {Promise<Number>} A Promise that resolves with the time stamp.
 	 */
-	async resolveTimestampAsync( /*renderContext, type*/ ) { }
-
-
 	async resolveAllTimestampsAsync( type = 'render' ) {
 
 		if ( ! this.trackTimestamp ) {
@@ -463,15 +459,9 @@ class Backend {
 
 		let total = 0;
 
-		// const types = [ 'render', 'compute' ];
-
-		// for ( let i = 0, l = types.length; i < l; i ++ ) {
-
-		// 	const type = types[ i ];
-
 		if ( ! this.timestampQueryPool[ type ] ) {
 
-			console.warn( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
+			warnOnce( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
 			return;
 
 		}
@@ -489,8 +479,6 @@ class Backend {
 
 		// TODO: Called twice (reminds me of skinning/skeleton issue in WebGLRenderer), need to keep track of frameId to prevent that
 		// 	console.log( 'render', duration );
-
-		// }
 
 		// }
 

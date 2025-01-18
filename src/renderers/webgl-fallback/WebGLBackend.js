@@ -313,7 +313,6 @@ class WebGLBackend extends Backend {
 
 		}
 
-
 	}
 
 	// timestamp utils
