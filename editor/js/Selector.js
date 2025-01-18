@@ -12,7 +12,14 @@ class Selector {
 		this.editor = editor;
 		this.signals = signals;
 
+		let readyForMultipleSelect = false;
 		// signals
+
+		signals.readyForMultipleSelect.add( ( isReady ) => {
+
+			readyForMultipleSelect = isReady;
+
+		} );
 
 		signals.intersectionsDetected.add( ( intersects ) => {
 
@@ -23,12 +30,28 @@ class Selector {
 				if ( object.userData.object !== undefined ) {
 
 					// helper
+					if ( readyForMultipleSelect ) {
 
-					this.select( object.userData.object );
+						this.selectMultiple( object.userData.object );
+
+					} else {
+
+						this.select( object.userData.object );
+
+					}
+
 
 				} else {
 
-					this.select( object );
+					if ( readyForMultipleSelect ) {
+
+						this.selectMultiple( object );
+
+					} else {
+
+						this.select( object );
+
+					}
 
 				}
 
@@ -72,6 +95,26 @@ class Selector {
 
 	}
 
+	selectMultiple( object ) {
+
+		if ( object === null ) {
+
+			this.editor.selectedObjects = [];
+			this.editor.config.setKey( 'selectedObjects', [] );
+			this.signals.objectsMultipleSelected.dispatch( [] );
+			this.editor.selected = null;
+			return;
+
+		}
+
+		const selectedObjects = [ ...this.editor.selectedObjects.filter( itm => itm !== object ), object ];
+		this.editor.selectedObjects = selectedObjects;
+		this.editor.config.setKey( 'selectedObjects', selectedObjects );
+		this.signals.objectsMultipleSelected.dispatch( selectedObjects );
+		this.editor.selected = object;
+
+	}
+
 	select( object ) {
 
 		if ( this.editor.selected === object ) return;
@@ -81,19 +124,26 @@ class Selector {
 		if ( object !== null ) {
 
 			uuid = object.uuid;
+			this.editor.selectedObjects = [ object ];
+
+		} else {
+
+			this.editor.selectedObjects = [];
 
 		}
 
 		this.editor.selected = object;
-		this.editor.config.setKey( 'selected', uuid );
 
+		this.editor.config.setKey( 'selected', uuid );
 		this.signals.objectSelected.dispatch( object );
+
 
 	}
 
 	deselect() {
 
 		this.select( null );
+		this.signals.objectsMultipleSelected.dispatch( null );
 
 	}
 
