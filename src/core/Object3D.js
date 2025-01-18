@@ -1002,15 +1002,15 @@ class Object3D extends EventDispatcher {
 
 		if ( recursive === true ) {
 
-			if ( typeof source.geometry.clone != 'undefined' ) {
+			if ( typeof source.geometry.copy != 'undefined' ) {
 
-				this.geometry = source.geometry.clone( true );
+				this.geometry = source.geometry.copy( true );
 
 			}
 
-			if ( typeof source.material.clone != 'undefined' ) {
+			if ( typeof source.material.copy != 'undefined' ) {
 
-				this.material = source.material.clone( true );
+				this.material = source.material.copy( true );
 
 			}
 
