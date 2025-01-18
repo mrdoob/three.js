@@ -10067,7 +10067,7 @@ const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	let cameraProjectionMatrix;
 
-	if ( camera.isArrayCamera ) {
+	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
 		const matrices = [];
 
@@ -10107,7 +10107,7 @@ const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	let cameraViewMatrix;
 
-	if ( camera.isArrayCamera ) {
+	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
 		const matrices = [];
 
@@ -15844,9 +15844,9 @@ class NodeMaterial extends Material {
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
-		// < MONITOR >
+		// < OBSERVER >
 
-		builder.monitor = this.setupObserver( builder );
+		builder.observer = this.setupObserver( builder );
 
 	}
 
@@ -22975,7 +22975,7 @@ class RenderObject {
 	 */
 	getMonitor() {
 
-		return this._monitor || ( this._monitor = this.getNodeBuilderState().monitor );
+		return this._monitor || ( this._monitor = this.getNodeBuilderState().observer );
 
 	}
 
@@ -23384,9 +23384,15 @@ class RenderObject {
 
 		}
 
+		if ( this.camera.isArrayCamera ) {
+
+			cacheKey = hash$1( cacheKey, this.camera.cameras.length );
+
+		}
+
 		if ( this.object.receiveShadow ) {
 
-			cacheKey += 1;
+			cacheKey = hash$1( cacheKey, 1 );
 
 		}
 
@@ -38591,6 +38597,20 @@ class Background extends DataMap {
 
 		//
 
+		const environmentBlendMode = renderer.xr.getEnvironmentBlendMode();
+
+		if ( environmentBlendMode === 'additive' ) {
+
+			_clearColor$1.set( 0, 0, 0, 1 );
+
+		} else if ( environmentBlendMode === 'alpha-blend' ) {
+
+			_clearColor$1.set( 0, 0, 0, 0 );
+
+		}
+
+		//
+
 		if ( renderer.autoClear === true || forceClear === true ) {
 
 			const clearColorValue = renderContext.clearColorValue;
@@ -38713,10 +38733,10 @@ class NodeBuilderState {
 	 * @param {Array<Node>} updateNodes - An array of nodes that implement their `update()` method.
 	 * @param {Array<Node>} updateBeforeNodes - An array of nodes that implement their `updateBefore()` method.
 	 * @param {Array<Node>} updateAfterNodes - An array of nodes that implement their `updateAfter()` method.
-	 * @param {NodeMaterialObserver} monitor - A node material observer.
+	 * @param {NodeMaterialObserver} observer - A node material observer.
 	 * @param {Array<Object>} transforms - An array with transform attribute objects. Only relevant when using compute shaders with WebGL 2.
 	 */
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, transforms = [] ) {
 
 		/**
 		 * The native vertex shader code.
@@ -38789,7 +38809,7 @@ class NodeBuilderState {
 		 *
 		 * @type {NodeMaterialObserver}
 		 */
-		this.monitor = monitor;
+		this.observer = observer;
 
 		/**
 		 * How often this state is used by render objects.
@@ -38813,7 +38833,7 @@ class NodeBuilderState {
 
 		for ( const instanceGroup of this.bindings ) {
 
-			const shared = instanceGroup.bindings[ 0 ].groupNode.shared; // TODO: Is it safe to always check the first binding in the group?
+			const shared = instanceGroup.bindings[ 0 ].groupNode.shared; // All bindings in the group must have the same groupNode.
 
 			if ( shared !== true ) {
 
@@ -40955,7 +40975,7 @@ class NodeBuilder {
 		 * @type {NodeMaterialObserver?}
 		 * @default null
 		 */
-		this.monitor = null;
+		this.observer = null;
 
 		/**
 		 * A reference to the current lights node.
@@ -44698,7 +44718,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
-			nodeBuilder.monitor,
+			nodeBuilder.observer,
 			nodeBuilder.transforms
 		);
 
@@ -45827,6 +45847,8 @@ const _cameraRPos = /*@__PURE__*/ new Vector3();
  * manage XR sessions with `WebGPURenderer`.
  *
  * XR is currently only supported with a WebGL 2 backend.
+ *
+ * @augments EventDispatcher
  */
 class XRManager extends EventDispatcher {
 
@@ -46190,9 +46212,9 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the frammebuffer scale factor.
+	 * Returns the framebuffer scale factor.
 	 *
-	 * @return {Number} The frammebuffer scale factor.
+	 * @return {Number} The framebuffer scale factor.
 	 */
 	getFramebufferScaleFactor() {
 
@@ -46201,11 +46223,11 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * Sets the frammebuffer scale factor.
+	 * Sets the framebuffer scale factor.
 	 *
 	 * This method can not be used during a XR session.
 	 *
-	 * @param {Number} factor - The frammebuffer scale factor.
+	 * @param {Number} factor - The framebuffer scale factor.
 	 */
 	setFramebufferScaleFactor( factor ) {
 
@@ -46285,7 +46307,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the environment blend mode from the current XR session.
 	 *
-	 * @return {'opaque'|'additive'|'alpha-blend'} The environment blend mode.
+	 * @return {('opaque'|'additive'|'alpha-blend')?} The environment blend mode. Returns `null` when used outside of a XR session.
 	 */
 	getEnvironmentBlendMode() {
 
@@ -46408,7 +46430,7 @@ class XRManager extends EventDispatcher {
 
 	/**
 	 * This method is called by the renderer per frame and updates the XR camera
-	 * and it sub cameras based on the given camera. The given camera is the "normal"
+	 * and it sub cameras based on the given camera. The given camera is the "user"
 	 * camera created on application level and used for non-XR rendering.
 	 *
 	 * @param {PerspectiveCamera} camera - The camera.
@@ -48204,11 +48226,7 @@ class Renderer {
 
 		//
 
-		if ( xr.enabled === false || xr.isPresenting === false ) {
-
-			this._background.update( sceneRef, renderList, renderContext );
-
-		}
+		this._background.update( sceneRef, renderList, renderContext );
 
 		//
 
@@ -56896,12 +56914,13 @@ class WebGLBackend extends Backend {
 
 		};
 
-		if ( renderObject.camera.isArrayCamera ) {
+		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
 			const cameraData = this.get( renderObject.camera );
 			const cameras = renderObject.camera.cameras;
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
 
-			if ( cameraData.indexesGPU === undefined ) {
+			if ( cameraData.indexesGPU === undefined || cameraData.indexesGPU.length !== cameras.length ) {
 
 				const data = new Uint32Array( [ 0, 0, 0, 0 ] );
 				const indexesGPU = [];
@@ -56923,7 +56942,6 @@ class WebGLBackend extends Backend {
 
 			}
 
-			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
 			const cameraIndexData = this.get( cameraIndex );
 			const pixelRatio = this.renderer.getPixelRatio();
 
@@ -65793,14 +65811,14 @@ class WebGPUBackend extends Backend {
 
 		};
 
-		if ( renderObject.camera.isArrayCamera ) {
+		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
 			const cameraData = this.get( renderObject.camera );
 			const cameras = renderObject.camera.cameras;
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' );
 
-			if ( cameraData.indexesGPU === undefined ) {
+			if ( cameraData.indexesGPU === undefined || cameraData.indexesGPU.length !== cameras.length ) {
 
-				const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' );
 				const bindingsData = this.get( cameraIndex );
 				const indexesGPU = [];
 
@@ -65817,7 +65835,6 @@ class WebGPUBackend extends Backend {
 				}
 
 				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
-				cameraData.cameraIndex = cameraIndex;
 
 			}
 
@@ -65840,7 +65857,7 @@ class WebGPUBackend extends Backend {
 						context.viewportValue.maxDepth
 					);
 
-					passEncoderGPU.setBindGroup( cameraData.cameraIndex.index, cameraData.indexesGPU[ i ] );
+					passEncoderGPU.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
 
 					draw();
 
