@@ -3,7 +3,7 @@ let _color4 = null;
 
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { createCanvasElement } from '../../utils.js';
+import { createCanvasElement, warnOnce } from '../../utils.js';
 import { REVISION } from '../../constants.js';
 
 /**
@@ -57,6 +57,14 @@ class Backend {
 		 * @default null
 		 */
 		this.domElement = null;
+
+		/**
+		 * A reference to the timestamp query pool.
+		 */
+		this.timestampQueryPool = {
+			'render': null,
+			'compute': null
+		};
 
 	}
 
@@ -442,6 +450,54 @@ class Backend {
 	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
 	 */
 	async resolveTimestampAsync( /*renderContext, type*/ ) { }
+
+
+	async resolveAllTimestampsAsync( type = 'render' ) {
+
+		if ( ! this.trackTimestamp ) {
+
+			warnOnce( 'WebGPURenderer: Timestamp tracking is disabled.' );
+			return;
+
+		}
+
+		let total = 0;
+
+		// const types = [ 'render', 'compute' ];
+
+		// for ( let i = 0, l = types.length; i < l; i ++ ) {
+
+		// 	const type = types[ i ];
+
+		if ( ! this.timestampQueryPool[ type ] ) {
+
+			console.warn( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
+			return;
+
+		}
+
+		const duration = await this.timestampQueryPool[ type ].resolveAllQueriesAsync();
+
+		if ( duration > 0 ) {
+
+			this.renderer.info[ type ].timestamp = duration;
+			total += duration;
+
+		}
+
+		// if ( type === 'render' ) {
+
+		// TODO: Called twice (reminds me of skinning/skeleton issue in WebGLRenderer), need to keep track of frameId to prevent that
+		// 	console.log( 'render', duration );
+
+		// }
+
+		// }
+
+		return total;
+
+	}
+
 
 	/**
 	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,

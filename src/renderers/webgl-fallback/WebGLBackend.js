@@ -13,6 +13,7 @@ import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
+import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
 /**
  * A backend implementation targeting WebGL 2.
@@ -293,31 +294,25 @@ class WebGLBackend extends Backend {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
 
-		const renderContextData = this.get( renderContext );
+		const type = renderContext.isComputeNode ? 'compute' : 'render';
 
-		if ( this.queryRunning ) {
+		if ( ! this.timestampQueryPool[ type ] ) {
 
-		  if ( ! renderContextData.queryQueue ) renderContextData.queryQueue = [];
-		  renderContextData.queryQueue.push( renderContext );
-		  return;
-
-		}
-
-		if ( renderContextData.activeQuery ) {
-
-		  this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
-		  renderContextData.activeQuery = null;
+			// TODO: Variable maxQueries?
+			this.timestampQueryPool[ type ] = new WebGLTimestampQueryPool( this.gl, type, 2048 );
 
 		}
 
-		renderContextData.activeQuery = this.gl.createQuery();
+		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		if ( renderContextData.activeQuery !== null ) {
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( renderContext );
 
-		  this.gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, renderContextData.activeQuery );
-		  this.queryRunning = true;
+		if ( baseOffset !== null ) {
+
+			timestampQueryPool.beginQuery( renderContext );
 
 		}
+
 
 	}
 
@@ -332,64 +327,13 @@ class WebGLBackend extends Backend {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
 
-		const renderContextData = this.get( renderContext );
+		const type = renderContext.isComputeNode ? 'compute' : 'render';
+		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		if ( renderContextData.activeQuery ) {
-
-		  this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
-
-		  if ( ! renderContextData.gpuQueries ) renderContextData.gpuQueries = [];
-		  renderContextData.gpuQueries.push( { query: renderContextData.activeQuery } );
-		  renderContextData.activeQuery = null;
-		  this.queryRunning = false;
-
-		  if ( renderContextData.queryQueue && renderContextData.queryQueue.length > 0 ) {
-
-				const nextRenderContext = renderContextData.queryQueue.shift();
-				this.initTimestampQuery( nextRenderContext );
-
-			}
-
-		}
+		timestampQueryPool.endQuery( renderContext );
 
 	}
 
-	/**
-	 * Resolves the time stamp for the given render context and type.
-	 *
-	 * @async
-	 * @param {RenderContext} renderContext - The render context.
-	 * @param {String} type - The render context.
-	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
-	 */
-	async resolveTimestampAsync( renderContext, type = 'render' ) {
-
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
-
-		const renderContextData = this.get( renderContext );
-
-		if ( ! renderContextData.gpuQueries ) renderContextData.gpuQueries = [];
-
-		for ( let i = 0; i < renderContextData.gpuQueries.length; i ++ ) {
-
-		  const queryInfo = renderContextData.gpuQueries[ i ];
-		  const available = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT_AVAILABLE );
-		  const disjoint = this.gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
-
-		  if ( available && ! disjoint ) {
-
-				const elapsed = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT );
-				const duration = Number( elapsed ) / 1000000; // Convert nanoseconds to milliseconds
-				this.gl.deleteQuery( queryInfo.query );
-				renderContextData.gpuQueries.splice( i, 1 ); // Remove the processed query
-				i --;
-				this.renderer.info.updateTimestamp( type, duration );
-
-			}
-
-		}
-
-	}
 
 	/**
 	 * Returns the backend's rendering context.

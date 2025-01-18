@@ -1,0 +1,187 @@
+import TimestampQueryPool from '../../common/TimestampQueryPool.js';
+
+class WebGPUTimestampQueryPool extends TimestampQueryPool {
+
+	constructor( device, type, maxQueries = 2048 ) {
+
+		super( maxQueries );
+
+		this.device = device;
+		this.type = type;
+
+		this.querySet = this.device.createQuerySet( {
+			type: 'timestamp',
+			count: this.maxQueries,
+			label: `queryset_global_timestamp_${type}`
+		} );
+
+		const bufferSize = this.maxQueries * 8;
+		this.resolveBuffer = this.device.createBuffer( {
+			label: `buffer_timestamp_resolve_${type}`,
+			size: bufferSize,
+			usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
+		} );
+
+		this.resultBuffer = this.device.createBuffer( {
+			label: `buffer_timestamp_result_${type}`,
+			size: bufferSize,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+		} );
+
+		this.queryOffsets = new Map();
+		this.pendingResolve = null; // Store the current pending promise
+
+	}
+
+	allocateQueriesForContext( renderContext ) {
+
+		if ( ! this.trackTimestamp ) return null;
+
+		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
+
+			return null;
+
+		}
+
+		const baseOffset = this.currentQueryIndex;
+		this.currentQueryIndex += 2;
+
+		this.queryOffsets.set( renderContext.id, baseOffset );
+		return baseOffset;
+
+	}
+
+	async resolveAllQueriesAsync() {
+
+		// Early returns with proper promise handling
+		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 ) {
+
+			return 0;
+
+		}
+
+		// If there's already a pending resolve, wait for it
+		if ( this.pendingResolve ) {
+
+			try {
+
+				return await this.pendingResolve;
+
+			} catch ( error ) {
+
+				console.error( 'Error in pending resolve:', error );
+				return 0;
+
+			}
+
+		}
+
+		// Create and store the new promise
+		this.pendingResolve = this._resolveQueries();
+
+		try {
+
+			const result = await this.pendingResolve;
+			return result;
+
+		} finally {
+
+			this.pendingResolve = null;
+
+		}
+
+	}
+
+	async _resolveQueries() {
+
+		try {
+
+			if ( this.resultBuffer.mapState !== 'unmapped' ) {
+
+				return 0;
+
+			}
+
+			const currentOffsets = new Map( this.queryOffsets );
+			const queryCount = this.currentQueryIndex;
+			const bytesUsed = queryCount * 8;
+
+			// Reset state before GPU work
+			this.currentQueryIndex = 0;
+			this.queryOffsets.clear();
+
+			const commandEncoder = this.device.createCommandEncoder();
+
+			commandEncoder.resolveQuerySet(
+				this.querySet,
+				0,
+				queryCount,
+				this.resolveBuffer,
+				0
+			);
+
+			commandEncoder.copyBufferToBuffer(
+				this.resolveBuffer,
+				0,
+				this.resultBuffer,
+				0,
+				bytesUsed
+			);
+
+			// Submit GPU work and ensure it's completed
+			const commandBuffer = commandEncoder.finish();
+			this.device.queue.submit( [ commandBuffer ] );
+
+			// Check map state again after waiting
+			if ( this.resultBuffer.mapState !== 'unmapped' ) {
+
+				return 0;
+
+			}
+
+			await this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
+
+			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
+			let totalDuration = 0;
+
+			for ( const [ , baseOffset ] of currentOffsets ) {
+
+				const startTime = times[ baseOffset ];
+				const endTime = times[ baseOffset + 1 ];
+				const duration = Number( endTime - startTime ) / 1e6;
+				totalDuration += duration;
+
+			}
+
+			this.resultBuffer.unmap();
+			return totalDuration;
+
+		} catch ( error ) {
+
+			console.error( 'Error resolving queries:', error );
+			if ( this.resultBuffer.mapState === 'mapped' ) {
+
+				this.resultBuffer.unmap();
+
+			}
+
+			return 0;
+
+		}
+
+	}
+
+	dispose() {
+
+		this.querySet.destroy();
+		this.resolveBuffer.destroy();
+		this.resultBuffer.destroy();
+		this.queryOffsets.clear();
+		this.pendingResolve = null;
+		this.currentQueryIndex = 0;
+
+	}
+
+}
+
+export default WebGPUTimestampQueryPool;

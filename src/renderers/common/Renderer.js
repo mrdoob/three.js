@@ -933,9 +933,7 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		const renderContext = this._renderScene( scene, camera );
-
-		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+		this._renderScene( scene, camera );
 
 	}
 
@@ -2208,8 +2206,6 @@ class Renderer {
 
 		this.compute( computeNodes );
 
-		await this.backend.resolveTimestampAsync( computeNodes, 'compute' );
-
 	}
 
 	/**
@@ -2224,6 +2220,14 @@ class Renderer {
 		if ( this._initialized === false ) await this.init();
 
 		return this.backend.hasFeature( name );
+
+	}
+
+	async resolveAllTimestampsAsync( type = 'render' ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		return this.backend.resolveAllTimestampsAsync( type );
 
 	}
 

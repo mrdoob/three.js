@@ -14,11 +14,11 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
+					"three": "../src/Three.WebGPU.js",
+					"three/webgpu": "../src/Three.WebGPU.js",
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.8/dist/main.js"
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 				}
 			}
 		</script>
@@ -264,7 +264,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -273,7 +273,9 @@
 
 				stats = new Stats( {
 					precision: 3,
-					horizontal: false
+					horizontal: false,
+					trackGPU: true,
+					trackCPT: true
 				} );
 				stats.init( renderer );
 				document.body.appendChild( stats.dom );
@@ -347,7 +349,8 @@
 
 				// compute
 
-				await renderer.computeAsync( computeParticles );
+				renderer.computeAsync( computeParticles );
+				renderer.resolveAllTimestampsAsync( 'compute' );
 
 				// result
 
@@ -356,6 +359,7 @@
 
 				await postProcessing.renderAsync();
 
+				await renderer.resolveAllTimestampsAsync();
 				stats.update();
 
 			}
