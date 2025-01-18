@@ -521,9 +521,9 @@ class NodeMaterial extends Material {
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
-		// < MONITOR >
+		// < OBSERVER >
 
-		builder.monitor = this.setupObserver( builder );
+		builder.observer = this.setupObserver( builder );
 
 	}
 

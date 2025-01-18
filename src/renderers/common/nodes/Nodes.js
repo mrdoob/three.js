@@ -289,7 +289,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
-			nodeBuilder.monitor,
+			nodeBuilder.observer,
 			nodeBuilder.transforms
 		);
 
