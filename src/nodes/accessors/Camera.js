@@ -36,7 +36,7 @@ export const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	let cameraProjectionMatrix;
 
-	if ( camera.isArrayCamera ) {
+	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
 		const matrices = [];
 
@@ -76,7 +76,7 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	let cameraViewMatrix;
 
-	if ( camera.isArrayCamera ) {
+	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
 		const matrices = [];
 
