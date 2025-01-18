@@ -22,10 +22,10 @@ class NodeBuilderState {
 	 * @param {Array<Node>} updateNodes - An array of nodes that implement their `update()` method.
 	 * @param {Array<Node>} updateBeforeNodes - An array of nodes that implement their `updateBefore()` method.
 	 * @param {Array<Node>} updateAfterNodes - An array of nodes that implement their `updateAfter()` method.
-	 * @param {NodeMaterialObserver} monitor - A node material observer.
+	 * @param {NodeMaterialObserver} observer - A node material observer.
 	 * @param {Array<Object>} transforms - An array with transform attribute objects. Only relevant when using compute shaders with WebGL 2.
 	 */
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, transforms = [] ) {
 
 		/**
 		 * The native vertex shader code.
@@ -98,7 +98,7 @@ class NodeBuilderState {
 		 *
 		 * @type {NodeMaterialObserver}
 		 */
-		this.monitor = monitor;
+		this.observer = observer;
 
 		/**
 		 * How often this state is used by render objects.

@@ -177,7 +177,7 @@ class NodeBuilder {
 		 * @type {NodeMaterialObserver?}
 		 * @default null
 		 */
-		this.monitor = null;
+		this.observer = null;
 
 		/**
 		 * A reference to the current lights node.

@@ -361,7 +361,7 @@ class RenderObject {
 	 */
 	getMonitor() {
 
-		return this._monitor || ( this._monitor = this.getNodeBuilderState().monitor );
+		return this._monitor || ( this._monitor = this.getNodeBuilderState().observer );
 
 	}
 
