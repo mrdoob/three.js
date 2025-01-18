@@ -122,7 +122,13 @@
 				controller.addEventListener( 'selectend', onSelectEnd );
 				controller.addEventListener( 'connected', function ( event ) {
 
-					this.add( buildController( event.data ) );
+					const targetRayMode = event.data.targetRayMode;
+
+					if ( targetRayMode === 'tracked-pointer' || targetRayMode === 'gaze' ) {
+
+						this.add( buildController( event.data ) );
+
+					}
 
 				} );
 				controller.addEventListener( 'disconnected', function () {
