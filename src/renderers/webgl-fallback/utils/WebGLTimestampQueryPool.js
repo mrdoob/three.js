@@ -9,6 +9,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		this.gl = gl;
 		this.type = type;
 		this.pendingResolve = false;
+		this.lastValue = 0; // Add lastValue tracking
 
 		// Check for timer query extensions
 		this.ext = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' ) ||
@@ -131,7 +132,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		if ( ! this.trackTimestamp || this.pendingResolve ) {
 
-			return 0;
+			return this.lastValue;
 
 		}
 
@@ -155,12 +156,15 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			if ( resolvePromises.length === 0 ) {
 
-				return 0;
+				return this.lastValue;
 
 			}
 
 			const results = await Promise.all( resolvePromises );
 			const totalDuration = results.reduce( ( acc, val ) => acc + val, 0 );
+
+			// Store the last valid result
+			this.lastValue = totalDuration;
 
 			// Reset states
 			this.currentQueryIndex = 0;
@@ -173,7 +177,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		} catch ( error ) {
 
 			console.error( 'Error resolving queries:', error );
-			return 0;
+			return this.lastValue;
 
 		} finally {
 
@@ -194,7 +198,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 					const disjoint = this.gl.getParameter( this.ext.GPU_DISJOINT_EXT );
 					if ( disjoint ) {
 
-						resolve( 0 );
+						resolve( this.lastValue );
 						return;
 
 					}
@@ -213,7 +217,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 				} catch ( error ) {
 
 					console.error( 'Error checking query:', error );
-					resolve( 0 );
+					resolve( this.lastValue );
 
 				}
 
@@ -238,6 +242,8 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		this.queries = [];
 		this.queryStates.clear();
 		this.queryOffsets.clear();
+		this.lastValue = 0;
+		this.activeQuery = null;
 
 	}
 

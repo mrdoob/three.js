@@ -1545,10 +1545,9 @@ class WebGPUBackend extends Backend {
 
 		descriptor.timestampWrites = {
 			querySet: timestampQueryPool.querySet,
-			beginningOfPassWriteIndex: baseOffset, // e.g. 0 for the first pass
-			endOfPassWriteIndex: baseOffset + 1, // 1 for the first pass
+			beginningOfPassWriteIndex: baseOffset,
+			endOfPassWriteIndex: baseOffset + 1,
 		  };
-
 
 	}
 

@@ -457,35 +457,21 @@ class Backend {
 
 		}
 
-		let total = 0;
-
-		if ( ! this.timestampQueryPool[ type ] ) {
+		const queryPool = this.timestampQueryPool[ type ];
+		if ( ! queryPool ) {
 
 			warnOnce( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
 			return;
 
 		}
 
-		const duration = await this.timestampQueryPool[ type ].resolveAllQueriesAsync();
+		const duration = await queryPool.resolveAllQueriesAsync();
 
-		if ( duration > 0 ) {
+		this.renderer.info[ type ].timestamp = duration;
 
-			this.renderer.info[ type ].timestamp = duration;
-			total += duration;
-
-		}
-
-		// if ( type === 'render' ) {
-
-		// TODO: Called twice (reminds me of skinning/skeleton issue in WebGLRenderer), need to keep track of frameId to prevent that
-		// 	console.log( 'render', duration );
-
-		// }
-
-		return total;
+		return duration;
 
 	}
-
 
 	/**
 	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,

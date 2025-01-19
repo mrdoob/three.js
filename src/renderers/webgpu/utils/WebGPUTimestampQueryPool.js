@@ -1,3 +1,4 @@
+import { warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 class WebGPUTimestampQueryPool extends TimestampQueryPool {
@@ -5,7 +6,6 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	constructor( device, type, maxQueries = 2048 ) {
 
 		super( maxQueries );
-
 		this.device = device;
 		this.type = type;
 
@@ -29,7 +29,8 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		} );
 
 		this.queryOffsets = new Map();
-		this.pendingResolve = null; // Store the current pending promise
+		this.pendingResolve = null;
+		this.lastValue = 0; // Store last valid timing value
 
 	}
 
@@ -39,6 +40,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
 
+			warnOnce( 'WebGPUTimestampQueryPool: Maximum number of queries exceeded.' );
 			return null;
 
 		}
@@ -53,30 +55,18 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	async resolveAllQueriesAsync() {
 
-		// Early returns with proper promise handling
 		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 ) {
 
-			return 0;
+			return this.lastValue;
 
 		}
 
-		// If there's already a pending resolve, wait for it
 		if ( this.pendingResolve ) {
 
-			try {
-
-				return await this.pendingResolve;
-
-			} catch ( error ) {
-
-				console.error( 'Error in pending resolve:', error );
-				return 0;
-
-			}
+			return this.pendingResolve;
 
 		}
 
-		// Create and store the new promise
 		this.pendingResolve = this._resolveQueries();
 
 		try {
@@ -98,7 +88,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
 
-				return 0;
+				return this.lastValue;
 
 			}
 
@@ -128,14 +118,12 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 				bytesUsed
 			);
 
-			// Submit GPU work and ensure it's completed
 			const commandBuffer = commandEncoder.finish();
 			this.device.queue.submit( [ commandBuffer ] );
 
-			// Check map state again after waiting
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
 
-				return 0;
+				return this.lastValue;
 
 			}
 
@@ -165,7 +153,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			}
 
-			return 0;
+			return this.lastValue;
 
 		}
 
@@ -178,7 +166,6 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		this.resultBuffer.destroy();
 		this.queryOffsets.clear();
 		this.pendingResolve = null;
-		this.currentQueryIndex = 0;
 
 	}
 
