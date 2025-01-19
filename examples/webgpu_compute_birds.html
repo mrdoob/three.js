@@ -317,7 +317,7 @@
 					const zoneRadiusSq = zoneRadius.mul( zoneRadius ).toConst();
 
 					// Cache current bird's position and velocity outside the loop
-					const birdIndex = instanceIndex.toConst( 'uint' );
+					const birdIndex = instanceIndex.toConst( 'birdIndex' );
 					const position = positionStorage.element( birdIndex ).toVar();
 					const velocity = velocityStorage.element( birdIndex ).toVar();
 
