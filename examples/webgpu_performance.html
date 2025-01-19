@@ -160,7 +160,7 @@
 			async function render() {
 
 				await renderer.renderAsync( scene, camera );
-				await renderer.resolveTimestampsAsync( 'render' );
+				renderer.resolveTimestampsAsync( 'render' );
 
 				stats.update();
 
