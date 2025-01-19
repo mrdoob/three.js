@@ -1,7 +1,18 @@
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
+/**
+ * Manages a pool of WebGL timestamp queries for performance measurement.
+ * Handles creation, execution, and resolution of timer queries using WebGL extensions.
+ * @extends TimestampQueryPool
+ */
 class WebGLTimestampQueryPool extends TimestampQueryPool {
 
+	/**
+     * Creates a new WebGL timestamp query pool.
+     * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL context.
+     * @param {string} type - The type identifier for this query pool.
+     * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+     */
 	constructor( gl, type, maxQueries = 2048 ) {
 
 		super( maxQueries );
@@ -37,6 +48,11 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Allocates a pair of queries for a given render context.
+     * @param {Object} renderContext - The render context to allocate queries for.
+     * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
+     */
 	allocateQueriesForContext( renderContext ) {
 
 		if ( ! this.trackTimestamp ) return null;
@@ -59,6 +75,10 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Begins a timestamp query for the specified render context.
+     * @param {Object} renderContext - The render context to begin timing for.
+     */
 	beginQuery( renderContext ) {
 
 		if ( ! this.trackTimestamp ) return;
@@ -97,6 +117,11 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Ends the active timestamp query for the specified render context.
+     * @param {Object} renderContext - The render context to end timing for.
+     * @param {string} renderContext.id - Unique identifier for the render context.
+     */
 	endQuery( renderContext ) {
 
 		if ( ! this.trackTimestamp ) return;
@@ -128,7 +153,11 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
-	async resolveAllQueriesAsync() {
+	/**
+     * Asynchronously resolves all completed queries and returns the total duration.
+     * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
+     */
+	async resolveQueriesAsync() {
 
 		if ( ! this.trackTimestamp || this.pendingResolve ) {
 
@@ -187,6 +216,12 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Resolves a single query, checking for completion and disjoint operation.
+     * @private
+     * @param {WebGLQuery} query - The query object to resolve.
+     * @returns {Promise<number>} The elapsed time in milliseconds.
+     */
 	async resolveQuery( query ) {
 
 		return new Promise( ( resolve ) => {
@@ -229,6 +264,10 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Releases all resources held by this query pool.
+     * This includes deleting all query objects and clearing internal state.
+     */
 	dispose() {
 
 		if ( ! this.trackTimestamp ) return;

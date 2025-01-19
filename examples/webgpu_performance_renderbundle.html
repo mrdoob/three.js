@@ -290,7 +290,7 @@
 		
 				const average = renderTimeAverages.reduce( ( a, b ) => a + b, 0 ) / renderTimeAverages.length;
 
-				renderer.resolveAllTimestampsAsync();
+				renderer.resolveTimestampsAsync();
 				stats.update();
 
 				document.getElementById( 'backend' ).innerText = `Average Render Time ${api.renderBundle ? '(Bundle)' : ''}: ` + average.toFixed( 2 ) + 'ms';

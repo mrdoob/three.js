@@ -448,7 +448,7 @@ class Backend {
 	 * @param {String} [type='render'] - The type of the time stamp.
 	 * @return {Promise<Number>} A Promise that resolves with the time stamp.
 	 */
-	async resolveAllTimestampsAsync( type = 'render' ) {
+	async resolveTimestampsAsync( type = 'render' ) {
 
 		if ( ! this.trackTimestamp ) {
 
@@ -465,7 +465,7 @@ class Backend {
 
 		}
 
-		const duration = await queryPool.resolveAllQueriesAsync();
+		const duration = await queryPool.resolveQueriesAsync();
 
 		this.renderer.info[ type ].timestamp = duration;
 

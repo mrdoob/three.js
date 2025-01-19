@@ -11,17 +11,24 @@ class TimestampQueryPool {
 
 	/**
      * Allocate queries for a specific renderContext.
-     * Must be overridden by subclasses.
+	 *
+	 * @abstract
      */
 	allocateQueriesForContext( /* renderContext */ ) {}
 
 	/**
      * Resolve all timestamps and return data (or process them).
-     * Must be overridden by subclasses.
+	 *
+	 * @abstract
+	 * @returns {Promise<Number>|Number} The resolved timestamp value.
      */
-	async resolveAllQueriesAsync() {}
+	async resolveQueriesAsync() {}
 
-
+	/**
+	 * Dispose of the query pool.
+	 *
+	 * @abstract
+	 */
 	dispose() {}
 
 }

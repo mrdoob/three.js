@@ -176,12 +176,12 @@
 			function animate() {
 
 				renderer.compute( computeNode );
-				renderer.resolveAllTimestampsAsync( 'compute' );
+				renderer.resolveTimestampsAsync( 'compute' );
 
 				renderer.render( scene, camera );
 
 
-				renderer.resolveAllTimestampsAsync().then( () => {
+				renderer.resolveTimestampsAsync().then( () => {
 
 					stats.update();
 

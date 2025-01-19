@@ -1,8 +1,19 @@
 import { warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
+/**
+ * Manages a pool of WebGPU timestamp queries for performance measurement.
+ * Extends the base TimestampQueryPool to provide WebGPU-specific implementation.
+ * @extends TimestampQueryPool
+ */
 class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
+	/**
+     * Creates a new WebGPU timestamp query pool.
+     * @param {GPUDevice} device - The WebGPU device to create queries on.
+     * @param {string} type - The type identifier for this query pool.
+     * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+     */
 	constructor( device, type, maxQueries = 2048 ) {
 
 		super( maxQueries );
@@ -34,6 +45,11 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Allocates a pair of queries for a given render context.
+     * @param {Object} renderContext - The render context to allocate queries for.
+     * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
+     */
 	allocateQueriesForContext( renderContext ) {
 
 		if ( ! this.trackTimestamp ) return null;
@@ -53,7 +69,12 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
-	async resolveAllQueriesAsync() {
+	/**
+     * Asynchronously resolves all pending queries and returns the total duration.
+     * If there's already a pending resolve operation, returns that promise instead.
+     * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
+     */
+	async resolveQueriesAsync() {
 
 		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 ) {
 
@@ -82,6 +103,11 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Internal method to resolve queries and calculate total duration.
+     * @private
+     * @returns {Promise<number>} The total duration in milliseconds.
+     */
 	async _resolveQueries() {
 
 		try {
@@ -159,6 +185,10 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+     * Releases all resources held by this query pool.
+     * This includes destroying the query set and associated buffers.
+     */
 	dispose() {
 
 		this.querySet.destroy();

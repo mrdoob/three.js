@@ -9,7 +9,7 @@ import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
  * TSL function for creating a storage buffer node with a configured `StorageBufferAttribute`.
  *
  * @function
- * @param {Number} count - The data count.
+ * @param {Number|TypedArray} count - The data count.
  * @param {String} [type='float'] - The data type.
  * @returns {StorageBufferNode}
  */
@@ -29,7 +29,7 @@ export const attributeArray = ( count, type = 'float' ) => {
  * TSL function for creating a storage buffer node with a configured `StorageInstancedBufferAttribute`.
  *
  * @function
- * @param {Number} count - The data count.
+ * @param {Number|TypedArray} count - The data count.
  * @param {String} [type='float'] - The data type.
  * @returns {StorageBufferNode}
  */

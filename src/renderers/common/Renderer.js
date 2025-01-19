@@ -2223,11 +2223,11 @@ class Renderer {
 
 	}
 
-	async resolveAllTimestampsAsync( type = 'render' ) {
+	async resolveTimestampsAsync( type = 'render' ) {
 
 		if ( this._initialized === false ) await this.init();
 
-		return this.backend.resolveAllTimestampsAsync( type );
+		return this.backend.resolveTimestampsAsync( type );
 
 	}
 

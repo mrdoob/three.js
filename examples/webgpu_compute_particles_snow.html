@@ -264,7 +264,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -345,12 +345,12 @@
 
 				scene.overrideMaterial = collisionPosMaterial;
 				renderer.setRenderTarget( collisionPosRT );
-				await renderer.renderAsync( scene, collisionCamera );
+				renderer.render( scene, collisionCamera );
 
 				// compute
 
-				renderer.computeAsync( computeParticles );
-				renderer.resolveAllTimestampsAsync( 'compute' );
+				renderer.compute( computeParticles );
+				await renderer.resolveTimestampsAsync( 'compute' );
 
 				// result
 
@@ -359,7 +359,7 @@
 
 				await postProcessing.renderAsync();
 
-				await renderer.resolveAllTimestampsAsync();
+				renderer.resolveTimestampsAsync();
 				stats.update();
 
 			}
