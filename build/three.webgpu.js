@@ -596,7 +596,7 @@ function getCacheKey$1( object, force = false ) {
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		values.push( cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
+		values.push( cyrb53( property.slice( 0, -4 ) ), childNode.getCacheKey( force ) );
 
 	}
 
@@ -814,7 +814,7 @@ function getValueType( value ) {
  */
 function getValueFromType( type, ...params ) {
 
-	const last4 = type ? type.slice( - 4 ) : undefined;
+	const last4 = type ? type.slice( -4 ) : undefined;
 
 	if ( params.length === 1 ) { // ensure same behaviour as in NodeBuilder.format()
 
@@ -3175,7 +3175,7 @@ class ShaderNodeInternal extends Node {
 
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
-const ints = [ - 1, - 2 ];
+const ints = [ -1, -2 ];
 const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2 ), Math.PI / 2 ];
 
 const boolsCacheMap = new Map();
@@ -6155,7 +6155,7 @@ const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
 
-// deprecated
+// Deprecated
 
 /**
  * @function
@@ -6512,7 +6512,7 @@ addMethodChaining( 'temp', temp );
  * existing nodes like the following:
  *
  * ```js
- * const positionLocal = positionGeometry.varying( 'vPositionLocal' );
+ * const positionLocal = positionGeometry.toVarying( 'vPositionLocal' );
  * ```
  *
  * @augments Node
@@ -6686,8 +6686,24 @@ const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
  */
 const vertexStage = ( node ) => varying( node );
 
-addMethodChaining( 'varying', varying );
-addMethodChaining( 'vertexStage', vertexStage );
+addMethodChaining( 'toVarying', varying );
+addMethodChaining( 'toVertexStage', vertexStage );
+
+// Deprecated
+
+addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
+
+	console.warn( 'TSL.VaryingNode: .varying() has been renamed to .toVarying().' );
+	return varying( ...params );
+
+} );
+
+addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
+
+	console.warn( 'TSL.VaryingNode: .vertexStage() has been renamed to .toVertexStage().' );
+	return varying( ...params );
+
+} );
 
 /** @module ColorSpaceFunctions **/
 
@@ -10042,7 +10058,7 @@ const uniforms = ( values, nodeType ) => { // @deprecated, r168
  *
  * @type {UniformNode<uint>}
  */
-const cameraIndex = /*@__PURE__*/ uniform( 'uint' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).vertexStage();
+const cameraIndex = /*@__PURE__*/ uniform( 0, 'uint' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).toVarying( 'v_cameraIndex' );
 
 /**
  * TSL object that represents the `near` value of the camera used for the current render.
@@ -10551,7 +10567,7 @@ const positionGeometry = /*@__PURE__*/ attribute( 'position', 'vec3' );
  *
  * @type {AttributeNode<vec3>}
  */
-const positionLocal = /*@__PURE__*/ positionGeometry.varying( 'positionLocal' );
+const positionLocal = /*@__PURE__*/ positionGeometry.toVarying( 'positionLocal' );
 
 /**
  * TSL object that represents the previous vertex position in local space of the current rendered object.
@@ -10559,21 +10575,21 @@ const positionLocal = /*@__PURE__*/ positionGeometry.varying( 'positionLocal' );
  *
  * @type {AttributeNode<vec3>}
  */
-const positionPrevious = /*@__PURE__*/ positionGeometry.varying( 'positionPrevious' );
+const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'positionPrevious' );
 
 /**
  * TSL object that represents the vertex position in world space of the current rendered object.
  *
  * @type {VaryingNode<vec3>}
  */
-const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.varying( 'v_positionWorld' ).context( { needsPositionReassign: true } );
+const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.toVarying( 'v_positionWorld' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position world direction of the current rendered object.
  *
  * @type {Node<vec3>}
  */
-const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).varying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' ).context( { needsPositionReassign: true } );
+const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).toVarying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the vertex position in view space of the current rendered object.
@@ -10584,14 +10600,14 @@ const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupPositionView();
 
-}, 'vec3' ).once() )().varying( 'v_positionView' ).context( { needsPositionReassign: true } );
+}, 'vec3' ).once() )().toVarying( 'v_positionView' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
  *
  * @type {VaryingNode<vec3>}
  */
-const positionViewDirection = /*@__PURE__*/ positionView.negate().varying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
+const positionViewDirection = /*@__PURE__*/ positionView.negate().toVarying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
 
 /** @module FrontFacingNode **/
 
@@ -11488,14 +11504,14 @@ const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
  *
  * @type {Node<vec3>}
  */
-const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.varying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
+const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
 
 /**
  * TSL object that represents the vertex tangent in world space of the current rendered object.
  *
  * @type {Node<vec3>}
  */
-const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).varying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
+const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).toVarying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
 
 /**
  * TSL object that represents the transformed vertex tangent in view space of the current rendered object.
@@ -12583,7 +12599,7 @@ const modelViewProjection = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupModelViewProjection();
 
-}, 'vec4' ).once() )().varying( 'v_modelViewProjection' );
+}, 'vec4' ).once() )().toVarying( 'v_modelViewProjection' );
 
 /** @module IndexNode **/
 
@@ -13723,7 +13739,7 @@ const Continue = () => expression( 'continue' ).append();
  */
 const Break = () => expression( 'break' ).append();
 
-// deprecated
+// Deprecated
 
 /**
  * @function
@@ -16839,7 +16855,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
 			const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
-			const nearEstimate = b.mul( - 0.5 ).div( a );
+			const nearEstimate = b.mul( -0.5 ).div( a );
 
 			const alpha = nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
 
@@ -16893,7 +16909,7 @@ class Line2NodeMaterial extends NodeMaterial {
 			// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
 			// perhaps there is a more elegant solution -- WestLangley
 
-			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 ); // 4th entry in the 3rd column
+			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( -1 ); // 4th entry in the 3rd column
 
 			If( perspective, () => {
 
@@ -17051,7 +17067,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				const vLineDistance = varyingProperty( 'float', 'lineDistance' );
 
-				vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
+				vUv.y.lessThan( -1 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
 				vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
 
 			}
@@ -17354,7 +17370,7 @@ class EquirectUVNode extends TempNode {
 		const dir = this.dirNode;
 
 		const u = dir.z.atan( dir.x ).mul( 1 / ( Math.PI * 2 ) ).add( 0.5 );
-		const v = dir.y.clamp( - 1.0, 1.0 ).asin().mul( 1 / Math.PI ).add( 0.5 );
+		const v = dir.y.clamp( -1, 1.0 ).asin().mul( 1 / Math.PI ).add( 0.5 );
 
 		return vec2( u, v );
 
@@ -18066,7 +18082,7 @@ const F_Schlick = /*@__PURE__*/ Fn( ( { f0, f90, dotVH } ) => {
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
-	const fresnel = dotVH.mul( - 5.55473 ).sub( 6.98316 ).mul( dotVH ).exp2();
+	const fresnel = dotVH.mul( -5.55473 ).sub( 6.98316 ).mul( dotVH ).exp2();
 
 	return f0.mul( fresnel.oneMinus() ).add( f90.mul( fresnel ) );
 
@@ -18549,15 +18565,15 @@ const BRDF_GGX = /*@__PURE__*/ Fn( ( inputs ) => {
 // https://www.unrealengine.com/blog/physically-based-shading-on-mobile
 const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
-	const c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
+	const c0 = vec4( -1, -0.0275, -0.572, 0.022 );
 
-	const c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
+	const c1 = vec4( 1, 0.0425, 1.04, -0.04 );
 
 	const r = roughness.mul( c0 ).add( c1 );
 
-	const a004 = r.x.mul( r.x ).min( dotNV.mul( - 9.28 ).exp2() ).mul( r.x ).add( r.y );
+	const a004 = r.x.mul( r.x ).min( dotNV.mul( -9.28 ).exp2() ).mul( r.x ).add( r.y );
 
-	const fab = vec2( - 1.04, 1.04 ).mul( a004 ).add( r.zw );
+	const fab = vec2( -1.04, 1.04 ).mul( a004 ).add( r.zw );
 
 	return fab;
 
@@ -18785,7 +18801,7 @@ const w0 = ( a ) => mul( bC, mul( a, mul( a, a.negate().add( 3.0 ) ).sub( 3.0 ) 
 
 const w1 = ( a ) => mul( bC, mul( a, mul( a, mul( 3.0, a ).sub( 6.0 ) ) ).add( 4.0 ) );
 
-const w2 = ( a ) => mul( bC, mul( a, mul( a, mul( - 3.0, a ).add( 3.0 ) ).add( 3.0 ) ).add( 1.0 ) );
+const w2 = ( a ) => mul( bC, mul( a, mul( a, mul( -3, a ).add( 3.0 ) ).add( 3.0 ) ).add( 1.0 ) );
 
 const w3 = ( a ) => mul( bC, pow( a, 3 ) );
 
@@ -18794,7 +18810,7 @@ const g0 = ( a ) => w0( a ).add( w1( a ) );
 const g1 = ( a ) => w2( a ).add( w3( a ) );
 
 // h0 and h1 are the two offset functions
-const h0 = ( a ) => add( - 1.0, w1( a ).div( w0( a ).add( w1( a ) ) ) );
+const h0 = ( a ) => add( -1, w1( a ).div( w0( a ).add( w1( a ) ) ) );
 
 const h1 = ( a ) => add( 1.0, w3( a ).div( w2( a ).add( w3( a ) ) ) );
 
@@ -19014,9 +19030,9 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 
 // XYZ to linear-sRGB color space
 const XYZ_TO_REC709 = /*@__PURE__*/ mat3(
-	3.2404542, - 0.9692660, 0.0556434,
-	- 1.5371385, 1.8760108, - 0.2040259,
-	- 0.4985314, 0.0415560, 1.0572252
+	3.2404542, -0.969266, 0.0556434,
+	-1.5371385, 1.8760108, -0.2040259,
+	-0.4985314, 0.0415560, 1.0572252
 );
 
 // Assume air interface for top
@@ -19045,7 +19061,7 @@ const evalSensitivity = ( OPD, shift ) => {
 	const pos = vec3( 1.6810e+06, 1.7953e+06, 2.2084e+06 );
 	const VAR = vec3( 4.3278e+09, 9.3046e+09, 6.6121e+09 );
 
-	const x = float( 9.7470e-14 * Math.sqrt( 2.0 * Math.PI * 4.5282e+09 ) ).mul( phase.mul( 2.2399e+06 ).add( shift.x ).cos() ).mul( phase.pow2().mul( - 4.5282e+09 ).exp() );
+	const x = float( 9.7470e-14 * Math.sqrt( 2.0 * Math.PI * 4.5282e+09 ) ).mul( phase.mul( 2.2399e+06 ).add( shift.x ).cos() ).mul( phase.pow2().mul( -45282e5 ).exp() );
 
 	let xyz = val.mul( VAR.mul( 2.0 * Math.PI ).sqrt() ).mul( pos.mul( phase ).add( shift ).cos() ).mul( phase.pow2().negate().mul( VAR ).exp() );
 	xyz = vec3( xyz.x.add( x ), xyz.y, xyz.z ).div( 1.0685e-7 );
@@ -19146,8 +19162,8 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	const a = select(
 		roughness.lessThan( 0.25 ),
-		float( - 339.2 ).mul( r2 ).add( float( 161.4 ).mul( roughness ) ).sub( 25.9 ),
-		float( - 8.48 ).mul( r2 ).add( float( 14.3 ).mul( roughness ) ).sub( 9.95 )
+		float( -339.2 ).mul( r2 ).add( float( 161.4 ).mul( roughness ) ).sub( 25.9 ),
+		float( -8.48 ).mul( r2 ).add( float( 14.3 ).mul( roughness ) ).sub( 9.95 )
 	);
 
 	const b = select(
@@ -19558,7 +19574,7 @@ class PhysicalLightingModel extends LightingModel {
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
 		const aoNV = dotNV.add( ambientOcclusion );
-		const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
+		const aoExp = roughness.mul( -16 ).oneMinus().negate().exp2();
 
 		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
 
@@ -19622,9 +19638,9 @@ class PhysicalLightingModel extends LightingModel {
 // These defines must match with PMREMGenerator
 
 const cubeUV_r0 = /*@__PURE__*/ float( 1.0 );
-const cubeUV_m0 = /*@__PURE__*/ float( - 2.0 );
+const cubeUV_m0 = /*@__PURE__*/ float( -2 );
 const cubeUV_r1 = /*@__PURE__*/ float( 0.8 );
-const cubeUV_m1 = /*@__PURE__*/ float( - 1.0 );
+const cubeUV_m1 = /*@__PURE__*/ float( -1 );
 const cubeUV_r4 = /*@__PURE__*/ float( 0.4 );
 const cubeUV_m4 = /*@__PURE__*/ float( 2.0 );
 const cubeUV_r5 = /*@__PURE__*/ float( 0.305 );
@@ -19642,7 +19658,7 @@ const cubeUV_minTileSize = /*@__PURE__*/ float( 16.0 );
 const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
 	const absDirection = vec3( abs( direction ) ).toVar();
-	const face = float( - 1.0 ).toVar();
+	const face = float( -1 ).toVar();
 
 	If( absDirection.x.greaterThan( absDirection.z ), () => {
 
@@ -19744,7 +19760,7 @@ const roughnessToMip = /*@__PURE__*/ Fn( ( [ roughness ] ) => {
 
 	} ).Else( () => {
 
-		mip.assign( float( - 2.0 ).mul( log2( mul( 1.16, roughness ) ) ) ); // 1.16 = 1.79^0.25
+		mip.assign( float( -2 ).mul( log2( mul( 1.16, roughness ) ) ) ); // 1.16 = 1.79^0.25
 
 	} );
 
@@ -19772,25 +19788,25 @@ const getDirection = /*@__PURE__*/ Fn( ( [ uv_immutable, face ] ) => {
 	} ).ElseIf( face.equal( 1.0 ), () => {
 
 		direction.assign( direction.xzy );
-		direction.xz.mulAssign( - 1.0 ); // ( -u, 1, -v ) pos y
+		direction.xz.mulAssign( -1 ); // ( -u, 1, -v ) pos y
 
 	} ).ElseIf( face.equal( 2.0 ), () => {
 
-		direction.x.mulAssign( - 1.0 ); // ( -u, v, 1 ) pos z
+		direction.x.mulAssign( -1 ); // ( -u, v, 1 ) pos z
 
 	} ).ElseIf( face.equal( 3.0 ), () => {
 
 		direction.assign( direction.zyx );
-		direction.xz.mulAssign( - 1.0 ); // ( -1, v, -u ) neg x
+		direction.xz.mulAssign( -1 ); // ( -1, v, -u ) neg x
 
 	} ).ElseIf( face.equal( 4.0 ), () => {
 
 		direction.assign( direction.xzy );
-		direction.xy.mulAssign( - 1.0 ); // ( -u, -1, v ) neg y
+		direction.xy.mulAssign( -1 ); // ( -u, -1, v ) neg y
 
 	} ).ElseIf( face.equal( 5.0 ), () => {
 
-		direction.z.mulAssign( - 1.0 ); // ( u, v, -1 ) neg zS
+		direction.z.mulAssign( -1 ); // ( u, v, -1 ) neg zS
 
 	} );
 
@@ -19893,7 +19909,7 @@ const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, we
 		} );
 
 		const theta = float( dTheta.mul( float( i ) ) ).toVar();
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
+		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( -1 ), axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 
 	} );
@@ -19938,7 +19954,7 @@ function _getPMREMFromTexture( texture ) {
 
 	let cacheTexture = _cache.get( texture );
 
-	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : - 1;
+	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : -1;
 
 	if ( pmremVersion !== texture.pmremVersion ) {
 
@@ -20134,7 +20150,7 @@ class PMREMNode extends TempNode {
 
 		let pmrem = this._pmrem;
 
-		const pmremVersion = pmrem ? pmrem.pmremVersion : - 1;
+		const pmremVersion = pmrem ? pmrem.pmremVersion : -1;
 		const texture = this._value;
 
 		if ( pmremVersion !== texture.pmremVersion ) {
@@ -22041,23 +22057,23 @@ const normal = Fn( ( { texture, uv } ) => {
 
 	} ).ElseIf( uv.x.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( - 1, 0, 0 ) );
+		ret.assign( vec3( -1, 0, 0 ) );
 
 	} ).ElseIf( uv.y.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( 0, - 1, 0 ) );
+		ret.assign( vec3( 0, -1, 0 ) );
 
 	} ).ElseIf( uv.z.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( 0, 0, - 1 ) );
+		ret.assign( vec3( 0, 0, -1 ) );
 
 	} ).Else( () => {
 
 		const step = 0.01;
 
-		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+		const x = texture.sample( uv.add( vec3( -0.01, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, -0.01, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, -0.01 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
 
 		ret.assign( vec3( x, y, z ) );
 
@@ -22302,7 +22318,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 		const hitBox = Fn( ( { orig, dir } ) => {
 
-			const box_min = vec3( - 0.5 );
+			const box_min = vec3( -0.5 );
 			const box_max = vec3( 0.5 );
 
 			const inv_dir = dir.reciprocal();
@@ -26328,19 +26344,24 @@ class Textures extends DataMap {
 
 		//
 
+
 		const options = { sampleCount };
 
-		for ( let i = 0; i < textures.length; i ++ ) {
+		if ( ( renderTarget.isXRRenderTarget === true && renderTarget.hasExternalTextures === true ) === false ) {
 
-			const texture = textures[ i ];
+			for ( let i = 0; i < textures.length; i ++ ) {
 
-			if ( textureNeedsUpdate ) texture.needsUpdate = true;
+				const texture = textures[ i ];
 
-			this.updateTexture( texture, options );
+				if ( textureNeedsUpdate ) texture.needsUpdate = true;
+
+				this.updateTexture( texture, options );
+
+			}
 
 		}
 
-		if ( depthTexture ) {
+		if ( depthTexture && renderTarget.autoAllocateDepthBuffer !== false ) {
 
 			this.updateTexture( depthTexture, options );
 
@@ -26941,7 +26962,7 @@ class StackNode extends Node {
 
 	}
 
-	// deprecated
+	// Deprecated
 
 	/**
 	 * @function
@@ -27092,7 +27113,7 @@ function getTextureIndex( textures, name ) {
 
 	}
 
-	return - 1;
+	return -1;
 
 }
 
@@ -27441,7 +27462,7 @@ class FunctionOverloadingNode extends Node {
 		if ( candidateFnCall === null ) {
 
 			let candidateFn = null;
-			let candidateScore = - 1;
+			let candidateScore = -1;
 
 			for ( const functionNode of this.functionNodes ) {
 
@@ -27967,7 +27988,7 @@ const _normal = new Vector3();
 const _reflectorWorldPosition = new Vector3();
 const _cameraWorldPosition = new Vector3();
 const _rotationMatrix = new Matrix4();
-const _lookAtPosition = new Vector3( 0, 0, - 1 );
+const _lookAtPosition = new Vector3( 0, 0, -1 );
 const clipPlane = new Vector4();
 
 const _view = new Vector3();
@@ -28344,7 +28365,7 @@ class ReflectorBaseNode extends Node {
 
 		_rotationMatrix.extractRotation( camera.matrixWorld );
 
-		_lookAtPosition.set( 0, 0, - 1 );
+		_lookAtPosition.set( 0, 0, -1 );
 		_lookAtPosition.applyMatrix4( _rotationMatrix );
 		_lookAtPosition.add( _cameraWorldPosition );
 
@@ -28378,7 +28399,7 @@ class ReflectorBaseNode extends Node {
 
 		_q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
 		_q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-		_q.z = - 1.0;
+		_q.z = -1;
 		_q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 		// Calculate the scaled plane vector
@@ -28442,7 +28463,7 @@ class ReflectorBaseNode extends Node {
  */
 const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
 
-const _camera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+const _camera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 
 /**
  * The purpose of this special geometry is to fill the entire viewport with a single triangle.
@@ -28463,9 +28484,9 @@ class QuadGeometry extends BufferGeometry {
 
 		super();
 
-		const uv = flipY === false ? [ 0, - 1, 0, 1, 2, 1 ] : [ 0, 2, 0, 0, 2, 0 ];
+		const uv = flipY === false ? [ 0, -1, 0, 1, 2, 1 ] : [ 0, 2, 0, 0, 2, 0 ];
 
-		this.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
+		this.setAttribute( 'position', new Float32BufferAttribute( [ -1, 3, 0, -1, -1, 0, 3, -1, 0 ], 3 ) );
 		this.setAttribute( 'uv', new Float32BufferAttribute( uv, 2 ) );
 
 	}
@@ -29729,7 +29750,7 @@ class SceneNode extends Node {
 					_e1.copy( scene.backgroundRotation );
 
 					// accommodate left-handed frame
-					_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
+					_e1.x *= -1; _e1.y *= -1; _e1.z *= -1;
 
 					_m1.makeRotationFromEuler( _e1 );
 
@@ -30418,7 +30439,7 @@ const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-// deprecated
+// Deprecated
 
 /**
  * @function
@@ -30520,7 +30541,7 @@ const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
 	const mx = color.r.max( color.g.max( color.b ) );
-	const amt = mx.sub( average ).mul( adjustment ).mul( - 3.0 );
+	const amt = mx.sub( average ).mul( adjustment ).mul( -3 );
 
 	return mix( color.rgb, mx, amt );
 
@@ -31610,9 +31631,9 @@ const acesFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// ODT_SAT => XYZ => D60_2_D65 => sRGB
 	const ACESOutputMat = mat3(
-		1.60475, - 0.53108, - 0.07367,
-		- 0.10208, 1.10813, - 0.00605,
-		- 0.00327, - 0.07276, 1.07602
+		1.60475, -0.53108, -0.07367,
+		-0.10208, 1.10813, -605e-5,
+		-327e-5, -0.07276, 1.07602
 	);
 
 	color = color.mul( exposure ).div( 0.6 );
@@ -31636,7 +31657,7 @@ const acesFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	]
 } );
 
-const LINEAR_REC2020_TO_LINEAR_SRGB = /*@__PURE__*/ mat3( vec3( 1.6605, - 0.1246, - 0.0182 ), vec3( - 0.5876, 1.1329, - 0.1006 ), vec3( - 0.0728, - 0.0083, 1.1187 ) );
+const LINEAR_REC2020_TO_LINEAR_SRGB = /*@__PURE__*/ mat3( vec3( 1.6605, -0.1246, -0.0182 ), vec3( -0.5876, 1.1329, -0.1006 ), vec3( -0.0728, -83e-4, 1.1187 ) );
 const LINEAR_SRGB_TO_LINEAR_REC2020 = /*@__PURE__*/ mat3( vec3( 0.6274, 0.0691, 0.0164 ), vec3( 0.3293, 0.9195, 0.0880 ), vec3( 0.0433, 0.0113, 0.8956 ) );
 
 const agxDefaultContrastApprox = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
@@ -31661,8 +31682,8 @@ const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const colortone = vec3( color ).toVar();
 	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
-	const AgXOutsetMatrix = mat3( vec3( 1.1271005818144368, - 0.1413297634984383, - 0.14132976349843826 ), vec3( - 0.11060664309660323, 1.157823702216272, - 0.11060664309660294 ), vec3( - 0.016493938717834573, - 0.016493938717834257, 1.2519364065950405 ) );
-	const AgxMinEv = float( - 12.47393 );
+	const AgXOutsetMatrix = mat3( vec3( 1.1271005818144368, -0.1413297634984383, -0.14132976349843826 ), vec3( -0.11060664309660323, 1.157823702216272, -0.11060664309660294 ), vec3( -0.016493938717834573, -0.016493938717834257, 1.2519364065950405 ) );
+	const AgxMinEv = float( -12.47393 );
 	const AgxMaxEv = float( 4.026069 );
 	colortone.mulAssign( exposure );
 	colortone.assign( LINEAR_SRGB_TO_LINEAR_REC2020.mul( colortone ) );
@@ -35101,7 +35122,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass 
 	const squaredMean = float( 0 ).toVar();
 
 	const uvStride = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
-	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( - 1 ) );
+	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( -1 ) );
 
 	Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -35138,7 +35159,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 	const squaredMean = float( 0 ).toVar();
 
 	const uvStride = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
-	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( - 1 ) );
+	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( -1 ) );
 
 	Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -35985,7 +36006,7 @@ const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, tex
 const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
-	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize.y );
+	const offset = vec2( -1, 1.0 ).mul( radius ).mul( texelSize.y );
 
 	return texture( depthTexture, cubeToUV( bd3D.add( offset.xyy ), texelSize.y ) ).compare( dp )
 		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yyy ), texelSize.y ) ).compare( dp ) )
@@ -37373,9 +37394,9 @@ const mx_worley_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immuta
 	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
 	const sqdist = float( 1e6 ).toVar();
 
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
 			sqdist.assign( min$1( sqdist, dist ) );
@@ -37411,9 +37432,9 @@ const mx_worley_noise_vec2_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
 	const sqdist = vec2( 1e6, 1e6 ).toVar();
 
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
 
@@ -37459,9 +37480,9 @@ const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
 	const sqdist = vec3( 1e6, 1e6, 1e6 ).toVar();
 
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
 
@@ -37513,11 +37534,11 @@ const mx_worley_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immuta
 	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
 	const sqdist = float( 1e6 ).toVar();
 
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+			Loop( { start: -1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
 				sqdist.assign( min$1( sqdist, dist ) );
@@ -37557,11 +37578,11 @@ const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
 	const sqdist = vec2( 1e6, 1e6 ).toVar();
 
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+			Loop( { start: -1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
 
@@ -37611,11 +37632,11 @@ const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
 	const sqdist = vec3( 1e6, 1e6, 1e6 ).toVar();
 
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+			Loop( { start: -1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
 
@@ -37884,7 +37905,7 @@ const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos
 
 	const nDir = normalize( normal ).toVar( 'nDir' );
 	const rbmax = sub( float( 0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar( 'rbmax' );
-	const rbmin = sub( float( - 0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar( 'rbmin' );
+	const rbmin = sub( float( -0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar( 'rbmin' );
 	const rbminmax = vec3().toVar( 'rbminmax' );
 	rbminmax.x = nDir.x.greaterThan( float( 0 ) ).select( rbmax.x, rbmin.x );
 	rbminmax.y = nDir.y.greaterThan( float( 0 ) ).select( rbmax.y, rbmin.y );
@@ -39965,7 +39986,7 @@ const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 // samples and exit early, but not recompile the shader.
 const MAX_SAMPLES = 20;
 
-const _flatCamera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+const _flatCamera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
 const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
@@ -39985,9 +40006,9 @@ const _axisDirections = [
 	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
 	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
 	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
-	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( -1, 1, -1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, -1 ),
+	/*@__PURE__*/ new Vector3( -1, 1, 1 ),
 	/*@__PURE__*/ new Vector3( 1, 1, 1 )
 ];
 
@@ -40387,8 +40408,8 @@ class PMREMGenerator {
 		cubeCamera.far = far;
 
 		// px, py, pz, nx, ny, nz
-		const upSign = [ 1, 1, 1, 1, - 1, 1 ];
-		const forwardSign = [ 1, - 1, 1, - 1, 1, - 1 ];
+		const upSign = [ 1, 1, 1, 1, -1, 1 ];
+		const forwardSign = [ 1, -1, 1, -1, 1, -1 ];
 
 		const renderer = this._renderer;
 
@@ -40709,7 +40730,7 @@ function _createPlanes( lodMax ) {
 		for ( let face = 0; face < cubeFaces; face ++ ) {
 
 			const x = ( face % 3 ) * 2 / 3 - 1;
-			const y = face > 2 ? 0 : - 1;
+			const y = face > 2 ? 0 : -1;
 			const coordinates = [
 				x, y, 0,
 				x + 2 / 3, y, 0,
@@ -42659,7 +42680,7 @@ class NodeBuilder {
 	 */
 	removeFlowTab() {
 
-		this.tab = this.tab.slice( 0, - 1 );
+		this.tab = this.tab.slice( 0, -1 );
 
 		return this;
 
@@ -43263,7 +43284,7 @@ class NodeBuilder {
 
 	}
 
-	// deprecated
+	// Deprecated
 
 	/**
 	 * @function
@@ -44263,7 +44284,7 @@ const parse$1 = ( source ) => {
 
 	const pragmaMainIndex = source.indexOf( pragmaMain );
 
-	const mainCode = pragmaMainIndex !== - 1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source;
+	const mainCode = pragmaMainIndex !== -1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source;
 
 	const declaration = mainCode.match( declarationRegexp$1 );
 
@@ -44332,7 +44353,7 @@ const parse$1 = ( source ) => {
 
 		const precision = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
 
-		const headerCode = pragmaMainIndex !== - 1 ? source.slice( 0, pragmaMainIndex ) : '';
+		const headerCode = pragmaMainIndex !== -1 ? source.slice( 0, pragmaMainIndex ) : '';
 
 		return {
 			type,
@@ -46118,6 +46139,24 @@ class XRManager extends EventDispatcher {
 		this._glBaseLayer = null;
 
 		/**
+		 * A reference to the current XR binding.
+		 *
+		 * @private
+		 * @type {XRWebGLBinding?}
+		 * @default null
+		 */
+		this._glBinding = null;
+
+		/**
+		 * A reference to the current XR projection layer.
+		 *
+		 * @private
+		 * @type {XRProjectionLayer?}
+		 * @default null
+		 */
+		this._glProjLayer = null;
+
+		/**
 		 * A reference to the current XR frame.
 		 *
 		 * @private
@@ -46125,6 +46164,15 @@ class XRManager extends EventDispatcher {
 		 * @default null
 		 */
 		this._xrFrame = null;
+
+		/**
+		 * Whether to use projection layers or not.
+		 *
+		 * @private
+		 * @type {Boolean}
+		 * @readonly
+		 */
+		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
 	}
 
@@ -46179,11 +46227,11 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the foveation value.
 	 *
-	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base layer is defined.
+	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base or projection layer is defined.
 	 */
 	getFoveation() {
 
-		if ( this._glBaseLayer === null ) {
+		if ( this._glProjLayer === null && this._glBaseLayer === null ) {
 
 			return undefined;
 
@@ -46202,6 +46250,12 @@ class XRManager extends EventDispatcher {
 	setFoveation( foveation ) {
 
 		this._foveation = foveation;
+
+		if ( this._glProjLayer !== null ) {
+
+			this._glProjLayer.fixedFoveation = foveation;
+
+		}
 
 		if ( this._glBaseLayer !== null && this._glBaseLayer.fixedFoveation !== undefined ) {
 
@@ -46353,13 +46407,15 @@ class XRManager extends EventDispatcher {
 	async setSession( session ) {
 
 		const renderer = this._renderer;
+		const backend = renderer.backend;
+
 		const gl = renderer.getContext();
 
 		this._session = session;
 
 		if ( session !== null ) {
 
-			if ( renderer.backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
 			this._currentRenderTarget = renderer.getRenderTarget();
 
@@ -46372,7 +46428,7 @@ class XRManager extends EventDispatcher {
 			session.addEventListener( 'end', this._onSessionEnd );
 			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
 
-			await renderer.makeXRCompatible();
+			await backend.makeXRCompatible();
 
 			this._currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( this._currentSize );
@@ -46381,36 +46437,92 @@ class XRManager extends EventDispatcher {
 			this._currentAnimationLoop = renderer._animation.getAnimationLoop();
 			renderer._animation.stop();
 
+			//
+
 			const attributes = gl.getContextAttributes();
 
-			const layerInit = {
-				antialias: attributes.antialias,
-				alpha: true,
-				depth: attributes.depth,
-				stencil: attributes.stencil,
-				framebufferScaleFactor: this.getFramebufferScaleFactor()
-			};
+			if ( this._useLayers === true ) {
 
-			const glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
-			this._glBaseLayer = glBaseLayer;
+				// default path using XRWebGLBinding/XRProjectionLayer
 
-			session.updateRenderState( { baseLayer: glBaseLayer } );
+				let depthFormat = null;
+				let depthType = null;
+				let glDepthFormat = null;
 
-			renderer.setPixelRatio( 1 );
-			renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+				if ( attributes.depth ) {
 
-			this._xrRenderTarget = new RenderTarget(
-				glBaseLayer.framebufferWidth,
-				glBaseLayer.framebufferHeight,
-				{
-					format: RGBAFormat,
-					type: UnsignedByteType,
-					colorSpace: renderer.outputColorSpace,
-					stencilBuffer: attributes.stencil
+					glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
+					depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
+					depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
+
 				}
-			);
+
+				const projectionlayerInit = {
+					colorFormat: gl.RGBA8,
+					depthFormat: glDepthFormat,
+					scaleFactor: this._framebufferScaleFactor
+				};
+
+				const glBinding = new XRWebGLBinding( session, gl );
+				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+				this._glBinding = glBinding;
+				this._glProjLayer = glProjLayer;
+
+				session.updateRenderState( { layers: [ glProjLayer ] } );
+
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+
+				this._xrRenderTarget = new RenderTarget(
+					glProjLayer.textureWidth,
+					glProjLayer.textureHeight,
+					{
+						format: RGBAFormat,
+						type: UnsignedByteType,
+						colorSpace: renderer.outputColorSpace,
+						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+						stencilBuffer: attributes.stencil
+					} );
+
+				this._xrRenderTarget.hasExternalTextures = true;
+
+			} else {
+
+				// fallback to XRWebGLLayer
+
+				const layerInit = {
+					antialias: attributes.antialias,
+					alpha: true,
+					depth: attributes.depth,
+					stencil: attributes.stencil,
+					framebufferScaleFactor: this.getFramebufferScaleFactor()
+				};
+
+				const glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+				this._glBaseLayer = glBaseLayer;
+
+				session.updateRenderState( { baseLayer: glBaseLayer } );
+
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+
+				this._xrRenderTarget = new RenderTarget(
+					glBaseLayer.framebufferWidth,
+					glBaseLayer.framebufferHeight,
+					{
+						format: RGBAFormat,
+						type: UnsignedByteType,
+						colorSpace: renderer.outputColorSpace,
+						stencilBuffer: attributes.stencil
+					}
+				);
+
+			}
 
 			this._xrRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
+
+			//
 
 			this.setFoveation( this.getFoveation() );
 
@@ -46571,7 +46683,7 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 	camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
 	// Check if the projection uses an infinite far plane.
-	if ( projL[ 10 ] === - 1.0 ) {
+	if ( projL[ 10 ] === -1 ) {
 
 		// Use the projection matrix from the left eye.
 		// The camera offset is sufficient to include the view volumes
@@ -46662,7 +46774,7 @@ function onSessionEvent( event ) {
 
 	const controllerIndex = this._controllerInputSources.indexOf( event.inputSource );
 
-	if ( controllerIndex === - 1 ) {
+	if ( controllerIndex === -1 ) {
 
 		return;
 
@@ -46712,6 +46824,7 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
+	renderer.backend.setXRTarget( null );
 	renderer.setRenderTarget( this._currentRenderTarget );
 
 	this._session = null;
@@ -46729,8 +46842,6 @@ function onSessionEnd() {
 
 	renderer.setPixelRatio( this._currentPixelRatio );
 	renderer.setSize( this._currentSize.width, this._currentSize.height, false );
-
-	renderer.setXRTarget( null );
 
 	this.dispatchEvent( { type: 'sessionend' } );
 
@@ -46765,7 +46876,7 @@ function onInputSourcesChange( event ) {
 
 		let controllerIndex = controllerInputSources.indexOf( inputSource );
 
-		if ( controllerIndex === - 1 ) {
+		if ( controllerIndex === -1 ) {
 
 			// Assign input source a controller that currently has no input source
 
@@ -46789,7 +46900,7 @@ function onInputSourcesChange( event ) {
 
 			// If all controllers do currently receive input we ignore new ones
 
-			if ( controllerIndex === - 1 ) break;
+			if ( controllerIndex === -1 ) break;
 
 		}
 
@@ -46811,6 +46922,7 @@ function onAnimationFrame( time, frame ) {
 
 	const cameraXR = this._cameraXR;
 	const renderer = this._renderer;
+	const backend = renderer.backend;
 
 	const glBaseLayer = this._glBaseLayer;
 
@@ -46823,8 +46935,11 @@ function onAnimationFrame( time, frame ) {
 
 		const views = pose.views;
 
-		renderer.setXRTarget( glBaseLayer.framebuffer );
-		renderer.setRenderTarget( this._xrRenderTarget );
+		if ( this._glBaseLayer !== null ) {
+
+			backend.setXRTarget( glBaseLayer.framebuffer );
+
+		}
 
 		let cameraXRNeedsUpdate = false;
 
@@ -46841,7 +46956,29 @@ function onAnimationFrame( time, frame ) {
 
 			const view = views[ i ];
 
-			const viewport = glBaseLayer.getViewport( view );
+			let viewport;
+
+			if ( this._useLayers === true ) {
+
+				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
+				viewport = glSubImage.viewport;
+
+				// For side-by-side projection, we only produce a single texture for both eyes.
+				if ( i === 0 ) {
+
+					backend.setRenderTargetTextures(
+						this._xrRenderTarget,
+						glSubImage.colorTexture,
+						this._glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture
+					);
+
+				}
+
+			} else {
+
+				viewport = glBaseLayer.getViewport( view );
+
+			}
 
 			let camera = this._cameras[ i ];
 
@@ -46874,6 +47011,8 @@ function onAnimationFrame( time, frame ) {
 			}
 
 		}
+
+		renderer.setRenderTarget( this._xrRenderTarget );
 
 	}
 
@@ -48910,29 +49049,6 @@ class Renderer {
 	}
 
 	/**
-	 * Ensures the renderer is XR compatible.
-	 *
-	 * @async
-	 * @return {Promise} A Promise that resolve when the renderer is XR compatible.
-	 */
-	async makeXRCompatible() {
-
-		await this.backend.makeXRCompatible();
-
-	}
-
-	/**
-	 * Sets the XR rendering destination.
-	 *
-	 * @param {WebGLFramebuffer} xrTarget - The XR target.
-	 */
-	setXRTarget( xrTarget ) {
-
-		this.backend.setXRTarget( xrTarget );
-
-	}
-
-	/**
 	 * Sets the given render target. Calling this method means the renderer does not
 	 * target the default framebuffer (meaning the canvas) anymore but a custom framebuffer.
 	 * Use `null` as the first argument to reset the state.
@@ -50050,7 +50166,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const index = this.uniforms.indexOf( uniform );
 
-		if ( index !== - 1 ) {
+		if ( index !== -1 ) {
 
 			this.uniforms.splice( index, 1 );
 
@@ -56134,6 +56250,27 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Configures the render target with external textures.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target.
+	 * @param {WebGLTexture} colorTexture - A native color texture.
+	 * @param {WebGLTexture?} [depthTexture=null] - A native depth texture.
+	 */
+	setRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
+
+		this.set( renderTarget.texture, { textureGPU: colorTexture } );
+
+		if ( depthTexture !== null ) {
+
+			this.set( renderTarget.depthTexture, { textureGPU: depthTexture } );
+
+			renderTarget.autoAllocateDepthBuffer = false;
+
+		}
+
+	}
+
+	/**
 	 * Inits a time stamp query for the given render context.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
@@ -57719,6 +57856,7 @@ class WebGLBackend extends Backend {
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
+			const hasExternalTextures = renderTarget.hasExternalTextures === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
@@ -57733,7 +57871,7 @@ class WebGLBackend extends Backend {
 
 				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
 
-			} else if ( isXRRenderTarget ) {
+			} else if ( isXRRenderTarget && hasExternalTextures === false ) {
 
 				fb = this._xrFamebuffer;
 
@@ -57804,6 +57942,32 @@ class WebGLBackend extends Backend {
 					textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+				}
+
+			} else {
+
+				// rebind external XR textures
+
+				if ( isXRRenderTarget && hasExternalTextures ) {
+
+					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
+
+					// rebind color
+
+					const textureData = this.get( descriptor.textures[ 0 ] );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					// rebind depth
+
+					if ( descriptor.depthTexture !== null ) {
+
+						const textureData = this.get( descriptor.depthTexture );
+						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					}
 
 				}
 
