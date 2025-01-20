@@ -1320,7 +1320,7 @@ class NodeBuilder {
 
 		if ( length === 1 ) return componentType;
 
-		const baseType = getTypeFromLength( length );
+		let baseType = getTypeFromLength( length );
 		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
 
 		// fix edge case for mat2x2 being same size as vec4
