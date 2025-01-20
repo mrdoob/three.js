@@ -7,7 +7,8 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebXRController } from '../webxr/WebXRController.js';
-import { RGBAFormat, UnsignedByteType } from '../../constants.js';
+import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType } from '../../constants.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -288,6 +289,24 @@ class XRManager extends EventDispatcher {
 		this._glBaseLayer = null;
 
 		/**
+		 * A reference to the current XR binding.
+		 *
+		 * @private
+		 * @type {XRWebGLBinding?}
+		 * @default null
+		 */
+		this._glBinding = null;
+
+		/**
+		 * A reference to the current XR projection layer.
+		 *
+		 * @private
+		 * @type {XRProjectionLayer?}
+		 * @default null
+		 */
+		this._glProjLayer = null;
+
+		/**
 		 * A reference to the current XR frame.
 		 *
 		 * @private
@@ -295,6 +314,15 @@ class XRManager extends EventDispatcher {
 		 * @default null
 		 */
 		this._xrFrame = null;
+
+		/**
+		 * Whether to use projection layers or not.
+		 *
+		 * @private
+		 * @type {Boolean}
+		 * @readonly
+		 */
+		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
 	}
 
@@ -349,11 +377,11 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the foveation value.
 	 *
-	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base layer is defined.
+	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base or projection layer is defined.
 	 */
 	getFoveation() {
 
-		if ( this._glBaseLayer === null ) {
+		if ( this._glProjLayer === null && this._glBaseLayer === null ) {
 
 			return undefined;
 
@@ -372,6 +400,12 @@ class XRManager extends EventDispatcher {
 	setFoveation( foveation ) {
 
 		this._foveation = foveation;
+
+		if ( this._glProjLayer !== null ) {
+
+			this._glProjLayer.fixedFoveation = foveation;
+
+		}
 
 		if ( this._glBaseLayer !== null && this._glBaseLayer.fixedFoveation !== undefined ) {
 
@@ -523,13 +557,15 @@ class XRManager extends EventDispatcher {
 	async setSession( session ) {
 
 		const renderer = this._renderer;
+		const backend = renderer.backend;
+
 		const gl = renderer.getContext();
 
 		this._session = session;
 
 		if ( session !== null ) {
 
-			if ( renderer.backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
 			this._currentRenderTarget = renderer.getRenderTarget();
 
@@ -542,7 +578,7 @@ class XRManager extends EventDispatcher {
 			session.addEventListener( 'end', this._onSessionEnd );
 			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
 
-			await renderer.makeXRCompatible();
+			await backend.makeXRCompatible();
 
 			this._currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( this._currentSize );
@@ -551,36 +587,92 @@ class XRManager extends EventDispatcher {
 			this._currentAnimationLoop = renderer._animation.getAnimationLoop();
 			renderer._animation.stop();
 
+			//
+
 			const attributes = gl.getContextAttributes();
 
-			const layerInit = {
-				antialias: attributes.antialias,
-				alpha: true,
-				depth: attributes.depth,
-				stencil: attributes.stencil,
-				framebufferScaleFactor: this.getFramebufferScaleFactor()
-			};
+			if ( this._useLayers === true ) {
 
-			const glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
-			this._glBaseLayer = glBaseLayer;
+				// default path using XRWebGLBinding/XRProjectionLayer
 
-			session.updateRenderState( { baseLayer: glBaseLayer } );
+				let depthFormat = null;
+				let depthType = null;
+				let glDepthFormat = null;
 
-			renderer.setPixelRatio( 1 );
-			renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+				if ( attributes.depth ) {
 
-			this._xrRenderTarget = new RenderTarget(
-				glBaseLayer.framebufferWidth,
-				glBaseLayer.framebufferHeight,
-				{
-					format: RGBAFormat,
-					type: UnsignedByteType,
-					colorSpace: renderer.outputColorSpace,
-					stencilBuffer: attributes.stencil
+					glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
+					depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
+					depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
+
 				}
-			);
+
+				const projectionlayerInit = {
+					colorFormat: gl.RGBA8,
+					depthFormat: glDepthFormat,
+					scaleFactor: this._framebufferScaleFactor
+				};
+
+				const glBinding = new XRWebGLBinding( session, gl );
+				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+				this._glBinding = glBinding;
+				this._glProjLayer = glProjLayer;
+
+				session.updateRenderState( { layers: [ glProjLayer ] } );
+
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+
+				this._xrRenderTarget = new RenderTarget(
+					glProjLayer.textureWidth,
+					glProjLayer.textureHeight,
+					{
+						format: RGBAFormat,
+						type: UnsignedByteType,
+						colorSpace: renderer.outputColorSpace,
+						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+						stencilBuffer: attributes.stencil
+					} );
+
+				this._xrRenderTarget.hasExternalTextures = true;
+
+			} else {
+
+				// fallback to XRWebGLLayer
+
+				const layerInit = {
+					antialias: attributes.antialias,
+					alpha: true,
+					depth: attributes.depth,
+					stencil: attributes.stencil,
+					framebufferScaleFactor: this.getFramebufferScaleFactor()
+				};
+
+				const glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+				this._glBaseLayer = glBaseLayer;
+
+				session.updateRenderState( { baseLayer: glBaseLayer } );
+
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+
+				this._xrRenderTarget = new RenderTarget(
+					glBaseLayer.framebufferWidth,
+					glBaseLayer.framebufferHeight,
+					{
+						format: RGBAFormat,
+						type: UnsignedByteType,
+						colorSpace: renderer.outputColorSpace,
+						stencilBuffer: attributes.stencil
+					}
+				);
+
+			}
 
 			this._xrRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
+
+			//
 
 			this.setFoveation( this.getFoveation() );
 
@@ -882,7 +974,7 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
-	renderer.setXRTarget( null );
+	renderer.backend.setXRTarget( null );
 	renderer.setRenderTarget( this._currentRenderTarget );
 
 	this._session = null;
@@ -980,6 +1072,7 @@ function onAnimationFrame( time, frame ) {
 
 	const cameraXR = this._cameraXR;
 	const renderer = this._renderer;
+	const backend = renderer.backend;
 
 	const glBaseLayer = this._glBaseLayer;
 
@@ -992,8 +1085,11 @@ function onAnimationFrame( time, frame ) {
 
 		const views = pose.views;
 
-		renderer.setXRTarget( glBaseLayer.framebuffer );
-		renderer.setRenderTarget( this._xrRenderTarget );
+		if ( this._glBaseLayer !== null ) {
+
+			backend.setXRTarget( glBaseLayer.framebuffer );
+
+		}
 
 		let cameraXRNeedsUpdate = false;
 
@@ -1010,7 +1106,29 @@ function onAnimationFrame( time, frame ) {
 
 			const view = views[ i ];
 
-			const viewport = glBaseLayer.getViewport( view );
+			let viewport;
+
+			if ( this._useLayers === true ) {
+
+				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
+				viewport = glSubImage.viewport;
+
+				// For side-by-side projection, we only produce a single texture for both eyes.
+				if ( i === 0 ) {
+
+					backend.setRenderTargetTextures(
+						this._xrRenderTarget,
+						glSubImage.colorTexture,
+						this._glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture
+					);
+
+				}
+
+			} else {
+
+				viewport = glBaseLayer.getViewport( view );
+
+			}
 
 			let camera = this._cameras[ i ];
 
@@ -1043,6 +1161,8 @@ function onAnimationFrame( time, frame ) {
 			}
 
 		}
+
+		renderer.setRenderTarget( this._xrRenderTarget );
 
 	}
 
