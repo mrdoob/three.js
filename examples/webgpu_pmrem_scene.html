@@ -98,11 +98,7 @@
 
 				//while ( scene.children.length > 0 ) scene.remove( scene.children[ 0 ] );
 
-				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( {
-					scene: scene,
-					size: 512,
-					position: center
-				} );
+				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( scene, 0, 0.1, 100, 512, center );
 
 				//
 

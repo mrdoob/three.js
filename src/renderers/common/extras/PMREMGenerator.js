@@ -141,7 +141,7 @@ class PMREMGenerator {
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromSceneAsync
 	 */
-	fromScene( { scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0 ), renderTarget = null } ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0 ), renderTarget = null ) {
 
 		this._setSize( size );
 
