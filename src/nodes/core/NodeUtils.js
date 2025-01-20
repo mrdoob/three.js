@@ -283,6 +283,10 @@ export function getValueType( value ) {
 
 		return 'vec4';
 
+	} else if ( value.isMatrix2 === true ) {
+
+		return 'mat2';
+
 	} else if ( value.isMatrix3 === true ) {
 
 		return 'mat3';
