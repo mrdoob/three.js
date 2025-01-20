@@ -323,6 +323,27 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Configures the render target with external textures.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target.
+	 * @param {WebGLTexture} colorTexture - A native color texture.
+	 * @param {WebGLTexture?} [depthTexture=null] - A native depth texture.
+	 */
+	setRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
+
+		this.set( renderTarget.texture, { textureGPU: colorTexture } );
+
+		if ( depthTexture !== null ) {
+
+			this.set( renderTarget.depthTexture, { textureGPU: depthTexture } );
+
+			renderTarget.autoAllocateDepthBuffer = false;
+
+		}
+
+	}
+
+	/**
 	 * Inits a time stamp query for the given render context.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
@@ -1908,6 +1929,7 @@ class WebGLBackend extends Backend {
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
+			const hasExternalTextures = renderTarget.hasExternalTextures === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
@@ -1922,7 +1944,7 @@ class WebGLBackend extends Backend {
 
 				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
 
-			} else if ( isXRRenderTarget ) {
+			} else if ( isXRRenderTarget && hasExternalTextures === false ) {
 
 				fb = this._xrFamebuffer;
 
@@ -1993,6 +2015,32 @@ class WebGLBackend extends Backend {
 					textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+				}
+
+			} else {
+
+				// rebind external XR textures
+
+				if ( isXRRenderTarget && hasExternalTextures ) {
+
+					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
+
+					// rebind color
+
+					const textureData = this.get( descriptor.textures[ 0 ] );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					// rebind depth
+
+					if ( descriptor.depthTexture !== null ) {
+
+						const textureData = this.get( descriptor.depthTexture );
+						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					}
 
 				}
 
