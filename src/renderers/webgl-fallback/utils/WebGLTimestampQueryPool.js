@@ -19,8 +19,6 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		this.gl = gl;
 		this.type = type;
-		this.pendingResolve = false;
-		this.lastValue = 0; // Add lastValue tracking
 
 		// Check for timer query extensions
 		this.ext = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' ) ||
@@ -42,7 +40,6 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		}
 
-		this.queryOffsets = new Map();
 		this.activeQuery = null;
 		this.queryStates = new Map(); // Track state of each query: 'inactive', 'started', 'ended'
 
@@ -81,10 +78,18 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
      */
 	beginQuery( renderContext ) {
 
-		if ( ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp || this.isDisposed ) {
+
+			return;
+
+		}
 
 		const baseOffset = this.queryOffsets.get( renderContext.id );
-		if ( baseOffset == null ) return;
+		if ( baseOffset == null ) {
+
+			return;
+
+		}
 
 		// Don't start a new query if there's an active one
 		if ( this.activeQuery !== null ) {
@@ -94,7 +99,11 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		}
 
 		const query = this.queries[ baseOffset ];
-		if ( ! query ) return;
+		if ( ! query ) {
+
+			return;
+
+		}
 
 		try {
 
@@ -124,10 +133,18 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
      */
 	endQuery( renderContext ) {
 
-		if ( ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp || this.isDisposed ) {
+
+			return;
+
+		}
 
 		const baseOffset = this.queryOffsets.get( renderContext.id );
-		if ( baseOffset == null ) return;
+		if ( baseOffset == null ) {
+
+			return;
+
+		}
 
 		// Only end if this is the active query
 		if ( this.activeQuery !== baseOffset ) {
@@ -226,14 +243,55 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		return new Promise( ( resolve ) => {
 
+			if ( this.isDisposed ) {
+
+				resolve( this.lastValue );
+				return;
+
+			}
+
+			let timeoutId;
+			let isResolved = false;
+
+			const cleanup = () => {
+
+				if ( timeoutId ) {
+
+					clearTimeout( timeoutId );
+					timeoutId = null;
+
+				}
+
+			};
+
+			const finalizeResolution = ( value ) => {
+
+				if ( ! isResolved ) {
+
+					isResolved = true;
+					cleanup();
+					resolve( value );
+
+				}
+
+			};
+
 			const checkQuery = () => {
+
+				if ( this.isDisposed ) {
+
+					finalizeResolution( this.lastValue );
+					return;
+
+				}
 
 				try {
 
+					// Check if the GPU timer was disjoint (i.e., timing was unreliable)
 					const disjoint = this.gl.getParameter( this.ext.GPU_DISJOINT_EXT );
 					if ( disjoint ) {
 
-						resolve( this.lastValue );
+						finalizeResolution( this.lastValue );
 						return;
 
 					}
@@ -241,7 +299,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 					const available = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT_AVAILABLE );
 					if ( ! available ) {
 
-						setTimeout( checkQuery, 1 );
+						timeoutId = setTimeout( checkQuery, 1 );
 						return;
 
 					}
@@ -269,6 +327,14 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
      * This includes deleting all query objects and clearing internal state.
      */
 	dispose() {
+
+		if ( this.isDisposed ) {
+
+			return;
+
+		}
+
+		this.isDisposed = true;
 
 		if ( ! this.trackTimestamp ) return;
 

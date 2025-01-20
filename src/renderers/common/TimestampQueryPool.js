@@ -6,6 +6,9 @@ class TimestampQueryPool {
 		this.maxQueries = maxQueries;
 		this.currentQueryIndex = 0; // how many queries allocated so far
 		this.queryOffsets = new Map(); // track offsets for different contexts
+		this.isDisposed = false;
+		this.lastValue = 0;
+		this.pendingResolve = false;
 
 	}
 

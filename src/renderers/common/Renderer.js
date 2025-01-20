@@ -2019,6 +2019,12 @@ class Renderer {
 		this._renderContexts.dispose();
 		this._textures.dispose();
 
+		Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+
+			if ( queryPool !== null ) queryPool.dispose();
+
+		} );
+
 		this.setRenderTarget( null );
 		this.setAnimationLoop( null );
 

@@ -39,10 +39,6 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 		} );
 
-		this.queryOffsets = new Map();
-		this.pendingResolve = null;
-		this.lastValue = 0; // Store last valid timing value
-
 	}
 
 	/**
@@ -52,7 +48,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
      */
 	allocateQueriesForContext( renderContext ) {
 
-		if ( ! this.trackTimestamp ) return null;
+		if ( ! this.trackTimestamp || this.isDisposed ) return null;
 
 		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
 
@@ -76,7 +72,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
      */
 	async resolveQueriesAsync() {
 
-		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 ) {
+		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 || this.isDisposed ) {
 
 			return this.lastValue;
 
@@ -110,6 +106,13 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
      */
 	async _resolveQueries() {
 
+		if ( this.isDisposed ) {
+
+			return this.lastValue;
+
+		}
+
+		let mappingOperation = null;
 		try {
 
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
@@ -147,13 +150,28 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			const commandBuffer = commandEncoder.finish();
 			this.device.queue.submit( [ commandBuffer ] );
 
-			if ( this.resultBuffer.mapState !== 'unmapped' ) {
+			if ( this.resultBuffer.mapState !== 'unmapped' || this.isDisposed ) {
 
 				return this.lastValue;
 
 			}
 
-			await this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
+			// Create and track the mapping operation
+			mappingOperation = this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
+
+			await mappingOperation;
+
+			if ( this.isDisposed ) {
+
+				if ( this.resultBuffer.mapState === 'mapped' ) {
+
+					this.resultBuffer.unmap();
+
+				}
+
+				return this.lastValue;
+
+			}
 
 			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
 			let totalDuration = 0;
@@ -168,6 +186,8 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			}
 
 			this.resultBuffer.unmap();
+			this.lastValue = totalDuration;
+
 			return totalDuration;
 
 		} catch ( error ) {
@@ -185,15 +205,68 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
-	/**
-     * Releases all resources held by this query pool.
-     * This includes destroying the query set and associated buffers.
-     */
-	dispose() {
+	async dispose() {
 
-		this.querySet.destroy();
-		this.resolveBuffer.destroy();
-		this.resultBuffer.destroy();
+		if ( this.isDisposed ) {
+
+			return;
+
+		}
+
+		this.isDisposed = true;
+
+		// Wait for pending resolve operation
+		if ( this.pendingResolve ) {
+
+			try {
+
+				await this.pendingResolve;
+
+			} catch ( error ) {
+
+				console.error( 'Error waiting for pending resolve:', error );
+
+			}
+
+		}
+
+		// Ensure buffer is unmapped before destroying
+		if ( this.resultBuffer && this.resultBuffer.mapState === 'mapped' ) {
+
+			try {
+
+				this.resultBuffer.unmap();
+
+			} catch ( error ) {
+
+				console.error( 'Error unmapping buffer:', error );
+
+			}
+
+		}
+
+		// Destroy resources
+		if ( this.querySet ) {
+
+			this.querySet.destroy();
+			this.querySet = null;
+
+		}
+
+		if ( this.resolveBuffer ) {
+
+			this.resolveBuffer.destroy();
+			this.resolveBuffer = null;
+
+		}
+
+		if ( this.resultBuffer ) {
+
+			this.resultBuffer.destroy();
+			this.resultBuffer = null;
+
+		}
+
 		this.queryOffsets.clear();
 		this.pendingResolve = null;
 

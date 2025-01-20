@@ -2208,6 +2208,9 @@ class WebGLBackend extends Backend {
 	 */
 	dispose() {
 
+		const extension = this.extensions.get( 'WEBGL_lose_context' );
+		if ( extension ) extension.loseContext();
+
 		this.renderer.domElement.removeEventListener( 'webglcontextlost', this._onContextLost );
 
 	}
