@@ -112,7 +112,6 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 		}
 
-		let mappingOperation = null;
 		try {
 
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
@@ -150,16 +149,14 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			const commandBuffer = commandEncoder.finish();
 			this.device.queue.submit( [ commandBuffer ] );
 
-			if ( this.resultBuffer.mapState !== 'unmapped' || this.isDisposed ) {
+			if ( this.resultBuffer.mapState !== 'unmapped' ) {
 
 				return this.lastValue;
 
 			}
 
 			// Create and track the mapping operation
-			mappingOperation = this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
-
-			await mappingOperation;
+			await this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
 
 			if ( this.isDisposed ) {
 
