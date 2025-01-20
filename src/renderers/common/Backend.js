@@ -60,6 +60,7 @@ class Backend {
 
 		/**
 		 * A reference to the timestamp query pool.
+   		 * @type {{render: TimestampQueryPool, compute: TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
 			'render': null,
