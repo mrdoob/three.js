@@ -1,4 +1,5 @@
 import { Color } from '../../math/Color.js';
+import { Matrix2 } from '../../math/Matrix2.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -229,6 +230,7 @@ export function getLengthFromType( type ) {
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 4;
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
@@ -280,6 +282,10 @@ export function getValueType( value ) {
 	} else if ( value.isVector4 === true ) {
 
 		return 'vec4';
+
+	} else if ( value.isMatrix2 === true ) {
+
+		return 'mat2';
 
 	} else if ( value.isMatrix3 === true ) {
 
@@ -338,6 +344,10 @@ export function getValueFromType( type, ...params ) {
 	} else if ( last4 === 'vec4' ) {
 
 		return new Vector4( ...params );
+
+	} else if ( last4 === 'mat2' ) {
+
+		return new Matrix2( ...params );
 
 	} else if ( last4 === 'mat3' ) {
 
