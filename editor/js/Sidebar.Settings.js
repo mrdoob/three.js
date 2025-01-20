@@ -39,6 +39,8 @@ function SidebarSettings( editor ) {
 
 		editor.config.setKey( 'language', value );
 
+		window.location.reload();
+
 	} );
 
 	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setClass( 'Label' ) );
