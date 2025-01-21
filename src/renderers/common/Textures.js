@@ -127,7 +127,18 @@ class Textures extends DataMap {
 
 		const options = { sampleCount };
 
-		if ( ( renderTarget.isXRRenderTarget === true && renderTarget.hasExternalTextures === true ) === false ) {
+		// when using the WebXR Layers API, the render target uses external textures which
+		// require no manual updates
+
+		if ( renderTarget.isXRRenderTarget === true && renderTarget.hasExternalTextures === true ) {
+
+			if ( depthTexture && renderTarget.autoAllocateDepthBuffer === true ) {
+
+				this.updateTexture( depthTexture, options );
+
+			}
+
+		} else {
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -139,11 +150,11 @@ class Textures extends DataMap {
 
 			}
 
-		}
+			if ( depthTexture ) {
 
-		if ( depthTexture && renderTarget.autoAllocateDepthBuffer !== false ) {
+				this.updateTexture( depthTexture, options );
 
-			this.updateTexture( depthTexture, options );
+			}
 
 		}
 
