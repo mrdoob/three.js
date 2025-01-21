@@ -269,7 +269,7 @@ class ColorNodeUniform extends ColorUniform {
 class Matrix2NodeUniform extends Matrix2Uniform {
 
 	/**
-	 * Constructs a new node-based Matrix3 uniform.
+	 * Constructs a new node-based Matrix2 uniform.
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
@@ -289,7 +289,7 @@ class Matrix2NodeUniform extends Matrix2Uniform {
 	/**
 	 * Overwritten to return the value of the node uniform.
 	 *
-	 * @return {Matrix3} The value.
+	 * @return {Matrix2} The value.
 	 */
 	getValue() {
 
