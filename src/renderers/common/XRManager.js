@@ -1,6 +1,5 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { RAD2DEG } from '../../math/MathUtils.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -9,6 +8,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { WebXRController } from '../webxr/WebXRController.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType } from '../../constants.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
+import { XRRenderTarget } from './XRRenderTarget.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -316,7 +316,7 @@ class XRManager extends EventDispatcher {
 		this._xrFrame = null;
 
 		/**
-		 * Whether to use projection layers or not.
+		 * Whether to use the WebXR Layers API or not.
 		 *
 		 * @private
 		 * @type {Boolean}
@@ -624,7 +624,7 @@ class XRManager extends EventDispatcher {
 				renderer.setPixelRatio( 1 );
 				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
-				this._xrRenderTarget = new RenderTarget(
+				this._xrRenderTarget = new XRRenderTarget(
 					glProjLayer.textureWidth,
 					glProjLayer.textureHeight,
 					{
@@ -657,7 +657,7 @@ class XRManager extends EventDispatcher {
 				renderer.setPixelRatio( 1 );
 				renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
 
-				this._xrRenderTarget = new RenderTarget(
+				this._xrRenderTarget = new XRRenderTarget(
 					glBaseLayer.framebufferWidth,
 					glBaseLayer.framebufferHeight,
 					{
@@ -669,8 +669,6 @@ class XRManager extends EventDispatcher {
 				);
 
 			}
-
-			this._xrRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
 
 			//
 
@@ -1116,7 +1114,7 @@ function onAnimationFrame( time, frame ) {
 				// For side-by-side projection, we only produce a single texture for both eyes.
 				if ( i === 0 ) {
 
-					backend.setRenderTargetTextures(
+					backend.setXRRenderTargetTextures(
 						this._xrRenderTarget,
 						glSubImage.colorTexture,
 						this._glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture

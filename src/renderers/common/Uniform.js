@@ -1,4 +1,5 @@
 import { Color } from '../../math/Color.js';
+import { Matrix2 } from '../../math/Matrix2.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -257,6 +258,41 @@ class ColorUniform extends Uniform {
 }
 
 /**
+ * Represents a Matrix2 uniform.
+ *
+ * @private
+ * @augments Uniform
+ */
+class Matrix2Uniform extends Uniform {
+
+	/**
+	 * Constructs a new Number uniform.
+	 *
+	 * @param {String} name - The uniform's name.
+	 * @param {Matrix2} value - The uniform's value.
+	 */
+	constructor( name, value = new Matrix2() ) {
+
+		super( name, value );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {Boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isMatrix2Uniform = true;
+
+		this.boundary = 16;
+		this.itemSize = 4;
+
+	}
+
+}
+
+
+/**
  * Represents a Matrix3 uniform.
  *
  * @private
@@ -327,5 +363,5 @@ class Matrix4Uniform extends Uniform {
 export {
 	NumberUniform,
 	Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform,
-	Matrix3Uniform, Matrix4Uniform
+	Matrix2Uniform, Matrix3Uniform, Matrix4Uniform
 };

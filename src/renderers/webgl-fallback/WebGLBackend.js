@@ -323,13 +323,15 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Configures the render target with external textures.
+	 * Configures the given XR render target with external textures.
 	 *
-	 * @param {RenderTarget} renderTarget - The render target.
+	 * This method is only relevant when using the WebXR Layers API.
+	 *
+	 * @param {XRRenderTarget} renderTarget - The XR render target.
 	 * @param {WebGLTexture} colorTexture - A native color texture.
 	 * @param {WebGLTexture?} [depthTexture=null] - A native depth texture.
 	 */
-	setRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
+	setXRRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
 
 		this.set( renderTarget.texture, { textureGPU: colorTexture } );
 
@@ -1929,7 +1931,7 @@ class WebGLBackend extends Backend {
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
-			const hasExternalTextures = renderTarget.hasExternalTextures === true;
+			const hasExternalTextures = ( isXRRenderTarget === true && renderTarget.hasExternalTextures === true );
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
