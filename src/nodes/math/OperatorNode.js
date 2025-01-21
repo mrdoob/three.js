@@ -343,11 +343,7 @@ class OperatorNode extends TempNode {
 
 				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
 
-					return builder.format( `${b} ${op} ${a}`, type, output );
-
-				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
-
-					return builder.format( `${ a } ${ op } ${ b }`, type, output );
+					return builder.format( `${ b } ${ op } ${ a }`, type, output );
 
 				} else {
 
