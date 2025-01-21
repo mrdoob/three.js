@@ -43,6 +43,7 @@ export const anisotropyB = TSL.anisotropyB;
 export const anisotropyT = TSL.anisotropyT;
 export const any = TSL.any;
 export const append = TSL.append;
+export const array = TSL.array;
 export const arrayBuffer = TSL.arrayBuffer;
 export const asin = TSL.asin;
 export const assign = TSL.assign;

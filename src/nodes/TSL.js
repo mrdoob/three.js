@@ -2,6 +2,7 @@
 export * from './core/constants.js';
 
 // core
+export * from './core/ArrayNode.js';
 export * from './core/AssignNode.js';
 export * from './core/AttributeNode.js';
 export * from './core/BypassNode.js';
