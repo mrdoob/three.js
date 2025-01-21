@@ -52,9 +52,7 @@ class Info {
 		 * @property {Number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {Number} points - The number of rendered point primitives of the current frame.
 		 * @property {Number} lines - The number of rendered line primitives of the current frame.
-		 * @property {Number} previousFrameCalls - The number of render calls of the previous frame.
 		 * @property {Number} timestamp - The timestamp of the frame when using `renderer.renderAsync()`.
-		 * @property {Number} timestampCalls - The number of render calls using `renderer.renderAsync()`.
 		 */
 		this.render = {
 			calls: 0,
@@ -64,8 +62,6 @@ class Info {
 			points: 0,
 			lines: 0,
 			timestamp: 0,
-			previousFrameCalls: 0,
-			timestampCalls: 0
 		};
 
 		/**
@@ -75,16 +71,12 @@ class Info {
 		 * @readonly
 		 * @property {Number} calls - The number of compute calls since the app has been started.
 		 * @property {Number} frameCalls - The number of compute calls of the current frame.
-		 * @property {Number} previousFrameCalls - The number of compute calls of the previous frame.
 		 * @property {Number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
-		 * @property {Number} timestampCalls - The number of render calls using `renderer.computeAsync()`.
 		 */
 		this.compute = {
 			calls: 0,
 			frameCalls: 0,
-			timestamp: 0,
-			previousFrameCalls: 0,
-			timestampCalls: 0
+			timestamp: 0
 		};
 
 		/**
@@ -138,45 +130,9 @@ class Info {
 	}
 
 	/**
-	 * Used by async render methods to updated timestamp metrics.
-	 *
-	 * @param {('render'|'compute')} type - The type of render call.
-	 * @param {Number} time - The duration of the compute/render call in milliseconds.
-	 */
-	updateTimestamp( type, time ) {
-
-		if ( this[ type ].timestampCalls === 0 ) {
-
-			this[ type ].timestamp = 0;
-
-		}
-
-
-		this[ type ].timestamp += time;
-
-		this[ type ].timestampCalls ++;
-
-
-		if ( this[ type ].timestampCalls >= this[ type ].previousFrameCalls ) {
-
-			this[ type ].timestampCalls = 0;
-
-		}
-
-
-	}
-
-	/**
 	 * Resets frame related metrics.
 	 */
 	reset() {
-
-		const previousRenderFrameCalls = this.render.frameCalls;
-		this.render.previousFrameCalls = previousRenderFrameCalls;
-
-		const previousComputeFrameCalls = this.compute.frameCalls;
-		this.compute.previousFrameCalls = previousComputeFrameCalls;
-
 
 		this.render.drawCalls = 0;
 		this.render.frameCalls = 0;

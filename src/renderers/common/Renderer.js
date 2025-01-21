@@ -932,9 +932,7 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		const renderContext = this._renderScene( scene, camera );
-
-		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+		this._renderScene( scene, camera );
 
 	}
 
@@ -2028,6 +2026,12 @@ class Renderer {
 		this._renderContexts.dispose();
 		this._textures.dispose();
 
+		Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+
+			if ( queryPool !== null ) queryPool.dispose();
+
+		} );
+
 		this.setRenderTarget( null );
 		this.setAnimationLoop( null );
 
@@ -2215,8 +2219,6 @@ class Renderer {
 
 		this.compute( computeNodes );
 
-		await this.backend.resolveTimestampAsync( computeNodes, 'compute' );
-
 	}
 
 	/**
@@ -2231,6 +2233,14 @@ class Renderer {
 		if ( this._initialized === false ) await this.init();
 
 		return this.backend.hasFeature( name );
+
+	}
+
+	async resolveTimestampsAsync( type = 'render' ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		return this.backend.resolveTimestampsAsync( type );
 
 	}
 

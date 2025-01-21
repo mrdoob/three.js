@@ -3,7 +3,7 @@ let _color4 = null;
 
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { createCanvasElement } from '../../utils.js';
+import { createCanvasElement, warnOnce } from '../../utils.js';
 import { REVISION } from '../../constants.js';
 
 /**
@@ -57,6 +57,16 @@ class Backend {
 		 * @default null
 		 */
 		this.domElement = null;
+
+		/**
+		 * A reference to the timestamp query pool.
+   		 *
+   		 * @type {{render: TimestampQueryPool?, compute: TimestampQueryPool?}}
+		 */
+		this.timestampQueryPool = {
+			'render': null,
+			'compute': null
+		};
 
 	}
 
@@ -437,11 +447,33 @@ class Backend {
 	 *
 	 * @async
 	 * @abstract
-	 * @param {RenderContext} renderContext - The render context.
-	 * @param {String} type - The render context.
-	 * @return {Promise} A Promise that resolves when the time stamp has been computed.
+	 * @param {String} [type='render'] - The type of the time stamp.
+	 * @return {Promise<Number>} A Promise that resolves with the time stamp.
 	 */
-	async resolveTimestampAsync( /*renderContext, type*/ ) { }
+	async resolveTimestampsAsync( type = 'render' ) {
+
+		if ( ! this.trackTimestamp ) {
+
+			warnOnce( 'WebGPURenderer: Timestamp tracking is disabled.' );
+			return;
+
+		}
+
+		const queryPool = this.timestampQueryPool[ type ];
+		if ( ! queryPool ) {
+
+			warnOnce( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
+			return;
+
+		}
+
+		const duration = await queryPool.resolveQueriesAsync();
+
+		this.renderer.info[ type ].timestamp = duration;
+
+		return duration;
+
+	}
 
 	/**
 	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,

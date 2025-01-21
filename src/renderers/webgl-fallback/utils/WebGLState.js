@@ -8,7 +8,7 @@ import {
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
 
-let initialized = false, equationToGL, factorToGL;
+let equationToGL, factorToGL;
 
 /**
  * A WebGL 2 backend utility module for managing the WebGL state.
@@ -81,13 +81,8 @@ class WebGLState {
 		this.currentBoundTextures = {};
 		this.currentBoundBufferBases = {};
 
-		if ( initialized === false ) {
 
-			this._init();
-
-			initialized = true;
-
-		}
+		this._init();
 
 	}
 
