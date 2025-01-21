@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
-
+asdfasdf
 /** @module MathNode **/
 
 /**
@@ -386,7 +386,7 @@ export const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL );
  * @param {Node | Number} x - The parameter.
  * @returns {Node<bool>}
  */
-export const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
+export const anyof = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
 
 /**
  * Converts a quantity in degrees to radians.
