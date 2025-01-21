@@ -337,7 +337,7 @@ class OperatorNode extends TempNode {
 
 			if ( fnOpSnippet ) {
 
-				return builder.format( `${fnOpSnippet}(${a}, ${b})`, type, output );
+				return builder.format( `${ fnOpSnippet }( ${ a }, ${ b } )`, type, output );
 
 			} else {
 
@@ -347,11 +347,11 @@ class OperatorNode extends TempNode {
 
 				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
 
-					return builder.format( `${a} ${op} ${b}`, type, output );
+					return builder.format( `${ a } ${ op } ${ b }`, type, output );
 
 				} else {
 
-					return builder.format( `${a} ${op} ${b}`, type, output );
+					return builder.format( `${ a } ${ op } ${ b }`, type, output );
 
 				}
 
