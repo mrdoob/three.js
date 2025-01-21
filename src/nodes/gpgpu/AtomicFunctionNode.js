@@ -103,7 +103,13 @@ class AtomicFunctionNode extends TempNode {
 		const params = [];
 
 		params.push( `&${ a.build( builder, inputType ) }` );
-		params.push( b.build( builder, inputType ) );
+
+		if ( b !== null ) {
+
+			params.push( b.build( builder, inputType ) );
+
+
+		}
 
 		const methodSnippet = `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`;
 
@@ -165,6 +171,16 @@ export const atomicFunc = ( method, pointerNode, valueNode, storeNode = null ) =
 	return node;
 
 };
+
+/**
+ * Loads the value stored in the atomic variable.
+ *
+ * @function
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @returns {AtomicFunctionNode}
+ */
+export const atomicLoad = ( pointerNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_LOAD, pointerNode, null, storeNode );
 
 /**
  * Stores a value in the atomic variable.

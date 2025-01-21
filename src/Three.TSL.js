@@ -57,6 +57,7 @@ export const atomicOr = TSL.atomicOr;
 export const atomicStore = TSL.atomicStore;
 export const atomicSub = TSL.atomicSub;
 export const atomicXor = TSL.atomicXor;
+export const atomicLoad = TSL.atomicLoad;
 export const attenuationColor = TSL.attenuationColor;
 export const attenuationDistance = TSL.attenuationDistance;
 export const attribute = TSL.attribute;
