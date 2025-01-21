@@ -258,7 +258,7 @@ class ColorUniform extends Uniform {
 }
 
 /**
- * Represents a Matrix3 uniform.
+ * Represents a Matrix2 uniform.
  *
  * @private
  * @augments Uniform
@@ -269,7 +269,7 @@ class Matrix2Uniform extends Uniform {
 	 * Constructs a new Number uniform.
 	 *
 	 * @param {String} name - The uniform's name.
-	 * @param {Matrix3} value - The uniform's value.
+	 * @param {Matrix2} value - The uniform's value.
 	 */
 	constructor( name, value = new Matrix2() ) {
 
