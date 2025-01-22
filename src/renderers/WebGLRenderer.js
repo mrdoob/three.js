@@ -1151,6 +1151,16 @@ class WebGLRenderer {
 
 			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
+			// Restore original camera fov
+
+			if ( xr.enabled === true && xr.isPresenting === false && camera.userData.previousFov !== undefined ) {
+
+				camera.fov = camera.userData.previousFov;
+				delete camera.userData.previousFov;
+				camera.updateProjectionMatrix();
+
+			}
+
 			// update camera matrices and frustum
 
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();

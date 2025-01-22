@@ -633,6 +633,12 @@ class WebXRManager extends EventDispatcher {
 
 			if ( camera.isPerspectiveCamera ) {
 
+				if ( camera.userData.previousFov === undefined ) {
+
+					camera.userData.previousFov = camera.fov;
+
+				}
+
 				camera.fov = RAD2DEG * 2 * Math.atan( 1 / camera.projectionMatrix.elements[ 5 ] );
 				camera.zoom = 1;
 
