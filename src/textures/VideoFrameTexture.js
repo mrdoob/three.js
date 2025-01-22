@@ -6,6 +6,8 @@ class VideoFrameTexture extends VideoTexture {
 
 		super( {}, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
+		this.isVideoFrameTexture = true;
+
 	}
 
 	update() {
