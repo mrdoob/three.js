@@ -1,4 +1,4 @@
-let isAvailable = ( typeof navigator !== 'undefined'  && navigator.gpu !== undefined );
+let isAvailable = ( typeof navigator !== 'undefined' && navigator.gpu !== undefined );
 
 if ( typeof window !== 'undefined' && isAvailable ) {
 

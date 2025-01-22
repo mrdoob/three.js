@@ -39,7 +39,7 @@ const NUM_OBJECT_LAYERS = 2;
 
 function setupCollisionFiltering( settings ) {
 
-	let objectFilter = new Jolt.ObjectLayerPairFilterTable( NUM_OBJECT_LAYERS );
+	const objectFilter = new Jolt.ObjectLayerPairFilterTable( NUM_OBJECT_LAYERS );
 	objectFilter.EnableCollision( LAYER_NON_MOVING, LAYER_MOVING );
 	objectFilter.EnableCollision( LAYER_MOVING, LAYER_MOVING );
 
@@ -47,7 +47,7 @@ function setupCollisionFiltering( settings ) {
 	const BP_LAYER_MOVING = new Jolt.BroadPhaseLayer( 1 );
 	const NUM_BROAD_PHASE_LAYERS = 2;
 
-	let bpInterface = new Jolt.BroadPhaseLayerInterfaceTable( NUM_OBJECT_LAYERS, NUM_BROAD_PHASE_LAYERS );
+	const bpInterface = new Jolt.BroadPhaseLayerInterfaceTable( NUM_OBJECT_LAYERS, NUM_BROAD_PHASE_LAYERS );
 	bpInterface.MapObjectToBroadPhaseLayer( LAYER_NON_MOVING, BP_LAYER_NON_MOVING );
 	bpInterface.MapObjectToBroadPhaseLayer( LAYER_MOVING, BP_LAYER_MOVING );
 
@@ -55,7 +55,7 @@ function setupCollisionFiltering( settings ) {
 	settings.mBroadPhaseLayerInterface = bpInterface;
 	settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterTable( settings.mBroadPhaseLayerInterface, NUM_BROAD_PHASE_LAYERS, settings.mObjectLayerPairFilter, NUM_OBJECT_LAYERS );
 
-};
+}
 
 async function JoltPhysics() {
 
@@ -111,8 +111,8 @@ async function JoltPhysics() {
 		if ( shape === null ) return;
 
 		const body = mesh.isInstancedMesh
-							? createInstancedBody( mesh, mass, restitution, shape )
-							: createBody( mesh.position, mesh.quaternion, mass, restitution, shape );
+			? createInstancedBody( mesh, mass, restitution, shape )
+			: createBody( mesh.position, mesh.quaternion, mass, restitution, shape );
 
 		if ( mass > 0 ) {
 
@@ -175,8 +175,8 @@ async function JoltPhysics() {
 
 			const physics = mesh.userData.physics;
 
-			let shape = body.GetShape();
-			let body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
+			const shape = body.GetShape();
+			const body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
 
 			bodies[ index ] = body2;
 
