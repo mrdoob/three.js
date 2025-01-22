@@ -11,14 +11,16 @@ import { VolumeSlice } from '../misc/VolumeSlice.js';
  * For now it only handles 3 dimensional data.
  * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
  * @class
- * @param   {number}        xLength         Width of the volume
- * @param   {number}        yLength         Length of the volume
- * @param   {number}        zLength         Depth of the volume
- * @param   {string}        type            The type of data (uint8, uint16, ...)
- * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
  */
 class Volume {
 
+	/**
+	 * @param   {number}        xLength         Width of the volume
+	 * @param   {number}        yLength         Length of the volume
+	 * @param   {number}        zLength         Depth of the volume
+	 * @param   {string}        type            The type of data (uint8, uint16, ...)
+	 * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
+	 */
 	constructor( xLength, yLength, zLength, type, arrayBuffer ) {
 
 		if ( xLength !== undefined ) {

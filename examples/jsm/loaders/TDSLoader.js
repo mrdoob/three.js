@@ -20,7 +20,6 @@ import {
  * Loads geometry with uv and materials basic properties with texture support.
  *
  * @class TDSLoader
- * @constructor
  */
 
 class TDSLoader extends Loader {
