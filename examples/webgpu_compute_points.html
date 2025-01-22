@@ -176,7 +176,7 @@
 			function animate() {
 
 				renderer.compute( computeNode );
-				renderer.resolveTimestampsAsync( 'compute' );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 				renderer.render( scene, camera );
 

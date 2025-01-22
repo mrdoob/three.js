@@ -160,7 +160,7 @@
 			async function render() {
 
 				await renderer.renderAsync( scene, camera );
-				renderer.resolveTimestampsAsync( 'render' );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
 
 				stats.update();
 
