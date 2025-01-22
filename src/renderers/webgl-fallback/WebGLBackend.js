@@ -334,11 +334,15 @@ class WebGLBackend extends Backend {
 	 */
 	setXRRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
 
-		this.set( renderTarget.texture, { textureGPU: colorTexture } );
+		const gl = this.gl;
+
+		this.set( renderTarget.texture, { textureGPU: colorTexture, glInternalFormat: gl.RGBA8 } ); // see #24698 why RGBA8 and not SRGB8_ALPHA8 is used
 
 		if ( depthTexture !== null ) {
 
-			this.set( renderTarget.depthTexture, { textureGPU: depthTexture } );
+			const glInternalFormat = renderTarget.stencilBuffer ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
+
+			this.set( renderTarget.depthTexture, { textureGPU: depthTexture, glInternalFormat: glInternalFormat } );
 
 			renderTarget.autoAllocateDepthBuffer = false;
 
