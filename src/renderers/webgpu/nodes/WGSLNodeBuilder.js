@@ -1477,11 +1477,24 @@ ${ flowData.code }
 	 *
 	 * @param {String} type - The variable's type.
 	 * @param {String} name - The variable's name.
+	 * @param {Number?} [count=null] - The array length.
 	 * @return {String} The WGSL snippet that defines a variable.
 	 */
-	getVar( type, name ) {
+	getVar( type, name, count = null ) {
 
-		return `var ${ name } : ${ this.getType( type ) }`;
+		let snippet = `var ${ name } : `;
+
+		if ( count !== null ) {
+
+			snippet += this.generateArrayDeclaration( type, count );
+
+		} else {
+
+			snippet += this.getType( type );
+
+		}
+
+		return snippet;
 
 	}
 
@@ -1500,7 +1513,7 @@ ${ flowData.code }
 
 			for ( const variable of vars ) {
 
-				snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
+				snippets.push( `\t${ this.getVar( variable.type, variable.name, variable.count ) };` );
 
 			}
 

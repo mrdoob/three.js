@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import TempNode from './TempNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
 /** @module ArrayNode **/
@@ -16,7 +16,7 @@ import { nodeObject } from '../tsl/TSLCore.js';
  *
  * @augments Node
  */
-class ArrayNode extends Node {
+class ArrayNode extends TempNode {
 
 	static get type() {
 
