@@ -6,13 +6,6 @@ class VideoFrameTexture extends VideoTexture {
 
 		super( {}, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {Boolean}
-		 * @readonly
-		 * @default true
-		 */
 		this.isVideoFrameTexture = true;
 
 	}
