@@ -277,13 +277,14 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
 
 /**
  * Visualize IK bones
- *
- * @param {SkinnedMesh} mesh
- * @param {Array<Object>} iks
- * @param {number} sphereSize
  */
 class CCDIKHelper extends Object3D {
 
+	/**
+	 * @param {SkinnedMesh} mesh
+ 	 * @param {Array<Object>} [iks=[]]
+ 	 * @param {number} [sphereSize=0.25]
+	 */
 	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 		super();

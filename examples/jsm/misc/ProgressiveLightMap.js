@@ -13,12 +13,13 @@ import { potpack } from '../libs/potpack.module.js';
  * This should begin accumulating lightmaps which apply to
  * your objects, so you can start jittering lighting to achieve
  * the texture-space effect you're looking for.
- *
- * @param {WebGLRenderer} renderer An instance of WebGLRenderer.
- * @param {number} res The side-long dimension of you total lightmap.
  */
 class ProgressiveLightMap {
 
+	/**
+	 * @param {WebGLRenderer} renderer An instance of WebGLRenderer.
+ 	 * @param {number} [res=1024] The side-long dimension of you total lightmap.
+	 */
 	constructor( renderer, res = 1024 ) {
 
 		this.renderer = renderer;
