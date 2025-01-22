@@ -1,5 +1,6 @@
 import Node from './Node.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { nodeObject, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import ArrayElementNode from '../utils/ArrayElementNode.js';
 
 /** @module VarNode **/
 
@@ -74,6 +75,14 @@ class VarNode extends Node {
 		 */
 		this.readOnly = readOnly;
 
+		/**
+		 * The length of the variable in case of an array type.
+		 *
+		 * @type {Number}
+		 * @default 1
+		 */
+		this.length = 1;
+
 	}
 
 	getHash( builder ) {
@@ -87,6 +96,58 @@ class VarNode extends Node {
 		return this.node.getNodeType( builder );
 
 	}
+
+	/**
+	 * Sets the length of the variable in case of an array type.
+	 * This method is chainable.
+	 *
+	 * @param {Number} length - The variable's length.
+	 * @return {VarNode} The current node.
+	 */
+	toArray( length ) {
+
+		this.length = length;
+
+		return this;
+
+	}
+
+	/**
+	 * Specific to array element
+	 * Returns an array element node that represents the access to a specific element
+	 *
+	 * @param {IndexNode} indexNode - The index node.
+	 * @return {ArrayElementNode} The array element node.
+	 */
+	element( indexNode ) {
+
+		return nodeObject( new ArrayElementNode( this, nodeObject( indexNode ) ) );
+
+	}
+
+	/**
+	 * Specific to array element
+	 * The data type of the array elements.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {String} The element type.
+	 */
+
+	getElementType( builder ) {
+
+		const type = this.getNodeType( builder );
+		const elementType = builder.getElementType( type );
+
+		if ( this.length > 1 ) {
+
+			return this.getNodeType( builder );
+
+		}
+
+		return elementType;
+
+	}
+
 
 	generate( builder ) {
 
@@ -109,7 +170,7 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly, this.length );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
@@ -117,13 +178,13 @@ class VarNode extends Node {
 
 		if ( shouldTreatAsReadOnly ) {
 
-			const type = builder.getType( nodeVar.type );
+			const type = builder.getType( nodeVar.type, this.length );
 
 			if ( isWebGPUBackend ) {
 
 				declarationPrefix = isDeterministic
-					? `const ${ propertyName }`
-					: `let ${ propertyName }`;
+					? `const ${ propertyName }: ${ type }`
+					: `let ${ propertyName }: ${ type }`;
 
 			} else {
 
@@ -133,7 +194,11 @@ class VarNode extends Node {
 
 		}
 
-		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
+		if ( this.length <= 1 ) {
+
+			builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
+
+		}
 
 		return propertyName;
 
