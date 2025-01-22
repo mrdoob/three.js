@@ -85,7 +85,7 @@
 
 			const coloredVignette = screenUV.distance( .5 ).mix( hue( color( 0x0175ad ), time.mul( .1 ) ), hue( color( 0x02274f ), time.mul( .5 ) ) );
 			const lightSpeedEffect = lightSpeed( normalWorld ).clamp();
-			const lightSpeedSky = normalWorld.y.remapClamp( -.1, 1 ).mix( 0, lightSpeedEffect );
+			const lightSpeedSky = normalWorld.y.remapClamp( - .1, 1 ).mix( 0, lightSpeedEffect );
 			const composedBackground = blendDodge( coloredVignette, lightSpeedSky );
 
 			scene.backgroundNode = composedBackground;
@@ -164,7 +164,7 @@
 
 			function getSource( sourceModel ) {
 
-				const clip = sourceModel.animations[ 0 ]
+				const clip = sourceModel.animations[ 0 ];
 
 				const helper = new THREE.SkeletonHelper( sourceModel.scene );
 				helpers.add( helper );

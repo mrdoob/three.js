@@ -1317,6 +1317,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'clone', ( assert ) => {
 
+			/* eslint-disable prefer-const*/
 			let a;
 			const b = new Object3D();
 
