@@ -81,7 +81,7 @@ class VarNode extends Node {
 		 * @type {Number}
 		 * @default 1
 		 */
-		this.length = 1;
+		this.arrayLength = 1;
 
 	}
 
@@ -106,7 +106,7 @@ class VarNode extends Node {
 	 */
 	toArray( length ) {
 
-		this.length = length;
+		this.arrayLength = length;
 
 		return this;
 
@@ -138,7 +138,7 @@ class VarNode extends Node {
 		const type = this.getNodeType( builder );
 		const elementType = builder.getElementType( type );
 
-		if ( this.length > 1 ) {
+		if ( this.arrayLength > 1 ) {
 
 			return this.getNodeType( builder );
 
@@ -170,7 +170,7 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly, this.length );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly, this.arrayLength );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
@@ -178,7 +178,7 @@ class VarNode extends Node {
 
 		if ( shouldTreatAsReadOnly ) {
 
-			const type = builder.getType( nodeVar.type, this.length );
+			const type = builder.getType( nodeVar.type, this.arrayLength );
 
 			if ( isWebGPUBackend ) {
 
@@ -194,7 +194,7 @@ class VarNode extends Node {
 
 		}
 
-		if ( this.length <= 1 ) {
+		if ( this.arrayLength <= 1 ) {
 
 			builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
 

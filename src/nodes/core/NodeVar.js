@@ -12,9 +12,9 @@ class NodeVar {
 	 * @param {String} name - The name of the variable.
 	 * @param {String} type - The type of the variable.
 	 * @param {Boolean} [readOnly=false] - The read-only flag.
-	 * @param {Number} [length=1] - The variable's length in case of an array type.
+	 * @param {Number} [arrayLength=1] - The variable's length in case of an array type.
 	 */
-	constructor( name, type, readOnly = false, length = 1 ) {
+	constructor( name, type, readOnly = false, arrayLength = 1 ) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -47,11 +47,11 @@ class NodeVar {
 		this.readOnly = readOnly;
 
 		/**
-		 * The length of the variable.
+		 * The length of the variable in case of an array type.
 		 *
 		 * @type {Number}
 		 */
-		this.length = length;
+		this.arrayLength = arrayLength;
 
 	}
 

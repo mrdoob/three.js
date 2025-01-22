@@ -1612,11 +1612,11 @@ class NodeBuilder {
 	 * @param {String} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {Boolean} [readOnly=false] - Whether the variable is read-only or not.
-	 * @param {Number} [length=1] - The variable's length in case of an array type.
+	 * @param {Number} [arrayLength=1] - The variable's length in case of an array type.
 	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, length = 1 ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, arrayLength = 1 ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -1637,7 +1637,7 @@ class NodeBuilder {
 
 			}
 
-			nodeVar = new NodeVar( name, type, readOnly, length );
+			nodeVar = new NodeVar( name, type, readOnly, arrayLength );
 
 			if ( ! readOnly ) {
 
@@ -2135,14 +2135,14 @@ class NodeBuilder {
 	 *
 	 * @param {String} type - The variable's type.
 	 * @param {String} name - The variable's name.
-	 * @param {Number} [length=1] - The variable's length in case of an array type.
+	 * @param {Number} [arrayLength=1] - The variable's length in case of an array type.
 	 * @return {String} The shader string.
 	 */
-	getVar( type, name, length ) {
+	getVar( type, name, arrayLength ) {
 
-		const arrayLength = length > 1 ? `[ ${ length } ]` : '';
+		const length = arrayLength > 1 ? `[ ${ arrayLength } ]` : '';
 
-		return `${ this.getType( type ) }${ arrayLength } ${ name }`;
+		return `${ this.getType( type ) }${ length } ${ name }`;
 
 	}
 
@@ -2162,7 +2162,7 @@ class NodeBuilder {
 
 			for ( const variable of vars ) {
 
-				snippet += `${ this.getVar( variable.type, variable.name, variable.length ) }; `;
+				snippet += `${ this.getVar( variable.type, variable.name, variable.arrayLength ) }; `;
 
 			}
 

@@ -1464,12 +1464,12 @@ ${ flowData.code }
 	 *
 	 * @param {String} type - The variable's type.
 	 * @param {String} name - The variable's name.
-	 * @param {Number} length - The variable's length.
+	 * @param {Number} arrayLength - The variable's length.
 	 * @return {String} The WGSL snippet that defines a variable.
 	 */
-	getVar( type, name, length ) {
+	getVar( type, name, arrayLength ) {
 
-		return `var ${ name } : ${ this.getType( type, length ) }`;
+		return `var ${ name } : ${ this.getType( type, arrayLength ) }`;
 
 	}
 
@@ -1823,22 +1823,22 @@ ${ flowData.code }
 	 * Returns the WGSL type of the given node data type.
 	 *
 	 * @param {String} type - The node data type.
-	 * @param {Number} [length=1] - The length of the type.
+	 * @param {Number} [arrayLength=1] - The length of the type.
 	 * @return {String} The WGSL type.
 	 */
-	getType( type, length = 1 ) {
+	getType( type, arrayLength = 1 ) {
 
 		const baseType = wgslTypeLib[ type ] || type;
 
 		// Return base type if length is 1 or not provided
-		if ( ! length || length <= 1 ) {
+		if ( ! arrayLength || arrayLength <= 1 ) {
 
 			return baseType;
 
 		}
 
 		// Return array type with specified length for arrays
-		return `array<${baseType}, ${length}>`;
+		return `array<${baseType}, ${arrayLength}>`;
 
 	}
 
