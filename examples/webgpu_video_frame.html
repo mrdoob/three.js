@@ -87,6 +87,8 @@
 								// In case our VideoFrameTexture is no longer needed, we should close its backed VideoFrame, see issue #30379:
 								if ( videoTexture.image instanceof VideoFrame ) videoTexture.image.close();
 
+								videoTexture.image = null;
+
 							} );
 
 						}
