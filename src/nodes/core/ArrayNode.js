@@ -1,5 +1,5 @@
 import TempNode from './TempNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 /** @module ArrayNode **/
 
@@ -121,3 +121,5 @@ export const array = ( ...params ) => {
 	return nodeObject( node );
 
 };
+
+addMethodChaining( 'toArray', ( node, count ) => array( Array( count ).fill( node ) ) );
