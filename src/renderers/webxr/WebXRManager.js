@@ -65,6 +65,8 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		let updatedCameraProperties = null;
+
 		this.cameraAutoUpdate = true;
 		this.enabled = false;
 
@@ -181,6 +183,17 @@ class WebXRManager extends EventDispatcher {
 			animation.stop();
 
 			scope.isPresenting = false;
+
+			if ( updatedCameraProperties !== null ) {
+
+				const camera = updatedCameraProperties.camera;
+				camera.fov = updatedCameraProperties.fov;
+				camera.zoom = updatedCameraProperties.zoom;
+				camera.updateProjectionMatrix();
+
+				updatedCameraProperties = null;
+
+			}
 
 			renderer.setPixelRatio( currentPixelRatio );
 			renderer.setSize( currentSize.width, currentSize.height, false );
@@ -362,6 +375,8 @@ class WebXRManager extends EventDispatcher {
 				animation.start();
 
 				scope.isPresenting = true;
+
+				updatedCameraProperties = null;
 
 				scope.dispatchEvent( { type: 'sessionstart' } );
 
@@ -633,9 +648,13 @@ class WebXRManager extends EventDispatcher {
 
 			if ( camera.isPerspectiveCamera ) {
 
-				if ( camera.userData.previousFov === undefined ) {
+				if ( updatedCameraProperties === null ) {
 
-					camera.userData.previousFov = camera.fov;
+					updatedCameraProperties = {
+						camera: camera,
+						fov: camera.fov,
+						zoom: camera.zoom,
+					};
 
 				}
 
