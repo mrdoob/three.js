@@ -217,6 +217,11 @@ const GLSL3 = '300 es';
 const WebGLCoordinateSystem = 2000;
 const WebGPUCoordinateSystem = 2001;
 
+const TimestampQuery = {
+	COMPUTE: 'compute',
+	RENDER: 'render'
+};
+
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
  */
@@ -17862,6 +17867,8 @@ class VideoFrameTexture extends VideoTexture {
 	constructor( mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 		super( {}, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		this.isVideoFrameTexture = true;
 
 	}
 
@@ -55073,6 +55080,7 @@ exports.TetrahedronGeometry = TetrahedronGeometry;
 exports.Texture = Texture;
 exports.TextureLoader = TextureLoader;
 exports.TextureUtils = TextureUtils;
+exports.TimestampQuery = TimestampQuery;
 exports.TorusGeometry = TorusGeometry;
 exports.TorusKnotGeometry = TorusKnotGeometry;
 exports.Triangle = Triangle;
