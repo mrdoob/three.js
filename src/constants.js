@@ -209,3 +209,8 @@ export const GLSL3 = '300 es';
 
 export const WebGLCoordinateSystem = 2000;
 export const WebGPUCoordinateSystem = 2001;
+
+export const TimestampQuery = {
+	COMPUTE: 'compute',
+	RENDER: 'render'
+};

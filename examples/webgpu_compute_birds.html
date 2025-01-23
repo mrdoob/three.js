@@ -505,7 +505,7 @@
 
 				renderer.compute( computeVelocity );
 				renderer.compute( computePosition );
-				renderer.resolveTimestampsAsync( 'compute' );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 				renderer.render( scene, camera );
 
 				// Move pointer away so we only affect birds when moving the mouse
