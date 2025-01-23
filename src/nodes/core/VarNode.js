@@ -82,6 +82,12 @@ class VarNode extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.node.getElementType( builder );
+
+	}
+
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
@@ -117,8 +123,6 @@ class VarNode extends Node {
 
 		if ( shouldTreatAsReadOnly ) {
 
-			const type = builder.getType( nodeVar.type );
-
 			if ( isWebGPUBackend ) {
 
 				declarationPrefix = isDeterministic
@@ -127,7 +131,9 @@ class VarNode extends Node {
 
 			} else {
 
-				declarationPrefix = `const ${ type } ${ propertyName }`;
+				const count = builder.getArrayCount( node );
+
+				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
 
 			}
 

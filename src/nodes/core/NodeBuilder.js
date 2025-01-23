@@ -1054,6 +1054,55 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Generates the array declaration string.
+	 *
+	 * @param {String} type - The type.
+	 * @param {Number?} [count] - The count.
+	 * @return {String} The generated value as a shader string.
+	 */
+	generateArrayDeclaration( type, count ) {
+
+		return this.getType( type ) + '[ ' + count + ' ]';
+
+	}
+
+	/**
+	 * Generates the array shader string for the given type and value.
+	 *
+	 * @param {String} type - The type.
+	 * @param {Number?} [count] - The count.
+	 * @param {Array<Node>?} [values=null] - The default values.
+	 * @return {String} The generated value as a shader string.
+	 */
+	generateArray( type, count, values = null ) {
+
+		let snippet = this.generateArrayDeclaration( type, count ) + '( ';
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			const value = values ? values[ i ] : null;
+
+			if ( value !== null ) {
+
+				snippet += value.build( this, type );
+
+			} else {
+
+				snippet += this.generateConst( type );
+
+			}
+
+			if ( i < count - 1 ) snippet += ', ';
+
+		}
+
+		snippet += ' )';
+
+		return snippet;
+
+	}
+
+	/**
 	 * Generates the shader string for the given type and value.
 	 *
 	 * @param {String} type - The type.
@@ -1605,6 +1654,23 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the array length.
+	 *
+	 * @param {Node} node - The node.
+	 * @return {Number?} The array length.
+	 */
+	getArrayCount( node ) {
+
+		let count = null;
+
+		if ( node.isArrayNode ) count = node.count;
+		else if ( node.isVarNode && node.node.isArrayNode ) count = node.node.count;
+
+		return count;
+
+	}
+
+	/**
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
@@ -1636,7 +1702,11 @@ class NodeBuilder {
 
 			}
 
-			nodeVar = new NodeVar( name, type, readOnly );
+			//
+
+			const count = this.getArrayCount( node );
+
+			nodeVar = new NodeVar( name, type, readOnly, count );
 
 			if ( ! readOnly ) {
 
@@ -1670,6 +1740,24 @@ class NodeBuilder {
 
 			return this.isDeterministic( node.aNode ) &&
 				( node.bNode ? this.isDeterministic( node.bNode ) : true );
+
+		} else if ( node.isArrayNode ) {
+
+			if ( node.values !== null ) {
+
+				for ( const n of node.values ) {
+
+					if ( ! this.isDeterministic( n ) ) {
+
+						return false;
+
+					}
+
+				}
+
+			}
+
+			return true;
 
 		} else if ( node.isConstNode ) {
 
@@ -2134,11 +2222,12 @@ class NodeBuilder {
 	 *
 	 * @param {String} type - The variable's type.
 	 * @param {String} name - The variable's name.
+	 * @param {Number?} [count=null] - The array length.
 	 * @return {String} The shader string.
 	 */
-	getVar( type, name ) {
+	getVar( type, name, count = null ) {
 
-		return `${ this.getType( type ) } ${ name }`;
+		return `${ count !== null ? this.generateArrayDeclaration( type, count ) : this.getType( type ) } ${ name }`;
 
 	}
 

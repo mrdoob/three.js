@@ -496,7 +496,7 @@ ${ flowData.code }
 
 			for ( const variable of vars ) {
 
-				snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count ) };` );
 
 			}
 
