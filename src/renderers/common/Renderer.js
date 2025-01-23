@@ -1394,7 +1394,11 @@ class Renderer {
 
 			}
 
+			const currentXREnabled = this.xr.enabled;
+
+			this.xr.enabled = false;
 			this._renderScene( quad, quad.camera, false );
+			this.xr.enabled = currentXREnabled;
 
 		}
 
@@ -1992,7 +1996,7 @@ class Renderer {
 	 */
 	get currentToneMapping() {
 
-		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+		return ( this._renderTarget !== null && this._renderTarget.isXRRenderTarget !== true ) ? NoToneMapping : this.toneMapping;
 
 	}
 
@@ -2004,7 +2008,7 @@ class Renderer {
 	 */
 	get currentColorSpace() {
 
-		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
+		return ( this._renderTarget !== null && this._renderTarget.isXRRenderTarget !== true ) ? LinearSRGBColorSpace : this.outputColorSpace;
 
 	}
 
