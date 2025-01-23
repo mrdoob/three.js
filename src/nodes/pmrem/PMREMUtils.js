@@ -267,7 +267,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 	axis.assign( normalize( axis ) );
 
 	const gl_FragColor = vec3().toVar();
-	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
+	gl_FragColor.addAssign( weights.element( 0 ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 
 	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
 
