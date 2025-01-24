@@ -1,5 +1,7 @@
 import InputNode from './InputNode.js';
 
+const _regNum = /float|u?int/;
+
 /**
  * Class for representing a constant value in the shader.
  *
@@ -49,6 +51,12 @@ class ConstNode extends InputNode {
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
+
+		if ( _regNum.test( type ) && _regNum.test( output ) ) {
+
+			return builder.generateConst( output, this.value );
+
+		}
 
 		return builder.format( this.generateConst( builder ), type, output );
 
