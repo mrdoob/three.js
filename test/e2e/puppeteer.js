@@ -148,7 +148,6 @@ const exceptionList = [
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
 	'webgpu_lights_rectarealight',
-	'webgpu_tsl_coffee_smoke',
 	'webgpu_tsl_vfx_flames',
 	'webgpu_tsl_halftone',
 	'webgpu_tsl_vfx_linkedparticles',
@@ -157,6 +156,7 @@ const exceptionList = [
 	'webgpu_rendertarget_2d-array_3d',
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_sobel',
+	'webgpu_postprocessing_3dlut',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
