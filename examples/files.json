@@ -431,7 +431,6 @@
 		"webgpu_textures_partialupdate",
 		"webgpu_tonemapping",
 		"webgpu_tsl_angular_slicing",
-		"webgpu_tsl_coffee_smoke",
 		"webgpu_tsl_compute_attractors_particles",
 		"webgpu_tsl_earth",
 		"webgpu_tsl_editor",
