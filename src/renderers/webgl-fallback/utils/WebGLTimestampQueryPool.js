@@ -1,3 +1,4 @@
+import { warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
@@ -57,6 +58,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		// Check if we have enough space for a new query pair
 		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
 
+			warnOnce( `WebGPUTimestampQueryPool [${ this.type }]: Maximum number of queries exceeded, when using trackTimestamp it is necessary to resolves the queries via renderer.resolveTimestampsAsync( THREE.TimestampQuery.${ this.type.toUpperCase() } ).` );
 			return null;
 
 		}

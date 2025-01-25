@@ -90,7 +90,7 @@
 				const box = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( box );
 
-				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL, trackTimestamp: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
