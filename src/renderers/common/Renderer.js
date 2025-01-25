@@ -26,7 +26,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap, UnsignedByteType } from '../../constants.js';
 
 /** @module Renderer **/
 
@@ -1121,14 +1121,21 @@ class Renderer {
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
+		// to improve performance we only want to use HalfFloatType if necessary
+		// HalfFloatType is required when a) tone mapping is used or b) the backend specifically requests it
+
+		const type = ( useToneMapping || this.backend.needsHalfFloatFrameBufferTarget() ) ? HalfFloatType : UnsignedByteType;
+
 		let frameBufferTarget = this._frameBufferTarget;
 
-		if ( frameBufferTarget === null ) {
+		if ( frameBufferTarget === null || this._frameBufferTarget.texture.type !== type ) {
+
+			if ( frameBufferTarget !== null ) frameBufferTarget.dispose();
 
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
-				type: HalfFloatType, // FloatType
+				type: type,
 				format: RGBAFormat,
 				colorSpace: LinearSRGBColorSpace,
 				generateMipmaps: false,

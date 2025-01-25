@@ -589,6 +589,17 @@ class Backend {
 	}
 
 	/**
+	 * Returns `true` if the backend requires a framebuffer target with type `HalfFloat`.
+	 *
+	 * @return {Boolean} Whether the backend requires a framebuffer target with type `HalfFloat` or not.
+	 */
+	needsHalfFloatFrameBufferTarget() {
+
+		return false;
+
+	}
+
+	/**
 	 * Sets a dictionary for the given object into the
 	 * internal data structure.
 	 *
