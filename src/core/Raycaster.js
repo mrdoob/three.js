@@ -38,13 +38,13 @@ class Raycaster {
 
 		if ( camera.isPerspectiveCamera ) {
 
-			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
+			this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
 			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 			this.camera = camera;
 
 		} else if ( camera.isOrthographicCamera ) {
 
-			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
+			this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
 			this.camera = camera;
 
