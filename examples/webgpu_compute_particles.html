@@ -266,8 +266,10 @@
 				stats.update();
 
 				await renderer.computeAsync( computeParticles );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 				await renderer.renderAsync( scene, camera );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
 
 				// throttle the logging
 
