@@ -96,7 +96,31 @@ export const struct = ( membersLayout ) => {
 
 	const structLayout = new StructTypeNode( membersLayout );
 
-	const struct = ( values ) => {
+	const struct = ( ...params ) => {
+
+		let values = null;
+
+		if ( params.length > 0 ) {
+
+			if ( params[ 0 ].isNode ) {
+
+				values = {};
+
+				const names = Object.keys( membersLayout );
+
+				for ( let i = 0; i < params.length; i ++ ) {
+
+					values[ names[ i ] ] = params[ i ];
+
+				}
+
+			} else {
+
+				values = params[ 0 ];
+
+			}
+
+		}
 
 		return nodeObject( new StructNode( structLayout, values ) );
 
