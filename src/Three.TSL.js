@@ -444,6 +444,7 @@ export const storageBarrier = TSL.storageBarrier;
 export const storageObject = TSL.storageObject;
 export const storageTexture = TSL.storageTexture;
 export const string = TSL.string;
+export const struct = TSL.struct;
 export const sub = TSL.sub;
 export const subgroupIndex = TSL.subgroupIndex;
 export const subgroupSize = TSL.subgroupSize;

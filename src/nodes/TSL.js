@@ -11,6 +11,7 @@ export * from './core/IndexNode.js';
 export * from './core/ParameterNode.js';
 export * from './core/PropertyNode.js';
 export * from './core/StackNode.js';
+export * from './core/StructNode.js';
 export * from './core/UniformGroupNode.js';
 export * from './core/UniformNode.js';
 export * from './core/VaryingNode.js';
