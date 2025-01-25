@@ -55,6 +55,7 @@ export { default as StorageArrayElementNode } from './utils/StorageArrayElementN
 export { default as TriplanarTexturesNode } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
+export { default as MemberNode } from './utils/MemberNode.js';
 
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';

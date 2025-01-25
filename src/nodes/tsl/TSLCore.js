@@ -6,6 +6,7 @@ import SplitNode from '../utils/SplitNode.js';
 import SetNode from '../utils/SetNode.js';
 import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
+import MemberNode from '../utils/MemberNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
 /** @module TSLCore **/
@@ -111,6 +112,12 @@ const shaderNodeHandler = {
 				// accessing array
 
 				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
+
+			} else if ( /^get$/.test( prop ) === true ) {
+
+				// accessing properties
+
+				return ( value ) => nodeObject( new MemberNode( nodeObj, value ) );
 
 			}
 
@@ -258,6 +265,12 @@ class ShaderCallNodeInternal extends Node {
 	getNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
+
+	}
+
+	getMemberType( builder, name ) {
+
+		return this.getOutputNode( builder ).getMemberType( builder, name );
 
 	}
 

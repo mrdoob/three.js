@@ -36,6 +36,14 @@ class StructTypeNode extends Node {
 
 	}
 
+	getMemberType( builder, name ) {
+
+		const member = this.membersLayout.find( m => m.name === name );
+
+		return member ? member.type : 'void';
+
+	}
+
 	getNodeType( builder ) {
 
 		const structType = builder.getStructTypeFromNode( this, this.membersLayout );

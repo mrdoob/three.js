@@ -4,47 +4,6 @@ import { nodeObject } from '../tsl/TSLCore.js';
 
 /** @module StructNode **/
 
-class InternalStructMemberNode extends Node {
-
-	static get type() {
-
-		return 'InternalStructMemberNode';
-
-	}
-
-	constructor( structNode, member ) {
-
-		super( member.type );
-
-		this._structNode = structNode;
-		this._member = member;
-
-		this.isStructMemberNode = true;
-
-	}
-
-	get structNode() {
-
-		return this._structNode;
-
-	}
-
-	get member() {
-
-		return this._member;
-
-	}
-
-	generate( builder ) {
-
-		const structName = this.structNode.build( builder );
-
-		return structName + '.' + this.member.name;
-
-	}
-
-}
-
 class StructNode extends Node {
 
 	static get type() {
@@ -60,12 +19,6 @@ class StructNode extends Node {
 		this.structLayoutNode = structLayoutNode;
 		this.values = values;
 
-		for ( const member of structLayoutNode.membersLayout ) {
-
-			this[ member.name ] = nodeObject( new InternalStructMemberNode( this, member ) );
-
-		}
-
 		this.isStructNode = true;
 
 	}
@@ -73,6 +26,12 @@ class StructNode extends Node {
 	getNodeType( builder ) {
 
 		return this.structLayoutNode.getNodeType( builder );
+
+	}
+
+	getMemberType( builder, name ) {
+
+		return this.structLayoutNode.getMemberType( builder, name );
 
 	}
 
