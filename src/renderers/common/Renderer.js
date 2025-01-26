@@ -445,13 +445,14 @@ class Renderer {
 		this._transparentSort = null;
 
 		/**
-		 * The framebuffer target.
+		 * A map that holds a framebuffer target for each render
+		 * target type.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {Map<Number,RenderTarget>}
 		 * @default null
 		 */
-		this._frameBufferTarget = null;
+		this._frameBufferTargetMap = new Map();
 
 		const alphaClear = this.alpha === true ? 0 : 1;
 
@@ -1126,11 +1127,9 @@ class Renderer {
 
 		const type = ( useToneMapping || this.backend.needsHalfFloatFrameBufferTarget() ) ? HalfFloatType : UnsignedByteType;
 
-		let frameBufferTarget = this._frameBufferTarget;
+		let frameBufferTarget = this._frameBufferTargetMap.get( type );
 
-		if ( frameBufferTarget === null || this._frameBufferTarget.texture.type !== type ) {
-
-			if ( frameBufferTarget !== null ) frameBufferTarget.dispose();
+		if ( frameBufferTarget === undefined ) {
 
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
@@ -1146,7 +1145,7 @@ class Renderer {
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;
 
-			this._frameBufferTarget = frameBufferTarget;
+			this._frameBufferTargetMap.set( type, frameBufferTarget );
 
 		}
 
@@ -2032,6 +2031,14 @@ class Renderer {
 		this._renderLists.dispose();
 		this._renderContexts.dispose();
 		this._textures.dispose();
+
+		for ( const renderTarget of this._frameBufferTargetMap.values() ) {
+
+			renderTarget.dispose();
+
+		}
+
+		this._frameBufferTargetMap.clear();
 
 		Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
