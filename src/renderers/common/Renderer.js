@@ -450,7 +450,6 @@ class Renderer {
 		 *
 		 * @private
 		 * @type {Map<Number,RenderTarget>}
-		 * @default null
 		 */
 		this._frameBufferTargetMap = new Map();
 
