@@ -461,11 +461,11 @@ class GLSLDecoder {
 			const isHex = /^(0x)/.test( firstToken.str );
 
 			if ( isHex ) type = 'int';
-			else if ( /u$/.test( firstToken.str ) ) type = 'uint';
+			else if ( /u$|U$/.test( firstToken.str ) ) type = 'uint';
 			else if ( /f|e|\./.test( firstToken.str ) ) type = 'float';
 			else type = 'int';
 
-			let str = firstToken.str.replace( /u|i$/, '' );
+			let str = firstToken.str.replace( /u|U|i$/, '' );
 
 			if ( isHex === false ) {
 
