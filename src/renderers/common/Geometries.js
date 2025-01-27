@@ -1,29 +1,8 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
+import { arrayNeedsUint32 } from '../../utils.js';
 
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
-
-/**
- * Returns `true` if the given array has values that require an Uint32 array type.
- *
- * @private
- * @function
- * @param {Array<Number>} array - The array to test.
- * @return {Boolean} Whether the given array has values that require an Uint32 array type or not.
- */
-function arrayNeedsUint32( array ) {
-
-	// assumes larger values usually on last
-
-	for ( let i = array.length - 1; i >= 0; -- i ) {
-
-		if ( array[ i ] >= 65535 ) return true; // account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
-
-	}
-
-	return false;
-
-}
 
 /**
  * Returns the wireframe version for the given geometry.
