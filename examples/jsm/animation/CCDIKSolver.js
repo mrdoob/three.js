@@ -10,7 +10,7 @@ import {
 	Object3D,
 	Quaternion,
 	SphereGeometry,
-	Vector3
+	Vector3,
 } from 'three';
 
 const _q = new Quaternion();
@@ -24,7 +24,6 @@ const _linkScale = new Vector3();
 const _axis = new Vector3();
 const _vector = new Vector3();
 const _matrix = new Matrix4();
-
 
 /**
  * CCD Algorithm
@@ -63,16 +62,17 @@ class CCDIKSolver {
 
 	/**
 	 * Update all IK bones.
-	 *
+	 	 * @param {number} [globalBlendFactor=1.0] - Blend factor applied if an IK chain doesn't have its own .blendFactor.
+
 	 * @return {CCDIKSolver}
 	 */
-	update() {
+	update( globalBlendFactor = 1.0 ) {
 
 		const iks = this.iks;
 
 		for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
-			this.updateOne( iks[ i ] );
+			this.updateOne( iks[ i ], globalBlendFactor );
 
 		}
 
@@ -84,10 +84,12 @@ class CCDIKSolver {
 	 * Update one IK bone
 	 *
 	 * @param {Object} ik parameter
+	 * @param {number} [overrideBlend=1.0]
 	 * @return {CCDIKSolver}
 	 */
-	updateOne( ik ) {
+	updateOne( ik, overrideBlend = 1.0 ) {
 
+		const initialQuaternions = [];
 		const bones = this.mesh.skeleton.bones;
 
 		// for reference overhead reduction in loop
@@ -102,6 +104,13 @@ class CCDIKSolver {
 
 		const links = ik.links;
 		const iteration = ik.iteration !== undefined ? ik.iteration : 1;
+
+		for ( let j = 0; j < links.length; j ++ ) {
+
+			const linkIndex = links[ j ].index;
+			initialQuaternions[ j ] = bones[ linkIndex ].quaternion.clone();
+
+		}
 
 		for ( let i = 0; i < iteration; i ++ ) {
 
@@ -176,22 +185,28 @@ class CCDIKSolver {
 					if ( c > 1.0 ) c = 1.0;
 
 					const c2 = math.sqrt( 1 - c * c );
-					link.quaternion.set( limitation.x * c2,
-					                     limitation.y * c2,
-					                     limitation.z * c2,
-					                     c );
+					link.quaternion.set(
+						limitation.x * c2,
+						limitation.y * c2,
+						limitation.z * c2,
+						c
+					);
 
 				}
 
 				if ( rotationMin !== undefined ) {
 
-					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).max( rotationMin ) );
+					link.rotation.setFromVector3(
+						_vector.setFromEuler( link.rotation ).max( rotationMin )
+					);
 
 				}
 
 				if ( rotationMax !== undefined ) {
 
-					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).min( rotationMax ) );
+					link.rotation.setFromVector3(
+						_vector.setFromEuler( link.rotation ).min( rotationMax )
+					);
 
 				}
 
@@ -202,6 +217,25 @@ class CCDIKSolver {
 			}
 
 			if ( ! rotated ) break;
+
+		}
+
+		const chainBlend =
+			ik.blendFactor !== undefined ? ik.blendFactor : overrideBlend;
+
+		if ( chainBlend < 1.0 ) {
+
+			for ( let j = 0; j < links.length; j ++ ) {
+
+				const linkIndex = links[ j ].index;
+				const link = bones[ linkIndex ];
+				const ikQuat = link.quaternion.clone();
+
+				const blended = initialQuaternions[ j ].clone().slerp( ikQuat, chainBlend );
+				link.quaternion.copy( blended );
+				link.updateMatrixWorld( true );
+
+			}
 
 		}
 
@@ -243,7 +277,12 @@ class CCDIKSolver {
 
 				if ( link0.parent !== link1 ) {
 
-					console.warn( 'THREE.CCDIKSolver: bone ' + link0.name + ' is not the child of bone ' + link1.name );
+					console.warn(
+						'THREE.CCDIKSolver: bone ' +
+							link0.name +
+							' is not the child of bone ' +
+							link1.name
+					);
 
 				}
 
@@ -282,8 +321,8 @@ class CCDIKHelper extends Object3D {
 
 	/**
 	 * @param {SkinnedMesh} mesh
- 	 * @param {Array<Object>} [iks=[]]
- 	 * @param {number} [sphereSize=0.25]
+	 * @param {Array<Object>} [iks=[]]
+	 * @param {number} [sphereSize=0.25]
 	 */
 	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
@@ -301,28 +340,28 @@ class CCDIKHelper extends Object3D {
 			color: new Color( 0xff8888 ),
 			depthTest: false,
 			depthWrite: false,
-			transparent: true
+			transparent: true,
 		} );
 
 		this.effectorSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0x88ff88 ),
 			depthTest: false,
 			depthWrite: false,
-			transparent: true
+			transparent: true,
 		} );
 
 		this.linkSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0x8888ff ),
 			depthTest: false,
 			depthWrite: false,
-			transparent: true
+			transparent: true,
 		} );
 
 		this.lineMaterial = new LineBasicMaterial( {
 			color: new Color( 0xff0000 ),
 			depthTest: false,
 			depthWrite: false,
-			transparent: true
+			transparent: true,
 		} );
 
 		this._init();
