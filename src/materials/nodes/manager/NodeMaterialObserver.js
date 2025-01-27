@@ -143,6 +143,7 @@ class NodeMaterialObserver {
 			data = {
 				material: this.getMaterialData( material ),
 				geometry: {
+					id: geometry.id,
 					attributes: this.getAttributesData( geometry.attributes ),
 					indexVersion: geometry.index ? geometry.index.version : null,
 					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
@@ -361,6 +362,13 @@ class NodeMaterialObserver {
 
 		const storedAttributeNames = Object.keys( storedAttributes );
 		const currentAttributeNames = Object.keys( attributes );
+
+		if ( storedGeometryData.id !== geometry.id ) {
+
+			storedGeometryData.id = geometry.id;
+			return false;
+
+		}
 
 		if ( storedAttributeNames.length !== currentAttributeNames.length ) {
 
