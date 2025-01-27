@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { HalfFloatType, WebGPUCoordinateSystem } from '../../constants.js';
+import { WebGPUCoordinateSystem } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 
 /**
@@ -276,17 +276,6 @@ class WebGPUBackend extends Backend {
 	getContext() {
 
 		return this.context;
-
-	}
-
-	/**
-	 * Returns `true` if the backend requires a framebuffer target with type `HalfFloat`.
-	 *
-	 * @return {Boolean} Whether the backend requires a framebuffer target with type `HalfFloat` or not.
-	 */
-	needsHalfFloatFrameBufferTarget() {
-
-		return ( this.parameters.outputType === HalfFloatType );
 
 	}
 

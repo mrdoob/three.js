@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION } from '../../constants.js';
+import { HalfFloatType, REVISION } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -595,7 +595,7 @@ class Backend {
 	 */
 	needsHalfFloatFrameBufferTarget() {
 
-		return false;
+		return ( this.parameters.outputType === HalfFloatType );
 
 	}
 
