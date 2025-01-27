@@ -255,6 +255,8 @@ class TSLEncoder {
 
 			code = node.expression.type + '( ' + node.type + ' ' + node.expression.value + ' )';
 
+			this.addImport( node.expression.type );
+
 		} else if ( node.isUnary ) {
 
 			let type = unaryLib[ node.type ];
