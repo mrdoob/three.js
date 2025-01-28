@@ -51,9 +51,9 @@ class StructNode extends Node {
 
 export default StructNode;
 
-export const struct = ( membersLayout ) => {
+export const struct = ( membersLayout, name = null ) => {
 
-	const structLayout = new StructTypeNode( membersLayout );
+	const structLayout = new StructTypeNode( membersLayout, name );
 
 	const struct = ( ...params ) => {
 
@@ -84,6 +84,9 @@ export const struct = ( membersLayout ) => {
 		return nodeObject( new StructNode( structLayout, values ) );
 
 	};
+
+	struct.layout = structLayout;
+	struct.isStruct = true;
 
 	return struct;
 

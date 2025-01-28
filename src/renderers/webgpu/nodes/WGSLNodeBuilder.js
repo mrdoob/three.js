@@ -758,6 +758,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
+				if ( this.isCustomStruct( node ) ) {
+
+					return name;
+
+				}
+
 				return name + '.value';
 
 			} else {
@@ -1431,7 +1437,15 @@ ${ flowData.code }
 
 			const prefix = struct.output ? '@location( ' + member.index + ' ) ' : '';
 
-			snippets.push( `\t${ prefix + member.name } : ${ this.getType( member.type ) }` );
+			let type = this.getType( member.type );
+
+			if ( member.atomic ) {
+
+				type = 'atomic< ' + type + ' >';
+
+			}
+
+			snippets.push( `\t${ prefix + member.name } : ${ type }` );
 
 		}
 
@@ -1582,6 +1596,12 @@ ${ flowData.code }
 
 	}
 
+	isCustomStruct( nodeUniform ) {
+
+		return nodeUniform.value.isStorageBufferAttribute && nodeUniform.node.structTypeNode !== null;
+
+	}
+
 	/**
 	 * Returns the uniforms of the given shader stage as a WGSL string.
 	 *
@@ -1672,15 +1692,23 @@ ${ flowData.code }
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'indirectStorageBuffer' ) {
 
 				const bufferNode = uniform.node;
-				const bufferType = this.getType( bufferNode.bufferType );
+				const bufferType = this.getType( bufferNode.getNodeType( this ) );
 				const bufferCount = bufferNode.bufferCount;
-
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
-				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${ bufferType }>` : `${ bufferType }`;
-				const bufferSnippet = `\tvalue : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >`;
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode, shaderStage ) }` : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( uniform.name, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+				if ( this.isCustomStruct( uniform ) ) {
+
+					bufferSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var<${ bufferAccessMode }> ${ uniform.name } : ${ bufferType };` );
+
+				} else {
+
+					const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${ bufferType }>` : `${ bufferType }`;
+					const bufferSnippet = `\tvalue : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >`;
+
+					bufferSnippets.push( this._getWGSLStructBinding( uniform.name, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+
+				}
 
 			} else {
 
@@ -1725,6 +1753,8 @@ ${ flowData.code }
 		this.sortBindingGroups();
 
 		for ( const shaderStage in shadersData ) {
+
+			this.shaderStage = shaderStage;
 
 			const stageData = shadersData[ shaderStage ];
 			stageData.uniforms = this.getUniforms( shaderStage );
@@ -1805,6 +1835,8 @@ ${ flowData.code }
 
 		}
 
+		this.shaderStage = null;
+
 		if ( this.material !== null ) {
 
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
@@ -1813,7 +1845,6 @@ ${ flowData.code }
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
-			//console.log( this.computeShader );
 
 		}
 
@@ -1943,6 +1974,9 @@ ${ flowData.code }
 // directives
 ${shaderData.directives}
 
+// structs
+${shaderData.structs}
+
 // uniforms
 ${shaderData.uniforms}
 
@@ -1982,11 +2016,11 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 // global
 ${ diagnostics }
 
-// uniforms
-${shaderData.uniforms}
-
 // structs
 ${shaderData.structs}
+
+// uniforms
+${shaderData.uniforms}
 
 // codes
 ${shaderData.codes}
@@ -2024,6 +2058,9 @@ var<private> instanceIndex : u32;
 
 // locals
 ${shaderData.scopedArrays}
+
+// structs
+${shaderData.structs}
 
 // uniforms
 ${shaderData.uniforms}

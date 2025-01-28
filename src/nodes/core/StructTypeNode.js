@@ -1,4 +1,5 @@
 import Node from './Node.js';
+import { getLengthFromType } from './NodeUtils.js';
 
 /** @module StructTypeNode **/
 
@@ -26,13 +27,28 @@ class StructTypeNode extends Node {
 
 	}
 
-	constructor( membersLayout ) {
+	constructor( membersLayout, name = null ) {
 
 		super( 'struct' );
 
 		this.membersLayout = getMembersLayout( membersLayout );
+		this.name = name;
 
 		this.isStructLayoutNode = true;
+
+	}
+
+	getLength() {
+
+		let length = 0;
+
+		for ( const member of this.membersLayout ) {
+
+			length += getLengthFromType( member.type );
+
+		}
+
+		return length;
 
 	}
 
@@ -46,9 +62,15 @@ class StructTypeNode extends Node {
 
 	getNodeType( builder ) {
 
-		const structType = builder.getStructTypeFromNode( this, this.membersLayout );
+		const structType = builder.getStructTypeFromNode( this, this.membersLayout, this.name );
 
 		return structType.name;
+
+	}
+
+	generate( builder ) {
+
+		return this.getNodeType( builder );
 
 	}
 
