@@ -918,8 +918,9 @@ class WebGLTextureUtils {
 	 * @param {WebGLRenderbuffer} renderbuffer - The render buffer.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Number} samples - The MSAA sample count.
+	 * @param {Boolean} [useMultisampledRTT=false] - Whether to use WEBGL_multisampled_render_to_texture or not.
 	 */
-	setupRenderBufferStorage( renderbuffer, renderContext, samples ) {
+	setupRenderBufferStorage( renderbuffer, renderContext, samples, useMultisampledRTT = false ) {
 
 		const { gl } = this;
 		const renderTarget = renderContext.renderTarget;
@@ -932,7 +933,13 @@ class WebGLTextureUtils {
 
 			let glInternalFormat = gl.DEPTH_COMPONENT24;
 
-			if ( samples > 0 ) {
+			if ( useMultisampledRTT === true ) {
+
+				const multisampledRTTExt = this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
+
+				multisampledRTTExt.renderbufferStorageMultisampleEXT( gl.RENDERBUFFER, renderTarget.samples, glInternalFormat, width, height );
+
+			} else if ( samples > 0 ) {
 
 				if ( depthTexture && depthTexture.isDepthTexture ) {
 
