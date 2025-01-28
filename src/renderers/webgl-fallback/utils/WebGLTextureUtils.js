@@ -917,13 +917,14 @@ class WebGLTextureUtils {
 	 *
 	 * @param {WebGLRenderbuffer} renderbuffer - The render buffer.
 	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Number} samples - The MSAA sample count.
 	 */
-	setupRenderBufferStorage( renderbuffer, renderContext ) {
+	setupRenderBufferStorage( renderbuffer, renderContext, samples ) {
 
 		const { gl } = this;
 		const renderTarget = renderContext.renderTarget;
 
-		const { samples, depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+		const { depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
 
 		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
 

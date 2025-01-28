@@ -127,18 +127,9 @@ class Textures extends DataMap {
 
 		const options = { sampleCount };
 
-		// when using the WebXR Layers API, the render target uses external textures which
-		// require no manual updates
+		// XR render targets require no texture updates
 
-		if ( renderTarget.isXRRenderTarget === true && renderTarget.hasExternalTextures === true ) {
-
-			if ( depthTexture && renderTarget.autoAllocateDepthBuffer === true ) {
-
-				this.updateTexture( depthTexture, options );
-
-			}
-
-		} else {
+		if ( renderTarget.isXRRenderTarget !== true ) {
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
