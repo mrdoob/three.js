@@ -353,6 +353,14 @@ class WebGLBackend extends Backend {
 
 			renderTarget.autoAllocateDepthBuffer = false;
 
+			// The multisample_render_to_texture extension doesn't work properly if there
+			// are midframe flushes and an external depth texture.
+			if ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
+
+				console.warn( 'THREE.WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
+
+			}
+
 		}
 
 	}
@@ -530,7 +538,7 @@ class WebGLBackend extends Backend {
 
 			const { samples } = renderContext.renderTarget;
 
-			if ( samples > 0 ) {
+			if ( samples > 0 && this._useMultisampledRTT( renderContext.renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 
@@ -1889,6 +1897,8 @@ class WebGLBackend extends Backend {
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
+			const multisampledRTTExt = this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
+			const useMultisampledRTT = this._useMultisampledRTT( renderTarget );
 
 			const cacheKey = getCacheKey( descriptor );
 
@@ -1951,11 +1961,17 @@ class WebGLBackend extends Backend {
 
 						} else {
 
-							gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+							if ( useMultisampledRTT ) {
+
+								multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
+							} else {
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+							}
 
 						}
-
-
 
 					}
 
@@ -1966,7 +1982,7 @@ class WebGLBackend extends Backend {
 				if ( renderTarget.isXRRenderTarget && renderTarget.autoAllocateDepthBuffer === true ) {
 
 					const renderbuffer = gl.createRenderbuffer();
-					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0 );
+					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0, useMultisampledRTT );
 					renderTargetContextData.xrDepthRenderbuffer = renderbuffer;
 
 				} else {
@@ -1978,7 +1994,15 @@ class WebGLBackend extends Backend {
 						textureData.renderTarget = descriptor.renderTarget;
 						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+						if ( useMultisampledRTT ) {
+
+							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
+						} else {
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+						}
 
 					}
 
@@ -1995,7 +2019,16 @@ class WebGLBackend extends Backend {
 					// rebind color
 
 					const textureData = this.get( descriptor.textures[ 0 ] );
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					if ( useMultisampledRTT ) {
+
+						multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
+					} else {
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					}
 
 					// rebind depth
 
@@ -2010,7 +2043,16 @@ class WebGLBackend extends Backend {
 					} else {
 
 						const textureData = this.get( descriptor.depthTexture );
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+						if ( useMultisampledRTT ) {
+
+							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
+						} else {
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+						}
 
 					}
 
@@ -2018,7 +2060,7 @@ class WebGLBackend extends Backend {
 
 			}
 
-			if ( samples > 0 ) {
+			if ( samples > 0 && useMultisampledRTT === false ) {
 
 				if ( msaaFb === undefined ) {
 
@@ -2320,6 +2362,20 @@ class WebGLBackend extends Backend {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Returns `true` if the `WEBGL_multisampled_render_to_texture` extension
+	 * should be used when MSAA is enabled.
+	 *
+	 * @private
+	 * @param {RenderTarget} renderTarget - The render target that should be multisampled.
+	 * @return {Boolean} Whether to use the `WEBGL_multisampled_render_to_texture` extension for MSAA or not.
+	 */
+	_useMultisampledRTT( renderTarget ) {
+
+		return renderTarget.samples > 0 && this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true && renderTarget.autoAllocateDepthBuffer !== false;
 
 	}
 
