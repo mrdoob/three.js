@@ -211,7 +211,12 @@ class WebGLBackend extends Backend {
 
 		const parameters = this.parameters;
 
-		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2' );
+		const contextAttributes = {
+			antialias: false, // MSAA is applied via a custom renderbuffer
+			alpha: true // always true for performance reasons
+		};
+
+		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2', contextAttributes );
 
 	 	function onContextLost( event ) {
 

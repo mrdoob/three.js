@@ -589,8 +589,6 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			const attributes = gl.getContextAttributes();
-
 			if ( this._useLayers === true ) {
 
 				// default path using XRWebGLBinding/XRProjectionLayer
@@ -599,11 +597,11 @@ class XRManager extends EventDispatcher {
 				let depthType = null;
 				let glDepthFormat = null;
 
-				if ( attributes.depth ) {
+				if ( renderer.depth ) {
 
-					glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
-					depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
-					depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
+					glDepthFormat = renderer.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
+					depthFormat = renderer.stencil ? DepthStencilFormat : DepthFormat;
+					depthType = renderer.stencil ? UnsignedInt248Type : UnsignedIntType;
 
 				}
 
@@ -632,8 +630,8 @@ class XRManager extends EventDispatcher {
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
 						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-						stencilBuffer: attributes.stencil,
-						samples: attributes.antialias ? 4 : 0
+						stencilBuffer: renderer.stencil,
+						samples: renderer.samples
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
@@ -643,10 +641,10 @@ class XRManager extends EventDispatcher {
 				// fallback to XRWebGLLayer
 
 				const layerInit = {
-					antialias: attributes.antialias,
+					antialias: renderer.samples > 0,
 					alpha: true,
-					depth: attributes.depth,
-					stencil: attributes.stencil,
+					depth: renderer.depth,
+					stencil: renderer.stencil,
 					framebufferScaleFactor: this.getFramebufferScaleFactor()
 				};
 
@@ -665,7 +663,7 @@ class XRManager extends EventDispatcher {
 						format: RGBAFormat,
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
-						stencilBuffer: attributes.stencil
+						stencilBuffer: renderer.stencil
 					}
 				);
 
