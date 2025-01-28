@@ -46,7 +46,7 @@ class XRRenderTarget extends RenderTarget {
 		 * Allocating a depth buffer is the default behavior of XR render
 		 * targets. However, when using the WebXR Layers API, this flag
 		 * must be set to `false` when the `ignoreDepthValues` property of
-		 * the projection layers evaluates to `true`.
+		 * the projection layers evaluates to `false`.
 		 *
 		 * Reference: {@link https://www.w3.org/TR/webxrlayers-1/#dom-xrprojectionlayer-ignoredepthvalues}.
 		 *

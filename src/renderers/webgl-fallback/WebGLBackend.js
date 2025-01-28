@@ -1963,14 +1963,24 @@ class WebGLBackend extends Backend {
 
 				}
 
-				if ( descriptor.depthTexture !== null ) {
+				if ( renderTarget.isXRRenderTarget && renderTarget.autoAllocateDepthBuffer === true ) {
 
-					const textureData = this.get( descriptor.depthTexture );
-					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
-					textureData.renderTarget = descriptor.renderTarget;
-					textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
+					const renderbuffer = gl.createRenderbuffer();
+					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0 );
+					renderTargetContextData.xrDepthRenderbuffer = renderbuffer;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+				} else {
+
+					if ( descriptor.depthTexture !== null ) {
+
+						const textureData = this.get( descriptor.depthTexture );
+						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+						textureData.renderTarget = descriptor.renderTarget;
+						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					}
 
 				}
 
@@ -1989,11 +1999,17 @@ class WebGLBackend extends Backend {
 
 					// rebind depth
 
-					if ( descriptor.depthTexture !== null ) {
+					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+
+					if ( renderTarget.autoAllocateDepthBuffer === true ) {
+
+						const renderbuffer = renderTargetContextData.xrDepthRenderbuffer;
+						gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
+						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, depthStyle, gl.RENDERBUFFER, renderbuffer );
+
+					} else {
 
 						const textureData = this.get( descriptor.depthTexture );
-						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
-
 						gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 					}
@@ -2046,7 +2062,7 @@ class WebGLBackend extends Backend {
 					if ( depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
-						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, descriptor );
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, descriptor, samples );
 
 						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
