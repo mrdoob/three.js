@@ -162,16 +162,15 @@
 		Return [page:CCDIKHelper]. You can visualize IK bones by adding the helper to scene.
 		</p>
 
-		<h3>[method:this update]()</h3>
+		<h3>[method:this update]( [param:Number blendFactor] )</h3>
 		<p>
-		Update IK bones quaternion by solving CCD algorithm.
+		Update IK bones quaternion by solving CCD algorithm. Optional blendFactor parameter (default is 1.0) controls the influence of the IK solution globally.
 		</p>
-
-		<h3>[method:this updateOne]( [param:Object ikParam] )</h3>
+		
+		<h3>[method:this updateOne]( [param:Object ikParam], [param:Number blendFactor] )</h3>
 		<p>
-		Update an IK bone quaternion by solving CCD algorithm.
+		Update an IK bone quaternion by solving CCD algorithm. Optional blendFactor parameter (default is 1.0) controls the influence of the IK solution for this specific update call.
 		</p>
-
 		<h2>Source</h2>
 
 		<p>
