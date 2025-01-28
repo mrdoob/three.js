@@ -213,7 +213,9 @@ class WebGLBackend extends Backend {
 
 		const contextAttributes = {
 			antialias: false, // MSAA is applied via a custom renderbuffer
-			alpha: true // always true for performance reasons
+			alpha: true, // always true for performance reasons
+			depth: false, // depth and stencil are set to false since the engine always renders into a framebuffer target first
+			stencil: false
 		};
 
 		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2', contextAttributes );
