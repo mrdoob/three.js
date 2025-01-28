@@ -29,6 +29,16 @@
 			import { struct, storage, wgslFn, instanceIndex, time, varyingProperty, attribute } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
 
 			const renderer = new THREE.WebGPURenderer( { antialias: true } );
 			renderer.outputColorSpace = THREE.SRGBColorSpace;
