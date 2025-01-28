@@ -138,7 +138,7 @@
 					instances: instances,
 					index: instanceIndex,
 					time: time
-				} ).compute( instances );	//not neccessary in this case but normally one wants to run through all instances
+				} ).compute( instances ); // not neccessary in this case but normally one wants to run through all instances
 
 				const initDrawBuffer = wgslFn( `
 					fn compute(            
@@ -161,12 +161,12 @@
   				const vColor = varyingProperty( 'vec4', 'vColor' );
 
   				const positionShaderParams = {
-    				position: attribute( 'position' ),
-    				offset: attribute( 'offset' ),
-    				color: attribute( 'color' ),
-    				orientationStart: attribute( 'orientationStart' ),
-    				orientationEnd: attribute( 'orientationEnd' ),
-    				time: time
+					position: attribute( 'position' ),
+					offset: attribute( 'offset' ),
+					color: attribute( 'color' ),
+					orientationStart: attribute( 'orientationStart' ),
+					orientationEnd: attribute( 'orientationEnd' ),
+					time: time
 				};
 
 				const positionShader = wgslFn( `
