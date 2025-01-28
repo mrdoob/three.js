@@ -29,6 +29,8 @@ export { default as TempNode } from './core/TempNode.js';
 export { default as UniformGroupNode } from './core/UniformGroupNode.js';
 export { default as UniformNode } from './core/UniformNode.js';
 export { default as VaryingNode } from './core/VaryingNode.js';
+export { default as StructNode } from './core/StructNode.js';
+export { default as StructTypeNode } from './core/StructTypeNode.js';
 export { default as OutputStructNode } from './core/OutputStructNode.js';
 export { default as MRTNode } from './core/MRTNode.js';
 
@@ -53,6 +55,7 @@ export { default as StorageArrayElementNode } from './utils/StorageArrayElementN
 export { default as TriplanarTexturesNode } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
+export { default as MemberNode } from './utils/MemberNode.js';
 
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';

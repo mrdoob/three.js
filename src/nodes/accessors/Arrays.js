@@ -10,13 +10,24 @@ import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
  *
  * @function
  * @param {Number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
- * @param {String} [type='float'] - The data type.
+ * @param {String|Struct} [type='float'] - The data type.
  * @returns {StorageBufferNode}
  */
 export const attributeArray = ( count, type = 'float' ) => {
 
-	const itemSize = getLengthFromType( type );
-	const typedArray = getTypedArrayFromType( type );
+	let itemSize, typedArray;
+
+	if ( type.isStruct === true ) {
+
+		itemSize = type.layout.getLength();
+		typedArray = getTypedArrayFromType( 'float' );
+
+	} else {
+
+		itemSize = getLengthFromType( type );
+		typedArray = getTypedArrayFromType( type );
+
+	}
 
 	const buffer = new StorageBufferAttribute( count, itemSize, typedArray );
 	const node = storage( buffer, type, count );
@@ -30,13 +41,24 @@ export const attributeArray = ( count, type = 'float' ) => {
  *
  * @function
  * @param {Number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
- * @param {String} [type='float'] - The data type.
+ * @param {String|Struct} [type='float'] - The data type.
  * @returns {StorageBufferNode}
  */
 export const instancedArray = ( count, type = 'float' ) => {
 
-	const itemSize = getLengthFromType( type );
-	const typedArray = getTypedArrayFromType( type );
+	let itemSize, typedArray;
+
+	if ( type.isStruct === true ) {
+
+		itemSize = type.layout.getLength();
+		typedArray = getTypedArrayFromType( 'float' );
+
+	} else {
+
+		itemSize = getLengthFromType( type );
+		typedArray = getTypedArrayFromType( type );
+
+	}
 
 	const buffer = new StorageInstancedBufferAttribute( count, itemSize, typedArray );
 	const node = storage( buffer, type, count );

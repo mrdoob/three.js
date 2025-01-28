@@ -76,6 +76,12 @@ class StackNode extends Node {
 
 	}
 
+	getMemberType( builder, name ) {
+
+		return this.outputNode ? this.outputNode.getMemberType( builder, name ) : 'void';
+
+	}
+
 	/**
 	 * Adds a node to this stack.
 	 *

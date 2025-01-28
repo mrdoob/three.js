@@ -44,24 +44,34 @@ class OutputStructNode extends Node {
 
 	}
 
-	setup( builder ) {
+	getNodeType( builder ) {
 
-		super.setup( builder );
+		const properties = builder.getNodeProperties( this );
 
-		const members = this.members;
-		const types = [];
+		if ( properties.membersLayout === undefined ) {
 
-		for ( let i = 0; i < members.length; i ++ ) {
+			const members = this.members;
+			const membersLayout = [];
 
-			types.push( members[ i ].getNodeType( builder ) );
+			for ( let i = 0; i < members.length; i ++ ) {
+
+				const name = 'm' + i;
+				const type = members[ i ].getNodeType( builder );
+
+				membersLayout.push( { name, type, index: i } );
+
+			}
+
+			properties.membersLayout = membersLayout;
+			properties.structType = builder.getOutputStructTypeFromNode( this, properties.membersLayout );
 
 		}
 
-		this.nodeType = builder.getStructTypeFromNode( this, types ).name;
+		return properties.structType.name;
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const propertyName = builder.getOutputStructName();
 		const members = this.members;
@@ -70,7 +80,7 @@ class OutputStructNode extends Node {
 
 		for ( let i = 0; i < members.length; i ++ ) {
 
-			const snippet = members[ i ].build( builder, output );
+			const snippet = members[ i ].build( builder );
 
 			builder.addLineFlowCode( `${ structPrefix }m${ i } = ${ snippet }`, this );
 

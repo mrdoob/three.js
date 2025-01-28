@@ -696,12 +696,10 @@ ${ flowData.code }
 	getStructMembers( struct ) {
 
 		const snippets = [];
-		const members = struct.getMemberTypes();
 
-		for ( let i = 0; i < members.length; i ++ ) {
+		for ( const member of struct.members ) {
 
-			const member = members[ i ];
-			snippets.push( `layout( location = ${i} ) out ${ member} m${i};` );
+			snippets.push( `\t${ member.type } ${ member.name };` );
 
 		}
 
@@ -720,25 +718,37 @@ ${ flowData.code }
 		const snippets = [];
 		const structs = this.structs[ shaderStage ];
 
-		if ( structs.length === 0 ) {
+		const outputSnippet = [];
 
-			return 'layout( location = 0 ) out vec4 fragColor;\n';
+		for ( const struct of structs ) {
+
+			if ( struct.output ) {
+
+				for ( const member of struct.members ) {
+
+					outputSnippet.push( `layout( location = ${ member.index } ) out ${ member.type } ${ member.name };` );
+
+				}
+
+			} else {
+
+				let snippet = 'struct ' + struct.name + ' {\n';
+				snippet += this.getStructMembers( struct );
+				snippet += '\n};\n';
+
+				snippets.push( snippet );
+
+			}
 
 		}
 
-		for ( let index = 0, length = structs.length; index < length; index ++ ) {
+		if ( outputSnippet.length === 0 ) {
 
-			const struct = structs[ index ];
-
-			let snippet = '\n';
-			snippet += this.getStructMembers( struct );
-			snippet += '\n';
-
-			snippets.push( snippet );
+			outputSnippet.push( 'layout( location = 0 ) out vec4 fragColor;' );
 
 		}
 
-		return snippets.join( '\n\n' );
+		return '\n' + outputSnippet.join( '\n' ) + '\n\n' + snippets.join( '\n' );
 
 	}
 
@@ -1156,6 +1166,7 @@ ${shaderData.varyings}
 // codes
 ${shaderData.codes}
 
+// structs
 ${shaderData.structs}
 
 void main() {
@@ -1245,6 +1256,7 @@ void main() {
 
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
+			console.log( this.fragmentShader );
 
 		} else {
 

@@ -61,6 +61,20 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
+	getMemberType( builder, name ) {
+
+		const structTypeNode = this.storageBufferNode.structTypeNode;
+
+		if ( structTypeNode ) {
+
+			return structTypeNode.getMemberType( builder, name );
+
+		}
+
+		return 'void';
+
+	}
+
 	setup( builder ) {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {

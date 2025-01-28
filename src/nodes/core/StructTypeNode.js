@@ -1,11 +1,24 @@
 import Node from './Node.js';
+import { getLengthFromType } from './NodeUtils.js';
 
-/**
- * {@link NodeBuilder} is going to create instances of this class during the build process
- * of nodes. They represent the final shader struct data that are going to be generated
- * by the builder. A dictionary of struct types is maintained in {@link NodeBuilder#structs}
- * for this purpose.
- */
+/** @module StructTypeNode **/
+
+function getMembersLayout( members ) {
+
+	return Object.entries( members ).map( ( [ name, value ] ) => {
+
+		if ( typeof value === 'string' ) {
+
+			return { name, type: value, atomic: false };
+
+		}
+
+		return { name, type: value.type, atomic: value.atomic || false };
+
+	} );
+
+}
+
 class StructTypeNode extends Node {
 
 	static get type() {
@@ -14,50 +27,50 @@ class StructTypeNode extends Node {
 
 	}
 
-	/**
-	 * Constructs a new struct type node.
-	 *
-	 * @param {String} name - The name of the struct.
-	 * @param {Array<String>} types - An array of types.
-	 */
-	constructor( name, types ) {
+	constructor( membersLayout, name = null ) {
 
-		super();
+		super( 'struct' );
 
-		/**
-		 * The name of the struct.
-		 *
-		 * @type {String}
-		 */
+		this.membersLayout = getMembersLayout( membersLayout );
 		this.name = name;
 
-
-		/**
-		 * An array of types.
-		 *
-		 * @type {Array<String>}
-		 */
-		this.types = types;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {Boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isStructTypeNode = true;
+		this.isStructLayoutNode = true;
 
 	}
 
-	/**
-	 * Returns the member types.
-	 *
-	 * @return {Array<String>} The types.
-	 */
-	getMemberTypes() {
+	getLength() {
 
-		return this.types;
+		let length = 0;
+
+		for ( const member of this.membersLayout ) {
+
+			length += getLengthFromType( member.type );
+
+		}
+
+		return length;
+
+	}
+
+	getMemberType( builder, name ) {
+
+		const member = this.membersLayout.find( m => m.name === name );
+
+		return member ? member.type : 'void';
+
+	}
+
+	getNodeType( builder ) {
+
+		const structType = builder.getStructTypeFromNode( this, this.membersLayout, this.name );
+
+		return structType.name;
+
+	}
+
+	generate( builder ) {
+
+		return this.getNodeType( builder );
 
 	}
 

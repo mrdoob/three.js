@@ -424,6 +424,7 @@
 		"webgpu_sky",
 		"webgpu_sprites",
 		"webgpu_storage_buffer",
+		"webgpu_struct_drawindirect",
 		"webgpu_texturegrad",
 		"webgpu_textures_2d-array",
 		"webgpu_textures_2d-array_compressed",
