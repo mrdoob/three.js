@@ -55,6 +55,8 @@ class Renderer {
 	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
 	 * to overwrite the default.
 	 * @param {Function?} [parameters.getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
+	 * @param {Number} [parameters.colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
+	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 */
 	constructor( backend, parameters = {} ) {
 
@@ -76,7 +78,8 @@ class Renderer {
 			stencil = false,
 			antialias = false,
 			samples = 0,
-			getFallback = null
+			getFallback = null,
+			colorBufferType = HalfFloatType
 		} = parameters;
 
 		/**
@@ -578,6 +581,17 @@ class Renderer {
 		this.onDeviceLost = this._onDeviceLost;
 
 		/**
+		 * Defines the type of color buffers. The default `HalfFloatType` is recommend for
+		 * best quality. To save memory and bandwidth, `UnsignedByteType` might be used.
+		 * This will reduce rendering quality though.
+		 *
+		 * @private
+		 * @type {Number}
+		 * @default HalfFloatType
+		 */
+		this._colorBufferType = colorBufferType;
+
+		/**
 		 * Whether the renderer has been initialized or not.
 		 *
 		 * @private
@@ -975,6 +989,17 @@ class Renderer {
 	}
 
 	/**
+	 * Returns the color buffer type.
+	 *
+	 * @return {Number} The color buffer type.
+	 */
+	getColorBufferType() {
+
+		return this._colorBufferType;
+
+	}
+
+	/**
 	 * Default implementation of the device lost callback.
 	 *
 	 * @private
@@ -1128,7 +1153,7 @@ class Renderer {
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
-				type: HalfFloatType, // FloatType
+				type: this._colorBufferType,
 				format: RGBAFormat,
 				colorSpace: LinearSRGBColorSpace,
 				generateMipmaps: false,
@@ -2025,6 +2050,8 @@ class Renderer {
 		this._renderLists.dispose();
 		this._renderContexts.dispose();
 		this._textures.dispose();
+
+		if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
 
 		Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
