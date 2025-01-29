@@ -50,7 +50,7 @@ class StorageBufferNode extends BufferNode {
 	 * Constructs a new storage buffer node.
 	 *
 	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
-	 * @param {String|Struct?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
+	 * @param {(String|Struct)?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
 	 * @param {Number} [bufferCount=0] - The buffer count.
 	 */
 	constructor( value, bufferType = null, bufferCount = 0 ) {
@@ -366,7 +366,7 @@ export default StorageBufferNode;
  *
  * @function
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
- * @param {String|Struct?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {(String|Struct)?} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {Number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
  */
