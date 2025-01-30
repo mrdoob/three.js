@@ -769,10 +769,20 @@ ${ flowData.code }
 			for ( const varying of varyings ) {
 
 				if ( shaderStage === 'compute' ) varying.needsInterpolation = true;
-				const type = this.getType( varying.type );
-				const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
-				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
+				const type = this.getType( varying.type );
+
+				if ( varying.needsInterpolation ) {
+
+					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+
+					snippet += `${flat} out ${type} ${varying.name};\n`;
+
+				} else {
+
+					snippet += `${type} ${varying.name};\n`; // generate variable (no varying required)
+
+				}
 
 			}
 
