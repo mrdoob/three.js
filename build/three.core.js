@@ -17416,7 +17416,7 @@ class Line extends Object3D {
 				const a = index.getX( i );
 				const b = index.getX( i + 1 );
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b, i );
 
 				if ( intersect ) {
 
@@ -17431,7 +17431,7 @@ class Line extends Object3D {
 				const a = index.getX( end - 1 );
 				const b = index.getX( start );
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b, end - 1 );
 
 				if ( intersect ) {
 
@@ -17448,7 +17448,7 @@ class Line extends Object3D {
 
 			for ( let i = start, l = end - 1; i < l; i += step ) {
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, i, i + 1 );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, i, i + 1, i );
 
 				if ( intersect ) {
 
@@ -17460,7 +17460,7 @@ class Line extends Object3D {
 
 			if ( this.isLineLoop ) {
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, end - 1, start );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, end - 1, start, end - 1 );
 
 				if ( intersect ) {
 
@@ -17507,7 +17507,7 @@ class Line extends Object3D {
 
 }
 
-function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
+function checkIntersection( object, raycaster, ray, thresholdSq, a, b, i ) {
 
 	const positionAttribute = object.geometry.attributes.position;
 
@@ -17530,7 +17530,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
 		// What do we want? intersection point on the ray or on the segment??
 		// point: raycaster.ray.at( distance ),
 		point: _intersectPointOnSegment.clone().applyMatrix4( object.matrixWorld ),
-		index: a,
+		index: i,
 		face: null,
 		faceIndex: null,
 		barycoord: null,
