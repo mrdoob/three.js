@@ -1,0 +1,33 @@
+:root {
+    --background-color-dark: #222;
+    --background-color-light: #fff;
+    --border-style-dark: 1px solid #444;
+    --border-style-light: 1px solid #E8E8E8;
+}
+
+/* dark */
+
+body { 
+    background-color: var(--background-color-dark) !important;
+}
+.navbar-container {
+    background-color: var(--background-color-dark) !important;
+}
+.sidebar-container {
+    border-right: var(--border-style-dark);
+}
+
+/* light */
+
+body.light  { 
+    background-color: var(--background-color-light) !important;
+}
+.light .navbar-container {
+    background-color: var(--background-color-light) !important;
+}
+.light .sidebar-container {
+    border-right: var(--border-style-light);
+}
+.light .sidebar {
+    background-color: var(--background-color-light) !important;
+}

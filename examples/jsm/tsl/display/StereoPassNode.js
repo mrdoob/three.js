@@ -10,7 +10,7 @@ let _rendererState;
 /**
  * A special render pass node that renders the scene as a stereoscopic image.
  *
- * @augments PassNode
+ * @augments module:PassNode~PassNode
  */
 class StereoPassNode extends PassNode {
 
