@@ -198,7 +198,7 @@ class NodeMaterial extends Material {
 		 * material.transparent = true;
 		 *
 		 * // everything behind the object will be monochromatic
-		 * material.backdropNode = viewportSharedTexture().rgb.saturation( 0 );
+		 * material.backdropNode = saturation( viewportSharedTexture().rgb, 0 );
 		 * ```
 		 *
 		 * Backdrop computations are part of the lighting so only lit materials can use this property.
