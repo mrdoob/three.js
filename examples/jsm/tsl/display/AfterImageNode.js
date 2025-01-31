@@ -48,7 +48,7 @@ class AfterImageNode extends TempNode {
 		/**
 		 * How quickly the after-image fades. A higher value means the after-image
 		 * persists longer, while a lower value means it fades faster. Should be in
-		 * the range `[0, 1 ]`.
+		 * the range `[0, 1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
