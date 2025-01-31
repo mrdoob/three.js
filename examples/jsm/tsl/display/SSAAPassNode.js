@@ -16,7 +16,7 @@ let _rendererState;
  *
  * Reference: {@link https://en.wikipedia.org/wiki/Supersampling}
  *
- * @augments PassNode
+ * @augments module:PassNode~PassNode
  */
 class SSAAPassNode extends PassNode {
 

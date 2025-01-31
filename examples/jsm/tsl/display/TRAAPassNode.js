@@ -18,7 +18,7 @@ let _rendererState;
  * - {@link https://alextardif.com/TAA.html}
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
- * @augments PassNode
+ * @augments module:PassNode~PassNode
  */
 class TRAAPassNode extends PassNode {
 

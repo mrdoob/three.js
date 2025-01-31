@@ -6,7 +6,9 @@
             "recurse": true,
             "template": "node_modules/clean-jsdoc-theme",
             "theme_opts": {
-                "homepageTitle": "three.js docs"
+                "homepageTitle": "three.js docs",
+                "sections": ["Classes", "Modules"],
+                "include_css": ["utils/docs/custom/three.css"]
            }
     },
     "plugins": [ "plugins/markdown" ],
