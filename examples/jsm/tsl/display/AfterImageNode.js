@@ -46,7 +46,9 @@ class AfterImageNode extends TempNode {
 		this.textureNodeOld = texture();
 
 		/**
-		 * The damping intensity as a uniform node.
+		 * How quickly the after-image fades. A higher value means the after-image
+		 * persists longer, while a lower value means it fades faster. Should be in
+		 * the range `[0, 1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -174,27 +176,25 @@ class AfterImageNode extends TempNode {
 
 		//
 
-		const uvNode = textureNode.uvNode || uv();
-
-		textureNodeOld.uvNode = uvNode;
-
-		const sampleTexture = ( uv ) => textureNode.sample( uv );
-
-		const when_gt = Fn( ( [ x_immutable, y_immutable ] ) => {
-
-			const y = float( y_immutable ).toVar();
-			const x = vec4( x_immutable ).toVar();
-
-			return max( sign( x.sub( y ) ), 0.0 );
-
-		} );
+		textureNodeOld.uvNode = textureNode.uvNode || uv();
 
 		const afterImg = Fn( () => {
 
-			const texelOld = vec4( textureNodeOld );
-			const texelNew = vec4( sampleTexture( uvNode ) );
+			const texelOld = textureNodeOld.sample().toVar();
+			const texelNew = textureNode.sample().toVar();
 
-			texelOld.mulAssign( this.damp.mul( when_gt( texelOld, 0.1 ) ) );
+			const threshold = float( 0.1 ).toConst();
+
+			// m acts as a mask. It's 1 if the previous pixel was "bright enough" (above the threshold) and 0 if it wasn't.
+			const m = max( sign( texelOld.sub( threshold ) ), 0.0 );
+
+			// This is where the after-image fades:
+			//
+			// - If m is 0, texelOld is multiplied by 0, effectively clearing the after-image for that pixel.
+			// - If m is 1, texelOld is multiplied by "damp". Since "damp" is between 0 and 1, this reduces the color value of
+			// texelOld, making it darker and causing it to fade.
+			texelOld.mulAssign( this.damp.mul( m ) );
+
 			return max( texelNew, texelOld );
 
 		} );
