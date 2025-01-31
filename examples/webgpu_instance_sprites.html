@@ -70,7 +70,7 @@
 
 				// material
 
-				material = new THREE.SpriteNodeMaterial( { sizeAttenuation: true, map, alphaMap: map, alphaTest: 0.1, transparent: true } );
+				material = new THREE.SpriteNodeMaterial( { sizeAttenuation: true, map, alphaMap: map, alphaTest: 0.1 } );
 				material.color.setHSL( 1.0, 0.3, 0.7, THREE.SRGBColorSpace );
 				material.positionNode = instancedBufferAttribute( positionAttribute );
 				material.rotationNode = time.add( instanceIndex ).sin();
