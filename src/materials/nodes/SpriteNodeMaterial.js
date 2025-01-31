@@ -86,6 +86,14 @@ class SpriteNodeMaterial extends NodeMaterial {
 		 */
 		this.scaleNode = null;
 
+		/**
+		 * In Sprites, the transparent property is enabled by default.
+		 *
+		 * @type {Boolean}
+		 * @default true
+		 */
+		this.transparent = true;
+
 		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );

@@ -89,7 +89,6 @@
 				smokeNodeMaterial.positionNode = offsetRange.mul( lifeTime );
 				smokeNodeMaterial.scaleNode = scaleRange.mul( lifeTime.max( 0.3 ) );
 				smokeNodeMaterial.depthWrite = false;
-				smokeNodeMaterial.transparent = true;
 
 				const smokeInstancedSprite = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), smokeNodeMaterial );
 				smokeInstancedSprite.scale.setScalar( 400 );

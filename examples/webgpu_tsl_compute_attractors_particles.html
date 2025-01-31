@@ -141,7 +141,7 @@
 				// particles
 
 				const count = Math.pow( 2, 18 );
-				const material = new THREE.SpriteNodeMaterial( { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false } );
+				const material = new THREE.SpriteNodeMaterial( { blending: THREE.AdditiveBlending, depthWrite: false } );
 
 				const attractorMass = uniform( Number( `1e${7}` ) );
 				const particleGlobalMass = uniform( Number( `1e${4}` ) );

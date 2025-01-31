@@ -90,7 +90,7 @@
 
 				// material and TSL
 
-				const material = new THREE.SpriteNodeMaterial( { blending: THREE.AdditiveBlending, depthWrite: false, transparent: true } );
+				const material = new THREE.SpriteNodeMaterial( { blending: THREE.AdditiveBlending, depthWrite: false } );
 
 				const localTime = instancedBufferAttribute( timeAttribute ).add( time.mul( 0.1 ) );
 				const modTime = mod( localTime, 1.0 );
