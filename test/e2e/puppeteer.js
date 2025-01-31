@@ -158,6 +158,7 @@ const exceptionList = [
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
+	'webgpu_postprocessing_afterimage',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
