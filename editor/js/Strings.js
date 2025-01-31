@@ -3,8 +3,8 @@ function Strings( config ) {
 	const language = config.getKey( 'language' );
 
 	const values = {
-fa: {
-'prompt/file/open': 'تمام داده های ذخیره نشده پاک خواهند شد آیا مطمئنید؟',
+		fa: {
+			'prompt/file/open': 'تمام داده های ذخیره نشده پاک خواهند شد آیا مطمئنید؟',
 			'prompt/file/failedToOpenProject': 'خطایی در باز کردن پروژه پیش آمده',
 			'prompt/file/export/noMeshSelected': 'هیچ Mesh ای انتخاب نکردید',
 			'prompt/file/export/noObjectSelected': 'هیچ آبجکتی انتخاب نکردید!',
@@ -176,7 +176,7 @@ fa: {
 			'sidebar/geometry/buffer_geometry/attributes': 'صفات',
 			'sidebar/geometry/buffer_geometry/index': 'شاخص',
 			'sidebar/geometry/buffer_geometry/morphAttributes': 'صفات شکل (مورف)',
-			'sidebar/geometry/buffer_geometry/morphRelative':  'صفات نسبی (رلتیو)',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'صفات نسبی (رلتیو)',
 
 			'sidebar/geometry/capsule_geometry/radius': 'شعاع',
 			'sidebar/geometry/capsule_geometry/length': 'طول',
@@ -239,7 +239,7 @@ fa: {
 
 			'sidebar/geometry/sphere_geometry/radius': 'شعاع',
 			'sidebar/geometry/sphere_geometry/widthsegments': 'بخش عرض',
-			'sidebar/geometry/sphere_geometry/heightsegments':  'بخش ارتفاع',
+			'sidebar/geometry/sphere_geometry/heightsegments': 'بخش ارتفاع',
 			'sidebar/geometry/sphere_geometry/phistart': 'شروع فی',
 			'sidebar/geometry/sphere_geometry/philength': ' طول فی',
 			'sidebar/geometry/sphere_geometry/thetastart': 'شروع تتا',

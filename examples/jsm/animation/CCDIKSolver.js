@@ -28,7 +28,7 @@ const _matrix = new Matrix4();
 
 /**
  * CCD Algorithm
- *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
+ *  - https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
  * // ik parameter example
  * //
@@ -277,13 +277,14 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
 
 /**
  * Visualize IK bones
- *
- * @param {SkinnedMesh} mesh
- * @param {Array<Object>} iks
- * @param {number} sphereSize
  */
 class CCDIKHelper extends Object3D {
 
+	/**
+	 * @param {SkinnedMesh} mesh
+ 	 * @param {Array<Object>} [iks=[]]
+ 	 * @param {number} [sphereSize=0.25]
+	 */
 	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 		super();

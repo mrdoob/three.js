@@ -28,7 +28,7 @@ const OutputShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-	
+
 		precision highp float;
 
 		uniform sampler2D tDiffuse;
@@ -67,6 +67,10 @@ const OutputShader = {
 			#elif defined( NEUTRAL_TONE_MAPPING )
 
 				gl_FragColor.rgb = NeutralToneMapping( gl_FragColor.rgb );
+
+			#elif defined( CUSTOM_TONE_MAPPING )
+
+				gl_FragColor.rgb = CustomToneMapping( gl_FragColor.rgb );
 
 			#endif
 

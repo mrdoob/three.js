@@ -29,10 +29,10 @@
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
+				"three/webgpu": "../build/three.webgpu.js",
 				"three/tsl": "../build/three.tsl.js",
 				"three/addons/": "./jsm/",
-				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
+				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 			}
 		}
 	</script>
@@ -229,9 +229,10 @@
 
 			stats = new Stats( {
 				precision: 3,
-				horizontal: false
+				horizontal: false,
+				trackGPU: true,
 			} );
-			// stats.init( renderer );
+			stats.init( renderer );
 			document.body.appendChild( stats.dom );
 			stats.dom.style.position = 'absolute';
 
@@ -288,6 +289,8 @@
 				if ( renderTimeAverages.length > 60 ) renderTimeAverages.shift();
 		
 				const average = renderTimeAverages.reduce( ( a, b ) => a + b, 0 ) / renderTimeAverages.length;
+
+				renderer.resolveTimestampsAsync();
 				stats.update();
 
 				document.getElementById( 'backend' ).innerText = `Average Render Time ${api.renderBundle ? '(Bundle)' : ''}: ` + average.toFixed( 2 ) + 'ms';

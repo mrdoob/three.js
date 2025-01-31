@@ -57,6 +57,8 @@
 			import * as THREE from 'three';
 			import { storage, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
 
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const StepType = {
@@ -119,6 +121,14 @@
 
 			
 			} );
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
 
 			// Allow Workgroup Array Swaps
 			init();
@@ -515,11 +525,15 @@
 			
 					}
 
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+
+
 					const algo = new Uint32Array( await renderer.getArrayBufferAsync( nextAlgoBuffer ) );
 					algo > StepType.DISPERSE_LOCAL ? ( nextStepGlobal = true ) : ( nextStepGlobal = false );
 					const totalSwaps = new Uint32Array( await renderer.getArrayBufferAsync( counterBuffer ) );
 			
 					renderer.render( scene, camera );
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
 
 					timestamps[ forceGlobalSwap ? 'global_swap' : 'local_swap' ].innerHTML = `
 

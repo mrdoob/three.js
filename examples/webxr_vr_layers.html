@@ -305,9 +305,12 @@
 				const gl = renderer.getContext();
 
 				// Init layers once in immersive mode and video is ready.
-				const useLayers = session.enabledFeatures !== undefined && session.enabledFeatures.includes('layers');
+				const useLayers = session &&
+					session.enabledFeatures !== undefined &&
+					session.enabledFeatures.includes( 'layers' ) &&
+					XRMediaBinding !== undefined;
 
-				if ( session && ! useLayers ) {
+				if ( ! useLayers ) {
 
 					errorMesh.visible = true;
 

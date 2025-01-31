@@ -300,6 +300,7 @@
 		"webgpu_backdrop_area",
 		"webgpu_backdrop_water",
 		"webgpu_camera",
+		"webgpu_camera_array",
 		"webgpu_camera_logarithmicdepthbuffer",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
@@ -423,6 +424,7 @@
 		"webgpu_sky",
 		"webgpu_sprites",
 		"webgpu_storage_buffer",
+		"webgpu_struct_drawindirect",
 		"webgpu_texturegrad",
 		"webgpu_textures_2d-array",
 		"webgpu_textures_2d-array_compressed",
@@ -430,7 +432,6 @@
 		"webgpu_textures_partialupdate",
 		"webgpu_tonemapping",
 		"webgpu_tsl_angular_slicing",
-		"webgpu_tsl_coffee_smoke",
 		"webgpu_tsl_compute_attractors_particles",
 		"webgpu_tsl_earth",
 		"webgpu_tsl_editor",
@@ -443,10 +444,12 @@
 		"webgpu_tsl_vfx_flames",
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
+		"webgpu_video_frame",
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin",
-		"webgpu_water"
+		"webgpu_water",
+		"webgpu_xr_cubes"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -514,7 +517,8 @@
 		"misc_exporter_usdz",
 		"misc_exporter_exr",
 		"misc_exporter_ktx2",
-		"misc_lookat"
+		"misc_lookat",
+		"misc_raycaster_helper"
 	],
 	"css2d": [
 		"css2d_label"

@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2010-2024 Three.js Authors
+ * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 'use strict';
 
-const REVISION = '172';
+const REVISION = '173';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -217,6 +217,11 @@ const GLSL3 = '300 es';
 const WebGLCoordinateSystem = 2000;
 const WebGPUCoordinateSystem = 2001;
 
+const TimestampQuery = {
+	COMPUTE: 'compute',
+	RENDER: 'render'
+};
+
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
  */
@@ -245,9 +250,9 @@ class EventDispatcher {
 
 	hasEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) return false;
-
 		const listeners = this._listeners;
+
+		if ( listeners === undefined ) return false;
 
 		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
@@ -255,9 +260,10 @@ class EventDispatcher {
 
 	removeEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) return;
-
 		const listeners = this._listeners;
+
+		if ( listeners === undefined ) return;
+
 		const listenerArray = listeners[ type ];
 
 		if ( listenerArray !== undefined ) {
@@ -276,9 +282,10 @@ class EventDispatcher {
 
 	dispatchEvent( event ) {
 
-		if ( this._listeners === undefined ) return;
-
 		const listeners = this._listeners;
+
+		if ( listeners === undefined ) return;
+
 		const listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
@@ -1856,17 +1863,7 @@ class ImageUtils {
 
 		}
 
-		if ( canvas.width > 2048 || canvas.height > 2048 ) {
-
-			console.warn( 'THREE.ImageUtils.getDataURL: Image converted to jpg for performance reasons', image );
-
-			return canvas.toDataURL( 'image/jpeg', 0.6 );
-
-		} else {
-
-			return canvas.toDataURL( 'image/png' );
-
-		}
+		return canvas.toDataURL( 'image/png' );
 
 	}
 
@@ -10002,6 +9999,8 @@ const DataUtils = {
 const _vector$9 = /*@__PURE__*/ new Vector3();
 const _vector2$1 = /*@__PURE__*/ new Vector2();
 
+let _id$3 = 0;
+
 class BufferAttribute {
 
 	constructor( array, itemSize, normalized = false ) {
@@ -10013,6 +10012,8 @@ class BufferAttribute {
 		}
 
 		this.isBufferAttribute = true;
+
+		Object.defineProperty( this, 'id', { value: _id$3 ++ } );
 
 		this.name = '';
 
@@ -13251,6 +13252,358 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 }
 
+class Group extends Object3D {
+
+	constructor() {
+
+		super();
+
+		this.isGroup = true;
+
+		this.type = 'Group';
+
+	}
+
+}
+
+const _moveEvent = { type: 'move' };
+
+class WebXRController {
+
+	constructor() {
+
+		this._targetRay = null;
+		this._grip = null;
+		this._hand = null;
+
+	}
+
+	getHandSpace() {
+
+		if ( this._hand === null ) {
+
+			this._hand = new Group();
+			this._hand.matrixAutoUpdate = false;
+			this._hand.visible = false;
+
+			this._hand.joints = {};
+			this._hand.inputState = { pinching: false };
+
+		}
+
+		return this._hand;
+
+	}
+
+	getTargetRaySpace() {
+
+		if ( this._targetRay === null ) {
+
+			this._targetRay = new Group();
+			this._targetRay.matrixAutoUpdate = false;
+			this._targetRay.visible = false;
+			this._targetRay.hasLinearVelocity = false;
+			this._targetRay.linearVelocity = new Vector3();
+			this._targetRay.hasAngularVelocity = false;
+			this._targetRay.angularVelocity = new Vector3();
+
+		}
+
+		return this._targetRay;
+
+	}
+
+	getGripSpace() {
+
+		if ( this._grip === null ) {
+
+			this._grip = new Group();
+			this._grip.matrixAutoUpdate = false;
+			this._grip.visible = false;
+			this._grip.hasLinearVelocity = false;
+			this._grip.linearVelocity = new Vector3();
+			this._grip.hasAngularVelocity = false;
+			this._grip.angularVelocity = new Vector3();
+
+		}
+
+		return this._grip;
+
+	}
+
+	dispatchEvent( event ) {
+
+		if ( this._targetRay !== null ) {
+
+			this._targetRay.dispatchEvent( event );
+
+		}
+
+		if ( this._grip !== null ) {
+
+			this._grip.dispatchEvent( event );
+
+		}
+
+		if ( this._hand !== null ) {
+
+			this._hand.dispatchEvent( event );
+
+		}
+
+		return this;
+
+	}
+
+	connect( inputSource ) {
+
+		if ( inputSource && inputSource.hand ) {
+
+			const hand = this._hand;
+
+			if ( hand ) {
+
+				for ( const inputjoint of inputSource.hand.values() ) {
+
+					// Initialize hand with joints when connected
+					this._getHandJoint( hand, inputjoint );
+
+				}
+
+			}
+
+		}
+
+		this.dispatchEvent( { type: 'connected', data: inputSource } );
+
+		return this;
+
+	}
+
+	disconnect( inputSource ) {
+
+		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
+
+		if ( this._targetRay !== null ) {
+
+			this._targetRay.visible = false;
+
+		}
+
+		if ( this._grip !== null ) {
+
+			this._grip.visible = false;
+
+		}
+
+		if ( this._hand !== null ) {
+
+			this._hand.visible = false;
+
+		}
+
+		return this;
+
+	}
+
+	update( inputSource, frame, referenceSpace ) {
+
+		let inputPose = null;
+		let gripPose = null;
+		let handPose = null;
+
+		const targetRay = this._targetRay;
+		const grip = this._grip;
+		const hand = this._hand;
+
+		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
+
+			if ( hand && inputSource.hand ) {
+
+				handPose = true;
+
+				for ( const inputjoint of inputSource.hand.values() ) {
+
+					// Update the joints groups with the XRJoint poses
+					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
+
+					// The transform of this joint will be updated with the joint pose on each frame
+					const joint = this._getHandJoint( hand, inputjoint );
+
+					if ( jointPose !== null ) {
+
+						joint.matrix.fromArray( jointPose.transform.matrix );
+						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+						joint.matrixWorldNeedsUpdate = true;
+						joint.jointRadius = jointPose.radius;
+
+					}
+
+					joint.visible = jointPose !== null;
+
+				}
+
+				// Custom events
+
+				// Check pinchz
+				const indexTip = hand.joints[ 'index-finger-tip' ];
+				const thumbTip = hand.joints[ 'thumb-tip' ];
+				const distance = indexTip.position.distanceTo( thumbTip.position );
+
+				const distanceToPinch = 0.02;
+				const threshold = 0.005;
+
+				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
+
+					hand.inputState.pinching = false;
+					this.dispatchEvent( {
+						type: 'pinchend',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
+
+					hand.inputState.pinching = true;
+					this.dispatchEvent( {
+						type: 'pinchstart',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				}
+
+			} else {
+
+				if ( grip !== null && inputSource.gripSpace ) {
+
+					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+
+					if ( gripPose !== null ) {
+
+						grip.matrix.fromArray( gripPose.transform.matrix );
+						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+						grip.matrixWorldNeedsUpdate = true;
+
+						if ( gripPose.linearVelocity ) {
+
+							grip.hasLinearVelocity = true;
+							grip.linearVelocity.copy( gripPose.linearVelocity );
+
+						} else {
+
+							grip.hasLinearVelocity = false;
+
+						}
+
+						if ( gripPose.angularVelocity ) {
+
+							grip.hasAngularVelocity = true;
+							grip.angularVelocity.copy( gripPose.angularVelocity );
+
+						} else {
+
+							grip.hasAngularVelocity = false;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			if ( targetRay !== null ) {
+
+				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+				// Some runtimes (namely Vive Cosmos with Vive OpenXR Runtime) have only grip space and ray space is equal to it
+				if ( inputPose === null && gripPose !== null ) {
+
+					inputPose = gripPose;
+
+				}
+
+				if ( inputPose !== null ) {
+
+					targetRay.matrix.fromArray( inputPose.transform.matrix );
+					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+					targetRay.matrixWorldNeedsUpdate = true;
+
+					if ( inputPose.linearVelocity ) {
+
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
+
+					} else {
+
+						targetRay.hasLinearVelocity = false;
+
+					}
+
+					if ( inputPose.angularVelocity ) {
+
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
+
+					} else {
+
+						targetRay.hasAngularVelocity = false;
+
+					}
+
+					this.dispatchEvent( _moveEvent );
+
+				}
+
+			}
+
+
+		}
+
+		if ( targetRay !== null ) {
+
+			targetRay.visible = ( inputPose !== null );
+
+		}
+
+		if ( grip !== null ) {
+
+			grip.visible = ( gripPose !== null );
+
+		}
+
+		if ( hand !== null ) {
+
+			hand.visible = ( handPose !== null );
+
+		}
+
+		return this;
+
+	}
+
+	// private method
+
+	_getHandJoint( hand, inputjoint ) {
+
+		if ( hand.joints[ inputjoint.jointName ] === undefined ) {
+
+			const joint = new Group();
+			joint.matrixAutoUpdate = false;
+			joint.visible = false;
+			hand.joints[ inputjoint.jointName ] = joint;
+
+			hand.add( joint );
+
+		}
+
+		return hand.joints[ inputjoint.jointName ];
+
+	}
+
+}
+
 class FogExp2 {
 
 	constructor( color, density = 0.00025 ) {
@@ -16214,7 +16567,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
 
-			if ( instanceInfo[ i ].geometryIndex === geometryId ) {
+			if ( instanceInfo[ i ].active && instanceInfo[ i ].geometryIndex === geometryId ) {
 
 				this.deleteInstance( i );
 
@@ -17065,7 +17418,7 @@ class Line extends Object3D {
 				const a = index.getX( i );
 				const b = index.getX( i + 1 );
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b, i );
 
 				if ( intersect ) {
 
@@ -17080,7 +17433,7 @@ class Line extends Object3D {
 				const a = index.getX( end - 1 );
 				const b = index.getX( start );
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, a, b, end - 1 );
 
 				if ( intersect ) {
 
@@ -17097,7 +17450,7 @@ class Line extends Object3D {
 
 			for ( let i = start, l = end - 1; i < l; i += step ) {
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, i, i + 1 );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, i, i + 1, i );
 
 				if ( intersect ) {
 
@@ -17109,7 +17462,7 @@ class Line extends Object3D {
 
 			if ( this.isLineLoop ) {
 
-				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, end - 1, start );
+				const intersect = checkIntersection( this, raycaster, _ray$1, localThresholdSq, end - 1, start, end - 1 );
 
 				if ( intersect ) {
 
@@ -17156,7 +17509,7 @@ class Line extends Object3D {
 
 }
 
-function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
+function checkIntersection( object, raycaster, ray, thresholdSq, a, b, i ) {
 
 	const positionAttribute = object.geometry.attributes.position;
 
@@ -17179,7 +17532,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
 		// What do we want? intersection point on the ray or on the segment??
 		// point: raycaster.ray.at( distance ),
 		point: _intersectPointOnSegment.clone().applyMatrix4( object.matrixWorld ),
-		index: a,
+		index: i,
 		face: null,
 		faceIndex: null,
 		barycoord: null,
@@ -17458,20 +17811,6 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 
 }
 
-class Group extends Object3D {
-
-	constructor() {
-
-		super();
-
-		this.isGroup = true;
-
-		this.type = 'Group';
-
-	}
-
-}
-
 class VideoTexture extends Texture {
 
 	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
@@ -17518,6 +17857,38 @@ class VideoTexture extends Texture {
 			this.needsUpdate = true;
 
 		}
+
+	}
+
+}
+
+class VideoFrameTexture extends VideoTexture {
+
+	constructor( mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+		super( {}, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		this.isVideoFrameTexture = true;
+
+	}
+
+	update() {
+
+		// overwrites `VideoTexture.update()` with an empty method since
+		// this type of texture is updated via `setFrame()`.
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this ); // restoring Texture.clone()
+
+	}
+
+	setFrame( frame ) {
+
+		this.image = frame;
+		this.needsUpdate = true;
 
 	}
 
@@ -30689,6 +31060,7 @@ class ArrayCamera extends PerspectiveCamera {
 		this.isArrayCamera = true;
 
 		this.cameras = array;
+		this.index = 0;
 
 	}
 
@@ -38577,12 +38949,16 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 			boxMesh.geometry.dispose();
 			boxMesh.material.dispose();
 
+			boxMesh = undefined;
+
 		}
 
 		if ( planeMesh !== undefined ) {
 
 			planeMesh.geometry.dispose();
 			planeMesh.material.dispose();
+
+			planeMesh = undefined;
 
 		}
 
@@ -49522,344 +49898,6 @@ function WebGLUtils( gl, extensions ) {
 
 }
 
-const _moveEvent = { type: 'move' };
-
-class WebXRController {
-
-	constructor() {
-
-		this._targetRay = null;
-		this._grip = null;
-		this._hand = null;
-
-	}
-
-	getHandSpace() {
-
-		if ( this._hand === null ) {
-
-			this._hand = new Group();
-			this._hand.matrixAutoUpdate = false;
-			this._hand.visible = false;
-
-			this._hand.joints = {};
-			this._hand.inputState = { pinching: false };
-
-		}
-
-		return this._hand;
-
-	}
-
-	getTargetRaySpace() {
-
-		if ( this._targetRay === null ) {
-
-			this._targetRay = new Group();
-			this._targetRay.matrixAutoUpdate = false;
-			this._targetRay.visible = false;
-			this._targetRay.hasLinearVelocity = false;
-			this._targetRay.linearVelocity = new Vector3();
-			this._targetRay.hasAngularVelocity = false;
-			this._targetRay.angularVelocity = new Vector3();
-
-		}
-
-		return this._targetRay;
-
-	}
-
-	getGripSpace() {
-
-		if ( this._grip === null ) {
-
-			this._grip = new Group();
-			this._grip.matrixAutoUpdate = false;
-			this._grip.visible = false;
-			this._grip.hasLinearVelocity = false;
-			this._grip.linearVelocity = new Vector3();
-			this._grip.hasAngularVelocity = false;
-			this._grip.angularVelocity = new Vector3();
-
-		}
-
-		return this._grip;
-
-	}
-
-	dispatchEvent( event ) {
-
-		if ( this._targetRay !== null ) {
-
-			this._targetRay.dispatchEvent( event );
-
-		}
-
-		if ( this._grip !== null ) {
-
-			this._grip.dispatchEvent( event );
-
-		}
-
-		if ( this._hand !== null ) {
-
-			this._hand.dispatchEvent( event );
-
-		}
-
-		return this;
-
-	}
-
-	connect( inputSource ) {
-
-		if ( inputSource && inputSource.hand ) {
-
-			const hand = this._hand;
-
-			if ( hand ) {
-
-				for ( const inputjoint of inputSource.hand.values() ) {
-
-					// Initialize hand with joints when connected
-					this._getHandJoint( hand, inputjoint );
-
-				}
-
-			}
-
-		}
-
-		this.dispatchEvent( { type: 'connected', data: inputSource } );
-
-		return this;
-
-	}
-
-	disconnect( inputSource ) {
-
-		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-		if ( this._targetRay !== null ) {
-
-			this._targetRay.visible = false;
-
-		}
-
-		if ( this._grip !== null ) {
-
-			this._grip.visible = false;
-
-		}
-
-		if ( this._hand !== null ) {
-
-			this._hand.visible = false;
-
-		}
-
-		return this;
-
-	}
-
-	update( inputSource, frame, referenceSpace ) {
-
-		let inputPose = null;
-		let gripPose = null;
-		let handPose = null;
-
-		const targetRay = this._targetRay;
-		const grip = this._grip;
-		const hand = this._hand;
-
-		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
-
-			if ( hand && inputSource.hand ) {
-
-				handPose = true;
-
-				for ( const inputjoint of inputSource.hand.values() ) {
-
-					// Update the joints groups with the XRJoint poses
-					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
-
-					// The transform of this joint will be updated with the joint pose on each frame
-					const joint = this._getHandJoint( hand, inputjoint );
-
-					if ( jointPose !== null ) {
-
-						joint.matrix.fromArray( jointPose.transform.matrix );
-						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
-						joint.matrixWorldNeedsUpdate = true;
-						joint.jointRadius = jointPose.radius;
-
-					}
-
-					joint.visible = jointPose !== null;
-
-				}
-
-				// Custom events
-
-				// Check pinchz
-				const indexTip = hand.joints[ 'index-finger-tip' ];
-				const thumbTip = hand.joints[ 'thumb-tip' ];
-				const distance = indexTip.position.distanceTo( thumbTip.position );
-
-				const distanceToPinch = 0.02;
-				const threshold = 0.005;
-
-				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
-
-					hand.inputState.pinching = false;
-					this.dispatchEvent( {
-						type: 'pinchend',
-						handedness: inputSource.handedness,
-						target: this
-					} );
-
-				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
-
-					hand.inputState.pinching = true;
-					this.dispatchEvent( {
-						type: 'pinchstart',
-						handedness: inputSource.handedness,
-						target: this
-					} );
-
-				}
-
-			} else {
-
-				if ( grip !== null && inputSource.gripSpace ) {
-
-					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
-
-					if ( gripPose !== null ) {
-
-						grip.matrix.fromArray( gripPose.transform.matrix );
-						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
-						grip.matrixWorldNeedsUpdate = true;
-
-						if ( gripPose.linearVelocity ) {
-
-							grip.hasLinearVelocity = true;
-							grip.linearVelocity.copy( gripPose.linearVelocity );
-
-						} else {
-
-							grip.hasLinearVelocity = false;
-
-						}
-
-						if ( gripPose.angularVelocity ) {
-
-							grip.hasAngularVelocity = true;
-							grip.angularVelocity.copy( gripPose.angularVelocity );
-
-						} else {
-
-							grip.hasAngularVelocity = false;
-
-						}
-
-					}
-
-				}
-
-			}
-
-			if ( targetRay !== null ) {
-
-				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-				// Some runtimes (namely Vive Cosmos with Vive OpenXR Runtime) have only grip space and ray space is equal to it
-				if ( inputPose === null && gripPose !== null ) {
-
-					inputPose = gripPose;
-
-				}
-
-				if ( inputPose !== null ) {
-
-					targetRay.matrix.fromArray( inputPose.transform.matrix );
-					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
-					targetRay.matrixWorldNeedsUpdate = true;
-
-					if ( inputPose.linearVelocity ) {
-
-						targetRay.hasLinearVelocity = true;
-						targetRay.linearVelocity.copy( inputPose.linearVelocity );
-
-					} else {
-
-						targetRay.hasLinearVelocity = false;
-
-					}
-
-					if ( inputPose.angularVelocity ) {
-
-						targetRay.hasAngularVelocity = true;
-						targetRay.angularVelocity.copy( inputPose.angularVelocity );
-
-					} else {
-
-						targetRay.hasAngularVelocity = false;
-
-					}
-
-					this.dispatchEvent( _moveEvent );
-
-				}
-
-			}
-
-
-		}
-
-		if ( targetRay !== null ) {
-
-			targetRay.visible = ( inputPose !== null );
-
-		}
-
-		if ( grip !== null ) {
-
-			grip.visible = ( gripPose !== null );
-
-		}
-
-		if ( hand !== null ) {
-
-			hand.visible = ( handPose !== null );
-
-		}
-
-		return this;
-
-	}
-
-	// private method
-
-	_getHandJoint( hand, inputjoint ) {
-
-		if ( hand.joints[ inputjoint.jointName ] === undefined ) {
-
-			const joint = new Group();
-			joint.matrixAutoUpdate = false;
-			joint.visible = false;
-			hand.joints[ inputjoint.jointName ] = joint;
-
-			hand.add( joint );
-
-		}
-
-		return hand.joints[ inputjoint.jointName ];
-
-	}
-
-}
-
 const _occlusion_vertex = `
 void main() {
 
@@ -50227,7 +50265,9 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
-				const useLayers = session.enabledFeatures !== undefined && session.enabledFeatures.includes( 'layers' );
+				// Check that the browser implements the necessary APIs to use an
+				// XRProjectionLayer rather than an XRWebGLLayer
+				const useLayers = typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
 				if ( ! useLayers ) {
 
@@ -50736,8 +50776,11 @@ class WebXRManager extends EventDispatcher {
 				//
 
 				const enabledFeatures = session.enabledFeatures;
+				const gpuDepthSensingEnabled = enabledFeatures &&
+					enabledFeatures.includes( 'depth-sensing' ) &&
+					session.depthUsage == 'gpu-optimized';
 
-				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
+				if ( gpuDepthSensingEnabled && glBinding ) {
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
@@ -55037,6 +55080,7 @@ exports.TetrahedronGeometry = TetrahedronGeometry;
 exports.Texture = Texture;
 exports.TextureLoader = TextureLoader;
 exports.TextureUtils = TextureUtils;
+exports.TimestampQuery = TimestampQuery;
 exports.TorusGeometry = TorusGeometry;
 exports.TorusKnotGeometry = TorusKnotGeometry;
 exports.Triangle = Triangle;
@@ -55065,6 +55109,7 @@ exports.Vector2 = Vector2;
 exports.Vector3 = Vector3;
 exports.Vector4 = Vector4;
 exports.VectorKeyframeTrack = VectorKeyframeTrack;
+exports.VideoFrameTexture = VideoFrameTexture;
 exports.VideoTexture = VideoTexture;
 exports.WebGL3DRenderTarget = WebGL3DRenderTarget;
 exports.WebGLArrayRenderTarget = WebGLArrayRenderTarget;
@@ -55074,6 +55119,7 @@ exports.WebGLRenderTarget = WebGLRenderTarget;
 exports.WebGLRenderer = WebGLRenderer;
 exports.WebGLUtils = WebGLUtils;
 exports.WebGPUCoordinateSystem = WebGPUCoordinateSystem;
+exports.WebXRController = WebXRController;
 exports.WireframeGeometry = WireframeGeometry;
 exports.WrapAroundEnding = WrapAroundEnding;
 exports.ZeroCurvatureEnding = ZeroCurvatureEnding;

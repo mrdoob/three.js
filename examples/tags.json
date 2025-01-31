@@ -5,6 +5,7 @@
 	"misc_controls_orbit": [ "rotation" ],
 	"misc_controls_trackball": [ "rotation" ],
 	"misc_controls_transform": [ "scale", "rotate", "translate" ],
+	"misc_raycaster_helper": [ "external" ],
 	"physics_ammo_cloth": [ "integration" ],
 	"physics_jolt_instancing": [ "external" ],
 	"physics_rapier_instancing": [ "external" ],
@@ -122,6 +123,7 @@
 	"webgpu_compute_sort_bitonic": [ "gpgpu" ],
 	"webgpu_compute_texture": [ "gpgpu" ],
 	"webgpu_compute_texture_pingpong": [ "gpgpu" ],
+	"webgpu_compute_water": [ "gpgpu", "struct" ],
 	"webgpu_depth_texture": [ "renderTarget" ],
 	"webgpu_loader_gltf_dispersion": [ "transmission" ],
 	"webgpu_materials_lightmap": [ "shadow" ],
@@ -148,5 +150,6 @@
 	"webgpu_sky": [ "sun" ],
 	"webgpu_tonemapping": [ "gltf" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
-	"webgpu_ocean": [ "water" ]
+	"webgpu_ocean": [ "water" ],
+	"webgpu_video_frame": [ "webcodecs" ]
 }
