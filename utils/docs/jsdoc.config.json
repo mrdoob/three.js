@@ -7,7 +7,7 @@
             "template": "node_modules/clean-jsdoc-theme",
             "theme_opts": {
                 "homepageTitle": "three.js docs",
-                "sections": ["Classes", "Modules"],
+                "sections": ["Classes"],
                 "include_css": ["utils/docs/custom/three.css"]
            }
     },
