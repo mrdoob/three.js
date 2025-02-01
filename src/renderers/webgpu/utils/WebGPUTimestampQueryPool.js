@@ -4,16 +4,18 @@ import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 /**
  * Manages a pool of WebGPU timestamp queries for performance measurement.
  * Extends the base TimestampQueryPool to provide WebGPU-specific implementation.
- * @extends TimestampQueryPool
+ *
+ * @augments TimestampQueryPool
  */
 class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	/**
-     * Creates a new WebGPU timestamp query pool.
-     * @param {GPUDevice} device - The WebGPU device to create queries on.
-     * @param {string} type - The type identifier for this query pool.
-     * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
-     */
+	 * Creates a new WebGPU timestamp query pool.
+	 *
+	 * @param {GPUDevice} device - The WebGPU device to create queries on.
+	 * @param {String} type - The type identifier for this query pool.
+	 * @param {Number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+	 */
 	constructor( device, type, maxQueries = 2048 ) {
 
 		super( maxQueries );
@@ -42,10 +44,11 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-     * Allocates a pair of queries for a given render context.
-     * @param {Object} renderContext - The render context to allocate queries for.
-     * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
-     */
+	 * Allocates a pair of queries for a given render context.
+	 *
+	 * @param {Object} renderContext - The render context to allocate queries for.
+	 * @returns {Number?} The base offset for the allocated queries, or null if allocation failed.
+	 */
 	allocateQueriesForContext( renderContext ) {
 
 		if ( ! this.trackTimestamp || this.isDisposed ) return null;
@@ -66,10 +69,12 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-     * Asynchronously resolves all pending queries and returns the total duration.
-     * If there's already a pending resolve operation, returns that promise instead.
-     * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
-     */
+	 * Asynchronously resolves all pending queries and returns the total duration.
+	 * If there's already a pending resolve operation, returns that promise instead.
+	 *
+	 * @async
+	 * @returns {Promise<Number>} The total duration in milliseconds, or the last valid value if resolution fails.
+	 */
 	async resolveQueriesAsync() {
 
 		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 || this.isDisposed ) {
@@ -100,10 +105,12 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-     * Internal method to resolve queries and calculate total duration.
-     * @private
-     * @returns {Promise<number>} The total duration in milliseconds.
-     */
+	 * Internal method to resolve queries and calculate total duration.
+	 *
+	 * @async
+	 * @private
+	 * @returns {Promise<Number>} The total duration in milliseconds.
+	 */
 	async _resolveQueries() {
 
 		if ( this.isDisposed ) {
@@ -202,6 +209,12 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 	}
 
+	/**
+	 * Dispose of the query pool.
+	 *
+	 * @async
+	 * @returns {Promise} A Promise that resolves when the dispose has been executed.
+	 */
 	async dispose() {
 
 		if ( this.isDisposed ) {

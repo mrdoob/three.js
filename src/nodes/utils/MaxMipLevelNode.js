@@ -2,7 +2,7 @@ import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module MatcapUVNode **/
+/** @module MaxMipLevelNode **/
 
 /**
  * A special type of uniform node that computes the
