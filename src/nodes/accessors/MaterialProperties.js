@@ -1,7 +1,5 @@
 import { uniform } from '../core/UniformNode.js';
 
-/** @module MaterialProperties **/
-
 /**
  * TSL object that represents the refraction ratio of the material used for rendering the current object.
  *

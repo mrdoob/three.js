@@ -1,8 +1,6 @@
 import ReferenceNode from './ReferenceNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-/** @module MaterialReferenceNode **/
-
 /**
  * This node is a special type of reference node which is intended
  * for linking material properties with node values.
@@ -12,7 +10,7 @@ import { nodeObject } from '../tsl/TSLBase.js';
  * When changing `material.opacity`, the node value of `opacityNode` will
  * automatically be updated.
  *
- * @augments module:ReferenceNode~ReferenceNode
+ * @augments ReferenceNode
  */
 class MaterialReferenceNode extends ReferenceNode {
 
@@ -56,7 +54,7 @@ class MaterialReferenceNode extends ReferenceNode {
 
 	/**
 	 * Updates the reference based on the given state. The state is only evaluated
-	 * {@link module:MaterialReferenceNode~MaterialReferenceNode#material} is not set.
+	 * {@link MaterialReferenceNode#material} is not set.
 	 *
 	 * @param {(NodeFrame|NodeBuilder)} state - The current state.
 	 * @return {Object} The updated reference.

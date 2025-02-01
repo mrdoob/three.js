@@ -11,8 +11,6 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Color } from '../../math/Color.js';
 import { BasicShadowMap } from '../../constants.js';
 
-/** @module PointShadowNode **/
-
 const _clearColor = /*@__PURE__*/ new Color();
 
 // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
@@ -163,7 +161,7 @@ const _shadowMapSize = /*@__PURE__*/ new Vector2();
 /**
  * Represents the shadow implementation for point light nodes.
  *
- * @augments module:ShadowNode~ShadowNode
+ * @augments ShadowNode
  */
 class PointShadowNode extends ShadowNode {
 

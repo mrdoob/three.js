@@ -55,7 +55,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		 * and define the offset with a node instead.
 		 *
 		 * If you don't want to overwrite the offset but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialLineDashOffset}.
+		 * value instead, use {@link materialLineDashOffset}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -68,7 +68,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		 * and define the scale with a node instead.
 		 *
 		 * If you don't want to overwrite the scale but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialLineScale}.
+		 * value instead, use {@link materialLineScale}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -81,7 +81,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		 * and define the dash size with a node instead.
 		 *
 		 * If you don't want to overwrite the dash size but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialLineDashSize}.
+		 * value instead, use {@link materialLineDashSize}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -94,7 +94,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		 * and define the gap size with a node instead.
 		 *
 		 * If you don't want to overwrite the gap size but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialLineGapSize}.
+		 * value instead, use {@link materialLineGapSize}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null

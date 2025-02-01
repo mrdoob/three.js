@@ -1,8 +1,6 @@
 import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
 import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference } from 'three/tsl';
 
-/** @module OutlineNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 const _BLUR_DIRECTION_X = /*@__PURE__*/ new Vector2( 1.0, 0.0 );

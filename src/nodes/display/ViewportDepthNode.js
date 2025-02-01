@@ -4,8 +4,6 @@ import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
 
-/** @module ViewportDepthNode **/
-
 /**
  * This node offers a collection of features in context of the depth logic in the fragment shader.
  * Depending on {@link ViewportDepthNode#scope}, it can be used to define a depth value for the current

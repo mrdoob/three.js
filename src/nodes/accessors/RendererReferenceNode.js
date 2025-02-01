@@ -2,8 +2,6 @@ import ReferenceBaseNode from './ReferenceBaseNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 
-/** @module RendererReferenceNode **/
-
 /**
  * This node is a special type of reference node which is intended
  * for linking renderer properties with node values.
@@ -50,7 +48,7 @@ class RendererReferenceNode extends ReferenceBaseNode {
 
 	/**
 	 * Updates the reference based on the given state. The state is only evaluated
-	 * {@link module:RendererReferenceNode~RendererReferenceNode#renderer} is not set.
+	 * {@link RendererReferenceNode#renderer} is not set.
 	 *
 	 * @param {(NodeFrame|NodeBuilder)} state - The current state.
 	 * @return {Object} The updated reference.

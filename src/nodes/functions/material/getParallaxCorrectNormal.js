@@ -1,8 +1,6 @@
 import { positionWorld } from '../../accessors/Position.js';
 import { float, Fn, min, normalize, sub, vec3 } from '../../tsl/TSLBase.js';
 
-/** @module getParallaxCorrectNormal **/
-
 /**
  * This computes a parallax corrected normal which is used for box-projected cube mapping (BPCEM).
  *

@@ -9,8 +9,6 @@ import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
-/** @module TSLCore **/
-
 let currentStack = null;
 
 const NodeElements = new Map();

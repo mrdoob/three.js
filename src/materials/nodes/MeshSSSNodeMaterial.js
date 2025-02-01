@@ -4,8 +4,6 @@ import { transformedNormalView } from '../../nodes/accessors/Normal.js';
 import { positionViewDirection } from '../../nodes/accessors/Position.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
-/** @module MeshSSSNodeMaterial **/
-
 /**
  * Represents the lighting model for {@link MeshSSSNodeMaterial}.
  *

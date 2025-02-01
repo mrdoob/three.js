@@ -2,8 +2,6 @@ import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
-/** @module StructNode **/
-
 /**
  * StructNode allows to create custom structures with multiple members.
  * This can also be used to define structures in attribute and uniform data.

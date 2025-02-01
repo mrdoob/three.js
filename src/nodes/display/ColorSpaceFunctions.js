@@ -1,8 +1,6 @@
 import { mix } from '../math/MathNode.js';
 import { Fn } from '../tsl/TSLCore.js';
 
-/** @module ColorSpaceFunctions **/
-
 /**
  * Converts the given color value from sRGB to linear-sRGB color space.
  *

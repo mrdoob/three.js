@@ -4,12 +4,10 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
 
-/** @module CubeTextureNode **/
-
 /**
  * This type of uniform node represents a cube texture.
  *
- * @augments module:TextureNode~TextureNode
+ * @augments TextureNode
  */
 class CubeTextureNode extends TextureNode {
 

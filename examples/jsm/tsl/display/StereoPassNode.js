@@ -1,8 +1,6 @@
 import { StereoCamera, Vector2, PassNode, RendererUtils } from 'three/webgpu';
 import { nodeObject } from 'three/tsl';
 
-/** @module StereoPassNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
@@ -10,7 +8,7 @@ let _rendererState;
 /**
  * A special render pass node that renders the scene as a stereoscopic image.
  *
- * @augments module:PassNode~PassNode
+ * @augments PassNode
  */
 class StereoPassNode extends PassNode {
 

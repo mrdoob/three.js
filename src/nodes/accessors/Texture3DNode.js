@@ -2,8 +2,6 @@ import TextureNode from './TextureNode.js';
 import { nodeProxy, vec3, Fn, If, int } from '../tsl/TSLBase.js';
 import { textureSize } from './TextureSizeNode.js';
 
-/** @module Texture3DNode **/
-
 const normal = Fn( ( { texture, uv } ) => {
 
 	const epsilon = 0.0001;
@@ -53,7 +51,7 @@ const normal = Fn( ( { texture, uv } ) => {
 /**
  * This type of uniform node represents a 3D texture.
  *
- * @augments module:TextureNode~TextureNode
+ * @augments TextureNode
  */
 class Texture3DNode extends TextureNode {
 

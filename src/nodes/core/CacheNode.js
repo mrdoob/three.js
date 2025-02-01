@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
-/** @module CacheNode **/
-
 /**
  * This node can be used as a cache management component for another node.
  * Caching is in general used by default in {@link NodeBuilder} but this node

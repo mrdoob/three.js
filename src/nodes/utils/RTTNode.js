@@ -9,8 +9,6 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
 
-/** @module RTTNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 /**
@@ -19,7 +17,7 @@ const _size = /*@__PURE__*/ new Vector2();
  * texture input for their effects. With the helper function `convertToTexture()` which is based
  * on this module, the node system can automatically ensure texture input if required.
  *
- * @augments module:TextureNode~TextureNode
+ * @augments TextureNode
  */
 class RTTNode extends TextureNode {
 

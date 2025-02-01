@@ -4,8 +4,6 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 
-/** @module Camera **/
-
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
  *

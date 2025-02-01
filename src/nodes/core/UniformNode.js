@@ -2,8 +2,6 @@ import InputNode from './InputNode.js';
 import { objectGroup } from './UniformGroupNode.js';
 import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
 
-/** @module UniformNode **/
-
 /**
  * Class for representing a uniform.
  *

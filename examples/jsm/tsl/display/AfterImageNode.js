@@ -1,8 +1,6 @@
 import { RenderTarget, Vector2, QuadMesh, NodeMaterial, RendererUtils, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, texture, passTexture, uniform, sign, max, convertToTexture } from 'three/tsl';
 
-/** @module AfterImageNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
 

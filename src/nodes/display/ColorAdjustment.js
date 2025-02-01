@@ -5,8 +5,6 @@ import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { LinearSRGBColorSpace } from '../../constants.js';
 
-/** @module ColorAdjustment **/
-
 /**
  * Computes a grayscale value for the given RGB color value.
  *

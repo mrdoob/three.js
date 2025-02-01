@@ -56,7 +56,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		 * overwrite the default and define the emissive color with a node instead.
 		 *
 		 * If you don't want to overwrite the emissive color but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialEmissive}.
+		 * value instead, use {@link materialEmissive}.
 		 *
 		 * @type {Node<vec3>?}
 		 * @default null
@@ -69,7 +69,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		 * overwrite the default and define the metalness with a node instead.
 		 *
 		 * If you don't want to overwrite the metalness but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialMetalness}.
+		 * value instead, use {@link materialMetalness}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -82,7 +82,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		 * overwrite the default and define the roughness with a node instead.
 		 *
 		 * If you don't want to overwrite the roughness but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialRoughness}.
+		 * value instead, use {@link materialRoughness}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null

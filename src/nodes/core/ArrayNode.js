@@ -1,10 +1,8 @@
 import TempNode from './TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
-/** @module ArrayNode **/
-
 /**
- * ArrayNode represents a collection of nodes, typically created using the {@link module:TSL~array} function.
+ * ArrayNode represents a collection of nodes, typically created using the {@link marray} function.
  * ```js
  * const colors = array( [
  * 	vec3( 1, 0, 0 ),

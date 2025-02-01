@@ -3,8 +3,6 @@ import { screenUV } from '../display/ScreenNode.js';
 import { viewportDepthTexture } from '../display/ViewportDepthTextureNode.js';
 import { linearDepth } from '../display/ViewportDepthNode.js';
 
-/** @module ViewportUtils **/
-
 /**
  * A special version of a screen uv function that involves a depth comparison
  * when computing the final uvs. The function mitigates visual errors when

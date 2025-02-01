@@ -8,7 +8,7 @@ import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
  * So classes like `MeshBasicMaterial` are not compatible.
  *
  * @private
- * @augments module:Renderer~Renderer
+ * @augments Renderer
  */
 class WebGPURenderer extends Renderer {
 

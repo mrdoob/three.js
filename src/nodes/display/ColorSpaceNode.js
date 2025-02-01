@@ -6,8 +6,6 @@ import { ColorManagement } from '../../math/ColorManagement.js';
 import { sRGBTransferEOTF, sRGBTransferOETF } from './ColorSpaceFunctions.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
-/** @module ColorSpaceNode **/
-
 const WORKING_COLOR_SPACE = 'WorkingColorSpace';
 const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
 

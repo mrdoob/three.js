@@ -3,8 +3,6 @@ import { cameraViewMatrix } from './Camera.js';
 import { normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView } from './Normal.js';
 import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView } from './Tangent.js';
 
-/** @module Bitangent **/
-
 const getBitangent = ( crossNormalTangent ) => crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
 /**

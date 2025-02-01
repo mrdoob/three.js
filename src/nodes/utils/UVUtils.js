@@ -1,8 +1,6 @@
 import { Fn, vec2 } from '../tsl/TSLBase.js';
 import { rotate } from './RotateNode.js';
 
-/** @module UVUtils **/
-
 /**
  * Rotates the given uv coordinates around a center point
  *

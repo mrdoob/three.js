@@ -4,8 +4,6 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
-/** @module RenderOutputNode **/
-
 /**
  * Normally, tone mapping and color conversion happens automatically
  * before outputting pixel too the default (screen) framebuffer. In certain

@@ -10,8 +10,6 @@ import { Fn, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js';
 
-/** @module NormalMapNode **/
-
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 

@@ -8,8 +8,6 @@ import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
 
-/** @module ClippingNode **/
-
 /**
  * ```
  * This node is used in {@link NodeMaterial} to setup the clipping

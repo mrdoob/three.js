@@ -5,8 +5,6 @@ import { mat3, vec3, Fn, varying } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
 
-/** @module Normal **/
-
 /**
  * TSL object that represents the normal attribute of the current rendered object.
  *

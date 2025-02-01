@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module OutputStructNode **/
-
 /**
  * This node can be used to define multiple outputs in a shader programs.
  *

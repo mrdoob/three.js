@@ -6,8 +6,6 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-/** @module NodeUtils **/
-
 // cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
 // A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
 // Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.

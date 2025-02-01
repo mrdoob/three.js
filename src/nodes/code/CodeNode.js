@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module CodeNode **/
-
 /**
  * This class represents native code sections. It is the base
  * class for modules like {@link FunctionNode} which allows to implement

@@ -1,8 +1,6 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
 import { nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, vec2, vec3, Loop, mix, luminance } from 'three/tsl';
 
-/** @module AnamorphicNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;

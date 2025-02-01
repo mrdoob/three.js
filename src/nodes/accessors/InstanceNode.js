@@ -12,8 +12,6 @@ import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffe
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
-/** @module InstanceNode **/
-
 /**
  * This node implements the vertex shader logic which is required
  * when rendering 3D objects via instancing. The code makes sure

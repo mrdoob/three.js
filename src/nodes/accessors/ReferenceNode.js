@@ -10,8 +10,6 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 
 // TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
 
-/** @module ReferenceNode **/
-
 /**
  * This class is only relevant if the referenced property is array-like.
  * In this case, `ReferenceElementNode` allows to refer to a specific
@@ -38,7 +36,7 @@ class ReferenceElementNode extends ArrayElementNode {
 		super( referenceNode, indexNode );
 
 		/**
-		 * Similar to {@link module:ReferenceNode~ReferenceNode#reference}, an additional
+		 * Similar to {@link ReferenceNode#reference}, an additional
 		 * property references to the current node.
 		 *
 		 * @type {ReferenceNode?}
@@ -148,7 +146,7 @@ class ReferenceNode extends Node {
 		this.properties = property.split( '.' );
 
 		/**
-		 * Points to the current referred object. This property exists next to {@link module:ReferenceNode~ReferenceNode#object}
+		 * Points to the current referred object. This property exists next to {@link ReferenceNode#object}
 		 * since the final reference might be updated from calling code.
 		 *
 		 * @type {Object?}
@@ -319,7 +317,7 @@ class ReferenceNode extends Node {
 
 	/**
 	 * Allows to update the reference based on the given state. The state is only
-	 * evaluated {@link module:ReferenceNode~ReferenceNode#object} is not set.
+	 * evaluated {@link ReferenceNode#object} is not set.
 	 *
 	 * @param {(NodeFrame|NodeBuilder)} state - The current state.
 	 * @return {Object} The updated reference.

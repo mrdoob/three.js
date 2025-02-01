@@ -1,8 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module AtomicFunctionNode **/
-
 /**
  * `AtomicFunctionNode` represents any function that can operate on atomic variable types
  * within a shader. In an atomic function, any modification to an atomic variable will

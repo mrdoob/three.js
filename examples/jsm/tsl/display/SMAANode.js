@@ -1,8 +1,6 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
 import { abs, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
-/** @module SMAANode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 

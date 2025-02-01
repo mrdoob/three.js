@@ -4,8 +4,6 @@ import { Vector3 } from '../../math/Vector3.js';
 import { cameraViewMatrix } from './Camera.js';
 import { positionWorld } from './Position.js';
 
-/** @module Lights **/
-
 let uniformsLib;
 
 function getLightData( light ) {

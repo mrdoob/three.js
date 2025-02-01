@@ -14,8 +14,6 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FloatType } from '../../constants.js';
 
-/** @module MorphNode **/
-
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
 

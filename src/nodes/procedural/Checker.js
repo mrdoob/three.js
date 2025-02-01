@@ -1,8 +1,6 @@
 import { uv } from '../accessors/UV.js';
 import { Fn } from '../tsl/TSLBase.js';
 
-/** @module Procedural **/
-
 /**
  * Creates a 2x2 checkerboard pattern that can be used as procedural texture data.
  *

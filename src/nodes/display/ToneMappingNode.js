@@ -5,8 +5,6 @@ import { rendererReference } from '../accessors/RendererReferenceNode.js';
 import { NoToneMapping } from '../../constants.js';
 import { hash } from '../core/NodeUtils.js';
 
-/** @module ToneMappingNode **/
-
 /**
  * This node represents a tone mapping operation.
  *

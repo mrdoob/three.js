@@ -8,8 +8,6 @@ import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { BackSide } from '../../constants.js';
 import PassNode from './PassNode.js';
 
-/** @module ToonOutlinePassNode **/
-
 /**
  * Represents a render pass for producing a toon outline effect on compatible objects.
  * Only 3D objects with materials of type `MeshToonMaterial` and `MeshToonNodeMaterial`

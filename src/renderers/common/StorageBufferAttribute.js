@@ -8,7 +8,7 @@ import { BufferAttribute } from '../../core/BufferAttribute.js';
  * to compute the data for an attribute more efficiently on the GPU.
  *
  * The idea is to create an instance of this class and provide it as an input
- * to {@link module:StorageBufferNode}.
+ * to {@link StorageBufferNode}.
  *
  * Note: This type of buffer attribute can only be used with `WebGPURenderer`.
  *

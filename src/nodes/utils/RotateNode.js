@@ -2,8 +2,6 @@ import TempNode from '../core/TempNode.js';
 import { nodeProxy, vec4, mat2, mat4 } from '../tsl/TSLBase.js';
 import { cos, sin } from '../math/MathNode.js';
 
-/** @module RotateNode **/
-
 /**
  * Applies a rotation to the given position node.
  *

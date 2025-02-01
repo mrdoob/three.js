@@ -22,7 +22,7 @@ const debugHandler = {
  * to target different backends. By default, the renderer tries to use a WebGPU backend if the
  * browser supports WebGPU. If not, `WebGPURenderer` falls backs to a WebGL 2 backend.
  *
- * @augments module:Renderer~Renderer
+ * @augments Renderer
  */
 class WebGPURenderer extends Renderer {
 

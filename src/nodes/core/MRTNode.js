@@ -1,8 +1,6 @@
 import OutputStructNode from './OutputStructNode.js';
 import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
 
-/** @module MRTNode **/
-
 /**
  * Returns the MRT texture index for the given name.
  *

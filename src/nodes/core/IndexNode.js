@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { nodeImmutable, varying } from '../tsl/TSLBase.js';
 
-/** @module IndexNode **/
-
 /**
  * This class represents shader indices of different types. The following predefined node
  * objects cover frequent use cases:

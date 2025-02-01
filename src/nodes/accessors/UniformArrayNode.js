@@ -4,8 +4,6 @@ import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
 
-/** @module UniformArrayNode **/
-
 /**
  * Represents the element access on uniform array nodes.
  *
@@ -53,8 +51,8 @@ class UniformArrayElementNode extends ArrayElementNode {
 }
 
 /**
- * Similar to {@link module:BufferNode~BufferNode} this module represents array-like data as
- * uniform buffers. Unlike {@link module:BufferNode~BufferNode}, it can handle more common
+ * Similar to {@link BufferNode} this module represents array-like data as
+ * uniform buffers. Unlike {@link BufferNode}, it can handle more common
  * data types in the array (e.g `three.js` primitives) and automatically
  * manage buffer padding. It should be the first choice when working with
  * uniforms buffers.
@@ -67,7 +65,7 @@ class UniformArrayElementNode extends ArrayElementNode {
  *
  * const redColor = tintColors.element( 0 );
  *
- * @augments module:BufferNode~BufferNode
+ * @augments BufferNode
  */
 class UniformArrayNode extends BufferNode {
 
@@ -88,7 +86,7 @@ class UniformArrayNode extends BufferNode {
 		super( null );
 
 		/**
-		 * Array holding the buffer data. Unlike {@link module:BufferNode~BufferNode}, the array can
+		 * Array holding the buffer data. Unlike {@link BufferNode}, the array can
 		 * hold number primitives as well as three.js objects like vectors, matrices
 		 * or colors.
 		 *
@@ -132,7 +130,7 @@ class UniformArrayNode extends BufferNode {
 
 	/**
 	 * This method is overwritten since the node type is inferred from the
-	 * {@link module:UniformArrayNode~UniformArrayNode#paddedType}.
+	 * {@link UniformArrayNode#paddedType}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.
@@ -323,7 +321,7 @@ class UniformArrayNode extends BufferNode {
 
 	/**
 	 * Overwrites the default `element()` method to provide element access
-	 * based on {@link module:UniformArrayNode~UniformArrayNode}.
+	 * based on {@link UniformArrayNode}.
 	 *
 	 * @param {IndexNode} indexNode - The index node.
 	 * @return {UniformArrayElementNode}

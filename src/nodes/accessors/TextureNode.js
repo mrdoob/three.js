@@ -9,12 +9,10 @@ import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, UnsignedIntType } from '../../constants.js';
 
-/** @module TextureNode **/
-
 /**
  * This type of uniform node represents a 2D texture.
  *
- * @augments module:UniformNode~UniformNode
+ * @augments UniformNode
  */
 class TextureNode extends UniformNode {
 

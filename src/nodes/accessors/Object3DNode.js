@@ -4,8 +4,6 @@ import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-/** @module Object3DNode **/
-
 /**
  * This node can be used to access transformation related metrics of 3D objects.
  * Depending on the selected scope, a different metric is represented as a uniform

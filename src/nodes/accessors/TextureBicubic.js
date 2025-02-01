@@ -2,8 +2,6 @@ import { add, mul, div } from '../math/OperatorNode.js';
 import { floor, ceil, fract, pow } from '../math/MathNode.js';
 import { Fn, float, vec2, vec4, int } from '../tsl/TSLBase.js';
 
-/** @module TextureBicubic **/
-
 // Mipped Bicubic Texture Filtering by N8
 // https://www.shadertoy.com/view/Dl2SDW
 

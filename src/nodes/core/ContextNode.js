@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module ContextNode **/
-
 /**
  * This node can be used as a context management component for another node.
  * {@link NodeBuilder} performs its node building process in a specific context and
@@ -58,9 +56,9 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the reference to {@link module:ContextNode~ContextNode#node}.
+	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
 	 *
-	 * @return {Node} A reference to {@link module:ContextNode~ContextNode#node}.
+	 * @return {Node} A reference to {@link ContextNode#node}.
 	 */
 	getScope() {
 
@@ -69,7 +67,7 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the type of {@link module:ContextNode~ContextNode#node}.
+	 * This method is overwritten to ensure it returns the type of {@link ContextNode#node}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {String} The node type.

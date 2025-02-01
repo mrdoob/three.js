@@ -1,8 +1,6 @@
 import { nodeObject } from '../tsl/TSLBase.js';
 import PropertyNode from './PropertyNode.js';
 
-/** @module ParameterNode **/
-
 /**
  * Special version of {@link PropertyNode} which is used for parameters.
  *

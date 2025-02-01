@@ -3,8 +3,6 @@ import { select } from '../math/ConditionalNode.js';
 import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
 import { mul, sub, div } from '../math/OperatorNode.js';
 
-/** @module ToneMappingFunctions **/
-
 /**
  * Linear tone mapping, exposure only.
  *

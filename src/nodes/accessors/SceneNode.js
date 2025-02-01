@@ -9,8 +9,6 @@ import { reference } from './ReferenceNode.js';
 const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
-/** @module SceneNode **/
-
 /**
  * This module allows access to a collection of scene properties. The following predefined TSL objects
  * are available for easier use:

@@ -2,8 +2,6 @@ import { Fn, float } from '../tsl/TSLBase.js';
 import { lengthSq, smoothstep } from '../math/MathNode.js';
 import { uv } from '../accessors/UV.js';
 
-/** @module Shapes **/
-
 /**
  * Generates a circle based on the uv coordinates.
  *

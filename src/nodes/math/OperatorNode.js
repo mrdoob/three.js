@@ -1,8 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module OperatorNode **/
-
 /**
  * This node represents basic mathematical and logical operations like addition,
  * subtraction or comparisons (e.g. `equal()`).

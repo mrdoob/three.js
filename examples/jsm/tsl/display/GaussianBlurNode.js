@@ -1,8 +1,6 @@
 import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, If, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul } from 'three/tsl';
 
-/** @module GaussianBlurNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;

@@ -2,8 +2,6 @@ import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
-/** @module AssignNode **/
-
 /**
  * These node represents an assign operation. Meaning a node is assigned
  * to another node.

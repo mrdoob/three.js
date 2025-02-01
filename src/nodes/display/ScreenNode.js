@@ -6,13 +6,11 @@ import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-/** @module ScreenNode **/
-
 let screenSizeVec, viewportVec;
 
 /**
  * This node provides a collection of screen related metrics.
- * Depending on {@link module:ScreenNode~ScreenNode#scope}, the nodes can represent
+ * Depending on {@link ScreenNode#scope}, the nodes can represent
  * resolution or viewport data as well as fragment or uv coordinates.
  *
  * @augments Node

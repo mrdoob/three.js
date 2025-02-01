@@ -11,8 +11,6 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 
 const _objectData = new WeakMap();
 
-/** @module VelocityNode **/
-
 /**
  * A node for representing motion or velocity vectors. Foundation
  * for advanced post processing effects like motion blur or TRAA.

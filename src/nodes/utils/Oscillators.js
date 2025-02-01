@@ -1,7 +1,5 @@
 import { time } from './Timer.js';
 
-/** @module Oscillators **/
-
 /**
  * Generates a sine wave oscillation based on a timer.
  *

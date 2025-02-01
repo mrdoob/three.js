@@ -1,8 +1,6 @@
 import { Vector2, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
 
-/** @module SobelOperatorNode **/
-
 /**
  * Post processing node for detecting edges with a sobel filter.
  * A sobel filter should be applied after tone mapping and output color

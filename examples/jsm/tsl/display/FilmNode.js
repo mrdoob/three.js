@@ -1,8 +1,6 @@
 import { TempNode } from 'three/webgpu';
 import { rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
 
-/** @module FilmNode **/
-
 /**
  * Post processing node for creating a film grain effect.
  *

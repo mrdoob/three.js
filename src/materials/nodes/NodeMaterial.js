@@ -98,7 +98,7 @@ class NodeMaterial extends Material {
 		 * are affected by all lights of the scene. Sometimes selective
 		 * lighting is wanted which means only _some_ lights in the scene
 		 * affect a material. This can be achieved by creating an instance
-		 * of {@link module:LightsNode~LightsNode} with a list of selective
+		 * of {@link LightsNode} with a list of selective
 		 * lights and assign the node to this property.
 		 *
 		 * ```js
@@ -133,7 +133,7 @@ class NodeMaterial extends Material {
 		 * the default and define the ambient occlusion with a custom node instead.
 		 *
 		 * If you don't want to overwrite the diffuse color but modify the existing
-		 * values instead, use {@link module:MaterialNode.materialAO}.
+		 * values instead, use {@link materialAO}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -150,7 +150,7 @@ class NodeMaterial extends Material {
 		 * ```
 		 *
 		 * If you don't want to overwrite the diffuse color but modify the existing
-		 * values instead, use {@link module:MaterialNode.materialColor}.
+		 * values instead, use {@link materialColor}.
 		 *
 		 * ```js
 		 * material.colorNode = materialColor.mul( color( 0xff0000 ) ); // give diffuse colors a red tint
@@ -167,7 +167,7 @@ class NodeMaterial extends Material {
 		 * and define the normals with a node instead.
 		 *
 		 * If you don't want to overwrite the normals but modify the existing values instead,
-		 * use {@link module:MaterialNode.materialNormal}.
+		 * use {@link materialNormal}.
 		 *
 		 * @type {Node<vec3>?}
 		 * @default null
@@ -180,7 +180,7 @@ class NodeMaterial extends Material {
 		 * and define the opacity with a node instead.
 		 *
 		 * If you don't want to overwrite the normals but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialOpacity}.
+		 * value instead, use {@link materialOpacity}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -222,7 +222,7 @@ class NodeMaterial extends Material {
 		 * alpha test with a node instead.
 		 *
 		 * If you don't want to overwrite the alpha test but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialAlphaTest}.
+		 * value instead, use {@link materialAlphaTest}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -235,7 +235,7 @@ class NodeMaterial extends Material {
 		 * the default and define local vertex positions with nodes instead.
 		 *
 		 * If you don't want to overwrite the vertex positions but modify the existing
-		 * values instead, use {@link module:Position.positionLocal}.
+		 * values instead, use {@link positionLocal}.
 		 *
 		 *```js
 		 * material.positionNode = positionLocal.add( displace );
@@ -272,7 +272,7 @@ class NodeMaterial extends Material {
 
 		/**
 		 * Allows to overwrite the position used for shadow map rendering which
-		 * is by default {@link module:Position.positionWorld}, the vertex position
+		 * is by default {@link positionWorld}, the vertex position
 		 * in world space.
 		 *
 		 * @type {Node<float>?}

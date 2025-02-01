@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module TextureSizeNode **/
-
 /**
  * A node that represents the dimensions of a texture. The texture size is
  * retrieved in the shader via built-in shader functions like `textureDimensions()`

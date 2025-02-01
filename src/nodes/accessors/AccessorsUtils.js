@@ -6,8 +6,6 @@ import { mix } from '../math/MathNode.js';
 import { anisotropy, anisotropyB, roughness } from '../core/PropertyNode.js';
 import { positionViewDirection } from './Position.js';
 
-/** @module AccessorsUtils **/
-
 /**
  * TSL object that represents the TBN matrix in view space.
  *

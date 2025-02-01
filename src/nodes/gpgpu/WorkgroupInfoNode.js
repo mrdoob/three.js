@@ -2,8 +2,6 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import Node from '../core/Node.js';
 
-/** @module WorkgroupInfoNode **/
-
 /**
  * Represents an element of a 'workgroup' scoped buffer.
  *

@@ -1,8 +1,6 @@
 import { RenderTarget, Vector2, TempNode, NodeUpdateType, QuadMesh, RendererUtils, NodeMaterial } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, passTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
 
-/** @module LensflareNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
