@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 
-/** @module PropertyNode **/
-
 /**
  * This class represents a shader property. It can be used
  * to explicitly define a property and assign a value to it.

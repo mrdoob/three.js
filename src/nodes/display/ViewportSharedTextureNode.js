@@ -4,8 +4,6 @@ import { screenUV } from './ScreenNode.js';
 
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 
-/** @module ViewportSharedTextureNode **/
-
 let _sharedFramebuffer = null;
 
 /**
@@ -13,7 +11,7 @@ let _sharedFramebuffer = null;
  * shares a texture across all instances of `ViewportSharedTextureNode`. It should
  * be the first choice when using data of the default/screen framebuffer for performance reasons.
  *
- * @augments module:ViewportTextureNode~ViewportTextureNode
+ * @augments ViewportTextureNode
  */
 class ViewportSharedTextureNode extends ViewportTextureNode {
 

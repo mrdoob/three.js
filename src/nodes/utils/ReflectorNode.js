@@ -14,8 +14,6 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 
-/** @module ReflectorNode **/
-
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();
 const _reflectorWorldPosition = new Vector3();
@@ -48,7 +46,7 @@ let _inReflector = false;
  * plane.add( groundReflector.target );
  * ```
  *
- * @augments module:TextureNode~TextureNode
+ * @augments TextureNode
  */
 class ReflectorNode extends TextureNode {
 

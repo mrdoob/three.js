@@ -4,8 +4,6 @@ import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
-/** @module ScriptableValueNode **/
-
 /**
  * `ScriptableNode` uses this class to manage script inputs and outputs.
  *

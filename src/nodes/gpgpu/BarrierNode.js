@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module BarrierNode **/
-
 /**
  * Represents a GPU control barrier that synchronizes compute operations within a given scope.
  *

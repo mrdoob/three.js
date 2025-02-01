@@ -3,8 +3,6 @@ import { NodeUpdateType } from '../core/constants.js';
 import { vec3 } from '../tsl/TSLBase.js';
 import { positionWorld } from '../accessors/Position.js';
 
-/** @module ShadowBaseNode **/
-
 /**
  * Base class for all shadow nodes.
  *

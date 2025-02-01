@@ -1,8 +1,6 @@
 import { AdditiveBlending, Color, Vector2, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
 import { nodeObject, uniform, mrt, texture, getTextureIndex } from 'three/tsl';
 
-/** @module SSAAPassNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
@@ -16,7 +14,7 @@ let _rendererState;
  *
  * Reference: {@link https://en.wikipedia.org/wiki/Supersampling}
  *
- * @augments module:PassNode~PassNode
+ * @augments PassNode
  */
 class SSAAPassNode extends PassNode {
 

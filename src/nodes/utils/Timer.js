@@ -1,8 +1,6 @@
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { uniform } from '../core/UniformNode.js';
 
-/** @module Timer **/
-
 /**
  * Represents the elapsed time in seconds.
  *

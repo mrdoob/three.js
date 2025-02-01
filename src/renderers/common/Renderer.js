@@ -28,8 +28,6 @@ import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
-/** @module Renderer **/
-
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
@@ -644,7 +642,7 @@ class Renderer {
 		/**
 		 * The renderer's shadow configuration.
 		 *
-		 * @type {module:Renderer~ShadowMapConfig}
+		 * @type {ShadowMapConfig}
 		 */
 		this.shadowMap = {
 			enabled: false,
@@ -675,7 +673,7 @@ class Renderer {
 		/**
 		 * The renderer's debug configuration.
 		 *
-		 * @type {module:Renderer~DebugConfig}
+		 * @type {DebugConfig}
 		 */
 		this.debug = {
 			checkShaderErrors: true,
@@ -1957,7 +1955,7 @@ class Renderer {
 	}
 
 	/**
-	 * Async version of {@link module:Renderer~Renderer#clear}.
+	 * Async version of {@link Renderer#clear}.
 	 *
 	 * @async
 	 * @param {Boolean} [color=true] - Whether the color buffer should be cleared or not.
@@ -1974,7 +1972,7 @@ class Renderer {
 	}
 
 	/**
-	 * Async version of {@link module:Renderer~Renderer#clearColor}.
+	 * Async version of {@link Renderer#clearColor}.
 	 *
 	 * @async
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
@@ -1986,7 +1984,7 @@ class Renderer {
 	}
 
 	/**
-	 * Async version of {@link module:Renderer~Renderer#clearDepth}.
+	 * Async version of {@link Renderer#clearDepth}.
 	 *
 	 * @async
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
@@ -1998,7 +1996,7 @@ class Renderer {
 	}
 
 	/**
-	 * Async version of {@link module:Renderer~Renderer#clearStencil}.
+	 * Async version of {@link Renderer#clearStencil}.
 	 *
 	 * @async
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
@@ -2093,7 +2091,7 @@ class Renderer {
 	}
 
 	/**
-	 * Callback for {@link module:Renderer~Renderer#setRenderObjectFunction}.
+	 * Callback for {@link Renderer#setRenderObjectFunction}.
 	 *
 	 * @callback renderObjectFunction
 	 * @param {Object3D} object - The 3D object.
@@ -2109,14 +2107,14 @@ class Renderer {
 
 	/**
 	 * Sets the given render object function. Calling this method overwrites the default implementation
-	 * which is {@link module:Renderer~Renderer#renderObject}. Defining a custom function can be useful
+	 * which is {@link Renderer#renderObject}. Defining a custom function can be useful
 	 * if you want to modify the way objects are rendered. For example you can define things like "every
 	 * object that has material of a certain type should perform a pre-pass with a special overwrite material".
 	 * The custom function must always call `renderObject()` in its implementation.
 	 *
 	 * Use `null` as the first argument to reset the state.
 	 *
-	 * @param {module:Renderer~renderObjectFunction?} renderObjectFunction - The render object function.
+	 * @param {renderObjectFunction?} renderObjectFunction - The render object function.
 	 */
 	setRenderObjectFunction( renderObjectFunction ) {
 

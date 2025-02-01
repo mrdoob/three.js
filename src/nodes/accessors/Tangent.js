@@ -3,8 +3,6 @@ import { cameraViewMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 
-/** @module Tangent **/
-
 /**
  * TSL object that represents the tangent attribute of the current rendered object.
  *

@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 
-/** @module AttributeNode **/
-
 /**
  * Base class for representing shader attributes as nodes.
  *

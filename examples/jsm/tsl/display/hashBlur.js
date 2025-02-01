@@ -1,7 +1,5 @@
 import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
 
-/** @module HashBlur **/
-
 /**
  * Applies a hash blur effect to the given texture node.
  *

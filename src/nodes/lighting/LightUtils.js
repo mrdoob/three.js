@@ -1,7 +1,5 @@
 import { Fn } from '../tsl/TSLBase.js';
 
-/** @module LightUtils **/
-
 /**
  * Represents a `discard` shader operation in TSL.
  *

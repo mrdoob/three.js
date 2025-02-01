@@ -3,8 +3,6 @@ import { transformedNormalView } from './Normal.js';
 import { positionViewDirection } from './Position.js';
 import { materialRefractionRatio } from './MaterialProperties.js';
 
-/** @module ReflectVector **/
-
 /**
  * The reflect vector in view space.
  *

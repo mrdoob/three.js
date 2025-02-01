@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module BypassNode **/
-
 /**
  * The class generates the code of a given node but returns another node in the output.
  * This can be used to call a method or node that does not return a value, i.e.

@@ -19,8 +19,6 @@ import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
 
-/** @module ShadowNode **/
-
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
@@ -314,7 +312,7 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 /**
  * Represents the default shadow implementation for lighting nodes.
  *
- * @augments module:ShadowBaseNode~ShadowBaseNode
+ * @augments ShadowBaseNode
  */
 class ShadowNode extends ShadowBaseNode {
 

@@ -1,7 +1,5 @@
 import { Fn, float, uv, Loop, int } from 'three/tsl';
 
-/** @module MotionBlur **/
-
 /**
  * Applies a motion blur effect to the given input node.
  *

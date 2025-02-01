@@ -1,13 +1,11 @@
 import InstanceNode from './InstanceNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module InstancedMeshNode **/
-
 /**
  * This is a special version of `InstanceNode` which requires the usage of {@link InstancedMesh}.
  * It allows an easier setup of the instance node.
  *
- * @augments module:InstanceNode~InstanceNode
+ * @augments InstanceNode
  */
 class InstancedMeshNode extends InstanceNode {
 

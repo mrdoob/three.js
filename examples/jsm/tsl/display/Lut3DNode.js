@@ -1,8 +1,6 @@
 import { TempNode } from 'three/webgpu';
 import { nodeObject, Fn, float, uniform, vec3, vec4, mix } from 'three/tsl';
 
-/** @module Lut3DNode **/
-
 /**
  * A post processing node for color grading via lookup tables.
  *

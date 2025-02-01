@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 
-/** @module PointUVNode **/
-
 /**
  * A node for representing the uv coordinates of points.
  *

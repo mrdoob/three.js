@@ -5,8 +5,6 @@ import { positionLocal } from '../accessors/Position.js';
 import { texture } from '../accessors/TextureNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
-/** @module TriplanarTexturesNode **/
-
 /**
  * Can be used for triplanar texture mapping.
  *

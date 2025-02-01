@@ -2,8 +2,6 @@ import Node from '../core/Node.js';
 import { uv } from '../accessors/UV.js';
 import { nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
-/** @module SpriteSheetUVNode **/
-
 /**
  * Can be used to compute texture coordinates for animated sprite sheets.
  *

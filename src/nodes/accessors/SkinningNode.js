@@ -11,8 +11,6 @@ import { uniform } from '../core/UniformNode.js';
 import { buffer } from './BufferNode.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
 
-/** @module SkinningNode **/
-
 const _frameId = new WeakMap();
 
 /**

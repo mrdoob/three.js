@@ -1,7 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
 
-/** @module UV **/
-
 /**
  * TSL function for creating an uv attribute node with the given index.
  *

@@ -5,8 +5,6 @@ import { positionView } from '../accessors/Position.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
-/** @module BumpMapNode **/
-
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 

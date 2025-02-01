@@ -6,15 +6,13 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { cameraViewMatrix } from './Camera.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
-/** @module ModelNode **/
-
 /**
  * This type of node is a specialized version of `Object3DNode`
  * with larger set of model related metrics. Unlike `Object3DNode`,
  * `ModelNode` extracts the reference to the 3D object from the
  * current node frame state.
  *
- * @augments module:Object3DNode~Object3DNode
+ * @augments Object3DNode
  */
 class ModelNode extends Object3DNode {
 

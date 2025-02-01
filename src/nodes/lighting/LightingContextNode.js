@@ -2,7 +2,7 @@ import ContextNode from '../core/ContextNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
 /**
- * `LightingContextNode` represents an extension of the {@link module:ContextNode~ContextNode} module
+ * `LightingContextNode` represents an extension of the {@link ContextNode} module
  * by adding lighting specific context data. It represents the runtime context of
  * {@link LightsNode}.
  *

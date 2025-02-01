@@ -1,8 +1,6 @@
 import { TempNode } from 'three/webgpu';
 import { nodeObject, Fn, uv, uniform, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
 
-/** @module DotScreenNode **/
-
 /**
  * Post processing node for creating dot-screen effect.
  *

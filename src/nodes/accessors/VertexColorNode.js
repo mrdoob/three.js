@@ -2,12 +2,10 @@ import AttributeNode from '../core/AttributeNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-/** @module VertexColorNode **/
-
 /**
  * An attribute node for representing vertex colors.
  *
- * @augments module:AttributeNode~AttributeNode
+ * @augments AttributeNode
  */
 class VertexColorNode extends AttributeNode {
 

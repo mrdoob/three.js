@@ -2,8 +2,6 @@ import TextureNode from './TextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { NodeAccess } from '../core/constants.js';
 
-/** @module StorageTextureNode **/
-
 /**
  * This special version of a texture node can be used to
  * write data into a storage texture with a compute shader.
@@ -33,7 +31,7 @@ import { NodeAccess } from '../core/constants.js';
  *
  * This node can only be used with a WebGPU backend.
  *
- * @augments module:TextureNode~TextureNode
+ * @augments TextureNode
  */
 class StorageTextureNode extends TextureNode {
 

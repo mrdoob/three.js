@@ -1,8 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module PosterizeNode **/
-
 /**
  * Represents a posterize effect which reduces the number of colors
  * in an image, resulting in a more blocky and stylized appearance.

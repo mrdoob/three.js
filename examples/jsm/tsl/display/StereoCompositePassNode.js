@@ -14,7 +14,7 @@ let _rendererState;
  * anaglyph or parallax barrier.
  *
  * @abstract
- * @augments module:PassNode~PassNode
+ * @augments PassNode
  */
 class StereoCompositePassNode extends PassNode {
 

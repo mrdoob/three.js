@@ -3,8 +3,6 @@ import { textureSize } from '../accessors/TextureSizeNode.js';
 import { textureLoad } from '../accessors/TextureNode.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
 
-/** @module PostProcessingUtils **/
-
 /**
  * Computes a position in view space based on a fragment's screen position expressed as uv coordinates, the fragments
  * depth value and the camera's inverse projection matrix.

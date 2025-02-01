@@ -3,8 +3,6 @@ import { cameraViewMatrix, cameraProjectionMatrix } from '../accessors/Camera.js
 import { positionLocal } from '../accessors/Position.js';
 import { Fn, defined } from '../tsl/TSLBase.js';
 
-/** @module SpriteUtils **/
-
 /**
  * This can be used to achieve a billboarding behavior for flat meshes. That means they are
  * oriented always towards the camera.

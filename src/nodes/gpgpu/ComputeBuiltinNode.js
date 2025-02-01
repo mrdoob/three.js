@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-/** @module ComputeBuiltinNode **/
-
 /**
  * `ComputeBuiltinNode` represents a compute-scope builtin value that expose information
  * about the currently running dispatch and/or the device it is running on.

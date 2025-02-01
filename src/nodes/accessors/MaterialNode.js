@@ -8,8 +8,6 @@ import { normalMap } from '../display/NormalMapNode.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-/** @module MaterialNode **/
-
 const _propertyCache = new Map();
 
 /**

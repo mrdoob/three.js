@@ -2,8 +2,6 @@ import Node from '../core/Node.js';
 import { nodeObject, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
 
-/** @module LightsNode **/
-
 const sortLights = ( lights ) => {
 
 	return lights.sort( ( a, b ) => a.id - b.id );

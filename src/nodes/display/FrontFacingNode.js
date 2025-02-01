@@ -3,8 +3,6 @@ import { nodeImmutable, float } from '../tsl/TSLBase.js';
 
 import { BackSide, WebGLCoordinateSystem } from '../../constants.js';
 
-/** @module FrontFacingNode **/
-
 /**
  * This node can be used to evaluate whether a primitive is front or back facing.
  *

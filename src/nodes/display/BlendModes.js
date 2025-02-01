@@ -1,8 +1,6 @@
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 import { mix, min, step } from '../math/MathNode.js';
 
-/** @module BlendModes **/
-
 /**
  * Represents a "Color Burn" blend mode.
  *

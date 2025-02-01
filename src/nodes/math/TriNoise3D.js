@@ -3,8 +3,6 @@
 import { Loop } from '../utils/LoopNode.js';
 import { float, vec3, Fn } from '../tsl/TSLBase.js';
 
-/** @module TriNoise3D **/
-
 const tri = /*@__PURE__*/ Fn( ( [ x ] ) => {
 
 	return x.fract().sub( .5 ).abs();

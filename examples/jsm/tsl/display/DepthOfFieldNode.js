@@ -1,8 +1,6 @@
 import { TempNode, NodeUpdateType } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
 
-/** @module DepthOfFieldNode **/
-
 /**
  * Post processing node for creating depth of field (DOF) effect.
  *

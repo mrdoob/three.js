@@ -1,7 +1,5 @@
 import { Fn } from '../tsl/TSLCore.js';
 
-/** @module ModelViewProjectionNode **/
-
 /**
  * TSL object that represents the position in clip space after the model-view-projection transform of the current rendered object.
  *

@@ -2,8 +2,6 @@
 import Node from './Node.js';
 import { getLengthFromType } from './NodeUtils.js';
 
-/** @module StructTypeNode **/
-
 /**
  * Generates a layout for struct members.
  * This function takes an object representing struct members and returns an array of member layouts.

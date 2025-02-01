@@ -3,8 +3,6 @@ import StorageBufferAttribute from '../../renderers/common/StorageBufferAttribut
 import { storage } from './StorageBufferNode.js';
 import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
 
-/** @module Arrays **/
-
 /**
  * TSL function for creating a storage buffer node with a configured `StorageBufferAttribute`.
  *

@@ -2,8 +2,6 @@ import { NodeMaterial } from 'three/webgpu';
 import { nodeObject, Fn, vec4, uv, If, mod, screenCoordinate } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 
-/** @module ParallaxBarrierPassNode **/
-
 /**
  * A render pass node that creates a parallax barrier effect.
  *

@@ -69,7 +69,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		 * the rotation with a node instead.
 		 *
 		 * If you don't want to overwrite the rotation but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialRotation}.
+		 * value instead, use {@link materialRotation}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null

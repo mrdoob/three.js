@@ -5,8 +5,6 @@ import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { NodeAccess } from '../core/constants.js';
 import { getTypeFromLength } from '../core/NodeUtils.js';
 
-/** @module StorageBufferNode **/
-
 /**
  * This node is used in context of compute shaders and allows to define a
  * storage buffer for data. A typical workflow is to create instances of

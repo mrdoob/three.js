@@ -1,7 +1,5 @@
 import { nodeObject } from '../tsl/TSLBase.js';
 
-/** @module Packing **/
-
 /**
  * Packs a direction vector into a color value.
  *

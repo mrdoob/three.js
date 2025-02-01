@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module ExpressionNode **/
-
 /**
  * This class can be used to implement basic expressions in shader code.
  * Basic examples for that are `return`, `continue` or `discard` statements.

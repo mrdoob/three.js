@@ -2,8 +2,6 @@ import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module MaxMipLevelNode **/
-
 /**
  * A special type of uniform node that computes the
  * maximum mipmap level for a given texture node.
@@ -12,7 +10,7 @@ import { nodeProxy } from '../tsl/TSLBase.js';
  * const level = maxMipLevel( textureNode );
  * ```
  *
- * @augments module:UniformNode~UniformNode
+ * @augments UniformNode
  */
 class MaxMipLevelNode extends UniformNode {
 

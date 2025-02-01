@@ -59,7 +59,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	/**
 	 * Basic materials are not affected by normal and bump maps so we
-	 * return by default {@link module:Normal.normalView}.
+	 * return by default {@link normalView}.
 	 *
 	 * @return {Node<vec3>} The normal node.
 	 */

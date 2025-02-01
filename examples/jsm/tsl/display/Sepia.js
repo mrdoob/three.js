@@ -1,7 +1,5 @@
 import { dot, Fn, vec3, vec4 } from 'three/tsl';
 
-/** @module Sepia **/
-
 /**
  * Applies a sepia effect to the given color node.
  *

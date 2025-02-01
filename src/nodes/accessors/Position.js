@@ -2,8 +2,6 @@ import { attribute } from '../core/AttributeNode.js';
 import { Fn } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
 
-/** @module Position **/
-
 /**
  * TSL object that represents the position attribute of the current rendered object.
  *
@@ -20,7 +18,7 @@ export const positionLocal = /*@__PURE__*/ positionGeometry.toVarying( 'position
 
 /**
  * TSL object that represents the previous vertex position in local space of the current rendered object.
- * Used in context of {@link module:VelocityNode~VelocityNode} for rendering motion vectors.
+ * Used in context of {@link VelocityNode} for rendering motion vectors.
  *
  * @type {AttributeNode<vec3>}
  */

@@ -2,8 +2,6 @@ import { DataTexture, RepeatWrapping, Vector2, Vector3, TempNode } from 'three/w
 import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 import { SimplexNoise } from '../../math/SimplexNoise.js';
 
-/** @module DenoiseNode **/
-
 /**
  * Post processing node for denoising data like raw screen-space ambient occlusion output.
  * Denoise can noticeably improve the quality of ambient occlusion but also add quite some

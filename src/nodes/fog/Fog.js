@@ -2,8 +2,6 @@ import { positionView } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
 import { Fn, output, vec4 } from '../tsl/TSLBase.js';
 
-/** @module Fog **/
-
 /**
  * Returns a node that represents the `z` coordinate in view space
  * for the current fragment. It's a different representation of the

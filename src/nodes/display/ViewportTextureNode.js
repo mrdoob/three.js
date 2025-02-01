@@ -7,8 +7,6 @@ import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { LinearMipmapLinearFilter } from '../../constants.js';
 
-/** @module ViewportTextureNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 /**
@@ -18,7 +16,7 @@ const _size = /*@__PURE__*/ new Vector2();
  * (which is good for performance). `ViewportTextureNode` can be used as an input for a
  * variety of effects like refractive or transmissive materials.
  *
- * @augments module:TextureNode~TextureNode
+ * @augments TextureNode
  */
 class ViewportTextureNode extends TextureNode {
 

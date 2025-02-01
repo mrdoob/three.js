@@ -1,8 +1,6 @@
 import UniformNode from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-/** @module BufferNode **/
-
 /**
  * A special type of uniform node which represents array-like data
  * as uniform buffers. The access usually happens via `element()`
@@ -15,7 +13,7 @@ import { nodeObject } from '../tsl/TSLBase.js';
  * In general, it is recommended to use the more managed {@link UniformArrayNode}
  * since it handles more input types and automatically cares about buffer paddings.
  *
- * @augments module:UniformNode~UniformNode
+ * @augments UniformNode
  */
 class BufferNode extends UniformNode {
 

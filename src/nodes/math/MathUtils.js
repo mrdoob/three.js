@@ -1,8 +1,6 @@
 import { sub, mul, div, add } from './OperatorNode.js';
 import { PI, pow, sin } from './MathNode.js';
 
-/** @module MathUtils **/
-
 /**
  * A function that remaps the `[0,1]` interval into the `[0,1]` interval.
  * The corners are mapped to `0` and the center to `1`.

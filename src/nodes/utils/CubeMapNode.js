@@ -6,8 +6,6 @@ import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
 
-/** @module CubeMapNode **/
-
 const _cache = new WeakMap();
 
 /**

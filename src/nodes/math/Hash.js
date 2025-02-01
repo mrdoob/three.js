@@ -1,7 +1,5 @@
 import { Fn } from '../tsl/TSLBase.js';
 
-/** @module Hash **/
-
 /**
  * Generates a hash value in the range `[0, 1]` from the given seed.
  *

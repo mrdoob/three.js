@@ -3,8 +3,6 @@ import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
-/** @module MathNode **/
-
 /**
  * This node represents a variety of mathematical methods available in shaders.
  * They are divided into three categories:

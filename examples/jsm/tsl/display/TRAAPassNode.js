@@ -1,8 +1,6 @@
 import { Color, Vector2, NearestFilter, Matrix4, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
 import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
 
-/** @module TRAAPassNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -18,7 +16,7 @@ let _rendererState;
  * - {@link https://alextardif.com/TAA.html}
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
- * @augments module:PassNode~PassNode
+ * @augments PassNode
  */
 class TRAAPassNode extends PassNode {
 

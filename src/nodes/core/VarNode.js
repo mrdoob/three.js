@@ -1,8 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-/** @module VarNode **/
-
 /**
  * Class for representing shader variables as nodes. Variables are created from
  * existing nodes like the following:

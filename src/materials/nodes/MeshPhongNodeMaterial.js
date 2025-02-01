@@ -54,7 +54,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		 * and define the shininess with a node instead.
 		 *
 		 * If you don't want to overwrite the shininess but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialShininess}.
+		 * value instead, use {@link materialShininess}.
 		 *
 		 * @type {Node<float>?}
 		 * @default null
@@ -67,7 +67,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		 * and define the specular color with a node instead.
 		 *
 		 * If you don't want to overwrite the specular color but modify the existing
-		 * value instead, use {@link module:MaterialNode.materialSpecular}.
+		 * value instead, use {@link materialSpecular}.
 		 *
 		 * @type {Node<vec3>?}
 		 * @default null

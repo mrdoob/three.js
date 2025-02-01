@@ -2,8 +2,6 @@ import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
-/** @module ComputeNode **/
-
 /**
  * TODO
  *

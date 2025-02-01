@@ -8,7 +8,7 @@ import { REVISION } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
- * {@link module:Renderer} module and related management components.
+ * {@link Renderer} module and related management components.
  * Sometimes it is required though to execute commands which are
  * specific to the current 3D backend (which is WebGPU or WebGL 2).
  * This abstract base class defines an interface that encapsulates

@@ -1,8 +1,6 @@
 import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property } from 'three/tsl';
 
-/** @module PixelationPassNode **/
-
 /**
  * A inner node definition that implements the actual pixelation TSL code.
  *

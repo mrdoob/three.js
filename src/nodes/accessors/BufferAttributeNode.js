@@ -6,8 +6,6 @@ import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribut
 import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
 import { StaticDrawUsage, DynamicDrawUsage } from '../../constants.js';
 
-/** @module BufferAttributeNode **/
-
 /**
  * In earlier `three.js` versions it was only possible to define attribute data
  * on geometry level. With `BufferAttributeNode`, it is also possible to do this

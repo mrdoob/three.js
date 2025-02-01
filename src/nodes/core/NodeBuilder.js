@@ -499,7 +499,7 @@ class NodeBuilder {
 
 	/**
 	 * Returns the output struct name which is required by
-	 * {@link module:OutputStructNode}.
+	 * {@link OutputStructNode}.
 	 *
 	 * @abstract
 	 * @return {String} The name of the output struct.

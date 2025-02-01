@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-/** @module BuiltinNode **/
-
 /**
  * The node allows to set values for built-in shader variables. That is
  * required for features like hardware-accelerated vertex clipping.

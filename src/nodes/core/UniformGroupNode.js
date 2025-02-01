@@ -1,7 +1,5 @@
 import Node from './Node.js';
 
-/** @module UniformGroupNode **/
-
 /**
  * This node can be used to group single instances of {@link UniformNode}
  * and manage them as a uniform buffer.

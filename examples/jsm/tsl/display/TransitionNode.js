@@ -1,8 +1,6 @@
 import { TempNode } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, convertToTexture, vec4, If, int, clamp, sub, mix } from 'three/tsl';
 
-/** @module TransitionNode **/
-
 /**
  * Post processing node for creating a transition effect between scenes.
  *

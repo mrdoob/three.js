@@ -203,7 +203,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		/**
 		 * A map for managing scope arrays. Only relevant for when using
-		 * {@link module:WorkgroupInfoNode} in context of compute shaders.
+		 * {@link WorkgroupInfoNode} in context of compute shaders.
 		 *
 		 * @type {Map<String,Object>}
 		 */
