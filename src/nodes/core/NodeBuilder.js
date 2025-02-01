@@ -1636,7 +1636,7 @@ class NodeBuilder {
 	 */
 	getStructTypeFromNode( node, membersLayout, name = null, shaderStage = this.shaderStage ) {
 
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let structType = nodeData.structType;
 
@@ -2044,6 +2044,22 @@ class NodeBuilder {
 		this.flowsData.set( node, flowData );
 
 		return flowData;
+
+	}
+
+	/**
+	 * Includes a node in the current function node.
+	 *
+	 * @param {Node} node - The node to include.
+	 * @returns {void}
+	 */
+	addInclude( node ) {
+
+		if ( this.currentFunctionNode !== null ) {
+
+			this.currentFunctionNode.includes.push( node );
+
+		}
 
 	}
 

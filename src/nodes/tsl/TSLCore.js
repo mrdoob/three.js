@@ -307,11 +307,7 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
-			if ( builder.currentFunctionNode !== null ) {
-
-				builder.currentFunctionNode.includes.push( functionNode );
-
-			}
+			builder.addInclude( functionNode );
 
 			result = nodeObject( functionNode.call( inputNodes ) );
 
