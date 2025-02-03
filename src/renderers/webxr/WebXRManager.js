@@ -65,7 +65,7 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		let updatedCameraProperties = null;
+		const updatedCameraProperties = new WeakMap();
 
 		this.cameraAutoUpdate = true;
 		this.enabled = false;
@@ -184,14 +184,16 @@ class WebXRManager extends EventDispatcher {
 
 			scope.isPresenting = false;
 
-			if ( updatedCameraProperties !== null ) {
+			if ( updatedCameraProperties.has( scope.getCamera() ) ) {
 
-				const camera = updatedCameraProperties.camera;
-				camera.fov = updatedCameraProperties.fov;
-				camera.zoom = updatedCameraProperties.zoom;
-				camera.updateProjectionMatrix();
+				const cameraAndProperties = updatedCameraProperties.get( scope.getCamera() );
 
-				updatedCameraProperties = null;
+				const userCamera = cameraAndProperties.userCamera;
+				userCamera.fov = cameraAndProperties.fov;
+				userCamera.zoom = cameraAndProperties.zoom;
+				userCamera.updateProjectionMatrix();
+
+				updatedCameraProperties.delete( scope.getCamera() );
 
 			}
 
@@ -376,7 +378,7 @@ class WebXRManager extends EventDispatcher {
 
 				scope.isPresenting = true;
 
-				updatedCameraProperties = null;
+				updatedCameraProperties.delete( scope.getCamera() );
 
 				scope.dispatchEvent( { type: 'sessionstart' } );
 
@@ -648,13 +650,13 @@ class WebXRManager extends EventDispatcher {
 
 			if ( camera.isPerspectiveCamera ) {
 
-				if ( updatedCameraProperties === null ) {
+				if ( ! updatedCameraProperties.has( scope.getCamera() ) ) {
 
-					updatedCameraProperties = {
-						camera: camera,
+					updatedCameraProperties.set( scope.getCamera(), {
+						userCamera: camera,
 						fov: camera.fov,
 						zoom: camera.zoom,
-					};
+					} );
 
 				}
 
