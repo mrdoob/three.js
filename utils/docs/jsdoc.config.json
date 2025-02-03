@@ -4,12 +4,7 @@
             "encoding": "utf8",
             "package": "package.json",
             "recurse": true,
-            "template": "node_modules/clean-jsdoc-theme",
-            "theme_opts": {
-                "homepageTitle": "three.js docs",
-                "sections": ["Classes"],
-                "include_css": ["utils/docs/custom/three.css"]
-           }
+            "template": "utils/docs/template"
     },
     "plugins": [ "plugins/markdown" ],
     "source": {
@@ -21,9 +16,5 @@
             "src/renderers/common", 
             "src/renderers/webgpu" 
         ]
-    },
-    "markdown": {
-        "hardwrap": false,
-        "idInHeadings": true
     }
 }
