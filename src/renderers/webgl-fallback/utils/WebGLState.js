@@ -548,7 +548,7 @@ class WebGLState {
 	}
 
 	/**
-	 * Specifies the viewport.
+	 * Specifies the scissor box.
 	 *
 	 * @param {Number} x - The x-coordinate of the lower left corner of the viewport.
 	 * @param {Number} y - The y-coordinate of the lower left corner of the viewport.
