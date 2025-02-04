@@ -144,6 +144,7 @@ const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 /**
  * TSL function for creating a function overloading node.
  *
+ * @tsl
  * @function
  * @param {Array<Function>} functionNodes - Array of `Fn` function definitions.
  * @returns {FunctionOverloadingNode}

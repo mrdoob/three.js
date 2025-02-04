@@ -116,6 +116,7 @@ export default ViewportTextureNode;
 /**
  * TSL function for creating a viewport texture node.
  *
+ * @tsl
  * @function
  * @param {Node} [uvNode=screenUV] - The uv node.
  * @param {Node?} [levelNode=null] - The level node.
@@ -127,6 +128,7 @@ export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
 /**
  * TSL function for creating a viewport texture node with enabled mipmap generation.
  *
+ * @tsl
  * @function
  * @param {Node} [uvNode=screenUV] - The uv node.
  * @param {Node?} [levelNode=null] - The level node.

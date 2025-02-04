@@ -526,6 +526,7 @@ export default SSRNode;
 /**
  * TSL function for creating screen space reflections (SSR).
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.

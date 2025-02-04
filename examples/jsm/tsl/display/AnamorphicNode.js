@@ -244,6 +244,7 @@ class AnamorphicNode extends TempNode {
 /**
  * TSL function for creating an anamorphic flare effect.
  *
+ * @tsl
  * @function
  * @param {TextureNode} node - The node that represents the input of the effect.
  * @param {Node<float> | Number} [threshold=0.9] - The threshold is one option to control the intensity and size of the effect.

@@ -6,6 +6,7 @@ import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
 /**
  * TSL function for creating a storage buffer node with a configured `StorageBufferAttribute`.
  *
+ * @tsl
  * @function
  * @param {Number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
  * @param {String|Struct} [type='float'] - The data type.
@@ -37,6 +38,7 @@ export const attributeArray = ( count, type = 'float' ) => {
 /**
  * TSL function for creating a storage buffer node with a configured `StorageInstancedBufferAttribute`.
  *
+ * @tsl
  * @function
  * @param {Number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
  * @param {String|Struct} [type='float'] - The data type.

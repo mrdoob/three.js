@@ -67,6 +67,7 @@ export default UserDataNode;
 /**
  * TSL function for creating a user data node.
  *
+ * @tsl
  * @function
  * @param {String} name - The property name that should be referenced by the node.
  * @param {String} inputType - The node data type of the reference.

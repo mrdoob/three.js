@@ -263,6 +263,7 @@ export default LensflareNode;
 /**
  * TSL function for creating a bloom-based lens flare effect.
  *
+ * @tsl
  * @function
  * @param {TextureNode} node - The node that represents the scene's bloom.
  * @param {Object} params - The parameter object for configuring the effect.

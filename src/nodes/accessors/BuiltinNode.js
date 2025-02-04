@@ -55,6 +55,7 @@ export default BuiltinNode;
 /**
  * TSL function for creating a builtin node.
  *
+ * @tsl
  * @function
  * @param {String} name - The name of the built-in shader variable.
  * @returns {BuiltinNode}

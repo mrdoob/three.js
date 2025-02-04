@@ -97,6 +97,7 @@ export default Lut3DNode;
 /**
  * TSL function for creating a LUT node for color grading via post processing.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that represents the input of the effect.
  * @param {TextureNode} lut - A texture node that represents the lookup table.

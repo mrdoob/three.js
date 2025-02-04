@@ -84,6 +84,7 @@ class ShadowBaseNode extends Node {
 /**
  * TSL object that represents the vertex position in world space during the shadow pass.
  *
+ * @tsl
  * @type {Node<vec3>}
  */
 export const shadowPositionWorld = /*@__PURE__*/ vec3().toVar( 'shadowPositionWorld' );

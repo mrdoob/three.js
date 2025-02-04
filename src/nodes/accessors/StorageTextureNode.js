@@ -200,6 +200,7 @@ export default StorageTextureNode;
 /**
  * TSL function for creating a storage texture node.
  *
+ * @tsl
  * @function
  * @param {StorageTexture} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
@@ -212,6 +213,7 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
 /**
  * TODO: Explain difference to `storageTexture()`.
  *
+ * @tsl
  * @function
  * @param {StorageTexture} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.

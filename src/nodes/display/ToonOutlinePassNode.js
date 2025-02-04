@@ -171,6 +171,7 @@ export default ToonOutlinePassNode;
 /**
  * TSL function for creating a toon outline pass node.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - A reference to the camera.

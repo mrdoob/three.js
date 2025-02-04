@@ -250,6 +250,7 @@ export default LoopNode;
 /**
  * TSL function for creating a loop node.
  *
+ * @tsl
  * @function
  * @param {...Any} params - A list of parameters.
  * @returns {LoopNode}
@@ -259,6 +260,7 @@ export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params
 /**
  * TSL function for creating a `Continue()` expression.
  *
+ * @tsl
  * @function
  * @returns {ExpressionNode}
  */
@@ -267,6 +269,7 @@ export const Continue = () => expression( 'continue' ).append();
 /**
  * TSL function for creating a `Break()` expression.
  *
+ * @tsl
  * @function
  * @returns {ExpressionNode}
  */
@@ -275,6 +278,7 @@ export const Break = () => expression( 'break' ).append();
 // Deprecated
 
 /**
+ * @tsl
  * @function
  * @deprecated since r168. Use {@link Loop} instead.
  *

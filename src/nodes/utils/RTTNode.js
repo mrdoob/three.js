@@ -231,6 +231,7 @@ export default RTTNode;
 /**
  * TSL function for creating a RTT node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
  * @param {Number?} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
@@ -243,6 +244,7 @@ export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( n
 /**
  * TSL function for converting nodes to textures nodes.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
  * @param {Number?} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.

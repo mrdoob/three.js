@@ -165,6 +165,7 @@ export default AssignNode;
 /**
  * TSL function for creating an assign node.
  *
+ * @tsl
  * @function
  * @param {Node} targetNode - The target node.
  * @param {Node} sourceNode - The source type.

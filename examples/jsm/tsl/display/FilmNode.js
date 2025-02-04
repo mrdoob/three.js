@@ -88,6 +88,7 @@ export default FilmNode;
 /**
  * TSL function for creating a film node for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} inputNode - The node that represents the input of the effect.
  * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.

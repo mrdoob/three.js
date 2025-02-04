@@ -371,6 +371,7 @@ export default GaussianBlurNode;
 /**
  * TSL function for creating a gaussian blur node for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
@@ -382,6 +383,7 @@ export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new Ga
 /**
  * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.

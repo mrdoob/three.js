@@ -93,6 +93,7 @@ export default DotScreenNode;
 /**
  * TSL function for creating a dot-screen node for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Number} [angle=1.57] - The rotation of the effect in radians.

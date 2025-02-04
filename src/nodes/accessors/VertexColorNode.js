@@ -102,6 +102,7 @@ export default VertexColorNode;
 /**
  * TSL function for creating a reference node.
  *
+ * @tsl
  * @function
  * @param {Number} index - The attribute index.
  * @returns {VertexColorNode}

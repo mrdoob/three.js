@@ -229,6 +229,7 @@ export default ClippingNode;
 /**
  * TSL function for setting up the default clipping logic.
  *
+ * @tsl
  * @function
  * @returns {ClippingNode}
  */
@@ -237,6 +238,7 @@ export const clipping = () => nodeObject( new ClippingNode() );
 /**
  * TSL function for setting up alpha to coverage.
  *
+ * @tsl
  * @function
  * @returns {ClippingNode}
  */
@@ -245,6 +247,7 @@ export const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.AL
 /**
  * TSL function for setting up hardware-based clipping.
  *
+ * @tsl
  * @function
  * @returns {ClippingNode}
  */

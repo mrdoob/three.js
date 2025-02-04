@@ -197,6 +197,7 @@ export default StackNode;
 /**
  * TSL function for creating a stack node.
  *
+ * @tsl
  * @function
  * @param {StackNode?} [parent=null] - The parent stack node.
  * @returns {StackNode}

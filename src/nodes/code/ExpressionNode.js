@@ -59,6 +59,7 @@ export default ExpressionNode;
 /**
  * TSL function for creating an expression node.
  *
+ * @tsl
  * @function
  * @param {String} [snippet=''] - The native code snippet.
  * @param {String} [nodeType='void'] - The node type.

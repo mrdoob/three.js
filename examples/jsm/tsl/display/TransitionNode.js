@@ -127,6 +127,7 @@ export default TransitionNode;
 /**
  * TSL function for creating a transition node for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} nodeA - A texture node that represents the beauty pass of the first scene.
  * @param {Node<vec4>} nodeB - A texture node that represents the beauty pass of the second scene.

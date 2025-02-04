@@ -167,6 +167,7 @@ export default VaryingNode;
 /**
  * TSL function for creating a varying node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node for which a varying should be created.
  * @param {String?} name - The name of the varying in the shader.
@@ -177,6 +178,7 @@ export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 /**
  * Computes a node in the vertex stage.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node which should be executed in the vertex stage.
  * @returns {VaryingNode}

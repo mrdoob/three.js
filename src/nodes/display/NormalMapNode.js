@@ -139,6 +139,7 @@ export default NormalMapNode;
 /**
  * TSL function for creating a normal map node.
  *
+ * @tsl
  * @function
  * @param {Node<vec3>} node - Represents the normal map data.
  * @param {Node<vec2>?} [scaleNode=null] - Controls the intensity of the effect.

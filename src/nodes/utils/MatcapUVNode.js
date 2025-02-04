@@ -42,6 +42,7 @@ export default MatcapUVNode;
 /**
  * TSL function for creating a matcap uv node.
  *
+ * @tsl
  * @function
  * @returns {MatcapUVNode}
  */

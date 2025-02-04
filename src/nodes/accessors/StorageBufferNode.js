@@ -362,6 +362,7 @@ export default StorageBufferNode;
 /**
  * TSL function for creating a storage buffer node.
  *
+ * @tsl
  * @function
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
  * @param {(String|Struct)?} [type=null] - The buffer type (e.g. `'vec3'`).
@@ -371,6 +372,7 @@ export default StorageBufferNode;
 export const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBufferNode( value, type, count ) );
 
 /**
+ * @tsl
  * @function
  * @deprecated since r171. Use `storage().setPBO( true )` instead.
  *

@@ -95,6 +95,7 @@ export default MaxMipLevelNode;
 /**
  * TSL function for creating a max mip level node.
  *
+ * @tsl
  * @function
  * @param {TextureNode} textureNode - The texture node to compute the max mip level for.
  * @returns {MaxMipLevelNode}

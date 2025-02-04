@@ -110,6 +110,7 @@ export default StereoPassNode;
 /**
  * TSL function for creating a stereo pass node for stereoscopic rendering.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

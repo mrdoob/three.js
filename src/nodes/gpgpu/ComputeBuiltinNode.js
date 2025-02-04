@@ -141,6 +141,7 @@ export default ComputeBuiltinNode;
 /**
  * TSL function for creating a compute builtin node.
  *
+ * @tsl
  * @function
  * @param {String} name - The built-in name.
  * @param {String} nodeType - The node type.
@@ -149,7 +150,6 @@ export default ComputeBuiltinNode;
 const computeBuiltin = ( name, nodeType ) => nodeObject( new ComputeBuiltinNode( name, nodeType ) );
 
 /**
- * TSL function for creating a `numWorkgroups` builtin node.
  * Represents the number of workgroups dispatched by the compute shader.
  * ```js
  * // Run 512 invocations/threads with a workgroup size of 128.
@@ -169,13 +169,12 @@ const computeBuiltin = ( name, nodeType ) => nodeObject( new ComputeBuiltinNode(
  * })().compute(512);
  * ```
  *
- * @function
- * @returns {ComputeBuiltinNode<uvec3>}
+ * @tsl
+ * @type {ComputeBuiltinNode<uvec3>}
  */
 export const numWorkgroups = /*@__PURE__*/ computeBuiltin( 'numWorkgroups', 'uvec3' );
 
 /**
- * TSL function for creating a `workgroupId` builtin node.
  * Represents the 3-dimensional index of the workgroup the current compute invocation belongs to.
  * ```js
  * // Execute 12 compute threads with a workgroup size of 3.
@@ -197,34 +196,31 @@ export const numWorkgroups = /*@__PURE__*/ computeBuiltin( 'numWorkgroups', 'uve
  * // Buffer Output =  [0, 1, 2, 0, 0, 0, 6, 7, 8, 0, 0, 0];
  * ```
  *
- * @function
- * @returns {ComputeBuiltinNode<uvec3>}
+ * @tsl
+ * @type {ComputeBuiltinNode<uvec3>}
  */
 export const workgroupId = /*@__PURE__*/ computeBuiltin( 'workgroupId', 'uvec3' );
 
 /**
- * TSL function for creating a `globalId` builtin node. A non-linearized 3-dimensional
- * representation of the current invocation's position within a 3D global grid.
+ * A non-linearized 3-dimensional representation of the current invocation's position within a 3D global grid.
  *
- * @function
- * @returns {ComputeBuiltinNode<uvec3>}
+ * @tsl
+ * @type {ComputeBuiltinNode<uvec3>}
  */
 export const globalId = /*@__PURE__*/ computeBuiltin( 'globalId', 'uvec3' );
 /**
- * TSL function for creating a `localId` builtin node. A non-linearized 3-dimensional
- * representation of the current invocation's position within a 3D workgroup grid.
+ * A non-linearized 3-dimensional representation of the current invocation's position within a 3D workgroup grid.
  *
- * @function
- * @returns {ComputeBuiltinNode<uvec3>}
+ * @tsl
+ * @type {ComputeBuiltinNode<uvec3>}
  */
 export const localId = /*@__PURE__*/ computeBuiltin( 'localId', 'uvec3' );
 
 /**
- * TSL function for creating a `subgroupSize` builtin node. A device dependent variable
- * that exposes the size of the current invocation's subgroup.
+ * A device dependent variable that exposes the size of the current invocation's subgroup.
  *
- * @function
- * @returns {ComputeBuiltinNode<uint>}
+ * @tsl
+ * @type {ComputeBuiltinNode<uint>}
  */
 export const subgroupSize = /*@__PURE__*/ computeBuiltin( 'subgroupSize', 'uint' );
 

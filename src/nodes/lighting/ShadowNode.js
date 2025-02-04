@@ -789,6 +789,7 @@ export default ShadowNode;
 /**
  * TSL function for creating an instance of `ShadowNode`.
  *
+ * @tsl
  * @function
  * @param {Light} light - The shadow casting light.
  * @param {LightShadow} shadow - The light shadow.

@@ -384,6 +384,7 @@ export default LightsNode;
  * TSL function for creating an instance of `LightsNode` and configuring
  * it with the given array of lights.
  *
+ * @tsl
  * @function
  * @param {Array<Light>} lights - An array of lights.
  * @return {LightsNode} The created lights node.

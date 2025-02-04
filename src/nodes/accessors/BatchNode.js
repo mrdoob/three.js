@@ -155,6 +155,7 @@ export default BatchNode;
 /**
  * TSL function for creating a batch node.
  *
+ * @tsl
  * @function
  * @param {BatchedMesh} batchMesh - A reference to batched mesh.
  * @returns {BatchNode}

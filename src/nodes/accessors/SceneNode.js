@@ -122,6 +122,7 @@ export default SceneNode;
 /**
  * TSL object that represents the scene's background blurriness.
  *
+ * @tsl
  * @type {SceneNode}
  */
 export const backgroundBlurriness = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
@@ -129,6 +130,7 @@ export const backgroundBlurriness = /*@__PURE__*/ nodeImmutable( SceneNode, Scen
 /**
  * TSL object that represents the scene's background intensity.
  *
+ * @tsl
  * @type {SceneNode}
  */
 export const backgroundIntensity = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
@@ -136,6 +138,7 @@ export const backgroundIntensity = /*@__PURE__*/ nodeImmutable( SceneNode, Scene
 /**
  * TSL object that represents the scene's background rotation.
  *
+ * @tsl
  * @type {SceneNode}
  */
 export const backgroundRotation = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_ROTATION );

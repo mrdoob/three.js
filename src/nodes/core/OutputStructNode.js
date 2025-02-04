@@ -95,6 +95,7 @@ export default OutputStructNode;
 /**
  * TSL function for creating an output struct node.
  *
+ * @tsl
  * @function
  * @param {...Node} members - A parameter list of nodes.
  * @returns {OutputStructNode}

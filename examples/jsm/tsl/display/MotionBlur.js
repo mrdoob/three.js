@@ -3,6 +3,7 @@ import { Fn, float, uv, Loop, int } from 'three/tsl';
 /**
  * Applies a motion blur effect to the given input node.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} inputNode - The input node to apply the motion blur for.
  * @param {Node<vec2>} velocity - The motion vectors of the beauty pass.

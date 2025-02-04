@@ -10,7 +10,8 @@ import { linearDepth } from '../display/ViewportDepthNode.js';
  * objects in front of a refractive surface might appear on the refractive surface
  * which is incorrect.
  *
- * @method
+ * @tsl
+ * @function
  * @param {Node<vec2>?} uv - Optional uv coordinates. By default `screenUV` is used.
  * @return {Node<vec2>} The update uv coordinates.
  */

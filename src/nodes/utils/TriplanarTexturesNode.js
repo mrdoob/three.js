@@ -120,6 +120,7 @@ export default TriplanarTexturesNode;
 /**
  * TSL function for creating a triplanar textures node.
  *
+ * @tsl
  * @function
  * @param {Node} textureXNode - First texture node.
  * @param {Node?} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.
@@ -134,6 +135,7 @@ export const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode 
 /**
  * TSL function for creating a triplanar textures node.
  *
+ * @tsl
  * @function
  * @param {Node} textureXNode - First texture node.
  * @param {Node?} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.

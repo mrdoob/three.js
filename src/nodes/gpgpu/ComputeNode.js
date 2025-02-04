@@ -188,6 +188,7 @@ export default ComputeNode;
 /**
  * TSL function for creating a compute node.
  *
+ * @tsl
  * @function
  * @param {Node} node - TODO
  * @param {Number} count - TODO.

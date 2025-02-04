@@ -185,6 +185,7 @@ export default DepthOfFieldNode;
 /**
  * TSL function for creating a depth-of-field effect (DOF) for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<float>} viewZNode - Represents the viewZ depth values of the scene.

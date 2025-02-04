@@ -717,6 +717,7 @@ export default ScriptableNode;
 /**
  * TSL function for creating a scriptable node.
  *
+ * @tsl
  * @function
  * @param {CodeNode?} [codeNode=null] - The code node.
  * @param {Object} [parameters={}] - The parameters definition.

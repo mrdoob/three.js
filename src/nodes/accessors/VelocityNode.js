@@ -217,6 +217,7 @@ export default VelocityNode;
 /**
  * TSL object that represents the velocity of a render pass.
  *
+ * @tsl
  * @type {VelocityNode}
  */
 export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );

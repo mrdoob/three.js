@@ -93,6 +93,7 @@ export default RotateNode;
 /**
  * TSL function for creating a rotate node.
  *
+ * @tsl
  * @function
  * @param {Node} positionNode - The position node.
  * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending

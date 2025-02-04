@@ -47,6 +47,7 @@ export default BarrierNode;
 /**
  * TSL function for creating a barrier node.
  *
+ * @tsl
  * @function
  * @param {String} scope - The scope defines the behavior of the node..
  * @returns {BarrierNode}
@@ -58,6 +59,7 @@ const barrier = nodeProxy( BarrierNode );
  * invocations must wait for each invocation within a workgroup to
  * complete before the barrier can be surpassed.
  *
+ * @tsl
  * @function
  * @returns {BarrierNode}
  */
@@ -68,6 +70,7 @@ export const workgroupBarrier = () => barrier( 'workgroup' ).append();
  * wait for each access to variables within the 'storage' address space
  * to complete before the barrier can be passed.
  *
+ * @tsl
  * @function
  * @returns {BarrierNode}
  */
@@ -78,6 +81,7 @@ export const storageBarrier = () => barrier( 'storage' ).append();
  * wait for each access to variables within the 'texture' address space
  * to complete before the barrier can be passed.
  *
+ * @tsl
  * @function
  * @returns {BarrierNode}
  */
