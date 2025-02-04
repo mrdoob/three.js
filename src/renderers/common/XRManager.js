@@ -545,6 +545,11 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	foveateBoundTexture( ) {
+
+		if ( this._glBinding && this._glBinding.foveateBoundTexture ) this._glBinding.foveateBoundTexture( this._renderer.getContext().TEXTURE_2D, this.getFoveation() );
+
+	}
 	/**
 	 * After a XR session has been requested usually with one of the `*Button` modules, it
 	 * is injected into the renderer with this method. This method triggers the start of

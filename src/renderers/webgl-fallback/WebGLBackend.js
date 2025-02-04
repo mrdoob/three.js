@@ -1963,6 +1963,9 @@ class WebGLBackend extends Backend {
 
 							if ( useMultisampledRTT ) {
 
+								state.bindTexture( gl.TEXTURE_2D, textureData.textureGPU );
+								this.renderer.xr.foveateBoundTexture();
+
 								multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
 							} else {
@@ -2034,7 +2037,7 @@ class WebGLBackend extends Backend {
 
 					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-					if ( renderTarget.autoAllocateDepthBuffer === true ) {
+					if ( ( renderTarget.autoAllocateDepthBuffer === true ) && !useMultisampledRTT ) {
 
 						const renderbuffer = renderTargetContextData.xrDepthRenderbuffer;
 						gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
