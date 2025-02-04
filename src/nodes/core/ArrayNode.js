@@ -91,6 +91,7 @@ export default ArrayNode;
 /**
  * TSL function for creating an array node.
  *
+ * @tsl
  * @function
  * @param {String|Array<Node>} nodeTypeOrValues - A string representing the element type (e.g., 'vec3')
  * or an array containing the default values (e.g., [ vec3() ]).

@@ -197,6 +197,7 @@ export default WorkgroupInfoNode;
  * TSL function for creating a workgroup info node.
  * Creates a new 'workgroup' scoped array buffer.
  *
+ * @tsl
  * @function
  * @param {String} type - The data type of a 'workgroup' scoped buffer element.
  * @param {Number} [count=0] - The number of elements in the buffer.

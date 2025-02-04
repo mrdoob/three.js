@@ -89,6 +89,7 @@ export default CacheNode;
 /**
  * TSL function for creating a cache node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
  * @param {Boolean} parent - Whether this node refers to a shared parent cache or not.

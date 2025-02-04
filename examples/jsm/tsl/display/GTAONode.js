@@ -511,6 +511,7 @@ function generateMagicSquare( size ) {
 /**
  * TSL function for creating a Ground Truth Ambient Occlusion (GTAO) effect.
  *
+ * @tsl
  * @function
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
  * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.

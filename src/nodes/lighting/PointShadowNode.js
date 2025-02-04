@@ -297,6 +297,7 @@ export default PointShadowNode;
 /**
  * TSL function for creating an instance of `PointShadowNode`.
  *
+ * @tsl
  * @function
  * @param {PointLight} light - The shadow casting point light.
  * @param {PointLightShadow?} [shadow=null] - An optional point light shadow.

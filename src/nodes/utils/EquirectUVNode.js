@@ -57,6 +57,7 @@ export default EquirectUVNode;
 /**
  * TSL function for creating an equirect uv node.
  *
+ * @tsl
  * @function
  * @param {Node<vec3>} [dirNode=positionWorldDirection] - A direction vector for sampling which is by default `positionWorldDirection`.
  * @returns {EquirectUVNode}

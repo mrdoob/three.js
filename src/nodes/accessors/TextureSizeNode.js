@@ -68,6 +68,7 @@ export default TextureSizeNode;
 /**
  * TSL function for creating a texture size node.
  *
+ * @tsl
  * @function
  * @param {TextureNode} textureNode - A texture node which size should be retrieved.
  * @param {Node<int>?} [levelNode=null] - A level node which defines the requested mip.

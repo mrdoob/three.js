@@ -756,4 +756,12 @@ class SMAANode extends TempNode {
 
 export default SMAANode;
 
+/**
+ * TSL function for creating a SMAA node for anti-aliasing via post processing.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @returns {SMAANode}
+ */
 export const smaa = ( node ) => nodeObject( new SMAANode( convertToTexture( node ) ) );

@@ -722,6 +722,7 @@ export default TextureNode;
 /**
  * TSL function for creating a texture node.
  *
+ * @tsl
  * @function
  * @param {Texture} value - The texture.
  * @param {Node<vec2|vec3>?} [uvNode=null] - The uv node.
@@ -734,6 +735,7 @@ export const texture = /*@__PURE__*/ nodeProxy( TextureNode );
 /**
  * TSL function for creating a texture node that fetches/loads texels without interpolation.
  *
+ * @tsl
  * @function
  * @param {Texture} value - The texture.
  * @param {Node<vec2|vec3>?} [uvNode=null] - The uv node.
@@ -748,6 +750,7 @@ export const textureLoad = ( ...params ) => texture( ...params ).setSampler( fal
 /**
  * Converts a texture or texture node to a sampler.
  *
+ * @tsl
  * @function
  * @param {TextureNode|Texture} aTexture - The texture or texture node to convert.
  * @returns {Node}

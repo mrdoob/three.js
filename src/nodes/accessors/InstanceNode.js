@@ -213,6 +213,7 @@ export default InstanceNode;
 /**
  * TSL function for creating an instance node.
  *
+ * @tsl
  * @function
  * @param {Number} count - The number of instances.
  * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.

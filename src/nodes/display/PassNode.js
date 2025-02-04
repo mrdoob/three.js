@@ -641,6 +641,7 @@ export default PassNode;
 /**
  * TSL function for creating a pass node.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - A reference to the camera.
@@ -652,6 +653,7 @@ export const pass = ( scene, camera, options ) => nodeObject( new PassNode( Pass
 /**
  * TSL function for creating a pass texture node.
  *
+ * @tsl
  * @function
  * @param {PassNode} pass - The pass node.
  * @param {Texture} texture - The output texture.
@@ -662,6 +664,7 @@ export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode(
 /**
  * TSL function for creating a depth pass node.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - A reference to the camera.

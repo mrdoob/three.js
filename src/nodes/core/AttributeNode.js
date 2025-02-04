@@ -158,6 +158,7 @@ export default AttributeNode;
 /**
  * TSL function for creating an attribute node.
  *
+ * @tsl
  * @function
  * @param {String} name - The name of the attribute.
  * @param {String?} nodeType - The node type.

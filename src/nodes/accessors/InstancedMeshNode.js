@@ -42,6 +42,7 @@ export default InstancedMeshNode;
 /**
  * TSL function for creating an instanced mesh node.
  *
+ * @tsl
  * @function
  * @param {InstancedMesh} instancedMesh - The instancedMesh.
  * @returns {InstancedMeshNode}

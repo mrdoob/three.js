@@ -118,6 +118,7 @@ export default IndexNode;
 /**
  * TSL object that represents the index of a vertex within a mesh.
  *
+ * @tsl
  * @type {IndexNode}
  */
 export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VERTEX );
@@ -125,6 +126,7 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
 /**
  * TSL object that represents the index of either a mesh instance or an invocation of a compute shader.
  *
+ * @tsl
  * @type {IndexNode}
  */
 export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
@@ -132,6 +134,7 @@ export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.I
 /**
  * TSL object that represents the index of the subgroup the current compute invocation belongs to.
  *
+ * @tsl
  * @type {IndexNode}
  */
 export const subgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.SUBGROUP );
@@ -139,6 +142,7 @@ export const subgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.S
 /**
  * TSL object that represents the index of a compute invocation within the scope of a subgroup.
  *
+ * @tsl
  * @type {IndexNode}
  */
 export const invocationSubgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_SUBGROUP );
@@ -146,6 +150,7 @@ export const invocationSubgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, I
 /**
  * TSL object that represents the index of a compute invocation within the scope of a workgroup load.
  *
+ * @tsl
  * @type {IndexNode}
  */
 export const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
@@ -153,6 +158,7 @@ export const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, Inde
 /**
  * TSL object that represents the index of a draw call.
  *
+ * @tsl
  * @type {IndexNode}
  */
 export const drawIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.DRAW );

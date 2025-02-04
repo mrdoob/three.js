@@ -119,6 +119,7 @@ export default ContextNode;
 /**
  * TSL function for creating a context node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node whose context should be modified.
  * @param {Object} [value={}] - The modified context data.
@@ -129,6 +130,7 @@ export const context = /*@__PURE__*/ nodeProxy( ContextNode );
 /**
  * TSL function for defining a label context value for a given node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node whose context should be modified.
  * @param {String} name - The name/label to set.

@@ -85,6 +85,7 @@ export default RGBShiftNode;
 /**
  * TSL function for creating a RGB shift or split effect for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Number} [amount=0.005] - The amount of the RGB shift.

@@ -97,6 +97,7 @@ export default AnaglyphPassNode;
 /**
  * TSL function for creating an anaglyph pass node.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

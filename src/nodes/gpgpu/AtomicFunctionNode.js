@@ -142,6 +142,7 @@ export default AtomicFunctionNode;
 /**
  * TSL function for creating an atomic function node.
  *
+ * @tsl
  * @function
  * @param {String} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
@@ -154,6 +155,7 @@ const atomicNode = nodeProxy( AtomicFunctionNode );
 /**
  * TSL function for appending an atomic function call into the programmatic flow of a compute shader.
  *
+ * @tsl
  * @function
  * @param {String} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
@@ -173,6 +175,7 @@ export const atomicFunc = ( method, pointerNode, valueNode, storeNode = null ) =
 /**
  * Loads the value stored in the atomic variable.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
@@ -183,6 +186,7 @@ export const atomicLoad = ( pointerNode, storeNode = null ) => atomicFunc( Atomi
 /**
  * Stores a value in the atomic variable.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -194,6 +198,7 @@ export const atomicStore = ( pointerNode, valueNode, storeNode = null ) => atomi
 /**
  * Increments the value stored in the atomic variable.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -205,6 +210,7 @@ export const atomicAdd = ( pointerNode, valueNode, storeNode = null ) => atomicF
 /**
  * Decrements the value stored in the atomic variable.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -216,6 +222,7 @@ export const atomicSub = ( pointerNode, valueNode, storeNode = null ) => atomicF
 /**
  * Stores in an atomic variable the maximum between its current value and a parameter.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -227,6 +234,7 @@ export const atomicMax = ( pointerNode, valueNode, storeNode = null ) => atomicF
 /**
  * Stores in an atomic variable the minimum between its current value and a parameter.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -238,6 +246,7 @@ export const atomicMin = ( pointerNode, valueNode, storeNode = null ) => atomicF
 /**
  * Stores in an atomic variable the bitwise AND of its value with a parameter.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -249,6 +258,7 @@ export const atomicAnd = ( pointerNode, valueNode, storeNode = null ) => atomicF
 /**
  * Stores in an atomic variable the bitwise OR of its value with a parameter.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
@@ -260,6 +270,7 @@ export const atomicOr = ( pointerNode, valueNode, storeNode = null ) => atomicFu
 /**
  * Stores in an atomic variable the bitwise XOR of its value with a parameter.
  *
+ * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.

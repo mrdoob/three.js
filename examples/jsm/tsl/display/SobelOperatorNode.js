@@ -159,6 +159,7 @@ export default SobelOperatorNode;
 /**
  * TSL function for creating a sobel operator node which performs edge detection with a sobel filter.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SobelOperatorNode}

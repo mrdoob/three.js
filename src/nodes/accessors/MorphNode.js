@@ -298,6 +298,7 @@ export default MorphNode;
 /**
  * TSL function for creating a morph node.
  *
+ * @tsl
  * @function
  * @param {Mesh} mesh - The mesh holding the morph targets.
  * @returns {MorphNode}

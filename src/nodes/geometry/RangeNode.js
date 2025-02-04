@@ -163,6 +163,7 @@ export default RangeNode;
 /**
  * TSL function for creating a range node.
  *
+ * @tsl
  * @function
  * @param {Node<any>} [minNode=float()] - A node defining the lower bound of the range.
  * @param {Node<any>} [maxNode=float()] - A node defining the upper bound of the range.

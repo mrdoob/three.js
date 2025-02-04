@@ -134,6 +134,7 @@ export default StorageArrayElementNode;
 /**
  * TSL function for creating a storage element node.
  *
+ * @tsl
  * @function
  * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
  * @param {Node} indexNode - The index node that defines the element access.

@@ -321,6 +321,7 @@ function generateDefaultNoise( size = 64 ) {
 /**
  * TSL function for creating a denoise effect.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that represents the input of the effect (e.g. AO).
  * @param {Node<float>} depthNode - A node that represents the scene's depth.

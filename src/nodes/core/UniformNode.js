@@ -159,6 +159,7 @@ export default UniformNode;
 /**
  * TSL function for creating a uniform node.
  *
+ * @tsl
  * @function
  * @param {Any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
  * @param {String?} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.

@@ -30,7 +30,8 @@ const tri3 = /*@__PURE__*/ Fn( ( [ p ] ) => {
 /**
  * Generates a noise value from the given position, speed and time parameters.
  *
- * @method
+ * @tsl
+ * @function
  * @param {Node<vec3>} position - The position.
  * @param {Node<float>} speed - The speed.
  * @param {Node<float>} time - The time.

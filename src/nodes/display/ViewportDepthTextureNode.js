@@ -46,6 +46,7 @@ export default ViewportDepthTextureNode;
 /**
  * TSL function for a viewport depth texture node.
  *
+ * @tsl
  * @function
  * @param {Node} [uvNode=screenUV] - The uv node.
  * @param {Node?} [levelNode=null] - The level node.

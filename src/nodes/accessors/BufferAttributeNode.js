@@ -287,6 +287,7 @@ export default BufferAttributeNode;
 /**
  * TSL function for creating a buffer attribute node.
  *
+ * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
  * @param {String?} [type=null] - The buffer type (e.g. `'vec3'`).
@@ -300,6 +301,7 @@ export const bufferAttribute = ( array, type = null, stride = 0, offset = 0 ) =>
  * TSL function for creating a buffer attribute node but with dynamic draw usage.
  * Use this function if attribute data are updated per frame.
  *
+ * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
  * @param {String?} [type=null] - The buffer type (e.g. `'vec3'`).
@@ -312,6 +314,7 @@ export const dynamicBufferAttribute = ( array, type = null, stride = 0, offset =
 /**
  * TSL function for creating a buffer attribute node but with enabled instancing
  *
+ * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
  * @param {String?} [type=null] - The buffer type (e.g. `'vec3'`).
@@ -324,6 +327,7 @@ export const instancedBufferAttribute = ( array, type = null, stride = 0, offset
 /**
  * TSL function for creating a buffer attribute node but with dynamic draw usage and enabled instancing
  *
+ * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
  * @param {String?} [type=null] - The buffer type (e.g. `'vec3'`).

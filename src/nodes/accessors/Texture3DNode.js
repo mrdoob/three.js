@@ -176,6 +176,7 @@ export default Texture3DNode;
 /**
  * TSL function for creating a 3D texture node.
  *
+ * @tsl
  * @function
  * @param {Data3DTexture} value - The 3D texture.
  * @param {Node<vec2|vec3>?} [uvNode=null] - The uv node.

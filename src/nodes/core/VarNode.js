@@ -156,6 +156,7 @@ export default VarNode;
 /**
  * TSL function for creating a var node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
  * @param {String?} name - The name of the variable in the shader.
@@ -166,6 +167,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 /**
  * TSL function for creating a var node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
  * @param {String?} name - The name of the variable in the shader.
@@ -176,6 +178,7 @@ export const Var = ( node, name = null ) => createVar( node, name ).append();
 /**
  * TSL function for creating a const node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node for which a constant should be created.
  * @param {String?} name - The name of the constant in the shader.
@@ -191,6 +194,7 @@ addMethodChaining( 'toConst', Const );
 // Deprecated
 
 /**
+ * @tsl
  * @function
  * @deprecated since r170. Use `Var( node )` or `node.toVar()` instead.
  *

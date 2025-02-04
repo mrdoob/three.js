@@ -49,6 +49,7 @@ export default PointUVNode;
 /**
  * TSL object that represents the uv coordinates of points.
  *
+ * @tsl
  * @type {PointUVNode}
  */
 export const pointUV = /*@__PURE__*/ nodeImmutable( PointUVNode );

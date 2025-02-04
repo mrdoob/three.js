@@ -142,6 +142,7 @@ export default MRTNode;
 /**
  * TSL function for creating a MRT node.
  *
+ * @tsl
  * @function
  * @param {Object<String, Node>} outputNodes - The MRT outputs.
  * @returns {MRTNode}

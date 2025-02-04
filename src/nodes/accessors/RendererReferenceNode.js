@@ -68,6 +68,7 @@ export default RendererReferenceNode;
 /**
  * TSL function for creating a renderer reference node.
  *
+ * @tsl
  * @function
  * @param {String} name - The name of the property the node refers to.
  * @param {String} type - The uniform type that should be used to represent the property value.

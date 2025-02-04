@@ -440,6 +440,7 @@ const _JitterVectors = [
 /**
  * TSL function for creating a TRAA pass node for Temporal Reprojection Anti-Aliasing.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

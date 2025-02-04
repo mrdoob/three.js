@@ -91,6 +91,7 @@ export default BufferNode;
 /**
  * TSL function for creating a buffer node.
  *
+ * @tsl
  * @function
  * @param {Array} value - Array-like buffer data.
  * @param {String} type - The data type of a buffer element.

@@ -356,6 +356,7 @@ export default FXAANode;
 /**
  * TSL function for creating a FXAA node for anti-aliasing via post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {FXAANode}

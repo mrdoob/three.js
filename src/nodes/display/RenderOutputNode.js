@@ -112,6 +112,7 @@ export default RenderOutputNode;
 /**
  * TSL function for creating a posterize node.
  *
+ * @tsl
  * @function
  * @param {Node} color - The color node to process.
  * @param {Number?} [toneMapping=null] - The tone mapping type.

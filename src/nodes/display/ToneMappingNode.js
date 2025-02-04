@@ -100,6 +100,7 @@ export default ToneMappingNode;
 /**
  * TSL function for creating a tone mapping node.
  *
+ * @tsl
  * @function
  * @param {Number} mapping - The tone mapping type.
  * @param {Node<float> | Number} exposure - The tone mapping exposure.
@@ -111,6 +112,7 @@ export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneM
 /**
  * TSL object that represents the global tone mapping exposure of the renderer.
  *
+ * @tsl
  * @type {RendererReferenceNode<vec3>}
  */
 export const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );

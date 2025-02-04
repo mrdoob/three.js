@@ -736,6 +736,7 @@ export default OutlineNode;
 /**
  * TSL function for creating an outline effect around selected objects.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - The camera the scene is rendered with.

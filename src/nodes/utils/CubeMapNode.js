@@ -229,6 +229,7 @@ function mapTextureMapping( texture, mapping ) {
 /**
  * TSL function for creating a cube map node.
  *
+ * @tsl
  * @function
  * @param {Node} envNode - The node representing the environment map.
  * @returns {CubeMapNode}

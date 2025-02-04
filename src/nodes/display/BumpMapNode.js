@@ -108,6 +108,7 @@ export default BumpMapNode;
 /**
  * TSL function for creating a bump map node.
  *
+ * @tsl
  * @function
  * @param {Node<float>} textureNode - Represents the bump map data.
  * @param {Node<float>?} [scaleNode=null] - Controls the intensity of the bump effect.

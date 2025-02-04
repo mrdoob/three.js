@@ -199,6 +199,7 @@ export default ConditionalNode;
 /**
  * TSL function for creating a conditional node.
  *
+ * @tsl
  * @function
  * @param {Node} condNode - The node that defines the condition.
  * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
@@ -212,6 +213,7 @@ addMethodChaining( 'select', select );
 // Deprecated
 
 /**
+ * @tsl
  * @function
  * @deprecated since r168. Use {@link select} instead.
  *

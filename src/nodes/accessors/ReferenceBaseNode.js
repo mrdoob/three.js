@@ -333,6 +333,7 @@ export default ReferenceBaseNode;
 /**
  * TSL function for creating a reference base node.
  *
+ * @tsl
  * @function
  * @param {String} name - The name of the property the node refers to.
  * @param {String} type - The uniform type that should be used to represent the property value.
@@ -345,6 +346,7 @@ export const reference = ( name, type, object ) => nodeObject( new ReferenceBase
  * TSL function for creating a reference base node. Use this function if you want need a reference
  * to an array-like property that should be represented as a uniform buffer.
  *
+ * @tsl
  * @function
  * @param {String} name - The name of the property the node refers to.
  * @param {String} type - The uniform type that should be used to represent the property value.

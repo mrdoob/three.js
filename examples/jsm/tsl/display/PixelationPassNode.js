@@ -319,6 +319,7 @@ class PixelationPassNode extends PassNode {
 /**
  * TSL function for creating a pixelation render pass node for post processing.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

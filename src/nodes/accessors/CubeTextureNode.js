@@ -131,6 +131,7 @@ export default CubeTextureNode;
 /**
  * TSL function for creating a cube texture node.
  *
+ * @tsl
  * @function
  * @param {CubeTexture} value - The cube texture.
  * @param {Node<vec3>?} [uvNode=null] - The uv node.

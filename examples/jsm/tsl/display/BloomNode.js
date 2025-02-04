@@ -505,6 +505,7 @@ class BloomNode extends TempNode {
 /**
  * TSL function for creating a bloom effect.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Number} [strength=1] - The strength of the bloom.

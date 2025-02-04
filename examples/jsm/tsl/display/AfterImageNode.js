@@ -232,6 +232,7 @@ class AfterImageNode extends TempNode {
 /**
  * TSL function for creating an after image node for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.

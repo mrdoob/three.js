@@ -245,6 +245,7 @@ export default ScriptableValueNode;
 /**
  * TSL function for creating a scriptable value node.
  *
+ * @tsl
  * @function
  * @param {Any} [value=null] - The value.
  * @returns {ScriptableValueNode}

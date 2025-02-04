@@ -339,6 +339,7 @@ export default UniformArrayNode;
 /**
  * TSL function for creating an uniform array node.
  *
+ * @tsl
  * @function
  * @param {Array<Any>} values - Array-like data.
  * @param {String?} nodeType - The data type of the array elements.
@@ -347,6 +348,7 @@ export default UniformArrayNode;
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
 /**
+ * @tsl
  * @function
  * @deprecated since r168. Use {@link uniformArray} instead.
  *
