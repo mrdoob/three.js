@@ -1408,16 +1408,7 @@ class Renderer {
 
 			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
-			const quad = this._quad;
-
-			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
-
-				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
-				quad.material.needsUpdate = true;
-
-			}
-
-			this._renderScene( quad, quad.camera, false );
+			this._renderOutput( renderTarget );
 
 		}
 
@@ -1428,6 +1419,32 @@ class Renderer {
 		//
 
 		return renderContext;
+
+	}
+
+	/**
+	 * The output pass performs tone mapping and color space conversion.
+	 *
+	 * @private
+	 * @param {RenderTarget} renderTarget - The current render target.
+	 */
+	_renderOutput( renderTarget ) {
+
+		const quad = this._quad;
+
+		if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+
+			quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			quad.material.needsUpdate = true;
+
+		}
+
+		// a clear operation clears the intermediate renderTarget texture, but should not update the screen canvas.
+
+		const currentAutoClear = this.autoClear;
+		this.autoClear = false;
+		this._renderScene( quad, quad.camera, false );
+		this.autoClear = currentAutoClear;
 
 	}
 
@@ -1900,19 +1917,7 @@ class Renderer {
 
 		if ( renderTarget !== null && this._renderTarget === null ) {
 
-			// If a color space transform or tone mapping is required,
-			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.
-
-			const quad = this._quad;
-
-			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
-
-				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
-				quad.material.needsUpdate = true;
-
-			}
-
-			this._renderScene( quad, quad.camera, false );
+			this._renderOutput( renderTarget );
 
 		}
 
