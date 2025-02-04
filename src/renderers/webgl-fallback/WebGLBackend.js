@@ -438,18 +438,6 @@ class WebGLBackend extends Backend {
 
 		//
 
-		//
-
-		this.initTimestampQuery( renderContext );
-
-		renderContextData.previousContext = this._currentContext;
-		this._currentContext = renderContext;
-
-		this._setFramebuffer( renderContext );
-
-		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
-
-		//
 		if ( renderContext.viewport ) {
 
 			this.updateViewport( renderContext );
@@ -467,6 +455,18 @@ class WebGLBackend extends Backend {
 			state.scissor( x, renderContext.height - height - y, width, height );
 
 		}
+
+		//
+
+		this.initTimestampQuery( renderContext );
+
+		renderContextData.previousContext = this._currentContext;
+		this._currentContext = renderContext;
+
+		this._setFramebuffer( renderContext );
+
+		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
+
 
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
