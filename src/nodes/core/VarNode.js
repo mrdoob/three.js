@@ -23,8 +23,8 @@ class VarNode extends Node {
 	 * Constructs a new variable node.
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
-	 * @param {string?} name - The name of the variable in the shader.
-	 * @param {boolean?} readOnly - The read-only flag.
+	 * @param {?string} name - The name of the variable in the shader.
+	 * @param {?boolean} readOnly - The read-only flag.
 	 */
 	constructor( node, name = null, readOnly = false ) {
 
@@ -41,7 +41,7 @@ class VarNode extends Node {
 		 * The name of the variable in the shader. If no name is defined,
 		 * the node system auto-generates one.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = name;
@@ -159,7 +159,7 @@ export default VarNode;
  * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
- * @param {string?} name - The name of the variable in the shader.
+ * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
@@ -170,7 +170,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
  * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
- * @param {string?} name - The name of the variable in the shader.
+ * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
 export const Var = ( node, name = null ) => createVar( node, name ).append();
@@ -181,7 +181,7 @@ export const Var = ( node, name = null ) => createVar( node, name ).append();
  * @tsl
  * @function
  * @param {Node} node - The node for which a constant should be created.
- * @param {string?} name - The name of the constant in the shader.
+ * @param {?string} name - The name of the constant in the shader.
  * @returns {VarNode}
  */
 export const Const = ( node, name = null ) => createVar( node, name, true ).append();

@@ -9,7 +9,7 @@ class NodeCache {
 	/**
 	 * Constructs a new node cache.
 	 *
-	 * @param {NodeCache?} parent - A reference to a parent cache.
+	 * @param {?NodeCache} parent - A reference to a parent cache.
 	 */
 	constructor( parent = null ) {
 
@@ -31,7 +31,7 @@ class NodeCache {
 		/**
 		 * Reference to a parent node cache.
 		 *
-		 * @type {NodeCache?}
+		 * @type {?NodeCache}
 		 * @default null
 		 */
 		this.parent = parent;
@@ -42,7 +42,7 @@ class NodeCache {
 	 * Returns the data for the given node.
 	 *
 	 * @param {Node} node - The node.
-	 * @return {Object?} The data for the node.
+	 * @return {?Object} The data for the node.
 	 */
 	getData( node ) {
 

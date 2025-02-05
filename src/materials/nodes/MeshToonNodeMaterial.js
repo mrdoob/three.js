@@ -21,7 +21,7 @@ class MeshToonNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh toon node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

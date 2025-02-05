@@ -40,7 +40,7 @@ class Pipelines extends DataMap {
 		 * This reference will be set inside the `Bindings`
 		 * constructor.
 		 *
-		 * @type {Bindings?}
+		 * @type {?Bindings}
 		 * @default null
 		 */
 		this.bindings = null;
@@ -145,7 +145,7 @@ class Pipelines extends DataMap {
 	 * Returns a render pipeline for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {Array<Promise>?} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
+	 * @param {?Array<Promise>} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {RenderPipeline} The render pipeline.
 	 */
 	getForRender( renderObject, promises = null ) {
@@ -238,7 +238,7 @@ class Pipelines extends DataMap {
 	 * Deletes the pipeline for the given render object.
 	 *
 	 * @param {RenderObject} object - The render object.
-	 * @return {Object?} The deleted dictionary.
+	 * @return {?Object} The deleted dictionary.
 	 */
 	delete( object ) {
 
@@ -343,7 +343,7 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageVertex - The programmable stage representing the vertex shader.
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
 	 * @param {string} cacheKey - The cache key.
-	 * @param {Array<Promise>?} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
+	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
 	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {

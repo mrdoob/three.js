@@ -28,7 +28,7 @@ class ConditionalNode extends Node {
 	 *
 	 * @param {Node} condNode - The node that defines the condition.
 	 * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
-	 * @param {Node?} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
+	 * @param {?Node} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
 	 */
 	constructor( condNode, ifNode, elseNode = null ) {
 
@@ -51,7 +51,7 @@ class ConditionalNode extends Node {
 		/**
 		 * The node that is evaluate when the condition ends up `false`.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.elseNode = elseNode;
@@ -203,7 +203,7 @@ export default ConditionalNode;
  * @function
  * @param {Node} condNode - The node that defines the condition.
  * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
- * @param {Node?} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
+ * @param {?Node} [elseNode=null] - The node that is evaluate when the condition ends up `false`.
  * @returns {ConditionalNode}
  */
 export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );

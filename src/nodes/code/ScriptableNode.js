@@ -117,7 +117,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Constructs a new scriptable node.
 	 *
-	 * @param {CodeNode?} [codeNode=null] - The code node.
+	 * @param {?CodeNode} [codeNode=null] - The code node.
 	 * @param {Object} [parameters={}] - The parameters definition.
 	 */
 	constructor( codeNode = null, parameters = {} ) {
@@ -127,7 +127,7 @@ class ScriptableNode extends Node {
 		/**
 		 * The code node.
 		 *
-		 * @type {CodeNode?}
+		 * @type {?CodeNode}
 		 * @default null
 		 */
 		this.codeNode = codeNode;
@@ -444,7 +444,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Refreshes the script node.
 	 *
-	 * @param {string?} [output=null] - An optional output.
+	 * @param {?string} [output=null] - An optional output.
 	 */
 	refresh( output = null ) {
 
@@ -719,7 +719,7 @@ export default ScriptableNode;
  *
  * @tsl
  * @function
- * @param {CodeNode?} [codeNode=null] - The code node.
+ * @param {?CodeNode} [codeNode=null] - The code node.
  * @param {Object} [parameters={}] - The parameters definition.
  * @returns {ScriptableNode}
  */

@@ -20,7 +20,7 @@ class TextureSizeNode extends Node {
 	 * Constructs a new texture size node.
 	 *
 	 * @param {TextureNode} textureNode - A texture node which size should be retrieved.
-	 * @param {Node<int>?} [levelNode=null] - A level node which defines the requested mip.
+	 * @param {?Node<int>} [levelNode=null] - A level node which defines the requested mip.
 	 */
 	constructor( textureNode, levelNode = null ) {
 
@@ -71,7 +71,7 @@ export default TextureSizeNode;
  * @tsl
  * @function
  * @param {TextureNode} textureNode - A texture node which size should be retrieved.
- * @param {Node<int>?} [levelNode=null] - A level node which defines the requested mip.
+ * @param {?Node<int>} [levelNode=null] - A level node which defines the requested mip.
  * @returns {TextureSizeNode}
  */
 export const textureSize = /*@__PURE__*/ nodeProxy( TextureSizeNode );

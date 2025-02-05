@@ -24,7 +24,7 @@ class VaryingNode extends Node {
 	 * Constructs a new varying node.
 	 *
 	 * @param {Node} node - The node for which a varying should be created.
-	 * @param {string?} name - The name of the varying in the shader.
+	 * @param {?string} name - The name of the varying in the shader.
 	 */
 	constructor( node, name = null ) {
 
@@ -41,7 +41,7 @@ class VaryingNode extends Node {
 		 * The name of the varying in the shader. If no name is defined,
 		 * the node system auto-generates one.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = name;
@@ -170,7 +170,7 @@ export default VaryingNode;
  * @tsl
  * @function
  * @param {Node} node - The node for which a varying should be created.
- * @param {string?} name - The name of the varying in the shader.
+ * @param {?string} name - The name of the varying in the shader.
  * @returns {VaryingNode}
  */
 export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );

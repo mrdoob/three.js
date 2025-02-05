@@ -29,7 +29,7 @@ class Object3DNode extends Node {
 	 * Constructs a new object 3D node.
 	 *
 	 * @param {('position'|'viewPosition'|'direction'|'scale'|'worldMatrix')} scope - The node represents a different type of transformation depending on the scope.
-	 * @param {Object3D?} [object3d=null] - The 3D object.
+	 * @param {?Object3D} [object3d=null] - The 3D object.
 	 */
 	constructor( scope, object3d = null ) {
 
@@ -45,7 +45,7 @@ class Object3DNode extends Node {
 		/**
 		 * The 3D object.
 		 *
-		 * @type {Object3D?}
+		 * @type {?Object3D}
 		 * @default null
 		 */
 		this.object3d = object3d;
@@ -191,7 +191,7 @@ export default Object3DNode;
  *
  * @tsl
  * @function
- * @param {Object3D?} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d=null] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
 export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
@@ -201,7 +201,7 @@ export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNo
  *
  * @tsl
  * @function
- * @param {Object3D?} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d=null] - The 3D object.
  * @returns {Object3DNode<mat4>}
  */
 export const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
@@ -211,7 +211,7 @@ export const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3D
  *
  * @tsl
  * @function
- * @param {Object3D?} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d=null] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
 export const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION );
@@ -221,7 +221,7 @@ export const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNod
  *
  * @tsl
  * @function
- * @param {Object3D?} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d=null] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
 export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );
@@ -231,7 +231,7 @@ export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.S
  *
  * @tsl
  * @function
- * @param {Object3D?} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d=null] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
 export const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );

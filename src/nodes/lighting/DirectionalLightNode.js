@@ -17,7 +17,7 @@ class DirectionalLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new directional light node.
 	 *
-	 * @param {DirectionalLight?} [light=null] - The directional light source.
+	 * @param {?DirectionalLight} [light=null] - The directional light source.
 	 */
 	constructor( light = null ) {
 

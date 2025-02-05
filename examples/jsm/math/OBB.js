@@ -322,7 +322,7 @@ class OBB {
 	*
 	* @param {Ray} ray
 	* @param {Vector3} result
-	* @return {Vector3?}
+	* @return {?Vector3}
 	*/
 	intersectRay( ray, result ) {
 

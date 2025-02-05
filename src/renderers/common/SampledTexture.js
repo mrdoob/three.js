@@ -14,7 +14,7 @@ class SampledTexture extends Binding {
 	 * Constructs a new sampled texture.
 	 *
 	 * @param {string} name - The sampled texture's name.
-	 * @param {Texture?} texture - The texture this binding is referring to.
+	 * @param {?Texture} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -30,7 +30,7 @@ class SampledTexture extends Binding {
 		/**
 		 * The texture this binding is referring to.
 		 *
-		 * @type {Texture?}
+		 * @type {?Texture}
 		 */
 		this.texture = texture;
 
@@ -53,7 +53,7 @@ class SampledTexture extends Binding {
 		 * The binding's generation which is an additional version
 		 * qualifier.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.generation = null;
@@ -128,7 +128,7 @@ class SampledArrayTexture extends SampledTexture {
 	 * Constructs a new sampled array texture.
 	 *
 	 * @param {string} name - The sampled array texture's name.
-	 * @param {(DataArrayTexture|CompressedArrayTexture)?} texture - The texture this binding is referring to.
+	 * @param {?(DataArrayTexture|CompressedArrayTexture)} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -159,7 +159,7 @@ class Sampled3DTexture extends SampledTexture {
 	 * Constructs a new sampled 3D texture.
 	 *
 	 * @param {string} name - The sampled 3D texture's name.
-	 * @param {Data3DTexture?} texture - The texture this binding is referring to.
+	 * @param {?Data3DTexture} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -190,7 +190,7 @@ class SampledCubeTexture extends SampledTexture {
 	 * Constructs a new sampled cube texture.
 	 *
 	 * @param {string} name - The sampled cube texture's name.
-	 * @param {(CubeTexture|CompressedCubeTexture)?} texture - The texture this binding is referring to.
+	 * @param {?(CubeTexture|CompressedCubeTexture)} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 

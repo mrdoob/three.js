@@ -7,7 +7,7 @@ import { addMethodChaining } from '../tsl/TSLCore.js';
  *
  * @tsl
  * @function
- * @param {ConditionalNode?} conditional - An optional conditional node. It allows to decide whether the discard should be executed or not.
+ * @param {?ConditionalNode} conditional - An optional conditional node. It allows to decide whether the discard should be executed or not.
  * @return {Node} The `discard` expression.
  */
 export const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) ).append();

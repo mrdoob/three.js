@@ -40,7 +40,7 @@ class BufferAttributeNode extends InputNode {
 	 * Constructs a new buffer attribute node.
 	 *
 	 * @param {BufferAttribute|InterleavedBuffer|TypedArray} value - The attribute data.
-	 * @param {string?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
+	 * @param {?string} [bufferType=null] - The buffer type (e.g. `'vec3'`).
 	 * @param {number} [bufferStride=0] - The buffer stride.
 	 * @param {number} [bufferOffset=0] - The buffer offset.
 	 */
@@ -101,7 +101,7 @@ class BufferAttributeNode extends InputNode {
 		/**
 		 * A reference to the buffer attribute.
 		 *
-		 * @type {BufferAttribute?}
+		 * @type {?BufferAttribute}
 		 * @default null
 		 */
 		this.attribute = null;
@@ -290,7 +290,7 @@ export default BufferAttributeNode;
  * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
- * @param {string?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
  * @returns {BufferAttributeNode}
@@ -304,7 +304,7 @@ export const bufferAttribute = ( array, type = null, stride = 0, offset = 0 ) =>
  * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
- * @param {string?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
  * @returns {BufferAttributeNode}
@@ -317,7 +317,7 @@ export const dynamicBufferAttribute = ( array, type = null, stride = 0, offset =
  * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
- * @param {string?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
  * @returns {BufferAttributeNode}
@@ -330,7 +330,7 @@ export const instancedBufferAttribute = ( array, type = null, stride = 0, offset
  * @tsl
  * @function
  * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
- * @param {string?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
  * @returns {BufferAttributeNode}

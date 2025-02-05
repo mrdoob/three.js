@@ -47,7 +47,7 @@ class ToneMappingNode extends TempNode {
 		/**
 		 * Represents the color to process.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.colorNode = colorNode;

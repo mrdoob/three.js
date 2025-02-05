@@ -16,7 +16,7 @@ class AmbientLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new ambient light node.
 	 *
-	 * @param {AmbientLight?} [light=null] - The ambient light source.
+	 * @param {?AmbientLight} [light=null] - The ambient light source.
 	 */
 	constructor( light = null ) {
 

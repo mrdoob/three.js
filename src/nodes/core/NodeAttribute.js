@@ -11,7 +11,7 @@ class NodeAttribute {
 	 *
 	 * @param {string} name - The name of the attribute.
 	 * @param {string} type - The type of the attribute.
-	 * @param {Node?} node - An optional reference to the node.
+	 * @param {?Node} node - An optional reference to the node.
 	 */
 	constructor( name, type, node = null ) {
 
@@ -41,7 +41,7 @@ class NodeAttribute {
 		/**
 		 * An optional reference to the node.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.node = node;

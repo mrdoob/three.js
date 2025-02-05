@@ -26,8 +26,8 @@ class MathNode extends TempNode {
 	 *
 	 * @param {string} method - The method name.
 	 * @param {Node} aNode - The first input.
-	 * @param {Node?} [bNode=null] - The second input.
-	 * @param {Node?} [cNode=null] - The third input.
+	 * @param {?Node} [bNode=null] - The second input.
+	 * @param {?Node} [cNode=null] - The third input.
 	 */
 	constructor( method, aNode, bNode = null, cNode = null ) {
 
@@ -50,7 +50,7 @@ class MathNode extends TempNode {
 		/**
 		 * The second input.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.bNode = bNode;
@@ -58,7 +58,7 @@ class MathNode extends TempNode {
 		/**
 		 * The third input.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.cNode = cNode;
@@ -569,7 +569,7 @@ export const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
  * @tsl
  * @function
  * @param {Node | number} y - The y parameter.
- * @param {(Node | number)?} x - The x parameter.
+ * @param {?(Node | number)} x - The x parameter.
  * @returns {Node}
  */
 export const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );

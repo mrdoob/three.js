@@ -45,7 +45,7 @@ class Backend {
 		/**
 		 * A reference to the renderer.
 		 *
-		 * @type {Renderer?}
+		 * @type {?Renderer}
 		 * @default null
 		 */
 		this.renderer = null;
@@ -53,7 +53,7 @@ class Backend {
 		/**
 		 * A reference to the canvas element the renderer is drawing to.
 		 *
-		 * @type {(HTMLCanvasElement|OffscreenCanvas)?}
+		 * @type {?(HTMLCanvasElement|OffscreenCanvas)}
 		 * @default null
 		 */
 		this.domElement = null;
@@ -61,7 +61,7 @@ class Backend {
 		/**
 		 * A reference to the timestamp query pool.
    		 *
-   		 * @type {{render: TimestampQueryPool?, compute: TimestampQueryPool?}}
+   		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
 			'render': null,
@@ -344,8 +344,8 @@ class Backend {
 	 * @abstract
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
-	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
 	 * @param {number} [level=0] - The mip level to copy.
 	 */
 	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0*/ ) {}

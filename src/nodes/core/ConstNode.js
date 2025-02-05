@@ -19,7 +19,7 @@ class ConstNode extends InputNode {
 	 * Constructs a new input node.
 	 *
 	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color).
-	 * @param {string?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
 

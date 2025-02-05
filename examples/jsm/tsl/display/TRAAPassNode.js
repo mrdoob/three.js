@@ -90,7 +90,8 @@ class TRAAPassNode extends PassNode {
 		 * The render target that holds the current sample.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
+		 * @default null
 		 */
 		this._sampleRenderTarget = null;
 
@@ -98,7 +99,8 @@ class TRAAPassNode extends PassNode {
 		 * The render target that represents the history of frame data.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
+		 * @default null
 		 */
 		this._historyRenderTarget = null;
 

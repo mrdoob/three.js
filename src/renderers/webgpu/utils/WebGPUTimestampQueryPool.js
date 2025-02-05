@@ -47,7 +47,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * Allocates a pair of queries for a given render context.
 	 *
 	 * @param {Object} renderContext - The render context to allocate queries for.
-	 * @returns {number?} The base offset for the allocated queries, or null if allocation failed.
+	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
 	 */
 	allocateQueriesForContext( renderContext ) {
 

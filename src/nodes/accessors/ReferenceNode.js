@@ -28,7 +28,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {ReferenceNode?} referenceNode - The reference node.
+	 * @param {?ReferenceNode} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -39,7 +39,7 @@ class ReferenceElementNode extends ArrayElementNode {
 		 * Similar to {@link ReferenceNode#reference}, an additional
 		 * property references to the current node.
 		 *
-		 * @type {ReferenceNode?}
+		 * @type {?ReferenceNode}
 		 * @default null
 		 */
 		this.referenceNode = referenceNode;
@@ -100,8 +100,8 @@ class ReferenceNode extends Node {
 	 *
 	 * @param {string} property - The name of the property the node refers to.
 	 * @param {string} uniformType - The uniform type that should be used to represent the property value.
-	 * @param {Object?} [object=null] - The object the property belongs to.
-	 * @param {number?} [count=null] - When the linked property is an array-like, this parameter defines its length.
+	 * @param {?Object} [object=null] - The object the property belongs to.
+	 * @param {?number} [count=null] - When the linked property is an array-like, this parameter defines its length.
 	 */
 	constructor( property, uniformType, object = null, count = null ) {
 
@@ -124,7 +124,7 @@ class ReferenceNode extends Node {
 		/**
 		 * The object the property belongs to.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.object = object;
@@ -132,7 +132,7 @@ class ReferenceNode extends Node {
 		/**
 		 * When the linked property is an array, this parameter defines its length.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.count = count;
@@ -149,7 +149,7 @@ class ReferenceNode extends Node {
 		 * Points to the current referred object. This property exists next to {@link ReferenceNode#object}
 		 * since the final reference might be updated from calling code.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.reference = object;
@@ -173,7 +173,7 @@ class ReferenceNode extends Node {
 		/**
 		 * An optional label of the internal uniform node.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = null;

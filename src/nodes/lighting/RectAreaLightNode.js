@@ -29,7 +29,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new rect area light node.
 	 *
-	 * @param {RectAreaLight?} [light=null] - The rect area light source.
+	 * @param {?RectAreaLight} [light=null] - The rect area light source.
 	 */
 	constructor( light = null ) {
 

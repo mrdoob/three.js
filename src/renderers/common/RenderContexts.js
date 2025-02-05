@@ -34,7 +34,7 @@ class RenderContexts {
 	 *
 	 * @param {Scene} scene - The scene.
 	 * @param {Camera} camera - The camera that is used to render the scene.
-	 * @param {RenderTarget?} [renderTarget=null] - The active render target.
+	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
 	 * @return {RenderContext} The render context.
 	 */
 	get( scene, camera, renderTarget = null ) {
@@ -80,7 +80,7 @@ class RenderContexts {
 	/**
 	 * Returns a render context intended for clear operations.
 	 *
-	 * @param {RenderTarget?} [renderTarget=null] - The active render target.
+	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
 	 * @return {RenderContext} The render context.
 	 */
 	getForClear( renderTarget = null ) {

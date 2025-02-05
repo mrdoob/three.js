@@ -135,7 +135,7 @@ class PMREMGenerator {
 	 * @param {number} [sigma=0] - The blur radius in radians.
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
-	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromSceneAsync
 	 */
@@ -189,7 +189,7 @@ class PMREMGenerator {
 	 * @param {number} [sigma=0] - The blur radius in radians.
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
-	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
 	 * @see fromScene
 	 */
@@ -207,7 +207,7 @@ class PMREMGenerator {
 	 * as this matches best with the 256 x 256 cubemap output.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromEquirectangularAsync
 	 */
@@ -237,7 +237,7 @@ class PMREMGenerator {
 	 * as this matches best with the 256 x 256 cubemap output.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
 	 * @see fromEquirectangular
 	 */
@@ -255,7 +255,7 @@ class PMREMGenerator {
 	 * as this matches best with the 256 x 256 cubemap output.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromCubemapAsync
 	 */
@@ -285,7 +285,7 @@ class PMREMGenerator {
 	 * with the 256 x 256 cubemap output.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
 	 * @see fromCubemap
 	 */

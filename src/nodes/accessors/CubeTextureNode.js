@@ -21,9 +21,9 @@ class CubeTextureNode extends TextureNode {
 	 * Constructs a new cube texture node.
 	 *
 	 * @param {CubeTexture} value - The cube texture.
-	 * @param {Node<vec3>?} [uvNode=null] - The uv node.
-	 * @param {Node<int>?} [levelNode=null] - The level node.
-	 * @param {Node<float>?} [biasNode=null] - The bias node.
+	 * @param {?Node<vec3>} [uvNode=null] - The uv node.
+	 * @param {?Node<int>} [levelNode=null] - The level node.
+	 * @param {?Node<float>} [biasNode=null] - The bias node.
 	 */
 	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
@@ -134,9 +134,9 @@ export default CubeTextureNode;
  * @tsl
  * @function
  * @param {CubeTexture} value - The cube texture.
- * @param {Node<vec3>?} [uvNode=null] - The uv node.
- * @param {Node<int>?} [levelNode=null] - The level node.
- * @param {Node<float>?} [biasNode=null] - The bias node.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {CubeTextureNode}
  */
 export const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode );

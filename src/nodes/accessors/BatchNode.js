@@ -42,7 +42,7 @@ class BatchNode extends Node {
 		/**
 		 * The batching index node.
 		 *
-		 * @type {IndexNode?}
+		 * @type {?IndexNode}
 		 * @default null
 		 */
 		this.batchingIdNode = null;

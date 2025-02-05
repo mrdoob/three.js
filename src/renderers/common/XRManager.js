@@ -105,7 +105,7 @@ class XRManager extends EventDispatcher {
 		 * The current near value of the XR camera.
 		 *
 		 * @private
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this._currentDepthNear = null;
@@ -114,7 +114,7 @@ class XRManager extends EventDispatcher {
 		 * The current far value of the XR camera.
 		 *
 		 * @private
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this._currentDepthFar = null;
@@ -140,7 +140,7 @@ class XRManager extends EventDispatcher {
 		 * The current render target of the renderer.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
 		 * @default null
 		 */
 		this._currentRenderTarget = null;
@@ -150,7 +150,7 @@ class XRManager extends EventDispatcher {
 		 * during an active XR session.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
 		 * @default null
 		 */
 		this._xrRenderTarget = null;
@@ -159,7 +159,7 @@ class XRManager extends EventDispatcher {
 		 * The current animation context.
 		 *
 		 * @private
-		 * @type {Window?}
+		 * @type {?Window}
 		 * @default null
 		 */
 		this._currentAnimationContext = null;
@@ -168,7 +168,7 @@ class XRManager extends EventDispatcher {
 		 * The current animation loop.
 		 *
 		 * @private
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._currentAnimationLoop = null;
@@ -177,7 +177,7 @@ class XRManager extends EventDispatcher {
 		 * The current pixel ratio.
 		 *
 		 * @private
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this._currentPixelRatio = null;
@@ -229,7 +229,7 @@ class XRManager extends EventDispatcher {
 		 * The current XR reference space.
 		 *
 		 * @private
-		 * @type {XRReferenceSpace?}
+		 * @type {?XRReferenceSpace}
 		 * @default null
 		 */
 		this._referenceSpace = null;
@@ -247,7 +247,7 @@ class XRManager extends EventDispatcher {
 		 * A custom reference space defined by the application.
 		 *
 		 * @private
-		 * @type {XRReferenceSpace?}
+		 * @type {?XRReferenceSpace}
 		 * @default null
 		 */
 		this._customReferenceSpace = null;
@@ -274,7 +274,7 @@ class XRManager extends EventDispatcher {
 		 * A reference to the current XR session.
 		 *
 		 * @private
-		 * @type {XRSession?}
+		 * @type {?XRSession}
 		 * @default null
 		 */
 		this._session = null;
@@ -283,7 +283,7 @@ class XRManager extends EventDispatcher {
 		 * A reference to the current XR base layer.
 		 *
 		 * @private
-		 * @type {XRWebGLLayer?}
+		 * @type {?XRWebGLLayer}
 		 * @default null
 		 */
 		this._glBaseLayer = null;
@@ -292,7 +292,7 @@ class XRManager extends EventDispatcher {
 		 * A reference to the current XR binding.
 		 *
 		 * @private
-		 * @type {XRWebGLBinding?}
+		 * @type {?XRWebGLBinding}
 		 * @default null
 		 */
 		this._glBinding = null;
@@ -301,7 +301,7 @@ class XRManager extends EventDispatcher {
 		 * A reference to the current XR projection layer.
 		 *
 		 * @private
-		 * @type {XRProjectionLayer?}
+		 * @type {?XRProjectionLayer}
 		 * @default null
 		 */
 		this._glProjLayer = null;
@@ -310,7 +310,7 @@ class XRManager extends EventDispatcher {
 		 * A reference to the current XR frame.
 		 *
 		 * @private
-		 * @type {XRFrame?}
+		 * @type {?XRFrame}
 		 * @default null
 		 */
 		this._xrFrame = null;
@@ -511,7 +511,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the environment blend mode from the current XR session.
 	 *
-	 * @return {('opaque'|'additive'|'alpha-blend')?} The environment blend mode. Returns `null` when used outside of a XR session.
+	 * @return {?('opaque'|'additive'|'alpha-blend')} The environment blend mode. Returns `null` when used outside of a XR session.
 	 */
 	getEnvironmentBlendMode() {
 
@@ -526,7 +526,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the current XR frame.
 	 *
-	 * @return {XRFrame?} The XR frame. Returns `null` when used outside a XR session.
+	 * @return {?XRFrame} The XR frame. Returns `null` when used outside a XR session.
 	 */
 	getFrame() {
 
@@ -537,7 +537,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the current XR session.
 	 *
-	 * @return {XRSession?} The XR session. Returns `null` when used outside a XR session.
+	 * @return {?XRSession} The XR session. Returns `null` when used outside a XR session.
 	 */
 	getSession() {
 

@@ -27,7 +27,7 @@ class ArrayNode extends TempNode {
 	 *
 	 * @param {string} [nodeType] - The data type of the elements.
 	 * @param {number} [count] - Size of the array.
-	 * @param {Array<Node>?} [values=null] - Array default values.
+	 * @param {?Array<Node>} [values=null] - Array default values.
 	 */
 	constructor( nodeType, count, values = null ) {
 
@@ -36,14 +36,14 @@ class ArrayNode extends TempNode {
 		/**
 		 * Array size.
 		 *
-		 * @type {Array<Node>}
+		 * @type {number}
 		 */
 		this.count = count;
 
 		/**
 		 * Array default values.
 		 *
-		 * @type {Array<Node>}
+		 * @type {?Array<Node>}
 		 */
 		this.values = values;
 
@@ -95,7 +95,7 @@ export default ArrayNode;
  * @function
  * @param {string|Array<Node>} nodeTypeOrValues - A string representing the element type (e.g., 'vec3')
  * or an array containing the default values (e.g., [ vec3() ]).
- * @param {number?} [count] - Size of the array.
+ * @param {?number} [count] - Size of the array.
  * @returns {ArrayNode}
  */
 export const array = ( ...params ) => {

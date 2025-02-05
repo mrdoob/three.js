@@ -39,7 +39,7 @@ class VelocityNode extends TempNode {
 		/**
 		 * The current projection matrix.
 		 *
-		 * @type {Matrix4?}
+		 * @type {?Matrix4}
 		 * @default null
 		 */
 		this.projectionMatrix = null;

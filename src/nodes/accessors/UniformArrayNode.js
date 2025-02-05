@@ -79,7 +79,7 @@ class UniformArrayNode extends BufferNode {
 	 * Constructs a new uniform array node.
 	 *
 	 * @param {Array<any>} value - Array holding the buffer data.
-	 * @param {string?} [elementType=null] - The data type of a buffer element.
+	 * @param {?string} [elementType=null] - The data type of a buffer element.
 	 */
 	constructor( value, elementType = null ) {
 
@@ -342,7 +342,7 @@ export default UniformArrayNode;
  * @tsl
  * @function
  * @param {Array<any>} values - Array-like data.
- * @param {string?} nodeType - The data type of the array elements.
+ * @param {?string} nodeType - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );

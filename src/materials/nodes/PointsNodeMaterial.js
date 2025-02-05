@@ -26,7 +26,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 	/**
 	 * Constructs a new points node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -35,7 +35,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 		/**
 		 * This node property provides an additional way to set the point size.
 		 *
-		 * @type {Node<vec2>?}
+		 * @type {?Node<vec2>}
 		 * @default null
 		 */
 		this.sizeNode = null;

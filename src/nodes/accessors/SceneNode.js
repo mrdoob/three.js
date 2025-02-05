@@ -31,7 +31,7 @@ class SceneNode extends Node {
 	 * Constructs a new scene node.
 	 *
 	 * @param {('backgroundBlurriness'|'backgroundIntensity'|'backgroundRotation')} scope - The scope defines the type of scene property that is accessed.
-	 * @param {Scene?} [scene=null] - A reference to the scene.
+	 * @param {?Scene} [scene=null] - A reference to the scene.
 	 */
 	constructor( scope = SceneNode.BACKGROUND_BLURRINESS, scene = null ) {
 
@@ -47,7 +47,7 @@ class SceneNode extends Node {
 		/**
 		 * A reference to the scene that is going to be accessed.
 		 *
-		 * @type {Scene?}
+		 * @type {?Scene}
 		 * @default null
 		 */
 		this.scene = scene;

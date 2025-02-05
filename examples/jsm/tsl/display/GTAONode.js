@@ -42,7 +42,7 @@ class GTAONode extends TempNode {
 	 * Constructs a new GTAO node.
 	 *
 	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
-	 * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
 	constructor( depthNode, normalNode, camera ) {
@@ -61,7 +61,7 @@ class GTAONode extends TempNode {
 		 * constructor (because MRT is not available), normals can be automatically
 		 * reconstructed from depth values in the shader.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 */
 		this.normalNode = normalNode;
 
@@ -514,7 +514,7 @@ function generateMagicSquare( size ) {
  * @tsl
  * @function
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
- * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+ * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {GTAONode}
  */

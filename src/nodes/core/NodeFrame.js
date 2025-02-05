@@ -69,7 +69,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current renderer.
 		 *
-		 * @type {Renderer?}
+		 * @type {?Renderer}
 		 * @default null
 		 */
 		this.renderer = null;
@@ -77,7 +77,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current material.
 		 *
-		 * @type {Material?}
+		 * @type {?Material}
 		 * @default null
 		 */
 		this.material = null;
@@ -85,7 +85,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current camera.
 		 *
-		 * @type {Camera?}
+		 * @type {?Camera}
 		 * @default null
 		 */
 		this.camera = null;
@@ -93,7 +93,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current 3D object.
 		 *
-		 * @type {Object3D?}
+		 * @type {?Object3D}
 		 * @default null
 		 */
 		this.object = null;
@@ -101,7 +101,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current scene.
 		 *
-		 * @type {Scene?}
+		 * @type {?Scene}
 		 * @default null
 		 */
 		this.scene = null;

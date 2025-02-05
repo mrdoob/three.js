@@ -241,7 +241,7 @@ export function getLengthFromType( type ) {
  *
  * @method
  * @param {any} value - The value.
- * @return {string?} The data type.
+ * @return {?string} The data type.
  */
 export function getValueType( value ) {
 

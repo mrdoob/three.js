@@ -31,8 +31,8 @@ class RTTNode extends TextureNode {
 	 * Constructs a new RTT node.
 	 *
 	 * @param {Node} node - The node to render a texture with.
-	 * @param {number?} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
-	 * @param {number?} [height=null] - The height of the internal render target.
+	 * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+	 * @param {?number} [height=null] - The height of the internal render target.
 	 * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
 	 */
 	constructor( node, width = null, height = null, options = { type: HalfFloatType } ) {
@@ -52,7 +52,7 @@ class RTTNode extends TextureNode {
 		 * The width of the internal render target.
 		 * If not width is applied, the render target is automatically resized.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.width = width;
@@ -60,7 +60,7 @@ class RTTNode extends TextureNode {
 		/**
 		 * The height of the internal render target.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.height = height;
@@ -234,8 +234,8 @@ export default RTTNode;
  * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
- * @param {number?} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
- * @param {number?} [height=null] - The height of the internal render target.
+ * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+ * @param {?number} [height=null] - The height of the internal render target.
  * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
  * @returns {RTTNode}
  */
@@ -247,8 +247,8 @@ export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( n
  * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
- * @param {number?} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
- * @param {number?} [height=null] - The height of the internal render target.
+ * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+ * @param {?number} [height=null] - The height of the internal render target.
  * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
  * @returns {RTTNode}
  */

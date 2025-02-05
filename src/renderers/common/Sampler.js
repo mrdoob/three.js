@@ -12,7 +12,7 @@ class Sampler extends Binding {
 	 * Constructs a new sampler.
 	 *
 	 * @param {string} name - The samplers's name.
-	 * @param {Texture?} texture - The texture this binding is referring to.
+	 * @param {?Texture} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -21,7 +21,7 @@ class Sampler extends Binding {
 		/**
 		 * The texture the sampler is referring to.
 		 *
-		 * @type {Texture?}
+		 * @type {?Texture}
 		 */
 		this.texture = texture;
 

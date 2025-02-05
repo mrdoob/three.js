@@ -82,7 +82,7 @@ class LightsNode extends Node {
 		 * corresponding light node.
 		 *
 		 * @private
-		 * @type {Array<LightingNode>?}
+		 * @type {?Array<LightingNode>}
 		 * @default null
 		 */
 		this._lightNodes = null;
@@ -91,7 +91,7 @@ class LightsNode extends Node {
 		 * A hash for identifying the current light nodes setup.
 		 *
 		 * @private
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this._lightNodesHash = null;

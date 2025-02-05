@@ -156,7 +156,7 @@ class RenderObject {
 		/**
 		 * The draw range of the geometry.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.drawRange = null;
@@ -166,7 +166,7 @@ class RenderObject {
 		 * of the render object. This entails attribute
 		 * definitions on geometry and node level.
 		 *
-		 * @type {Array<BufferAttribute>?}
+		 * @type {?Array<BufferAttribute>}
 		 * @default null
 		 */
 		this.attributes = null;
@@ -185,7 +185,7 @@ class RenderObject {
 		 * multiple materials. This represents a group entry
 		 * from the respective `BufferGeometry`.
 		 *
-		 * @type {{start: number, count: number}?}
+		 * @type {?{start: number, count: number}}
 		 * @default null
 		 */
 		this.group = null;
@@ -194,7 +194,7 @@ class RenderObject {
 		 * An array holding the vertex buffers which can
 		 * be buffer attributes but also interleaved buffers.
 		 *
-		 * @type {Array<BufferAttribute|InterleavedBuffer>?}
+		 * @type {?Array<BufferAttribute|InterleavedBuffer>}
 		 * @default null
 		 */
 		this.vertexBuffers = null;
@@ -202,7 +202,7 @@ class RenderObject {
 		/**
 		 * The parameters for the draw command.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.drawParams = null;
@@ -211,7 +211,7 @@ class RenderObject {
 		 * If this render object is used inside a render bundle,
 		 * this property points to the respective bundle group.
 		 *
-		 * @type {BundleGroup?}
+		 * @type {?BundleGroup}
 		 * @default null
 		 */
 		this.bundle = null;
@@ -247,7 +247,7 @@ class RenderObject {
 		/**
 		 * The node builder state.
 		 *
-		 * @type {NodeBuilderState?}
+		 * @type {?NodeBuilderState}
 		 * @private
 		 * @default null
 		 */
@@ -256,7 +256,7 @@ class RenderObject {
 		/**
 		 * An array of bindings.
 		 *
-		 * @type {Array<BindGroup>?}
+		 * @type {?Array<BindGroup>}
 		 * @private
 		 * @default null
 		 */
@@ -265,7 +265,7 @@ class RenderObject {
 		/**
 		 * Reference to the node material observer.
 		 *
-		 * @type {NodeMaterialObserver?}
+		 * @type {?NodeMaterialObserver}
 		 * @private
 		 * @default null
 		 */
@@ -380,7 +380,7 @@ class RenderObject {
 	 * Returns a binding group by group name of this render object.
 	 *
 	 * @param {string} name - The name of the binding group.
-	 * @return {BindGroup?} The bindings.
+	 * @return {?BindGroup} The bindings.
 	 */
 	getBindingGroup( name ) {
 
@@ -399,7 +399,7 @@ class RenderObject {
 	/**
 	 * Returns the index of the render object's geometry.
 	 *
-	 * @return {BufferAttribute?} The index. Returns `null` for non-indexed geometries.
+	 * @return {?BufferAttribute} The index. Returns `null` for non-indexed geometries.
 	 */
 	getIndex() {
 
@@ -410,7 +410,7 @@ class RenderObject {
 	/**
 	 * Returns the indirect buffer attribute.
 	 *
-	 * @return {BufferAttribute?} The indirect attribute. `null` if no indirect drawing is used.
+	 * @return {?BufferAttribute} The indirect attribute. `null` if no indirect drawing is used.
 	 */
 	getIndirect() {
 

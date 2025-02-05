@@ -19,7 +19,7 @@ class FunctionCallNode extends TempNode {
 	/**
 	 * Constructs a new function call node.
 	 *
-	 * @param {FunctionNode?} functionNode - The function node.
+	 * @param {?FunctionNode} functionNode - The function node.
 	 * @param {Object<string, Node>} [parameters={}] - The parameters for the function call.
 	 */
 	constructor( functionNode = null, parameters = {} ) {
@@ -29,7 +29,7 @@ class FunctionCallNode extends TempNode {
 		/**
 		 * The function node.
 		 *
-		 * @type {FunctionNode}
+		 * @type {?FunctionNode}
 		 * @default null
 		 */
 		this.functionNode = functionNode;

@@ -28,7 +28,7 @@ class UserDataNode extends ReferenceNode {
 	 *
 	 * @param {string} property - The property name that should be referenced by the node.
 	 * @param {string} inputType - The node data type of the reference.
-	 * @param {Object?} [userData=null] - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
+	 * @param {?Object} [userData=null] - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
 	 */
 	constructor( property, inputType, userData = null ) {
 
@@ -38,7 +38,7 @@ class UserDataNode extends ReferenceNode {
 		 * A reference to the `userData` object. If not provided, the `userData`
 		 * property of the 3D object that uses the node material is evaluated.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.userData = userData;
@@ -71,7 +71,7 @@ export default UserDataNode;
  * @function
  * @param {string} name - The property name that should be referenced by the node.
  * @param {string} inputType - The node data type of the reference.
- * @param {Object?} userData - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
+ * @param {?Object} userData - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
  * @returns {UserDataNode}
  */
 export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );

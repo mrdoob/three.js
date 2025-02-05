@@ -25,7 +25,7 @@ class MaterialReferenceNode extends ReferenceNode {
 	 *
 	 * @param {string} property - The name of the property the node refers to.
 	 * @param {string} inputType - The uniform type that should be used to represent the property value.
-	 * @param {Material?} [material=null] - The material the property belongs to. When no material is set,
+	 * @param {?Material} [material=null] - The material the property belongs to. When no material is set,
 	 * the node refers to the material of the current rendered object.
 	 */
 	constructor( property, inputType, material = null ) {
@@ -36,7 +36,7 @@ class MaterialReferenceNode extends ReferenceNode {
 		 * The material the property belongs to. When no material is set,
 		 * the node refers to the material of the current rendered object.
 		 *
-		 * @type {Material?}
+		 * @type {?Material}
 		 * @default null
 		 */
 		this.material = material;
@@ -78,7 +78,7 @@ export default MaterialReferenceNode;
  * @function
  * @param {string} name - The name of the property the node refers to.
  * @param {string} type - The uniform type that should be used to represent the property value.
- * @param {Material?} [material=null] - The material the property belongs to.
+ * @param {?Material} [material=null] - The material the property belongs to.
  * When no material is set, the node refers to the material of the current rendered object.
  * @returns {MaterialReferenceNode}
  */

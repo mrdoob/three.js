@@ -309,7 +309,7 @@ class PassNode extends TempNode {
 		 * A MRT node configuring the MRT settings.
 		 *
 		 * @private
-		 * @type {MRTNode?}
+		 * @type {?MRTNode}
 		 * @default null
 		 */
 		this._mrt = null;

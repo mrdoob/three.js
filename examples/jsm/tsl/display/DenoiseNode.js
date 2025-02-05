@@ -25,7 +25,7 @@ class DenoiseNode extends TempNode {
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect (e.g. AO).
 	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
-	 * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
 	constructor( textureNode, depthNode, normalNode, camera ) {
@@ -51,7 +51,7 @@ class DenoiseNode extends TempNode {
 		 * constructor (because MRT is not available), normals can be automatically
 		 * reconstructed from depth values in the shader.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 */
 		this.normalNode = normalNode;
 
@@ -325,7 +325,7 @@ function generateDefaultNoise( size = 64 ) {
  * @function
  * @param {Node} node - The node that represents the input of the effect (e.g. AO).
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
- * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+ * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {DenoiseNode}
  */

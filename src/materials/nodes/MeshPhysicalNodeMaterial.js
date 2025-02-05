@@ -27,7 +27,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Constructs a new mesh physical node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -50,7 +50,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the clearcoat but modify the existing
 		 * value instead, use {@link materialClearcoat}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.clearcoatNode = null;
@@ -63,7 +63,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the clearcoat roughness but modify the existing
 		 * value instead, use {@link materialClearcoatRoughness}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.clearcoatRoughnessNode = null;
@@ -76,7 +76,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the clearcoat normal but modify the existing
 		 * value instead, use {@link materialClearcoatNormal}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.clearcoatNormalNode = null;
@@ -89,7 +89,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the sheen but modify the existing
 		 * value instead, use {@link materialSheen}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.sheenNode = null;
@@ -102,7 +102,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the sheen roughness but modify the existing
 		 * value instead, use {@link materialSheenRoughness}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.sheenRoughnessNode = null;
@@ -115,7 +115,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the iridescence but modify the existing
 		 * value instead, use {@link materialIridescence}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.iridescenceNode = null;
@@ -128,7 +128,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the iridescence IOR but modify the existing
 		 * value instead, use {@link materialIridescenceIOR}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.iridescenceIORNode = null;
@@ -141,7 +141,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the iridescence thickness but modify the existing
 		 * value instead, use {@link materialIridescenceThickness}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.iridescenceThicknessNode = null;
@@ -154,7 +154,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the specular intensity but modify the existing
 		 * value instead, use {@link materialSpecularIntensity}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.specularIntensityNode = null;
@@ -167,7 +167,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the specular color but modify the existing
 		 * value instead, use {@link materialSpecularColor}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.specularColorNode = null;
@@ -180,7 +180,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the ior but modify the existing
 		 * value instead, use {@link materialIOR}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.iorNode = null;
@@ -193,7 +193,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the transmission but modify the existing
 		 * value instead, use {@link materialTransmission}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.transmissionNode = null;
@@ -206,7 +206,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the thickness but modify the existing
 		 * value instead, use {@link materialThickness}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.thicknessNode = null;
@@ -219,7 +219,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the attenuation distance but modify the existing
 		 * value instead, use {@link materialAttenuationDistance}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.attenuationDistanceNode = null;
@@ -232,7 +232,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the attenuation color but modify the existing
 		 * value instead, use {@link materialAttenuationColor}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.attenuationColorNode = null;
@@ -245,7 +245,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the dispersion but modify the existing
 		 * value instead, use {@link materialDispersion}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.dispersionNode = null;
@@ -258,7 +258,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * If you don't want to overwrite the anisotropy but modify the existing
 		 * value instead, use {@link materialAnisotropy}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.anisotropyNode = null;
