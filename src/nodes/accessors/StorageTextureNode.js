@@ -46,7 +46,7 @@ class StorageTextureNode extends TextureNode {
 	 *
 	 * @param {StorageTexture} value - The storage texture.
 	 * @param {Node<vec2|vec3>} uvNode - The uv node.
-	 * @param {Node?} [storeNode=null] - The value node that should be stored in the texture.
+	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
 	 */
 	constructor( value, uvNode, storeNode = null ) {
 
@@ -55,7 +55,7 @@ class StorageTextureNode extends TextureNode {
 		/**
 		 * The value node that should be stored in the texture.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.storeNode = storeNode;
@@ -204,7 +204,7 @@ export default StorageTextureNode;
  * @function
  * @param {StorageTexture} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
- * @param {Node?} [storeNode=null] - The value node that should be stored in the texture.
+ * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
 export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
@@ -217,7 +217,7 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
  * @function
  * @param {StorageTexture} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
- * @param {Node?} [storeNode=null] - The value node that should be stored in the texture.
+ * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
 export const textureStore = ( value, uvNode, storeNode ) => {

@@ -27,7 +27,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh standard node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -58,7 +58,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		 * If you don't want to overwrite the emissive color but modify the existing
 		 * value instead, use {@link materialEmissive}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.emissiveNode = null;
@@ -71,7 +71,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		 * If you don't want to overwrite the metalness but modify the existing
 		 * value instead, use {@link materialMetalness}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.metalnessNode = null;
@@ -84,7 +84,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		 * If you don't want to overwrite the roughness but modify the existing
 		 * value instead, use {@link materialRoughness}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.roughnessNode = null;
@@ -101,7 +101,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	 * method honors `Scene.environment`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {EnvironmentNode<vec3>?} The environment node.
+	 * @return {?EnvironmentNode<vec3>} The environment node.
 	 */
 	setupEnvironment( builder ) {
 

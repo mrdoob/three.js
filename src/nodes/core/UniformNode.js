@@ -19,7 +19,7 @@ class UniformNode extends InputNode {
 	 * Constructs a new uniform node.
 	 *
 	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
-	 * @param {string?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
 
@@ -162,7 +162,7 @@ export default UniformNode;
  * @tsl
  * @function
  * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {string?} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @param {?string} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.
  * @returns {UniformNode}
  */
 export const uniform = ( arg1, arg2 ) => {

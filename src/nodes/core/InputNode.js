@@ -18,7 +18,7 @@ class InputNode extends Node {
 	 * Constructs a new input node.
 	 *
 	 * @param {any} value - The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
-	 * @param {string?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
 
@@ -43,7 +43,7 @@ class InputNode extends Node {
 		/**
 		 * The precision of the value in the shader.
 		 *
-		 * @type {('low'|'medium'|'high')?}
+		 * @type {?('low'|'medium'|'high')}
 		 * @default null
 		 */
 		this.precision = null;

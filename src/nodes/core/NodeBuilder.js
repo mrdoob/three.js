@@ -87,14 +87,14 @@ class NodeBuilder {
 		/**
 		 * The material of the 3D object.
 		 *
-		 * @type {Material?}
+		 * @type {?Material}
 		 */
 		this.material = ( object && object.material ) || null;
 
 		/**
 		 * The geometry of the 3D object.
 		 *
-		 * @type {BufferGeometry?}
+		 * @type {?BufferGeometry}
 		 */
 		this.geometry = ( object && object.geometry ) || null;
 
@@ -115,7 +115,7 @@ class NodeBuilder {
 		/**
 		 * The scene the 3D object belongs to.
 		 *
-		 * @type {Scene?}
+		 * @type {?Scene}
 		 * @default null
 		 */
 		this.scene = null;
@@ -123,7 +123,7 @@ class NodeBuilder {
 		/**
 		 * The camera the 3D object is rendered with.
 		 *
-		 * @type {Camera?}
+		 * @type {?Camera}
 		 * @default null
 		 */
 		this.camera = null;
@@ -174,7 +174,7 @@ class NodeBuilder {
 		/**
 		 * A reference to a node material observer.
 		 *
-		 * @type {NodeMaterialObserver?}
+		 * @type {?NodeMaterialObserver}
 		 * @default null
 		 */
 		this.observer = null;
@@ -182,7 +182,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current lights node.
 		 *
-		 * @type {LightsNode?}
+		 * @type {?LightsNode}
 		 * @default null
 		 */
 		this.lightsNode = null;
@@ -190,7 +190,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current environment node.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.environmentNode = null;
@@ -198,7 +198,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current fog node.
 		 *
-		 * @type {FogNode?}
+		 * @type {?FogNode}
 		 * @default null
 		 */
 		this.fogNode = null;
@@ -206,28 +206,28 @@ class NodeBuilder {
 		/**
 		 * The current clipping context.
 		 *
-		 * @type {ClippingContext?}
+		 * @type {?ClippingContext}
 		 */
 		this.clippingContext = null;
 
 		/**
 		 * The generated vertex shader.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 */
 		this.vertexShader = null;
 
 		/**
 		 * The generated fragment shader.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 */
 		this.fragmentShader = null;
 
 		/**
 		 * The generated compute shader.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 */
 		this.computeShader = null;
 
@@ -278,7 +278,7 @@ class NodeBuilder {
 		/**
 		 * Reference to the array of bind groups.
 		 *
-		 * @type {Array<BindGroup>?}
+		 * @type {?Array<BindGroup>}
 		 */
 		this.bindGroups = null;
 
@@ -365,7 +365,7 @@ class NodeBuilder {
 		/**
 		 * Reference to the current function node.
 		 *
-		 * @type {FunctionNode?}
+		 * @type {?FunctionNode}
 		 * @default null
 		 */
 		this.currentFunctionNode = null;
@@ -401,14 +401,14 @@ class NodeBuilder {
 		/**
 		 * The current shader stage.
 		 *
-		 * @type {('vertex'|'fragment'|'compute'|'any')?}
+		 * @type {?('vertex'|'fragment'|'compute'|'any')}
 		 */
 		this.shaderStage = null;
 
 		/**
 		 * The current build stage.
 		 *
-		 * @type {('setup'|'analyze'|'generate')?}
+		 * @type {?('setup'|'analyze'|'generate')}
 		 */
 		this.buildStage = null;
 
@@ -1043,7 +1043,7 @@ class NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The texture property name.
 	 * @param {string} uvSnippet - Snippet defining the texture coordinates.
-	 * @param {string?} depthSnippet - Snippet defining the 0-based texture array index to sample.
+	 * @param {?string} depthSnippet - Snippet defining the 0-based texture array index to sample.
 	 * @param {string} levelSnippet - Snippet defining the mip level.
 	 * @return {string} The generated shader string.
 	 */
@@ -1057,7 +1057,7 @@ class NodeBuilder {
 	 * Generates the array declaration string.
 	 *
 	 * @param {string} type - The type.
-	 * @param {number?} [count] - The count.
+	 * @param {?number} [count] - The count.
 	 * @return {string} The generated value as a shader string.
 	 */
 	generateArrayDeclaration( type, count ) {
@@ -1070,8 +1070,8 @@ class NodeBuilder {
 	 * Generates the array shader string for the given type and value.
 	 *
 	 * @param {string} type - The type.
-	 * @param {number?} [count] - The count.
-	 * @param {Array<Node>?} [values=null] - The default values.
+	 * @param {?number} [count] - The count.
+	 * @param {?Array<Node>} [values=null] - The default values.
 	 * @return {string} The generated value as a shader string.
 	 */
 	generateArray( type, count, values = null ) {
@@ -1107,7 +1107,7 @@ class NodeBuilder {
 	 *
 	 * @param {string} type - The type.
 	 * @param {Array<Object>} [membersLayout] - The count.
-	 * @param {Array<Node>?} [values=null] - The default values.
+	 * @param {?Array<Node>} [values=null] - The default values.
 	 * @return {string} The generated value as a shader string.
 	 */
 	generateStruct( type, membersLayout, values = null ) {
@@ -1139,7 +1139,7 @@ class NodeBuilder {
 	 * Generates the shader string for the given type and value.
 	 *
 	 * @param {string} type - The type.
-	 * @param {any?} [value=null] - The value.
+	 * @param {?any} [value=null] - The value.
 	 * @return {string} The generated value as a shader string.
 	 */
 	generateConst( type, value = null ) {
@@ -1558,7 +1558,7 @@ class NodeBuilder {
 	 *
 	 * @param {Node} node - The node to get the data for.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
-	 * @param {NodeCache?} cache - An optional cache.
+	 * @param {?NodeCache} cache - An optional cache.
 	 * @return {Object} The node data.
 	 */
 	getDataFromNode( node, shaderStage = this.shaderStage, cache = null ) {
@@ -1630,7 +1630,7 @@ class NodeBuilder {
 	 *
 	 * @param {OutputStructNode} node - The output struct node.
 	 * @param {Array<Object>} membersLayout - The output struct types.
-	 * @param {string?} [name=null] - The name of the struct.
+	 * @param {?string} [name=null] - The name of the struct.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @return {StructType} The struct type attribute.
 	 */
@@ -1680,7 +1680,7 @@ class NodeBuilder {
 	 * @param {UniformNode} node - The uniform node.
 	 * @param {string} type - The uniform type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
-	 * @param {string?} name - The name of the uniform.
+	 * @param {?string} name - The name of the uniform.
 	 * @return {NodeUniform} The node uniform.
 	 */
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
@@ -1709,7 +1709,7 @@ class NodeBuilder {
 	 * Returns the array length.
 	 *
 	 * @param {Node} node - The node.
-	 * @return {number?} The array length.
+	 * @return {?number} The array length.
 	 */
 	getArrayCount( node ) {
 
@@ -1726,7 +1726,7 @@ class NodeBuilder {
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
-	 * @param {string?} name - The variable's name.
+	 * @param {?string} name - The variable's name.
 	 * @param {string} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {boolean} [readOnly=false] - Whether the variable is read-only or not.
@@ -1825,7 +1825,7 @@ class NodeBuilder {
 	 * Returns an instance of {@link NodeVarying} for the given varying node.
 	 *
 	 * @param {(VaryingNode|PropertyNode)} node - The varying node.
-	 * @param {string?} name - The varying's name.
+	 * @param {?string} name - The varying's name.
 	 * @param {string} [type=node.getNodeType( this )] - The varying's type.
 	 * @return {NodeVar} The node varying.
 	 */
@@ -1948,7 +1948,7 @@ class NodeBuilder {
 	 * Add a inline-code to the current flow.
 	 *
 	 * @param {string} code - The code to add.
-	 * @param {Node?} [node= null] - Optional Node, can help the system understand if the Node is part of a code-block.
+	 * @param {?Node} [node= null] - Optional Node, can help the system understand if the Node is part of a code-block.
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
 	addLineFlowCode( code, node = null ) {
@@ -2134,7 +2134,7 @@ class NodeBuilder {
 	 * Runs the node flow through all the steps of creation, 'setup', 'analyze', 'generate'.
 	 *
 	 * @param {Node} node - The node to execute.
-	 * @param {string?} output - Expected output type. For example 'vec3'.
+	 * @param {?string} output - Expected output type. For example 'vec3'.
 	 * @return {Object}
 	 */
 	flowStagesNode( node, output = null ) {
@@ -2193,7 +2193,7 @@ class NodeBuilder {
 	 * Generates a code flow based on a child Node.
 	 *
 	 * @param {Node} node - The node to execute.
-	 * @param {string?} output - Expected output type. For example 'vec3'.
+	 * @param {?string} output - Expected output type. For example 'vec3'.
 	 * @return {Object} The code flow.
 	 */
 	flowChildNode( node, output = null ) {
@@ -2222,8 +2222,8 @@ class NodeBuilder {
 	 *
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
 	 * @param {Node} node - The node to execute.
-	 * @param {string?} output - Expected output type. For example 'vec3'.
-	 * @param {string?} propertyName - The property name to assign the result.
+	 * @param {?string} output - Expected output type. For example 'vec3'.
+	 * @param {?string} propertyName - The property name to assign the result.
 	 * @return {Object}
 	 */
 	flowNodeFromShaderStage( shaderStage, node, output = null, propertyName = null ) {
@@ -2290,7 +2290,7 @@ class NodeBuilder {
 	 *
 	 * @param {string} type - The variable's type.
 	 * @param {string} name - The variable's name.
-	 * @param {number?} [count=null] - The array length.
+	 * @param {?number} [count=null] - The array length.
 	 * @return {string} The shader string.
 	 */
 	getVar( type, name, count = null ) {
@@ -2378,7 +2378,7 @@ class NodeBuilder {
 	/**
 	 * Sets the current shader stage.
 	 *
-	 * @param {('vertex'|'fragment'|'compute'|'any')?} shaderStage - The shader stage to set.
+	 * @param {?('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage to set.
 	 */
 	setShaderStage( shaderStage ) {
 
@@ -2389,7 +2389,7 @@ class NodeBuilder {
 	/**
 	 * Returns the current shader stage.
 	 *
-	 * @return {('vertex'|'fragment'|'compute'|'any')?} The current shader stage.
+	 * @return {?('vertex'|'fragment'|'compute'|'any')} The current shader stage.
 	 */
 	getShaderStage() {
 
@@ -2400,7 +2400,7 @@ class NodeBuilder {
 	/**
 	 * Sets the current build stage.
 	 *
-	 * @param {('setup'|'analyze'|'generate')?} buildStage - The build stage to set.
+	 * @param {?('setup'|'analyze'|'generate')} buildStage - The build stage to set.
 	 */
 	setBuildStage( buildStage ) {
 
@@ -2411,7 +2411,7 @@ class NodeBuilder {
 	/**
 	 * Returns the current build stage.
 	 *
-	 * @return {('setup'|'analyze'|'generate')?} The current build stage.
+	 * @return {?('setup'|'analyze'|'generate')} The current build stage.
 	 */
 	getBuildStage() {
 

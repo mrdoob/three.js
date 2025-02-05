@@ -56,7 +56,7 @@ class WebGPUTextureUtils {
 		/**
 		 * A reference to the pass utils.
 		 *
-		 * @type {WebGPUTexturePassUtils?}
+		 * @type {?WebGPUTexturePassUtils}
 		 * @default null
 		 */
 		this._passUtils = null;
@@ -80,7 +80,7 @@ class WebGPUTextureUtils {
 		/**
 		 * A default video frame.
 		 *
-		 * @type {VideoFrame?}
+		 * @type {?VideoFrame}
 		 * @default null
 		 */
 		this.defaultVideoFrame = null;
@@ -88,7 +88,7 @@ class WebGPUTextureUtils {
 		/**
 		 * Represents the color attachment of the default framebuffer.
 		 *
-		 * @type {GPUTexture?}
+		 * @type {?GPUTexture}
 		 * @default null
 		 */
 		this.colorBuffer = null;
@@ -1104,7 +1104,7 @@ class WebGPUTextureUtils {
  * Returns the GPU format for the given texture.
  *
  * @param {Texture} texture - The texture.
- * @param {GPUDevice?} [device=null] - The GPU device which is used for feature detection.
+ * @param {?GPUDevice} [device=null] - The GPU device which is used for feature detection.
  * It is not necessary to apply the device for most formats.
  * @return {string} The GPU format.
  */

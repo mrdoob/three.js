@@ -84,7 +84,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	/**
 	 * Constructs a new mesh SSS node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -93,7 +93,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 		/**
 		 * Represents the thickness color.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.thicknessColorNode = null;
@@ -101,35 +101,35 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 		/**
 		 * Represents the distortion factor.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessDistortionNode = float( 0.1 );
 
 		/**
 		 * Represents the thickness ambient factor.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessAmbientNode = float( 0.0 );
 
 		/**
 		 * Represents the thickness attenuation.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessAttenuationNode = float( .1 );
 
 		/**
 		 * Represents the thickness power.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessPowerNode = float( 2.0 );
 
 		/**
 		 * Represents the thickness scale.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessScaleNode = float( 10.0 );
 

@@ -50,7 +50,7 @@ class PointLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new point light node.
 	 *
-	 * @param {PointLight?} [light=null] - The point light source.
+	 * @param {?PointLight} [light=null] - The point light source.
 	 */
 	constructor( light = null ) {
 

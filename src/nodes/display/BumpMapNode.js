@@ -65,7 +65,7 @@ class BumpMapNode extends TempNode {
 	 * Constructs a new bump map node.
 	 *
 	 * @param {Node<float>} textureNode - Represents the bump map data.
-	 * @param {Node<float>?} [scaleNode=null] - Controls the intensity of the bump effect.
+	 * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
 	 */
 	constructor( textureNode, scaleNode = null ) {
 
@@ -81,7 +81,7 @@ class BumpMapNode extends TempNode {
 		/**
 		 * Controls the intensity of the bump effect.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.scaleNode = scaleNode;
@@ -111,7 +111,7 @@ export default BumpMapNode;
  * @tsl
  * @function
  * @param {Node<float>} textureNode - Represents the bump map data.
- * @param {Node<float>?} [scaleNode=null] - Controls the intensity of the bump effect.
+ * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
  * @returns {BumpMapNode}
  */
 export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode );

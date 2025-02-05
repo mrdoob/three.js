@@ -23,7 +23,7 @@ class SpotLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new spot light node.
 	 *
-	 * @param {SpotLight?} [light=null] - The spot light source.
+	 * @param {?SpotLight} [light=null] - The spot light source.
 	 */
 	constructor( light = null ) {
 

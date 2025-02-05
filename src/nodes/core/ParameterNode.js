@@ -18,7 +18,7 @@ class ParameterNode extends PropertyNode {
 	 * Constructs a new parameter node.
 	 *
 	 * @param {string} nodeType - The type of the node.
-	 * @param {string?} [name=null] - The name of the parameter in the shader.
+	 * @param {?string} [name=null] - The name of the parameter in the shader.
 	 */
 	constructor( nodeType, name = null ) {
 
@@ -57,7 +57,7 @@ export default ParameterNode;
  * @tsl
  * @function
  * @param {string} type - The type of the node.
- * @param {string?} name - The name of the parameter in the shader.
+ * @param {?string} name - The name of the parameter in the shader.
  * @returns {ParameterNode}
  */
 export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );

@@ -18,8 +18,8 @@ class FilmNode extends TempNode {
 	 * Constructs a new film node.
 	 *
 	 * @param {Node} inputNode - The node that represents the input of the effect.
-	 * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.
-	 * @param {Node<vec2>?} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
+	 * @param {?Node<float>} [intensityNode=null] - A node that represents the effect's intensity.
+	 * @param {?Node<vec2>} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
 	 */
 	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
@@ -35,14 +35,16 @@ class FilmNode extends TempNode {
 		/**
 		 * A node that represents the effect's intensity.
 		 *
-		 * @type {Node<float>}
+		 * @type {?Node<float>}
+		 * @default null
 		 */
 		this.intensityNode = intensityNode;
 
 		/**
 		 * A node that allows to pass custom (e.g. animated) uv data.
 		 *
-		 * @type {Node<vec2>}
+		 * @type {?Node<vec2>}
+		 * @default null
 		 */
 		this.uvNode = uvNode;
 
@@ -91,8 +93,8 @@ export default FilmNode;
  * @tsl
  * @function
  * @param {Node<vec4>} inputNode - The node that represents the input of the effect.
- * @param {Node<float>?} [intensityNode=null] - A node that represents the effect's intensity.
- * @param {Node<vec2>?} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
+ * @param {?Node<float>} [intensityNode=null] - A node that represents the effect's intensity.
+ * @param {?Node<vec2>} [uvNode=null] - A node that allows to pass custom (e.g. animated) uv data.
  * @returns {FilmNode}
  */
 export const film = /*@__PURE__*/ nodeProxy( FilmNode );

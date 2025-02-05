@@ -366,7 +366,7 @@ ${ flowData.code }
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
-	 * @param {string?} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
 	 * @param {string} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The GLSL snippet.
 	 */
@@ -390,7 +390,7 @@ ${ flowData.code }
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
-	 * @param {string?} depthSnippet -  A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {?string} depthSnippet -  A GLSL snippet that represents the 0-based texture array index to sample.
 	 * @return {string} The GLSL snippet.
 	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
@@ -462,7 +462,7 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} compareSnippet -  A GLSL snippet that represents the reference value.
-	 * @param {string?} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The GLSL snippet.
 	 */
@@ -853,7 +853,7 @@ ${ flowData.code }
 	/**
 	 * Returns the draw index builtin.
 	 *
-	 * @return {string?} The drawIndex shader string. Returns `null` if `WEBGL_multi_draw` isn't supported by the device.
+	 * @return {?string} The drawIndex shader string. Returns `null` if `WEBGL_multi_draw` isn't supported by the device.
 	 */
 	getDrawIndex() {
 
@@ -1285,7 +1285,7 @@ void main() {
 	 * @param {UniformNode} node - The uniform node.
 	 * @param {string} type - The node data type.
 	 * @param {string} shaderStage - The shader stage.
-	 * @param {string?} [name=null] - An optional uniform name.
+	 * @param {?string} [name=null] - An optional uniform name.
 	 * @return {NodeUniform} The node uniform object.
 	 */
 	getUniformFromNode( node, type, shaderStage, name = null ) {

@@ -26,7 +26,7 @@ class AtomicFunctionNode extends TempNode {
 	 * @param {string} method - The signature of the atomic function to construct.
 	 * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
 	 * @param {Node} valueNode - The value that mutates the atomic variable.
-	 * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+	 * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
 	 */
 	constructor( method, pointerNode, valueNode, storeNode = null ) {
 
@@ -56,7 +56,7 @@ class AtomicFunctionNode extends TempNode {
 		/**
 		 * A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.storeNode = storeNode;
@@ -147,7 +147,7 @@ export default AtomicFunctionNode;
  * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 const atomicNode = nodeProxy( AtomicFunctionNode );
@@ -160,7 +160,7 @@ const atomicNode = nodeProxy( AtomicFunctionNode );
  * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicFunc = ( method, pointerNode, valueNode, storeNode = null ) => {
@@ -178,7 +178,7 @@ export const atomicFunc = ( method, pointerNode, valueNode, storeNode = null ) =
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicLoad = ( pointerNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_LOAD, pointerNode, null, storeNode );
@@ -190,7 +190,7 @@ export const atomicLoad = ( pointerNode, storeNode = null ) => atomicFunc( Atomi
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicStore = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_STORE, pointerNode, valueNode, storeNode );
@@ -202,7 +202,7 @@ export const atomicStore = ( pointerNode, valueNode, storeNode = null ) => atomi
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicAdd = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_ADD, pointerNode, valueNode, storeNode );
@@ -214,7 +214,7 @@ export const atomicAdd = ( pointerNode, valueNode, storeNode = null ) => atomicF
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicSub = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_SUB, pointerNode, valueNode, storeNode );
@@ -226,7 +226,7 @@ export const atomicSub = ( pointerNode, valueNode, storeNode = null ) => atomicF
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicMax = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_MAX, pointerNode, valueNode, storeNode );
@@ -238,7 +238,7 @@ export const atomicMax = ( pointerNode, valueNode, storeNode = null ) => atomicF
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicMin = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_MIN, pointerNode, valueNode, storeNode );
@@ -250,7 +250,7 @@ export const atomicMin = ( pointerNode, valueNode, storeNode = null ) => atomicF
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicAnd = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_AND, pointerNode, valueNode, storeNode );
@@ -262,7 +262,7 @@ export const atomicAnd = ( pointerNode, valueNode, storeNode = null ) => atomicF
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicOr = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_OR, pointerNode, valueNode, storeNode );
@@ -274,7 +274,7 @@ export const atomicOr = ( pointerNode, valueNode, storeNode = null ) => atomicFu
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
- * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
+ * @param {?Node} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
  * @returns {AtomicFunctionNode}
  */
 export const atomicXor = ( pointerNode, valueNode, storeNode = null ) => atomicFunc( AtomicFunctionNode.ATOMIC_XOR, pointerNode, valueNode, storeNode );

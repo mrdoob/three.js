@@ -50,7 +50,7 @@ class QuadMesh extends Mesh {
 	/**
 	 * Constructs a new quad mesh.
 	 *
-	 * @param {Material?} [material=null] - The material to render the quad mesh with.
+	 * @param {?Material} [material=null] - The material to render the quad mesh with.
 	 */
 	constructor( material = null ) {
 

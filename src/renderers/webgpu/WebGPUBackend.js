@@ -70,7 +70,7 @@ class WebGPUBackend extends Backend {
 		/**
 		 * A reference to the device.
 		 *
-		 * @type {GPUDevice?}
+		 * @type {?GPUDevice}
 		 * @default null
 		 */
 		this.device = null;
@@ -78,7 +78,7 @@ class WebGPUBackend extends Backend {
 		/**
 		 * A reference to the context.
 		 *
-		 * @type {GPUCanvasContext?}
+		 * @type {?GPUCanvasContext}
 		 * @default null
 		 */
 		this.context = null;
@@ -86,7 +86,7 @@ class WebGPUBackend extends Backend {
 		/**
 		 * A reference to the color attachment of the default framebuffer.
 		 *
-		 * @type {GPUTexture?}
+		 * @type {?GPUTexture}
 		 * @default null
 		 */
 		this.colorBuffer = null;
@@ -94,7 +94,7 @@ class WebGPUBackend extends Backend {
 		/**
 		 * A reference to the default render pass descriptor.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.defaultRenderPassdescriptor = null;
@@ -824,7 +824,7 @@ class WebGPUBackend extends Backend {
 	 * @param {boolean} color - Whether the color buffer should be cleared or not.
 	 * @param {boolean} depth - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} stencil - Whether the stencil buffer should be cleared or not.
-	 * @param {RenderContext?} [renderTargetContext=null] - The render context of the current set render target.
+	 * @param {?RenderContext} [renderTargetContext=null] - The render context of the current set render target.
 	 */
 	clear( color, depth, stencil, renderTargetContext = null ) {
 
@@ -1825,8 +1825,8 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
-	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
 	 * @param {number} [level=0] - The mip level to copy.
 	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {

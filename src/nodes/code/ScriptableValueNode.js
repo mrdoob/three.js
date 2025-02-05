@@ -45,7 +45,7 @@ class ScriptableValueNode extends Node {
 		/**
 		 * If this node represents an input, this property represents the input type.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.inputType = null;
@@ -53,7 +53,7 @@ class ScriptableValueNode extends Node {
 		/**
 		 * If this node represents an output, this property represents the output type.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.outputType = null;

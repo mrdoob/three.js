@@ -19,7 +19,7 @@ class BasicLightMapNode extends LightingNode {
 	/**
 	 * Constructs a new basic light map node.
 	 *
-	 * @param {Node<vec3>?} [lightMapNode=null] - The light map node.
+	 * @param {?Node<vec3>} [lightMapNode=null] - The light map node.
 	 */
 	constructor( lightMapNode = null ) {
 
@@ -28,7 +28,7 @@ class BasicLightMapNode extends LightingNode {
 		/**
 		 * The light map node.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 */
 		this.lightMapNode = lightMapNode;
 

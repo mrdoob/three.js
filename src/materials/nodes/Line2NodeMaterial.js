@@ -33,7 +33,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new node material for wide line rendering.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -77,7 +77,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the lines color.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.lineColorNode = null;
@@ -85,7 +85,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the offset.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.offsetNode = null;
@@ -93,7 +93,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the dash scale.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.dashScaleNode = null;
@@ -101,7 +101,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the dash size.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.dashSizeNode = null;
@@ -109,7 +109,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the gap size.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.gapSizeNode = null;

@@ -288,7 +288,7 @@ class Geometries extends DataMap {
 	 * Returns the indirect buffer attribute of the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {BufferAttribute?} The indirect attribute. `null` if no indirect drawing is used.
+	 * @return {?BufferAttribute} The indirect attribute. `null` if no indirect drawing is used.
 	 */
 	getIndirect( renderObject ) {
 
@@ -301,7 +301,7 @@ class Geometries extends DataMap {
 	 * in a method to return a wireframe index if necessary.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {BufferAttribute?} The index. Returns `null` for non-indexed geometries.
+	 * @return {?BufferAttribute} The index. Returns `null` for non-indexed geometries.
 	 */
 	getIndex( renderObject ) {
 

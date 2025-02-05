@@ -87,7 +87,7 @@ class NodeLibrary {
 	 * Returns a tone mapping node function for a tone mapping technique (constant).
 	 *
 	 * @param {number} toneMapping - The tone mapping.
-	 * @return {Function?} The tone mapping node function. Returns `null` if no node function is found.
+	 * @return {?Function} The tone mapping node function. Returns `null` if no node function is found.
 	 */
 	getToneMappingFunction( toneMapping ) {
 
@@ -99,7 +99,7 @@ class NodeLibrary {
 	 * Returns a node material class definition for a material type.
 	 *
 	 * @param {string} materialType - The material type.
-	 * @return {NodeMaterial.constructor?} The node material class definition. Returns `null` if no node material is found.
+	 * @return {?NodeMaterial.constructor} The node material class definition. Returns `null` if no node material is found.
 	 */
 	getMaterialNodeClass( materialType ) {
 
@@ -123,7 +123,7 @@ class NodeLibrary {
 	 * Returns a light node class definition for a light class definition.
 	 *
 	 * @param {Light.constructor} light - The light class definition.
-	 * @return {AnalyticLightNode.constructor?} The light node class definition. Returns `null` if no light node is found.
+	 * @return {?AnalyticLightNode.constructor} The light node class definition. Returns `null` if no light node is found.
 	 */
 	getLightNodeClass( light ) {
 

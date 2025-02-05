@@ -23,7 +23,7 @@ class AnalyticLightNode extends LightingNode {
 	/**
 	 * Constructs a new analytic light node.
 	 *
-	 * @param {Light?} [light=null] - The light source.
+	 * @param {?Light} [light=null] - The light source.
 	 */
 	constructor( light = null ) {
 
@@ -32,7 +32,7 @@ class AnalyticLightNode extends LightingNode {
 		/**
 		 * The light source.
 		 *
-		 * @type {Light?}
+		 * @type {?Light}
 		 * @default null
 		 */
 		this.light = light;
@@ -56,7 +56,7 @@ class AnalyticLightNode extends LightingNode {
 		 * This property is used to retain a reference to the original value of {@link AnalyticLightNode#colorNode}.
 		 * The final color node is represented by a different node when using shadows.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.baseColorNode = null;
@@ -64,7 +64,7 @@ class AnalyticLightNode extends LightingNode {
 		/**
 		 * Represents the light's shadow.
 		 *
-		 * @type {ShadowNode?}
+		 * @type {?ShadowNode}
    		 * @default null
 		 */
 		this.shadowNode = null;
@@ -72,7 +72,7 @@ class AnalyticLightNode extends LightingNode {
 		/**
 		 * Represents the light's shadow color.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
    		 * @default null
 		 */
 		this.shadowColorNode = null;

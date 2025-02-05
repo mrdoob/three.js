@@ -26,7 +26,7 @@ class RendererReferenceNode extends ReferenceBaseNode {
 	 *
 	 * @param {string} property - The name of the property the node refers to.
 	 * @param {string} inputType - The uniform type that should be used to represent the property value.
-	 * @param {Renderer?} [renderer=null] - The renderer the property belongs to. When no renderer is set,
+	 * @param {?Renderer} [renderer=null] - The renderer the property belongs to. When no renderer is set,
 	 * the node refers to the renderer of the current state.
 	 */
 	constructor( property, inputType, renderer = null ) {
@@ -37,7 +37,7 @@ class RendererReferenceNode extends ReferenceBaseNode {
 		 * The renderer the property belongs to. When no renderer is set,
 		 * the node refers to the renderer of the current state.
 		 *
-		 * @type {Renderer?}
+		 * @type {?Renderer}
 		 * @default null
 		 */
 		this.renderer = renderer;
@@ -72,7 +72,7 @@ export default RendererReferenceNode;
  * @function
  * @param {string} name - The name of the property the node refers to.
  * @param {string} type - The uniform type that should be used to represent the property value.
- * @param {Renderer?} [renderer=null] - The renderer the property belongs to. When no renderer is set,
+ * @param {?Renderer} [renderer=null] - The renderer the property belongs to. When no renderer is set,
  * the node refers to the renderer of the current state.
  * @returns {RendererReferenceNode}
  */

@@ -27,7 +27,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new volume node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -53,7 +53,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 		/**
 		 * A 3D data texture holding the volumetric data.
 		 *
-		 * @type {Data3DTexture?}
+		 * @type {?Data3DTexture}
 		 * @default null
 		 */
 		this.map = null;
@@ -89,7 +89,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 		 * where the rays enters the volume. The last parameter is a color
 		 * that allows the callback to determine the final color.
 		 *
-		 * @type {testNodeCallback?}
+		 * @type {?testNodeCallback}
 		 * @default null
 		 */
 		this.testNode = null;

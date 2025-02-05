@@ -22,7 +22,7 @@ class WebGLCapabilities {
 		/**
 		 * This value holds the cached max anisotropy value.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.maxAnisotropy = null;

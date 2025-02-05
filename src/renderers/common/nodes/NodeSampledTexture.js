@@ -15,7 +15,7 @@ class NodeSampledTexture extends SampledTexture {
 	 * @param {string} name - The textures's name.
 	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {UniformGroupNode} groupNode - The uniform group node.
-	 * @param {string?} [access=null] - The access type.
+	 * @param {?string} [access=null] - The access type.
 	 */
 	constructor( name, textureNode, groupNode, access = null ) {
 
@@ -38,7 +38,7 @@ class NodeSampledTexture extends SampledTexture {
 		/**
 		 * The access type.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.access = access;
@@ -96,7 +96,7 @@ class NodeSampledCubeTexture extends NodeSampledTexture {
 	 * @param {string} name - The textures's name.
 	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {UniformGroupNode} groupNode - The uniform group node.
-	 * @param {string?} [access=null] - The access type.
+	 * @param {?string} [access=null] - The access type.
 	 */
 	constructor( name, textureNode, groupNode, access = null ) {
 
@@ -130,7 +130,7 @@ class NodeSampledTexture3D extends NodeSampledTexture {
 	 * @param {string} name - The textures's name.
 	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {UniformGroupNode} groupNode - The uniform group node.
-	 * @param {string?} [access=null] - The access type.
+	 * @param {?string} [access=null] - The access type.
 	 */
 	constructor( name, textureNode, groupNode, access = null ) {
 

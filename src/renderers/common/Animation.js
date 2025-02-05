@@ -39,7 +39,7 @@ class Animation {
 		/**
 		 * The user-defined animation loop.
 		 *
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._animationLoop = null;
@@ -48,7 +48,7 @@ class Animation {
 		 * The requestId which is returned from the `requestAnimationFrame()` call.
 		 * Can be used to cancel the stop the animation loop.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this._requestId = null;

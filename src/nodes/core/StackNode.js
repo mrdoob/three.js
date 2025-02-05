@@ -19,7 +19,7 @@ class StackNode extends Node {
 	/**
 	 * Constructs a new stack node.
 	 *
-	 * @param {StackNode?} [parent=null] - The parent stack node.
+	 * @param {?StackNode} [parent=null] - The parent stack node.
 	 */
 	constructor( parent = null ) {
 
@@ -35,7 +35,7 @@ class StackNode extends Node {
 		/**
 		 * The output node.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.outputNode = null;
@@ -43,7 +43,7 @@ class StackNode extends Node {
 		/**
 		 * The parent stack node.
 		 *
-		 * @type {StackNode}
+		 * @type {?StackNode}
 		 * @default null
 		 */
 		this.parent = parent;
@@ -199,7 +199,7 @@ export default StackNode;
  *
  * @tsl
  * @function
- * @param {StackNode?} [parent=null] - The parent stack node.
+ * @param {?StackNode} [parent=null] - The parent stack node.
  * @returns {StackNode}
  */
 export const stack = /*@__PURE__*/ nodeProxy( StackNode );

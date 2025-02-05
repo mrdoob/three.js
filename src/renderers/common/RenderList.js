@@ -225,7 +225,7 @@ class RenderList {
 	 * @param {Material} material - The 3D object's material.
 	 * @param {number} groupOrder - The current group order.
 	 * @param {number} z - Th 3D object's depth value (z value in clip space).
-	 * @param {number?} group - {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 * @return {Object} The render item.
 	 */
@@ -278,7 +278,7 @@ class RenderList {
 	 * @param {Material} material - The 3D object's material.
 	 * @param {number} groupOrder - The current group order.
 	 * @param {number} z - Th 3D object's depth value (z value in clip space).
-	 * @param {number?} group - {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 */
 	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
@@ -310,7 +310,7 @@ class RenderList {
 	 * @param {Material} material - The 3D object's material.
 	 * @param {number} groupOrder - The current group order.
 	 * @param {number} z - Th 3D object's depth value (z value in clip space).
-	 * @param {number?} group - {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 */
 	unshift( object, geometry, material, groupOrder, z, group, clippingContext ) {

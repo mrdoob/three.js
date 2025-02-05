@@ -79,8 +79,8 @@ class ArcballControls extends Controls {
 	/**
 	 *
 	 * @param {Camera} camera Virtual camera used in the scene
-	 * @param {HTMLElement?} [domElement=null] Renderer's dom element
-	 * @param {Scene?} [scene=null] The scene to be rendered
+	 * @param {?HTMLElement} [domElement=null] Renderer's dom element
+	 * @param {?Scene} [scene=null] The scene to be rendered
 	 */
 	constructor( camera, domElement = null, scene = null ) {
 
@@ -1250,7 +1250,7 @@ class ArcballControls extends Controls {
 	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
 	 * @param {0|1|2} mouse Mouse button index (0, 1, 2)
 	 * @param {'CTRL'|'SHIFT'|null} key Keyboard modifier
-	 * @returns {STATE?} The FSA state obtained from the operation associated to mouse/keyboard combination
+	 * @returns {?STATE} The FSA state obtained from the operation associated to mouse/keyboard combination
 	 */
 	getOpStateFromAction( mouse, key ) {
 
@@ -2328,7 +2328,7 @@ class ArcballControls extends Controls {
 	 *
 	 * @param {Vector2} cursor Cursor coordinates in NDC
 	 * @param {Camera} camera Virtual camera
-	 * @returns {Vector3?} The point of intersection with the model, if exist, null otherwise
+	 * @returns {?Vector3} The point of intersection with the model, if exist, null otherwise
 	 */
 	unprojectOnObj( cursor, camera ) {
 

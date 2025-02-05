@@ -26,7 +26,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh basic node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -74,7 +74,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	 * to implement the default environment mapping.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 * @return {?BasicEnvironmentNode<vec3>} The environment node.
 	 */
 	setupEnvironment( builder ) {
 
@@ -89,7 +89,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	 * with a special scaling factor for basic materials.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {BasicLightMapNode<vec3>?} The light map node.
+	 * @return {?BasicLightMapNode<vec3>} The light map node.
 	 */
 	setupLightMap( builder ) {
 

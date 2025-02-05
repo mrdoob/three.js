@@ -17,7 +17,7 @@ class ClippingContext {
 	/**
 	 * Constructs a new clipping context.
 	 *
-	 * @param {ClippingContext?} [parentContext=null] - A reference to the parent clipping context.
+	 * @param {?ClippingContext} [parentContext=null] - A reference to the parent clipping context.
 	 */
 	constructor( parentContext = null ) {
 
@@ -32,7 +32,7 @@ class ClippingContext {
 		/**
 		 * Whether the intersection of the clipping planes is used to clip objects, rather than their union.
 		 *
-		 * @type {boolean?}
+		 * @type {?boolean}
 		 * @default null
 		 */
 		this.clipIntersection = null;
@@ -83,7 +83,7 @@ class ClippingContext {
 		/**
 		 * The version of the clipping context's parent context.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 * @readonly
 		 */
 		this.parentVersion = null;

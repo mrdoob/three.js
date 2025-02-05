@@ -223,7 +223,7 @@ class Nodes extends DataMap {
 	 * Deletes the given object from the internal data map
 	 *
 	 * @param {any} object - The object to delete.
-	 * @return {Object?} The deleted dictionary.
+	 * @return {?Object} The deleted dictionary.
 	 */
 	delete( object ) {
 

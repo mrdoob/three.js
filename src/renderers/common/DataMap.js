@@ -46,7 +46,7 @@ class DataMap {
 	 * Deletes the dictionary for the given object.
 	 *
 	 * @param {Object} object - The object.
-	 * @return {Object?} The deleted dictionary.
+	 * @return {?Object} The deleted dictionary.
 	 */
 	delete( object ) {
 

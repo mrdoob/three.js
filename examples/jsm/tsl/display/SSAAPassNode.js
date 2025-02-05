@@ -88,7 +88,8 @@ class SSAAPassNode extends PassNode {
 		 * Reference to the internal render target that holds the current sample.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
+		 * @default null
 		 */
 		this._sampleRenderTarget = null;
 

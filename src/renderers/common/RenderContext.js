@@ -134,7 +134,7 @@ class RenderContext {
 		/**
 		 * The active render target.
 		 *
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
 		 * @default null
 		 */
 		this.renderTarget = null;
@@ -143,7 +143,7 @@ class RenderContext {
 		 * The textures of the active render target.
 		 * `null` when no render target is set.
 		 *
-		 * @type {Array<Texture>?}
+		 * @type {?Array<Texture>}
 		 * @default null
 		 */
 		this.textures = null;
@@ -152,7 +152,7 @@ class RenderContext {
 		 * The depth texture of the active render target.
 		 * `null` when no render target is set.
 		 *
-		 * @type {DepthTexture?}
+		 * @type {?DepthTexture}
 		 * @default null
 		 */
 		this.depthTexture = null;
@@ -209,7 +209,7 @@ class RenderContext {
 		/**
 		 * The current clipping context.
 		 *
-		 * @type {ClippingContext?}
+		 * @type {?ClippingContext}
 		 * @default null
 		 */
 		this.clippingContext = null;

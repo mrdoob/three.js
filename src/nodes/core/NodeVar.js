@@ -12,7 +12,7 @@ class NodeVar {
 	 * @param {string} name - The name of the variable.
 	 * @param {string} type - The type of the variable.
 	 * @param {boolean} [readOnly=false] - The read-only flag.
-	 * @param {number?} [count=null] - The size.
+	 * @param {?number} [count=null] - The size.
 	 */
 	constructor( name, type, readOnly = false, count = null ) {
 
@@ -49,7 +49,7 @@ class NodeVar {
 		/**
 		 * The size.
 		 *
-		 * @type {number?}
+		 * @type {?number}
 		 */
 		this.count = count;
 

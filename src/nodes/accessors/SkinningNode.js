@@ -116,7 +116,7 @@ class SkinningNode extends Node {
 		 * The previous bind matrices as a uniform buffer node.
 		 * Required for computing motion vectors.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.previousBoneMatricesNode = null;

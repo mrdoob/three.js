@@ -106,7 +106,7 @@ class NodeMaterial extends Material {
 		 * material.lightsNode = customLightsNode;
 		 * ```
 		 *
-		 * @type {LightsNode?}
+		 * @type {?LightsNode}
 		 * @default null
 		 */
 		this.lightsNode = null;
@@ -121,7 +121,7 @@ class NodeMaterial extends Material {
 		 * material.envNode = pmremTexture( renderTarget.texture );
 		 * ```
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.envNode = null;
@@ -135,7 +135,7 @@ class NodeMaterial extends Material {
 		 * If you don't want to overwrite the diffuse color but modify the existing
 		 * values instead, use {@link materialAO}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.aoNode = null;
@@ -156,7 +156,7 @@ class NodeMaterial extends Material {
 		 * material.colorNode = materialColor.mul( color( 0xff0000 ) ); // give diffuse colors a red tint
 		 * ```
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.colorNode = null;
@@ -169,7 +169,7 @@ class NodeMaterial extends Material {
 		 * If you don't want to overwrite the normals but modify the existing values instead,
 		 * use {@link materialNormal}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.normalNode = null;
@@ -182,7 +182,7 @@ class NodeMaterial extends Material {
 		 * If you don't want to overwrite the normals but modify the existing
 		 * value instead, use {@link materialOpacity}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.opacityNode = null;
@@ -203,7 +203,7 @@ class NodeMaterial extends Material {
 		 *
 		 * Backdrop computations are part of the lighting so only lit materials can use this property.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.backdropNode = null;
@@ -211,7 +211,7 @@ class NodeMaterial extends Material {
 		/**
 		 * This node allows to modulate the influence of `backdropNode` to the outgoing light.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.backdropAlphaNode = null;
@@ -224,7 +224,7 @@ class NodeMaterial extends Material {
 		 * If you don't want to overwrite the alpha test but modify the existing
 		 * value instead, use {@link materialAlphaTest}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.alphaTestNode = null;
@@ -241,7 +241,7 @@ class NodeMaterial extends Material {
 		 * material.positionNode = positionLocal.add( displace );
 		 * ```
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.positionNode = null;
@@ -265,7 +265,7 @@ class NodeMaterial extends Material {
 		/**
 		 * Allows to overwrite depth values in the fragment shader.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.depthNode = null;
@@ -275,7 +275,7 @@ class NodeMaterial extends Material {
 		 * is by default {@link positionWorld}, the vertex position
 		 * in world space.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.shadowPositionNode = null;
@@ -292,7 +292,7 @@ class NodeMaterial extends Material {
 		 * 	return shadow.mix( color( 0xff0000 ), 1 ); // modify shadow color
 		 * } );
 		 *
-		 * @type {Node<vec4>?}
+		 * @type {?Node<vec4>}
 		 * @default null
 		 */
 		this.receivedShadowNode = null;
@@ -316,7 +316,7 @@ class NodeMaterial extends Material {
 		 * } )();
 		 *  ```
 		 *
-		 * @type {Node<vec4>?}
+		 * @type {?Node<vec4>}
 		 * @default null
 		 */
 		this.castShadowNode = null;
@@ -326,7 +326,7 @@ class NodeMaterial extends Material {
 		 *
 		 * TODO: Explain the differences to `fragmentNode`.
 		 *
-		 * @type {Node<vec4>?}
+		 * @type {?Node<vec4>}
 		 * @default null
 		 */
 		this.outputNode = null;
@@ -337,7 +337,7 @@ class NodeMaterial extends Material {
 		 * can be useful for implementing selective FX features that should only affect
 		 * specific objects.
 		 *
-		 * @type {MRTNode?}
+		 * @type {?MRTNode}
 		 * @default null
 		 */
 		this.mrtNode = null;
@@ -347,7 +347,7 @@ class NodeMaterial extends Material {
 		 * the fragment shader. Assigning a node will replace the built-in material
 		 * logic used in the fragment stage.
 		 *
-		 * @type {Node<vec4>?}
+		 * @type {?Node<vec4>}
 		 * @default null
 		 */
 		this.fragmentNode = null;
@@ -357,7 +357,7 @@ class NodeMaterial extends Material {
 		 * the vertex shader. Assigning a node will replace the built-in material logic
 		 * used in the vertex stage.
 		 *
-		 * @type {Node<vec4>?}
+		 * @type {?Node<vec4>}
 		 * @default null
 		 */
 		this.vertexNode = null;
@@ -1062,7 +1062,7 @@ class NodeMaterial extends Material {
 	/**
 	 * Serializes this material to JSON.
 	 *
-	 * @param {(Object|string)?} meta - The meta information for serialization.
+	 * @param {?(Object|string)} meta - The meta information for serialization.
 	 * @return {Object} The serialized node.
 	 */
 	toJSON( meta ) {

@@ -19,7 +19,7 @@ class TempNode extends Node {
 	/**
 	 * Constructs a temp node.
 	 *
-	 * @param {string?} nodeType - The node type.
+	 * @param {?string} nodeType - The node type.
 	 */
 	constructor( nodeType = null ) {
 

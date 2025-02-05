@@ -52,7 +52,7 @@ class Renderer {
 	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
 	 * to overwrite the default.
-	 * @param {Function?} [parameters.getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
+	 * @param {?Function} [parameters.getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 	 * @param {number} [parameters.colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 */
@@ -304,7 +304,7 @@ class Renderer {
 		 * A reference to a renderer module for managing shader attributes.
 		 *
 		 * @private
-		 * @type {Attributes?}
+		 * @type {?Attributes}
 		 * @default null
 		 */
 		this._attributes = null;
@@ -313,7 +313,7 @@ class Renderer {
 		 * A reference to a renderer module for managing geometries.
 		 *
 		 * @private
-		 * @type {Geometries?}
+		 * @type {?Geometries}
 		 * @default null
 		 */
 		this._geometries = null;
@@ -322,7 +322,7 @@ class Renderer {
 		 * A reference to a renderer module for managing node related logic.
 		 *
 		 * @private
-		 * @type {Nodes?}
+		 * @type {?Nodes}
 		 * @default null
 		 */
 		this._nodes = null;
@@ -331,7 +331,7 @@ class Renderer {
 		 * A reference to a renderer module for managing the internal animation loop.
 		 *
 		 * @private
-		 * @type {Animation?}
+		 * @type {?Animation}
 		 * @default null
 		 */
 		this._animation = null;
@@ -340,7 +340,7 @@ class Renderer {
 		 * A reference to a renderer module for managing shader program bindings.
 		 *
 		 * @private
-		 * @type {Bindings?}
+		 * @type {?Bindings}
 		 * @default null
 		 */
 		this._bindings = null;
@@ -349,7 +349,7 @@ class Renderer {
 		 * A reference to a renderer module for managing render objects.
 		 *
 		 * @private
-		 * @type {RenderObjects?}
+		 * @type {?RenderObjects}
 		 * @default null
 		 */
 		this._objects = null;
@@ -358,7 +358,7 @@ class Renderer {
 		 * A reference to a renderer module for managing render and compute pipelines.
 		 *
 		 * @private
-		 * @type {Pipelines?}
+		 * @type {?Pipelines}
 		 * @default null
 		 */
 		this._pipelines = null;
@@ -367,7 +367,7 @@ class Renderer {
 		 * A reference to a renderer module for managing render bundles.
 		 *
 		 * @private
-		 * @type {RenderBundles?}
+		 * @type {?RenderBundles}
 		 * @default null
 		 */
 		this._bundles = null;
@@ -376,7 +376,7 @@ class Renderer {
 		 * A reference to a renderer module for managing render lists.
 		 *
 		 * @private
-		 * @type {RenderLists?}
+		 * @type {?RenderLists}
 		 * @default null
 		 */
 		this._renderLists = null;
@@ -385,7 +385,7 @@ class Renderer {
 		 * A reference to a renderer module for managing render contexts.
 		 *
 		 * @private
-		 * @type {RenderContexts?}
+		 * @type {?RenderContexts}
 		 * @default null
 		 */
 		this._renderContexts = null;
@@ -394,7 +394,7 @@ class Renderer {
 		 * A reference to a renderer module for managing textures.
 		 *
 		 * @private
-		 * @type {Textures?}
+		 * @type {?Textures}
 		 * @default null
 		 */
 		this._textures = null;
@@ -403,7 +403,7 @@ class Renderer {
 		 * A reference to a renderer module for backgrounds.
 		 *
 		 * @private
-		 * @type {Background?}
+		 * @type {?Background}
 		 * @default null
 		 */
 		this._background = null;
@@ -422,7 +422,7 @@ class Renderer {
 		 * A reference to the current render context.
 		 *
 		 * @private
-		 * @type {RenderContext?}
+		 * @type {?RenderContext}
 		 * @default null
 		 */
 		this._currentRenderContext = null;
@@ -431,7 +431,7 @@ class Renderer {
 		 * A custom sort function for the opaque render list.
 		 *
 		 * @private
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._opaqueSort = null;
@@ -440,7 +440,7 @@ class Renderer {
 		 * A custom sort function for the transparent render list.
 		 *
 		 * @private
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._transparentSort = null;
@@ -449,7 +449,7 @@ class Renderer {
 		 * The framebuffer target.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
 		 * @default null
 		 */
 		this._frameBufferTarget = null;
@@ -486,7 +486,7 @@ class Renderer {
 		 * The current render target.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
 		 * @default null
 		 */
 		this._renderTarget = null;
@@ -513,7 +513,7 @@ class Renderer {
 		 * The MRT setting.
 		 *
 		 * @private
-		 * @type {MRTNode?}
+		 * @type {?MRTNode}
 		 * @default null
 		 */
 		this._mrt = null;
@@ -523,7 +523,7 @@ class Renderer {
 		 * to be rendered.
 		 *
 		 * @private
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._renderObjectFunction = null;
@@ -532,7 +532,7 @@ class Renderer {
 		 * Used to keep track of the current render object function.
 		 *
 		 * @private
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._currentRenderObjectFunction = null;
@@ -541,7 +541,7 @@ class Renderer {
 		 * Used to keep track of the current render bundle.
 		 *
 		 * @private
-		 * @type {RenderBundle?}
+		 * @type {?RenderBundle}
 		 * @default null
 		 */
 		this._currentRenderBundle = null;
@@ -555,7 +555,7 @@ class Renderer {
 		 * and pipeline updates.
 		 *
 		 * @private
-		 * @type {Function?}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this._handleObjectFunction = this._renderObjectDirect;
@@ -602,7 +602,7 @@ class Renderer {
 		 * A reference to the promise which initializes the renderer.
 		 *
 		 * @private
-		 * @type {Promise?}
+		 * @type {?Promise}
 		 * @default null
 		 */
 		this._initPromise = null;
@@ -611,7 +611,7 @@ class Renderer {
 		 * An array of compilation promises which are used in `compileAsync()`.
 		 *
 		 * @private
-		 * @type {Array<Promise>?}
+		 * @type {?Array<Promise>}
 		 * @default null
 		 */
 		this._compilationPromises = null;
@@ -1107,7 +1107,7 @@ class Renderer {
 	 *
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera to render the scene with.
-	 * @return {Promise?} A Promise that resolve when the scene has been rendered.
+	 * @return {?Promise} A Promise that resolve when the scene has been rendered.
 	 * Only returned when the renderer has not been initialized.
 	 */
 	render( scene, camera ) {
@@ -1130,7 +1130,7 @@ class Renderer {
 	 * pass and not inline to achieve more correct results.
 	 *
 	 * @private
-	 * @return {RenderTarget?} The render target. The method returns `null` if no output conversion should be applied.
+	 * @return {?RenderTarget} The render target. The method returns `null` if no output conversion should be applied.
 	 */
 	_getFrameBufferTarget() {
 
@@ -2071,7 +2071,7 @@ class Renderer {
 	 * target the default framebuffer (meaning the canvas) anymore but a custom framebuffer.
 	 * Use `null` as the first argument to reset the state.
 	 *
-	 * @param {RenderTarget?} renderTarget - The render target to set.
+	 * @param {?RenderTarget} renderTarget - The render target to set.
 	 * @param {number} [activeCubeFace=0] - The active cube face.
 	 * @param {number} [activeMipmapLevel=0] - The active mipmap level.
 	 */
@@ -2086,7 +2086,7 @@ class Renderer {
 	/**
 	 * Returns the current render target.
 	 *
-	 * @return {RenderTarget?} The render target. Returns `null` if no render target is set.
+	 * @return {?RenderTarget} The render target. Returns `null` if no render target is set.
 	 */
 	getRenderTarget() {
 
@@ -2103,10 +2103,10 @@ class Renderer {
 	 * @param {Camera} camera - The camera the object should be rendered with.
 	 * @param {BufferGeometry} geometry - The object's geometry.
 	 * @param {Material} material - The object's material.
-	 * @param {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {string?} [passId=null] - An optional ID for identifying the pass.
+	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 
 	/**
@@ -2118,7 +2118,7 @@ class Renderer {
 	 *
 	 * Use `null` as the first argument to reset the state.
 	 *
-	 * @param {renderObjectFunction?} renderObjectFunction - The render object function.
+	 * @param {?renderObjectFunction} renderObjectFunction - The render object function.
 	 */
 	setRenderObjectFunction( renderObjectFunction ) {
 
@@ -2129,7 +2129,7 @@ class Renderer {
 	/**
 	 * Returns the current render object function.
 	 *
-	 * @return {Function?} The current render object function. Returns `null` if no function is set.
+	 * @return {?Function} The current render object function. Returns `null` if no function is set.
 	 */
 	getRenderObjectFunction() {
 
@@ -2142,7 +2142,7 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @return {Promise?} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
+	 * @return {?Promise} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes ) {
 
@@ -2648,7 +2648,7 @@ class Renderer {
 	 * @param {Camera} camera - The camera the render list should be rendered with.
 	 * @param {Scene} scene - The scene the render list belongs to.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {string?} [passId=null] - An optional ID for identifying the pass.
+	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
 
@@ -2671,10 +2671,10 @@ class Renderer {
 	 * @param {Camera} camera - The camera the object should be rendered with.
 	 * @param {BufferGeometry} geometry - The object's geometry.
 	 * @param {Material} material - The object's material.
-	 * @param {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {string?} [passId=null] - An optional ID for identifying the pass.
+	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
@@ -2781,9 +2781,9 @@ class Renderer {
 	 * @param {Scene} scene - The scene the 3D object belongs to.
 	 * @param {Camera} camera - The camera the object should be rendered with.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {{start: number, count: number}?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {string?} [passId=null] - An optional ID for identifying the pass.
+	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
@@ -2836,9 +2836,9 @@ class Renderer {
 	 * @param {Scene} scene - The scene the 3D object belongs to.
 	 * @param {Camera} camera - The camera the object should be rendered with.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {{start: number, count: number}?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {string?} [passId=null] - An optional ID for identifying the pass.
+	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 

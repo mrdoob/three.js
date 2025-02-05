@@ -154,7 +154,7 @@ class BloomNode extends TempNode {
 		 * The material for the composite pass.
 		 *
 		 * @private
-		 * @type {NodeMaterial?}
+		 * @type {?NodeMaterial}
 		 */
 		this._compositeMaterial = null;
 
@@ -162,7 +162,7 @@ class BloomNode extends TempNode {
 		 * The material for the luminance pass.
 		 *
 		 * @private
-		 * @type {NodeMaterial?}
+		 * @type {?NodeMaterial}
 		 */
 		this._highPassFilterMaterial = null;
 

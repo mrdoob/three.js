@@ -414,7 +414,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The clear coat radiance.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.clearcoatRadiance = null;
@@ -422,7 +422,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The clear coat specular direct.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.clearcoatSpecularDirect = null;
@@ -430,7 +430,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The clear coat specular indirect.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.clearcoatSpecularIndirect = null;
@@ -438,7 +438,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The sheen specular direct.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.sheenSpecularDirect = null;
@@ -446,7 +446,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The sheen specular indirect.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.sheenSpecularIndirect = null;
@@ -454,7 +454,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The iridescence Fresnel.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.iridescenceFresnel = null;
@@ -462,7 +462,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The iridescence F0.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.iridescenceF0 = null;

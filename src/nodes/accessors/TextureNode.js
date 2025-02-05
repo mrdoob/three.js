@@ -26,9 +26,9 @@ class TextureNode extends UniformNode {
 	 * Constructs a new texture node.
 	 *
 	 * @param {Texture} value - The texture.
-	 * @param {Node<vec2|vec3>?} [uvNode=null] - The uv node.
-	 * @param {Node<int>?} [levelNode=null] - The level node.
-	 * @param {Node<float>?} [biasNode=null] - The bias node.
+	 * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+	 * @param {?Node<int>} [levelNode=null] - The level node.
+	 * @param {?Node<float>} [biasNode=null] - The bias node.
 	 */
 	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
@@ -46,7 +46,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * Represents the texture coordinates.
 		 *
-		 * @type {Node<vec2|vec3>?}
+		 * @type {?Node<vec2|vec3>}
 		 * @default null
 		 */
 		this.uvNode = uvNode;
@@ -54,7 +54,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * Represents the mip level that should be selected.
 		 *
-		 * @type {Node<int>?}
+		 * @type {?Node<int>}
 		 * @default null
 		 */
 		this.levelNode = levelNode;
@@ -62,7 +62,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * Represents the bias to be applied during level-of-detail computation.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.biasNode = biasNode;
@@ -70,7 +70,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * Represents a reference value a texture sample is compared to.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.compareNode = null;
@@ -78,7 +78,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * When using texture arrays, the depth node defines the layer to select.
 		 *
-		 * @type {Node<int>?}
+		 * @type {?Node<int>}
 		 * @default null
 		 */
 		this.depthNode = null;
@@ -86,7 +86,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * When defined, a texture is sampled using explicit gradients.
 		 *
-		 * @type {Array<Node<vec2>>?}
+		 * @type {?Array<Node<vec2>>}
 		 * @default null
 		 */
 		this.gradNode = null;
@@ -122,7 +122,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * The reference node.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.referenceNode = null;
@@ -139,7 +139,7 @@ class TextureNode extends UniformNode {
 		 * The uniform node that represents the uv transformation matrix.
 		 *
 		 * @private
-		 * @type {UniformNode<mat3>?}
+		 * @type {?UniformNode<mat3>}
 		 */
 		this._matrixUniform = null;
 
@@ -382,11 +382,11 @@ class TextureNode extends UniformNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {string} textureProperty - The texture property.
 	 * @param {string} uvSnippet - The uv snippet.
-	 * @param {string?} levelSnippet - The level snippet.
-	 * @param {string?} biasSnippet - The bias snippet.
-	 * @param {string?} depthSnippet - The depth snippet.
-	 * @param {string?} compareSnippet - The compare snippet.
-	 * @param {Array<string>?} gradSnippet - The grad snippet.
+	 * @param {?string} levelSnippet - The level snippet.
+	 * @param {?string} biasSnippet - The bias snippet.
+	 * @param {?string} depthSnippet - The depth snippet.
+	 * @param {?string} compareSnippet - The compare snippet.
+	 * @param {?Array<string>} gradSnippet - The grad snippet.
 	 * @return {string} The generated code snippet.
 	 */
 	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
@@ -725,9 +725,9 @@ export default TextureNode;
  * @tsl
  * @function
  * @param {Texture} value - The texture.
- * @param {Node<vec2|vec3>?} [uvNode=null] - The uv node.
- * @param {Node<int>?} [levelNode=null] - The level node.
- * @param {Node<float>?} [biasNode=null] - The bias node.
+ * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
 export const texture = /*@__PURE__*/ nodeProxy( TextureNode );
@@ -738,9 +738,9 @@ export const texture = /*@__PURE__*/ nodeProxy( TextureNode );
  * @tsl
  * @function
  * @param {Texture} value - The texture.
- * @param {Node<vec2|vec3>?} [uvNode=null] - The uv node.
- * @param {Node<int>?} [levelNode=null] - The level node.
- * @param {Node<float>?} [biasNode=null] - The bias node.
+ * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );

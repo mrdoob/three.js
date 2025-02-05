@@ -20,7 +20,7 @@ class LightProbeNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new light probe node.
 	 *
-	 * @param {LightProbe?} [light=null] - The light probe.
+	 * @param {?LightProbe} [light=null] - The light probe.
 	 */
 	constructor( light = null ) {
 

@@ -48,7 +48,7 @@ class StorageBufferNode extends BufferNode {
 	 * Constructs a new storage buffer node.
 	 *
 	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
-	 * @param {(string|Struct)?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
+	 * @param {?(string|Struct)} [bufferType=null] - The buffer type (e.g. `'vec3'`).
 	 * @param {number} [bufferCount=0] - The buffer count.
 	 */
 	constructor( value, bufferType = null, bufferCount = 0 ) {
@@ -86,7 +86,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * The buffer struct type.
 		 *
-		 * @type {structTypeNode?}
+		 * @type {?structTypeNode}
 		 * @default null
 		 */
 		this.structTypeNode = structTypeNode;
@@ -119,7 +119,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal buffer attribute node.
 		 *
-		 * @type {BufferAttributeNode?}
+		 * @type {?BufferAttributeNode}
 		 * @default null
 		 */
 		this._attribute = null;
@@ -127,7 +127,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal varying node.
 		 *
-		 * @type {VaryingNode?}
+		 * @type {?VaryingNode}
 		 * @default null
 		 */
 		this._varying = null;
@@ -365,7 +365,7 @@ export default StorageBufferNode;
  * @tsl
  * @function
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
- * @param {(string|Struct)?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {?(string|Struct)} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
  */
@@ -377,7 +377,7 @@ export const storage = ( value, type = null, count = 0 ) => nodeObject( new Stor
  * @deprecated since r171. Use `storage().setPBO( true )` instead.
  *
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
- * @param {string?} type - The buffer type (e.g. `'vec3'`).
+ * @param {?string} type - The buffer type (e.g. `'vec3'`).
  * @param {number} count - The buffer count.
  * @returns {StorageBufferNode}
  */

@@ -20,7 +20,7 @@ class LineBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new line basic node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

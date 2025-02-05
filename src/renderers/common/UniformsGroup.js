@@ -32,7 +32,7 @@ class UniformsGroup extends UniformBuffer {
 		 * An array with the raw uniform values.
 		 *
 		 * @private
-		 * @type {Array<number>?}
+		 * @type {?Array<number>}
 		 * @default null
 		 */
 		this._values = null;

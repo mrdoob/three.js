@@ -14,7 +14,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Constructs a new node object loader.
 	 *
-	 * @param {LoadingManager?} manager - A reference to a loading manager.
+	 * @param {?LoadingManager} manager - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -38,7 +38,7 @@ class NodeObjectLoader extends ObjectLoader {
 		 * A reference to hold the `nodes` JSON property.
 		 *
 		 * @private
-		 * @type {Object?}
+		 * @type {?Object}
 		 */
 		this._nodesJSON = null;
 

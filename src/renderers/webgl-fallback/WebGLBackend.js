@@ -53,7 +53,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding shader attribute-related
 		 * utility functions.
 		 *
-		 * @type {WebGLAttributeUtils?}
+		 * @type {?WebGLAttributeUtils}
 		 * @default null
 		 */
 		this.attributeUtils = null;
@@ -62,7 +62,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding extension-related
 		 * utility functions.
 		 *
-		 * @type {WebGLExtensions?}
+		 * @type {?WebGLExtensions}
 		 * @default null
 		 */
 		this.extensions = null;
@@ -71,7 +71,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding capability-related
 		 * utility functions.
 		 *
-		 * @type {WebGLCapabilities?}
+		 * @type {?WebGLCapabilities}
 		 * @default null
 		 */
 		this.capabilities = null;
@@ -80,7 +80,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding texture-related
 		 * utility functions.
 		 *
-		 * @type {WebGLTextureUtils?}
+		 * @type {?WebGLTextureUtils}
 		 * @default null
 		 */
 		this.textureUtils = null;
@@ -89,7 +89,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding renderer-related
 		 * utility functions.
 		 *
-		 * @type {WebGLBufferRenderer?}
+		 * @type {?WebGLBufferRenderer}
 		 * @default null
 		 */
 		this.bufferRenderer = null;
@@ -97,7 +97,7 @@ class WebGLBackend extends Backend {
 		/**
 		 * A reference to the rendering context.
 		 *
-		 * @type {WebGL2RenderingContext?}
+		 * @type {?WebGL2RenderingContext}
 		 * @default null
 		 */
 		this.gl = null;
@@ -106,7 +106,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding state-related
 		 * utility functions.
 		 *
-		 * @type {WebGLState?}
+		 * @type {?WebGLState}
 		 * @default null
 		 */
 		this.state = null;
@@ -115,7 +115,7 @@ class WebGLBackend extends Backend {
 		 * A reference to a backend module holding common
 		 * utility functions.
 		 *
-		 * @type {WebGLUtils?}
+		 * @type {?WebGLUtils}
 		 * @default null
 		 */
 		this.utils = null;
@@ -147,7 +147,7 @@ class WebGLBackend extends Backend {
 		 * A reference to the `EXT_disjoint_timer_query_webgl2` extension. `null` if the
 		 * device does not support the extension.
 		 *
-		 * @type {EXTDisjointTimerQueryWebGL2?}
+		 * @type {?EXTDisjointTimerQueryWebGL2}
 		 * @default null
 		 */
 		this.disjoint = null;
@@ -156,7 +156,7 @@ class WebGLBackend extends Backend {
 		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
 		* device does not support the extension.
 		*
-		* @type {KHRParallelShaderCompile?}
+		* @type {?KHRParallelShaderCompile}
 		* @default null
 		*/
 		this.parallel = null;
@@ -337,7 +337,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {XRRenderTarget} renderTarget - The XR render target.
 	 * @param {WebGLTexture} colorTexture - A native color texture.
-	 * @param {WebGLTexture?} [depthTexture=null] - A native depth texture.
+	 * @param {?WebGLTexture} [depthTexture=null] - A native depth texture.
 	 */
 	setXRRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
 
@@ -712,7 +712,7 @@ class WebGLBackend extends Backend {
 	 * @param {boolean} color - Whether the color buffer should be cleared or not.
 	 * @param {boolean} depth - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} stencil - Whether the stencil buffer should be cleared or not.
-	 * @param {Object?} [descriptor=null] - The render context of the current set render target.
+	 * @param {?Object} [descriptor=null] - The render context of the current set render target.
 	 * @param {boolean} [setFrameBuffer=true] - TODO.
 	 */
 	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
@@ -1848,8 +1848,8 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
-	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
+	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
 	 * @param {number} [level=0] - The mip level to copy.
 	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
@@ -2135,7 +2135,7 @@ class WebGLBackend extends Backend {
 	 * Computes the VAO key for the given index and attributes.
 	 *
 	 * @private
-	 * @param {BufferAttribute?} index - The index. `null` for non-indexed geometries.
+	 * @param {?BufferAttribute} index - The index. `null` for non-indexed geometries.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
 	 * @return {string} The VAO key.
 	 */
@@ -2167,7 +2167,7 @@ class WebGLBackend extends Backend {
 	 * Creates a VAO from the index and attributes.
 	 *
 	 * @private
-	 * @param {BufferAttribute?} index - The index. `null` for non-indexed geometries.
+	 * @param {?BufferAttribute} index - The index. `null` for non-indexed geometries.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
 	 * @return {Object} The VAO data.
 	 */

@@ -22,7 +22,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Constructs a new node.
 	 *
-	 * @param {string?} nodeType - The node type.
+	 * @param {?string} nodeType - The node type.
 	 */
 	constructor( nodeType = null ) {
 
@@ -31,7 +31,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The node type. This represents the result type of the node (e.g. `float` or `vec3`).
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.nodeType = nodeType;
@@ -102,7 +102,7 @@ class Node extends EventDispatcher {
 		 * The cache key of this node.
 		 *
 		 * @private
-		 * @type {number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this._cacheKey = null;
@@ -473,7 +473,7 @@ class Node extends EventDispatcher {
 	 * The output node must be returned in the `return` statement.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node?} The output node.
+	 * @return {?Node} The output node.
 	 */
 	setup( builder ) {
 
@@ -528,8 +528,8 @@ class Node extends EventDispatcher {
 	 * This state builds the output node and returns the resulting shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string?} output - Can be used to define the output type.
-	 * @return {string?} The generated shader string.
+	 * @param {?string} output - Can be used to define the output type.
+	 * @return {?string} The generated shader string.
 	 */
 	generate( builder, output ) {
 
@@ -549,7 +549,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 * @return {?boolean} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	updateBefore( /*frame*/ ) {
 
@@ -563,7 +563,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 * @return {?boolean} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	updateAfter( /*frame*/ ) {
 
@@ -577,7 +577,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 * @return {?boolean} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	update( /*frame*/ ) {
 
@@ -590,8 +590,8 @@ class Node extends EventDispatcher {
 	 * on the current build stage (setup, analyze or generate).
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string?} output - Can be used to define the output type.
-	 * @return {string?} When this method is executed in the setup or analyze stage, `null` is returned. In the generate stage, the generated shader string.
+	 * @param {?string} output - Can be used to define the output type.
+	 * @return {?string} When this method is executed in the setup or analyze stage, `null` is returned. In the generate stage, the generated shader string.
 	 */
 	build( builder, output = null ) {
 
@@ -807,7 +807,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Serializes the node into the three.js JSON Object/Scene format.
 	 *
-	 * @param {Object?} meta - An optional JSON object that already holds serialized data from other scene objects.
+	 * @param {?Object} meta - An optional JSON object that already holds serialized data from other scene objects.
 	 * @return {Object} The serialized node.
 	 */
 	toJSON( meta ) {

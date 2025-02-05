@@ -25,7 +25,7 @@ class PropertyNode extends Node {
 	 * Constructs a new property node.
 	 *
 	 * @param {string} nodeType - The type of the node.
-	 * @param {string?} [name=null] - The name of the property in the shader.
+	 * @param {?string} [name=null] - The name of the property in the shader.
 	 * @param {boolean} [varying=false] - Whether this property is a varying or not.
 	 */
 	constructor( nodeType, name = null, varying = false ) {
@@ -36,7 +36,7 @@ class PropertyNode extends Node {
 		 * The name of the property in the shader. If no name is defined,
 		 * the node system auto-generates one.
 		 *
-		 * @type {string?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = name;
@@ -107,7 +107,7 @@ export default PropertyNode;
  * @tsl
  * @function
  * @param {string} type - The type of the node.
- * @param {string?} [name=null] - The name of the property in the shader.
+ * @param {?string} [name=null] - The name of the property in the shader.
  * @returns {PropertyNode}
  */
 export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
@@ -118,7 +118,7 @@ export const property = ( type, name ) => nodeObject( new PropertyNode( type, na
  * @tsl
  * @function
  * @param {string} type - The type of the node.
- * @param {string?} [name=null] - The name of the varying in the shader.
+ * @param {?string} [name=null] - The name of the varying in the shader.
  * @returns {PropertyNode}
  */
 export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );

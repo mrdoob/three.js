@@ -18,7 +18,7 @@ class AttributeNode extends Node {
 	 * Constructs a new attribute node.
 	 *
 	 * @param {string} attributeName - The name of the attribute.
-	 * @param {string?} nodeType - The node type.
+	 * @param {?string} nodeType - The node type.
 	 */
 	constructor( attributeName, nodeType = null ) {
 
@@ -161,7 +161,7 @@ export default AttributeNode;
  * @tsl
  * @function
  * @param {string} name - The name of the attribute.
- * @param {string?} nodeType - The node type.
+ * @param {?string} nodeType - The node type.
  * @returns {AttributeNode}
  */
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
