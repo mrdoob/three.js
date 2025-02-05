@@ -179,12 +179,15 @@
 
 						if ( color.a == 0.0 ) discard;
 
-						// calculate the final point in the camera space
-						vec4 camFinalPoint = vInstanceToViewMatrix * vec4( p, 1.0 );
-						camFinalPoint /= camFinalPoint.w;
+						// calculate the final point in the ndc coords
+						vec4 ndc = projectionMatrix * vInstanceToViewMatrix * vec4( p, 1.0 );
+						ndc /= ndc.w;
 
-						// set gl_FragDepth to the distance of the of the final point mapped from [near, far] to [0, 1]
-						gl_FragDepth = length( camFinalPoint.xyz - camRayOrigin ) / length( camRayEnd - camRayOrigin );
+						// map the ndc coordinate to depth
+						// https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth
+						float far = gl_DepthRange.far;
+						float near = gl_DepthRange.near;
+						gl_FragDepth = ( ( ( far - near ) * ndc.z ) + near + far ) / 2.0;
 
 					}
 				`;
