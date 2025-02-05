@@ -62,14 +62,14 @@
 					uniform vec3 cameraPos;
 
 					out vec4 vScreenPosition;
-					out mat4 vInstanceMatrix;
+					out mat4 vInstanceToViewMatrix;
 
 					void main() {
 						vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4( position, 1.0 );
 
 						gl_Position = projectionMatrix * mvPosition;
 						vScreenPosition = vec4( gl_Position.xy, 0.0, gl_Position.w );
-						vInstanceMatrix = modelViewMatrix * instanceMatrix;
+						vInstanceToViewMatrix = modelViewMatrix * instanceMatrix;
 					}
 				`;
 
@@ -82,7 +82,7 @@
 					uniform mat4 projectionMatrix;
 
 					in vec4 vScreenPosition;
-					in mat4 vInstanceMatrix;
+					in mat4 vInstanceToViewMatrix;
 
 					out vec4 color;
 
@@ -128,9 +128,10 @@
 
 					void main() {
 
-						mat4 invProjectionMatrix = inverse( projectionMatrix );
-						mat4 invInstanceMatrix = inverse( vInstanceMatrix );
+						// perform w divide in the fragment shader to avoid interpolation artifacts
 						vec2 screenUv = vScreenPosition.xy / vScreenPosition.w;
+						mat4 invProjectionMatrix = inverse( projectionMatrix );
+						mat4 invInstanceToViewMatrix = inverse( vInstanceToViewMatrix );
 						
 						// get camera ray
 						vec4 temp;
@@ -143,8 +144,8 @@
 						
 						// get local ray
 						vec3 instRayOrigin, instRayDirection, instRayEnd;
-						instRayOrigin = ( invInstanceMatrix * vec4( camRayOrigin, 1.0 ) ).xyz;
-						instRayEnd = ( invInstanceMatrix * vec4( camRayEnd, 1.0 ) ).xyz;
+						instRayOrigin = ( invInstanceToViewMatrix * vec4( camRayOrigin, 1.0 ) ).xyz;
+						instRayEnd = ( invInstanceToViewMatrix * vec4( camRayEnd, 1.0 ) ).xyz;
 						instRayDirection = normalize( instRayEnd - instRayOrigin );
 
 						// calculate the start of the ray at the box edge
@@ -179,7 +180,7 @@
 						if ( color.a == 0.0 ) discard;
 
 						// calculate the final point in the camera space
-						vec4 camFinalPoint = vInstanceMatrix * vec4( p, 1.0 );
+						vec4 camFinalPoint = vInstanceToViewMatrix * vec4( p, 1.0 );
 						camFinalPoint /= camFinalPoint.w;
 
 						// set gl_FragDepth to the distance of the of the final point mapped from [near, far] to [0, 1]
