@@ -513,7 +513,7 @@ class Renderer {
 		 * The current output render target.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
 		 * @default null
 		 */
 		this._outputRenderTarget = null;
