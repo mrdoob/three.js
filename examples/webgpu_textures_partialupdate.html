@@ -27,8 +27,12 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, clock, dataTexture, diffuseMap;
+			let rt, rtQuad, rtScene, rtCamera;
+			let gui, params;
 
 			let last = 0;
 			const position = new THREE.Vector2();
@@ -36,8 +40,12 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
+				params = { randomSize: false };
+				gui = new GUI();
+				gui.add( params, 'randomSize' ).name( 'Random Size' );
+			
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.z = 2;
 
@@ -65,11 +73,18 @@
 				const data = new Uint8Array( width * height * 4 );
 				dataTexture = new THREE.DataTexture( data, width, height );
 
+				rt = new THREE.RenderTarget( 16, 16, { depth: false, stencil: false } );
+				rtQuad = new FullScreenQuad( new THREE.MeshBasicMaterial( { map: dataTexture } ) );
+				rtScene = new THREE.Scene();
+				rtScene.add( rtQuad._mesh );
+				rtCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
 				//
 
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				await renderer.init();
 
 				document.body.appendChild( renderer.domElement );
 
@@ -102,19 +117,34 @@
 
 					last = elapsedTime;
 
-					position.x = ( 32 * THREE.MathUtils.randInt( 1, 16 ) ) - 32;
-					position.y = ( 32 * THREE.MathUtils.randInt( 1, 16 ) ) - 32;
-
 					// generate new color data
 					updateDataTexture( dataTexture );
 
 					// perform copy from src to dest texture to a random position
 
-					renderer.copyTextureToTexture( dataTexture, diffuseMap, null, position );
+					const size = Math.pow( 2, params.randomSize ? THREE.MathUtils.randInt( 2, 7 ) : 4 );
+					position.x = ( size * THREE.MathUtils.randInt( 1, 16 * 32 / size ) ) - size;
+					position.y = ( size * THREE.MathUtils.randInt( 1, 16 * 32 / size ) ) - size;
 
+					if ( params.randomSize ) {
+
+						rt.setSize( size, size );
+						renderer.setRenderTarget( rt );
+						renderer.render( rtScene, rtCamera );
+						renderer.setRenderTarget( null );
+
+						renderer.copyTextureToTexture( rt.texture, diffuseMap, null, position );
+			
+					} else {
+
+						renderer.copyTextureToTexture( dataTexture, diffuseMap, null, position );
+			
+					}
+			
 				}
 
 			}
+
 
 			function updateDataTexture( texture ) {
 
