@@ -101,7 +101,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	 * method honors `Scene.environment`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Environment?Node<vec3>} The environment node.
+	 * @return {?EnvironmentNode<vec3>} The environment node.
 	 */
 	setupEnvironment( builder ) {
 
