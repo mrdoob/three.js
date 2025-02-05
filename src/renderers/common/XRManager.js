@@ -137,15 +137,6 @@ class XRManager extends EventDispatcher {
 		this._controllerInputSources = [];
 
 		/**
-		 * The current render target of the renderer.
-		 *
-		 * @private
-		 * @type {RenderTarget?}
-		 * @default null
-		 */
-		this._currentRenderTarget = null;
-
-		/**
 		 * The XR render target that represents the rendering destination
 		 * during an active XR session.
 		 *
@@ -567,8 +558,6 @@ class XRManager extends EventDispatcher {
 
 			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
-			this._currentRenderTarget = renderer.getRenderTarget();
-
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
 			session.addEventListener( 'selectend', this._onSessionEvent );
@@ -972,7 +961,7 @@ function onSessionEnd() {
 	// restore framebuffer/rendering state
 
 	renderer.backend.setXRTarget( null );
-	renderer.setRenderTarget( this._currentRenderTarget );
+	renderer.setOutputTarget( null );
 
 	this._session = null;
 	this._xrRenderTarget = null;
@@ -1159,7 +1148,7 @@ function onAnimationFrame( time, frame ) {
 
 		}
 
-		renderer.setRenderTarget( this._xrRenderTarget );
+		renderer.setOutputTarget( this._xrRenderTarget );
 
 	}
 
