@@ -510,13 +510,13 @@ class Renderer {
 		this._activeMipmapLevel = 0;
 
 		/**
-		 * The current output target.
+		 * The current output render target.
 		 *
 		 * @private
 		 * @type {RenderTarget?}
 		 * @default null
 		 */
-		this._outputTarget = null;
+		this._outputRenderTarget = null;
 
 		/**
 		 * The MRT setting.
@@ -1215,7 +1215,7 @@ class Renderer {
 
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
-		const outputRenderTarget = this._renderTarget || this._outputTarget;
+		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -2028,7 +2028,7 @@ class Renderer {
 	 */
 	get currentToneMapping() {
 
-		return this.isOutputTarget ? this.toneMapping : NoToneMapping;
+		return this.isOutputScreen ? this.toneMapping : NoToneMapping;
 
 	}
 
@@ -2040,18 +2040,18 @@ class Renderer {
 	 */
 	get currentColorSpace() {
 
-		return this.isOutputTarget ? this.outputColorSpace : LinearSRGBColorSpace;
+		return this.isOutputScreen ? this.outputColorSpace : LinearSRGBColorSpace;
 
 	}
 
 	/**
 	 * Returns `true` if the rendering settings are set to screen output.
 	 *
-	 * @returns {boolean} True if the current render target is the output target, otherwise false.
+	 * @returns {boolean} True if the current render target is the output target or `null`, otherwise false.
 	 */
-	get isOutputTarget() {
+	get isOutputScreen() {
 
-		return this._renderTarget === this._outputTarget;
+		return this._renderTarget === this._outputRenderTarget;
 
 	}
 
@@ -2115,24 +2115,24 @@ class Renderer {
 	}
 
 	/**
-	 * Sets the output target for the renderer.
+	 * Sets the output render target for the renderer.
 	 *
 	 * @param {Object} renderTarget - The render target to set as the output target.
 	 */
-	setOutputTarget( renderTarget ) {
+	setOutputRenderTarget( renderTarget ) {
 
-		this._outputTarget = renderTarget;
+		this._outputRenderTarget = renderTarget;
 
 	}
 
 	/**
 	 * Returns the current output target.
 	 *
-	 * @return {RenderTarget?} The current output target. Returns `null` if no output target is set.
+	 * @return {?RenderTarget} The current output render target. Returns `null` if no output target is set.
 	 */
-	getOutputTarget() {
+	getOutputRenderTarget() {
 
-		return this._outputTarget;
+		return this._outputRenderTarget;
 
 	}
 

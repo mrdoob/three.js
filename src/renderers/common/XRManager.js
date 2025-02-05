@@ -961,7 +961,7 @@ function onSessionEnd() {
 	// restore framebuffer/rendering state
 
 	renderer.backend.setXRTarget( null );
-	renderer.setOutputTarget( null );
+	renderer.setOutputRenderTarget( null );
 
 	this._session = null;
 	this._xrRenderTarget = null;
@@ -1148,7 +1148,7 @@ function onAnimationFrame( time, frame ) {
 
 		}
 
-		renderer.setOutputTarget( this._xrRenderTarget );
+		renderer.setOutputRenderTarget( this._xrRenderTarget );
 
 	}
 

@@ -565,16 +565,16 @@ class PassNode extends TempNode {
 		let camera;
 		let pixelRatio;
 
-		const outputTarget = renderer.getOutputTarget();
+		const outputRenderTarget = renderer.getOutputRenderTarget();
 
-		if ( outputTarget && outputTarget.isXRRenderTarget === true ) {
+		if ( outputRenderTarget && outputRenderTarget.isXRRenderTarget === true ) {
 
 			pixelRatio = 1;
 			camera = renderer.xr.getCamera();
 
 			renderer.xr.updateCamera( camera );
 
-			_size.set( outputTarget.width, outputTarget.height );
+			_size.set( outputRenderTarget.width, outputRenderTarget.height );
 
 		} else {
 
