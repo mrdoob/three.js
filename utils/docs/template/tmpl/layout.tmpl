@@ -61,75 +61,8 @@
     </div>
 </div>
 
-<script> 
-
-const expandButton = document.getElementById( 'expandButton' );
-const clearSearchButton = document.getElementById( 'clearSearchButton' );
-const fliterInput = document.getElementById( 'filterInput' );
-
-// Functionality for hamburger button (on small devices)
-
-expandButton.onclick = function ( event ) {
-
-    event.preventDefault();
-    panel.classList.toggle( 'open' );
-
-};
-
-panelScrim.onclick = function ( event ) {
-
-    event.preventDefault();
-    panel.classList.toggle( 'open' );
-
-};
-
-// Functionality for search/filter input field
-
-fliterInput.onfocus = function () {
-
-    panel.classList.add( 'searchFocused' );
-
-};
-
-fliterInput.onblur = function () {
-
-    if ( fliterInput.value === '' ) {
-
-        panel.classList.remove( 'searchFocused' );
-
-    }
-
-};
-
-filterInput.oninput = function () {
-
-    const term = filterInput.value.trim();
-    search( term ); // defined in search.js
-
-};
-
-clearSearchButton.onclick = function () {
-
-    fliterInput.value = '';
-    fliterInput.focus();
-    hideSearch(); // defined in search.js
-
-};
-
-prettyPrint();
-
-console.log( [
-            '    __     __',
-            ' __/ __\\  / __\\__   ____   _____   _____',
-            '/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
-            '\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
-            '/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
-            '\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
-            '                                         / __/  /  \\__  \\',
-            '                                         \\/____/\\/_____/'
-].join( '\n' ) );
-</script>
 <script src="scripts/linenumber.js"></script>
+<script src="scripts/page.js"></script>
 <script src="scripts/search.js"></script>
 </body>
 </html>

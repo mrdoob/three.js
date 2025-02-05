@@ -362,7 +362,7 @@ function buildClassNav( items, itemsSeen, linktoFn ) {
 
 				}
 
-				itemNav += `<li>${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
+				itemNav += `<li data-name="${item.longname}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
 
 				itemsSeen[ item.longname ] = true;
 
@@ -429,7 +429,7 @@ function buildGlobalsNav( globals, seen ) {
 
 			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) && Array.isArray( tags ) && tags[ 0 ].title === 'tsl' ) {
 
-				tslNav += `<li>${linkto( longname, name )}</li>`;
+				tslNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
 
 				seen[ longname ] = true;
 
@@ -447,7 +447,7 @@ function buildGlobalsNav( globals, seen ) {
 
 			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				globalNav += `<li>${linkto( longname, name )}</li>`;
+				globalNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
 
 			}
 
