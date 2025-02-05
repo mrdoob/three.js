@@ -1907,11 +1907,10 @@ class Renderer {
 			renderContext.renderTarget = renderTarget;
 			renderContext.depth = renderTarget.depthBuffer;
 			renderContext.stencil = renderTarget.stencilBuffer;
+			// #30329
+			renderContext.clearColorValue = this._clearColor;
 
 		}
-
-		// #30329
-		renderContext.clearColorValue = this._clearColor;
 
 		this.backend.clear( color, depth, stencil, renderContext );
 
