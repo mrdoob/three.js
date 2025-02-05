@@ -70,7 +70,7 @@ class RemapNode extends Node {
 		 * Whether the node value should be clamped before
 		 * remapping it to the target range.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.doClamp = true;

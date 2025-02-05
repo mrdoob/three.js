@@ -29,7 +29,7 @@ class MaterialNode extends Node {
 	/**
 	 * Constructs a new material node.
 	 *
-	 * @param {String} scope - The scope defines what kind of material property is referred by the node.
+	 * @param {string} scope - The scope defines what kind of material property is referred by the node.
 	 */
 	constructor( scope ) {
 
@@ -38,7 +38,7 @@ class MaterialNode extends Node {
 		/**
 		 * The scope defines what material property is referred by the node.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.scope = scope;
 
@@ -47,8 +47,8 @@ class MaterialNode extends Node {
 	/**
 	 * Returns a cached reference node for the given property and type.
 	 *
-	 * @param {String} property - The name of the material property.
-	 * @param {String} type - The uniform type of the property.
+	 * @param {string} property - The name of the material property.
+	 * @param {string} type - The uniform type of the property.
 	 * @return {MaterialReferenceNode} A material reference node representing the property access.
 	 */
 	getCache( property, type ) {
@@ -70,7 +70,7 @@ class MaterialNode extends Node {
 	/**
 	 * Returns a float-typed material reference node for the given property name.
 	 *
-	 * @param {String} property - The name of the material property.
+	 * @param {string} property - The name of the material property.
 	 * @return {MaterialReferenceNode<float>} A material reference node representing the property access.
 	 */
 	getFloat( property ) {
@@ -82,7 +82,7 @@ class MaterialNode extends Node {
 	/**
 	 * Returns a color-typed material reference node for the given property name.
 	 *
-	 * @param {String} property - The name of the material property.
+	 * @param {string} property - The name of the material property.
 	 * @return {MaterialReferenceNode<color>} A material reference node representing the property access.
 	 */
 	getColor( property ) {
@@ -94,7 +94,7 @@ class MaterialNode extends Node {
 	/**
 	 * Returns a texture-typed material reference node for the given property name.
 	 *
-	 * @param {String} property - The name of the material property.
+	 * @param {string} property - The name of the material property.
 	 * @return {MaterialReferenceNode} A material reference node representing the property access.
 	 */
 	getTexture( property ) {

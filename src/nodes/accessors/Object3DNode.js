@@ -53,7 +53,7 @@ class Object3DNode extends Node {
 		/**
 		 * Overwritten since this type of node is updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'object'
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
@@ -71,7 +71,7 @@ class Object3DNode extends Node {
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType() {
 
@@ -140,7 +140,7 @@ class Object3DNode extends Node {
 	 * node also depends on the selected scope.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The generated code snippet.
+	 * @return {string} The generated code snippet.
 	 */
 	generate( builder ) {
 

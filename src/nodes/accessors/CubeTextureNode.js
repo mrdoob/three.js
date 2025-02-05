@@ -32,7 +32,7 @@ class CubeTextureNode extends TextureNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -44,7 +44,7 @@ class CubeTextureNode extends TextureNode {
 	 * Overwrites the default implementation to return a fixed value `'cubeTexture'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
 
@@ -83,7 +83,7 @@ class CubeTextureNode extends TextureNode {
 	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
 	 * for cube textures. The uv transformation matrix is not applied to cube textures.
 	 *
-	 * @param {Boolean} value - The update toggle.
+	 * @param {boolean} value - The update toggle.
 	 */
 	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
 
@@ -116,7 +116,7 @@ class CubeTextureNode extends TextureNode {
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} cubeUV - The uv node to generate code for.
-	 * @return {String} The generated code snippet.
+	 * @return {string} The generated code snippet.
 	 */
 	generateUV( builder, cubeUV ) {
 

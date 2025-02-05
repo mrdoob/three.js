@@ -154,7 +154,7 @@ class ScriptableNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -165,7 +165,7 @@ class ScriptableNode extends Node {
 	/**
 	 * The source code of the scriptable node.
 	 *
-	 * @type {String}
+	 * @type {string}
 	 */
 	get source() {
 
@@ -176,7 +176,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Sets the reference of a local script variable.
 	 *
-	 * @param {String} name - The variable name.
+	 * @param {string} name - The variable name.
 	 * @param {Object} value - The reference to set.
 	 * @return {Resources} The resource map
 	 */
@@ -189,7 +189,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Gets the value of a local script variable.
 	 *
-	 * @param {String} name - The variable name.
+	 * @param {string} name - The variable name.
 	 * @return {Object} The value.
 	 */
 	getLocal( name ) {
@@ -210,7 +210,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Returns an input from the layout with the given id/name.
 	 *
-	 * @param {String} id - The id/name of the input.
+	 * @param {string} id - The id/name of the input.
 	 * @return {Object} The element entry.
 	 */
 	getInputLayout( id ) {
@@ -230,7 +230,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Returns an output from the layout with the given id/name.
 	 *
-	 * @param {String} id - The id/name of the output.
+	 * @param {string} id - The id/name of the output.
 	 * @return {Object} The element entry.
 	 */
 	getOutputLayout( id ) {
@@ -250,7 +250,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Defines a script output for the given name and value.
 	 *
-	 * @param {String} name - The name of the output.
+	 * @param {string} name - The name of the output.
 	 * @param {Node} value - The node value.
 	 * @return {ScriptableNode} A reference to this node.
 	 */
@@ -275,7 +275,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Returns a script output for the given name.
 	 *
-	 * @param {String} name - The name of the output.
+	 * @param {string} name - The name of the output.
 	 * @return {ScriptableValueNode} The node value.
 	 */
 	getOutput( name ) {
@@ -287,7 +287,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Returns a parameter for the given name
 	 *
-	 * @param {String} name - The name of the parameter.
+	 * @param {string} name - The name of the parameter.
 	 * @return {ScriptableValueNode} The node value.
 	 */
 	getParameter( name ) {
@@ -299,8 +299,8 @@ class ScriptableNode extends Node {
 	/**
 	 * Sets a value for the given parameter name.
 	 *
-	 * @param {String} name - The parameter name.
-	 * @param {Any} value - The parameter value.
+	 * @param {string} name - The parameter name.
+	 * @param {any} value - The parameter value.
 	 * @return {ScriptableNode} A reference to this node.
 	 */
 	setParameter( name, value ) {
@@ -351,7 +351,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Deletes a parameter from the script.
 	 *
-	 * @param {String} name - The parameter to remove.
+	 * @param {string} name - The parameter to remove.
 	 * @return {ScriptableNode} A reference to this node.
 	 */
 	deleteParameter( name ) {
@@ -392,9 +392,9 @@ class ScriptableNode extends Node {
 	/**
 	 * Calls a function from the script.
 	 *
-	 * @param {String} name - The function name.
-	 * @param {...Any} params - A list of parameters.
-	 * @return {Any} The result of the function call.
+	 * @param {string} name - The function name.
+	 * @param {...any} params - A list of parameters.
+	 * @return {any} The result of the function call.
 	 */
 	call( name, ...params ) {
 
@@ -412,9 +412,9 @@ class ScriptableNode extends Node {
 	/**
 	 * Asynchronously calls a function from the script.
 	 *
-	 * @param {String} name - The function name.
-	 * @param {...Any} params - A list of parameters.
-	 * @return {Promise<Any>} The result of the function call.
+	 * @param {string} name - The function name.
+	 * @param {...any} params - A list of parameters.
+	 * @return {Promise<any>} The result of the function call.
 	 */
 	async callAsync( name, ...params ) {
 
@@ -433,7 +433,7 @@ class ScriptableNode extends Node {
 	 * Overwritten since the node types is inferred from the script's output.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -444,7 +444,7 @@ class ScriptableNode extends Node {
 	/**
 	 * Refreshes the script node.
 	 *
-	 * @param {String?} [output=null] - An optional output.
+	 * @param {string?} [output=null] - An optional output.
 	 */
 	refresh( output = null ) {
 

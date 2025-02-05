@@ -132,9 +132,9 @@ class PMREMGenerator {
 	 * is placed at the origin).
 	 *
 	 * @param {Scene} scene - The scene to be captured.
-	 * @param {Number} [sigma=0] - The blur radius in radians.
-	 * @param {Number} [near=0.1] - The near plane distance.
-	 * @param {Number} [far=100] - The far plane distance.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
 	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromSceneAsync
@@ -186,9 +186,9 @@ class PMREMGenerator {
 	 * is placed at the origin).
 	 *
 	 * @param {Scene} scene - The scene to be captured.
-	 * @param {Number} [sigma=0] - The blur radius in radians.
-	 * @param {Number} [near=0.1] - The near plane distance.
-	 * @param {Number} [far=100] - The far plane distance.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
 	 * @param {RenderTarget?} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
 	 * @see fromScene
@@ -623,9 +623,9 @@ class PMREMGenerator {
 	 * accurate at the poles, but still does a decent job.
 	 *
 	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
-	 * @param {Number} lodIn - The input level-of-detail.
-	 * @param {Number} lodOut - The output level-of-detail.
-	 * @param {Number} sigma - The blur radius in radians.
+	 * @param {number} lodIn - The input level-of-detail.
+	 * @param {number} lodOut - The output level-of-detail.
+	 * @param {number} sigma - The blur radius in radians.
 	 * @param {Vector3} [poleAxis] - The pole axis.
 	 */
 	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {

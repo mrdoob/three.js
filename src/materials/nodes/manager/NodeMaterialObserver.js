@@ -76,28 +76,28 @@ class NodeMaterialObserver {
 		/**
 		 * Whether the material uses node objects or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.hasNode = this.containsNode( builder );
 
 		/**
 		 * Whether the node builder's 3D object is animated or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.hasAnimation = builder.object.isSkinnedMesh === true;
 
 		/**
 		 * A list of all possible material uniforms
 		 *
-		 * @type {Array<String>}
+		 * @type {Array<string>}
 		 */
 		this.refreshUniforms = refreshUniforms;
 
 		/**
 		 * Holds the current render ID from the node frame.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.renderId = 0;
@@ -108,7 +108,7 @@ class NodeMaterialObserver {
 	 * Returns `true` if the given render object is verified for the first time of this observer.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {Boolean} Whether the given render object is verified for the first time of this observer.
+	 * @return {boolean} Whether the given render object is verified for the first time of this observer.
 	 */
 	firstInitialization( renderObject ) {
 
@@ -216,7 +216,7 @@ class NodeMaterialObserver {
 	 * node properties.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Boolean} Whether the node builder's material uses node properties or not.
+	 * @return {boolean} Whether the node builder's material uses node properties or not.
 	 */
 	containsNode( builder ) {
 
@@ -281,7 +281,7 @@ class NodeMaterialObserver {
 	 * Returns `true` if the given render object has not changed its state.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {Boolean} Whether the given render object has changed its state or not.
+	 * @return {boolean} Whether the given render object has changed its state or not.
 	 */
 	equals( renderObject ) {
 
@@ -475,7 +475,7 @@ class NodeMaterialObserver {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {NodeFrame} nodeFrame - The current node frame.
-	 * @return {Boolean} Whether the given render object requires a refresh or not.
+	 * @return {boolean} Whether the given render object requires a refresh or not.
 	 */
 	needsRefresh( renderObject, nodeFrame ) {
 

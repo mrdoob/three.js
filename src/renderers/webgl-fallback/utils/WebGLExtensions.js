@@ -29,7 +29,7 @@ class WebGLExtensions {
 		/**
 		 * A list with all the supported WebGL extensions.
 		 *
-		 * @type {Array<String>}
+		 * @type {Array<string>}
 		 */
 		this.availableExtensions = this.gl.getSupportedExtensions();
 
@@ -38,7 +38,7 @@ class WebGLExtensions {
 		 * The key is the name of the extension, the value
 		 * the requested extension object.
 		 *
-		 * @type {Object<String,Object>}
+		 * @type {Object<string,Object>}
 		 */
 		this.extensions = {};
 
@@ -47,7 +47,7 @@ class WebGLExtensions {
 	/**
 	 * Returns the extension object for the given extension name.
 	 *
-	 * @param {String} name - The extension name.
+	 * @param {string} name - The extension name.
 	 * @return {Object} The extension object.
 	 */
 	get( name ) {
@@ -69,8 +69,8 @@ class WebGLExtensions {
 	/**
 	 * Returns `true` if the requested extension is available.
 	 *
-	 * @param {String} name - The extension name.
-	 * @return {Boolean} Whether the given extension is available or not.
+	 * @param {string} name - The extension name.
+	 * @return {boolean} Whether the given extension is available or not.
 	 */
 	has( name ) {
 

@@ -24,7 +24,7 @@ class SetNode extends TempNode {
 	 * Constructs a new set node.
 	 *
 	 * @param {Node} sourceNode - The node that should be updated.
-	 * @param {String} components - The components that should be updated.
+	 * @param {string} components - The components that should be updated.
 	 * @param {Node} targetNode - The value node.
 	 */
 	constructor( sourceNode, components, targetNode ) {
@@ -41,7 +41,7 @@ class SetNode extends TempNode {
 		/**
 		 * The components that should be updated.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.components = components;
 
@@ -58,7 +58,7 @@ class SetNode extends TempNode {
 	 * This method is overwritten since the node type is inferred from {@link SetNode#sourceNode}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 

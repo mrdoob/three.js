@@ -23,8 +23,8 @@ class MaterialReferenceNode extends ReferenceNode {
 	/**
 	 * Constructs a new material reference node.
 	 *
-	 * @param {String} property - The name of the property the node refers to.
-	 * @param {String} inputType - The uniform type that should be used to represent the property value.
+	 * @param {string} property - The name of the property the node refers to.
+	 * @param {string} inputType - The uniform type that should be used to represent the property value.
 	 * @param {Material?} [material=null] - The material the property belongs to. When no material is set,
 	 * the node refers to the material of the current rendered object.
 	 */
@@ -44,7 +44,7 @@ class MaterialReferenceNode extends ReferenceNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -76,8 +76,8 @@ export default MaterialReferenceNode;
  *
  * @tsl
  * @function
- * @param {String} name - The name of the property the node refers to.
- * @param {String} type - The uniform type that should be used to represent the property value.
+ * @param {string} name - The name of the property the node refers to.
+ * @param {string} type - The uniform type that should be used to represent the property value.
  * @param {Material?} [material=null] - The material the property belongs to.
  * When no material is set, the node refers to the material of the current rendered object.
  * @returns {MaterialReferenceNode}

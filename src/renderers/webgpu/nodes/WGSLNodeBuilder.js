@@ -183,21 +183,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 * A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
 		 * another dictionary which manages UBOs per group ('render','frame','object').
 		 *
-		 * @type {Object<String,Object<String,NodeUniformsGroup>>}
+		 * @type {Object<string,Object<string,NodeUniformsGroup>>}
 		 */
 		this.uniformGroups = {};
 
 		/**
 		 * A dictionary that holds for each shader stage a Map of builtins.
 		 *
-		 * @type {Object<String,Map<String,Object>>}
+		 * @type {Object<string,Map<string,Object>>}
 		 */
 		this.builtins = {};
 
 		/**
 		 * A dictionary that holds for each shader stage a Set of directives.
 		 *
-		 * @type {Object<String,Set<String>>}
+		 * @type {Object<string,Set<string>>}
 		 */
 		this.directives = {};
 
@@ -205,7 +205,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 * A map for managing scope arrays. Only relevant for when using
 		 * {@link WorkgroupInfoNode} in context of compute shaders.
 		 *
-		 * @type {Map<String,Object>}
+		 * @type {Map<string,Object>}
 		 */
 		this.scopedArrays = new Map();
 
@@ -215,7 +215,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Checks if the given texture requires a manual conversion to the working color space.
 	 *
 	 * @param {Texture} texture - The texture to check.
-	 * @return {Boolean} Whether the given texture requires a conversion to working color space or not.
+	 * @return {boolean} Whether the given texture requires a conversion to working color space or not.
 	 */
 	needsToWorkingColorSpace( texture ) {
 
@@ -228,11 +228,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @private
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -264,10 +264,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet when sampling video textures.
 	 *
 	 * @private
-	 * @param {String} textureProperty - The name of the video texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the video texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	_generateVideoSample( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
@@ -288,12 +288,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @private
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -317,7 +317,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates a wrap function used in context of textures.
 	 *
 	 * @param {Texture} texture - The texture to generate the function for.
-	 * @return {String} The name of the generated function.
+	 * @return {string} The name of the generated function.
 	 */
 	generateWrapFunction( texture ) {
 
@@ -391,9 +391,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	/**
 	 * Generates the array declaration string.
 	 *
-	 * @param {String} type - The type.
-	 * @param {Number?} [count] - The count.
-	 * @return {String} The generated value as a shader string.
+	 * @param {string} type - The type.
+	 * @param {number?} [count] - The count.
+	 * @return {string} The generated value as a shader string.
 	 */
 	generateArrayDeclaration( type, count ) {
 
@@ -407,9 +407,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * texture as well as the cube face count of cube textures.
 	 *
 	 * @param {Texture} texture - The texture to generate the function for.
-	 * @param {String} textureProperty - The name of the video texture uniform in the shader.
-	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @return {String} The name of the dimension variable.
+	 * @param {string} textureProperty - The name of the video texture uniform in the shader.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The name of the dimension variable.
 	 */
 	generateTextureDimension( texture, textureProperty, levelSnippet ) {
 
@@ -483,10 +483,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet for a manual filtered texture.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0u' ) {
 
@@ -504,11 +504,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Since it's a lookup, no sampling or filtering is applied.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet = '0u' ) {
 
@@ -526,11 +526,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet that reads a single texel from a texture without sampling or filtering.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
 
@@ -554,10 +554,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet that writes a single texel to a texture.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} valueSnippet - A WGSL snippet that represent the new texel value.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} valueSnippet - A WGSL snippet that represent the new texel value.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureStore( texture, textureProperty, uvIndexSnippet, valueSnippet ) {
 
@@ -569,7 +569,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns `true` if the sampled values of the given texture should be compared against a reference value.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @return {Boolean} Whether the sampled values of the given texture should be compared against a reference value or not.
+	 * @return {boolean} Whether the sampled values of the given texture should be compared against a reference value or not.
 	 */
 	isSampleCompare( texture ) {
 
@@ -581,7 +581,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns `true` if the given texture is unfilterable.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @return {Boolean} Whether the given texture is unfilterable or not.
+	 * @return {boolean} Whether the given texture is unfilterable or not.
 	 */
 	isUnfilterable( texture ) {
 
@@ -596,11 +596,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet for sampling/loading the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -628,12 +628,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet for sampling/loading the given texture using explicit gradients.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {Array<String>} gradSnippet - An array holding both gradient WGSL snippets.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {Array<string>} gradSnippet - An array holding both gradient WGSL snippets.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -655,12 +655,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * against a reference value.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} compareSnippet -  A WGSL snippet that represents the reference value.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet -  A WGSL snippet that represents the reference value.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -680,12 +680,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet when sampling textures with explicit mip level.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -709,12 +709,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Generates the WGSL snippet when sampling textures with a bias to the mip level.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {String} textureProperty - The name of the texture uniform in the shader.
-	 * @param {String} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {String} biasSnippet - A WGSL snippet that represents the bias to apply to the mip level before sampling.
-	 * @param {String?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The WGSL snippet.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} biasSnippet - A WGSL snippet that represents the bias to apply to the mip level before sampling.
+	 * @param {string?} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -734,8 +734,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns a WGSL snippet that represents the property name of the given node.
 	 *
 	 * @param {Node} node - The node.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The property name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The property name.
 	 */
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
@@ -781,7 +781,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	/**
 	 * Returns the output struct name.
 	 *
-	 * @return {String} The name of the output struct.
+	 * @return {string} The name of the output struct.
 	 */
 	getOutputStructName() {
 
@@ -793,8 +793,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns uniforms group count for the given shader stage.
 	 *
 	 * @private
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {Number} The uniforms group count for the given shader stage.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {number} The uniforms group count for the given shader stage.
 	 */
 	_getUniformGroupCount( shaderStage ) {
 
@@ -805,8 +805,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 	/**
 	 * Returns the native shader operator name for a given generic name.
 	 *
-	 * @param {String} op - The operator name to resolve.
-	 * @return {String} The resolved operator name.
+	 * @param {string} op - The operator name to resolve.
+	 * @return {string} The resolved operator name.
 	 */
 	getFunctionOperator( op ) {
 
@@ -828,8 +828,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns the node access for the given node and shader stage.
 	 *
 	 * @param {StorageTextureNode|StorageBufferNode} node - The storage node.
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The node access.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The node access.
 	 */
 	getNodeAccess( node, shaderStage ) {
 
@@ -844,8 +844,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns A WGSL snippet representing the storage access.
 	 *
 	 * @param {StorageTextureNode|StorageBufferNode} node - The storage node.
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The WGSL snippet representing the storage access.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet representing the storage access.
 	 */
 	getStorageAccess( node, shaderStage ) {
 
@@ -861,9 +861,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * and layouts.
 	 *
 	 * @param {UniformNode} node - The uniform node.
-	 * @param {String} type - The node data type.
-	 * @param {String} shaderStage - The shader stage.
-	 * @param {String?} [name=null] - An optional uniform name.
+	 * @param {string} type - The node data type.
+	 * @param {string} shaderStage - The shader stage.
+	 * @param {string?} [name=null] - An optional uniform name.
 	 * @return {NodeUniform} The node uniform object.
 	 */
 	getUniformFromNode( node, type, shaderStage, name = null ) {
@@ -969,11 +969,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * The internal builtins data structure will make sure builtins are
 	 * defined in the WGSL source.
 	 *
-	 * @param {String} name - The builtin name.
-	 * @param {String} property - The property name.
-	 * @param {String} type - The node data type.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} The property name.
+	 * @param {string} name - The builtin name.
+	 * @param {string} property - The property name.
+	 * @param {string} type - The node data type.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The property name.
 	 */
 	getBuiltin( name, property, type, shaderStage = this.shaderStage ) {
 
@@ -996,9 +996,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	/**
 	 * Returns `true` if the given builtin is defined in the given shader stage.
 	 *
-	 * @param {String} name - The builtin name.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {String} Whether the given builtin is defined in the given shader stage or not.
+	 * @param {string} name - The builtin name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} Whether the given builtin is defined in the given shader stage or not.
 	 */
 	hasBuiltin( name, shaderStage = this.shaderStage ) {
 
@@ -1009,7 +1009,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	/**
 	 * Returns the vertex index builtin.
 	 *
-	 * @return {String} The vertex index.
+	 * @return {string} The vertex index.
 	 */
 	getVertexIndex() {
 
@@ -1027,7 +1027,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Builds the given shader node.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - The shader node.
-	 * @return {String} The WGSL function code.
+	 * @return {string} The WGSL function code.
 	 */
 	buildFunctionCode( shaderNode ) {
 
@@ -1066,7 +1066,7 @@ ${ flowData.code }
 	/**
 	 * Returns the instance index builtin.
 	 *
-	 * @return {String} The instance index.
+	 * @return {string} The instance index.
 	 */
 	getInstanceIndex() {
 
@@ -1083,7 +1083,7 @@ ${ flowData.code }
 	/**
 	 * Returns the invocation local index builtin.
 	 *
-	 * @return {String} The invocation local index.
+	 * @return {string} The invocation local index.
 	 */
 	getInvocationLocalIndex() {
 
@@ -1094,7 +1094,7 @@ ${ flowData.code }
 	/**
 	 * Returns the subgroup size builtin.
 	 *
-	 * @return {String} The subgroup size.
+	 * @return {string} The subgroup size.
 	 */
 	getSubgroupSize() {
 
@@ -1107,7 +1107,7 @@ ${ flowData.code }
 	/**
 	 * Returns the invocation subgroup index builtin.
 	 *
-	 * @return {String} The invocation subgroup index.
+	 * @return {string} The invocation subgroup index.
 	 */
 	getInvocationSubgroupIndex() {
 
@@ -1120,7 +1120,7 @@ ${ flowData.code }
 	/**
 	 * Returns the subgroup index builtin.
 	 *
-	 * @return {String} The subgroup index.
+	 * @return {string} The subgroup index.
 	 */
 	getSubgroupIndex() {
 
@@ -1144,7 +1144,7 @@ ${ flowData.code }
 	/**
 	 * Returns the front facing builtin.
 	 *
-	 * @return {String} The front facing builtin.
+	 * @return {string} The front facing builtin.
 	 */
 	getFrontFacing() {
 
@@ -1155,7 +1155,7 @@ ${ flowData.code }
 	/**
 	 * Returns the frag coord builtin.
 	 *
-	 * @return {String} The frag coord builtin.
+	 * @return {string} The frag coord builtin.
 	 */
 	getFragCoord() {
 
@@ -1166,7 +1166,7 @@ ${ flowData.code }
 	/**
 	 * Returns the frag depth builtin.
 	 *
-	 * @return {String} The frag depth builtin.
+	 * @return {string} The frag depth builtin.
 	 */
 	getFragDepth() {
 
@@ -1177,7 +1177,7 @@ ${ flowData.code }
 	/**
 	 * Returns the clip distances builtin.
 	 *
-	 * @return {String} The clip distances builtin.
+	 * @return {string} The clip distances builtin.
 	 */
 	getClipDistance() {
 
@@ -1188,7 +1188,7 @@ ${ flowData.code }
 	/**
 	 * Whether to flip texture data along its vertical axis or not.
 	 *
-	 * @return {Boolean} Returns always `false` in context of WGSL.
+	 * @return {boolean} Returns always `false` in context of WGSL.
 	 */
 	isFlipY() {
 
@@ -1199,8 +1199,8 @@ ${ flowData.code }
 	/**
 	 * Enables the given directive for the given shader stage.
 	 *
-	 * @param {String} name - The directive name.
-	 * @param {String} [shaderStage=this.shaderStage] - The shader stage to enable the directive for.
+	 * @param {string} name - The directive name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage to enable the directive for.
 	 */
 	enableDirective( name, shaderStage = this.shaderStage ) {
 
@@ -1212,8 +1212,8 @@ ${ flowData.code }
 	/**
 	 * Returns the directives of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} A WGSL snippet that enables the directives of the given stage.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} A WGSL snippet that enables the directives of the given stage.
 	 */
 	getDirectives( shaderStage ) {
 
@@ -1282,7 +1282,7 @@ ${ flowData.code }
 	/**
 	 * Enables hardware clipping.
 	 *
-	 * @param {String} planeCount - The clipping plane count.
+	 * @param {string} planeCount - The clipping plane count.
 	 */
 	enableHardwareClipping( planeCount ) {
 
@@ -1294,8 +1294,8 @@ ${ flowData.code }
 	/**
 	 * Returns the builtins of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} A WGSL snippet that represents the builtins of the given stage.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} A WGSL snippet that represents the builtins of the given stage.
 	 */
 	getBuiltins( shaderStage ) {
 
@@ -1321,11 +1321,11 @@ ${ flowData.code }
 	 * compute shaders. It adds the array to the internal data structure which is
 	 * later used to generate the respective WGSL.
 	 *
-	 * @param {String} name - The array name.
-	 * @param {String} scope - The scope.
-	 * @param {String} bufferType - The buffer type.
-	 * @param {String} bufferCount - The buffer count.
-	 * @return {String} The array name.
+	 * @param {string} name - The array name.
+	 * @param {string} scope - The scope.
+	 * @param {string} bufferType - The buffer type.
+	 * @param {string} bufferCount - The buffer count.
+	 * @return {string} The array name.
 	 */
 	getScopedArray( name, scope, bufferType, bufferCount ) {
 
@@ -1347,8 +1347,8 @@ ${ flowData.code }
 	/**
 	 * Returns the scoped arrays of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String|undefined} The WGSL snippet that defines the scoped arrays.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string|undefined} The WGSL snippet that defines the scoped arrays.
 	 * Returns `undefined` when used in the vertex or fragment stage.
 	 */
 	getScopedArrays( shaderStage ) {
@@ -1376,8 +1376,8 @@ ${ flowData.code }
 	/**
 	 * Returns the shader attributes of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The WGSL snippet that defines the shader attributes.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the shader attributes.
 	 */
 	getAttributes( shaderStage ) {
 
@@ -1427,7 +1427,7 @@ ${ flowData.code }
 	 * Returns the members of the given struct type node as a WGSL string.
 	 *
 	 * @param {StructTypeNode} struct - The struct type node.
-	 * @return {String} The WGSL snippet that defines the struct members.
+	 * @return {string} The WGSL snippet that defines the struct members.
 	 */
 	getStructMembers( struct ) {
 
@@ -1456,8 +1456,8 @@ ${ flowData.code }
 	/**
 	 * Returns the structs of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The WGSL snippet that defines the structs.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the structs.
 	 */
 	getStructs( shaderStage ) {
 
@@ -1490,10 +1490,10 @@ ${ flowData.code }
 	/**
 	 * Returns a WGSL string representing a variable.
 	 *
-	 * @param {String} type - The variable's type.
-	 * @param {String} name - The variable's name.
-	 * @param {Number?} [count=null] - The array length.
-	 * @return {String} The WGSL snippet that defines a variable.
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {number?} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a variable.
 	 */
 	getVar( type, name, count = null ) {
 
@@ -1516,8 +1516,8 @@ ${ flowData.code }
 	/**
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The WGSL snippet that defines the variables.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the variables.
 	 */
 	getVars( shaderStage ) {
 
@@ -1541,8 +1541,8 @@ ${ flowData.code }
 	/**
 	 * Returns the varyings of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The WGSL snippet that defines the varyings.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the varyings.
 	 */
 	getVaryings( shaderStage ) {
 
@@ -1605,8 +1605,8 @@ ${ flowData.code }
 	/**
 	 * Returns the uniforms of the given shader stage as a WGSL string.
 	 *
-	 * @param {String} shaderStage - The shader stage.
-	 * @return {String} The WGSL snippet that defines the uniforms.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the uniforms.
 	 */
 	getUniforms( shaderStage ) {
 
@@ -1853,9 +1853,9 @@ ${ flowData.code }
 	/**
 	 * Returns the native shader method name for a given generic name.
 	 *
-	 * @param {String} method - The method name to resolve.
-	 * @param {String} [output=null] - An optional output.
-	 * @return {String} The resolved WGSL method name.
+	 * @param {string} method - The method name to resolve.
+	 * @param {string} [output=null] - An optional output.
+	 * @return {string} The resolved WGSL method name.
 	 */
 	getMethod( method, output = null ) {
 
@@ -1880,8 +1880,8 @@ ${ flowData.code }
 	/**
 	 * Returns the WGSL type of the given node data type.
 	 *
-	 * @param {String} type - The node data type.
-	 * @return {String} The WGSL type.
+	 * @param {string} type - The node data type.
+	 * @return {string} The WGSL type.
 	 */
 	getType( type ) {
 
@@ -1892,8 +1892,8 @@ ${ flowData.code }
 	/**
 	 * Whether the requested feature is available or not.
 	 *
-	 * @param {String} name - The requested feature.
-	 * @return {Boolean} Whether the requested feature is supported or not.
+	 * @param {string} name - The requested feature.
+	 * @return {boolean} Whether the requested feature is supported or not.
 	 */
 	isAvailable( name ) {
 
@@ -1923,8 +1923,8 @@ ${ flowData.code }
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @private
-	 * @param {String} method - The method name to resolve.
-	 * @return {String} The resolved WGSL method name.
+	 * @param {string} method - The method name to resolve.
+	 * @return {string} The resolved WGSL method name.
 	 */
 	_getWGSLMethod( method ) {
 
@@ -1943,7 +1943,7 @@ ${ flowData.code }
 	 * function node.
 	 *
 	 * @private
-	 * @param {String} name - The method name to include.
+	 * @param {string} name - The method name to include.
 	 * @return {CodeNode} The respective code node.
 	 */
 	_include( name ) {
@@ -1966,7 +1966,7 @@ ${ flowData.code }
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @return {String} The vertex shader.
+	 * @return {string} The vertex shader.
 	 */
 	_getWGSLVertexCode( shaderData ) {
 
@@ -2008,7 +2008,7 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @return {String} The vertex shader.
+	 * @return {string} The vertex shader.
 	 */
 	_getWGSLFragmentCode( shaderData ) {
 
@@ -2044,8 +2044,8 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @param {String} workgroupSize - The workgroup size.
-	 * @return {String} The vertex shader.
+	 * @param {string} workgroupSize - The workgroup size.
+	 * @return {string} The vertex shader.
 	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
@@ -2089,9 +2089,9 @@ fn main( ${shaderData.attributes} ) {
 	 * Returns a WGSL struct based on the given name and variables.
 	 *
 	 * @private
-	 * @param {String} name - The struct name.
-	 * @param {String} vars - The struct variables.
-	 * @return {String} The WGSL snippet representing a struct.
+	 * @param {string} name - The struct name.
+	 * @param {string} vars - The struct variables.
+	 * @return {string} The WGSL snippet representing a struct.
 	 */
 	_getWGSLStruct( name, vars ) {
 
@@ -2106,12 +2106,12 @@ ${vars}
 	 * Returns a WGSL struct binding.
 	 *
 	 * @private
-	 * @param {String} name - The struct name.
-	 * @param {String} vars - The struct variables.
-	 * @param {String} access - The access.
-	 * @param {Number} [binding=0] - The binding index.
-	 * @param {Number} [group=0] - The group index.
-	 * @return {String} The WGSL snippet representing a struct binding.
+	 * @param {string} name - The struct name.
+	 * @param {string} vars - The struct variables.
+	 * @param {string} access - The access.
+	 * @param {number} [binding=0] - The binding index.
+	 * @param {number} [group=0] - The group index.
+	 * @return {string} The WGSL snippet representing a struct binding.
 	 */
 	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
 

@@ -29,11 +29,11 @@ class LensflareNode extends TempNode {
 	 * @param {TextureNode} textureNode - The texture node that represents the scene's bloom.
 	 * @param {Object} params - The parameter object for configuring the effect.
 	 * @param {Node<vec3> | Color} [params.ghostTint=vec3(1, 1, 1)] - Defines the tint of the flare/ghosts.
-	 * @param {Node<float> | Number} [params.threshold=float(0.5)] - Controls the size and strength of the effect. A higher threshold results in smaller flares.
-	 * @param {Node<float> | Number} [params.ghostSamples=float(4)] - Represents the number of flares/ghosts per bright spot which pivot around the center.
-	 * @param {Node<float> | Number} [params.ghostSpacing=float(0.25)] - Defines the spacing of the flares/ghosts.
-	 * @param {Node<float> | Number} [params.ghostAttenuationFactor=float(25)] - Defines the attenuation factor of flares/ghosts.
-	 * @param {Number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
+	 * @param {Node<float> | number} [params.threshold=float(0.5)] - Controls the size and strength of the effect. A higher threshold results in smaller flares.
+	 * @param {Node<float> | number} [params.ghostSamples=float(4)] - Represents the number of flares/ghosts per bright spot which pivot around the center.
+	 * @param {Node<float> | number} [params.ghostSpacing=float(0.25)] - Defines the spacing of the flares/ghosts.
+	 * @param {Node<float> | number} [params.ghostAttenuationFactor=float(25)] - Defines the attenuation factor of flares/ghosts.
+	 * @param {number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
 	 */
 	constructor( textureNode, params = {} ) {
 
@@ -93,7 +93,7 @@ class LensflareNode extends TempNode {
 		/**
 		 * Defines how downsampling since the effect is usually not rendered at full resolution.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.downSampleRatio = downSampleRatio;
 
@@ -101,7 +101,7 @@ class LensflareNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -148,8 +148,8 @@ class LensflareNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -268,11 +268,11 @@ export default LensflareNode;
  * @param {TextureNode} node - The node that represents the scene's bloom.
  * @param {Object} params - The parameter object for configuring the effect.
  * @param {Node<vec3> | Color} [params.ghostTint=vec3(1, 1, 1)] - Defines the tint of the flare/ghosts.
- * @param {Node<float> | Number} [params.threshold=float(0.5)] - Controls the size and strength of the effect. A higher threshold results in smaller flares.
- * @param {Node<float> | Number} [params.ghostSamples=float(4)] - Represents the number of flares/ghosts per bright spot which pivot around the center.
- * @param {Node<float> | Number} [params.ghostSpacing=float(0.25)] - Defines the spacing of the flares/ghosts.
- * @param {Node<float> | Number} [params.ghostAttenuationFactor=float(25)] - Defines the attenuation factor of flares/ghosts.
- * @param {Number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
+ * @param {Node<float> | number} [params.threshold=float(0.5)] - Controls the size and strength of the effect. A higher threshold results in smaller flares.
+ * @param {Node<float> | number} [params.ghostSamples=float(4)] - Represents the number of flares/ghosts per bright spot which pivot around the center.
+ * @param {Node<float> | number} [params.ghostSpacing=float(0.25)] - Defines the spacing of the flares/ghosts.
+ * @param {Node<float> | number} [params.ghostAttenuationFactor=float(25)] - Defines the attenuation factor of flares/ghosts.
+ * @param {number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
  * @returns {LensflareNode}
  */
 export const lensflare = ( node, params ) => nodeObject( new LensflareNode( convertToTexture( node ), params ) );

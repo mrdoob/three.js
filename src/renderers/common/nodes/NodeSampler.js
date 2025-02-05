@@ -12,7 +12,7 @@ class NodeSampler extends Sampler {
 	/**
 	 * Constructs a new node-based sampler.
 	 *
-	 * @param {String} name - The samplers's name.
+	 * @param {string} name - The samplers's name.
 	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {UniformGroupNode} groupNode - The uniform group node.
 	 */

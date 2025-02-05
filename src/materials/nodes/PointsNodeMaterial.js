@@ -43,7 +43,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -128,7 +128,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 	/**
 	 * Whether alpha to coverage should be used or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get alphaToCoverage() {

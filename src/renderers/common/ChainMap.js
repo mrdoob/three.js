@@ -26,7 +26,7 @@ class ChainMap {
 	 * Returns the value for the given array of keys.
 	 *
 	 * @param {Array<Object>} keys - List of keys.
-	 * @return {Any} The value. Returns `undefined` if no value was found.
+	 * @return {any} The value. Returns `undefined` if no value was found.
 	 */
 	get( keys ) {
 
@@ -48,7 +48,7 @@ class ChainMap {
 	 * Sets the value for the given keys.
 	 *
 	 * @param {Array<Object>} keys - List of keys.
-	 * @param {Any} value - The value to set.
+	 * @param {any} value - The value to set.
 	 * @return {ChainMap} A reference to this Chain Map.
 	 */
 	set( keys, value ) {
@@ -75,7 +75,7 @@ class ChainMap {
 	 * Deletes a value for the given keys.
 	 *
 	 * @param {Array<Object>} keys - The keys.
-	 * @return {Boolean} Returns `true` if the value has been removed successfully and `false` if the value has not be found.
+	 * @return {boolean} Returns `true` if the value has been removed successfully and `false` if the value has not be found.
 	 */
 	delete( keys ) {
 

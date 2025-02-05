@@ -16,7 +16,7 @@ class NodeFrame {
 		/**
 		 * The elapsed time in seconds.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.time = 0;
@@ -24,7 +24,7 @@ class NodeFrame {
 		/**
 		 * The delta time in seconds.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.deltaTime = 0;
@@ -32,7 +32,7 @@ class NodeFrame {
 		/**
 		 * The frame ID.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.frameId = 0;
@@ -40,7 +40,7 @@ class NodeFrame {
 		/**
 		 * The render ID.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.renderId = 0;
@@ -115,7 +115,7 @@ class NodeFrame {
 	 * @private
 	 * @param {WeakMap<Node, Object>} referenceMap - The reference weak map.
 	 * @param {Node} nodeRef - The reference to the current node.
-	 * @return {Object<String,WeakMap>} The dictionary.
+	 * @return {Object<string,WeakMap>} The dictionary.
 	 */
 	_getMaps( referenceMap, nodeRef ) {
 

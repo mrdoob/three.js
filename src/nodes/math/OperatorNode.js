@@ -18,7 +18,7 @@ class OperatorNode extends TempNode {
 	/**
 	 * Constructs a new operator node.
 	 *
-	 * @param {String} op - The operator.
+	 * @param {string} op - The operator.
 	 * @param {Node} aNode - The first input.
 	 * @param {Node} bNode - The second input.
 	 * @param {...Node} params - Additional input parameters.
@@ -45,7 +45,7 @@ class OperatorNode extends TempNode {
 		/**
 		 * The operator.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.op = op;
 
@@ -66,7 +66,7 @@ class OperatorNode extends TempNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -79,8 +79,8 @@ class OperatorNode extends TempNode {
 	 * and the input node types.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String} output - The current output string.
-	 * @return {String} The node type.
+	 * @param {string} output - The current output string.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder, output ) {
 

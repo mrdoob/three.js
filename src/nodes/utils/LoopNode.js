@@ -39,7 +39,7 @@ class LoopNode extends Node {
 	/**
 	 * Constructs a new loop node.
 	 *
-	 * @param {Array<Any>} params - Depending on the loop type, array holds different parameterization values for the loop.
+	 * @param {Array<any>} params - Depending on the loop type, array holds different parameterization values for the loop.
 	 */
 	constructor( params = [] ) {
 
@@ -53,8 +53,8 @@ class LoopNode extends Node {
 	 * Returns a loop variable name based on an index. The pattern is
 	 * `0` = `i`, `1`= `j`, `2`= `k` and so on.
 	 *
-	 * @param {Number} index - The index.
-	 * @return {String} The loop variable name.
+	 * @param {number} index - The index.
+	 * @return {string} The loop variable name.
 	 */
 	getVarName( index ) {
 
@@ -104,7 +104,7 @@ class LoopNode extends Node {
 	 * This method is overwritten since the node type is inferred based on the loop configuration.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -252,7 +252,7 @@ export default LoopNode;
  *
  * @tsl
  * @function
- * @param {...Any} params - A list of parameters.
+ * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
 export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();

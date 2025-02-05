@@ -104,8 +104,8 @@ import { FullScreenQuad } from '../postprocessing/Pass.js';
 class GPUComputationRenderer {
 
 	/**
-	 * @param {Number} sizeX Computation problem size is always 2d: sizeX * sizeY elements.
- 	 * @param {Number} sizeY Computation problem size is always 2d: sizeX * sizeY elements.
+	 * @param {number} sizeX Computation problem size is always 2d: sizeX * sizeY elements.
+ 	 * @param {number} sizeY Computation problem size is always 2d: sizeX * sizeY elements.
  	 * @param {WebGLRenderer} renderer The renderer
 	 */
 	constructor( sizeX, sizeY, renderer ) {

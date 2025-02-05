@@ -19,7 +19,7 @@ class CodeNode extends Node {
 	/**
 	 * Constructs a new code node.
 	 *
-	 * @param {String} [code=''] - The native code.
+	 * @param {string} [code=''] - The native code.
 	 * @param {Array<Node>} [includes=[]] - An array of includes.
 	 * @param {('js'|'wgsl'|'glsl')} [language=''] - The used language.
 	 */
@@ -30,7 +30,7 @@ class CodeNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -39,7 +39,7 @@ class CodeNode extends Node {
 		/**
 		 * The native code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default ''
 		 */
 		this.code = code;
@@ -65,7 +65,7 @@ class CodeNode extends Node {
 	/**
 	 * The method is overwritten so it always returns `true`.
 	 *
-	 * @return {Boolean} Whether this node is global or not.
+	 * @return {boolean} Whether this node is global or not.
 	 */
 	isGlobal() {
 
@@ -143,7 +143,7 @@ export default CodeNode;
  *
  * @tsl
  * @function
- * @param {String} [code=''] - The native code.
+ * @param {string} [code=''] - The native code.
  * @param {Array<Node>} [includes=[]] - An array of includes.
  * @param {('js'|'wgsl'|'glsl')} [language=''] - The used language.
  * @returns {CodeNode}
@@ -155,7 +155,7 @@ export const code = /*@__PURE__*/ nodeProxy( CodeNode );
  *
  * @tsl
  * @function
- * @param {String} src - The native code.
+ * @param {string} src - The native code.
  * @param {Array<Node>} includes - An array of includes.
  * @returns {CodeNode}
  */
@@ -166,7 +166,7 @@ export const js = ( src, includes ) => code( src, includes, 'js' );
  *
  * @tsl
  * @function
- * @param {String} src - The native code.
+ * @param {string} src - The native code.
  * @param {Array<Node>} includes - An array of includes.
  * @returns {CodeNode}
  */
@@ -177,7 +177,7 @@ export const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );
  *
  * @tsl
  * @function
- * @param {String} src - The native code.
+ * @param {string} src - The native code.
  * @param {Array<Node>} includes - An array of includes.
  * @returns {CodeNode}
  */

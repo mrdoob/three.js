@@ -32,7 +32,7 @@ class ContextNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -70,7 +70,7 @@ class ContextNode extends Node {
 	 * This method is overwritten to ensure it returns the type of {@link ContextNode#node}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -133,7 +133,7 @@ export const context = /*@__PURE__*/ nodeProxy( ContextNode );
  * @tsl
  * @function
  * @param {Node} node - The node whose context should be modified.
- * @param {String} name - The name/label to set.
+ * @param {string} name - The name/label to set.
  * @returns {ContextNode}
  */
 export const label = ( node, name ) => context( node, { label: name } );

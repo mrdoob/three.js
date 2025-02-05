@@ -18,7 +18,7 @@ class QuadGeometry extends BufferGeometry {
 	/**
 	 * Constructs a new quad geometry.
 	 *
-	 * @param {Boolean} [flipY=false] - Whether the uv coordinates should be flipped along the vertical axis or not.
+	 * @param {boolean} [flipY=false] - Whether the uv coordinates should be flipped along the vertical axis or not.
 	 */
 	constructor( flipY = false ) {
 
@@ -67,7 +67,7 @@ class QuadMesh extends Mesh {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

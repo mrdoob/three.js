@@ -63,7 +63,7 @@ class ConditionalNode extends Node {
 	 * nodes.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 

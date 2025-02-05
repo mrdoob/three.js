@@ -49,7 +49,7 @@ class GaussianBlurNode extends TempNode {
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
 	 * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
-	 * @param {Number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 	 */
 	constructor( textureNode, directionNode = null, sigma = 2 ) {
 
@@ -72,7 +72,7 @@ class GaussianBlurNode extends TempNode {
 		/**
 		 * Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.sigma = sigma;
 
@@ -124,7 +124,7 @@ class GaussianBlurNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -141,7 +141,7 @@ class GaussianBlurNode extends TempNode {
 		 * Whether the effect should use premultiplied alpha or not. Set this to `true`
 		 * if you are going to blur texture input with transparency.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.premultipliedAlpha = false;
@@ -151,7 +151,7 @@ class GaussianBlurNode extends TempNode {
 	/**
 	 * Sets the given premultiplied alpha value.
 	 *
-	 * @param {Boolean} value - Whether the effect should use premultiplied alpha or not.
+	 * @param {boolean} value - Whether the effect should use premultiplied alpha or not.
 	 * @return {GaussianBlurNode} height - A reference to this node.
 	 */
 	setPremultipliedAlpha( value ) {
@@ -165,7 +165,7 @@ class GaussianBlurNode extends TempNode {
 	/**
 	 * Returns the premultiplied alpha value.
 	 *
-	 * @return {Boolean} Whether the effect should use premultiplied alpha or not.
+	 * @return {boolean} Whether the effect should use premultiplied alpha or not.
 	 */
 	getPremultipliedAlpha() {
 
@@ -176,8 +176,8 @@ class GaussianBlurNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -347,8 +347,8 @@ class GaussianBlurNode extends TempNode {
 	 * Computes gaussian coefficients depending on the given kernel radius.
 	 *
 	 * @private
-	 * @param {Number} kernelRadius - The kernel radius.
-	 * @return {Array<Number>}
+	 * @param {number} kernelRadius - The kernel radius.
+	 * @return {Array<number>}
 	 */
 	_getCoefficients( kernelRadius ) {
 
@@ -375,7 +375,7 @@ export default GaussianBlurNode;
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
- * @param {Number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+ * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @returns {GaussianBlurNode}
  */
 export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
@@ -387,7 +387,7 @@ export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new Ga
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
- * @param {Number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+ * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @returns {GaussianBlurNode}
  */
 export const premultipliedGaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ).setPremultipliedAlpha( true ) );

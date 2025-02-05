@@ -9,17 +9,17 @@ class NodeFunction {
 	/**
 	 * Constructs a new node function.
 	 *
-	 * @param {String} type - The node type. This type is the return type of the node function.
+	 * @param {string} type - The node type. This type is the return type of the node function.
 	 * @param {Array<NodeFunctionInput>} inputs - The function's inputs.
-	 * @param {String} [name=''] - The function's name.
-	 * @param {String} [precision=''] - The precision qualifier.
+	 * @param {string} [name=''] - The function's name.
+	 * @param {string} [precision=''] - The precision qualifier.
 	 */
 	constructor( type, inputs, name = '', precision = '' ) {
 
 		/**
 		 * The node type. This type is the return type of the node function.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type;
 
@@ -33,7 +33,7 @@ class NodeFunction {
 		/**
 		 * The name of the uniform.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default ''
 		 */
 		this.name = name;
@@ -41,7 +41,7 @@ class NodeFunction {
 		/**
 		 * The precision qualifier.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default ''
 		 */
 		this.precision = precision;
@@ -52,8 +52,8 @@ class NodeFunction {
 	 * This method returns the native code of the node function.
 	 *
 	 * @abstract
-	 * @param {String} name - The function's name.
-	 * @return {String} A shader code.
+	 * @param {string} name - The function's name.
+	 * @return {string} A shader code.
 	 */
 	getCode( /*name = this.name*/ ) {
 

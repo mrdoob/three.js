@@ -55,7 +55,7 @@ class XRControllerModel extends Object3D {
 	 * Polls data from the XRInputSource and updates the model's components to match
 	 * the real world data
 	 *
-	 * @param {Boolean} force
+	 * @param {boolean} force
 	 */
 	updateMatrixWorld( force ) {
 

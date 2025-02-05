@@ -8,7 +8,7 @@ class NodeParser {
 	 * The method parses the given native code an returns a node function.
 	 *
 	 * @abstract
-	 * @param {String} source - The native shader code.
+	 * @param {string} source - The native shader code.
 	 * @return {NodeFunction} A node function.
 	 */
 	parseFunction( /*source*/ ) {

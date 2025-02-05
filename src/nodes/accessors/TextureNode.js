@@ -37,7 +37,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -94,7 +94,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * Whether texture values should be sampled or fetched.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.sampler = true;
@@ -104,7 +104,7 @@ class TextureNode extends UniformNode {
 		 * automatically updated or not. Use `setUpdateMatrix()`
 		 * if you want to change the value of the property.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.updateMatrix = false;
@@ -114,7 +114,7 @@ class TextureNode extends UniformNode {
 		 * sets the value to `frame` when the uv transformation matrix should
 		 * automatically be updated.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'none'
 		 */
 		this.updateType = NodeUpdateType.NONE;
@@ -176,7 +176,7 @@ class TextureNode extends UniformNode {
 	 * Overwritten since the uniform hash is defined by the texture's UUID.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The uniform hash.
+	 * @return {string} The uniform hash.
 	 */
 	getUniformHash( /*builder*/ ) {
 
@@ -188,7 +188,7 @@ class TextureNode extends UniformNode {
 	 * Overwritten since the node type is inferred from the texture type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( /*builder*/ ) {
 
@@ -212,7 +212,7 @@ class TextureNode extends UniformNode {
 	 * Overwrites the default implementation to return a fixed value `'texture'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
 
@@ -234,7 +234,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Overwritten to always return the texture reference of the node.
 	 *
-	 * @param {Any} state - This method can be invocated in different contexts so `state` can refer to any object type.
+	 * @param {any} state - This method can be invocated in different contexts so `state` can refer to any object type.
 	 * @return {Texture} The texture reference.
 	 */
 	updateReference( /*state*/ ) {
@@ -260,7 +260,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Defines whether the uv transformation matrix should automatically be updated or not.
 	 *
-	 * @param {Boolean} value - The update toggle.
+	 * @param {boolean} value - The update toggle.
 	 * @return {TextureNode} A reference to this node.
 	 */
 	setUpdateMatrix( value ) {
@@ -368,7 +368,7 @@ class TextureNode extends UniformNode {
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} uvNode - The uv node to generate code for.
-	 * @return {String} The generated code snippet.
+	 * @return {string} The generated code snippet.
 	 */
 	generateUV( builder, uvNode ) {
 
@@ -380,14 +380,14 @@ class TextureNode extends UniformNode {
 	 * Generates the snippet for the texture sampling.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String} textureProperty - The texture property.
-	 * @param {String} uvSnippet - The uv snippet.
-	 * @param {String?} levelSnippet - The level snippet.
-	 * @param {String?} biasSnippet - The bias snippet.
-	 * @param {String?} depthSnippet - The depth snippet.
-	 * @param {String?} compareSnippet - The compare snippet.
-	 * @param {Array<String>?} gradSnippet - The grad snippet.
-	 * @return {String} The generated code snippet.
+	 * @param {string} textureProperty - The texture property.
+	 * @param {string} uvSnippet - The uv snippet.
+	 * @param {string?} levelSnippet - The level snippet.
+	 * @param {string?} biasSnippet - The bias snippet.
+	 * @param {string?} depthSnippet - The depth snippet.
+	 * @param {string?} compareSnippet - The compare snippet.
+	 * @param {Array<string>?} gradSnippet - The grad snippet.
+	 * @return {string} The generated code snippet.
 	 */
 	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
 
@@ -429,8 +429,8 @@ class TextureNode extends UniformNode {
 	 * Generates the code snippet of the texture node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String} output - The current output.
-	 * @return {String} The generated code snippet.
+	 * @param {string} output - The current output.
+	 * @return {string} The generated code snippet.
 	 */
 	generate( builder, output ) {
 
@@ -495,7 +495,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Sets the sampler value.
 	 *
-	 * @param {Boolean} value - The sampler value to set.
+	 * @param {boolean} value - The sampler value to set.
 	 * @return {TextureNode} A reference to this texture node.
 	 */
 	setSampler( value ) {
@@ -509,7 +509,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Returns the sampler value.
 	 *
-	 * @return {Boolean} The sampler value.
+	 * @return {boolean} The sampler value.
 	 */
 	getSampler() {
 

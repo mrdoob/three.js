@@ -36,7 +36,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -89,7 +89,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		/**
 		 * In Sprites, the transparent property is enabled by default.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.transparent = true;
@@ -173,7 +173,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	/**
 	 * Whether to use size attenuation or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get sizeAttenuation() {

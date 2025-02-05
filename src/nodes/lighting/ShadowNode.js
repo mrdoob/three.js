@@ -398,7 +398,7 @@ class ShadowNode extends ShadowBaseNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -488,7 +488,7 @@ class ShadowNode extends ShadowBaseNode {
 	/**
 	 * Returns the shadow filtering function for the given shadow type.
 	 *
-	 * @param {Number} type - The shadow type.
+	 * @param {number} type - The shadow type.
 	 * @return {Function} The filtering function.
 	 */
 	getShadowFilterFn( type ) {

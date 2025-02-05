@@ -43,7 +43,7 @@ class WebGPUPipelineUtils {
 	 *
 	 * @private
 	 * @param {RenderContext} renderContext - The render context.
-	 * @return {Number} The sample count.
+	 * @return {number} The sample count.
 	 */
 	_getSampleCount( renderContext ) {
 
@@ -397,8 +397,8 @@ class WebGPUPipelineUtils {
 	 * Returns the GPU blend factor which is required for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Number} blend - The blend factor as a three.js constant.
-	 * @return {String} The GPU blend factor.
+	 * @param {number} blend - The blend factor as a three.js constant.
+	 * @return {string} The GPU blend factor.
 	 */
 	_getBlendFactor( blend ) {
 
@@ -472,7 +472,7 @@ class WebGPUPipelineUtils {
 	 *
 	 * @private
 	 * @param {Material} material - The material.
-	 * @return {String} The GPU stencil compare function.
+	 * @return {string} The GPU stencil compare function.
 	 */
 	_getStencilCompare( material ) {
 
@@ -527,8 +527,8 @@ class WebGPUPipelineUtils {
 	 * Returns the GPU stencil operation which is required for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Number} op - A three.js constant defining the stencil operation.
-	 * @return {String} The GPU stencil operation.
+	 * @param {number} op - A three.js constant defining the stencil operation.
+	 * @return {string} The GPU stencil operation.
 	 */
 	_getStencilOperation( op ) {
 
@@ -581,8 +581,8 @@ class WebGPUPipelineUtils {
 	 * Returns the GPU blend operation which is required for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Number} blendEquation - A three.js constant defining the blend equation.
-	 * @return {String} The GPU blend operation.
+	 * @param {number} blendEquation - A three.js constant defining the blend equation.
+	 * @return {string} The GPU blend operation.
 	 */
 	_getBlendOperation( blendEquation ) {
 
@@ -674,7 +674,7 @@ class WebGPUPipelineUtils {
 	 *
 	 * @private
 	 * @param {Material} material - The material.
-	 * @return {String} The GPU color write mask.
+	 * @return {string} The GPU color write mask.
 	 */
 	_getColorWriteMask( material ) {
 
@@ -687,7 +687,7 @@ class WebGPUPipelineUtils {
 	 *
 	 * @private
 	 * @param {Material} material - The material.
-	 * @return {String} The GPU depth compare function.
+	 * @return {string} The GPU depth compare function.
 	 */
 	_getDepthCompare( material ) {
 

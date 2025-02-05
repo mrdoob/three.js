@@ -22,7 +22,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Constructs a new node.
 	 *
-	 * @param {String?} nodeType - The node type.
+	 * @param {string?} nodeType - The node type.
 	 */
 	constructor( nodeType = null ) {
 
@@ -31,7 +31,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The node type. This represents the result type of the node (e.g. `float` or `vec3`).
 		 *
-		 * @type {String?}
+		 * @type {string?}
 		 * @default null
 		 */
 		this.nodeType = nodeType;
@@ -39,7 +39,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The update type of the node's {@link Node#update} method. Possible values are listed in {@link NodeUpdateType}.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'none'
 		 */
 		this.updateType = NodeUpdateType.NONE;
@@ -47,7 +47,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The update type of the node's {@link Node#updateBefore} method. Possible values are listed in {@link NodeUpdateType}.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'none'
 		 */
 		this.updateBeforeType = NodeUpdateType.NONE;
@@ -55,7 +55,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The update type of the node's {@link Node#updateAfter} method. Possible values are listed in {@link NodeUpdateType}.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'none'
 		 */
 		this.updateAfterType = NodeUpdateType.NONE;
@@ -63,7 +63,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The UUID of the node.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @readonly
 		 */
 		this.uuid = MathUtils.generateUUID();
@@ -71,7 +71,7 @@ class Node extends EventDispatcher {
 		/**
 		 * The version of the node. The version automatically is increased when {@link Node#needsUpdate} is set to `true`.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @readonly
 		 * @default 0
 		 */
@@ -82,7 +82,7 @@ class Node extends EventDispatcher {
 		 * node caching system. All nodes which should be declared just once should
 		 * set this flag to `true` (a typical example is {@link AttributeNode}).
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.global = false;
@@ -90,7 +90,7 @@ class Node extends EventDispatcher {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -102,7 +102,7 @@ class Node extends EventDispatcher {
 		 * The cache key of this node.
 		 *
 		 * @private
-		 * @type {Number?}
+		 * @type {number?}
 		 * @default null
 		 */
 		this._cacheKey = null;
@@ -111,7 +111,7 @@ class Node extends EventDispatcher {
 		 * The cache key 's version.
 		 *
 		 * @private
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this._cacheKeyVersion = 0;
@@ -123,7 +123,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Set this property to `true` when the node should be regenerated.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -140,7 +140,7 @@ class Node extends EventDispatcher {
 	/**
 	 * The type of the class. The value is usually the constructor name.
 	 *
-	 * @type {String}
+	 * @type {string}
  	 * @readonly
 	 */
 	get type() {
@@ -153,7 +153,7 @@ class Node extends EventDispatcher {
 	 * Convenient method for defining {@link Node#update}.
 	 *
 	 * @param {Function} callback - The update method.
-	 * @param {String} updateType - The update type.
+	 * @param {string} updateType - The update type.
 	 * @return {Node} A reference to this node.
 	 */
 	onUpdate( callback, updateType ) {
@@ -236,8 +236,8 @@ class Node extends EventDispatcher {
 	 * Nodes might refer to other objects like materials. This method allows to dynamically update the reference
 	 * to such objects based on a given state (e.g. the current node frame or builder).
 	 *
-	 * @param {Any} state - This method can be invocated in different contexts so `state` can refer to any object type.
-	 * @return {Any} The updated reference.
+	 * @param {any} state - This method can be invocated in different contexts so `state` can refer to any object type.
+	 * @return {any} The updated reference.
 	 */
 	updateReference( /*state*/ ) {
 
@@ -251,7 +251,7 @@ class Node extends EventDispatcher {
 	 * global status.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Boolean} Whether this node is global or not.
+	 * @return {boolean} Whether this node is global or not.
 	 */
 	isGlobal( /*builder*/ ) {
 
@@ -312,8 +312,8 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the cache key for this node.
 	 *
-	 * @param {Boolean} [force=false] - When set to `true`, a recomputation of the cache key is forced.
-	 * @return {Number} The cache key of the node.
+	 * @param {boolean} [force=false] - When set to `true`, a recomputation of the cache key is forced.
+	 * @return {number} The cache key of the node.
 	 */
 	getCacheKey( force = false ) {
 
@@ -333,7 +333,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Generate a custom cache key for this node.
 	 *
-	 * @return {Number} The cache key of the node.
+	 * @return {number} The cache key of the node.
 	 */
 	customCacheKey() {
 
@@ -358,7 +358,7 @@ class Node extends EventDispatcher {
 	 * depending on their implementation.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The hash.
+	 * @return {string} The hash.
 	 */
 	getHash( /*builder*/ ) {
 
@@ -405,7 +405,7 @@ class Node extends EventDispatcher {
 	 * these elements.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The type of the node.
+	 * @return {string} The type of the node.
 	 */
 	getElementType( builder ) {
 
@@ -420,8 +420,8 @@ class Node extends EventDispatcher {
 	 * Returns the node member type for the given name.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String} name - The name of the member.
-	 * @return {String} The type of the node.
+	 * @param {string} name - The name of the member.
+	 * @return {string} The type of the node.
 	 */
 	getMemberType( /*uilder, name*/ ) {
 
@@ -433,7 +433,7 @@ class Node extends EventDispatcher {
 	 * Returns the node's type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The type of the node.
+	 * @return {string} The type of the node.
 	 */
 	getNodeType( builder ) {
 
@@ -528,8 +528,8 @@ class Node extends EventDispatcher {
 	 * This state builds the output node and returns the resulting shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String?} output - Can be used to define the output type.
-	 * @return {String?} The generated shader string.
+	 * @param {string?} output - Can be used to define the output type.
+	 * @return {string?} The generated shader string.
 	 */
 	generate( builder, output ) {
 
@@ -549,7 +549,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 * @return {boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	updateBefore( /*frame*/ ) {
 
@@ -563,7 +563,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 * @return {boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	updateAfter( /*frame*/ ) {
 
@@ -577,7 +577,7 @@ class Node extends EventDispatcher {
 	 *
 	 * @abstract
 	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 * @return {Boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
+	 * @return {boolean?} An optional bool that indicates whether the implementation actually performed an update or not (e.g. due to caching).
 	 */
 	update( /*frame*/ ) {
 
@@ -590,8 +590,8 @@ class Node extends EventDispatcher {
 	 * on the current build stage (setup, analyze or generate).
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String?} output - Can be used to define the output type.
-	 * @return {String?} When this method is executed in the setup or analyze stage, `null` is returned. In the generate stage, the generated shader string.
+	 * @param {string?} output - Can be used to define the output type.
+	 * @return {string?} When this method is executed in the setup or analyze stage, `null` is returned. In the generate stage, the generated shader string.
 	 */
 	build( builder, output = null ) {
 

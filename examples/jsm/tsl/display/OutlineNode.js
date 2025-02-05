@@ -58,7 +58,7 @@ class OutlineNode extends TempNode {
 	 * @param {Array<Object3D>} params.selectedObjects - An array of selected objects.
 	 * @param {Node<float>} [params.edgeThickness=float(1)] - The thickness of the edges.
 	 * @param {Node<float>} [params.edgeGlow=float(0)] - Can be used for an animated glow/pulse effects.
-	 * @param {Number} [params.downSampleRatio=2] - The downsample ratio.
+	 * @param {number} [params.downSampleRatio=2] - The downsample ratio.
 	 */
 	constructor( scene, camera, params = {} ) {
 
@@ -109,7 +109,7 @@ class OutlineNode extends TempNode {
 		/**
 		 * The downsample ratio.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 2
 		 */
 		this.downSampleRatio = downSampleRatio;
@@ -118,7 +118,7 @@ class OutlineNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -403,8 +403,8 @@ class OutlineNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -744,7 +744,7 @@ export default OutlineNode;
  * @param {Array<Object3D>} params.selectedObjects - An array of selected objects.
  * @param {Node<float>} [params.edgeThickness=float(1)] - The thickness of the edges.
  * @param {Node<float>} [params.edgeGlow=float(0)] - Can be used for animated glow/pulse effects.
- * @param {Number} [params.downSampleRatio=2] - The downsample ratio.
+ * @param {number} [params.downSampleRatio=2] - The downsample ratio.
  * @returns {OutlineNode}
  */
 export const outline = ( scene, camera, params ) => nodeObject( new OutlineNode( scene, camera, params ) );

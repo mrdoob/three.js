@@ -37,7 +37,7 @@ class StereoCompositePassNode extends PassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -92,7 +92,7 @@ class StereoCompositePassNode extends PassNode {
 	/**
 	 * Updates the internal stereo camera.
 	 *
-	 * @param {Number} coordinateSystem - The current coordinate system.
+	 * @param {number} coordinateSystem - The current coordinate system.
 	 */
 	updateStereoCamera( coordinateSystem ) {
 
@@ -105,8 +105,8 @@ class StereoCompositePassNode extends PassNode {
 	/**
 	 * Sets the size of the pass.
 	 *
-	 * @param {Number} width - The width of the pass.
-	 * @param {Number} height - The height of the pass.
+	 * @param {number} width - The width of the pass.
+	 * @param {number} height - The height of the pass.
 	 */
 	setSize( width, height ) {
 

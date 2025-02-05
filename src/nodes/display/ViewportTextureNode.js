@@ -47,7 +47,7 @@ class ViewportTextureNode extends TextureNode {
 		/**
 		 * Whether to generate mipmaps or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.generateMipmaps = false;
@@ -55,7 +55,7 @@ class ViewportTextureNode extends TextureNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -65,7 +65,7 @@ class ViewportTextureNode extends TextureNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
 		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;

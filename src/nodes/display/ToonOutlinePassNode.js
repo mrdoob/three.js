@@ -176,8 +176,8 @@ export default ToonOutlinePassNode;
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - A reference to the camera.
  * @param {Color} color - Defines the outline's color.
- * @param {Number} [thickness=0.003] - Defines the outline's thickness.
- * @param {Number} [alpha=1] - Defines the outline's alpha.
+ * @param {number} [thickness=0.003] - Defines the outline's thickness.
+ * @param {number} [alpha=1] - Defines the outline's alpha.
  * @returns {ToonOutlinePassNode}
  */
 export const toonOutlinePass = ( scene, camera, color = new Color( 0, 0, 0 ), thickness = 0.003, alpha = 1 ) => nodeObject( new ToonOutlinePassNode( scene, camera, nodeObject( color ), nodeObject( thickness ), nodeObject( alpha ) ) );

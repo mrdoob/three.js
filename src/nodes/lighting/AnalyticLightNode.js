@@ -80,7 +80,7 @@ class AnalyticLightNode extends LightingNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -90,7 +90,7 @@ class AnalyticLightNode extends LightingNode {
 		 * Overwritten since analytic light nodes are updated
 		 * once per frame.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateType = NodeUpdateType.FRAME;
@@ -101,7 +101,7 @@ class AnalyticLightNode extends LightingNode {
 	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
 	 * `light.id` and `light.castShadow` into the cache key.
 	 *
-	 * @return {Number} The custom cache key.
+	 * @return {number} The custom cache key.
 	 */
 	customCacheKey() {
 

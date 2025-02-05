@@ -26,8 +26,8 @@ class UserDataNode extends ReferenceNode {
 	/**
 	 * Constructs a new user data node.
 	 *
-	 * @param {String} property - The property name that should be referenced by the node.
-	 * @param {String} inputType - The node data type of the reference.
+	 * @param {string} property - The property name that should be referenced by the node.
+	 * @param {string} inputType - The node data type of the reference.
 	 * @param {Object?} [userData=null] - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
 	 */
 	constructor( property, inputType, userData = null ) {
@@ -69,8 +69,8 @@ export default UserDataNode;
  *
  * @tsl
  * @function
- * @param {String} name - The property name that should be referenced by the node.
- * @param {String} inputType - The node data type of the reference.
+ * @param {string} name - The property name that should be referenced by the node.
+ * @param {string} inputType - The node data type of the reference.
  * @param {Object?} userData - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
  * @returns {UserDataNode}
  */

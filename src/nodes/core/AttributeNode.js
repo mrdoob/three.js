@@ -17,8 +17,8 @@ class AttributeNode extends Node {
 	/**
 	 * Constructs a new attribute node.
 	 *
-	 * @param {String} attributeName - The name of the attribute.
-	 * @param {String?} nodeType - The node type.
+	 * @param {string} attributeName - The name of the attribute.
+	 * @param {string?} nodeType - The node type.
 	 */
 	constructor( attributeName, nodeType = null ) {
 
@@ -27,7 +27,7 @@ class AttributeNode extends Node {
 		/**
 		 * `AttributeNode` sets this property to `true` by default.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.global = true;
@@ -73,7 +73,7 @@ class AttributeNode extends Node {
 	 * overwritten in derived classes if the final name must be computed
 	 * analytically.
 	 *
-	 * @param {String} attributeName - The name of the attribute.
+	 * @param {string} attributeName - The name of the attribute.
 	 * @return {AttributeNode} A reference to this node.
 	 */
 	setAttributeName( attributeName ) {
@@ -90,7 +90,7 @@ class AttributeNode extends Node {
 	 * analytically.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The attribute name.
+	 * @return {string} The attribute name.
 	 */
 	getAttributeName( /*builder*/ ) {
 
@@ -160,8 +160,8 @@ export default AttributeNode;
  *
  * @tsl
  * @function
- * @param {String} name - The name of the attribute.
- * @param {String?} nodeType - The node type.
+ * @param {string} name - The name of the attribute.
+ * @param {string?} nodeType - The node type.
  * @returns {AttributeNode}
  */
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );

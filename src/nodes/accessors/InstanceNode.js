@@ -31,7 +31,7 @@ class InstanceNode extends Node {
 	/**
 	 * Constructs a new instance node.
 	 *
-	 * @param {Number} count - The number of instances.
+	 * @param {number} count - The number of instances.
 	 * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
 	 * @param {InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
 	 */
@@ -42,7 +42,7 @@ class InstanceNode extends Node {
 		/**
 		 * The number of instances.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.count = count;
 
@@ -78,7 +78,7 @@ class InstanceNode extends Node {
 		 * The update type is set to `frame` since an update
 		 * of instanced buffer data must be checked per frame.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateType = NodeUpdateType.FRAME;
@@ -215,7 +215,7 @@ export default InstanceNode;
  *
  * @tsl
  * @function
- * @param {Number} count - The number of instances.
+ * @param {number} count - The number of instances.
  * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
  * @param {InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
  * @returns {InstanceNode}

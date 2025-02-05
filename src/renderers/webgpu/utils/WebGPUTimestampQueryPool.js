@@ -13,8 +13,8 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * Creates a new WebGPU timestamp query pool.
 	 *
 	 * @param {GPUDevice} device - The WebGPU device to create queries on.
-	 * @param {String} type - The type identifier for this query pool.
-	 * @param {Number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+	 * @param {string} type - The type identifier for this query pool.
+	 * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
 	 */
 	constructor( device, type, maxQueries = 2048 ) {
 
@@ -47,7 +47,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * Allocates a pair of queries for a given render context.
 	 *
 	 * @param {Object} renderContext - The render context to allocate queries for.
-	 * @returns {Number?} The base offset for the allocated queries, or null if allocation failed.
+	 * @returns {number?} The base offset for the allocated queries, or null if allocation failed.
 	 */
 	allocateQueriesForContext( renderContext ) {
 
@@ -73,7 +73,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * If there's already a pending resolve operation, returns that promise instead.
 	 *
 	 * @async
-	 * @returns {Promise<Number>} The total duration in milliseconds, or the last valid value if resolution fails.
+	 * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
 	 */
 	async resolveQueriesAsync() {
 
@@ -109,7 +109,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 *
 	 * @async
 	 * @private
-	 * @returns {Promise<Number>} The total duration in milliseconds.
+	 * @returns {Promise<number>} The total duration in milliseconds.
 	 */
 	async _resolveQueries() {
 

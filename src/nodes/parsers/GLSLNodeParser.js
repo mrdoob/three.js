@@ -11,7 +11,7 @@ class GLSLNodeParser extends NodeParser {
 	/**
 	 * The method parses the given GLSL code an returns a node function.
 	 *
-	 * @param {String} source - The GLSL code.
+	 * @param {string} source - The GLSL code.
 	 * @return {GLSLNodeFunction} A node function.
 	 */
 	parseFunction( source ) {

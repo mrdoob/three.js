@@ -18,7 +18,7 @@ class VertexColorNode extends AttributeNode {
 	/**
 	 * Constructs a new vertex color node.
 	 *
-	 * @param {Number} [index=0] - The attribute index.
+	 * @param {number} [index=0] - The attribute index.
 	 */
 	constructor( index = 0 ) {
 
@@ -27,7 +27,7 @@ class VertexColorNode extends AttributeNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -36,7 +36,7 @@ class VertexColorNode extends AttributeNode {
 		/**
 		 * The attribute index to enable more than one sets of vertex colors.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.index = index;
@@ -47,7 +47,7 @@ class VertexColorNode extends AttributeNode {
 	 * Overwrites the default implementation by honoring the attribute index.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The attribute name.
+	 * @return {string} The attribute name.
 	 */
 	getAttributeName( /*builder*/ ) {
 
@@ -104,7 +104,7 @@ export default VertexColorNode;
  *
  * @tsl
  * @function
- * @param {Number} index - The attribute index.
+ * @param {number} index - The attribute index.
  * @returns {VertexColorNode}
  */
 export const vertexColor = ( index ) => nodeObject( new VertexColorNode( index ) );

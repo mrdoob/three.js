@@ -36,7 +36,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -272,7 +272,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Whether the lighting model should use clearcoat or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useClearcoat() {
@@ -284,7 +284,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Whether the lighting model should use iridescence or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useIridescence() {
@@ -296,7 +296,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Whether the lighting model should use sheen or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useSheen() {
@@ -308,7 +308,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Whether the lighting model should use anisotropy or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useAnisotropy() {
@@ -320,7 +320,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Whether the lighting model should use transmission or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useTransmission() {
@@ -332,7 +332,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Whether the lighting model should use dispersion or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useDispersion() {

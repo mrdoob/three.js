@@ -151,7 +151,7 @@ class WGSLNodeFunction extends NodeFunction {
 	/**
 	 * Constructs a new WGSL node function.
 	 *
-	 * @param {String} source - The WGSL source.
+	 * @param {string} source - The WGSL source.
 	 */
 	constructor( source ) {
 
@@ -168,8 +168,8 @@ class WGSLNodeFunction extends NodeFunction {
 	/**
 	 * This method returns the WGSL code of the node function.
 	 *
-	 * @param {String} [name=this.name] - The function's name.
-	 * @return {String} The shader code.
+	 * @param {string} [name=this.name] - The function's name.
+	 * @return {string} The shader code.
 	 */
 	getCode( name = this.name ) {
 
