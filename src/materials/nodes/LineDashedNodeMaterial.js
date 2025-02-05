@@ -33,7 +33,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -44,7 +44,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		/**
 		 * The dash offset.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.dashOffset = 0;

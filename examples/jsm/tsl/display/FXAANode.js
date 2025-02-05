@@ -35,7 +35,7 @@ class FXAANode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;

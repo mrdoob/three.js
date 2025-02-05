@@ -23,7 +23,7 @@ class RenderContexts {
 		 * A dictionary that manages render contexts in chain maps
 		 * for each attachment state.
 		 *
-		 * @type {Object<String,ChainMap>}
+		 * @type {Object<string,ChainMap>}
 		 */
 		this.chainMaps = {};
 
@@ -93,7 +93,7 @@ class RenderContexts {
 	 * Returns a chain map for the given attachment state.
 	 *
 	 * @private
-	 * @param {String} attachmentState - The attachment state.
+	 * @param {string} attachmentState - The attachment state.
 	 * @return {ChainMap} The chain map.
 	 */
 	_getChainMap( attachmentState ) {

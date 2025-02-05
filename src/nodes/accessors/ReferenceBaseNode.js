@@ -43,7 +43,7 @@ class ReferenceElementNode extends ArrayElementNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -55,7 +55,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	 * This method is overwritten since the node type is inferred from
 	 * the uniform type of the reference node.
 	 *
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType() {
 
@@ -94,10 +94,10 @@ class ReferenceBaseNode extends Node {
 	/**
 	 * Constructs a new reference base node.
 	 *
-	 * @param {String} property - The name of the property the node refers to.
-	 * @param {String} uniformType - The uniform type that should be used to represent the property value.
+	 * @param {string} property - The name of the property the node refers to.
+	 * @param {string} uniformType - The uniform type that should be used to represent the property value.
 	 * @param {Object?} [object=null] - The object the property belongs to.
-	 * @param {Number?} [count=null] - When the linked property is an array-like, this parameter defines its length.
+	 * @param {number?} [count=null] - When the linked property is an array-like, this parameter defines its length.
 	 */
 	constructor( property, uniformType, object = null, count = null ) {
 
@@ -106,14 +106,14 @@ class ReferenceBaseNode extends Node {
 		/**
 		 * The name of the property the node refers to.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.property = property;
 
 		/**
 		 * The uniform type that should be used to represent the property value.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.uniformType = uniformType;
 
@@ -128,7 +128,7 @@ class ReferenceBaseNode extends Node {
 		/**
 		 * When the linked property is an array, this parameter defines its length.
 		 *
-		 * @type {Number?}
+		 * @type {number?}
 		 * @default null
 		 */
 		this.count = count;
@@ -137,7 +137,7 @@ class ReferenceBaseNode extends Node {
 		 * The property name might have dots so nested properties can be referred.
 		 * The hierarchy of the names is stored inside this array.
 		 *
-		 * @type {Array<String>}
+		 * @type {Array<string>}
 		 */
 		this.properties = property.split( '.' );
 
@@ -169,7 +169,7 @@ class ReferenceBaseNode extends Node {
 		/**
 		 * Overwritten since reference nodes are updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'object'
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
@@ -207,7 +207,7 @@ class ReferenceBaseNode extends Node {
 	 * Sets the node type which automatically defines the internal
 	 * uniform type.
 	 *
-	 * @param {String} uniformType - The type to set.
+	 * @param {string} uniformType - The type to set.
 	 */
 	setNodeType( uniformType ) {
 
@@ -228,7 +228,7 @@ class ReferenceBaseNode extends Node {
 	 * the type of the reference node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -247,7 +247,7 @@ class ReferenceBaseNode extends Node {
 	 * Returns the property value from the given referred object.
 	 *
 	 * @param {Object} [object=this.reference] - The object to retrieve the property value from.
-	 * @return {Any} The value.
+	 * @return {any} The value.
 	 */
 	getValueFromReference( object = this.reference ) {
 
@@ -335,8 +335,8 @@ export default ReferenceBaseNode;
  *
  * @tsl
  * @function
- * @param {String} name - The name of the property the node refers to.
- * @param {String} type - The uniform type that should be used to represent the property value.
+ * @param {string} name - The name of the property the node refers to.
+ * @param {string} type - The uniform type that should be used to represent the property value.
  * @param {Object} object - The object the property belongs to.
  * @returns {ReferenceBaseNode}
  */
@@ -348,9 +348,9 @@ export const reference = ( name, type, object ) => nodeObject( new ReferenceBase
  *
  * @tsl
  * @function
- * @param {String} name - The name of the property the node refers to.
- * @param {String} type - The uniform type that should be used to represent the property value.
- * @param {Number} count - The number of value inside the array-like object.
+ * @param {string} name - The name of the property the node refers to.
+ * @param {string} type - The uniform type that should be used to represent the property value.
+ * @param {number} count - The number of value inside the array-like object.
  * @param {Object} object - An array-like object the property belongs to.
  * @returns {ReferenceBaseNode}
  */

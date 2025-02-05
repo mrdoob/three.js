@@ -16,7 +16,7 @@ class NodeCache {
 		/**
 		 * The id of the cache.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @readonly
 		 */
 		this.id = _id ++;

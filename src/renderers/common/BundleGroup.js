@@ -24,7 +24,7 @@ class BundleGroup extends Group {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -35,7 +35,7 @@ class BundleGroup extends Group {
 		 * during serialization/deserialization. It should always
 		 * match the class name.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @readonly
 		 * @default 'BundleGroup'
 		 */
@@ -49,7 +49,7 @@ class BundleGroup extends Group {
 		 * If a change is required, an update can still be forced by setting the
 		 * `needsUpdate` flag to `true`.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.static = true;
@@ -57,7 +57,7 @@ class BundleGroup extends Group {
 		/**
 		 * The bundle group's version.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @readonly
 		 * @default 0
 		 */
@@ -68,9 +68,9 @@ class BundleGroup extends Group {
 	/**
 	 * Set this property to `true` when the bundle group has changed.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default false
-	 * @param {Boolean} value
+	 * @param {boolean} value
 	 */
 	set needsUpdate( value ) {
 

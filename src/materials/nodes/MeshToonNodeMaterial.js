@@ -30,7 +30,7 @@ class MeshToonNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -39,7 +39,7 @@ class MeshToonNodeMaterial extends NodeMaterial {
 		/**
 		 * Set to `true` because toon materials react on lights.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.lights = true;

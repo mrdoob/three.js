@@ -38,7 +38,7 @@ class FunctionNode extends CodeNode {
 	/**
 	 * Constructs a new function node.
 	 *
-	 * @param {String} [code=''] - The native code.
+	 * @param {string} [code=''] - The native code.
 	 * @param {Array<Node>} [includes=[]] - An array of includes.
 	 * @param {('js'|'wgsl'|'glsl')} [language=''] - The used language.
 	 */

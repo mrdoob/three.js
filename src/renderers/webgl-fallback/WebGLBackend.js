@@ -27,13 +27,13 @@ class WebGLBackend extends Backend {
 	 * Constructs a new WebGPU backend.
 	 *
 	 * @param {Object} parameters - The configuration parameter.
-	 * @param {Boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {Boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {Boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {Boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {Boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {Number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {Boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @param {boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 * @param {WebGL2RenderingContext} [parameters.context=undefined] - A WebGL 2 rendering context.
 	 */
 	constructor( parameters = {} ) {
@@ -43,7 +43,7 @@ class WebGLBackend extends Backend {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -123,14 +123,14 @@ class WebGLBackend extends Backend {
 		/**
 		 * Dictionary for caching VAOs.
 		 *
-		 * @type {Object<String,WebGLVertexArrayObject>}
+		 * @type {Object<string,WebGLVertexArrayObject>}
 		 */
 		this.vaoCache = {};
 
 		/**
 		 * Dictionary for caching transform feedback objects.
 		 *
-		 * @type {Object<String,WebGLTransformFeedback>}
+		 * @type {Object<string,WebGLTransformFeedback>}
 		 */
 		this.transformFeedbackCache = {};
 
@@ -138,7 +138,7 @@ class WebGLBackend extends Backend {
 		 * Controls if `gl.RASTERIZER_DISCARD` should be enabled or not.
 		 * Only relevant when using compute shaders.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.discard = false;
@@ -164,7 +164,7 @@ class WebGLBackend extends Backend {
 		/**
 		 * Whether to track timestamps with a Timestamp Query API or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
@@ -266,7 +266,7 @@ class WebGLBackend extends Backend {
 	/**
 	 * The coordinate system of the backend.
 	 *
-	 * @type {Number}
+	 * @type {number}
 	 * @readonly
 	 */
 	get coordinateSystem() {
@@ -669,7 +669,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object3D} object - The 3D object to test.
-	 * @return {Boolean} Whether the 3D object is fully occluded or not.
+	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
 	isOccluded( renderContext, object ) {
 
@@ -696,7 +696,7 @@ class WebGLBackend extends Backend {
 	/**
 	 * Defines the scissor test.
 	 *
-	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
 	setScissorTest( boolean ) {
 
@@ -709,11 +709,11 @@ class WebGLBackend extends Backend {
 	/**
 	 * Performs a clear operation.
 	 *
-	 * @param {Boolean} color - Whether the color buffer should be cleared or not.
-	 * @param {Boolean} depth - Whether the depth buffer should be cleared or not.
-	 * @param {Boolean} stencil - Whether the stencil buffer should be cleared or not.
+	 * @param {boolean} color - Whether the color buffer should be cleared or not.
+	 * @param {boolean} depth - Whether the depth buffer should be cleared or not.
+	 * @param {boolean} stencil - Whether the stencil buffer should be cleared or not.
 	 * @param {Object?} [descriptor=null] - The render context of the current set render target.
-	 * @param {Boolean} [setFrameBuffer=true] - TODO.
+	 * @param {boolean} [setFrameBuffer=true] - TODO.
 	 */
 	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
 
@@ -1163,7 +1163,7 @@ class WebGLBackend extends Backend {
 	 * Explain why always null is returned.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {Boolean} Whether the render pipeline requires an update or not.
+	 * @return {boolean} Whether the render pipeline requires an update or not.
 	 */
 	needsRenderUpdate( /*renderObject*/ ) {
 
@@ -1175,7 +1175,7 @@ class WebGLBackend extends Backend {
 	 * Explain why no cache key is computed.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {String} The cache key.
+	 * @return {string} The cache key.
 	 */
 	getRenderCacheKey( /*renderObject*/ ) {
 
@@ -1248,11 +1248,11 @@ class WebGLBackend extends Backend {
 	 *
 	 * @async
 	 * @param {Texture} texture - The texture to copy.
-	 * @param {Number} x - The x coordinate of the copy origin.
-	 * @param {Number} y - The y coordinate of the copy origin.
-	 * @param {Number} width - The width of the copy.
-	 * @param {Number} height - The height of the copy.
-	 * @param {Number} faceIndex - The face index.
+	 * @param {number} x - The x coordinate of the copy origin.
+	 * @param {number} y - The y coordinate of the copy origin.
+	 * @param {number} width - The width of the copy.
+	 * @param {number} height - The height of the copy.
+	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
@@ -1396,9 +1396,9 @@ class WebGLBackend extends Backend {
 	 * Formats the source code of error messages.
 	 *
 	 * @private
-	 * @param {String} string - The code.
-	 * @param {Number} errorLine - The error line.
-	 * @return {String} The formatted code.
+	 * @param {string} string - The code.
+	 * @param {number} errorLine - The error line.
+	 * @return {string} The formatted code.
 	 */
 	_handleSource( string, errorLine ) {
 
@@ -1425,8 +1425,8 @@ class WebGLBackend extends Backend {
 	 * @private
 	 * @param {WebGL2RenderingContext} gl - The rendering context.
 	 * @param {WebGLShader} shader - The WebGL shader object.
-	 * @param {String} type - The shader type.
-	 * @return {String} The shader errors.
+	 * @param {string} type - The shader type.
+	 * @return {string} The shader errors.
 	 */
 	_getShaderErrors( gl, shader, type ) {
 
@@ -1639,8 +1639,8 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {Number} cacheIndex - The cache index.
-	 * @param {Number} version - The version.
+	 * @param {number} cacheIndex - The cache index.
+	 * @param {number} version - The version.
 	 */
 	createBindings( bindGroup, bindings /*, cacheIndex, version*/ ) {
 
@@ -1678,8 +1678,8 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {Number} cacheIndex - The cache index.
-	 * @param {Number} version - The version.
+	 * @param {number} cacheIndex - The cache index.
+	 * @param {number} version - The version.
 	 */
 	updateBindings( bindGroup /*, bindings, cacheIndex, version*/ ) {
 
@@ -1813,8 +1813,8 @@ class WebGLBackend extends Backend {
 	/**
 	 * Checks if the given feature is supported  by the backend.
 	 *
-	 * @param {String} name - The feature's name.
-	 * @return {Boolean} Whether the feature is supported or not.
+	 * @param {string} name - The feature's name.
+	 * @return {boolean} Whether the feature is supported or not.
 	 */
 	hasFeature( name ) {
 
@@ -1835,7 +1835,7 @@ class WebGLBackend extends Backend {
 	/**
 	 * Returns the maximum anisotropy texture filtering value.
 	 *
-	 * @return {Number} The maximum anisotropy texture filtering value.
+	 * @return {number} The maximum anisotropy texture filtering value.
 	 */
 	getMaxAnisotropy() {
 
@@ -1850,7 +1850,7 @@ class WebGLBackend extends Backend {
 	 * @param {Texture} dstTexture - The destination texture.
 	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
-	 * @param {Number} [level=0] - The mip level to copy.
+	 * @param {number} [level=0] - The mip level to copy.
 	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
@@ -2137,7 +2137,7 @@ class WebGLBackend extends Backend {
 	 * @private
 	 * @param {BufferAttribute?} index - The index. `null` for non-indexed geometries.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
-	 * @return {String} The VAO key.
+	 * @return {string} The VAO key.
 	 */
 	_getVaoKey( index, attributes ) {
 
@@ -2371,7 +2371,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @private
 	 * @param {RenderTarget} renderTarget - The render target that should be multisampled.
-	 * @return {Boolean} Whether to use the `WEBGL_multisampled_render_to_texture` extension for MSAA or not.
+	 * @return {boolean} Whether to use the `WEBGL_multisampled_render_to_texture` extension for MSAA or not.
 	 */
 	_useMultisampledRTT( renderTarget ) {
 

@@ -63,7 +63,7 @@ class RangeNode extends Node {
 	 * Returns the vector length which is computed based on the range definition.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Number} The vector length.
+	 * @return {number} The vector length.
 	 */
 	getVectorLength( builder ) {
 
@@ -78,7 +78,7 @@ class RangeNode extends Node {
 	 * This method is overwritten since the node type is inferred from range definition.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 

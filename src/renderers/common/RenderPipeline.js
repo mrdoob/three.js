@@ -11,7 +11,7 @@ class RenderPipeline extends Pipeline {
 	/**
 	 * Constructs a new render pipeline.
 	 *
-	 * @param {String} cacheKey - The pipeline's cache key.
+	 * @param {string} cacheKey - The pipeline's cache key.
 	 * @param {ProgrammableStage} vertexProgram - The pipeline's vertex shader.
 	 * @param {ProgrammableStage} fragmentProgram - The pipeline's fragment shader.
 	 */

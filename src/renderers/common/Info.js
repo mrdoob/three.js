@@ -16,7 +16,7 @@ class Info {
 		 * by apps which manage their own animation loop. They must
 		 * then call `renderer.info.reset()` once per frame manually.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.autoReset = true;
@@ -25,7 +25,7 @@ class Info {
 		 * The current frame ID. This ID is managed
 		 * by `NodeFrame`.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @readonly
 		 * @default 0
 		 */
@@ -35,7 +35,7 @@ class Info {
 		 * The number of render calls since the
 		 * app has been started.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @readonly
 		 * @default 0
 		 */
@@ -46,13 +46,13 @@ class Info {
 		 *
 		 * @type {Object}
 		 * @readonly
-		 * @property {Number} calls - The number of render calls since the app has been started.
-		 * @property {Number} frameCalls - The number of render calls of the current frame.
-		 * @property {Number} drawCalls - The number of draw calls of the current frame.
-		 * @property {Number} triangles - The number of rendered triangle primitives of the current frame.
-		 * @property {Number} points - The number of rendered point primitives of the current frame.
-		 * @property {Number} lines - The number of rendered line primitives of the current frame.
-		 * @property {Number} timestamp - The timestamp of the frame when using `renderer.renderAsync()`.
+		 * @property {number} calls - The number of render calls since the app has been started.
+		 * @property {number} frameCalls - The number of render calls of the current frame.
+		 * @property {number} drawCalls - The number of draw calls of the current frame.
+		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
+		 * @property {number} points - The number of rendered point primitives of the current frame.
+		 * @property {number} lines - The number of rendered line primitives of the current frame.
+		 * @property {number} timestamp - The timestamp of the frame when using `renderer.renderAsync()`.
 		 */
 		this.render = {
 			calls: 0,
@@ -69,9 +69,9 @@ class Info {
 		 *
 		 * @type {Object}
 		 * @readonly
-		 * @property {Number} calls - The number of compute calls since the app has been started.
-		 * @property {Number} frameCalls - The number of compute calls of the current frame.
-		 * @property {Number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
+		 * @property {number} calls - The number of compute calls since the app has been started.
+		 * @property {number} frameCalls - The number of compute calls of the current frame.
+		 * @property {number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
 		 */
 		this.compute = {
 			calls: 0,
@@ -84,8 +84,8 @@ class Info {
 		 *
 		 * @type {Object}
 		 * @readonly
-		 * @property {Number} geometries - The number of active geometries.
-		 * @property {Number} frameCalls - The number of active textures.
+		 * @property {number} geometries - The number of active geometries.
+		 * @property {number} frameCalls - The number of active textures.
 		 */
 		this.memory = {
 			geometries: 0,
@@ -98,8 +98,8 @@ class Info {
 	 * This method should be executed per draw call and updates the corresponding metrics.
 	 *
 	 * @param {Object3D} object - The 3D object that is going to be rendered.
-	 * @param {Number} count - The vertex or index count.
-	 * @param {Number} instanceCount - The instance count.
+	 * @param {number} count - The vertex or index count.
+	 * @param {number} instanceCount - The instance count.
 	 */
 	update( object, count, instanceCount ) {
 

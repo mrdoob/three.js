@@ -105,7 +105,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		 * A cache for GPU render pipelines used for copy/transfer passes.
 		 * Every texture format requires a unique pipeline.
 		 *
-		 * @type {Object<String,GPURenderPipeline>}
+		 * @type {Object<string,GPURenderPipeline>}
 		 */
 		this.transferPipelines = {};
 
@@ -113,7 +113,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		 * A cache for GPU render pipelines used for flipY passes.
 		 * Every texture format requires a unique pipeline.
 		 *
-		 * @type {Object<String,GPURenderPipeline>}
+		 * @type {Object<string,GPURenderPipeline>}
 		 */
 		this.flipYPipelines = {};
 
@@ -153,7 +153,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 * Returns a render pipeline for the internal copy render pass. The pass
 	 * requires a unique render pipeline for each texture format.
 	 *
-	 * @param {String} format - The GPU texture format
+	 * @param {string} format - The GPU texture format
 	 * @return {GPURenderPipeline} The GPU render pipeline.
 	 */
 	getTransferPipeline( format ) {
@@ -192,7 +192,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 * Returns a render pipeline for the flipY render pass. The pass
 	 * requires a unique render pipeline for each texture format.
 	 *
-	 * @param {String} format - The GPU texture format
+	 * @param {string} format - The GPU texture format
 	 * @return {GPURenderPipeline} The GPU render pipeline.
 	 */
 	getFlipYPipeline( format ) {
@@ -232,7 +232,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 *
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureGPUDescriptor - The texture descriptor.
-	 * @param {Number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
 	 */
 	flipY( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
@@ -309,7 +309,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 *
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureGPUDescriptor - The texture descriptor.
-	 * @param {Number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
 	 */
 	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
@@ -342,7 +342,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 *
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureGPUDescriptor - The texture descriptor.
-	 * @param {Number} baseArrayLayer - The index of the first array layer accessible to the texture view.
+	 * @param {number} baseArrayLayer - The index of the first array layer accessible to the texture view.
 	 * @return {Array} An array of render bundles.
 	 */
 	_mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer ) {

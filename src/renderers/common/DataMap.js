@@ -68,7 +68,7 @@ class DataMap {
 	 * Returns `true` if the given object has a dictionary defined.
 	 *
 	 * @param {Object} object - The object to test.
-	 * @return {Boolean} Whether a dictionary is defined or not.
+	 * @return {boolean} Whether a dictionary is defined or not.
 	 */
 	has( object ) {
 

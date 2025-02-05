@@ -74,7 +74,7 @@ class SSRNode extends TempNode {
 		 * to `1` improves quality but also results in more
 		 * computational overhead.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0.5
 		 */
 		this.resolutionScale = 0.5;
@@ -83,7 +83,7 @@ class SSRNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -209,8 +209,8 @@ class SSRNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 

@@ -39,7 +39,7 @@ class TRAAPassNode extends PassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -56,7 +56,7 @@ class TRAAPassNode extends PassNode {
 		/**
 		 * The clear alpha of the pass.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.clearAlpha = 0;
@@ -65,7 +65,7 @@ class TRAAPassNode extends PassNode {
 		 * The jitter index selects the current camera offset value.
 		 *
 		 * @private
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this._jitterIndex = 0;
@@ -116,9 +116,9 @@ class TRAAPassNode extends PassNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
-	 * @return {Boolean} Whether the TRAA needs a restart or not. That is required after a resize since buffer data with different sizes can't be resolved.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
+	 * @return {boolean} Whether the TRAA needs a restart or not. That is required after a resize since buffer data with different sizes can't be resolved.
 	 */
 	setSize( width, height ) {
 

@@ -75,7 +75,7 @@ class Texture3DNode extends TextureNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -87,7 +87,7 @@ class Texture3DNode extends TextureNode {
 	 * Overwrites the default implementation to return a fixed value `'texture3D'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
 
@@ -111,7 +111,7 @@ class Texture3DNode extends TextureNode {
 	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
 	 * for 3D textures. The uv transformation matrix is not applied to 3D textures.
 	 *
-	 * @param {Boolean} value - The update toggle.
+	 * @param {boolean} value - The update toggle.
 	 */
 	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
 
@@ -149,7 +149,7 @@ class Texture3DNode extends TextureNode {
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} uvNode - The uv node to generate code for.
-	 * @return {String} The generated code snippet.
+	 * @return {string} The generated code snippet.
 	 */
 	generateUV( builder, uvNode ) {
 

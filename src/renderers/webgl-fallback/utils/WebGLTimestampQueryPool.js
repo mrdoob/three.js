@@ -52,7 +52,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	 * Allocates a pair of queries for a given render context.
 	 *
 	 * @param {Object} renderContext - The render context to allocate queries for.
-	 * @returns {Number?} The base offset for the allocated queries, or null if allocation failed.
+	 * @returns {number?} The base offset for the allocated queries, or null if allocation failed.
 	 */
 	allocateQueriesForContext( renderContext ) {
 
@@ -136,7 +136,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	 * Ends the active timestamp query for the specified render context.
 	 *
 	 * @param {Object} renderContext - The render context to end timing for.
-	 * @param {String} renderContext.id - Unique identifier for the render context.
+	 * @param {string} renderContext.id - Unique identifier for the render context.
 	 */
 	endQuery( renderContext ) {
 
@@ -181,7 +181,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	 * Asynchronously resolves all completed queries and returns the total duration.
 	 *
 	 * @async
-	 * @returns {Promise<Number>} The total duration in milliseconds, or the last valid value if resolution fails.
+	 * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
 	 */
 	async resolveQueriesAsync() {
 
@@ -247,7 +247,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	 *
 	 * @async
 	 * @param {WebGLQuery} query - The query object to resolve.
-	 * @returns {Promise<Number>} The elapsed time in milliseconds.
+	 * @returns {Promise<number>} The elapsed time in milliseconds.
 	 */
 	async resolveQuery( query ) {
 

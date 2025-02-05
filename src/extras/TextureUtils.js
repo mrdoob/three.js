@@ -70,11 +70,11 @@ function fill( texture ) {
  * Given the width, height, format, and type of a texture. Determines how many
  * bytes must be used to represent the texture.
  *
- * @param {Number} width
- * @param {Number} height
- * @param {Number} format
- * @param {Number} type
- * @return {Number} The number of bytes required to represent the texture.
+ * @param {number} width
+ * @param {number} height
+ * @param {number} format
+ * @param {number} type
+ * @return {number} The number of bytes required to represent the texture.
  */
 function getByteLength( width, height, format, type ) {
 

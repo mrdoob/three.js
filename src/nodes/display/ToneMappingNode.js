@@ -21,7 +21,7 @@ class ToneMappingNode extends TempNode {
 	/**
 	 * Constructs a new tone mapping node.
 	 *
-	 * @param {Number} toneMapping - The tone mapping type.
+	 * @param {number} toneMapping - The tone mapping type.
 	 * @param {Node} exposureNode - The tone mapping exposure.
 	 * @param {Node} [colorNode=null] - The color node to process.
 	 */
@@ -32,7 +32,7 @@ class ToneMappingNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.toneMapping = toneMapping;
 
@@ -58,7 +58,7 @@ class ToneMappingNode extends TempNode {
 	 * Overwrites the default `customCacheKey()` implementation by including the tone
 	 * mapping type into the cache key.
 	 *
-	 * @return {Number} The hash.
+	 * @return {number} The hash.
 	 */
 	customCacheKey() {
 
@@ -102,8 +102,8 @@ export default ToneMappingNode;
  *
  * @tsl
  * @function
- * @param {Number} mapping - The tone mapping type.
- * @param {Node<float> | Number} exposure - The tone mapping exposure.
+ * @param {number} mapping - The tone mapping type.
+ * @param {Node<float> | number} exposure - The tone mapping exposure.
  * @param {Node<vec3> | Color} color - The color node to process.
  * @returns {ToneMappingNode<vec3>}
  */

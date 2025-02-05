@@ -9,8 +9,8 @@ class NodeUniform {
 	/**
 	 * Constructs a new node uniform.
 	 *
-	 * @param {String} name - The name of the uniform.
-	 * @param {String} type - The type of the uniform.
+	 * @param {string} name - The name of the uniform.
+	 * @param {string} type - The type of the uniform.
 	 * @param {UniformNode} node - An reference to the node.
 	 */
 	constructor( name, type, node ) {
@@ -18,7 +18,7 @@ class NodeUniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -27,14 +27,14 @@ class NodeUniform {
 		/**
 		 * The name of the uniform.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = name;
 
 		/**
 		 * The type of the uniform.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type;
 
@@ -50,7 +50,7 @@ class NodeUniform {
 	/**
 	 * The value of the uniform node.
 	 *
-	 * @type {Any}
+	 * @type {any}
 	 */
 	get value() {
 
@@ -67,7 +67,7 @@ class NodeUniform {
 	/**
 	 * The id of the uniform node.
 	 *
-	 * @type {Number}
+	 * @type {number}
 	 */
 	get id() {
 

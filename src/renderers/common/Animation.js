@@ -48,7 +48,7 @@ class Animation {
 		 * The requestId which is returned from the `requestAnimationFrame()` call.
 		 * Can be used to cancel the stop the animation loop.
 		 *
-		 * @type {Number?}
+		 * @type {number?}
 		 * @default null
 		 */
 		this._requestId = null;

@@ -18,7 +18,7 @@ class MemberNode extends Node {
 	 * Constructs an array element node.
 	 *
 	 * @param {Node} node - The array-like node.
-	 * @param {String} property - The property name.
+	 * @param {string} property - The property name.
 	 */
 	constructor( node, property ) {
 
@@ -41,7 +41,7 @@ class MemberNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

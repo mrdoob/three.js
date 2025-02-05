@@ -10,7 +10,7 @@ import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferA
  * @private
  * @function
  * @param {BufferGeometry} geometry - The geometry.
- * @return {Number} The version.
+ * @return {number} The version.
  */
 function getWireframeVersion( geometry ) {
 
@@ -113,7 +113,7 @@ class Geometries extends DataMap {
 		 * This Weak Map is used to make sure buffer attributes are
 		 * updated only once per render call.
 		 *
-		 * @type {WeakMap<BufferAttribute,Number>}
+		 * @type {WeakMap<BufferAttribute,number>}
 		 */
 		this.attributeCall = new WeakMap();
 
@@ -123,7 +123,7 @@ class Geometries extends DataMap {
 	 * Returns `true` if the given render object has an initialized geometry.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {Boolean} Whether if the given render object has an initialized geometry or not.
+	 * @return {boolean} Whether if the given render object has an initialized geometry or not.
 	 */
 	has( renderObject ) {
 
@@ -246,7 +246,7 @@ class Geometries extends DataMap {
 	 * Updates the given attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The attribute to update.
-	 * @param {Number} type - The attribute type.
+	 * @param {number} type - The attribute type.
 	 */
 	updateAttribute( attribute, type ) {
 

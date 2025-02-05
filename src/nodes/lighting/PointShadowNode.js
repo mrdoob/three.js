@@ -187,7 +187,7 @@ class PointShadowNode extends ShadowNode {
 	 * Overwrites the default implementation to return point light shadow specific
 	 * filtering functions.
 	 *
-	 * @param {Number} type - The shadow type.
+	 * @param {number} type - The shadow type.
 	 * @return {Function} The filtering function.
 	 */
 	getShadowFilterFn( type ) {

@@ -20,8 +20,8 @@ class ComputeBuiltinNode extends Node {
 	/**
 	 * Constructs a new compute builtin node.
 	 *
-	 * @param {String} builtinName - The built-in name.
-	 * @param {String} nodeType - The node type.
+	 * @param {string} builtinName - The built-in name.
+	 * @param {string} nodeType - The node type.
 	 */
 	constructor( builtinName, nodeType ) {
 
@@ -31,7 +31,7 @@ class ComputeBuiltinNode extends Node {
 		 * The built-in name.
 		 *
 		 * @private
-		 * @type {String}
+		 * @type {string}
 		 */
 		this._builtinName = builtinName;
 
@@ -41,7 +41,7 @@ class ComputeBuiltinNode extends Node {
 	 * This method is overwritten since hash is derived from the built-in name.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The hash.
+	 * @return {string} The hash.
 	 */
 	getHash( builder ) {
 
@@ -53,7 +53,7 @@ class ComputeBuiltinNode extends Node {
 	 * This method is overwritten since the node type is simply derived from `nodeType`..
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( /*builder*/ ) {
 
@@ -64,7 +64,7 @@ class ComputeBuiltinNode extends Node {
 	/**
 	 * Sets the builtin name.
 	 *
-	 * @param {String} builtinName - The built-in name.
+	 * @param {string} builtinName - The built-in name.
 	 * @return {ComputeBuiltinNode} A reference to this node.
 	 */
 	setBuiltinName( builtinName ) {
@@ -79,7 +79,7 @@ class ComputeBuiltinNode extends Node {
 	 * Returns the builtin name.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The builtin name.
+	 * @return {string} The builtin name.
 	 */
 	getBuiltinName( /*builder*/ ) {
 
@@ -143,8 +143,8 @@ export default ComputeBuiltinNode;
  *
  * @tsl
  * @function
- * @param {String} name - The built-in name.
- * @param {String} nodeType - The node type.
+ * @param {string} name - The built-in name.
+ * @param {string} nodeType - The node type.
  * @returns {ComputeBuiltinNode}
  */
 const computeBuiltin = ( name, nodeType ) => nodeObject( new ComputeBuiltinNode( name, nodeType ) );

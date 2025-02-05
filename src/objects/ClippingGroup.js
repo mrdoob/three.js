@@ -24,7 +24,7 @@ class ClippingGroup extends Group {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -40,7 +40,7 @@ class ClippingGroup extends Group {
 		/**
 		 * Whether clipping should be enabled or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.enabled = true;
@@ -48,7 +48,7 @@ class ClippingGroup extends Group {
 		/**
 		 * Whether the intersection of the clipping planes is used to clip objects, rather than their union.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.clipIntersection = false;
@@ -56,7 +56,7 @@ class ClippingGroup extends Group {
 		/**
 		 * Whether shadows should be clipped or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.clipShadows = false;

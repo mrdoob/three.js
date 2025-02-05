@@ -8,14 +8,14 @@ class TimestampQueryPool {
 	/**
 	 * Creates a new timestamp query pool.
 	 *
-	 * @param {Number} [maxQueries=256] - Maximum number of queries this pool can hold.
+	 * @param {number} [maxQueries=256] - Maximum number of queries this pool can hold.
 	 */
 	constructor( maxQueries = 256 ) {
 
 		/**
 		 * Whether to track timestamps or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.trackTimestamp = true;
@@ -23,7 +23,7 @@ class TimestampQueryPool {
 		/**
 		 * Maximum number of queries this pool can hold.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 256
 		 */
 		this.maxQueries = maxQueries;
@@ -31,7 +31,7 @@ class TimestampQueryPool {
 		/**
 		 * How many queries allocated so far.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.currentQueryIndex = 0;
@@ -46,7 +46,7 @@ class TimestampQueryPool {
 		/**
 		 * Whether the pool has been disposed or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.isDisposed = false;
@@ -54,7 +54,7 @@ class TimestampQueryPool {
 		/**
 		 * TODO
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.lastValue = 0;
@@ -62,7 +62,7 @@ class TimestampQueryPool {
 		/**
 		 * TODO
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.pendingResolve = false;
@@ -82,7 +82,7 @@ class TimestampQueryPool {
 	 *
 	 * @abstract
 	 * @async
-	 * @returns {Promise<Number>|Number} The resolved timestamp value.
+	 * @returns {Promise<number>|number} The resolved timestamp value.
 	 */
 	async resolveQueriesAsync() {}
 

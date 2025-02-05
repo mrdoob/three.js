@@ -41,7 +41,7 @@ class MaxMipLevelNode extends UniformNode {
 		 * The `updateType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * the texture once per frame in its {@link MaxMipLevelNode#update} method.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateType = NodeUpdateType.FRAME;

@@ -89,7 +89,7 @@ class Backend {
 	 * The coordinate system of the backend.
 	 *
 	 * @abstract
-	 * @type {Number}
+	 * @type {number}
 	 * @readonly
 	 */
 	get coordinateSystem() {}
@@ -186,8 +186,8 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {Number} cacheIndex - The cache index.
-	 * @param {Number} version - The version.
+	 * @param {number} cacheIndex - The cache index.
+	 * @param {number} version - The version.
 	 */
 	createBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
 
@@ -197,8 +197,8 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {Number} cacheIndex - The cache index.
-	 * @param {Number} version - The version.
+	 * @param {number} cacheIndex - The cache index.
+	 * @param {number} version - The version.
 	 */
 	updateBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
 
@@ -237,7 +237,7 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {Boolean} Whether the render pipeline requires an update or not.
+	 * @return {boolean} Whether the render pipeline requires an update or not.
 	 */
 	needsRenderUpdate( /*renderObject*/ ) { }
 
@@ -246,7 +246,7 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {String} The cache key.
+	 * @return {string} The cache key.
 	 */
 	getRenderCacheKey( /*renderObject*/ ) { }
 
@@ -329,11 +329,11 @@ class Backend {
 	 * @abstract
 	 * @async
 	 * @param {Texture} texture - The texture to copy.
-	 * @param {Number} x - The x coordinate of the copy origin.
-	 * @param {Number} y - The y coordinate of the copy origin.
-	 * @param {Number} width - The width of the copy.
-	 * @param {Number} height - The height of the copy.
-	 * @param {Number} faceIndex - The face index.
+	 * @param {number} x - The x coordinate of the copy origin.
+	 * @param {number} y - The y coordinate of the copy origin.
+	 * @param {number} width - The width of the copy.
+	 * @param {number} height - The height of the copy.
+	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
@@ -346,7 +346,7 @@ class Backend {
 	 * @param {Texture} dstTexture - The destination texture.
 	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
-	 * @param {Number} [level=0] - The mip level to copy.
+	 * @param {number} [level=0] - The mip level to copy.
 	 */
 	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0*/ ) {}
 
@@ -438,7 +438,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object3D} object - The 3D object to test.
-	 * @return {Boolean} Whether the 3D object is fully occluded or not.
+	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
 	isOccluded( /*renderContext, object*/ ) {}
 
@@ -447,8 +447,8 @@ class Backend {
 	 *
 	 * @async
 	 * @abstract
-	 * @param {String} [type='render'] - The type of the time stamp.
-	 * @return {Promise<Number>} A Promise that resolves with the time stamp.
+	 * @param {string} [type='render'] - The type of the time stamp.
+	 * @return {Promise<number>} A Promise that resolves with the time stamp.
 	 */
 	async resolveTimestampsAsync( type = 'render' ) {
 
@@ -500,8 +500,8 @@ class Backend {
 	 *
 	 * @async
 	 * @abstract
-	 * @param {String} name - The feature's name.
-	 * @return {Promise<Boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
+	 * @param {string} name - The feature's name.
+	 * @return {Promise<boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
 	 */
 	async hasFeatureAsync( /*name*/ ) { }
 
@@ -509,8 +509,8 @@ class Backend {
 	 * Checks if the given feature is supported  by the backend.
 	 *
 	 * @abstract
-	 * @param {String} name - The feature's name.
-	 * @return {Boolean} Whether the feature is supported or not.
+	 * @param {string} name - The feature's name.
+	 * @return {boolean} Whether the feature is supported or not.
 	 */
 	hasFeature( /*name*/ ) {}
 
@@ -518,7 +518,7 @@ class Backend {
 	 * Returns the maximum anisotropy texture filtering value.
 	 *
 	 * @abstract
-	 * @return {Number} The maximum anisotropy texture filtering value.
+	 * @return {number} The maximum anisotropy texture filtering value.
 	 */
 	getMaxAnisotropy() {}
 
@@ -539,7 +539,7 @@ class Backend {
 	 * Defines the scissor test.
 	 *
 	 * @abstract
-	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
 	setScissorTest( /*boolean*/ ) { }
 
@@ -627,7 +627,7 @@ class Backend {
 	 * with data defined.
 	 *
 	 * @param {Object} object - The object.
-	 * @return {Boolean} Whether a dictionary for the given object as been defined or not.
+	 * @return {boolean} Whether a dictionary for the given object as been defined or not.
 	 */
 	has( object ) {
 

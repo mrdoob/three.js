@@ -23,7 +23,7 @@ class AtomicFunctionNode extends TempNode {
 	/**
 	 * Constructs a new atomic function node.
 	 *
-	 * @param {String} method - The signature of the atomic function to construct.
+	 * @param {string} method - The signature of the atomic function to construct.
 	 * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
 	 * @param {Node} valueNode - The value that mutates the atomic variable.
 	 * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
@@ -35,7 +35,7 @@ class AtomicFunctionNode extends TempNode {
 		/**
 		 * The signature of the atomic function to construct.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.method = method;
 
@@ -68,7 +68,7 @@ class AtomicFunctionNode extends TempNode {
 	 * the pointer node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( builder ) {
 
@@ -80,7 +80,7 @@ class AtomicFunctionNode extends TempNode {
 	 * Overwritten since the node type is inferred from the input type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -144,7 +144,7 @@ export default AtomicFunctionNode;
  *
  * @tsl
  * @function
- * @param {String} method - The signature of the atomic function to construct.
+ * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
  * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.
@@ -157,7 +157,7 @@ const atomicNode = nodeProxy( AtomicFunctionNode );
  *
  * @tsl
  * @function
- * @param {String} method - The signature of the atomic function to construct.
+ * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
  * @param {Node} valueNode - The value that mutates the atomic variable.
  * @param {Node?} [storeNode=null] - A variable storing the return value of an atomic operation, typically the value of the atomic variable before the operation.

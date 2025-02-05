@@ -101,7 +101,7 @@ class DenoiseNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -259,9 +259,9 @@ export default DenoiseNode;
 /**
  * Generates denoise samples based on the given parameters.
  *
- * @param {Number} numSamples - The number of samples.
- * @param {Number} numRings - The number of rings.
- * @param {Number} radiusExponent - The radius exponent.
+ * @param {number} numSamples - The number of samples.
+ * @param {number} numRings - The number of rings.
+ * @param {number} radiusExponent - The radius exponent.
  * @return {Array<Vector3>} The denoise samples.
  */
 function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
@@ -283,7 +283,7 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 /**
  * Generates a default noise texture for the given size.
  *
- * @param {Number} [size=64] - The texture size.
+ * @param {number} [size=64] - The texture size.
  * @return {DataTexture} The generated noise texture.
  */
 function generateDefaultNoise( size = 64 ) {

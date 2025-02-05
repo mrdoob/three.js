@@ -36,7 +36,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -62,7 +62,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 		 * This number of samples for each ray that hits the mesh's surface
 		 * and travels through the volume.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 100
 		 */
 		this.steps = 100;

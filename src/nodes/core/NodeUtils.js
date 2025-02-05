@@ -50,8 +50,8 @@ function cyrb53( value, seed = 0 ) {
  * Computes a hash for the given string.
  *
  * @method
- * @param {String} str - The string to be hashed.
- * @return {Number} The hash.
+ * @param {string} str - The string to be hashed.
+ * @return {number} The hash.
  */
 export const hashString = ( str ) => cyrb53( str );
 
@@ -59,8 +59,8 @@ export const hashString = ( str ) => cyrb53( str );
  * Computes a hash for the given array.
  *
  * @method
- * @param {Array<Number>} array - The array to be hashed.
- * @return {Number} The hash.
+ * @param {Array<number>} array - The array to be hashed.
+ * @return {number} The hash.
  */
 export const hashArray = ( array ) => cyrb53( array );
 
@@ -68,8 +68,8 @@ export const hashArray = ( array ) => cyrb53( array );
  * Computes a hash for the given list of parameters.
  *
  * @method
- * @param {...Number} params - A list of parameters.
- * @return {Number} The hash.
+ * @param {...number} params - A list of parameters.
+ * @return {number} The hash.
  */
 export const hash = ( ...params ) => cyrb53( params );
 
@@ -78,8 +78,8 @@ export const hash = ( ...params ) => cyrb53( params );
  *
  * @method
  * @param {Object} object - The object to be hashed.
- * @param {Boolean} [force=false] - Whether to force a cache key computation or not.
- * @return {Number} The hash.
+ * @param {boolean} [force=false] - Whether to force a cache key computation or not.
+ * @return {number} The hash.
  */
 export function getCacheKey( object, force = false ) {
 
@@ -108,7 +108,7 @@ export function getCacheKey( object, force = false ) {
  *
  * @generator
  * @param {Object} node - The object to be hashed.
- * @param {Boolean} [toJSON=false] - Whether to return JSON or not.
+ * @param {boolean} [toJSON=false] - Whether to return JSON or not.
  * @yields {Object} A result node holding the property, index (if available) and the child node.
  */
 export function* getNodeChildren( node, toJSON = false ) {
@@ -173,8 +173,8 @@ const dataFromObject = /*@__PURE__*/ new WeakMap();
  * Returns the data type for the given the length.
  *
  * @method
- * @param {Number} length - The length.
- * @return {String} The data type.
+ * @param {number} length - The length.
+ * @return {string} The data type.
  */
 export function getTypeFromLength( length ) {
 
@@ -186,7 +186,7 @@ export function getTypeFromLength( length ) {
  * Returns the typed array for the given data type.
  *
  * @method
- * @param {String} type - The data type.
+ * @param {string} type - The data type.
  * @return {TypedArray} The typed array.
  */
 export function getTypedArrayFromType( type ) {
@@ -219,8 +219,8 @@ export function getTypedArrayFromType( type ) {
  * Returns the length for the given data type.
  *
  * @method
- * @param {String} type - The data type.
- * @return {Number} The length.
+ * @param {string} type - The data type.
+ * @return {number} The length.
  */
 export function getLengthFromType( type ) {
 
@@ -240,8 +240,8 @@ export function getLengthFromType( type ) {
  * Returns the data type for the given value.
  *
  * @method
- * @param {Any} value - The value.
- * @return {String?} The data type.
+ * @param {any} value - The value.
+ * @return {string?} The data type.
  */
 export function getValueType( value ) {
 
@@ -311,9 +311,9 @@ export function getValueType( value ) {
  * Returns the value/object for the given data type and parameters.
  *
  * @method
- * @param {String} type - The given type.
- * @param {...Any} params - A parameter list.
- * @return {Any} The value/object.
+ * @param {string} type - The given type.
+ * @param {...any} params - A parameter list.
+ * @return {any} The value/object.
  */
 export function getValueFromType( type, ...params ) {
 
@@ -403,7 +403,7 @@ export function getDataFromObject( object ) {
  *
  * @method
  * @param {ArrayBuffer} arrayBuffer - The array buffer.
- * @return {String} The Base64 string.
+ * @return {string} The Base64 string.
  */
 export function arrayBufferToBase64( arrayBuffer ) {
 
@@ -425,7 +425,7 @@ export function arrayBufferToBase64( arrayBuffer ) {
  * Converts the given Base64 string to an array buffer.
  *
  * @method
- * @param {String} base64 - The Base64 string.
+ * @param {string} base64 - The Base64 string.
  * @return {ArrayBuffer} The array buffer.
  */
 export function base64ToArrayBuffer( base64 ) {

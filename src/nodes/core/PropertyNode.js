@@ -24,9 +24,9 @@ class PropertyNode extends Node {
 	/**
 	 * Constructs a new property node.
 	 *
-	 * @param {String} nodeType - The type of the node.
-	 * @param {String?} [name=null] - The name of the property in the shader.
-	 * @param {Boolean} [varying=false] - Whether this property is a varying or not.
+	 * @param {string} nodeType - The type of the node.
+	 * @param {string?} [name=null] - The name of the property in the shader.
+	 * @param {boolean} [varying=false] - Whether this property is a varying or not.
 	 */
 	constructor( nodeType, name = null, varying = false ) {
 
@@ -36,7 +36,7 @@ class PropertyNode extends Node {
 		 * The name of the property in the shader. If no name is defined,
 		 * the node system auto-generates one.
 		 *
-		 * @type {String?}
+		 * @type {string?}
 		 * @default null
 		 */
 		this.name = name;
@@ -44,7 +44,7 @@ class PropertyNode extends Node {
 		/**
 		 * Whether this property is a varying or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.varying = varying;
@@ -52,7 +52,7 @@ class PropertyNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -70,7 +70,7 @@ class PropertyNode extends Node {
 	 * The method is overwritten so it always returns `true`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Boolean} Whether this node is global or not.
+	 * @return {boolean} Whether this node is global or not.
 	 */
 	isGlobal( /*builder*/ ) {
 
@@ -106,8 +106,8 @@ export default PropertyNode;
  *
  * @tsl
  * @function
- * @param {String} type - The type of the node.
- * @param {String?} [name=null] - The name of the property in the shader.
+ * @param {string} type - The type of the node.
+ * @param {string?} [name=null] - The name of the property in the shader.
  * @returns {PropertyNode}
  */
 export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
@@ -117,8 +117,8 @@ export const property = ( type, name ) => nodeObject( new PropertyNode( type, na
  *
  * @tsl
  * @function
- * @param {String} type - The type of the node.
- * @param {String?} [name=null] - The name of the varying in the shader.
+ * @param {string} type - The type of the node.
+ * @param {string?} [name=null] - The name of the varying in the shader.
  * @returns {PropertyNode}
  */
 export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );

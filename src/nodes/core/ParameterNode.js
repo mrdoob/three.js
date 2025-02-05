@@ -17,8 +17,8 @@ class ParameterNode extends PropertyNode {
 	/**
 	 * Constructs a new parameter node.
 	 *
-	 * @param {String} nodeType - The type of the node.
-	 * @param {String?} [name=null] - The name of the parameter in the shader.
+	 * @param {string} nodeType - The type of the node.
+	 * @param {string?} [name=null] - The name of the parameter in the shader.
 	 */
 	constructor( nodeType, name = null ) {
 
@@ -27,7 +27,7 @@ class ParameterNode extends PropertyNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -56,8 +56,8 @@ export default ParameterNode;
  *
  * @tsl
  * @function
- * @param {String} type - The type of the node.
- * @param {String?} name - The name of the parameter in the shader.
+ * @param {string} type - The type of the node.
+ * @param {string?} name - The name of the parameter in the shader.
  * @returns {ParameterNode}
  */
 export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );

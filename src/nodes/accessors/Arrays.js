@@ -8,8 +8,8 @@ import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
  *
  * @tsl
  * @function
- * @param {Number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
- * @param {String|Struct} [type='float'] - The data type.
+ * @param {number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
+ * @param {string|Struct} [type='float'] - The data type.
  * @returns {StorageBufferNode}
  */
 export const attributeArray = ( count, type = 'float' ) => {
@@ -40,8 +40,8 @@ export const attributeArray = ( count, type = 'float' ) => {
  *
  * @tsl
  * @function
- * @param {Number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
- * @param {String|Struct} [type='float'] - The data type.
+ * @param {number|TypedArray} count - The data count. It is also valid to pass a typed array as an argument.
+ * @param {string|Struct} [type='float'] - The data type.
  * @returns {StorageBufferNode}
  */
 export const instancedArray = ( count, type = 'float' ) => {

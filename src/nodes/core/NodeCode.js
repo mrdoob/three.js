@@ -9,30 +9,30 @@ class NodeCode {
 	/**
 	 * Constructs a new code node.
 	 *
-	 * @param {String} name - The name of the code.
-	 * @param {String} type - The node type.
-	 * @param {String} [code=''] - The native shader code.
+	 * @param {string} name - The name of the code.
+	 * @param {string} type - The node type.
+	 * @param {string} [code=''] - The native shader code.
 	 */
 	constructor( name, type, code = '' ) {
 
 		/**
 		 * The name of the code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = name;
 
 		/**
 		 * The node type.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type;
 
 		/**
 		 * The native shader code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default ''
 		 */
 		this.code = code;

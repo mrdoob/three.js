@@ -41,7 +41,7 @@ class NodeMaterial extends Material {
 	/**
 	 * Represents the type of the node material.
 	 *
-	 * @type {String}
+	 * @type {string}
 	 */
 	get type() {
 
@@ -61,7 +61,7 @@ class NodeMaterial extends Material {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -70,7 +70,7 @@ class NodeMaterial extends Material {
 		/**
 		 * Whether this material is affected by fog or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.fog = true;
@@ -78,7 +78,7 @@ class NodeMaterial extends Material {
 		/**
 		 * Whether this material is affected by lights or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.lights = false;
@@ -88,7 +88,7 @@ class NodeMaterial extends Material {
 		 * This property is managed by the engine and should not be
 		 * modified by apps.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.hardwareClipping = false;
@@ -368,7 +368,7 @@ class NodeMaterial extends Material {
 	 * Allows to define a custom cache key that influence the material key computation
 	 * for render objects.
 	 *
-	 * @return {String} The custom cache key.
+	 * @return {string} The custom cache key.
 	 */
 	customProgramCacheKey() {
 
@@ -1062,7 +1062,7 @@ class NodeMaterial extends Material {
 	/**
 	 * Serializes this material to JSON.
 	 *
-	 * @param {(Object|String)?} meta - The meta information for serialization.
+	 * @param {(Object|string)?} meta - The meta information for serialization.
 	 * @return {Object} The serialized node.
 	 */
 	toJSON( meta ) {

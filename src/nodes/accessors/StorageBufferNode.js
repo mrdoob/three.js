@@ -48,8 +48,8 @@ class StorageBufferNode extends BufferNode {
 	 * Constructs a new storage buffer node.
 	 *
 	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
-	 * @param {(String|Struct)?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
-	 * @param {Number} [bufferCount=0] - The buffer count.
+	 * @param {(string|Struct)?} [bufferType=null] - The buffer type (e.g. `'vec3'`).
+	 * @param {number} [bufferCount=0] - The buffer count.
 	 */
 	constructor( value, bufferType = null, bufferCount = 0 ) {
 
@@ -76,7 +76,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -94,7 +94,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * The access type of the texture node.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'readWrite'
 		 */
 		this.access = NodeAccess.READ_WRITE;
@@ -102,7 +102,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * Whether the node is atomic or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.isAtomic = false;
@@ -111,7 +111,7 @@ class StorageBufferNode extends BufferNode {
 		 * Whether the node represents a PBO or not.
 		 * Only relevant for WebGL.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.isPBO = false;
@@ -135,7 +135,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * `StorageBufferNode` sets this property to `true` by default.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.global = true;
@@ -156,7 +156,7 @@ class StorageBufferNode extends BufferNode {
 	 * and thus the hash should be shared as well.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The hash.
+	 * @return {string} The hash.
 	 */
 	getHash( builder ) {
 
@@ -186,7 +186,7 @@ class StorageBufferNode extends BufferNode {
 	 * Overwrites the default implementation to return a fixed value `'indirectStorageBuffer'` or `'storageBuffer'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
 
@@ -209,7 +209,7 @@ class StorageBufferNode extends BufferNode {
 	/**
 	 * Defines whether this node is a PBO or not. Only relevant for WebGL.
 	 *
-	 * @param {Boolean} value - The value so set.
+	 * @param {boolean} value - The value so set.
 	 * @return {StorageBufferNode} A reference to this node.
 	 */
 	setPBO( value ) {
@@ -223,7 +223,7 @@ class StorageBufferNode extends BufferNode {
 	/**
 	 * Returns the `isPBO` value.
 	 *
-	 * @return {Boolean} Whether the node represents a PBO or not.
+	 * @return {boolean} Whether the node represents a PBO or not.
 	 */
 	getPBO() {
 
@@ -234,7 +234,7 @@ class StorageBufferNode extends BufferNode {
 	/**
 	 * Defines the node access.
 	 *
-	 * @param {String} value - The node access.
+	 * @param {string} value - The node access.
 	 * @return {StorageBufferNode} A reference to this node.
 	 */
 	setAccess( value ) {
@@ -259,7 +259,7 @@ class StorageBufferNode extends BufferNode {
 	/**
 	 * Defines whether the node is atomic or not.
 	 *
-	 * @param {Boolean} value - The atomic flag.
+	 * @param {boolean} value - The atomic flag.
 	 * @return {StorageBufferNode} A reference to this node.
 	 */
 	setAtomic( value ) {
@@ -307,7 +307,7 @@ class StorageBufferNode extends BufferNode {
 	 * and the attribute data.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -333,7 +333,7 @@ class StorageBufferNode extends BufferNode {
 	 * Generates the code snippet of the storage buffer node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The generated code snippet.
+	 * @return {string} The generated code snippet.
 	 */
 	generate( builder ) {
 
@@ -365,8 +365,8 @@ export default StorageBufferNode;
  * @tsl
  * @function
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
- * @param {(String|Struct)?} [type=null] - The buffer type (e.g. `'vec3'`).
- * @param {Number} [count=0] - The buffer count.
+ * @param {(string|Struct)?} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
  */
 export const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBufferNode( value, type, count ) );
@@ -377,8 +377,8 @@ export const storage = ( value, type = null, count = 0 ) => nodeObject( new Stor
  * @deprecated since r171. Use `storage().setPBO( true )` instead.
  *
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
- * @param {String?} type - The buffer type (e.g. `'vec3'`).
- * @param {Number} count - The buffer count.
+ * @param {string?} type - The buffer type (e.g. `'vec3'`).
+ * @param {number} count - The buffer count.
  * @returns {StorageBufferNode}
  */
 export const storageObject = ( value, type, count ) => { // @deprecated, r171

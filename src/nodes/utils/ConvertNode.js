@@ -19,7 +19,7 @@ class ConvertNode extends Node {
 	 * Constructs a new convert node.
 	 *
 	 * @param {Node} node - The node which type should be converted.
-	 * @param {String} convertTo - The target node type. Multiple types can be defined by separating them with a `|` sign.
+	 * @param {string} convertTo - The target node type. Multiple types can be defined by separating them with a `|` sign.
 	 */
 	constructor( node, convertTo ) {
 
@@ -35,7 +35,7 @@ class ConvertNode extends Node {
 		/**
 		 * The target node type. Multiple types can be defined by separating them with a `|` sign.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.convertTo = convertTo;
 
@@ -46,7 +46,7 @@ class ConvertNode extends Node {
 	 * matching type from the {@link ConvertNode#convertTo} property.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 

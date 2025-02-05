@@ -11,7 +11,7 @@ class Sampler extends Binding {
 	/**
 	 * Constructs a new sampler.
 	 *
-	 * @param {String} name - The samplers's name.
+	 * @param {string} name - The samplers's name.
 	 * @param {Texture?} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
@@ -28,14 +28,14 @@ class Sampler extends Binding {
 		/**
 		 * The binding's version.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.version = texture ? texture.version : 0;
 
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

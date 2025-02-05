@@ -20,7 +20,7 @@ class ScriptableValueNode extends Node {
 	/**
 	 * Constructs a new scriptable node.
 	 *
-	 * @param {Any} [value=null] - The value.
+	 * @param {any} [value=null] - The value.
 	 */
 	constructor( value = null ) {
 
@@ -45,7 +45,7 @@ class ScriptableValueNode extends Node {
 		/**
 		 * If this node represents an input, this property represents the input type.
 		 *
-		 * @type {String?}
+		 * @type {string?}
 		 * @default null
 		 */
 		this.inputType = null;
@@ -53,7 +53,7 @@ class ScriptableValueNode extends Node {
 		/**
 		 * If this node represents an output, this property represents the output type.
 		 *
-		 * @type {String?}
+		 * @type {string?}
 		 * @default null
 		 */
 		this.outputType = null;
@@ -68,7 +68,7 @@ class ScriptableValueNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -79,7 +79,7 @@ class ScriptableValueNode extends Node {
 	/**
 	 * Whether this node represents an output or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @readonly
 	 * @default true
 	 */
@@ -112,7 +112,7 @@ class ScriptableValueNode extends Node {
 	/**
 	 * The node's value.
 	 *
-	 * @type {Any}
+	 * @type {any}
 	 */
 	get value() {
 
@@ -133,7 +133,7 @@ class ScriptableValueNode extends Node {
 	 * The `value` property usually represents a node or even binary data in form of array buffers.
 	 * In this case, this method tries to return the actual value behind the complex type.
 	 *
-	 * @return {Any} The value.
+	 * @return {any} The value.
 	 */
 	getValue() {
 
@@ -166,7 +166,7 @@ class ScriptableValueNode extends Node {
 	 * Overwritten since the node type is inferred from the value.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -247,7 +247,7 @@ export default ScriptableValueNode;
  *
  * @tsl
  * @function
- * @param {Any} [value=null] - The value.
+ * @param {any} [value=null] - The value.
  * @returns {ScriptableValueNode}
  */
 export const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );

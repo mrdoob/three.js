@@ -47,7 +47,7 @@ class VelocityNode extends TempNode {
 		/**
 		 * Overwritten since velocity nodes are updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'object'
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
@@ -55,7 +55,7 @@ class VelocityNode extends TempNode {
 		/**
 		 * Overwritten since velocity nodes save data after the update.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'object'
 		 */
 		this.updateAfterType = NodeUpdateType.OBJECT;

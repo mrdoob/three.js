@@ -39,7 +39,7 @@ class ShadowBaseNode extends Node {
 		/**
 		 * Overwritten since shadows are updated by default per render.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'render'
 		 */
 		this.updateBeforeType = NodeUpdateType.RENDER;
@@ -47,7 +47,7 @@ class ShadowBaseNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

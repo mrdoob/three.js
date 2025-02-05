@@ -35,7 +35,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -46,7 +46,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		 * this property to `true` since we use a lighting model to compute
 		 * the outgoing light of the fragment shader.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.lights = true;

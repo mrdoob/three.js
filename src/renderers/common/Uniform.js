@@ -17,22 +17,22 @@ class Uniform {
 	/**
 	 * Constructs a new uniform.
 	 *
-	 * @param {String} name - The uniform's name.
-	 * @param {Any} value - The uniform's value.
+	 * @param {string} name - The uniform's name.
+	 * @param {any} value - The uniform's value.
 	 */
 	constructor( name, value ) {
 
 		/**
 		 * The uniform's name.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = name;
 
 		/**
 		 * The uniform's value.
 		 *
-		 * @type {Any}
+		 * @type {any}
 		 */
 		this.value = value;
 
@@ -41,7 +41,7 @@ class Uniform {
 		 * Derived uniforms will set this property to a data type specific
 		 * value.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.boundary = 0;
 
@@ -49,7 +49,7 @@ class Uniform {
 		 * The item size. Derived uniforms will set this property to a data
 		 * type specific value.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.itemSize = 0;
 
@@ -57,7 +57,7 @@ class Uniform {
 		 * This property is set by {@link UniformsGroup} and marks
 		 * the start position in the uniform buffer.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.offset = 0;
 
@@ -66,7 +66,7 @@ class Uniform {
 	/**
 	 * Sets the uniform's value.
 	 *
-	 * @param {Any} value - The value to set.
+	 * @param {any} value - The value to set.
 	 */
 	setValue( value ) {
 
@@ -77,7 +77,7 @@ class Uniform {
 	/**
 	 * Returns the uniform's value.
 	 *
-	 * @return {Any} The value.
+	 * @return {any} The value.
 	 */
 	getValue() {
 
@@ -98,8 +98,8 @@ class NumberUniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
-	 * @param {Number} value - The uniform's value.
+	 * @param {string} name - The uniform's name.
+	 * @param {number} value - The uniform's value.
 	 */
 	constructor( name, value = 0 ) {
 
@@ -108,7 +108,7 @@ class NumberUniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -132,7 +132,7 @@ class Vector2Uniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Vector2} value - The uniform's value.
 	 */
 	constructor( name, value = new Vector2() ) {
@@ -142,7 +142,7 @@ class Vector2Uniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -166,7 +166,7 @@ class Vector3Uniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Vector3} value - The uniform's value.
 	 */
 	constructor( name, value = new Vector3() ) {
@@ -176,7 +176,7 @@ class Vector3Uniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -200,7 +200,7 @@ class Vector4Uniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Vector4} value - The uniform's value.
 	 */
 	constructor( name, value = new Vector4() ) {
@@ -210,7 +210,7 @@ class Vector4Uniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -234,7 +234,7 @@ class ColorUniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Color} value - The uniform's value.
 	 */
 	constructor( name, value = new Color() ) {
@@ -244,7 +244,7 @@ class ColorUniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -268,7 +268,7 @@ class Matrix2Uniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Matrix2} value - The uniform's value.
 	 */
 	constructor( name, value = new Matrix2() ) {
@@ -278,7 +278,7 @@ class Matrix2Uniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -303,7 +303,7 @@ class Matrix3Uniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Matrix3} value - The uniform's value.
 	 */
 	constructor( name, value = new Matrix3() ) {
@@ -313,7 +313,7 @@ class Matrix3Uniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -337,7 +337,7 @@ class Matrix4Uniform extends Uniform {
 	/**
 	 * Constructs a new Number uniform.
 	 *
-	 * @param {String} name - The uniform's name.
+	 * @param {string} name - The uniform's name.
 	 * @param {Matrix4} value - The uniform's value.
 	 */
 	constructor( name, value = new Matrix4() ) {
@@ -347,7 +347,7 @@ class Matrix4Uniform extends Uniform {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

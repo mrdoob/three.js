@@ -5,8 +5,8 @@ import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
  * Returns the MRT texture index for the given name.
  *
  * @param {Array<Texture>} textures - The textures of a MRT-configured render target.
- * @param {String} name - The name of the MRT texture which index is requested.
- * @return {Number} The texture index.
+ * @param {string} name - The name of the MRT texture which index is requested.
+ * @return {number} The texture index.
  */
 export function getTextureIndex( textures, name ) {
 
@@ -48,7 +48,7 @@ class MRTNode extends OutputStructNode {
 	/**
 	 * Constructs a new output struct node.
 	 *
-	 * @param {Object<String, Node>} outputNodes - The MRT outputs.
+	 * @param {Object<string, Node>} outputNodes - The MRT outputs.
 	 */
 	constructor( outputNodes ) {
 
@@ -59,14 +59,14 @@ class MRTNode extends OutputStructNode {
 		 * is the name of the output, the value the node which produces
 		 * the output result.
 		 *
-		 * @type {Object<String, Node>}
+		 * @type {Object<string, Node>}
 		 */
 		this.outputNodes = outputNodes;
 
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -77,7 +77,7 @@ class MRTNode extends OutputStructNode {
 	/**
 	 * Returns `true` if the MRT node has an output with the given name.
 	 *
-	 * @param {String} name - The name of the output.
+	 * @param {string} name - The name of the output.
 	 * @return {NodeBuilder} Whether the MRT node has an output for the given name or not.
 	 */
 	has( name ) {
@@ -89,7 +89,7 @@ class MRTNode extends OutputStructNode {
 	/**
 	 * Returns the output node for the given name.
 	 *
-	 * @param {String} name - The name of the output.
+	 * @param {string} name - The name of the output.
 	 * @return {Node} The output node.
 	 */
 	get( name ) {
@@ -144,7 +144,7 @@ export default MRTNode;
  *
  * @tsl
  * @function
- * @param {Object<String, Node>} outputNodes - The MRT outputs.
+ * @param {Object<string, Node>} outputNodes - The MRT outputs.
  * @returns {MRTNode}
  */
 export const mrt = /*@__PURE__*/ nodeProxy( MRTNode );

@@ -19,9 +19,9 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 	/**
 	 * Constructs a new storage instanced buffer attribute.
 	 *
-	 * @param {Number|TypedArray} count - The item count. It is also valid to pass a typed array as an argument.
+	 * @param {number|TypedArray} count - The item count. It is also valid to pass a typed array as an argument.
 	 * The subsequent parameters are then obsolete.
-	 * @param {Number} itemSize - The item size.
+	 * @param {number} itemSize - The item size.
 	 * @param {TypedArray.constructor} [typeClass=Float32Array] - A typed array constructor.
 	 */
 	constructor( count, itemSize, typeClass = Float32Array ) {
@@ -33,7 +33,7 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

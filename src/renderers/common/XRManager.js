@@ -35,7 +35,7 @@ class XRManager extends EventDispatcher {
 		/**
 		 * This flag globally enables XR rendering.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.enabled = false;
@@ -43,7 +43,7 @@ class XRManager extends EventDispatcher {
 		/**
 		 * Whether the XR device is currently presenting or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 * @readonly
 		 */
@@ -52,7 +52,7 @@ class XRManager extends EventDispatcher {
 		/**
 		 * Whether the XR camera should automatically be updated or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.cameraAutoUpdate = true;
@@ -105,7 +105,7 @@ class XRManager extends EventDispatcher {
 		 * The current near value of the XR camera.
 		 *
 		 * @private
-		 * @type {Number?}
+		 * @type {number?}
 		 * @default null
 		 */
 		this._currentDepthNear = null;
@@ -114,7 +114,7 @@ class XRManager extends EventDispatcher {
 		 * The current far value of the XR camera.
 		 *
 		 * @private
-		 * @type {Number?}
+		 * @type {number?}
 		 * @default null
 		 */
 		this._currentDepthFar = null;
@@ -177,7 +177,7 @@ class XRManager extends EventDispatcher {
 		 * The current pixel ratio.
 		 *
 		 * @private
-		 * @type {Number?}
+		 * @type {number?}
 		 * @default null
 		 */
 		this._currentPixelRatio = null;
@@ -238,7 +238,7 @@ class XRManager extends EventDispatcher {
 		 * The current XR reference space type.
 		 *
 		 * @private
-		 * @type {String}
+		 * @type {string}
 		 * @default 'local-floor'
 		 */
 		this._referenceSpaceType = 'local-floor';
@@ -256,7 +256,7 @@ class XRManager extends EventDispatcher {
 		 * The framebuffer scale factor.
 		 *
 		 * @private
-		 * @type {Number}
+		 * @type {number}
 		 * @default 1
 		 */
 		this._framebufferScaleFactor = 1;
@@ -265,7 +265,7 @@ class XRManager extends EventDispatcher {
 		 * The foveation factor.
 		 *
 		 * @private
-		 * @type {Number}
+		 * @type {number}
 		 * @default 1
 		 */
 		this._foveation = 1.0;
@@ -319,7 +319,7 @@ class XRManager extends EventDispatcher {
 		 * Whether to use the WebXR Layers API or not.
 		 *
 		 * @private
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 */
 		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
@@ -331,7 +331,7 @@ class XRManager extends EventDispatcher {
 	 * of a XR controller in target ray space. The requested controller is defined
 	 * by the given index.
 	 *
-	 * @param {Number} index - The index of the XR controller.
+	 * @param {number} index - The index of the XR controller.
 	 * @return {Group} A group that represents the controller's transformation.
 	 */
 	getController( index ) {
@@ -347,7 +347,7 @@ class XRManager extends EventDispatcher {
 	 * of a XR controller in grip space. The requested controller is defined
 	 * by the given index.
 	 *
-	 * @param {Number} index - The index of the XR controller.
+	 * @param {number} index - The index of the XR controller.
 	 * @return {Group} A group that represents the controller's transformation.
 	 */
 	getControllerGrip( index ) {
@@ -363,7 +363,7 @@ class XRManager extends EventDispatcher {
 	 * of a XR controller in hand space. The requested controller is defined
 	 * by the given index.
 	 *
-	 * @param {Number} index - The index of the XR controller.
+	 * @param {number} index - The index of the XR controller.
 	 * @return {Group} A group that represents the controller's transformation.
 	 */
 	getHand( index ) {
@@ -377,7 +377,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the foveation value.
 	 *
-	 * @return {Number|undefined} The foveation value. Returns `undefined` if no base or projection layer is defined.
+	 * @return {number|undefined} The foveation value. Returns `undefined` if no base or projection layer is defined.
 	 */
 	getFoveation() {
 
@@ -394,7 +394,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Sets the foveation value.
 	 *
-	 * @param {Number} foveation - A number in the range `[0,1]` where `0` means no foveation (full resolution)
+	 * @param {number} foveation - A number in the range `[0,1]` where `0` means no foveation (full resolution)
 	 * and `1` means maximum foveation (the edges render at lower resolution).
 	 */
 	setFoveation( foveation ) {
@@ -418,7 +418,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the framebuffer scale factor.
 	 *
-	 * @return {Number} The framebuffer scale factor.
+	 * @return {number} The framebuffer scale factor.
 	 */
 	getFramebufferScaleFactor() {
 
@@ -431,7 +431,7 @@ class XRManager extends EventDispatcher {
 	 *
 	 * This method can not be used during a XR session.
 	 *
-	 * @param {Number} factor - The framebuffer scale factor.
+	 * @param {number} factor - The framebuffer scale factor.
 	 */
 	setFramebufferScaleFactor( factor ) {
 
@@ -448,7 +448,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the reference space type.
 	 *
-	 * @return {String} The reference space type.
+	 * @return {string} The reference space type.
 	 */
 	getReferenceSpaceType() {
 
@@ -461,7 +461,7 @@ class XRManager extends EventDispatcher {
 	 *
 	 * This method can not be used during a XR session.
 	 *
-	 * @param {String} type - The reference space type.
+	 * @param {string} type - The reference space type.
 	 */
 	setReferenceSpaceType( type ) {
 
@@ -764,7 +764,7 @@ class XRManager extends EventDispatcher {
 	 * Returns a WebXR controller for the given controller index.
 	 *
 	 * @private
-	 * @param {Number} index - The controller index.
+	 * @param {number} index - The controller index.
 	 * @return {WebXRController} The XR controller.
 	 */
 	_getController( index ) {

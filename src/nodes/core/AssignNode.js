@@ -46,7 +46,7 @@ class AssignNode extends TempNode {
 	 * Whether this node is used more than once in context of other nodes. This method
 	 * is overwritten since it always returns `false` (assigns are unique).
 	 *
-	 * @return {Boolean} A flag that indicates if there is more than one dependency to other nodes. Always `false`.
+	 * @return {boolean} A flag that indicates if there is more than one dependency to other nodes. Always `false`.
 	 */
 	hasDependencies() {
 
@@ -65,7 +65,7 @@ class AssignNode extends TempNode {
 	 * target and source data type does not match.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Boolean} Whether a split is required when assigning source to target.
+	 * @return {boolean} Whether a split is required when assigning source to target.
 	 */
 	needsSplitAssign( builder ) {
 

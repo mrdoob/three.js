@@ -9,21 +9,21 @@ class Pipeline {
 	/**
 	 * Constructs a new pipeline.
 	 *
-	 * @param {String} cacheKey - The pipeline's cache key.
+	 * @param {string} cacheKey - The pipeline's cache key.
 	 */
 	constructor( cacheKey ) {
 
 		/**
 		 * The pipeline's cache key.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.cacheKey = cacheKey;
 
 		/**
 		 * How often the pipeline is currently in use.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.usedTimes = 0;

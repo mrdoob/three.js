@@ -196,7 +196,7 @@ class MorphNode extends Node {
 		/**
 		 * The update type overwritten since morph nodes are updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
 

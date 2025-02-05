@@ -34,14 +34,14 @@ class IndexNode extends Node {
 		/**
 		 * The scope of the index node.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.scope = scope;
 
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

@@ -31,7 +31,7 @@ class SkinningNode extends Node {
 	 * Constructs a new skinning node.
 	 *
 	 * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
-	 * @param {Boolean} [useReference=false] - Whether to use reference nodes for internal skinned mesh related data or not.
+	 * @param {boolean} [useReference=false] - Whether to use reference nodes for internal skinned mesh related data or not.
 	 */
 	constructor( skinnedMesh, useReference = false ) {
 
@@ -48,14 +48,14 @@ class SkinningNode extends Node {
 		 * Whether to use reference nodes for internal skinned mesh related data or not.
 		 * TODO: Explain the purpose of the property.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.useReference = useReference;
 
 		/**
 		 * The update type overwritten since skinning nodes are updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
 
@@ -211,7 +211,7 @@ class SkinningNode extends Node {
 	 * Returns `true` if bone matrices from the previous frame are required.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Boolean} Whether bone matrices from the previous frame are required or not.
+	 * @return {boolean} Whether bone matrices from the previous frame are required or not.
 	 */
 	needsPreviousBoneMatrices( builder ) {
 
@@ -259,8 +259,8 @@ class SkinningNode extends Node {
 	 * Generates the code snippet of the skinning node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String} output - The current output.
-	 * @return {String} The generated code snippet.
+	 * @param {string} output - The current output.
+	 * @return {string} The generated code snippet.
 	 */
 	generate( builder, output ) {
 

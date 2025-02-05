@@ -15,10 +15,10 @@ class Color4 extends Color {
 	 * You can also pass a single THREE.Color, hex or
 	 * string argument to this constructor.
 	 *
-	 * @param {Number|String} [r=1] - The red value.
-	 * @param {Number} [g=1] - The green value.
-	 * @param {Number} [b=1] - The blue value.
-	 * @param {Number} [a=1] - The alpha value.
+	 * @param {number|string} [r=1] - The red value.
+	 * @param {number} [g=1] - The green value.
+	 * @param {number} [b=1] - The blue value.
+	 * @param {number} [a=1] - The alpha value.
 	 */
 	constructor( r, g, b, a = 1 ) {
 
@@ -33,10 +33,10 @@ class Color4 extends Color {
 	 * You can also pass a single THREE.Color, hex or
 	 * string argument to this method.
 	 *
-	 * @param {Number|String} r - The red value.
-	 * @param {Number} g - The green value.
-	 * @param {Number} b - The blue value.
-	 * @param {Number} [a=1] - The alpha value.
+	 * @param {number|string} r - The red value.
+	 * @param {number} g - The green value.
+	 * @param {number} b - The blue value.
+	 * @param {number} [a=1] - The alpha value.
 	 * @return {Color4} A reference to this object.
 	 */
 	set( r, g, b, a = 1 ) {

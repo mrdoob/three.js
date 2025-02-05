@@ -13,7 +13,7 @@ class BarrierNode extends Node {
 	/**
 	 * Constructs a new barrier node.
 	 *
-	 * @param {String} scope - The scope defines the behavior of the node.
+	 * @param {string} scope - The scope defines the behavior of the node.
 	 */
 	constructor( scope ) {
 
@@ -49,7 +49,7 @@ export default BarrierNode;
  *
  * @tsl
  * @function
- * @param {String} scope - The scope defines the behavior of the node..
+ * @param {string} scope - The scope defines the behavior of the node..
  * @returns {BarrierNode}
  */
 const barrier = nodeProxy( BarrierNode );

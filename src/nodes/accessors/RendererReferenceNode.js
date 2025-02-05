@@ -24,8 +24,8 @@ class RendererReferenceNode extends ReferenceBaseNode {
 	/**
 	 * Constructs a new renderer reference node.
 	 *
-	 * @param {String} property - The name of the property the node refers to.
-	 * @param {String} inputType - The uniform type that should be used to represent the property value.
+	 * @param {string} property - The name of the property the node refers to.
+	 * @param {string} inputType - The uniform type that should be used to represent the property value.
 	 * @param {Renderer?} [renderer=null] - The renderer the property belongs to. When no renderer is set,
 	 * the node refers to the renderer of the current state.
 	 */
@@ -70,8 +70,8 @@ export default RendererReferenceNode;
  *
  * @tsl
  * @function
- * @param {String} name - The name of the property the node refers to.
- * @param {String} type - The uniform type that should be used to represent the property value.
+ * @param {string} name - The name of the property the node refers to.
+ * @param {string} type - The uniform type that should be used to represent the property value.
  * @param {Renderer?} [renderer=null] - The renderer the property belongs to. When no renderer is set,
  * the node refers to the renderer of the current state.
  * @returns {RendererReferenceNode}

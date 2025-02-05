@@ -31,7 +31,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -40,7 +40,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 		/**
 		 * Set to `true` because lambert materials react on lights.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.lights = true;
