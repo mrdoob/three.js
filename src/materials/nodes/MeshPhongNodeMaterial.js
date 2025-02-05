@@ -25,7 +25,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -34,7 +34,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -43,7 +43,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		/**
 		 * Set to `true` because phong materials react on lights.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.lights = true;
@@ -56,7 +56,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		 * If you don't want to overwrite the shininess but modify the existing
 		 * value instead, use {@link materialShininess}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.shininessNode = null;
@@ -69,7 +69,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		 * If you don't want to overwrite the specular color but modify the existing
 		 * value instead, use {@link materialSpecular}.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.specularNode = null;
@@ -85,7 +85,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 	 * to implement the default environment mapping.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 * @return {?BasicEnvironmentNode<vec3>} The environment node.
 	 */
 	setupEnvironment( builder ) {
 

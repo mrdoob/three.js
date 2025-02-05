@@ -18,8 +18,8 @@ class ConstNode extends InputNode {
 	/**
 	 * Constructs a new input node.
 	 *
-	 * @param {Any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color).
-	 * @param {String?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color).
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
 
@@ -28,7 +28,7 @@ class ConstNode extends InputNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -40,7 +40,7 @@ class ConstNode extends InputNode {
 	 * Generates the shader string of the value with the current node builder.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The generated value as a shader string.
+	 * @return {string} The generated value as a shader string.
 	 */
 	generateConst( builder ) {
 

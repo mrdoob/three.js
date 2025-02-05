@@ -14,13 +14,13 @@ class SSSLightingModel extends PhysicalLightingModel {
 	/**
 	 * Constructs a new physical lighting model.
 	 *
-	 * @param {Boolean} [clearcoat=false] - Whether clearcoat is supported or not.
-	 * @param {Boolean} [sheen=false] - Whether sheen is supported or not.
-	 * @param {Boolean} [iridescence=false] - Whether iridescence is supported or not.
-	 * @param {Boolean} [anisotropy=false] - Whether anisotropy is supported or not.
-	 * @param {Boolean} [transmission=false] - Whether transmission is supported or not.
-	 * @param {Boolean} [dispersion=false] - Whether dispersion is supported or not.
-	 * @param {Boolean} [sss=false] - Whether SSS is supported or not.
+	 * @param {boolean} [clearcoat=false] - Whether clearcoat is supported or not.
+	 * @param {boolean} [sheen=false] - Whether sheen is supported or not.
+	 * @param {boolean} [iridescence=false] - Whether iridescence is supported or not.
+	 * @param {boolean} [anisotropy=false] - Whether anisotropy is supported or not.
+	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
+	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
+	 * @param {boolean} [sss=false] - Whether SSS is supported or not.
 	 */
 	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, sss = false ) {
 
@@ -29,7 +29,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 		/**
 		 * Whether the lighting model should use SSS or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.useSSS = sss;
@@ -84,7 +84,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	/**
 	 * Constructs a new mesh SSS node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -93,7 +93,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 		/**
 		 * Represents the thickness color.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.thicknessColorNode = null;
@@ -101,35 +101,35 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 		/**
 		 * Represents the distortion factor.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessDistortionNode = float( 0.1 );
 
 		/**
 		 * Represents the thickness ambient factor.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessAmbientNode = float( 0.0 );
 
 		/**
 		 * Represents the thickness attenuation.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessAttenuationNode = float( .1 );
 
 		/**
 		 * Represents the thickness power.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessPowerNode = float( 2.0 );
 
 		/**
 		 * Represents the thickness scale.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 */
 		this.thicknessScaleNode = float( 10.0 );
 
@@ -138,7 +138,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	/**
 	 * Whether the lighting model should use SSS or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get useSSS() {

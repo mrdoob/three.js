@@ -57,7 +57,7 @@ class PostProcessing {
 		 * const outputPass = renderOutput( scenePass );
 		 * ```
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.outputColorTransform = true;
 

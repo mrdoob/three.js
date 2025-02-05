@@ -17,8 +17,8 @@ class InputNode extends Node {
 	/**
 	 * Constructs a new input node.
 	 *
-	 * @param {Any} value - The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
-	 * @param {String?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 * @param {any} value - The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
 
@@ -27,7 +27,7 @@ class InputNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -36,14 +36,14 @@ class InputNode extends Node {
 		/**
 		 * The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
 		 *
-		 * @type {Any}
+		 * @type {any}
 		 */
 		this.value = value;
 
 		/**
 		 * The precision of the value in the shader.
 		 *
-		 * @type {('low'|'medium'|'high')?}
+		 * @type {?('low'|'medium'|'high')}
 		 * @default null
 		 */
 		this.precision = null;
@@ -70,7 +70,7 @@ class InputNode extends Node {
 	 * normal RGBA texture is `texture` whereas its node type is `vec4`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( builder ) {
 

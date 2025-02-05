@@ -18,8 +18,8 @@ class ExpressionNode extends Node {
 	/**
 	 * Constructs a new expression node.
 	 *
-	 * @param {String} [snippet=''] - The native code snippet.
-	 * @param {String} [nodeType='void'] - The node type.
+	 * @param {string} [snippet=''] - The native code snippet.
+	 * @param {string} [nodeType='void'] - The node type.
 	 */
 	constructor( snippet = '', nodeType = 'void' ) {
 
@@ -28,7 +28,7 @@ class ExpressionNode extends Node {
 		/**
 		 * The native code snippet.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default ''
 		 */
 		this.snippet = snippet;
@@ -59,9 +59,10 @@ export default ExpressionNode;
 /**
  * TSL function for creating an expression node.
  *
+ * @tsl
  * @function
- * @param {String} [snippet=''] - The native code snippet.
- * @param {String} [nodeType='void'] - The node type.
+ * @param {string} [snippet=''] - The native code snippet.
+ * @param {string} [nodeType='void'] - The node type.
  * @returns {ExpressionNode}
  */
 export const expression = /*@__PURE__*/ nodeProxy( ExpressionNode );

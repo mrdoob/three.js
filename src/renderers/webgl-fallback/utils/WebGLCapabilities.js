@@ -22,7 +22,7 @@ class WebGLCapabilities {
 		/**
 		 * This value holds the cached max anisotropy value.
 		 *
-		 * @type {Number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.maxAnisotropy = null;
@@ -34,7 +34,7 @@ class WebGLCapabilities {
 	 * depends on the device and is reported by the `EXT_texture_filter_anisotropic`
 	 * WebGL extension.
 	 *
-	 * @return {Number} The maximum anisotropy texture filtering value.
+	 * @return {number} The maximum anisotropy texture filtering value.
 	 */
 	getMaxAnisotropy() {
 

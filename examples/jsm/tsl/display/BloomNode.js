@@ -53,9 +53,9 @@ class BloomNode extends TempNode {
 	 * Constructs a new bloom node.
 	 *
 	 * @param {Node<vec4>} inputNode - The node that represents the input of the effect.
-	 * @param {Number} [strength=1] - The strength of the bloom.
-	 * @param {Number} [radius=0] - The radius of the bloom.
-	 * @param {Number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
+	 * @param {number} [strength=1] - The strength of the bloom.
+	 * @param {number} [radius=0] - The radius of the bloom.
+	 * @param {number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
 	 */
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
@@ -116,7 +116,7 @@ class BloomNode extends TempNode {
 		 * The number if blur mips.
 		 *
 		 * @private
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this._nMips = 5;
 
@@ -154,7 +154,7 @@ class BloomNode extends TempNode {
 		 * The material for the composite pass.
 		 *
 		 * @private
-		 * @type {NodeMaterial?}
+		 * @type {?NodeMaterial}
 		 */
 		this._compositeMaterial = null;
 
@@ -162,7 +162,7 @@ class BloomNode extends TempNode {
 		 * The material for the luminance pass.
 		 *
 		 * @private
-		 * @type {NodeMaterial?}
+		 * @type {?NodeMaterial}
 		 */
 		this._highPassFilterMaterial = null;
 
@@ -234,7 +234,7 @@ class BloomNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -255,8 +255,8 @@ class BloomNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -442,7 +442,7 @@ class BloomNode extends TempNode {
 	 * Create a separable blur material for the given kernel radius.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {Number} kernelRadius - The kernel radius.
+	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}
 	 */
 	_getSeparableBlurMaterial( builder, kernelRadius ) {
@@ -505,11 +505,12 @@ class BloomNode extends TempNode {
 /**
  * TSL function for creating a bloom effect.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {Number} [strength=1] - The strength of the bloom.
- * @param {Number} [radius=0] - The radius of the bloom.
- * @param {Number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
+ * @param {number} [strength=1] - The strength of the bloom.
+ * @param {number} [radius=0] - The radius of the bloom.
+ * @param {number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
  * @returns {BloomNode}
  */
 export const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode( nodeObject( node ), strength, radius, threshold ) );

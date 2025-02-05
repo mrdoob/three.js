@@ -7,7 +7,7 @@ import { DoubleSide } from '../../constants.js';
  * @function
  * @param {Object} a - The first render item.
  * @param {Object} b - The second render item.
- * @return {Number} A numeric value which defines the sort order.
+ * @return {number} A numeric value which defines the sort order.
  */
 function painterSortStable( a, b ) {
 
@@ -42,7 +42,7 @@ function painterSortStable( a, b ) {
  * @function
  * @param {Object} a - The first render item.
  * @param {Object} b - The second render item.
- * @return {Number} A numeric value which defines the sort order.
+ * @return {number} A numeric value which defines the sort order.
  */
 function reversePainterSortStable( a, b ) {
 
@@ -72,7 +72,7 @@ function reversePainterSortStable( a, b ) {
  * @private
  * @function
  * @param {Material} material - The transparent material.
- * @return {Boolean} Whether the given material requires a double pass or not.
+ * @return {boolean} Whether the given material requires a double pass or not.
  */
 function needsDoublePass( material ) {
 
@@ -114,7 +114,7 @@ class RenderList {
 		/**
 		 * The current render items index.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.renderItemsIndex = 0;
@@ -182,7 +182,7 @@ class RenderList {
 		/**
 		 * How many objects perform occlusion query tests.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.occlusionQueryCount = 0;
@@ -223,9 +223,9 @@ class RenderList {
 	 * @param {Object3D} object - The 3D object.
 	 * @param {BufferGeometry} geometry - The 3D object's geometry.
 	 * @param {Material} material - The 3D object's material.
-	 * @param {Number} groupOrder - The current group order.
-	 * @param {Number} z - Th 3D object's depth value (z value in clip space).
-	 * @param {Number?} group - {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {number} groupOrder - The current group order.
+	 * @param {number} z - Th 3D object's depth value (z value in clip space).
+	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 * @return {Object} The render item.
 	 */
@@ -276,9 +276,9 @@ class RenderList {
 	 * @param {Object3D} object - The 3D object.
 	 * @param {BufferGeometry} geometry - The 3D object's geometry.
 	 * @param {Material} material - The 3D object's material.
-	 * @param {Number} groupOrder - The current group order.
-	 * @param {Number} z - Th 3D object's depth value (z value in clip space).
-	 * @param {Number?} group - {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {number} groupOrder - The current group order.
+	 * @param {number} z - Th 3D object's depth value (z value in clip space).
+	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 */
 	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
@@ -308,9 +308,9 @@ class RenderList {
 	 * @param {Object3D} object - The 3D object.
 	 * @param {BufferGeometry} geometry - The 3D object's geometry.
 	 * @param {Material} material - The 3D object's material.
-	 * @param {Number} groupOrder - The current group order.
-	 * @param {Number} z - Th 3D object's depth value (z value in clip space).
-	 * @param {Number?} group - {Object?} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {number} groupOrder - The current group order.
+	 * @param {number} z - Th 3D object's depth value (z value in clip space).
+	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 */
 	unshift( object, geometry, material, groupOrder, z, group, clippingContext ) {
@@ -356,8 +356,8 @@ class RenderList {
 	/**
 	 * Sorts the internal render lists.
 	 *
-	 * @param {function(Any, Any): Number} customOpaqueSort - A custom sort function for opaque objects.
-	 * @param {function(Any, Any): Number} customTransparentSort -  A custom sort function for transparent objects.
+	 * @param {function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
+	 * @param {function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
 	 */
 	sort( customOpaqueSort, customTransparentSort ) {
 

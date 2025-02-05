@@ -149,14 +149,14 @@ class RenderObject {
 		/**
 		 * The render object's version.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.version = material.version;
 
 		/**
 		 * The draw range of the geometry.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.drawRange = null;
@@ -166,7 +166,7 @@ class RenderObject {
 		 * of the render object. This entails attribute
 		 * definitions on geometry and node level.
 		 *
-		 * @type {Array<BufferAttribute>?}
+		 * @type {?Array<BufferAttribute>}
 		 * @default null
 		 */
 		this.attributes = null;
@@ -185,7 +185,7 @@ class RenderObject {
 		 * multiple materials. This represents a group entry
 		 * from the respective `BufferGeometry`.
 		 *
-		 * @type {{start: Number, count: Number}?}
+		 * @type {?{start: number, count: number}}
 		 * @default null
 		 */
 		this.group = null;
@@ -194,7 +194,7 @@ class RenderObject {
 		 * An array holding the vertex buffers which can
 		 * be buffer attributes but also interleaved buffers.
 		 *
-		 * @type {Array<BufferAttribute|InterleavedBuffer>?}
+		 * @type {?Array<BufferAttribute|InterleavedBuffer>}
 		 * @default null
 		 */
 		this.vertexBuffers = null;
@@ -202,7 +202,7 @@ class RenderObject {
 		/**
 		 * The parameters for the draw command.
 		 *
-		 * @type {Object?}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.drawParams = null;
@@ -211,7 +211,7 @@ class RenderObject {
 		 * If this render object is used inside a render bundle,
 		 * this property points to the respective bundle group.
 		 *
-		 * @type {BundleGroup?}
+		 * @type {?BundleGroup}
 		 * @default null
 		 */
 		this.bundle = null;
@@ -226,28 +226,28 @@ class RenderObject {
 		/**
 		 * The clipping context's cache key.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.clippingContextCacheKey = clippingContext !== null ? clippingContext.cacheKey : '';
 
 		/**
 		 * The initial node cache key.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.initialNodesCacheKey = this.getDynamicCacheKey();
 
 		/**
 		 * The initial cache key.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.initialCacheKey = this.getCacheKey();
 
 		/**
 		 * The node builder state.
 		 *
-		 * @type {NodeBuilderState?}
+		 * @type {?NodeBuilderState}
 		 * @private
 		 * @default null
 		 */
@@ -256,7 +256,7 @@ class RenderObject {
 		/**
 		 * An array of bindings.
 		 *
-		 * @type {Array<BindGroup>?}
+		 * @type {?Array<BindGroup>}
 		 * @private
 		 * @default null
 		 */
@@ -265,7 +265,7 @@ class RenderObject {
 		/**
 		 * Reference to the node material observer.
 		 *
-		 * @type {NodeMaterialObserver?}
+		 * @type {?NodeMaterialObserver}
 		 * @private
 		 * @default null
 		 */
@@ -282,7 +282,7 @@ class RenderObject {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -318,7 +318,7 @@ class RenderObject {
 	/**
 	 * Whether the clipping requires an update or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @readonly
 	 */
 	get clippingNeedsUpdate() {
@@ -334,7 +334,7 @@ class RenderObject {
 	/**
 	 * The number of clipping planes defined in context of hardware clipping.
 	 *
-	 * @type {Number}
+	 * @type {number}
 	 * @readonly
 	 */
 	get hardwareClippingPlanes() {
@@ -379,8 +379,8 @@ class RenderObject {
 	/**
 	 * Returns a binding group by group name of this render object.
 	 *
-	 * @param {String} name - The name of the binding group.
-	 * @return {BindGroup?} The bindings.
+	 * @param {string} name - The name of the binding group.
+	 * @return {?BindGroup} The bindings.
 	 */
 	getBindingGroup( name ) {
 
@@ -399,7 +399,7 @@ class RenderObject {
 	/**
 	 * Returns the index of the render object's geometry.
 	 *
-	 * @return {BufferAttribute?} The index. Returns `null` for non-indexed geometries.
+	 * @return {?BufferAttribute} The index. Returns `null` for non-indexed geometries.
 	 */
 	getIndex() {
 
@@ -410,7 +410,7 @@ class RenderObject {
 	/**
 	 * Returns the indirect buffer attribute.
 	 *
-	 * @return {BufferAttribute?} The indirect attribute. `null` if no indirect drawing is used.
+	 * @return {?BufferAttribute} The indirect attribute. `null` if no indirect drawing is used.
 	 */
 	getIndirect() {
 
@@ -494,7 +494,7 @@ class RenderObject {
 	/**
 	 * Returns the draw parameters for the render object.
 	 *
-	 * @return {{vertexCount: Number, firstVertex: Number, instanceCount: Number, firstInstance: Number}} The draw parameters.
+	 * @return {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} The draw parameters.
 	 */
 	getDrawParameters() {
 
@@ -567,7 +567,7 @@ class RenderObject {
 	 *
 	 * The geometry cache key is part of the material cache key.
 	 *
-	 * @return {String} The geometry cache key.
+	 * @return {string} The geometry cache key.
 	 */
 	getGeometryCacheKey() {
 
@@ -623,7 +623,7 @@ class RenderObject {
 	 *
 	 * The material cache key is part of the render object cache key.
 	 *
-	 * @return {Number} The material cache key.
+	 * @return {number} The material cache key.
 	 */
 	getMaterialCacheKey() {
 
@@ -720,7 +720,7 @@ class RenderObject {
 	/**
 	 * Whether the geometry requires an update or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @readonly
 	 */
 	get needsGeometryUpdate() {
@@ -743,7 +743,7 @@ class RenderObject {
 	 * TODO: Investigate if it's possible to merge both steps so there is only a single place
 	 * that performs the 'needsUpdate' check.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @readonly
 	 */
 	get needsUpdate() {
@@ -755,7 +755,7 @@ class RenderObject {
 	/**
 	 * Returns the dynamic cache key which represents a key that is computed per draw command.
 	 *
-	 * @return {Number} The cache key.
+	 * @return {number} The cache key.
 	 */
 	getDynamicCacheKey() {
 
@@ -789,7 +789,7 @@ class RenderObject {
 	/**
 	 * Returns the render object's cache key.
 	 *
-	 * @return {Number} The cache key.
+	 * @return {number} The cache key.
 	 */
 	getCacheKey() {
 

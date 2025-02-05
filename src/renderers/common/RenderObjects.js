@@ -68,7 +68,7 @@ class RenderObjects {
 		 * A dictionary that manages render contexts in chain maps
 		 * for each pass ID.
 		 *
-		 * @type {Object<String,ChainMap>}
+		 * @type {Object<string,ChainMap>}
 		 */
 		this.chainMaps = {};
 
@@ -84,7 +84,7 @@ class RenderObjects {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {String?} passId - An optional ID for identifying the pass.
+	 * @param {?string} passId - An optional ID for identifying the pass.
 	 * @return {RenderObject} The render object.
 	 */
 	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
@@ -142,7 +142,7 @@ class RenderObjects {
 	/**
 	 * Returns a chain map for the given pass ID.
 	 *
-	 * @param {String} [passId='default'] - The pass ID.
+	 * @param {string} [passId='default'] - The pass ID.
 	 * @return {ChainMap} The chain map.
 	 */
 	getChainMap( passId = 'default' ) {
@@ -173,7 +173,7 @@ class RenderObjects {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {String?} passId - An optional ID for identifying the pass.
+	 * @param {?string} passId - An optional ID for identifying the pass.
 	 * @return {RenderObject} The render object.
 	 */
 	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {

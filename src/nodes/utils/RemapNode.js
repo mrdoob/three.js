@@ -70,7 +70,7 @@ class RemapNode extends Node {
 		 * Whether the node value should be clamped before
 		 * remapping it to the target range.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.doClamp = true;
@@ -96,6 +96,7 @@ export default RemapNode;
 /**
  * TSL function for creating a remap node.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that should be remapped.
  * @param {Node} inLowNode - The source or current lower bound of the range.
@@ -109,6 +110,7 @@ export const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: 
 /**
  * TSL function for creating a remap node, but with enabled clamping.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that should be remapped.
  * @param {Node} inLowNode - The source or current lower bound of the range.

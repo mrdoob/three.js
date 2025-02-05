@@ -16,7 +16,7 @@ class NodeFrame {
 		/**
 		 * The elapsed time in seconds.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.time = 0;
@@ -24,7 +24,7 @@ class NodeFrame {
 		/**
 		 * The delta time in seconds.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.deltaTime = 0;
@@ -32,7 +32,7 @@ class NodeFrame {
 		/**
 		 * The frame ID.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.frameId = 0;
@@ -40,7 +40,7 @@ class NodeFrame {
 		/**
 		 * The render ID.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.renderId = 0;
@@ -69,7 +69,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current renderer.
 		 *
-		 * @type {Renderer?}
+		 * @type {?Renderer}
 		 * @default null
 		 */
 		this.renderer = null;
@@ -77,7 +77,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current material.
 		 *
-		 * @type {Material?}
+		 * @type {?Material}
 		 * @default null
 		 */
 		this.material = null;
@@ -85,7 +85,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current camera.
 		 *
-		 * @type {Camera?}
+		 * @type {?Camera}
 		 * @default null
 		 */
 		this.camera = null;
@@ -93,7 +93,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current 3D object.
 		 *
-		 * @type {Object3D?}
+		 * @type {?Object3D}
 		 * @default null
 		 */
 		this.object = null;
@@ -101,7 +101,7 @@ class NodeFrame {
 		/**
 		 * A reference to the current scene.
 		 *
-		 * @type {Scene?}
+		 * @type {?Scene}
 		 * @default null
 		 */
 		this.scene = null;
@@ -115,7 +115,7 @@ class NodeFrame {
 	 * @private
 	 * @param {WeakMap<Node, Object>} referenceMap - The reference weak map.
 	 * @param {Node} nodeRef - The reference to the current node.
-	 * @return {Object<String,WeakMap>} The dictionary.
+	 * @return {Object<string,WeakMap>} The dictionary.
 	 */
 	_getMaps( referenceMap, nodeRef ) {
 

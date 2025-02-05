@@ -15,8 +15,8 @@ class StorageTexture extends Texture {
 	/**
 	 * Constructs a new storage texture.
 	 *
-	 * @param {Number} [width=1] - The storage texture's width.
-	 * @param {Number} [height=1] - The storage texture's height.
+	 * @param {number} [width=1] - The storage texture's width.
+	 * @param {number} [height=1] - The storage texture's height.
 	 */
 	constructor( width = 1, height = 1 ) {
 
@@ -25,28 +25,28 @@ class StorageTexture extends Texture {
 		/**
 		 * The image object which just represents the texture's dimension.
 		 *
-		 * @type {{width: Number, height: Number}}
+		 * @type {{width: number, height: number}}
 		 */
 		this.image = { width, height };
 
 		/**
 		 * The default `magFilter` for storage textures is `THREE.LinearFilter`.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.magFilter = LinearFilter;
 
 		/**
 		 * The default `minFilter` for storage textures is `THREE.LinearFilter`.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.minFilter = LinearFilter;
 
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

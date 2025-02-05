@@ -22,7 +22,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -31,7 +31,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -40,7 +40,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 		/**
 		 * Set to `true` because lambert materials react on lights.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.lights = true;
@@ -56,7 +56,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 	 * to implement the default environment mapping.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {BasicEnvironmentNode<vec3>?} The environment node.
+	 * @return {?BasicEnvironmentNode<vec3>} The environment node.
 	 */
 	setupEnvironment( builder ) {
 

@@ -19,7 +19,7 @@ class JoinNode extends TempNode {
 	 * Constructs a new join node.
 	 *
 	 * @param {Array<Node>} nodes - An array of nodes that should be joined.
-	 * @param {String?} [nodeType=null] - The node type.
+	 * @param {?string} [nodeType=null] - The node type.
 	 */
 	constructor( nodes = [], nodeType = null ) {
 
@@ -39,7 +39,7 @@ class JoinNode extends TempNode {
 	 * joined data length if not explicitly defined.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 

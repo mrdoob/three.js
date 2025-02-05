@@ -13,7 +13,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Constructs a new node loader.
 	 *
-	 * @param {LoadingManager?} manager - A reference to a loading manager.
+	 * @param {?LoadingManager} manager - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -22,14 +22,14 @@ class NodeLoader extends Loader {
 		/**
 		 * Represents a dictionary of textures.
 		 *
-		 * @type {Object<String,Texture>}
+		 * @type {Object<string,Texture>}
 		 */
 		this.textures = {};
 
 		/**
 		 * Represents a dictionary of node types.
 		 *
-		 * @type {Object<String,Node.constructor>}
+		 * @type {Object<string,Node.constructor>}
 		 */
 		this.nodes = {};
 
@@ -38,7 +38,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Loads the node definitions from the given URL.
 	 *
-	 * @param {String} url - The path/URL of the file to be loaded.
+	 * @param {string} url - The path/URL of the file to be loaded.
 	 * @param {Function} onLoad - Will be called when load completes.
 	 * @param {Function} onProgress - Will be called while load progresses.
 	 * @param {Function} onError - Will be called when errors are thrown during the loading process.
@@ -79,7 +79,7 @@ class NodeLoader extends Loader {
 	 * Parse the node dependencies for the loaded node.
 	 *
 	 * @param {Object} json - The JSON definition
-	 * @return {Object<String,Node>} A dictionary with node dependencies.
+	 * @return {Object<string,Node>} A dictionary with node dependencies.
 	 */
 	parseNodes( json ) {
 
@@ -142,7 +142,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Defines the dictionary of textures.
 	 *
-	 * @param {Object<String,Texture>} value - The texture library defines as `<uuid,texture>`.
+	 * @param {Object<string,Texture>} value - The texture library defines as `<uuid,texture>`.
 	 * @return {NodeLoader} A reference to this loader.
 	 */
 	setTextures( value ) {
@@ -155,7 +155,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Defines the dictionary of node types.
 	 *
-	 * @param {Object<String,Node.constructor>} value - The node library defined as `<classname,class>`.
+	 * @param {Object<string,Node.constructor>} value - The node library defined as `<classname,class>`.
 	 * @return {NodeLoader} A reference to this loader.
 	 */
 	setNodes( value ) {
@@ -168,7 +168,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Creates a node object from the given type.
 	 *
-	 * @param {String} type - The node type.
+	 * @param {string} type - The node type.
 	 * @return {Node} The created node instance.
 	 */
 	createNodeFromType( type ) {

@@ -36,7 +36,7 @@ class SobelOperatorNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -159,6 +159,7 @@ export default SobelOperatorNode;
 /**
  * TSL function for creating a sobel operator node which performs edge detection with a sobel filter.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SobelOperatorNode}

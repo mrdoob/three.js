@@ -25,7 +25,7 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 	 * Constructs a new viewport shared texture node.
 	 *
 	 * @param {Node} [uvNode=screenUV] - The uv node.
-	 * @param {Node?} [levelNode=null] - The level node.
+	 * @param {?Node} [levelNode=null] - The level node.
 	 */
 	constructor( uvNode = screenUV, levelNode = null ) {
 
@@ -52,9 +52,10 @@ export default ViewportSharedTextureNode;
 /**
  * TSL function for creating a shared viewport texture node.
  *
+ * @tsl
  * @function
  * @param {Node} [uvNode=screenUV] - The uv node.
- * @param {Node?} [levelNode=null] - The level node.
+ * @param {?Node} [levelNode=null] - The level node.
  * @returns {ViewportSharedTextureNode}
  */
 export const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );

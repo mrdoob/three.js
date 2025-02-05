@@ -82,7 +82,7 @@ class LightsNode extends Node {
 		 * corresponding light node.
 		 *
 		 * @private
-		 * @type {Array<LightingNode>?}
+		 * @type {?Array<LightingNode>}
 		 * @default null
 		 */
 		this._lightNodes = null;
@@ -91,7 +91,7 @@ class LightsNode extends Node {
 		 * A hash for identifying the current light nodes setup.
 		 *
 		 * @private
-		 * @type {String?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this._lightNodesHash = null;
@@ -99,7 +99,7 @@ class LightsNode extends Node {
 		/**
 		 * `LightsNode` sets this property to `true` by default.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.global = true;
@@ -110,7 +110,7 @@ class LightsNode extends Node {
 	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
 	 * light IDs into the cache key.
 	 *
-	 * @return {Number} The custom cache key.
+	 * @return {number} The custom cache key.
 	 */
 	customCacheKey() {
 
@@ -131,7 +131,7 @@ class LightsNode extends Node {
 	 * Computes a hash value for identifying the current light nodes setup.
 	 *
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {String} The computed hash.
+	 * @return {string} The computed hash.
 	 */
 	getHash( builder ) {
 
@@ -368,7 +368,7 @@ class LightsNode extends Node {
 	/**
 	 * Whether the scene has lights or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	get hasLights() {
 
@@ -384,6 +384,7 @@ export default LightsNode;
  * TSL function for creating an instance of `LightsNode` and configuring
  * it with the given array of lights.
  *
+ * @tsl
  * @function
  * @param {Array<Light>} lights - An array of lights.
  * @return {LightsNode} The created lights node.

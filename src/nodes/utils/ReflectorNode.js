@@ -61,10 +61,10 @@ class ReflectorNode extends TextureNode {
 	 *
 	 * @param {Object} [parameters={}] - An object holding configuration parameters.
 	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
-	 * @param {Number} [parameters.resolution=1] - The resolution scale.
-	 * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
-	 * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
-	 * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 * @param {number} [parameters.resolution=1] - The resolution scale.
+	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
+	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
 	 * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
 	 * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
 	 */
@@ -76,7 +76,7 @@ class ReflectorNode extends TextureNode {
 		 * A reference to the internal reflector base node which holds the actual implementation.
 		 *
 		 * @private
-		 * @type {ReflectorBaseNode?}
+		 * @type {?ReflectorBaseNode}
 		 * @default null
 		 */
 		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
@@ -85,7 +85,7 @@ class ReflectorNode extends TextureNode {
 		 * A reference to the internal depth node.
 		 *
 		 * @private
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this._depthNode = null;
@@ -186,10 +186,10 @@ class ReflectorBaseNode extends Node {
 	 * @param {TextureNode} textureNode - Represents the rendered reflections as a texture node.
 	 * @param {Object} [parameters={}] - An object holding configuration parameters.
 	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
-	 * @param {Number} [parameters.resolution=1] - The resolution scale.
-	 * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
-	 * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
-	 * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 * @param {number} [parameters.resolution=1] - The resolution scale.
+	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
+	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
 	 */
 	constructor( textureNode, parameters = {} ) {
 
@@ -221,7 +221,7 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default {1}
 		 */
 		this.resolution = resolution;
@@ -229,7 +229,7 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * Whether mipmaps should be generated or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default {false}
 		 */
 		this.generateMipmaps = generateMipmaps;
@@ -237,7 +237,7 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * Whether reflectors can render other reflector nodes or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default {true}
 		 */
 		this.bounces = bounces;
@@ -245,7 +245,7 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * Whether depth data should be generated or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default {false}
 		 */
 		this.depth = depth;
@@ -254,7 +254,7 @@ class ReflectorBaseNode extends Node {
 		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` when {@link ReflectorBaseNode#bounces}
 		 * is `true`. Otherwise it's `NodeUpdateType.FRAME`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'render'
 		 */
 		this.updateBeforeType = bounces ? NodeUpdateType.RENDER : NodeUpdateType.FRAME;
@@ -481,13 +481,14 @@ class ReflectorBaseNode extends Node {
 /**
  * TSL function for creating a reflector node.
  *
+ * @tsl
  * @function
  * @param {Object} [parameters={}] - An object holding configuration parameters.
  * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
- * @param {Number} [parameters.resolution=1] - The resolution scale.
- * @param {Boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
- * @param {Boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
- * @param {Boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+ * @param {number} [parameters.resolution=1] - The resolution scale.
+ * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+ * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
+ * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
  * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
  * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
  * @returns {ReflectorNode}

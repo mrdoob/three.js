@@ -19,7 +19,7 @@ class Lut3DNode extends TempNode {
 	 *
 	 * @param {Node} inputNode - The node that represents the input of the effect.
 	 * @param {TextureNode} lutNode - A texture node that represents the lookup table.
-	 * @param {Number} size - The size of the lookup table.
+	 * @param {number} size - The size of the lookup table.
 	 * @param {Node<float>} intensityNode - Controls the intensity of the effect.
 	 */
 	constructor( inputNode, lutNode, size, intensityNode ) {
@@ -97,11 +97,12 @@ export default Lut3DNode;
 /**
  * TSL function for creating a LUT node for color grading via post processing.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that represents the input of the effect.
  * @param {TextureNode} lut - A texture node that represents the lookup table.
- * @param {Number} size - The size of the lookup table.
- * @param {Node<float> | Number} intensity - Controls the intensity of the effect.
+ * @param {number} size - The size of the lookup table.
+ * @param {Node<float> | number} intensity - Controls the intensity of the effect.
  * @returns {Lut3DNode}
  */
 export const lut3D = ( node, lut, size, intensity ) => nodeObject( new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) ) );

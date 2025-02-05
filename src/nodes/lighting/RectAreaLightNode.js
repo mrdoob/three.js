@@ -29,7 +29,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new rect area light node.
 	 *
-	 * @param {RectAreaLight?} [light=null] - The rect area light source.
+	 * @param {?RectAreaLight} [light=null] - The rect area light source.
 	 */
 	constructor( light = null ) {
 
@@ -53,7 +53,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 		 * The `updateType` is set to `NodeUpdateType.RENDER` since the light
 		 * relies on `viewMatrix` which might vary per render call.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'render'
 		 */
 		this.updateType = NodeUpdateType.RENDER;

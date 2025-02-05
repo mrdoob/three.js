@@ -6,32 +6,32 @@ class NodeFunctionInput {
 	/**
 	 * Constructs a new node function input.
 	 *
-	 * @param {String} type - The input type.
-	 * @param {String} name - The input name.
-	 * @param {Number?} [count=null] - If the input is an Array, count will be the length.
+	 * @param {string} type - The input type.
+	 * @param {string} name - The input name.
+	 * @param {?number} [count=null] - If the input is an Array, count will be the length.
 	 * @param {('in'|'out'|'inout')} [qualifier=''] - The parameter qualifier (only relevant for GLSL).
-	 * @param {Boolean} [isConst=false] - Whether the input uses a const qualifier or not (only relevant for GLSL).
+	 * @param {boolean} [isConst=false] - Whether the input uses a const qualifier or not (only relevant for GLSL).
 	 */
 	constructor( type, name, count = null, qualifier = '', isConst = false ) {
 
 		/**
 		 *  The input type.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type;
 
 		/**
 		 * The input name.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = name;
 
 		/**
 		 * If the input is an Array, count will be the length.
 		 *
-		 * @type {Number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.count = count;
@@ -47,7 +47,7 @@ class NodeFunctionInput {
 		/**
 		 * Whether the input uses a const qualifier or not (only relevant for GLSL).
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.isConst = isConst;

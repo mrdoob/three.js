@@ -24,9 +24,9 @@ class PropertyNode extends Node {
 	/**
 	 * Constructs a new property node.
 	 *
-	 * @param {String} nodeType - The type of the node.
-	 * @param {String?} [name=null] - The name of the property in the shader.
-	 * @param {Boolean} [varying=false] - Whether this property is a varying or not.
+	 * @param {string} nodeType - The type of the node.
+	 * @param {?string} [name=null] - The name of the property in the shader.
+	 * @param {boolean} [varying=false] - Whether this property is a varying or not.
 	 */
 	constructor( nodeType, name = null, varying = false ) {
 
@@ -36,7 +36,7 @@ class PropertyNode extends Node {
 		 * The name of the property in the shader. If no name is defined,
 		 * the node system auto-generates one.
 		 *
-		 * @type {String?}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = name;
@@ -44,7 +44,7 @@ class PropertyNode extends Node {
 		/**
 		 * Whether this property is a varying or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.varying = varying;
@@ -52,7 +52,7 @@ class PropertyNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -70,7 +70,7 @@ class PropertyNode extends Node {
 	 * The method is overwritten so it always returns `true`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Boolean} Whether this node is global or not.
+	 * @return {boolean} Whether this node is global or not.
 	 */
 	isGlobal( /*builder*/ ) {
 
@@ -104,9 +104,10 @@ export default PropertyNode;
 /**
  * TSL function for creating a property node.
  *
+ * @tsl
  * @function
- * @param {String} type - The type of the node.
- * @param {String?} [name=null] - The name of the property in the shader.
+ * @param {string} type - The type of the node.
+ * @param {?string} [name=null] - The name of the property in the shader.
  * @returns {PropertyNode}
  */
 export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
@@ -114,9 +115,10 @@ export const property = ( type, name ) => nodeObject( new PropertyNode( type, na
 /**
  * TSL function for creating a varying property node.
  *
+ * @tsl
  * @function
- * @param {String} type - The type of the node.
- * @param {String?} [name=null] - The name of the varying in the shader.
+ * @param {string} type - The type of the node.
+ * @param {?string} [name=null] - The name of the varying in the shader.
  * @returns {PropertyNode}
  */
 export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
@@ -124,6 +126,7 @@ export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( t
 /**
  * TSL object that represents the shader variable `DiffuseColor`.
  *
+ * @tsl
  * @type {PropertyNode<vec4>}
  */
 export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
@@ -131,6 +134,7 @@ export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', '
 /**
  * TSL object that represents the shader variable `EmissiveColor`.
  *
+ * @tsl
  * @type {PropertyNode<vec3>}
  */
 export const emissive = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'EmissiveColor' );
@@ -138,6 +142,7 @@ export const emissive = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'Emis
 /**
  * TSL object that represents the shader variable `Roughness`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const roughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Roughness' );
@@ -145,6 +150,7 @@ export const roughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Ro
 /**
  * TSL object that represents the shader variable `Metalness`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const metalness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Metalness' );
@@ -152,6 +158,7 @@ export const metalness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Me
 /**
  * TSL object that represents the shader variable `Clearcoat`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const clearcoat = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
@@ -159,6 +166,7 @@ export const clearcoat = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Cl
 /**
  * TSL object that represents the shader variable `ClearcoatRoughness`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const clearcoatRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'ClearcoatRoughness' );
@@ -166,6 +174,7 @@ export const clearcoatRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'fl
 /**
  * TSL object that represents the shader variable `Sheen`.
  *
+ * @tsl
  * @type {PropertyNode<vec3>}
  */
 export const sheen = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
@@ -173,6 +182,7 @@ export const sheen = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'Sheen' 
 /**
  * TSL object that represents the shader variable `SheenRoughness`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const sheenRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
@@ -180,6 +190,7 @@ export const sheenRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float'
 /**
  * TSL object that represents the shader variable `Iridescence`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const iridescence = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Iridescence' );
@@ -187,6 +198,7 @@ export const iridescence = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', '
 /**
  * TSL object that represents the shader variable `IridescenceIOR`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const iridescenceIOR = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
@@ -194,6 +206,7 @@ export const iridescenceIOR = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float'
 /**
  * TSL object that represents the shader variable `IridescenceThickness`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const iridescenceThickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
@@ -201,6 +214,7 @@ export const iridescenceThickness = /*@__PURE__*/ nodeImmutable( PropertyNode, '
 /**
  * TSL object that represents the shader variable `AlphaT`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const alphaT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AlphaT' );
@@ -208,6 +222,7 @@ export const alphaT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Alpha
 /**
  * TSL object that represents the shader variable `Anisotropy`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const anisotropy = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Anisotropy' );
@@ -215,6 +230,7 @@ export const anisotropy = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'A
 /**
  * TSL object that represents the shader variable `AnisotropyT`.
  *
+ * @tsl
  * @type {PropertyNode<vec3>}
  */
 export const anisotropyT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'AnisotropyT' );
@@ -222,6 +238,7 @@ export const anisotropyT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'A
 /**
  * TSL object that represents the shader variable `AnisotropyB`.
  *
+ * @tsl
  * @type {PropertyNode<vec3>}
  */
 export const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'AnisotropyB' );
@@ -229,6 +246,7 @@ export const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'A
 /**
  * TSL object that represents the shader variable `SpecularColor`.
  *
+ * @tsl
  * @type {PropertyNode<color>}
  */
 export const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
@@ -236,6 +254,7 @@ export const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color',
 /**
  * TSL object that represents the shader variable `SpecularF90`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const specularF90 = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'SpecularF90' );
@@ -243,6 +262,7 @@ export const specularF90 = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', '
 /**
  * TSL object that represents the shader variable `Shininess`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const shininess = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Shininess' );
@@ -250,6 +270,7 @@ export const shininess = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Sh
 /**
  * TSL object that represents the shader variable `Output`.
  *
+ * @tsl
  * @type {PropertyNode<vec4>}
  */
 export const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'Output' );
@@ -257,6 +278,7 @@ export const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'Output
 /**
  * TSL object that represents the shader variable `dashSize`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const dashSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'dashSize' );
@@ -264,6 +286,7 @@ export const dashSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'das
 /**
  * TSL object that represents the shader variable `gapSize`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const gapSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'gapSize' );
@@ -271,6 +294,7 @@ export const gapSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'gapS
 /**
  * TSL object that represents the shader variable `pointWidth`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const pointWidth = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'pointWidth' );
@@ -278,6 +302,7 @@ export const pointWidth = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'p
 /**
  * TSL object that represents the shader variable `IOR`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const ior = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IOR' );
@@ -285,6 +310,7 @@ export const ior = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IOR' );
 /**
  * TSL object that represents the shader variable `Transmission`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const transmission = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Transmission' );
@@ -292,6 +318,7 @@ export const transmission = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 
 /**
  * TSL object that represents the shader variable `Thickness`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const thickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Thickness' );
@@ -299,6 +326,7 @@ export const thickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Th
 /**
  * TSL object that represents the shader variable `AttenuationDistance`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const attenuationDistance = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
@@ -306,6 +334,7 @@ export const attenuationDistance = /*@__PURE__*/ nodeImmutable( PropertyNode, 'f
 /**
  * TSL object that represents the shader variable `AttenuationColor`.
  *
+ * @tsl
  * @type {PropertyNode<color>}
  */
 export const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
@@ -313,6 +342,7 @@ export const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'colo
 /**
  * TSL object that represents the shader variable `Dispersion`.
  *
+ * @tsl
  * @type {PropertyNode<float>}
  */
 export const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );

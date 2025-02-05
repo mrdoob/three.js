@@ -12,8 +12,8 @@ class XRRenderTarget extends RenderTarget {
 	/**
 	 * Constructs a new XR render target.
 	 *
-	 * @param {Number} [width=1] - The width of the render target.
-	 * @param {Number} [height=1] - The height of the render target.
+	 * @param {number} [width=1] - The width of the render target.
+	 * @param {number} [height=1] - The height of the render target.
 	 * @param {Object} [options={}] - The configuration options.
 	 */
 	constructor( width = 1, height = 1, options = {} ) {
@@ -23,7 +23,7 @@ class XRRenderTarget extends RenderTarget {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -34,7 +34,7 @@ class XRRenderTarget extends RenderTarget {
 		 * are defined by external textures. This flag is
 		 * set to `true` when using the WebXR Layers API.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.hasExternalTextures = false;
@@ -50,7 +50,7 @@ class XRRenderTarget extends RenderTarget {
 		 *
 		 * Reference: {@link https://www.w3.org/TR/webxrlayers-1/#dom-xrprojectionlayer-ignoredepthvalues}.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.autoAllocateDepthBuffer = true;

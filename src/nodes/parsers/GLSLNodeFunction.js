@@ -111,7 +111,7 @@ class GLSLNodeFunction extends NodeFunction {
 	/**
 	 * Constructs a new GLSL node function.
 	 *
-	 * @param {String} source - The GLSL source.
+	 * @param {string} source - The GLSL source.
 	 */
 	constructor( source ) {
 
@@ -128,8 +128,8 @@ class GLSLNodeFunction extends NodeFunction {
 	/**
 	 * This method returns the GLSL code of the node function.
 	 *
-	 * @param {String} [name=this.name] - The function's name.
-	 * @return {String} The shader code.
+	 * @param {string} [name=this.name] - The function's name.
+	 * @return {string} The shader code.
 	 */
 	getCode( name = this.name ) {
 

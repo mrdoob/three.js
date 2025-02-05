@@ -325,7 +325,7 @@ class WebGPUAttributeUtils {
 	 *
 	 * @private
 	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
-	 * @return {String} The vertex format (e.g. 'float32x3').
+	 * @return {string} The vertex format (e.g. 'float32x3').
 	 */
 	_getVertexFormat( geometryAttribute ) {
 
@@ -376,8 +376,8 @@ class WebGPUAttributeUtils {
 	 * Returns `true` if the given array is a typed array.
 	 *
 	 * @private
-	 * @param {Any} array - The array.
-	 * @return {Boolean} Whether the given array is a typed array or not.
+	 * @param {any} array - The array.
+	 * @return {boolean} Whether the given array is a typed array or not.
 	 */
 	_isTypedArray( array ) {
 

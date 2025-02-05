@@ -54,7 +54,8 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 /**
  * Applies mipped bicubic texture filtering to the given texture node.
  *
- * @method
+ * @tsl
+ * @function
  * @param {TextureNode} textureNode - The texture node that should be filtered.
  * @param {Node<float>} [lodNode=float(3)] - Defines the LOD to sample from.
  * @return {Node} The filtered texture sample.

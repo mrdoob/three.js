@@ -9,11 +9,10 @@ import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
 
 /**
- * ```
  * This node is used in {@link NodeMaterial} to setup the clipping
  * which can happen hardware-accelerated (if supported) and optionally
  * use alpha-to-coverage for anti-aliasing clipped edges.
- * ```
+ *
  * @augments Node
  */
 class ClippingNode extends Node {
@@ -230,6 +229,7 @@ export default ClippingNode;
 /**
  * TSL function for setting up the default clipping logic.
  *
+ * @tsl
  * @function
  * @returns {ClippingNode}
  */
@@ -238,6 +238,7 @@ export const clipping = () => nodeObject( new ClippingNode() );
 /**
  * TSL function for setting up alpha to coverage.
  *
+ * @tsl
  * @function
  * @returns {ClippingNode}
  */
@@ -246,6 +247,7 @@ export const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.AL
 /**
  * TSL function for setting up hardware-based clipping.
  *
+ * @tsl
  * @function
  * @returns {ClippingNode}
  */

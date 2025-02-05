@@ -24,10 +24,10 @@ class MathNode extends TempNode {
 	/**
 	 * Constructs a new math node.
 	 *
-	 * @param {String} method - The method name.
+	 * @param {string} method - The method name.
 	 * @param {Node} aNode - The first input.
-	 * @param {Node?} [bNode=null] - The second input.
-	 * @param {Node?} [cNode=null] - The third input.
+	 * @param {?Node} [bNode=null] - The second input.
+	 * @param {?Node} [cNode=null] - The third input.
 	 */
 	constructor( method, aNode, bNode = null, cNode = null ) {
 
@@ -36,7 +36,7 @@ class MathNode extends TempNode {
 		/**
 		 * The method name.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.method = method;
 
@@ -50,7 +50,7 @@ class MathNode extends TempNode {
 		/**
 		 * The second input.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.bNode = bNode;
@@ -58,7 +58,7 @@ class MathNode extends TempNode {
 		/**
 		 * The third input.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.cNode = cNode;
@@ -66,7 +66,7 @@ class MathNode extends TempNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -78,7 +78,7 @@ class MathNode extends TempNode {
 	 * The input type is inferred from the node types of the input nodes.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( builder ) {
 
@@ -112,7 +112,7 @@ class MathNode extends TempNode {
 	 * The selected method as well as the input type determine the node type of this node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType( builder ) {
 
@@ -343,6 +343,7 @@ export default MathNode;
 /**
  * A small value used to handle floating-point precision errors.
  *
+ * @tsl
  * @type {Node<float>}
  */
 export const EPSILON = /*@__PURE__*/ float( 1e-6 );
@@ -350,6 +351,7 @@ export const EPSILON = /*@__PURE__*/ float( 1e-6 );
 /**
  * Represents infinity.
  *
+ * @tsl
  * @type {Node<float>}
  */
 export const INFINITY = /*@__PURE__*/ float( 1e6 );
@@ -357,6 +359,7 @@ export const INFINITY = /*@__PURE__*/ float( 1e6 );
 /**
  * Represents PI.
  *
+ * @tsl
  * @type {Node<float>}
  */
 export const PI = /*@__PURE__*/ float( Math.PI );
@@ -364,6 +367,7 @@ export const PI = /*@__PURE__*/ float( Math.PI );
 /**
  * Represents PI * 2.
  *
+ * @tsl
  * @type {Node<float>}
  */
 export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
@@ -371,8 +375,9 @@ export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
 /**
  * Returns `true` if all components of `x` are `true`.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node<bool>}
  */
 export const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL );
@@ -380,8 +385,9 @@ export const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL );
 /**
  * Returns `true` if any components of `x` are `true`.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node<bool>}
  */
 export const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
@@ -389,8 +395,9 @@ export const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
 /**
  * Converts a quantity in degrees to radians.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The input in degrees.
+ * @param {Node | number} x - The input in degrees.
  * @returns {Node}
  */
 export const radians = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RADIANS );
@@ -398,8 +405,9 @@ export const radians = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RADIANS );
 /**
  * Convert a quantity in radians to degrees.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The input in radians.
+ * @param {Node | number} x - The input in radians.
  * @returns {Node}
  */
 export const degrees = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DEGREES );
@@ -407,8 +415,9 @@ export const degrees = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DEGREES );
 /**
  * Returns the natural exponentiation of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const exp = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP );
@@ -416,8 +425,9 @@ export const exp = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP );
 /**
  * Returns 2 raised to the power of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const exp2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP2 );
@@ -425,8 +435,9 @@ export const exp2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP2 );
 /**
  * Returns the natural logarithm of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const log = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG );
@@ -434,8 +445,9 @@ export const log = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG );
 /**
  * Returns the base 2 logarithm of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const log2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG2 );
@@ -443,8 +455,9 @@ export const log2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG2 );
 /**
  * Returns the square root of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const sqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SQRT );
@@ -452,8 +465,9 @@ export const sqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SQRT );
 /**
  * Returns the inverse of the square root of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const inverseSqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE_SQRT );
@@ -461,8 +475,9 @@ export const inverseSqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE_S
 /**
  * Finds the nearest integer less than or equal to the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const floor = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FLOOR );
@@ -470,8 +485,9 @@ export const floor = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FLOOR );
 /**
  * Finds the nearest integer that is greater than or equal to the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const ceil = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CEIL );
@@ -479,6 +495,7 @@ export const ceil = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CEIL );
 /**
  * Calculates the unit vector in the same direction as the original vector.
  *
+ * @tsl
  * @function
  * @param {Node} x - The input vector.
  * @returns {Node}
@@ -488,8 +505,9 @@ export const normalize = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NORMALIZE )
 /**
  * Computes the fractional part of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const fract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FRACT );
@@ -497,8 +515,9 @@ export const fract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FRACT );
 /**
  * Returns the sine of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const sin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIN );
@@ -506,8 +525,9 @@ export const sin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIN );
 /**
  * Returns the cosine of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const cos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.COS );
@@ -515,8 +535,9 @@ export const cos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.COS );
 /**
  * Returns the tangent of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const tan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TAN );
@@ -524,8 +545,9 @@ export const tan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TAN );
 /**
  * Returns the arcsine of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const asin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ASIN );
@@ -533,8 +555,9 @@ export const asin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ASIN );
 /**
  * Returns the arccosine of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
@@ -543,9 +566,10 @@ export const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
  * Returns the arc-tangent of the parameter.
  * If two parameters are provided, the result is `atan2(y/x)`.
  *
+ * @tsl
  * @function
- * @param {Node | Number} y - The y parameter.
- * @param {(Node | Number)?} x - The x parameter.
+ * @param {Node | number} y - The y parameter.
+ * @param {?(Node | number)} x - The x parameter.
  * @returns {Node}
  */
 export const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );
@@ -553,8 +577,9 @@ export const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );
 /**
  * Returns the absolute value of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const abs = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ABS );
@@ -562,8 +587,9 @@ export const abs = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ABS );
 /**
  * Extracts the sign of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const sign = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIGN );
@@ -571,6 +597,7 @@ export const sign = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIGN );
 /**
  * Calculates the length of a vector.
  *
+ * @tsl
  * @function
  * @param {Node} x - The parameter.
  * @returns {Node<float>}
@@ -580,8 +607,9 @@ export const length = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LENGTH );
 /**
  * Negates the value of the parameter (-x).
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const negate = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NEGATE );
@@ -589,8 +617,9 @@ export const negate = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NEGATE );
 /**
  * Return `1` minus the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const oneMinus = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ONE_MINUS );
@@ -598,8 +627,9 @@ export const oneMinus = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ONE_MINUS );
 /**
  * Returns the partial derivative of the parameter with respect to x.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const dFdx = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDX );
@@ -607,8 +637,9 @@ export const dFdx = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDX );
 /**
  * Returns the partial derivative of the parameter with respect to y.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const dFdy = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDY );
@@ -616,8 +647,9 @@ export const dFdy = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDY );
 /**
  * Rounds the parameter to the nearest integer.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const round = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ROUND );
@@ -625,8 +657,9 @@ export const round = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ROUND );
 /**
  * Returns the reciprocal of the parameter `(1/x)`.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const reciprocal = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RECIPROCAL );
@@ -634,8 +667,9 @@ export const reciprocal = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RECIPROCAL
 /**
  * Truncates the parameter, removing the fractional part.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const trunc = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRUNC );
@@ -643,8 +677,9 @@ export const trunc = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRUNC );
 /**
  * Returns the sum of the absolute derivatives in x and y.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
+ * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
 export const fwidth = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FWIDTH );
@@ -652,6 +687,7 @@ export const fwidth = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FWIDTH );
 /**
  * Returns the transpose of a matrix.
  *
+ * @tsl
  * @function
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node}
@@ -663,9 +699,10 @@ export const transpose = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSPOSE )
 /**
  * Reinterpret the bit representation of a value in one type as a value in another type.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The parameter.
- * @param {String} y - The new type.
+ * @param {Node | number} x - The parameter.
+ * @param {string} y - The new type.
  * @returns {Node}
  */
 export const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST );
@@ -673,9 +710,10 @@ export const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST );
 /**
  * Returns `true` if `x` equals `y`.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The first parameter.
- * @param {Node | Number} y - The second parameter.
+ * @param {Node | number} x - The first parameter.
+ * @param {Node | number} y - The second parameter.
  * @returns {Node<bool>}
  */
 export const equals = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EQUALS );
@@ -683,9 +721,10 @@ export const equals = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EQUALS );
 /**
  * Returns the lesser of two values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The y parameter.
- * @param {Node | Number} y - The x parameter.
+ * @param {Node | number} x - The y parameter.
+ * @param {Node | number} y - The x parameter.
  * @returns {Node}
  */
 export const min = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN );
@@ -693,9 +732,10 @@ export const min = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN );
 /**
  * Returns the greater of two values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The y parameter.
- * @param {Node | Number} y - The x parameter.
+ * @param {Node | number} x - The y parameter.
+ * @param {Node | number} y - The x parameter.
  * @returns {Node}
  */
 export const max = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX );
@@ -703,9 +743,10 @@ export const max = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX );
 /**
  * Computes the remainder of dividing the first node by the second one.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The y parameter.
- * @param {Node | Number} y - The x parameter.
+ * @param {Node | number} x - The y parameter.
+ * @param {Node | number} y - The x parameter.
  * @returns {Node}
  */
 export const mod = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MOD );
@@ -713,9 +754,10 @@ export const mod = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MOD );
 /**
  * Generate a step function by comparing two values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The y parameter.
- * @param {Node | Number} y - The x parameter.
+ * @param {Node | number} x - The y parameter.
+ * @param {Node | number} y - The x parameter.
  * @returns {Node}
  */
 export const step = /*@__PURE__*/ nodeProxy( MathNode, MathNode.STEP );
@@ -723,6 +765,7 @@ export const step = /*@__PURE__*/ nodeProxy( MathNode, MathNode.STEP );
 /**
  * Calculates the reflection direction for an incident vector.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} I - The incident vector.
  * @param {Node<vec2|vec3|vec4>} N - The normal vector.
@@ -733,6 +776,7 @@ export const reflect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFLECT );
 /**
  * Calculates the distance between two points.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} x - The first point.
  * @param {Node<vec2|vec3|vec4>} y - The second point.
@@ -743,9 +787,10 @@ export const distance = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DISTANCE );
 /**
  * Calculates the absolute difference between two values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The first parameter.
- * @param {Node | Number} y - The second parameter.
+ * @param {Node | number} x - The first parameter.
+ * @param {Node | number} y - The second parameter.
  * @returns {Node}
  */
 export const difference = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DIFFERENCE );
@@ -753,6 +798,7 @@ export const difference = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DIFFERENCE
 /**
  * Calculates the dot product of two vectors.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} x - The first vector.
  * @param {Node<vec2|vec3|vec4>} y - The second vector.
@@ -763,6 +809,7 @@ export const dot = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DOT );
 /**
  * Calculates the cross product of two vectors.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} x - The first vector.
  * @param {Node<vec2|vec3|vec4>} y - The second vector.
@@ -773,9 +820,10 @@ export const cross = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CROSS );
 /**
  * Return the value of the first parameter raised to the power of the second one.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The first parameter.
- * @param {Node | Number} y - The second parameter.
+ * @param {Node | number} x - The first parameter.
+ * @param {Node | number} y - The second parameter.
  * @returns {Node}
  */
 export const pow = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW );
@@ -783,8 +831,9 @@ export const pow = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW );
 /**
  * Returns the square of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The first parameter.
+ * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
 export const pow2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 2 );
@@ -792,8 +841,9 @@ export const pow2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 2 );
 /**
  * Returns the cube of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The first parameter.
+ * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
 export const pow3 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 3 );
@@ -801,8 +851,9 @@ export const pow3 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 3 );
 /**
  * Returns the fourth power of the parameter.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The first parameter.
+ * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
 export const pow4 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 4 );
@@ -810,6 +861,7 @@ export const pow4 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 4 );
 /**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} direction - The direction vector.
  * @param {Node<mat2|mat3|mat4>} matrix - The transformation matrix.
@@ -820,8 +872,9 @@ export const transformDirection = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TR
 /**
  * Returns the cube root of a number.
  *
+ * @tsl
  * @function
- * @param {Node | Number} a - The first parameter.
+ * @param {Node | number} a - The first parameter.
  * @returns {Node}
  */
 export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
@@ -829,6 +882,7 @@ export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
 /**
  * Calculate the squared length of a vector.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} a - The vector.
  * @returns {Node<float>}
@@ -838,10 +892,11 @@ export const lengthSq = ( a ) => dot( a, a );
 /**
  * Linearly interpolates between two values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} a - The first parameter.
- * @param {Node | Number} b - The second parameter.
- * @param {Node | Number} t - The interpolation value.
+ * @param {Node | number} a - The first parameter.
+ * @param {Node | number} b - The second parameter.
+ * @param {Node | number} t - The interpolation value.
  * @returns {Node}
  */
 export const mix = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIX );
@@ -849,10 +904,11 @@ export const mix = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIX );
 /**
  * Constrains a value to lie between two further values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} value - The value to constrain.
- * @param {Node | Number} [low=0] - The lower bound.
- * @param {Node | Number} [high=1] - The upper bound.
+ * @param {Node | number} value - The value to constrain.
+ * @param {Node | number} [low=0] - The lower bound.
+ * @param {Node | number} [high=1] - The upper bound.
  * @returns {Node}
  */
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
@@ -860,8 +916,9 @@ export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( M
 /**
  * Constrains a value between `0` and `1`.
  *
+ * @tsl
  * @function
- * @param {Node | Number} value - The value to constrain.
+ * @param {Node | number} value - The value to constrain.
  * @returns {Node}
  */
 export const saturate = ( value ) => clamp( value );
@@ -869,6 +926,7 @@ export const saturate = ( value ) => clamp( value );
 /**
  * Calculates the refraction direction for an incident vector.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} I - The incident vector.
  * @param {Node<vec2|vec3|vec4>} N - The normal vector.
@@ -880,10 +938,11 @@ export const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT );
 /**
  * Performs a Hermite interpolation between two values.
  *
+ * @tsl
  * @function
- * @param {Node | Number} low - The value of the lower edge of the Hermite function.
- * @param {Node | Number} high - The value of the upper edge of the Hermite function.
- * @param {Node | Number} x - The source value for interpolation.
+ * @param {Node | number} low - The value of the lower edge of the Hermite function.
+ * @param {Node | number} high - The value of the upper edge of the Hermite function.
+ * @param {Node | number} x - The source value for interpolation.
  * @returns {Node}
  */
 export const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP );
@@ -891,6 +950,7 @@ export const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP
 /**
  * Returns a vector pointing in the same direction as another.
  *
+ * @tsl
  * @function
  * @param {Node<vec2|vec3|vec4>} N - The vector to orient.
  * @param {Node<vec2|vec3|vec4>} I - The incident vector.
@@ -902,6 +962,7 @@ export const faceForward = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FACEFORWA
 /**
  * Returns a random value for the given uv.
  *
+ * @tsl
  * @function
  * @param {Node<vec2>} uv - The uv node.
  * @returns {Node<float>}
@@ -918,10 +979,11 @@ export const rand = /*@__PURE__*/ Fn( ( [ uv ] ) => {
 /**
  * Alias for `mix()` with a different parameter order.
  *
+ * @tsl
  * @function
- * @param {Node | Number} t - The interpolation value.
- * @param {Node | Number} e1 - The first parameter.
- * @param {Node | Number} e2 - The second parameter.
+ * @param {Node | number} t - The interpolation value.
+ * @param {Node | number} e1 - The first parameter.
+ * @param {Node | number} e2 - The second parameter.
  * @returns {Node}
  */
 export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
@@ -929,10 +991,11 @@ export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
 /**
  * Alias for `smoothstep()` with a different parameter order.
  *
+ * @tsl
  * @function
- * @param {Node | Number} x - The source value for interpolation.
- * @param {Node | Number} low - The value of the lower edge of the Hermite function.
- * @param {Node | Number} high - The value of the upper edge of the Hermite function.
+ * @param {Node | number} x - The source value for interpolation.
+ * @param {Node | number} low - The value of the lower edge of the Hermite function.
+ * @param {Node | number} high - The value of the upper edge of the Hermite function.
  * @returns {Node}
  */
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
@@ -940,11 +1003,12 @@ export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
 /**
  * Returns the arc-tangent of the quotient of its parameters.
  *
+ * @tsl
  * @function
  * @deprecated since r172. Use {@link atan} instead.
  *
- * @param {Node | Number} y - The y parameter.
- * @param {Node | Number} x - The x parameter.
+ * @param {Node | number} y - The y parameter.
+ * @param {Node | number} x - The x parameter.
  * @returns {Node}
  */
 export const atan2 = ( y, x ) => { // @deprecated, r172

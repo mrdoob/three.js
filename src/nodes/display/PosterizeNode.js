@@ -56,6 +56,7 @@ export default PosterizeNode;
 /**
  * TSL function for creating a posterize node.
  *
+ * @tsl
  * @function
  * @param {Node} sourceNode - The input color.
  * @param {Node} stepsNode - Controls the intensity of the posterization effect. A lower number results in a more blocky appearance.

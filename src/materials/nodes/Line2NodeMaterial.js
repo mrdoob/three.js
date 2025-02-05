@@ -33,7 +33,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new node material for wide line rendering.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -42,7 +42,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -53,7 +53,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Whether vertex colors should be used or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.useColor = parameters.vertexColors;
@@ -61,7 +61,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * The dash offset.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.dashOffset = 0;
@@ -69,7 +69,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * The line width.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.lineWidth = 1;
@@ -77,7 +77,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the lines color.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.lineColorNode = null;
@@ -85,7 +85,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the offset.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.offsetNode = null;
@@ -93,7 +93,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the dash scale.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.dashScaleNode = null;
@@ -101,7 +101,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the dash size.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.dashSizeNode = null;
@@ -109,7 +109,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		/**
 		 * Defines the gap size.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.gapSizeNode = null;
@@ -118,7 +118,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * Blending is set to `NoBlending` since transparency
 		 * is not supported, yet.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.blending = NoBlending;
@@ -479,7 +479,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	 * Whether the lines should sized in world units or not.
 	 * When set to `false` the unit is pixel.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default false
 	 */
 	get worldUnits() {
@@ -502,7 +502,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	/**
 	 * Whether the lines should be dashed or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default false
 	 */
 	get dashed() {
@@ -525,7 +525,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	/**
 	 * Whether alpha to coverage should be used or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get alphaToCoverage() {

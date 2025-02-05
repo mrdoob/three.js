@@ -13,8 +13,8 @@ class SampledTexture extends Binding {
 	/**
 	 * Constructs a new sampled texture.
 	 *
-	 * @param {String} name - The sampled texture's name.
-	 * @param {Texture?} texture - The texture this binding is referring to.
+	 * @param {string} name - The sampled texture's name.
+	 * @param {?Texture} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -23,28 +23,28 @@ class SampledTexture extends Binding {
 		/**
 		 * This identifier.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.id = _id ++;
 
 		/**
 		 * The texture this binding is referring to.
 		 *
-		 * @type {Texture?}
+		 * @type {?Texture}
 		 */
 		this.texture = texture;
 
 		/**
 		 * The binding's version.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.version = texture ? texture.version : 0;
 
 		/**
 		 * Whether the texture is a storage texture or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.store = false;
@@ -53,7 +53,7 @@ class SampledTexture extends Binding {
 		 * The binding's generation which is an additional version
 		 * qualifier.
 		 *
-		 * @type {Number?}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.generation = null;
@@ -61,7 +61,7 @@ class SampledTexture extends Binding {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -73,8 +73,8 @@ class SampledTexture extends Binding {
 	 * Returns `true` whether this binding requires an update for the
 	 * given generation.
 	 *
-	 * @param {Number} generation - The generation.
-	 * @return {Boolean} Whether an update is required or not.
+	 * @param {number} generation - The generation.
+	 * @return {boolean} Whether an update is required or not.
 	 */
 	needsBindingsUpdate( generation ) {
 
@@ -95,7 +95,7 @@ class SampledTexture extends Binding {
 	/**
 	 * Updates the binding.
 	 *
-	 * @return {Boolean} Whether the texture has been updated and must be
+	 * @return {boolean} Whether the texture has been updated and must be
 	 * uploaded to the GPU.
 	 */
 	update() {
@@ -127,8 +127,8 @@ class SampledArrayTexture extends SampledTexture {
 	/**
 	 * Constructs a new sampled array texture.
 	 *
-	 * @param {String} name - The sampled array texture's name.
-	 * @param {(DataArrayTexture|CompressedArrayTexture)?} texture - The texture this binding is referring to.
+	 * @param {string} name - The sampled array texture's name.
+	 * @param {?(DataArrayTexture|CompressedArrayTexture)} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -137,7 +137,7 @@ class SampledArrayTexture extends SampledTexture {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -158,8 +158,8 @@ class Sampled3DTexture extends SampledTexture {
 	/**
 	 * Constructs a new sampled 3D texture.
 	 *
-	 * @param {String} name - The sampled 3D texture's name.
-	 * @param {Data3DTexture?} texture - The texture this binding is referring to.
+	 * @param {string} name - The sampled 3D texture's name.
+	 * @param {?Data3DTexture} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -168,7 +168,7 @@ class Sampled3DTexture extends SampledTexture {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -189,8 +189,8 @@ class SampledCubeTexture extends SampledTexture {
 	/**
 	 * Constructs a new sampled cube texture.
 	 *
-	 * @param {String} name - The sampled cube texture's name.
-	 * @param {(CubeTexture|CompressedCubeTexture)?} texture - The texture this binding is referring to.
+	 * @param {string} name - The sampled cube texture's name.
+	 * @param {?(CubeTexture|CompressedCubeTexture)} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
 
@@ -199,7 +199,7 @@ class SampledCubeTexture extends SampledTexture {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

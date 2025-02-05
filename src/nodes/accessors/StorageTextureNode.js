@@ -46,7 +46,7 @@ class StorageTextureNode extends TextureNode {
 	 *
 	 * @param {StorageTexture} value - The storage texture.
 	 * @param {Node<vec2|vec3>} uvNode - The uv node.
-	 * @param {Node?} [storeNode=null] - The value node that should be stored in the texture.
+	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
 	 */
 	constructor( value, uvNode, storeNode = null ) {
 
@@ -55,7 +55,7 @@ class StorageTextureNode extends TextureNode {
 		/**
 		 * The value node that should be stored in the texture.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.storeNode = storeNode;
@@ -63,7 +63,7 @@ class StorageTextureNode extends TextureNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -72,7 +72,7 @@ class StorageTextureNode extends TextureNode {
 		/**
 		 * The access type of the texture node.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'writeOnly'
 		 */
 		this.access = NodeAccess.WRITE_ONLY;
@@ -83,7 +83,7 @@ class StorageTextureNode extends TextureNode {
 	 * Overwrites the default implementation to return a fixed value `'storageTexture'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The input type.
+	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
 
@@ -103,7 +103,7 @@ class StorageTextureNode extends TextureNode {
 	/**
 	 * Defines the node access.
 	 *
-	 * @param {String} value - The node access.
+	 * @param {string} value - The node access.
 	 * @return {StorageTextureNode} A reference to this node.
 	 */
 	setAccess( value ) {
@@ -118,8 +118,8 @@ class StorageTextureNode extends TextureNode {
 	 * is defined, the texture node is generated as normal texture.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {String} output - The current output.
-	 * @return {String} The generated code snippet.
+	 * @param {string} output - The current output.
+	 * @return {string} The generated code snippet.
 	 */
 	generate( builder, output ) {
 
@@ -200,10 +200,11 @@ export default StorageTextureNode;
 /**
  * TSL function for creating a storage texture node.
  *
+ * @tsl
  * @function
  * @param {StorageTexture} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
- * @param {Node?} [storeNode=null] - The value node that should be stored in the texture.
+ * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
 export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
@@ -212,10 +213,11 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
 /**
  * TODO: Explain difference to `storageTexture()`.
  *
+ * @tsl
  * @function
  * @param {StorageTexture} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
- * @param {Node?} [storeNode=null] - The value node that should be stored in the texture.
+ * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
 export const textureStore = ( value, uvNode, storeNode ) => {

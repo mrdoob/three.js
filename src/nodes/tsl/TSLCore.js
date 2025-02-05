@@ -561,6 +561,7 @@ export const Fn = ( jsFunc, nodeType ) => {
 };
 
 /**
+ * @tsl
  * @function
  * @deprecated since r168. Use {@link Fn} instead.
  *

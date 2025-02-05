@@ -176,7 +176,7 @@ class WebGLState {
 	 * This method caches the state so `gl.frontFace()` is only
 	 * called when necessary.
 	 *
-	 * @param {Boolean} flipSided - Whether triangles flipped their sides or not.
+	 * @param {boolean} flipSided - Whether triangles flipped their sides or not.
 	 */
 	setFlipSided( flipSided ) {
 
@@ -207,7 +207,7 @@ class WebGLState {
 	 * This method caches the state so `gl.cullFace()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} cullFace - Defines which polygons are candidates for culling.
+	 * @param {number} cullFace - Defines which polygons are candidates for culling.
 	 */
 	setCullFace( cullFace ) {
 
@@ -251,7 +251,7 @@ class WebGLState {
 	 * This method caches the state so `gl.lineWidth()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} width - The line width.
+	 * @param {number} width - The line width.
 	 */
 	setLineWidth( width ) {
 
@@ -273,14 +273,14 @@ class WebGLState {
 	 * This method caches the state so `gl.blendEquation()`, `gl.blendEquationSeparate()`,
 	 * `gl.blendFunc()` and  `gl.blendFuncSeparate()` are only called when necessary.
 	 *
-	 * @param {Number} blending - The blending type.
-	 * @param {Number} blendEquation - The blending equation.
-	 * @param {Number} blendSrc - Only relevant for custom blending. The RGB source blending factor.
-	 * @param {Number} blendDst - Only relevant for custom blending. The RGB destination blending factor.
-	 * @param {Number} blendEquationAlpha - Only relevant for custom blending. The blending equation for alpha.
-	 * @param {Number} blendSrcAlpha - Only relevant for custom blending. The alpha source blending factor.
-	 * @param {Number} blendDstAlpha - Only relevant for custom blending. The alpha destination blending factor.
-	 * @param {Boolean} premultipliedAlpha - Whether premultiplied alpha is enabled or not.
+	 * @param {number} blending - The blending type.
+	 * @param {number} blendEquation - The blending equation.
+	 * @param {number} blendSrc - Only relevant for custom blending. The RGB source blending factor.
+	 * @param {number} blendDst - Only relevant for custom blending. The RGB destination blending factor.
+	 * @param {number} blendEquationAlpha - Only relevant for custom blending. The blending equation for alpha.
+	 * @param {number} blendSrcAlpha - Only relevant for custom blending. The alpha source blending factor.
+	 * @param {number} blendDstAlpha - Only relevant for custom blending. The alpha destination blending factor.
+	 * @param {boolean} premultipliedAlpha - Whether premultiplied alpha is enabled or not.
 	 */
 	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
@@ -425,7 +425,7 @@ class WebGLState {
 	 * This method caches the state so `gl.colorMask()` is only
 	 * called when necessary.
 	 *
-	 * @param {Boolean} colorMask - The color mask.
+	 * @param {boolean} colorMask - The color mask.
 	 */
 	setColorMask( colorMask ) {
 
@@ -441,7 +441,7 @@ class WebGLState {
 	/**
 	 * Specifies whether the depth test is enabled or not.
 	 *
-	 * @param {Boolean} depthTest - Whether the depth test is enabled or not.
+	 * @param {boolean} depthTest - Whether the depth test is enabled or not.
 	 */
 	setDepthTest( depthTest ) {
 
@@ -466,7 +466,7 @@ class WebGLState {
 	 * This method caches the state so `gl.depthMask()` is only
 	 * called when necessary.
 	 *
-	 * @param {Boolean} depthMask - The depth mask.
+	 * @param {boolean} depthMask - The depth mask.
 	 */
 	setDepthMask( depthMask ) {
 
@@ -485,7 +485,7 @@ class WebGLState {
 	 * This method caches the state so `gl.depthFunc()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} depthFunc - The depth compare function.
+	 * @param {number} depthFunc - The depth compare function.
 	 */
 	setDepthFunc( depthFunc ) {
 
@@ -548,12 +548,12 @@ class WebGLState {
 	}
 
 	/**
-	 * Specifies the viewport.
+	 * Specifies the scissor box.
 	 *
-	 * @param {Number} x - The x-coordinate of the lower left corner of the viewport.
-	 * @param {Number} y - The y-coordinate of the lower left corner of the viewport.
-	 * @param {Number} width - The width of the viewport.
-	 * @param {Number} height - The height of the viewport.
+	 * @param {number} x - The x-coordinate of the lower left corner of the viewport.
+	 * @param {number} y - The y-coordinate of the lower left corner of the viewport.
+	 * @param {number} width - The width of the viewport.
+	 * @param {number} height - The height of the viewport.
 	 *
 	 */
 	scissor( x, y, width, height ) {
@@ -574,10 +574,10 @@ class WebGLState {
 	/**
 	 * Specifies the viewport.
 	 *
-	 * @param {Number} x - The x-coordinate of the lower left corner of the viewport.
-	 * @param {Number} y - The y-coordinate of the lower left corner of the viewport.
-	 * @param {Number} width - The width of the viewport.
-	 * @param {Number} height - The height of the viewport.
+	 * @param {number} x - The x-coordinate of the lower left corner of the viewport.
+	 * @param {number} y - The y-coordinate of the lower left corner of the viewport.
+	 * @param {number} width - The width of the viewport.
+	 * @param {number} height - The height of the viewport.
 	 *
 	 */
 	viewport( x, y, width, height ) {
@@ -598,7 +598,7 @@ class WebGLState {
 	/**
 	 * Defines the scissor test.
 	 *
-	 * @param {Boolean} boolean - Whether the scissor test should be enabled or not.
+	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
 	setScissorTest( boolean ) {
 
@@ -619,7 +619,7 @@ class WebGLState {
 	/**
 	 * Specifies whether the stencil test is enabled or not.
 	 *
-	 * @param {Boolean} stencilTest - Whether the stencil test is enabled or not.
+	 * @param {boolean} stencilTest - Whether the stencil test is enabled or not.
 	 */
 	setStencilTest( stencilTest ) {
 
@@ -644,7 +644,7 @@ class WebGLState {
 	 * This method caches the state so `gl.stencilMask()` is only
 	 * called when necessary.
 	 *
-	 * @param {Boolean} stencilMask - The stencil mask.
+	 * @param {boolean} stencilMask - The stencil mask.
 	 */
 	setStencilMask( stencilMask ) {
 
@@ -663,9 +663,9 @@ class WebGLState {
 	 * This method caches the state so `gl.stencilFunc()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} stencilFunc - The stencil compare function.
-	 * @param {Number} stencilRef - The reference value for the stencil test.
-	 * @param {Number} stencilMask - A bit-wise mask that is used to AND the reference value and the stored stencil value when the test is done.
+	 * @param {number} stencilFunc - The stencil compare function.
+	 * @param {number} stencilRef - The reference value for the stencil test.
+	 * @param {number} stencilMask - A bit-wise mask that is used to AND the reference value and the stored stencil value when the test is done.
 	 */
 	setStencilFunc( stencilFunc, stencilRef, stencilMask ) {
 
@@ -689,9 +689,9 @@ class WebGLState {
 	 * This method caches the state so `gl.stencilOp()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} stencilFail - The function to use when the stencil test fails.
-	 * @param {Number} stencilZFail - The function to use when the stencil test passes, but the depth test fail.
-	 * @param {Number} stencilZPass - The function to use when both the stencil test and the depth test pass,
+	 * @param {number} stencilFail - The function to use when the stencil test fails.
+	 * @param {number} stencilZFail - The function to use when the stencil test passes, but the depth test fail.
+	 * @param {number} stencilZPass - The function to use when both the stencil test and the depth test pass,
 	 * or when the stencil test passes and there is no depth buffer or depth testing is disabled.
 	 */
 	setStencilOp( stencilFail, stencilZFail, stencilZPass ) {
@@ -714,8 +714,8 @@ class WebGLState {
 	 * Configures the WebGL state for the given material.
 	 *
 	 * @param {Material} material - The material to configure the state for.
-	 * @param {Number} frontFaceCW - Whether the front faces are counter-clockwise or not.
-	 * @param {Number} hardwareClippingPlanes - The number of hardware clipping planes.
+	 * @param {number} frontFaceCW - Whether the front faces are counter-clockwise or not.
+	 * @param {number} hardwareClippingPlanes - The number of hardware clipping planes.
 	 */
 	setMaterial( material, frontFaceCW, hardwareClippingPlanes ) {
 
@@ -787,9 +787,9 @@ class WebGLState {
 	 * This method caches the state so `gl.polygonOffset()` is only
 	 * called when necessary.
 	 *
-	 * @param {Boolean} polygonOffset - Whether polygon offset is enabled or not.
-	 * @param {Number} factor - The scale factor for the variable depth offset for each polygon.
-	 * @param {Number} units - The multiplier by which an implementation-specific value is multiplied with to create a constant depth offset.
+	 * @param {boolean} polygonOffset - Whether polygon offset is enabled or not.
+	 * @param {number} factor - The scale factor for the variable depth offset for each polygon.
+	 * @param {number} units - The multiplier by which an implementation-specific value is multiplied with to create a constant depth offset.
 	 */
 	setPolygonOffset( polygonOffset, factor, units ) {
 
@@ -823,7 +823,7 @@ class WebGLState {
 	 * called when necessary.
 	 *
 	 * @param {WebGLProgram} program - The WebGL program to use.
-	 * @return {Boolean} Whether a program change has been executed or not.
+	 * @return {boolean} Whether a program change has been executed or not.
 	 */
 	useProgram( program ) {
 
@@ -850,9 +850,9 @@ class WebGLState {
 	 * This method caches the state so `gl.bindFramebuffer()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} target - The binding point (target).
+	 * @param {number} target - The binding point (target).
 	 * @param {WebGLFramebuffer} framebuffer - The WebGL framebuffer to bind.
-	 * @return {Boolean} Whether a bind has been executed or not.
+	 * @return {boolean} Whether a bind has been executed or not.
 	 */
 	bindFramebuffer( target, framebuffer ) {
 
@@ -962,7 +962,7 @@ class WebGLState {
 	 * This method caches the state so `gl.activeTexture()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} webglSlot - The texture unit to make active.
+	 * @param {number} webglSlot - The texture unit to make active.
 	 */
 	activeTexture( webglSlot ) {
 
@@ -985,9 +985,9 @@ class WebGLState {
 	 * This method caches the state so `gl.bindTexture()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} webglType - The binding point (target).
+	 * @param {number} webglType - The binding point (target).
 	 * @param {WebGLTexture} webglTexture - The WebGL texture to bind.
-	 * @param {Number} webglSlot - The texture.
+	 * @param {number} webglSlot - The texture.
 	 */
 	bindTexture( webglType, webglTexture, webglSlot ) {
 
@@ -1040,10 +1040,10 @@ class WebGLState {
 	 * This method caches the state so `gl.bindBufferBase()` is only
 	 * called when necessary.
 	 *
-	 * @param {Number} target - The target for the bind operation.
-	 * @param {Number} index - The index of the target.
+	 * @param {number} target - The target for the bind operation.
+	 * @param {number} index - The index of the target.
 	 * @param {WebGLBuffer} buffer - The WebGL buffer.
-	 * @return {Boolean} Whether a bind has been executed or not.
+	 * @return {boolean} Whether a bind has been executed or not.
 	 */
 	bindBufferBase( target, index, buffer ) {
 

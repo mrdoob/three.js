@@ -23,7 +23,7 @@ class AfterImageNode extends TempNode {
 	 * Constructs a new after image node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+	 * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
 	 */
 	constructor( textureNode, damp = 0.96 ) {
 
@@ -82,7 +82,7 @@ class AfterImageNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -103,8 +103,8 @@ class AfterImageNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -232,9 +232,10 @@ class AfterImageNode extends TempNode {
 /**
  * TSL function for creating an after image node for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {Number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+ * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
 export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );

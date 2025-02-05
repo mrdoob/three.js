@@ -34,7 +34,7 @@ class OutputStructNode extends Node {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -95,6 +95,7 @@ export default OutputStructNode;
 /**
  * TSL function for creating an output struct node.
  *
+ * @tsl
  * @function
  * @param {...Node} members - A parameter list of nodes.
  * @returns {OutputStructNode}

@@ -25,7 +25,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh normal node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -34,7 +34,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

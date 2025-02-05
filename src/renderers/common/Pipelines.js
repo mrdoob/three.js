@@ -40,7 +40,7 @@ class Pipelines extends DataMap {
 		 * This reference will be set inside the `Bindings`
 		 * constructor.
 		 *
-		 * @type {Bindings?}
+		 * @type {?Bindings}
 		 * @default null
 		 */
 		this.bindings = null;
@@ -49,7 +49,7 @@ class Pipelines extends DataMap {
 		 * Internal cache for maintaining pipelines.
 		 * The key of the map is a cache key, the value the pipeline.
 		 *
-		 * @type {Map<String,Pipeline>}
+		 * @type {Map<string,Pipeline>}
 		 */
 		this.caches = new Map();
 
@@ -58,7 +58,7 @@ class Pipelines extends DataMap {
 		 * fragment and compute) the programmable stage objects which
 		 * represent the actual shader code.
 		 *
-		 * @type {Object<String,Map>}
+		 * @type {Object<string,Map>}
 		 */
 		this.programs = {
 			vertex: new Map(),
@@ -145,7 +145,7 @@ class Pipelines extends DataMap {
 	 * Returns a render pipeline for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {Array<Promise>?} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
+	 * @param {?Array<Promise>} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {RenderPipeline} The render pipeline.
 	 */
 	getForRender( renderObject, promises = null ) {
@@ -238,7 +238,7 @@ class Pipelines extends DataMap {
 	 * Deletes the pipeline for the given render object.
 	 *
 	 * @param {RenderObject} object - The render object.
-	 * @return {Object?} The deleted dictionary.
+	 * @return {?Object} The deleted dictionary.
 	 */
 	delete( object ) {
 
@@ -309,7 +309,7 @@ class Pipelines extends DataMap {
 	 * @private
 	 * @param {Node} computeNode - The compute node.
 	 * @param {ProgrammableStage} stageCompute - The programmable stage representing the compute shader.
-	 * @param {String} cacheKey - The cache key.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
@@ -342,8 +342,8 @@ class Pipelines extends DataMap {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {ProgrammableStage} stageVertex - The programmable stage representing the vertex shader.
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
-	 * @param {String} cacheKey - The cache key.
-	 * @param {Array<Promise>?} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
+	 * @param {string} cacheKey - The cache key.
+	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
 	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
@@ -380,7 +380,7 @@ class Pipelines extends DataMap {
 	 * @private
 	 * @param {Node} computeNode - The compute node.
 	 * @param {ProgrammableStage} stageCompute - The programmable stage representing the compute shader.
-	 * @return {String} The cache key.
+	 * @return {string} The cache key.
 	 */
 	_getComputeCacheKey( computeNode, stageCompute ) {
 
@@ -395,7 +395,7 @@ class Pipelines extends DataMap {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {ProgrammableStage} stageVertex - The programmable stage representing the vertex shader.
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
-	 * @return {String} The cache key.
+	 * @return {string} The cache key.
 	 */
 	_getRenderCacheKey( renderObject, stageVertex, stageFragment ) {
 
@@ -435,7 +435,7 @@ class Pipelines extends DataMap {
 	 *
 	 * @private
 	 * @param {Node} computeNode - The compute node.
-	 * @return {Boolean} Whether the compute pipeline for the given compute node requires an update or not.
+	 * @return {boolean} Whether the compute pipeline for the given compute node requires an update or not.
 	 */
 	_needsComputeUpdate( computeNode ) {
 
@@ -450,7 +450,7 @@ class Pipelines extends DataMap {
 	 *
 	 * @private
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {Boolean} Whether the render object for the given render object requires an update or not.
+	 * @return {boolean} Whether the render object for the given render object requires an update or not.
 	 */
 	_needsRenderUpdate( renderObject ) {
 

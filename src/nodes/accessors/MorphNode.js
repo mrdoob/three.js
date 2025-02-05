@@ -196,7 +196,7 @@ class MorphNode extends Node {
 		/**
 		 * The update type overwritten since morph nodes are updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
 
@@ -298,6 +298,7 @@ export default MorphNode;
 /**
  * TSL function for creating a morph node.
  *
+ * @tsl
  * @function
  * @param {Mesh} mesh - The mesh holding the morph targets.
  * @returns {MorphNode}

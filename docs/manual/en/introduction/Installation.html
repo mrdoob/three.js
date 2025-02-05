@@ -90,6 +90,23 @@ npm install --save-dev vite
 							npm installs the code for each dependency in a new <i>node_modules/</i> folder. When Vite builds your application, it sees imports for 'three' and pulls three.js files automatically from this folder. The <i>node_modules/</i> folder is used only during development, and shouldn't be uploaded to your web hosting provider or committed to version history.
 						</p>
 					</details>
+					<details>
+						<summary>Improve your editor auto-completion with <i>jsconfig</i> or <i>tscondig</i></summary>
+						<p>
+							Place a <i>jsconfig.json</i> (or <i>tsconfig.json</i> for TypeScript projects) in your project's root. Adding the configuration below helps your editor locate three.js files for enhanced auto-completion. 
+						</p>						
+						<code>
+							{
+								"compilerOptions": {
+									// other options...
+									"paths": {
+										"three/webgpu": ["node_modules/three/build/three.webgpu.js"],
+										"three/tsl": ["node_modules/three/build/three.tsl.js"],
+									},
+								}
+							}
+						</code>
+					</details>
 				</aside>
 			</li>
 			<li>

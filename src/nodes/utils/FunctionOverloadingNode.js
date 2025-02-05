@@ -51,7 +51,7 @@ class FunctionOverloadingNode extends Node {
 		/**
 		 * This node is marked as global.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.global = true;
@@ -63,7 +63,7 @@ class FunctionOverloadingNode extends Node {
 	 * the function's return type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The node type.
+	 * @return {string} The node type.
 	 */
 	getNodeType() {
 
@@ -144,6 +144,7 @@ const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 /**
  * TSL function for creating a function overloading node.
  *
+ * @tsl
  * @function
  * @param {Array<Function>} functionNodes - Array of `Fn` function definitions.
  * @returns {FunctionOverloadingNode}

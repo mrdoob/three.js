@@ -18,8 +18,8 @@ class UniformNode extends InputNode {
 	/**
 	 * Constructs a new uniform node.
 	 *
-	 * @param {Any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
-	 * @param {String?} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
 
@@ -28,7 +28,7 @@ class UniformNode extends InputNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -37,7 +37,7 @@ class UniformNode extends InputNode {
 		/**
 		 * The name or label of the uniform.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default ''
 		 */
 		this.name = '';
@@ -56,7 +56,7 @@ class UniformNode extends InputNode {
 	/**
 	 * Sets the {@link UniformNode#name} property.
 	 *
-	 * @param {String} name - The name of the uniform.
+	 * @param {string} name - The name of the uniform.
 	 * @return {UniformNode} A reference to this node.
 	 */
 	label( name ) {
@@ -97,7 +97,7 @@ class UniformNode extends InputNode {
 	 * classes might overwrite this method with a different implementation.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {String} The uniform hash.
+	 * @return {string} The uniform hash.
 	 */
 	getUniformHash( builder ) {
 
@@ -159,9 +159,10 @@ export default UniformNode;
 /**
  * TSL function for creating a uniform node.
  *
+ * @tsl
  * @function
- * @param {Any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {String?} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+ * @param {?string} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.
  * @returns {UniformNode}
  */
 export const uniform = ( arg1, arg2 ) => {

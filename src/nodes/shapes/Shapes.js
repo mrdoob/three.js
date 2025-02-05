@@ -5,7 +5,8 @@ import { uv } from '../accessors/UV.js';
 /**
  * Generates a circle based on the uv coordinates.
  *
- * @method
+ * @tsl
+ * @function
  * @param {Node<vec2>} coord - The uv to generate the circle.
  * @return {Node<float>} The circle shape.
  */

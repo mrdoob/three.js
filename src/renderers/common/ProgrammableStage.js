@@ -12,32 +12,32 @@ class ProgrammableStage {
 	/**
 	 * Constructs a new programmable stage.
 	 *
-	 * @param {String} code - The shader code.
+	 * @param {string} code - The shader code.
 	 * @param {('vertex'|'fragment'|'compute')} stage - The type of stage.
-	 * @param {String} name - The name of the shader.
-	 * @param {Array<Object>?} [transforms=null] - The transforms (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
-	 * @param {Array<Object>?} [attributes=null] - The attributes (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
+	 * @param {string} name - The name of the shader.
+	 * @param {?Array<Object>} [transforms=null] - The transforms (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
+	 * @param {?Array<Object>} [attributes=null] - The attributes (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
 	 */
 	constructor( code, stage, name, transforms = null, attributes = null ) {
 
 		/**
 		 * The id of the programmable stage.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.id = _id ++;
 
 		/**
 		 * The shader code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.code = code;
 
 		/**
 		 * The type of stage.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.stage = stage;
 
@@ -45,28 +45,28 @@ class ProgrammableStage {
 		 * The name of the stage.
 		 * This is used for debugging purposes.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = name;
 
 		/**
 		 * The transforms (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
 		 *
-		 * @type {Array<Object>?}
+		 * @type {?Array<Object>}
 		 */
 		this.transforms = transforms;
 
 		/**
 		 * The attributes (only relevant for compute stages with WebGL 2 which uses Transform Feedback).
 		 *
-		 * @type {Array<Object>?}
+		 * @type {?Array<Object>}
 		 */
 		this.attributes = attributes;
 
 		/**
 		 * How often the programmable stage is currently in use.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.usedTimes = 0;

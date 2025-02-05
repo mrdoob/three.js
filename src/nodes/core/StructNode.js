@@ -72,6 +72,7 @@ export default StructNode;
 /**
  * TSL function for creating a struct node.
  *
+ * @tsl
  * @function
  * @param {Object} membersLayout - The layout of the struct members.
  * @param {string} [name=null] - The name of the struct.

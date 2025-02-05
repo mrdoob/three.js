@@ -14,9 +14,9 @@ class NodeBuilderState {
 	/**
 	 * Constructs a new node builder state.
 	 *
-	 * @param {String?} vertexShader - The native vertex shader code.
-	 * @param {String?} fragmentShader - The native fragment shader code.
-	 * @param {String?} computeShader - The native compute shader code.
+	 * @param {?string} vertexShader - The native vertex shader code.
+	 * @param {?string} fragmentShader - The native fragment shader code.
+	 * @param {?string} computeShader - The native compute shader code.
 	 * @param {Array<NodeAttribute>} nodeAttributes - An array of node attributes.
 	 * @param {Array<BindGroup>} bindings - An array of bind groups.
 	 * @param {Array<Node>} updateNodes - An array of nodes that implement their `update()` method.
@@ -30,21 +30,21 @@ class NodeBuilderState {
 		/**
 		 * The native vertex shader code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.vertexShader = vertexShader;
 
 		/**
 		 * The native fragment shader code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.fragmentShader = fragmentShader;
 
 		/**
 		 * The native compute shader code.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.computeShader = computeShader;
 
@@ -103,7 +103,7 @@ class NodeBuilderState {
 		/**
 		 * How often this state is used by render objects.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.usedTimes = 0;
 

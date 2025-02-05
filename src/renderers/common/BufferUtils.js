@@ -5,8 +5,8 @@ import { GPU_CHUNK_BYTES } from './Constants.js';
  * It returns an padded value which ensure chunk size alignment according to STD140 layout.
  *
  * @function
- * @param {Number} floatLength - The buffer length.
- * @return {Number} The padded length.
+ * @param {number} floatLength - The buffer length.
+ * @return {number} The padded length.
  */
 function getFloatLength( floatLength ) {
 
@@ -21,9 +21,9 @@ function getFloatLength( floatLength ) {
  * a total length in bytes with buffer alignment according to STD140 layout.
  *
  * @function
- * @param {Number} count - The number of vectors.
- * @param {Number} [vectorLength=4] - The vector length.
- * @return {Number} The padded length.
+ * @param {number} count - The number of vectors.
+ * @param {number} [vectorLength=4] - The vector length.
+ * @return {number} The padded length.
  */
 function getVectorLength( count, vectorLength = 4 ) {
 
@@ -40,8 +40,8 @@ function getVectorLength( count, vectorLength = 4 ) {
  * matches a predefined stride (in this case `4`).
  *
  * @function
- * @param {Number} vectorLength - The vector length.
- * @return {Number} The padded length.
+ * @param {number} vectorLength - The vector length.
+ * @return {number} The padded length.
  */
 function getStrideLength( vectorLength ) {
 

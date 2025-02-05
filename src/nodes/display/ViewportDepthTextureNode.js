@@ -25,7 +25,7 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 	 * Constructs a new viewport depth texture node.
 	 *
 	 * @param {Node} [uvNode=screenUV] - The uv node.
-	 * @param {Node?} [levelNode=null] - The level node.
+	 * @param {?Node} [levelNode=null] - The level node.
 	 */
 	constructor( uvNode = screenUV, levelNode = null ) {
 
@@ -46,9 +46,10 @@ export default ViewportDepthTextureNode;
 /**
  * TSL function for a viewport depth texture node.
  *
+ * @tsl
  * @function
  * @param {Node} [uvNode=screenUV] - The uv node.
- * @param {Node?} [levelNode=null] - The level node.
+ * @param {?Node} [levelNode=null] - The level node.
  * @returns {ViewportDepthTextureNode}
  */
 export const viewportDepthTexture = /*@__PURE__*/ nodeProxy( ViewportDepthTextureNode );

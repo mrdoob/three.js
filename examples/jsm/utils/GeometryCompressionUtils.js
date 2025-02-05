@@ -18,7 +18,7 @@ import {
  * Make the input geometry's normal attribute encoded and compressed by 3 different methods.
  *
  * @param {THREE.BufferGeometry} geometry
- * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
+ * @param {string} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
  *
  */
 function compressNormals( geometry, encodeMethod ) {

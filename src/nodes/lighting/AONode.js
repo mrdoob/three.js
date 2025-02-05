@@ -18,7 +18,7 @@ class AONode extends LightingNode {
 	/**
 	 * Constructs a new AO node.
 	 *
-	 * @param {Node<float>?} [aoNode=null] - The ambient occlusion node.
+	 * @param {?Node<float>} [aoNode=null] - The ambient occlusion node.
 	 */
 	constructor( aoNode = null ) {
 
@@ -27,7 +27,7 @@ class AONode extends LightingNode {
 		/**
 		 * The ambient occlusion node.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.aoNode = aoNode;

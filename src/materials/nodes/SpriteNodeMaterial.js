@@ -27,7 +27,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new sprite node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -36,7 +36,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -58,7 +58,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		 * particleMaterial.positionNode = positionBuffer.toAttribute();
 		 * ```
 		 *
-		 * @type {Node<vec2>?}
+		 * @type {?Node<vec2>}
 		 * @default null
 		 */
 		this.positionNode = null;
@@ -71,7 +71,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		 * If you don't want to overwrite the rotation but modify the existing
 		 * value instead, use {@link materialRotation}.
 		 *
-		 * @type {Node<float>?}
+		 * @type {?Node<float>}
 		 * @default null
 		 */
 		this.rotationNode = null;
@@ -81,7 +81,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		 * `Object3D.scale`. The scale transformation based in `Object3D.scale`
 		 * is multiplied with the scale value of this node in the vertex shader.
 		 *
-		 * @type {Node<vec2>?}
+		 * @type {?Node<vec2>}
 		 * @default null
 		 */
 		this.scaleNode = null;
@@ -89,7 +89,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		/**
 		 * In Sprites, the transparent property is enabled by default.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.transparent = true;
@@ -173,7 +173,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	/**
 	 * Whether to use size attenuation or not.
 	 *
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @default true
 	 */
 	get sizeAttenuation() {

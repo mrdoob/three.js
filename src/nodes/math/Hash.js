@@ -3,7 +3,8 @@ import { Fn } from '../tsl/TSLBase.js';
 /**
  * Generates a hash value in the range `[0, 1]` from the given seed.
  *
- * @method
+ * @tsl
+ * @function
  * @param {Node<float>} seed - The seed.
  * @return {Node<float>} The hash value.
  */

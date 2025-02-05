@@ -42,7 +42,7 @@ class BatchNode extends Node {
 		/**
 		 * The batching index node.
 		 *
-		 * @type {IndexNode?}
+		 * @type {?IndexNode}
 		 * @default null
 		 */
 		this.batchingIdNode = null;
@@ -155,6 +155,7 @@ export default BatchNode;
 /**
  * TSL function for creating a batch node.
  *
+ * @tsl
  * @function
  * @param {BatchedMesh} batchMesh - A reference to batched mesh.
  * @returns {BatchNode}

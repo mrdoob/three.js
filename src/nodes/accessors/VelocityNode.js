@@ -39,7 +39,7 @@ class VelocityNode extends TempNode {
 		/**
 		 * The current projection matrix.
 		 *
-		 * @type {Matrix4?}
+		 * @type {?Matrix4}
 		 * @default null
 		 */
 		this.projectionMatrix = null;
@@ -47,7 +47,7 @@ class VelocityNode extends TempNode {
 		/**
 		 * Overwritten since velocity nodes are updated per object.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'object'
 		 */
 		this.updateType = NodeUpdateType.OBJECT;
@@ -55,7 +55,7 @@ class VelocityNode extends TempNode {
 		/**
 		 * Overwritten since velocity nodes save data after the update.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'object'
 		 */
 		this.updateAfterType = NodeUpdateType.OBJECT;
@@ -217,6 +217,7 @@ export default VelocityNode;
 /**
  * TSL object that represents the velocity of a render pass.
  *
+ * @tsl
  * @type {VelocityNode}
  */
 export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );

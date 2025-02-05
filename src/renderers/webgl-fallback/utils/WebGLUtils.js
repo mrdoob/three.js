@@ -43,9 +43,9 @@ class WebGLUtils {
 	 * The method currently supports the conversion of texture formats
 	 * and types.
 	 *
-	 * @param {Number} p - The three.js constant.
-	 * @param {String} [colorSpace=NoColorSpace] - The color space.
-	 * @return {Number} The corresponding WebGL constant.
+	 * @param {number} p - The three.js constant.
+	 * @param {string} [colorSpace=NoColorSpace] - The color space.
+	 * @return {number} The corresponding WebGL constant.
 	 */
 	convert( p, colorSpace = NoColorSpace ) {
 

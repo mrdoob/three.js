@@ -19,8 +19,8 @@ class FunctionCallNode extends TempNode {
 	/**
 	 * Constructs a new function call node.
 	 *
-	 * @param {FunctionNode?} functionNode - The function node.
-	 * @param {Object<String, Node>} [parameters={}] - The parameters for the function call.
+	 * @param {?FunctionNode} functionNode - The function node.
+	 * @param {Object<string, Node>} [parameters={}] - The parameters for the function call.
 	 */
 	constructor( functionNode = null, parameters = {} ) {
 
@@ -29,7 +29,7 @@ class FunctionCallNode extends TempNode {
 		/**
 		 * The function node.
 		 *
-		 * @type {FunctionNode}
+		 * @type {?FunctionNode}
 		 * @default null
 		 */
 		this.functionNode = functionNode;
@@ -37,7 +37,7 @@ class FunctionCallNode extends TempNode {
 		/**
 		 * The parameters of the function call.
 		 *
-		 * @type {Object<String, Node>}
+		 * @type {Object<string, Node>}
 		 * @default {}
 		 */
 		this.parameters = parameters;
@@ -47,7 +47,7 @@ class FunctionCallNode extends TempNode {
 	/**
 	 * Sets the parameters of the function call node.
 	 *
-	 * @param {Object<String, Node>} parameters - The parameters to set.
+	 * @param {Object<string, Node>} parameters - The parameters to set.
 	 * @return {FunctionCallNode} A reference to this node.
 	 */
 	setParameters( parameters ) {
@@ -61,7 +61,7 @@ class FunctionCallNode extends TempNode {
 	/**
 	 * Returns the parameters of the function call node.
 	 *
-	 * @return {Object<String, Node>} The parameters of this node.
+	 * @return {Object<string, Node>} The parameters of this node.
 	 */
 	getParameters() {
 

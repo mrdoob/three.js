@@ -20,7 +20,7 @@ class LineBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new line basic node material.
 	 *
-	 * @param {Object?} parameters - The configuration parameter.
+	 * @param {?Object} parameters - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -29,7 +29,7 @@ class LineBasicNodeMaterial extends NodeMaterial {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */

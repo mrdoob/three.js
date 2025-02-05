@@ -14,7 +14,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Constructs a new node object loader.
 	 *
-	 * @param {LoadingManager?} manager - A reference to a loading manager.
+	 * @param {?LoadingManager} manager - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -23,14 +23,14 @@ class NodeObjectLoader extends ObjectLoader {
 		/**
 		 * Represents a dictionary of node types.
 		 *
-		 * @type {Object<String,Node.constructor>}
+		 * @type {Object<string,Node.constructor>}
 		 */
 		this.nodes = {};
 
 		/**
 		 * Represents a dictionary of node material types.
 		 *
-		 * @type {Object<String,NodeMaterial.constructor>}
+		 * @type {Object<string,NodeMaterial.constructor>}
 		 */
 		this.nodeMaterials = {};
 
@@ -38,7 +38,7 @@ class NodeObjectLoader extends ObjectLoader {
 		 * A reference to hold the `nodes` JSON property.
 		 *
 		 * @private
-		 * @type {Object?}
+		 * @type {?Object}
 		 */
 		this._nodesJSON = null;
 
@@ -47,7 +47,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Defines the dictionary of node types.
 	 *
-	 * @param {Object<String,Node.constructor>} value - The node library defined as `<classname,class>`.
+	 * @param {Object<string,Node.constructor>} value - The node library defined as `<classname,class>`.
 	 * @return {NodeLoader} A reference to this loader.
 	 */
 	setNodes( value ) {
@@ -60,7 +60,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Defines the dictionary of node material types.
 	 *
-	 * @param {Object<String,NodeMaterial.constructor>} value - The node material library defined as `<classname,class>`.
+	 * @param {Object<string,NodeMaterial.constructor>} value - The node material library defined as `<classname,class>`.
 	 * @return {NodeLoader} A reference to this loader.
 	 */
 	setNodeMaterials( value ) {
@@ -93,8 +93,8 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Parses the node objects from the given JSON and textures.
 	 *
 	 * @param {Object} json - The JSON definition
-	 * @param {Object<String,Texture>} textures - The texture library.
-	 * @return {Object<String,Node>}. The parsed nodes.
+	 * @param {Object<string,Texture>} textures - The texture library.
+	 * @return {Object<string,Node>}. The parsed nodes.
 	 */
 	parseNodes( json, textures ) {
 
@@ -116,8 +116,8 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Parses the node objects from the given JSON and textures.
 	 *
 	 * @param {Object} json - The JSON definition
-	 * @param {Object<String,Texture>} textures - The texture library.
-	 * @return {Object<String,NodeMaterial>}. The parsed materials.
+	 * @param {Object<string,Texture>} textures - The texture library.
+	 * @return {Object<string,NodeMaterial>}. The parsed materials.
 	 */
 	parseMaterials( json, textures ) {
 

@@ -175,7 +175,7 @@ class PointShadowNode extends ShadowNode {
 	 * Constructs a new point shadow node.
 	 *
 	 * @param {PointLight} light - The shadow casting point light.
-	 * @param {PointLightShadow?} [shadow=null] - An optional point light shadow.
+	 * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
 	 */
 	constructor( light, shadow = null ) {
 
@@ -187,7 +187,7 @@ class PointShadowNode extends ShadowNode {
 	 * Overwrites the default implementation to return point light shadow specific
 	 * filtering functions.
 	 *
-	 * @param {Number} type - The shadow type.
+	 * @param {number} type - The shadow type.
 	 * @return {Function} The filtering function.
 	 */
 	getShadowFilterFn( type ) {
@@ -297,9 +297,10 @@ export default PointShadowNode;
 /**
  * TSL function for creating an instance of `PointShadowNode`.
  *
+ * @tsl
  * @function
  * @param {PointLight} light - The shadow casting point light.
- * @param {PointLightShadow?} [shadow=null] - An optional point light shadow.
+ * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
  * @return {PointShadowNode} The created point shadow node.
  */
 export const pointShadow = ( light, shadow ) => nodeObject( new PointShadowNode( light, shadow ) );

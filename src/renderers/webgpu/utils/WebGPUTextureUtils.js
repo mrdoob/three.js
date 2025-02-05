@@ -56,7 +56,7 @@ class WebGPUTextureUtils {
 		/**
 		 * A reference to the pass utils.
 		 *
-		 * @type {WebGPUTexturePassUtils?}
+		 * @type {?WebGPUTexturePassUtils}
 		 * @default null
 		 */
 		this._passUtils = null;
@@ -65,7 +65,7 @@ class WebGPUTextureUtils {
 		 * A dictionary for managing default textures. The key
 		 * is the texture format, the value the texture object.
 		 *
-		 * @type {Object<String,Texture>}
+		 * @type {Object<string,Texture>}
 		 */
 		this.defaultTexture = {};
 
@@ -73,14 +73,14 @@ class WebGPUTextureUtils {
 		 * A dictionary for managing default cube textures. The key
 		 * is the texture format, the value the texture object.
 		 *
-		 * @type {Object<String,CubeTexture>}
+		 * @type {Object<string,CubeTexture>}
 		 */
 		this.defaultCubeTexture = {};
 
 		/**
 		 * A default video frame.
 		 *
-		 * @type {VideoFrame?}
+		 * @type {?VideoFrame}
 		 * @default null
 		 */
 		this.defaultVideoFrame = null;
@@ -88,7 +88,7 @@ class WebGPUTextureUtils {
 		/**
 		 * Represents the color attachment of the default framebuffer.
 		 *
-		 * @type {GPUTexture?}
+		 * @type {?GPUTexture}
 		 * @default null
 		 */
 		this.colorBuffer = null;
@@ -387,8 +387,8 @@ class WebGPUTextureUtils {
 	 * Returns the depth buffer representing the depth
 	 * attachment of the default framebuffer.
 	 *
-	 * @param {Boolean} [depth=true] - Whether depth is enabled or not.
-	 * @param {Boolean} [stencil=false] -  Whether stencil is enabled or not.
+	 * @param {boolean} [depth=true] - Whether depth is enabled or not.
+	 * @param {boolean} [stencil=false] -  Whether stencil is enabled or not.
 	 * @return {GPUTexture} The depth buffer.
 	 */
 	getDepthBuffer( depth = true, stencil = false ) {
@@ -499,11 +499,11 @@ class WebGPUTextureUtils {
 	 *
 	 * @async
 	 * @param {Texture} texture - The texture to copy.
-	 * @param {Number} x - The x coordinate of the copy origin.
-	 * @param {Number} y - The y coordinate of the copy origin.
-	 * @param {Number} width - The width of the copy.
-	 * @param {Number} height - The height of the copy.
-	 * @param {Number} faceIndex - The face index.
+	 * @param {number} x - The x coordinate of the copy origin.
+	 * @param {number} y - The y coordinate of the copy origin.
+	 * @param {number} width - The width of the copy.
+	 * @param {number} height - The height of the copy.
+	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
@@ -560,7 +560,7 @@ class WebGPUTextureUtils {
 	 *
 	 * @private
 	 * @param {Texture} texture - The texture.
-	 * @return {Boolean} Whether the given texture is an environment map or not.
+	 * @return {boolean} Whether the given texture is an environment map or not.
 	 */
 	_isEnvironmentTexture( texture ) {
 
@@ -574,7 +574,7 @@ class WebGPUTextureUtils {
 	 * Returns the default GPU texture for the given format.
 	 *
 	 * @private
-	 * @param {String} format - The GPU format.
+	 * @param {string} format - The GPU format.
 	 * @return {GPUTexture} The GPU texture.
 	 */
 	_getDefaultTextureGPU( format ) {
@@ -601,7 +601,7 @@ class WebGPUTextureUtils {
 	 * Returns the default GPU cube texture for the given format.
 	 *
 	 * @private
-	 * @param {String} format - The GPU format.
+	 * @param {string} format - The GPU format.
 	 * @return {GPUTexture} The GPU texture.
 	 */
 	_getDefaultCubeTextureGPU( format ) {
@@ -658,7 +658,7 @@ class WebGPUTextureUtils {
 	 * @param {Array} images - The cube image data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
-	 * @param {Boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
 	 */
 	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
 
@@ -689,8 +689,8 @@ class WebGPUTextureUtils {
 	 * @param {HTMLImageElement|ImageBitmap|HTMLCanvasElement} image - The image data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
-	 * @param {Number} originDepth - The origin depth.
-	 * @param {Boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {number} originDepth - The origin depth.
+	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
 	 */
 	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
 
@@ -739,7 +739,7 @@ class WebGPUTextureUtils {
 	 * @private
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureDescriptorGPU - The texture descriptor.
-	 * @param {Number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
 	 */
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
@@ -753,7 +753,7 @@ class WebGPUTextureUtils {
 	 * @private
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureDescriptorGPU - The texture descriptor.
-	 * @param {Number} [originDepth=0] - The origin depth.
+	 * @param {number} [originDepth=0] - The origin depth.
 	 */
 	_flipY( textureGPU, textureDescriptorGPU, originDepth = 0 ) {
 
@@ -768,9 +768,9 @@ class WebGPUTextureUtils {
 	 * @param {Object} image - An object defining the image buffer data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
-	 * @param {Number} originDepth - The origin depth.
-	 * @param {Boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {Number} [depth=0] - TODO.
+	 * @param {number} originDepth - The origin depth.
+	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {number} [depth=0] - TODO.
 	 */
 	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
 
@@ -869,7 +869,7 @@ class WebGPUTextureUtils {
 	 * data descriptor for the given GPU compressed texture format.
 	 *
 	 * @private
-	 * @param {String} format - The GPU compressed texture format.
+	 * @param {string} format - The GPU compressed texture format.
 	 * @return {Object} The block data descriptor.
 	 */
 	_getBlockData( format ) {
@@ -911,8 +911,8 @@ class WebGPUTextureUtils {
 	 * Converts the three.js uv wrapping constants to GPU address mode constants.
 	 *
 	 * @private
-	 * @param {Number} value - The three.js constant defining a uv wrapping mode.
-	 * @return {String} The GPU address mode.
+	 * @param {number} value - The three.js constant defining a uv wrapping mode.
+	 * @return {string} The GPU address mode.
 	 */
 	_convertAddressMode( value ) {
 
@@ -936,8 +936,8 @@ class WebGPUTextureUtils {
 	 * Converts the three.js filter constants to GPU filter constants.
 	 *
 	 * @private
-	 * @param {Number} value - The three.js constant defining a filter mode.
-	 * @return {String} The GPU filter mode.
+	 * @param {number} value - The three.js constant defining a filter mode.
+	 * @return {string} The GPU filter mode.
 	 */
 	_convertFilterMode( value ) {
 
@@ -957,8 +957,8 @@ class WebGPUTextureUtils {
 	 * Returns the bytes-per-texel value for the given GPU texture format.
 	 *
 	 * @private
-	 * @param {String} format - The GPU texture format.
-	 * @return {Number} The bytes-per-texel.
+	 * @param {string} format - The GPU texture format.
+	 * @return {number} The bytes-per-texel.
 	 */
 	_getBytesPerTexel( format ) {
 
@@ -1020,7 +1020,7 @@ class WebGPUTextureUtils {
 	 * Returns the corresponding typed array type for the given GPU texture format.
 	 *
 	 * @private
-	 * @param {String} format - The GPU texture format.
+	 * @param {string} format - The GPU texture format.
 	 * @return {TypedArray.constructor} The typed array type.
 	 */
 	_getTypedArrayType( format ) {
@@ -1078,7 +1078,7 @@ class WebGPUTextureUtils {
 	 *
 	 * @private
 	 * @param {Texture} texture - The texture.
-	 * @return {String} The GPU dimension.
+	 * @return {string} The GPU dimension.
 	 */
 	_getDimension( texture ) {
 
@@ -1104,9 +1104,9 @@ class WebGPUTextureUtils {
  * Returns the GPU format for the given texture.
  *
  * @param {Texture} texture - The texture.
- * @param {GPUDevice?} [device=null] - The GPU device which is used for feature detection.
+ * @param {?GPUDevice} [device=null] - The GPU device which is used for feature detection.
  * It is not necessary to apply the device for most formats.
- * @return {String} The GPU format.
+ * @return {string} The GPU format.
  */
 export function getFormat( texture, device = null ) {
 

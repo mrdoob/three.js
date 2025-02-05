@@ -54,7 +54,7 @@ class Attributes extends DataMap {
 	 * for new attributes and updates data for existing ones.
 	 *
 	 * @param {BufferAttribute} attribute - The attribute to update.
-	 * @param {Number} type - The attribute type.
+	 * @param {number} type - The attribute type.
 	 */
 	update( attribute, type ) {
 

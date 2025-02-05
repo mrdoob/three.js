@@ -23,7 +23,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 	/**
 	 * Constructs a new hemisphere light node.
 	 *
-	 * @param {HemisphereLight?} [light=null] - The hemisphere light source.
+	 * @param {?HemisphereLight} [light=null] - The hemisphere light source.
 	 */
 	constructor( light = null ) {
 

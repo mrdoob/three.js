@@ -352,12 +352,12 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Constructs a new physical lighting model.
 	 *
-	 * @param {Boolean} [clearcoat=false] - Whether clearcoat is supported or not.
-	 * @param {Boolean} [sheen=false] - Whether sheen is supported or not.
-	 * @param {Boolean} [iridescence=false] - Whether iridescence is supported or not.
-	 * @param {Boolean} [anisotropy=false] - Whether anisotropy is supported or not.
-	 * @param {Boolean} [transmission=false] - Whether transmission is supported or not.
-	 * @param {Boolean} [dispersion=false] - Whether dispersion is supported or not.
+	 * @param {boolean} [clearcoat=false] - Whether clearcoat is supported or not.
+	 * @param {boolean} [sheen=false] - Whether sheen is supported or not.
+	 * @param {boolean} [iridescence=false] - Whether iridescence is supported or not.
+	 * @param {boolean} [anisotropy=false] - Whether anisotropy is supported or not.
+	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
+	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
 	 */
 	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false ) {
 
@@ -366,7 +366,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * Whether clearcoat is supported or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.clearcoat = clearcoat;
@@ -374,7 +374,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * Whether sheen is supported or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.sheen = sheen;
@@ -382,7 +382,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * Whether iridescence is supported or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.iridescence = iridescence;
@@ -390,7 +390,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * Whether anisotropy is supported or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.anisotropy = anisotropy;
@@ -398,7 +398,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * Whether transmission is supported or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.transmission = transmission;
@@ -406,7 +406,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * Whether dispersion is supported or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.dispersion = dispersion;
@@ -414,7 +414,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The clear coat radiance.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.clearcoatRadiance = null;
@@ -422,7 +422,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The clear coat specular direct.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.clearcoatSpecularDirect = null;
@@ -430,7 +430,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The clear coat specular indirect.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.clearcoatSpecularIndirect = null;
@@ -438,7 +438,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The sheen specular direct.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.sheenSpecularDirect = null;
@@ -446,7 +446,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The sheen specular indirect.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.sheenSpecularIndirect = null;
@@ -454,7 +454,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The iridescence Fresnel.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.iridescenceFresnel = null;
@@ -462,7 +462,7 @@ class PhysicalLightingModel extends LightingModel {
 		/**
 		 * The iridescence F0.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.iridescenceF0 = null;

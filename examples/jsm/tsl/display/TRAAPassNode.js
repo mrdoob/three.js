@@ -39,7 +39,7 @@ class TRAAPassNode extends PassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -56,7 +56,7 @@ class TRAAPassNode extends PassNode {
 		/**
 		 * The clear alpha of the pass.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.clearAlpha = 0;
@@ -65,7 +65,7 @@ class TRAAPassNode extends PassNode {
 		 * The jitter index selects the current camera offset value.
 		 *
 		 * @private
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this._jitterIndex = 0;
@@ -90,7 +90,8 @@ class TRAAPassNode extends PassNode {
 		 * The render target that holds the current sample.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
+		 * @default null
 		 */
 		this._sampleRenderTarget = null;
 
@@ -98,7 +99,8 @@ class TRAAPassNode extends PassNode {
 		 * The render target that represents the history of frame data.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
+		 * @default null
 		 */
 		this._historyRenderTarget = null;
 
@@ -116,9 +118,9 @@ class TRAAPassNode extends PassNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
-	 * @return {Boolean} Whether the TRAA needs a restart or not. That is required after a resize since buffer data with different sizes can't be resolved.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
+	 * @return {boolean} Whether the TRAA needs a restart or not. That is required after a resize since buffer data with different sizes can't be resolved.
 	 */
 	setSize( width, height ) {
 
@@ -440,6 +442,7 @@ const _JitterVectors = [
 /**
  * TSL function for creating a TRAA pass node for Temporal Reprojection Anti-Aliasing.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

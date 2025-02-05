@@ -9,16 +9,16 @@ class NodeAttribute {
 	/**
 	 * Constructs a new node attribute.
 	 *
-	 * @param {String} name - The name of the attribute.
-	 * @param {String} type - The type of the attribute.
-	 * @param {Node?} node - An optional reference to the node.
+	 * @param {string} name - The name of the attribute.
+	 * @param {string} type - The type of the attribute.
+	 * @param {?Node} node - An optional reference to the node.
 	 */
 	constructor( name, type, node = null ) {
 
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -27,21 +27,21 @@ class NodeAttribute {
 		/**
 		 * The name of the attribute.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = name;
 
 		/**
 		 * The type of the attribute.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type;
 
 		/**
 		 * An optional reference to the node.
 		 *
-		 * @type {Node?}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.node = node;

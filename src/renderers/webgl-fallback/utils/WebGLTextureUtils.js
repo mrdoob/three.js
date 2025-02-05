@@ -134,11 +134,11 @@ class WebGLTextureUtils {
 	/**
 	 * Returns the native texture type for the given texture.
 	 *
-	 * @param {String?} internalFormatName - The internal format name. When `null`, the internal format is derived from the subsequent parameters.
+	 * @param {?string} internalFormatName - The internal format name. When `null`, the internal format is derived from the subsequent parameters.
 	 * @param {GLenum} glFormat - The WebGL format.
 	 * @param {GLenum} glType - The WebGL type.
-	 * @param {String} colorSpace - The texture's color space.
-	 * @param {Boolean} [forceLinearTransfer=false] - Whether to force a linear transfer or not.
+	 * @param {string} colorSpace - The texture's color space.
+	 * @param {boolean} [forceLinearTransfer=false] - Whether to force a linear transfer or not.
 	 * @return {GLenum} The internal format.
 	 */
 	getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
@@ -697,9 +697,9 @@ class WebGLTextureUtils {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {Vector4?} [srcRegion=null] - The region of the source texture to copy.
-	 * @param {(Vector2|Vector3)?} [dstPosition=null] - The destination position of the copy.
-	 * @param {Number} [level=0] - The mip level to copy.
+	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
+	 * @param {number} [level=0] - The mip level to copy.
 	 */
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
@@ -918,8 +918,8 @@ class WebGLTextureUtils {
 	 *
 	 * @param {WebGLRenderbuffer} renderbuffer - The render buffer.
 	 * @param {RenderContext} renderContext - The render context.
-	 * @param {Number} samples - The MSAA sample count.
-	 * @param {Boolean} [useMultisampledRTT=false] - Whether to use WEBGL_multisampled_render_to_texture or not.
+	 * @param {number} samples - The MSAA sample count.
+	 * @param {boolean} [useMultisampledRTT=false] - Whether to use WEBGL_multisampled_render_to_texture or not.
 	 */
 	setupRenderBufferStorage( renderbuffer, renderContext, samples, useMultisampledRTT = false ) {
 
@@ -986,11 +986,11 @@ class WebGLTextureUtils {
 	 *
 	 * @async
 	 * @param {Texture} texture - The texture to copy.
-	 * @param {Number} x - The x coordinate of the copy origin.
-	 * @param {Number} y - The y coordinate of the copy origin.
-	 * @param {Number} width - The width of the copy.
-	 * @param {Number} height - The height of the copy.
-	 * @param {Number} faceIndex - The face index.
+	 * @param {number} x - The x coordinate of the copy origin.
+	 * @param {number} y - The y coordinate of the copy origin.
+	 * @param {number} width - The width of the copy.
+	 * @param {number} height - The height of the copy.
+	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
@@ -1066,7 +1066,7 @@ class WebGLTextureUtils {
 	 * @private
 	 * @param {GLenum} glType - The WebGL data type.
 	 * @param {GLenum} glFormat - The WebGL texture format.
-	 * @return {Number} The bytes-per-texel.
+	 * @return {number} The bytes-per-texel.
 	 */
 	_getBytesPerTexel( glType, glFormat ) {
 
