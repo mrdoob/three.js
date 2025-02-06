@@ -1080,7 +1080,7 @@ class WebGPUBackend extends Backend {
 	 */
 	draw( renderObject, info ) {
 
-		const { object, context, pipeline } = renderObject;
+		const { object, material, context, pipeline } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
@@ -1186,6 +1186,14 @@ class WebGPUBackend extends Backend {
 				renderContextData.lastOcclusionObject = object;
 
 			}
+
+		}
+
+		// stencil
+
+		if ( context.stencil === true && material.stencilWrite === true ) {
+
+			passEncoderGPU.setStencilReference( material.stencilRef );
 
 		}
 
