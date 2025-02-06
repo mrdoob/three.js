@@ -2028,7 +2028,7 @@ class Renderer {
 	 */
 	get currentToneMapping() {
 
-		return this.isOutputScreen ? this.toneMapping : NoToneMapping;
+		return this.isOutputTarget ? this.toneMapping : NoToneMapping;
 
 	}
 
@@ -2040,16 +2040,16 @@ class Renderer {
 	 */
 	get currentColorSpace() {
 
-		return this.isOutputScreen ? this.outputColorSpace : LinearSRGBColorSpace;
+		return this.isOutputTarget ? this.outputColorSpace : LinearSRGBColorSpace;
 
 	}
 
 	/**
 	 * Returns `true` if the rendering settings are set to screen output.
 	 *
-	 * @returns {boolean} True if the current render target is the output target or `null`, otherwise false.
+	 * @returns {boolean} True if the current render target is the same of output render target or `null`, otherwise false.
 	 */
-	get isOutputScreen() {
+	get isOutputTarget() {
 
 		return this._renderTarget === this._outputRenderTarget;
 
