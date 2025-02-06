@@ -1191,9 +1191,10 @@ class WebGPUBackend extends Backend {
 
 		// stencil
 
-		if ( context.stencil === true && material.stencilWrite === true ) {
+		if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
 
 			passEncoderGPU.setStencilReference( material.stencilRef );
+			renderContextData.currentStencilRef = material.stencilRef;
 
 		}
 
