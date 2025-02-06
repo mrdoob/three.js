@@ -59,6 +59,8 @@ class SelectionHelper {
 		this.renderer.domElement.removeEventListener( 'pointermove', this.onPointerMove );
 		this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
 
+		this.element.remove(); // in case disposal happens while dragging
+
 	}
 
 	onSelectStart( event ) {
