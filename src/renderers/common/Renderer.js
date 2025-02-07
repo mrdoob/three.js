@@ -510,6 +510,15 @@ class Renderer {
 		this._activeMipmapLevel = 0;
 
 		/**
+		 * The current output render target.
+		 *
+		 * @private
+		 * @type {?RenderTarget}
+		 * @default null
+		 */
+		this._outputRenderTarget = null;
+
+		/**
 		 * The MRT setting.
 		 *
 		 * @private
@@ -1206,7 +1215,7 @@ class Renderer {
 
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
-		const outputRenderTarget = this._renderTarget;
+		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -2019,7 +2028,7 @@ class Renderer {
 	 */
 	get currentToneMapping() {
 
-		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+		return this.isOutputTarget ? this.toneMapping : NoToneMapping;
 
 	}
 
@@ -2031,7 +2040,18 @@ class Renderer {
 	 */
 	get currentColorSpace() {
 
-		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
+		return this.isOutputTarget ? this.outputColorSpace : LinearSRGBColorSpace;
+
+	}
+
+	/**
+	 * Returns `true` if the rendering settings are set to screen output.
+	 *
+	 * @returns {boolean} True if the current render target is the same of output render target or `null`, otherwise false.
+	 */
+	get isOutputTarget() {
+
+		return this._renderTarget === this._outputRenderTarget;
 
 	}
 
@@ -2091,6 +2111,28 @@ class Renderer {
 	getRenderTarget() {
 
 		return this._renderTarget;
+
+	}
+
+	/**
+	 * Sets the output render target for the renderer.
+	 *
+	 * @param {Object} renderTarget - The render target to set as the output target.
+	 */
+	setOutputRenderTarget( renderTarget ) {
+
+		this._outputRenderTarget = renderTarget;
+
+	}
+
+	/**
+	 * Returns the current output target.
+	 *
+	 * @return {?RenderTarget} The current output render target. Returns `null` if no output target is set.
+	 */
+	getOutputRenderTarget() {
+
+		return this._outputRenderTarget;
 
 	}
 

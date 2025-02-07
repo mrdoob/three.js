@@ -101,7 +101,12 @@ class PostProcessing {
 
 		//
 
+		const currentXR = renderer.xr.enabled;
+		renderer.xr.enabled = false;
+
 		this._quadMesh.render( renderer );
+
+		renderer.xr.enabled = currentXR;
 
 		//
 
@@ -164,7 +169,12 @@ class PostProcessing {
 
 		//
 
+		const currentXR = renderer.xr.enabled;
+		renderer.xr.enabled = false;
+
 		await this._quadMesh.renderAsync( renderer );
+
+		renderer.xr.enabled = currentXR;
 
 		//
 
