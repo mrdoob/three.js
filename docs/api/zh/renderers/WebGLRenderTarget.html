@@ -51,7 +51,7 @@
 
 		<h3>[property:Boolean isWebGLRenderTarget]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			只读属性，用于检查给定对象是否为[name]类型。
 		</p>
 
 		<h3>[property:number width]</h3>
@@ -86,8 +86,8 @@
 
 		<h3>[property:Texture textures]</h3>
 		<p>
-			An array holding the [page:WebGLRenderTarget.texture texture] references
-			of multiple render targets configured with the [page:Number count] option.
+            使用数组来存放[page:WebGLRenderTarget.texture texture] 的引用
+            来配置的多个渲染目标
 		</p>
 
 		<h3>[property:Boolean depthBuffer]</h3>
@@ -102,14 +102,14 @@
 
 		<h3>[property:Boolean resolveDepthBuffer]</h3>
 		<p>
-			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
-			默认为`true`.
-		</p>
+            设置在渲染到多采样渲染目标时是否解析深度缓冲区
+            默认为`true`.
+        </p>
 
 		<h3>[property:Boolean resolveStencilBuffer]</h3>
 		<p>
-			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
-			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+            设置在渲染到多采样渲染目标时是否解析模板缓冲区
+            这个属性在[page:.resolveDepthBuffer]设置为`false`时无效
 			默认为`true`.
 		</p>
 
@@ -120,7 +120,7 @@
 
 		<h3>[property:Number samples]</h3>
 		<p>
-		Defines the count of MSAA samples. Default is *0*.
+        设置渲染目标的MSAA采样值。默认是0.
 		</p>
 
 		<h2>方法</h2>
