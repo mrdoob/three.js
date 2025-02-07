@@ -97,7 +97,7 @@ class SelectionHelper {
 
 	onSelectOver() {
 
-		this.element.parentElement.removeChild( this.element );
+		this.element.remove();
 
 	}
 
