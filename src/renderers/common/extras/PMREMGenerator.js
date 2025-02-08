@@ -140,8 +140,7 @@ class PMREMGenerator {
 	 * @param {number} [options.size=256] - The texture size of the PMREM.
 	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
 	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>|RenderTarget} A Promise that resolve with the PMREM when the generation has been finished.
-	 * When the renderer has been initialized already, a render target is returned.
+	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromSceneAsync
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
@@ -158,7 +157,13 @@ class PMREMGenerator {
 
 			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
-			return this.fromSceneAsync( scene, sigma, near, far, options );
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			options.renderTarget = cubeUVRenderTarget;
+
+			this.fromSceneAsync( scene, sigma, near, far, options );
+
+			return cubeUVRenderTarget;
 
 		}
 
