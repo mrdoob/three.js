@@ -1224,6 +1224,8 @@ class WebGPUBackend extends Backend {
 
 					}
 
+					info.update( object, counts[ i ], count );
+
 				}
 
 			} else if ( hasIndex === true ) {
