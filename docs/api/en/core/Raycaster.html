@@ -185,6 +185,9 @@ object.layers.enable( 1 );
 		<p>
 			[page:Float distance] – distance between the origin of the ray and the
 			intersection<br />
+			[page:Float distanceToRay] – Some objects (f.e. [page:Points Points]) provide
+			the distance of the intersection to the nearest point on the ray. For other
+			objects it will be `undefined`<br />
 			[page:Vector3 point] – point of intersection, in world coordinates<br />
 			[page:Object face] – intersected face<br />
 			[page:Integer faceIndex] – index of the intersected face<br />
