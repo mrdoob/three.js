@@ -1917,7 +1917,17 @@ class Renderer {
 			renderContext.depth = renderTarget.depthBuffer;
 			renderContext.stencil = renderTarget.stencilBuffer;
 			// #30329
-			renderContext.clearColorValue = this._clearColor;
+			renderContext.clearColorValue = this.backend.getClearColor();
+
+			// premultiply alpha
+
+			if ( this.backend.isWebGLBackend === true || this.alpha === true ) {
+
+				renderContext.clearColorValue.r *= renderContext.clearColorValue.a;
+				renderContext.clearColorValue.g *= renderContext.clearColorValue.a;
+				renderContext.clearColorValue.b *= renderContext.clearColorValue.a;
+
+			}
 
 		}
 
