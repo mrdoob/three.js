@@ -3538,7 +3538,7 @@ addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
 
 /**
- * ArrayNode represents a collection of nodes, typically created using the {@link marray} function.
+ * ArrayNode represents a collection of nodes, typically created using the {@link array} function.
  * ```js
  * const colors = array( [
  * 	vec3( 1, 0, 0 ),
@@ -31992,13 +31992,34 @@ class PassNode extends TempNode {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
-		const { scene, camera } = this;
+		const { scene } = this;
 
-		this._pixelRatio = renderer.getPixelRatio();
+		let camera;
+		let pixelRatio;
 
-		const size = renderer.getSize( _size );
+		const outputRenderTarget = renderer.getOutputRenderTarget();
 
-		this.setSize( size.width, size.height );
+		if ( outputRenderTarget && outputRenderTarget.isXRRenderTarget === true ) {
+
+			pixelRatio = 1;
+			camera = renderer.xr.getCamera();
+
+			renderer.xr.updateCamera( camera );
+
+			_size.set( outputRenderTarget.width, outputRenderTarget.height );
+
+		} else {
+
+			camera = this.camera;
+			pixelRatio = renderer.getPixelRatio();
+
+			renderer.getSize( _size );
+
+		}
+
+		this._pixelRatio = pixelRatio;
+
+		this.setSize( _size.width, _size.height );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
@@ -39317,14 +39338,14 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			renderer._clearColor.getRGB( _clearColor$1, LinearSRGBColorSpace );
+			renderer._clearColor.getRGB( _clearColor$1 );
 			_clearColor$1.a = renderer._clearColor.a;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			background.getRGB( _clearColor$1, LinearSRGBColorSpace );
+			background.getRGB( _clearColor$1 );
 			_clearColor$1.a = 1;
 
 			forceClear = true;
@@ -40833,6 +40854,8 @@ const _axisDirections = [
 	/*@__PURE__*/ new Vector3( 1, 1, 1 )
 ];
 
+const _origin = /*@__PURE__*/ new Vector3();
+
 // maps blur materials to their uniforms dictionary
 
 const _uniformsMap = new WeakMap();
@@ -40857,8 +40880,8 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting
- * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+ * Paper: Fast, Accurate Image-Based Lighting:
+ * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
 */
 
 class PMREMGenerator {
@@ -40892,20 +40915,28 @@ class PMREMGenerator {
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
 	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
 	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
-	 * is placed at the origin).
+	 * and far planes ensure the scene is rendered in its entirety.
 	 *
 	 * @param {Scene} scene - The scene to be captured.
 	 * @param {number} [sigma=0] - The blur radius in radians.
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
 	 * @see fromSceneAsync
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
-		this._setSize( 256 );
+		const {
+			size = 256,
+			position = _origin,
+			renderTarget = null,
+		} = options;
+
+		this._setSize( size );
 
 		if ( this._hasInitialized === false ) {
 
@@ -40913,7 +40944,9 @@ class PMREMGenerator {
 
 			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 
-			this.fromSceneAsync( scene, sigma, near, far, cubeUVRenderTarget );
+			options.renderTarget = cubeUVRenderTarget;
+
+			this.fromSceneAsync( scene, sigma, near, far, options );
 
 			return cubeUVRenderTarget;
 
@@ -40926,7 +40959,7 @@ class PMREMGenerator {
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position );
 
 		if ( sigma > 0 ) {
 
@@ -40953,15 +40986,18 @@ class PMREMGenerator {
 	 * @param {number} [sigma=0] - The blur radius in radians.
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
 	 * @see fromScene
 	 */
-	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, renderTarget = null ) {
+	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
 		if ( this._hasInitialized === false ) await this._renderer.init();
 
-		return this.fromScene( scene, sigma, near, far, renderTarget );
+		return this.fromScene( scene, sigma, near, far, options );
 
 	}
 
@@ -41222,7 +41258,7 @@ class PMREMGenerator {
 
 	}
 
-	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position ) {
 
 		const cubeCamera = _cubeCamera;
 		cubeCamera.near = near;
@@ -41292,17 +41328,22 @@ class PMREMGenerator {
 			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
 
 			} else if ( col === 1 ) {
 
 				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
+
 
 			} else {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
+
 
 			}
 
@@ -47044,15 +47085,6 @@ class XRManager extends EventDispatcher {
 		this._controllerInputSources = [];
 
 		/**
-		 * The current render target of the renderer.
-		 *
-		 * @private
-		 * @type {?RenderTarget}
-		 * @default null
-		 */
-		this._currentRenderTarget = null;
-
-		/**
 		 * The XR render target that represents the rendering destination
 		 * during an active XR session.
 		 *
@@ -47474,8 +47506,6 @@ class XRManager extends EventDispatcher {
 
 			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
-			this._currentRenderTarget = renderer.getRenderTarget();
-
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
 			session.addEventListener( 'selectend', this._onSessionEvent );
@@ -47879,7 +47909,7 @@ function onSessionEnd() {
 	// restore framebuffer/rendering state
 
 	renderer.backend.setXRTarget( null );
-	renderer.setRenderTarget( this._currentRenderTarget );
+	renderer.setOutputRenderTarget( null );
 
 	this._session = null;
 	this._xrRenderTarget = null;
@@ -48066,7 +48096,7 @@ function onAnimationFrame( time, frame ) {
 
 		}
 
-		renderer.setRenderTarget( this._xrRenderTarget );
+		renderer.setOutputRenderTarget( this._xrRenderTarget );
 
 	}
 
@@ -48577,6 +48607,15 @@ class Renderer {
 		 * @default 0
 		 */
 		this._activeMipmapLevel = 0;
+
+		/**
+		 * The current output render target.
+		 *
+		 * @private
+		 * @type {?RenderTarget}
+		 * @default null
+		 */
+		this._outputRenderTarget = null;
 
 		/**
 		 * The MRT setting.
@@ -49275,7 +49314,7 @@ class Renderer {
 
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
-		const outputRenderTarget = this._renderTarget;
+		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -49977,7 +50016,7 @@ class Renderer {
 			renderContext.depth = renderTarget.depthBuffer;
 			renderContext.stencil = renderTarget.stencilBuffer;
 			// #30329
-			renderContext.clearColorValue = this._clearColor;
+			renderContext.clearColorValue = this.backend.getClearColor();
 
 		}
 
@@ -50088,7 +50127,7 @@ class Renderer {
 	 */
 	get currentToneMapping() {
 
-		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+		return this.isOutputTarget ? this.toneMapping : NoToneMapping;
 
 	}
 
@@ -50100,7 +50139,18 @@ class Renderer {
 	 */
 	get currentColorSpace() {
 
-		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
+		return this.isOutputTarget ? this.outputColorSpace : LinearSRGBColorSpace;
+
+	}
+
+	/**
+	 * Returns `true` if the rendering settings are set to screen output.
+	 *
+	 * @returns {boolean} True if the current render target is the same of output render target or `null`, otherwise false.
+	 */
+	get isOutputTarget() {
+
+		return this._renderTarget === this._outputRenderTarget;
 
 	}
 
@@ -50160,6 +50210,28 @@ class Renderer {
 	getRenderTarget() {
 
 		return this._renderTarget;
+
+	}
+
+	/**
+	 * Sets the output render target for the renderer.
+	 *
+	 * @param {Object} renderTarget - The render target to set as the output target.
+	 */
+	setOutputRenderTarget( renderTarget ) {
+
+		this._outputRenderTarget = renderTarget;
+
+	}
+
+	/**
+	 * Returns the current output target.
+	 *
+	 * @return {?RenderTarget} The current output render target. Returns `null` if no output target is set.
+	 */
+	getOutputRenderTarget() {
+
+		return this._outputRenderTarget;
 
 	}
 
@@ -53893,7 +53965,7 @@ class Backend {
 
 		renderer.getClearColor( _color4 );
 
-		_color4.getRGB( _color4, this.renderer.currentColorSpace );
+		_color4.getRGB( _color4 );
 
 		return _color4;
 
@@ -56979,7 +57051,7 @@ class WebGLBufferRenderer {
 
 		}
 
-		info.update( object, count, mode, 1 );
+		info.update( object, count, 1 );
 
 	}
 
@@ -56999,7 +57071,7 @@ class WebGLBufferRenderer {
 
 		}
 
-		info.update( object, count, mode, primcount );
+		info.update( object, count, primcount );
 
 	}
 
@@ -57038,7 +57110,7 @@ class WebGLBufferRenderer {
 
 			}
 
-			info.update( object, elementCount, mode, 1 );
+			info.update( object, elementCount, 1 );
 
 		}
 
@@ -57079,7 +57151,7 @@ class WebGLBufferRenderer {
 
 			}
 
-			info.update( object, elementCount, mode, 1 );
+			info.update( object, elementCount, 1 );
 
 		}
 
@@ -58241,6 +58313,27 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Returns the clear color and alpha into a single
+	 * color object.
+	 *
+	 * @return {Color4} The clear color.
+	 */
+	getClearColor() {
+
+		const clearColor = super.getClearColor();
+
+		// Since the canvas is always created with alpha: true,
+		// WebGL must always premultiply the clear color.
+
+		clearColor.r *= clearColor.a;
+		clearColor.g *= clearColor.a;
+		clearColor.b *= clearColor.a;
+
+		return clearColor;
+
+	}
+
+	/**
 	 * Performs a clear operation.
 	 *
 	 * @param {boolean} color - Whether the color buffer should be cleared or not.
@@ -58251,17 +58344,11 @@ class WebGLBackend extends Backend {
 	 */
 	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
 
-		const { gl } = this;
+		const { gl, renderer } = this;
 
 		if ( descriptor === null ) {
 
 			const clearColor = this.getClearColor();
-
-			// premultiply alpha
-
-			clearColor.r *= clearColor.a;
-			clearColor.g *= clearColor.a;
-			clearColor.b *= clearColor.a;
 
 			descriptor = {
 				textures: null,
@@ -58290,13 +58377,10 @@ class WebGLBackend extends Backend {
 
 				clearColor = this.getClearColor();
 
-				// premultiply alpha
-
-				clearColor.r *= clearColor.a;
-				clearColor.g *= clearColor.a;
-				clearColor.b *= clearColor.a;
-
 			}
+
+			const clearDepth = renderer.getClearDepth();
+			const clearStencil = renderer.getClearStencil();
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -58321,15 +58405,15 @@ class WebGLBackend extends Backend {
 
 				if ( depth && stencil ) {
 
-					gl.clearBufferfi( gl.DEPTH_STENCIL, 0, 1, 0 );
+					gl.clearBufferfi( gl.DEPTH_STENCIL, 0, clearDepth, clearStencil );
 
 				} else if ( depth ) {
 
-					gl.clearBufferfv( gl.DEPTH, 0, [ 1.0 ] );
+					gl.clearBufferfv( gl.DEPTH, 0, [ clearDepth ] );
 
 				} else if ( stencil ) {
 
-					gl.clearBufferiv( gl.STENCIL, 0, [ 0 ] );
+					gl.clearBufferiv( gl.STENCIL, 0, [ clearStencil ] );
 
 				}
 
@@ -67494,6 +67578,30 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Returns the clear color and alpha into a single
+	 * color object.
+	 *
+	 * @return {Color4} The clear color.
+	 */
+	getClearColor() {
+
+		const clearColor = super.getClearColor();
+
+		// only premultiply alpha when alphaMode is "premultiplied"
+
+		if ( this.renderer.alpha === true ) {
+
+			clearColor.r *= clearColor.a;
+			clearColor.g *= clearColor.a;
+			clearColor.b *= clearColor.a;
+
+		}
+
+		return clearColor;
+
+	}
+
+	/**
 	 * Performs a clear operation.
 	 *
 	 * @param {boolean} color - Whether the color buffer should be cleared or not.
@@ -67517,20 +67625,7 @@ class WebGPUBackend extends Backend {
 		if ( color ) {
 
 			const clearColor = this.getClearColor();
-
-			if ( this.renderer.alpha === true ) {
-
-				// premultiply alpha
-
-				const a = clearColor.a;
-
-				clearValue = { r: clearColor.r * a, g: clearColor.g * a, b: clearColor.b * a, a: a };
-
-			} else {
-
-				clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
-
-			}
+			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
 
 		}
 
@@ -67898,6 +67993,8 @@ class WebGPUBackend extends Backend {
 						passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
 
 					}
+
+					info.update( object, counts[ i ], count );
 
 				}
 
@@ -69028,7 +69125,12 @@ class PostProcessing {
 
 		//
 
+		const currentXR = renderer.xr.enabled;
+		renderer.xr.enabled = false;
+
 		this._quadMesh.render( renderer );
+
+		renderer.xr.enabled = currentXR;
 
 		//
 
@@ -69091,7 +69193,12 @@ class PostProcessing {
 
 		//
 
+		const currentXR = renderer.xr.enabled;
+		renderer.xr.enabled = false;
+
 		await this._quadMesh.renderAsync( renderer );
+
+		renderer.xr.enabled = currentXR;
 
 		//
 
