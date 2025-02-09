@@ -1468,7 +1468,7 @@ class ThreeMFLoader extends Loader {
 			const modelsData = data3mf.model;
 			const modelRels = data3mf.modelRels;
 			const objects = {};
-			const modelsKeys = Object.keys( modelsData );
+			const modelsKeys = Object.keys( modelsData ).reverse();
 			const textureData = {};
 
 			// evaluate model relationships to textures
