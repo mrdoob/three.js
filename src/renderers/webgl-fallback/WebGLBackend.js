@@ -765,7 +765,7 @@ class WebGLBackend extends Backend {
 			}
 
 			const clearDepth = renderer.getClearDepth();
-			const clearStecil = renderer.getClearStencil();
+			const clearStencil = renderer.getClearStencil();
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -790,7 +790,7 @@ class WebGLBackend extends Backend {
 
 				if ( depth && stencil ) {
 
-					gl.clearBufferfi( gl.DEPTH_STENCIL, 0, clearDepth, clearStecil );
+					gl.clearBufferfi( gl.DEPTH_STENCIL, 0, clearDepth, clearStencil );
 
 				} else if ( depth ) {
 
@@ -798,7 +798,7 @@ class WebGLBackend extends Backend {
 
 				} else if ( stencil ) {
 
-					gl.clearBufferiv( gl.STENCIL, 0, [ clearStecil ] );
+					gl.clearBufferiv( gl.STENCIL, 0, [ clearStencil ] );
 
 				}
 
