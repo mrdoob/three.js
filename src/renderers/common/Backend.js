@@ -557,7 +557,7 @@ class Backend {
 
 		renderer.getClearColor( _color4 );
 
-		_color4.getRGB( _color4, this.renderer.currentColorSpace );
+		_color4.getRGB( _color4 );
 
 		return _color4;
 

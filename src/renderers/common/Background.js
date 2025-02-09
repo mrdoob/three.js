@@ -5,7 +5,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
-import { BackSide, LinearSRGBColorSpace } from '../../constants.js';
+import { BackSide } from '../../constants.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
 
@@ -64,14 +64,14 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			renderer._clearColor.getRGB( _clearColor, LinearSRGBColorSpace );
+			renderer._clearColor.getRGB( _clearColor );
 			_clearColor.a = renderer._clearColor.a;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			background.getRGB( _clearColor, LinearSRGBColorSpace );
+			background.getRGB( _clearColor );
 			_clearColor.a = 1;
 
 			forceClear = true;
