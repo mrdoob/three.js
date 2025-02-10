@@ -1451,9 +1451,16 @@ class Renderer {
 		// a clear operation clears the intermediate renderTarget texture, but should not update the screen canvas.
 
 		const currentAutoClear = this.autoClear;
+		const currentXR = this.xr.enabled;
+
 		this.autoClear = false;
+		this.xr.enabled = false;
+
 		this._renderScene( quad, quad.camera, false );
+
 		this.autoClear = currentAutoClear;
+		this.xr.enabled = currentXR;
+
 
 	}
 
@@ -2051,7 +2058,7 @@ class Renderer {
 	 */
 	get isOutputTarget() {
 
-		return this._renderTarget === this._outputRenderTarget;
+		return this._renderTarget === this._outputRenderTarget || this._renderTarget === null;
 
 	}
 
