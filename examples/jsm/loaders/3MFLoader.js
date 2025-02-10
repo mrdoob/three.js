@@ -135,12 +135,12 @@ class ThreeMFLoader extends Loader {
 					modelRelsName = file;
 
 				} else if ( file.match( /^3D\/[^\/]*\.model$/ ) ) {
-					// root model
+
 					rootModelFile = file ;
 
 				} else if ( file.match( /^3D\/.*\/.*\.model$/ ) ) {
-					// sub models
-					modelPartNames.push( file );
+
+					modelPartNames.push( file ); // sub models
 
 				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
@@ -150,7 +150,7 @@ class ThreeMFLoader extends Loader {
 
 			}
 
-			modelPartNames.push(rootModelFile);
+			modelPartNames.push( rootModelFile ); // push root model at the end so it is processed after the sub models
 
 			if ( relsName === undefined ) throw new Error( 'THREE.ThreeMFLoader: Cannot find relationship file `rels` in 3MF archive.' );
 
