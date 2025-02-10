@@ -65,7 +65,7 @@ export const RaymarchingBox = ( steps, callback ) => {
 };
 
 /**
- * Generates a function that performs raymarching on a 3D texture.
+ * Performs raymarching on the specified 3D texture.
  *
  * @tsl
  * @function
