@@ -26,7 +26,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, materialReference, smoothstep, If, Break, Fn } from 'three/tsl';
+			import { vec3, vec4, float, texture3D, uniform, smoothstep, If, Break, Fn } from 'three/tsl';
+
+			import { raymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -109,72 +111,64 @@
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
 
+				// Cloud Shader
 
-				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				const baseColor = uniform( new THREE.Color( 0x798aa0 ) );
+				const range = uniform( 0.1 );
+				const threshold = uniform( 0.25 );
+				const opacity = uniform( 0.25 );
+				const steps = uniform( 100 );
 
-				const material = new THREE.VolumeNodeMaterial( {
-					side: THREE.BackSide,
-					transparent: true
-				} );
+				const cloud3d = Fn( () => {
 
-				material.map = texture;
-				material.base = new THREE.Color( 0x798aa0 );
-				material.steps = 100;
-				material.range = 0.1;
-				material.threshold = 0.25;
-				material.opacity = 0.25;
+					const map = texture3D( texture, null, 0 );
+					const finalColor = vec4( baseColor, 0 ).toVar();
 
-				const range = materialReference( 'range', 'float' );
-				const threshold = materialReference( 'threshold', 'float' );
-				const opacity = materialReference( 'opacity', 'float' );
+					raymarchingBox( steps, ( { positionRay } ) => {
 
-				material.testNode = Fn( ( { map, mapValue, probe, finalColor } ) => {
+						const mapValue = float( map.sample( positionRay.add( 0.5 ) ).r ).toVar();
 
-					mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
+						mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
 
-					const shading = map.sample( probe.add( vec3( - 0.01 ) ) ).r.sub( map.sample( probe.add( vec3( 0.01 ) ) ).r );
+						const shading = map.sample( positionRay.add( vec3( - 0.01 ) ) ).r.sub( map.sample( positionRay.add( vec3( 0.01 ) ) ).r );
 
-					const col = shading.mul( 3.0 ).add( probe.x.add( probe.y ).mul( 0.25 ) ).add( 0.2 );
+						const col = shading.mul( 3.0 ).add( positionRay.x.add( positionRay.y ).mul( 0.25 ) ).add( 0.2 );
 
-					finalColor.rgb.addAssign( finalColor.a.oneMinus().mul( mapValue ).mul( col ) );
+						finalColor.rgb.addAssign( finalColor.a.oneMinus().mul( mapValue ).mul( col ) );
 
-					finalColor.a.addAssign( finalColor.a.oneMinus().mul( mapValue ) );
+						finalColor.a.addAssign( finalColor.a.oneMinus().mul( mapValue ) );
 
-					If( finalColor.a.greaterThanEqual( 0.95 ), () => {
+						If( finalColor.a.greaterThanEqual( 0.95 ), () => {
 
-						Break();
+							Break();
+
+						} );
 
 					} );
 
+					return finalColor;
+
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
+				//
 
+				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+
+				const material = new THREE.NodeMaterial();
+				material.colorNode = cloud3d();
+				material.side = THREE.BackSide;
+				material.transparent = true;
+
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				const parameters = {
-					threshold: 0.25,
-					opacity: 0.25,
-					range: 0.1,
-					steps: 100
-				};
-
-				function update() {
-
-					material.threshold = parameters.threshold;
-					material.opacity = parameters.opacity;
-					material.range = parameters.range;
-					material.steps = parameters.steps;
-
-				}
-
 				const gui = new GUI();
-				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'opacity', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'range', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'steps', 0, 200, 1 ).onChange( update );
+				gui.add( threshold, 'value', 0, 1, 0.01 ).name( 'threshold' );
+				gui.add( opacity, 'value', 0, 1, 0.01 ).name( 'opacity' );
+				gui.add( range, 'value', 0, 1, 0.01 ).name( 'range' );
+				gui.add( steps, 'value', 0, 200, 1 ).name( 'steps' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
