@@ -122,6 +122,8 @@ class ThreeMFLoader extends Loader {
 
 			}
 
+			let rootModelFile = null;
+
 			for ( file in zip ) {
 
 				if ( file.match( /\_rels\/.rels$/ ) ) {
@@ -132,8 +134,12 @@ class ThreeMFLoader extends Loader {
 
 					modelRelsName = file;
 
-				} else if ( file.match( /^3D\/.*\.model$/ ) ) {
+				} else if ( file.match( /^3D\/[^\/]*\.model$/ ) ) {
+					// root model
+					rootModelFile = file ;
 
+				} else if ( file.match( /^3D\/.*\/.*\.model$/ ) ) {
+					// sub models
 					modelPartNames.push( file );
 
 				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
@@ -143,6 +149,8 @@ class ThreeMFLoader extends Loader {
 				}
 
 			}
+
+			modelPartNames.push(rootModelFile);
 
 			if ( relsName === undefined ) throw new Error( 'THREE.ThreeMFLoader: Cannot find relationship file `rels` in 3MF archive.' );
 
@@ -1468,7 +1476,7 @@ class ThreeMFLoader extends Loader {
 			const modelsData = data3mf.model;
 			const modelRels = data3mf.modelRels;
 			const objects = {};
-			const modelsKeys = Object.keys( modelsData ).reverse();
+			const modelsKeys = Object.keys( modelsData );
 			const textureData = {};
 
 			// evaluate model relationships to textures
