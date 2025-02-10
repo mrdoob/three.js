@@ -77,7 +77,6 @@ export const RaymarchingBox = ( steps, callback ) => {
  * @param {Number|Node} [params.steps=100] - The number of steps for raymarching.
  * @returns {Function} The generated function that performs raymarching on the 3D texture.
  */
-
 export const raymarchingTexture3D = Fn( ( {
 	texture,
 	range = float( 0.1 ),
