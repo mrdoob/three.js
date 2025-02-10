@@ -28,7 +28,7 @@
 			import * as THREE from 'three';
 			import { vec3, vec4, float, texture3D, uniform, smoothstep, If, Break, Fn } from 'three/tsl';
 
-			import { raymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -124,7 +124,7 @@
 					const map = texture3D( texture, null, 0 );
 					const finalColor = vec4( baseColor, 0 ).toVar();
 
-					raymarchingBox( steps, ( { positionRay } ) => {
+					RaymarchingBox( steps, ( { positionRay } ) => {
 
 						const mapValue = float( map.sample( positionRay.add( 0.5 ) ).r ).toVar();
 

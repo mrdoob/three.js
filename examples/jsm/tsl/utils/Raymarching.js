@@ -20,7 +20,22 @@ const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
 
 } );
 
-export const raymarchingBox = ( steps, callback ) => {
+/**
+ * Performs raymarching box-area using the specified number of steps and a callback function.
+ *
+ * ```js
+ * RaymarchingBox( count, ( { positionRay } ) => {
+ *
+ * } );
+ * ```
+ *
+ * @tsl
+ * @function
+ * @param {Number} steps - The number of steps for raymarching.
+ * @param {Function|FunctionNode} callback - The callback function to execute at each step.
+ * @returns {void}
+ */
+export const RaymarchingBox = ( steps, callback ) => {
 
 	const vOrigin = varying( vec3( modelWorldMatrixInverse.mul( vec4( cameraPosition, 1.0 ) ) ) );
 	const vDirection = varying( positionGeometry.sub( vOrigin ) );
