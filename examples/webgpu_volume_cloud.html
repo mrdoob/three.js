@@ -28,7 +28,7 @@
 			import * as THREE from 'three';
 			import { vec3, vec4, float, texture3D, uniform, smoothstep, If, Break, Fn } from 'three/tsl';
 
-			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+			import { raymarchingTexture3D } from 'three/addons/tsl/utils/Raymarching.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -119,43 +119,22 @@
 				const opacity = uniform( 0.25 );
 				const steps = uniform( 100 );
 
-				const cloud3d = Fn( () => {
-
-					const map = texture3D( texture, null, 0 );
-					const finalColor = vec4( baseColor, 0 ).toVar();
-
-					RaymarchingBox( steps, ( { positionRay } ) => {
-
-						const mapValue = float( map.sample( positionRay.add( 0.5 ) ).r ).toVar();
-
-						mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
-
-						const shading = map.sample( positionRay.add( vec3( - 0.01 ) ) ).r.sub( map.sample( positionRay.add( vec3( 0.01 ) ) ).r );
-
-						const col = shading.mul( 3.0 ).add( positionRay.x.add( positionRay.y ).mul( 0.25 ) ).add( 0.2 );
-
-						finalColor.rgb.addAssign( finalColor.a.oneMinus().mul( mapValue ).mul( col ) );
-
-						finalColor.a.addAssign( finalColor.a.oneMinus().mul( mapValue ) );
-
-						If( finalColor.a.greaterThanEqual( 0.95 ), () => {
-
-							Break();
-
-						} );
-
-					} );
-
-					return finalColor;
-
+				const cloud3d = raymarchingTexture3D( {
+					texture: texture3D( texture, null, 0 ),
+					range: range,
+					threshold: threshold,
+					opacity: opacity,
+					steps: steps
 				} );
+
+				const finalCloud = cloud3d.setRGB( cloud3d.rgb.add( baseColor ) );
 
 				//
 
 				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 				const material = new THREE.NodeMaterial();
-				material.colorNode = cloud3d();
+				material.colorNode = finalCloud;
 				material.side = THREE.BackSide;
 				material.transparent = true;
 
