@@ -188,6 +188,14 @@ class WebGPUPipelineUtils {
 
 			}
 
+			if ( material.polygonOffset === true ) {
+
+				depthStencil.depthBias = material.polygonOffsetUnits;
+				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
+				depthStencil.depthBiasClamp = 0; // three.js does not provide an API to configure this value
+
+			}
+
 			pipelineDescriptor.depthStencil = depthStencil;
 
 		}
