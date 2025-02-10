@@ -31,7 +31,7 @@ const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
  *
  * @tsl
  * @function
- * @param {Number} steps - The number of steps for raymarching.
+ * @param {Number|Node} steps - The number of steps for raymarching.
  * @param {Function|FunctionNode} callback - The callback function to execute at each step.
  * @returns {void}
  */
