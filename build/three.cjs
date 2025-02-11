@@ -47016,19 +47016,31 @@ function WebGLState( gl, extensions ) {
 
 	function setCullFace( cullFace ) {
 
-		{
+		if ( cullFace !== CullFaceNone ) {
 
 			enable( gl.CULL_FACE );
 
 			if ( cullFace !== currentCullFace ) {
 
-				{
+				if ( cullFace === CullFaceBack ) {
 
 					gl.cullFace( gl.BACK );
+
+				} else if ( cullFace === CullFaceFront ) {
+
+					gl.cullFace( gl.FRONT );
+
+				} else {
+
+					gl.cullFace( gl.FRONT_AND_BACK );
 
 				}
 
 			}
+
+		} else {
+
+			disable( gl.CULL_FACE );
 
 		}
 
