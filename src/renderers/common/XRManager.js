@@ -619,8 +619,7 @@ class XRManager extends EventDispatcher {
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
 						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-						stencilBuffer: renderer.stencil,
-						samples: renderer.samples
+						stencilBuffer: renderer.stencil
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
