@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - pointer controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #ccc;
+				color: #000;
+			}
+
+			a {
+				color: #f00;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - pointer controls
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+            import { TransformControls } from 'three/addons/controls/TransformControls.js';
+            import { PointerControls } from 'three/addons/controls/PointerControls.js'
+
+			let camera, orbit, transform, pointer, scene, renderer;
+
+			init();
+			render();
+
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcccccc );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 400, 200, 0 );
+
+				// Orbit controls
+
+				orbit = new OrbitControls( camera, renderer.domElement );
+                orbit.update();
+				orbit.addEventListener( 'change', render );
+				// world
+                const objects = []
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x7777aa, flatShading: true } );
+				for ( let i = -10; i < 10; i ++ ) {
+                    for( let j = -10 ; j <10 ; j ++){
+                        const mesh = new THREE.Mesh( geometry, material );
+                        mesh.position.x = Math.random() * 1200 - 600;
+                        mesh.position.y = Math.random() * 1200 - 600;
+                        mesh.position.z = Math.random() * 1200 - 600;
+                        mesh.updateMatrix();
+                        mesh.matrixAutoUpdate = false;
+                        objects.push( mesh );
+                        scene.add( mesh );
+                    }
+
+				}
+
+                // Select Object to Translate  
+                transform = new TransformControls(camera, renderer.domElement);
+                transform.addEventListener( 'change', render );
+				transform.addEventListener( 'dragging-changed', function ( event ) {
+					orbit.enabled = ! event.value;
+				} );
+                scene.add( transform );
+                pointer = new PointerControls(objects, camera, renderer.domElement);
+                pointer.addEventListener("hoveron", e=> {
+                    e.object.matrixAutoUpdate = true;
+                    transform.attach(e.object);
+                })
+
+				// lights
+
+				const dirLight1 = new THREE.DirectionalLight( 0xffffff, 10 );
+				dirLight1.position.set( 1, 1, 1 );
+				scene.add( dirLight1 );
+
+				const dirLight2 = new THREE.DirectionalLight( 0x002288, 3 );
+				dirLight2.position.set( - 1, - 1, - 1 );
+				scene.add( dirLight2 );
+
+				const ambientLight = new THREE.AmbientLight( 0x555555 );
+				scene.add( ambientLight );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+			function render() {
+				renderer.render( scene, camera );
+
+			}
+		</script>
+
+	</body>
+</html>
