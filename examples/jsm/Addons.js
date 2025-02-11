@@ -12,6 +12,7 @@ export * from './controls/OrbitControls.js';
 export * from './controls/PointerLockControls.js';
 export * from './controls/TrackballControls.js';
 export * from './controls/TransformControls.js';
+export * from './controls/PointerControls.js';
 
 export * from './csm/CSM.js';
 export * from './csm/CSMFrustum.js';
