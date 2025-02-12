@@ -12,7 +12,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  *
  * const redColor = tintColors.element( 0 );
  *
- * @augments Node
+ * @augments TempNode
  */
 class ArrayNode extends TempNode {
 
@@ -25,8 +25,8 @@ class ArrayNode extends TempNode {
 	/**
 	 * Constructs a new array node.
 	 *
-	 * @param {string} [nodeType] - The data type of the elements.
-	 * @param {number} [count] - Size of the array.
+	 * @param {?string} nodeType - The data type of the elements.
+	 * @param {number} count - Size of the array.
 	 * @param {?Array<Node>} [values=null] - Array default values.
 	 */
 	constructor( nodeType, count, values = null ) {

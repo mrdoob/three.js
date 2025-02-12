@@ -39,8 +39,8 @@ class RenderOutputNode extends TempNode {
 	 * Constructs a new render output node.
 	 *
 	 * @param {Node} colorNode - The color node to process.
-	 * @param {number} toneMapping - The tone mapping type.
-	 * @param {string} outputColorSpace - The output color space.
+	 * @param {?number} toneMapping - The tone mapping type.
+	 * @param {?string} outputColorSpace - The output color space.
 	 */
 	constructor( colorNode, toneMapping, outputColorSpace ) {
 
