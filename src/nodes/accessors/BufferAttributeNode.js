@@ -60,7 +60,7 @@ class BufferAttributeNode extends InputNode {
 		/**
 		 * The buffer type (e.g. `'vec3'`).
 		 *
-		 * @type {string}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.bufferType = bufferType;

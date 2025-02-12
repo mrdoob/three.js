@@ -39,7 +39,7 @@ class TimestampQueryPool {
 		/**
 		 * Tracks offsets for different contexts.
 		 *
-		 * @type {Map}
+		 * @type {Map<string, number>}
 		 */
 		this.queryOffsets = new Map();
 

@@ -27,7 +27,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new sprite node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

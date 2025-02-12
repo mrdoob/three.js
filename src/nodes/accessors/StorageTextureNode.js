@@ -114,7 +114,7 @@ class StorageTextureNode extends TextureNode {
 	}
 
 	/**
-	 * Generates the code snippet of the stroge node. If no `storeNode`
+	 * Generates the code snippet of the storage node. If no `storeNode`
 	 * is defined, the texture node is generated as normal texture.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

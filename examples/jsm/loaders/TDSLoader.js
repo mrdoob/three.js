@@ -41,7 +41,7 @@ class TDSLoader extends Loader {
 	 * Load 3ds file from url.
 	 *
 	 * @method load
-	 * @param {[type]} url URL for the file.
+	 * @param {string} url URL for the file.
 	 * @param {Function} onLoad onLoad callback, receives group Object3D as argument.
 	 * @param {Function} onProgress onProgress callback.
 	 * @param {Function} onError onError callback.
