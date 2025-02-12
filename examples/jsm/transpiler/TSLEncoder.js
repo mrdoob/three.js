@@ -110,12 +110,6 @@ class TSLEncoder {
 
 		let code;
 
-		/*@TODO: else if ( node.isVarying ) {
-
-			code = this.emitVarying( node );
-
-		}*/
-
 		if ( node.isAccessor ) {
 
 			this.addImport( node.property );
@@ -242,6 +236,10 @@ class TSLEncoder {
 		} else if ( node.isUniform ) {
 
 			code = this.emitUniform( node );
+
+		} else if ( node.isVarying ) {
+
+			code = this.emitVarying( node );
 
 		} else if ( node.isTernary ) {
 
@@ -500,7 +498,16 @@ ${ this.tab }} )`;
 
 	}
 
-	/*emitVarying( node ) { }*/
+	emitVarying( node ) {
+
+		const { name, type } = node;
+
+		this.addImport( 'varying' );
+		this.addImport( type );
+
+		return `const ${ name } = varying( ${ type }(), '${ name }' )`;
+
+	}
 
 	emitOverloadingFunction( nodes ) {
 
