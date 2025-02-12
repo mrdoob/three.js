@@ -7,7 +7,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { WebGLCoordinateSystem } from '../../constants.js';
 import { Texture } from '../../textures/Texture.js';
-import { PMREMGenerator } from '../../renderers/common/extras/PMREMGenerator.js';
+import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 
 const _cache = new WeakMap();
 
@@ -191,14 +191,6 @@ class PMREMNode extends TempNode {
 		this._maxMip = uniform( 0 );
 
 		/**
-		 * A reference to a PMREM generator that can be globally used for generating PMREMs.
-		 *
-		 * @type {?PMREMGenerator}
-		 * @default null
-		 */
-		this._generator = null;
-
-		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER`.
 		 *
 		 * @type {string}
@@ -275,9 +267,9 @@ class PMREMNode extends TempNode {
 
 	setup( builder ) {
 
-		if ( this._pmremGenerator === null ) {
+		if ( this._generator === null ) {
 
-			this._pmremGenerator = new PMREMGenerator( builder.renderer );
+			this._generator = new PMREMGenerator( builder.renderer );
 
 		}
 
