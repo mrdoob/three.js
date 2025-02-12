@@ -22,8 +22,6 @@ import { getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 
-import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
-
 import BindGroup from '../../renderers/common/BindGroup.js';
 
 import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
@@ -469,19 +467,6 @@ class NodeBuilder {
 	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
-
-	}
-
-	/**
-	 * Factory method for creating an instance of {@link PMREMGenerator}.
-	 *
-	 * @return {PMREMGenerator} The PMREM generator.
-	 */
-	createPMREMGenerator() {
-
-		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
-
-		return new PMREMGenerator( this.renderer );
 
 	}
 

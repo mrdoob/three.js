@@ -7,8 +7,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { WebGLCoordinateSystem } from '../../constants.js';
 import { Texture } from '../../textures/Texture.js';
-
-let _generator = null;
+import { PMREMGenerator } from '../../renderers/common/extras/PMREMGenerator.js';
 
 const _cache = new WeakMap();
 
@@ -36,9 +35,10 @@ function _generateCubeUVSize( imageHeight ) {
  *
  * @private
  * @param {Texture} texture - The texture to create the PMREM for.
+ * @param {PMREMGenerator} generator - The PMREM generator.
  * @return {Texture} The PMREM.
  */
-function _getPMREMFromTexture( texture ) {
+function _getPMREMFromTexture( texture, generator ) {
 
 	let cacheTexture = _cache.get( texture );
 
@@ -52,7 +52,7 @@ function _getPMREMFromTexture( texture ) {
 
 			if ( isCubeMapReady( image ) ) {
 
-				cacheTexture = _generator.fromCubemap( texture, cacheTexture );
+				cacheTexture = generator.fromCubemap( texture, cacheTexture );
 
 			} else {
 
@@ -65,7 +65,7 @@ function _getPMREMFromTexture( texture ) {
 
 			if ( isEquirectangularMapReady( image ) ) {
 
-				cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
+				cacheTexture = generator.fromEquirectangular( texture, cacheTexture );
 
 			} else {
 
@@ -191,6 +191,14 @@ class PMREMNode extends TempNode {
 		this._maxMip = uniform( 0 );
 
 		/**
+		 * A reference to a PMREM generator that can be globally used for generating PMREMs.
+		 *
+		 * @type {?PMREMGenerator}
+		 * @default null
+		 */
+		this._generator = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER`.
 		 *
 		 * @type {string}
@@ -249,7 +257,7 @@ class PMREMNode extends TempNode {
 
 			} else {
 
-				pmrem = _getPMREMFromTexture( texture );
+				pmrem = _getPMREMFromTexture( texture, this._generator );
 
 			}
 
@@ -267,13 +275,11 @@ class PMREMNode extends TempNode {
 
 	setup( builder ) {
 
-		if ( _generator === null ) {
+		if ( this._pmremGenerator === null ) {
 
-			_generator = builder.createPMREMGenerator();
+			this._pmremGenerator = new PMREMGenerator( builder.renderer );
 
 		}
-
-		//
 
 		this.updateBefore( builder );
 
@@ -312,6 +318,14 @@ class PMREMNode extends TempNode {
 		//
 
 		return textureCubeUV( this._texture, uvNode, levelNode, this._width, this._height, this._maxMip );
+
+	}
+
+	dispose() {
+
+		super.dispose();
+
+		if ( this._generator !== null ) this._generator.dispose();
 
 	}
 
