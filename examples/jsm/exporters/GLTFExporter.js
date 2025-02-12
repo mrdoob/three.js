@@ -1486,7 +1486,7 @@ class GLTFWriter {
 	/**
 	 * Process material
 	 * @param  {THREE.Material} material Material to process
-	 * @return {Promise<Number|null>} Index of the processed material in the "materials" array
+	 * @return {Promise<number|null>} Index of the processed material in the "materials" array
 	 */
 	async processMaterialAsync( material ) {
 
@@ -1662,7 +1662,7 @@ class GLTFWriter {
 	/**
 	 * Process mesh
 	 * @param  {THREE.Mesh} mesh Mesh to process
-	 * @return {Promise<Number|null>} Index of the processed mesh in the "meshes" array
+	 * @return {Promise<number|null>} Index of the processed mesh in the "meshes" array
 	 */
 	async processMeshAsync( mesh ) {
 

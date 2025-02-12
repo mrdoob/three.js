@@ -2254,7 +2254,7 @@ const ALPHA_MODES = {
 /**
  * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
  *
- * @param {Object<String, Material>} cache
+ * @param {Object<string, Material>} cache
  * @return {Material}
  */
 function createDefaultMaterial( cache ) {
