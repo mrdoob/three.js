@@ -28,7 +28,7 @@ class MTLLoader extends Loader {
 	/**
 	 * Loads and parses a MTL asset from a URL.
 	 *
-	 * @param {String} url - URL to the MTL file.
+	 * @param {string} url - URL to the MTL file.
 	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
 	 * @param {Function} [onProgress] - Callback for download progress.
 	 * @param {Function} [onError] - Callback for download errors.
@@ -84,8 +84,8 @@ class MTLLoader extends Loader {
 	/**
 	 * Parses a MTL file.
 	 *
-	 * @param {String} text - Content of MTL file
-	 * @param {String} path
+	 * @param {string} text - Content of MTL file
+	 * @param {string} path
 	 * @return {MaterialCreator}
 	 *
 	 * @see setPath setResourcePath
@@ -443,12 +443,13 @@ class MaterialCreator {
 
 					break;
 
-                case 'disp':
-                // Displacement texture map
+				case 'disp':
 
-                setMapForType("displacementMap", value);
+					// Displacement texture map
 
-                break;
+					setMapForType( 'displacementMap', value );
+
+					break;
 
 				case 'map_d':
 
@@ -527,15 +528,15 @@ class MaterialCreator {
 
 		}
 
-         pos = items.indexOf( '-mm' );
+		pos = items.indexOf( '-mm' );
 
-         if (pos >= 0) {
+		if ( pos >= 0 ) {
 
-           matParams.displacementBias = parseFloat(items[pos + 1]);
-           matParams.displacementScale = parseFloat(items[pos + 2]);
-           items.splice(pos, 3);
+			matParams.displacementBias = parseFloat( items[ pos + 1 ] );
+			matParams.displacementScale = parseFloat( items[ pos + 2 ] );
+			items.splice( pos, 3 );
 
-        }
+		}
 
 		pos = items.indexOf( '-s' );
 
