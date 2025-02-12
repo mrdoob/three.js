@@ -423,7 +423,7 @@ class Node extends EventDispatcher {
 	 * @param {string} name - The name of the member.
 	 * @return {string} The type of the node.
 	 */
-	getMemberType( /*uilder, name*/ ) {
+	getMemberType( /*builder, name*/ ) {
 
 		return 'void';
 
