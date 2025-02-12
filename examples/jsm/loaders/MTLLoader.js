@@ -443,6 +443,14 @@ class MaterialCreator {
 
 					break;
 
+				case 'disp':
+
+					// Displacement texture map
+
+					setMapForType( 'displacementMap', value );
+
+					break;
+
 				case 'map_d':
 
 					// Alpha map
@@ -517,6 +525,16 @@ class MaterialCreator {
 
 			matParams.bumpScale = parseFloat( items[ pos + 1 ] );
 			items.splice( pos, 2 );
+
+		}
+
+		pos = items.indexOf( '-mm' );
+
+		if ( pos >= 0 ) {
+
+			matParams.displacementBias = parseFloat( items[ pos + 1 ] );
+			matParams.displacementScale = parseFloat( items[ pos + 2 ] );
+			items.splice( pos, 3 );
 
 		}
 
