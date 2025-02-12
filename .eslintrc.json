@@ -72,7 +72,14 @@
         "requireReturnType": true,
         "requireParamDescription": false,
         "requireReturnDescription": false,
-        "requireParamType": true
+        "requireParamType": true,
+        "preferType": {
+          "Any": "any",
+          "Boolean": "boolean",
+          "Number": "number",
+          "object": "Object",
+          "String": "string"
+        }
       }
     ]
   }

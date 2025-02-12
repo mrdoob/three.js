@@ -5,8 +5,8 @@ class SetColorCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} attributeName
-	 * @param {Number|null} [newValue=null] Integer representing a hex color value
+	 * @param {string} attributeName
+	 * @param {?number} [newValue=null] Integer representing a hex color value
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null ) {

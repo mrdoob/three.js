@@ -6,7 +6,7 @@ class SetValueCommand extends Command {
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} object
 	 * @param {string} attributeName
-	 * @param {Number|String|Boolean|Object|null} newValue
+	 * @param {number|string|boolean|Object|null} newValue
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null ) {

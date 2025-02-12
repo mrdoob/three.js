@@ -31,7 +31,7 @@ const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
  *
  * @tsl
  * @function
- * @param {Number|Node} steps - The number of steps for raymarching.
+ * @param {number|Node} steps - The number of steps for raymarching.
  * @param {Function|FunctionNode} callback - The callback function to execute at each step.
  * @returns {void}
  */
@@ -71,10 +71,10 @@ export const RaymarchingBox = ( steps, callback ) => {
  * @function
  * @param {Object} params - The parameters for the function.
  * @param {Texture|Node} params.texture - The 3D texture to sample.
- * @param {Number|Node} [params.range=0.1] - The range for the smoothstep function.
- * @param {Number|Node} [params.threshold=0.25] - The threshold for the smoothstep function.
- * @param {Number|Node} [params.opacity=0.25] - The opacity value for the final color.
- * @param {Number|Node} [params.steps=100] - The number of steps for raymarching.
+ * @param {number|Node} [params.range=0.1] - The range for the smoothstep function.
+ * @param {number|Node} [params.threshold=0.25] - The threshold for the smoothstep function.
+ * @param {number|Node} [params.opacity=0.25] - The opacity value for the final color.
+ * @param {number|Node} [params.steps=100] - The number of steps for raymarching.
  * @returns {Function} The generated function that performs raymarching on the 3D texture.
  */
 export const raymarchingTexture3D = Fn( ( {

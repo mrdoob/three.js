@@ -6,9 +6,9 @@ class SetMaterialMapCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} [mapName='']
+	 * @param {string} [mapName='']
 	 * @param {THREE.Texture|null} [newMap=null]
-	 * @param {Number} [materialSlot=-1]
+	 * @param {number} [materialSlot=-1]
 	 * @constructor
 	 */
 	constructor( editor, object = null, mapName = '', newMap = null, materialSlot = - 1 ) {

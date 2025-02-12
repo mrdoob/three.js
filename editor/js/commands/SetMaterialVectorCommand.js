@@ -6,9 +6,9 @@ class SetMaterialVectorCommand extends Command {
 	 *
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} [attributeName='']
+	 * @param {string} [attributeName='']
 	 * @param {THREE.Vector2|THREE.Vector3|THREE.Vector4|null} [newValue=null]
-	 * @param {Number} [materialSlot=-1]
+	 * @param {number} [materialSlot=-1]
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {

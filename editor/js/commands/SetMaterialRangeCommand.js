@@ -5,10 +5,10 @@ class SetMaterialRangeCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} [attributeName='']
-	 * @param {Number} [newMinValue=-Infinity]
-	 * @param {Number} [newMaxValue=Infinity]
-	 * @param {Number} [materialSlot=-1]
+	 * @param {string} [attributeName='']
+	 * @param {number} [newMinValue=-Infinity]
+	 * @param {number} [newMaxValue=Infinity]
+	 * @param {number} [materialSlot=-1]
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newMinValue = - Infinity, newMaxValue = Infinity, materialSlot = - 1 ) {

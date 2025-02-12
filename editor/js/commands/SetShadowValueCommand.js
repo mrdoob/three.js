@@ -5,8 +5,8 @@ class SetShadowValueCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} object
-	 * @param {String} attributeName
-	 * @param {Number|String|Boolean|Object|null} newValue
+	 * @param {string} attributeName
+	 * @param {number|string|boolean|Object|null} newValue
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null ) {

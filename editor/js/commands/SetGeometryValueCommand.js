@@ -5,8 +5,8 @@ class SetGeometryValueCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} [attributeName='']
-	 * @param {Number|String|Boolean|Object|null} [newValue=null]
+	 * @param {string} [attributeName='']
+	 * @param {number|string|boolean|Object|null} [newValue=null]
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null ) {

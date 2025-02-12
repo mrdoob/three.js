@@ -136,7 +136,7 @@ class ThreeMFLoader extends Loader {
 
 				} else if ( file.match( /^3D\/[^\/]*\.model$/ ) ) {
 
-					rootModelFile = file ;
+					rootModelFile = file;
 
 				} else if ( file.match( /^3D\/.*\/.*\.model$/ ) ) {
 
