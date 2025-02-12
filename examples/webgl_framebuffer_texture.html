@@ -61,7 +61,7 @@
 			const dpr = window.devicePixelRatio;
 
 			const textureSize = 128 * dpr;
-			const vector = new THREE.Vector2();
+			const box = new THREE.Box2();
 			const color = new THREE.Color();
 
 			init();
@@ -103,7 +103,8 @@
 
 				//
 
-				texture = new THREE.FramebufferTexture( textureSize, textureSize );
+				texture = new THREE.DataTexture( new Uint8Array( textureSize * textureSize * 4 ), textureSize, textureSize );
+				texture.needsUpdate = true;
 
 				//
 
@@ -178,11 +179,13 @@
 				renderer.render( scene, camera );
 
 				// calculate start position for copying data
+				const x = window.innerWidth * dpr / 2 - textureSize / 2;
+				const y = window.innerHeight * dpr / 2 - textureSize / 2;
 
-				vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
-				vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+				box.min.set( x, y );
+				box.max.set( x + textureSize, y + textureSize );
+				renderer.copyTextureToTexture( null, texture, box );
 
-				renderer.copyFramebufferToTexture( texture, vector );
 
 				renderer.clearDepth();
 				renderer.render( sceneOrtho, cameraOrtho );
