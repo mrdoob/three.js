@@ -3971,7 +3971,7 @@ class ColladaLoader extends Loader {
 				} else {
 
 					result += '\n';
-					stack.push.apply( stack, node.childNodes );
+					stack.push( ...node.childNodes );
 
 				}
 

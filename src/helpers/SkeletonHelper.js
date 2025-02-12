@@ -116,7 +116,7 @@ function getBoneList( object ) {
 
 	for ( let i = 0; i < object.children.length; i ++ ) {
 
-		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+		boneList.push( ...getBoneList( object.children[ i ] ) );
 
 	}
 

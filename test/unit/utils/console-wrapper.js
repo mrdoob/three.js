@@ -33,30 +33,30 @@ console._debug = console.debug;
 // Wrap console methods
 console.error = function () {
 
-	if ( this.level >= CONSOLE_LEVEL.ERROR ) this._error.apply( this, arguments );
+	if ( this.level >= CONSOLE_LEVEL.ERROR ) this._error( ...arguments );
 
 };
 
 console.warn = function () {
 
-	if ( this.level >= CONSOLE_LEVEL.WARN ) this._warn.apply( this, arguments );
+	if ( this.level >= CONSOLE_LEVEL.WARN ) this._warn( ...arguments );
 
 };
 
 console.log = function () {
 
-	if ( this.level >= CONSOLE_LEVEL.LOG ) this._log.apply( this, arguments );
+	if ( this.level >= CONSOLE_LEVEL.LOG ) this._log( ...arguments );
 
 };
 
 console.info = function () {
 
-	if ( this.level >= CONSOLE_LEVEL.INFO ) this._info.apply( this, arguments );
+	if ( this.level >= CONSOLE_LEVEL.INFO ) this._info( ...arguments );
 
 };
 
 console.debug = function () {
 
-	if ( this.level >= CONSOLE_LEVEL.DEBUG ) this._debug.apply( this, arguments );
+	if ( this.level >= CONSOLE_LEVEL.DEBUG ) this._debug( ...arguments );
 
 };
