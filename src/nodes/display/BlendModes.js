@@ -107,7 +107,7 @@ export const blendOverlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 /**
  * This function blends two color based on their alpha values by replicating the behavior of `THREE.NormalBlending`.
- * It assumes both input colors have non-preumiltiplied alpha.
+ * It assumes both input colors have non-premultiplied alpha.
  *
  * @tsl
  * @function

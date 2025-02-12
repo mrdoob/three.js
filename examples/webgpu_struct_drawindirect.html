@@ -130,7 +130,7 @@
 				}, 'DrawBuffer' );
 
 				const writeDrawBuffer = wgslFn( `
-					fn compute(            
+					fn compute(
 						index: u32,
 						drawBuffer: ptr<storage, DrawBuffer, read_write>,
 						instances: f32,
@@ -148,10 +148,10 @@
 					instances: instances,
 					index: instanceIndex,
 					time: time
-				} ).compute( instances ); // not neccessary in this case but normally one wants to run through all instances
+				} ).compute( instances ); // not necessary in this case but normally one wants to run through all instances
 
 				const initDrawBuffer = wgslFn( `
-					fn compute(            
+					fn compute(
 						drawBuffer: ptr< storage, DrawBuffer, read_write >,
 					) -> void {
 
