@@ -224,7 +224,7 @@ class Tokenizer {
 
 }
 
-const isType = ( str ) => /void|bool|float|u?int|(u|i)?vec[234]/.test( str );
+const isType = ( str ) => /void|bool|float|u?int|mat[234]|(u|i)?vec[234]/.test( str );
 
 class GLSLDecoder {
 
