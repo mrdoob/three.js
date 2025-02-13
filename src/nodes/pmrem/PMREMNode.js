@@ -30,16 +30,19 @@ function _generateCubeUVSize( imageHeight ) {
 }
 
 /**
- * Generates a PMREM from the given texture .
+ * Generates a PMREM from the given texture.
  *
  * @private
  * @param {Texture} texture - The texture to create the PMREM for.
+ * @param {Renderer} renderer - The renderer.
  * @param {PMREMGenerator} generator - The PMREM generator.
  * @return {Texture} The PMREM.
  */
-function _getPMREMFromTexture( texture, generator ) {
+function _getPMREMFromTexture( texture, renderer, generator ) {
 
-	let cacheTexture = _cache.get( texture );
+	const cache = _getCache( renderer );
+
+	let cacheTexture = cache.get( texture );
 
 	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : - 1;
 
@@ -76,11 +79,35 @@ function _getPMREMFromTexture( texture, generator ) {
 
 		cacheTexture.pmremVersion = texture.pmremVersion;
 
-		_cache.set( texture, cacheTexture );
+		cache.set( texture, cacheTexture );
 
 	}
 
 	return cacheTexture.texture;
+
+}
+
+/**
+ * Returns a cache that stores generated PMREMs for the respective textures.
+ * A cache must be maintaned per renderer since PMREMs are render target textures
+ * which can't be shared across render contexts.
+ *
+ * @private
+ * @param {Renderer} renderer - The renderer.
+ * @return {WeakMap<Texture, Texture>} The PMREM cache.
+ */
+function _getCache( renderer ) {
+
+	let rendererCache = _cache.get( renderer );
+
+	if ( rendererCache === undefined ) {
+
+		rendererCache = new WeakMap();
+		_cache.set( renderer, rendererCache );
+
+	}
+
+	return rendererCache;
 
 }
 
@@ -233,7 +260,7 @@ class PMREMNode extends TempNode {
 
 	}
 
-	updateBefore() {
+	updateBefore( frame ) {
 
 		let pmrem = this._pmrem;
 
@@ -248,7 +275,7 @@ class PMREMNode extends TempNode {
 
 			} else {
 
-				pmrem = _getPMREMFromTexture( texture, this._generator );
+				pmrem = _getPMREMFromTexture( texture, frame.renderer, this._generator );
 
 			}
 
