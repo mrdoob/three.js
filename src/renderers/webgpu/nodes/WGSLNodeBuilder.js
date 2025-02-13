@@ -790,19 +790,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
-	 * Returns uniforms group count for the given shader stage.
-	 *
-	 * @private
-	 * @param {string} shaderStage - The shader stage.
-	 * @return {number} The uniforms group count for the given shader stage.
-	 */
-	_getUniformGroupCount( shaderStage ) {
-
-		return Object.keys( this.uniforms[ shaderStage ] ).length;
-
-	}
-
-	/**
 	 * Returns the native shader operator name for a given generic name.
 	 *
 	 * @param {string} op - The operator name to resolve.
@@ -1446,6 +1433,12 @@ ${ flowData.code }
 			}
 
 			snippets.push( `\t${ prefix + member.name } : ${ type }` );
+
+		}
+
+		if ( struct.output ) {
+
+			snippets.push( `\t${ this.getBuiltins( 'output' ) }` );
 
 		}
 
