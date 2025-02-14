@@ -1,6 +1,6 @@
 class Timer {
 
-	constructor() {
+	constructor( usePageVisibilityAPI = true ) {
 
 		this._previousTime = 0;
 		this._currentTime = 0;
@@ -13,7 +13,7 @@ class Timer {
 
 		// use Page Visibility API to avoid large time delta values
 
-		this._usePageVisibilityAPI = ( typeof document !== 'undefined' && document.hidden !== undefined );
+		this._usePageVisibilityAPI = ( usePageVisibilityAPI === true ) && ( typeof document !== 'undefined' && document.hidden !== undefined );
 
 		if ( this._usePageVisibilityAPI === true ) {
 
