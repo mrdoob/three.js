@@ -99,19 +99,19 @@ class TSLEncoder {
 
 				this.addImport( 'texture' );
 
-				code += 'texture( \'/* <THREE.Texture> */\' )';
+				code += 'texture( /* <THREE.Texture> */ )';
 
 			} else if ( node.type === 'cubeTexture' ) {
 
 				this.addImport( 'cubeTexture' );
 
-				code += 'cubeTexture( \'/* <THREE.CubeTexture> */\' )';
+				code += 'cubeTexture( /* <THREE.CubeTexture> */ )';
 
 			} else if ( node.type === 'texture3D' ) {
 
 				this.addImport( 'texture3D' );
 
-				code += 'texture3D( \'/* <THREE.Data3DTexture> */\' )';
+				code += 'texture3D( /* <THREE.Data3DTexture> */ )';
 
 			} else {
 
