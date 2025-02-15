@@ -101,7 +101,7 @@
 
 			function init() {
 
-				const LAYER_VOLUMETRIC_FOG = 10;
+				const LAYER_VOLUMETRIC_LIGHTING = 10;
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -130,7 +130,7 @@
 				const noiseTexture3D = createTexture3D();
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
-				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric fog in the same scene pass
+				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric lighting in the same scene pass
 				volumetricMaterial.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( int( 2 ) ) ) );
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
@@ -150,7 +150,7 @@
 				volumetricMesh.receiveShadow = true;
 				volumetricMesh.position.y = 2;
 				volumetricMesh.layers.disableAll();
-				volumetricMesh.layers.enable( LAYER_VOLUMETRIC_FOG );
+				volumetricMesh.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				scene.add( volumetricMesh );
 
 				// Objects
@@ -170,7 +170,7 @@
 				pointLight = new THREE.PointLight( 0xf9bb50, 3, 100 );
 				pointLight.castShadow = true;
 				pointLight.position.set( 0, 1.4, 0 );
-				pointLight.layers.enable( LAYER_VOLUMETRIC_FOG );
+				pointLight.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				//lightBase.add( new THREE.Mesh( new THREE.SphereGeometry( 0.1, 16, 16 ), new THREE.MeshBasicMaterial( { color: 0xf9bb50 } ) ) );
 				scene.add( pointLight );
 
@@ -189,7 +189,7 @@
 				spotLight.shadow.camera.far = 15;
 				spotLight.shadow.focus = 1;
 				spotLight.shadow.bias = - .003;
-				spotLight.layers.enable( LAYER_VOLUMETRIC_FOG );
+				spotLight.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				//sunLight.add( new THREE.Mesh( new THREE.SphereGeometry( 0.1, 16, 16 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 				scene.add( spotLight );
 
@@ -199,18 +199,18 @@
 
 				//
 
-				const volumetricFogIntensity = uniform( 1 );
+				const volumetricLightingIntensity = uniform( 1 );
 
 				const volumetricLayer = new THREE.Layers();
 				volumetricLayer.disableAll();
-				volumetricLayer.enable( LAYER_VOLUMETRIC_FOG );
+				volumetricLayer.enable( LAYER_VOLUMETRIC_LIGHTING );
 
 				//
 
 				const scenePass = pass( scene, camera );
 				const sceneLinearDepth = scenePass.getTextureNode( 'depth' );
 
-				// Oclussion depth of volumetric fog based on the scene depth
+				// Oclussion depth of volumetric lighting based on the scene depth
 
 				volumetricMaterial.depthNode = linearDepth( sceneLinearDepth.sample( screenUV ) );
 
@@ -224,7 +224,7 @@
 
 				const blurredVolumetricPass = gaussianBlur( volumetricPass, denoiseStrength );
 
-				const scenePassColor = scenePass.add( blurredVolumetricPass.mul( volumetricFogIntensity ) );
+				const scenePassColor = scenePass.add( blurredVolumetricPass.mul( volumetricLightingIntensity ) );
 
 				postProcessing.outputNode = scenePassColor;
 
@@ -270,7 +270,7 @@
 
 					const volumetric = denoise ? blurredVolumetricPass : volumetricPass;
 
-					const scenePassColor = scenePass.add( volumetric.mul( volumetricFogIntensity ) );
+					const scenePassColor = scenePass.add( volumetric.mul( volumetricLightingIntensity ) );
 
 					postProcessing.outputNode = scenePassColor;
 					postProcessing.needsUpdate = true;
@@ -280,7 +280,7 @@
 				const lighting = gui.addFolder( 'Lighting' ).close();
 				lighting.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
 				lighting.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
-				lighting.add( volumetricFogIntensity, 'value', 0, 2 ).name( 'fog intensity' );
+				lighting.add( volumetricLightingIntensity, 'value', 0, 2 ).name( 'fog intensity' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
