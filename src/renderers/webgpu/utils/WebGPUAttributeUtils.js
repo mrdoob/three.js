@@ -109,6 +109,8 @@ class WebGPUAttributeUtils {
 				bufferAttribute.itemSize = 4;
 				bufferAttribute.array = array;
 
+				bufferData._force3to4BytesAlignment = true;
+
 			}
 
 			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
@@ -142,9 +144,27 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
+		const bufferData = backend.get( bufferAttribute );
 		const buffer = backend.get( bufferAttribute ).buffer;
 
-		const array = bufferAttribute.array;
+		let array = bufferAttribute.array;
+
+		//  if storage buffer ensure 4 byte alignment
+		if ( bufferData._force3to4BytesAlignment === true ) {
+
+			array = new array.constructor( bufferAttribute.count * 4 );
+
+			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+
+				array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+
+			}
+
+			bufferAttribute.array = array;
+
+		}
+
+
 		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
