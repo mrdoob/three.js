@@ -125,7 +125,7 @@
 				controls.maxDistance = 40;
 				controls.minDistance = 2;
 
-				// Voluemtric Fog
+				// Volumetric Fog Area
 
 				const noiseTexture3D = createTexture3D();
 
@@ -197,7 +197,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				//
+				// Layers
 
 				const volumetricLightingIntensity = uniform( 1 );
 
@@ -205,20 +205,22 @@
 				volumetricLayer.disableAll();
 				volumetricLayer.enable( LAYER_VOLUMETRIC_LIGHTING );
 
-				//
+				// Scene Pass
 
 				const scenePass = pass( scene, camera );
 				const sceneLinearDepth = scenePass.getTextureNode( 'depth' );
 
-				// Oclussion depth of volumetric lighting based on the scene depth
+				// Material - Apply oclussion depth of volumetric lighting based on the scene depth
 
 				volumetricMaterial.depthNode = linearDepth( sceneLinearDepth.sample( screenUV ) );
 
-				//
+				// Volumetric Lighting Pass
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
 				volumetricPass.setResolution( .2 );
+
+				// Compose and denoise
 
 				const denoiseStrength = uniform( .45 );
 
@@ -228,7 +230,7 @@
 
 				postProcessing.outputNode = scenePassColor;
 
-				//
+				// GUI
 
 				const params = {
 					quality: 1,
