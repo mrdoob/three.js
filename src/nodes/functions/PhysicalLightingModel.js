@@ -473,9 +473,11 @@ class PhysicalLightingModel extends LightingModel {
 	 * Depending on what features are requested, the method prepares certain node variables
 	 * which are later used for lighting computations.
 	 *
-	 * @param {ContextNode} context - The current node context.
+	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	start( context ) {
+	start( builder ) {
+
+		super.start( builder );
 
 		if ( this.clearcoat === true ) {
 
@@ -513,6 +515,8 @@ class PhysicalLightingModel extends LightingModel {
 			const position = positionWorld;
 			const v = cameraPosition.sub( positionWorld ).normalize(); // TODO: Create Node for this, same issue in MaterialX
 			const n = transformedNormalWorld;
+
+			const context = builder.context;
 
 			context.backdrop = getIBLVolumeRefraction(
 				n,
@@ -568,8 +572,7 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the direct light.
 	 *
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	direct( { lightDirection, lightColor, reflectedLight } ) {

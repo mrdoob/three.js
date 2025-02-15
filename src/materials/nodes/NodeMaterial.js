@@ -965,7 +965,7 @@ class NodeMaterial extends Material {
 
 		if ( lightsNode && lightsNode.getScope().hasLights ) {
 
-			const lightingModel = this.setupLightingModel( builder );
+			const lightingModel = this.setupLightingModel( builder ) || null;
 
 			outgoingLightNode = lightingContext( lightsNode, lightingModel, backdropNode, backdropAlphaNode );
 

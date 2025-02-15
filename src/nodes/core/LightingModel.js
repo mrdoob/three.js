@@ -11,11 +11,19 @@ class LightingModel {
 	 * which are later used in the evaluation process.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	start( /*input, stack, builder*/ ) { }
+	start( builder ) {
+
+		// lights ( direct )
+
+		builder.lightsNode.setupLights( builder, builder.lightsNode.getLightsNode( builder ) );
+
+		// indirect
+
+		this.indirect( builder.context, builder.stack, builder );
+
+	}
 
 	/**
 	 * This method is intended for executing final tasks like final updates

@@ -5,7 +5,10 @@ import { Color } from '../../math/Color.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { hash } from '../core/NodeUtils.js';
 import { shadow } from './ShadowNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
+import { nodeObject, vec4 } from '../tsl/TSLCore.js';
+import { modelViewMatrix } from '../accessors/ModelNode.js';
+import { lightPosition, lightViewPosition } from '../accessors/Lights.js';
+import { positionView } from '../accessors/Position.js';
 
 /**
  * Base class for analytic light nodes.
@@ -115,6 +118,38 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	getLightVector( builder ) {
+
+		let lVector;
+
+		if ( builder.context.positionView ) {
+
+			// TODO: lightViewPosition() should be used here but for some reason it doesn't work
+			// lVector = lightViewPosition( this.light ).sub( builder.context.positionView || positionView );
+
+			lVector = modelViewMatrix.mul( vec4( lightPosition( this.light ), 1 ) ).xyz.sub( builder.context.positionView );
+
+		} else {
+
+			lVector = lightViewPosition( this.light ).sub( positionView );
+
+		}
+
+		return lVector;
+
+	}
+
+	/**
+	 * Sets up the direct lighting for the analytic light node.
+	 *
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 */
+	setupDirect( /*builder*/ ) {
+
+		console.error( 'AnalyticLightNode: .setupDirect() not implemented.' );
+
+	}
+
 	/**
 	 * Setups the shadow node for this light. The method exists so concrete light classes
 	 * can setup different types of shadow nodes.
@@ -198,6 +233,8 @@ class AnalyticLightNode extends LightingNode {
 			this.shadowColorNode = null;
 
 		}
+
+		builder.lightsNode.setupDirectLight( builder, this, this.setupDirect( builder ) );
 
 	}
 

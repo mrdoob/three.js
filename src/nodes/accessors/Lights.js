@@ -53,18 +53,18 @@ export function lightShadowMatrix( light ) {
  * @param {Light} light -The light source.
  * @returns {Node<vec3>} The projected uvs.
  */
-export function lightProjectionUV( light ) {
+export function lightProjectionUV( light, position = positionWorld ) {
 
 	const data = getLightData( light );
 
-	if ( data.projectionUV === undefined ) {
+	//if ( data.projectionUV === undefined ) {
 
-		const spotLightCoord = lightShadowMatrix( light ).mul( positionWorld );
+		const spotLightCoord = lightShadowMatrix( light ).mul( position );
 
 		data.projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
 
 
-	}
+	//}
 
 	return data.projectionUV;
 
@@ -107,7 +107,7 @@ export function lightTargetPosition( light ) {
  *
  * @tsl
  * @function
- * @param {Light} light -The light source.
+ * @param {Light} light - The light source.
  * @returns {UniformNode<vec3>} The light's position in view space.
  */
 export function lightViewPosition( light ) {

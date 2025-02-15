@@ -4,8 +4,10 @@ import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { positionView } from '../accessors/Position.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { lightViewPosition, lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
+import { lightViewPosition, lightTargetDirection, lightProjectionUV, lightPosition } from '../accessors/Lights.js';
 import { texture } from '../accessors/TextureNode.js';
+import { modelViewMatrix } from '../accessors/ModelNode.js';
+import { vec4 } from '../tsl/TSLCore.js';
 
 /**
  * Module for representing spot lights as nodes.
@@ -92,21 +94,17 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
-
-		super.setup( builder );
-
-		const lightingModel = builder.context.lightingModel;
+	setupDirect( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
-		const lVector = lightViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
+		const lightVector = this.getLightVector( builder );
 
-		const lightDirection = lVector.normalize();
+		const lightDirection = lightVector.normalize();
 		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
 		const spotAttenuation = this.getSpotAttenuation( angleCos );
 
-		const lightDistance = lVector.length();
+		const lightDistance = lightVector.length();
 
 		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
@@ -118,22 +116,17 @@ class SpotLightNode extends AnalyticLightNode {
 
 		if ( light.map ) {
 
-			const spotLightCoord = lightProjectionUV( light );
+			const spotLightCoord = lightProjectionUV( light, builder.context.positionWorld );
 			const projectedTexture = texture( light.map, spotLightCoord.xy ).onRenderUpdate( () => light.map );
 
-			const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
+			//const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
 
-			lightColor = inSpotLightMap.select( lightColor.mul( projectedTexture ), lightColor );
+			//lightColor = inSpotLightMap.select( lightColor.mul( projectedTexture ), lightColor );
+			lightColor = lightColor.mul( projectedTexture );
 
 		}
 
-		const reflectedLight = builder.context.reflectedLight;
-
-		lightingModel.direct( {
-			lightDirection,
-			lightColor,
-			reflectedLight
-		}, builder.stack, builder );
+		return { color: lightColor, direction: lightDirection };
 
 	}
 

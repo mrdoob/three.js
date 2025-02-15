@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { vec3 } from '../tsl/TSLBase.js';
+import { property } from '../tsl/TSLBase.js';
 import { positionWorld } from '../accessors/Position.js';
 
 /**
@@ -58,13 +58,13 @@ class ShadowBaseNode extends Node {
 	/**
 	 * Setups the shadow position node which is by default the predefined TSL node object `shadowPositionWorld`.
 	 *
-	 * @param {(NodeBuilder|{Material})} object - A configuration object that must at least hold a material reference.
+	 * @param {NodeBuilder} object - A configuration object that must at least hold a material reference.
 	 */
-	setupShadowPosition( { material } ) {
+	setupShadowPosition( { context, material } ) {
 
 		// Use assign inside an Fn()
 
-		shadowPositionWorld.assign( material.shadowPositionNode || positionWorld );
+		shadowPositionWorld.assign( material.shadowPositionNode || context.shadowPositionWorld || positionWorld );
 
 	}
 
@@ -87,6 +87,6 @@ class ShadowBaseNode extends Node {
  * @tsl
  * @type {Node<vec3>}
  */
-export const shadowPositionWorld = /*@__PURE__*/ vec3().toVar( 'shadowPositionWorld' );
+export const shadowPositionWorld = /*@__PURE__*/ property( 'vec3', 'shadowPositionWorld' );
 
 export default ShadowBaseNode;
