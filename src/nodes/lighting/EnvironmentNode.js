@@ -7,7 +7,7 @@ import { positionViewDirection } from '../accessors/Position.js';
 import { float } from '../tsl/TSLBase.js';
 import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
-import { materialEnvIntensity } from '../accessors/MaterialNode.js';
+import { materialEnvIntensity } from '../accessors/MaterialProperties.js';
 
 const _envNodeCache = new WeakMap();
 

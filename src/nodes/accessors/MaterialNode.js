@@ -7,12 +7,8 @@ import { uniform } from '../core/UniformNode.js';
 import { normalMap } from '../display/NormalMapNode.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { Euler } from '../../math/Euler.js';
-import { Matrix4 } from '../../math/Matrix4.js';
 
 const _propertyCache = new Map();
-const _e1 = /*@__PURE__*/ new Euler();
-const _m1 = /*@__PURE__*/ new Matrix4();
 
 /**
  * This class should simplify the node access to material properties.
@@ -390,12 +386,6 @@ class MaterialNode extends Node {
 
 			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
 
-		} else if ( scope === MaterialNode.ENV_INTENSITY ) {
-
-			const scene = builder.scene;
-
-			node = material.envMap ? this.getFloat( 'envMapIntensity' ) : reference( 'environmentIntensity', 'float', scene );
-
 		} else {
 
 			const outputType = this.getNodeType( builder );
@@ -447,7 +437,6 @@ MaterialNode.POINT_SIZE = 'size';
 MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO = 'ao';
-MaterialNode.ENV_INTENSITY = 'envIntensity';
 
 export default MaterialNode;
 
@@ -778,46 +767,5 @@ export const materialAnisotropyVector = /*@__PURE__*/ uniform( new Vector2() ).o
 } ).onRenderUpdate( function ( { material } ) {
 
 	this.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
-
-} );
-
-/**
- * TSL object that represents the intensity of environment maps of PBR materials.
- * When `material.envMap` is set, the value is `material.envMapIntensity` otherwise `scene.environmentIntensity`.
- *
- * @tsl
- * @type {Node<float>}
- */
-export const materialEnvIntensity = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ENV_INTENSITY );
-
-/**
- * TSL object that represents the rotation of environment maps.
- * When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the
- * rotation of `scene.environment` instead.
- *
- * @tsl
- * @type {Node<mat4>}
- */
-export const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onReference( function ( frame ) {
-
-	return frame.material;
-
-} ).onRenderUpdate( function ( { material, scene } ) {
-
-	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
-
-	if ( rotation ) {
-
-		_e1.copy( rotation );
-
-		_m1.makeRotationFromEuler( _e1 );
-
-	} else {
-
-		_m1.identity();
-
-	}
-
-	return _m1;
 
 } );

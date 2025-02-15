@@ -7,7 +7,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { Texture } from '../../textures/Texture.js';
 import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
-import { materialEnvRotation } from '../accessors/MaterialNode.js';
+import { materialEnvRotation } from '../accessors/MaterialProperties.js';
 
 const _cache = new WeakMap();
 
