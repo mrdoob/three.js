@@ -34,6 +34,10 @@ const glslToTSL = {
 	inversesqrt: 'inverseSqrt'
 };
 
+const samplers = [ 'sampler1D', 'sampler2D', 'sampler2DArray', 'sampler2DShadow', 'sampler2DArrayShadow', 'isampler2D', 'isampler2DArray', 'usampler2D', 'usampler2DArray' ];
+const samplersCube = [ 'samplerCube', 'samplerCubeShadow', 'usamplerCube', 'isamplerCube' ];
+const samplers3D = [ 'sampler3D', 'isampler3D', 'usampler3D' ];
+
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
@@ -719,8 +723,14 @@ class GLSLDecoder {
 
 		const tokens = this.readTokensUntil( ';' );
 
-		const type = tokens[ 1 ].str;
+		let type = tokens[ 1 ].str;
 		const name = tokens[ 2 ].str;
+
+		// GLSL to TSL types
+
+		if ( samplers.includes( type ) ) type = 'texture';
+		else if ( samplersCube.includes( type ) ) type = 'cubeTexture';
+		else if ( samplers3D.includes( type ) ) type = 'texture3D';
 
 		return new Uniform( type, name );
 
