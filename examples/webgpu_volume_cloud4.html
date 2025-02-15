@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, Fn, time, texture3D, deltaTime, frameId, screenCoordinate, pass } from 'three/tsl';
+			import { vec3, Fn, time, texture3D, screenUV, frameId, screenCoordinate, linearDepth, pass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -128,9 +128,10 @@
 
 				const noiseTexture3D = createTexture3D();
 
-				const material = new THREE.VolumeNodeMaterial();
-				material.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( 2 ) ) );
-				material.scatteringNode = Fn( ( { positionRay } ) => {
+				const volumetricMaterial = new THREE.VolumeNodeMaterial();
+				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric fog in the same pass as the scene
+				volumetricMaterial.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( 2 ) ) );
+				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
 					const timeScaled = vec3( time, 0, time.mul( .3 ) );
 
@@ -144,7 +145,7 @@
 
 				} );
 
-				volumetricMesh = new THREE.Mesh( new THREE.BoxGeometry( 20, 10, 20 ), material );
+				volumetricMesh = new THREE.Mesh( new THREE.BoxGeometry( 20, 10, 20 ), volumetricMaterial );
 				volumetricMesh.receiveShadow = true;
 				volumetricMesh.position.y = 2;
 				volumetricMesh.layers.disableAll();
@@ -195,13 +196,24 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
+				//
+
 				const volumetricLayer = new THREE.Layers();
 				volumetricLayer.disableAll();
 				volumetricLayer.enable( LAYER_VOLUMETRIC_FOG );
 
-				const scenePass = pass( scene, camera );
+				//
 
-				const volumetricPass = pass( scene, camera );
+				const scenePass = pass( scene, camera );
+				const sceneLinearDepth = scenePass.getTextureNode( 'depth' );
+
+				//
+
+				volumetricMaterial.depthNode = linearDepth( sceneLinearDepth.sample( screenUV ) );
+
+				//
+
+				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
 				volumetricPass.setResolution( .5 );
 
@@ -224,20 +236,20 @@
 
 					const minSteps = 3;
 					const maxSteps = 12;
-					const minStepSize = .2;
+					const minStepSize = 1;
 					const maxStepSize = 5;
 
-					material.steps = minSteps + ( Math.floor( quality * ( maxSteps - minSteps ) ) );
-					material.stepSize = minStepSize + ( maxStepSize - ( quality * ( maxStepSize - minStepSize ) ) );
+					volumetricMaterial.steps = minSteps + ( Math.floor( quality * ( maxSteps - minSteps ) ) );
+					volumetricMaterial.stepSize = minStepSize + ( maxStepSize - ( quality * ( maxStepSize - minStepSize ) ) );
 
-					material.stepSize *= distance;
+					volumetricMaterial.stepSize *= distance;
 
 				}
 
 				update();
 
 				const gui = new GUI();
-				gui.add( params, 'quality', 0, .7 ).onChange( update );
+				gui.add( params, 'quality', 0, 1 ).onChange( update );
 				gui.add( params, 'distance', 0, 2 ).onChange( update);
 				gui.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
 				gui.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
