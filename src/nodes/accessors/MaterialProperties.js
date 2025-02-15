@@ -11,7 +11,7 @@ const _m1 = /*@__PURE__*/ new Matrix4();
  * @tsl
  * @type {UniformNode<float>}
  */
-export const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onRenderUpdate( ( { material } ) => material.refractionRatio );
+export const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onObjectUpdate( ( { material } ) => material.refractionRatio );
 
 /**
  * TSL object that represents the intensity of environment maps of PBR materials.
@@ -20,7 +20,11 @@ export const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( (
  * @tsl
  * @type {Node<float>}
  */
-export const materialEnvIntensity = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onRenderUpdate( ( { material, scene } ) => material.envMap ? material.envIntensity : scene.environmentIntensity );
+export const materialEnvIntensity = /*@__PURE__*/ uniform( 1 ).onReference( ( { material } ) => material ).onObjectUpdate( function ( { material, scene } ) {
+
+	return material.envMap ? material.envMapIntensity : scene.environmentIntensity;
+
+} );
 
 /**
  * TSL object that represents the rotation of environment maps.
@@ -34,7 +38,7 @@ export const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onRefe
 
 	return frame.material;
 
-} ).onRenderUpdate( function ( { material, scene } ) {
+} ).onObjectUpdate( function ( { material, scene } ) {
 
 	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
