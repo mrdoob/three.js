@@ -1,6 +1,5 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
-import { DynamicDrawUsage } from '../../constants.js';
 
 /**
  * This renderer module manages the bindings of the renderer.
