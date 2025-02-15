@@ -1,5 +1,6 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
+import { DynamicDrawUsage } from '../../constants.js';
 
 /**
  * This renderer module manages the bindings of the renderer.
@@ -221,6 +222,16 @@ class Bindings extends DataMap {
 				// we move one with the next binding. Otherwise the next if block will update the group.
 
 				if ( updated === false ) continue;
+
+			}
+
+			if ( binding.isStorageBuffer ) {
+
+				const attribute = binding.attribute;
+				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
+
+				this.attributes.update( attribute, attributeType );
+
 
 			}
 
