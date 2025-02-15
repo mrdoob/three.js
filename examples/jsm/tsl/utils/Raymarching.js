@@ -1,4 +1,4 @@
-import { varying, vec4, modelWorldMatrixInverse, cameraPosition, positionGeometry, float, Fn, Loop, max, min, vec2, vec3, smoothstep, If, Break } from 'three/tsl';
+import { varying, vec4, modelWorldMatrixInverse, cameraPosition, positionGeometry, float, Fn, Loop, max, min, vec2, vec3 } from 'three/tsl';
 
 const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
 
