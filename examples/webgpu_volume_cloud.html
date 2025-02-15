@@ -26,9 +26,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture3D, uniform } from 'three/tsl';
+			import { float, vec3, vec4, If, Break, Fn, smoothstep, texture3D, uniform } from 'three/tsl';
 
-			import { raymarchingTexture3D } from 'three/addons/tsl/utils/Raymarching.js';
+			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -111,7 +111,45 @@
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
 
-				// Cloud Shader
+				// Shader
+
+				const transparentRaymarchingTexture = Fn( ( {
+					texture,
+					range = float( 0.1 ),
+					threshold = float( 0.25 ),
+					opacity = float( 0.25 ),
+					steps = float( 100 )
+				} ) => {
+
+					const finalColor = vec4( 0 ).toVar();
+
+					RaymarchingBox( steps, ( { positionRay } ) => {
+
+						const mapValue = float( texture.sample( positionRay.add( 0.5 ) ).r ).toVar();
+
+						mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
+
+						const shading = texture.sample( positionRay.add( vec3( - 0.01 ) ) ).r.sub( texture.sample( positionRay.add( vec3( 0.01 ) ) ).r );
+
+						const col = shading.mul( 3.0 ).add( positionRay.x.add( positionRay.y ).mul( 0.25 ) ).add( 0.2 );
+
+						finalColor.rgb.addAssign( finalColor.a.oneMinus().mul( mapValue ).mul( col ) );
+
+						finalColor.a.addAssign( finalColor.a.oneMinus().mul( mapValue ) );
+
+						If( finalColor.a.greaterThanEqual( 0.95 ), () => {
+
+							Break();
+
+						} );
+
+					} );
+
+					return finalColor;
+
+				} );
+
+				// Material
 
 				const baseColor = uniform( new THREE.Color( 0x798aa0 ) );
 				const range = uniform( 0.1 );
@@ -119,26 +157,22 @@
 				const opacity = uniform( 0.25 );
 				const steps = uniform( 100 );
 
-				const cloud3d = raymarchingTexture3D( {
+				const cloud3d = transparentRaymarchingTexture( {
 					texture: texture3D( texture, null, 0 ),
-					range: range,
-					threshold: threshold,
-					opacity: opacity,
-					steps: steps
+					range,
+					threshold,
+					opacity,
+					steps
 				} );
 
 				const finalCloud = cloud3d.setRGB( cloud3d.rgb.add( baseColor ) );
-
-				//
-
-				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 				const material = new THREE.NodeMaterial();
 				material.colorNode = finalCloud;
 				material.side = THREE.BackSide;
 				material.transparent = true;
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), material );
 				scene.add( mesh );
 
 				//
