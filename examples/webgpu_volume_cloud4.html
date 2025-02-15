@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, Fn, time, texture3D, screenUV, frameId, screenCoordinate, linearDepth, pass } from 'three/tsl';
+			import { vec3, Fn, time, texture3D, screenUV, uniform, frameId, screenCoordinate, linearDepth, pass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -110,7 +110,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
-				renderer.toneMappingExposure = 1.0;
+				renderer.toneMappingExposure = 2;
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -198,6 +198,8 @@
 
 				//
 
+				const volumetricFogIntensity = uniform( 1 );
+
 				const volumetricLayer = new THREE.Layers();
 				volumetricLayer.disableAll();
 				volumetricLayer.enable( LAYER_VOLUMETRIC_FOG );
@@ -207,7 +209,7 @@
 				const scenePass = pass( scene, camera );
 				const sceneLinearDepth = scenePass.getTextureNode( 'depth' );
 
-				//
+				// Oclussion depth of volumetric fog based on the scene depth
 
 				volumetricMaterial.depthNode = linearDepth( sceneLinearDepth.sample( screenUV ) );
 
@@ -219,7 +221,7 @@
 
 				const blurredVolumetricPass = gaussianBlur( volumetricPass, 1 );
 
-				const scenePassColor = scenePass.add( blurredVolumetricPass );
+				const scenePassColor = scenePass.add( blurredVolumetricPass.mul( volumetricFogIntensity ) );
 
 				postProcessing.outputNode = scenePassColor;
 
@@ -227,7 +229,8 @@
 
 				const params = {
 					quality: .5,
-					distance: 1
+					distance: 1,
+					denoise: true
 				};
 
 				function update() {
@@ -249,10 +252,21 @@
 				update();
 
 				const gui = new GUI();
-				gui.add( params, 'quality', 0, 1 ).onChange( update );
-				gui.add( params, 'distance', 0, 2 ).onChange( update);
+				gui.add( params, 'quality', 0, 1 ).name( 'fog quality' ).onChange( update );
+				gui.add( params, 'distance', 0, 2 ).name( 'ray distance' ).onChange( update);
 				gui.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
 				gui.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
+				gui.add( volumetricFogIntensity, 'value', 0, 2 ).name( 'fog intensity' );
+				gui.add( params, 'denoise' ).onChange( ( denoise ) => {
+
+					const volumetric = denoise ? blurredVolumetricPass : volumetricPass;
+
+					const scenePassColor = scenePass.add( volumetric.mul( volumetricFogIntensity ) );
+
+					postProcessing.outputNode = scenePassColor;
+					postProcessing.needsUpdate = true;
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
