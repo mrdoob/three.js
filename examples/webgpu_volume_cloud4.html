@@ -31,13 +31,14 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, Fn, time, texture3D, screenCoordinate } from 'three/tsl';
+			import { vec3, Fn, time, texture3D, deltaTime, frameId, screenCoordinate, pass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -45,6 +46,7 @@
 
 			let renderer, scene, camera;
 			let volumetricMesh, teapot, pointLight, spotLight;
+			let postProcessing;
 			let stats;
 
 			init();
@@ -98,10 +100,12 @@
 
 			function init() {
 
+				const LAYER_VOLUMETRIC_FOG = 10;
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer( { /*antialias: true,*/ forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -120,13 +124,51 @@
 				controls.maxDistance = 40;
 				controls.minDistance = 2;
 
-				// texture
+				// Voluemtric Fog
 
-				// lights
+				const noiseTexture3D = createTexture3D();
+
+				const material = new THREE.VolumeNodeMaterial();
+				material.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( 2 ) ) );
+				material.scatteringNode = Fn( ( { positionRay } ) => {
+
+					const timeScaled = vec3( time, 0, time.mul( .3 ) );
+
+					const sampleGrain = ( scale, timeScale = 1 ) => texture3D( noiseTexture3D, positionRay.add( timeScaled.mul( timeScale ) ).mul( scale ).mod( 1 ), 0 ).r.add( .5 );
+
+					let density = sampleGrain( 1 );
+					density = density.mul( sampleGrain( .03, 1 ) );
+					density = density.mul( sampleGrain( .02, 2 ) );
+
+					return density;
+
+				} );
+
+				volumetricMesh = new THREE.Mesh( new THREE.BoxGeometry( 20, 10, 20 ), material );
+				volumetricMesh.receiveShadow = true;
+				volumetricMesh.position.y = 2;
+				volumetricMesh.layers.disableAll();
+				volumetricMesh.layers.enable( LAYER_VOLUMETRIC_FOG );
+				scene.add( volumetricMesh );
+
+				// Objects
+
+				teapot = new THREE.Mesh( new TeapotGeometry( .8, 18 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
+				teapot.castShadow = true;
+				scene.add( teapot );
+
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
+				floor.rotation.x = - Math.PI / 2;
+				floor.position.y = - 3;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				// Lights
 
 				pointLight = new THREE.PointLight( 0xf9bb50, 3, 100 );
 				pointLight.castShadow = true;
 				pointLight.position.set( 0, 1.4, 0 );
+				pointLight.layers.enable( LAYER_VOLUMETRIC_FOG );
 				//lightBase.add( new THREE.Mesh( new THREE.SphereGeometry( 0.1, 16, 16 ), new THREE.MeshBasicMaterial( { color: 0xf9bb50 } ) ) );
 				scene.add( pointLight );
 
@@ -145,50 +187,34 @@
 				spotLight.shadow.camera.far = 15;
 				spotLight.shadow.focus = 1;
 				spotLight.shadow.bias = - .003;
+				spotLight.layers.enable( LAYER_VOLUMETRIC_FOG );
 				//sunLight.add( new THREE.Mesh( new THREE.SphereGeometry( 0.1, 16, 16 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 				scene.add( spotLight );
 
-				// Material
+				// Post-Proccessing
 
-				const noiseTexture3D = createTexture3D();
+				postProcessing = new THREE.PostProcessing( renderer );
 
-				const material = new THREE.VolumeNodeMaterial();
-				material.offsetNode = bayer16( screenCoordinate );
-				material.scatteringNode = Fn( ( { positionRay } ) => {
+				const volumetricLayer = new THREE.Layers();
+				volumetricLayer.disableAll();
+				volumetricLayer.enable( LAYER_VOLUMETRIC_FOG );
 
-					const timeScaled = vec3( time, 0, time.mul( .3 ) );
+				const scenePass = pass( scene, camera );
 
-					const sampleGrain = ( scale, timeScale = 1 ) => texture3D( noiseTexture3D, positionRay.add( timeScaled.mul( timeScale ) ).mul( scale ).mod( 1 ), 0 ).r.add( .5 );
+				const volumetricPass = pass( scene, camera );
+				volumetricPass.setLayers( volumetricLayer );
+				volumetricPass.setResolution( .5 );
 
-					let density = sampleGrain( 1 );
-					density = density.mul( sampleGrain( .03, 1 ) );
-					density = density.mul( sampleGrain( .02, 2 ) );
+				const blurredVolumetricPass = gaussianBlur( volumetricPass, 1 );
 
-					return density;
+				const scenePassColor = scenePass.add( blurredVolumetricPass );
 
-				} );
-
-				volumetricMesh = new THREE.Mesh( new THREE.BoxGeometry( 20, 10, 20 ), material );
-				volumetricMesh.receiveShadow = true;
-				volumetricMesh.position.y = 2;
-				scene.add( volumetricMesh );
-
-				//
-
-				teapot = new THREE.Mesh( new TeapotGeometry( .8, 18 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
-				teapot.castShadow = true;
-				scene.add( teapot );
-
-				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
-				floor.rotation.x = - Math.PI / 2;
-				floor.position.y = - 3;
-				floor.receiveShadow = true;
-				scene.add( floor );
+				postProcessing.outputNode = scenePassColor;
 
 				//
 
 				const params = {
-					quality: .3,
+					quality: .5,
 					distance: 1
 				};
 
@@ -245,7 +271,8 @@
 
 				teapot.rotation.y = time * 0.2;
 
-				renderer.render( scene, camera );
+				//renderer.render( scene, camera );
+				postProcessing.render();
 
 			}
 

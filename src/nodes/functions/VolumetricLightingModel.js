@@ -34,7 +34,7 @@ class VolumetricLightingModel extends LightingModel {
 		const distTravelled = float( 0.0 ).toVar();
 		const transmittance = vec3( 1 ).toVar();
 
-		if ( material.offsetNode !== null ) {
+		if ( material.offsetNode ) {
 
 			// reduce banding
 
@@ -95,11 +95,13 @@ class VolumetricLightingModel extends LightingModel {
 
 		// TODO: We need a viewportOpaqueLinearDepth() and viewportOpaqueTexture() to fit with modern rendering approche
 
-		If( viewportLinearDepth.greaterThanEqual( lightDepthRay ), () => {
+		scatteringDensity.addAssign( lightColor.xyz );
+
+		/*If( viewportLinearDepth.greaterThanEqual( lightDepthRay ), () => {
 
 			scatteringDensity.addAssign( lightColor.xyz );
 
-		} );
+		} );*/
 
 	}
 
