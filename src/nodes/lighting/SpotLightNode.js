@@ -119,10 +119,9 @@ class SpotLightNode extends AnalyticLightNode {
 			const spotLightCoord = lightProjectionUV( light, builder.context.positionWorld );
 			const projectedTexture = texture( light.map, spotLightCoord.xy ).onRenderUpdate( () => light.map );
 
-			//const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
+			const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
 
-			//lightColor = inSpotLightMap.select( lightColor.mul( projectedTexture ), lightColor );
-			lightColor = lightColor.mul( projectedTexture );
+			lightColor = inSpotLightMap.select( lightColor.mul( projectedTexture ), lightColor );
 
 		}
 

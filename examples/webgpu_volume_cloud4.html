@@ -154,7 +154,7 @@
 
 				// Objects
 
-				teapot = new THREE.Mesh( new TeapotGeometry( .8, 18 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
+				teapot = new THREE.Mesh( new TeapotGeometry( .8, 18 ), new THREE.MeshStandardMaterial( { color: 0xffffff, side: THREE.DoubleSide } ) );
 				teapot.castShadow = true;
 				scene.add( teapot );
 
@@ -217,7 +217,7 @@
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .5 );
+				volumetricPass.setResolution( .25 );
 
 				const blurredVolumetricPass = gaussianBlur( volumetricPass, 1 );
 
@@ -228,8 +228,9 @@
 				//
 
 				const params = {
-					quality: .5,
+					quality: .1,
 					distance: 1,
+					resolution: volumetricPass.getResolution(),
 					denoise: true
 				};
 
@@ -237,10 +238,10 @@
 
 					const { quality, distance } = params;
 
-					const minSteps = 3;
+					const minSteps = 2;
 					const maxSteps = 12;
 					const minStepSize = 1;
-					const maxStepSize = 5;
+					const maxStepSize = 10;
 
 					volumetricMaterial.steps = minSteps + ( Math.floor( quality * ( maxSteps - minSteps ) ) );
 					volumetricMaterial.stepSize = minStepSize + ( maxStepSize - ( quality * ( maxStepSize - minStepSize ) ) );
@@ -257,6 +258,11 @@
 				gui.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
 				gui.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
 				gui.add( volumetricFogIntensity, 'value', 0, 2 ).name( 'fog intensity' );
+				gui.add( params, 'resolution', .1, .7 ).onChange( ( resolution ) => {
+
+					volumetricPass.setResolution( resolution );
+
+				} );
 				gui.add( params, 'denoise' ).onChange( ( denoise ) => {
 
 					const volumetric = denoise ? blurredVolumetricPass : volumetricPass;

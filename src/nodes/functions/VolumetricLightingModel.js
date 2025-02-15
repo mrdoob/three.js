@@ -91,25 +91,27 @@ class VolumetricLightingModel extends LightingModel {
 
 		const depthNode = builder.material.depthNode;
 
-		console.log( 'depthNode', depthNode );
-
 		// Ignore lights with infinite distance
 
 		if ( lightNode.light.distance === undefined ) return;
 
-		// TODO: We need a viewportOpaqueLinearDepth() and viewportOpaqueTexture() to fit with modern rendering approche
+		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approches
+
+		const directLight = lightColor.xyz.toVar();
+
+		directLight.mulAssign( lightNode.shadowNode );
 
 		if ( depthNode !== null ) {
 
 			If( depthNode.greaterThanEqual( lightDepthRay ), () => {
 
-				scatteringDensity.addAssign( lightColor.xyz );
+				scatteringDensity.addAssign( directLight );
 
 			} );
 
 		} else {
 
-			scatteringDensity.addAssign( lightColor.xyz );
+			scatteringDensity.addAssign( directLight );
 
 		}
 
