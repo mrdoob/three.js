@@ -98,7 +98,6 @@ class VolumetricLightingModel extends LightingModel {
 		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approches
 
 		const directLight = lightColor.xyz.toVar();
-
 		directLight.mulAssign( lightNode.shadowNode );
 
 		if ( depthNode !== null ) {

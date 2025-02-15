@@ -2,12 +2,9 @@ import AnalyticLightNode from './AnalyticLightNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
-import { positionView } from '../accessors/Position.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { lightViewPosition, lightTargetDirection, lightProjectionUV, lightPosition } from '../accessors/Lights.js';
+import { lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
 import { texture } from '../accessors/TextureNode.js';
-import { modelViewMatrix } from '../accessors/ModelNode.js';
-import { vec4 } from '../tsl/TSLCore.js';
 
 /**
  * Module for representing spot lights as nodes.

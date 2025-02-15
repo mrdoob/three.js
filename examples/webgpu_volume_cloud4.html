@@ -10,6 +10,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volumetric fog
+			<br>Improve the quality/performance adjusting the parameters in the Controls
 		</div>
 
 		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
@@ -31,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, Fn, time, texture3D, screenUV, uniform, frameId, screenCoordinate, linearDepth, pass } from 'three/tsl';
+			import { int, vec3, Fn, time, texture3D, screenUV, uniform, frameId, screenCoordinate, linearDepth, pass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -105,7 +106,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				renderer = new THREE.WebGPURenderer( { /*antialias: true,*/ forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer( { forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -117,8 +118,8 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 20, 50 );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( - 12, 3, - 7 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 50 );
+				camera.position.set( 6, 1, - 6 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxDistance = 40;
@@ -129,16 +130,16 @@
 				const noiseTexture3D = createTexture3D();
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
-				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric fog in the same pass as the scene
-				volumetricMaterial.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( 2 ) ) );
+				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric fog in the same scene pass
+				volumetricMaterial.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( int( 2 ) ) ) );
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
 					const timeScaled = vec3( time, 0, time.mul( .3 ) );
 
 					const sampleGrain = ( scale, timeScale = 1 ) => texture3D( noiseTexture3D, positionRay.add( timeScaled.mul( timeScale ) ).mul( scale ).mod( 1 ), 0 ).r.add( .5 );
 
-					let density = sampleGrain( 1 );
-					density = density.mul( sampleGrain( .03, 1 ) );
+					let density = sampleGrain( .1 );
+					density = density.mul( sampleGrain( .05, 1 ) );
 					density = density.mul( sampleGrain( .02, 2 ) );
 
 					return density;
@@ -181,7 +182,7 @@
 				spotLight.distance = 0;
 				spotLight.map = new THREE.TextureLoader().setPath( 'textures/' ).load( 'colors.png' );
 				spotLight.castShadow = true;
-				spotLight.shadow.intensity = .9;
+				//spotLight.shadow.intensity = .9;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
 				spotLight.shadow.camera.near = 1;
@@ -217,9 +218,11 @@
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .25 );
+				volumetricPass.setResolution( .2 );
 
-				const blurredVolumetricPass = gaussianBlur( volumetricPass, 1 );
+				const denoiseStrength = uniform( .45 );
+
+				const blurredVolumetricPass = gaussianBlur( volumetricPass, denoiseStrength );
 
 				const scenePassColor = scenePass.add( blurredVolumetricPass.mul( volumetricFogIntensity ) );
 
@@ -228,7 +231,7 @@
 				//
 
 				const params = {
-					quality: .1,
+					quality: 1,
 					distance: 1,
 					resolution: volumetricPass.getResolution(),
 					denoise: true
@@ -253,17 +256,17 @@
 				update();
 
 				const gui = new GUI();
-				gui.add( params, 'quality', 0, 1 ).name( 'fog quality' ).onChange( update );
-				gui.add( params, 'distance', 0, 2 ).name( 'ray distance' ).onChange( update);
-				gui.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
-				gui.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
-				gui.add( volumetricFogIntensity, 'value', 0, 2 ).name( 'fog intensity' );
-				gui.add( params, 'resolution', .1, .7 ).onChange( ( resolution ) => {
+
+				const rayMarching = gui.addFolder( 'Ray Marching' ).close();
+				rayMarching.add( params, 'resolution', .1, .9 ).onChange( ( resolution ) => {
 
 					volumetricPass.setResolution( resolution );
 
 				} );
-				gui.add( params, 'denoise' ).onChange( ( denoise ) => {
+				rayMarching.add( params, 'quality', 0, 1 ).name( 'fog quality' ).onChange( update );
+				rayMarching.add( params, 'distance', 0, 2 ).name( 'ray distance' ).onChange( update );
+				rayMarching.add( denoiseStrength, 'value', 0, 2 ).name( 'denoise strength' );
+				rayMarching.add( params, 'denoise' ).onChange( ( denoise ) => {
 
 					const volumetric = denoise ? blurredVolumetricPass : volumetricPass;
 
@@ -273,6 +276,11 @@
 					postProcessing.needsUpdate = true;
 
 				} );
+
+				const lighting = gui.addFolder( 'Lighting' ).close();
+				lighting.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
+				lighting.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
+				lighting.add( volumetricFogIntensity, 'value', 0, 2 ).name( 'fog intensity' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -291,7 +299,7 @@
 
 				stats.update();
 
-				const time = Date.now() * 0.001;
+				const time = performance.now() * 0.001;
 				const scale = 2.4;
 
 				pointLight.position.x = Math.sin( time * 0.7 ) * scale;
@@ -303,7 +311,6 @@
 
 				teapot.rotation.y = time * 0.2;
 
-				//renderer.render( scene, camera );
 				postProcessing.render();
 
 			}
