@@ -7,6 +7,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { Texture } from '../../textures/Texture.js';
 import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
+import { materialEnvRotation } from '../accessors/MaterialNode.js';
 
 const _cache = new WeakMap();
 
@@ -313,7 +314,7 @@ class PMREMNode extends TempNode {
 
 		//
 
-		uvNode = vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
+		uvNode = materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) );
 
 		//
 

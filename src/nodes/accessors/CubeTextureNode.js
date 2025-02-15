@@ -3,6 +3,7 @@ import { reflectVector, refractVector } from './ReflectVector.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
+import { materialEnvRotation } from './MaterialNode.js';
 
 /**
  * This type of uniform node represents a cube texture.
@@ -101,13 +102,11 @@ class CubeTextureNode extends TextureNode {
 
 		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
 
-			return vec3( uvNode.x.negate(), uvNode.yz );
-
-		} else {
-
-			return uvNode;
+			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
 
 		}
+
+		return materialEnvRotation.mul( uvNode );
 
 	}
 

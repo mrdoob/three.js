@@ -107,7 +107,8 @@
 					Refraction: false,
 					backgroundRotationX: false,
 					backgroundRotationY: false,
-					backgroundRotationZ: false
+					backgroundRotationZ: false,
+					syncMaterial: false
 				};
 
 				const gui = new GUI( { width: 300 } );
@@ -133,6 +134,7 @@
 				gui.add( params, 'backgroundRotationX' );
 				gui.add( params, 'backgroundRotationY' );
 				gui.add( params, 'backgroundRotationZ' );
+				gui.add( params, 'syncMaterial' );
 				gui.open();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -167,6 +169,12 @@
 				if ( params.backgroundRotationZ ) {
 
 					scene.backgroundRotation.z += 0.001;
+
+				}
+
+				if ( params.syncMaterial ) {
+
+					sphereMesh.material.envMapRotation.copy( scene.backgroundRotation );
 
 				}
 

@@ -5,9 +5,9 @@ import { cameraViewMatrix } from '../accessors/Camera.js';
 import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/Normal.js';
 import { positionViewDirection } from '../accessors/Position.js';
 import { float } from '../tsl/TSLBase.js';
-import { reference } from '../accessors/ReferenceNode.js';
 import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
+import { materialEnvIntensity } from '../accessors/MaterialNode.js';
 
 const _envNodeCache = new WeakMap();
 
@@ -71,14 +71,11 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		const envMap = material.envMap;
-		const intensity = envMap ? reference( 'envMapIntensity', 'float', builder.material ) : reference( 'environmentIntensity', 'float', builder.scene ); // @TODO: Add materialEnvIntensity in MaterialNode
-
 		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
 		const radianceNormalView = useAnisotropy ? transformedBentNormalView : transformedNormalView;
 
-		const radiance = envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( intensity );
-		const irradiance = envNode.context( createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( intensity );
+		const radiance = envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity );
+		const irradiance = envNode.context( createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity );
 
 		const isolateRadiance = cache( radiance );
 		const isolateIrradiance = cache( irradiance );
@@ -95,7 +92,7 @@ class EnvironmentNode extends LightingNode {
 
 		if ( clearcoatRadiance ) {
 
-			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
+			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( materialEnvIntensity );
 			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
 
 			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
