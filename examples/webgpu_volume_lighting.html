@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { int, vec3, Fn, time, texture3D, screenUV, uniform, frameId, screenCoordinate, linearDepth, pass } from 'three/tsl';
+			import { vec3, Fn, time, texture3D, screenUV, uniform, screenCoordinate, linearDepth, pass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -131,7 +131,7 @@
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
 				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric lighting in the same scene pass
-				volumetricMaterial.offsetNode = bayer16( screenCoordinate.add( frameId.modInt( int( 2 ) ) ) );
+				volumetricMaterial.offsetNode = bayer16( screenCoordinate );
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
 					const timeScaled = vec3( time, 0, time.mul( .3 ) );
