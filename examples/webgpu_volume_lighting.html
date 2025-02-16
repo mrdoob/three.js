@@ -132,9 +132,10 @@
 				const smokeAmount = uniform( 1.5 );
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
-				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric lighting in the same scene pass
-				volumetricMaterial.offsetNode = bayer16( screenCoordinate );
+				volumetricMaterial.offsetNode = bayer16( screenCoordinate ); // Add dithering to reduce banding
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
+
+					// Return the amount of fog based on the noise texture
 
 					const timeScaled = vec3( time, 0, time.mul( .3 ) );
 
