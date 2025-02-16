@@ -129,7 +129,7 @@
 
 				const noiseTexture3D = createTexture3D();
 
-				const smokeAmount = uniform( 1.5 );
+				const smokeAmount = uniform( 2 );
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
 				volumetricMaterial.offsetNode = bayer16( screenCoordinate ); // Add dithering to reduce banding
@@ -221,7 +221,7 @@
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .3 );
+				volumetricPass.setResolution( .25 );
 
 				// Compose and Denoise
 
@@ -247,11 +247,13 @@
 
 					const minSteps = 2;
 					const maxSteps = 12;
-					const minStepSize = 1;
-					const maxStepSize = 10;
+					const minStepSize = 2;
+					const maxStepSize = 12;
 
-					volumetricMaterial.steps = minSteps + ( Math.floor( quality * ( maxSteps - minSteps ) ) );
-					volumetricMaterial.stepSize = minStepSize + ( maxStepSize - ( quality * ( maxStepSize - minStepSize ) ) );
+					volumetricMaterial.steps = minSteps + Math.floor( quality * ( maxSteps - minSteps ) );
+					volumetricMaterial.stepSize = maxStepSize + ( quality * ( minStepSize - maxStepSize ) );
+
+					console.log( volumetricMaterial.stepSize );
 
 				}
 
