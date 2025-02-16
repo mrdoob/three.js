@@ -13,6 +13,7 @@
             "src/loaders/nodes", 
             "src/materials/nodes", 
             "src/nodes", 
+            "src/math/Box3.js", 
             "src/renderers/common", 
             "src/renderers/webgpu" 
         ]
