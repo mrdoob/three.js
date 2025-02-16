@@ -234,14 +234,13 @@
 
 				const params = {
 					quality: 1,
-					distance: 1,
 					resolution: volumetricPass.getResolution(),
 					denoise: true
 				};
 
 				function update() {
 
-					const { quality, distance } = params;
+					const { quality } = params;
 
 					const minSteps = 2;
 					const maxSteps = 12;
@@ -251,8 +250,6 @@
 					volumetricMaterial.steps = minSteps + ( Math.floor( quality * ( maxSteps - minSteps ) ) );
 					volumetricMaterial.stepSize = minStepSize + ( maxStepSize - ( quality * ( maxStepSize - minStepSize ) ) );
 
-					volumetricMaterial.stepSize *= distance;
-
 				}
 
 				update();
@@ -260,14 +257,13 @@
 				const gui = new GUI();
 
 				const rayMarching = gui.addFolder( 'Ray Marching' ).close();
-				rayMarching.add( params, 'resolution', .1, .9 ).onChange( ( resolution ) => {
+				rayMarching.add( params, 'resolution', .1, 1 ).onChange( ( resolution ) => {
 
 					volumetricPass.setResolution( resolution );
 
 				} );
 				rayMarching.add( params, 'quality', 0, 1 ).name( 'fog quality' ).onChange( update );
-				rayMarching.add( params, 'distance', 0, 2 ).name( 'ray distance' ).onChange( update );
-				rayMarching.add( denoiseStrength, 'value', 0, 2 ).name( 'denoise strength' );
+				rayMarching.add( denoiseStrength, 'value', 0, 1 ).name( 'denoise strength' );
 				rayMarching.add( params, 'denoise' ).onChange( ( denoise ) => {
 
 					const volumetric = denoise ? blurredVolumetricPass : volumetricPass;
