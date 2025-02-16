@@ -119,7 +119,7 @@
 				scene.fog = new THREE.Fog( 0x000000, 20, 50 );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 50 );
-				camera.position.set( 6, 1, - 6 );
+				camera.position.set( - 8, 1, - 6 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxDistance = 40;
@@ -218,11 +218,11 @@
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .2 );
+				volumetricPass.setResolution( .3 );
 
 				// Compose and Denoise
 
-				const denoiseStrength = uniform( .45 );
+				const denoiseStrength = uniform( .6 );
 
 				const blurredVolumetricPass = gaussianBlur( volumetricPass, denoiseStrength );
 
@@ -257,7 +257,7 @@
 				const gui = new GUI();
 
 				const rayMarching = gui.addFolder( 'Ray Marching' ).close();
-				rayMarching.add( params, 'resolution', .1, 1 ).onChange( ( resolution ) => {
+				rayMarching.add( params, 'resolution', .1, .5 ).onChange( ( resolution ) => {
 
 					volumetricPass.setResolution( resolution );
 
