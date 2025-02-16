@@ -129,6 +129,8 @@
 
 				const noiseTexture3D = createTexture3D();
 
+				const smokeAmount = uniform( 1 );
+
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
 				//volumetricMaterial.depthNode = viewportLinearDepth; // Use this if the idea is to render the volumetric lighting in the same scene pass
 				volumetricMaterial.offsetNode = bayer16( screenCoordinate );
@@ -142,7 +144,7 @@
 					density = density.mul( sampleGrain( .05, 1 ) );
 					density = density.mul( sampleGrain( .02, 2 ) );
 
-					return density;
+					return smokeAmount.mix( 1, density );
 
 				} );
 
@@ -275,10 +277,11 @@
 
 				} );
 
-				const lighting = gui.addFolder( 'Lighting' ).close();
+				const lighting = gui.addFolder( 'Lighting / Scene' ).close();
 				lighting.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
 				lighting.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
 				lighting.add( volumetricLightingIntensity, 'value', 0, 2 ).name( 'fog intensity' );
+				lighting.add( smokeAmount, 'value', 0, 3 ).name( 'smoke amount' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
