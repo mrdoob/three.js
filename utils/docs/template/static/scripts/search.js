@@ -65,7 +65,7 @@ function buildSearchResult( result ) {
 		const _description = description.replace( removeHTMLTagsRegExp, '' );
 
 		output += `
-    <a href="${_link}" class="search-result-item">
+    <a href="${_link}" class="search-result-item" onclick="hideSearch()">
       <span class="search-result-item-title">${_title}</span>
       <span class="search-result-item-description">- ${_description || 'No description available.'}</span>
     </a>
