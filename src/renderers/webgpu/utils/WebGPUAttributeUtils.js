@@ -186,9 +186,21 @@ class WebGPUAttributeUtils {
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
+				let dataOffset, size;
 
-				const dataOffset = range.start * byteOffsetFactor;
-				const size = range.count * byteOffsetFactor;
+				if ( bufferData._force3to4BytesAlignment === true ) {
+
+					const vertexStart = Math.floor( range.start / 3 );
+					const vertexCount = Math.ceil( range.count / 3 );
+					dataOffset = vertexStart * 4 * byteOffsetFactor;
+					size = vertexCount * 4 * byteOffsetFactor;
+
+				} else {
+
+					dataOffset = range.start * byteOffsetFactor;
+					size = range.count * byteOffsetFactor;
+
+				}
 
 				device.queue.writeBuffer(
 					buffer,
