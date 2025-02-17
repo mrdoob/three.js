@@ -285,7 +285,7 @@ class Box3 {
 	}
 
 	/**
-	 * Expands the boundaries of this box to include an {@link Object3D} and
+	 * Expands the boundaries of this box to include the given 3D object and
 	 * its children, accounting for the object's, and children's, world
 	 * transforms. The function may result in a larger box than strictly
 	 * necessary (unless the precise parameter is set to true).
