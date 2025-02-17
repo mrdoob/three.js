@@ -244,6 +244,12 @@ class TSLEncoder {
 
 			}
 
+		} else if ( node.isDiscard ) {
+
+			this.addImport( 'Discard' );
+
+			code = 'Discard()';
+
 		} else if ( node.isAccessorElements ) {
 
 			code = this.emitExpression( node.object );
