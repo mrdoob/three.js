@@ -12,7 +12,7 @@ import {
 /**
  * This class has been made to hold a slice of a volume data
  * @class
- * @see Volume
+ * @see {@link Volume}
  */
 class VolumeSlice {
 
@@ -95,7 +95,7 @@ class VolumeSlice {
 
 		/**
 		 * @member {Function} sliceAccess Function that allow the slice to access right data
-		 * @see Volume.extractPerpendicularPlane
+		 * @see {@link Volume#extractPerpendicularPlane}
 		 * @param {number} i The first coordinate
 		 * @param {number} j The second coordinate
 		 * @returns {number} the index corresponding to the voxel in volume.data of the given position in the slice
@@ -192,7 +192,7 @@ class VolumeSlice {
 
 	/**
 	 * Refresh the geometry according to axis and index
-	 * @see Volume.extractPerpendicularPlane
+	 * @see {@link Volume#extractPerpendicularPlane}
 	 * @memberof VolumeSlice
 	 */
 	updateGeometry() {
