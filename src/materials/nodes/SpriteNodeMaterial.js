@@ -121,7 +121,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( scaleNode !== null ) {
 
-			scale = scale.mul( float( scaleNode ) );
+			scale = scale.mul( vec2( scaleNode ) );
 
 		}
 
