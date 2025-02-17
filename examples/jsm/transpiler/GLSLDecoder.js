@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform } from './AST.js';
+import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -488,6 +488,10 @@ class GLSLDecoder {
 			if ( firstToken.str === 'return' ) {
 
 				return new Return( this.parseExpressionFromTokens( tokens.slice( 1 ) ) );
+
+			} else if ( firstToken.str === 'discard' ) {
+
+				return new Discard();
 
 			}
 
