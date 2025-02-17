@@ -5,9 +5,8 @@ import { Color } from '../../math/Color.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { hash } from '../core/NodeUtils.js';
 import { shadow } from './ShadowNode.js';
-import { nodeObject, vec4 } from '../tsl/TSLCore.js';
-import { modelViewMatrix } from '../accessors/ModelNode.js';
-import { lightPosition, lightViewPosition } from '../accessors/Lights.js';
+import { nodeObject } from '../tsl/TSLCore.js';
+import { lightViewPosition } from '../accessors/Lights.js';
 import { positionView } from '../accessors/Position.js';
 
 /**
