@@ -181,10 +181,10 @@
 
 					const geometry = new THREE.PlaneGeometry( 4, 10 );
 					const frontMaterial = new THREE.MeshBasicMaterial( { color: rectLight.color, side: THREE.BackSide } );
-					const backMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff } );
+					const backMaterial = new THREE.MeshStandardMaterial( { color: 0x111111 } );
 
 					const backSide = new THREE.Mesh( geometry, backMaterial );
-					backSide.position.set( 0, 0, .05 );
+					backSide.position.set( 0, 0, .08 );
 
 					const frontSide = new THREE.Mesh( geometry, frontMaterial );
 					frontSide.position.set( 0, 0, .01 );
