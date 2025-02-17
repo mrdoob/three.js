@@ -7,7 +7,7 @@ pre .pun, code .pun { color: #888888; } /* punctuation */
 pre .pln, code .pln { color: #444444; } /* plaintext */
 pre .dec, code .dec { color: #22c0c4; } /* decimal */
 
-pre, code {
+pre {
 	background-color: #F5F5F5;
 	font-family: 'Roboto Mono', monospace;
 }
@@ -22,7 +22,7 @@ pre, code {
 	pre .lit, code .lit { color: #ff3399; } /* literal */
 	pre .pln, code .pln { color: #aaaaaa; } /* plaintext */
 
-	pre, code {
+	pre {
 		background-color: #333333;
 	}
 
