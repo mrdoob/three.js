@@ -141,7 +141,7 @@ class PMREMGenerator {
 	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
 	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
-	 * @see fromSceneAsync
+	 * @see {@link PMREMGenerator#fromSceneAsync}
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
@@ -206,7 +206,7 @@ class PMREMGenerator {
 	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
 	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
-	 * @see fromScene
+	 * @see {@link PMREMGenerator#fromScene}
 	 */
 	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
@@ -224,7 +224,7 @@ class PMREMGenerator {
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
-	 * @see fromEquirectangularAsync
+	 * @see {@link PMREMGenerator#fromEquirectangularAsync}
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
@@ -254,7 +254,7 @@ class PMREMGenerator {
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
-	 * @see fromEquirectangular
+	 * @see {@link PMREMGenerator#fromEquirectangular}
 	 */
 	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
 
@@ -272,7 +272,7 @@ class PMREMGenerator {
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
-	 * @see fromCubemapAsync
+	 * @see {@link PMREMGenerator#fromCubemapAsync}
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
@@ -302,7 +302,7 @@ class PMREMGenerator {
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
-	 * @see fromCubemap
+	 * @see {@link PMREMGenerator#fromCubemap}
 	 */
 	async fromCubemapAsync( cubemap, renderTarget = null ) {
 

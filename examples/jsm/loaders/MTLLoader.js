@@ -33,7 +33,7 @@ class MTLLoader extends Loader {
 	 * @param {Function} [onProgress] - Callback for download progress.
 	 * @param {Function} [onError] - Callback for download errors.
 	 *
-	 * @see setPath setResourcePath
+	 * @see {@link FileLoader#setPath} {@link FileLoader#setResourcePath}
 	 *
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setResourcePath() explicitly prior to load.
@@ -88,7 +88,7 @@ class MTLLoader extends Loader {
 	 * @param {string} path
 	 * @return {MaterialCreator}
 	 *
-	 * @see setPath setResourcePath
+	 * @see {@link FileLoader#setPath} {@link FileLoader#setResourcePath}
 	 *
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setResourcePath() explicitly prior to parse.
