@@ -1160,11 +1160,34 @@ class NodeBuilder {
 
 			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
 
-		} else if ( typeLength === 4 ) {
+		} else if ( typeLength === 4 && type !== 'mat2' ) {
 
 			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
 
-		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
+		} else if ( typeLength >= 4 && value && ( value.isMatrix2 || value.isMatrix3 || value.isMatrix4 ) ) {
+
+			// in WGSL matN() -> zero matrix and matN( 1.0 ) -> identity matrix
+			// in GLSL matN() -> identity matrix and matN( 0.0 ) -> zero matrix
+			const argumentsLength = value.elements.filter( e => e !== undefined ).length;
+
+			// aligns GLSL with WGSL to matN() -> zero matri
+			if ( argumentsLength === 0 && this.isFlipY() ) {
+
+				value.elements.fill( 0 );
+
+			} else if ( argumentsLength === 1 ) {
+
+				if ( value.elements[ 0 ] === 0 ) {
+
+					value.elements.fill( 0 );
+
+				} else if ( value.elements[ 0 ] === 1 ) {
+
+					value.identity();
+
+				}
+
+			}
 
 			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
