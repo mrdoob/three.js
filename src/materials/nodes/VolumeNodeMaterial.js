@@ -1,6 +1,7 @@
 import NodeMaterial from './NodeMaterial.js';
 import VolumetricLightingModel from '../../nodes/functions/VolumetricLightingModel.js';
-import { AdditiveBlending, BackSide } from '../../constants.js';
+import { BackSide } from '../../constants.js';
+import { output, vec4 } from '../../nodes/TSL.js';
 
 
 class VolumeNodeMaterial extends NodeMaterial {
@@ -38,7 +39,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 		this.transparent = true;
 		this.side = BackSide;
-		this.blending = AdditiveBlending;
+
 		this.depthTest = false;
 		this.depthWrite = false;
 

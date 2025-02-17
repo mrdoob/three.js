@@ -120,22 +120,7 @@ class AnalyticLightNode extends LightingNode {
 
 	getLightVector( builder ) {
 
-		let lVector;
-
-		if ( builder.context.positionView ) {
-
-			// TODO: lightViewPosition() should be used here but for some reason it doesn't work
-			// lVector = lightViewPosition( this.light ).sub( builder.context.positionView || positionView );
-
-			lVector = modelViewMatrix.mul( vec4( lightPosition( this.light ), 1 ) ).xyz.sub( builder.context.positionView );
-
-		} else {
-
-			lVector = lightViewPosition( this.light ).sub( positionView );
-
-		}
-
-		return lVector;
+		return lightViewPosition( this.light ).sub( builder.context.positionView || positionView );
 
 	}
 

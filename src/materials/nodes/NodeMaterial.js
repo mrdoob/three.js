@@ -990,6 +990,29 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Setup the fog.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node<vec4>} outputNode - The existing output node.
+	 * @return {Node<vec4>} The output node.
+	 */
+	setupFog( builder, outputNode ) {
+
+		const fogNode = builder.fogNode;
+
+		if ( fogNode ) {
+
+			output.assign( outputNode );
+
+			outputNode = vec4( fogNode );
+
+		}
+
+		return outputNode;
+
+	}
+
+	/**
 	 * Setups the output node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -1002,15 +1025,7 @@ class NodeMaterial extends Material {
 
 		if ( this.fog === true ) {
 
-			const fogNode = builder.fogNode;
-
-			if ( fogNode ) {
-
-				output.assign( outputNode );
-
-				outputNode = vec4( fogNode );
-
-			}
+			outputNode = this.setupFog( builder, outputNode );
 
 		}
 

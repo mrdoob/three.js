@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, Fn, time, texture3D, screenUV, uniform, screenCoordinate, linearDepth, pass } from 'three/tsl';
+			import { vec3, Fn, time, texture3D, screenUV, uniform, screenCoordinate, pass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -116,9 +116,8 @@
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 20, 50 );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 50 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( - 8, 1, - 6 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -132,6 +131,7 @@
 				const smokeAmount = uniform( 2 );
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
+				volumetricMaterial.steps = 12;
 				volumetricMaterial.offsetNode = bayer16( screenCoordinate ); // Add dithering to reduce banding
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
@@ -215,7 +215,7 @@
 
 				// Material - Apply oclussion depth of volumetric lighting based on the scene depth
 
-				volumetricMaterial.depthNode = linearDepth( sceneLinearDepth.sample( screenUV ) );
+				volumetricMaterial.depthNode = sceneLinearDepth.sample( screenUV );
 
 				// Volumetric Lighting Pass
 
@@ -241,24 +241,6 @@
 					denoise: true
 				};
 
-				function update() {
-
-					const { quality } = params;
-
-					const minSteps = 2;
-					const maxSteps = 12;
-					const minStepSize = 2;
-					const maxStepSize = 12;
-
-					volumetricMaterial.steps = minSteps + Math.floor( quality * ( maxSteps - minSteps ) );
-					volumetricMaterial.stepSize = maxStepSize + ( quality * ( minStepSize - maxStepSize ) );
-
-					console.log( volumetricMaterial.stepSize );
-
-				}
-
-				update();
-
 				const gui = new GUI();
 
 				const rayMarching = gui.addFolder( 'Ray Marching' ).close();
@@ -267,7 +249,7 @@
 					volumetricPass.setResolution( resolution );
 
 				} );
-				rayMarching.add( params, 'quality', 0, 1 ).name( 'fog quality' ).onChange( update );
+				rayMarching.add( volumetricMaterial, 'steps', 2, 12 ).name( 'step count' );
 				rayMarching.add( denoiseStrength, 'value', 0, 1 ).name( 'denoise strength' );
 				rayMarching.add( params, 'denoise' ).onChange( ( denoise ) => {
 
