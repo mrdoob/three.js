@@ -616,8 +616,8 @@ class Object3D extends EventDispatcher {
 	 * This method does not support objects having non-uniformly-scaled parent(s).
 	 *
 	 * @param {number|Vector3} x - The x coordinate in world space. Alternatively, a vector representing a position in world space
-	 * @param {number} y - The y coordinate in world space.
-	 * @param {number} z - The z coordinate in world space.
+	 * @param {number} [y] - The y coordinate in world space.
+	 * @param {number} [z] - The z coordinate in world space.
 	 */
 	lookAt( x, y, z ) {
 
@@ -1162,7 +1162,8 @@ class Object3D extends EventDispatcher {
 	 * Serializes the 3D object into JSON.
 	 *
 	 * @param {?(Object|String)} meta - An optional value holding meta information about the serialization.
-	 * @return {Object} The JSON.
+	 * @return {Object} A large Js object used to store all the important properties of this 3D object.
+	 * @see {@link ObjectLoader#parse}
 	 */
 	toJSON( meta ) {
 
