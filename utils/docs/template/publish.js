@@ -390,7 +390,9 @@ function buildClassNav( items, itemsSeen, linktoFn ) {
 
 			nav += `<h2>${mainCategory}</h2>`;
 
-			for ( const [ subCategory, links ] of map ) {
+			const sortedMap = new Map( [ ...map.entries() ].sort() ); // sort sub categories
+
+			for ( const [ subCategory, links ] of sortedMap ) {
 
 				nav += `<h3>${subCategory}</h3>`;
 
@@ -490,8 +492,8 @@ function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
 
 /**
  * Create the navigation sidebar.
- * @param {object} members The members that will be used to create the sidebar.
- * @param {array<object>} members.classes
+ * @param {Object} members The members that will be used to create the sidebar.
+ * @param {Array<Object>} members.classes
  * @return {string} The HTML for the navigation sidebar.
  */
 function buildNav( members ) {
@@ -508,7 +510,7 @@ function buildNav( members ) {
 
 /**
     @param {TAFFY} taffyData See <http://taffydb.com/>.
-    @param {object} opts
+    @param {Object} opts
     @param {Tutorial} tutorials
  */
 exports.publish = ( taffyData, opts, tutorials ) => {

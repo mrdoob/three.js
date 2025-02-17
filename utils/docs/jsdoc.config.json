@@ -10,6 +10,8 @@
     "source": {
         "include": [
             "examples/jsm/tsl",
+            "src/core/Object3D.js",
+            "src/core/EventDispatcher.js",
             "src/loaders/nodes", 
             "src/materials/nodes", 
             "src/nodes", 
