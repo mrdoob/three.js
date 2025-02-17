@@ -28,17 +28,6 @@ export class Matrix2 {
 
 	}
 
-	multiplyScalar( scalar ) {
-
-		const te = this.elements;
-
-		te[ 0 ] *= scalar; te[ 2 ] *= scalar;
-		te[ 1 ] *= scalar; te[ 3 ] *= scalar;
-
-		return this;
-
-	}
-
 	fromArray( array, offset = 0 ) {
 
 		for ( let i = 0; i < 4; i ++ ) {

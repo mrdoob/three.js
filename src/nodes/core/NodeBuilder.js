@@ -1166,12 +1166,6 @@ class NodeBuilder {
 
 		} else if ( typeLength >= 4 && value && ( value.isMatrix2 || value.isMatrix3 || value.isMatrix4 ) ) {
 
-			if ( value.elements.filter( e => e !== undefined ).length === 1 ) {
-
-				value.identity().multiplyScalar( value.elements[ 0 ] );
-
-			}
-
 			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
 		} else if ( typeLength > 4 ) {
