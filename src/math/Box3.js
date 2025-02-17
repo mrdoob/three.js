@@ -138,7 +138,7 @@ class Box3 {
 	}
 
 	/**
-	 * Computes the world-axis-aligned bounding box of an [page:Object3D]
+	 * Computes the world-axis-aligned bounding box of an {@link Object3D}
 	 * (including its children), accounting for the object's, and children's,
 	 * world transforms. The function may result in a larger box than strictly necessary.
 	 *
@@ -253,7 +253,7 @@ class Box3 {
 	 * Expands this box equilaterally by the given vector. The width of this
 	 * box will be expanded by the x component of the vector in both
 	 * directions. The height of this box will be expanded by the y component of
-	 * the vectorin both directions. The depth of this box will be
+	 * the vector in both directions. The depth of this box will be
 	 * expanded by the z component of the vector in both directions.
 	 *
 	 * @param {Vector3} vector - The vector that should expand the bounding box.
@@ -285,7 +285,7 @@ class Box3 {
 	}
 
 	/**
-	 * Expands the boundaries of this box to include [page:Object3D object] and
+	 * Expands the boundaries of this box to include an {@link Object3D|object} and
 	 * its children, accounting for the object's, and children's, world
 	 * transforms. The function may result in a larger box than strictly
 	 * necessary (unless the precise parameter is set to true).
@@ -643,7 +643,7 @@ class Box3 {
 	}
 
 	/**
-	 * Computes the union of this box and [page:Box3 box], setting the upper
+	 * Computes the union of this box and another {@link Box3|box}, setting the upper
 	 * bound of this box to the greater of the two boxes' upper bounds and the
 	 * lower bound of this box to the lesser of the two boxes' lower bounds.
 	 *
