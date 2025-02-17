@@ -1176,9 +1176,9 @@ class NodeBuilder {
 
 					value.elements.fill( 0 );
 
-				} else if ( value.elements[ 0 ] === 1 ) {
+				} else {
 
-					value.identity();
+					value.identity().multiplyScalar( value.elements[ 0 ] );
 
 				}
 
