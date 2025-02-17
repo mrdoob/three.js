@@ -1168,14 +1168,9 @@ class NodeBuilder {
 
 			// in WGSL matN() -> zero matrix and matN( 1.0 ) -> identity matrix
 			// in GLSL matN() -> identity matrix and matN( 0.0 ) -> zero matrix
-			const argumentsLength = value.elements.filter( e => e !== undefined ).length;
+			// undefined values fallback to 0 in the NodeBuilder setting both backends matN() to zero matrix
 
-			// aligns GLSL with WGSL to matN() -> zero matri
-			if ( argumentsLength === 0 && this.isFlipY() ) {
-
-				value.elements.fill( 0 );
-
-			} else if ( argumentsLength === 1 ) {
+			if ( value.elements.filter( e => e !== undefined ).length === 1 ) {
 
 				if ( value.elements[ 0 ] === 0 ) {
 
