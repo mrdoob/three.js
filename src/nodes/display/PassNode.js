@@ -338,6 +338,13 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Sets the resolution for the pass.
+	 * The resolution is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
+	 * @return {PassNode} A reference to this pass.
+	 */
 	setResolution( resolution ) {
 
 		this._resolution = resolution;
@@ -346,6 +353,12 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Gets the current resolution of the pass.
+	 *
+	 * @return {number} The current resolution. A value of `1` means full resolution.
+	 * @default 1
+	 */
 	getResolution() {
 
 		return this._resolution;
