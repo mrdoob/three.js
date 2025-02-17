@@ -1166,21 +1166,9 @@ class NodeBuilder {
 
 		} else if ( typeLength >= 4 && value && ( value.isMatrix2 || value.isMatrix3 || value.isMatrix4 ) ) {
 
-			// in WGSL matN() -> zero matrix and matN( 1.0 ) -> identity matrix
-			// in GLSL matN() -> identity matrix and matN( 0.0 ) -> zero matrix
-			// undefined values fallback to 0 in the NodeBuilder setting both backends matN() to zero matrix
-
 			if ( value.elements.filter( e => e !== undefined ).length === 1 ) {
 
-				if ( value.elements[ 0 ] === 0 ) {
-
-					value.elements.fill( 0 );
-
-				} else {
-
-					value.identity().multiplyScalar( value.elements[ 0 ] );
-
-				}
+				value.identity().multiplyScalar( value.elements[ 0 ] );
 
 			}
 
