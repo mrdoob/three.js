@@ -2,10 +2,10 @@ import LightingModel from '../core/LightingModel.js';
 import { property } from '../core/PropertyNode.js';
 import { float, If, uniform, vec3, vec4 } from '../tsl/TSLBase.js';
 import { positionWorld } from '../accessors/Position.js';
-import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { cameraFar, cameraNear, cameraPosition, cameraViewMatrix } from '../accessors/Camera.js';
 import { Loop } from '../utils/LoopNode.js';
 import { linearDepth, viewZToPerspectiveDepth } from '../display/ViewportDepthNode.js';
+import { modelRadius } from '../accessors/ModelNode.js';
 
 const scatteringDensity = property( 'vec3' );
 const linearDepthRay = property( 'vec3' );
@@ -21,11 +21,7 @@ class VolumetricLightingModel extends LightingModel {
 
 	start( builder ) {
 
-		const { material, object, context } = builder;
-
-		// TODO: Create a node for this
-
-		const maxDistance = object.geometry.boundingSphere.radius * 2;
+		const { material, context } = builder;
 
 		// This approach dynamically changes the direction of the ray,
 		// prioritizing the ray from the camera to the object if it is inside the mesh, and from the object to the camera if it is far away.
@@ -33,7 +29,7 @@ class VolumetricLightingModel extends LightingModel {
 		const startPos = property( 'vec3' );
 		const endPos = property( 'vec3' );
 
-		If( cameraPosition.sub( positionWorld ).length().greaterThan( maxDistance ), () => {
+		If( cameraPosition.sub( positionWorld ).length().greaterThan( modelRadius ), () => {
 
 			startPos.assign( cameraPosition );
 			endPos.assign( positionWorld );
