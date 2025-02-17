@@ -138,7 +138,7 @@ class Box3 {
 	}
 
 	/**
-	 * Computes the world-axis-aligned bounding box of an {@link Object3D}
+	 * Computes the world-axis-aligned bounding box for the given 3D object
 	 * (including its children), accounting for the object's, and children's,
 	 * world transforms. The function may result in a larger box than strictly necessary.
 	 *
