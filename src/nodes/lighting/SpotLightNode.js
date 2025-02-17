@@ -122,7 +122,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		}
 
-		return { color: lightColor, direction: lightDirection };
+		return { lightColor, lightDirection };
 
 	}
 

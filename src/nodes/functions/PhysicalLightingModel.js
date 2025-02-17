@@ -477,8 +477,6 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	start( builder ) {
 
-		super.start( builder );
-
 		if ( this.clearcoat === true ) {
 
 			this.clearcoatRadiance = vec3().toVar( 'clearcoatRadiance' );
@@ -541,6 +539,8 @@ class PhysicalLightingModel extends LightingModel {
 			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, transmission ) );
 
 		}
+
+		super.start( builder );
 
 	}
 
@@ -606,7 +606,6 @@ class PhysicalLightingModel extends LightingModel {
 	 * rect area light nodes.
 	 *
 	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 } ) {
@@ -644,26 +643,24 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( context, stack, builder ) {
+	indirect( builder ) {
 
-		this.indirectDiffuse( context, stack, builder );
-		this.indirectSpecular( context, stack, builder );
-		this.ambientOcclusion( context, stack, builder );
+		this.indirectDiffuse( builder );
+		this.indirectSpecular( builder );
+		this.ambientOcclusion( builder );
 
 	}
 
 	/**
 	 * Implements the indirect diffuse term.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirectDiffuse( { irradiance, reflectedLight } ) {
+	indirectDiffuse( builder ) {
+
+		const { irradiance, reflectedLight } = builder.context;
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
@@ -672,11 +669,11 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect specular term.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirectSpecular( { radiance, iblIrradiance, reflectedLight } ) {
+	indirectSpecular( builder ) {
+
+		const { radiance, iblIrradiance, reflectedLight } = builder.context;
 
 		if ( this.sheen === true ) {
 
@@ -728,11 +725,11 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the ambient occlusion term.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	ambientOcclusion( { ambientOcclusion, reflectedLight } ) {
+	ambientOcclusion( builder ) {
+
+		const { ambientOcclusion, reflectedLight } = builder.context;
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
@@ -761,11 +758,9 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Used for final lighting accumulations depending on the requested features.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( context ) {
+	finish( { context } ) {
 
 		const { outgoingLight } = context;
 

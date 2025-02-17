@@ -6,7 +6,7 @@ import { pointShadow } from './PointShadowNode.js';
 
 export const directPointLight = ( { color, lightVector, cutoffDistance, decayExponent } ) => {
 
-	const direction = lightVector.normalize();
+	const lightDirection = lightVector.normalize();
 	const lightDistance = lightVector.length();
 
 	const attenuation = getDistanceAttenuation( {
@@ -17,7 +17,7 @@ export const directPointLight = ( { color, lightVector, cutoffDistance, decayExp
 
 	const lightColor = color.mul( attenuation );
 
-	return { direction, color: lightColor };
+	return { lightDirection, lightColor };
 
 };
 

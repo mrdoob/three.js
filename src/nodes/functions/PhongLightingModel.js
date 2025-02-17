@@ -82,11 +82,11 @@ class PhongLightingModel extends BasicLightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
+	indirect( builder ) {
+
+		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 

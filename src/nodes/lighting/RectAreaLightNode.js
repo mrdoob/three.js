@@ -86,9 +86,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
-
-		super.setup( builder );
+	setupDirectRectArea( builder ) {
 
 		let ltc_1, ltc_2;
 
@@ -105,20 +103,17 @@ class RectAreaLightNode extends AnalyticLightNode {
 		}
 
 		const { colorNode, light } = this;
-		const lightingModel = builder.context.lightingModel;
 
 		const lightPosition = lightViewPosition( light );
-		const reflectedLight = builder.context.reflectedLight;
 
-		lightingModel.directRectArea( {
+		return {
 			lightColor: colorNode,
 			lightPosition,
 			halfWidth: this.halfWidth,
 			halfHeight: this.halfHeight,
-			reflectedLight,
 			ltc_1,
 			ltc_2
-		}, builder.stack, builder );
+		};
 
 	}
 

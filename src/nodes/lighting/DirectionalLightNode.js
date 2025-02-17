@@ -27,10 +27,10 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 	setupDirect() {
 
-		const color = this.colorNode;
-		const direction = lightTargetDirection( this.light );
+		const lightColor = this.colorNode;
+		const lightDirection = lightTargetDirection( this.light );
 
-		return { direction, color };
+		return { lightDirection, lightColor };
 
 	}
 

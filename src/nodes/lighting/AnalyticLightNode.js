@@ -126,13 +126,12 @@ class AnalyticLightNode extends LightingNode {
 	/**
 	 * Sets up the direct lighting for the analytic light node.
 	 *
+	 * @abstract
 	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
 	 */
-	setupDirect( /*builder*/ ) {
+	setupDirect( /*builder*/ ) { }
 
-		console.error( 'AnalyticLightNode: .setupDirect() not implemented.' );
-
-	}
+	setupDirectRectArea( /*builder*/ ) { }
 
 	/**
 	 * Setups the shadow node for this light. The method exists so concrete light classes
@@ -218,7 +217,20 @@ class AnalyticLightNode extends LightingNode {
 
 		}
 
-		builder.lightsNode.setupDirectLight( builder, this, this.setupDirect( builder ) );
+		const directLightData = this.setupDirect( builder );
+		const directRectAreaLightData = this.setupDirectRectArea( builder );
+
+		if ( directLightData ) {
+
+			builder.lightsNode.setupDirectLight( builder, this, directLightData );
+
+		}
+
+		if ( directRectAreaLightData ) {
+
+			builder.lightsNode.setupDirectRectAreaLight( builder, this, directRectAreaLightData );
+
+		}
 
 	}
 

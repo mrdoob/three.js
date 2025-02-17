@@ -242,17 +242,26 @@ class LightsNode extends Node {
 	 * @param {Object} builder - The builder object containing the context and stack.
 	 * @param {Object} lightNode - The light node.
 	 * @param {Object} lightData - The light object containing color and direction properties.
-	 * @param {Node<color>} lightData.color - The color of the light.
-	 * @param {Node<vec3>} lightData.direction - The direction of the light.
 	 */
-	setupDirectLight( builder, lightNode, { color, direction } ) {
+	setupDirectLight( builder, lightNode, lightData ) {
 
 		const { lightingModel, reflectedLight } = builder.context;
 
 		lightingModel.direct( {
+			...lightData,
 			lightNode,
-			lightDirection: direction,
-			lightColor: color,
+			reflectedLight
+		}, builder );
+
+	}
+
+	setupDirectRectAreaLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.directRectArea( {
+			...lightData,
+			lightNode,
 			reflectedLight
 		}, builder );
 
@@ -275,7 +284,7 @@ class LightsNode extends Node {
 
 	}
 
-	getLightsNode( builder ) {
+	getLightNodes( builder ) {
 
 		if ( this._lightNodes === null ) this.setupLightsNode( builder );
 
@@ -292,6 +301,12 @@ class LightsNode extends Node {
 	 * @return {Node<vec3>} A node representing the outgoing light.
 	 */
 	setup( builder ) {
+
+		const currentLightsNode = builder.lightsNode;
+
+		builder.lightsNode = this;
+
+		//
 
 		let outgoingLightNode = this.outgoingLightNode;
 
@@ -346,7 +361,7 @@ class LightsNode extends Node {
 
 			//
 
-			lightingModel.finish( context, stack, builder );
+			lightingModel.finish( builder );
 
 			//
 
@@ -357,6 +372,10 @@ class LightsNode extends Node {
 			properties.nodes = [];
 
 		}
+
+		//
+
+		builder.lightsNode = currentLightsNode;
 
 		return outgoingLightNode;
 

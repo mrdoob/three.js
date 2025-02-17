@@ -6,6 +6,7 @@ import { cameraFar, cameraNear, cameraPosition, cameraViewMatrix } from '../acce
 import { Loop } from '../utils/LoopNode.js';
 import { linearDepth, viewZToPerspectiveDepth } from '../display/ViewportDepthNode.js';
 import { modelRadius } from '../accessors/ModelNode.js';
+import { LTC_Evaluate_Volume } from './BSDF/LTC.js';
 
 const scatteringDensity = property( 'vec3' );
 const linearDepthRay = property( 'vec3' );
@@ -119,6 +120,38 @@ class VolumetricLightingModel extends LightingModel {
 
 	}
 
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight }, builder ) {
+
+		const depthNode = builder.material.depthNode;
+		const positionView = builder.context.positionView;
+
+		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
+		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
+		const p2 = lightPosition.sub( halfWidth ).add( halfHeight );
+		const p3 = lightPosition.add( halfWidth ).add( halfHeight );
+
+		const P = positionView.toVar();
+
+		const directLight = lightColor.xyz.mul( LTC_Evaluate_Volume( { P, p0, p1, p2, p3 } ) ).pow( 1.5 );
+
+		if ( depthNode !== null ) {
+
+			const linearDepthNode = linearDepth( depthNode );
+
+			If( linearDepthNode.greaterThanEqual( linearDepthRay ), () => {
+
+				scatteringDensity.addAssign( directLight );
+
+			} );
+
+		} else {
+
+			scatteringDensity.addAssign( directLight );
+
+		}
+
+	}
+
 	direct( { lightNode, lightColor }, builder ) {
 
 		const depthNode = builder.material.depthNode;
@@ -150,9 +183,9 @@ class VolumetricLightingModel extends LightingModel {
 
 	}
 
-	finish( { outgoingLight } ) {
+	finish( builder ) {
 
-		outgoingLight.assign( outgoingRayLight );
+		builder.context.outgoingLight.assign( outgoingRayLight );
 
 	}
 
