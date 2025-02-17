@@ -163,6 +163,10 @@ h3 {
 		padding-left: 64px;
 	}
 
+	ol.linenums .selected {
+		background-color: #ddd;
+	}
+
 	code {
 		display: inline-block;
 		vertical-align: middle;
@@ -213,6 +217,10 @@ h3 {
 
 		.link-anchor {
 			color: #555;
+		}
+
+		ol.linenums .selected {
+			background-color: #444;
 		}
 	
 	}

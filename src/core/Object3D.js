@@ -58,6 +58,7 @@ class Object3D extends EventDispatcher {
 		/**
 		 * The ID of the 3D object.
 		 *
+		 * @name Object3D#id
 		 * @type {number}
 		 * @readonly
 		 */
