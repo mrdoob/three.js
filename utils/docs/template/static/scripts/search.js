@@ -2,12 +2,10 @@ const contentContainer = document.querySelector( '#page-content' );
 const searchContainer = document.querySelector( '#search-content' );
 const resultBox = document.querySelector( '#search-result' );
 
-// eslint-disable-next-line no-unused-vars
 function hideSearch() {
 
 	searchContainer.style.display = 'none';
 	contentContainer.style.display = 'block';
-
 
 }
 
@@ -99,13 +97,7 @@ function getSearchResult( list, keys, searchKey ) {
 
 	const result = fuse.search( searchKey );
 
-	if ( result.length > 20 ) {
-
-		return result.slice( 0, 20 );
-
-	}
-
-	return result;
+	return result.slice( 0, 20 );
 
 }
 
@@ -122,8 +114,6 @@ async function search( value ) {
 	}
 
 	showSearch();
-
-	const keys = [ 'title', 'description' ];
 
 	if ( searchData === undefined ) {
 
@@ -144,6 +134,7 @@ async function search( value ) {
 
 	}
 
+	const keys = [ 'title' ];
 	const result = getSearchResult( searchData, keys, value );
 
 	if ( ! result.length ) {
@@ -154,6 +145,6 @@ async function search( value ) {
 
 	}
 
-	resultBox.innerHTML = buildSearchResult( result );
+	showResultText( buildSearchResult( result ) );
 
 }
