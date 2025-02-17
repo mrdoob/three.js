@@ -1,5 +1,5 @@
 import { TextureLoader } from 'three';
-import { Fn, int, ivec2, textureLoad, screenCoordinate } from 'three/tsl';
+import { Fn, int, ivec2, textureLoad } from 'three/tsl';
 
 let bayer16Texture = null;
 
