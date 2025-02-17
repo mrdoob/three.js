@@ -285,7 +285,7 @@ class Box3 {
 	}
 
 	/**
-	 * Expands the boundaries of this box to include an {@link Object3D|object} and
+	 * Expands the boundaries of this box to include an {@link Object3D} and
 	 * its children, accounting for the object's, and children's, world
 	 * transforms. The function may result in a larger box than strictly
 	 * necessary (unless the precise parameter is set to true).
@@ -643,7 +643,7 @@ class Box3 {
 	}
 
 	/**
-	 * Computes the union of this box and another {@link Box3|box}, setting the upper
+	 * Computes the union of this box and another and the given one, setting the upper
 	 * bound of this box to the greater of the two boxes' upper bounds and the
 	 * lower bound of this box to the lesser of the two boxes' lower bounds.
 	 *
