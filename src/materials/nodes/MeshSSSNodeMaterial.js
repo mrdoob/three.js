@@ -42,10 +42,9 @@ class SSSLightingModel extends PhysicalLightingModel {
 	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
 	 *
 	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	direct( { lightDirection, lightColor, reflectedLight }, stack, builder ) {
+	direct( { lightDirection, lightColor, reflectedLight }, builder ) {
 
 		if ( this.useSSS === true ) {
 
@@ -61,7 +60,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 
 		}
 
-		super.direct( { lightDirection, lightColor, reflectedLight }, stack, builder );
+		super.direct( { lightDirection, lightColor, reflectedLight }, builder );
 
 	}
 
