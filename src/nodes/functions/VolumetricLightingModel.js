@@ -79,6 +79,8 @@ class VolumetricLightingModel extends LightingModel {
 
 				linearDepthRay.assign( linearDepth( viewZToPerspectiveDepth( positionViewRay.z, cameraNear, cameraFar ) ) );
 
+				context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
+
 			}
 
 			context.positionWorld = positionRay;
@@ -122,13 +124,11 @@ class VolumetricLightingModel extends LightingModel {
 
 	scaterringLight( lightColor, builder ) {
 
-		const depthNode = builder.material.depthNode;
+		const sceneDepthNode = builder.context.sceneDepthNode;
 
-		if ( depthNode !== null ) {
+		if ( sceneDepthNode ) {
 
-			const linearDepthNode = linearDepth( depthNode );
-
-			If( linearDepthNode.greaterThanEqual( linearDepthRay ), () => {
+			If( sceneDepthNode.greaterThanEqual( linearDepthRay ), () => {
 
 				scatteringDensity.addAssign( lightColor );
 
@@ -142,21 +142,6 @@ class VolumetricLightingModel extends LightingModel {
 
 	}
 
-	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight }, builder ) {
-
-		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
-		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
-		const p2 = lightPosition.sub( halfWidth ).add( halfHeight );
-		const p3 = lightPosition.add( halfWidth ).add( halfHeight );
-
-		const P = builder.context.positionView;
-
-		const directLight = lightColor.xyz.mul( LTC_Evaluate_Volume( { P, p0, p1, p2, p3 } ) ).pow( 1.5 );
-
-		this.scaterringLight( directLight, builder );
-
-	}
-
 	direct( { lightNode, lightColor }, builder ) {
 
 		// Ignore lights with infinite distance
@@ -167,6 +152,21 @@ class VolumetricLightingModel extends LightingModel {
 
 		const directLight = lightColor.xyz.toVar();
 		directLight.mulAssign( lightNode.shadowNode ); // it no should be necessary if used in the same render pass
+
+		this.scaterringLight( directLight, builder );
+
+	}
+
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight }, builder ) {
+
+		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
+		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
+		const p2 = lightPosition.sub( halfWidth ).add( halfHeight );
+		const p3 = lightPosition.add( halfWidth ).add( halfHeight );
+
+		const P = builder.context.positionView;
+
+		const directLight = lightColor.xyz.mul( LTC_Evaluate_Volume( { P, p0, p1, p2, p3 } ) ).pow( 1.5 );
 
 		this.scaterringLight( directLight, builder );
 
