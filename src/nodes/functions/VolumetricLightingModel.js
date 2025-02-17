@@ -37,7 +37,7 @@ class VolumetricLightingModel extends LightingModel {
 		// This approach dynamically changes the direction of the ray,
 		// prioritizing the ray from the camera to the object if it is inside the mesh, and from the object to the camera if it is far away.
 
-		If( cameraPosition.sub( positionWorld ).length().greaterThan( modelRadius ), () => {
+		If( cameraPosition.sub( positionWorld ).length().greaterThan( modelRadius.mul( 2 ) ), () => {
 
 			startPos.assign( cameraPosition );
 			endPos.assign( positionWorld );
