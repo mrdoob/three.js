@@ -123,7 +123,7 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 250 );
 				camera.position.set( 0, 5, - 15 );
 
 				// Volumetric Fog Area
@@ -212,6 +212,8 @@
 				scene.add( meshKnot );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 200;
 				controls.target.copy( meshKnot.position );
 				controls.update();
 
