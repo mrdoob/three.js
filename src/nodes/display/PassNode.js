@@ -314,6 +314,10 @@ class PassNode extends TempNode {
 		 */
 		this._mrt = null;
 
+		this._layers = null;
+
+		this._resolution = 1;
+
 		/**
 		 * This flag can be used for type testing.
 		 *
@@ -331,6 +335,47 @@ class PassNode extends TempNode {
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
+
+	}
+
+	/**
+	 * Sets the resolution for the pass.
+	 * The resolution is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
+	 * @return {PassNode} A reference to this pass.
+	 */
+	setResolution( resolution ) {
+
+		this._resolution = resolution;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the current resolution of the pass.
+	 *
+	 * @return {number} The current resolution. A value of `1` means full resolution.
+	 * @default 1
+	 */
+	getResolution() {
+
+		return this._resolution;
+
+	}
+
+	setLayers( layers ) {
+
+		this._layers = layers;
+
+		return this;
+
+	}
+
+	getLayers() {
+
+		return this._layers;
 
 	}
 
@@ -591,9 +636,16 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentMask = camera.layers.mask;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
+
+		if ( this._layers !== null ) {
+
+			camera.layers.mask = this._layers.mask;
+
+		}
 
 		for ( const name in this._previousTextures ) {
 
@@ -609,6 +661,8 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 
+		camera.layers.mask = currentMask;
+
 	}
 
 	/**
@@ -622,8 +676,8 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio;
-		const effectiveHeight = this._height * this._pixelRatio;
+		const effectiveWidth = this._width * this._pixelRatio * this._resolution;
+		const effectiveHeight = this._height * this._pixelRatio * this._resolution;
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 

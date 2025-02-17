@@ -19,14 +19,14 @@ class LightingContextNode extends ContextNode {
 	/**
 	 * Constructs a new lighting context node.
 	 *
-	 * @param {LightsNode} node - The lights node.
+	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {?LightingModel} [lightingModel=null] - The current lighting model.
 	 * @param {?Node<vec3>} [backdropNode=null] - A backdrop node.
 	 * @param {?Node<float>} [backdropAlphaNode=null] - A backdrop alpha node.
 	 */
-	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
+	constructor( lightsNode, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
-		super( node );
+		super( lightsNode );
 
 		/**
 		 * The current lighting model.

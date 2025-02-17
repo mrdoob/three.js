@@ -11,54 +11,56 @@ class LightingModel {
 	 * which are later used in the evaluation process.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	start( /*input, stack, builder*/ ) { }
+	start( builder ) {
+
+		// lights ( direct )
+
+		builder.lightsNode.setupLights( builder, builder.lightsNode.getLightNodes( builder ) );
+
+		// indirect
+
+		this.indirect( builder );
+
+	}
 
 	/**
 	 * This method is intended for executing final tasks like final updates
 	 * to the outgoing light.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( /*input, stack, builder*/ ) { }
+	finish( /*builder*/ ) { }
 
 	/**
 	 * This method is intended for implementing the direct light term and
 	 * executed during the build process of directional, point and spot light nodes.
 	 *
 	 * @abstract
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	direct( /*input, stack, builder*/ ) { }
+	direct( /*lightData, builder*/ ) { }
 
 	/**
 	 * This method is intended for implementing the direct light term for
 	 * rect area light nodes.
 	 *
 	 * @abstract
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	directRectArea( /*input, stack, builder*/ ) {}
+	directRectArea( /*lightData, builder*/ ) {}
 
 	/**
 	 * This method is intended for implementing the indirect light term.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( /*input, stack, builder*/ ) { }
+	indirect( /*builder*/ ) { }
 
 	/**
 	 * This method is intended for implementing the ambient occlusion term.
@@ -66,8 +68,6 @@ class LightingModel {
 	 * model in its indirect term.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	ambientOcclusion( /*input, stack, builder*/ ) { }

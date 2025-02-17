@@ -3,6 +3,9 @@ import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { Sphere } from '../../math/Sphere.js';
+
+const _sphere = /*@__PURE__*/ new Sphere();
 
 /**
  * This node can be used to access transformation related metrics of 3D objects.
@@ -85,6 +88,10 @@ class Object3DNode extends Node {
 
 			return 'vec3';
 
+		} else if ( scope === Object3DNode.RADIUS ) {
+
+			return 'float';
+
 		}
 
 	}
@@ -131,6 +138,16 @@ class Object3DNode extends Node {
 
 			uniformNode.value.applyMatrix4( camera.matrixWorldInverse );
 
+		} else if ( scope === Object3DNode.RADIUS ) {
+
+			const geometry = frame.object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+			uniformNode.value = _sphere.radius;
+
 		}
 
 	}
@@ -153,6 +170,10 @@ class Object3DNode extends Node {
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
 			this._uniformNode.nodeType = 'vec3';
+
+		} else if ( scope === Object3DNode.RADIUS ) {
+
+			this._uniformNode.nodeType = 'float';
 
 		}
 
@@ -183,6 +204,7 @@ Object3DNode.POSITION = 'position';
 Object3DNode.SCALE = 'scale';
 Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
+Object3DNode.RADIUS = 'radius';
 
 export default Object3DNode;
 
@@ -235,3 +257,13 @@ export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.S
  * @returns {Object3DNode<vec3>}
  */
 export const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+
+/**
+ * TSL function for creating an object 3D node that represents the object's radius.
+ *
+ * @tsl
+ * @function
+ * @param {?Object3D} [object3d=null] - The 3D object.
+ * @returns {Object3DNode<vec3>}
+ */
+export const objectRadius = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.RADIUS );

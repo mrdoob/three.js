@@ -92,6 +92,14 @@ export const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCAL
 export const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 
 /**
+ * TSL object that represents the object's radius.
+ *
+ * @tsl
+ * @type {ModelNode<float>}
+ */
+export const modelRadius = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.RADIUS );
+
+/**
  * TSL object that represents the object's normal matrix.
  *
  * @tsl

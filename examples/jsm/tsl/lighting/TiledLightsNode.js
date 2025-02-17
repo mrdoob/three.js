@@ -226,12 +226,12 @@ class TiledLightsNode extends LightsNode {
 
 				const { color, decay, viewPosition, distance } = this.getLightData( lightIndex.sub( 1 ) );
 
-				directPointLight( {
+				builder.lightsNode.setupDirectLight( builder, directPointLight( {
 					color,
-					lightViewPosition: viewPosition,
 					cutoffDistance: distance,
-					decayExponent: decay
-				} ).append();
+					decayExponent: decay,
+					lightViewPosition: viewPosition
+				} ) );
 
 			} );
 

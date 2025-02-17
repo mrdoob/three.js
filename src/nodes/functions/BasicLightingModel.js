@@ -26,15 +26,13 @@ class BasicLightingModel extends LightingModel {
 	/**
 	 * Implements the baked indirect lighting with its modulation.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( context, stack, builder ) {
+	indirect( { context } ) {
 
 		const ambientOcclusion = context.ambientOcclusion;
 		const reflectedLight = context.reflectedLight;
-		const irradianceLightMap = builder.context.irradianceLightMap;
+		const irradianceLightMap = context.irradianceLightMap;
 
 		reflectedLight.indirectDiffuse.assign( vec4( 0.0 ) );
 
@@ -61,13 +59,12 @@ class BasicLightingModel extends LightingModel {
 	/**
 	 * Implements the environment mapping.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( context, stack, builder ) {
+	finish( builder ) {
 
-		const material = builder.material;
+		const { material, context } = builder;
+
 		const outgoingLight = context.outgoingLight;
 		const envNode = builder.context.environment;
 
