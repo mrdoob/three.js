@@ -1160,11 +1160,11 @@ class NodeBuilder {
 
 			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
 
-		} else if ( typeLength === 4 ) {
+		} else if ( typeLength === 4 && type !== 'mat2' ) {
 
 			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
 
-		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
+		} else if ( typeLength >= 4 && value && ( value.isMatrix2 || value.isMatrix3 || value.isMatrix4 ) ) {
 
 			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
