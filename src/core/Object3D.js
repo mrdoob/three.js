@@ -22,18 +22,41 @@ const _xAxis = /*@__PURE__*/ new Vector3( 1, 0, 0 );
 const _yAxis = /*@__PURE__*/ new Vector3( 0, 1, 0 );
 const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 
+/**
+ * Fires when the object has been added to its parent object.
+ *
+ * @event Object3D#added
+ * @type {Object}
+ */
 const _addedEvent = { type: 'added' };
+
+/**
+ * Fires when the object has been removed from its parent object.
+ *
+ * @event Object3D#removed
+ * @type {Object}
+ */
 const _removedEvent = { type: 'removed' };
 
+/**
+ * Fires when a new child object has been added.
+ *
+ * @event Object3D#childadded
+ * @type {Object}
+ */
 const _childaddedEvent = { type: 'childadded', child: null };
+
+/**
+ * Fires when a new child object has been added.
+ *
+ * @event Object3D#childremoved
+ * @type {Object}
+ */
 const _childremovedEvent = { type: 'childremoved', child: null };
 
 /**
  * This is the base class for most objects in three.js and provides a set of
  * properties and methods for manipulating objects in 3D space.
- *
- * Note that this can be used for grouping objects via the `add()` method which
- * adds the object as a child, however it is better to use {@link Group} for this.
  *
  * @augments EventDispatcher
  */
@@ -666,6 +689,8 @@ class Object3D extends EventDispatcher {
 	 * objects may be added. Any current parent on an object passed in here will be
 	 * removed, since an object can have at most one parent.
 	 *
+	 * @fires Object3D#added
+	 * @fires Object3D#childadded
 	 * @param {Object3D} object - The 3D object to add.
 	 * @return {Object3D} A reference to this instance.
 	 */
@@ -716,6 +741,8 @@ class Object3D extends EventDispatcher {
 	 * Removes the given 3D object as child from this 3D object.
 	 * An arbitrary number of objects may be removed.
 	 *
+	 * @fires Object3D#removed
+	 * @fires Object3D#childremoved
 	 * @param {Object3D} object - The 3D object to remove.
 	 * @return {Object3D} A reference to this instance.
 	 */
@@ -755,6 +782,8 @@ class Object3D extends EventDispatcher {
 	/**
 	 * Removes this 3D object from its current parent.
 	 *
+	 * @fires Object3D#removed
+	 * @fires Object3D#childremoved
 	 * @return {Object3D} A reference to this instance.
 	 */
 	removeFromParent() {
@@ -774,6 +803,8 @@ class Object3D extends EventDispatcher {
 	/**
 	 * Removes all child objects.
 	 *
+	 * @fires Object3D#removed
+	 * @fires Object3D#childremoved
 	 * @return {Object3D} A reference to this instance.
 	 */
 	clear() {
@@ -786,6 +817,8 @@ class Object3D extends EventDispatcher {
 	 * Adds the given 3D object as a child of this 3D object, while maintaining the object's world
 	 * transform. This method does not support scene graphs having non-uniformly-scaled nodes(s).
 	 *
+	 * @fires Object3D#added
+	 * @fires Object3D#childadded
 	 * @param {Object3D} object - The 3D object to attach.
 	 * @return {Object3D} A reference to this instance.
 	 */
