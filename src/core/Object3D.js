@@ -978,6 +978,13 @@ class Object3D extends EventDispatcher {
 	 */
 	raycast( /* raycaster, intersects */ ) {}
 
+	/**
+	 * Executes the callback on this 3D object and all descendants.
+	 *
+	 * Note: Modifying the scene graph inside the callback is discouraged.
+	 *
+	 * @param {Function} callback - A callback function that allows to process the current 3D object.
+	 */
 	traverse( callback ) {
 
 		callback( this );
@@ -992,6 +999,14 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	/**
+	 * Like {@link Object3D#traverse}, but the callback will only be executed for visible 3D objects.
+	 * Descendants of invisible 3D objects are not traversed.
+	 *
+	 * Note: Modifying the scene graph inside the callback is discouraged.
+	 *
+	 * @param {Function} callback - A callback function that allows to process the current 3D object.
+	 */
 	traverseVisible( callback ) {
 
 		if ( this.visible === false ) return;
@@ -1008,6 +1023,13 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	/**
+	 * Like {@link Object3D#traverse}, but the callback will only be executed for all ancestors.
+	 *
+	 * Note: Modifying the scene graph inside the callback is discouraged.
+	 *
+	 * @param {Function} callback - A callback function that allows to process the current 3D object.
+	 */
 	traverseAncestors( callback ) {
 
 		const parent = this.parent;
