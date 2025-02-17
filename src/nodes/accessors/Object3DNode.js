@@ -148,8 +148,6 @@ class Object3DNode extends Node {
 
 			uniformNode.value = _sphere.radius;
 
-			console.log( uniformNode.value );
-
 		}
 
 	}

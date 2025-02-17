@@ -1,9 +1,12 @@
 import NodeMaterial from './NodeMaterial.js';
 import VolumetricLightingModel from '../../nodes/functions/VolumetricLightingModel.js';
 import { BackSide } from '../../constants.js';
-import { output, vec4 } from '../../nodes/TSL.js';
 
-
+/**
+ * Volume node material.
+ *
+ * @augments NodeMaterial
+ */
 class VolumeNodeMaterial extends NodeMaterial {
 
 	static get type() {
@@ -30,9 +33,20 @@ class VolumeNodeMaterial extends NodeMaterial {
 		 */
 		this.isVolumeNodeMaterial = true;
 
+		/**
+		 * Number of steps used for raymarching.
+		 *
+		 * @type {number}
+		 * @default 25
+		 */
 		this.steps = 25;
-		this.stepSize = 1.0;
 
+		/**
+		 * Node used for scattering calculations.
+		 *
+		 * @type {Function<vec4>|FunctionNode<vec4>}
+		 * @default null
+		 */
 		this.scatteringNode = null;
 
 		this.lights = true;

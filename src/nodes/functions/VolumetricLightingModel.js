@@ -11,6 +11,14 @@ const scatteringDensity = property( 'vec3' );
 const linearDepthRay = property( 'vec3' );
 const outgoingRayLight = property( 'vec3' );
 
+/**
+ * VolumetricLightingModel class extends the LightingModel to implement volumetric lighting effects.
+ * This model calculates the scattering and transmittance of light through a volumetric medium.
+ * It dynamically adjusts the direction of the ray based on the camera and object positions.
+ * The model supports custom scattering and depth nodes to enhance the lighting effects.
+ *
+ * @augments LightingModel
+ */
 class VolumetricLightingModel extends LightingModel {
 
 	constructor() {
@@ -23,11 +31,11 @@ class VolumetricLightingModel extends LightingModel {
 
 		const { material, context } = builder;
 
-		// This approach dynamically changes the direction of the ray,
-		// prioritizing the ray from the camera to the object if it is inside the mesh, and from the object to the camera if it is far away.
-
 		const startPos = property( 'vec3' );
 		const endPos = property( 'vec3' );
+
+		// This approach dynamically changes the direction of the ray,
+		// prioritizing the ray from the camera to the object if it is inside the mesh, and from the object to the camera if it is far away.
 
 		If( cameraPosition.sub( positionWorld ).length().greaterThan( modelRadius ), () => {
 
