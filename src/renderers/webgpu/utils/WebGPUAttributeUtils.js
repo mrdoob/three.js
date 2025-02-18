@@ -357,7 +357,7 @@ class WebGPUAttributeUtils {
 	 *
 	 * @private
 	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
-	 * @return {string} The vertex format (e.g. 'float32x3').
+	 * @return {string|undefined} The vertex format (e.g. 'float32x3').
 	 */
 	_getVertexFormat( geometryAttribute ) {
 

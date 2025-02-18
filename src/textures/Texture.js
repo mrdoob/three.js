@@ -30,7 +30,7 @@ class Texture extends EventDispatcher {
 	/**
 	 * Constructs a new texture.
 	 *
-	 * @param {Object} [image=Texture.DEFAULT_IMAGE] - The image holding the texture data.
+	 * @param {?Object} [image=Texture.DEFAULT_IMAGE] - The image holding the texture data.
 	 * @param {number} [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
 	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
 	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
@@ -352,7 +352,7 @@ class Texture extends EventDispatcher {
 	/**
 	 * The image object holding the texture data.
 	 *
-	 * @type {Object}
+	 * @type {?Object}
 	 */
 	get image() {
 

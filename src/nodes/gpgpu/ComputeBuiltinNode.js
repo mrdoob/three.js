@@ -91,10 +91,11 @@ class ComputeBuiltinNode extends Node {
 	 * Whether the current node builder has the builtin or not.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the builder has the builtin or not.
 	 */
 	hasBuiltin( builder ) {
 
-		builder.hasBuiltin( this._builtinName );
+		return builder.hasBuiltin( this._builtinName );
 
 	}
 
