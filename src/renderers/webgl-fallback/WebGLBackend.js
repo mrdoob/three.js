@@ -1076,6 +1076,8 @@ class WebGLBackend extends Backend {
 
 				if ( object._multiDrawInstances !== null ) {
 
+					// @deprecated, r170
+					warnOnce( 'THREE.WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r180. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
