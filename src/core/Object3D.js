@@ -1194,7 +1194,7 @@ class Object3D extends EventDispatcher {
 	/**
 	 * Serializes the 3D object into JSON.
 	 *
-	 * @param {?(Object|String)} meta - An optional value holding meta information about the serialization.
+	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized 3D object.
 	 * @see {@link ObjectLoader#parse}
 	 */
