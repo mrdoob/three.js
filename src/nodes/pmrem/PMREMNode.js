@@ -37,7 +37,7 @@ function _generateCubeUVSize( imageHeight ) {
  * @param {Texture} texture - The texture to create the PMREM for.
  * @param {Renderer} renderer - The renderer.
  * @param {PMREMGenerator} generator - The PMREM generator.
- * @return {Texture} The PMREM.
+ * @return {?Texture} The PMREM.
  */
 function _getPMREMFromTexture( texture, renderer, generator ) {
 
@@ -177,7 +177,7 @@ class PMREMNode extends TempNode {
 		 * Reference to a PMREM generator.
 		 *
 		 * @private
-		 * @type {PMREMGenerator}
+		 * @type {?PMREMGenerator}
 		 * @default null
 		 */
 		this._generator = null;

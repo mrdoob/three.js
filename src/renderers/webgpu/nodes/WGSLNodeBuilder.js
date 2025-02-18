@@ -793,7 +793,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * Returns the native shader operator name for a given generic name.
 	 *
 	 * @param {string} op - The operator name to resolve.
-	 * @return {string} The resolved operator name.
+	 * @return {?string} The resolved operator name.
 	 */
 	getFunctionOperator( op ) {
 
@@ -985,7 +985,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @param {string} name - The builtin name.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {string} Whether the given builtin is defined in the given shader stage or not.
+	 * @return {boolean} Whether the given builtin is defined in the given shader stage or not.
 	 */
 	hasBuiltin( name, shaderStage = this.shaderStage ) {
 
@@ -1847,7 +1847,7 @@ ${ flowData.code }
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @param {string} method - The method name to resolve.
-	 * @param {string} [output=null] - An optional output.
+	 * @param {?string} [output=null] - An optional output.
 	 * @return {string} The resolved WGSL method name.
 	 */
 	getMethod( method, output = null ) {

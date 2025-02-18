@@ -194,8 +194,8 @@ class Material extends EventDispatcher {
 		 *
 		 * This property has only an effect when using custom blending with `ConstantAlpha` or `OneMinusConstantAlpha`.
 		 *
-		 * @type {Color}
-		 * @default (0,0,0)
+		 * @type {number}
+		 * @default 0
 		 */
 		this.blendAlpha = 0;
 
