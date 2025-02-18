@@ -172,6 +172,7 @@ h3 {
 		vertical-align: middle;
 		border-radius: 4px;
 		padding: 0px 5px;
+		background-color: #F5F5F5;
 	}
 
 	pre {
@@ -181,11 +182,8 @@ h3 {
 		line-height: calc(var(--line-height) - 1px);
 	}
 
-	pre > code {
-		display: block;
-		box-sizing: border-box;
-		border-radius: 0;
-		padding: calc(var(--page-padding) - 6px) var(--page-padding);
+	pre code {
+		background-color: inherit;
 	}
 
 	.link-anchor {
@@ -220,6 +218,10 @@ h3 {
 		}
 
 		ol.linenums .selected {
+			background-color: #444;
+		}
+
+		code {
 			background-color: #444;
 		}
 	
