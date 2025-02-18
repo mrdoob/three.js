@@ -14,10 +14,12 @@
             "src/core/EventDispatcher.js",
             "src/loaders/nodes", 
             "src/materials/nodes", 
+            "src/materials/Material.js", 
             "src/nodes", 
             "src/math/Box3.js", 
             "src/renderers/common", 
-            "src/renderers/webgpu" 
+            "src/renderers/webgpu" ,
+            "src/textures/Texture.js" 
         ]
     }
 }
