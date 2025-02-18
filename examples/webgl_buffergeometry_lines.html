@@ -51,6 +51,7 @@
 				scene = new THREE.Scene();
 
 				timer = new Timer();
+				timer.connect( document );
 
 				const geometry = new THREE.BufferGeometry();
 				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
