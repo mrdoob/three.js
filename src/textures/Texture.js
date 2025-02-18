@@ -443,7 +443,7 @@ class Texture extends EventDispatcher {
 	/**
 	 * Serializes the texture into JSON.
 	 *
-	 * @param {?(Object|String)} meta - An optional value holding meta information about the serialization.
+	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized texture.
 	 * @see {@link ObjectLoader#parse}
 	 */
@@ -666,7 +666,7 @@ Texture.DEFAULT_IMAGE = null;
  * The default mapping for all textures.
  *
  * @static
- * @type {Number}
+ * @type {number}
  * @default UVMapping
  */
 Texture.DEFAULT_MAPPING = UVMapping;
@@ -675,7 +675,7 @@ Texture.DEFAULT_MAPPING = UVMapping;
  * The default anisotropy value for all textures.
  *
  * @static
- * @type {Number}
+ * @type {number}
  * @default 1
  */
 Texture.DEFAULT_ANISOTROPY = 1;

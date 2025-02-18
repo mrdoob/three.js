@@ -581,7 +581,7 @@ class Material extends EventDispatcher {
 	/**
 	 * Serializes the material into JSON.
 	 *
-	 * @param {?(Object|String)} meta - An optional value holding meta information about the serialization.
+	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized material.
 	 * @see {@link ObjectLoader#parse}
 	 */
