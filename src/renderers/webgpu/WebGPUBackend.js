@@ -1223,7 +1223,7 @@ class WebGPUBackend extends Backend {
 
 				if ( drawInstances !== null ) {
 
-					// @deprecated, r170
+					// @deprecated, r173
 					warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r180. Append to renderMultiDraw arguments and use indirection.' );
 
 				}
