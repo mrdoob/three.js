@@ -1,7 +1,7 @@
 import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
 
 import {
-	attributeArray, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop,
+	attributeArray, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop, positionView,
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight
 } from 'three/tsl';
 
@@ -226,11 +226,11 @@ class TiledLightsNode extends LightsNode {
 
 				const { color, decay, viewPosition, distance } = this.getLightData( lightIndex.sub( 1 ) );
 
-				builder.lightsNode.setupDirectLight( builder, directPointLight( {
+				builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
 					color,
+					lightVector: viewPosition.sub( positionView ),
 					cutoffDistance: distance,
-					decayExponent: decay,
-					lightViewPosition: viewPosition
+					decayExponent: decay
 				} ) );
 
 			} );
