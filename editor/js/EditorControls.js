@@ -16,31 +16,31 @@ class EditorControls extends THREE.EventDispatcher {
 
 		// internals
 
-		var scope = this;
-		var vector = new THREE.Vector3();
-		var delta = new THREE.Vector3();
-		var box = new THREE.Box3();
+		const scope = this;
+		const vector = new THREE.Vector3();
+		const delta = new THREE.Vector3();
+		const box = new THREE.Box3();
 
-		var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
-		var state = STATE.NONE;
+		const STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+		let state = STATE.NONE;
 
-		var center = this.center;
-		var normalMatrix = new THREE.Matrix3();
-		var pointer = new THREE.Vector2();
-		var pointerOld = new THREE.Vector2();
-		var spherical = new THREE.Spherical();
-		var sphere = new THREE.Sphere();
+		const center = this.center;
+		const normalMatrix = new THREE.Matrix3();
+		const pointer = new THREE.Vector2();
+		const pointerOld = new THREE.Vector2();
+		const spherical = new THREE.Spherical();
+		const sphere = new THREE.Sphere();
 
-		var pointers = [];
-		var pointerPositions = {};
+		const pointers = [];
+		const pointerPositions = {};
 
 		// events
 
-		var changeEvent = { type: 'change' };
+		const changeEvent = { type: 'change' };
 
 		this.focus = function ( target ) {
 
-			var distance;
+			let distance;
 
 			box.setFromObject( target );
 
@@ -70,7 +70,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		this.pan = function ( delta ) {
 
-			var distance = object.position.distanceTo( center );
+			const distance = object.position.distanceTo( center );
 
 			delta.multiplyScalar( distance * scope.panSpeed );
 			delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
@@ -84,7 +84,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		this.zoom = function ( delta ) {
 
-			var distance = object.position.distanceTo( center );
+			const distance = object.position.distanceTo( center );
 
 			delta.multiplyScalar( distance * scope.zoomSpeed );
 
@@ -187,8 +187,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 				case 1:
 
-					var pointerId = pointers[ 0 ];
-					var position = pointerPositions[ pointerId ];
+					const pointerId = pointers[ 0 ];
+					const position = pointerPositions[ pointerId ];
 
 					// minimal placeholder event - allows state correction on pointer-up
 					onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
@@ -225,8 +225,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 			pointer.set( event.clientX, event.clientY );
 
-			var movementX = pointer.x - pointerOld.x;
-			var movementY = pointer.y - pointerOld.y;
+			const movementX = pointer.x - pointerOld.x;
+			const movementY = pointer.y - pointerOld.y;
 
 			if ( state === STATE.ROTATE ) {
 
@@ -287,10 +287,10 @@ class EditorControls extends THREE.EventDispatcher {
 
 		// touch
 
-		var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-		var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+		const touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+		const prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
-		var prevDistance = null;
+		let prevDistance = null;
 
 		function onTouchStart( event ) {
 
@@ -305,7 +305,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 				case 2:
 
-					var position = getSecondPointerPosition( event );
+					const position = getSecondPointerPosition( event );
 
 					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
@@ -326,9 +326,9 @@ class EditorControls extends THREE.EventDispatcher {
 
 			function getClosest( touch, touches ) {
 
-				var closest = touches[ 0 ];
+				let closest = touches[ 0 ];
 
-				for ( var touch2 of touches ) {
+				for ( const touch2 of touches ) {
 
 					if ( closest.distanceTo( touch ) > touch2.distanceTo( touch ) ) closest = touch2;
 
@@ -348,17 +348,17 @@ class EditorControls extends THREE.EventDispatcher {
 
 				case 2:
 
-					var position = getSecondPointerPosition( event );
+					const position = getSecondPointerPosition( event );
 
 					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
-					var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
+					const distance = touches[ 0 ].distanceTo( touches[ 1 ] );
 					scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 					prevDistance = distance;
 
 
-					var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
-					var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );
+					const offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
+					const offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );
 					offset0.x = - offset0.x;
 					offset1.x = - offset1.x;
 
@@ -383,7 +383,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 			delete pointerPositions[ event.pointerId ];
 
-			for ( var i = 0; i < pointers.length; i ++ ) {
+			for ( let i = 0; i < pointers.length; i ++ ) {
 
 				if ( pointers[ i ] == event.pointerId ) {
 
@@ -398,7 +398,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		function isTrackingPointer( event ) {
 
-			for ( var i = 0; i < pointers.length; i ++ ) {
+			for ( let i = 0; i < pointers.length; i ++ ) {
 
 				if ( pointers[ i ] == event.pointerId ) return true;
 
@@ -410,7 +410,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		function trackPointer( event ) {
 
-			var position = pointerPositions[ event.pointerId ];
+			let position = pointerPositions[ event.pointerId ];
 
 			if ( position === undefined ) {
 
@@ -425,7 +425,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		function getSecondPointerPosition( event ) {
 
-			var pointerId = ( event.pointerId === pointers[ 0 ] ) ? pointers[ 1 ] : pointers[ 0 ];
+			const pointerId = ( event.pointerId === pointers[ 0 ] ) ? pointers[ 1 ] : pointers[ 0 ];
 
 			return pointerPositions[ pointerId ];
 

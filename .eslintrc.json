@@ -65,6 +65,9 @@
     "no-duplicate-imports": [
       "error"
     ],
+    "no-var": [
+      "error"
+    ],
     "prefer-spread": "error",
     "valid-jsdoc": [
       "error",

@@ -7,7 +7,7 @@ import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 import { Selector } from './Selector.js';
 
-var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+const _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
 _DEFAULT_CAMERA.position.set( 0, 5, 10 );
 _DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
@@ -168,7 +168,7 @@ Editor.prototype = {
 
 	addObject: function ( object, parent, index ) {
 
-		var scope = this;
+		const scope = this;
 
 		object.traverse( function ( child ) {
 
@@ -207,7 +207,7 @@ Editor.prototype = {
 
 		if ( object.parent === null ) return; // avoid deleting the camera or scene
 
-		var scope = this;
+		const scope = this;
 
 		object.traverse( function ( child ) {
 
@@ -242,7 +242,7 @@ Editor.prototype = {
 
 		if ( Array.isArray( material ) ) {
 
-			for ( var i = 0, l = material.length; i < l; i ++ ) {
+			for ( let i = 0, l = material.length; i < l; i ++ ) {
 
 				this.addMaterialToRefCounter( material[ i ] );
 
@@ -260,9 +260,9 @@ Editor.prototype = {
 
 	addMaterialToRefCounter: function ( material ) {
 
-		var materialsRefCounter = this.materialsRefCounter;
+		const materialsRefCounter = this.materialsRefCounter;
 
-		var count = materialsRefCounter.get( material );
+		let count = materialsRefCounter.get( material );
 
 		if ( count === undefined ) {
 
@@ -282,7 +282,7 @@ Editor.prototype = {
 
 		if ( Array.isArray( material ) ) {
 
-			for ( var i = 0, l = material.length; i < l; i ++ ) {
+			for ( let i = 0, l = material.length; i < l; i ++ ) {
 
 				this.removeMaterialFromRefCounter( material[ i ] );
 
@@ -300,9 +300,9 @@ Editor.prototype = {
 
 	removeMaterialFromRefCounter: function ( material ) {
 
-		var materialsRefCounter = this.materialsRefCounter;
+		const materialsRefCounter = this.materialsRefCounter;
 
-		var count = materialsRefCounter.get( material );
+		let count = materialsRefCounter.get( material );
 		count --;
 
 		if ( count === 0 ) {
@@ -320,10 +320,10 @@ Editor.prototype = {
 
 	getMaterialById: function ( id ) {
 
-		var material;
-		var materials = Object.values( this.materials );
+		let material;
+		const materials = Object.values( this.materials );
 
-		for ( var i = 0; i < materials.length; i ++ ) {
+		for ( let i = 0; i < materials.length; i ++ ) {
 
 			if ( materials[ i ].id === id ) {
 
@@ -381,8 +381,8 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereGeometry( 2, 4, 2 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
+		const geometry = new THREE.SphereGeometry( 2, 4, 2 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object, helper ) {
 
@@ -443,7 +443,7 @@ Editor.prototype = {
 
 		if ( this.helpers[ object.id ] !== undefined ) {
 
-			var helper = this.helpers[ object.id ];
+			const helper = this.helpers[ object.id ];
 			helper.parent.remove( helper );
 			helper.dispose();
 
@@ -475,7 +475,7 @@ Editor.prototype = {
 
 		if ( this.scripts[ object.uuid ] === undefined ) return;
 
-		var index = this.scripts[ object.uuid ].indexOf( script );
+		const index = this.scripts[ object.uuid ].indexOf( script );
 
 		if ( index !== - 1 ) {
 
@@ -489,7 +489,7 @@ Editor.prototype = {
 
 	getObjectMaterial: function ( object, slot ) {
 
-		var material = object.material;
+		let material = object.material;
 
 		if ( Array.isArray( material ) && slot !== undefined ) {
 
@@ -552,7 +552,7 @@ Editor.prototype = {
 
 	selectByUuid: function ( uuid ) {
 
-		var scope = this;
+		const scope = this;
 
 		this.scene.traverse( function ( child ) {
 
@@ -602,7 +602,7 @@ Editor.prototype = {
 		this.scene.environment = null;
 		this.scene.fog = null;
 
-		var objects = this.scene.children;
+		const objects = this.scene.children;
 
 		this.signals.sceneGraphChanged.active = false;
 
@@ -634,8 +634,8 @@ Editor.prototype = {
 
 	fromJSON: async function ( json ) {
 
-		var loader = new THREE.ObjectLoader();
-		var camera = await loader.parseAsync( json.camera );
+		const loader = new THREE.ObjectLoader();
+		const camera = await loader.parseAsync( json.camera );
 
 		const existingUuid = this.camera.uuid;
 		const incomingUuid = camera.uuid;
@@ -667,12 +667,12 @@ Editor.prototype = {
 
 		// scripts clean up
 
-		var scene = this.scene;
-		var scripts = this.scripts;
+		const scene = this.scene;
+		const scripts = this.scripts;
 
-		for ( var key in scripts ) {
+		for ( const key in scripts ) {
 
-			var script = scripts[ key ];
+			const script = scripts[ key ];
 
 			if ( script.length === 0 || scene.getObjectByProperty( 'uuid', key ) === undefined ) {
 

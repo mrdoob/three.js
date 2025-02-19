@@ -77,18 +77,20 @@ export default QUnit.module( 'Animation', () => {
 		// OTHERS
 		QUnit.test( 'smoke test', ( assert ) => {
 
-			var expect = function expect( testIndex, group, bindings, path, cached, roots ) {
+			const expect = function expect( testIndex, group, bindings, path, cached, roots ) {
 
-				var rootNodes = [], pathsOk = true, nodesOk = true;
+				const rootNodes = [];
+				let pathsOk = true;
+				let nodesOk = true;
 
-				for ( var i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+				for ( let i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 					if ( bindings[ i ].path !== path ) pathsOk = false;
 					rootNodes.push( bindings[ i ].rootNode );
 
 				}
 
-				for ( var i = 0, n = roots.length; i !== n; ++ i ) {
+				for ( let i = 0, n = roots.length; i !== n; ++ i ) {
 
 					if ( rootNodes.indexOf( roots[ i ] ) === - 1 ) nodesOk = false;
 

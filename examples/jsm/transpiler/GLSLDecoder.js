@@ -193,7 +193,7 @@ class Tokenizer {
 
 		const remainingCode = this.skip( spaceRegExp );
 
-		for ( var i = 0; i < TokenParserList.length; i ++ ) {
+		for ( let i = 0; i < TokenParserList.length; i ++ ) {
 
 			const parser = TokenParserList[ i ];
 			const result = parser.regexp.exec( remainingCode );

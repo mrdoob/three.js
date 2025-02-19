@@ -77,7 +77,7 @@
 
 			import initJank from 'three/addons/offscreen/jank.js';
 			import init from 'three/addons/offscreen/scene.js';
-			
+
 			// onscreen
 
 			const canvas1 = document.getElementById( 'canvas1' );
@@ -98,8 +98,8 @@
 			// If it's Safari, then check the version because Safari < 17 doesn't support OffscreenCanvas with a WebGL context.
 			if ( isSafari ) {
 
-				var versionMatch = navigator.userAgent.match( /version\/(\d+)/i );
-				var safariVersion = versionMatch ? parseInt( versionMatch[ 1 ] ) : 0;
+				const versionMatch = navigator.userAgent.match( /version\/(\d+)/i );
+				const safariVersion = versionMatch ? parseInt( versionMatch[ 1 ] ) : 0;
 
 				supportOffScreenWebGL = safariVersion >= 17;
 
