@@ -3,8 +3,8 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, UnsignedIntType, IntType, BackSide, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, RenderTarget, Object3D, HalfFloatType, LinearMipMapLinearFilter, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, Euler, LinearSRGBColorSpace, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, PerspectiveCamera, CubeUVReflectionMapping, RGBAFormat, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, WebXRController, RAD2DEG, SRGBColorSpace, PCFShadowMap, Frustum, FrontSide, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, warnOnce, createCanvasElement, ReverseSubtractEquation, SubtractEquation, AddEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, ZeroFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, UnsignedIntType, IntType, Sphere, BackSide, Euler, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, WebXRController, RAD2DEG, SRGBColorSpace, PCFShadowMap, Frustum, FrontSide, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, warnOnce, createCanvasElement, ReverseSubtractEquation, SubtractEquation, AddEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, ZeroFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -1447,7 +1447,7 @@ class Node extends EventDispatcher {
 	 * @param {string} name - The name of the member.
 	 * @return {string} The type of the node.
 	 */
-	getMemberType( /*uilder, name*/ ) {
+	getMemberType( /*builder, name*/ ) {
 
 		return 'void';
 
@@ -3550,7 +3550,7 @@ addMethodChaining( 'convert', convert );
  *
  * const redColor = tintColors.element( 0 );
  *
- * @augments Node
+ * @augments TempNode
  */
 class ArrayNode extends TempNode {
 
@@ -3563,8 +3563,8 @@ class ArrayNode extends TempNode {
 	/**
 	 * Constructs a new array node.
 	 *
-	 * @param {string} [nodeType] - The data type of the elements.
-	 * @param {number} [count] - Size of the array.
+	 * @param {?string} nodeType - The data type of the elements.
+	 * @param {number} count - Size of the array.
 	 * @param {?Array<Node>} [values=null] - Array default values.
 	 */
 	constructor( nodeType, count, values = null ) {
@@ -3596,6 +3596,12 @@ class ArrayNode extends TempNode {
 
 	}
 
+	/**
+	 * Returns the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The type of the node.
+	 */
 	getNodeType( builder ) {
 
 		if ( this.nodeType === null ) {
@@ -3608,12 +3614,24 @@ class ArrayNode extends TempNode {
 
 	}
 
+	/**
+	 * Returns the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The type of the node.
+	 */
 	getElementType( builder ) {
 
 		return this.getNodeType( builder );
 
 	}
 
+	/**
+	 * This method builds the output node and returns the resulting array as a shader string.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The generated shader string.
+	 */
 	generate( builder ) {
 
 		const type = this.getNodeType( builder );
@@ -3951,7 +3969,7 @@ class UniformNode extends InputNode {
  * @tsl
  * @function
  * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {?string} arg2 - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @param {string} [arg2] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
  * @returns {UniformNode}
  */
 const uniform = ( arg1, arg2 ) => {
@@ -7923,7 +7941,7 @@ class BufferAttributeNode extends InputNode {
 		/**
 		 * The buffer type (e.g. `'vec3'`).
 		 *
-		 * @type {string}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.bufferType = bufferType;
@@ -8821,8 +8839,8 @@ class RenderOutputNode extends TempNode {
 	 * Constructs a new render output node.
 	 *
 	 * @param {Node} colorNode - The color node to process.
-	 * @param {number} toneMapping - The tone mapping type.
-	 * @param {string} outputColorSpace - The output color space.
+	 * @param {?number} toneMapping - The tone mapping type.
+	 * @param {?string} outputColorSpace - The output color space.
 	 */
 	constructor( colorNode, toneMapping, outputColorSpace ) {
 
@@ -10581,6 +10599,8 @@ const cameraNormalMatrix = /*@__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalM
  */
 const cameraPosition = /*@__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( renderGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
 
+const _sphere = /*@__PURE__*/ new Sphere();
+
 /**
  * This node can be used to access transformation related metrics of 3D objects.
  * Depending on the selected scope, a different metric is represented as a uniform
@@ -10662,6 +10682,10 @@ class Object3DNode extends Node {
 
 			return 'vec3';
 
+		} else if ( scope === Object3DNode.RADIUS ) {
+
+			return 'float';
+
 		}
 
 	}
@@ -10708,6 +10732,16 @@ class Object3DNode extends Node {
 
 			uniformNode.value.applyMatrix4( camera.matrixWorldInverse );
 
+		} else if ( scope === Object3DNode.RADIUS ) {
+
+			const geometry = frame.object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+			uniformNode.value = _sphere.radius;
+
 		}
 
 	}
@@ -10730,6 +10764,10 @@ class Object3DNode extends Node {
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
 			this._uniformNode.nodeType = 'vec3';
+
+		} else if ( scope === Object3DNode.RADIUS ) {
+
+			this._uniformNode.nodeType = 'float';
 
 		}
 
@@ -10760,6 +10798,7 @@ Object3DNode.POSITION = 'position';
 Object3DNode.SCALE = 'scale';
 Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
+Object3DNode.RADIUS = 'radius';
 
 /**
  * TSL function for creating an object 3D node that represents the object's direction in world space.
@@ -10810,6 +10849,16 @@ const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );
  * @returns {Object3DNode<vec3>}
  */
 const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+
+/**
+ * TSL function for creating an object 3D node that represents the object's radius.
+ *
+ * @tsl
+ * @function
+ * @param {?Object3D} [object3d=null] - The 3D object.
+ * @returns {Object3DNode<vec3>}
+ */
+const objectRadius = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.RADIUS );
 
 /**
  * This type of node is a specialized version of `Object3DNode`
@@ -10893,6 +10942,14 @@ const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCALE );
  * @type {ModelNode<vec3>}
  */
 const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+
+/**
+ * TSL object that represents the object's radius.
+ *
+ * @tsl
+ * @type {ModelNode<float>}
+ */
+const modelRadius = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.RADIUS );
 
 /**
  * TSL object that represents the object's normal matrix.
@@ -11257,13 +11314,61 @@ const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) => {
 
 } );
 
+const _e1$1 = /*@__PURE__*/ new Euler();
+const _m1$1 = /*@__PURE__*/ new Matrix4();
+
 /**
  * TSL object that represents the refraction ratio of the material used for rendering the current object.
  *
  * @tsl
  * @type {UniformNode<float>}
  */
-const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onRenderUpdate( ( { material } ) => material.refractionRatio );
+const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onObjectUpdate( ( { material } ) => material.refractionRatio );
+
+/**
+ * TSL object that represents the intensity of environment maps of PBR materials.
+ * When `material.envMap` is set, the value is `material.envMapIntensity` otherwise `scene.environmentIntensity`.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+const materialEnvIntensity = /*@__PURE__*/ uniform( 1 ).onReference( ( { material } ) => material ).onObjectUpdate( function ( { material, scene } ) {
+
+	return material.envMap ? material.envMapIntensity : scene.environmentIntensity;
+
+} );
+
+/**
+ * TSL object that represents the rotation of environment maps.
+ * When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the
+ * rotation of `scene.environment` instead.
+ *
+ * @tsl
+ * @type {Node<mat4>}
+ */
+const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onReference( function ( frame ) {
+
+	return frame.material;
+
+} ).onObjectUpdate( function ( { material, scene } ) {
+
+	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
+
+	if ( rotation ) {
+
+		_e1$1.copy( rotation );
+
+		_m1$1.makeRotationFromEuler( _e1$1 );
+
+	} else {
+
+		_m1$1.identity();
+
+	}
+
+	return _m1$1;
+
+} );
 
 /**
  * The reflect vector in view space.
@@ -11394,13 +11499,11 @@ class CubeTextureNode extends TextureNode {
 
 		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
 
-			return vec3( uvNode.x.negate(), uvNode.yz );
-
-		} else {
-
-			return uvNode;
+			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
 
 		}
+
+		return materialEnvRotation.mul( uvNode );
 
 	}
 
@@ -11810,7 +11913,7 @@ class ReferenceNode extends Node {
  * @function
  * @param {string} name - The name of the property the node refers to.
  * @param {string} type - The uniform type that should be used to represent the property value.
- * @param {Object} object - The object the property belongs to.
+ * @param {?Object} object - The object the property belongs to.
  * @returns {ReferenceNode}
  */
 const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
@@ -14620,14 +14723,14 @@ class LightingContextNode extends ContextNode {
 	/**
 	 * Constructs a new lighting context node.
 	 *
-	 * @param {LightsNode} node - The lights node.
+	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {?LightingModel} [lightingModel=null] - The current lighting model.
 	 * @param {?Node<vec3>} [backdropNode=null] - A backdrop node.
 	 * @param {?Node<float>} [backdropAlphaNode=null] - A backdrop alpha node.
 	 */
-	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
+	constructor( lightsNode, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
-		super( node );
+		super( lightsNode );
 
 		/**
 		 * The current lighting model.
@@ -16128,7 +16231,7 @@ class NodeMaterial extends Material {
 		 * 	return shadow.mix( color( 0xff0000 ), 1 ); // modify shadow color
 		 * } );
 		 *
-		 * @type {?Node<vec4>}
+		 * @type {?(Function|FunctionNode<vec4>)}
 		 * @default null
 		 */
 		this.receivedShadowNode = null;
@@ -16801,7 +16904,7 @@ class NodeMaterial extends Material {
 
 		if ( lightsNode && lightsNode.getScope().hasLights ) {
 
-			const lightingModel = this.setupLightingModel( builder );
+			const lightingModel = this.setupLightingModel( builder ) || null;
 
 			outgoingLightNode = lightingContext( lightsNode, lightingModel, backdropNode, backdropAlphaNode );
 
@@ -16826,6 +16929,29 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Setup the fog.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node<vec4>} outputNode - The existing output node.
+	 * @return {Node<vec4>} The output node.
+	 */
+	setupFog( builder, outputNode ) {
+
+		const fogNode = builder.fogNode;
+
+		if ( fogNode ) {
+
+			output.assign( outputNode );
+
+			outputNode = vec4( fogNode );
+
+		}
+
+		return outputNode;
+
+	}
+
+	/**
 	 * Setups the output node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -16838,15 +16964,7 @@ class NodeMaterial extends Material {
 
 		if ( this.fog === true ) {
 
-			const fogNode = builder.fogNode;
-
-			if ( fogNode ) {
-
-				output.assign( outputNode );
-
-				outputNode = vec4( fogNode );
-
-			}
+			outputNode = this.setupFog( builder, outputNode );
 
 		}
 
@@ -18290,54 +18408,56 @@ class LightingModel {
 	 * which are later used in the evaluation process.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	start( /*input, stack, builder*/ ) { }
+	start( builder ) {
+
+		// lights ( direct )
+
+		builder.lightsNode.setupLights( builder, builder.lightsNode.getLightNodes( builder ) );
+
+		// indirect
+
+		this.indirect( builder );
+
+	}
 
 	/**
 	 * This method is intended for executing final tasks like final updates
 	 * to the outgoing light.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( /*input, stack, builder*/ ) { }
+	finish( /*builder*/ ) { }
 
 	/**
 	 * This method is intended for implementing the direct light term and
 	 * executed during the build process of directional, point and spot light nodes.
 	 *
 	 * @abstract
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	direct( /*input, stack, builder*/ ) { }
+	direct( /*lightData, builder*/ ) { }
 
 	/**
 	 * This method is intended for implementing the direct light term for
 	 * rect area light nodes.
 	 *
 	 * @abstract
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	directRectArea( /*input, stack, builder*/ ) {}
+	directRectArea( /*lightData, builder*/ ) {}
 
 	/**
 	 * This method is intended for implementing the indirect light term.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( /*input, stack, builder*/ ) { }
+	indirect( /*builder*/ ) { }
 
 	/**
 	 * This method is intended for implementing the ambient occlusion term.
@@ -18345,8 +18465,6 @@ class LightingModel {
 	 * model in its indirect term.
 	 *
 	 * @abstract
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	ambientOcclusion( /*input, stack, builder*/ ) { }
@@ -18374,15 +18492,13 @@ class BasicLightingModel extends LightingModel {
 	/**
 	 * Implements the baked indirect lighting with its modulation.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( context, stack, builder ) {
+	indirect( { context } ) {
 
 		const ambientOcclusion = context.ambientOcclusion;
 		const reflectedLight = context.reflectedLight;
-		const irradianceLightMap = builder.context.irradianceLightMap;
+		const irradianceLightMap = context.irradianceLightMap;
 
 		reflectedLight.indirectDiffuse.assign( vec4( 0.0 ) );
 
@@ -18409,13 +18525,12 @@ class BasicLightingModel extends LightingModel {
 	/**
 	 * Implements the environment mapping.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( context, stack, builder ) {
+	finish( builder ) {
 
-		const material = builder.material;
+		const { material, context } = builder;
+
 		const outgoingLight = context.outgoingLight;
 		const envNode = builder.context.environment;
 
@@ -18643,9 +18758,7 @@ class PhongLightingModel extends BasicLightingModel {
 	 * Implements the direct lighting. The specular portion is optional an can be controlled
 	 * with the {@link PhongLightingModel#specular} flag.
 	 *
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
-	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} lightData - The light data.
 	 */
 	direct( { lightDirection, lightColor, reflectedLight } ) {
 
@@ -18665,11 +18778,11 @@ class PhongLightingModel extends BasicLightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
+	indirect( builder ) {
+
+		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
@@ -19284,6 +19397,51 @@ const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => 
 	]
 } );
 
+const LTC_Evaluate_Volume = /*@__PURE__*/ Fn( ( { P, p0, p1, p2, p3 } ) => {
+
+	// bail if point is on back side of plane of light
+	// assumes ccw winding order of light vertices
+	const v1 = p1.sub( p0 ).toVar();
+	const v2 = p3.sub( p0 ).toVar();
+
+	const lightNormal = v1.cross( v2 );
+	const result = vec3().toVar();
+
+	If( lightNormal.dot( P.sub( p0 ) ).greaterThanEqual( 0.0 ), () => {
+
+		// transform rect
+		// & project rect onto sphere
+		const coords0 = p0.sub( P ).normalize().toVar();
+		const coords1 = p1.sub( P ).normalize().toVar();
+		const coords2 = p2.sub( P ).normalize().toVar();
+		const coords3 = p3.sub( P ).normalize().toVar();
+
+		// calculate vector form factor
+		const vectorFormFactor = vec3( 0 ).toVar();
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords0, v2: coords1 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords1, v2: coords2 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords2, v2: coords3 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
+
+		// adjust for horizon clipping
+		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor.abs() } ) ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'LTC_Evaluate',
+	type: 'vec3',
+	inputs: [
+		{ name: 'P', type: 'vec3' },
+		{ name: 'p0', type: 'vec3' },
+		{ name: 'p1', type: 'vec3' },
+		{ name: 'p2', type: 'vec3' },
+		{ name: 'p3', type: 'vec3' }
+	]
+} );
+
 // Mipped Bicubic Texture Filtering by N8
 // https://www.shadertoy.com/view/Dl2SDW
 
@@ -19806,9 +19964,9 @@ class PhysicalLightingModel extends LightingModel {
 	 * Depending on what features are requested, the method prepares certain node variables
 	 * which are later used for lighting computations.
 	 *
-	 * @param {ContextNode} context - The current node context.
+	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	start( context ) {
+	start( builder ) {
 
 		if ( this.clearcoat === true ) {
 
@@ -19847,6 +20005,8 @@ class PhysicalLightingModel extends LightingModel {
 			const v = cameraPosition.sub( positionWorld ).normalize(); // TODO: Create Node for this, same issue in MaterialX
 			const n = transformedNormalWorld;
 
+			const context = builder.context;
+
 			context.backdrop = getIBLVolumeRefraction(
 				n,
 				v,
@@ -19870,6 +20030,8 @@ class PhysicalLightingModel extends LightingModel {
 			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, transmission ) );
 
 		}
+
+		super.start( builder );
 
 	}
 
@@ -19901,8 +20063,7 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the direct light.
 	 *
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	direct( { lightDirection, lightColor, reflectedLight } ) {
@@ -19936,7 +20097,6 @@ class PhysicalLightingModel extends LightingModel {
 	 * rect area light nodes.
 	 *
 	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 } ) {
@@ -19974,26 +20134,24 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( context, stack, builder ) {
+	indirect( builder ) {
 
-		this.indirectDiffuse( context, stack, builder );
-		this.indirectSpecular( context, stack, builder );
-		this.ambientOcclusion( context, stack, builder );
+		this.indirectDiffuse( builder );
+		this.indirectSpecular( builder );
+		this.ambientOcclusion( builder );
 
 	}
 
 	/**
 	 * Implements the indirect diffuse term.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirectDiffuse( { irradiance, reflectedLight } ) {
+	indirectDiffuse( builder ) {
+
+		const { irradiance, reflectedLight } = builder.context;
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
@@ -20002,11 +20160,11 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect specular term.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirectSpecular( { radiance, iblIrradiance, reflectedLight } ) {
+	indirectSpecular( builder ) {
+
+		const { radiance, iblIrradiance, reflectedLight } = builder.context;
 
 		if ( this.sheen === true ) {
 
@@ -20058,11 +20216,11 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Implements the ambient occlusion term.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	ambientOcclusion( { ambientOcclusion, reflectedLight } ) {
+	ambientOcclusion( builder ) {
+
+		const { ambientOcclusion, reflectedLight } = builder.context;
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
@@ -20091,11 +20249,9 @@ class PhysicalLightingModel extends LightingModel {
 	/**
 	 * Used for final lighting accumulations depending on the requested features.
 	 *
-	 * @param {ContextNode} context - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( context ) {
+	finish( { context } ) {
 
 		const { outgoingLight } = context;
 
@@ -20411,7 +20567,904 @@ const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, we
 
 } );
 
-let _generator = null;
+const LOD_MIN = 4;
+
+// The standard deviations (radians) associated with the extra mips. These are
+// chosen to approximate a Trowbridge-Reitz distribution function times the
+// geometric shadowing function. These sigma values squared must match the
+// variance #defines in cube_uv_reflection_fragment.glsl.js.
+const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
+
+// The maximum length of the blur for loop. Smaller sigmas will use fewer
+// samples and exit early, but not recompile the shader.
+const MAX_SAMPLES = 20;
+
+const _flatCamera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
+const _clearColor$2 = /*@__PURE__*/ new Color();
+let _oldTarget = null;
+let _oldActiveCubeFace = 0;
+let _oldActiveMipmapLevel = 0;
+
+// Golden Ratio
+const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
+const INV_PHI = 1 / PHI;
+
+// Vertices of a dodecahedron (except the opposites, which represent the
+// same axis), used as axis directions evenly spread on a sphere.
+const _axisDirections = [
+	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
+	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
+	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
+	/*@__PURE__*/ new Vector3( -1, 1, -1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, -1 ),
+	/*@__PURE__*/ new Vector3( -1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, 1 )
+];
+
+const _origin = /*@__PURE__*/ new Vector3();
+
+// maps blur materials to their uniforms dictionary
+
+const _uniformsMap = new WeakMap();
+
+// WebGPU Face indices
+const _faceLib = [
+	3, 1, 5,
+	0, 4, 2
+];
+
+const _direction = /*@__PURE__*/ getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
+const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direction.z );
+
+/**
+ * This class generates a Prefiltered, Mipmapped Radiance Environment Map
+ * (PMREM) from a cubeMap environment texture. This allows different levels of
+ * blur to be quickly accessed based on material roughness. It is packed into a
+ * special CubeUV format that allows us to perform custom interpolation so that
+ * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
+ * chain, it only goes down to the LOD_MIN level (above), and then creates extra
+ * even more filtered 'mips' at the same LOD_MIN resolution, associated with
+ * higher roughness levels. In this way we maintain resolution to smoothly
+ * interpolate diffuse lighting while limiting sampling computation.
+ *
+ * Paper: Fast, Accurate Image-Based Lighting:
+ * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
+*/
+
+class PMREMGenerator {
+
+	constructor( renderer ) {
+
+		this._renderer = renderer;
+		this._pingPongRenderTarget = null;
+
+		this._lodMax = 0;
+		this._cubeSize = 0;
+		this._lodPlanes = [];
+		this._sizeLods = [];
+		this._sigmas = [];
+		this._lodMeshes = [];
+
+		this._blurMaterial = null;
+		this._cubemapMaterial = null;
+		this._equirectMaterial = null;
+		this._backgroundBox = null;
+
+	}
+
+	get _hasInitialized() {
+
+		return this._renderer.hasInitialized();
+
+	}
+
+	/**
+	 * Generates a PMREM from a supplied Scene, which can be faster than using an
+	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
+	 * in radians to be applied to the scene before PMREM generation. Optional near
+	 * and far planes ensure the scene is rendered in its entirety.
+	 *
+	 * @param {Scene} scene - The scene to be captured.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {RenderTarget} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromSceneAsync}
+	 */
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
+
+		const {
+			size = 256,
+			position = _origin,
+			renderTarget = null,
+		} = options;
+
+		this._setSize( size );
+
+		if ( this._hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			options.renderTarget = cubeUVRenderTarget;
+
+			this.fromSceneAsync( scene, sigma, near, far, options );
+
+			return cubeUVRenderTarget;
+
+		}
+
+		_oldTarget = this._renderer.getRenderTarget();
+		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
+		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
+
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+		cubeUVRenderTarget.depthBuffer = true;
+
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position );
+
+		if ( sigma > 0 ) {
+
+			this._blur( cubeUVRenderTarget, 0, 0, sigma );
+
+		}
+
+		this._applyPMREM( cubeUVRenderTarget );
+
+		this._cleanup( cubeUVRenderTarget );
+
+		return cubeUVRenderTarget;
+
+	}
+
+	/**
+	 * Generates a PMREM from a supplied Scene, which can be faster than using an
+	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
+	 * in radians to be applied to the scene before PMREM generation. Optional near
+	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
+	 * is placed at the origin).
+	 *
+	 * @param {Scene} scene - The scene to be captured.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
+	 * @see {@link PMREMGenerator#fromScene}
+	 */
+	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
+
+		if ( this._hasInitialized === false ) await this._renderer.init();
+
+		return this.fromScene( scene, sigma, near, far, options );
+
+	}
+
+	/**
+	 * Generates a PMREM from an equirectangular texture, which can be either LDR
+	 * or HDR. The ideal input image size is 1k (1024 x 512),
+	 * as this matches best with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {RenderTarget} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromEquirectangularAsync}
+	 */
+	fromEquirectangular( equirectangular, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
+
+			this._setSizeFromTexture( equirectangular );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
+
+			return cubeUVRenderTarget;
+
+		}
+
+		return this._fromTexture( equirectangular, renderTarget );
+
+	}
+
+	/**
+	 * Generates a PMREM from an equirectangular texture, which can be either LDR
+	 * or HDR. The ideal input image size is 1k (1024 x 512),
+	 * as this matches best with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromEquirectangular}
+	 */
+	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) await this._renderer.init();
+
+		return this._fromTexture( equirectangular, renderTarget );
+
+	}
+
+	/**
+	 * Generates a PMREM from an cubemap texture, which can be either LDR
+	 * or HDR. The ideal input cube size is 256 x 256,
+	 * as this matches best with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} cubemap - The cubemap texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {RenderTarget} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromCubemapAsync}
+	 */
+	fromCubemap( cubemap, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
+
+			this._setSizeFromTexture( cubemap );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+			this.fromCubemapAsync( cubemap, renderTarget );
+
+			return cubeUVRenderTarget;
+
+		}
+
+		return this._fromTexture( cubemap, renderTarget );
+
+	}
+
+	/**
+	 * Generates a PMREM from an cubemap texture, which can be either LDR
+	 * or HDR. The ideal input cube size is 256 x 256,
+	 * with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} cubemap - The cubemap texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromCubemap}
+	 */
+	async fromCubemapAsync( cubemap, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) await this._renderer.init();
+
+		return this._fromTexture( cubemap, renderTarget );
+
+	}
+
+	/**
+	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
+	 * your texture's network fetch for increased concurrency.
+	 *
+	 * @returns {Promise}
+	 */
+	async compileCubemapShader() {
+
+		if ( this._cubemapMaterial === null ) {
+
+			this._cubemapMaterial = _getCubemapMaterial();
+			await this._compileMaterial( this._cubemapMaterial );
+
+		}
+
+	}
+
+	/**
+	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
+	 * your texture's network fetch for increased concurrency.
+	 *
+	 * @returns {Promise}
+	 */
+	async compileEquirectangularShader() {
+
+		if ( this._equirectMaterial === null ) {
+
+			this._equirectMaterial = _getEquirectMaterial();
+			await this._compileMaterial( this._equirectMaterial );
+
+		}
+
+	}
+
+	/**
+	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
+	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
+	 * one of them will cause any others to also become unusable.
+	 */
+	dispose() {
+
+		this._dispose();
+
+		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
+		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
+		if ( this._backgroundBox !== null ) {
+
+			this._backgroundBox.geometry.dispose();
+			this._backgroundBox.material.dispose();
+
+		}
+
+	}
+
+	// private interface
+
+	_setSizeFromTexture( texture ) {
+
+		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
+
+			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+
+		} else { // Equirectangular
+
+			this._setSize( texture.image.width / 4 );
+
+		}
+
+	}
+
+	_setSize( cubeSize ) {
+
+		this._lodMax = Math.floor( Math.log2( cubeSize ) );
+		this._cubeSize = Math.pow( 2, this._lodMax );
+
+	}
+
+	_dispose() {
+
+		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
+
+		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
+
+		for ( let i = 0; i < this._lodPlanes.length; i ++ ) {
+
+			this._lodPlanes[ i ].dispose();
+
+		}
+
+	}
+
+	_cleanup( outputTarget ) {
+
+		this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
+		outputTarget.scissorTest = false;
+		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
+
+	}
+
+	_fromTexture( texture, renderTarget ) {
+
+		this._setSizeFromTexture( texture );
+
+		_oldTarget = this._renderer.getRenderTarget();
+		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
+		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
+
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+		this._textureToCubeUV( texture, cubeUVRenderTarget );
+		this._applyPMREM( cubeUVRenderTarget );
+		this._cleanup( cubeUVRenderTarget );
+
+		return cubeUVRenderTarget;
+
+	}
+
+	_allocateTargets() {
+
+		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
+		const height = 4 * this._cubeSize;
+
+		const params = {
+			magFilter: LinearFilter,
+			minFilter: LinearFilter,
+			generateMipmaps: false,
+			type: HalfFloatType,
+			format: RGBAFormat,
+			colorSpace: LinearSRGBColorSpace,
+			//depthBuffer: false
+		};
+
+		const cubeUVRenderTarget = _createRenderTarget( width, height, params );
+
+		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width || this._pingPongRenderTarget.height !== height ) {
+
+			if ( this._pingPongRenderTarget !== null ) {
+
+				this._dispose();
+
+			}
+
+			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
+
+			const { _lodMax } = this;
+			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas, lodMeshes: this._lodMeshes } = _createPlanes( _lodMax ) );
+
+			this._blurMaterial = _getBlurShader( _lodMax, width, height );
+
+		}
+
+		return cubeUVRenderTarget;
+
+	}
+
+	async _compileMaterial( material ) {
+
+		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
+		await this._renderer.compile( tmpMesh, _flatCamera );
+
+	}
+
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position ) {
+
+		const cubeCamera = _cubeCamera;
+		cubeCamera.near = near;
+		cubeCamera.far = far;
+
+		// px, py, pz, nx, ny, nz
+		const upSign = [ 1, 1, 1, 1, -1, 1 ];
+		const forwardSign = [ 1, -1, 1, -1, 1, -1 ];
+
+		const renderer = this._renderer;
+
+		const originalAutoClear = renderer.autoClear;
+
+		renderer.getClearColor( _clearColor$2 );
+
+		renderer.autoClear = false;
+
+		let backgroundBox = this._backgroundBox;
+
+		if ( backgroundBox === null ) {
+
+			const backgroundMaterial = new MeshBasicMaterial( {
+				name: 'PMREM.Background',
+				side: BackSide,
+				depthWrite: false,
+				depthTest: false
+			} );
+
+			backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+
+		}
+
+		let useSolidColor = false;
+		const background = scene.background;
+
+		if ( background ) {
+
+			if ( background.isColor ) {
+
+				backgroundBox.material.color.copy( background );
+				scene.background = null;
+				useSolidColor = true;
+
+			}
+
+		} else {
+
+			backgroundBox.material.color.copy( _clearColor$2 );
+			useSolidColor = true;
+
+		}
+
+		renderer.setRenderTarget( cubeUVRenderTarget );
+
+		renderer.clear();
+
+		if ( useSolidColor ) {
+
+			renderer.render( backgroundBox, cubeCamera );
+
+		}
+
+		for ( let i = 0; i < 6; i ++ ) {
+
+			const col = i % 3;
+
+			if ( col === 0 ) {
+
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
+
+			} else if ( col === 1 ) {
+
+				cubeCamera.up.set( 0, 0, upSign[ i ] );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
+
+
+			} else {
+
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
+
+
+			}
+
+			const size = this._cubeSize;
+
+			_setViewport( cubeUVRenderTarget, col * size, i > 2 ? size : 0, size, size );
+
+			renderer.render( scene, cubeCamera );
+
+		}
+
+		renderer.autoClear = originalAutoClear;
+		scene.background = background;
+
+	}
+
+	_textureToCubeUV( texture, cubeUVRenderTarget ) {
+
+		const renderer = this._renderer;
+
+		const isCubeTexture = ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping );
+
+		if ( isCubeTexture ) {
+
+			if ( this._cubemapMaterial === null ) {
+
+				this._cubemapMaterial = _getCubemapMaterial( texture );
+
+			}
+
+		} else {
+
+			if ( this._equirectMaterial === null ) {
+
+				this._equirectMaterial = _getEquirectMaterial( texture );
+
+			}
+
+		}
+
+		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
+		material.fragmentNode.value = texture;
+
+		const mesh = this._lodMeshes[ 0 ];
+		mesh.material = material;
+
+		const size = this._cubeSize;
+
+		_setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
+
+		renderer.setRenderTarget( cubeUVRenderTarget );
+		renderer.render( mesh, _flatCamera );
+
+	}
+
+	_applyPMREM( cubeUVRenderTarget ) {
+
+		const renderer = this._renderer;
+		const autoClear = renderer.autoClear;
+		renderer.autoClear = false;
+		const n = this._lodPlanes.length;
+
+		for ( let i = 1; i < n; i ++ ) {
+
+			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
+
+			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
+
+			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+
+		}
+
+		renderer.autoClear = autoClear;
+
+	}
+
+	/**
+	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
+	 * vertically and horizontally, but this breaks down on a cube. Here we apply
+	 * the blur latitudinally (around the poles), and then longitudinally (towards
+	 * the poles) to approximate the orthogonally-separable blur. It is least
+	 * accurate at the poles, but still does a decent job.
+	 *
+	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
+	 * @param {number} lodIn - The input level-of-detail.
+	 * @param {number} lodOut - The output level-of-detail.
+	 * @param {number} sigma - The blur radius in radians.
+	 * @param {Vector3} [poleAxis] - The pole axis.
+	 */
+	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+
+		const pingPongRenderTarget = this._pingPongRenderTarget;
+
+		this._halfBlur(
+			cubeUVRenderTarget,
+			pingPongRenderTarget,
+			lodIn,
+			lodOut,
+			sigma,
+			'latitudinal',
+			poleAxis );
+
+		this._halfBlur(
+			pingPongRenderTarget,
+			cubeUVRenderTarget,
+			lodOut,
+			lodOut,
+			sigma,
+			'longitudinal',
+			poleAxis );
+
+	}
+
+	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+
+		const renderer = this._renderer;
+		const blurMaterial = this._blurMaterial;
+
+		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
+
+			console.error( 'blur direction must be either latitudinal or longitudinal!' );
+
+		}
+
+		// Number of standard deviations at which to cut off the discrete approximation.
+		const STANDARD_DEVIATIONS = 3;
+
+		const blurMesh = this._lodMeshes[ lodOut ];
+		blurMesh.material = blurMaterial;
+
+		const blurUniforms = _uniformsMap.get( blurMaterial );
+
+		const pixels = this._sizeLods[ lodIn ] - 1;
+		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
+		const sigmaPixels = sigmaRadians / radiansPerPixel;
+		const samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
+
+		if ( samples > MAX_SAMPLES ) {
+
+			console.warn( `sigmaRadians, ${
+				sigmaRadians}, is too large and will clip, as it requested ${
+				samples} samples when the maximum is set to ${MAX_SAMPLES}` );
+
+		}
+
+		const weights = [];
+		let sum = 0;
+
+		for ( let i = 0; i < MAX_SAMPLES; ++ i ) {
+
+			const x = i / sigmaPixels;
+			const weight = Math.exp( - x * x / 2 );
+			weights.push( weight );
+
+			if ( i === 0 ) {
+
+				sum += weight;
+
+			} else if ( i < samples ) {
+
+				sum += 2 * weight;
+
+			}
+
+		}
+
+		for ( let i = 0; i < weights.length; i ++ ) {
+
+			weights[ i ] = weights[ i ] / sum;
+
+		}
+
+		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
+
+		blurUniforms.envMap.value = targetIn.texture;
+		blurUniforms.samples.value = samples;
+		blurUniforms.weights.array = weights;
+		blurUniforms.latitudinal.value = direction === 'latitudinal' ? 1 : 0;
+
+		if ( poleAxis ) {
+
+			blurUniforms.poleAxis.value = poleAxis;
+
+		}
+
+		const { _lodMax } = this;
+		blurUniforms.dTheta.value = radiansPerPixel;
+		blurUniforms.mipInt.value = _lodMax - lodIn;
+
+		const outputSize = this._sizeLods[ lodOut ];
+		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const y = 4 * ( this._cubeSize - outputSize );
+
+		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( targetOut );
+		renderer.render( blurMesh, _flatCamera );
+
+	}
+
+}
+
+function _createPlanes( lodMax ) {
+
+	const lodPlanes = [];
+	const sizeLods = [];
+	const sigmas = [];
+	const lodMeshes = [];
+
+	let lod = lodMax;
+
+	const totalLods = lodMax - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+
+	for ( let i = 0; i < totalLods; i ++ ) {
+
+		const sizeLod = Math.pow( 2, lod );
+		sizeLods.push( sizeLod );
+		let sigma = 1.0 / sizeLod;
+
+		if ( i > lodMax - LOD_MIN ) {
+
+			sigma = EXTRA_LOD_SIGMA[ i - lodMax + LOD_MIN - 1 ];
+
+		} else if ( i === 0 ) {
+
+			sigma = 0;
+
+		}
+
+		sigmas.push( sigma );
+
+		const texelSize = 1.0 / ( sizeLod - 2 );
+		const min = - texelSize;
+		const max = 1 + texelSize;
+		const uv1 = [ min, min, max, min, max, max, min, min, max, max, min, max ];
+
+		const cubeFaces = 6;
+		const vertices = 6;
+		const positionSize = 3;
+		const uvSize = 2;
+		const faceIndexSize = 1;
+
+		const position = new Float32Array( positionSize * vertices * cubeFaces );
+		const uv = new Float32Array( uvSize * vertices * cubeFaces );
+		const faceIndex = new Float32Array( faceIndexSize * vertices * cubeFaces );
+
+		for ( let face = 0; face < cubeFaces; face ++ ) {
+
+			const x = ( face % 3 ) * 2 / 3 - 1;
+			const y = face > 2 ? 0 : -1;
+			const coordinates = [
+				x, y, 0,
+				x + 2 / 3, y, 0,
+				x + 2 / 3, y + 1, 0,
+				x, y, 0,
+				x + 2 / 3, y + 1, 0,
+				x, y + 1, 0
+			];
+
+			const faceIdx = _faceLib[ face ];
+			position.set( coordinates, positionSize * vertices * faceIdx );
+			uv.set( uv1, uvSize * vertices * faceIdx );
+			const fill = [ faceIdx, faceIdx, faceIdx, faceIdx, faceIdx, faceIdx ];
+			faceIndex.set( fill, faceIndexSize * vertices * faceIdx );
+
+		}
+
+		const planes = new BufferGeometry();
+		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
+		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
+		planes.setAttribute( 'faceIndex', new BufferAttribute( faceIndex, faceIndexSize ) );
+		lodPlanes.push( planes );
+		lodMeshes.push( new Mesh( planes, null ) );
+
+		if ( lod > LOD_MIN ) {
+
+			lod --;
+
+		}
+
+	}
+
+	return { lodPlanes, sizeLods, sigmas, lodMeshes };
+
+}
+
+function _createRenderTarget( width, height, params ) {
+
+	const cubeUVRenderTarget = new RenderTarget( width, height, params );
+	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
+	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
+	cubeUVRenderTarget.texture.isPMREMTexture = true;
+	cubeUVRenderTarget.scissorTest = true;
+	return cubeUVRenderTarget;
+
+}
+
+function _setViewport( target, x, y, width, height ) {
+
+	target.viewport.set( x, y, width, height );
+	target.scissor.set( x, y, width, height );
+
+}
+
+function _getMaterial( type ) {
+
+	const material = new NodeMaterial();
+	material.depthTest = false;
+	material.depthWrite = false;
+	material.blending = NoBlending;
+	material.name = `PMREM_${ type }`;
+
+	return material;
+
+}
+
+function _getBlurShader( lodMax, width, height ) {
+
+	const weights = uniformArray( new Array( MAX_SAMPLES ).fill( 0 ) );
+	const poleAxis = uniform( new Vector3( 0, 1, 0 ) );
+	const dTheta = uniform( 0 );
+	const n = float( MAX_SAMPLES );
+	const latitudinal = uniform( 0 ); // false, bool
+	const samples = uniform( 1 ); // int
+	const envMap = texture( null );
+	const mipInt = uniform( 0 ); // int
+	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
+	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
+	const CUBEUV_MAX_MIP = float( lodMax );
+
+	const materialUniforms = {
+		n,
+		latitudinal,
+		weights,
+		poleAxis,
+		outputDirection: _outputDirection,
+		dTheta,
+		samples,
+		envMap,
+		mipInt,
+		CUBEUV_TEXEL_WIDTH,
+		CUBEUV_TEXEL_HEIGHT,
+		CUBEUV_MAX_MIP
+	};
+
+	const material = _getMaterial( 'blur' );
+	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+
+	_uniformsMap.set( material, materialUniforms );
+
+	return material;
+
+}
+
+function _getCubemapMaterial( envTexture ) {
+
+	const material = _getMaterial( 'cubemap' );
+	material.fragmentNode = cubeTexture( envTexture, _outputDirection );
+
+	return material;
+
+}
+
+function _getEquirectMaterial( envTexture ) {
+
+	const material = _getMaterial( 'equirect' );
+	material.fragmentNode = texture( envTexture, equirectUV( _outputDirection ), 0 );
+
+	return material;
+
+}
 
 const _cache = new WeakMap();
 
@@ -20435,15 +21488,19 @@ function _generateCubeUVSize( imageHeight ) {
 }
 
 /**
- * Generates a PMREM from the given texture .
+ * Generates a PMREM from the given texture.
  *
  * @private
  * @param {Texture} texture - The texture to create the PMREM for.
- * @return {Texture} The PMREM.
+ * @param {Renderer} renderer - The renderer.
+ * @param {PMREMGenerator} generator - The PMREM generator.
+ * @return {?Texture} The PMREM.
  */
-function _getPMREMFromTexture( texture ) {
+function _getPMREMFromTexture( texture, renderer, generator ) {
 
-	let cacheTexture = _cache.get( texture );
+	const cache = _getCache( renderer );
+
+	let cacheTexture = cache.get( texture );
 
 	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : -1;
 
@@ -20455,7 +21512,7 @@ function _getPMREMFromTexture( texture ) {
 
 			if ( isCubeMapReady( image ) ) {
 
-				cacheTexture = _generator.fromCubemap( texture, cacheTexture );
+				cacheTexture = generator.fromCubemap( texture, cacheTexture );
 
 			} else {
 
@@ -20468,7 +21525,7 @@ function _getPMREMFromTexture( texture ) {
 
 			if ( isEquirectangularMapReady( image ) ) {
 
-				cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
+				cacheTexture = generator.fromEquirectangular( texture, cacheTexture );
 
 			} else {
 
@@ -20480,11 +21537,35 @@ function _getPMREMFromTexture( texture ) {
 
 		cacheTexture.pmremVersion = texture.pmremVersion;
 
-		_cache.set( texture, cacheTexture );
+		cache.set( texture, cacheTexture );
 
 	}
 
 	return cacheTexture.texture;
+
+}
+
+/**
+ * Returns a cache that stores generated PMREMs for the respective textures.
+ * A cache must be maintaned per renderer since PMREMs are render target textures
+ * which can't be shared across render contexts.
+ *
+ * @private
+ * @param {Renderer} renderer - The renderer.
+ * @return {WeakMap<Texture, Texture>} The PMREM cache.
+ */
+function _getCache( renderer ) {
+
+	let rendererCache = _cache.get( renderer );
+
+	if ( rendererCache === undefined ) {
+
+		rendererCache = new WeakMap();
+		_cache.set( renderer, rendererCache );
+
+	}
+
+	return rendererCache;
 
 }
 
@@ -20553,7 +21634,7 @@ class PMREMNode extends TempNode {
 		 * Reference to a PMREM generator.
 		 *
 		 * @private
-		 * @type {PMREMGenerator}
+		 * @type {?PMREMGenerator}
 		 * @default null
 		 */
 		this._generator = null;
@@ -20637,7 +21718,7 @@ class PMREMNode extends TempNode {
 
 	}
 
-	updateBefore() {
+	updateBefore( frame ) {
 
 		let pmrem = this._pmrem;
 
@@ -20652,7 +21733,7 @@ class PMREMNode extends TempNode {
 
 			} else {
 
-				pmrem = _getPMREMFromTexture( texture );
+				pmrem = _getPMREMFromTexture( texture, frame.renderer, this._generator );
 
 			}
 
@@ -20670,13 +21751,11 @@ class PMREMNode extends TempNode {
 
 	setup( builder ) {
 
-		if ( _generator === null ) {
+		if ( this._generator === null ) {
 
-			_generator = builder.createPMREMGenerator();
+			this._generator = new PMREMGenerator( builder.renderer );
 
 		}
-
-		//
 
 		this.updateBefore( builder );
 
@@ -20692,15 +21771,7 @@ class PMREMNode extends TempNode {
 
 		//
 
-		const texture = this.value;
-
-		if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem && texture.isPMREMTexture !== true && texture.isRenderTargetTexture === true ) {
-
-			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
-
-		}
-
-		uvNode = vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
+		uvNode = materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) );
 
 		//
 
@@ -20715,6 +21786,14 @@ class PMREMNode extends TempNode {
 		//
 
 		return textureCubeUV( this._texture, uvNode, levelNode, this._width, this._height, this._maxMip );
+
+	}
+
+	dispose() {
+
+		super.dispose();
+
+		if ( this._generator !== null ) this._generator.dispose();
 
 	}
 
@@ -20834,14 +21913,11 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		const envMap = material.envMap;
-		const intensity = envMap ? reference( 'envMapIntensity', 'float', builder.material ) : reference( 'environmentIntensity', 'float', builder.scene ); // @TODO: Add materialEnvIntensity in MaterialNode
-
 		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
 		const radianceNormalView = useAnisotropy ? transformedBentNormalView : transformedNormalView;
 
-		const radiance = envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( intensity );
-		const irradiance = envNode.context( createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( intensity );
+		const radiance = envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity );
+		const irradiance = envNode.context( createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity );
 
 		const isolateRadiance = cache( radiance );
 		const isolateIrradiance = cache( irradiance );
@@ -20858,7 +21934,7 @@ class EnvironmentNode extends LightingNode {
 
 		if ( clearcoatRadiance ) {
 
-			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
+			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( materialEnvIntensity );
 			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
 
 			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
@@ -21633,10 +22709,9 @@ class SSSLightingModel extends PhysicalLightingModel {
 	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
 	 *
 	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	direct( { lightDirection, lightColor, reflectedLight }, stack, builder ) {
+	direct( { lightDirection, lightColor, reflectedLight }, builder ) {
 
 		if ( this.useSSS === true ) {
 
@@ -21652,7 +22727,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 
 		}
 
-		super.direct( { lightDirection, lightColor, reflectedLight }, stack, builder );
+		super.direct( { lightDirection, lightColor, reflectedLight }, builder );
 
 	}
 
@@ -21797,11 +22872,10 @@ class ToonLightingModel extends LightingModel {
 	 * Implements the direct lighting. Instead of using a conventional smooth irradiance, the irradiance is
 	 * reduced to a small number of discrete shades to create a comic-like, flat look.
 	 *
-	 * @param {Object} input - The input data.
-	 * @param {StackNode} stack - The current stack.
+	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	direct( { lightDirection, lightColor, reflectedLight }, stack, builder ) {
+	direct( { lightDirection, lightColor, reflectedLight }, builder ) {
 
 		const irradiance = getGradientIrradiance( { normal: normalGeometry, lightDirection, builder } ).mul( lightColor );
 
@@ -21812,11 +22886,11 @@ class ToonLightingModel extends LightingModel {
 	/**
 	 * Implements the indirect lighting.
 	 *
-	 * @param {ContextNode} input - The current node context.
-	 * @param {StackNode} stack - The current stack.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
+	indirect( builder ) {
+
+		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
@@ -22111,7 +23185,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new sprite node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -22205,7 +23279,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( scaleNode !== null ) {
 
-			scale = scale.mul( float( scaleNode ) );
+			scale = scale.mul( vec2( scaleNode ) );
 
 		}
 
@@ -22284,7 +23358,7 @@ const _defaultValues$1 = /*@__PURE__*/ new PointsMaterial();
 /**
  * Node material version of `PointsMaterial`.
  *
- * @augments NodeMaterial
+ * @augments SpriteNodeMaterial
  */
 class PointsNodeMaterial extends SpriteNodeMaterial {
 
@@ -22297,7 +23371,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 	/**
 	 * Constructs a new points node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -22531,190 +23605,180 @@ class ShadowNodeMaterial extends NodeMaterial {
 
 }
 
-const normal = Fn( ( { texture, uv } ) => {
-
-	const epsilon = 0.0001;
-
-	const ret = vec3().toVar();
-
-	If( uv.x.lessThan( epsilon ), () => {
-
-		ret.assign( vec3( 1, 0, 0 ) );
-
-	} ).ElseIf( uv.y.lessThan( epsilon ), () => {
-
-		ret.assign( vec3( 0, 1, 0 ) );
-
-	} ).ElseIf( uv.z.lessThan( epsilon ), () => {
-
-		ret.assign( vec3( 0, 0, 1 ) );
-
-	} ).ElseIf( uv.x.greaterThan( 1 - epsilon ), () => {
-
-		ret.assign( vec3( -1, 0, 0 ) );
-
-	} ).ElseIf( uv.y.greaterThan( 1 - epsilon ), () => {
-
-		ret.assign( vec3( 0, -1, 0 ) );
-
-	} ).ElseIf( uv.z.greaterThan( 1 - epsilon ), () => {
-
-		ret.assign( vec3( 0, 0, -1 ) );
-
-	} ).Else( () => {
-
-		const step = 0.01;
-
-		const x = texture.sample( uv.add( vec3( -0.01, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, -0.01, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, -0.01 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
-
-		ret.assign( vec3( x, y, z ) );
-
-	} );
-
-	return ret.normalize();
-
-} );
+const scatteringDensity = property( 'vec3' );
+const linearDepthRay = property( 'vec3' );
+const outgoingRayLight = property( 'vec3' );
 
 /**
- * This type of uniform node represents a 3D texture.
+ * VolumetricLightingModel class extends the LightingModel to implement volumetric lighting effects.
+ * This model calculates the scattering and transmittance of light through a volumetric medium.
+ * It dynamically adjusts the direction of the ray based on the camera and object positions.
+ * The model supports custom scattering and depth nodes to enhance the lighting effects.
  *
- * @augments TextureNode
+ * @augments LightingModel
  */
-class Texture3DNode extends TextureNode {
+class VolumetricLightingModel extends LightingModel {
 
-	static get type() {
+	constructor() {
 
-		return 'Texture3DNode';
-
-	}
-
-	/**
-	 * Constructs a new 3D texture node.
-	 *
-	 * @param {Data3DTexture} value - The 3D texture.
-	 * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
-	 * @param {?Node<int>} [levelNode=null] - The level node.
-	 */
-	constructor( value, uvNode = null, levelNode = null ) {
-
-		super( value, uvNode, levelNode );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isTexture3DNode = true;
+		super();
 
 	}
 
-	/**
-	 * Overwrites the default implementation to return a fixed value `'texture3D'`.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The input type.
-	 */
-	getInputType( /*builder*/ ) {
+	start( builder ) {
 
-		return 'texture3D';
+		const { material, context } = builder;
 
-	}
+		const startPos = property( 'vec3' );
+		const endPos = property( 'vec3' );
 
-	/**
-	 * Returns a default uv node which is in context of 3D textures a three-dimensional
-	 * uv node.
-	 *
-	 * @return {Node<vec3>} The default uv node.
-	 */
-	getDefaultUV() {
+		// This approach dynamically changes the direction of the ray,
+		// prioritizing the ray from the camera to the object if it is inside the mesh, and from the object to the camera if it is far away.
 
-		return vec3( 0.5, 0.5, 0.5 );
+		If( cameraPosition.sub( positionWorld ).length().greaterThan( modelRadius.mul( 2 ) ), () => {
 
-	}
+			startPos.assign( cameraPosition );
+			endPos.assign( positionWorld );
 
-	/**
-	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
-	 * for 3D textures. The uv transformation matrix is not applied to 3D textures.
-	 *
-	 * @param {boolean} value - The update toggle.
-	 */
-	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
+		} ).Else( () => {
 
-	/**
-	 * Overwrites the default implementation to return the unmodified uv node.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {Node} uvNode - The uv node to setup.
-	 * @return {Node} The unmodified uv node.
-	 */
-	setupUV( builder, uvNode ) {
+			startPos.assign( positionWorld );
+			endPos.assign( cameraPosition );
 
-		const texture = this.value;
+		} );
 
-		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) ) {
+		//
 
-			if ( this.sampler ) {
+		const viewVector = endPos.sub( startPos );
 
-				uvNode = uvNode.flipY();
+		const steps = uniform( 'int' ).onRenderUpdate( ( { material } ) => material.steps );
+		const stepSize = viewVector.length().div( steps ).toVar();
 
-			} else {
+		const rayDir = viewVector.normalize().toVar(); // TODO: toVar() should be automatic here ( in loop )
 
-				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
+		const distTravelled = float( 0.0 ).toVar();
+		const transmittance = vec3( 1 ).toVar();
 
-			}
+		if ( material.offsetNode ) {
+
+			// reduce banding
+
+			distTravelled.addAssign( material.offsetNode.mul( stepSize ) );
 
 		}
 
-		return uvNode;
+		Loop( steps, () => {
+
+			const positionRay = startPos.add( rayDir.mul( distTravelled ) );
+			const positionViewRay = cameraViewMatrix.mul( vec4( positionRay, 1 ) ).xyz;
+
+			if ( material.depthNode !== null ) {
+
+				linearDepthRay.assign( linearDepth( viewZToPerspectiveDepth( positionViewRay.z, cameraNear, cameraFar ) ) );
+
+				context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
+
+			}
+
+			context.positionWorld = positionRay;
+			context.shadowPositionWorld = positionRay;
+			context.positionView = positionViewRay;
+
+			scatteringDensity.assign( 0 );
+
+			let scatteringNode;
+
+			if ( material.scatteringNode ) {
+
+				scatteringNode = material.scatteringNode( {
+					positionRay
+				} );
+
+			}
+
+			super.start( builder );
+
+			if ( scatteringNode ) {
+
+				scatteringDensity.mulAssign( scatteringNode );
+
+			}
+
+			// beer's law
+
+			const falloff = scatteringDensity.mul( .01 ).negate().mul( stepSize ).exp();
+			transmittance.mulAssign( falloff );
+
+			// move along the ray
+
+			distTravelled.addAssign( stepSize );
+
+		} );
+
+		outgoingRayLight.addAssign( transmittance.saturate().oneMinus() );
 
 	}
 
-	/**
-	 * Generates the uv code snippet.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {Node} uvNode - The uv node to generate code for.
-	 * @return {string} The generated code snippet.
-	 */
-	generateUV( builder, uvNode ) {
+	scaterringLight( lightColor, builder ) {
 
-		return uvNode.build( builder, 'vec3' );
+		const sceneDepthNode = builder.context.sceneDepthNode;
+
+		if ( sceneDepthNode ) {
+
+			If( sceneDepthNode.greaterThanEqual( linearDepthRay ), () => {
+
+				scatteringDensity.addAssign( lightColor );
+
+			} );
+
+		} else {
+
+			scatteringDensity.addAssign( lightColor );
+
+		}
 
 	}
 
-	/**
-	 * TODO.
-	 *
-	 * @param {Node<vec3>} uvNode - The uv node .
-	 * @return {Node<vec3>} TODO.
-	 */
-	normal( uvNode ) {
+	direct( { lightNode, lightColor }, builder ) {
 
-		return normal( { texture: this, uv: uvNode } );
+		// Ignore lights with infinite distance
+
+		if ( lightNode.light.distance === undefined ) return;
+
+		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approches
+
+		const directLight = lightColor.xyz.toVar();
+		directLight.mulAssign( lightNode.shadowNode ); // it no should be necessary if used in the same render pass
+
+		this.scaterringLight( directLight, builder );
+
+	}
+
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight }, builder ) {
+
+		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
+		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
+		const p2 = lightPosition.sub( halfWidth ).add( halfHeight );
+		const p3 = lightPosition.add( halfWidth ).add( halfHeight );
+
+		const P = builder.context.positionView;
+
+		const directLight = lightColor.xyz.mul( LTC_Evaluate_Volume( { P, p0, p1, p2, p3 } ) ).pow( 1.5 );
+
+		this.scaterringLight( directLight, builder );
+
+	}
+
+	finish( builder ) {
+
+		builder.context.outgoingLight.assign( outgoingRayLight );
 
 	}
 
 }
 
 /**
- * TSL function for creating a 3D texture node.
- *
- * @tsl
- * @function
- * @param {Data3DTexture} value - The 3D texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
- * @param {?Node<int>} [levelNode=null] - The level node.
- * @returns {Texture3DNode}
- */
-const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );
-
-/**
- * Node material intended for volume rendering. The volumetric data are
- * defined with an instance of {@link Data3DTexture}.
+ * Volume node material.
  *
  * @augments NodeMaterial
  */
@@ -22745,137 +23809,36 @@ class VolumeNodeMaterial extends NodeMaterial {
 		this.isVolumeNodeMaterial = true;
 
 		/**
-		 * The base color of the volume.
-		 *
-		 * @type {Color}
-		 * @default 100
-		 */
-		this.base = new Color( 0xffffff );
-
-		/**
-		 * A 3D data texture holding the volumetric data.
-		 *
-		 * @type {?Data3DTexture}
-		 * @default null
-		 */
-		this.map = null;
-
-		/**
-		 * This number of samples for each ray that hits the mesh's surface
-		 * and travels through the volume.
+		 * Number of steps used for raymarching.
 		 *
 		 * @type {number}
-		 * @default 100
+		 * @default 25
 		 */
-		this.steps = 100;
+		this.steps = 25;
 
 		/**
-		 * Callback for {@link VolumeNodeMaterial#testNode}.
+		 * Node used for scattering calculations.
 		 *
-		 * @callback testNodeCallback
-		 * @param {Data3DTexture<float>} map - The 3D texture.
-		 * @param {Node<float>} mapValue - The sampled value inside the volume.
-		 * @param {Node<vec3>} probe - The probe which is the entry point of the ray on the mesh's surface.
-		 * @param {Node<vec4>} finalColor - The final color.
-		 */
-
-		/**
-		 * The volume rendering of this material works by shooting rays
-		 * from the camera position through each fragment of the mesh's
-		 * surface and sample the inner volume in a raymarching fashion
-		 * multiple times.
-		 *
-		 * This node can be used to assign a callback function of type `Fn`
-		 * that will be executed per sample. The callback receives the
-		 * texture, the sampled texture value as well as position on the surface
-		 * where the rays enters the volume. The last parameter is a color
-		 * that allows the callback to determine the final color.
-		 *
-		 * @type {?testNodeCallback}
+		 * @type {Function|FunctionNode<vec4>}
 		 * @default null
 		 */
-		this.testNode = null;
+		this.scatteringNode = null;
+
+		this.lights = true;
+
+		this.transparent = true;
+		this.side = BackSide;
+
+		this.depthTest = false;
+		this.depthWrite = false;
 
 		this.setValues( parameters );
 
 	}
 
-	/**
-	 * Setups the vertex and fragment stage of this node material.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setup( builder ) {
+	setupLightingModel() {
 
-		const map = texture3D( this.map, null, 0 );
-
-		const hitBox = Fn( ( { orig, dir } ) => {
-
-			const box_min = vec3( -0.5 );
-			const box_max = vec3( 0.5 );
-
-			const inv_dir = dir.reciprocal();
-
-			const tmin_tmp = box_min.sub( orig ).mul( inv_dir );
-			const tmax_tmp = box_max.sub( orig ).mul( inv_dir );
-
-			const tmin = min$1( tmin_tmp, tmax_tmp );
-			const tmax = max$1( tmin_tmp, tmax_tmp );
-
-			const t0 = max$1( tmin.x, max$1( tmin.y, tmin.z ) );
-			const t1 = min$1( tmax.x, min$1( tmax.y, tmax.z ) );
-
-			return vec2( t0, t1 );
-
-		} );
-
-		this.fragmentNode = Fn( () => {
-
-			const vOrigin = varying( vec3( modelWorldMatrixInverse.mul( vec4( cameraPosition, 1.0 ) ) ) );
-			const vDirection = varying( positionGeometry.sub( vOrigin ) );
-
-			const rayDir = vDirection.normalize();
-			const bounds = vec2( hitBox( { orig: vOrigin, dir: rayDir } ) ).toVar();
-
-			bounds.x.greaterThan( bounds.y ).discard();
-
-			bounds.assign( vec2( max$1( bounds.x, 0.0 ), bounds.y ) );
-
-			const p = vec3( vOrigin.add( bounds.x.mul( rayDir ) ) ).toVar();
-			const inc = vec3( rayDir.abs().reciprocal() ).toVar();
-			const delta = float( min$1( inc.x, min$1( inc.y, inc.z ) ) ).toVar( 'delta' ); // used 'delta' name in loop
-
-			delta.divAssign( materialReference( 'steps', 'float' ) );
-
-			const ac = vec4( materialReference( 'base', 'color' ), 0.0 ).toVar();
-
-			Loop( { type: 'float', start: bounds.x, end: bounds.y, update: '+= delta' }, () => {
-
-				const d = property( 'float', 'd' ).assign( map.sample( p.add( 0.5 ) ).r );
-
-				if ( this.testNode !== null ) {
-
-					this.testNode( { map: map, mapValue: d, probe: p, finalColor: ac } ).append();
-
-				} else {
-
-					// default to show surface of mesh
-					ac.a.assign( 1 );
-					Break();
-
-				}
-
-				p.addAssign( rayDir.mul( delta ) );
-
-			} );
-
-			ac.a.equal( 0 ).discard();
-
-			return vec4( ac );
-
-		} )();
-
-		super.setup( builder );
+		return new VolumetricLightingModel();
 
 	}
 
@@ -22942,7 +23905,7 @@ class Animation {
 	 */
 	start() {
 
-		const update = ( time, frame ) => {
+		const update = ( time, xrFrame ) => {
 
 			this._requestId = this._context.requestAnimationFrame( update );
 
@@ -22952,7 +23915,7 @@ class Animation {
 
 			this.info.frame = this.nodes.nodeFrame.frameId;
 
-			if ( this._animationLoop !== null ) this._animationLoop( time, frame );
+			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame );
 
 		};
 
@@ -25718,6 +26681,16 @@ class Bindings extends DataMap {
 				// we move one with the next binding. Otherwise the next if block will update the group.
 
 				if ( updated === false ) continue;
+
+			}
+
+			if ( binding.isStorageBuffer ) {
+
+				const attribute = binding.attribute;
+				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
+
+				this.attributes.update( attribute, attributeType );
+
 
 			}
 
@@ -30659,7 +31632,7 @@ class StorageTextureNode extends TextureNode {
 	}
 
 	/**
-	 * Generates the code snippet of the stroge node. If no `storeNode`
+	 * Generates the code snippet of the storage node. If no `storeNode`
 	 * is defined, the texture node is generated as normal texture.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -30772,6 +31745,187 @@ const textureStore = ( value, uvNode, storeNode ) => {
 	return node;
 
 };
+
+const normal = Fn( ( { texture, uv } ) => {
+
+	const epsilon = 0.0001;
+
+	const ret = vec3().toVar();
+
+	If( uv.x.lessThan( epsilon ), () => {
+
+		ret.assign( vec3( 1, 0, 0 ) );
+
+	} ).ElseIf( uv.y.lessThan( epsilon ), () => {
+
+		ret.assign( vec3( 0, 1, 0 ) );
+
+	} ).ElseIf( uv.z.lessThan( epsilon ), () => {
+
+		ret.assign( vec3( 0, 0, 1 ) );
+
+	} ).ElseIf( uv.x.greaterThan( 1 - epsilon ), () => {
+
+		ret.assign( vec3( -1, 0, 0 ) );
+
+	} ).ElseIf( uv.y.greaterThan( 1 - epsilon ), () => {
+
+		ret.assign( vec3( 0, -1, 0 ) );
+
+	} ).ElseIf( uv.z.greaterThan( 1 - epsilon ), () => {
+
+		ret.assign( vec3( 0, 0, -1 ) );
+
+	} ).Else( () => {
+
+		const step = 0.01;
+
+		const x = texture.sample( uv.add( vec3( -0.01, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, -0.01, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, -0.01 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+
+		ret.assign( vec3( x, y, z ) );
+
+	} );
+
+	return ret.normalize();
+
+} );
+
+/**
+ * This type of uniform node represents a 3D texture.
+ *
+ * @augments TextureNode
+ */
+class Texture3DNode extends TextureNode {
+
+	static get type() {
+
+		return 'Texture3DNode';
+
+	}
+
+	/**
+	 * Constructs a new 3D texture node.
+	 *
+	 * @param {Data3DTexture} value - The 3D texture.
+	 * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+	 * @param {?Node<int>} [levelNode=null] - The level node.
+	 */
+	constructor( value, uvNode = null, levelNode = null ) {
+
+		super( value, uvNode, levelNode );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isTexture3DNode = true;
+
+	}
+
+	/**
+	 * Overwrites the default implementation to return a fixed value `'texture3D'`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The input type.
+	 */
+	getInputType( /*builder*/ ) {
+
+		return 'texture3D';
+
+	}
+
+	/**
+	 * Returns a default uv node which is in context of 3D textures a three-dimensional
+	 * uv node.
+	 *
+	 * @return {Node<vec3>} The default uv node.
+	 */
+	getDefaultUV() {
+
+		return vec3( 0.5, 0.5, 0.5 );
+
+	}
+
+	/**
+	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
+	 * for 3D textures. The uv transformation matrix is not applied to 3D textures.
+	 *
+	 * @param {boolean} value - The update toggle.
+	 */
+	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
+
+	/**
+	 * Overwrites the default implementation to return the unmodified uv node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} uvNode - The uv node to setup.
+	 * @return {Node} The unmodified uv node.
+	 */
+	setupUV( builder, uvNode ) {
+
+		const texture = this.value;
+
+		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) ) {
+
+			if ( this.sampler ) {
+
+				uvNode = uvNode.flipY();
+
+			} else {
+
+				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
+
+			}
+
+		}
+
+		return uvNode;
+
+	}
+
+	/**
+	 * Generates the uv code snippet.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} uvNode - The uv node to generate code for.
+	 * @return {string} The generated code snippet.
+	 */
+	generateUV( builder, uvNode ) {
+
+		return uvNode.build( builder, 'vec3' );
+
+	}
+
+	/**
+	 * TODO.
+	 *
+	 * @param {Node<vec3>} uvNode - The uv node .
+	 * @return {Node<vec3>} TODO.
+	 */
+	normal( uvNode ) {
+
+		return normal( { texture: this, uv: uvNode } );
+
+	}
+
+}
+
+/**
+ * TSL function for creating a 3D texture node.
+ *
+ * @tsl
+ * @function
+ * @param {Data3DTexture} value - The 3D texture.
+ * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @returns {Texture3DNode}
+ */
+const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );
 
 /**
  * A special type of reference node that allows to link values in
@@ -31163,7 +32317,7 @@ const blendOverlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 /**
  * This function blends two color based on their alpha values by replicating the behavior of `THREE.NormalBlending`.
- * It assumes both input colors have non-preumiltiplied alpha.
+ * It assumes both input colors have non-premultiplied alpha.
  *
  * @tsl
  * @function
@@ -31748,6 +32902,10 @@ class PassNode extends TempNode {
 		 */
 		this._mrt = null;
 
+		this._layers = null;
+
+		this._resolution = 1;
+
 		/**
 		 * This flag can be used for type testing.
 		 *
@@ -31765,6 +32923,47 @@ class PassNode extends TempNode {
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
+
+	}
+
+	/**
+	 * Sets the resolution for the pass.
+	 * The resolution is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
+	 * @return {PassNode} A reference to this pass.
+	 */
+	setResolution( resolution ) {
+
+		this._resolution = resolution;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the current resolution of the pass.
+	 *
+	 * @return {number} The current resolution. A value of `1` means full resolution.
+	 * @default 1
+	 */
+	getResolution() {
+
+		return this._resolution;
+
+	}
+
+	setLayers( layers ) {
+
+		this._layers = layers;
+
+		return this;
+
+	}
+
+	getLayers() {
+
+		return this._layers;
 
 	}
 
@@ -32025,9 +33224,16 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentMask = camera.layers.mask;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
+
+		if ( this._layers !== null ) {
+
+			camera.layers.mask = this._layers.mask;
+
+		}
 
 		for ( const name in this._previousTextures ) {
 
@@ -32043,6 +33249,8 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 
+		camera.layers.mask = currentMask;
+
 	}
 
 	/**
@@ -32056,8 +33264,8 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio;
-		const effectiveHeight = this._height * this._pixelRatio;
+		const effectiveWidth = this._width * this._pixelRatio * this._resolution;
+		const effectiveHeight = this._height * this._pixelRatio * this._resolution;
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
@@ -32088,7 +33296,18 @@ class PassNode extends TempNode {
 
 }
 
+/**
+ * @static
+ * @type {'color'}
+ * @default 'color'
+ */
 PassNode.COLOR = 'color';
+
+/**
+ * @static
+ * @type {'depth'}
+ * @default 'depth'
+ */
 PassNode.DEPTH = 'depth';
 
 /**
@@ -34198,10 +35417,11 @@ class ComputeBuiltinNode extends Node {
 	 * Whether the current node builder has the builtin or not.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the builder has the builtin or not.
 	 */
 	hasBuiltin( builder ) {
 
-		builder.hasBuiltin( this._builtinName );
+		return builder.hasBuiltin( this._builtinName );
 
 	}
 
@@ -34937,22 +36157,15 @@ function lightShadowMatrix( light ) {
  * @tsl
  * @function
  * @param {Light} light -The light source.
+ * @param {Node<vec3>} [position=positionWorld] -The position to project.
  * @returns {Node<vec3>} The projected uvs.
  */
-function lightProjectionUV( light ) {
+function lightProjectionUV( light, position = positionWorld ) {
 
-	const data = getLightData( light );
+	const spotLightCoord = lightShadowMatrix( light ).mul( position );
+	const projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
 
-	if ( data.projectionUV === undefined ) {
-
-		const spotLightCoord = lightShadowMatrix( light ).mul( positionWorld );
-
-		data.projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
-
-
-	}
-
-	return data.projectionUV;
+	return projectionUV;
 
 }
 
@@ -34993,7 +36206,7 @@ function lightTargetPosition( light ) {
  *
  * @tsl
  * @function
- * @param {Light} light -The light source.
+ * @param {Light} light - The light source.
  * @returns {UniformNode<vec3>} The light's position in view space.
  */
 function lightViewPosition( light ) {
@@ -35256,6 +36469,37 @@ class LightsNode extends Node {
 	}
 
 	/**
+	 * Sets up a direct light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and direction properties.
+	 */
+	setupDirectLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.direct( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	setupDirectRectAreaLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.directRectArea( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	/**
 	 * Setups the internal lights by building all respective
 	 * light nodes.
 	 *
@@ -35272,6 +36516,14 @@ class LightsNode extends Node {
 
 	}
 
+	getLightNodes( builder ) {
+
+		if ( this._lightNodes === null ) this.setupLightsNode( builder );
+
+		return this._lightNodes;
+
+	}
+
 	/**
 	 * The implementation makes sure that for each light in the scene
 	 * there is a corresponding light node. By building the light nodes
@@ -35282,16 +36534,22 @@ class LightsNode extends Node {
 	 */
 	setup( builder ) {
 
-		if ( this._lightNodes === null ) this.setupLightsNode( builder );
+		const currentLightsNode = builder.lightsNode;
+
+		builder.lightsNode = this;
+
+		//
+
+		let outgoingLightNode = this.outgoingLightNode;
 
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		let outgoingLightNode = this.outgoingLightNode;
+		const properties = builder.getDataFromNode( this );
 
 		if ( lightingModel ) {
 
-			const { _lightNodes, totalDiffuseNode, totalSpecularNode } = this;
+			const { totalDiffuseNode, totalSpecularNode } = this;
 
 			context.outgoingLight = outgoingLightNode;
 
@@ -35299,20 +36557,11 @@ class LightsNode extends Node {
 
 			//
 
-			const properties = builder.getDataFromNode( this );
 			properties.nodes = stack.nodes;
 
 			//
 
-			lightingModel.start( context, stack, builder );
-
-			// lights
-
-			this.setupLights( builder, _lightNodes );
-
-			//
-
-			lightingModel.indirect( context, stack, builder );
+			lightingModel.start( builder );
 
 			//
 
@@ -35344,13 +36593,21 @@ class LightsNode extends Node {
 
 			//
 
-			lightingModel.finish( context, stack, builder );
+			lightingModel.finish( builder );
 
 			//
 
 			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
 
+		} else {
+
+			properties.nodes = [];
+
 		}
+
+		//
+
+		builder.lightsNode = currentLightsNode;
 
 		return outgoingLightNode;
 
@@ -35463,13 +36720,13 @@ class ShadowBaseNode extends Node {
 	/**
 	 * Setups the shadow position node which is by default the predefined TSL node object `shadowPositionWorld`.
 	 *
-	 * @param {(NodeBuilder|{Material})} object - A configuration object that must at least hold a material reference.
+	 * @param {NodeBuilder} object - A configuration object that must at least hold a material reference.
 	 */
-	setupShadowPosition( { material } ) {
+	setupShadowPosition( { context, material } ) {
 
 		// Use assign inside an Fn()
 
-		shadowPositionWorld.assign( material.shadowPositionNode || positionWorld );
+		shadowPositionWorld.assign( material.shadowPositionNode || context.shadowPositionWorld || positionWorld );
 
 	}
 
@@ -35492,7 +36749,7 @@ class ShadowBaseNode extends Node {
  * @tsl
  * @type {Node<vec3>}
  */
-const shadowPositionWorld = /*@__PURE__*/ vec3().toVar( 'shadowPositionWorld' );
+const shadowPositionWorld = /*@__PURE__*/ property( 'vec3', 'shadowPositionWorld' );
 
 /**
  * Saves the state of the given renderer and stores it into the given state object.
@@ -36073,6 +37330,8 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		this._cameraFrameId = new WeakMap();
+
 		/**
 		 * This flag can be used for type testing.
 		 *
@@ -36444,7 +37703,19 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { shadow } = this;
 
-		const needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+
+		if ( needsUpdate ) {
+
+			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
+
+				needsUpdate = false;
+
+			}
+
+			this._cameraFrameId[ frame.camera ] = frame.frameId;
+
+		}
 
 		if ( needsUpdate ) {
 
@@ -36473,244 +37744,7 @@ class ShadowNode extends ShadowBaseNode {
  */
 const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
 
-/**
- * Base class for analytic light nodes.
- *
- * @augments LightingNode
- */
-class AnalyticLightNode extends LightingNode {
-
-	static get type() {
-
-		return 'AnalyticLightNode';
-
-	}
-
-	/**
-	 * Constructs a new analytic light node.
-	 *
-	 * @param {?Light} [light=null] - The light source.
-	 */
-	constructor( light = null ) {
-
-		super();
-
-		/**
-		 * The light source.
-		 *
-		 * @type {?Light}
-		 * @default null
-		 */
-		this.light = light;
-
-		/**
-		 * The light's color value.
-		 *
-		 * @type {Color}
-		 */
-		this.color = new Color();
-
-		/**
-		 * The light's color node. Points to `colorNode` of the light source, if set. Otherwise
-		 * it creates a uniform node based on {@link AnalyticLightNode#color}.
-		 *
-		 * @type {Node}
-		 */
-		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
-
-		/**
-		 * This property is used to retain a reference to the original value of {@link AnalyticLightNode#colorNode}.
-		 * The final color node is represented by a different node when using shadows.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.baseColorNode = null;
-
-		/**
-		 * Represents the light's shadow.
-		 *
-		 * @type {?ShadowNode}
-   		 * @default null
-		 */
-		this.shadowNode = null;
-
-		/**
-		 * Represents the light's shadow color.
-		 *
-		 * @type {?Node}
-   		 * @default null
-		 */
-		this.shadowColorNode = null;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isAnalyticLightNode = true;
-
-		/**
-		 * Overwritten since analytic light nodes are updated
-		 * once per frame.
-		 *
-		 * @type {string}
-		 * @default 'frame'
-		 */
-		this.updateType = NodeUpdateType.FRAME;
-
-	}
-
-	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
-	 * `light.id` and `light.castShadow` into the cache key.
-	 *
-	 * @return {number} The custom cache key.
-	 */
-	customCacheKey() {
-
-		return hash$1( this.light.id, this.light.castShadow ? 1 : 0 );
-
-	}
-
-	getHash() {
-
-		return this.light.uuid;
-
-	}
-
-	/**
-	 * Setups the shadow node for this light. The method exists so concrete light classes
-	 * can setup different types of shadow nodes.
-	 *
-	 * @return {ShadowNode} The created shadow node.
-	 */
-	setupShadowNode() {
-
-		return shadow( this.light );
-
-	}
-
-	/**
-	 * Setups the shadow for this light. This method is only executed if the light
-	 * cast shadows and the current build object receives shadows. It incorporates
-	 * shadows into the lighting computation.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setupShadow( builder ) {
-
-		const { renderer } = builder;
-
-		if ( renderer.shadowMap.enabled === false ) return;
-
-		let shadowColorNode = this.shadowColorNode;
-
-		if ( shadowColorNode === null ) {
-
-			const customShadowNode = this.light.shadow.shadowNode;
-
-			let shadowNode;
-
-			if ( customShadowNode !== undefined ) {
-
-				shadowNode = nodeObject( customShadowNode );
-
-			} else {
-
-				shadowNode = this.setupShadowNode( builder );
-
-			}
-
-			this.shadowNode = shadowNode;
-
-			this.shadowColorNode = shadowColorNode = this.colorNode.mul( shadowNode );
-
-			this.baseColorNode = this.colorNode;
-
-		}
-
-		//
-
-		this.colorNode = shadowColorNode;
-
-	}
-
-	/**
-	 * Unlike most other nodes, lighting nodes do not return a output node in {@link Node#setup}.
-	 * The main purpose of lighting nodes is to configure the current {@link LightingModel} and/or
-	 * invocate the respective interface methods.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setup( builder ) {
-
-		this.colorNode = this.baseColorNode || this.colorNode;
-
-		if ( this.light.castShadow ) {
-
-			if ( builder.object.receiveShadow ) {
-
-				this.setupShadow( builder );
-
-			}
-
-		} else if ( this.shadowNode !== null ) {
-
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-			this.shadowColorNode = null;
-
-		}
-
-	}
-
-	/**
-	 * The update method is used to update light uniforms per frame.
-	 * Potentially overwritten in concrete light nodes to update light
-	 * specific uniforms.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	update( /*frame*/ ) {
-
-		const { light } = this;
-
-		this.color.copy( light.color ).multiplyScalar( light.intensity );
-
-	}
-
-}
-
-/**
- * Represents a `discard` shader operation in TSL.
- *
- * @method
- * @param {Object} inputs - The input parameter object.
- * @param {Node<float>} inputs.lightDistance - The distance of the light's position to the current fragment position.
- * @param {Node<float>} inputs.cutoffDistance - The light's cutoff distance.
- * @param {Node<float>} inputs.decayExponent - The light's decay exponent.
- * @return {Node<float>} The distance falloff.
- */
-const getDistanceAttenuation = /*@__PURE__*/ Fn( ( inputs ) => {
-
-	const { lightDistance, cutoffDistance, decayExponent } = inputs;
-
-	// based upon Frostbite 3 Moving to Physically-based Rendering
-	// page 32, equation 26: E[window1]
-	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-	const distanceFalloff = lightDistance.pow( decayExponent ).max( 0.01 ).reciprocal();
-
-	return cutoffDistance.greaterThan( 0 ).select(
-		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().oneMinus().clamp().pow2() ),
-		distanceFalloff
-	);
-
-} ); // validated
-
-const _clearColor$2 = /*@__PURE__*/ new Color();
+const _clearColor$1 = /*@__PURE__*/ new Color();
 
 // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
 // vector suitable for 2D texture mapping. This code uses the following layout for the
@@ -36951,7 +37985,7 @@ class PointShadowNode extends ShadowNode {
 
 		const previousAutoClear = renderer.autoClear;
 
-		const previousClearColor = renderer.getClearColor( _clearColor$2 );
+		const previousClearColor = renderer.getClearColor( _clearColor$1 );
 		const previousClearAlpha = renderer.getClearAlpha();
 
 		renderer.autoClear = false;
@@ -37002,32 +38036,288 @@ class PointShadowNode extends ShadowNode {
  */
 const pointShadow = ( light, shadow ) => nodeObject( new PointShadowNode( light, shadow ) );
 
-const directPointLight = Fn( ( { color, lightViewPosition, cutoffDistance, decayExponent }, builder ) => {
+/**
+ * Base class for analytic light nodes.
+ *
+ * @augments LightingNode
+ */
+class AnalyticLightNode extends LightingNode {
 
-	const lightingModel = builder.context.lightingModel;
+	static get type() {
 
-	const lVector = lightViewPosition.sub( positionView ); // @TODO: Add it into LightNode
+		return 'AnalyticLightNode';
 
-	const lightDirection = lVector.normalize();
-	const lightDistance = lVector.length();
+	}
 
-	const lightAttenuation = getDistanceAttenuation( {
+	/**
+	 * Constructs a new analytic light node.
+	 *
+	 * @param {?Light} [light=null] - The light source.
+	 */
+	constructor( light = null ) {
+
+		super();
+
+		/**
+		 * The light source.
+		 *
+		 * @type {?Light}
+		 * @default null
+		 */
+		this.light = light;
+
+		/**
+		 * The light's color value.
+		 *
+		 * @type {Color}
+		 */
+		this.color = new Color();
+
+		/**
+		 * The light's color node. Points to `colorNode` of the light source, if set. Otherwise
+		 * it creates a uniform node based on {@link AnalyticLightNode#color}.
+		 *
+		 * @type {Node}
+		 */
+		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
+
+		/**
+		 * This property is used to retain a reference to the original value of {@link AnalyticLightNode#colorNode}.
+		 * The final color node is represented by a different node when using shadows.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.baseColorNode = null;
+
+		/**
+		 * Represents the light's shadow.
+		 *
+		 * @type {?ShadowNode}
+   		 * @default null
+		 */
+		this.shadowNode = null;
+
+		/**
+		 * Represents the light's shadow color.
+		 *
+		 * @type {?Node}
+   		 * @default null
+		 */
+		this.shadowColorNode = null;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isAnalyticLightNode = true;
+
+		/**
+		 * Overwritten since analytic light nodes are updated
+		 * once per frame.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
+		this.updateType = NodeUpdateType.FRAME;
+
+	}
+
+	/**
+	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
+	 * `light.id` and `light.castShadow` into the cache key.
+	 *
+	 * @return {number} The custom cache key.
+	 */
+	customCacheKey() {
+
+		return hash$1( this.light.id, this.light.castShadow ? 1 : 0 );
+
+	}
+
+	getHash() {
+
+		return this.light.uuid;
+
+	}
+
+	getLightVector( builder ) {
+
+		return lightViewPosition( this.light ).sub( builder.context.positionView || positionView );
+
+	}
+
+	/**
+	 * Sets up the direct lighting for the analytic light node.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 */
+	setupDirect( /*builder*/ ) { }
+
+	setupDirectRectArea( /*builder*/ ) { }
+
+	/**
+	 * Setups the shadow node for this light. The method exists so concrete light classes
+	 * can setup different types of shadow nodes.
+	 *
+	 * @return {ShadowNode} The created shadow node.
+	 */
+	setupShadowNode() {
+
+		return shadow( this.light );
+
+	}
+
+	/**
+	 * Setups the shadow for this light. This method is only executed if the light
+	 * cast shadows and the current build object receives shadows. It incorporates
+	 * shadows into the lighting computation.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setupShadow( builder ) {
+
+		const { renderer } = builder;
+
+		if ( renderer.shadowMap.enabled === false ) return;
+
+		let shadowColorNode = this.shadowColorNode;
+
+		if ( shadowColorNode === null ) {
+
+			const customShadowNode = this.light.shadow.shadowNode;
+
+			let shadowNode;
+
+			if ( customShadowNode !== undefined ) {
+
+				shadowNode = nodeObject( customShadowNode );
+
+			} else {
+
+				shadowNode = this.setupShadowNode( builder );
+
+			}
+
+			this.shadowNode = shadowNode;
+
+			this.shadowColorNode = shadowColorNode = this.colorNode.mul( shadowNode );
+
+			this.baseColorNode = this.colorNode;
+
+		}
+
+		//
+
+		this.colorNode = shadowColorNode;
+
+	}
+
+	/**
+	 * Unlike most other nodes, lighting nodes do not return a output node in {@link Node#setup}.
+	 * The main purpose of lighting nodes is to configure the current {@link LightingModel} and/or
+	 * invocate the respective interface methods.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setup( builder ) {
+
+		this.colorNode = this.baseColorNode || this.colorNode;
+
+		if ( this.light.castShadow ) {
+
+			if ( builder.object.receiveShadow ) {
+
+				this.setupShadow( builder );
+
+			}
+
+		} else if ( this.shadowNode !== null ) {
+
+			this.shadowNode.dispose();
+			this.shadowNode = null;
+			this.shadowColorNode = null;
+
+		}
+
+		const directLightData = this.setupDirect( builder );
+		const directRectAreaLightData = this.setupDirectRectArea( builder );
+
+		if ( directLightData ) {
+
+			builder.lightsNode.setupDirectLight( builder, this, directLightData );
+
+		}
+
+		if ( directRectAreaLightData ) {
+
+			builder.lightsNode.setupDirectRectAreaLight( builder, this, directRectAreaLightData );
+
+		}
+
+	}
+
+	/**
+	 * The update method is used to update light uniforms per frame.
+	 * Potentially overwritten in concrete light nodes to update light
+	 * specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( /*frame*/ ) {
+
+		const { light } = this;
+
+		this.color.copy( light.color ).multiplyScalar( light.intensity );
+
+	}
+
+}
+
+/**
+ * Represents a `discard` shader operation in TSL.
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {Node<float>} inputs.lightDistance - The distance of the light's position to the current fragment position.
+ * @param {Node<float>} inputs.cutoffDistance - The light's cutoff distance.
+ * @param {Node<float>} inputs.decayExponent - The light's decay exponent.
+ * @return {Node<float>} The distance falloff.
+ */
+const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutoffDistance, decayExponent } ) => {
+
+	// based upon Frostbite 3 Moving to Physically-based Rendering
+	// page 32, equation 26: E[window1]
+	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+	const distanceFalloff = lightDistance.pow( decayExponent ).max( 0.01 ).reciprocal();
+
+	return cutoffDistance.greaterThan( 0 ).select(
+		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().oneMinus().clamp().pow2() ),
+		distanceFalloff
+	);
+
+} ); // validated
+
+const directPointLight = ( { color, lightVector, cutoffDistance, decayExponent } ) => {
+
+	const lightDirection = lightVector.normalize();
+	const lightDistance = lightVector.length();
+
+	const attenuation = getDistanceAttenuation( {
 		lightDistance,
 		cutoffDistance,
 		decayExponent
 	} );
 
-	const lightColor = color.mul( lightAttenuation );
+	const lightColor = color.mul( attenuation );
 
-	const reflectedLight = builder.context.reflectedLight;
+	return { lightDirection, lightColor };
 
-	lightingModel.direct( {
-		lightDirection,
-		lightColor,
-		reflectedLight
-	}, builder.stack, builder );
-
-} );
+};
 
 /**
  * Module for representing point lights as nodes.
@@ -37094,16 +38384,14 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
+	setupDirect( builder ) {
 
-		super.setup( builder );
-
-		directPointLight( {
+		return directPointLight( {
 			color: this.colorNode,
-			lightViewPosition: lightViewPosition( this.light ),
+			lightVector: this.getLightVector( builder ),
 			cutoffDistance: this.cutoffDistanceNode,
 			decayExponent: this.decayExponentNode
-		} ).append();
+		} );
 
 	}
 
@@ -38745,6 +40033,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	BRDF_GGX: BRDF_GGX,
 	BRDF_Lambert: BRDF_Lambert,
+	BasicPointShadowFilter: BasicPointShadowFilter,
 	BasicShadowFilter: BasicShadowFilter,
 	Break: Break,
 	Const: Const,
@@ -38766,6 +40055,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	PCFSoftShadowFilter: PCFSoftShadowFilter,
 	PI: PI,
 	PI2: PI2,
+	PointShadowFilter: PointShadowFilter,
 	Return: Return,
 	Schlick_to_F0: Schlick_to_F0,
 	ScriptableNodeResources: ScriptableNodeResources,
@@ -38870,6 +40160,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	cos: cos,
 	cross: cross,
 	cubeTexture: cubeTexture,
+	cubeToUV: cubeToUV,
 	dFdx: dFdx,
 	dFdy: dFdy,
 	dashSize: dashSize,
@@ -38992,6 +40283,8 @@ var TSL = /*#__PURE__*/Object.freeze({
 	materialColor: materialColor,
 	materialDispersion: materialDispersion,
 	materialEmissive: materialEmissive,
+	materialEnvIntensity: materialEnvIntensity,
+	materialEnvRotation: materialEnvRotation,
 	materialIOR: materialIOR,
 	materialIridescence: materialIridescence,
 	materialIridescenceIOR: materialIridescenceIOR,
@@ -39032,6 +40325,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	modelDirection: modelDirection,
 	modelNormalMatrix: modelNormalMatrix,
 	modelPosition: modelPosition,
+	modelRadius: modelRadius,
 	modelScale: modelScale,
 	modelViewMatrix: modelViewMatrix,
 	modelViewPosition: modelViewPosition,
@@ -39083,6 +40377,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	objectDirection: objectDirection,
 	objectGroup: objectGroup,
 	objectPosition: objectPosition,
+	objectRadius: objectRadius,
 	objectScale: objectScale,
 	objectViewPosition: objectViewPosition,
 	objectWorldMatrix: objectWorldMatrix,
@@ -39106,6 +40401,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	pcurve: pcurve,
 	perspectiveDepthToViewZ: perspectiveDepthToViewZ,
 	pmremTexture: pmremTexture,
+	pointShadow: pointShadow,
 	pointUV: pointUV,
 	pointWidth: pointWidth,
 	positionGeometry: positionGeometry,
@@ -39283,7 +40579,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	xor: xor
 });
 
-const _clearColor$1 = /*@__PURE__*/ new Color4();
+const _clearColor = /*@__PURE__*/ new Color4();
 
 /**
  * This renderer module manages the background.
@@ -39340,15 +40636,15 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			renderer._clearColor.getRGB( _clearColor$1 );
-			_clearColor$1.a = renderer._clearColor.a;
+			renderer._clearColor.getRGB( _clearColor );
+			_clearColor.a = renderer._clearColor.a;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			background.getRGB( _clearColor$1 );
-			_clearColor$1.a = 1;
+			background.getRGB( _clearColor );
+			_clearColor.a = 1;
 
 			forceClear = true;
 
@@ -39357,7 +40653,7 @@ class Background extends DataMap {
 			const sceneData = this.get( scene );
 			const backgroundNode = background;
 
-			_clearColor$1.copy( renderer._clearColor );
+			_clearColor.copy( renderer._clearColor );
 
 			let backgroundMesh = sceneData.backgroundMesh;
 
@@ -39422,11 +40718,11 @@ class Background extends DataMap {
 
 		if ( environmentBlendMode === 'additive' ) {
 
-			_clearColor$1.set( 0, 0, 0, 1 );
+			_clearColor.set( 0, 0, 0, 1 );
 
 		} else if ( environmentBlendMode === 'alpha-blend' ) {
 
-			_clearColor$1.set( 0, 0, 0, 0 );
+			_clearColor.set( 0, 0, 0, 0 );
 
 		}
 
@@ -39436,10 +40732,10 @@ class Background extends DataMap {
 
 			const clearColorValue = renderContext.clearColorValue;
 
-			clearColorValue.r = _clearColor$1.r;
-			clearColorValue.g = _clearColor$1.g;
-			clearColorValue.b = _clearColor$1.b;
-			clearColorValue.a = _clearColor$1.a;
+			clearColorValue.r = _clearColor.r;
+			clearColorValue.g = _clearColor.g;
+			clearColorValue.b = _clearColor.b;
+			clearColorValue.a = _clearColor.a;
 
 			// premultiply alpha
 
@@ -40818,905 +42114,6 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 }
 
-const LOD_MIN = 4;
-
-// The standard deviations (radians) associated with the extra mips. These are
-// chosen to approximate a Trowbridge-Reitz distribution function times the
-// geometric shadowing function. These sigma values squared must match the
-// variance #defines in cube_uv_reflection_fragment.glsl.js.
-const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
-
-// The maximum length of the blur for loop. Smaller sigmas will use fewer
-// samples and exit early, but not recompile the shader.
-const MAX_SAMPLES = 20;
-
-const _flatCamera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
-const _clearColor = /*@__PURE__*/ new Color();
-let _oldTarget = null;
-let _oldActiveCubeFace = 0;
-let _oldActiveMipmapLevel = 0;
-
-// Golden Ratio
-const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
-const INV_PHI = 1 / PHI;
-
-// Vertices of a dodecahedron (except the opposites, which represent the
-// same axis), used as axis directions evenly spread on a sphere.
-const _axisDirections = [
-	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( -1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( -1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, 1 )
-];
-
-const _origin = /*@__PURE__*/ new Vector3();
-
-// maps blur materials to their uniforms dictionary
-
-const _uniformsMap = new WeakMap();
-
-// WebGPU Face indices
-const _faceLib = [
-	3, 1, 5,
-	0, 4, 2
-];
-
-const _direction = /*@__PURE__*/ getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
-const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direction.z );
-
-/**
- * This class generates a Prefiltered, Mipmapped Radiance Environment Map
- * (PMREM) from a cubeMap environment texture. This allows different levels of
- * blur to be quickly accessed based on material roughness. It is packed into a
- * special CubeUV format that allows us to perform custom interpolation so that
- * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
- * chain, it only goes down to the LOD_MIN level (above), and then creates extra
- * even more filtered 'mips' at the same LOD_MIN resolution, associated with
- * higher roughness levels. In this way we maintain resolution to smoothly
- * interpolate diffuse lighting while limiting sampling computation.
- *
- * Paper: Fast, Accurate Image-Based Lighting:
- * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
-*/
-
-class PMREMGenerator {
-
-	constructor( renderer ) {
-
-		this._renderer = renderer;
-		this._pingPongRenderTarget = null;
-
-		this._lodMax = 0;
-		this._cubeSize = 0;
-		this._lodPlanes = [];
-		this._sizeLods = [];
-		this._sigmas = [];
-		this._lodMeshes = [];
-
-		this._blurMaterial = null;
-		this._cubemapMaterial = null;
-		this._equirectMaterial = null;
-		this._backgroundBox = null;
-
-	}
-
-	get _hasInitialized() {
-
-		return this._renderer.hasInitialized();
-
-	}
-
-	/**
-	 * Generates a PMREM from a supplied Scene, which can be faster than using an
-	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
-	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety.
-	 *
-	 * @param {Scene} scene - The scene to be captured.
-	 * @param {number} [sigma=0] - The blur radius in radians.
-	 * @param {number} [near=0.1] - The near plane distance.
-	 * @param {number} [far=100] - The far plane distance.
-	 * @param {Object} [options={}] - The configuration options.
-	 * @param {number} [options.size=256] - The texture size of the PMREM.
-	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
-	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
-	 * @return {RenderTarget} The resulting PMREM.
-	 * @see fromSceneAsync
-	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
-
-		const {
-			size = 256,
-			position = _origin,
-			renderTarget = null,
-		} = options;
-
-		this._setSize( size );
-
-		if ( this._hasInitialized === false ) {
-
-			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
-
-			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-
-			options.renderTarget = cubeUVRenderTarget;
-
-			this.fromSceneAsync( scene, sigma, near, far, options );
-
-			return cubeUVRenderTarget;
-
-		}
-
-		_oldTarget = this._renderer.getRenderTarget();
-		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
-		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
-
-		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-		cubeUVRenderTarget.depthBuffer = true;
-
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position );
-
-		if ( sigma > 0 ) {
-
-			this._blur( cubeUVRenderTarget, 0, 0, sigma );
-
-		}
-
-		this._applyPMREM( cubeUVRenderTarget );
-
-		this._cleanup( cubeUVRenderTarget );
-
-		return cubeUVRenderTarget;
-
-	}
-
-	/**
-	 * Generates a PMREM from a supplied Scene, which can be faster than using an
-	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
-	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
-	 * is placed at the origin).
-	 *
-	 * @param {Scene} scene - The scene to be captured.
-	 * @param {number} [sigma=0] - The blur radius in radians.
-	 * @param {number} [near=0.1] - The near plane distance.
-	 * @param {number} [far=100] - The far plane distance.
-	 * @param {Object} [options={}] - The configuration options.
-	 * @param {number} [options.size=256] - The texture size of the PMREM.
-	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
-	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
-	 * @see fromScene
-	 */
-	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
-
-		if ( this._hasInitialized === false ) await this._renderer.init();
-
-		return this.fromScene( scene, sigma, near, far, options );
-
-	}
-
-	/**
-	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * or HDR. The ideal input image size is 1k (1024 x 512),
-	 * as this matches best with the 256 x 256 cubemap output.
-	 *
-	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {RenderTarget} The resulting PMREM.
-	 * @see fromEquirectangularAsync
-	 */
-	fromEquirectangular( equirectangular, renderTarget = null ) {
-
-		if ( this._hasInitialized === false ) {
-
-			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
-
-			this._setSizeFromTexture( equirectangular );
-
-			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-
-			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
-
-			return cubeUVRenderTarget;
-
-		}
-
-		return this._fromTexture( equirectangular, renderTarget );
-
-	}
-
-	/**
-	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * or HDR. The ideal input image size is 1k (1024 x 512),
-	 * as this matches best with the 256 x 256 cubemap output.
-	 *
-	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} The resulting PMREM.
-	 * @see fromEquirectangular
-	 */
-	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
-
-		if ( this._hasInitialized === false ) await this._renderer.init();
-
-		return this._fromTexture( equirectangular, renderTarget );
-
-	}
-
-	/**
-	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * or HDR. The ideal input cube size is 256 x 256,
-	 * as this matches best with the 256 x 256 cubemap output.
-	 *
-	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {RenderTarget} The resulting PMREM.
-	 * @see fromCubemapAsync
-	 */
-	fromCubemap( cubemap, renderTarget = null ) {
-
-		if ( this._hasInitialized === false ) {
-
-			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
-
-			this._setSizeFromTexture( cubemap );
-
-			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-
-			this.fromCubemapAsync( cubemap, renderTarget );
-
-			return cubeUVRenderTarget;
-
-		}
-
-		return this._fromTexture( cubemap, renderTarget );
-
-	}
-
-	/**
-	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * or HDR. The ideal input cube size is 256 x 256,
-	 * with the 256 x 256 cubemap output.
-	 *
-	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} The resulting PMREM.
-	 * @see fromCubemap
-	 */
-	async fromCubemapAsync( cubemap, renderTarget = null ) {
-
-		if ( this._hasInitialized === false ) await this._renderer.init();
-
-		return this._fromTexture( cubemap, renderTarget );
-
-	}
-
-	/**
-	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
-	 * your texture's network fetch for increased concurrency.
-	 *
-	 * @returns {Promise}
-	 */
-	async compileCubemapShader() {
-
-		if ( this._cubemapMaterial === null ) {
-
-			this._cubemapMaterial = _getCubemapMaterial();
-			await this._compileMaterial( this._cubemapMaterial );
-
-		}
-
-	}
-
-	/**
-	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
-	 * your texture's network fetch for increased concurrency.
-	 *
-	 * @returns {Promise}
-	 */
-	async compileEquirectangularShader() {
-
-		if ( this._equirectMaterial === null ) {
-
-			this._equirectMaterial = _getEquirectMaterial();
-			await this._compileMaterial( this._equirectMaterial );
-
-		}
-
-	}
-
-	/**
-	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
-	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
-	 * one of them will cause any others to also become unusable.
-	 */
-	dispose() {
-
-		this._dispose();
-
-		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
-		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
-		if ( this._backgroundBox !== null ) {
-
-			this._backgroundBox.geometry.dispose();
-			this._backgroundBox.material.dispose();
-
-		}
-
-	}
-
-	// private interface
-
-	_setSizeFromTexture( texture ) {
-
-		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
-
-			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
-
-		} else { // Equirectangular
-
-			this._setSize( texture.image.width / 4 );
-
-		}
-
-	}
-
-	_setSize( cubeSize ) {
-
-		this._lodMax = Math.floor( Math.log2( cubeSize ) );
-		this._cubeSize = Math.pow( 2, this._lodMax );
-
-	}
-
-	_dispose() {
-
-		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
-
-		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
-
-		for ( let i = 0; i < this._lodPlanes.length; i ++ ) {
-
-			this._lodPlanes[ i ].dispose();
-
-		}
-
-	}
-
-	_cleanup( outputTarget ) {
-
-		this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
-		outputTarget.scissorTest = false;
-		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
-
-	}
-
-	_fromTexture( texture, renderTarget ) {
-
-		this._setSizeFromTexture( texture );
-
-		_oldTarget = this._renderer.getRenderTarget();
-		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
-		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
-
-		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-		this._textureToCubeUV( texture, cubeUVRenderTarget );
-		this._applyPMREM( cubeUVRenderTarget );
-		this._cleanup( cubeUVRenderTarget );
-
-		return cubeUVRenderTarget;
-
-	}
-
-	_allocateTargets() {
-
-		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
-		const height = 4 * this._cubeSize;
-
-		const params = {
-			magFilter: LinearFilter,
-			minFilter: LinearFilter,
-			generateMipmaps: false,
-			type: HalfFloatType,
-			format: RGBAFormat,
-			colorSpace: LinearSRGBColorSpace,
-			//depthBuffer: false
-		};
-
-		const cubeUVRenderTarget = _createRenderTarget( width, height, params );
-
-		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width || this._pingPongRenderTarget.height !== height ) {
-
-			if ( this._pingPongRenderTarget !== null ) {
-
-				this._dispose();
-
-			}
-
-			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
-
-			const { _lodMax } = this;
-			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas, lodMeshes: this._lodMeshes } = _createPlanes( _lodMax ) );
-
-			this._blurMaterial = _getBlurShader( _lodMax, width, height );
-
-		}
-
-		return cubeUVRenderTarget;
-
-	}
-
-	async _compileMaterial( material ) {
-
-		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
-		await this._renderer.compile( tmpMesh, _flatCamera );
-
-	}
-
-	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position ) {
-
-		const cubeCamera = _cubeCamera;
-		cubeCamera.near = near;
-		cubeCamera.far = far;
-
-		// px, py, pz, nx, ny, nz
-		const upSign = [ 1, 1, 1, 1, -1, 1 ];
-		const forwardSign = [ 1, -1, 1, -1, 1, -1 ];
-
-		const renderer = this._renderer;
-
-		const originalAutoClear = renderer.autoClear;
-
-		renderer.getClearColor( _clearColor );
-
-		renderer.autoClear = false;
-
-		let backgroundBox = this._backgroundBox;
-
-		if ( backgroundBox === null ) {
-
-			const backgroundMaterial = new MeshBasicMaterial( {
-				name: 'PMREM.Background',
-				side: BackSide,
-				depthWrite: false,
-				depthTest: false
-			} );
-
-			backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
-
-		}
-
-		let useSolidColor = false;
-		const background = scene.background;
-
-		if ( background ) {
-
-			if ( background.isColor ) {
-
-				backgroundBox.material.color.copy( background );
-				scene.background = null;
-				useSolidColor = true;
-
-			}
-
-		} else {
-
-			backgroundBox.material.color.copy( _clearColor );
-			useSolidColor = true;
-
-		}
-
-		renderer.setRenderTarget( cubeUVRenderTarget );
-
-		renderer.clear();
-
-		if ( useSolidColor ) {
-
-			renderer.render( backgroundBox, cubeCamera );
-
-		}
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			const col = i % 3;
-
-			if ( col === 0 ) {
-
-				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
-
-			} else if ( col === 1 ) {
-
-				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
-
-
-			} else {
-
-				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
-
-
-			}
-
-			const size = this._cubeSize;
-
-			_setViewport( cubeUVRenderTarget, col * size, i > 2 ? size : 0, size, size );
-
-			renderer.render( scene, cubeCamera );
-
-		}
-
-		renderer.autoClear = originalAutoClear;
-		scene.background = background;
-
-	}
-
-	_textureToCubeUV( texture, cubeUVRenderTarget ) {
-
-		const renderer = this._renderer;
-
-		const isCubeTexture = ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping );
-
-		if ( isCubeTexture ) {
-
-			if ( this._cubemapMaterial === null ) {
-
-				this._cubemapMaterial = _getCubemapMaterial( texture );
-
-			}
-
-		} else {
-
-			if ( this._equirectMaterial === null ) {
-
-				this._equirectMaterial = _getEquirectMaterial( texture );
-
-			}
-
-		}
-
-		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
-		material.fragmentNode.value = texture;
-
-		const mesh = this._lodMeshes[ 0 ];
-		mesh.material = material;
-
-		const size = this._cubeSize;
-
-		_setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
-
-		renderer.setRenderTarget( cubeUVRenderTarget );
-		renderer.render( mesh, _flatCamera );
-
-	}
-
-	_applyPMREM( cubeUVRenderTarget ) {
-
-		const renderer = this._renderer;
-		const autoClear = renderer.autoClear;
-		renderer.autoClear = false;
-		const n = this._lodPlanes.length;
-
-		for ( let i = 1; i < n; i ++ ) {
-
-			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
-
-			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
-
-			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
-
-		}
-
-		renderer.autoClear = autoClear;
-
-	}
-
-	/**
-	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
-	 * vertically and horizontally, but this breaks down on a cube. Here we apply
-	 * the blur latitudinally (around the poles), and then longitudinally (towards
-	 * the poles) to approximate the orthogonally-separable blur. It is least
-	 * accurate at the poles, but still does a decent job.
-	 *
-	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
-	 * @param {number} lodIn - The input level-of-detail.
-	 * @param {number} lodOut - The output level-of-detail.
-	 * @param {number} sigma - The blur radius in radians.
-	 * @param {Vector3} [poleAxis] - The pole axis.
-	 */
-	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
-
-		const pingPongRenderTarget = this._pingPongRenderTarget;
-
-		this._halfBlur(
-			cubeUVRenderTarget,
-			pingPongRenderTarget,
-			lodIn,
-			lodOut,
-			sigma,
-			'latitudinal',
-			poleAxis );
-
-		this._halfBlur(
-			pingPongRenderTarget,
-			cubeUVRenderTarget,
-			lodOut,
-			lodOut,
-			sigma,
-			'longitudinal',
-			poleAxis );
-
-	}
-
-	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
-
-		const renderer = this._renderer;
-		const blurMaterial = this._blurMaterial;
-
-		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
-
-			console.error( 'blur direction must be either latitudinal or longitudinal!' );
-
-		}
-
-		// Number of standard deviations at which to cut off the discrete approximation.
-		const STANDARD_DEVIATIONS = 3;
-
-		const blurMesh = this._lodMeshes[ lodOut ];
-		blurMesh.material = blurMaterial;
-
-		const blurUniforms = _uniformsMap.get( blurMaterial );
-
-		const pixels = this._sizeLods[ lodIn ] - 1;
-		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
-		const sigmaPixels = sigmaRadians / radiansPerPixel;
-		const samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
-
-		if ( samples > MAX_SAMPLES ) {
-
-			console.warn( `sigmaRadians, ${
-				sigmaRadians}, is too large and will clip, as it requested ${
-				samples} samples when the maximum is set to ${MAX_SAMPLES}` );
-
-		}
-
-		const weights = [];
-		let sum = 0;
-
-		for ( let i = 0; i < MAX_SAMPLES; ++ i ) {
-
-			const x = i / sigmaPixels;
-			const weight = Math.exp( - x * x / 2 );
-			weights.push( weight );
-
-			if ( i === 0 ) {
-
-				sum += weight;
-
-			} else if ( i < samples ) {
-
-				sum += 2 * weight;
-
-			}
-
-		}
-
-		for ( let i = 0; i < weights.length; i ++ ) {
-
-			weights[ i ] = weights[ i ] / sum;
-
-		}
-
-		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
-
-		blurUniforms.envMap.value = targetIn.texture;
-		blurUniforms.samples.value = samples;
-		blurUniforms.weights.array = weights;
-		blurUniforms.latitudinal.value = direction === 'latitudinal' ? 1 : 0;
-
-		if ( poleAxis ) {
-
-			blurUniforms.poleAxis.value = poleAxis;
-
-		}
-
-		const { _lodMax } = this;
-		blurUniforms.dTheta.value = radiansPerPixel;
-		blurUniforms.mipInt.value = _lodMax - lodIn;
-
-		const outputSize = this._sizeLods[ lodOut ];
-		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
-		const y = 4 * ( this._cubeSize - outputSize );
-
-		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
-		renderer.setRenderTarget( targetOut );
-		renderer.render( blurMesh, _flatCamera );
-
-	}
-
-}
-
-function _createPlanes( lodMax ) {
-
-	const lodPlanes = [];
-	const sizeLods = [];
-	const sigmas = [];
-	const lodMeshes = [];
-
-	let lod = lodMax;
-
-	const totalLods = lodMax - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
-
-	for ( let i = 0; i < totalLods; i ++ ) {
-
-		const sizeLod = Math.pow( 2, lod );
-		sizeLods.push( sizeLod );
-		let sigma = 1.0 / sizeLod;
-
-		if ( i > lodMax - LOD_MIN ) {
-
-			sigma = EXTRA_LOD_SIGMA[ i - lodMax + LOD_MIN - 1 ];
-
-		} else if ( i === 0 ) {
-
-			sigma = 0;
-
-		}
-
-		sigmas.push( sigma );
-
-		const texelSize = 1.0 / ( sizeLod - 2 );
-		const min = - texelSize;
-		const max = 1 + texelSize;
-		const uv1 = [ min, min, max, min, max, max, min, min, max, max, min, max ];
-
-		const cubeFaces = 6;
-		const vertices = 6;
-		const positionSize = 3;
-		const uvSize = 2;
-		const faceIndexSize = 1;
-
-		const position = new Float32Array( positionSize * vertices * cubeFaces );
-		const uv = new Float32Array( uvSize * vertices * cubeFaces );
-		const faceIndex = new Float32Array( faceIndexSize * vertices * cubeFaces );
-
-		for ( let face = 0; face < cubeFaces; face ++ ) {
-
-			const x = ( face % 3 ) * 2 / 3 - 1;
-			const y = face > 2 ? 0 : -1;
-			const coordinates = [
-				x, y, 0,
-				x + 2 / 3, y, 0,
-				x + 2 / 3, y + 1, 0,
-				x, y, 0,
-				x + 2 / 3, y + 1, 0,
-				x, y + 1, 0
-			];
-
-			const faceIdx = _faceLib[ face ];
-			position.set( coordinates, positionSize * vertices * faceIdx );
-			uv.set( uv1, uvSize * vertices * faceIdx );
-			const fill = [ faceIdx, faceIdx, faceIdx, faceIdx, faceIdx, faceIdx ];
-			faceIndex.set( fill, faceIndexSize * vertices * faceIdx );
-
-		}
-
-		const planes = new BufferGeometry();
-		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
-		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
-		planes.setAttribute( 'faceIndex', new BufferAttribute( faceIndex, faceIndexSize ) );
-		lodPlanes.push( planes );
-		lodMeshes.push( new Mesh( planes, null ) );
-
-		if ( lod > LOD_MIN ) {
-
-			lod --;
-
-		}
-
-	}
-
-	return { lodPlanes, sizeLods, sigmas, lodMeshes };
-
-}
-
-function _createRenderTarget( width, height, params ) {
-
-	const cubeUVRenderTarget = new RenderTarget( width, height, params );
-	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
-	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-	cubeUVRenderTarget.texture.isPMREMTexture = true;
-	cubeUVRenderTarget.scissorTest = true;
-	return cubeUVRenderTarget;
-
-}
-
-function _setViewport( target, x, y, width, height ) {
-
-	target.viewport.set( x, y, width, height );
-	target.scissor.set( x, y, width, height );
-
-}
-
-function _getMaterial( type ) {
-
-	const material = new NodeMaterial();
-	material.depthTest = false;
-	material.depthWrite = false;
-	material.blending = NoBlending;
-	material.name = `PMREM_${ type }`;
-
-	return material;
-
-}
-
-function _getBlurShader( lodMax, width, height ) {
-
-	const weights = uniformArray( new Array( MAX_SAMPLES ).fill( 0 ) );
-	const poleAxis = uniform( new Vector3( 0, 1, 0 ) );
-	const dTheta = uniform( 0 );
-	const n = float( MAX_SAMPLES );
-	const latitudinal = uniform( 0 ); // false, bool
-	const samples = uniform( 1 ); // int
-	const envMap = texture( null );
-	const mipInt = uniform( 0 ); // int
-	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
-	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
-	const CUBEUV_MAX_MIP = float( lodMax );
-
-	const materialUniforms = {
-		n,
-		latitudinal,
-		weights,
-		poleAxis,
-		outputDirection: _outputDirection,
-		dTheta,
-		samples,
-		envMap,
-		mipInt,
-		CUBEUV_TEXEL_WIDTH,
-		CUBEUV_TEXEL_HEIGHT,
-		CUBEUV_MAX_MIP
-	};
-
-	const material = _getMaterial( 'blur' );
-	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
-
-	_uniformsMap.set( material, materialUniforms );
-
-	return material;
-
-}
-
-function _getCubemapMaterial( envTexture ) {
-
-	const material = _getMaterial( 'cubemap' );
-	material.fragmentNode = cubeTexture( envTexture, _outputDirection );
-
-	return material;
-
-}
-
-function _getEquirectMaterial( envTexture ) {
-
-	const material = _getMaterial( 'equirect' );
-	material.fragmentNode = texture( envTexture, equirectUV( _outputDirection ), 0 );
-
-	return material;
-
-}
-
 const rendererCache = new WeakMap();
 
 const typeFromArray = new Map( [
@@ -42152,19 +42549,6 @@ class NodeBuilder {
 	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
-
-	}
-
-	/**
-	 * Factory method for creating an instance of {@link PMREMGenerator}.
-	 *
-	 * @return {PMREMGenerator} The PMREM generator.
-	 */
-	createPMREMGenerator() {
-
-		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
-
-		return new PMREMGenerator( this.renderer );
 
 	}
 
@@ -42856,11 +43240,11 @@ class NodeBuilder {
 
 			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
 
-		} else if ( typeLength === 4 ) {
+		} else if ( typeLength === 4 && type !== 'mat2' ) {
 
 			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
 
-		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
+		} else if ( typeLength >= 4 && value && ( value.isMatrix2 || value.isMatrix3 || value.isMatrix4 ) ) {
 
 			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
@@ -44717,21 +45101,12 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
-
-		super.setup( builder );
-
-		const lightingModel = builder.context.lightingModel;
+	setupDirect() {
 
 		const lightColor = this.colorNode;
 		const lightDirection = lightTargetDirection( this.light );
-		const reflectedLight = builder.context.reflectedLight;
 
-		lightingModel.direct( {
-			lightDirection,
-			lightColor,
-			reflectedLight
-		}, builder.stack, builder );
+		return { lightDirection, lightColor };
 
 	}
 
@@ -44815,9 +45190,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
-
-		super.setup( builder );
+	setupDirectRectArea( builder ) {
 
 		let ltc_1, ltc_2;
 
@@ -44834,20 +45207,17 @@ class RectAreaLightNode extends AnalyticLightNode {
 		}
 
 		const { colorNode, light } = this;
-		const lightingModel = builder.context.lightingModel;
 
 		const lightPosition = lightViewPosition( light );
-		const reflectedLight = builder.context.reflectedLight;
 
-		lightingModel.directRectArea( {
+		return {
 			lightColor: colorNode,
 			lightPosition,
 			halfWidth: this.halfWidth,
 			halfHeight: this.halfHeight,
-			reflectedLight,
 			ltc_1,
 			ltc_2
-		}, builder.stack, builder );
+		};
 
 	}
 
@@ -44949,21 +45319,17 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( builder ) {
-
-		super.setup( builder );
-
-		const lightingModel = builder.context.lightingModel;
+	setupDirect( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
-		const lVector = lightViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
+		const lightVector = this.getLightVector( builder );
 
-		const lightDirection = lVector.normalize();
+		const lightDirection = lightVector.normalize();
 		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
 		const spotAttenuation = this.getSpotAttenuation( angleCos );
 
-		const lightDistance = lVector.length();
+		const lightDistance = lightVector.length();
 
 		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
@@ -44975,7 +45341,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		if ( light.map ) {
 
-			const spotLightCoord = lightProjectionUV( light );
+			const spotLightCoord = lightProjectionUV( light, builder.context.positionWorld );
 			const projectedTexture = texture( light.map, spotLightCoord.xy ).onRenderUpdate( () => light.map );
 
 			const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
@@ -44984,13 +45350,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		}
 
-		const reflectedLight = builder.context.reflectedLight;
-
-		lightingModel.direct( {
-			lightDirection,
-			lightColor,
-			reflectedLight
-		}, builder.stack, builder );
+		return { lightColor, lightDirection };
 
 	}
 
@@ -47158,7 +47518,7 @@ class XRManager extends EventDispatcher {
 
 		/**
 		 * The animation loop which is used as a replacement for the default
-		 * animation loop of the applicatio. It is only used when a XR session
+		 * animation loop of the application. It is only used when a XR session
 		 * is active.
 		 *
 		 * @private
@@ -47569,8 +47929,7 @@ class XRManager extends EventDispatcher {
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
 						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-						stencilBuffer: renderer.stencil,
-						samples: renderer.samples
+						stencilBuffer: renderer.stencil
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
@@ -47820,7 +48179,7 @@ function updateCamera( camera, parent ) {
 }
 
 /**
- * Updates the given camera with the transfomration of the XR camera and parent object.
+ * Updates the given camera with the transformation of the XR camera and parent object.
  *
  * @inner
  * @param {Camera} camera - The camera to update.
@@ -48353,7 +48712,7 @@ class Renderer {
 		this._getFallback = getFallback;
 
 		/**
-		 * The renderer's pixel ration.
+		 * The renderer's pixel ratio.
 		 *
 		 * @private
 		 * @type {number}
@@ -48712,7 +49071,7 @@ class Renderer {
 		 * A reference to the promise which initializes the renderer.
 		 *
 		 * @private
-		 * @type {?Promise}
+		 * @type {?Promise<this>}
 		 * @default null
 		 */
 		this._initPromise = null;
@@ -48812,7 +49171,7 @@ class Renderer {
 	 * Initializes the renderer so it is ready for usage.
 	 *
 	 * @async
-	 * @return {Promise} A Promise that resolves when the renderer has been initialized.
+	 * @return {Promise<this>} A Promise that resolves when the renderer has been initialized.
 	 */
 	async init() {
 
@@ -48881,7 +49240,7 @@ class Renderer {
 			this._animation.start();
 			this._initialized = true;
 
-			resolve();
+			resolve( this );
 
 		} );
 
@@ -49676,7 +50035,7 @@ class Renderer {
 	}
 
 	/**
-	 * Sets the given pixel ration and resizes the canvas if necessary.
+	 * Sets the given pixel ratio and resizes the canvas if necessary.
 	 *
 	 * @param {number} [value=1] - The pixel ratio.
 	 */
@@ -57211,7 +57570,7 @@ class TimestampQueryPool {
 		/**
 		 * Tracks offsets for different contexts.
 		 *
-		 * @type {Map}
+		 * @type {Map<string, number>}
 		 */
 		this.queryOffsets = new Map();
 
@@ -57809,7 +58168,7 @@ class WebGLBackend extends Backend {
 		 * @type {WebGLFramebuffer}
 		 * @default null
 		 */
-		this._xrFamebuffer = null;
+		this._xrFramebuffer = null;
 
 	}
 
@@ -57827,10 +58186,10 @@ class WebGLBackend extends Backend {
 		const parameters = this.parameters;
 
 		const contextAttributes = {
-			antialias: false, // MSAA is applied via a custom renderbuffer
+			antialias: renderer.samples > 0,
 			alpha: true, // always true for performance reasons
-			depth: false, // depth and stencil are set to false since the engine always renders into a framebuffer target first
-			stencil: false
+			depth: renderer.depth,
+			stencil: renderer.stencil
 		};
 
 		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2', contextAttributes );
@@ -57937,11 +58296,11 @@ class WebGLBackend extends Backend {
 	/**
 	 * Sets the XR rendering destination.
 	 *
-	 * @param {WebGLFramebuffer} xrFamebuffer - The XR framebuffer.
+	 * @param {WebGLFramebuffer} xrFramebuffer - The XR framebuffer.
 	 */
-	setXRTarget( xrFamebuffer ) {
+	setXRTarget( xrFramebuffer ) {
 
-		this._xrFamebuffer = xrFamebuffer;
+		this._xrFramebuffer = xrFramebuffer;
 
 	}
 
@@ -58691,6 +59050,8 @@ class WebGLBackend extends Backend {
 
 				if ( object._multiDrawInstances !== null ) {
 
+					// @deprecated, r174
+					warnOnce( 'THREE.WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
@@ -59539,7 +59900,7 @@ class WebGLBackend extends Backend {
 
 			} else if ( isXRRenderTarget && hasExternalTextures === false ) {
 
-				fb = this._xrFamebuffer;
+				fb = this._xrFramebuffer;
 
 			} else {
 
@@ -63340,23 +63701,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
-	 * Returns uniforms group count for the given shader stage.
-	 *
-	 * @private
-	 * @param {string} shaderStage - The shader stage.
-	 * @return {number} The uniforms group count for the given shader stage.
-	 */
-	_getUniformGroupCount( shaderStage ) {
-
-		return Object.keys( this.uniforms[ shaderStage ] ).length;
-
-	}
-
-	/**
 	 * Returns the native shader operator name for a given generic name.
 	 *
 	 * @param {string} op - The operator name to resolve.
-	 * @return {string} The resolved operator name.
+	 * @return {?string} The resolved operator name.
 	 */
 	getFunctionOperator( op ) {
 
@@ -63548,7 +63896,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @param {string} name - The builtin name.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {string} Whether the given builtin is defined in the given shader stage or not.
+	 * @return {boolean} Whether the given builtin is defined in the given shader stage or not.
 	 */
 	hasBuiltin( name, shaderStage = this.shaderStage ) {
 
@@ -63999,6 +64347,12 @@ ${ flowData.code }
 
 		}
 
+		if ( struct.output ) {
+
+			snippets.push( `\t${ this.getBuiltins( 'output' ) }` );
+
+		}
+
 		return snippets.join( ',\n' );
 
 	}
@@ -64404,7 +64758,7 @@ ${ flowData.code }
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @param {string} method - The method name to resolve.
-	 * @param {string} [output=null] - An optional output.
+	 * @param {?string} [output=null] - An optional output.
 	 * @return {string} The resolved WGSL method name.
 	 */
 	getMethod( method, output = null ) {
@@ -65021,6 +65375,8 @@ class WebGPUAttributeUtils {
 				bufferAttribute.itemSize = 4;
 				bufferAttribute.array = array;
 
+				bufferData._force3to4BytesAlignment = true;
+
 			}
 
 			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
@@ -65054,9 +65410,27 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
+		const bufferData = backend.get( bufferAttribute );
 		const buffer = backend.get( bufferAttribute ).buffer;
 
-		const array = bufferAttribute.array;
+		let array = bufferAttribute.array;
+
+		//  if storage buffer ensure 4 byte alignment
+		if ( bufferData._force3to4BytesAlignment === true ) {
+
+			array = new array.constructor( bufferAttribute.count * 4 );
+
+			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+
+				array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+
+			}
+
+			bufferAttribute.array = array;
+
+		}
+
+
 		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
@@ -65078,9 +65452,21 @@ class WebGPUAttributeUtils {
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
+				let dataOffset, size;
 
-				const dataOffset = range.start * byteOffsetFactor;
-				const size = range.count * byteOffsetFactor;
+				if ( bufferData._force3to4BytesAlignment === true ) {
+
+					const vertexStart = Math.floor( range.start / 3 );
+					const vertexCount = Math.ceil( range.count / 3 );
+					dataOffset = vertexStart * 4 * byteOffsetFactor;
+					size = vertexCount * 4 * byteOffsetFactor;
+
+				} else {
+
+					dataOffset = range.start * byteOffsetFactor;
+					size = range.count * byteOffsetFactor;
+
+				}
 
 				device.queue.writeBuffer(
 					buffer,
@@ -65237,7 +65623,7 @@ class WebGPUAttributeUtils {
 	 *
 	 * @private
 	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
-	 * @return {string} The vertex format (e.g. 'float32x3').
+	 * @return {string|undefined} The vertex format (e.g. 'float32x3').
 	 */
 	_getVertexFormat( geometryAttribute ) {
 
@@ -67996,6 +68382,13 @@ class WebGPUBackend extends Backend {
 				const drawCount = object._multiDrawCount;
 				const drawInstances = object._multiDrawInstances;
 
+				if ( drawInstances !== null ) {
+
+					// @deprecated, r174
+					warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+
+				}
+
 				for ( let i = 0; i < drawCount; i ++ ) {
 
 					const count = drawInstances ? drawInstances[ i ] : 1;
@@ -69784,4 +70177,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, DataArrayTexture, DataTexture, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoopNode, LuminanceAlphaFormat, LuminanceFormat, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, PropertyNode, QuadMesh, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };

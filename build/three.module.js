@@ -9760,7 +9760,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.compressedTexImage2D.apply( gl, arguments );
+			gl.compressedTexImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9774,7 +9774,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.compressedTexImage3D.apply( gl, arguments );
+			gl.compressedTexImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9788,7 +9788,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.texSubImage2D.apply( gl, arguments );
+			gl.texSubImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9802,7 +9802,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.texSubImage3D.apply( gl, arguments );
+			gl.texSubImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9816,7 +9816,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.compressedTexSubImage2D.apply( gl, arguments );
+			gl.compressedTexSubImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9830,7 +9830,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.compressedTexSubImage3D.apply( gl, arguments );
+			gl.compressedTexSubImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9844,7 +9844,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.texStorage2D.apply( gl, arguments );
+			gl.texStorage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9858,7 +9858,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.texStorage3D.apply( gl, arguments );
+			gl.texStorage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9872,7 +9872,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.texImage2D.apply( gl, arguments );
+			gl.texImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -9886,7 +9886,7 @@ function WebGLState( gl, extensions ) {
 
 		try {
 
-			gl.texImage3D.apply( gl, arguments );
+			gl.texImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -14876,7 +14876,7 @@ class WebGLRenderer {
 
 		this.setClearColor = function () {
 
-			background.setClearColor.apply( background, arguments );
+			background.setClearColor( ...arguments );
 
 		};
 
@@ -14888,7 +14888,7 @@ class WebGLRenderer {
 
 		this.setClearAlpha = function () {
 
-			background.setClearAlpha.apply( background, arguments );
+			background.setClearAlpha( ...arguments );
 
 		};
 
@@ -15224,6 +15224,8 @@ class WebGLRenderer {
 
 				if ( object._multiDrawInstances !== null ) {
 
+					// @deprecated, r174
+					warnOnce( 'THREE.WebGLRenderer: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else {
