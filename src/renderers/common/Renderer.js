@@ -611,7 +611,7 @@ class Renderer {
 		 * A reference to the promise which initializes the renderer.
 		 *
 		 * @private
-		 * @type {?Promise}
+		 * @type {?Promise<this>}
 		 * @default null
 		 */
 		this._initPromise = null;
@@ -711,7 +711,7 @@ class Renderer {
 	 * Initializes the renderer so it is ready for usage.
 	 *
 	 * @async
-	 * @return {Promise} A Promise that resolves when the renderer has been initialized.
+	 * @return {Promise<this>} A Promise that resolves when the renderer has been initialized.
 	 */
 	async init() {
 
@@ -780,7 +780,7 @@ class Renderer {
 			this._animation.start();
 			this._initialized = true;
 
-			resolve();
+			resolve( this );
 
 		} );
 

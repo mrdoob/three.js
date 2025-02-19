@@ -90,7 +90,7 @@ function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 			if ( value !== undefined ) {
 
 				times.push( key.time );
-				values.push.apply( values, value ); // push all elements
+				values.push( ...value ); // push all elements
 
 			}
 

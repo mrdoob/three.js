@@ -5,10 +5,9 @@ import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
-import { WebGLCoordinateSystem } from '../../constants.js';
 import { Texture } from '../../textures/Texture.js';
-
-let _generator = null;
+import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
+import { materialEnvRotation } from '../accessors/MaterialProperties.js';
 
 const _cache = new WeakMap();
 
@@ -32,15 +31,19 @@ function _generateCubeUVSize( imageHeight ) {
 }
 
 /**
- * Generates a PMREM from the given texture .
+ * Generates a PMREM from the given texture.
  *
  * @private
  * @param {Texture} texture - The texture to create the PMREM for.
- * @return {Texture} The PMREM.
+ * @param {Renderer} renderer - The renderer.
+ * @param {PMREMGenerator} generator - The PMREM generator.
+ * @return {?Texture} The PMREM.
  */
-function _getPMREMFromTexture( texture ) {
+function _getPMREMFromTexture( texture, renderer, generator ) {
 
-	let cacheTexture = _cache.get( texture );
+	const cache = _getCache( renderer );
+
+	let cacheTexture = cache.get( texture );
 
 	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : - 1;
 
@@ -52,7 +55,7 @@ function _getPMREMFromTexture( texture ) {
 
 			if ( isCubeMapReady( image ) ) {
 
-				cacheTexture = _generator.fromCubemap( texture, cacheTexture );
+				cacheTexture = generator.fromCubemap( texture, cacheTexture );
 
 			} else {
 
@@ -65,7 +68,7 @@ function _getPMREMFromTexture( texture ) {
 
 			if ( isEquirectangularMapReady( image ) ) {
 
-				cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
+				cacheTexture = generator.fromEquirectangular( texture, cacheTexture );
 
 			} else {
 
@@ -77,11 +80,35 @@ function _getPMREMFromTexture( texture ) {
 
 		cacheTexture.pmremVersion = texture.pmremVersion;
 
-		_cache.set( texture, cacheTexture );
+		cache.set( texture, cacheTexture );
 
 	}
 
 	return cacheTexture.texture;
+
+}
+
+/**
+ * Returns a cache that stores generated PMREMs for the respective textures.
+ * A cache must be maintaned per renderer since PMREMs are render target textures
+ * which can't be shared across render contexts.
+ *
+ * @private
+ * @param {Renderer} renderer - The renderer.
+ * @return {WeakMap<Texture, Texture>} The PMREM cache.
+ */
+function _getCache( renderer ) {
+
+	let rendererCache = _cache.get( renderer );
+
+	if ( rendererCache === undefined ) {
+
+		rendererCache = new WeakMap();
+		_cache.set( renderer, rendererCache );
+
+	}
+
+	return rendererCache;
 
 }
 
@@ -150,7 +177,7 @@ class PMREMNode extends TempNode {
 		 * Reference to a PMREM generator.
 		 *
 		 * @private
-		 * @type {PMREMGenerator}
+		 * @type {?PMREMGenerator}
 		 * @default null
 		 */
 		this._generator = null;
@@ -234,7 +261,7 @@ class PMREMNode extends TempNode {
 
 	}
 
-	updateBefore() {
+	updateBefore( frame ) {
 
 		let pmrem = this._pmrem;
 
@@ -249,7 +276,7 @@ class PMREMNode extends TempNode {
 
 			} else {
 
-				pmrem = _getPMREMFromTexture( texture );
+				pmrem = _getPMREMFromTexture( texture, frame.renderer, this._generator );
 
 			}
 
@@ -267,13 +294,11 @@ class PMREMNode extends TempNode {
 
 	setup( builder ) {
 
-		if ( _generator === null ) {
+		if ( this._generator === null ) {
 
-			_generator = builder.createPMREMGenerator();
+			this._generator = new PMREMGenerator( builder.renderer );
 
 		}
-
-		//
 
 		this.updateBefore( builder );
 
@@ -289,15 +314,7 @@ class PMREMNode extends TempNode {
 
 		//
 
-		const texture = this.value;
-
-		if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem && texture.isPMREMTexture !== true && texture.isRenderTargetTexture === true ) {
-
-			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
-
-		}
-
-		uvNode = vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
+		uvNode = materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) );
 
 		//
 
@@ -312,6 +329,14 @@ class PMREMNode extends TempNode {
 		//
 
 		return textureCubeUV( this._texture, uvNode, levelNode, this._width, this._height, this._maxMip );
+
+	}
+
+	dispose() {
+
+		super.dispose();
+
+		if ( this._generator !== null ) this._generator.dispose();
 
 	}
 

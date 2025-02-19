@@ -15,6 +15,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
+import { warnOnce } from '../../utils.js';
 
 /**
  * A backend implementation targeting WebGPU.
@@ -1219,6 +1220,13 @@ class WebGPUBackend extends Backend {
 				const counts = object._multiDrawCounts;
 				const drawCount = object._multiDrawCount;
 				const drawInstances = object._multiDrawInstances;
+
+				if ( drawInstances !== null ) {
+
+					// @deprecated, r174
+					warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+
+				}
 
 				for ( let i = 0; i < drawCount; i ++ ) {
 

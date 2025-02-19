@@ -109,6 +109,8 @@ class WebGPUAttributeUtils {
 				bufferAttribute.itemSize = 4;
 				bufferAttribute.array = array;
 
+				bufferData._force3to4BytesAlignment = true;
+
 			}
 
 			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
@@ -142,9 +144,27 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
+		const bufferData = backend.get( bufferAttribute );
 		const buffer = backend.get( bufferAttribute ).buffer;
 
-		const array = bufferAttribute.array;
+		let array = bufferAttribute.array;
+
+		//  if storage buffer ensure 4 byte alignment
+		if ( bufferData._force3to4BytesAlignment === true ) {
+
+			array = new array.constructor( bufferAttribute.count * 4 );
+
+			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+
+				array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+
+			}
+
+			bufferAttribute.array = array;
+
+		}
+
+
 		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
@@ -166,9 +186,21 @@ class WebGPUAttributeUtils {
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
+				let dataOffset, size;
 
-				const dataOffset = range.start * byteOffsetFactor;
-				const size = range.count * byteOffsetFactor;
+				if ( bufferData._force3to4BytesAlignment === true ) {
+
+					const vertexStart = Math.floor( range.start / 3 );
+					const vertexCount = Math.ceil( range.count / 3 );
+					dataOffset = vertexStart * 4 * byteOffsetFactor;
+					size = vertexCount * 4 * byteOffsetFactor;
+
+				} else {
+
+					dataOffset = range.start * byteOffsetFactor;
+					size = range.count * byteOffsetFactor;
+
+				}
 
 				device.queue.writeBuffer(
 					buffer,
@@ -325,7 +357,7 @@ class WebGPUAttributeUtils {
 	 *
 	 * @private
 	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
-	 * @return {string} The vertex format (e.g. 'float32x3').
+	 * @return {string|undefined} The vertex format (e.g. 'float32x3').
 	 */
 	_getVertexFormat( geometryAttribute ) {
 

@@ -204,6 +204,16 @@ export class Return {
 
 }
 
+export class Discard {
+
+	constructor() {
+
+		this.isDiscard = true;
+
+	}
+
+}
+
 export class Accessor {
 
 	constructor( property ) {
