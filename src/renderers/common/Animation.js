@@ -60,7 +60,7 @@ class Animation {
 	 */
 	start() {
 
-		const update = ( time, frame ) => {
+		const update = ( time ) => {
 
 			this._requestId = this._context.requestAnimationFrame( update );
 
@@ -70,7 +70,7 @@ class Animation {
 
 			this.info.frame = this.nodes.nodeFrame.frameId;
 
-			if ( this._animationLoop !== null ) this._animationLoop( time, frame );
+			if ( this._animationLoop !== null ) this._animationLoop( time );
 
 		};
 
