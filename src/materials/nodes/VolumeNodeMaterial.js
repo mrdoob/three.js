@@ -44,7 +44,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 		/**
 		 * Node used for scattering calculations.
 		 *
-		 * @type {Function<vec4>|FunctionNode<vec4>}
+		 * @type {Function|FunctionNode<vec4>}
 		 * @default null
 		 */
 		this.scatteringNode = null;

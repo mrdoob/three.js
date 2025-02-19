@@ -292,7 +292,7 @@ class NodeMaterial extends Material {
 		 * 	return shadow.mix( color( 0xff0000 ), 1 ); // modify shadow color
 		 * } );
 		 *
-		 * @type {?(Function<vec4>|FunctionNode<vec4>)}
+		 * @type {?(Function|FunctionNode<vec4>)}
 		 * @default null
 		 */
 		this.receivedShadowNode = null;
