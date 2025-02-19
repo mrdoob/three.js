@@ -237,6 +237,37 @@ class LightsNode extends Node {
 	}
 
 	/**
+	 * Sets up a direct light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and direction properties.
+	 */
+	setupDirectLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.direct( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	setupDirectRectAreaLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.directRectArea( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	/**
 	 * Setups the internal lights by building all respective
 	 * light nodes.
 	 *
@@ -253,6 +284,14 @@ class LightsNode extends Node {
 
 	}
 
+	getLightNodes( builder ) {
+
+		if ( this._lightNodes === null ) this.setupLightsNode( builder );
+
+		return this._lightNodes;
+
+	}
+
 	/**
 	 * The implementation makes sure that for each light in the scene
 	 * there is a corresponding light node. By building the light nodes
@@ -263,16 +302,22 @@ class LightsNode extends Node {
 	 */
 	setup( builder ) {
 
-		if ( this._lightNodes === null ) this.setupLightsNode( builder );
+		const currentLightsNode = builder.lightsNode;
+
+		builder.lightsNode = this;
+
+		//
+
+		let outgoingLightNode = this.outgoingLightNode;
 
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		let outgoingLightNode = this.outgoingLightNode;
+		const properties = builder.getDataFromNode( this );
 
 		if ( lightingModel ) {
 
-			const { _lightNodes, totalDiffuseNode, totalSpecularNode } = this;
+			const { totalDiffuseNode, totalSpecularNode } = this;
 
 			context.outgoingLight = outgoingLightNode;
 
@@ -280,20 +325,11 @@ class LightsNode extends Node {
 
 			//
 
-			const properties = builder.getDataFromNode( this );
 			properties.nodes = stack.nodes;
 
 			//
 
-			lightingModel.start( context, stack, builder );
-
-			// lights
-
-			this.setupLights( builder, _lightNodes );
-
-			//
-
-			lightingModel.indirect( context, stack, builder );
+			lightingModel.start( builder );
 
 			//
 
@@ -325,13 +361,21 @@ class LightsNode extends Node {
 
 			//
 
-			lightingModel.finish( context, stack, builder );
+			lightingModel.finish( builder );
 
 			//
 
 			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
 
+		} else {
+
+			properties.nodes = [];
+
 		}
+
+		//
+
+		builder.lightsNode = currentLightsNode;
 
 		return outgoingLightNode;
 

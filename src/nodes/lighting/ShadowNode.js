@@ -395,6 +395,8 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		this._cameraFrameId = new WeakMap();
+
 		/**
 		 * This flag can be used for type testing.
 		 *
@@ -766,7 +768,19 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { shadow } = this;
 
-		const needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+
+		if ( needsUpdate ) {
+
+			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
+
+				needsUpdate = false;
+
+			}
+
+			this._cameraFrameId[ frame.camera ] = frame.frameId;
+
+		}
 
 		if ( needsUpdate ) {
 
