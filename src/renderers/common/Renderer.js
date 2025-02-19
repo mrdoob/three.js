@@ -252,7 +252,7 @@ class Renderer {
 		this._getFallback = getFallback;
 
 		/**
-		 * The renderer's pixel ration.
+		 * The renderer's pixel ratio.
 		 *
 		 * @private
 		 * @type {number}
@@ -1575,7 +1575,7 @@ class Renderer {
 	}
 
 	/**
-	 * Sets the given pixel ration and resizes the canvas if necessary.
+	 * Sets the given pixel ratio and resizes the canvas if necessary.
 	 *
 	 * @param {number} [value=1] - The pixel ratio.
 	 */
