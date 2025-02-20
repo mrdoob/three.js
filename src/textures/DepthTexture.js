@@ -1,6 +1,5 @@
 import { Texture } from './Texture.js';
 import { NearestFilter, UnsignedIntType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
-import { Source } from './Source.js';
 
 class DepthTexture extends Texture {
 
@@ -31,11 +30,11 @@ class DepthTexture extends Texture {
 
 	}
 
+
 	copy( source ) {
 
 		super.copy( source );
 
-		this.source = new Source( Object.assign( {}, source.image ) ); // see #30540
 		this.compareFunction = source.compareFunction;
 
 		return this;
