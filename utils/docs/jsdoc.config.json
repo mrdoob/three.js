@@ -10,15 +10,20 @@
     "source": {
         "include": [
             "examples/jsm/tsl",
+            "src/cameras/Camera.js",
             "src/core/Object3D.js",
             "src/core/EventDispatcher.js",
+            "src/extras/core/Curve.js",
+            "src/extras/Controls.js",
             "src/loaders/nodes", 
+            "src/loaders/Loader.js", 
             "src/materials/nodes", 
             "src/materials/Material.js", 
             "src/nodes", 
             "src/math/Box3.js", 
             "src/renderers/common", 
             "src/renderers/webgpu" ,
+            "src/scenes/Fog.js" ,
             "src/textures/Texture.js" 
         ]
     }
