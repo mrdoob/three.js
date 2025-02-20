@@ -10,7 +10,7 @@
     "source": {
         "include": [
             "examples/jsm/tsl",
-            "src/cameras/Camera.js",
+            "src/cameras",
             "src/core/Object3D.js",
             "src/core/EventDispatcher.js",
             "src/extras/core/Curve.js",
@@ -23,7 +23,7 @@
             "src/math/Box3.js", 
             "src/renderers/common", 
             "src/renderers/webgpu" ,
-            "src/scenes/Fog.js" ,
+            "src/scenes" ,
             "src/textures/Texture.js" 
         ]
     }
