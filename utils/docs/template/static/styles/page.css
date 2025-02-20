@@ -184,6 +184,11 @@ h3 {
 
 	pre code {
 		background-color: inherit;
+		padding: calc(var(--page-padding) - 6px) var(--page-padding);
+	}
+
+	pre.linenums code {
+		padding: 0px 5px;
 	}
 
 	.link-anchor {
