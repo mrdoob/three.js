@@ -73,6 +73,9 @@ class WebGLState {
 		this.currentLineWidth = null;
 		this.currentClippingPlanes = 0;
 
+		this.currentVAO = null;
+		this.currentIndex = null;
+
 		this.currentBoundFramebuffers = {};
 		this.currentDrawbuffers = new WeakMap();
 
@@ -838,6 +841,53 @@ class WebGLState {
 		}
 
 		return false;
+
+	}
+
+	/**
+	 * Sets the vertex state by binding the given VAO and element buffer.
+	 *
+	 * @param {WebGLVertexArrayObject} vao - The VAO.
+	 * @param {WebGLBuffer} indexBuffer - The index buffer.
+	 * @return {boolean} Whether a vertex state has been changed or not.
+	 */
+	setVertexState( vao, indexBuffer = null ) {
+
+		const gl = this.gl;
+
+		if ( this.currentVAO !== vao || this.currentIndex !== indexBuffer ) {
+
+			gl.bindVertexArray( vao );
+
+			if ( indexBuffer !== null ) {
+
+				gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+
+			}
+
+			this.currentVAO = vao;
+			this.currentIndex = indexBuffer;
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Resets the vertex array state by resetting the VAO and element buffer.
+	 */
+	resetVertexState() {
+
+		const gl = this.gl;
+
+		gl.bindVertexArray( null );
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, null );
+
+		this.currentVAO = null;
+		this.currentIndex = null;
 
 	}
 
