@@ -68,14 +68,16 @@
 		<h3>[property:Float displacementScale]</h3>
 		<p>
 			Dans quelle mesure la carte de déplacement affecte le maillage (où le noir n'est pas un déplacement,
-			et le blanc est le déplacement maximal). Sans ensemble de cartes de déplacement, cette valeur n'est pas appliquée.
-			La valeur par défaut est 1.
+			et le blanc est le déplacement maximal). Sans carte de déplacement, cette valeur n'est pas appliquée.
+			La valeur par défaut est `1`.
 		</p>
 
 		<h3>[property:Float displacementBias]</h3>
 		<p>
 			Le décalage des valeurs de la carte de déplacement sur les sommets du maillage.
-			Sans ensemble de cartes de déplacement, cette valeur n'est pas appliquée. La valeur par défaut est 0.
+			Le décalage est ajouté après la mise à l'échelle de la carte de déplacement.
+			Sans carte de déplacement, cette valeur n'est pas appliquée. La valeur par défaut
+			est `0`.
 		</p>
 
 		<h3>[property:Texture map]</h3>
