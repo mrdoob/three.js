@@ -148,12 +148,12 @@ class RenderTarget extends EventDispatcher {
 			this.textures[ i ].isRenderTargetTexture = true;
 			this.textures[ i ].renderTarget = this;
 
-			// ensure image object is not shared, see #20328
-
-			const image = Object.assign( {}, source.textures[ i ].image );
-			this.textures[ i ].source = new Source( image );
-
 		}
+
+		// ensure image object is not shared, see #20328
+
+		const image = Object.assign( {}, source.texture.image );
+		this.texture.source = new Source( image );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
