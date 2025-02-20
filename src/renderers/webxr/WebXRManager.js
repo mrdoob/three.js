@@ -303,7 +303,10 @@ class WebXRManager extends EventDispatcher {
 							format: RGBAFormat,
 							type: UnsignedByteType,
 							colorSpace: renderer.outputColorSpace,
-							stencilBuffer: attributes.stencil
+							stencilBuffer: attributes.stencil,
+							resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+							resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false )
+
 						}
 					);
 
@@ -346,7 +349,8 @@ class WebXRManager extends EventDispatcher {
 							stencilBuffer: attributes.stencil,
 							colorSpace: renderer.outputColorSpace,
 							samples: attributes.antialias ? 4 : 0,
-							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false )
+							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
+							resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false )
 						} );
 
 				}
