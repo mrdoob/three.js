@@ -1,10 +1,21 @@
 /**
- * Port from https://github.com/mapbox/earcut (v2.2.4)
+ * An implementation of the earcut polygon triangulation algorithm. The code
+ * is a port of [mapbox/earcut]{@link https://github.com/mapbox/earcut mapbox/earcut} (v2.2.4).
+ *
+ * @hideconstructor
  */
+class Earcut {
 
-const Earcut = {
-
-	triangulate: function ( data, holeIndices, dim = 2 ) {
+	/**
+	 * Triangulates the given shape definition by returning an array of triangles.
+	 *
+	 * @param {Array<number>} data - An array with 2D points.
+	 * @param {Array<number>} holeIndices - An array with indices defining holes.
+	 * @param {number} [dim=2] - The number of coordinates per vertex in the input array.
+	 * @return {Array<number>} An array representing the triangulated faces. Each face is defined by three consecutive numbers
+	 * representing vertex indices.
+	 */
+	static triangulate( data, holeIndices, dim = 2 ) {
 
 		const hasHoles = holeIndices && holeIndices.length;
 		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
@@ -46,7 +57,7 @@ const Earcut = {
 
 	}
 
-};
+}
 
 // create a circular doubly linked list from polygon points in the specified winding order
 function linkedList( data, start, end, dim, clockwise ) {

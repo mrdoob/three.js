@@ -13,8 +13,7 @@
             "src/cameras",
             "src/core/Object3D.js",
             "src/core/EventDispatcher.js",
-            "src/extras/core/Curve.js",
-            "src/extras/Controls.js",
+            "src/extras",
             "src/loaders/nodes", 
             "src/loaders/Loader.js", 
             "src/materials/nodes", 
@@ -25,6 +24,9 @@
             "src/renderers/webgpu" ,
             "src/scenes" ,
             "src/textures/Texture.js" 
+        ],
+        "exclude": [
+            "src/extras/PMREMGenerator.js"
         ]
     }
 }

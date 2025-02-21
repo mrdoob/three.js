@@ -98,7 +98,6 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
  * Paper: Fast, Accurate Image-Based Lighting:
  * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
 */
-
 class PMREMGenerator {
 
 	constructor( renderer ) {
