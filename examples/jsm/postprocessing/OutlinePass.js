@@ -294,6 +294,7 @@ class OutlinePass extends Pass {
 			this.changeVisibilityOfSelectedObjects( false );
 
 			const currentBackground = this.renderScene.background;
+			const currentOverrideMaterial = this.renderScene.overrideMaterial;
 			this.renderScene.background = null;
 
 			// 1. Draw Non Selected objects in the depth buffer
@@ -318,12 +319,12 @@ class OutlinePass extends Pass {
 			renderer.setRenderTarget( this.renderTargetMaskBuffer );
 			renderer.clear();
 			renderer.render( this.renderScene, this.renderCamera );
-			this.renderScene.overrideMaterial = null;
 			this.changeVisibilityOfNonSelectedObjects( true );
 			this._visibilityCache.clear();
 			this._selectionCache.clear();
 
 			this.renderScene.background = currentBackground;
+			this.renderScene.overrideMaterial = currentOverrideMaterial;
 
 			// 2. Downsample to Half resolution
 			this.fsQuad.material = this.materialCopy;
