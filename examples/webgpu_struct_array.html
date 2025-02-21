@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - structArray</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - structArray<br />
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { struct, storage, wgslFn, instanceIndex, varyingProperty, attribute } from 'three/tsl';
+			import { cameraProjectionMatrix, cameraViewMatrix, modelWorldMatrix } from "three/tsl";
+
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0x000000 );
+			renderer.setClearAlpha( 0 );
+			document.body.appendChild( renderer.domElement );
+
+			const aspect = window.innerWidth / window.innerHeight;
+
+			const camera = new THREE.PerspectiveCamera( 50.0, aspect, 0.1, 10000 );
+			const scene = new THREE.Scene();
+
+			scene.background = new THREE.Color( 0x00001f );
+			camera.position.set( 1, 1, 1 );
+			const controls = new OrbitControls( camera, renderer.domElement );
+
+
+			init();
+
+			async function init() {
+
+				await renderer.init();
+
+				let m;
+				const width = 1;
+				const resolution = 10;
+				const instanceCount = 6;
+				const transforms = [];
+				const positions = [];
+				const indices = [];
+
+
+				m = new THREE.Matrix4();
+				transforms.push( m.premultiply( new THREE.Matrix4().makeTranslation( 0, 0, width / 2 ) ) );
+
+				m = new THREE.Matrix4();
+				m.makeRotationY( Math.PI );
+				transforms.push( m.premultiply( new THREE.Matrix4().makeTranslation( 0, 0, - width / 2 ) ) );
+
+				m = new THREE.Matrix4();
+				m.makeRotationX( - Math.PI / 2 );
+				transforms.push( m.premultiply( new THREE.Matrix4().makeTranslation( 0, width / 2, 0 ) ) );
+
+				m = new THREE.Matrix4();
+				m.makeRotationX( Math.PI / 2 );
+				transforms.push( m.premultiply( new THREE.Matrix4().makeTranslation( 0, - width / 2, 0 ) ) );
+
+				m = new THREE.Matrix4();
+				m.makeRotationY( Math.PI / 2 );
+				transforms.push( m.premultiply( new THREE.Matrix4().makeTranslation( width / 2, 0, 0 ) ) );
+
+				m = new THREE.Matrix4();
+				m.makeRotationY( - Math.PI / 2 );
+				transforms.push( m.premultiply( new THREE.Matrix4().makeTranslation( - width / 2, 0, 0 ) ) );
+
+
+				for ( let x = 0; x <= resolution; x ++ ) {
+
+					let xp = width * Math.min( Math.max( x / resolution, 0 ), 1 );
+
+					for ( let y = 0; y <= resolution; y ++ ) {
+
+						let yp = width * Math.min( Math.max( y / resolution, 0 ), 1 );
+
+						positions.push( xp - width / 2, yp - width / 2, 0 );
+
+					}
+
+				}
+
+				for ( let i = 0; i < resolution; i ++ ) {
+
+					for ( let j = 0; j < resolution; j ++ ) {
+
+						indices.push( i * ( resolution + 1 ) + j );
+						indices.push( ( i + 1 ) * ( resolution + 1 ) + j );
+						indices.push( i * ( resolution + 1 ) + j + 1 );
+
+						indices.push( ( i + 1 ) * ( resolution + 1 ) + j );
+						indices.push( ( i + 1 ) * ( resolution + 1 ) + j + 1 );
+						indices.push( i * ( resolution + 1 ) + j + 1 );
+
+					}
+
+				}
+
+				const colors = [
+					[1.0, 0.0, 0.0],
+					[0.0, 1.0, 0.0],
+					[0.25, 0.25, 1],
+					[1.0, 1.0, 0.0],
+					[0.0, 1.0, 1.0],
+					[1.0, 0.0, 1.0]
+				];
+
+				const instancedGeometry = new THREE.InstancedBufferGeometry();
+				instancedGeometry.instanceCount = instanceCount;
+				instancedGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				instancedGeometry.setIndex( new THREE.BufferAttribute( new Uint32Array( indices ), 1 ) );
+
+				const combinedBuffer = new THREE.StorageBufferAttribute( new Float32Array( instanceCount * 20 ), 20 );
+
+
+				for ( let i = 0; i < instanceCount; i ++ ) {
+
+					combinedBuffer.array.set( transforms[ i ].elements, i * 20 );
+
+					const colorValues = new Float32Array( [ ...colors[ i ], 1.0 ] );
+
+					combinedBuffer.array.set( colorValues, i * 20 + 16 );
+
+				}
+
+
+				combinedBuffer.set( combinedBuffer.array, 0 );
+
+
+				const combinedDataStruct = struct( {
+					matrix: 'mat4',
+					color: 'vec4'
+				}, 'CombinedStructArray' );
+
+
+				const vColor = varyingProperty( "vec4", "vColor" );
+
+				const vertexShaderParams = {
+					projectionMatrix: cameraProjectionMatrix,
+					cameraViewMatrix: cameraViewMatrix,
+					modelWorldMatrix: modelWorldMatrix,
+					instanceIndex: instanceIndex,
+					position: attribute( "position" ),
+					combinedDatas: storage( combinedBuffer, combinedDataStruct, combinedBuffer.count ).toReadOnly(),
+				};
+
+
+				const fragmentShaderParams = {
+					vColor: vColor
+				};
+
+
+				const vertexShader = wgslFn(`
+					fn main_vertex(
+						projectionMatrix: mat4x4<f32>,
+						cameraViewMatrix: mat4x4<f32>,
+						modelWorldMatrix: mat4x4<f32>,
+						instanceIndex: u32,
+						position: vec3<f32>,
+						combinedDatas: ptr<storage, array<CombinedStructArray>, read>,
+					) -> vec4<f32> {
+
+						var transformMatrix = combinedDatas[ instanceIndex ].matrix;
+						var transformed = transformMatrix * vec4<f32>( position , 1.0 );
+
+						var outPosition = projectionMatrix * cameraViewMatrix * modelWorldMatrix * transformed;
+
+						varyings.vColor = combinedDatas[ instanceIndex ].color;
+
+						return outPosition;
+
+					}
+
+				`, [vColor] );
+
+
+				const fragmentShader = wgslFn(`
+					fn main_fragment(
+						vColor: vec4<f32>
+					) -> vec4<f32> {
+
+						return vColor;
+
+					}
+
+				`);
+
+
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.vertexNode = vertexShader( vertexShaderParams );
+				material.fragmentNode = fragmentShader( fragmentShaderParams );
+				material.colorSpace = THREE.SRGBColorSpace;
+				material.wireframe = true;
+
+
+				const mesh = new THREE.Mesh( instancedGeometry, material );
+				scene.add( mesh );
+
+
+
+				renderer.setAnimationLoop( render );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function render() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+		</script>
+
+	</body>
+</html>
