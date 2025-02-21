@@ -101,6 +101,13 @@ class OrbitControls extends Controls {
 		this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 		this.zoomToCursor = false;
 
+		// Set constraints to how far you can pan
+		this.panLimits = {
+			x: { min: null, max: null },
+			y: { min: null, max: null },
+			z: { min: null, max: null },
+		};
+
 		// Set to true to automatically rotate around the target
 		// If auto-rotate is enabled, you must call controls.update() in your animation loop
 		this.autoRotate = false;
@@ -361,6 +368,27 @@ class OrbitControls extends Controls {
 
 			this.target.add( this._panOffset );
 
+		}
+
+		// restrict panning to set limits
+		if ( this.enablePan ) {
+			if ( this.panLimits.x?.min != null && this.target.x < this.panLimits.x.min )
+				this.target.setX( this.panLimits.x.min );
+
+			if ( this.panLimits.x?.max != null && this.target.x > this.panLimits.x.max )
+				this.target.setX( this.panLimits.x.max );
+
+			if ( this.panLimits.y?.min != null && this.target.y < this.panLimits.y.min )
+				this.target.setY( this.panLimits.y.min );
+
+			if ( this.panLimits.y?.max != null && this.target.y > this.panLimits.y.max )
+				this.target.setY( this.panLimits.y.max );
+
+			if ( this.panLimits.z?.min != null && this.target.z < this.panLimits.z.min )
+				this.target.setZ( this.panLimits.z.min );
+
+			if ( this.panLimits.z?.max != null && this.target.z > this.panLimits.z.max )
+				this.target.setZ( this.panLimits.z.max );
 		}
 
 		// Limit the target distance from the cursor to create a sphere around the center of interest
