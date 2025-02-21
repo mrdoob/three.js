@@ -244,6 +244,19 @@ controls.mouseButtons = {
 		Default is `true`.
 		</p>
 
+		<h3>[property:Object panLimits]</h3>
+		<p>
+			Defines 'invisible walls' camera will bump onto when panning, preventing it from leaving area designated for viewing.
+			Can be defined partially, to restrict movement on specific axes, or block one side only.
+			<code>
+				controls.panLimits = {
+					x: { min: Float, max: Float },
+					y: { min: Float, max: Float },
+					z: { min: Float, max: Float }
+				}
+			</code>
+		</p>
+
 		<h3>[property:Vector3 target0]</h3>
 		<p>
 			Used internally by the [page:.saveState] and [page:.reset] methods.
