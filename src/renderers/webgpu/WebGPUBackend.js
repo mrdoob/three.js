@@ -442,13 +442,23 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				// only apply the user-defined clearValue to the first color attachment like in beginRender()
+
+				let clearValue = { r: 0, g: 0, b: 0, a: 1 };
+
+				if ( i === 0 && colorAttachmentsConfig.clearValue ) {
+
+					clearValue = colorAttachmentsConfig.clearValue;
+
+				}
+
 				colorAttachments.push( {
 					view,
 					depthSlice: sliceIndex,
 					resolveTarget,
-					loadOp: GPULoadOp.Load,
-					storeOp: GPUStoreOp.Store,
-					...colorAttachmentsConfig
+					loadOp: colorAttachmentsConfig.loadOP || GPULoadOp.Load,
+					storeOp: colorAttachmentsConfig.storeOP || GPUStoreOp.Store,
+					clearValue: clearValue
 				} );
 
 			}
