@@ -708,22 +708,26 @@ class WebGLTextureUtils {
 
 		const { textureGPU: dstTextureGPU, glTextureType, glType, glFormat } = backend.get( dstTexture );
 
-		let width, height, minX, minY;
-		let dstX, dstY;
+		let width, height, depth, minX, minY, minZ;
+		let dstX, dstY, dstZ;
 
 		if ( srcRegion !== null ) {
 
 			width = srcRegion.max.x - srcRegion.min.x;
 			height = srcRegion.max.y - srcRegion.min.y;
+			depth = srcRegion.max.z - srcRegion.min.z;
 			minX = srcRegion.min.x;
 			minY = srcRegion.min.y;
+			minZ = srcRegion.min.z;
 
 		} else {
 
 			width = srcTexture.image.width;
 			height = srcTexture.image.height;
+			depth = srcTexture.image.depth;
 			minX = 0;
 			minY = 0;
+			minZ = 0;
 
 		}
 
@@ -731,11 +735,13 @@ class WebGLTextureUtils {
 
 			dstX = dstPosition.x;
 			dstY = dstPosition.y;
+			dstZ = dstPosition.z;
 
 		} else {
 
 			dstX = 0;
 			dstY = 0;
+			dstZ = 0;
 
 		}
 
@@ -760,6 +766,9 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, image.height );
 		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, minX );
 		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, minY );
+		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
+
+		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
 
 		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
@@ -786,22 +795,46 @@ class WebGLTextureUtils {
 
 		} else {
 
-			if ( srcTexture.isDataTexture ) {
+			if( isDst3D ){
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
+				if ( srcTexture.isDataTexture ) {
+
+					gl.texSubImage3D( glTextureType, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
+	
+				} else {
+	
+					if ( dstTexture.isCompressedTexture ) {
+	
+						gl.compressedTexSubImage3D( glTextureType, level, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
+	
+					} else {
+	
+						gl.texSubImage3D( glTextureType, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
+	
+					}
+	
+				}
 
 			} else {
 
-				if ( srcTexture.isCompressedTexture ) {
+				if ( srcTexture.isDataTexture ) {
 
-					gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
-
+					gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
+	
 				} else {
-
-					gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
-
+	
+					if ( srcTexture.isCompressedTexture ) {
+	
+						gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+	
+					} else {
+	
+						gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+	
+					}
+	
 				}
-
+				
 			}
 
 		}
@@ -813,7 +846,7 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
-		if ( level === 0 && dstTexture.generateMipmaps ) gl.generateMipmap( gl.TEXTURE_2D );
+		if ( level === 0 && dstTexture.generateMipmaps ) gl.generateMipmap( glTextureType );
 
 		state.unbindTexture();
 
