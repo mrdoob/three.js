@@ -58,17 +58,15 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storage, If, vec3, not, varying, uniform, uv, texture, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
+			import { varying, uv, texture, Fn } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 
 			let rendererAntialiasingEnabled;
 			let rendererAntialiasingDisabled;
-			let renderer;
 			let camera;
 			let scene;
-			let orbitControls;
 			let gui;
 
 			const effectController = {
@@ -111,7 +109,7 @@
 			canvasTexture.format = THREE.RGBAFormat;
 			canvasTexture.type = THREE.UnsignedByteType;
 
-			const forceWebGL = true;
+			const forceWebGL = false;
 
 			init();
 
@@ -147,6 +145,28 @@
 				};
 
 				const material = new THREE.MeshBasicNodeMaterial();
+
+				const createShader = ( type, sampling ) => {
+
+					return Fn( () => {
+
+						const testUV = varying( uv(), 'testUV' ).setInterpolation( type, sampling );
+						return texture( canvasTexture, testUV ).rgb;
+
+					} );
+
+				};
+
+				const withFlatFirstShader = createShader( 'flat', 'first' );
+				const withFlatEitherShader = createShader( 'flat', 'either' );
+
+				const withSampleShader = Fn( () => {
+
+					const testUV = varying( uv(), 'testUV' ).setInterpolation( 'perspective', 'sample' );
+
+					return texture( canvasTexture, testUV ).rgb;
+
+				} );
 
 				const withInterpolationShader = Fn( () => {
 
@@ -206,17 +226,47 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				gui = new GUI();
-				gui.add( effectController, 'sampling', [ 'normal', 'centroid' ] ).onChange( () => {
+				gui.add( effectController, 'sampling', [ 'normal', 'centroid', 'sample', 'flat first', 'flat either' ] ).onChange( () => {
 
 					let shader;
 
-					if ( effectController.sampling === 'centroid' ) {
+					switch ( effectController.sampling ) {
 
-						shader = withInterpolationShader;
+						case 'centroid': {
 
-					} else {
+							shader = withInterpolationShader;
+							break;
+			
+						}
 
-						shader = withoutInterpolationShader;
+						case 'sample': {
+
+							shader = withSampleShader;
+							break;
+			
+						}
+
+						case 'normal': {
+
+							shader = withoutInterpolationShader;
+							break;
+			
+						}
+
+						case 'flat first': {
+
+							shader = withFlatFirstShader;
+							break;
+			
+						}
+
+						case 'flat either': {
+
+							shader = withFlatEitherShader;
+							break;
+
+			
+						}
 
 					}
 
