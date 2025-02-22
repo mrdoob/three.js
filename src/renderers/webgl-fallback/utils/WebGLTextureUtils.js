@@ -795,24 +795,24 @@ class WebGLTextureUtils {
 
 		} else {
 
-			if( isDst3D ){
+			if ( isDst3D ) {
 
 				if ( srcTexture.isDataTexture ) {
 
 					gl.texSubImage3D( glTextureType, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
-	
+
 				} else {
-	
+
 					if ( dstTexture.isCompressedTexture ) {
-	
+
 						gl.compressedTexSubImage3D( glTextureType, level, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
-	
+
 					} else {
-	
+
 						gl.texSubImage3D( glTextureType, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
-	
+
 					}
-	
+
 				}
 
 			} else {
@@ -820,21 +820,21 @@ class WebGLTextureUtils {
 				if ( srcTexture.isDataTexture ) {
 
 					gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
-	
+
 				} else {
-	
+
 					if ( srcTexture.isCompressedTexture ) {
-	
+
 						gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
-	
+
 					} else {
-	
+
 						gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
-	
+
 					}
-	
+
 				}
-				
+
 			}
 
 		}
