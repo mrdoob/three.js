@@ -20634,7 +20634,6 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
  * Paper: Fast, Accurate Image-Based Lighting:
  * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
 */
-
 class PMREMGenerator {
 
 	constructor( renderer ) {
@@ -47929,7 +47928,9 @@ class XRManager extends EventDispatcher {
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
 						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-						stencilBuffer: renderer.stencil
+						stencilBuffer: renderer.stencil,
+						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
+						resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
@@ -47961,7 +47962,9 @@ class XRManager extends EventDispatcher {
 						format: RGBAFormat,
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
-						stencilBuffer: renderer.stencil
+						stencilBuffer: renderer.stencil,
+						resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+						resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false ),
 					}
 				);
 
@@ -54814,6 +54817,9 @@ class WebGLState {
 		this.currentLineWidth = null;
 		this.currentClippingPlanes = 0;
 
+		this.currentVAO = null;
+		this.currentIndex = null;
+
 		this.currentBoundFramebuffers = {};
 		this.currentDrawbuffers = new WeakMap();
 
@@ -55579,6 +55585,53 @@ class WebGLState {
 		}
 
 		return false;
+
+	}
+
+	/**
+	 * Sets the vertex state by binding the given VAO and element buffer.
+	 *
+	 * @param {WebGLVertexArrayObject} vao - The VAO.
+	 * @param {WebGLBuffer} indexBuffer - The index buffer.
+	 * @return {boolean} Whether a vertex state has been changed or not.
+	 */
+	setVertexState( vao, indexBuffer = null ) {
+
+		const gl = this.gl;
+
+		if ( this.currentVAO !== vao || this.currentIndex !== indexBuffer ) {
+
+			gl.bindVertexArray( vao );
+
+			if ( indexBuffer !== null ) {
+
+				gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+
+			}
+
+			this.currentVAO = vao;
+			this.currentIndex = indexBuffer;
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Resets the vertex array state by resetting the VAO and element buffer.
+	 */
+	resetVertexState() {
+
+		const gl = this.gl;
+
+		gl.bindVertexArray( null );
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, null );
+
+		this.currentVAO = null;
+		this.currentIndex = null;
 
 	}
 
@@ -58472,6 +58525,8 @@ class WebGLBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
 
+		state.resetVertexState();
+
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -58765,7 +58820,15 @@ class WebGLBackend extends Backend {
 
 					for ( let i = 0; i < descriptor.textures.length; i ++ ) {
 
-						gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+						if ( i === 0 ) {
+
+							gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+
+						} else {
+
+							gl.clearBufferfv( gl.COLOR, i, [ 0, 0, 0, 1 ] );
+
+						}
 
 					}
 
@@ -58828,17 +58891,17 @@ class WebGLBackend extends Backend {
 
 		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
 
-		const vaoKey = this._getVaoKey( null, attributes );
+		const vaoKey = this._getVaoKey( attributes );
 
 		const vaoGPU = this.vaoCache[ vaoKey ];
 
 		if ( vaoGPU === undefined ) {
 
-			this._createVao( null, attributes );
+			this._createVao( attributes );
 
 		} else {
 
-			gl.bindVertexArray( vaoGPU );
+			state.setVertexState( vaoGPU );
 
 		}
 
@@ -58936,7 +58999,7 @@ class WebGLBackend extends Backend {
 
 		state.useProgram( programGPU );
 
-		//
+		// vertex state
 
 		const renderObjectData = this.get( renderObject );
 
@@ -58944,7 +59007,7 @@ class WebGLBackend extends Backend {
 
 		if ( vaoGPU === undefined || renderObjectData.geometryId !== renderObject.geometry.id ) {
 
-			const vaoKey = this._getVaoKey( renderObject.getIndex(), renderObject.getAttributes() );
+			const vaoKey = this._getVaoKey( renderObject.getAttributes() );
 
 			vaoGPU = this.vaoCache[ vaoKey ];
 
@@ -58952,7 +59015,7 @@ class WebGLBackend extends Backend {
 
 				let staticVao;
 
-				( { vaoGPU, staticVao } = this._createVao( renderObject.getIndex(), renderObject.getAttributes() ) );
+				( { vaoGPU, staticVao } = this._createVao( renderObject.getAttributes() ) );
 
 				if ( staticVao ) {
 
@@ -58965,11 +59028,10 @@ class WebGLBackend extends Backend {
 
 		}
 
-		gl.bindVertexArray( vaoGPU );
-
-		//
-
 		const index = renderObject.getIndex();
+		const indexGPU = ( index !== null ) ? this.get( index ).bufferGPU : null;
+
+		state.setVertexState( vaoGPU, indexGPU );
 
 		//
 
@@ -59140,10 +59202,6 @@ class WebGLBackend extends Backend {
 			draw();
 
 		}
-
-		//
-
-		gl.bindVertexArray( null );
 
 	}
 
@@ -60123,21 +60181,12 @@ class WebGLBackend extends Backend {
 	 * Computes the VAO key for the given index and attributes.
 	 *
 	 * @private
-	 * @param {?BufferAttribute} index - The index. `null` for non-indexed geometries.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
 	 * @return {string} The VAO key.
 	 */
-	_getVaoKey( index, attributes ) {
+	_getVaoKey( attributes ) {
 
 		let key = '';
-
-		if ( index !== null ) {
-
-			const indexData = this.get( index );
-
-			key += ':' + indexData.id;
-
-		}
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
@@ -60155,11 +60204,10 @@ class WebGLBackend extends Backend {
 	 * Creates a VAO from the index and attributes.
 	 *
 	 * @private
-	 * @param {?BufferAttribute} index - The index. `null` for non-indexed geometries.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
 	 * @return {Object} The VAO data.
 	 */
-	_createVao( index, attributes ) {
+	_createVao( attributes ) {
 
 		const { gl } = this;
 
@@ -60169,16 +60217,6 @@ class WebGLBackend extends Backend {
 		let staticVao = true;
 
 		gl.bindVertexArray( vaoGPU );
-
-		if ( index !== null ) {
-
-			const indexData = this.get( index );
-
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
-
-			key += ':' + indexData.id;
-
-		}
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
@@ -67603,13 +67641,23 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				// only apply the user-defined clearValue to the first color attachment like in beginRender()
+
+				let clearValue = { r: 0, g: 0, b: 0, a: 1 };
+
+				if ( i === 0 && colorAttachmentsConfig.clearValue ) {
+
+					clearValue = colorAttachmentsConfig.clearValue;
+
+				}
+
 				colorAttachments.push( {
 					view,
 					depthSlice: sliceIndex,
 					resolveTarget,
-					loadOp: GPULoadOp.Load,
-					storeOp: GPUStoreOp.Store,
-					...colorAttachmentsConfig
+					loadOp: colorAttachmentsConfig.loadOP || GPULoadOp.Load,
+					storeOp: colorAttachmentsConfig.storeOP || GPUStoreOp.Store,
+					clearValue: clearValue
 				} );
 
 			}
