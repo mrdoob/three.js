@@ -372,7 +372,15 @@ class TextureNode extends UniformNode {
 	 */
 	generateUV( builder, uvNode ) {
 
-		return uvNode.build( builder, this.sampler === true ? 'vec2' : 'ivec2' );
+		let vecType = ( this.sampler === true ) ? 'vec2' : 'ivec2';
+
+		if ( this.value.isDataArrayTexture ) {
+
+			vecType = 'vec3';
+
+		}
+
+		return uvNode.build( builder, vecType );
 
 	}
 
