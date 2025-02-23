@@ -9,7 +9,6 @@ import { SRGBColorSpace } from '../../constants.js';
 
 import { MeshNormalMaterial } from '../MeshNormalMaterial.js';
 
-
 const _defaultValues = /*@__PURE__*/ new MeshNormalMaterial();
 
 /**
