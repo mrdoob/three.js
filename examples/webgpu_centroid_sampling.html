@@ -69,7 +69,7 @@
 			let gui;
 
 			const effectController = {
-				sampling: 'centroid'
+				sampling: 'normal'
 			};
 
 			const atlasCanvas = document.createElement( 'canvas' );
@@ -181,7 +181,7 @@
 
 				} );
 
-				material.colorNode = withInterpolationShader();
+				material.colorNode = withoutInterpolationShader();
 
 				const faceMeshes = [];
 
