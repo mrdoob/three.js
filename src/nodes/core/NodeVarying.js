@@ -15,8 +15,10 @@ class NodeVarying extends NodeVar {
 	 *
 	 * @param {string} name - The name of the varying.
 	 * @param {string} type - The type of the varying.
+	 * @param {?string} interpolationType - The interpolation type of the varying.
+	 * @param {?string} interpolationSampling - The interpolation sampling type of the varying.
 	 */
-	constructor( name, type ) {
+	constructor( name, type, interpolationType = null, interpolationSampling = null ) {
 
 		super( name, type );
 
@@ -37,6 +39,22 @@ class NodeVarying extends NodeVar {
 		 * @default true
 		 */
 		this.isNodeVarying = true;
+
+		/**
+		 * The interpolation type of the varying data.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.interpolationType = interpolationType;
+
+		/**
+		 * The interpolation sampling type of varying data.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.interpolationSampling = interpolationSampling;
 
 	}
 
