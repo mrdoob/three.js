@@ -74,6 +74,7 @@
     <?js } ?>
 
     <?js
+        var ignoreInheritedSymbols = { ...(self.ignoreInheritedSymbols ? { inherited: {isUndefined: true} } : {}) };
         var classes = self.find({kind: 'class', memberof: doc.longname});
         if (!isGlobalPage && classes && classes.length) {
     ?>
@@ -86,7 +87,7 @@
     <?js } ?>
 
     <?js
-        var interfaces = self.find({kind: 'interface', memberof: doc.longname});
+        var interfaces = self.find({kind: 'interface', memberof: doc.longname, ...ignoreInheritedSymbols});
         if (!isGlobalPage && interfaces && interfaces.length) {
     ?>
         <h3 class="subsection-title">Interfaces</h3>
@@ -98,7 +99,7 @@
     <?js } ?>
 
     <?js
-        var mixins = self.find({kind: 'mixin', memberof: doc.longname});
+        var mixins = self.find({kind: 'mixin', memberof: doc.longname, ...ignoreInheritedSymbols});
         if (!isGlobalPage && mixins && mixins.length) {
     ?>
         <h3 class="subsection-title">Mixins</h3>
@@ -110,7 +111,7 @@
     <?js } ?>
 
     <?js
-        var namespaces = self.find({kind: 'namespace', memberof: doc.longname});
+        var namespaces = self.find({kind: 'namespace', memberof: doc.longname, ...ignoreInheritedSymbols});
         if (!isGlobalPage && namespaces && namespaces.length) {
     ?>
         <h3 class="subsection-title">Namespaces</h3>
@@ -122,7 +123,7 @@
     <?js } ?>
 
     <?js
-        var members = self.find({kind: 'member', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
+        var members = self.find({kind: 'member', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
 
         // symbols that are assigned to module.exports are not globals, even though they're not a memberof anything
         if (isGlobalPage && members && members.length && members.forEach) {
@@ -140,7 +141,7 @@
     <?js } ?>
 
     <?js
-        var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
+        var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
         if (methods && methods.length && methods.forEach) {
     ?>
         <h3 class="subsection-title">Methods</h3>
@@ -151,7 +152,7 @@
     <?js } ?>
 
     <?js
-        var typedefs = self.find({kind: 'typedef', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
+        var typedefs = self.find({kind: 'typedef', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
         if (typedefs && typedefs.length && typedefs.forEach) {
     ?>
         <h3 class="subsection-title">Type Definitions</h3>
@@ -171,7 +172,7 @@
     <?js } ?>
 
     <?js
-        var events = self.find({kind: 'event', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
+        var events = self.find({kind: 'event', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
         if (events && events.length && events.forEach) {
     ?>
         <h3 class="subsection-title">Events</h3>
