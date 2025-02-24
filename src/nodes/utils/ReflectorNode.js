@@ -273,6 +273,14 @@ class ReflectorBaseNode extends Node {
 		 */
 		this.renderTargets = new WeakMap();
 
+		/**
+		 * force render even if reflector is facing away from camera
+		 *
+		 * @type {boolean}
+		 * @default {false}
+		 */
+		this.forceUpdate = false;
+
 	}
 
 	/**
@@ -387,9 +395,10 @@ class ReflectorBaseNode extends Node {
 
 		_view.subVectors( _reflectorWorldPosition, _cameraWorldPosition );
 
-		// Avoid rendering when reflector is facing away
+		// Avoid rendering when reflector is facing away unless forcing an update
+		const isFacingAway = _view.dot(_normal) > 0;
 
-		if ( _view.dot( _normal ) > 0 ) return;
+		if ( isFacingAway === true && this.forceUpdate === false ) return;
 
 		_view.reflect( _normal ).negate();
 		_view.add( _reflectorWorldPosition );
@@ -474,6 +483,7 @@ class ReflectorBaseNode extends Node {
 
 		_inReflector = false;
 
+		this.forceUpdate = false;
 	}
 
 }
