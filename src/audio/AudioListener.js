@@ -53,6 +53,7 @@ class AudioListener extends Object3D {
 		 * Defined via {@AudioListener#setFilter}.
 		 *
 		 * @type {?AudioNode}
+		 * @default null
 		 * @readonly
 		 */
 		this.filter = null;
