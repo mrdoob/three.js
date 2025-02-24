@@ -122,7 +122,7 @@ class VolumetricLightingModel extends LightingModel {
 
 	}
 
-	scaterringLight( lightColor, builder ) {
+	scatteringLight( lightColor, builder ) {
 
 		const sceneDepthNode = builder.context.sceneDepthNode;
 
@@ -148,12 +148,12 @@ class VolumetricLightingModel extends LightingModel {
 
 		if ( lightNode.light.distance === undefined ) return;
 
-		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approches
+		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approaches
 
 		const directLight = lightColor.xyz.toVar();
 		directLight.mulAssign( lightNode.shadowNode ); // it no should be necessary if used in the same render pass
 
-		this.scaterringLight( directLight, builder );
+		this.scatteringLight( directLight, builder );
 
 	}
 
@@ -168,7 +168,7 @@ class VolumetricLightingModel extends LightingModel {
 
 		const directLight = lightColor.xyz.mul( LTC_Evaluate_Volume( { P, p0, p1, p2, p3 } ) ).pow( 1.5 );
 
-		this.scaterringLight( directLight, builder );
+		this.scatteringLight( directLight, builder );
 
 	}
 

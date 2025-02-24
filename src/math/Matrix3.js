@@ -352,7 +352,7 @@ class Matrix3 {
 	/**
 	 * Transposes this matrix into the supplied array, and returns itself unchanged.
 	 *
-	 * @param {Array<number>} r - An arry to store the transposed matrix elements.
+	 * @param {Array<number>} r - An array to store the transposed matrix elements.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	transposeIntoArray( r ) {

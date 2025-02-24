@@ -680,7 +680,7 @@ class Matrix4 {
 	 * Sets the position component for this matrix from the given vector,
 	 * without affecting the rest of the matrix.
 	 *
-	 * @param {number|Vector3} x - The x component of the vector or alternativley the vector object.
+	 * @param {number|Vector3} x - The x component of the vector or alternatively the vector object.
 	 * @param {number} y - The y component of the vector.
 	 * @param {number} z - The z component of the vector.
 	 * @return {Matrix4} A reference to this matrix.
@@ -782,7 +782,7 @@ class Matrix4 {
 	/**
 	 * Gets the maximum scale value of the three axes.
 	 *
-	 * @return {number} The maxium scale.
+	 * @return {number} The maximum scale.
 	 */
 	getMaxScaleOnAxis() {
 
@@ -1035,7 +1035,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Decomposes this matrix into its positon, rotation and scale components
+	 * Decomposes this matrix into its position, rotation and scale components
 	 * and provides the result in the given objects.
 	 *
 	 * Note: Not all matrices are decomposable in this way. For example, if an

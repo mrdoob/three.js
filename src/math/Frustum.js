@@ -37,7 +37,7 @@ class Frustum {
 	}
 
 	/**
-	 * Sets the frustum planens by copying the given planes.
+	 * Sets the frustum planes by copying the given planes.
 	 *
 	 * @param {Plane} [p0] - The first plane that encloses the frustum.
 	 * @param {Plane} [p1] - The second plane that encloses the frustum.
@@ -232,7 +232,7 @@ class Frustum {
 	 * Returns `true` if the given point lies within the frustum.
 	 *
 	 * @param {Vector3} point - The point to test.
-	 * @return {boolean} Whether the point liest within this frustum or not.
+	 * @return {boolean} Whether the point lies within this frustum or not.
 	 */
 	containsPoint( point ) {
 

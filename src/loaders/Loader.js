@@ -186,7 +186,7 @@ class Loader {
  *
  *
  * @callback onErrorCallback
- * @param {Error} error - The error which occured during the loading process.
+ * @param {Error} error - The error which occurred during the loading process.
  */
 
 /**

@@ -1,14 +1,14 @@
 // Bezier Curves formulas obtained from: https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 
 /**
- * Computes a point on a Camtull-Rom spline.
+ * Computes a point on a Catmull-Rom spline.
  *
  * @param {number} t - The interpolation factor.
  * @param {number} p0 - The first control point.
  * @param {number} p1 - The second control point.
  * @param {number} p2 - The third control point.
  * @param {number} p3 - The fourth control point.
- * @return {number} The calculated point on a Camtull-Rom spline.
+ * @return {number} The calculated point on a Catmull-Rom spline.
  */
 function CatmullRom( t, p0, p1, p2, p3 ) {
 

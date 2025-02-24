@@ -10,7 +10,7 @@ const _scale = /*@__PURE__*/ new Vector3();
 const _orientation = /*@__PURE__*/ new Vector3();
 
 /**
- * The class represents a virtual listern of the all positional and non-positional audio effects
+ * The class represents a virtual listener of the all positional and non-positional audio effects
  * in the scene. A three.js application usually creates a single listener. It is a mandatory
  * constructor parameter for audios entities like {@link Audio} and {@link PositionalAudio}.
  *

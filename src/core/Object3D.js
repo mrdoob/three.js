@@ -182,7 +182,7 @@ class Object3D extends EventDispatcher {
 				value: rotation
 			},
 			/**
-			 * Represents the object's local rotation as Quaterions.
+			 * Represents the object's local rotation as Quaternions.
 			 *
 			 * @name Object3D#quaternion
 			 * @type {Quaternion}
@@ -409,7 +409,7 @@ class Object3D extends EventDispatcher {
 	/**
 	 * Applies a rotation represented by given the quaternion to the 3D object.
 	 *
-	 * @param {Quaternion} q - The quaterion.
+	 * @param {Quaternion} q - The quaternion.
 	 * @return {Object3D} A reference to this instance.
 	 */
 	applyQuaternion( q ) {
@@ -460,9 +460,9 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Sets the given rotation represented as a Quanterion to the 3D object.
+	 * Sets the given rotation represented as a Quaternion to the 3D object.
 	 *
-	 * @param {Quaternion} q - The Quanterion
+	 * @param {Quaternion} q - The Quaternion
 	 */
 	setRotationFromQuaternion( q ) {
 
@@ -1079,7 +1079,7 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * Updates the transformation matrix in local space by computing it from the current
-	 * positon, rotation and scale values.
+	 * position, rotation and scale values.
 	 */
 	updateMatrix() {
 
