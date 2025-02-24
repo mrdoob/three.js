@@ -108,7 +108,7 @@ class PMREMGenerator {
 	 * @param {number} sigma
 	 * @param {number} near
 	 * @param {number} far
-	 * @param {?Object} [options={}]
+	 * @param {Object} [options={}]
 	 * @return {WebGLRenderTarget}
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
@@ -152,7 +152,7 @@ class PMREMGenerator {
 	 * The smallest supported equirectangular image size is 64 x 32.
 	 *
 	 * @param {Texture} equirectangular
-	 * @param {WebGLRenderTarget} [renderTarget=null] - Optional render target.
+	 * @param {?WebGLRenderTarget} [renderTarget=null] - Optional render target.
 	 * @return {WebGLRenderTarget}
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {

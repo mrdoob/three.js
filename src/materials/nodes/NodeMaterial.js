@@ -257,7 +257,7 @@ class NodeMaterial extends Material {
 		 * simulation would be implemented as compute shaders and managed inside a `Fn` function. This function is
 		 * eventually assigned to `geometryNode`.
 		 *
-		 * @type {Function}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this.geometryNode = null;

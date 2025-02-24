@@ -91,7 +91,7 @@ class Line3 {
 	/**
 	 * Returns the squared Euclidean distance between the line' start and end point.
 	 *
-	 * @return {Vector3} The squared Euclidean distance.
+	 * @return {number} The squared Euclidean distance.
 	 */
 	distanceSq() {
 
@@ -102,7 +102,7 @@ class Line3 {
 	/**
 	 * Returns the Euclidean distance between the line' start and end point.
 	 *
-	 * @return {Vector3} The Euclidean distance.
+	 * @return {number} The Euclidean distance.
 	 */
 	distance() {
 
@@ -113,7 +113,7 @@ class Line3 {
 	/**
 	 * Returns a vector at a certain position along the line segment.
 	 *
-	 * @param {Vector3} t - A value between `[0,1]` to represent a position along the line segment.
+	 * @param {number} t - A value between `[0,1]` to represent a position along the line segment.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
 	 * @return {Vector3} The delta vector.
 	 */
