@@ -16,6 +16,7 @@ let data;
 let view;
 
 let outdir = path.normalize( env.opts.destination );
+const themeOpts = ( env.opts.themeOpts ) || {};
 
 function mkdirSync( filepath ) {
 
@@ -723,6 +724,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 	view.resolveAuthorLinks = resolveAuthorLinks;
 	view.htmlsafe = htmlsafe;
 	view.outputSourceFiles = outputSourceFiles;
+	view.ignoreInheritedSymbols = themeOpts.ignoreInheritedSymbols;
 
 	// once for all
 	view.nav = buildNav( members );
