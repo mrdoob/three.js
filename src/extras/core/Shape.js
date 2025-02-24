@@ -54,7 +54,7 @@ class Shape extends Path {
 		this.type = 'Shape';
 
 		/**
-		 * Defines the holes in the shape. Hole defnitions must use the
+		 * Defines the holes in the shape. Hole definitions must use the
 		 * opposite winding order (CW/CCW) than the outer shape.
 		 *
 		 * @type {Array<Path>}

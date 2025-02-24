@@ -377,7 +377,7 @@ class Euler {
 
 	/**
 	 * Sets this Euler instance's components to values from the given array. The first three
-	 * entries of the array are assign to the x,y and z components. An optinal fourth entry
+	 * entries of the array are assign to the x,y and z components. An optional fourth entry
 	 * defines the Euler order.
 	 *
 	 * @param {Array<number,number,number,?string>} array - An array holding the Euler component values.

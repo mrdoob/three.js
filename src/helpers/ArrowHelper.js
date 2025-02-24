@@ -33,7 +33,7 @@ let _lineGeometry, _coneGeometry;
 class ArrowHelper extends Object3D {
 
 	/**
-	 * Constructs a new arror helper.
+	 * Constructs a new arrow helper.
 	 *
 	 * @param {Vector3} [dir=(0, 0, 1)] - The (normalized) direction vector.
 	 * @param {Vector3} [origin=(0, 0, 0)] - Point at which the arrow starts.

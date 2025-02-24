@@ -90,7 +90,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 /**
  * Returns a cache that stores generated PMREMs for the respective textures.
- * A cache must be maintaned per renderer since PMREMs are render target textures
+ * A cache must be maintained per renderer since PMREMs are render target textures
  * which can't be shared across render contexts.
  *
  * @private

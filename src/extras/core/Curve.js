@@ -287,7 +287,7 @@ class Curve {
 	 *
 	 * @param {number} t - The interpolation factor.
 	 * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
-	 * @return {(Vector2|Vector3)} The tagent vector.
+	 * @return {(Vector2|Vector3)} The tangent vector.
 	 */
 	getTangent( t, optionalTarget ) {
 
@@ -316,7 +316,7 @@ class Curve {
 	 *
 	 * @param {number} u - The interpolation factor.
 	 * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
-	 * @return {(Vector2|Vector3)} The tagent vector.
+	 * @return {(Vector2|Vector3)} The tangent vector.
 	 * @see {@link Curve#getPointAt}
 	 */
 	getTangentAt( u, optionalTarget ) {

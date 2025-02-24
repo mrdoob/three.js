@@ -36,7 +36,7 @@ class Texture extends EventDispatcher {
 	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
 	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
 	 * @param {number} [minFilter=LinearFilter] - The min filter value.
-	 * @param {number} [format=RGABFormat] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The min filter value.
 	 * @param {number} [type=UnsignedByteType] - The min filter value.
 	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The min filter value.
 	 * @param {string} [colorSpace=NoColorSpace] - The min filter value.

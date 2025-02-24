@@ -532,7 +532,7 @@ class Quaternion {
 	}
 
 	/**
-	 * Rotates this quaternion by a given angular step to the given quaterion.
+	 * Rotates this quaternion by a given angular step to the given quaternion.
 	 * The method ensures that the final quaternion will not overshoot `q`.
 	 *
 	 * @param {Quaternion} q - The target quaternion.

@@ -196,7 +196,7 @@
 				//sunLight.add( new THREE.Mesh( new THREE.SphereGeometry( 0.1, 16, 16 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 				scene.add( spotLight );
 
-				// Post-Proccessing
+				// Post-Processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
@@ -213,7 +213,7 @@
 				const scenePass = pass( scene, camera );
 				const sceneLinearDepth = scenePass.getTextureNode( 'depth' );
 
-				// Material - Apply oclussion depth of volumetric lighting based on the scene depth
+				// Material - Apply occlusion depth of volumetric lighting based on the scene depth
 
 				volumetricMaterial.depthNode = sceneLinearDepth.sample( screenUV );
 

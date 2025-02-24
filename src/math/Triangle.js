@@ -81,7 +81,7 @@ class Triangle {
 	}
 
 	/**
-	 * Copmutes a barycentric coordinates from the given vector.
+	 * Computes a barycentric coordinates from the given vector.
 	 * Returns `null` if the triangle is degenerate.
 	 *
 	 * @param {Vector3} point - A point in 3D space.
@@ -366,7 +366,7 @@ class Triangle {
 	}
 
 	/**
-	 * Copmutes a barycentric coordinates from the given vector.
+	 * Computes a barycentric coordinates from the given vector.
 	 * Returns `null` if the triangle is degenerate.
 	 *
 	 * @param {Vector3} point - A point in 3D space.
