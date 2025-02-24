@@ -80,7 +80,7 @@ class Reflector extends Mesh {
 			// Avoid rendering when reflector is facing away unless forcing an update
 			const isFacingAway = view.dot( normal ) > 0;
 
-			if ( isFacingAway && !this.forceUpdate ) return;
+			if ( isFacingAway === true && this.forceUpdate === false ) return;
 
 			view.reflect( normal ).negate();
 			view.add( reflectorWorldPosition );
