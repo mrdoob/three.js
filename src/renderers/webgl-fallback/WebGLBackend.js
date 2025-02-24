@@ -186,6 +186,15 @@ class WebGLBackend extends Backend {
 		 */
 		this._knownBindings = new WeakSet();
 
+
+		/**
+		 * Whether the device supports framebuffers invalidation or not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 */
+		this._supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test( navigator.userAgent );
+
 		/**
 		 * The target framebuffer when rendering with
 		 * the WebXR device API.
@@ -564,12 +573,22 @@ class WebGLBackend extends Backend {
 						const viewY = renderContext.height - height - y;
 
 						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
-						gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, viewY, width, height );
+
+						if ( this._supportsInvalidateFramebuffer === true ) {
+
+							gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, viewY, width, height );
+
+						}
 
 					} else {
 
 						gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
-						gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
+						if ( this._supportsInvalidateFramebuffer === true ) {
+
+							gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
+						}
 
 					}
 
