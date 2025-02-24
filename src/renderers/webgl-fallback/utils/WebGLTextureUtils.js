@@ -781,85 +781,27 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
-		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
 		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
-		if ( srcTexture.isDepthTexture ) {
+		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
-			const srcTextureProperties = properties.get( srcTexture );
-			const dstTextureProperties = properties.get( dstTexture );
-			const srcRenderTargetProperties = properties.get( srcTextureProperties.__renderTarget );
-			const dstRenderTargetProperties = properties.get( dstTextureProperties.__renderTarget );
-			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcRenderTargetProperties.__webglFramebuffer );
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstRenderTargetProperties.__webglFramebuffer );
+			const srcTextureData = backend.get( srcTexture );
+			const dstTextureData = backend.get( dstTexture );
 
-			for ( let i = 0; i < depth; i ++ ) {
+			const srcRenderContextData = backend.get( srcTextureData.renderTarget );
+			const dstRenderContextData = backend.get( dstTextureData.renderTarget );
 
-				// if the source or destination are a 3d target then a layer needs to be bound
-				if ( isSrc3D ) {
+			const srcFramebuffer = srcRenderContextData.framebuffers[ srcTextureData.cacheKey ];
+			const dstFramebuffer = dstRenderContextData.framebuffers[ dstTextureData.cacheKey ];
 
-					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel, minZ + i );
-					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
 
-				}
+			let mask = gl.COLOR_BUFFER_BIT;
 
-				gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+			if ( srcTexture.isDepthTexture ) mask = gl.DEPTH_BUFFER_BIT;
 
-			}
+			gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, gl.NEAREST );
 
-			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
-
-		} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture ) {
-
-			// get the appropriate frame buffers
-			const srcTextureProperties = properties.get( srcTexture );
-			const dstTextureProperties = properties.get( dstTexture );
-
-			// bind the frame buffer targets
-			state.bindFramebuffer( gl.READ_FRAMEBUFFER, _srcFramebuffer );
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, _dstFramebuffer );
-
-			for ( let i = 0; i < depth; i ++ ) {
-
-				// assign the correct layers and mip maps to the frame buffers
-				if ( isSrc3D ) {
-
-					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, srcTextureProperties.__webglTexture, srcLevel, minZ + i );
-
-				} else {
-
-					gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, srcTextureProperties.__webglTexture, srcLevel );
-
-				}
-
-				if ( isDst3D ) {
-
-					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, dstTextureProperties.__webglTexture, dstLevel, dstZ + i );
-
-				} else {
-
-					gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dstTextureProperties.__webglTexture, dstLevel );
-
-				}
-
-				// copy the data using the fastest function that can achieve the copy
-				if ( srcLevel !== 0 ) {
-
-					gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
-
-				} else if ( isDst3D ) {
-
-					gl.copyTexSubImage3D( glTextureType, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
-
-				} else {
-
-					gl.copyTexSubImage2D( glTextureType, dstLevel, dstX, dstY, minX, minY, width, height );
-
-				}
-
-			}
-
-			// unbind read, draw buffers
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 
