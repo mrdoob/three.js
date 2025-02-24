@@ -579,7 +579,7 @@ class Vector2 {
 	 * Calculates the cross product of the given vector with this instance.
 	 *
 	 * @param {Vector2} v - The vector to compute the cross product with.
-	 * @return {Vector2} The result of the cross product.
+	 * @return {number} The result of the cross product.
 	 */
 	cross( v ) {
 

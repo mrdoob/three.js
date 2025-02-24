@@ -290,7 +290,7 @@ class Plane {
 	 * projection of the normal at the origin onto the plane.
 	 *
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {boolean} The coplanar point.
+	 * @return {Vector3} The coplanar point.
 	 */
 	coplanarPoint( target ) {
 

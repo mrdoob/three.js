@@ -267,7 +267,7 @@ class Vector3 {
 	/**
 	 * Adds the given vector scaled by the given factor to this instance.
 	 *
-	 * @param {Vector3} v - The vector.
+	 * @param {Vector3|Vector4} v - The vector.
 	 * @param {number} s - The factor that scales `v`.
 	 * @return {Vector3} A reference to this vector.
 	 */

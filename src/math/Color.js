@@ -561,7 +561,7 @@ class Color {
 	 *
 	 * @param {{h:0,s:0,l:0}} target - The target object that is used to store the method's result.
 	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
-	 * @return {{h:0,s:0,l:0}} The HSL representation of this color.
+	 * @return {{h:number,s:number,l:number}} The HSL representation of this color.
 	 */
 	getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
 

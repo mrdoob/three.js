@@ -77,7 +77,7 @@ export const hash = ( ...params ) => cyrb53( params );
  * Computes a cache key for the given node.
  *
  * @method
- * @param {Object} object - The object to be hashed.
+ * @param {Object|Node} object - The object to be hashed.
  * @param {boolean} [force=false] - Whether to force a cache key computation or not.
  * @return {number} The hash.
  */

@@ -178,7 +178,6 @@ class WebGPUTextureUtils {
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
-	 * @return {undefined}
 	 */
 	createTexture( texture, options = {} ) {
 
@@ -266,7 +265,8 @@ class WebGPUTextureUtils {
 
 				console.warn( 'WebGPURenderer: Texture format not supported.' );
 
-				return this.createDefaultTexture( texture );
+				this.createDefaultTexture( texture );
+				return;
 
 			}
 
