@@ -524,14 +524,13 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
-			if ( uniform.type === 'texture' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'texture3D' ) {
 
 				const texture = uniform.node.value;
 
 				let typePrefix = '';
 
-				if ( texture.isDataTexture === true ) {
-
+				if ( texture.isDataTexture === true || texture.isData3DTexture === true ) {
 
 					if ( texture.type === UnsignedIntType ) {
 
@@ -553,6 +552,10 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
 
+				} else if ( uniform.type === 'texture3D' ) {
+
+					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
+
 				} else {
 
 					snippet = `${typePrefix}sampler2D ${ uniform.name };`;
@@ -562,10 +565,6 @@ ${ flowData.code }
 			} else if ( uniform.type === 'cubeTexture' ) {
 
 				snippet = `samplerCube ${ uniform.name };`;
-
-			} else if ( uniform.type === 'texture3D' ) {
-
-				snippet = `sampler3D ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -1115,7 +1114,7 @@ ${vars}
 
 ${ this.getSignature() }
 
-// extensions 
+// extensions
 ${shaderData.extensions}
 
 // precision
