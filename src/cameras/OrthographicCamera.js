@@ -7,6 +7,11 @@ import { Camera } from './Camera.js';
  * constant regardless of its distance from the camera. This can be useful
  * for rendering 2D scenes and UI elements, amongst other things.
  *
+ * ```js
+ * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+ * scene.add( camera );
+ * ```
+ *
  * @augments Camera
  */
 class OrthographicCamera extends Camera {
