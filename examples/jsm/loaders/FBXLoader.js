@@ -22,7 +22,6 @@ import {
 	Mesh,
 	MeshLambertMaterial,
 	MeshPhongMaterial,
-	MeshStandardMaterial,
 	NumberKeyframeTrack,
 	Object3D,
 	PerspectiveCamera,
@@ -1321,7 +1320,7 @@ class FBXTreeParser {
 
 			if ( needsDefaultMaterial ) {
 
-				const defaultMaterial = new MeshStandardMaterial();
+				const defaultMaterial = new MeshPhongMaterial();
 				materials.push( defaultMaterial );
 
 			}
