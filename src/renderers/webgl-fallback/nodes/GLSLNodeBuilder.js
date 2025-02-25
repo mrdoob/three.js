@@ -556,6 +556,10 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
 
+				} else if ( uniform.type === 'texture3D' ) {
+
+					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
+
 				} else {
 
 					snippet = `${typePrefix}sampler2D ${ uniform.name };`;
