@@ -396,7 +396,7 @@ class ReflectorBaseNode extends Node {
 		_view.subVectors( _reflectorWorldPosition, _cameraWorldPosition );
 
 		// Avoid rendering when reflector is facing away unless forcing an update
-		const isFacingAway = _view.dot(_normal) > 0;
+		const isFacingAway = _view.dot( _normal ) > 0;
 
 		if ( isFacingAway === true && this.forceUpdate === false ) return;
 
@@ -484,6 +484,7 @@ class ReflectorBaseNode extends Node {
 		_inReflector = false;
 
 		this.forceUpdate = false;
+
 	}
 
 }
