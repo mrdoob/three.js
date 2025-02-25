@@ -13,6 +13,11 @@ const _maxTarget = /*@__PURE__*/ new Vector2();
  * This projection mode is designed to mimic the way the human eye sees. It
  * is the most common projection mode used for rendering a 3D scene.
  *
+ * ```js
+ * const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+ * scene.add( camera );
+ * ```
+ *
  * @augments Camera
  */
 class PerspectiveCamera extends Camera {
