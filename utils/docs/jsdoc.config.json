@@ -19,6 +19,7 @@
             "src/core/EventDispatcher.js",
             "src/extras",
             "src/helpers",
+            "src/lights",
             "src/loaders/nodes", 
             "src/loaders/Loader.js", 
             "src/materials/nodes", 
