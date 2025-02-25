@@ -274,7 +274,7 @@ class ReflectorBaseNode extends Node {
 		this.renderTargets = new WeakMap();
 
 		/**
-		 * force render even if reflector is facing away from camera
+		 * Force render even if reflector is facing away from camera.
 		 *
 		 * @type {boolean}
 		 * @default {false}
