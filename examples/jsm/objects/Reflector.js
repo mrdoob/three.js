@@ -21,6 +21,7 @@ class Reflector extends Mesh {
 		this.isReflector = true;
 
 		this.type = 'Reflector';
+		this.forceUpdate = false;
 		this.camera = new PerspectiveCamera();
 
 		const scope = this;
@@ -76,9 +77,10 @@ class Reflector extends Mesh {
 
 			view.subVectors( reflectorWorldPosition, cameraWorldPosition );
 
-			// Avoid rendering when reflector is facing away
+			// Avoid rendering when reflector is facing away unless forcing an update
+			const isFacingAway = view.dot( normal ) > 0;
 
-			if ( view.dot( normal ) > 0 ) return;
+			if ( isFacingAway === true && this.forceUpdate === false ) return;
 
 			view.reflect( normal ).negate();
 			view.add( reflectorWorldPosition );
@@ -172,6 +174,7 @@ class Reflector extends Mesh {
 			}
 
 			scope.visible = true;
+			this.forceUpdate = false;
 
 		};
 
