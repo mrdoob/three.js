@@ -59,7 +59,10 @@ function Editor() {
 
 		geometryChanged: new Signal(),
 
+		readyForMultipleSelect: new Signal(),
+
 		objectSelected: new Signal(),
+		objectsMultipleSelected: new Signal(),
 		objectFocused: new Signal(),
 
 		objectAdded: new Signal(),
@@ -123,6 +126,7 @@ function Editor() {
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
+	this.selectedObjects = [];
 	this.helpers = {};
 
 	this.cameras = {};

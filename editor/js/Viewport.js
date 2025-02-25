@@ -62,18 +62,18 @@ function Viewport( editor ) {
 
 	//
 
-	const box = new THREE.Box3();
+	let selectedObjects = [];
+	let boxes = [ new THREE.Box3() ];
 
-	const selectionBox = new THREE.Box3Helper( box );
-	selectionBox.material.depthTest = false;
-	selectionBox.material.transparent = true;
-	selectionBox.visible = false;
-	sceneHelpers.add( selectionBox );
+	let selectionBoxes = [ new THREE.Box3Helper( boxes[ 0 ] ) ];
+	selectionBoxes[ 0 ].material.depthTest = false;
+	selectionBoxes[ 0 ].material.transparent = true;
+	selectionBoxes[ 0 ].visible = false;
+	sceneHelpers.add( selectionBoxes[ 0 ] );
 
 	let objectPositionOnDown = null;
 	let objectRotationOnDown = null;
 	let objectScaleOnDown = null;
-
 	const transformControls = new TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'axis-changed', function () {
 
@@ -108,7 +108,16 @@ function Viewport( editor ) {
 
 					if ( ! objectPositionOnDown.equals( object.position ) ) {
 
-						editor.execute( new SetPositionCommand( editor, object, object.position, objectPositionOnDown ) );
+						selectedObjects.map( ( selectedObject ) => {
+
+							var direction = new THREE.Vector3();
+							direction.subVectors( object.position, objectPositionOnDown );
+
+							const newPosition = selectedObject === object ? object.position : new THREE.Vector3( direction.x + selectedObject.position.x, direction.y + selectedObject.position.y, direction.z + selectedObject.position.z );
+							editor.execute( new SetPositionCommand( editor, selectedObject, newPosition, objectPositionOnDown ) );
+
+						} );
+
 
 					}
 
@@ -118,7 +127,12 @@ function Viewport( editor ) {
 
 					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
 
-						editor.execute( new SetRotationCommand( editor, object, object.rotation, objectRotationOnDown ) );
+						selectedObjects.map( ( selectedObject ) => {
+
+							editor.execute( new SetRotationCommand( editor, selectedObject, object.rotation, objectRotationOnDown ) );
+
+						} );
+
 
 					}
 
@@ -128,7 +142,12 @@ function Viewport( editor ) {
 
 					if ( ! objectScaleOnDown.equals( object.scale ) ) {
 
-						editor.execute( new SetScaleCommand( editor, object, object.scale, objectScaleOnDown ) );
+						selectedObjects.map( ( selectedObject ) => {
+
+							editor.execute( new SetScaleCommand( editor, selectedObject, object.scale, objectScaleOnDown ) );
+
+						} );
+
 
 					}
 
@@ -267,9 +286,33 @@ function Viewport( editor ) {
 
 	}
 
+	function onKeyDown( event ) {
+
+		if ( event.key === 'Control' ) {
+
+			signals.readyForMultipleSelect.dispatch( true );
+
+		}
+
+
+	}
+
+	function onKeyUp( event ) {
+
+		if ( event.key === 'Control' ) {
+
+			signals.readyForMultipleSelect.dispatch( false );
+
+		}
+
+	}
+
 	container.dom.addEventListener( 'mousedown', onMouseDown );
 	container.dom.addEventListener( 'touchstart', onTouchStart, { passive: false } );
 	container.dom.addEventListener( 'dblclick', onDoubleClick );
+
+	document.addEventListener( 'keydown', onKeyDown );
+	document.addEventListener( 'keyup', onKeyUp );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
@@ -404,16 +447,21 @@ function Viewport( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		selectionBox.visible = false;
+		boxes = [ new THREE.Box3() ];
+		selectionBoxes.map( ( item ) => sceneHelpers.remove( item ) );
+		selectionBoxes = [ new THREE.Box3Helper( boxes[ 0 ] ) ];
+		selectedObjects = [ object ];
 		transformControls.detach();
+
 
 		if ( object !== null && object !== scene && object !== camera ) {
 
-			box.setFromObject( object, true );
+			boxes[ 0 ].setFromObject( object, true );
 
-			if ( box.isEmpty() === false ) {
+			if ( boxes[ 0 ].isEmpty() === false ) {
 
-				selectionBox.visible = true;
+				selectionBoxes[ 0 ].visible = true;
+				sceneHelpers.add( selectionBoxes[ 0 ] );
 
 			}
 
@@ -421,6 +469,47 @@ function Viewport( editor ) {
 
 		}
 
+		render();
+
+	} );
+
+	signals.objectsMultipleSelected.add( function ( objectList ) {
+
+		boxes = [];
+		selectionBoxes.map( item => sceneHelpers.remove( item ) );
+		selectionBoxes = [];
+		selectedObjects = objectList;
+
+		objectList.map( ( object, index ) => {
+
+
+
+			if ( object !== null && object !== scene && object !== camera ) {
+
+				boxes.push( new THREE.Box3() );
+
+				selectionBoxes.push( new THREE.Box3Helper( boxes[ index ] ) );
+				selectionBoxes[ index ].material.depthTest = false;
+				selectionBoxes[ index ].material.transparent = true;
+				selectionBoxes[ index ].visible = false;
+
+				sceneHelpers.add( selectionBoxes[ index ] );
+
+				transformControls.detach();
+				boxes[ index ].setFromObject( object, true );
+
+				if ( boxes[ index ].isEmpty() === false ) {
+
+					selectionBoxes[ index ].visible = true;
+
+				}
+
+				transformControls.attach( object );
+
+			}
+
+
+		} );
 		render();
 
 	} );
@@ -435,7 +524,7 @@ function Viewport( editor ) {
 
 		if ( object !== undefined ) {
 
-			box.setFromObject( object, true );
+			boxes[ 0 ].setFromObject( object, true );
 
 		}
 
@@ -446,9 +535,10 @@ function Viewport( editor ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		if ( editor.selected === object ) {
+		const index = selectedObjects.findIndex( itm => itm == object );
+		if ( editor.selected === object || editor.selectedObjects.includes( object ) ) {
 
-			box.setFromObject( object, true );
+			boxes[ index !== - 1 ? index : 0 ].setFromObject( object, true );
 
 		}
 
@@ -781,7 +871,7 @@ function Viewport( editor ) {
 			if ( editor.selected !== null ) {
 
 				editor.selected.updateWorldMatrix( false, true ); // avoid frame late effect for certain skinned meshes (e.g. Michelle.glb)
-				selectionBox.box.setFromObject( editor.selected, true ); // selection box should reflect current animation state
+				selectionBoxes[ 0 ].box.setFromObject( editor.selected, true ); // selection box should reflect current animation state
 
 			}
 
