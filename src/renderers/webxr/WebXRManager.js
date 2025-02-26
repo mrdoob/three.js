@@ -65,6 +65,8 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		const updatedCameraProperties = new WeakMap();
+
 		this.cameraAutoUpdate = true;
 		this.enabled = false;
 
@@ -181,6 +183,19 @@ class WebXRManager extends EventDispatcher {
 			animation.stop();
 
 			scope.isPresenting = false;
+
+			if ( updatedCameraProperties.has( scope.getCamera() ) ) {
+
+				const cameraAndProperties = updatedCameraProperties.get( scope.getCamera() );
+
+				const userCamera = cameraAndProperties.userCamera;
+				userCamera.fov = cameraAndProperties.fov;
+				userCamera.zoom = cameraAndProperties.zoom;
+				userCamera.updateProjectionMatrix();
+
+				updatedCameraProperties.delete( scope.getCamera() );
+
+			}
 
 			renderer.setPixelRatio( currentPixelRatio );
 			renderer.setSize( currentSize.width, currentSize.height, false );
@@ -366,6 +381,8 @@ class WebXRManager extends EventDispatcher {
 				animation.start();
 
 				scope.isPresenting = true;
+
+				updatedCameraProperties.delete( scope.getCamera() );
 
 				scope.dispatchEvent( { type: 'sessionstart' } );
 
@@ -636,6 +653,16 @@ class WebXRManager extends EventDispatcher {
 			camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
 
 			if ( camera.isPerspectiveCamera ) {
+
+				if ( ! updatedCameraProperties.has( scope.getCamera() ) ) {
+
+					updatedCameraProperties.set( scope.getCamera(), {
+						userCamera: camera,
+						fov: camera.fov,
+						zoom: camera.zoom,
+					} );
+
+				}
 
 				camera.fov = RAD2DEG * 2 * Math.atan( 1 / camera.projectionMatrix.elements[ 5 ] );
 				camera.zoom = 1;
