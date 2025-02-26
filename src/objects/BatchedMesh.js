@@ -141,41 +141,107 @@ function copyArrayContents( src, target ) {
 
 }
 
+/**
+ * A special version of a mesh with multi draw batch rendering support. Use
+ * this class if you have to render a large number of objects with the same
+ * material but with different geometries or world transformations. The usage of
+ * `BatchedMesh` will help you to reduce the number of draw calls and thus improve the overall
+ * rendering performance in your application.
+ *
+ * ```js
+ * const box = new THREE.BoxGeometry( 1, 1, 1 );
+ * const sphere = new THREE.SphereGeometry( 1, 12, 12 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ *
+ * // initialize and add geometries into the batched mesh
+ * const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+ * const boxGeometryId = batchedMesh.addGeometry( box );
+ * const sphereGeometryId = batchedMesh.addGeometry( sphere );
+ *
+ * // create instances of those geometries
+ * const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId );
+ * const boxInstancedId2 = batchedMesh.addInstance( boxGeometryId );
+ *
+ * const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId );
+ * const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId );
+ *
+ * // position the geometries
+ * batchedMesh.setMatrixAt( boxInstancedId1, boxMatrix1 );
+ * batchedMesh.setMatrixAt( boxInstancedId2, boxMatrix2 );
+ *
+ * batchedMesh.setMatrixAt( sphereInstancedId1, sphereMatrix1 );
+ * batchedMesh.setMatrixAt( sphereInstancedId2, sphereMatrix2 );
+ *
+ * scene.add( batchedMesh );
+ * ```
+ *
+ * @augments Mesh
+ */
 class BatchedMesh extends Mesh {
 
-	get maxInstanceCount() {
-
-		return this._maxInstanceCount;
-
-	}
-
-	get instanceCount() {
-
-		return this._instanceInfo.length - this._availableInstanceIds.length;
-
-	}
-
-	get unusedVertexCount() {
-
-		return this._maxVertexCount - this._nextVertexStart;
-
-	}
-
-	get unusedIndexCount() {
-
-		return this._maxIndexCount - this._nextIndexStart;
-
-	}
-
+	/**
+	 * Constructs a new batched mesh.
+	 *
+	 * @param {number} maxInstanceCount - The maximum number of individual instances planned to be added and rendered.
+	 * @param {number} maxVertexCount - The maximum number of vertices to be used by all unique geometries.
+	 * @param {number} [maxIndexCount=maxVertexCount*2] - The maximum number of indices to be used by all unique geometries
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 */
 	constructor( maxInstanceCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isBatchedMesh = true;
+
+		/**
+		 * When set ot `true`, the individual objects of a batch are frustum culled.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.perObjectFrustumCulled = true;
+
+		/**
+		 * When set to `true`, the individual objects of a batch are sorted to improve overdraw-related artifacts.
+		 * If the material is marked as "transparent" objects are rendered back to front and if not then they are
+		 * rendered front to back.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortObjects = true;
+
+		/**
+		 * The bounding box of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingBox}.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
 		this.boundingBox = null;
+
+		/**
+		 * The bounding sphere of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingSphere}.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
 		this.boundingSphere = null;
+
+		/**
+		 * Takes a sort a function that is run before render. The function takes a list of instances to
+		 * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered
+		 * sort with.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
 		this.customSort = null;
 
 		// stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
@@ -213,6 +279,54 @@ class BatchedMesh extends Mesh {
 
 		this._initMatricesTexture();
 		this._initIndirectTexture();
+
+	}
+
+	/**
+	 * The maximum number of individual instances that can be stored in the batch.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get maxInstanceCount() {
+
+		return this._maxInstanceCount;
+
+	}
+
+	/**
+	 * The instance count.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get instanceCount() {
+
+		return this._instanceInfo.length - this._availableInstanceIds.length;
+
+	}
+
+	/**
+	 * The number of unused vertices.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get unusedVertexCount() {
+
+		return this._maxVertexCount - this._nextVertexStart;
+
+	}
+
+	/**
+	 * The number of unused indices.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get unusedIndexCount() {
+
+		return this._maxIndexCount - this._nextIndexStart;
 
 	}
 
@@ -329,6 +443,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Validates the instance defined by the given ID.
+	 *
+	 * @param {number} instanceId - The the instance to validate.
+	 */
 	validateInstanceId( instanceId ) {
 
 		const instanceInfo = this._instanceInfo;
@@ -340,6 +459,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Validates the geometry defined by the given ID.
+	 *
+	 * @param {number} geometryId - The the geometry to validate.
+	 */
 	validateGeometryId( geometryId ) {
 
 		const geometryInfoList = this._geometryInfo;
@@ -351,7 +475,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
-
+	/**
+	 * Takes a sort a function that is run before render. The function takes a list of instances to
+	 * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered sort with.
+	 *
+	 * @param {Function} func - The custom sort function.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setCustomSort( func ) {
 
 		this.customSort = func;
@@ -359,6 +489,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding box, updating {@link BatchedMesh#boundingBox}.
+	 * Bounding boxes aren't computed by default. They need to be explicitly computed,
+	 * otherwise they are `null`.
+	 */
 	computeBoundingBox() {
 
 		if ( this.boundingBox === null ) {
@@ -384,6 +519,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding sphere, updating {@link BatchedMesh#boundingSphere}.
+	 * Bounding spheres aren't computed by default. They need to be explicitly computed,
+	 * otherwise they are `null`.
+	 */
 	computeBoundingSphere() {
 
 		if ( this.boundingSphere === null ) {
@@ -409,6 +549,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Adds a new instance to the batch using the geometry of the given ID and returns
+	 * a new id referring to the new instance to be used by other functions.
+	 *
+	 * @param {number} geometryId - The ID of a previously added geometry via {@link BatchedMesh#addGeometry}.
+	 * @return {number} The instance ID.
+	 */
 	addInstance( geometryId ) {
 
 		const atCapacity = this._instanceInfo.length >= this.maxInstanceCount;
@@ -460,6 +607,21 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Adds the given geometry to the batch and returns the associated
+	 * geometry id referring to it to be used in other functions.
+	 *
+	 * @param {BufferGeometry} geometry - The geometry to add.
+	 * @param {number} [reservedVertexCount=-1] - Optional parameter specifying the amount of
+	 * vertex buffer space to reserve for the added geometry. This is necessary if it is planned
+	 * to set a new geometry at this index at a later time that is larger than the original geometry.
+	 * Defaults to the length of the given geometry vertex buffer.
+	 * @param {number} [reservedIndexCount=-1] - Optional parameter specifying the amount of index
+	 * buffer space to reserve for the added geometry. This is necessary if it is planned to set a
+	 * new geometry at this index at a later time that is larger than the original geometry. Defaults to
+	 * the length of the given geometry index buffer.
+	 * @return {number} The geometry ID.
+	 */
 	addGeometry( geometry, reservedVertexCount = - 1, reservedIndexCount = - 1 ) {
 
 		this._initializeGeometry( geometry );
@@ -538,6 +700,15 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Replaces the geometry at the given ID with the provided geometry. Throws an error if there
+	 * is not enough space reserved for geometry. Calling this will change all instances that are
+	 * rendering that geometry.
+	 *
+	 * @param {number} geometryId - The ID of the geomtry that should be replaced with the given geometry.
+	 * @param {BufferGeometry} geometry - The new geometry.
+	 * @return {number} The geometry ID.
+	 */
 	setGeometryAt( geometryId, geometry ) {
 
 		if ( geometryId >= this._geometryCount ) {
@@ -643,6 +814,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Deletes the geometry defined by the given ID from this batch. Any instances referencing
+	 * this geometry will also be removed as a side effect.
+	 *
+	 * @param {number} geometryId - The ID of the geomtry to remove from the batch.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	deleteGeometry( geometryId ) {
 
 		const geometryInfoList = this._geometryInfo;
@@ -672,6 +850,12 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Deletes an existing instance from the batch using the given ID.
+	 *
+	 * @param {number} instanceId - The ID of the instance to remove from the batch.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	deleteInstance( instanceId ) {
 
 		this.validateInstanceId( instanceId );
@@ -684,6 +868,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Repacks the sub geometries in [name] to remove any unused space remaining from
+	 * previously deleted geometry, freeing up space to add new geometry.
+	 *
+	 * @param {number} instanceId - The ID of the instance to remove from the batch.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	optimize() {
 
 		// track the next indices to copy data to
@@ -773,7 +964,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	// get bounding box and compute it if it doesn't exist
+	/**
+	 * Returns the bounding box for the given geometry.
+	 *
+	 * @param {number} geometryId - The ID of the geometry to return the bounding box for.
+	 * @param {Box3} target - The target object that is used to store the method's result.
+	 * @return {Box3|null} The geometry's bounding box. Returns `null` if no geometry has been found for the given ID.
+	 */
 	getBoundingBoxAt( geometryId, target ) {
 
 		if ( geometryId >= this._geometryCount ) {
@@ -812,7 +1009,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	// get bounding sphere and compute it if it doesn't exist
+	/**
+	 * Returns the bounding sphere for the given geometry.
+	 *
+	 * @param {number} geometryId - The ID of the geometry to return the bounding sphere for.
+	 * @param {Sphere} target - The target object that is used to store the method's result.
+	 * @return {Sphere|null} The geometry's bounding sphere. Returns `null` if no geometry has been found for the given ID.
+	 */
 	getBoundingSphereAt( geometryId, target ) {
 
 		if ( geometryId >= this._geometryCount ) {
@@ -858,6 +1061,14 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the given local transformation matrix to the defined instance.
+	 * Negatively scaled matrices are not supported.
+	 *
+	 * @param {number} instanceId - The ID of an instance to set the matrix of.
+	 * @param {Matrix4} matrix - A 4x4 matrix representing the local transformation of a single instance.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setMatrixAt( instanceId, matrix ) {
 
 		this.validateInstanceId( instanceId );
@@ -871,6 +1082,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the local transformation matrix of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the matrix of.
+	 * @param {Matrix4} matrix - The target object that is used to store the method's result.
+	 * @return {Matrix4} The instance's local transformation matrix.
+	 */
 	getMatrixAt( instanceId, matrix ) {
 
 		this.validateInstanceId( instanceId );
@@ -878,6 +1096,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the given color to the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to set the color of.
+	 * @param {Color} color - The color to set the instance to.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setColorAt( instanceId, color ) {
 
 		this.validateInstanceId( instanceId );
@@ -895,6 +1120,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the color of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the color of.
+	 * @param {Color} color - The target object that is used to store the method's result.
+	 * @return {Color} The instance's color.
+	 */
 	getColorAt( instanceId, color ) {
 
 		this.validateInstanceId( instanceId );
@@ -902,23 +1134,36 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	setVisibleAt( instanceId, value ) {
+	/**
+	 * Sets the visibility of the instance.
+	 *
+	 * @param {number} instanceId - The id of the instance to set the visibility of.
+	 * @param {boolean} visible - Whether the instance is visible or not.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
+	setVisibleAt( instanceId, visible ) {
 
 		this.validateInstanceId( instanceId );
 
-		if ( this._instanceInfo[ instanceId ].visible === value ) {
+		if ( this._instanceInfo[ instanceId ].visible === visible ) {
 
 			return this;
 
 		}
 
-		this._instanceInfo[ instanceId ].visible = value;
+		this._instanceInfo[ instanceId ].visible = visible;
 		this._visibilityChanged = true;
 
 		return this;
 
 	}
 
+	/**
+	 * Returns the visibility state of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the visibility state of.
+	 * @return {boolean} Whether the instance is visible or not.
+	 */
 	getVisibleAt( instanceId ) {
 
 		this.validateInstanceId( instanceId );
@@ -927,6 +1172,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the geometry ID of the instance at the given index.
+	 *
+	 * @param {number} instanceId - The ID of the instance to set the geometry ID of.
+	 * @param {number} geometryId - The geometry ID to be use by the instance.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setGeometryIdAt( instanceId, geometryId ) {
 
 		this.validateInstanceId( instanceId );
@@ -938,6 +1190,12 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the geometry ID of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the geometry ID of.
+	 * @return {number} The instance's geometry ID.
+	 */
 	getGeometryIdAt( instanceId ) {
 
 		this.validateInstanceId( instanceId );
@@ -946,6 +1204,18 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Get the range representing the subset of triangles related to the attached geometry,
+	 * indicating the starting offset and count, or `null` if invalid.
+	 *
+	 * @param {number} geometryId - The id of the geometry to get the range of.
+	 * @param {Object} [target] - The target object that is used to store the method's result.
+	 * @return {{
+	 * 	vertexStart:number,vertexCount:number,reservedVertexCount:number,
+	 * 	indexStart:number,indexCount:number,reservedIndexCount:number,
+	 * 	start:number,count:number
+	 * }} The result object with range data.
+	 */
 	getGeometryRangeAt( geometryId, target = {} ) {
 
 		this.validateGeometryId( geometryId );
@@ -966,6 +1236,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Resizes the necessary buffers to support the provided number of instances.
+	 * If the provided arguments shrink the number of instances but there are not enough
+	 * unused Ids at the end of the list then an error is thrown.
+	 *
+	 * @param {number} maxInstanceCount - The max number of individual instances that can be added and rendered by the batch.
+	*/
 	setInstanceCount( maxInstanceCount ) {
 
 		// shrink the available instances as much as possible
@@ -1019,6 +1296,14 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Resizes the available space in the batch's vertex and index buffer attributes to the provided sizes.
+	 * If the provided arguments shrink the geometry buffers but there is not enough unused space at the
+	 * end of the geometry attributes then an error is thrown.
+	 *
+	 * @param {number} maxVertexCount - The maximum number of vertices to be used by all unique geometries to resize to.
+	 * @param {number} maxIndexCount - The maximum number of indices to be used by all unique geometries to resize to.
+	*/
 	setGeometrySize( maxVertexCount, maxIndexCount ) {
 
 		// Check if we can shrink to the requested vertex attribute size
@@ -1179,6 +1464,10 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		// Assuming the geometry is not shared with other meshes
@@ -1196,8 +1485,6 @@ class BatchedMesh extends Mesh {
 			this._colorsTexture = null;
 
 		}
-
-		return this;
 
 	}
 
