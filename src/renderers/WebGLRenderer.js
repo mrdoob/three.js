@@ -1028,8 +1028,7 @@ class WebGLRenderer {
 
 			} );
 
-			renderStateStack.pop();
-			currentRenderState = null;
+			currentRenderState = renderStateStack.pop();
 
 			return materials;
 

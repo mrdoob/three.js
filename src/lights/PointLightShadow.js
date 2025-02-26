@@ -9,12 +9,27 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
+/**
+ * Represents the shadow configuration of point lights.
+ *
+ * @augments LightShadow
+ */
 class PointLightShadow extends LightShadow {
 
+	/**
+	 * Constructs a new point light shadow.
+	 */
 	constructor() {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPointLightShadow = true;
 
 		this._frameExtents = new Vector2( 4, 2 );
@@ -61,6 +76,12 @@ class PointLightShadow extends LightShadow {
 
 	}
 
+	/**
+	 * Update the matrices for the camera and shadow, used internally by the renderer.
+	 *
+	 * @param {Light} light - The light for which the shadow is being rendered.
+	 * @param {number} [viewportIndex=0] - The viewport index.
+	 */
 	updateMatrices( light, viewportIndex = 0 ) {
 
 		const camera = this.camera;
