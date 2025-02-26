@@ -544,17 +544,17 @@ ${ flowData.code }
 
 				}
 
-				if ( texture.compareFunction ) {
+				if ( uniform.type === 'texture3D' ) {
+
+					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
+
+				} else if ( texture.compareFunction ) {
 
 					snippet = `sampler2DShadow ${ uniform.name };`;
 
 				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
-
-				} else if ( uniform.type === 'texture3D' ) {
-
-					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
 				} else {
 
