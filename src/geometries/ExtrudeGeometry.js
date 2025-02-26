@@ -28,14 +28,58 @@ import { Vector3 } from '../math/Vector3.js';
 import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
 
+/**
+ * Creates extruded geometry from a path shape.
+ *
+ * ```js
+ * const length = 12, width = 8;
+ *
+ * const shape = new THREE.Shape();
+ * shape.moveTo( 0,0 );
+ * shape.lineTo( 0, width );
+ * shape.lineTo( length, width );
+ * shape.lineTo( length, 0 );
+ * shape.lineTo( 0, 0 );
+ *
+ * const geometry = new THREE.ExtrudeGeometry( shape );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const mesh = new THREE.Mesh( geometry, material ) ;
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class ExtrudeGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new extrude geometry.
+	 *
+	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
+	 * @param {Object} [options={}] - The extrude settings.
+	 * @param {number} [options.curveSegments=12] - Number of points on the curves.
+	 * @param {number} [options.steps=1] - Number of points used for subdividing segments along the depth of the extruded spline.
+	 * @param {number} [options.depth=1] - Depth to extrude the shape.
+	 * @param {boolean} [options.bevelEnabled=true] - Whether to beveling to the shape or not.
+	 * @param {number} [options.bevelThickness=0.2] - How deep into the original shape the bevel goes.
+	 * @param {number} [options.bevelSize=bevelThickness-0.1] - Distance from the shape outline that the bevel extends.
+	 * @param {number} [options.bevelOffset=0] - Distance from the shape outline that the bevel starts.
+	 * @param {number} [options.bevelSegments=3] - Number of bevel layers.
+	 * @param {Curve} [options.extrudePath=3] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
+	 * @param {Object} [options.UVGenerator] - An object that provides UV generator functions for custom UV generation.
+	 */
 	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
 		super();
 
 		this.type = 'ExtrudeGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			shapes: shapes,
 			options: options
@@ -698,6 +742,14 @@ class ExtrudeGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @param {Array<Shape>} shapes - An array of shapes.
+	 * @return {ExtrudeGeometry} A new instance.
+	 */
 	static fromJSON( data, shapes ) {
 
 		const geometryShapes = [];

@@ -18,6 +18,7 @@
             "src/core/Object3D.js",
             "src/core/EventDispatcher.js",
             "src/extras",
+            "src/geometries",
             "src/helpers",
             "src/lights",
             "src/loaders/nodes", 
