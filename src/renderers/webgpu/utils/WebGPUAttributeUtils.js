@@ -204,7 +204,7 @@ class WebGPUAttributeUtils {
 
 				device.queue.writeBuffer(
 					buffer,
-					0,
+					dataOffset * 4,
 					array,
 					dataOffset,
 					size
