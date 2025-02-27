@@ -1427,7 +1427,7 @@ class Vector2 {
 	 * Calculates the cross product of the given vector with this instance.
 	 *
 	 * @param {Vector2} v - The vector to compute the cross product with.
-	 * @return {Vector2} The result of the cross product.
+	 * @return {number} The result of the cross product.
 	 */
 	cross( v ) {
 
@@ -2065,7 +2065,7 @@ class Matrix3 {
 	/**
 	 * Transposes this matrix into the supplied array, and returns itself unchanged.
 	 *
-	 * @param {Array<number>} r - An arry to store the transposed matrix elements.
+	 * @param {Array<number>} r - An array to store the transposed matrix elements.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	transposeIntoArray( r ) {
@@ -2907,7 +2907,7 @@ class Texture extends EventDispatcher {
 	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
 	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
 	 * @param {number} [minFilter=LinearFilter] - The min filter value.
-	 * @param {number} [format=RGABFormat] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The min filter value.
 	 * @param {number} [type=UnsignedByteType] - The min filter value.
 	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The min filter value.
 	 * @param {string} [colorSpace=NoColorSpace] - The min filter value.
@@ -5432,7 +5432,7 @@ class Quaternion {
 	}
 
 	/**
-	 * Rotates this quaternion by a given angular step to the given quaterion.
+	 * Rotates this quaternion by a given angular step to the given quaternion.
 	 * The method ensures that the final quaternion will not overshoot `q`.
 	 *
 	 * @param {Quaternion} q - The target quaternion.
@@ -6105,7 +6105,7 @@ class Vector3 {
 	/**
 	 * Adds the given vector scaled by the given factor to this instance.
 	 *
-	 * @param {Vector3} v - The vector.
+	 * @param {Vector3|Vector4} v - The vector.
 	 * @param {number} s - The factor that scales `v`.
 	 * @return {Vector3} A reference to this vector.
 	 */
@@ -9587,7 +9587,7 @@ class Matrix4 {
 	 * Sets the position component for this matrix from the given vector,
 	 * without affecting the rest of the matrix.
 	 *
-	 * @param {number|Vector3} x - The x component of the vector or alternativley the vector object.
+	 * @param {number|Vector3} x - The x component of the vector or alternatively the vector object.
 	 * @param {number} y - The y component of the vector.
 	 * @param {number} z - The z component of the vector.
 	 * @return {Matrix4} A reference to this matrix.
@@ -9689,7 +9689,7 @@ class Matrix4 {
 	/**
 	 * Gets the maximum scale value of the three axes.
 	 *
-	 * @return {number} The maxium scale.
+	 * @return {number} The maximum scale.
 	 */
 	getMaxScaleOnAxis() {
 
@@ -9942,7 +9942,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Decomposes this matrix into its positon, rotation and scale components
+	 * Decomposes this matrix into its position, rotation and scale components
 	 * and provides the result in the given objects.
 	 *
 	 * Note: Not all matrices are decomposable in this way. For example, if an
@@ -10559,7 +10559,7 @@ class Euler {
 
 	/**
 	 * Sets this Euler instance's components to values from the given array. The first three
-	 * entries of the array are assign to the x,y and z components. An optinal fourth entry
+	 * entries of the array are assign to the x,y and z components. An optional fourth entry
 	 * defines the Euler order.
 	 *
 	 * @param {Array<number,number,number,?string>} array - An array holding the Euler component values.
@@ -10860,7 +10860,7 @@ class Object3D extends EventDispatcher {
 				value: rotation
 			},
 			/**
-			 * Represents the object's local rotation as Quaterions.
+			 * Represents the object's local rotation as Quaternions.
 			 *
 			 * @name Object3D#quaternion
 			 * @type {Quaternion}
@@ -11087,7 +11087,7 @@ class Object3D extends EventDispatcher {
 	/**
 	 * Applies a rotation represented by given the quaternion to the 3D object.
 	 *
-	 * @param {Quaternion} q - The quaterion.
+	 * @param {Quaternion} q - The quaternion.
 	 * @return {Object3D} A reference to this instance.
 	 */
 	applyQuaternion( q ) {
@@ -11138,9 +11138,9 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Sets the given rotation represented as a Quanterion to the 3D object.
+	 * Sets the given rotation represented as a Quaternion to the 3D object.
 	 *
-	 * @param {Quaternion} q - The Quanterion
+	 * @param {Quaternion} q - The Quaternion
 	 */
 	setRotationFromQuaternion( q ) {
 
@@ -11757,7 +11757,7 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * Updates the transformation matrix in local space by computing it from the current
-	 * positon, rotation and scale values.
+	 * position, rotation and scale values.
 	 */
 	updateMatrix() {
 
@@ -12349,7 +12349,7 @@ class Triangle {
 	}
 
 	/**
-	 * Copmutes a barycentric coordinates from the given vector.
+	 * Computes a barycentric coordinates from the given vector.
 	 * Returns `null` if the triangle is degenerate.
 	 *
 	 * @param {Vector3} point - A point in 3D space.
@@ -12634,7 +12634,7 @@ class Triangle {
 	}
 
 	/**
-	 * Copmutes a barycentric coordinates from the given vector.
+	 * Computes a barycentric coordinates from the given vector.
 	 * Returns `null` if the triangle is degenerate.
 	 *
 	 * @param {Vector3} point - A point in 3D space.
@@ -13363,7 +13363,7 @@ class Color {
 	 *
 	 * @param {{h:0,s:0,l:0}} target - The target object that is used to store the method's result.
 	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
-	 * @return {{h:0,s:0,l:0}} The HSL representation of this color.
+	 * @return {{h:number,s:number,l:number}} The HSL representation of this color.
 	 */
 	getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
 
@@ -16768,18 +16768,75 @@ const _morphA = /*@__PURE__*/ new Vector3();
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
+/**
+ * Class representing triangular polygon mesh based objects.
+ *
+ * ```js
+ * const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const mesh = new THREE.Mesh( geometry, material );
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments Object3D
+ */
 class Mesh extends Object3D {
 
+	/**
+	 * Constructs a new mesh.
+	 *
+	 * @param {BufferGeometry} [geometry] - The mesh geometry.
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 */
 	constructor( geometry = new BufferGeometry(), material = new MeshBasicMaterial() ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isMesh = true;
 
 		this.type = 'Mesh';
 
+		/**
+		 * The mesh geometry.
+		 *
+		 * @type {BufferGeometry}
+		 */
 		this.geometry = geometry;
+
+		/**
+		 * The mesh material.
+		 *
+		 * @type {Material|Array<Material>}
+		 * @default MeshBasicMaterial
+		 */
 		this.material = material;
+
+		/**
+		 * A dictionary representing the morph targets in the geometry. The key is the
+		 * morph targets name, the value its attribute index. This member is `undefined`
+		 * by default and only set when morph targets are detected in the geometry.
+		 *
+		 * @type {Object<String,number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetDictionary = undefined;
+
+		/**
+		 * An array of weights typically in the range `[0,1]` that specify how much of the morph
+		 * is applied. This member is `undefined` by default and only set when morph targets are
+		 * detected in the geometry.
+		 *
+		 * @type {Array<number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetInfluences = undefined;
 
 		this.updateMorphTargets();
 
@@ -16808,6 +16865,10 @@ class Mesh extends Object3D {
 
 	}
 
+	/**
+	 * Sets the values of {@link Mesh#morphTargetDictionary} and {@link Mesh#morphTargetInfluences}
+	 * to make sure existing morph targets can influence this 3D object.
+	 */
 	updateMorphTargets() {
 
 		const geometry = this.geometry;
@@ -16839,6 +16900,14 @@ class Mesh extends Object3D {
 
 	}
 
+	/**
+	 * Returns the local-space position of the vertex at the given index, taking into
+	 * account the current animation state of both morph targets and skinning.
+	 *
+	 * @param {number} index - The vertex index.
+	 * @param {Vector3} target - The target object that is used to store the method's result.
+	 * @return {Vector3} The vertex position in local space.
+	 */
 	getVertexPosition( index, target ) {
 
 		const geometry = this.geometry;
@@ -16883,6 +16952,12 @@ class Mesh extends Object3D {
 
 	}
 
+	/**
+	 * Computes intersection points between a casted ray and this line.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
 	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
@@ -17153,14 +17228,45 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 
 }
 
+/**
+ * A geometry class for a rectangular cuboid with a given width, height, and depth.
+ * On creation, the cuboid is centred on the origin, with each edge parallel to one
+ * of the axes.
+ *
+ * ```js
+ * const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const cube = new THREE.Mesh( geometry, material );
+ * scene.add( cube );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class BoxGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new box geometry.
+	 *
+	 * @param {number} [width=1] - The width. That is, the length of the edges parallel to the X axis.
+	 * @param {number} [height=1] - The height. That is, the length of the edges parallel to the Y axis.
+	 * @param {number} [depth=1] - The depth. That is, the length of the edges parallel to the Z axis.
+	 * @param {number} [widthSegments=1] - Number of segmented rectangular faces along the width of the sides.
+	 * @param {number} [heightSegments=1] - Number of segmented rectangular faces along the height of the sides.
+	 * @param {number} [depthSegments=1] - Number of segmented rectangular faces along the depth of the sides.
+	 */
 	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
 
 		super();
 
 		this.type = 'BoxGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			width: width,
 			height: height,
@@ -17320,6 +17426,13 @@ class BoxGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {BoxGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new BoxGeometry( data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments );
@@ -17662,14 +17775,14 @@ class Camera extends Object3D {
 		this.projectionMatrix = new Matrix4();
 
 		/**
-		 * The inverse of the camera's prjection matrix.
+		 * The inverse of the camera's projection matrix.
 		 *
 		 * @type {Matrix4}
 		 */
 		this.projectionMatrixInverse = new Matrix4();
 
 		/**
-		 * The coordinate system in which the camrea is used.
+		 * The coordinate system in which the camera is used.
 		 *
 		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
 		 */
@@ -17740,6 +17853,11 @@ const _maxTarget = /*@__PURE__*/ new Vector2();
  *
  * This projection mode is designed to mimic the way the human eye sees. It
  * is the most common projection mode used for rendering a 3D scene.
+ *
+ * ```js
+ * const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+ * scene.add( camera );
+ * ```
  *
  * @augments Camera
  */
@@ -18526,12 +18644,36 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 }
 
+/**
+ * This is almost identical to an {@link Object3D}. Its purpose is to
+ * make working with groups of objects syntactically clearer.
+ *
+ * ```js
+ * // Create a group and add the two cubes.
+ * // These cubes can now be rotated / scaled etc as a group.
+ * const group = new THREE.Group();
+ *
+ * group.add( meshA );
+ * group.add( meshB );
+ *
+ * scene.add( group );
+ * ```
+ *
+ * @augments Object3D
+ */
 class Group extends Object3D {
 
 	constructor() {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isGroup = true;
 
 		this.type = 'Group';
@@ -19782,12 +19924,41 @@ const _uvA = /*@__PURE__*/ new Vector2();
 const _uvB = /*@__PURE__*/ new Vector2();
 const _uvC = /*@__PURE__*/ new Vector2();
 
+/**
+ * A sprite is a plane that always faces towards the camera, generally with a
+ * partially transparent texture applied.
+ *
+ * Sprites do not cast shadows, setting {@link Object3D#castShadow} to `true` will
+ * have no effect.
+ *
+ * ```js
+ * const map = new THREE.TextureLoader().load( 'sprite.png' );
+ * const material = new THREE.SpriteMaterial( { map: map } );
+ *
+ * const sprite = new THREE.Sprite( material );
+ * scene.add( sprite );
+ * ```
+ *
+ * @augments Object3D
+ */
 class Sprite extends Object3D {
 
+	/**
+	 * Constructs a new sprite.
+	 *
+	 * @param {SpriteMaterial} [material] - The sprite material.
+	 */
 	constructor( material = new SpriteMaterial() ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSprite = true;
 
 		this.type = 'Sprite';
@@ -19811,13 +19982,38 @@ class Sprite extends Object3D {
 
 		}
 
+		/**
+		 * The sprite geometry.
+		 *
+		 * @type {BufferGeometry}
+		 */
 		this.geometry = _geometry;
+
+		/**
+		 * The sprite material.
+		 *
+		 * @type {SpriteMaterial}
+		 */
 		this.material = material;
 
+		/**
+		 * The sprite's anchor point, and the point around which the sprite rotates.
+		 * A value of `(0.5, 0.5)` corresponds to the midpoint of the sprite. A value
+		 * of `(0, 0)` corresponds to the lower left corner of the sprite.
+		 *
+		 * @type {Vector2}
+		 * @default (0.5,0.5)
+		 */
 		this.center = new Vector2( 0.5, 0.5 );
 
 	}
 
+	/**
+	 * Computes intersection points between a casted ray and this sprite.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
 	raycast( raycaster, intersects ) {
 
 		if ( raycaster.camera === null ) {
@@ -19937,26 +20133,82 @@ function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) 
 const _v1$2 = /*@__PURE__*/ new Vector3();
 const _v2$1 = /*@__PURE__*/ new Vector3();
 
+/**
+ * A component for providing a basic Level of Detail (LOD) mechanism.
+ *
+ * Every LOD level is associated with an object, and rendering can be switched
+ * between them at the distances specified. Typically you would create, say,
+ * three meshes, one for far away (low detail), one for mid range (medium
+ * detail) and one for close up (high detail).
+ *
+ * ```js
+ * const lod = new THREE.LOD();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ *
+ * //Create spheres with 3 levels of detail and create new LOD levels for them
+ * for( let i = 0; i < 3; i++ ) {
+ *
+ * 	const geometry = new THREE.IcosahedronGeometry( 10, 3 - i );
+ * 	const mesh = new THREE.Mesh( geometry, material );
+ * 	lod.addLevel( mesh, i * 75 );
+ *
+ * }
+ *
+ * scene.add( lod );
+ * ```
+ *
+ * @augments Object3D
+ */
 class LOD extends Object3D {
 
+	/**
+	 * Constructs a new LOD.
+	 */
 	constructor() {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLOD = true;
+
+		/**
+		 * The current LOD index.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
 		this._currentLevel = 0;
 
 		this.type = 'LOD';
 
 		Object.defineProperties( this, {
+			/**
+			 * This array holds the LOD levels.
+			 *
+			 * @name LOD#levels
+			 * @type {Array<{object:Object3D,distance:number,hysteresis:number}>}
+			 */
 			levels: {
 				enumerable: true,
 				value: []
-			},
-			isLOD: {
-				value: true,
 			}
 		} );
 
+		/**
+		 * Whether the LOD object is updated automatically by the renderer per frame
+		 * or not. If set to `false`, you have to call {@link LOD#update} in the
+		 * render loop by yourself.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoUpdate = true;
 
 	}
@@ -19981,6 +20233,15 @@ class LOD extends Object3D {
 
 	}
 
+	/**
+	 * Adds a mesh that will display at a certain distance and greater. Typically
+	 * the further away the distance, the lower the detail on the mesh.
+	 *
+	 * @param {Object3D} object - The 3D object to display at this level.
+	 * @param {number} [distance=0] - The distance at which to display this level of detail.
+	 * @param {number} [hysteresis=0] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
+	 * @return {LOD} A reference to this instance.
+	 */
 	addLevel( object, distance = 0, hysteresis = 0 ) {
 
 		distance = Math.abs( distance );
@@ -20007,6 +20268,13 @@ class LOD extends Object3D {
 
 	}
 
+	/**
+	 * Removes an existing level, based on the distance from the camera.
+	 * Returns `true` when the level has been removed. Otherwise `false`.
+	 *
+	 * @param {number} distance - Distance of the level to remove.
+	 * @return {boolean} Whether the level has been removed or not.
+	 */
 	removeLevel( distance ) {
 
 		const levels = this.levels;
@@ -20028,14 +20296,24 @@ class LOD extends Object3D {
 
 	}
 
+	/**
+	 * Returns the currently active LOD level index.
+	 *
+	 * @return {number} The current active LOD level index.
+	 */
 	getCurrentLevel() {
 
 		return this._currentLevel;
 
 	}
 
-
-
+	/**
+	 * Returns a reference to the first 3D object that is greater than
+	 * the given distance.
+	 *
+	 * @param {number} distance - The LOD distance.
+	 * @return {Object3D|null} The found 3D object. `null` if no 3D object has been found.
+	 */
 	getObjectForDistance( distance ) {
 
 		const levels = this.levels;
@@ -20070,6 +20348,12 @@ class LOD extends Object3D {
 
 	}
 
+	/**
+	 * Computes intersection points between a casted ray and this LOD.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
 	raycast( raycaster, intersects ) {
 
 		const levels = this.levels;
@@ -20086,6 +20370,12 @@ class LOD extends Object3D {
 
 	}
 
+	/**
+	 * Updates the LOD by computing which LOD level should be visible according
+	 * to the current distance of the given camera.
+	 *
+	 * @param {Camera} camera - The camera the scene is renderd with.
+	 */
 	update( camera ) {
 
 		const levels = this.levels;
@@ -20177,25 +20467,90 @@ const _sphere$5 = /*@__PURE__*/ new Sphere();
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
 
+/**
+ * A mesh that has a {@link Skeleton} that can then be used to animate the
+ * vertices of the geometry with skinning/skeleton animation.
+ *
+ * Next to a valid skeleton, the skinned mesh requires skin indices and weights
+ * as buffer attributes in its geometry. These attribute define which bones affect a single
+ * vertex to a certain extend.
+ *
+ * Typically skinned meshes are not created manually but loaders like {@link GLTFLoader}
+ * or {@link FBXLoader } import respective models.
+ *
+ * @augments Mesh
+ */
 class SkinnedMesh extends Mesh {
 
+	/**
+	 * Constructs a new skinned mesh.
+	 *
+	 * @param {BufferGeometry} [geometry] - The mesh geometry.
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 */
 	constructor( geometry, material ) {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSkinnedMesh = true;
 
 		this.type = 'SkinnedMesh';
 
+		/**
+		 * `AttachedBindMode` means the skinned mesh shares the same world space as the skeleton.
+		 * This is not true when using `DetachedBindMode` which is useful when sharing a skeleton
+		 * across multiple skinned meshes.
+		 *
+		 * @type {(AttachedBindMode|DetachedBindMode)}
+		 * @default AttachedBindMode
+		 */
 		this.bindMode = AttachedBindMode;
+
+		/**
+		 * The base matrix that is used for the bound bone transforms.
+		 *
+		 * @type {Matrix4}
+		 */
 		this.bindMatrix = new Matrix4();
+
+		/**
+		 * The base matrix that is used for resetting the bound bone transforms.
+		 *
+		 * @type {Matrix4}
+		 */
 		this.bindMatrixInverse = new Matrix4();
 
+		/**
+		 * The bounding box of the skinned mesh. Can be computed via {@link SkinnedMesh#computeBoundingBox}.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
 		this.boundingBox = null;
+
+		/**
+		 * The bounding sphere of the skinned mesh. Can be computed via {@link SkinnedMesh#computeBoundingSphere}.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
 		this.boundingSphere = null;
 
 	}
 
+	/**
+	 * Computes the bounding box of the skinned mesh, and updates {@link SkinnedMesh#boundingBox}.
+	 * The bounding box is not automatically computed by the engine; this method must be called by your app.
+	 * If the skinned mesh is animated, the bounding box should be recomputed per frame in order to reflect
+	 * the current animation state.
+	 */
 	computeBoundingBox() {
 
 		const geometry = this.geometry;
@@ -20219,6 +20574,12 @@ class SkinnedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding sphere of the skinned mesh, and updates {@link SkinnedMesh#boundingSphere}.
+	 * The bounding sphere is automatically computed by the engine once when it is needed, e.g., for ray casting
+	 * and view frustum culling. If the skinned mesh is animated, the bounding sphere should be recomputed
+	 * per frame in order to reflect the current animation state.
+	 */
 	computeBoundingSphere() {
 
 		const geometry = this.geometry;
@@ -20304,6 +20665,13 @@ class SkinnedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Binds the given skeleton to the skinned mesh.
+	 *
+	 * @param {Skeleton} skeleton - The skeleton to bind.
+	 * @param {Matrix4} [bindMatrix] - The bind matrix. If no bind matrix is provided,
+	 * the skinned mesh's world matrix will be used instead.
+	 */
 	bind( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
@@ -20323,12 +20691,19 @@ class SkinnedMesh extends Mesh {
 
 	}
 
+	/**
+	 * This method sets the skinned mesh in the rest pose).
+	 */
 	pose() {
 
 		this.skeleton.pose();
 
 	}
 
+	/**
+	 * Normalizes the skin weights which are defined as a buffer attribute
+	 * in the skinned mesh's geometry.
+	 */
 	normalizeSkinWeights() {
 
 		const vector = new Vector4();
@@ -20377,7 +20752,16 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	applyBoneTransform( index, vector ) {
+	/**
+	 * Applies the bone transform associated with the given index to the given
+	 * vertex position. Returns the updated vector.
+	 *
+	 * @param {number} index - The vertex index.
+	 * @param {Vector3} target - The target object that is used to store the method's result.
+	 * the skinned mesh's world matrix will be used instead.
+	 * @return {Vector3} The updated vertex position.
+	 */
+	applyBoneTransform( index, target ) {
 
 		const skeleton = this.skeleton;
 		const geometry = this.geometry;
@@ -20385,9 +20769,9 @@ class SkinnedMesh extends Mesh {
 		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
 		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
 
-		_basePosition.copy( vector ).applyMatrix4( this.bindMatrix );
+		_basePosition.copy( target ).applyMatrix4( this.bindMatrix );
 
-		vector.set( 0, 0, 0 );
+		target.set( 0, 0, 0 );
 
 		for ( let i = 0; i < 4; i ++ ) {
 
@@ -20399,24 +20783,48 @@ class SkinnedMesh extends Mesh {
 
 				_matrix4.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 
-				vector.addScaledVector( _vector3.copy( _basePosition ).applyMatrix4( _matrix4 ), weight );
+				target.addScaledVector( _vector3.copy( _basePosition ).applyMatrix4( _matrix4 ), weight );
 
 			}
 
 		}
 
-		return vector.applyMatrix4( this.bindMatrixInverse );
+		return target.applyMatrix4( this.bindMatrixInverse );
 
 	}
 
 }
 
+/**
+ * A bone which is part of a {@link Skeleton}. The skeleton in turn is used by
+ * the {@link SkinnedMesh}.
+ *
+ * ```js
+ * const root = new THREE.Bone();
+ * const child = new THREE.Bone();
+ *
+ * root.add( child );
+ * child.position.y = 5;
+ * ```
+ *
+ * @augments Object3D
+ */
 class Bone extends Object3D {
 
+	/**
+	 * Constructs a new bone.
+	 */
 	constructor() {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isBone = true;
 
 		this.type = 'Bone';
@@ -20446,22 +20854,83 @@ class DataTexture extends Texture {
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
+/**
+ * Class for representing the armatures in `three.js`. The skeleton
+ * is defined by a hierarchy of bones.
+ *
+ * ```js
+ * const bones = [];
+ *
+ * const shoulder = new THREE.Bone();
+ * const elbow = new THREE.Bone();
+ * const hand = new THREE.Bone();
+ *
+ * shoulder.add( elbow );
+ * elbow.add( hand );
+ *
+ * bones.push( shoulder , elbow, hand);
+ *
+ * shoulder.position.y = -5;
+ * elbow.position.y = 0;
+ * hand.position.y = 5;
+ *
+ * const armSkeleton = new THREE.Skeleton( bones );
+ * ```
+ */
 class Skeleton {
 
+	/**
+	 * Constructs a new skeleton.
+	 *
+	 * @param {Array<Bone>} [bones] - An array of bones.
+	 * @param {Array<Matrix4>} [boneInverses] - An array of bone inverse matrices.
+	 * If not provided, these matrices will be computed automatically via {@link Skeleton#calculateInverses}.
+	 */
 	constructor( bones = [], boneInverses = [] ) {
 
 		this.uuid = generateUUID();
 
+		/**
+		 * An array of bones defining the skeleton.
+		 *
+		 * @type {Array<Bone>}
+		 */
 		this.bones = bones.slice( 0 );
+
+		/**
+		 * An array of bone inverse matrices.
+		 *
+		 * @type {Array<Matrix4>}
+		 */
 		this.boneInverses = boneInverses;
+
+		/**
+		 * An array buffer holding the bone data.
+		 * Input data for {@link Skeleton#boneTexture}.
+		 *
+		 * @type {?Float32Array}
+		 * @default null
+		 */
 		this.boneMatrices = null;
 
+		/**
+		 * A texture holding the bone data for use
+		 * in the vertex shader.
+		 *
+		 * @type {?DataTexture}
+		 * @default null
+		 */
 		this.boneTexture = null;
 
 		this.init();
 
 	}
 
+	/**
+	 * Initializes the skeleton. This method gets automatically called by the constructor
+	 * but depending on how the skeleton is created it might be necessary to call this method
+	 * manually.
+	 */
 	init() {
 
 		const bones = this.bones;
@@ -20497,6 +20966,10 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Computes the bone inverse matrices. This method resets {@link Skeleton#boneInverses}
+	 * and fills it with new matrices.
+	 */
 	calculateInverses() {
 
 		this.boneInverses.length = 0;
@@ -20517,6 +20990,9 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Resets the skeleton to the base pose.
+	 */
 	pose() {
 
 		// recover the bind-time world matrices
@@ -20560,6 +21036,9 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Resets the skeleton to the base pose.
+	 */
 	update() {
 
 		const bones = this.bones;
@@ -20588,12 +21067,22 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Returns a new skeleton with copied values from this instance.
+	 *
+	 * @return {Skeleton} A clone of this instance.
+	 */
 	clone() {
 
 		return new Skeleton( this.bones, this.boneInverses );
 
 	}
 
+	/**
+	 * Computes a data texture for passing bone data to the vertex shader.
+	 *
+	 * @return {Skeleton} A reference of this instance.
+	 */
 	computeBoneTexture() {
 
 		// layout (1 matrix = 4 pixels)
@@ -20620,6 +21109,13 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Searches through the skeleton's bone array and returns the first with a
+	 * matching name.
+	 *
+	 * @param {string} name - The name of the bone.
+	 * @return {Bone|undefined} The found bone. `undefined` if no bone has been found.
+	 */
 	getBoneByName( name ) {
 
 		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
@@ -20638,6 +21134,10 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose( ) {
 
 		if ( this.boneTexture !== null ) {
@@ -20650,6 +21150,13 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Setups the skeleton by the given JSON and bones.
+	 *
+	 * @param {Object} json - The skeleton as serialized JSON.
+	 * @param {Array<Bone>} bones - An array of bones.
+	 * @return {Skeleton} A reference of this instance.
+	 */
 	fromJSON( json, bones ) {
 
 		this.uuid = json.uuid;
@@ -20677,6 +21184,12 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Serializes the skeleton into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized skeleton.
+	 * @see {@link ObjectLoader#parse}
+	 */
 	toJSON() {
 
 		const data = {
@@ -20756,21 +21269,87 @@ const _identity = /*@__PURE__*/ new Matrix4();
 const _mesh$1 = /*@__PURE__*/ new Mesh();
 const _sphere$4 = /*@__PURE__*/ new Sphere();
 
+/**
+ * A special version of a mesh with instanced rendering support. Use
+ * this class if you have to render a large number of objects with the same
+ * geometry and material(s) but with different world transformations. The usage
+ * of 'InstancedMesh' will help you to reduce the number of draw calls and thus
+ * improve the overall rendering performance in your application.
+ *
+ * @augments Mesh
+ */
 class InstancedMesh extends Mesh {
 
+	/**
+	 * Constructs a new instanced mesh.
+	 *
+	 * @param {BufferGeometry} [geometry] - The mesh geometry.
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 * @param {number} count - The number of instances.
+	 */
 	constructor( geometry, material, count ) {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isInstancedMesh = true;
 
+		/**
+		 * Represents the local transformation of all instances. You have to set its
+		 * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
+		 * via {@link InstancedMesh#setMatrixAt}.
+		 *
+		 * @type {InstancedBufferAttribute}
+		 */
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
+
+		/**
+		 * Represents the color of all instances. You have to set its
+		 * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
+		 * via {@link InstancedMesh#setColorAt}.
+		 *
+		 * @type {?InstancedBufferAttribute}
+		 * @default null
+		 */
 		this.instanceColor = null;
+
+		/**
+		 * Represents the morph target weights of all instances. You have to set its
+		 * {@link Texture#needsUpdate} flag to true if you modify instanced data
+		 * via {@link InstancedMesh#setMorphAt}.
+		 *
+		 * @type {?InstancedBufferAttribute}
+		 * @default null
+		 */
 		this.morphTexture = null;
 
+		/**
+		 * The number of instances.
+		 *
+		 * @type {number}
+		 */
 		this.count = count;
 
+		/**
+		 * The bounding box of the instanced mesh. Can be computed via {@link InstancedMesh#computeBoundingBox}.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
 		this.boundingBox = null;
+
+		/**
+		 * The bounding sphere of the instanced mesh. Can be computed via {@link InstancedMesh#computeBoundingSphere}.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
 		this.boundingSphere = null;
 
 		for ( let i = 0; i < count; i ++ ) {
@@ -20781,6 +21360,11 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding box of the instanced mesh, and updates {@link InstancedMesh#boundingBox}.
+	 * The bounding box is not automatically computed by the engine; this method must be called by your app.
+	 * You may need to recompute the bounding box if an instance is transformed via {@link InstancedMesh#setMatrixAt}.
+	 */
 	computeBoundingBox() {
 
 		const geometry = this.geometry;
@@ -20812,6 +21396,11 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding sphere of the instanced mesh, and updates {@link InstancedMesh#boundingSphere}
+	 * The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+	 * You may need to recompute the bounding sphere if an instance is transformed via {@link InstancedMesh#setMatrixAt}.
+	 */
 	computeBoundingSphere() {
 
 		const geometry = this.geometry;
@@ -20861,18 +21450,36 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Gets the color of the defined instance.
+	 *
+	 * @param {number} index - The instance index.
+	 * @param {Color} color - The target object that is used to store the method's result.
+	 */
 	getColorAt( index, color ) {
 
 		color.fromArray( this.instanceColor.array, index * 3 );
 
 	}
 
+	/**
+	 * Gets the local transformation matrix of the defined instance.
+	 *
+	 * @param {number} index - The instance index.
+	 * @param {Matrix4} matrix - The target object that is used to store the method's result.
+	 */
 	getMatrixAt( index, matrix ) {
 
 		matrix.fromArray( this.instanceMatrix.array, index * 16 );
 
 	}
 
+	/**
+	 * Gets the morph target weights of the defined instance.
+	 *
+	 * @param {number} index - The instance index.
+	 * @param {Mesh} object - The target object that is used to store the method's result.
+	 */
 	getMorphAt( index, object ) {
 
 		const objectInfluences = object.morphTargetInfluences;
@@ -20943,6 +21550,13 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the given color to the defined instance. Make sure you set the `needsUpdate` flag of
+	 * {@link InstancedMesh#instanceColor} to `true` after updating all the colors.
+	 *
+	 * @param {number} index - The instance index.
+	 * @param {Color} color - The instance color.
+	 */
 	setColorAt( index, color ) {
 
 		if ( this.instanceColor === null ) {
@@ -20955,12 +21569,27 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the given local transformation matrix to the defined instance. Make sure you set the `needsUpdate` flag of
+	 * {@link InstancedMesh#instanceMatrix} to `true` after updating all the colors.
+	 *
+	 * @param {number} index - The instance index.
+	 * @param {Matrix4} matrix - The the local transformation.
+	 */
 	setMatrixAt( index, matrix ) {
 
 		matrix.toArray( this.instanceMatrix.array, index * 16 );
 
 	}
 
+	/**
+	 * Sets the morph target weights to the defined instance. Make sure you set the `needsUpdate` flag of
+	 * {@link InstancedMesh#morphTexture} to `true` after updating all the influences.
+	 *
+	 * @param {number} index - The instance index.
+	 * @param {Mesh} object -  A mesh which `morphTargetInfluences` property containing the morph target weights
+	 * of a single instance.
+	 */
 	setMorphAt( index, object ) {
 
 		const objectInfluences = object.morphTargetInfluences;
@@ -20997,6 +21626,10 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
@@ -21007,8 +21640,6 @@ class InstancedMesh extends Mesh {
 			this.morphTexture = null;
 
 		}
-
-		return this;
 
 	}
 
@@ -21303,7 +21934,7 @@ class Plane {
 	 * projection of the normal at the origin onto the plane.
 	 *
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {boolean} The coplanar point.
+	 * @return {Vector3} The coplanar point.
 	 */
 	coplanarPoint( target ) {
 
@@ -21411,7 +22042,7 @@ class Frustum {
 	}
 
 	/**
-	 * Sets the frustum planens by copying the given planes.
+	 * Sets the frustum planes by copying the given planes.
 	 *
 	 * @param {Plane} [p0] - The first plane that encloses the frustum.
 	 * @param {Plane} [p1] - The second plane that encloses the frustum.
@@ -21606,7 +22237,7 @@ class Frustum {
 	 * Returns `true` if the given point lies within the frustum.
 	 *
 	 * @param {Vector3} point - The point to test.
-	 * @return {boolean} Whether the point liest within this frustum or not.
+	 * @return {boolean} Whether the point lies within this frustum or not.
 	 */
 	containsPoint( point ) {
 
@@ -21769,41 +22400,107 @@ function copyArrayContents( src, target ) {
 
 }
 
+/**
+ * A special version of a mesh with multi draw batch rendering support. Use
+ * this class if you have to render a large number of objects with the same
+ * material but with different geometries or world transformations. The usage of
+ * `BatchedMesh` will help you to reduce the number of draw calls and thus improve the overall
+ * rendering performance in your application.
+ *
+ * ```js
+ * const box = new THREE.BoxGeometry( 1, 1, 1 );
+ * const sphere = new THREE.SphereGeometry( 1, 12, 12 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ *
+ * // initialize and add geometries into the batched mesh
+ * const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+ * const boxGeometryId = batchedMesh.addGeometry( box );
+ * const sphereGeometryId = batchedMesh.addGeometry( sphere );
+ *
+ * // create instances of those geometries
+ * const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId );
+ * const boxInstancedId2 = batchedMesh.addInstance( boxGeometryId );
+ *
+ * const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId );
+ * const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId );
+ *
+ * // position the geometries
+ * batchedMesh.setMatrixAt( boxInstancedId1, boxMatrix1 );
+ * batchedMesh.setMatrixAt( boxInstancedId2, boxMatrix2 );
+ *
+ * batchedMesh.setMatrixAt( sphereInstancedId1, sphereMatrix1 );
+ * batchedMesh.setMatrixAt( sphereInstancedId2, sphereMatrix2 );
+ *
+ * scene.add( batchedMesh );
+ * ```
+ *
+ * @augments Mesh
+ */
 class BatchedMesh extends Mesh {
 
-	get maxInstanceCount() {
-
-		return this._maxInstanceCount;
-
-	}
-
-	get instanceCount() {
-
-		return this._instanceInfo.length - this._availableInstanceIds.length;
-
-	}
-
-	get unusedVertexCount() {
-
-		return this._maxVertexCount - this._nextVertexStart;
-
-	}
-
-	get unusedIndexCount() {
-
-		return this._maxIndexCount - this._nextIndexStart;
-
-	}
-
+	/**
+	 * Constructs a new batched mesh.
+	 *
+	 * @param {number} maxInstanceCount - The maximum number of individual instances planned to be added and rendered.
+	 * @param {number} maxVertexCount - The maximum number of vertices to be used by all unique geometries.
+	 * @param {number} [maxIndexCount=maxVertexCount*2] - The maximum number of indices to be used by all unique geometries
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 */
 	constructor( maxInstanceCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isBatchedMesh = true;
+
+		/**
+		 * When set ot `true`, the individual objects of a batch are frustum culled.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.perObjectFrustumCulled = true;
+
+		/**
+		 * When set to `true`, the individual objects of a batch are sorted to improve overdraw-related artifacts.
+		 * If the material is marked as "transparent" objects are rendered back to front and if not then they are
+		 * rendered front to back.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortObjects = true;
+
+		/**
+		 * The bounding box of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingBox}.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
 		this.boundingBox = null;
+
+		/**
+		 * The bounding sphere of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingSphere}.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
 		this.boundingSphere = null;
+
+		/**
+		 * Takes a sort a function that is run before render. The function takes a list of instances to
+		 * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered
+		 * sort with.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
 		this.customSort = null;
 
 		// stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
@@ -21841,6 +22538,54 @@ class BatchedMesh extends Mesh {
 
 		this._initMatricesTexture();
 		this._initIndirectTexture();
+
+	}
+
+	/**
+	 * The maximum number of individual instances that can be stored in the batch.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get maxInstanceCount() {
+
+		return this._maxInstanceCount;
+
+	}
+
+	/**
+	 * The instance count.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get instanceCount() {
+
+		return this._instanceInfo.length - this._availableInstanceIds.length;
+
+	}
+
+	/**
+	 * The number of unused vertices.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get unusedVertexCount() {
+
+		return this._maxVertexCount - this._nextVertexStart;
+
+	}
+
+	/**
+	 * The number of unused indices.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get unusedIndexCount() {
+
+		return this._maxIndexCount - this._nextIndexStart;
 
 	}
 
@@ -21957,6 +22702,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Validates the instance defined by the given ID.
+	 *
+	 * @param {number} instanceId - The the instance to validate.
+	 */
 	validateInstanceId( instanceId ) {
 
 		const instanceInfo = this._instanceInfo;
@@ -21968,6 +22718,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Validates the geometry defined by the given ID.
+	 *
+	 * @param {number} geometryId - The the geometry to validate.
+	 */
 	validateGeometryId( geometryId ) {
 
 		const geometryInfoList = this._geometryInfo;
@@ -21979,7 +22734,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
-
+	/**
+	 * Takes a sort a function that is run before render. The function takes a list of instances to
+	 * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered sort with.
+	 *
+	 * @param {Function} func - The custom sort function.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setCustomSort( func ) {
 
 		this.customSort = func;
@@ -21987,6 +22748,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding box, updating {@link BatchedMesh#boundingBox}.
+	 * Bounding boxes aren't computed by default. They need to be explicitly computed,
+	 * otherwise they are `null`.
+	 */
 	computeBoundingBox() {
 
 		if ( this.boundingBox === null ) {
@@ -22012,6 +22778,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Computes the bounding sphere, updating {@link BatchedMesh#boundingSphere}.
+	 * Bounding spheres aren't computed by default. They need to be explicitly computed,
+	 * otherwise they are `null`.
+	 */
 	computeBoundingSphere() {
 
 		if ( this.boundingSphere === null ) {
@@ -22037,6 +22808,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Adds a new instance to the batch using the geometry of the given ID and returns
+	 * a new id referring to the new instance to be used by other functions.
+	 *
+	 * @param {number} geometryId - The ID of a previously added geometry via {@link BatchedMesh#addGeometry}.
+	 * @return {number} The instance ID.
+	 */
 	addInstance( geometryId ) {
 
 		const atCapacity = this._instanceInfo.length >= this.maxInstanceCount;
@@ -22088,6 +22866,21 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Adds the given geometry to the batch and returns the associated
+	 * geometry id referring to it to be used in other functions.
+	 *
+	 * @param {BufferGeometry} geometry - The geometry to add.
+	 * @param {number} [reservedVertexCount=-1] - Optional parameter specifying the amount of
+	 * vertex buffer space to reserve for the added geometry. This is necessary if it is planned
+	 * to set a new geometry at this index at a later time that is larger than the original geometry.
+	 * Defaults to the length of the given geometry vertex buffer.
+	 * @param {number} [reservedIndexCount=-1] - Optional parameter specifying the amount of index
+	 * buffer space to reserve for the added geometry. This is necessary if it is planned to set a
+	 * new geometry at this index at a later time that is larger than the original geometry. Defaults to
+	 * the length of the given geometry index buffer.
+	 * @return {number} The geometry ID.
+	 */
 	addGeometry( geometry, reservedVertexCount = -1, reservedIndexCount = -1 ) {
 
 		this._initializeGeometry( geometry );
@@ -22166,6 +22959,15 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Replaces the geometry at the given ID with the provided geometry. Throws an error if there
+	 * is not enough space reserved for geometry. Calling this will change all instances that are
+	 * rendering that geometry.
+	 *
+	 * @param {number} geometryId - The ID of the geomtry that should be replaced with the given geometry.
+	 * @param {BufferGeometry} geometry - The new geometry.
+	 * @return {number} The geometry ID.
+	 */
 	setGeometryAt( geometryId, geometry ) {
 
 		if ( geometryId >= this._geometryCount ) {
@@ -22271,6 +23073,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Deletes the geometry defined by the given ID from this batch. Any instances referencing
+	 * this geometry will also be removed as a side effect.
+	 *
+	 * @param {number} geometryId - The ID of the geomtry to remove from the batch.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	deleteGeometry( geometryId ) {
 
 		const geometryInfoList = this._geometryInfo;
@@ -22300,6 +23109,12 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Deletes an existing instance from the batch using the given ID.
+	 *
+	 * @param {number} instanceId - The ID of the instance to remove from the batch.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	deleteInstance( instanceId ) {
 
 		this.validateInstanceId( instanceId );
@@ -22312,6 +23127,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Repacks the sub geometries in [name] to remove any unused space remaining from
+	 * previously deleted geometry, freeing up space to add new geometry.
+	 *
+	 * @param {number} instanceId - The ID of the instance to remove from the batch.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	optimize() {
 
 		// track the next indices to copy data to
@@ -22401,7 +23223,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	// get bounding box and compute it if it doesn't exist
+	/**
+	 * Returns the bounding box for the given geometry.
+	 *
+	 * @param {number} geometryId - The ID of the geometry to return the bounding box for.
+	 * @param {Box3} target - The target object that is used to store the method's result.
+	 * @return {Box3|null} The geometry's bounding box. Returns `null` if no geometry has been found for the given ID.
+	 */
 	getBoundingBoxAt( geometryId, target ) {
 
 		if ( geometryId >= this._geometryCount ) {
@@ -22440,7 +23268,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	// get bounding sphere and compute it if it doesn't exist
+	/**
+	 * Returns the bounding sphere for the given geometry.
+	 *
+	 * @param {number} geometryId - The ID of the geometry to return the bounding sphere for.
+	 * @param {Sphere} target - The target object that is used to store the method's result.
+	 * @return {Sphere|null} The geometry's bounding sphere. Returns `null` if no geometry has been found for the given ID.
+	 */
 	getBoundingSphereAt( geometryId, target ) {
 
 		if ( geometryId >= this._geometryCount ) {
@@ -22486,6 +23320,14 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the given local transformation matrix to the defined instance.
+	 * Negatively scaled matrices are not supported.
+	 *
+	 * @param {number} instanceId - The ID of an instance to set the matrix of.
+	 * @param {Matrix4} matrix - A 4x4 matrix representing the local transformation of a single instance.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setMatrixAt( instanceId, matrix ) {
 
 		this.validateInstanceId( instanceId );
@@ -22499,6 +23341,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the local transformation matrix of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the matrix of.
+	 * @param {Matrix4} matrix - The target object that is used to store the method's result.
+	 * @return {Matrix4} The instance's local transformation matrix.
+	 */
 	getMatrixAt( instanceId, matrix ) {
 
 		this.validateInstanceId( instanceId );
@@ -22506,6 +23355,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the given color to the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to set the color of.
+	 * @param {Color} color - The color to set the instance to.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setColorAt( instanceId, color ) {
 
 		this.validateInstanceId( instanceId );
@@ -22523,6 +23379,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the color of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the color of.
+	 * @param {Color} color - The target object that is used to store the method's result.
+	 * @return {Color} The instance's color.
+	 */
 	getColorAt( instanceId, color ) {
 
 		this.validateInstanceId( instanceId );
@@ -22530,23 +23393,36 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	setVisibleAt( instanceId, value ) {
+	/**
+	 * Sets the visibility of the instance.
+	 *
+	 * @param {number} instanceId - The id of the instance to set the visibility of.
+	 * @param {boolean} visible - Whether the instance is visible or not.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
+	setVisibleAt( instanceId, visible ) {
 
 		this.validateInstanceId( instanceId );
 
-		if ( this._instanceInfo[ instanceId ].visible === value ) {
+		if ( this._instanceInfo[ instanceId ].visible === visible ) {
 
 			return this;
 
 		}
 
-		this._instanceInfo[ instanceId ].visible = value;
+		this._instanceInfo[ instanceId ].visible = visible;
 		this._visibilityChanged = true;
 
 		return this;
 
 	}
 
+	/**
+	 * Returns the visibility state of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the visibility state of.
+	 * @return {boolean} Whether the instance is visible or not.
+	 */
 	getVisibleAt( instanceId ) {
 
 		this.validateInstanceId( instanceId );
@@ -22555,6 +23431,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the geometry ID of the instance at the given index.
+	 *
+	 * @param {number} instanceId - The ID of the instance to set the geometry ID of.
+	 * @param {number} geometryId - The geometry ID to be use by the instance.
+	 * @return {BatchedMesh} A reference to this batched mesh.
+	 */
 	setGeometryIdAt( instanceId, geometryId ) {
 
 		this.validateInstanceId( instanceId );
@@ -22566,6 +23449,12 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the geometry ID of the defined instance.
+	 *
+	 * @param {number} instanceId - The ID of an instance to get the geometry ID of.
+	 * @return {number} The instance's geometry ID.
+	 */
 	getGeometryIdAt( instanceId ) {
 
 		this.validateInstanceId( instanceId );
@@ -22574,6 +23463,18 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Get the range representing the subset of triangles related to the attached geometry,
+	 * indicating the starting offset and count, or `null` if invalid.
+	 *
+	 * @param {number} geometryId - The id of the geometry to get the range of.
+	 * @param {Object} [target] - The target object that is used to store the method's result.
+	 * @return {{
+	 * 	vertexStart:number,vertexCount:number,reservedVertexCount:number,
+	 * 	indexStart:number,indexCount:number,reservedIndexCount:number,
+	 * 	start:number,count:number
+	 * }} The result object with range data.
+	 */
 	getGeometryRangeAt( geometryId, target = {} ) {
 
 		this.validateGeometryId( geometryId );
@@ -22594,6 +23495,13 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Resizes the necessary buffers to support the provided number of instances.
+	 * If the provided arguments shrink the number of instances but there are not enough
+	 * unused Ids at the end of the list then an error is thrown.
+	 *
+	 * @param {number} maxInstanceCount - The max number of individual instances that can be added and rendered by the batch.
+	*/
 	setInstanceCount( maxInstanceCount ) {
 
 		// shrink the available instances as much as possible
@@ -22647,6 +23555,14 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Resizes the available space in the batch's vertex and index buffer attributes to the provided sizes.
+	 * If the provided arguments shrink the geometry buffers but there is not enough unused space at the
+	 * end of the geometry attributes then an error is thrown.
+	 *
+	 * @param {number} maxVertexCount - The maximum number of vertices to be used by all unique geometries to resize to.
+	 * @param {number} maxIndexCount - The maximum number of indices to be used by all unique geometries to resize to.
+	*/
 	setGeometrySize( maxVertexCount, maxIndexCount ) {
 
 		// Check if we can shrink to the requested vertex attribute size
@@ -22807,6 +23723,10 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		// Assuming the geometry is not shared with other meshes
@@ -22824,8 +23744,6 @@ class BatchedMesh extends Mesh {
 			this._colorsTexture = null;
 
 		}
-
-		return this;
 
 	}
 
@@ -23033,18 +23951,83 @@ const _sphere$1 = /*@__PURE__*/ new Sphere();
 const _intersectPointOnRay = /*@__PURE__*/ new Vector3();
 const _intersectPointOnSegment = /*@__PURE__*/ new Vector3();
 
+/**
+ * A continuous line. The line are rendered by connecting consecutive
+ * vertices with straight lines.
+ *
+ * ```js
+ * const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+ *
+ * const points = [];
+ * points.push( new THREE.Vector3( - 10, 0, 0 ) );
+ * points.push( new THREE.Vector3( 0, 10, 0 ) );
+ * points.push( new THREE.Vector3( 10, 0, 0 ) );
+ *
+ * const geometry = new THREE.BufferGeometry().setFromPoints( points );
+ *
+ * const line = new THREE.Line( geometry, material );
+ * scene.add( line );
+ * ```
+ *
+ * @augments Object3D
+ */
 class Line extends Object3D {
 
+	/**
+	 * Constructs a new line.
+	 *
+	 * @param {BufferGeometry} [geometry] - The line geometry.
+	 * @param {Material|Array<Material>} [material] - The line material.
+	 */
 	constructor( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLine = true;
 
 		this.type = 'Line';
 
+		/**
+		 * The line geometry.
+		 *
+		 * @type {BufferGeometry}
+		 */
 		this.geometry = geometry;
+
+		/**
+		 * The line material.
+		 *
+		 * @type {Material|Array<Material>}
+		 * @default LineBasicMaterial
+		 */
 		this.material = material;
+
+		/**
+		 * A dictionary representing the morph targets in the geometry. The key is the
+		 * morph targets name, the value its attribute index. This member is `undefined`
+		 * by default and only set when morph targets are detected in the geometry.
+		 *
+		 * @type {Object<String,number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetDictionary = undefined;
+
+		/**
+		 * An array of weights typically in the range `[0,1]` that specify how much of the morph
+		 * is applied. This member is `undefined` by default and only set when morph targets are
+		 * detected in the geometry.
+		 *
+		 * @type {Array<number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetInfluences = undefined;
 
 		this.updateMorphTargets();
 
@@ -23061,6 +24044,13 @@ class Line extends Object3D {
 
 	}
 
+	/**
+	 * Computes an array of distance values which are necessary for rendering dashed lines.
+	 * For each vertex in the geometry, the method calculates the cumulative length from the
+	 * current point to the very beginning of the line.
+	 *
+	 * @return {Line} A reference to this line.
+	 */
 	computeLineDistances() {
 
 		const geometry = this.geometry;
@@ -23094,6 +24084,12 @@ class Line extends Object3D {
 
 	}
 
+	/**
+	 * Computes intersection points between a casted ray and this line.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
 	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
@@ -23193,6 +24189,10 @@ class Line extends Object3D {
 
 	}
 
+	/**
+	 * Sets the values of {@link Line#morphTargetDictionary} and {@link Line#morphTargetInfluences}
+	 * to make sure existing morph targets can influence this 3D object.
+	 */
 	updateMorphTargets() {
 
 		const geometry = this.geometry;
@@ -23262,12 +24262,30 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b, i ) {
 const _start = /*@__PURE__*/ new Vector3();
 const _end = /*@__PURE__*/ new Vector3();
 
+/**
+ * A series of lines drawn between pairs of vertices.
+ *
+ * @augments Line
+ */
 class LineSegments extends Line {
 
+	/**
+	 * Constructs a new line segments.
+	 *
+	 * @param {BufferGeometry} [geometry] - The line geometry.
+	 * @param {Material|Array<Material>} [material] - The line material.
+	 */
 	constructor( geometry, material ) {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLineSegments = true;
 
 		this.type = 'LineSegments';
@@ -23309,12 +24327,32 @@ class LineSegments extends Line {
 
 }
 
+/**
+ * A continuous line. This is nearly the same as {@link Line} the only difference
+ * is that the last vertex is connected with the first vertex in order to close
+ * the line to form a loop.
+ *
+ * @augments Line
+ */
 class LineLoop extends Line {
 
+	/**
+	 * Constructs a new line loop.
+	 *
+	 * @param {BufferGeometry} [geometry] - The line geometry.
+	 * @param {Material|Array<Material>} [material] - The line material.
+	 */
 	constructor( geometry, material ) {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLineLoop = true;
 
 		this.type = 'LineLoop';
@@ -23374,18 +24412,68 @@ const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _position$2 = /*@__PURE__*/ new Vector3();
 
+/**
+ * A class for displaying points or point clouds.
+ *
+ * @augments Object3D
+ */
 class Points extends Object3D {
 
+	/**
+	 * Constructs a new point cloud.
+	 *
+	 * @param {BufferGeometry} [geometry] - The points geometry.
+	 * @param {Material|Array<Material>} [material] - The points material.
+	 */
 	constructor( geometry = new BufferGeometry(), material = new PointsMaterial() ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPoints = true;
 
 		this.type = 'Points';
 
+		/**
+		 * The points geometry.
+		 *
+		 * @type {BufferGeometry}
+		 */
 		this.geometry = geometry;
+
+		/**
+		 * The line material.
+		 *
+		 * @type {Material|Array<Material>}
+		 * @default PointsMaterial
+		 */
 		this.material = material;
+
+		/**
+		 * A dictionary representing the morph targets in the geometry. The key is the
+		 * morph targets name, the value its attribute index. This member is `undefined`
+		 * by default and only set when morph targets are detected in the geometry.
+		 *
+		 * @type {Object<String,number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetDictionary = undefined;
+
+		/**
+		 * An array of weights typically in the range `[0,1]` that specify how much of the morph
+		 * is applied. This member is `undefined` by default and only set when morph targets are
+		 * detected in the geometry.
+		 *
+		 * @type {Array<number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetInfluences = undefined;
 
 		this.updateMorphTargets();
 
@@ -23402,6 +24490,12 @@ class Points extends Object3D {
 
 	}
 
+	/**
+	 * Computes intersection points between a casted ray and this point cloud.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
 	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
@@ -23463,6 +24557,10 @@ class Points extends Object3D {
 
 	}
 
+	/**
+	 * Sets the values of {@link Points#morphTargetDictionary} and {@link Points#morphTargetInfluences}
+	 * to make sure existing morph targets can influence this 3D object.
+	 */
 	updateMorphTargets() {
 
 		const geometry = this.geometry;
@@ -24049,7 +25147,7 @@ class Curve {
 	 *
 	 * @param {number} t - The interpolation factor.
 	 * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
-	 * @return {(Vector2|Vector3)} The tagent vector.
+	 * @return {(Vector2|Vector3)} The tangent vector.
 	 */
 	getTangent( t, optionalTarget ) {
 
@@ -24078,7 +25176,7 @@ class Curve {
 	 *
 	 * @param {number} u - The interpolation factor.
 	 * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
-	 * @return {(Vector2|Vector3)} The tagent vector.
+	 * @return {(Vector2|Vector3)} The tangent vector.
 	 * @see {@link Curve#getPointAt}
 	 */
 	getTangentAt( u, optionalTarget ) {
@@ -24889,14 +25987,14 @@ class CatmullRomCurve3 extends Curve {
 // Bezier Curves formulas obtained from: https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 
 /**
- * Computes a point on a Camtull-Rom spline.
+ * Computes a point on a Catmull-Rom spline.
  *
  * @param {number} t - The interpolation factor.
  * @param {number} p0 - The first control point.
  * @param {number} p1 - The second control point.
  * @param {number} p2 - The third control point.
  * @param {number} p3 - The fourth control point.
- * @return {number} The calculated point on a Camtull-Rom spline.
+ * @return {number} The calculated point on a Catmull-Rom spline.
  */
 function CatmullRom( t, p0, p1, p2, p3 ) {
 
@@ -26446,7 +27544,7 @@ class Path extends CurvePath {
 	 * @param {number} aStartAngle - The start angle in radians.
 	 * @param {number} aEndAngle - The end angle in radians.
 	 * @param {boolean} [aClockwise=false] - Whether to sweep the ellipse clockwise or not.
-	 * @param {boolean} [aRotation=0] - The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.
+	 * @param {number} [aRotation=0] - The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.
 	 * @return {Path} A reference to this path.
 	 */
 	absellipse( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
@@ -26507,14 +27605,47 @@ class Path extends CurvePath {
 
 }
 
+/**
+ * Creates meshes with axial symmetry like vases. The lathe rotates around the Y axis.
+ *
+ * ```js
+ * const points = [];
+ * for ( let i = 0; i < 10; i ++ ) {
+ * 	points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+ * }
+ * const geometry = new THREE.LatheGeometry( points );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const lathe = new THREE.Mesh( geometry, material );
+ * scene.add( lathe );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class LatheGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new lathe geometry.
+	 *
+	 * @param {Array<Vector2>} [points] - An array of points in 2D space. The x-coordinate of each point
+	 * must be greater than zero.
+	 * @param {number} [segments=12] - The number of circumference segments to generate.
+	 * @param {number} [phiStart=0] - The starting angle in radians.
+	 * @param {number} [phiLength=Math.PI*2] - The radian (0 to 2PI) range of the lathed section 2PI is a
+	 * closed lathe, less than 2PI is a portion.
+	 */
 	constructor( points = [ new Vector2( 0, -0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
 		this.type = 'LatheGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			points: points,
 			segments: segments,
@@ -26680,6 +27811,13 @@ class LatheGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {LatheGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new LatheGeometry( data.points, data.segments, data.phiStart, data.phiLength );
@@ -26688,8 +27826,28 @@ class LatheGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A geometry class for a capsule with given radii and height. It is constructed using a lathe.
+ *
+ * ```js
+ * const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const capsule = new THREE.Mesh( geometry, material );
+ * scene.add( capsule );
+ * ```
+ *
+ * @augments LatheGeometry
+ */
 class CapsuleGeometry extends LatheGeometry {
 
+	/**
+	 * Constructs a new capsule geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the capsule.
+	 * @param {number} [length=1] - Length of the middle section.
+	 * @param {number} [capSegments=4] - Number of curve segments used to build the caps.
+	 * @param {number} [radialSegments=8] - Number of segmented faces around the circumference of the capsule.
+	 */
 	constructor( radius = 1, length = 1, capSegments = 4, radialSegments = 8 ) {
 
 		const path = new Path();
@@ -26700,6 +27858,13 @@ class CapsuleGeometry extends LatheGeometry {
 
 		this.type = 'CapsuleGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			length: length,
@@ -26709,6 +27874,13 @@ class CapsuleGeometry extends LatheGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {CapsuleGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new CapsuleGeometry( data.radius, data.length, data.capSegments, data.radialSegments );
@@ -26717,14 +27889,47 @@ class CapsuleGeometry extends LatheGeometry {
 
 }
 
+/**
+ * A simple shape of Euclidean geometry. It is constructed from a
+ * number of triangular segments that are oriented around a central point and
+ * extend as far out as a given radius. It is built counter-clockwise from a
+ * start angle and a given central angle. It can also be used to create
+ * regular polygons, where the number of segments determines the number of
+ * sides.
+ *
+ * ```js
+ * const geometry = new THREE.CircleGeometry( 5, 32 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const circle = new THREE.Mesh( geometry, material );
+ * scene.add( circle )
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class CircleGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new circle geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the circle.
+	 * @param {number} [segments=32] - Number of segments (triangles), minimum = `3`.
+	 * @param {number} [thetaStart=0] - Start angle for first segment in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - The central angle, often called theta,
+	 * of the circular sector in radians. The default value results in a complete circle.
+	 */
 	constructor( radius = 1, segments = 32, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
 		this.type = 'CircleGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			segments: segments,
@@ -26803,6 +28008,13 @@ class CircleGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {CircleGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new CircleGeometry( data.radius, data.segments, data.thetaStart, data.thetaLength );
@@ -26811,14 +28023,46 @@ class CircleGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A geometry class for representing a cylinder.
+ *
+ * ```js
+ * const geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const cylinder = new THREE.Mesh( geometry, material );
+ * scene.add( cylinder );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class CylinderGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new cylinder geometry.
+	 *
+	 * @param {number} [radiusTop=1] - Radius of the cylinder at the top.
+	 * @param {number} [radiusBottom=1] - Radius of the cylinder at the bottom.
+	 * @param {number} [height=1] - Height of the cylinder.
+	 * @param {number} [radialSegments=32] - Number of segmented faces around the circumference of the cylinder.
+	 * @param {number} [heightSegments=1] - Number of rows of faces along the height of the cylinder.
+	 * @param {boolean} [openEnded=false] - Whether the base of the cylinder is open or capped.
+	 * @param {boolean} [thetaStart=0] - Start angle for first segment, in radians.
+	 * @param {boolean} [thetaLength=Math.PI*2] - The central angle, often called theta, of the circular sector, in radians.
+	 * The default value results in a complete cylinder.
+	 */
 	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
 		this.type = 'CylinderGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radiusTop: radiusTop,
 			radiusBottom: radiusBottom,
@@ -27089,6 +28333,13 @@ class CylinderGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {CylinderGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new CylinderGeometry( data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
@@ -27097,14 +28348,45 @@ class CylinderGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A geometry class for representing a cone.
+ *
+ * ```js
+ * const geometry = new THREE.ConeGeometry( 5, 20, 32 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const cone = new THREE.Mesh(geometry, material );
+ * scene.add( cone );
+ * ```
+ *
+ * @augments CylinderGeometry
+ */
 class ConeGeometry extends CylinderGeometry {
 
+	/**
+	 * Constructs a new cone geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the cone base.
+	 * @param {number} [height=1] - Height of the cone.
+	 * @param {number} [radialSegments=32] - Number of segmented faces around the circumference of the cone.
+	 * @param {number} [heightSegments=1] - Number of rows of faces along the height of the cone.
+	 * @param {boolean} [openEnded=false] - Whether the base of the cone is open or capped.
+	 * @param {boolean} [thetaStart=0] - Start angle for first segment, in radians.
+	 * @param {boolean} [thetaLength=Math.PI*2] - The central angle, often called theta, of the circular sector, in radians.
+	 * The default value results in a complete cone.
+	 */
 	constructor( radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
 		this.type = 'ConeGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			height: height,
@@ -27117,6 +28399,13 @@ class ConeGeometry extends CylinderGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {ConeGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new ConeGeometry( data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
@@ -27125,14 +28414,36 @@ class ConeGeometry extends CylinderGeometry {
 
 }
 
+/**
+ * A polyhedron is a solid in three dimensions with flat faces. This class
+ * will take an array of vertices, project them onto a sphere, and then
+ * divide them up to the desired level of detail.
+ *
+ * @augments BufferGeometry
+ */
 class PolyhedronGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new polyhedron geometry.
+	 *
+	 * @param {Array<number>} [vertices] - A flat array of vertices describing the base shape.
+	 * @param {Array<number>} [indices] - A flat array of indices describing the base shape.
+	 * @param {number} [radius=1] - The radius of the shape.
+	 * @param {number} [detail=0] - How many levels to subdivide the geometry. The more detail, the smoother the shape.
+	 */
 	constructor( vertices = [], indices = [], radius = 1, detail = 0 ) {
 
 		super();
 
 		this.type = 'PolyhedronGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			vertices: vertices,
 			indices: indices,
@@ -27430,6 +28741,13 @@ class PolyhedronGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {PolyhedronGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
@@ -27438,8 +28756,26 @@ class PolyhedronGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A geometry class for representing a dodecahedron.
+ *
+ * ```js
+ * const geometry = new THREE.DodecahedronGeometry();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const dodecahedron = new THREE.Mesh( geometry, material );
+ * scene.add( dodecahedron );
+ * ```
+ *
+ * @augments PolyhedronGeometry
+ */
 class DodecahedronGeometry extends PolyhedronGeometry {
 
+	/**
+	 * Constructs a new dodecahedron geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the dodecahedron.
+	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a dodecahedron.
+	 */
 	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -27485,6 +28821,13 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 
 		this.type = 'DodecahedronGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			detail: detail
@@ -27492,6 +28835,13 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {DodecahedronGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new DodecahedronGeometry( data.radius, data.detail );
@@ -27505,14 +28855,42 @@ const _v1$1 = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
 const _triangle = /*@__PURE__*/ new Triangle();
 
+/**
+ * Can be used as a helper object to view the edges of a geometry.
+ *
+ * ```js
+ * const geometry = new THREE.BoxGeometry();
+ * const edges = new THREE.EdgesGeometry( geometry );
+ * const line = new THREE.LineSegments( edges );
+ * scene.add( line );
+ * ```
+ *
+ * Note: It is not yet possible to serialize/deserialize instances of this class.
+ *
+ * @augments BufferGeometry
+ */
 class EdgesGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new edges geometry.
+	 *
+	 * @param {?BufferGeometry} [geometry=null] - The geometry.
+	 * @param {number} [thresholdAngle=1] - An edge is only rendered if the angle (in degrees)
+	 * between the face normals of the adjoining faces exceeds this value.
+	 */
 	constructor( geometry = null, thresholdAngle = 1 ) {
 
 		super();
 
 		this.type = 'EdgesGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			geometry: geometry,
 			thresholdAngle: thresholdAngle
@@ -27698,7 +29076,7 @@ class Shape extends Path {
 		this.type = 'Shape';
 
 		/**
-		 * Defines the holes in the shape. Hole defnitions must use the
+		 * Defines the holes in the shape. Hole definitions must use the
 		 * opposite winding order (CW/CCW) than the outer shape.
 		 *
 		 * @type {Array<Path>}
@@ -28635,7 +30013,7 @@ class ShapeUtils {
 	/**
 	 * Returns `true` if the given contour uses a clockwise winding order.
 	 *
-	 * @param {Array<Vector2>} pts - An array of 2D points defining a polyong.
+	 * @param {Array<Vector2>} pts - An array of 2D points defining a polygon.
 	 * @return {boolean} Whether the given contour uses a clockwise winding order or not.
 	 */
 	static isClockWise( pts ) {
@@ -28645,7 +30023,7 @@ class ShapeUtils {
 	}
 
 	/**
-	 * Triangluates the given shape definition.
+	 * Triangulates the given shape definition.
 	 *
 	 * @param {Array<Vector2>} contour - An array of 2D points defining the contour.
 	 * @param {Array<Array<Vector2>>} holes - An array that holds arrays of 2D points defining the holes.
@@ -28738,14 +30116,58 @@ function addContour( vertices, contour ) {
  */
 
 
+/**
+ * Creates extruded geometry from a path shape.
+ *
+ * ```js
+ * const length = 12, width = 8;
+ *
+ * const shape = new THREE.Shape();
+ * shape.moveTo( 0,0 );
+ * shape.lineTo( 0, width );
+ * shape.lineTo( length, width );
+ * shape.lineTo( length, 0 );
+ * shape.lineTo( 0, 0 );
+ *
+ * const geometry = new THREE.ExtrudeGeometry( shape );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const mesh = new THREE.Mesh( geometry, material ) ;
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class ExtrudeGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new extrude geometry.
+	 *
+	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
+	 * @param {Object} [options={}] - The extrude settings.
+	 * @param {number} [options.curveSegments=12] - Number of points on the curves.
+	 * @param {number} [options.steps=1] - Number of points used for subdividing segments along the depth of the extruded spline.
+	 * @param {number} [options.depth=1] - Depth to extrude the shape.
+	 * @param {boolean} [options.bevelEnabled=true] - Whether to beveling to the shape or not.
+	 * @param {number} [options.bevelThickness=0.2] - How deep into the original shape the bevel goes.
+	 * @param {number} [options.bevelSize=bevelThickness-0.1] - Distance from the shape outline that the bevel extends.
+	 * @param {number} [options.bevelOffset=0] - Distance from the shape outline that the bevel starts.
+	 * @param {number} [options.bevelSegments=3] - Number of bevel layers.
+	 * @param {Curve} [options.extrudePath=3] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
+	 * @param {Object} [options.UVGenerator] - An object that provides UV generator functions for custom UV generation.
+	 */
 	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( -0.5, 0.5 ), new Vector2( -0.5, -0.5 ), new Vector2( 0.5, -0.5 ) ] ), options = {} ) {
 
 		super();
 
 		this.type = 'ExtrudeGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			shapes: shapes,
 			options: options
@@ -29408,6 +30830,14 @@ class ExtrudeGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @param {Array<Shape>} shapes - An array of shapes.
+	 * @return {ExtrudeGeometry} A new instance.
+	 */
 	static fromJSON( data, shapes ) {
 
 		const geometryShapes = [];
@@ -29520,8 +30950,26 @@ function toJSON$1( shapes, options, data ) {
 
 }
 
+/**
+ * A geometry class for representing an icosahedron.
+ *
+ * ```js
+ * const geometry = new THREE.IcosahedronGeometry();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const icosahedron = new THREE.Mesh( geometry, material );
+ * scene.add( icosahedron );
+ * ```
+ *
+ * @augments PolyhedronGeometry
+ */
 class IcosahedronGeometry extends PolyhedronGeometry {
 
+	/**
+	 * Constructs a new icosahedron geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the icosahedron.
+	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a icosahedron.
+	 */
 	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -29543,6 +30991,13 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 		this.type = 'IcosahedronGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			detail: detail
@@ -29550,6 +31005,13 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {IcosahedronGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new IcosahedronGeometry( data.radius, data.detail );
@@ -29558,8 +31020,26 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 }
 
+/**
+ * A geometry class for representing an octahedron.
+ *
+ * ```js
+ * const geometry = new THREE.OctahedronGeometry();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const octahedron = new THREE.Mesh( geometry, material );
+ * scene.add( octahedron );
+ * ```
+ *
+ * @augments PolyhedronGeometry
+ */
 class OctahedronGeometry extends PolyhedronGeometry {
 
+	/**
+	 * Constructs a new octahedron geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the octahedron.
+	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a octahedron.
+	 */
 	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
@@ -29577,6 +31057,13 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 		this.type = 'OctahedronGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			detail: detail
@@ -29584,6 +31071,13 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {OctahedronGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new OctahedronGeometry( data.radius, data.detail );
@@ -29592,14 +31086,41 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 }
 
+/**
+ * A geometry class for representing a plane.
+ *
+ * ```js
+ * const geometry = new THREE.PlaneGeometry( 1, 1 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
+ * const plane = new THREE.Mesh( geometry, material );
+ * scene.add( plane );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class PlaneGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new plane geometry.
+	 *
+	 * @param {number} [width=1] - The width along the X axis.
+	 * @param {number} [height=1] - The height along the Y axis
+	 * @param {number} [widthSegments=1] - The number of segments along the X axis.
+	 * @param {number} [heightSegments=1] - The number of segments along the Y axis.
+	 */
 	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
 
 		this.type = 'PlaneGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			width: width,
 			height: height,
@@ -29678,6 +31199,13 @@ class PlaneGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {PlaneGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new PlaneGeometry( data.width, data.height, data.widthSegments, data.heightSegments );
@@ -29686,14 +31214,43 @@ class PlaneGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A class for generating a two-dimensional ring geometry.
+ *
+ * ```js
+ * const geometry = new THREE.RingGeometry( 1, 5, 32 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
+ * const mesh = new THREE.Mesh( geometry, material );
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class RingGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new ring geometry.
+	 *
+	 * @param {number} [innerRadius=0.5] - The inner radius of the ring.
+	 * @param {number} [outerRadius=1] - The outer radius of the ring.
+	 * @param {number} [thetaSegments=32] - Number of segments. A higher number means the ring will be more round. Minimum is `3`.
+	 * @param {number} [phiSegments=1] - Number of segments per ring segment. Minimum is `1`.
+	 * @param {number} [thetaStart=0] - Starting angle in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - Central angle in radians.
+	 */
 	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
 		this.type = 'RingGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			innerRadius: innerRadius,
 			outerRadius: outerRadius,
@@ -29799,6 +31356,13 @@ class RingGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {RingGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new RingGeometry( data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength );
@@ -29807,14 +31371,43 @@ class RingGeometry extends BufferGeometry {
 
 }
 
+/**
+ * Creates an one-sided polygonal geometry from one or more path shapes.
+ *
+ * ```js
+ * const arcShape = new THREE.Shape()
+ *	.moveTo( 5, 1 )
+ *	.absarc( 1, 1, 4, 0, Math.PI * 2, false );
+ *
+ * const geometry = new THREE.ShapeGeometry( arcShape );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
+ * const mesh = new THREE.Mesh( geometry, material ) ;
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class ShapeGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new shape geometry.
+	 *
+	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
+	 * @param {number} [curveSegments=12] - Number of segments per shape.
+	 */
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( -0.5, -0.5 ), new Vector2( 0.5, -0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
 
 		this.type = 'ShapeGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			shapes: shapes,
 			curveSegments: curveSegments
@@ -29953,6 +31546,14 @@ class ShapeGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @param {Array<Shape>} shapes - An array of shapes.
+	 * @return {ShapeGeometry} A new instance.
+	 */
 	static fromJSON( data, shapes ) {
 
 		const geometryShapes = [];
@@ -29995,14 +31596,44 @@ function toJSON( shapes, data ) {
 
 }
 
+/**
+ * A class for generating a sphere geometry.
+ *
+ * ```js
+ * const geometry = new THREE.SphereGeometry( 15, 32, 16 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const sphere = new THREE.Mesh( geometry, material );
+ * scene.add( sphere );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class SphereGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new sphere geometry.
+	 *
+	 * @param {number} [radius=1] - The sphere radius.
+	 * @param {number} [widthSegments=32] - The number of horizontal segments. Minimum value is `3`.
+	 * @param {number} [heightSegments=16] - The number of vertical segments. Minimum value is `2`.
+	 * @param {number} [phiStart=0] - The horizontal starting angle in radians.
+	 * @param {number} [phiLength=Math.PI*2] - The horizontal sweep angle size.
+	 * @param {number} [thetaStart=0] - The vertical starting angle in radians.
+	 * @param {number} [thetaLength=Math.PI] - The vertical sweep angle size.
+	 */
 	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
 		super();
 
 		this.type = 'SphereGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			widthSegments: widthSegments,
@@ -30119,6 +31750,13 @@ class SphereGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {SphereGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
@@ -30127,8 +31765,26 @@ class SphereGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A geometry class for representing an tetrahedron.
+ *
+ * ```js
+ * const geometry = new THREE.TetrahedronGeometry();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const tetrahedron = new THREE.Mesh( geometry, material );
+ * scene.add( tetrahedron );
+ * ```
+ *
+ * @augments PolyhedronGeometry
+ */
 class TetrahedronGeometry extends PolyhedronGeometry {
 
+	/**
+	 * Constructs a new tetrahedron geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the tetrahedron.
+	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a tetrahedron.
+	 */
 	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
@@ -30143,6 +31799,13 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 		this.type = 'TetrahedronGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			detail: detail
@@ -30150,6 +31813,13 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {TetrahedronGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new TetrahedronGeometry( data.radius, data.detail );
@@ -30158,14 +31828,42 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 }
 
+/**
+ * A geometry class for representing an torus.
+ *
+ * ```js
+ * const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const torus = new THREE.Mesh( geometry, material );
+ * scene.add( torus );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class TorusGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new torus geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the torus, from the center of the torus to the center of the tube.
+	 * @param {number} [tube=0.4] - Radius of the tube. Must be smaller than `radius`.
+	 * @param {number} [radialSegments=12] - The number of radial segments.
+	 * @param {number} [tubularSegments=48] - The number of tubular segments.
+	 * @param {number} [arc=Math.PI*2] - Central angle in radians.
+	 */
 	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
 
 		super();
 
 		this.type = 'TorusGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			tube: tube,
@@ -30265,6 +31963,13 @@ class TorusGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {TorusGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
@@ -30273,14 +31978,45 @@ class TorusGeometry extends BufferGeometry {
 
 }
 
+/**
+ * Creates a torus knot, the particular shape of which is defined by a pair
+ * of coprime integers, p and q. If p and q are not coprime, the result will
+ * be a torus link.
+ *
+ * ```js
+ * const geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const torusKnot = new THREE.Mesh( geometry, material );
+ * scene.add( torusKnot );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class TorusKnotGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new torus knot geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the torus knot.
+	 * @param {number} [tube=0.4] - Radius of the tube.
+	 * @param {number} [tubularSegments=64] - The number of tubular segments.
+	 * @param {number} [radialSegments=8] - The number of radial segments.
+	 * @param {number} [p=2] - This value determines, how many times the geometry winds around its axis of rotational symmetry.
+	 * @param {number} [q=3] - This value determines, how many times the geometry winds around a circle in the interior of the torus.
+	 */
 	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
 
 		this.type = 'TorusKnotGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			tube: tube,
@@ -30427,6 +32163,13 @@ class TorusKnotGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {TorusKnotGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new TorusKnotGeometry( data.radius, data.tube, data.tubularSegments, data.radialSegments, data.p, data.q );
@@ -30435,14 +32178,56 @@ class TorusKnotGeometry extends BufferGeometry {
 
 }
 
+/**
+ * Creates a tube that extrudes along a 3D curve.
+ *
+ * ```js
+ * class CustomSinCurve extends THREE.Curve {
+ *
+ * 	getPoint( t, optionalTarget = new THREE.Vector3() ) {
+ *
+ * 		const tx = t * 3 - 1.5;
+ * 		const ty = Math.sin( 2 * Math.PI * t );
+ * 		const tz = 0;
+ *
+ * 		return optionalTarget.set( tx, ty, tz );
+ * 	}
+ *
+ * }
+ *
+ * const path = new CustomSinCurve( 10 );
+ * const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const mesh = new THREE.Mesh( geometry, material );
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class TubeGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new tube geometry.
+	 *
+	 * @param {Curve} [path=QuadraticBezierCurve3] - A 3D curve defining the path of the tube.
+	 * @param {number} [tubularSegments=64] - The number of segments that make up the tube.
+	 * @param {number} [radius=1] -The radius of the tube.
+	 * @param {number} [radialSegments=8] - The number of segments that make up the cross-section.
+	 * @param {boolean} [closed=false] - Whether the tube is closed or not.
+	 */
 	constructor( path = new QuadraticBezierCurve3( new Vector3( -1, -1, 0 ), new Vector3( -1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 
 		this.type = 'TubeGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			path: path,
 			tubularSegments: tubularSegments,
@@ -30614,6 +32399,13 @@ class TubeGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {TubeGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		// This only works for built-in curves (e.g. CatmullRomCurve3).
@@ -30630,14 +32422,46 @@ class TubeGeometry extends BufferGeometry {
 
 }
 
+/**
+ * Can be used as a helper object to visualize a geometry as a wireframe.
+ *
+ * ```js
+ * const geometry = new THREE.SphereGeometry();
+ *
+ * const wireframe = new THREE.WireframeGeometry( geometry );
+ *
+ * const line = new THREE.LineSegments( wireframe );
+ * line.material.depthWrite = false;
+ * line.material.opacity = 0.25;
+ * line.material.transparent = true;
+ *
+ * scene.add( line );
+ * ```
+ *
+ * Note: It is not yet possible to serialize/deserialize instances of this class.
+ *
+ * @augments BufferGeometry
+ */
 class WireframeGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new wireframe geometry.
+	 *
+	 * @param {?BufferGeometry} [geometry=null] - The geometry.
+	 */
 	constructor( geometry = null ) {
 
 		super();
 
 		this.type = 'WireframeGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			geometry: geometry
 		};
@@ -34073,7 +35897,7 @@ class Loader {
  *
  *
  * @callback onErrorCallback
- * @param {Error} error - The error which occured during the loading process.
+ * @param {Error} error - The error which occurred during the loading process.
  */
 
 /**
@@ -34853,21 +36677,57 @@ class TextureLoader extends Loader {
 
 }
 
+/**
+ * Abstract base class for lights - all other light types inherit the
+ * properties and methods described here.
+ *
+ * @abstract
+ * @augments Object3D
+ */
 class Light extends Object3D {
 
+	/**
+	 * Constructs a new light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
 	constructor( color, intensity = 1 ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLight = true;
 
 		this.type = 'Light';
 
+		/**
+		 * The light's color.
+		 *
+		 * @type {Color}
+		 */
 		this.color = new Color( color );
+
+		/**
+		 * The light's intensity.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.intensity = intensity;
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		// Empty here in base class; some subclasses override.
@@ -34908,12 +36768,39 @@ class Light extends Object3D {
 
 }
 
+/**
+ * A light source positioned directly above the scene, with color fading from
+ * the sky color to the ground color.
+ *
+ * This light cannot be used to cast shadows.
+ *
+ * ```js
+ * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+ * scene.add( light );
+ * ```
+ *
+ * @augments Light
+ */
 class HemisphereLight extends Light {
 
+	/**
+	 * Constructs a new hemisphere light.
+	 *
+	 * @param {(number|Color|string)} [skyColor=0xffffff] - The light's sky color.
+	 * @param {(number|Color|string)} [groundColor=0xffffff] - The light's ground color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
 	constructor( skyColor, groundColor, intensity ) {
 
 		super( skyColor, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isHemisphereLight = true;
 
 		this.type = 'HemisphereLight';
@@ -34921,6 +36808,11 @@ class HemisphereLight extends Light {
 		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
+		/**
+		 * The light's ground color.
+		 *
+		 * @type {Color}
+		 */
 		this.groundColor = new Color( groundColor );
 
 	}
@@ -34941,26 +36833,137 @@ const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld$1 = /*@__PURE__*/ new Vector3();
 const _lookTarget$1 = /*@__PURE__*/ new Vector3();
 
+/**
+ * Abstract base class for light shadow classes. These classes
+ * represent the shadow configuration for different ligth types.
+ *
+ * @abstract
+ */
 class LightShadow {
 
+	/**
+	 * Constructs a new light shadow.
+	 *
+	 * @param {Camera} camera - The light's view of the world.
+	 */
 	constructor( camera ) {
 
+		/**
+		 * The light's view of the world.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
 
+		/**
+		 * The intensity of the shadow. The default is `1`.
+		 * Valid values are in the range `[0, 1]`.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.intensity = 1;
 
+		/**
+		 * Shadow map bias, how much to add or subtract from the normalized depth
+		 * when deciding whether a surface is in shadow.
+		 *
+		 * The default is `0`. Very tiny adjustments here (in the order of `0.0001`)
+		 * may help reduce artifacts in shadows.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.bias = 0;
+
+		/**
+		 * Defines how much the position used to query the shadow map is offset along
+		 * the object normal. The default is `0`. Increasing this value can be used to
+		 * reduce shadow acne especially in large scenes where light shines onto
+		 * geometry at a shallow angle. The cost is that shadows may appear distorted.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.normalBias = 0;
+
+		/**
+		 * Setting this to values greater than 1 will blur the edges of the shadow.
+		 * High values will cause unwanted banding effects in the shadows - a greater
+		 * map size will allow for a higher value to be used here before these effects
+		 * become visible.
+		 *
+		 * The property has no effect when the shadow map type is `PCFSoftShadowMap` and
+		 * and it is recommended to increase softness by decreasing the shadow map size instead.
+		 *
+		 * The property has no effect when the shadow map type is `BasicShadowMap`.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.radius = 1;
+
+		/**
+		 * The amount of samples to use when blurring a VSM shadow map.
+		 *
+		 * @type {number}
+		 * @default 8
+		 */
 		this.blurSamples = 8;
 
+		/**
+		 * Defines the width and height of the shadow map. Higher values give better quality
+		 * shadows at the cost of computation time. Values must be powers of two.
+		 *
+		 * @type {Vector2}
+		 * @default (512,512)
+		 */
 		this.mapSize = new Vector2( 512, 512 );
 
+		/**
+		 * The depth map generated using the internal camera; a location beyond a
+		 * pixel's depth is in shadow. Computed internally during rendering.
+		 *
+		 * @type {?RenderTarget}
+		 * @default null
+		 */
 		this.map = null;
+
+		/**
+		 * The distribution map generated using the internal camera; an occlusion is
+		 * calculated based on the distribution of depths. Computed internally during
+		 * rendering.
+		 *
+		 * @type {?RenderTarget}
+		 * @default null
+		 */
 		this.mapPass = null;
+
+		/**
+		 * Model to shadow camera space, to compute location and depth in shadow map.
+		 * This is computed internally during rendering.
+		 *
+		 * @type {Matrix4}
+		 */
 		this.matrix = new Matrix4();
 
+		/**
+		 * Enables automatic updates of the light's shadow. If you do not require dynamic
+		 * lighting / shadows, you may set this to `false`.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoUpdate = true;
+
+		/**
+		 * When set to `true`, shadow maps will be updated in the next `render` call.
+		 * If you have set {@link LightShadow#autoUpdate} to `false`, you will need to
+		 * set this property to `true` and then make a render call to update the light's shadow.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.needsUpdate = false;
 
 		this._frustum = new Frustum();
@@ -34976,18 +36979,34 @@ class LightShadow {
 
 	}
 
+	/**
+	 * Used internally by the renderer to get the number of viewports that need
+	 * to be rendered for this shadow.
+	 *
+	 * @return {number} The viewport count.
+	 */
 	getViewportCount() {
 
 		return this._viewportCount;
 
 	}
 
+	/**
+	 * Gets the shadow cameras frustum. Used internally by the renderer to cull objects.
+	 *
+	 * @return {Frustum} The shadow camera frustum.
+	 */
 	getFrustum() {
 
 		return this._frustum;
 
 	}
 
+	/**
+	 * Update the matrices for the camera and shadow, used internally by the renderer.
+	 *
+	 * @param {Light} light - The light for which the shadow is being rendered.
+	 */
 	updateMatrices( light ) {
 
 		const shadowCamera = this.camera;
@@ -35014,18 +37033,33 @@ class LightShadow {
 
 	}
 
+	/**
+	 * Returns a viewport definition for the given viewport index.
+	 *
+	 * @param {number} viewportIndex - The viewport index.
+	 * @return {Vector4} The viewport.
+	 */
 	getViewport( viewportIndex ) {
 
 		return this._viewports[ viewportIndex ];
 
 	}
 
+	/**
+	 * Returns the frame extends.
+	 *
+	 * @return {Vector2} The frame extends.
+	 */
 	getFrameExtents() {
 
 		return this._frameExtents;
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		if ( this.map ) {
@@ -35042,6 +37076,12 @@ class LightShadow {
 
 	}
 
+	/**
+	 * Copies the values of the given light shadow instance to this instance.
+	 *
+	 * @param {LightShadow} source - The light shadow to copy.
+	 * @return {LightShadow} A reference to this light shadow instance.
+	 */
 	copy( source ) {
 
 		this.camera = source.camera.clone();
@@ -35057,12 +37097,23 @@ class LightShadow {
 
 	}
 
+	/**
+	 * Returns a new light shadow instance with copied values from this instance.
+	 *
+	 * @return {LightShadow} A clone of this instance.
+	 */
 	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
+	/**
+	 * Serializes the light shadow into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized light shadow.
+	 * @see {@link ObjectLoader#parse}
+	 */
 	toJSON() {
 
 		const object = {};
@@ -35082,14 +37133,36 @@ class LightShadow {
 
 }
 
+/**
+ * Represents the shadow configuration of directional lights.
+ *
+ * @augments LightShadow
+ */
 class SpotLightShadow extends LightShadow {
 
+	/**
+	 * Constructs a new spot light shadow.
+	 */
 	constructor() {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSpotLightShadow = true;
 
+		/**
+		 * Used to focus the shadow camera. The camera's field of view is set as a
+		 * percentage of the spotlight's field-of-view. Range is `[0, 1]`.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.focus = 1;
 
 	}
@@ -35127,12 +37200,51 @@ class SpotLightShadow extends LightShadow {
 
 }
 
+/**
+ * This light gets emitted from a single point in one direction, along a cone
+ * that increases in size the further from the light it gets.
+ *
+ * This light can cast shadows - see the {@link SpotLightShadow} for details.
+ *
+ * ```js
+ * // white spotlight shining from the side, modulated by a texture
+ * const spotLight = new THREE.SpotLight( 0xffffff );
+ * spotLight.position.set( 100, 1000, 100 );
+ * spotLight.map = new THREE.TextureLoader().load( url );
+ *
+ * spotLight.castShadow = true;
+ * spotLight.shadow.mapSize.width = 1024;
+ * spotLight.shadow.mapSize.height = 1024;
+ * spotLight.shadow.camera.near = 500;
+ * spotLight.shadow.camera.far = 4000;
+ * spotLight.shadow.camera.fov = 30;s
+ * ```
+ *
+ * @augments Light
+ */
 class SpotLight extends Light {
 
+	/**
+	 * Constructs a new spot light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
+	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
+	 * @param {number} [angle=Math.PI/3] - Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
+	 * @param {number} [penumbra=0] - Percent of the spotlight cone that is attenuated due to penumbra. Value range is `[0,1]`.
+	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 */
 	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2 ) {
 
 		super( color, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSpotLight = true;
 
 		this.type = 'SpotLight';
@@ -35140,19 +37252,82 @@ class SpotLight extends Light {
 		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
+		/**
+		 * The spot light points from its position to the
+		 * target's position.
+		 *
+		 * For the target's position to be changed to anything other
+		 * than the default, it must be added to the scene.
+		 *
+		 * It is also possible to set the target to be another 3D object
+		 * in the scene. The light will now track the target object.
+		 *
+		 * @type {Object3D}
+		 */
 		this.target = new Object3D();
 
+		/**
+		 * Maximum range of the light. `0` means no limit.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.distance = distance;
+
+		/**
+		 * Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
+		 *
+		 * @type {number}
+		 * @default Math.PI/3
+		 */
 		this.angle = angle;
+
+		/**
+		 * Percent of the spotlight cone that is attenuated due to penumbra.
+		 * Value range is `[0,1]`.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.penumbra = penumbra;
+
+		/**
+		 * The amount the light dims along the distance of the light. In context of
+		 * physically-correct rendering the default value should not be changed.
+		 *
+		 * @type {number}
+		 * @default 2
+		 */
 		this.decay = decay;
 
+		/**
+		 * A texture used to modulate the color of the light. The spot light
+		 * color is mixed with the RGB value of this texture, with a ratio
+		 * corresponding to its alpha value. The cookie-like masking effect is
+		 * reproduced using pixel values (0, 0, 0, 1-cookie_value).
+		 *
+		 * *Warning*: This property is disabled if {@link Object3D#castShadow} is set to `false`.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
 		this.map = null;
 
+		/**
+		 * This property holds the light's shadow configuration.
+		 *
+		 * @type {SpotLightShadow}
+		 */
 		this.shadow = new SpotLightShadow();
 
 	}
 
+	/**
+	 * The light's power. Power is the luminous power of the light measured in lumens (lm).
+	 *  Changing the power will also change the light's intensity.
+	 *
+	 * @type {number}
+	 */
 	get power() {
 
 		// compute the light's luminous power (in lumens) from its intensity (in candela)
@@ -35197,12 +37372,27 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
+/**
+ * Represents the shadow configuration of point lights.
+ *
+ * @augments LightShadow
+ */
 class PointLightShadow extends LightShadow {
 
+	/**
+	 * Constructs a new point light shadow.
+	 */
 	constructor() {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPointLightShadow = true;
 
 		this._frameExtents = new Vector2( 4, 2 );
@@ -35249,6 +37439,12 @@ class PointLightShadow extends LightShadow {
 
 	}
 
+	/**
+	 * Update the matrices for the camera and shadow, used internally by the renderer.
+	 *
+	 * @param {Light} light - The light for which the shadow is being rendered.
+	 * @param {number} [viewportIndex=0] - The viewport index.
+	 */
 	updateMatrices( light, viewportIndex = 0 ) {
 
 		const camera = this.camera;
@@ -35281,23 +37477,82 @@ class PointLightShadow extends LightShadow {
 
 }
 
+/**
+ * A light that gets emitted from a single point in all directions. A common
+ * use case for this is to replicate the light emitted from a bare
+ * lightbulb.
+ *
+ * This light can cast shadows - see the {@link PointLightShadow} for details.
+ *
+ * ```js
+ * const light = new THREE.PointLight( 0xff0000, 1, 100 );
+ * light.position.set( 50, 50, 50 );
+ * scene.add( light );
+ * ```
+ *
+ * @augments Light
+ */
 class PointLight extends Light {
 
+	/**
+	 * Constructs a new point light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
+	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
+	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 */
 	constructor( color, intensity, distance = 0, decay = 2 ) {
 
 		super( color, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPointLight = true;
 
 		this.type = 'PointLight';
 
+		/**
+		 * When distance is zero, light will attenuate according to inverse-square
+		 * law to infinite distance. When distance is non-zero, light will attenuate
+		 * according to inverse-square law until near the distance cutoff, where it
+		 * will then attenuate quickly and smoothly to 0. Inherently, cutoffs are not
+		 * physically correct.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.distance = distance;
+
+		/**
+		 * The amount the light dims along the distance of the light. In context of
+		 * physically-correct rendering the default value should not be changed.
+		 *
+		 * @type {number}
+		 * @default 2
+		 */
 		this.decay = decay;
 
+		/**
+		 * This property holds the light's shadow configuration.
+		 *
+		 * @type {PointLightShadow}
+		 */
 		this.shadow = new PointLightShadow();
 
 	}
 
+	/**
+	 * The light's power. Power is the luminous power of the light measured in lumens (lm).
+	 * Changing the power will also change the light's intensity.
+	 *
+	 * @type {number}
+	 */
 	get power() {
 
 		// compute the light's luminous power (in lumens) from its intensity (in candela)
@@ -35340,6 +37595,11 @@ class PointLight extends Light {
  * In this projection mode, an object's size in the rendered image stays
  * constant regardless of its distance from the camera. This can be useful
  * for rendering 2D scenes and UI elements, amongst other things.
+ *
+ * ```js
+ * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+ * scene.add( camera );
+ * ```
  *
  * @augments Camera
  */
@@ -35571,24 +37831,79 @@ class OrthographicCamera extends Camera {
 
 }
 
+/**
+ * Represents the shadow configuration of directional lights.
+ *
+ * @augments LightShadow
+ */
 class DirectionalLightShadow extends LightShadow {
 
+	/**
+	 * Constructs a new directional light shadow.
+	 */
 	constructor() {
 
 		super( new OrthographicCamera( -5, 5, 5, -5, 0.5, 500 ) );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isDirectionalLightShadow = true;
 
 	}
 
 }
 
+/**
+ * A light that gets emitted in a specific direction. This light will behave
+ * as though it is infinitely far away and the rays produced from it are all
+ * parallel. The common use case for this is to simulate daylight; the sun is
+ * far enough away that its position can be considered to be infinite, and
+ * all light rays coming from it are parallel.
+ *
+ * A common point of confusion for directional lights is that setting the
+ * rotation has no effect. This is because three.js's DirectionalLight is the
+ * equivalent to what is often called a 'Target Direct Light' in other
+ * applications.
+ *
+ * This means that its direction is calculated as pointing from the light's
+ * {@link Object3D#position} to the {@link DirectionalLight#target} position
+ * (as opposed to a 'Free Direct Light' that just has a rotation
+ * component).
+ *
+ * This light can cast shadows - see the {@link DirectionalLightShadow} for details.
+ *
+ * ```js
+ * // White directional light at half intensity shining from the top.
+ * const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+ * scene.add( directionalLight );
+ * ```
+ *
+ * @augments Light
+ */
 class DirectionalLight extends Light {
 
+	/**
+	 * Constructs a new directional light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
 	constructor( color, intensity ) {
 
 		super( color, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isDirectionalLight = true;
 
 		this.type = 'DirectionalLight';
@@ -35596,8 +37911,25 @@ class DirectionalLight extends Light {
 		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
+		/**
+		 * The directional light points from its position to the
+		 * target's position.
+		 *
+		 * For the target's position to be changed to anything other
+		 * than the default, it must be added to the scene.
+		 *
+		 * It is also possible to set the target to be another 3D object
+		 * in the scene. The light will now track the target object.
+		 *
+		 * @type {Object3D}
+		 */
 		this.target = new Object3D();
 
+		/**
+		 * This property holds the light's shadow configuration.
+		 *
+		 * @type {DirectionalLightShadow}
+		 */
 		this.shadow = new DirectionalLightShadow();
 
 	}
@@ -35621,12 +37953,37 @@ class DirectionalLight extends Light {
 
 }
 
+/**
+ * This light globally illuminates all objects in the scene equally.
+ *
+ * It cannot be used to cast shadows as it does not have a direction.
+ *
+ * ```js
+ * const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+ * scene.add( light );
+ * ```
+ *
+ * @augments Light
+ */
 class AmbientLight extends Light {
 
+	/**
+	 * Constructs a new ambient light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
 	constructor( color, intensity ) {
 
 		super( color, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isAmbientLight = true;
 
 		this.type = 'AmbientLight';
@@ -35635,21 +37992,80 @@ class AmbientLight extends Light {
 
 }
 
+/**
+ * This class emits light uniformly across the face a rectangular plane.
+ * This light type can be used to simulate light sources such as bright
+ * windows or strip lighting.
+ *
+ * Important Notes:
+ *
+ * - There is no shadow support.
+ * - Only PBR materials are supported.
+ * - You have to include `RectAreaLightUniformsLib` (`WebGLRenderer`) or `RectAreaLightTexturesLib` (`WebGPURenderer`)
+ * into your app and init the uniforms/textures.
+ *
+ * ```js
+ * RectAreaLightUniformsLib.init(); // only relevant for WebGLRenderer
+ * THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() ); //  only relevant for WebGPURenderer
+ *
+ * const intensity = 1; const width = 10; const height = 10;
+ * const rectLight = new THREE.RectAreaLight( 0xffffff, intensity, width, height );
+ * rectLight.position.set( 5, 5, 0 );
+ * rectLight.lookAt( 0, 0, 0 );
+ * scene.add( rectLight )
+ * ```
+ *
+ * @augments Light
+ */
 class RectAreaLight extends Light {
 
+	/**
+	 * Constructs a new area light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 * @param {number} [width=10] - The width of the light.
+	 * @param {number} [height=10] - The height of the light.
+	 */
 	constructor( color, intensity, width = 10, height = 10 ) {
 
 		super( color, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isRectAreaLight = true;
 
 		this.type = 'RectAreaLight';
 
+		/**
+		 * The width of the light.
+		 *
+		 * @type {number}
+		 * @default 10
+		 */
 		this.width = width;
+
+		/**
+		 * The height of the light.
+		 *
+		 * @type {number}
+		 * @default 10
+		 */
 		this.height = height;
 
 	}
 
+	/**
+	 * The light's power. Power is the luminous power of the light measured in lumens (lm).
+	 * Changing the power will also change the light's intensity.
+	 *
+	 * @type {number}
+	 */
 	get power() {
 
 		// compute the light's luminous power (in lumens) from its intensity (in nits)
@@ -36026,14 +38442,51 @@ class SphericalHarmonics3 {
 
 }
 
+/**
+ * Light probes are an alternative way of adding light to a 3D scene. Unlike
+ * classical light sources (e.g. directional, point or spot lights), light
+ * probes do not emit light. Instead they store information about light
+ * passing through 3D space. During rendering, the light that hits a 3D
+ * object is approximated by using the data from the light probe.
+ *
+ * Light probes are usually created from (radiance) environment maps. The
+ * class {@link LightProbeGenerator} can be used to create light probes from
+ * cube textures or render targets. However, light estimation data could also
+ * be provided in other forms e.g. by WebXR. This enables the rendering of
+ * augmented reality content that reacts to real world lighting.
+ *
+ * The current probe implementation in three.js supports so-called diffuse
+ * light probes. This type of light probe is functionally equivalent to an
+ * irradiance environment map.
+ *
+ * @augments Light
+ */
 class LightProbe extends Light {
 
+	/**
+	 * Constructs a new light probe.
+	 *
+	 * @param {SphericalHarmonics3} sh - The spherical harmonics which represents encoded lighting information.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
 		super( undefined, intensity );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLightProbe = true;
 
+		/**
+		 * A light probe uses spherical harmonics to encode lighting information.
+		 *
+		 * @type {SphericalHarmonics3}
+		 */
 		this.sh = sh;
 
 	}
@@ -36048,6 +38501,12 @@ class LightProbe extends Light {
 
 	}
 
+	/**
+	 * Deserializes the light prove from the given JSON.
+	 *
+	 * @param {Object} json - The JSON holding the serialized light probe.
+	 * @return {LightProbe} A reference to this light probe.
+	 */
 	fromJSON( json ) {
 
 		this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
@@ -37974,8 +40433,18 @@ class ImageBitmapLoader extends Loader {
 
 let _context;
 
+/**
+ * Manages the global audio context in the engine.
+ *
+ * @hideconstructor
+ */
 class AudioContext {
 
+	/**
+	 * Returns the global native audio context.
+	 *
+	 * @return {AudioContext} The native audio context.
+	 */
 	static getContext() {
 
 		if ( _context === undefined ) {
@@ -37988,6 +40457,11 @@ class AudioContext {
 
 	}
 
+	/**
+	 * Allows to set the global native audio context from outside.
+	 *
+	 * @param {AudioContext} value - The native context to set.
+	 */
 	static setContext( value ) {
 
 		_context = value;
@@ -38318,21 +40792,62 @@ const _quaternion$1 = /*@__PURE__*/ new Quaternion();
 const _scale$1 = /*@__PURE__*/ new Vector3();
 const _orientation$1 = /*@__PURE__*/ new Vector3();
 
+/**
+ * The class represents a virtual listener of the all positional and non-positional audio effects
+ * in the scene. A three.js application usually creates a single listener. It is a mandatory
+ * constructor parameter for audios entities like {@link Audio} and {@link PositionalAudio}.
+ *
+ * In most cases, the listener object is a child of the camera. So the 3D transformation of the
+ * camera represents the 3D transformation of the listener.
+ *
+ * @augments Object3D
+ */
 class AudioListener extends Object3D {
 
+	/**
+	 * Constructs a new audio listener.
+	 */
 	constructor() {
 
 		super();
 
 		this.type = 'AudioListener';
 
+		/**
+		 * The native audio context.
+		 *
+		 * @type {AudioContext}
+		 * @readonly
+		 */
 		this.context = AudioContext.getContext();
 
+		/**
+		 * The gain node used for volume control.
+		 *
+		 * @type {GainNode}
+		 * @readonly
+		 */
 		this.gain = this.context.createGain();
 		this.gain.connect( this.context.destination );
 
+		/**
+		 * An optional filter.
+		 *
+		 * Defined via {@AudioListener#setFilter}.
+		 *
+		 * @type {?AudioNode}
+		 * @default null
+		 * @readonly
+		 */
 		this.filter = null;
 
+		/**
+		 * Time delta values required for `linearRampToValueAtTime()` usage.
+		 *
+		 * @type {number}
+		 * @default 0
+		 * @readonly
+		 */
 		this.timeDelta = 0;
 
 		// private
@@ -38341,12 +40856,24 @@ class AudioListener extends Object3D {
 
 	}
 
+	/**
+	 * Returns the listener's input node.
+	 *
+	 * This method is used by other audio nodes to connect to this listener.
+	 *
+	 * @return {GainNode} The input node.
+	 */
 	getInput() {
 
 		return this.gain;
 
 	}
 
+	/**
+	 * Removes the current filter from this listener.
+	 *
+	 * @return {AudioListener} A reference to this listener.
+	 */
 	removeFilter() {
 
 		if ( this.filter !== null ) {
@@ -38362,12 +40889,23 @@ class AudioListener extends Object3D {
 
 	}
 
+	/**
+	 * Returns the current set filter.
+	 *
+	 * @return {AudioNode} The filter.
+	 */
 	getFilter() {
 
 		return this.filter;
 
 	}
 
+	/**
+	 * Sets the given filter to this listener.
+	 *
+	 * @param {AudioNode} value - The filter to set.
+	 * @return {AudioListener} A reference to this listener.
+	 */
 	setFilter( value ) {
 
 		if ( this.filter !== null ) {
@@ -38389,12 +40927,24 @@ class AudioListener extends Object3D {
 
 	}
 
+	/**
+	 * Returns the applications master volume.
+	 *
+	 * @return {number} The master volume.
+	 */
 	getMasterVolume() {
 
 		return this.gain.gain.value;
 
 	}
 
+	/**
+	 * Sets the applications master volume. This volume setting affects
+	 * all audio nodes in the scene.
+	 *
+	 * @param {number} value - The master volume to set.
+	 * @return {AudioListener} A reference to this listener.
+	 */
 	setMasterVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
@@ -38443,49 +40993,240 @@ class AudioListener extends Object3D {
 
 }
 
+/**
+ * Represents a non-positional ( global ) audio object.
+ *
+ * This and related audio modules make use of the [Web Audio API]{@link https://www.w3.org/TR/webaudio-1.1/}.
+ *
+ * ```js
+ * // create an AudioListener and add it to the camera
+ * const listener = new THREE.AudioListener();
+ * camera.add( listener );
+ *
+ * // create a global audio source
+ * const sound = new THREE.Audio( listener );
+ *
+ * // load a sound and set it as the Audio object's buffer
+ * const audioLoader = new THREE.AudioLoader();
+ * audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+ * 	sound.setBuffer( buffer );
+ * 	sound.setLoop( true );
+ * 	sound.setVolume( 0.5 );
+ * 	sound.play();
+ * });
+ * ```
+ *
+ * @augments Object3D
+ */
 class Audio extends Object3D {
 
+	/**
+	 * Constructs a new audio.
+	 *
+	 * @param {AudioListener} listener - The global audio listener.
+	 */
 	constructor( listener ) {
 
 		super();
 
 		this.type = 'Audio';
 
+		/**
+		 * The global audio listener.
+		 *
+		 * @type {AudioListener}
+		 * @readonly
+		 */
 		this.listener = listener;
+
+		/**
+		 * The audio context.
+		 *
+		 * @type {AudioContext}
+		 * @readonly
+		 */
 		this.context = listener.context;
 
+		/**
+		 * The gain node used for volume control.
+		 *
+		 * @type {GainNode}
+		 * @readonly
+		 */
 		this.gain = this.context.createGain();
 		this.gain.connect( listener.getInput() );
 
+		/**
+		 * Whether to start playback automatically or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.autoplay = false;
 
+		/**
+		 * A reference to an audio buffer.
+		 *
+		 * Defined via {@link Audio#setBuffer}.
+		 *
+		 * @type {?AudioBuffer}
+		 * @default null
+		 * @readonly
+		 */
 		this.buffer = null;
+
+		/**
+		 * Modify pitch, measured in cents. +/- 100 is a semitone.
+		 * +/- 1200 is an octave.
+		 *
+		 * Defined via {@link Audio#setDetune}.
+		 *
+		 * @type {number}
+		 * @default 0
+		 * @readonly
+		 */
 		this.detune = 0;
+
+		/**
+		 * Whether the audio should loop or not.
+		 *
+		 * Defined via {@link Audio#setLoop}.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 * @readonly
+		 */
 		this.loop = false;
+
+		/**
+		 * Defines where in the audio buffer the replay should
+		 * start, in seconds.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.loopStart = 0;
+
+		/**
+		 * Defines where in the audio buffer the replay should
+		 * stop, in seconds.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.loopEnd = 0;
+
+		/**
+		 * An offset to the time within the audio buffer the playback
+		 * should begin, in seconds.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.offset = 0;
+
+		/**
+		 * Overrides the default duration of the audio.
+		 *
+		 * @type {undefined|number}
+		 * @default undefined
+		 */
 		this.duration = undefined;
+
+		/**
+		 * The playback speed.
+		 *
+		 * Defined via {@link Audio#setPlaybackRate}.
+		 *
+		 * @type {number}
+		 * @readonly
+		 * @default 1
+		 */
 		this.playbackRate = 1;
+
+		/**
+		 * Indicates whether the audio is playing or not.
+		 *
+		 * This flag will be automatically set when using {@link Audio#play},
+		 * {@link Audio#pause}, {@link Audio#stop}.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.isPlaying = false;
+
+		/**
+		 * Indicates whether the audio playback can be controlled
+		 * with method like {@link Audio#play} or {@link Audio#pause}.
+		 *
+		 * This flag will be automatically set when audio sources are
+		 * defined.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.hasPlaybackControl = true;
+
+		/**
+		 * Holds a reference to the current audio source.
+		 *
+		 * The property is automatically by one of the `set*()` methods.
+		 *
+		 * @type {?AudioNode}
+		 * @readonly
+		 * @default null
+		 */
 		this.source = null;
+
+		/**
+		 * Defines the source type.
+		 *
+		 * The property is automatically by one of the `set*()` methods.
+		 *
+		 * @type {('empty'|'audioNode'|'mediaNode'|'mediaStreamNode'|'buffer')}
+		 * @readonly
+		 * @default 'empty'
+		 */
 		this.sourceType = 'empty';
 
 		this._startedAt = 0;
 		this._progress = 0;
 		this._connected = false;
 
+		/**
+		 * Can be used to apply a variety of low-order filters to create
+		 * more complex sound effects e.g. via `BiquadFilterNode`.
+		 *
+		 * The property is automatically set by {@link Audio#setFilters}.
+		 *
+		 * @type {Array<AudioNode>}
+		 * @readonly
+		 */
 		this.filters = [];
 
 	}
 
+	/**
+	 * Returns the output audio node.
+	 *
+	 * @return {GainNode} The output node.
+	 */
 	getOutput() {
 
 		return this.gain;
 
 	}
 
+	/**
+	 * Sets the given audio node as the source of this instance.
+	 *
+	 * {@link Audio#sourceType} is set to `audioNode` and {@link Audio#hasPlaybackControl} to `false`.
+	 *
+	 * @param {AudioNode} audioNode - The audio node like an instance of `OscillatorNode`.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setNodeSource( audioNode ) {
 
 		this.hasPlaybackControl = false;
@@ -38497,6 +41238,14 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Sets the given media element as the source of this instance.
+	 *
+	 * {@link Audio#sourceType} is set to `mediaNode` and {@link Audio#hasPlaybackControl} to `false`.
+	 *
+	 * @param {HTMLMediaElement} mediaElement - The media element.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setMediaElementSource( mediaElement ) {
 
 		this.hasPlaybackControl = false;
@@ -38508,6 +41257,14 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Sets the given media stream as the source of this instance.
+	 *
+	 * {@link Audio#sourceType} is set to `mediaStreamNode` and {@link Audio#hasPlaybackControl} to `false`.
+	 *
+	 * @param {MediaStream} mediaStream - The media stream.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setMediaStreamSource( mediaStream ) {
 
 		this.hasPlaybackControl = false;
@@ -38519,6 +41276,14 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Sets the given audio buffer as the source of this instance.
+	 *
+	 * {@link Audio#sourceType} is set to `buffer` and {@link Audio#hasPlaybackControl} to `true`.
+	 *
+	 * @param {AudioBuffer} audioBuffer - The audio buffer.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setBuffer( audioBuffer ) {
 
 		this.buffer = audioBuffer;
@@ -38530,6 +41295,14 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Starts the playback of the audio.
+	 *
+	 * Can only be used with compatible audio sources that allow playback control.
+	 *
+	 * @param {number} [delay=0] - The delay, in seconds, at which the audio should start playing.
+	 * @return {Audio|undefined} A reference to this instance.
+	 */
 	play( delay = 0 ) {
 
 		if ( this.isPlaying === true ) {
@@ -38567,6 +41340,13 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Pauses the playback of the audio.
+	 *
+	 * Can only be used with compatible audio sources that allow playback control.
+	 *
+	 * @return {Audio|undefined} A reference to this instance.
+	 */
 	pause() {
 
 		if ( this.hasPlaybackControl === false ) {
@@ -38601,6 +41381,14 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Stops the playback of the audio.
+	 *
+	 * Can only be used with compatible audio sources that allow playback control.
+	 *
+	 * @param {number} [delay=0] - The delay, in seconds, at which the audio should stop playing.
+	 * @return {Audio|undefined} A reference to this instance.
+	 */
 	stop( delay = 0 ) {
 
 		if ( this.hasPlaybackControl === false ) {
@@ -38625,6 +41413,12 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Connects to the audio source. This is used internally on
+	 * initialisation and when setting / removing filters.
+	 *
+	 * @return {Audio} A reference to this instance.
+	 */
 	connect() {
 
 		if ( this.filters.length > 0 ) {
@@ -38651,6 +41445,12 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Disconnects to the audio source. This is used internally on
+	 * initialisation and when setting / removing filters.
+	 *
+	 * @return {Audio|undefined} A reference to this instance.
+	 */
 	disconnect() {
 
 		if ( this._connected === false ) {
@@ -38683,12 +41483,23 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Returns the current set filters.
+	 *
+	 * @return {Array<AudioNode>} The list of filters.
+	 */
 	getFilters() {
 
 		return this.filters;
 
 	}
 
+	/**
+	 * Sets an array of filters and connects them with the audio source.
+	 *
+	 * @param {Array<AudioNode>} [value] - A list of filters.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setFilters( value ) {
 
 		if ( ! value ) value = [];
@@ -38709,6 +41520,12 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Defines the detuning of oscillation in cents.
+	 *
+	 * @param {number} value - The detuning of oscillation in cents.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setDetune( value ) {
 
 		this.detune = value;
@@ -38723,24 +41540,48 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Returns the detuning of oscillation in cents.
+	 *
+	 * @return {number} The detuning of oscillation in cents.
+	 */
 	getDetune() {
 
 		return this.detune;
 
 	}
 
+	/**
+	 * Returns the first filter in the list of filters.
+	 *
+	 * @return {AudioNode|undefined} The first filter in the list of filters.
+	 */
 	getFilter() {
 
 		return this.getFilters()[ 0 ];
 
 	}
 
+	/**
+	 * Applies a single filter node to the audio.
+	 *
+	 * @param {AudioNode} [filter] - The filter to set.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setFilter( filter ) {
 
 		return this.setFilters( filter ? [ filter ] : [] );
 
 	}
 
+	/**
+	 * Sets the playback rate.
+	 *
+	 * Can only be used with compatible audio sources that allow playback control.
+	 *
+	 * @param {number} [value] - The playback rate to set.
+	 * @return {Audio|undefined} A reference to this instance.
+	 */
 	setPlaybackRate( value ) {
 
 		if ( this.hasPlaybackControl === false ) {
@@ -38762,12 +41603,20 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Returns the current playback rate.
+
+	 * @return {number} The playback rate.
+	 */
 	getPlaybackRate() {
 
 		return this.playbackRate;
 
 	}
 
+	/**
+	 * Automatically called when playback finished.
+	 */
 	onEnded() {
 
 		this.isPlaying = false;
@@ -38775,6 +41624,13 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Returns the loop flag.
+	 *
+	 * Can only be used with compatible audio sources that allow playback control.
+	 *
+	 * @return {boolean} Whether the audio should loop or not.
+	 */
 	getLoop() {
 
 		if ( this.hasPlaybackControl === false ) {
@@ -38788,6 +41644,14 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Sets the loop flag.
+	 *
+	 * Can only be used with compatible audio sources that allow playback control.
+	 *
+	 * @param {boolean} value - Whether the audio should loop or not.
+	 * @return {Audio|undefined} A reference to this instance.
+	 */
 	setLoop( value ) {
 
 		if ( this.hasPlaybackControl === false ) {
@@ -38809,6 +41673,13 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Sets the loop start value which defines where in the audio buffer the replay should
+	 * start, in seconds.
+	 *
+	 * @param {number} value - The loop start value.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setLoopStart( value ) {
 
 		this.loopStart = value;
@@ -38817,6 +41688,13 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Sets the loop end value which defines where in the audio buffer the replay should
+	 * stop, in seconds.
+	 *
+	 * @param {number} value - The loop end value.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setLoopEnd( value ) {
 
 		this.loopEnd = value;
@@ -38825,12 +41703,23 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Returns the volume.
+	 *
+	 * @return {number} The volume.
+	 */
 	getVolume() {
 
 		return this.gain.gain.value;
 
 	}
 
+	/**
+	 * Sets the volume.
+	 *
+	 * @param {number} value - The volume to set.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
@@ -38883,12 +41772,54 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 const _scale = /*@__PURE__*/ new Vector3();
 const _orientation = /*@__PURE__*/ new Vector3();
 
+/**
+ * Represents a positional audio object.
+ *
+ * ```js
+ * // create an AudioListener and add it to the camera
+ * const listener = new THREE.AudioListener();
+ * camera.add( listener );
+ *
+ * // create the PositionalAudio object (passing in the listener)
+ * const sound = new THREE.PositionalAudio( listener );
+ *
+ * // load a sound and set it as the PositionalAudio object's buffer
+ * const audioLoader = new THREE.AudioLoader();
+ * audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+ * 	sound.setBuffer( buffer );
+ * 	sound.setRefDistance( 20 );
+ * 	sound.play();
+ * });
+ *
+ * // create an object for the sound to play from
+ * const sphere = new THREE.SphereGeometry( 20, 32, 16 );
+ * const material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+ * const mesh = new THREE.Mesh( sphere, material );
+ * scene.add( mesh );
+ *
+ * // finally add the sound to the mesh
+ * mesh.add( sound );
+ *
+ * @augments Audio
+ */
 class PositionalAudio extends Audio {
 
+	/**
+	 * Constructs a positional audio.
+	 *
+	 * @param {AudioListener} listener - The global audio listener.
+	 */
 	constructor( listener ) {
 
 		super( listener );
 
+		/**
+		 * The panner node represents the location, direction, and behavior of an audio
+		 * source in 3D space.
+		 *
+		 * @type {PannerNode}
+		 * @readonly
+		 */
 		this.panner = this.context.createPanner();
 		this.panner.panningModel = 'HRTF';
 		this.panner.connect( this.gain );
@@ -38901,6 +41832,8 @@ class PositionalAudio extends Audio {
 
 		this.panner.connect( this.gain );
 
+		return this;
+
 	}
 
 	disconnect() {
@@ -38908,6 +41841,8 @@ class PositionalAudio extends Audio {
 		super.disconnect();
 
 		this.panner.disconnect( this.gain );
+
+		return this;
 
 	}
 
@@ -38917,12 +41852,25 @@ class PositionalAudio extends Audio {
 
 	}
 
+	/**
+	 * Returns the current reference distance.
+	 *
+	 * @return {number} The reference distance.
+	 */
 	getRefDistance() {
 
 		return this.panner.refDistance;
 
 	}
 
+	/**
+	 * Defines the reference distance for reducing volume as the audio source moves
+	 * further from the listener – i.e. the distance at which the volume reduction
+	 * starts taking effect.
+	 *
+	 * @param {number} value - The reference distance to set.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setRefDistance( value ) {
 
 		this.panner.refDistance = value;
@@ -38931,12 +41879,23 @@ class PositionalAudio extends Audio {
 
 	}
 
+	/**
+	 * Returns the current rolloff factor.
+	 *
+	 * @return {number} The rolloff factor.
+	 */
 	getRolloffFactor() {
 
 		return this.panner.rolloffFactor;
 
 	}
 
+	/**
+	 * Defines how quickly the volume is reduced as the source moves away from the listener.
+	 *
+	 * @param {number} value - The rolloff factor.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setRolloffFactor( value ) {
 
 		this.panner.rolloffFactor = value;
@@ -38945,12 +41904,27 @@ class PositionalAudio extends Audio {
 
 	}
 
+	/**
+	 * Returns the current distance model.
+	 *
+	 * @return {('linear'|'inverse'|'exponential')} The distance model.
+	 */
 	getDistanceModel() {
 
 		return this.panner.distanceModel;
 
 	}
 
+	/**
+	 * Defines which algorithm to use to reduce the volume of the audio source
+	 * as it moves away from the listener.
+	 *
+	 * Read [the spec]{@link https://www.w3.org/TR/webaudio-1.1/#enumdef-distancemodeltype}
+	 * for more details.
+	 *
+	 * @param {('linear'|'inverse'|'exponential')} value - The distance model to set.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setDistanceModel( value ) {
 
 		this.panner.distanceModel = value;
@@ -38959,12 +41933,26 @@ class PositionalAudio extends Audio {
 
 	}
 
+	/**
+	 * Returns the current max distance.
+	 *
+	 * @return {number} The max distance.
+	 */
 	getMaxDistance() {
 
 		return this.panner.maxDistance;
 
 	}
 
+	/**
+	 * Defines the maximum distance between the audio source and the listener,
+	 * after which the volume is not reduced any further.
+	 *
+	 * This value is used only by the `linear` distance model.
+	 *
+	 * @param {number} value - The max distance.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setMaxDistance( value ) {
 
 		this.panner.maxDistance = value;
@@ -38973,6 +41961,14 @@ class PositionalAudio extends Audio {
 
 	}
 
+	/**
+	 * Sets the directional cone in which the audio can be listened.
+	 *
+	 * @param {number} coneInnerAngle - An angle, in degrees, of a cone inside of which there will be no volume reduction.
+	 * @param {number} coneOuterAngle - An angle, in degrees, of a cone outside of which the volume will be reduced by a constant value, defined by the `coneOuterGain` parameter.
+	 * @param {number} coneOuterGain - The amount of volume reduction outside the cone defined by the `coneOuterAngle`. When set to `0`, no sound can be heard.
+	 * @return {Audio} A reference to this instance.
+	 */
 	setDirectionalCone( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
 
 		this.panner.coneInnerAngle = coneInnerAngle;
@@ -39019,20 +42015,72 @@ class PositionalAudio extends Audio {
 
 }
 
+/**
+ * This class can be used to analyse audio data.
+ *
+ * ```js
+ * // create an AudioListener and add it to the camera
+ * const listener = new THREE.AudioListener();
+ * camera.add( listener );
+ *
+ * // create an Audio source
+ * const sound = new THREE.Audio( listener );
+ *
+ * // load a sound and set it as the Audio object's buffer
+ * const audioLoader = new THREE.AudioLoader();
+ * audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+ * 	sound.setBuffer( buffer );
+ * 	sound.setLoop(true);
+ * 	sound.setVolume(0.5);
+ * 	sound.play();
+ * });
+ *
+ * // create an AudioAnalyser, passing in the sound and desired fftSize
+ * const analyser = new THREE.AudioAnalyser( sound, 32 );
+ *
+ * // get the average frequency of the sound
+ * const data = analyser.getAverageFrequency();
+ * ```
+ */
 class AudioAnalyser {
 
+	/**
+	 * Constructs a new audio analyzer.
+	 *
+	 * @param {Audio} audio - The audio to analyze.
+	 * @param {Audio} [fftSize=2048] - The window size in samples that is used when performing a Fast Fourier Transform (FFT) to get frequency domain data.
+	 */
 	constructor( audio, fftSize = 2048 ) {
 
+		/**
+		 * The global audio listener.
+		 *
+		 * @type {AnalyserNode}
+		 */
 		this.analyser = audio.context.createAnalyser();
 		this.analyser.fftSize = fftSize;
 
+		/**
+		 * Holds the analyzed data.
+		 *
+		 * @type {Uint8Array}
+		 */
 		this.data = new Uint8Array( this.analyser.frequencyBinCount );
 
 		audio.getOutput().connect( this.analyser );
 
 	}
 
-
+	/**
+	 * Returns an array with frequency data of the audio.
+	 *
+	 * Each item in the array represents the decibel value for a specific frequency.
+	 * The frequencies are spread linearly from 0 to 1/2 of the sample rate.
+	 * For example, for 48000 sample rate, the last item of the array will represent
+	 * the decibel value for 24000 Hz.
+	 *
+	 * @return {Uint8Array} The frequency data.
+	 */
 	getFrequencyData() {
 
 		this.analyser.getByteFrequencyData( this.data );
@@ -39041,6 +42089,11 @@ class AudioAnalyser {
 
 	}
 
+	/**
+	 * Returns the average of the frequencies returned by {@link AudioAnalyser#getFrequencyData}.
+	 *
+	 * @return {number} The average frequency.
+	 */
 	getAverageFrequency() {
 
 		let value = 0;
@@ -43156,7 +46209,7 @@ class Line3 {
 	/**
 	 * Returns the squared Euclidean distance between the line' start and end point.
 	 *
-	 * @return {Vector3} The squared Euclidean distance.
+	 * @return {number} The squared Euclidean distance.
 	 */
 	distanceSq() {
 
@@ -43167,7 +46220,7 @@ class Line3 {
 	/**
 	 * Returns the Euclidean distance between the line' start and end point.
 	 *
-	 * @return {Vector3} The Euclidean distance.
+	 * @return {number} The Euclidean distance.
 	 */
 	distance() {
 
@@ -43178,7 +46231,7 @@ class Line3 {
 	/**
 	 * Returns a vector at a certain position along the line segment.
 	 *
-	 * @param {Vector3} t - A value between `[0,1]` to represent a position along the line segment.
+	 * @param {number} t - A value between `[0,1]` to represent a position along the line segment.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
 	 * @return {Vector3} The delta vector.
 	 */
@@ -44164,7 +47217,7 @@ const _camera = /*@__PURE__*/ new Camera();
 class CameraHelper extends LineSegments {
 
 	/**
-	 * Constructs a new arror helper.
+	 * Constructs a new arrow helper.
 	 *
 	 * @param {Camera} camera - The camera to visualize.
 	 */
@@ -44775,7 +47828,7 @@ let _lineGeometry, _coneGeometry;
 class ArrowHelper extends Object3D {
 
 	/**
-	 * Constructs a new arror helper.
+	 * Constructs a new arrow helper.
 	 *
 	 * @param {Vector3} [dir=(0, 0, 1)] - The (normalized) direction vector.
 	 * @param {Vector3} [origin=(0, 0, 0)] - Point at which the arrow starts.
