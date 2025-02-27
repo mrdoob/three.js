@@ -10,7 +10,7 @@ import { AdditiveAnimationBlendMode } from '../constants.js';
  */
 function convertArray( array, type ) {
 
-	if ( ! array && array.constructor === type ) return array;
+	if ( ! array || array.constructor === type ) return array;
 
 	if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
 
