@@ -2558,17 +2558,6 @@ class WebGLRenderer {
 
 		this.copyFramebufferToTexture = function ( texture, position = null, level = 0 ) {
 
-			// support previous signature with position first
-			if ( texture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyFramebufferToTexture function signature has changed.' );
-
-				position = arguments[ 0 ] || null;
-				texture = arguments[ 1 ];
-
-			}
-
 			const levelScale = Math.pow( 2, - level );
 			const width = Math.floor( texture.image.width * levelScale );
 			const height = Math.floor( texture.image.height * levelScale );
@@ -2587,20 +2576,6 @@ class WebGLRenderer {
 		const _srcFramebuffer = _gl.createFramebuffer();
 		const _dstFramebuffer = _gl.createFramebuffer();
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
-
-			// support previous signature with dstPosition first
-			if ( srcTexture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
-
-				dstPosition = arguments[ 0 ] || null;
-				srcTexture = arguments[ 1 ];
-				dstTexture = arguments[ 2 ];
-				dstLevel = arguments[ 3 ] || 0;
-				srcRegion = null;
-
-			}
 
 			// support the previous signature with just a single dst mipmap level
 			if ( dstLevel === null ) {
@@ -2853,20 +2828,6 @@ class WebGLRenderer {
 		};
 
 		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
-
-			// support previous signature with source box first
-			if ( srcTexture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
-
-				srcRegion = arguments[ 0 ] || null;
-				dstPosition = arguments[ 1 ] || null;
-				srcTexture = arguments[ 2 ];
-				dstTexture = arguments[ 3 ];
-				level = arguments[ 4 ] || 0;
-
-			}
 
 			// @deprecated, r170
 			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
