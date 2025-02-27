@@ -546,7 +546,7 @@ class AnimationMixer extends EventDispatcher {
 	 * @param {AnimationClip|string} clip - An animaion clip or alternatively the name of the animation clip.
 	 * @param {Object3D} [optionalRoot] - An alternative root object.
 	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode] - The blend mode.
-	 * @return {AnimationAction} The animation action.
+	 * @return {?AnimationAction} The animation action.
 	 */
 	clipAction( clip, optionalRoot, blendMode ) {
 

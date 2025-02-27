@@ -119,7 +119,7 @@ class PropertyBinding {
 		/**
 		 * The object path to the animated property.
 		 *
-		 * @type {PropertyBinding}
+		 * @type {string}
 		 */
 		this.path = path;
 

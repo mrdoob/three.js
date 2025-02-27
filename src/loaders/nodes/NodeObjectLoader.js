@@ -14,7 +14,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Constructs a new node object loader.
 	 *
-	 * @param {?LoadingManager} manager - A reference to a loading manager.
+	 * @param {LoadingManager} [manager] - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -48,7 +48,7 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Defines the dictionary of node types.
 	 *
 	 * @param {Object<string,Node.constructor>} value - The node library defined as `<classname,class>`.
-	 * @return {NodeLoader} A reference to this loader.
+	 * @return {NodeObjectLoader} A reference to this loader.
 	 */
 	setNodes( value ) {
 
@@ -61,7 +61,7 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Defines the dictionary of node material types.
 	 *
 	 * @param {Object<string,NodeMaterial.constructor>} value - The node material library defined as `<classname,class>`.
-	 * @return {NodeLoader} A reference to this loader.
+	 * @return {NodeObjectLoader} A reference to this loader.
 	 */
 	setNodeMaterials( value ) {
 

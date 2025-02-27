@@ -31,7 +31,7 @@ class AudioAnalyser {
 	 * Constructs a new audio analyzer.
 	 *
 	 * @param {Audio} audio - The audio to analyze.
-	 * @param {Audio} [fftSize=2048] - The window size in samples that is used when performing a Fast Fourier Transform (FFT) to get frequency domain data.
+	 * @param {number} [fftSize=2048] - The window size in samples that is used when performing a Fast Fourier Transform (FFT) to get frequency domain data.
 	 */
 	constructor( audio, fftSize = 2048 ) {
 

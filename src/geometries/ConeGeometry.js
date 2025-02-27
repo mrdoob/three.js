@@ -22,8 +22,8 @@ class ConeGeometry extends CylinderGeometry {
 	 * @param {number} [radialSegments=32] - Number of segmented faces around the circumference of the cone.
 	 * @param {number} [heightSegments=1] - Number of rows of faces along the height of the cone.
 	 * @param {boolean} [openEnded=false] - Whether the base of the cone is open or capped.
-	 * @param {boolean} [thetaStart=0] - Start angle for first segment, in radians.
-	 * @param {boolean} [thetaLength=Math.PI*2] - The central angle, often called theta, of the circular sector, in radians.
+	 * @param {number} [thetaStart=0] - Start angle for first segment, in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - The central angle, often called theta, of the circular sector, in radians.
 	 * The default value results in a complete cone.
 	 */
 	constructor( radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
