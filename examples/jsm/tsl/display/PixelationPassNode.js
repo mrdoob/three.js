@@ -1,8 +1,6 @@
 import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property } from 'three/tsl';
 
-/** @module PixelationPassNode **/
-
 /**
  * A inner node definition that implements the actual pixelation TSL code.
  *
@@ -84,7 +82,7 @@ class PixelationNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -235,9 +233,9 @@ class PixelationPassNode extends PassNode {
 	 *
 	 * @param {Scene} scene - The scene to render.
 	 * @param {Camera} camera - The camera to render the scene with.
-	 * @param {Node<float> | Number} [pixelSize=6] - The pixel size.
-	 * @param {Node<float> | Number} [normalEdgeStrength=03] - The normal edge strength.
-	 * @param {Node<float> | Number} [depthEdgeStrength=03] - The depth edge strength.
+	 * @param {Node<float> | number} [pixelSize=6] - The pixel size.
+	 * @param {Node<float> | number} [normalEdgeStrength=03] - The normal edge strength.
+	 * @param {Node<float> | number} [depthEdgeStrength=03] - The depth edge strength.
 	 */
 	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
 
@@ -246,7 +244,7 @@ class PixelationPassNode extends PassNode {
 		/**
 		 * The pixel size.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 6
 		 */
 		this.pixelSize = pixelSize;
@@ -254,7 +252,7 @@ class PixelationPassNode extends PassNode {
 		/**
 		 * The normal edge strength.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0.3
 		 */
 		this.normalEdgeStrength = normalEdgeStrength;
@@ -262,7 +260,7 @@ class PixelationPassNode extends PassNode {
 		/**
 		 * The depth edge strength.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0.4
 		 */
 		this.depthEdgeStrength = depthEdgeStrength;
@@ -270,7 +268,7 @@ class PixelationPassNode extends PassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -286,8 +284,8 @@ class PixelationPassNode extends PassNode {
 	/**
 	 * Sets the size of the pass.
 	 *
-	 * @param {Number} width - The width of the pass.
-	 * @param {Number} height - The height of the pass.
+	 * @param {number} width - The width of the pass.
+	 * @param {number} height - The height of the pass.
 	 */
 	setSize( width, height ) {
 
@@ -321,12 +319,13 @@ class PixelationPassNode extends PassNode {
 /**
  * TSL function for creating a pixelation render pass node for post processing.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.
- * @param {Node<float> | Number} [pixelSize=6] - The pixel size.
- * @param {Node<float> | Number} [normalEdgeStrength=03] - The normal edge strength.
- * @param {Node<float> | Number} [depthEdgeStrength=03] - The depth edge strength.
+ * @param {Node<float> | number} [pixelSize=6] - The pixel size.
+ * @param {Node<float> | number} [normalEdgeStrength=03] - The normal edge strength.
+ * @param {Node<float> | number} [depthEdgeStrength=03] - The depth edge strength.
  * @returns {PixelationPassNode}
  */
 export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );

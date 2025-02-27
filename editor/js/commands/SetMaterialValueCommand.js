@@ -5,9 +5,9 @@ class SetMaterialValueCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} [attributeName='']
-	 * @param {Number|String|Boolean|Object|null} [newValue=null]
-	 * @param {Number} [materialSlot=-1]
+	 * @param {string} [attributeName='']
+	 * @param {number|string|boolean|Object|null} [newValue=null]
+	 * @param {number} [materialSlot=-1]
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {

@@ -11,17 +11,37 @@ class Timer {
 
 		this._timescale = 1;
 
+		this._document = null;
+		this._pageVisibilityHandler = null;
+
+	}
+
+	connect( document ) {
+
+		this._document = document;
+
 		// use Page Visibility API to avoid large time delta values
 
-		this._usePageVisibilityAPI = ( typeof document !== 'undefined' && document.hidden !== undefined );
-
-		if ( this._usePageVisibilityAPI === true ) {
+		if ( document.hidden !== undefined ) {
 
 			this._pageVisibilityHandler = handleVisibilityChange.bind( this );
 
 			document.addEventListener( 'visibilitychange', this._pageVisibilityHandler, false );
 
 		}
+
+	}
+
+	disconnect() {
+
+		if ( this._pageVisibilityHandler !== null ) {
+
+			this._document.removeEventListener( 'visibilitychange', this._pageVisibilityHandler );
+			this._pageVisibilityHandler = null;
+
+		}
+
+		this._document = null;
 
 	}
 
@@ -61,11 +81,7 @@ class Timer {
 
 	dispose() {
 
-		if ( this._usePageVisibilityAPI === true ) {
-
-			document.removeEventListener( 'visibilitychange', this._pageVisibilityHandler );
-
-		}
+		this.disconnect();
 
 		return this;
 
@@ -73,8 +89,7 @@ class Timer {
 
 	update( timestamp ) {
 
-
-		if ( this._usePageVisibilityAPI === true && document.hidden === true ) {
+		if ( this._pageVisibilityHandler !== null && this._document.hidden === true ) {
 
 			this._delta = 0;
 
@@ -121,7 +136,7 @@ function now() {
 
 function handleVisibilityChange() {
 
-	if ( document.hidden === false ) this.reset();
+	if ( this._document.hidden === false ) this.reset();
 
 }
 

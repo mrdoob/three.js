@@ -5,9 +5,9 @@ class SetMaterialColorCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} attributeName
-	 * @param {Number|null} [newValue=null] Integer representing a hex color value
-	 * @param {Number} [materialSlot=-1]
+	 * @param {string} attributeName
+	 * @param {?number} [newValue=null] Integer representing a hex color value
+	 * @param {number} [materialSlot=-1]
 	 * @constructor
 	 */
 	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {

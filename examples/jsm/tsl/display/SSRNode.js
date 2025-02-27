@@ -1,8 +1,6 @@
 import { NearestFilter, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
 import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 
-/** @module SSRNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
@@ -76,7 +74,7 @@ class SSRNode extends TempNode {
 		 * to `1` improves quality but also results in more
 		 * computational overhead.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0.5
 		 */
 		this.resolutionScale = 0.5;
@@ -85,7 +83,7 @@ class SSRNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -211,8 +209,8 @@ class SSRNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -528,6 +526,7 @@ export default SSRNode;
 /**
  * TSL function for creating screen space reflections (SSR).
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.

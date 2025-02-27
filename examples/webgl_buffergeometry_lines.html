@@ -24,9 +24,10 @@
 
 			import * as THREE from 'three';
 
+			import { Timer } from 'three/addons/misc/Timer.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let container, stats, clock;
+			let container, stats, timer;
 
 			let camera, scene, renderer;
 
@@ -49,7 +50,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new Timer();
+				timer.connect( document );
 
 				const geometry = new THREE.BufferGeometry();
 				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
@@ -117,8 +119,10 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const delta = timer.getDelta();
+				const time = timer.getElapsed();
 
 				line.rotation.x = time * 0.25;
 				line.rotation.y = time * 0.5;

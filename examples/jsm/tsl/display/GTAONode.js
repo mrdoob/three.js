@@ -1,8 +1,6 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
 
-/** @module GTAONode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -44,7 +42,7 @@ class GTAONode extends TempNode {
 	 * Constructs a new GTAO node.
 	 *
 	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
-	 * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
 	constructor( depthNode, normalNode, camera ) {
@@ -63,7 +61,7 @@ class GTAONode extends TempNode {
 		 * constructor (because MRT is not available), normals can be automatically
 		 * reconstructed from depth values in the shader.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 */
 		this.normalNode = normalNode;
 
@@ -71,7 +69,7 @@ class GTAONode extends TempNode {
 		 * The resolution scale. By default the effect is rendered in full resolution
 		 * for best quality but a value of `0.5` should be sufficient for most scenes.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.resolutionScale = 1;
@@ -80,7 +78,7 @@ class GTAONode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -224,8 +222,8 @@ class GTAONode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -417,7 +415,7 @@ export default GTAONode;
 /**
  * Generates the AO's noise texture for the given size.
  *
- * @param {Number} [size=5] - The noise size.
+ * @param {number} [size=5] - The noise size.
  * @return {DataTexture} The generated noise texture.
  */
 function generateMagicSquareNoise( size = 5 ) {
@@ -455,8 +453,8 @@ function generateMagicSquareNoise( size = 5 ) {
 /**
  * Computes an array of magic square values required to generate the noise texture.
  *
- * @param {Number} size - The noise size.
- * @return {Array<Number>} The magic square values.
+ * @param {number} size - The noise size.
+ * @return {Array<number>} The magic square values.
  */
 function generateMagicSquare( size ) {
 
@@ -513,9 +511,10 @@ function generateMagicSquare( size ) {
 /**
  * TSL function for creating a Ground Truth Ambient Occlusion (GTAO) effect.
  *
+ * @tsl
  * @function
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
- * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+ * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {GTAONode}
  */

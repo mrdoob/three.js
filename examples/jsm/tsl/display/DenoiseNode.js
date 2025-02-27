@@ -2,8 +2,6 @@ import { DataTexture, RepeatWrapping, Vector2, Vector3, TempNode } from 'three/w
 import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 import { SimplexNoise } from '../../math/SimplexNoise.js';
 
-/** @module DenoiseNode **/
-
 /**
  * Post processing node for denoising data like raw screen-space ambient occlusion output.
  * Denoise can noticeably improve the quality of ambient occlusion but also add quite some
@@ -27,7 +25,7 @@ class DenoiseNode extends TempNode {
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect (e.g. AO).
 	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
-	 * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
 	constructor( textureNode, depthNode, normalNode, camera ) {
@@ -53,7 +51,7 @@ class DenoiseNode extends TempNode {
 		 * constructor (because MRT is not available), normals can be automatically
 		 * reconstructed from depth values in the shader.
 		 *
-		 * @type {Node<vec3>?}
+		 * @type {?Node<vec3>}
 		 */
 		this.normalNode = normalNode;
 
@@ -103,7 +101,7 @@ class DenoiseNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -261,9 +259,9 @@ export default DenoiseNode;
 /**
  * Generates denoise samples based on the given parameters.
  *
- * @param {Number} numSamples - The number of samples.
- * @param {Number} numRings - The number of rings.
- * @param {Number} radiusExponent - The radius exponent.
+ * @param {number} numSamples - The number of samples.
+ * @param {number} numRings - The number of rings.
+ * @param {number} radiusExponent - The radius exponent.
  * @return {Array<Vector3>} The denoise samples.
  */
 function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
@@ -285,7 +283,7 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 /**
  * Generates a default noise texture for the given size.
  *
- * @param {Number} [size=64] - The texture size.
+ * @param {number} [size=64] - The texture size.
  * @return {DataTexture} The generated noise texture.
  */
 function generateDefaultNoise( size = 64 ) {
@@ -323,10 +321,11 @@ function generateDefaultNoise( size = 64 ) {
 /**
  * TSL function for creating a denoise effect.
  *
+ * @tsl
  * @function
  * @param {Node} node - The node that represents the input of the effect (e.g. AO).
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
- * @param {Node<vec3>?} normalNode - A node that represents the scene's normals.
+ * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {DenoiseNode}
  */

@@ -427,7 +427,7 @@ class Volume {
 	/**
 	 * Call repaint on all the slices extracted from this volume
 	 *
-	 * @see VolumeSlice.repaint
+	 * @see {@link VolumeSlice#repaint}
 	 * @memberof Volume
 	 * @returns {Volume} this
 	 */

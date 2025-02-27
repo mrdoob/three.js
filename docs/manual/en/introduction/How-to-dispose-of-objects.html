@@ -57,6 +57,13 @@
 		for realizing custom rendering destinations. These objects are only deallocated by executing [page:WebGLRenderTarget.dispose]().
 	</p>
 
+	<h2>Skinned Mesh</h2>
+
+	<p>
+		Skinned meshes represent their bone hierarchy as skeletons. If you don't need a skinned mesh anymore, consider to call [page:Skeleton.dispose]() on the skeleton to free internal resources.
+		Keep in mind that skeletons can be shared across multiple skinned meshes, so only call `dispose()` if the skeleton is not used by other active skinned meshes.
+	</p>
+
 	<h2>Miscellaneous</h2>
 
 	<p>
@@ -99,7 +106,7 @@
 	<h3>What happens when I call `dispose()` and then use the respective object at a later point?</h3>
 
 	<p>
-		That depends. For geometries, materials, textures, render targets and post processing passes the deleted internal resources can be created again by the engine. 
+		That depends. For geometries, materials, textures, render targets and post processing passes the deleted internal resources can be created again by the engine.
 		So no runtime error will occur but you might notice a negative performance impact for the current frame, especially when shader programs have to be compiled.
 
 		Controls and renderers are an exception. Instances of these classes can not be used after `dispose()` has been called. You have to create new instances in this case.
@@ -112,6 +119,18 @@
 		it's not always necessary to dispose objects all the time. A good example for this is a game which consists of multiple levels. A good place for object disposal is when
 		switching the level. The app could traverse through the old scene and dispose all obsolete materials, geometries and textures. As mentioned in the previous section, it does not
 		produce a runtime error if you dispose an object that is actually still in use. The worst thing that can happen is performance drop for a single frame.
+	</p>
+
+	<h3>Why `renderer.info.memory` is still reporting geometries and textures after traversing the scene and disposing all reachable textures and geometries?</h3>
+
+	<p>
+		In certain cases, there are some textures and geometries used internally by Three.js
+		that are not reachable when traversing the scene graph in order to be disposed.
+		It is expected that `renderer.info.memory` will still report them even after a full scene cleanup.
+		However, they do not leak, but they are reused on consecutive scene cleanup/repopulating cycles.
+
+		These cases could be related to using `material.envMap`, `scene.background`, `scene.environment`,
+		or other contexts that would require the engine to create textures or geometries for internal use.
 	</p>
 
 	<h2>Examples that demonstrate the usage of dispose()</h2>

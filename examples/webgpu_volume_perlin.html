@@ -24,8 +24,11 @@
 		</script>
 
 		<script type="module">
+
 			import * as THREE from 'three';
-			import { Break, If, vec3, materialReference, Fn } from 'three/tsl';
+			import { Break, If, vec3, vec4, texture3D, uniform, Fn } from 'three/tsl';
+
+			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
@@ -86,52 +89,54 @@
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
 
-				// Material
+				// Shader
 
-				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const material = new THREE.VolumeNodeMaterial( {
-					side: THREE.BackSide
-				} );
+				const opaqueRaymarchingTexture = Fn( ( { texture, steps, threshold } ) => {
 
-				material.base = new THREE.Color( 0x798aa0 );
-				material.map = texture;
-				material.steps = 200;
-				material.threshold = 0.6;
+					const finalColor = vec4( 0 ).toVar();
 
-				const threshold = materialReference( 'threshold', 'float' );
+					RaymarchingBox( steps, ( { positionRay } ) => {
 
-				material.testNode = Fn( ( { map, mapValue, probe, finalColor } ) => {
+						const mapValue = texture.sample( positionRay.add( 0.5 ) ).r.toVar();
 
-					If( mapValue.greaterThan( threshold ), () => {
+						If( mapValue.greaterThan( threshold ), () => {
 
-						const p = vec3( probe ).add( 0.5 );
+							const p = vec3( positionRay ).add( 0.5 );
 
-						finalColor.rgb.assign( map.normal( p ).mul( 0.5 ).add( probe.mul( 1.5 ).add( 0.25 ) ) );
-						finalColor.a.assign( 1 );
-						Break();
+							finalColor.rgb.assign( texture.normal( p ).mul( 0.5 ).add( positionRay.mul( 1.5 ).add( 0.25 ) ) );
+							finalColor.a.assign( 1 );
+							Break();
+
+						} );
 
 					} );
 
+					return finalColor;
+
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
+				//
 
+				const threshold = uniform( 0.6 );
+				const steps = uniform( 200 );
+
+				const material = new THREE.NodeMaterial();
+				material.colorNode = opaqueRaymarchingTexture( {
+					texture: texture3D( texture, null, 0 ),
+					steps,
+					threshold
+				} );
+				material.side = THREE.BackSide;
+				material.transparent = true;
+
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), material );
 				scene.add( mesh );
 
 				//
 
-				const parameters = { threshold: 0.6, steps: 200 };
-
-				function update() {
-
-					material.threshold = parameters.threshold;
-					material.steps = parameters.steps;
-
-				}
-
 				const gui = new GUI();
-				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'steps', 0, 300, 1 ).onChange( update );
+				gui.add( threshold, 'value', 0, 1, 0.01 ).name( 'threshold' );
+				gui.add( steps, 'value', 0, 300, 1 ).name( 'steps' );
 
 				window.addEventListener( 'resize', onWindowResize );
 

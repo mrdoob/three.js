@@ -5,9 +5,9 @@ class SetScriptValueCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} object
-	 * @param {String} script
-	 * @param {String} attributeName
-	 * @param {String} newValue
+	 * @param {string} script
+	 * @param {string} attributeName
+	 * @param {string} newValue
 	 * @constructor
 	 */
 	constructor( editor, object = null, script = '', attributeName = '', newValue = null ) {

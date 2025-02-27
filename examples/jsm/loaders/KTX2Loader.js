@@ -324,7 +324,7 @@ class KTX2Loader extends Loader {
 
 	/**
 	 * @param {ArrayBuffer} buffer
-	 * @param {object?} config
+	 * @param {?Object} config
 	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
 	 */
 	async _createTexture( buffer, config = {} ) {

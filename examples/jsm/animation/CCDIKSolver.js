@@ -57,6 +57,22 @@ class CCDIKSolver {
 		this.mesh = mesh;
 		this.iks = iks;
 
+		this._initialQuaternions = [];
+		this._workingQuaternion = new Quaternion();
+
+		for ( const ik of iks ) {
+
+			const chainQuats = [];
+			for ( let i = 0; i < ik.links.length; i ++ ) {
+
+			  chainQuats.push( new Quaternion() );
+
+			}
+
+			this._initialQuaternions.push( chainQuats );
+
+		}
+
 		this._valid();
 
 	}
@@ -64,15 +80,16 @@ class CCDIKSolver {
 	/**
 	 * Update all IK bones.
 	 *
+	 * @param {number} [globalBlendFactor=1.0] - Blend factor applied if an IK chain doesn't have its own .blendFactor.
 	 * @return {CCDIKSolver}
 	 */
-	update() {
+	update( globalBlendFactor = 1.0 ) {
 
 		const iks = this.iks;
 
 		for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
-			this.updateOne( iks[ i ] );
+			this.updateOne( iks[ i ], globalBlendFactor );
 
 		}
 
@@ -84,11 +101,15 @@ class CCDIKSolver {
 	 * Update one IK bone
 	 *
 	 * @param {Object} ik parameter
+	 * @param {number} [overrideBlend=1.0] - If the ik object does not define .blendFactor, this value is used.
 	 * @return {CCDIKSolver}
 	 */
-	updateOne( ik ) {
+	updateOne( ik, overrideBlend = 1.0 ) {
 
+		const chainBlend = ik.blendFactor !== undefined ? ik.blendFactor : overrideBlend;
 		const bones = this.mesh.skeleton.bones;
+		const chainIndex = this.iks.indexOf( ik );
+		const initialQuaternions = this._initialQuaternions[ chainIndex ];
 
 		// for reference overhead reduction in loop
 		const math = Math;
@@ -102,6 +123,17 @@ class CCDIKSolver {
 
 		const links = ik.links;
 		const iteration = ik.iteration !== undefined ? ik.iteration : 1;
+
+		if ( chainBlend < 1.0 ) {
+
+			for ( let j = 0; j < links.length; j ++ ) {
+
+			  const linkIndex = links[ j ].index;
+			  initialQuaternions[ j ].copy( bones[ linkIndex ].quaternion );
+
+			}
+
+		}
 
 		for ( let i = 0; i < iteration; i ++ ) {
 
@@ -205,7 +237,23 @@ class CCDIKSolver {
 
 		}
 
-		return this;
+		if ( chainBlend < 1.0 ) {
+
+			for ( let j = 0; j < links.length; j ++ ) {
+
+			  const linkIndex = links[ j ].index;
+			  const link = bones[ linkIndex ];
+
+			  this._workingQuaternion.copy( initialQuaternions[ j ] ).slerp( link.quaternion, chainBlend );
+
+			  link.quaternion.copy( this._workingQuaternion );
+			  link.updateMatrixWorld( true );
+
+			}
+
+		}
+
+		  return this;
 
 	}
 
@@ -332,7 +380,7 @@ class CCDIKHelper extends Object3D {
 	/**
 	 * Updates IK bones visualization.
 	 *
-	 * @param {Boolean} force
+	 * @param {boolean} force
 	 */
 	updateMatrixWorld( force ) {
 

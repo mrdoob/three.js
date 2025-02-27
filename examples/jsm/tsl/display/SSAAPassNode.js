@@ -1,8 +1,6 @@
 import { AdditiveBlending, Color, Vector2, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
 import { nodeObject, uniform, mrt, texture, getTextureIndex } from 'three/tsl';
 
-/** @module SSAAPassNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
@@ -39,7 +37,7 @@ class SSAAPassNode extends PassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -49,7 +47,7 @@ class SSAAPassNode extends PassNode {
 		 * The sample level specified  as n, where the number of samples is 2^n,
 		 * so sampleLevel = 4, is 2^4 samples, 16.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 4
 		 */
 		this.sampleLevel = 4;
@@ -57,7 +55,7 @@ class SSAAPassNode extends PassNode {
 		/**
 		 * Whether rounding errors should be mitigated or not.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @default true
 		 */
 		this.unbiased = true;
@@ -73,7 +71,7 @@ class SSAAPassNode extends PassNode {
 		/**
 		 * The clear alpha of the pass.
 		 *
-		 * @type {Number}
+		 * @type {number}
 		 * @default 0
 		 */
 		this.clearAlpha = 0;
@@ -90,7 +88,8 @@ class SSAAPassNode extends PassNode {
 		 * Reference to the internal render target that holds the current sample.
 		 *
 		 * @private
-		 * @type {RenderTarget?}
+		 * @type {?RenderTarget}
+		 * @default null
 		 */
 		this._sampleRenderTarget = null;
 
@@ -349,6 +348,7 @@ const _JitterVectors = [
 /**
  * TSL function for creating a SSAA pass node for Supersampling Anti-Aliasing.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

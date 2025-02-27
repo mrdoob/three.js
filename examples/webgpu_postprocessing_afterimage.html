@@ -7,6 +7,12 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - postprocessing - after image<br />
+			Based on <a href="https://web.archive.org/web/20220629101314/http://oos.moxiecode.com/js_webgl/spiral/" target="_blank" rel="noopener">Particle Spiral</a>
+			by <a href="https://github.com/oosmoxiecode" target="_blank" rel="noopener">oosmoxiecode</a>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -21,62 +27,145 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { instancedBufferAttribute, mod, pass, texture, float, time, vec2, vec3, vec4, sin, cos } from 'three/tsl';
 			import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, scene, renderer;
-			let mesh, postProcessing, combinedPass;
+			let camera, scene, renderer, particles, stats;
+			let postProcessing, afterImagePass, scenePass;
 
 			const params = {
 
-				damp: 0.96
+				damp: 0.8,
+				enabled: true
 
 			};
 
 			init();
-			createGUI();
 
 			function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 400;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
-				const geometry = new THREE.TorusKnotGeometry( 100, 30, 100, 16 );
-				const material = new THREE.MeshNormalMaterial();
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				const sprite = new THREE.TextureLoader().load( 'textures/sprites/circle.png' );
+
+				// geometry
+
+				const radius = 600;
+				const count = 50000;
+
+				const vertex = new THREE.Vector3();
+				const color = new THREE.Color();
+
+				const colors = [];
+				const vertices = [];
+				const timeOffsets = [];
+
+				for ( var i = 0; i < count; i ++ ) {
+
+					getRandomPointOnSphere( radius, vertex );
+					vertices.push( vertex.x, vertex.y, vertex.z );
+
+					color.setHSL( i / count, 0.7, 0.7, THREE.SRGBColorSpace );
+					colors.push( color.r, color.g, color.b );
+
+					timeOffsets.push( i / count );
+			
+				}
+
+				const positionAttribute = new THREE.InstancedBufferAttribute( new Float32Array( vertices ), 3 );
+				const colorAttribute = new THREE.InstancedBufferAttribute( new Float32Array( colors ), 3 );
+				const timeAttribute = new THREE.InstancedBufferAttribute( new Float32Array( timeOffsets ), 1 );
+
+				// material and TSL
+
+				const material = new THREE.SpriteNodeMaterial( { blending: THREE.AdditiveBlending, depthWrite: false } );
+
+				const localTime = instancedBufferAttribute( timeAttribute ).add( time.mul( 0.1 ) );
+				const modTime = mod( localTime, 1.0 );
+				const accTime = modTime.mul( modTime );
+
+				const angle = accTime.mul( 40.0 );
+				const pulse = vec2( sin( angle ).mul( 20.0 ), cos( angle ).mul( 20.0 ) );
+				const pos = instancedBufferAttribute( positionAttribute );
+
+				const animated = vec3( pos.x.mul( accTime ).add( pulse.x ), pos.y.mul( accTime ).add( pulse.y ), pos.z.mul( accTime ).mul( 1.75 ) );
+				const fAlpha = modTime.oneMinus().mul( 2.0 );
+
+				material.colorNode = texture( sprite ).mul( vec4( instancedBufferAttribute( colorAttribute ), fAlpha ) );
+				material.positionNode = animated;
+				material.scaleNode = float( 2 );
+
+				particles = new THREE.Sprite( material );
+				particles.count = count;
+				scene.add( particles );
 
 				// postprocessing
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				scenePass = pass( scene, camera );
 
-				combinedPass = scenePassColor;
-				combinedPass = afterImage( combinedPass, params.damp );
+				afterImagePass = afterImage( scenePass, params.damp );
 
-				postProcessing.outputNode = combinedPass;
+				postProcessing.outputNode = afterImagePass;
+
+				//
+
+				const gui = new GUI( { title: 'Damp setting' } );
+				gui.add( afterImagePass.damp, 'value', 0.25, 1 );
+				gui.add( params, 'enabled' ).onChange( updatePassChain );
+
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function createGUI() {
+			function updatePassChain() {
 
-				const gui = new GUI( { title: 'Damp setting' } );
-				gui.add( combinedPass.damp, 'value', 0, 1 ).step( 0.001 );
+				if ( params.enabled === true ) {
+
+					postProcessing.outputNode = afterImagePass;
+
+				} else {
+
+					postProcessing.outputNode = scenePass;
+
+				}
+
+				postProcessing.needsUpdate = true;
+
+
+			}
+
+
+			function getRandomPointOnSphere( r, v ) {
+
+				const angle = Math.random() * Math.PI * 2;
+				const u = Math.random() * 2 - 1;
+			
+				v.set(
+					Math.cos( angle ) * Math.sqrt( 1 - Math.pow( u, 2 ) ) * r,
+					Math.sin( angle ) * Math.sqrt( 1 - Math.pow( u, 2 ) ) * r,
+					u * r
+				);
+			
+				return v;
 
 			}
 
@@ -89,19 +178,13 @@
 
 			}
 
-			function render() {
+			function animate( time ) {
 
-				mesh.rotation.x += 0.0075;
-				mesh.rotation.y += 0.015;
-
+				particles.rotation.z = time * 0.001;
 
 				postProcessing.render();
 
-			}
-
-			function animate() {
-
-				render();
+				stats.update();
 
 			}
 

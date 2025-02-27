@@ -5,7 +5,7 @@ class AddScriptCommand extends Command {
 	/**
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} [object=null]
-	 * @param {String} [script='']
+	 * @param {string} [script='']
 	 * @constructor
 	 */
 	constructor( editor, object = null, script = '' ) {

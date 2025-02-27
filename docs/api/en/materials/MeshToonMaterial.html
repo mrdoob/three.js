@@ -121,6 +121,7 @@
 		<h3>[property:Float displacementBias]</h3>
 		<p>
 			The offset of the displacement map's values on the mesh's vertices.
+			The bias is added to the scaled sample of the displacement map.
 			Without a displacement map set, this value is not applied. Default is `0`.
 		</p>
 
@@ -150,7 +151,7 @@
 		<h3>[property:Texture gradientMap]</h3>
 		<p>
 			Gradient map for toon shading. It's required to set
-			[page:Texture.minFilter] and [page:Texture.magFilter] to [page:Textures THREE.NearestFilter] 
+			[page:Texture.minFilter] and [page:Texture.magFilter] to [page:Textures THREE.NearestFilter]
 			when using this type of texture. Default is `null`.
 		</p>
 
@@ -165,7 +166,7 @@
 		<h3>[property:Texture map]</h3>
 		<p>
 			The color map. May optionally include an alpha channel, typically combined
-			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest]. 
+			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest].
 			Default is null. The texture map color is modulated by the diffuse [page:.color].
 		</p>
 
@@ -205,7 +206,7 @@
 			"square". Default is 'round'.<br /><br />
 
 			This corresponds to the
-			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap] 
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
@@ -215,7 +216,7 @@
 			"miter". Default is 'round'.<br /><br />
 
 			This corresponds to the
-			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin] 
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
@@ -224,7 +225,7 @@
 			Controls wireframe thickness. Default is `1`.<br /><br />
 
 			Due to limitations of the
-			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
 			with the [page:WebGLRenderer WebGL] renderer on most
 			platforms linewidth will always be `1` regardless of the set value.
 		</p>

@@ -1,12 +1,11 @@
 import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
 
-/** @module HashBlur **/
-
 /**
  * Applies a hash blur effect to the given texture node.
  *
  * Reference: {@link https://www.shadertoy.com/view/4lXXWn}.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} textureNode - The texture node that should be blurred.
  * @param {Node<float>} [bluramount=float(0.1)] - This node determines the amount of blur.

@@ -7,7 +7,7 @@ class SetMaterialCommand extends Command {
 	 * @param {Editor} editor
 	 * @param {THREE.Object3D|null} object
 	 * @param {THREE.Material|null} newMaterial
-	 * @param {Number} [materialSlot=-1]
+	 * @param {number} [materialSlot=-1]
 	 * @constructor
 	 */
 	constructor( editor, object = null, newMaterial = null, materialSlot = - 1 ) {

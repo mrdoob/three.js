@@ -12,7 +12,7 @@ import {
 /**
  * This class has been made to hold a slice of a volume data
  * @class
- * @see Volume
+ * @see {@link Volume}
  */
 class VolumeSlice {
 
@@ -29,7 +29,7 @@ class VolumeSlice {
 		 */
 		this.volume = volume;
 		/**
-		 * @member {Number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
+		 * @member {number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
 		 */
 		index = index || 0;
 		Object.defineProperty( this, 'index', {
@@ -47,7 +47,7 @@ class VolumeSlice {
 			}
 		} );
 		/**
-		 * @member {String} axis The normal axis
+		 * @member {string} axis The normal axis
 		 */
 		this.axis = axis || 'z';
 
@@ -80,25 +80,25 @@ class VolumeSlice {
 		this.mesh = new Mesh( this.geometry, material );
 		this.mesh.matrixAutoUpdate = false;
 		/**
-		 * @member {Boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
+		 * @member {boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
 		 */
 		this.geometryNeedsUpdate = true;
 		this.repaint();
 
 		/**
-		 * @member {Number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
+		 * @member {number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
 		 */
 
 		/**
-		 * @member {Number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
+		 * @member {number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
 		 */
 
 		/**
 		 * @member {Function} sliceAccess Function that allow the slice to access right data
-		 * @see Volume.extractPerpendicularPlane
-		 * @param {Number} i The first coordinate
-		 * @param {Number} j The second coordinate
-		 * @returns {Number} the index corresponding to the voxel in volume.data of the given position in the slice
+		 * @see {@link Volume#extractPerpendicularPlane}
+		 * @param {number} i The first coordinate
+		 * @param {number} j The second coordinate
+		 * @returns {number} the index corresponding to the voxel in volume.data of the given position in the slice
 		 */
 
 
@@ -192,7 +192,7 @@ class VolumeSlice {
 
 	/**
 	 * Refresh the geometry according to axis and index
-	 * @see Volume.extractPerpendicularPlane
+	 * @see {@link Volume#extractPerpendicularPlane}
 	 * @memberof VolumeSlice
 	 */
 	updateGeometry() {

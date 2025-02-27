@@ -151,8 +151,8 @@ class OBB {
 	* by Christer Ericson (chapter 4.4.1)
 	*
 	* @param {OBB} obb
-	* @param {Number} [epsilon=Number.EPSILON] - A small value to prevent arithmetic errors
-	* @returns {Boolean}
+	* @param {number} [epsilon=Number.EPSILON] - A small value to prevent arithmetic errors
+	* @returns {boolean}
 	*/
 	intersectsOBB( obb, epsilon = Number.EPSILON ) {
 
@@ -294,7 +294,7 @@ class OBB {
 	* by Christer Ericson (chapter 5.2.3)
 	*
 	* @param {Plane} plane
-	* @returns {Boolean}
+	* @returns {boolean}
 	*/
 	intersectsPlane( plane ) {
 
@@ -322,7 +322,7 @@ class OBB {
 	*
 	* @param {Ray} ray
 	* @param {Vector3} result
-	* @return {Vector3?}
+	* @return {?Vector3}
 	*/
 	intersectRay( ray, result ) {
 
@@ -363,7 +363,7 @@ class OBB {
 	* there is a intersection or not.
 	*
 	* @param {Ray} ray
-	* @returns {Boolean}
+	* @returns {boolean}
 	*/
 	intersectsRay( ray ) {
 

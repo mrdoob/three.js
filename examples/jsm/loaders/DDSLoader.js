@@ -126,7 +126,7 @@ class DDSLoader extends CompressedTextureLoader {
 					byteArray[ dst ] = r; dst ++;	//r
 					byteArray[ dst ] = g; dst ++;	//g
 					byteArray[ dst ] = b; dst ++;	//b
-                    			byteArray[ dst ] = 1.0; dst ++; //a
+					byteArray[ dst ] = 255; dst ++; //a
 
 				}
 

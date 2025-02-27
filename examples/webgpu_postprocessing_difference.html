@@ -62,6 +62,7 @@
 				scene.background = new THREE.Color( 0x0487e2 );
 
 				timer = new Timer();
+				timer.connect( document );
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 				texture.colorSpace = THREE.SRGBColorSpace;

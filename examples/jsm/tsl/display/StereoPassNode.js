@@ -1,8 +1,6 @@
 import { StereoCamera, Vector2, PassNode, RendererUtils } from 'three/webgpu';
 import { nodeObject } from 'three/tsl';
 
-/** @module StereoPassNode **/
-
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
@@ -33,7 +31,7 @@ class StereoPassNode extends PassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -112,6 +110,7 @@ export default StereoPassNode;
 /**
  * TSL function for creating a stereo pass node for stereoscopic rendering.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

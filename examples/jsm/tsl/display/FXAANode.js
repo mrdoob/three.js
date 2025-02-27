@@ -1,8 +1,6 @@
 import { Vector2, TempNode } from 'three/webgpu';
 import { nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
 
-/** @module FXAANode **/
-
 /**
  * Post processing node for applying FXAA. This node requires sRGB input
  * so tone mapping and color space conversion must happen before the anti-aliasing.
@@ -37,7 +35,7 @@ class FXAANode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -358,6 +356,7 @@ export default FXAANode;
 /**
  * TSL function for creating a FXAA node for anti-aliasing via post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {FXAANode}

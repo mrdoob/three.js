@@ -2,8 +2,6 @@ import { Matrix3, NodeMaterial } from 'three/webgpu';
 import { clamp, nodeObject, Fn, vec4, uv, uniform, max } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 
-/** @module AnaglyphPassNode **/
-
 /**
  * A render pass node that creates an anaglyph effect.
  *
@@ -30,7 +28,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		/**
 		 * This flag can be used for type testing.
 		 *
-		 * @type {Boolean}
+		 * @type {boolean}
 		 * @readonly
 		 * @default true
 		 */
@@ -99,6 +97,7 @@ export default AnaglyphPassNode;
 /**
  * TSL function for creating an anaglyph pass node.
  *
+ * @tsl
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.

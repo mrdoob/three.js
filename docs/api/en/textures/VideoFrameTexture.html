@@ -13,8 +13,8 @@
 
 		<p class="desc">
 			This class can be used as an alternative way to define video data. Instead of using
-			an instance of `HTMLVideoElement` like with `VideoTexture`, [name] expects each frame is 
-			defined manaully via [page:.setFrame setFrame](). A typical use case for this module is when
+			an instance of `HTMLVideoElement` like with `VideoTexture`, [name] expects each frame is
+			defined manually via [page:.setFrame setFrame](). A typical use case for this module is when
 			video frames are decoded with the WebCodecs API.
 		</p>
 
@@ -33,30 +33,30 @@
 
 		<h2>Constructor</h2>
 		<h3>
-			[name]( [param:Constant mapping], [param:Constant wrapS], 
-			[param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], 
+			[name]( [param:Constant mapping], [param:Constant wrapS],
+			[param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter],
 			[param:Constant format], [param:Constant type], [param:Number anisotropy] )
 		</h3>
 		<p>
 			[page:Constant mapping] -- How the image is applied to the object. An
-			object type of [page:Textures THREE.UVMapping]. 
+			object type of [page:Textures THREE.UVMapping].
 			See [page:Textures mapping constants] for other choices.<br />
 
-			[page:Constant wrapS] -- The default is [page:Textures THREE.ClampToEdgeWrapping]. 
+			[page:Constant wrapS] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
 			See [page:Textures wrap mode constants] for
 			other choices.<br />
 
-			[page:Constant wrapT] -- The default is [page:Textures THREE.ClampToEdgeWrapping]. 
+			[page:Constant wrapT] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
 			See [page:Textures wrap mode constants] for
 			other choices.<br />
 
 			[page:Constant magFilter] -- How the texture is sampled when a texel
-			covers more than one pixel. The default is [page:Textures THREE.LinearFilter]. 
+			covers more than one pixel. The default is [page:Textures THREE.LinearFilter].
 			See [page:Textures magnification filter constants]
 			for other choices.<br />
 
 			[page:Constant minFilter] -- How the texture is sampled when a texel
-			covers less than one pixel. The default is [page:Textures THREE.LinearFilter]. 
+			covers less than one pixel. The default is [page:Textures THREE.LinearFilter].
 			See [page:Textures minification filter constants] for
 			other choices.<br />
 
@@ -88,7 +88,7 @@
 
 		<h3>[method:undefined setFrame]( [param:VideoFrame frame] )</h3>
 		<p>
-			Sets the current frame of the video. This will automatically update the texture 
+			Sets the current frame of the video. This will automatically update the texture
 			so the data can be used for rendering.
 		</p>
 

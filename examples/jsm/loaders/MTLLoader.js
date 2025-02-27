@@ -28,12 +28,12 @@ class MTLLoader extends Loader {
 	/**
 	 * Loads and parses a MTL asset from a URL.
 	 *
-	 * @param {String} url - URL to the MTL file.
+	 * @param {string} url - URL to the MTL file.
 	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
 	 * @param {Function} [onProgress] - Callback for download progress.
 	 * @param {Function} [onError] - Callback for download errors.
 	 *
-	 * @see setPath setResourcePath
+	 * @see {@link FileLoader#setPath} {@link FileLoader#setResourcePath}
 	 *
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setResourcePath() explicitly prior to load.
@@ -84,11 +84,11 @@ class MTLLoader extends Loader {
 	/**
 	 * Parses a MTL file.
 	 *
-	 * @param {String} text - Content of MTL file
-	 * @param {String} path
+	 * @param {string} text - Content of MTL file
+	 * @param {string} path
 	 * @return {MaterialCreator}
 	 *
-	 * @see setPath setResourcePath
+	 * @see {@link FileLoader#setPath} {@link FileLoader#setResourcePath}
 	 *
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setResourcePath() explicitly prior to parse.
@@ -443,6 +443,14 @@ class MaterialCreator {
 
 					break;
 
+				case 'disp':
+
+					// Displacement texture map
+
+					setMapForType( 'displacementMap', value );
+
+					break;
+
 				case 'map_d':
 
 					// Alpha map
@@ -517,6 +525,16 @@ class MaterialCreator {
 
 			matParams.bumpScale = parseFloat( items[ pos + 1 ] );
 			items.splice( pos, 2 );
+
+		}
+
+		pos = items.indexOf( '-mm' );
+
+		if ( pos >= 0 ) {
+
+			matParams.displacementBias = parseFloat( items[ pos + 1 ] );
+			matParams.displacementScale = parseFloat( items[ pos + 2 ] );
+			items.splice( pos, 3 );
 
 		}
 

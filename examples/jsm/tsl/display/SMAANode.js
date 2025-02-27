@@ -1,8 +1,6 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
 import { abs, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
-/** @module SMAANode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -46,7 +44,7 @@ class SMAANode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -218,8 +216,8 @@ class SMAANode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -734,7 +732,7 @@ class SMAANode extends TempNode {
 	 * Returns the area texture as a Base64 string.
 	 *
 	 * @private
-	 * @return {String} The area texture.
+	 * @return {string} The area texture.
 	 */
 	_getAreaTexture() {
 
@@ -746,7 +744,7 @@ class SMAANode extends TempNode {
 	 * Returns the search texture as a Base64 string..
 	 *
 	 * @private
-	 * @return {String} The search texture.
+	 * @return {string} The search texture.
 	 */
 	_getSearchTexture() {
 
@@ -758,4 +756,12 @@ class SMAANode extends TempNode {
 
 export default SMAANode;
 
+/**
+ * TSL function for creating a SMAA node for anti-aliasing via post processing.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @returns {SMAANode}
+ */
 export const smaa = ( node ) => nodeObject( new SMAANode( convertToTexture( node ) ) );

@@ -41,7 +41,7 @@ class TDSLoader extends Loader {
 	 * Load 3ds file from url.
 	 *
 	 * @method load
-	 * @param {[type]} url URL for the file.
+	 * @param {string} url URL for the file.
 	 * @param {Function} onLoad onLoad callback, receives group Object3D as argument.
 	 * @param {Function} onProgress onProgress callback.
 	 * @param {Function} onError onError callback.
@@ -89,7 +89,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @method parse
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
-	 * @param {String} path Path for external resources.
+	 * @param {string} path Path for external resources.
 	 * @return {Group} Group loaded from 3ds file.
 	 */
 	parse( arraybuffer, path ) {
@@ -115,7 +115,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @method readFile
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
-	 * @param {String} path Path for external resources.
+	 * @param {string} path Path for external resources.
 	 */
 	readFile( arraybuffer, path ) {
 
@@ -158,7 +158,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @method readMeshData
 	 * @param {Chunk} chunk to read mesh from
-	 * @param {String} path Path for external resources.
+	 * @param {string} path Path for external resources.
 	 */
 	readMeshData( chunk, path ) {
 
@@ -235,7 +235,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @method readMaterialEntry
 	 * @param {Chunk} chunk Chunk in use.
-	 * @param {String} path Path for external resources.
+	 * @param {string} path Path for external resources.
 	 */
 	readMaterialEntry( chunk, path ) {
 
@@ -529,7 +529,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @method readMap
 	 * @param {Chunk} chunk Chunk in use.
-	 * @param {String} path Path for external resources.
+	 * @param {string} path Path for external resources.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
 	readMap( chunk, path ) {
@@ -656,7 +656,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @method readPercentage
 	 * @param {Chunk} chunk Chunk to read data from.
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readPercentage( chunk ) {
 
@@ -709,7 +709,7 @@ class Chunk {
 	 *
 	 * @class Chunk
 	 * @param {DataView} data DataView to read from.
-	 * @param {Number} position in data.
+	 * @param {number} position in data.
 	 * @param {Function} debugMessage logging callback.
 	 */
 	constructor( data, position, debugMessage ) {
@@ -772,7 +772,7 @@ class Chunk {
 	 * return the ID of this chunk as Hex
 	 *
 	 * @method idToString
-	 * @return {String} hex-string of id
+	 * @return {string} hex-string of id
 	 */
 	get hexId() {
 
@@ -790,7 +790,7 @@ class Chunk {
 	 * Read byte value.
 	 *
 	 * @method readByte
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readByte() {
 
@@ -804,7 +804,7 @@ class Chunk {
 	 * Read 32 bit float value.
 	 *
 	 * @method readFloat
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readFloat() {
 
@@ -827,7 +827,7 @@ class Chunk {
 	 * Read 32 bit signed integer value.
 	 *
 	 * @method readInt
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readInt() {
 
@@ -841,7 +841,7 @@ class Chunk {
 	 * Read 16 bit signed integer value.
 	 *
 	 * @method readShort
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readShort() {
 
@@ -855,7 +855,7 @@ class Chunk {
 	 * Read 64 bit unsigned integer value.
 	 *
 	 * @method readDWord
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readDWord() {
 
@@ -869,7 +869,7 @@ class Chunk {
 	 * Read 32 bit unsigned integer value.
 	 *
 	 * @method readWord
-	 * @return {Number} Data read from the dataview.
+	 * @return {number} Data read from the dataview.
 	 */
 	readWord() {
 
@@ -883,7 +883,7 @@ class Chunk {
 	 * Read NULL terminated ASCII string value from chunk-pos.
 	 *
 	 * @method readString
-	 * @return {String} Data read from the dataview.
+	 * @return {string} Data read from the dataview.
 	 */
 	readString() {
 

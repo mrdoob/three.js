@@ -1,8 +1,6 @@
 import { TempNode, NodeUpdateType } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
 
-/** @module DepthOfFieldNode **/
-
 /**
  * Post processing node for creating depth of field (DOF) effect.
  *
@@ -76,7 +74,7 @@ class DepthOfFieldNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -187,12 +185,13 @@ export default DepthOfFieldNode;
 /**
  * TSL function for creating a depth-of-field effect (DOF) for post processing.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<float>} viewZNode - Represents the viewZ depth values of the scene.
- * @param {Node<float> | Number} focus - Defines the effect's focus which is the distance along the camera's look direction in world units.
- * @param {Node<float> | Number} aperture - Defines the effect's aperture.
- * @param {Node<float> | Number} maxblur - Defines the effect's maximum blur.
+ * @param {Node<float> | number} focus - Defines the effect's focus which is the distance along the camera's look direction in world units.
+ * @param {Node<float> | number} aperture - Defines the effect's aperture.
+ * @param {Node<float> | number} maxblur - Defines the effect's maximum blur.
  * @returns {DepthOfFieldNode}
  */
 export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );

@@ -1298,6 +1298,35 @@ class FBXTreeParser {
 
 		}
 
+		// Sanitization: If geometry has groups, then it must match the provided material array.
+		// If not, we need to clean up the `group.materialIndex` properties inside the groups and point at a (new) default material.
+		// This isn't well defined; Unity creates default material, while Blender implicitly uses the previous material in the list.
+		if ( geometry.groups.length > 0 ) {
+
+			let needsDefaultMaterial = false;
+
+			for ( let i = 0, il = geometry.groups.length; i < il; i ++ ) {
+
+				const group = geometry.groups[ i ];
+
+				if ( group.materialIndex < 0 || group.materialIndex >= materials.length ) {
+
+					group.materialIndex = materials.length;
+					needsDefaultMaterial = true;
+
+				}
+
+			}
+
+			if ( needsDefaultMaterial ) {
+
+				const defaultMaterial = new MeshPhongMaterial();
+				materials.push( defaultMaterial );
+
+			}
+
+		}
+
 		if ( geometry.FBX_Deformer ) {
 
 			model = new SkinnedMesh( geometry, material );
