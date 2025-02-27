@@ -1,5 +1,16 @@
+/**
+ * A class with loader utility functions.
+ */
 class LoaderUtils {
 
+	/**
+	 * The function takes a stream of bytes as input and returns a string
+	 * representation.
+	 *
+	 * @deprecated since r165. Use the native `TextDecoder` API instead.
+	 * @param {TypedArray} array - A stream of bytes as a typed array.
+	 * @return {string} The decoded text.
+	 */
 	static decodeText( array ) { // @deprecated, r165
 
 		console.warn( 'THREE.LoaderUtils: decodeText() has been deprecated with r165 and will be removed with r175. Use TextDecoder instead.' );
@@ -36,6 +47,12 @@ class LoaderUtils {
 
 	}
 
+	/**
+	 * Extracts the base URL from the given URL.
+	 *
+	 * @param {string} url -The URL to extract the base URL from.
+	 * @return {string} The extracted base URL.
+	 */
 	static extractUrlBase( url ) {
 
 		const index = url.lastIndexOf( '/' );
@@ -46,6 +63,15 @@ class LoaderUtils {
 
 	}
 
+	/**
+	 * Resolves relative URLs against the given path. Absolute paths, data urls,
+	 * and blob URLs will be returned as is. Invalid URLs will return an empty
+	 * string.
+	 *
+	 * @param {string} url -The URL to resolve.
+	 * @param {string} path - The base path for relative URLs to be resolved against.
+	 * @return {string} The resolved URL.
+	 */
 	static resolveURL( url, path ) {
 
 		// Invalid URL

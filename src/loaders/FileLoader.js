@@ -14,14 +14,59 @@ class HttpError extends Error {
 
 }
 
+/**
+ * A low level class for loading resources with the Fetch API, used internally by
+ * most loaders. It can also be used directly to load any file type that does
+ * not have a loader.
+ *
+ * This loader supports caching. If you want to use it, add `THREE.Cache.enabled = true;`
+ * once to your application.
+ *
+ * ```js
+ * const loader = new THREE.FileLoader();
+ * const data = await loader.loadAsync( 'example.txt' );
+ * ```
+ *
+ * @augments Loader
+ */
 class FileLoader extends Loader {
 
+	/**
+	 * Constructs a new file loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * The expected mime type.
+		 *
+		 * @type {string|undefined}
+		 * @default undefined
+		 */
+		this.mimeType = undefined;
+
+		/**
+		 * The expected response type.
+		 *
+		 * @type {('arraybuffer'|'blob'|'document'|'json'|''|undefined)}
+		 * @default undefined
+		 */
+		this.responseType = undefined;
+
 	}
 
+	/**
+	 * Starts loading from the given URL and pass the loaded response to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(any)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @return {any|undefined} The cached resource if available.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
@@ -268,6 +313,12 @@ class FileLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the expected response type.
+	 *
+	 * @param {('arraybuffer'|'blob'|'document'|'json'|''|undefined)} value - The response type.
+	 * @return {FileLoader} A reference to this file loader.
+	 */
 	setResponseType( value ) {
 
 		this.responseType = value;
@@ -275,6 +326,12 @@ class FileLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the expected mime type of the loaded file.
+	 *
+	 * @param {string|undefined} value - The mime type.
+	 * @return {FileLoader} A reference to this file loader.
+	 */
 	setMimeType( value ) {
 
 		this.mimeType = value;
