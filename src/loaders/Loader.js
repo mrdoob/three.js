@@ -176,14 +176,12 @@ class Loader {
 /**
  * Callback for onProgress in loaders.
  *
- *
  * @callback onProgressCallback
  * @param {ProgressEvent} event - An instance of `ProgressEvent` that represents the current loading status.
  */
 
 /**
  * Callback for onError in loaders.
- *
  *
  * @callback onErrorCallback
  * @param {Error} error - The error which occurred during the loading process.
