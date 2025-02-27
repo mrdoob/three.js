@@ -1,5 +1,6 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
+import { warnOnce } from '../utils.js';
 
 class FramebufferTexture extends Texture {
 
@@ -15,6 +16,9 @@ class FramebufferTexture extends Texture {
 		this.generateMipmaps = false;
 
 		this.needsUpdate = true;
+
+		// @deprecated r170
+		warnOnce( 'FramebufferTexture: FramebufferTexture has been deprecated. Use any other texture with copyTextureToTexture, instead.' );
 
 	}
 
