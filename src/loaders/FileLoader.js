@@ -43,18 +43,17 @@ class FileLoader extends Loader {
 		/**
 		 * The expected mime type.
 		 *
-		 * @type {string|undefined}
-		 * @default undefined
+		 * @type {string}
 		 */
-		this.mimeType = undefined;
+		this.mimeType = '';
 
 		/**
 		 * The expected response type.
 		 *
-		 * @type {('arraybuffer'|'blob'|'document'|'json'|''|undefined)}
-		 * @default undefined
+		 * @type {('arraybuffer'|'blob'|'document'|'json'|'')}
+		 * @default ''
 		 */
-		this.responseType = undefined;
+		this.responseType = '';
 
 	}
 
@@ -242,7 +241,7 @@ class FileLoader extends Loader {
 
 					default:
 
-						if ( mimeType === undefined ) {
+						if ( mimeType === '' ) {
 
 							return response.text();
 
@@ -316,7 +315,7 @@ class FileLoader extends Loader {
 	/**
 	 * Sets the expected response type.
 	 *
-	 * @param {('arraybuffer'|'blob'|'document'|'json'|''|undefined)} value - The response type.
+	 * @param {('arraybuffer'|'blob'|'document'|'json'|'')} value - The response type.
 	 * @return {FileLoader} A reference to this file loader.
 	 */
 	setResponseType( value ) {
@@ -329,7 +328,7 @@ class FileLoader extends Loader {
 	/**
 	 * Sets the expected mime type of the loaded file.
 	 *
-	 * @param {string|undefined} value - The mime type.
+	 * @param {string} value - The mime type.
 	 * @return {FileLoader} A reference to this file loader.
 	 */
 	setMimeType( value ) {
