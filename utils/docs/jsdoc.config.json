@@ -13,6 +13,7 @@
     "source": {
         "include": [
             "examples/jsm/tsl",
+            "src/animation",
             "src/audio",
             "src/cameras",
             "src/core/Object3D.js",
