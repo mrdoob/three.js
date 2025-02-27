@@ -64,7 +64,7 @@ class ExtrudeGeometry extends BufferGeometry {
 	 * @param {number} [options.bevelSize=bevelThickness-0.1] - Distance from the shape outline that the bevel extends.
 	 * @param {number} [options.bevelOffset=0] - Distance from the shape outline that the bevel starts.
 	 * @param {number} [options.bevelSegments=3] - Number of bevel layers.
-	 * @param {Curve} [options.extrudePath=3] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
+	 * @param {?Curve} [options.extrudePath=null] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
 	 * @param {Object} [options.UVGenerator] - An object that provides UV generator functions for custom UV generation.
 	 */
 	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {

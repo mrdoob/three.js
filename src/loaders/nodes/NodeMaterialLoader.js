@@ -10,7 +10,7 @@ class NodeMaterialLoader extends MaterialLoader {
 	/**
 	 * Constructs a new node material loader.
 	 *
-	 * @param {?LoadingManager} manager - A reference to a loading manager.
+	 * @param {LoadingManager} [manager] - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 

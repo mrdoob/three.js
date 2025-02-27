@@ -13,7 +13,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Constructs a new node loader.
 	 *
-	 * @param {?LoadingManager} manager - A reference to a loading manager.
+	 * @param {LoadingManager} [manager] - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 

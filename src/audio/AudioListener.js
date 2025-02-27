@@ -50,7 +50,7 @@ class AudioListener extends Object3D {
 		/**
 		 * An optional filter.
 		 *
-		 * Defined via {@AudioListener#setFilter}.
+		 * Defined via {@link AudioListener#setFilter}.
 		 *
 		 * @type {?AudioNode}
 		 * @default null
@@ -109,7 +109,7 @@ class AudioListener extends Object3D {
 	/**
 	 * Returns the current set filter.
 	 *
-	 * @return {AudioNode} The filter.
+	 * @return {?AudioNode} The filter.
 	 */
 	getFilter() {
 

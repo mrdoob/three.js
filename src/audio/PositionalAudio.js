@@ -104,7 +104,7 @@ class PositionalAudio extends Audio {
 	 * starts taking effect.
 	 *
 	 * @param {number} value - The reference distance to set.
-	 * @return {Audio} A reference to this instance.
+	 * @return {PositionalAudio} A reference to this instance.
 	 */
 	setRefDistance( value ) {
 
@@ -129,7 +129,7 @@ class PositionalAudio extends Audio {
 	 * Defines how quickly the volume is reduced as the source moves away from the listener.
 	 *
 	 * @param {number} value - The rolloff factor.
-	 * @return {Audio} A reference to this instance.
+	 * @return {PositionalAudio} A reference to this instance.
 	 */
 	setRolloffFactor( value ) {
 
@@ -158,7 +158,7 @@ class PositionalAudio extends Audio {
 	 * for more details.
 	 *
 	 * @param {('linear'|'inverse'|'exponential')} value - The distance model to set.
-	 * @return {Audio} A reference to this instance.
+	 * @return {PositionalAudio} A reference to this instance.
 	 */
 	setDistanceModel( value ) {
 
@@ -186,7 +186,7 @@ class PositionalAudio extends Audio {
 	 * This value is used only by the `linear` distance model.
 	 *
 	 * @param {number} value - The max distance.
-	 * @return {Audio} A reference to this instance.
+	 * @return {PositionalAudio} A reference to this instance.
 	 */
 	setMaxDistance( value ) {
 
@@ -202,7 +202,7 @@ class PositionalAudio extends Audio {
 	 * @param {number} coneInnerAngle - An angle, in degrees, of a cone inside of which there will be no volume reduction.
 	 * @param {number} coneOuterAngle - An angle, in degrees, of a cone outside of which the volume will be reduced by a constant value, defined by the `coneOuterGain` parameter.
 	 * @param {number} coneOuterGain - The amount of volume reduction outside the cone defined by the `coneOuterAngle`. When set to `0`, no sound can be heard.
-	 * @return {Audio} A reference to this instance.
+	 * @return {PositionalAudio} A reference to this instance.
 	 */
 	setDirectionalCone( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
 
