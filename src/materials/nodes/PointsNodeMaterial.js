@@ -11,7 +11,7 @@ import { PointsMaterial } from '../PointsMaterial.js';
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
 /**
- * Node material version of `PointsMaterial`.
+ * Node material version of {@link PointsMaterial}.
  *
  * @augments SpriteNodeMaterial
  */

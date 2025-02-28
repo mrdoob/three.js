@@ -9,7 +9,7 @@ import { LineDashedMaterial } from '../LineDashedMaterial.js';
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 /**
- * Node material version of `LineDashedMaterial`.
+ * Node material version of  {@link LineDashedMaterial}.
  *
  * @augments NodeMaterial
  */

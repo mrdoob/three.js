@@ -536,6 +536,13 @@ class Material extends EventDispatcher {
 
 	}
 
+	/**
+	 * This method can be used to set default values from parameter objects.
+	 * It is a generic implementation so it can be used with different types
+	 * of materials.
+	 *
+	 * @param {Object} values - The material values to set.
+	 */
 	setValues( values ) {
 
 		if ( values === undefined ) return;

@@ -10,7 +10,7 @@ import { MeshMatcapMaterial } from '../MeshMatcapMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
 /**
- * Node material version of `MeshMatcapMaterial`.
+ * Node material version of {@link MeshMatcapMaterial}.
  *
  * @augments NodeMaterial
  */

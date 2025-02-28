@@ -12,7 +12,7 @@ import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshStandardMaterial();
 
 /**
- * Node material version of `MeshStandardMaterial`.
+ * Node material version of {@link MeshStandardMaterial}.
  *
  * @augments NodeMaterial
  */
