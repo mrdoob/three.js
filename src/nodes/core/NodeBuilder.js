@@ -946,7 +946,7 @@ class NodeBuilder {
 	 * Only relevant for WebGL and its `WEBGL_multi_draw` extension.
 	 *
 	 * @abstract
-	 * @return {string} The drawIndex shader string.
+	 * @return {?string} The drawIndex shader string.
 	 */
 	getDrawIndex() {
 
@@ -2166,7 +2166,7 @@ class NodeBuilder {
 	 *
 	 * @abstract
 	 * @param {string} op - The operator name to resolve.
-	 * @return {string} The resolved operator name.
+	 * @return {?string} The resolved operator name.
 	 */
 	getFunctionOperator( /* op */ ) {
 

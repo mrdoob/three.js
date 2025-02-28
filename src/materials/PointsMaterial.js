@@ -31,7 +31,7 @@ class PointsMaterial extends Material {
 	/**
 	 * Constructs a new points material.
 	 *
-	 * @param {Object} parameters - An object with one or more properties
+	 * @param {Object} [parameters] - An object with one or more properties
 	 * defining the material's appearance. Any property of the material
 	 * (including any property from inherited materials) can be passed
 	 * in here. Color values can be passed any type of value accepted

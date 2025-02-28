@@ -92,7 +92,7 @@ class Animation {
 	/**
 	 * Returns the user-level animation loop.
 	 *
-	 * @return {Function} The animation loop.
+	 * @return {?Function} The animation loop.
 	 */
 	getAnimationLoop() {
 

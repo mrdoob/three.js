@@ -24,7 +24,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new line dashed node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

@@ -33,7 +33,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new node material for wide line rendering.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters={}] - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 

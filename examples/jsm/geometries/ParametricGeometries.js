@@ -98,7 +98,7 @@ class ParametricTorusKnotGeometry extends ParametricTubeGeometry {
 		const radiusSegments = segmentsR;
 		const extrudePath = new TorusKnotCurve();
 
-		super( extrudePath, segments, tube, radiusSegments, true, false );
+		super( extrudePath, segments, tube, radiusSegments, true );
 
 		this.radius = radius;
 		this.tube = tube;

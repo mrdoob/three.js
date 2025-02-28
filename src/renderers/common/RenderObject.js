@@ -494,7 +494,7 @@ class RenderObject {
 	/**
 	 * Returns the draw parameters for the render object.
 	 *
-	 * @return {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} The draw parameters.
+	 * @return {?{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} The draw parameters.
 	 */
 	getDrawParameters() {
 

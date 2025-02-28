@@ -42,7 +42,7 @@ class CubeMapNode extends TempNode {
 		 * A reference to the internal cube texture.
 		 *
 		 * @private
-		 * @type {CubeTexture}
+		 * @type {?CubeTexture}
 		 * @default null
 		 */
 		this._cubeTexture = null;

@@ -22,7 +22,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

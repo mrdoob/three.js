@@ -133,7 +133,7 @@ class PropertyBinding {
 		/**
 		 * The object owns the animated property.
 		 *
-		 * @type {Object}
+		 * @type {?Object}
 		 */
 		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName );
 
@@ -259,7 +259,7 @@ class PropertyBinding {
 	 *
 	 * @static
 	 * @param {Object} root - The root object.
-	 * @param {string} nodeName - The name of the node.
+	 * @param {string|number} nodeName - The name of the node.
 	 * @return {?Object} The found node. Returns `null` if no object was found.
 	 */
 	static findNode( root, nodeName ) {

@@ -41,7 +41,7 @@ class ShaderMaterial extends Material {
 	/**
 	 * Constructs a new shader material.
 	 *
-	 * @param {Object} parameters - An object with one or more properties
+	 * @param {Object} [parameters] - An object with one or more properties
 	 * defining the material's appearance. Any property of the material
 	 * (including any property from inherited materials) can be passed
 	 * in here. Color values can be passed any type of value accepted
@@ -226,7 +226,7 @@ class ShaderMaterial extends Material {
 		 * If set, this calls [gl.bindAttribLocation]{@link https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation}
 		 * to bind a generic vertex index to an attribute variable.
 		 *
-		 * @type {?string}
+		 * @type {string|undefined}
 		 * @default undefined
 		 */
 		this.index0AttributeName = undefined;

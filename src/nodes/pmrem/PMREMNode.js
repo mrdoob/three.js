@@ -348,7 +348,7 @@ export default PMREMNode;
  * Returns `true` if the given cube map image has been fully loaded.
  *
  * @private
- * @param {Array<(Image|Object)>} image - The cube map image.
+ * @param {?Array<(Image|Object)>} [image] - The cube map image.
  * @return {boolean} Whether the given cube map is ready or not.
  */
 function isCubeMapReady( image ) {
