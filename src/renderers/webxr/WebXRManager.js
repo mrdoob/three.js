@@ -747,7 +747,7 @@ class WebXRManager extends EventDispatcher {
 							renderer.setRenderTargetTextures(
 								newRenderTarget,
 								glSubImage.colorTexture,
-								glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture );
+								glSubImage.depthStencilTexture );
 
 							renderer.setRenderTarget( newRenderTarget );
 
