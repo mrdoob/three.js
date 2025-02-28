@@ -6,7 +6,7 @@ import { ShadowMaterial } from '../ShadowMaterial.js';
 const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
 /**
- * Node material version of `ShadowMaterial`.
+ * Node material version of {@link ShadowMaterial}.
  *
  * @augments NodeMaterial
  */

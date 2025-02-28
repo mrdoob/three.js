@@ -10,7 +10,7 @@ import { MeshPhongMaterial } from '../MeshPhongMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshPhongMaterial();
 
 /**
- * Node material version of `MeshPhongMaterial`.
+ * Node material version of {@link MeshPhongMaterial}.
  *
  * @augments NodeMaterial
  */

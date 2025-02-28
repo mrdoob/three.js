@@ -331,6 +331,29 @@ class Object3D extends EventDispatcher {
 		this.animations = [];
 
 		/**
+		 * Custom depth material to be used when rendering to the depth map. Can only be used
+		 * in context of meshes. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
+		 * if you are modifying vertex positions in the vertex shader you must specify a custom depth
+		 * material for proper shadows.
+		 *
+		 * Only relevant in context of {@link WebGLRenderer}.
+		 *
+		 * @type {(Material|undefined)}
+		 * @default undefined
+		 */
+		this.customDepthMaterial = undefined;
+
+		/**
+		 * Same as {@link Object3D#customDepthMaterial}, but used with {@link PointLight}.
+		 *
+		 * Only relevant in context of {@link WebGLRenderer}.
+		 *
+		 * @type {(Material|undefined)}
+		 * @default undefined
+		 */
+		this.customDistanceMaterial = undefined;
+
+		/**
 		 * An object that can be used to store custom data about the 3D object. It
 		 * should not hold references to functions as these will not be cloned.
 		 *
