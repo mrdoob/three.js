@@ -31,7 +31,7 @@
             "src/renderers/common", 
             "src/renderers/webgpu" ,
             "src/scenes" ,
-            "src/textures/Texture.js" 
+            "src/textures" 
         ],
         "exclude": [
             "src/extras/PMREMGenerator.js"

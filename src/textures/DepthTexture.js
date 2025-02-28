@@ -1,10 +1,30 @@
 import { Source } from './Source.js';
 import { Texture } from './Texture.js';
-import { NearestFilter, UnsignedIntType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
+import { NearestFilter, UnsignedIntType, DepthFormat, DepthStencilFormat } from '../constants.js';
 
+/**
+ * This class can be used to automatically save the depth information of a
+ * rendering into a texture.
+ *
+ * @augments Texture
+ */
 class DepthTexture extends Texture {
 
-	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format = DepthFormat ) {
+	/**
+	 * Constructs a new depth texture.
+	 *
+	 * @param {number} width - The width of the texture.
+	 * @param {number} height - The height of the texture.
+	 * @param {number} [type=UnsignedIntType] - The texture type.
+	 * @param {number} [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
+	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
+	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
+	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
+	 * @param {number} [minFilter=LinearFilter] - The min filter value.
+	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
+	 * @param {number} [format=DepthFormat] - The texture format.
+	 */
+	constructor( width, height, type = UnsignedIntType, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, format = DepthFormat ) {
 
 		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
@@ -12,21 +32,51 @@ class DepthTexture extends Texture {
 
 		}
 
-		if ( type === undefined && format === DepthFormat ) type = UnsignedIntType;
-		if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
-
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isDepthTexture = true;
 
+		/**
+		 * The image property of a depth texture just defines its dimensions.
+		 *
+		 * @type {{width:number,height:number}}
+		 */
 		this.image = { width: width, height: height };
 
-		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
-
+		/**
+		 * If set to `true`, the texture is flipped along the vertical axis when
+		 * uploaded to the GPU.
+		 *
+		 * Overwritten and set to `false` by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.flipY = false;
+
+		/**
+		 * Whether to generate mipmaps (if possible) for a texture.
+		 *
+		 * Overwritten and set to `false` by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.generateMipmaps = false;
 
+		/**
+		 * The depth compare function.
+		 *
+		 * @type {?(NeverCompare|LessCompare|EqualCompare|LessEqualCompare|GreaterCompare|NotEqualCompare|GreaterEqualCompare|AlwaysCompare)}
+		 * @default null
+		 */
 		this.compareFunction = null;
 
 	}
