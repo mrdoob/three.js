@@ -2237,26 +2237,21 @@ class WebGLRenderer {
 
 		this.setRenderTargetTextures = function ( renderTarget, colorTexture, depthTexture ) {
 
-			properties.get( renderTarget.texture ).__webglTexture = colorTexture;
-			properties.get( renderTarget.depthTexture ).__webglTexture = depthTexture;
-
 			const renderTargetProperties = properties.get( renderTarget );
-			renderTargetProperties.__hasExternalTextures = true;
 
-			renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
-
-			if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
+			renderTargetProperties.__autoAllocateDepthBuffer = renderTarget.resolveDepthBuffer === false;
+			if ( renderTargetProperties.__autoAllocateDepthBuffer === false ) {
 
 				// The multisample_render_to_texture extension doesn't work properly if there
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
-				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
-
-					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
-					renderTargetProperties.__useRenderToTexture = false;
-
-				}
+				renderTargetProperties.__useRenderToTexture = false;
 
 			}
+
+			properties.get( renderTarget.texture ).__webglTexture = colorTexture;
+			properties.get( renderTarget.depthTexture ).__webglTexture = renderTargetProperties.__autoAllocateDepthBuffer ? undefined : depthTexture;
+
+			renderTargetProperties.__hasExternalTextures = true;
 
 		};
 
