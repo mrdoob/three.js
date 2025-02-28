@@ -1865,7 +1865,7 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Box3|Box2)} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
 	 * @param {number} [level=0] - The mip level to copy.
 	 */
@@ -1873,30 +1873,47 @@ class WebGPUBackend extends Backend {
 
 		let dstX = 0;
 		let dstY = 0;
-		let dstLayer = 0;
+		let dstZ = 0;
 
 		let srcX = 0;
 		let srcY = 0;
-		let srcLayer = 0;
+		let srcZ = 0;
 
 		let srcWidth = srcTexture.image.width;
 		let srcHeight = srcTexture.image.height;
+		let srcDepth = 1;
+
 
 		if ( srcRegion !== null ) {
 
-			srcX = srcRegion.x;
-			srcY = srcRegion.y;
-			srcLayer = srcRegion.z || 0;
-			srcWidth = srcRegion.width;
-			srcHeight = srcRegion.height;
+			if ( srcRegion.isBox3 === true ) {
+
+				srcX = srcRegion.min.x;
+				srcY = srcRegion.min.y;
+				srcZ = srcRegion.min.z;
+				srcWidth = srcRegion.max.x - srcRegion.min.x;
+				srcHeight = srcRegion.max.y - srcRegion.min.y;
+				srcDepth = srcRegion.max.z - srcRegion.min.z;
+
+			} else {
+
+				// Assume it's a Box2
+				srcX = srcRegion.min.x;
+				srcY = srcRegion.min.y;
+				srcWidth = srcRegion.max.x - srcRegion.min.x;
+				srcHeight = srcRegion.max.y - srcRegion.min.y;
+				srcDepth = 1;
+
+			}
 
 		}
+
 
 		if ( dstPosition !== null ) {
 
 			dstX = dstPosition.x;
 			dstY = dstPosition.y;
-			dstLayer = dstPosition.z || 0;
+			dstZ = dstPosition.z || 0;
 
 		}
 
@@ -1909,21 +1926,23 @@ class WebGPUBackend extends Backend {
 			{
 				texture: sourceGPU,
 				mipLevel: level,
-				origin: { x: srcX, y: srcY, z: srcLayer }
+				origin: { x: srcX, y: srcY, z: srcZ }
 			},
 			{
 				texture: destinationGPU,
 				mipLevel: level,
-				origin: { x: dstX, y: dstY, z: dstLayer }
+				origin: { x: dstX, y: dstY, z: dstZ }
 			},
 			[
 				srcWidth,
 				srcHeight,
-				1
+				srcDepth
 			]
 		);
 
 		this.device.queue.submit( [ encoder.finish() ] );
+
+		if ( dstTexture.generateMipmaps ) this.textureUtils.generateMipmaps( dstTexture );
 
 	}
 
