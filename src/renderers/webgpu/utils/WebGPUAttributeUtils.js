@@ -202,9 +202,11 @@ class WebGPUAttributeUtils {
 
 				}
 
+				const bufferOffset = dataOffset * ( isTypedArray ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
 				device.queue.writeBuffer(
 					buffer,
-					dataOffset * ( isTypedArray ? array.BYTES_PER_ELEMENT : 1 ),
+					bufferOffset,
 					array,
 					dataOffset,
 					size
