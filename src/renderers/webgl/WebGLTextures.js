@@ -1461,7 +1461,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
-		if ( renderTarget.depthBuffer ) {
+		if ( renderTarget.resolveDepthBuffer ) {
 
 			// retrieve the depth attachment types
 			const depthTexture = renderTarget.depthTexture;
