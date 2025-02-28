@@ -21,7 +21,7 @@ class ShadowNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new shadow node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

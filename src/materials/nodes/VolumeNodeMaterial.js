@@ -18,7 +18,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new volume node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

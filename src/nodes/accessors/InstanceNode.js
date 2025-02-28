@@ -63,14 +63,14 @@ class InstanceNode extends Node {
 		/**
 		 * The node that represents the instance matrix data.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 */
 		this.instanceMatrixNode = null;
 
 		/**
 		 * The node that represents the instance color data.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 */
 		this.instanceColorNode = null;
 
@@ -86,14 +86,14 @@ class InstanceNode extends Node {
 		/**
 		 * A reference to a buffer that is used by `instanceMatrixNode`.
 		 *
-		 * @type {InstancedInterleavedBuffer}
+		 * @type {?InstancedInterleavedBuffer}
 		 */
 		this.buffer = null;
 
 		/**
 		 * A reference to a buffer that is used by `instanceColorNode`.
 		 *
-		 * @type {InstancedBufferAttribute}
+		 * @type {?InstancedBufferAttribute}
 		 */
 		this.bufferColor = null;
 

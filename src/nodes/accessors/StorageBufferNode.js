@@ -86,7 +86,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * The buffer struct type.
 		 *
-		 * @type {?structTypeNode}
+		 * @type {?StructTypeNode}
 		 * @default null
 		 */
 		this.structTypeNode = structTypeNode;

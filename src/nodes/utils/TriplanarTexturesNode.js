@@ -46,7 +46,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Second texture node. When not set, the shader will sample from `textureXNode` instead.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.textureYNode = textureYNode;
@@ -54,7 +54,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Third texture node. When not set, the shader will sample from `textureXNode` instead.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.textureZNode = textureZNode;

@@ -76,8 +76,8 @@ class ReflectorNode extends TextureNode {
 		 * A reference to the internal reflector base node which holds the actual implementation.
 		 *
 		 * @private
-		 * @type {?ReflectorBaseNode}
-		 * @default null
+		 * @type {ReflectorBaseNode}
+		 * @default ReflectorBaseNode
 		 */
 		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
 

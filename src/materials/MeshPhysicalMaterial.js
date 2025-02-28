@@ -33,7 +33,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	/**
 	 * Constructs a new mesh physical material.
 	 *
-	 * @param {Object} parameters - An object with one or more properties
+	 * @param {Object} [parameters] - An object with one or more properties
 	 * defining the material's appearance. Any property of the material
 	 * (including any property from inherited materials) can be passed
 	 * in here. Color values can be passed any type of value accepted
@@ -111,8 +111,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * How much `clearcoatNormalMap` affects the clear coat layer, from
 		 * `(0,0)` to `(1,1)`.
 		 *
-		 * @type {number}
-		 * @default 0
+		 * @type {Vector2}
+		 * @default (1,1)
 		 */
 		this.clearcoatNormalScale = new Vector2( 1, 1 );
 

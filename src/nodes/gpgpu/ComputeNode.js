@@ -91,7 +91,7 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
-		 * @type {Function}
+		 * @type {?Function}
 		 */
 		this.onInitFunction = null;
 

@@ -356,8 +356,8 @@ class RenderList {
 	/**
 	 * Sorts the internal render lists.
 	 *
-	 * @param {function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
-	 * @param {function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
+	 * @param {?function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
+	 * @param {?function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
 	 */
 	sort( customOpaqueSort, customTransparentSort ) {
 

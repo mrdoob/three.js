@@ -27,7 +27,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh normal node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

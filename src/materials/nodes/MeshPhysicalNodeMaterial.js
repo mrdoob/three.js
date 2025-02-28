@@ -27,7 +27,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Constructs a new mesh physical node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

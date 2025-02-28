@@ -247,7 +247,7 @@ class Renderer {
 		 * This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 		 *
 		 * @private
-		 * @type {Function}
+		 * @type {?Function}
 		 */
 		this._getFallback = getFallback;
 
@@ -675,7 +675,7 @@ class Renderer {
 		 * Debug configuration.
 		 * @typedef {Object} DebugConfig
 		 * @property {boolean} checkShaderErrors - Whether shader errors should be checked or not.
-		 * @property {Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
+		 * @property {?Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
 		 * @property {Function} getShaderAsync - Allows the get the raw shader code for the given scene, camera and 3D object.
 		 */
 
@@ -814,8 +814,8 @@ class Renderer {
 	 * @async
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
-	 * @param {Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @return {Promise<Array>} A Promise that resolves when the compile has been finished.
+	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @return {Promise<Array|undefined>} A Promise that resolves when the compile has been finished.
 	 */
 	async compileAsync( scene, camera, targetScene = null ) {
 
@@ -2394,7 +2394,7 @@ class Renderer {
 	 * Copies the current bound framebuffer into the given texture.
 	 *
 	 * @param {FramebufferTexture} framebufferTexture - The texture.
-	 * @param {Vector2|Vector4} rectangle - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
+	 * @param {?Vector2|Vector4} [rectangle=null] - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
 	 */
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
@@ -2722,7 +2722,7 @@ class Renderer {
 	 * @param {Material} material - The object's material.
 	 * @param {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {ClippingContext} clippingContext - The clipping context.
+	 * @param {?ClippingContext} clippingContext - The clipping context.
 	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
