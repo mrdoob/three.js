@@ -41,20 +41,27 @@ const _vector4 = /*@__PURE__*/ new Vector4();
 class Renderer {
 
 	/**
+	 * Renderer options.
+	 *
+	 * @typedef {Object} Renderer~Options
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
+	 * to overwrite the default.
+	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
+	 * @property {number} [colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
+	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
+	 */
+
+	/**
 	 * Constructs a new renderer.
 	 *
 	 * @param {Backend} backend - The backend the renderer is targeting (e.g. WebGPU or WebGL 2).
-	 * @param {Object} parameters - The configuration parameter.
-	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
-	 * to overwrite the default.
-	 * @param {?Function} [parameters.getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
-	 * @param {number} [parameters.colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
-	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
+	 * @param {Renderer~Options} [parameters] - The configuration parameter.
+
 	 */
 	constructor( backend, parameters = {} ) {
 
