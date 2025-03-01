@@ -24,6 +24,13 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		super( size, options );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCubeRenderTarget = true;
 
 	}

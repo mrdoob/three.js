@@ -26,21 +26,27 @@ import { warnOnce } from '../../utils.js';
 class WebGPUBackend extends Backend {
 
 	/**
+	 * WebGPUBackend options.
+	 *
+	 * @typedef {Object} WebGPUBackend~Options
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
+	 * @property {string} [powerPreference=undefined] - The power preference.
+	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
+	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
+	 * @property {number} [outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
+	 */
+
+	/**
 	 * Constructs a new WebGPU backend.
 	 *
-	 * @param {Object} parameters - The configuration parameter.
-	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @param {boolean} [parameters.trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
-	 * @param {string} [parameters.powerPreference=undefined] - The power preference.
-	 * @param {Object} [parameters.requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
-	 * @param {GPUDevice} [parameters.device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
-	 * @param {number} [parameters.outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
+	 * @param {WebGPUBackend~Options} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
