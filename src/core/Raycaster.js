@@ -5,7 +5,7 @@ import { Layers } from './Layers.js';
 const _matrix = /*@__PURE__*/ new Matrix4();
 
 /**
- * This class is designed to assist with raycasting] Raycasting is used for
+ * This class is designed to assist with raycasting. Raycasting is used for
  * mouse picking (working out what objects in the 3d space the mouse is over)
  * amongst other things.
  */
