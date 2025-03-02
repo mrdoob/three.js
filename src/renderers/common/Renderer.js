@@ -1573,7 +1573,7 @@ class Renderer {
 	 * Returns the renderer's size in logical pixels. This method does not honor the pixel ratio.
 	 *
 	 * @param {Vector2} target - The method writes the result in this target object.
-	 * @return {Vector2} The drawing buffer size.
+	 * @return {Vector2} The renderer's size in logical pixels.
 	 */
 	getSize( target ) {
 
@@ -1600,10 +1600,10 @@ class Renderer {
 	 * This method allows to define the drawing buffer size by specifying
 	 * width, height and pixel ratio all at once. The size of the drawing
 	 * buffer is computed with this formula:
-	 * ````
+	 * ```js
 	 * size.x = width * pixelRatio;
 	 * size.y = height * pixelRatio;
-	 *```
+	 * ```
 	 *
 	 * @param {number} width - The width in logical pixels.
 	 * @param {number} height - The height in logical pixels.
@@ -2378,7 +2378,7 @@ class Renderer {
 	}
 
 	/**
-	 * Initializes the given textures. Useful for preloading a texture rather than waiting until first render
+	 * Initializes the given texture. Useful for preloading a texture rather than waiting until first render
 	 * (which can cause noticeable lags due to decode and GPU upload overhead).
 	 *
 	 * This method can only be used if the renderer has been initialized.
@@ -2461,7 +2461,7 @@ class Renderer {
 	}
 
 	/**
-	 * Copies data of source texture into a destination texture.
+	 * Copies data of the given source texture into a destination texture.
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.

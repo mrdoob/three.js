@@ -13,23 +13,7 @@
     "source": {
         "include": [
             "examples/jsm/tsl",
-            "src/animation",
-            "src/audio",
-            "src/cameras",
-            "src/core",
-            "src/extras",
-            "src/geometries",
-            "src/helpers",
-            "src/lights",
-            "src/loaders",
-            "src/materials",
-            "src/math",
-            "src/nodes",
-            "src/objects",
-            "src/renderers/common",
-            "src/renderers/webgpu",
-            "src/scenes",
-            "src/textures"
+            "src"
         ],
         "exclude": [
             "src/extras/PMREMGenerator.js"

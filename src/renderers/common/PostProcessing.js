@@ -14,6 +14,8 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
  *
  * postProcessing.outputNode = scenePass;
  * ```
+ *
+ * Note: This module can only be used with `WebGPURenderer`.
  */
 class PostProcessing {
 
