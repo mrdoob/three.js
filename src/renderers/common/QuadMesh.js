@@ -43,6 +43,8 @@ const _geometry = /*@__PURE__*/ new QuadGeometry();
  * The intended usage is to reuse a single quad mesh for rendering
  * subsequent passes by just reassigning the `material` reference.
  *
+ * Note: This module can only be used with `WebGPURenderer`.
+ *
  * @augments Mesh
  */
 class QuadMesh extends Mesh {
