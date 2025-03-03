@@ -12,6 +12,9 @@
     "plugins": [ "plugins/markdown" ],
     "source": {
         "include": [
+            "examples/jsm/animation",
+            "examples/jsm/capabilities",
+            "examples/jsm/controls",
             "examples/jsm/tsl",
             "src"
         ],
