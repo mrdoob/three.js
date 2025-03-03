@@ -333,7 +333,7 @@ function generateSourceFiles( sourceFiles, encoding = 'utf8' ) {
 
 }
 
-function buildClassNav( items, itemsSeen, linktoFn ) {
+function buildMainNav( items, itemsSeen, linktoFn ) {
 
 	const coreDirectory = 'src';
 	const addonsDirectory = 'examples/jsm';
@@ -363,7 +363,7 @@ function buildClassNav( items, itemsSeen, linktoFn ) {
 
 				}
 
-				itemNav += `<li data-name="${item.longname}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
+				itemNav += `<li data-name="${item.name}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
 
 				itemsSeen[ item.longname ] = true;
 
@@ -494,7 +494,6 @@ function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
 /**
  * Create the navigation sidebar.
  * @param {Object} members The members that will be used to create the sidebar.
- * @param {Array<Object>} members.classes
  * @return {string} The HTML for the navigation sidebar.
  */
 function buildNav( members ) {
@@ -502,7 +501,7 @@ function buildNav( members ) {
 	let nav = '';
 	const seen = {};
 
-	nav += buildClassNav( members.classes, seen, linkto );
+	nav += buildMainNav( [ ...members.classes, ...members.modules ], seen, linkto );
 	nav += buildGlobalsNav( members.globals, seen );
 
 	return nav;
@@ -757,14 +756,22 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	// set up the lists that we'll use to generate pages
 	const classes = taffy( members.classes );
+	const modules = taffy( members.modules );
 
 	Object.keys( helper.longnameToUrl ).forEach( longname => {
 
 		const myClasses = helper.find( classes, { longname: longname } );
+		const myModules = helper.find( modules, { longname: longname } );
 
 		if ( myClasses.length ) {
 
 			generate( `${myClasses[ 0 ].name}`, myClasses, helper.longnameToUrl[ longname ] );
+
+		}
+
+		if ( myModules.length ) {
+
+			generate( `${myModules[ 0 ].name}`, myModules, helper.longnameToUrl[ longname ] );
 
 		}
 

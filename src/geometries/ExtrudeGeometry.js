@@ -1,25 +1,3 @@
-/**
- * Creates extruded geometry from a path shape.
- *
- * parameters = {
- *
- *  curveSegments: <int>, // number of points on the curves
- *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
- *  depth: <float>, // Depth to extrude the shape
- *
- *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into the original shape bevel goes
- *  bevelSize: <float>, // how far from shape outline (including bevelOffset) is bevel
- *  bevelOffset: <float>, // how far from shape outline does bevel start
- *  bevelSegments: <int>, // number of bevel layers
- *
- *  extrudePath: <THREE.Curve> // curve to extrude shape along
- *
- *  UVGenerator: <Object> // object that provides UV generator functions
- *
- * }
- */
-
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import * as Curves from '../extras/curves/Curves.js';
@@ -55,17 +33,7 @@ class ExtrudeGeometry extends BufferGeometry {
 	 * Constructs a new extrude geometry.
 	 *
 	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
-	 * @param {Object} [options={}] - The extrude settings.
-	 * @param {number} [options.curveSegments=12] - Number of points on the curves.
-	 * @param {number} [options.steps=1] - Number of points used for subdividing segments along the depth of the extruded spline.
-	 * @param {number} [options.depth=1] - Depth to extrude the shape.
-	 * @param {boolean} [options.bevelEnabled=true] - Whether to beveling to the shape or not.
-	 * @param {number} [options.bevelThickness=0.2] - How deep into the original shape the bevel goes.
-	 * @param {number} [options.bevelSize=bevelThickness-0.1] - Distance from the shape outline that the bevel extends.
-	 * @param {number} [options.bevelOffset=0] - Distance from the shape outline that the bevel starts.
-	 * @param {number} [options.bevelSegments=3] - Number of bevel layers.
-	 * @param {?Curve} [options.extrudePath=null] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
-	 * @param {Object} [options.UVGenerator] - An object that provides UV generator functions for custom UV generation.
+	 * @param {ExtrudeGeometry~Options} [options] - The extrude settings.
 	 */
 	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
@@ -862,5 +830,20 @@ function toJSON( shapes, options, data ) {
 
 }
 
+/**
+ * Represents the `options` type of the geometry's constructor.
+ *
+ * @typedef {Object} ExtrudeGeometry~Options
+ * @property {number} [curveSegments=12] - Number of points on the curves.
+ * @property {number} [steps=1] - Number of points used for subdividing segments along the depth of the extruded spline.
+ * @property {number} [depth=1] - Depth to extrude the shape.
+ * @property {boolean} [bevelEnabled=true] - Whether to beveling to the shape or not.
+ * @property {number} [bevelThickness=0.2] - How deep into the original shape the bevel goes.
+ * @property {number} [bevelSize=bevelThickness-0.1] - Distance from the shape outline that the bevel extends.
+ * @property {number} [bevelOffset=0] - Distance from the shape outline that the bevel starts.
+ * @property {number} [bevelSegments=3] - Number of bevel layers.
+ * @property {?Curve} [extrudePath=null] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
+ * @property {Object} [UVGenerator] - An object that provides UV generator functions for custom UV generation.
+ **/
 
 export { ExtrudeGeometry };

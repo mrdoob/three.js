@@ -4,13 +4,23 @@ import {
 import * as NURBSUtils from '../curves/NURBSUtils.js';
 
 /**
- * NURBS volume object
+ * This class represents a NURBS volume.
  *
- * Implementation is based on (x, y, z [, w=1]]) control points with w=weight.
- **/
-
+ * Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weight`.
+ */
 class NURBSVolume {
 
+	/**
+	 * Constructs a new NURBS surface.
+	 *
+	 * @param {number} degree1 - The first NURBS degree.
+	 * @param {number} degree2 - The second NURBS degree.
+	 * @param {number} degree3 - The third NURBS degree.
+	 * @param {Array<number>} knots1 - The first knots as a flat array of numbers.
+	 * @param {Array<number>} knots2 - The second knots as a flat array of numbers.
+	 * @param {Array<number>} knots3 - The third knots as a flat array of numbers.
+	 * @param {Array<Array<Array<Vector2|Vector3|Vector4>>>} controlPoints - An array^3 holding control points.
+	 */
 	constructor( degree1, degree2, degree3, knots1, knots2, knots3 /* arrays of reals */, controlPoints /* array^3 of Vector(2|3|4) */ ) {
 
 		this.degree1 = degree1;
@@ -47,6 +57,14 @@ class NURBSVolume {
 
 	}
 
+	/**
+	 * This method returns a vector in 3D space for the given interpolation factor. This vector lies within the NURBS volume.
+	 *
+	 * @param {number} t1 - The first interpolation factor representing the `u` position within the volume. Must be in the range `[0,1]`.
+	 * @param {number} t2 - The second interpolation factor representing the `v` position within the volume. Must be in the range `[0,1]`.
+	 * @param {number} t3 - The third interpolation factor representing the `w` position within the volume. Must be in the range `[0,1]`.
+	 * @param {Vector3} target - The target vector the result is written to.
+	 */
 	getPoint( t1, t2, t3, target ) {
 
 		const u = this.knots1[ 0 ] + t1 * ( this.knots1[ this.knots1.length - 1 ] - this.knots1[ 0 ] ); // linear mapping t1->u
