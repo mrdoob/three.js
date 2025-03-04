@@ -20,6 +20,10 @@
             "examples/jsm/environments",
             "examples/jsm/exporters",
             "examples/jsm/helpers",
+            "examples/jsm/interactive",
+            "examples/jsm/lighting",
+            "examples/jsm/lights",
+            "examples/jsm/textures",
             "examples/jsm/tsl",
             "src"
         ],
