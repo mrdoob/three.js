@@ -7,7 +7,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
-import { NodeUpdateType } from '../Nodes.js';
+import { NodeUpdateType } from '../core/constants.js';
 import IndirectStorageBufferAttribute from '../../renderers/common/IndirectStorageBufferAttribute.js';
 
 /**
