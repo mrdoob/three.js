@@ -33,7 +33,7 @@ class InstancedMesh extends Mesh {
 	 * @param {BufferGeometry} [geometry] - The mesh geometry.
 	 * @param {Material|Array<Material>} [material] - The mesh material.
 	 * @param {number} count - The number of instances.
-	 * @param {boolean} prepopulateInstanceMatrix - The number of instances.
+	 * @param {boolean} [prepopulateInstanceMatrix=true] - Dictates whether the instanceMatrix should be prepopulated or not.
 	 */
 	constructor( geometry, material, count, prepopulateInstanceMatrix = true ) {
 
