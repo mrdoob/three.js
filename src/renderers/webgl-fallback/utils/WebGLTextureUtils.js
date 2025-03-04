@@ -715,6 +715,7 @@ class WebGLTextureUtils {
 		let width, height, depth, minX, minY, minZ;
 		let dstX, dstY, dstZ;
 		const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image;
+
 		if ( srcRegion !== null ) {
 
 			width = srcRegion.max.x - srcRegion.min.x;
@@ -729,6 +730,7 @@ class WebGLTextureUtils {
 			const levelScale = Math.pow( 2, - srcLevel );
 			width = Math.floor( image.width * levelScale );
 			height = Math.floor( image.height * levelScale );
+
 			if ( srcTexture.isDataArrayTexture ) {
 
 				depth = image.depth;
