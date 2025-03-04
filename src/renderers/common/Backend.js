@@ -346,9 +346,10 @@ class Backend {
 	 * @param {Texture} dstTexture - The destination texture.
 	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
-	 * @param {number} [level=0] - The mip level to copy.
+	 * @param {number} [srcLevel=0] - The source mip level to copy from.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0*/ ) {}
+	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0*/ ) {}
 
 	/**
 	* Copies the current bound framebuffer to the given texture.
