@@ -374,12 +374,6 @@ class WebGPUBackend extends Backend {
 			renderTargetData.samples !== renderTarget.samples
 		) {
 
-			console.log(
-				'WebGPUBackend: Render target descriptor cache miss. Recreating render pass descriptor.',
-				renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel,
-				renderTargetData.activeCubeFace !== renderContext.activeCubeFace,
-				renderTargetData.samples !== renderTarget.samples
-			);
 			descriptors = {};
 			renderTargetData.descriptors = descriptors;
 
