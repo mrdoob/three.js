@@ -7,6 +7,8 @@ import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
+import { NodeUpdateType } from '../Nodes.js';
+import IndirectStorageBufferAttribute from '../../renderers/common/IndirectStorageBufferAttribute.js';
 
 /**
  * This node implements the vertex shader logic which is required
@@ -46,6 +48,14 @@ class BatchNode extends Node {
 		 * @default null
 		 */
 		this.batchingIdNode = null;
+		this.updateBeforeType = NodeUpdateType.FRAME;
+
+		/**
+		 * A reference of the indirect version to prevent unnecessary updates.
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.indirectVersion = 0;
 
 	}
 
@@ -72,12 +82,43 @@ class BatchNode extends Node {
 
 		}
 
+
+		if ( builder.isFlipY() === false ) {
+
+			const object = this.batchMesh;
+			const geometry = object.geometry;
+
+			const uint32 = new Uint32Array( 5 * object._maxInstanceCount );
+			const starts = object._multiDrawStarts;
+			const counts = object._multiDrawCounts;
+			const drawCount = object._multiDrawCount;
+			const drawInstances = object._multiDrawInstances;
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				const count = drawInstances ? drawInstances[ i ] : 1;
+
+				uint32[ i * 5 ] = counts[ i ]; // indexCount
+				uint32[ i * 5 + 1 ] = count; // instanceCount
+				uint32[ i * 5 + 2 ] = starts[ i ] / object.geometry.index.array.BYTES_PER_ELEMENT; // firstIndex
+				uint32[ i * 5 + 3 ] = 0; // baseVertex
+				uint32[ i * 5 + 4 ] = i; // firstInstance
+
+			}
+
+			const indirectAttribute = new IndirectStorageBufferAttribute( uint32, 5 );
+			geometry.setIndirect( indirectAttribute );
+
+		}
+
 		const getIndirectIndex = Fn( ( [ id ] ) => {
 
-			const size = int( textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 ) );
-			const x = int( id ).modInt( size );
-			const y = int( id ).div( size );
-			return textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ) ).x;
+			const size = textureLoad( this.batchMesh._indirectTexture ).size( 0 ).x.toInt().toConst( 'size' );
+			const x = int( id ).modInt( size ).toConst( 'x' );
+			const y = int( id ).div( size ).toConst( 'y' );
+			const index = textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ) ).x.toFloat().toConst( 'index' );
+
+			return index;
 
 		} ).setLayout( {
 			name: 'getIndirectIndex',
@@ -143,6 +184,41 @@ class BatchNode extends Node {
 		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
 			tangentLocal.mulAssign( bm );
+
+		}
+
+	}
+
+	updateBefore() {
+
+		const object = this.batchMesh;
+
+		const indirect = object.geometry.getIndirect();
+
+		if ( indirect !== null && object._indirectTexture.version > this.indirectVersion ) {
+
+			const uint32 = new Uint32Array( 5 * object._maxInstanceCount );
+			const starts = object._multiDrawStarts;
+			const counts = object._multiDrawCounts;
+			const drawCount = object._multiDrawCount;
+			const drawInstances = object._multiDrawInstances;
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+			  const count = drawInstances ? drawInstances[ i ] : 1;
+
+			  uint32[ i * 5 ] = counts[ i ]; // indexCount
+			  uint32[ i * 5 + 1 ] = count; // instanceCount
+			  uint32[ i * 5 + 2 ] = starts[ i ] / object.geometry.index.array.BYTES_PER_ELEMENT; // firstIndex
+			  uint32[ i * 5 + 3 ] = 0; // baseVertex
+			  uint32[ i * 5 + 4 ] = i; // firstInstance
+
+			}
+
+			indirect.array = uint32;
+			indirect.needsUpdate = true;
+
+			this.indirectVersion = object._indirectTexture.version;
 
 		}
 
