@@ -14,7 +14,7 @@ class PeppersGhostEffect {
 	/**
 	 * Constructs a new peppers ghost effect.
 	 *
-	 * @param {(Renderer|WebGLRenderer)} renderer - The renderer.
+	 * @param {(WebGPURenderer|WebGLRenderer)} renderer - The renderer.
 	 */
 	constructor( renderer ) {
 

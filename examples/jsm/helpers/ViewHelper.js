@@ -144,7 +144,7 @@ class ViewHelper extends Object3D {
 		 * Renders the helper in a separate view in the bottom-right corner
 		 * of the viewport.
 		 *
-		 * @param {WebgLRenderer|Renderer} renderer - The renderer.
+		 * @param {WebGLRenderer|WebGPURenderer} renderer - The renderer.
 		 */
 		this.render = function ( renderer ) {
 
