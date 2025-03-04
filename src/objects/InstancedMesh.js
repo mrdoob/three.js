@@ -33,8 +33,9 @@ class InstancedMesh extends Mesh {
 	 * @param {BufferGeometry} [geometry] - The mesh geometry.
 	 * @param {Material|Array<Material>} [material] - The mesh material.
 	 * @param {number} count - The number of instances.
+	 * @param {boolean} prepopulateInstanceMatrix - The number of instances.
 	 */
-	constructor( geometry, material, count ) {
+	constructor( geometry, material, count, prepopulateInstanceMatrix = true ) {
 
 		super( geometry, material );
 
@@ -99,9 +100,13 @@ class InstancedMesh extends Mesh {
 		 */
 		this.boundingSphere = null;
 
-		for ( let i = 0; i < count; i ++ ) {
+		if ( prepopulateInstanceMatrix ) {
 
-			this.setMatrixAt( i, _identity );
+			for ( let i = 0; i < count; i ++ ) {
+
+				this.setMatrixAt( i, _identity );
+
+			}
 
 		}
 
