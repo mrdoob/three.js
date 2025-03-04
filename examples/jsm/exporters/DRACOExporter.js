@@ -1,24 +1,34 @@
 import { Color, ColorManagement, SRGBColorSpace } from 'three';
 
-/**
- * Export draco compressed files from threejs geometry objects.
- *
- * Draco files are compressed and usually are smaller than conventional 3D file formats.
- *
- * The exporter receives a options object containing
- *  - decodeSpeed, indicates how to tune the encoder regarding decode speed (0 gives better speed but worst quality)
- *  - encodeSpeed, indicates how to tune the encoder parameters (0 gives better speed but worst quality)
- *  - encoderMethod
- *  - quantization, indicates the presision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC)
- *  - exportUvs
- *  - exportNormals
- *  - exportColor
- */
-
 /* global DracoEncoderModule */
 
+/**
+ * An exporter to compress geometry with the Draco library.
+ *
+ * [Draco]{@link https://google.github.io/draco/} is an open source library for compressing and
+ * decompressing 3D meshes and point clouds. Compressed geometry can be significantly smaller,
+ * at the cost of additional decoding time on the client device.
+ *
+ * Standalone Draco files have a `.drc` extension, and contain vertex positions,
+ * normals, colors, and other attributes. Draco files *do not* contain materials,
+ * textures, animation, or node hierarchies – to use these features, embed Draco geometry
+ * inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file
+ * using [glTF-Pipeline]{@link https://github.com/AnalyticalGraphicsInc/gltf-pipeline}.
+ *
+ * ```js
+ * const exporter = new DRACOExporter();
+ * const data = exporter.parse( mesh, options );
+ * ```
+ */
 class DRACOExporter {
 
+	/**
+	 * Parses the given mesh or point cloud and generates the Draco output.
+	 *
+	 * @param {(Mesh|Points)} object - The mesh or point cloud to export.
+	 * @param {DRACOExporter~Options} options - The export options.
+	 * @return {ArrayBuffer} The exported Draco.
+	 */
 	parse( object, options = {} ) {
 
 		options = Object.assign( {
@@ -249,7 +259,24 @@ function createVertexColorSRGBArray( attribute ) {
 
 // Encoder methods
 
+/**
+ * Edgebreaker encoding.
+ *
+ * @static
+ * @constant
+ * @type {number}
+ * @default 1
+ */
 DRACOExporter.MESH_EDGEBREAKER_ENCODING = 1;
+
+/**
+ * Sequential encoding.
+ *
+ * @static
+ * @constant
+ * @type {number}
+ * @default 0
+ */
 DRACOExporter.MESH_SEQUENTIAL_ENCODING = 0;
 
 // Geometry type
@@ -265,5 +292,18 @@ DRACOExporter.NORMAL = 1;
 DRACOExporter.COLOR = 2;
 DRACOExporter.TEX_COORD = 3;
 DRACOExporter.GENERIC = 4;
+
+/**
+ * Export options of `DRACOExporter`.
+ *
+ * @typedef {Object} DRACOExporter~Options
+ * @property {number} [decodeSpeed=5] - Indicates how to tune the encoder regarding decode speed (0 gives better speed but worst quality).
+ * @property {number} [encodeSpeed=5] - Indicates how to tune the encoder parameters (0 gives better speed but worst quality).
+ * @property {number} [encoderMethod=1] - Either sequential (very little compression) or Edgebreaker. Edgebreaker traverses the triangles of the mesh in a deterministic, spiral-like way which provides most of the benefits of this data format.
+ * @property {Array<number>} [quantization=[ 16, 8, 8, 8, 8 ]] - Indicates the precision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC).
+ * @property {boolean} [exportUvs=true] - Whether to export UVs or not.
+ * @property {boolean} [exportNormals=true] - Whether to export normals or not.
+ * @property {boolean} [exportColor=false] - Whether to export colors or not.
+ **/
 
 export { DRACOExporter };

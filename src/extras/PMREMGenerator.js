@@ -73,12 +73,16 @@ const _origin = /*@__PURE__*/ new Vector3();
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting
- * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+ * Paper: Fast, Accurate Image-Based Lighting:
+ * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
 */
-
 class PMREMGenerator {
 
+	/**
+	 * Constructs a new PMREM generator.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		this._renderer = renderer;
@@ -104,12 +108,14 @@ class PMREMGenerator {
 	 * in radians to be applied to the scene before PMREM generation. Optional near
 	 * and far planes ensure the scene is rendered in its entirety.
 	 *
-	 * @param {Scene} scene
-	 * @param {number} sigma
-	 * @param {number} near
-	 * @param {number} far
-	 * @param {Object} [options={}]
-	 * @return {WebGLRenderTarget}
+	 * @param {Scene} scene - The scene to be captured.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
@@ -149,11 +155,10 @@ class PMREMGenerator {
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
-	 * The smallest supported equirectangular image size is 64 x 32.
 	 *
-	 * @param {Texture} equirectangular
-	 * @param {?WebGLRenderTarget} [renderTarget=null] - Optional render target.
-	 * @return {WebGLRenderTarget}
+	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
+	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
@@ -165,11 +170,10 @@ class PMREMGenerator {
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
-	 * The smallest supported cube size is 16 x 16.
 	 *
-	 * @param {Texture} cubemap
-	 * @param {null} [renderTarget=null] - Optional render target.
-	 * @return {WebGLRenderTarget}
+	 * @param {Texture} cubemap - The cubemap texture to be converted.
+	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
@@ -492,6 +496,7 @@ class PMREMGenerator {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 *
+	 * @private
 	 * @param {WebGLRenderTarget} cubeUVRenderTarget
 	 * @param {number} lodIn
 	 * @param {number} lodOut

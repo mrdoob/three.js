@@ -16,12 +16,17 @@
             "examples/jsm/capabilities",
             "examples/jsm/controls",
             "examples/jsm/curves",
+            "examples/jsm/effects",
             "examples/jsm/environments",
+            "examples/jsm/exporters",
+            "examples/jsm/helpers",
             "examples/jsm/tsl",
             "src"
         ],
         "exclude": [
-            "src/extras/PMREMGenerator.js"
+            "src/renderers/common/extras/PMREMGenerator.js",
+            "examples/jsm/helpers/LightProbeHelperGPU.js",
+            "examples/jsm/helpers/TextureHelperGPU.js"
         ]
     }
 }
