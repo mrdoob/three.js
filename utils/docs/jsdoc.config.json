@@ -19,6 +19,7 @@
             "examples/jsm/effects",
             "examples/jsm/environments",
             "examples/jsm/exporters",
+            "examples/jsm/geometries",
             "examples/jsm/helpers",
             "examples/jsm/interactive",
             "examples/jsm/lighting",
