@@ -1,5 +1,13 @@
 import { ShaderChunk } from 'three';
 
+/** @module CSMShader */
+
+/**
+ * The object that holds the GLSL enhancements to enable CSM. This
+ * code is injected into the built-in material shaders by {@link CSM}.
+ *
+ * @type {Object}
+ */
 const CSMShader = {
 	lights_fragment_begin: /* glsl */`
 vec3 geometryPosition = - vViewPosition;
