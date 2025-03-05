@@ -5,22 +5,44 @@ import {
 	Vector3
 } from 'three';
 
-/**
- * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
- */
+// Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
 
 const _position = new Vector3();
 const _quaternion = new Quaternion();
 const _scale = new Vector3();
 
+/**
+ * The base 3D object that is supported by {@link CSS3DRenderer}.
+ *
+ * @augments Object3D
+ */
 class CSS3DObject extends Object3D {
 
+	/**
+	 * Constructs a new CSS3D object.
+	 *
+	 * @param {DOMElement} [element] - The DOM element.
+	 */
 	constructor( element = document.createElement( 'div' ) ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCSS3DObject = true;
 
+		/**
+		 * The DOM element which defines the appearance of this 3D object.
+		 *
+		 * @type {DOMElement}
+		 * @readonly
+		 * @default true
+		 */
 		this.element = element;
 		this.element.style.position = 'absolute';
 		this.element.style.pointerEvents = 'auto';
@@ -59,14 +81,38 @@ class CSS3DObject extends Object3D {
 
 }
 
+/**
+ * A specialized version of {@link CSS3DObject} that represents
+ * DOM elements as sprites.
+ *
+ * @augments CSS3DObject
+ */
 class CSS3DSprite extends CSS3DObject {
 
+	/**
+	 * Constructs a new CSS3D sprite object.
+	 *
+	 * @param {DOMElement} [element] - The DOM element.
+	 */
 	constructor( element ) {
 
 		super( element );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCSS3DSprite = true;
 
+		/**
+		 * The sprite's rotation in radians.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.rotation2D = 0;
 
 	}
@@ -88,8 +134,28 @@ class CSS3DSprite extends CSS3DObject {
 const _matrix = new Matrix4();
 const _matrix2 = new Matrix4();
 
+/**
+ * This renderer can be used to apply hierarchical 3D transformations to DOM elements
+ * via the CSS3 [transform]{@link https://www.w3schools.com/cssref/css3_pr_transform.asp} property.
+ * `CSS3DRenderer` is particularly interesting if you want to apply 3D effects to a website without
+ * canvas based rendering. It can also be used in order to combine DOM elements with WebGLcontent.
+ *
+ * There are, however, some important limitations:
+ *
+ * - It's not possible to use the material system of *three.js*.
+ * - It's also not possible to use geometries.
+ * - The renderer only supports 100% browser and display zoom.
+ *
+ * So `CSS3DRenderer` is just focused on ordinary DOM elements. These elements are wrapped into special
+ * 3D objects ({@link CSS3DObject} or {@link CSS3DSprite}) and then added to the scene graph.
+ */
 class CSS3DRenderer {
 
+	/**
+	 * Constructs a new CSS3D renderer.
+	 *
+	 * @param {CSS3DRenderer~Parameters} [parameters] - The parameters.
+	 */
 	constructor( parameters = {} ) {
 
 		const _this = this;
@@ -106,6 +172,11 @@ class CSS3DRenderer {
 
 		domElement.style.overflow = 'hidden';
 
+		/**
+		 * The DOM where the renderer appends its child-elements.
+		 *
+		 * @type {DOMElement}
+		 */
 		this.domElement = domElement;
 
 		const viewElement = document.createElement( 'div' );
@@ -119,6 +190,11 @@ class CSS3DRenderer {
 
 		viewElement.appendChild( cameraElement );
 
+		/**
+		 * Returns an object containing the width and height of the renderer.
+		 *
+		 * @return {{width:number,height:number}} The size of the renderer.
+		 */
 		this.getSize = function () {
 
 			return {
@@ -128,6 +204,12 @@ class CSS3DRenderer {
 
 		};
 
+		/**
+		 * Renders the given scene using the given camera.
+		 *
+		 * @param {Object3D} scene - A scene or any other type of 3D object.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			const fov = camera.projectionMatrix.elements[ 5 ] * _heightHalf;
@@ -179,6 +261,12 @@ class CSS3DRenderer {
 
 		};
 
+		/**
+		 * Resizes the renderer to the given width and height.
+		 *
+		 * @param {number} width - The width of the renderer.
+		 * @param {number} height - The height of the renderer.
+		 */
 		this.setSize = function ( width, height ) {
 
 			_width = width;
@@ -349,5 +437,13 @@ class CSS3DRenderer {
 	}
 
 }
+
+/**
+ * Constructor parameters of `CSS3DRenderer`.
+ *
+ * @typedef {Object} CSS3DRenderer~Parameters
+ * @property {DOMElement} [element] - A DOM element where the renderer appends its child-elements.
+ * If not passed in here, a new div element will be created.
+ **/
 
 export { CSS3DObject, CSS3DSprite, CSS3DRenderer };
