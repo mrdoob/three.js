@@ -474,7 +474,6 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// Apply dynamic properties to cached views
 		const descriptor = {
 			colorAttachments: []
 		};
@@ -484,7 +483,6 @@ class WebGPUBackend extends Backend {
 
 			const viewInfo = descriptorBase.textureViews[ i ];
 
-			// Only apply the user-defined clearValue to the first color attachment
 			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
 			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
 
@@ -929,13 +927,11 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderTargetContext.depth;
 			supportsStencil = renderTargetContext.stencil;
 
-			// Config object with all dynamic properties
 			const clearConfig = {
 				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
 				clearValue: color ? clearValue : undefined
 			};
 
-			// If depth or stencil operations are needed, add them to config
 			if ( supportsDepth ) {
 
 				clearConfig.depthLoadOp = depth ? GPULoadOp.Clear : GPULoadOp.Load;
