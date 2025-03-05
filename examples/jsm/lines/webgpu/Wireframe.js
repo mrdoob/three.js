@@ -11,21 +11,49 @@ import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 const _start = new Vector3();
 const _end = new Vector3();
 
+/**
+ * A class for creating wireframes based on wide lines.
+ *
+ * This module can only be used with {@link WebGPURenderer}. When using {@link WebGLRenderer},
+ * import the class from `lines/Wireframe.js`.
+ *
+ * @augments Mesh
+ */
 class Wireframe extends Mesh {
 
+	/**
+	 * Constructs a new wireframe.
+	 *
+	 * @param {LineSegmentsGeometry} [geometry] - The line geometry.
+	 * @param {Line2NodeMaterial} [material] - The line material.
+	 */
 	constructor( geometry = new LineSegmentsGeometry(), material = new Line2NodeMaterial( { color: Math.random() * 0xffffff } ) ) {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isWireframe = true;
 
 		this.type = 'Wireframe';
 
 	}
 
-	// for backwards-compatibility, but could be a method of LineSegmentsGeometry...
-
+	/**
+	 * Computes an array of distance values which are necessary for rendering dashed lines.
+	 * For each vertex in the geometry, the method calculates the cumulative length from the
+	 * current point to the very beginning of the line.
+	 *
+	 * @return {Wireframe} A reference to this instance.
+	 */
 	computeLineDistances() {
+
+		// for backwards-compatibility, but could be a method of LineSegmentsGeometry...
 
 		const geometry = this.geometry;
 

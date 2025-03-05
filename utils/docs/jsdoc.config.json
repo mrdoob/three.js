@@ -15,6 +15,7 @@
             "examples/jsm/animation",
             "examples/jsm/capabilities",
             "examples/jsm/controls",
+            "examples/jsm/csm",
             "examples/jsm/curves",
             "examples/jsm/effects",
             "examples/jsm/environments",
@@ -24,6 +25,7 @@
             "examples/jsm/interactive",
             "examples/jsm/lighting",
             "examples/jsm/lights",
+            "examples/jsm/lines",
             "examples/jsm/textures",
             "examples/jsm/tsl",
             "src"
@@ -31,7 +33,8 @@
         "exclude": [
             "src/renderers/common/extras/PMREMGenerator.js",
             "examples/jsm/helpers/LightProbeHelperGPU.js",
-            "examples/jsm/helpers/TextureHelperGPU.js"
+            "examples/jsm/helpers/TextureHelperGPU.js",
+            "examples/jsm/lines/webgpu"
         ]
     }
 }
