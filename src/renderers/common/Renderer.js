@@ -1932,6 +1932,8 @@ class Renderer {
 			renderContext.stencil = renderTarget.stencilBuffer;
 			// #30329
 			renderContext.clearColorValue = this.backend.getClearColor();
+			renderContext.activeCubeFace = this.getActiveCubeFace();
+			renderContext.activeMipmapLevel = this.getActiveMipmapLevel();
 
 		}
 
