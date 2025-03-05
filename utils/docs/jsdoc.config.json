@@ -26,6 +26,9 @@
             "examples/jsm/lighting",
             "examples/jsm/lights",
             "examples/jsm/lines",
+            "examples/jsm/materials",
+            "examples/jsm/modifiers",
+            "examples/jsm/renderers",
             "examples/jsm/textures",
             "examples/jsm/tsl",
             "src"
@@ -34,7 +37,9 @@
             "src/renderers/common/extras/PMREMGenerator.js",
             "examples/jsm/helpers/LightProbeHelperGPU.js",
             "examples/jsm/helpers/TextureHelperGPU.js",
-            "examples/jsm/lines/webgpu"
+            "examples/jsm/lines/webgpu",
+            "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
+            "examples/jsm/modifiers/CurveModifierGPU.js"
         ]
     }
 }

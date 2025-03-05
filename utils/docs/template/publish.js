@@ -134,7 +134,7 @@ function buildSearchListForData() {
 
 	data().each( ( item ) => {
 
-		if ( item.kind !== 'package' && ! item.inherited ) {
+		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
 			searchList.push( {
 				title: item.longname,
