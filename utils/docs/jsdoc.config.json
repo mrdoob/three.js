@@ -27,6 +27,7 @@
             "examples/jsm/lights",
             "examples/jsm/lines",
             "examples/jsm/materials",
+            "examples/jsm/math",
             "examples/jsm/modifiers",
             "examples/jsm/renderers",
             "examples/jsm/textures",

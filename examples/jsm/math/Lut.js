@@ -4,22 +4,83 @@ import {
 	MathUtils
 } from 'three';
 
+/**
+ * Represents a lookup table for colormaps. It is used to determine the color
+ * values from a range of data values.
+ *
+ * ```js
+ * const lut = new Lut( 'rainbow', 512 );
+ * const color = lut.getColor( 0.5 );
+ * ```
+ */
 class Lut {
 
+	/**
+	 * Constructs a new Lut.
+	 *
+	 * @param {('rainbow'|'cooltowarm'|'blackbody'|'grayscale')} [colormap='rainbow'] - Sets a colormap from predefined list of colormaps.
+	 * @param {number} [count=32] - Sets the number of colors used to represent the data array.
+	 */
  	constructor( colormap, count = 32 ) {
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLut = true;
 
+
+		/**
+		 * The lookup table for the selected color map
+		 *
+		 * @type {Array<Color>}
+		 */
 		this.lut = [];
+
+		/**
+		 * The currently selected color map.
+		 *
+		 * @type {Array}
+		 */
 		this.map = [];
+
+		/**
+		 * The number of colors of the current selected color map.
+		 *
+		 * @type {number}
+		 * @default 32
+		 */
 		this.n = 0;
+
+		/**
+		 * The minimum value to be represented with the lookup table.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.minV = 0;
+
+		/**
+		 * The maximum value to be represented with the lookup table.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.maxV = 1;
 
 		this.setColorMap( colormap, count );
 
 	}
 
+	/**
+	 * Sets the given LUT.
+	 *
+	 * @param {Lut} value - The LUT to set.
+	 * @return {Lut} A reference to this LUT.
+	 */
 	set( value ) {
 
 		if ( value.isLut === true ) {
@@ -32,6 +93,12 @@ class Lut {
 
 	}
 
+	/**
+	 * Sets the minimum value to be represented with this LUT.
+	 *
+	 * @param {number} min - The minimum value to be represented with the lookup table.
+	 * @return {Lut} A reference to this LUT.
+	 */
 	setMin( min ) {
 
 		this.minV = min;
@@ -40,6 +107,12 @@ class Lut {
 
 	}
 
+	/**
+	 * Sets the maximum value to be represented with this LUT.
+	 *
+	 * @param {number} max - The maximum value to be represented with the lookup table.
+	 * @return {Lut} A reference to this LUT.
+	 */
 	setMax( max ) {
 
 		this.maxV = max;
@@ -48,6 +121,13 @@ class Lut {
 
 	}
 
+	/**
+	 * Configure the lookup table for the given color map and number of colors.
+	 *
+	 * @param {string} colormap - The name of the color map.
+	 * @param {number} [count=32] - The number of colors.
+	 * @return {Lut} A reference to this LUT.
+	 */
 	setColorMap( colormap, count = 32 ) {
 
 		this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
@@ -97,6 +177,12 @@ class Lut {
 
 	}
 
+	/**
+	 * Copies the given lut.
+	 *
+	 * @param {Lut} lut - The LUT to copy.
+	 * @return {Lut} A reference to this LUT.
+	 */
 	copy( lut ) {
 
 		this.lut = lut.lut;
@@ -109,6 +195,12 @@ class Lut {
 
 	}
 
+	/**
+	 * Returns an instance of Color for the given data value.
+	 *
+	 * @param {number} alpha - The value to lookup.
+	 * @return {Color} The color from the LUT.
+	 */
 	getColor( alpha ) {
 
 		alpha = MathUtils.clamp( alpha, this.minV, this.maxV );
@@ -121,6 +213,14 @@ class Lut {
 
 	}
 
+	/**
+	 * Adds a color map to this Lut instance.
+	 *
+	 * @param {string} name - The name of the color map.
+	 * @param {Array} arrayOfColors - An array of color values. Each value is an array
+	 * holding a threshold and the actual color value as a hexadecimal number.
+	 * @return {Lut} A reference to this LUT.
+	 */
 	addColorMap( name, arrayOfColors ) {
 
 		ColorMapKeywords[ name ] = arrayOfColors;
@@ -129,6 +229,11 @@ class Lut {
 
 	}
 
+	/**
+	 * Creates a canvas in order to visualize the lookup table as a texture.
+	 *
+	 * @return {HTMLCanvasElement} The created canvas.
+	 */
 	createCanvas() {
 
 		const canvas = document.createElement( 'canvas' );
@@ -141,6 +246,12 @@ class Lut {
 
 	}
 
+	/**
+	 * Updates the given canvas with the Lut's data.
+	 *
+	 * @param {HTMLCanvasElement} canvas - The canvas to update.
+	 * @return {HTMLCanvasElement} The updated canvas.
+	 */
 	updateCanvas( canvas ) {
 
 		const ctx = canvas.getContext( '2d', { alpha: false } );
