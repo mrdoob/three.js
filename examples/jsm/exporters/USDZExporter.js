@@ -119,7 +119,7 @@ class USDZExporter {
 
 					}
 
-					output += buildXform( object, geometry, material );
+					output += buildXform( object, geometry, materials[ material.uuid ] );
 
 				} else {
 
@@ -796,7 +796,7 @@ function buildCamera( camera ) {
 			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
 			token projection = "orthographic"
 		}
-	
+
 	`;
 
 	} else {
@@ -813,7 +813,7 @@ function buildCamera( camera ) {
 			token projection = "perspective"
 			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
 		}
-	
+
 	`;
 
 	}
