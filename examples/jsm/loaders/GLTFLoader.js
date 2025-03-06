@@ -2295,7 +2295,7 @@ function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
 }
 
 /**
- * @param {Object3D|Material|BufferGeometry} object
+ * @param {Object3D|Material|BufferGeometry|Object} object
  * @param {GLTF.definition} gltfDef
  */
 function assignExtrasToUserData( object, gltfDef ) {
@@ -3355,7 +3355,7 @@ class GLTFParser {
 	 * @param {Object} materialParams
 	 * @param {string} mapName
 	 * @param {Object} mapDef
-	 * @param {string} colorSpace
+	 * @param {string} [colorSpace]
 	 * @return {Promise<Texture>}
 	 */
 	assignTexture( materialParams, mapName, mapDef, colorSpace ) {
@@ -3761,7 +3761,7 @@ class GLTFParser {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#meshes
 	 * @param {number} meshIndex
-	 * @return {Promise<Group|Mesh|SkinnedMesh>}
+	 * @return {Promise<Group|Mesh|SkinnedMesh|Line|Points>}
 	 */
 	loadMesh( meshIndex ) {
 
@@ -4463,7 +4463,7 @@ class GLTFParser {
 				TypedKeyframeTrack = QuaternionKeyframeTrack;
 				break;
 
-			case PATH_PROPERTIES.position:
+			case PATH_PROPERTIES.translation:
 			case PATH_PROPERTIES.scale:
 
 				TypedKeyframeTrack = VectorKeyframeTrack;
