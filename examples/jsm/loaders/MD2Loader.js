@@ -388,7 +388,7 @@ class MD2Loader extends Loader {
 		geometry.morphAttributes.normal = morphNormals;
 		geometry.morphTargetsRelative = false;
 
-		geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
+		geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10, false );
 
 		return geometry;
 
