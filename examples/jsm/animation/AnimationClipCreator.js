@@ -15,7 +15,7 @@ import {
 class AnimationClipCreator {
 
 	/**
-	 * Creates an animation clip that rotates a 3D object 360 degress
+	 * Creates an animation clip that rotates a 3D object 360 degrees
 	 * in the given period of time around the given axis.
 	 *
 	 * @param {number} period - The duration of the animation.
@@ -115,7 +115,7 @@ class AnimationClipCreator {
 	}
 
 	/**
-	 * Creates an animation clip that toggles the visbility of a 3D object.
+	 * Creates an animation clip that toggles the visibility of a 3D object.
 	 *
 	 * @param {number} duration - The duration of the animation.
 	 * @return {AnimationClip} The created animation clip.

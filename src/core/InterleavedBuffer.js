@@ -161,7 +161,7 @@ class InterleavedBuffer {
 	 * and destination position in the attribute buffers are represented by the
 	 * given indices.
 	 *
-	 * @param {number} index1 - The destintation index into this interleaved buffer.
+	 * @param {number} index1 - The destination index into this interleaved buffer.
 	 * @param {InterleavedBuffer} interleavedBuffer - The interleaved buffer to copy from.
 	 * @param {number} index2 - The source index into the given interleaved buffer.
 	 * @return {InterleavedBuffer} A reference to this instance.

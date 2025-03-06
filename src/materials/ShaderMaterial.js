@@ -130,7 +130,7 @@ class ShaderMaterial extends Material {
 		/**
 		 * Controls line thickness or lines.
 		 *
-		 * WebGL and WebGPU ignore this setting and always render line primitves with a
+		 * WebGL and WebGPU ignore this setting and always render line primitives with a
 		 * width of one pixel.
 		 *
 		 * @type {number}

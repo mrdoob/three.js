@@ -57,7 +57,7 @@ class CSMFrustum {
 	/**
 	 * Setups this CSM frustum from the given projection matrix and max far value.
 	 *
-	 * @param {Matrix4} projectionMatrix - The projection matrix, ususally of the scene's camera.
+	 * @param {Matrix4} projectionMatrix - The projection matrix, usually of the scene's camera.
 	 * @param {number} maxFar - The maximum far value.
 	 * @returns {Object} An object representing the vertices of the near and far plane in view space.
 	 */

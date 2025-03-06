@@ -16,7 +16,7 @@ import { SRGBColorSpace } from '../constants.js';
  * a right-handed coordinate system, environment maps used in three.js will
  * have pos-x and neg-x swapped.
  *
- * The loaded cube textureis in sRGB color space. Meaning {@link Texture#colorSpace}
+ * The loaded cube texture is in sRGB color space. Meaning {@link Texture#colorSpace}
  * is set to `SRGBColorSpace` by default.
  *
  * ```js

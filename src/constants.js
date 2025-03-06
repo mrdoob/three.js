@@ -626,7 +626,7 @@ export const LinearMipmapLinearFilter = 1008;
 export const LinearMipMapLinearFilter = 1008; // legacy
 
 /**
- * An unsinged byte data type for textures.
+ * An unsigned byte data type for textures.
  *
  * @type {number}
  * @constant
@@ -650,7 +650,7 @@ export const ByteType = 1010;
 export const ShortType = 1011;
 
 /**
- * An unsinged short data type for textures.
+ * An unsigned short data type for textures.
  *
  * @type {number}
  * @constant
@@ -666,7 +666,7 @@ export const UnsignedShortType = 1012;
 export const IntType = 1013;
 
 /**
- * An unsinged int data type for textures.
+ * An unsigned int data type for textures.
  *
  * @type {number}
  * @constant
@@ -690,7 +690,7 @@ export const FloatType = 1015;
 export const HalfFloatType = 1016;
 
 /**
- * An unsinged short 4_4_4_4 (packed) data type for textures.
+ * An unsigned short 4_4_4_4 (packed) data type for textures.
  *
  * @type {number}
  * @constant
@@ -698,7 +698,7 @@ export const HalfFloatType = 1016;
 export const UnsignedShort4444Type = 1017;
 
 /**
- * An unsinged short 5_5_5_1 (packed) data type for textures.
+ * An unsigned short 5_5_5_1 (packed) data type for textures.
  *
  * @type {number}
  * @constant
@@ -706,7 +706,7 @@ export const UnsignedShort4444Type = 1017;
 export const UnsignedShort5551Type = 1018;
 
 /**
- * An unsinged int 24_8 data type for textures.
+ * An unsigned int 24_8 data type for textures.
  *
  * @type {number}
  * @constant
@@ -714,7 +714,7 @@ export const UnsignedShort5551Type = 1018;
 export const UnsignedInt248Type = 1020;
 
 /**
- * An unsinged int 5_9_9_9 (packed) data type for textures.
+ * An unsigned int 5_9_9_9 (packed) data type for textures.
  *
  * @type {number}
  * @constant

@@ -131,7 +131,7 @@ class InteractiveGroup extends Group {
 
 	/**
 	 * Calling this method makes sure the interactive group listens to Pointer and Mouse events.
-	 * The taret is the `domElement` of the given renderer. The camera is required for the internal
+	 * The target is the `domElement` of the given renderer. The camera is required for the internal
 	 * raycasting so 3D objects can be detected based on the events.
 	 *
 	 * @param {(WebGPURenderer|WebGLRenderer)} renderer - The renderer.

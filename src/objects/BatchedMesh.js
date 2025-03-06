@@ -705,7 +705,7 @@ class BatchedMesh extends Mesh {
 	 * is not enough space reserved for geometry. Calling this will change all instances that are
 	 * rendering that geometry.
 	 *
-	 * @param {number} geometryId - The ID of the geomtry that should be replaced with the given geometry.
+	 * @param {number} geometryId - The ID of the geometry that should be replaced with the given geometry.
 	 * @param {BufferGeometry} geometry - The new geometry.
 	 * @return {number} The geometry ID.
 	 */
@@ -818,7 +818,7 @@ class BatchedMesh extends Mesh {
 	 * Deletes the geometry defined by the given ID from this batch. Any instances referencing
 	 * this geometry will also be removed as a side effect.
 	 *
-	 * @param {number} geometryId - The ID of the geomtry to remove from the batch.
+	 * @param {number} geometryId - The ID of the geometry to remove from the batch.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	deleteGeometry( geometryId ) {

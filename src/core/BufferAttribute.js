@@ -216,7 +216,7 @@ class BufferAttribute {
 	 * and destination position in the attribute buffers are represented by the
 	 * given indices.
 	 *
-	 * @param {number} index1 - The destintation index into this buffer attribute.
+	 * @param {number} index1 - The destination index into this buffer attribute.
 	 * @param {BufferAttribute} attribute - The buffer attribute to copy from.
 	 * @param {number} index2 - The source index into the given buffer attribute.
 	 * @return {BufferAttribute} A reference to this instance.
@@ -390,7 +390,7 @@ class BufferAttribute {
 	}
 
 	/**
-	 * Sets the given value tothe given component of the vector at the given index.
+	 * Sets the given value to the given component of the vector at the given index.
 	 *
 	 * @param {number} index - The index into the buffer attribute.
 	 * @param {number} component - The component index.

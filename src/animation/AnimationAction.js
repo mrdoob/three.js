@@ -124,7 +124,7 @@ class AnimationAction {
 		this.paused = false;
 
 		/**
-		 * If set to `false`, the action is disabeled so it has no impact.
+		 * If set to `false`, the action is disabled so it has no impact.
 		 *
 		 * When the action is re-enabled, the animation continues from its current
 		 * time (setting `enabled` to `false` doesn't reset the action).

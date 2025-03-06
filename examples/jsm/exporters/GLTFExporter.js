@@ -201,7 +201,7 @@ class GLTFExporter {
 	}
 
 	/**
-	 * Registers a plugin callback. This API is iternally used to implement the various
+	 * Registers a plugin callback. This API is internally used to implement the various
 	 * glTF extensions but can also used by third-party code to add additional logic
 	 * to the exporter.
 	 *

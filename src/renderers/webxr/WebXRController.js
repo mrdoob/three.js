@@ -71,9 +71,9 @@ class WebXRController {
 	}
 
 	/**
-	 * Returns a group representing the traget ray space of the XR controller.
+	 * Returns a group representing the target ray space of the XR controller.
 	 *
-	 * @return {Group} A group representing the traget ray space of the XR controller.
+	 * @return {Group} A group representing the target ray space of the XR controller.
 	 */
 	getTargetRaySpace() {
 

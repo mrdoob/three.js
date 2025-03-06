@@ -282,7 +282,7 @@ class CSMShadowNode extends ShadowBaseNode {
 	}
 
 	/**
-	 * Sets the ligth breaks.
+	 * Sets the light breaks.
 	 *
 	 * @private
 	 */

@@ -136,7 +136,7 @@ class Octree {
 	}
 
 	/**
-	 * Adds the given triangle to the Octree. The triangle vertices are clampled if they exceed
+	 * Adds the given triangle to the Octree. The triangle vertices are clamped if they exceed
 	 * the bounds of the Octree.
 	 *
 	 * @param {Triangle} triangle - The triangle to add.

@@ -50,7 +50,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 	/**
-	 * Applies the given 4x4 tranformation matrix to the geometry.
+	 * Applies the given 4x4 transformation matrix to the geometry.
 	 *
 	 * @param {Matrix4} matrix - The matrix to apply.
 	 * @return {LineSegmentsGeometry} A reference to this instance.
@@ -87,7 +87,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 	/**
-	 * Sets the given line positions for this goemetry. The length must be a multiple of six since
+	 * Sets the given line positions for this geometry. The length must be a multiple of six since
 	 * each line segment is defined by a start end vertex in the pattern `(xyz xyz)`.
 	 *
 	 * @param {Float32|Array} array - The position data to set.
@@ -124,7 +124,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 	/**
-	 * Sets the given line colors for this goemetry. The length must be a multiple of six since
+	 * Sets the given line colors for this geometry. The length must be a multiple of six since
 	 * each line segment is defined by a start end color in the pattern `(rgb rgb)`.
 	 *
 	 * @param {Float32|Array} array - The position data to set.

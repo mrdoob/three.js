@@ -47,7 +47,7 @@ function initSplineTexture( numberOfCurves = 1 ) {
 /**
  * Write the curve description to the data texture.
  *
- * @privaate
+ * @private
  * @param {DataTexture} texture - The data texture to write to.
  * @param {Curve} splineCurve - The curve to describe.
  * @param {number} [offset=0] - Which curve slot to write to.
