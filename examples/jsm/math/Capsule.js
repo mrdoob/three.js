@@ -61,7 +61,7 @@ class Capsule {
 	 * @param {Vector3} start - The start vector.
 	 * @param {Vector3} end - The end vector
 	 * @param {number} radius - The capsule's radius.
-	 * @return {Box2} A reference to this bounding box.
+	 * @return {Capsule} A reference to this capsule.
 	 */
 	set( start, end, radius ) {
 
