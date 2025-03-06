@@ -476,7 +476,9 @@ class NodeMaterial extends Material {
 
 			//
 
-			if ( this.outputNode !== null ) resultNode = this.outputNode;
+			const isCustomOutput = this.outputNode !== null;
+
+			if ( isCustomOutput ) resultNode = this.outputNode;
 
 			// MRT
 
@@ -486,6 +488,8 @@ class NodeMaterial extends Material {
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
+
+					if ( isCustomOutput ) output.assign( resultNode );
 
 					resultNode = mrt;
 
