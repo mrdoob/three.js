@@ -662,7 +662,7 @@ class LineMaterial extends ShaderMaterial {
 	 * Whether to use alphaToCoverage or not. When enabled, this can improve the
 	 * anti-aliasing of line edges when using MSAA.
 	 *
-	 * @type {Vector2}
+	 * @type {boolean}
 	 */
 	get alphaToCoverage() {
 

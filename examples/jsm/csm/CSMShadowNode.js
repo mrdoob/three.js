@@ -49,7 +49,7 @@ class CSMShadowNode extends ShadowBaseNode {
 	 * Constructs a new CSM shadow node.
 	 *
 	 * @param {DirectionalLight} light - The CSM light.
-	 * @param {CSMShadowNode~Data} data - The CSM data.
+	 * @param {CSMShadowNode~Data} [data={}] - The CSM data.
 	 */
 	constructor( light, data = {} ) {
 
