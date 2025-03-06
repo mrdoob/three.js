@@ -1075,7 +1075,7 @@ class GLTFWriter {
 	 * @param {number} componentType
 	 * @param {number} start
 	 * @param {number} count
-	 * @param {?number} target Target usage of the BufferView
+	 * @param {number} [target] Target usage of the BufferView
 	 * @return {Object}
 	 */
 	processBufferView( attribute, componentType, start, count, target ) {
@@ -1264,7 +1264,7 @@ class GLTFWriter {
 	/**
 	 * Process attribute to generate an accessor
 	 * @param {BufferAttribute} attribute Attribute to process
-	 * @param {?BufferGeometry} geometry Geometry used for truncated draw range
+	 * @param {?BufferGeometry} [geometry] Geometry used for truncated draw range
 	 * @param {number} [start=0]
 	 * @param {number} [count=Infinity]
 	 * @return {?number} Index of the processed accessor on the "accessors" array

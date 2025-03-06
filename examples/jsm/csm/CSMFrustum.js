@@ -10,7 +10,7 @@ class CSMFrustum {
 	/**
 	 * Constructs a new CSM frustum.
 	 *
-	 * @param {CSMFrustum~Data} data - The CSM data.
+	 * @param {CSMFrustum~Data} [data] - The CSM data.
 	 */
 	constructor( data ) {
 

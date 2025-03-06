@@ -351,7 +351,7 @@ function calcKoverI( k, i ) {
  * Calculates derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
  *
  * @param {Array<Vector4>} Pders - Array with derivatives.
- * @return {Array<Vector4>} An array with derivatives for rational curve.
+ * @return {Array<Vector3>} An array with derivatives for rational curve.
  */
 function calcRationalCurveDerivatives( Pders ) {
 
@@ -395,7 +395,7 @@ function calcRationalCurveDerivatives( Pders ) {
  * @param {Array<Vector4>} P - The control points in homogeneous space.
  * @param {number} u - The parametric point.
  * @param {number} nd - The number of derivatives.
- * @return {Array<Vector4>} array with derivatives for rational curve.
+ * @return {Array<Vector3>} array with derivatives for rational curve.
  */
 function calcNURBSDerivatives( p, U, P, u, nd ) {
 
@@ -411,7 +411,7 @@ function calcNURBSDerivatives( p, U, P, u, nd ) {
  * @param {number} q - The second degree of B-Spline surface.
  * @param {Array<number>} U - The first knot vector.
  * @param {Array<number>} V - The second knot vector.
- * @param {Array<Vector4>} P - The control points in homogeneous space.
+ * @param {Array<Array<Vector4>>} P - The control points in homogeneous space.
  * @param {number} u - The first parametric point.
  * @param {number} v - The second parametric point.
  * @param {Vector3} target - The target vector.
@@ -461,7 +461,7 @@ function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
  * @param {Array<number>} U - The first knot vector.
  * @param {Array<number>} V - The second knot vector.
  * @param {Array<number>} W - The third knot vector.
- * @param {Array<Vector4>} P - The control points in homogeneous space.
+ * @param {Array<Array<Array<Vector4>>>} P - The control points in homogeneous space.
  * @param {number} u - The first parametric point.
  * @param {number} v - The second parametric point.
  * @param {number} w - The third parametric point.
