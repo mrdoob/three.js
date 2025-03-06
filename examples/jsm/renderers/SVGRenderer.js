@@ -273,7 +273,7 @@ class SVGRenderer {
 		}
 
 		/**
-		 * Performs a manual clear with the defined clera color.
+		 * Performs a manual clear with the defined clear color.
 		 */
 		this.clear = function () {
 

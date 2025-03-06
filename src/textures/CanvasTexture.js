@@ -4,7 +4,7 @@ import { Texture } from './Texture.js';
  * Creates a texture from a canvas element.
  *
  * This is almost the same as the base texture class, except that it sets {@link Texture#needsUpdate}
- * to `true` immediately since a canvas can direclty be used for rendering.
+ * to `true` immediately since a canvas can directly be used for rendering.
  *
  * @augments Texture
  */

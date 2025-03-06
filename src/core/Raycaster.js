@@ -160,7 +160,7 @@ class Raycaster {
 	 * @property {number} distance - The distance from the ray's origin to the intersection point.
 	 * @property {number} distanceToRay -  Some 3D objects e.g. {@link Points} provide the distance of the
 	 * intersection to the nearest point on the ray. For other objects it will be `undefined`.
-	 * @property {Vector3} point - The intersesction point, in world coordinates.
+	 * @property {Vector3} point - The intersection point, in world coordinates.
 	 * @property {Object} face - The face that has been intersected.
 	 * @property {number} faceIndex - The face index.
 	 * @property {Object3D} object - The 3D object that has been intersected.

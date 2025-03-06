@@ -245,7 +245,7 @@ class LOD extends Object3D {
 	 * Updates the LOD by computing which LOD level should be visible according
 	 * to the current distance of the given camera.
 	 *
-	 * @param {Camera} camera - The camera the scene is renderd with.
+	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
 	update( camera ) {
 

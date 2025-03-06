@@ -140,7 +140,7 @@ export class KTX2Exporter {
 	/**
 	 * This method has two variants.
 	 *
-	 * - When exporting a data texture, it receives one paramter. The data or 3D data texture.
+	 * - When exporting a data texture, it receives one parameter. The data or 3D data texture.
 	 * - When exporting a render target (e.g. a PMREM), it receives two parameters. The renderer and the
 	 * render target.
 	 *

@@ -253,7 +253,7 @@ class CCDIKSolver {
 	}
 
 	/**
-	 * Creates a helper for visualizing tehh CCDIK.
+	 * Creates a helper for visualizing the CCDIK.
 	 *
 	 * @param {number} sphereSize - The sphere size.
 	 * @return {CCDIKHelper} The created helper.
@@ -395,7 +395,7 @@ class CCDIKHelper extends Object3D {
 		} );
 
 		/**
-		 * A global line matreial.
+		 * A global line material.
 		 *
 		 * @type {LineBasicMaterial}
 		 */

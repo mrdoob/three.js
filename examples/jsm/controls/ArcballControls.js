@@ -1532,7 +1532,7 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Applys a transformation matrix, to the camera and gizmos.
+	 * Applies a transformation matrix, to the camera and gizmos.
 	 *
 	 * @private
 	 * @param {Object} transformation - Object containing matrices to apply to camera and gizmos.

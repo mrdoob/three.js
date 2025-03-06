@@ -13,7 +13,7 @@ import {
  *
  * ```js
  * const loader = new FontLoader();
- * const fonst = await loader.loadAsync( 'fonts/helvetiker_regular.typeface.json' );
+ * const font = await loader.loadAsync( 'fonts/helvetiker_regular.typeface.json' );
  * const geometry = new TextGeometry( 'Hello three.js!', {
  * 	font: font,
  * 	size: 80,

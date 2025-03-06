@@ -1294,7 +1294,7 @@ class WebGLRenderer {
 		 *
 		 * Note that the (target) scene's lighting and environment must be configured before calling this method.
 		 *
-		 * @param {Object3D} scene - The scene or anohter type of 3D object to precompile.
+		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
 		 * @param {Camera} camera - The camera.
 		 * @param {?Scene} [targetScene=null] - The target scene.
 		 * @return {?Set} The precompiled materials.
@@ -1401,7 +1401,7 @@ class WebGLRenderer {
 		 * it is recommended to use this version of `compile()` whenever possible.
 		 *
 		 * @async
-		 * @param {Object3D} scene - The scene or anohter type of 3D object to precompile.
+		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
 		 * @param {Camera} camera - The camera.
 		 * @param {?Scene} [targetScene=null] - The target scene.
 		 * @return {Promise} A Promise that resolves when the given scene can be rendered without unnecessary stalling due to shader compilation.

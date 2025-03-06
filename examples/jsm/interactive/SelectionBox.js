@@ -64,14 +64,14 @@ class SelectionBox {
 		this.scene = scene;
 
 		/**
-		 * The start point of the selction.
+		 * The start point of the selection.
 		 *
 		 * @type {Vector3}
 		 */
 		this.startPoint = new Vector3();
 
 		/**
-		 * The end point of the selction.
+		 * The end point of the selection.
 		 *
 		 * @type {Vector3}
 		 */

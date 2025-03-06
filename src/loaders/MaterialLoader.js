@@ -373,7 +373,7 @@ class MaterialLoader extends Loader {
 	}
 
 	/**
-	 * Textures are not embebbed in the material JSON so they have
+	 * Textures are not embedded in the material JSON so they have
 	 * to be injected before the loading process starts.
 	 *
 	 * @param {Object} value - A dictionary holding textures for material properties.

@@ -26,11 +26,11 @@ class SimplifyModifier {
 
 	/**
 	 * Returns a new, modified version of the given geometry by applying a simplification.
-	 * Please note that the resutling geometry is always non-indexed.
+	 * Please note that the resulting geometry is always non-indexed.
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
-	 * @return {BufferGeometry} A new, modified goemetry.
+	 * @return {BufferGeometry} A new, modified geometry.
 	 */
 	modify( geometry, count ) {
 

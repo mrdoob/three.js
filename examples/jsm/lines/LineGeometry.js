@@ -41,7 +41,7 @@ class LineGeometry extends LineSegmentsGeometry {
 	}
 
 	/**
-	 * Sets the given line positions for this goemetry.
+	 * Sets the given line positions for this geometry.
 	 *
 	 * @param {Float32|Array} array - The position data to set.
 	 * @return {LineGeometry} A reference to this geometry.
@@ -72,7 +72,7 @@ class LineGeometry extends LineSegmentsGeometry {
 	}
 
 	/**
-	 * Sets the given line colors for this goemetry.
+	 * Sets the given line colors for this geometry.
 	 *
 	 * @param {Float32|Array} array - The position data to set.
 	 * @return {LineGeometry} A reference to this geometry.

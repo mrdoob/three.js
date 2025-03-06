@@ -150,7 +150,7 @@ class ConvexHull {
 	 *
 	 * @param {Ray} ray - The ray to test.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3|null} The intersection point. Returns `null` if not intesection was detected.
+	 * @return {Vector3|null} The intersection point. Returns `null` if not intersection was detected.
 	 */
 	intersectRay( ray, target ) {
 
@@ -1575,7 +1575,7 @@ class VertexList {
 	}
 
 	/**
-	 * ppends a chain of vertices where the given vertex is the head.
+	 * Appends a chain of vertices where the given vertex is the head.
 	 *
 	 * @private
 	 * @param {VertexNode} vertex - The head vertex of a chain of vertices.

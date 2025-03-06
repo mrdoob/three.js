@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 /**
- * This class can be used to generate a geometry based on a paremtric surface.
+ * This class can be used to generate a geometry based on a parametric surface.
  *
  * Reference: [Mesh Generation with Python]{@link https://prideout.net/blog/old/blog/index.html@p=44.html}
  *

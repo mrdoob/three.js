@@ -10,7 +10,7 @@ class SimplexNoise {
 	 * Constructs a new simplex noise object.
 	 *
 	 * @param {Object} [r=Math] - A math utility class that holds a `random()` method. This makes it
-	 * possiblet o pass in custom random number generator.
+	 * possible to pass in custom random number generator.
 	 */
 	constructor( r = Math ) {
 

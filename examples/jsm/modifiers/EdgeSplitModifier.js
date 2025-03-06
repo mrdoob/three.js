@@ -22,12 +22,12 @@ class EdgeSplitModifier {
 
 	/**
 	 * Returns a new, modified version of the given geometry by applying an edge-split operation.
-	 * Please note that the resutling geometry is always indexed.
+	 * Please note that the resulting geometry is always indexed.
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} cutOffAngle - The cut off angle in radians.
 	 * @param {boolean} [tryKeepNormals=true] - Whether to try to keep normals or not.
-	 * @return {BufferGeometry} A new, modified goemetry.
+	 * @return {BufferGeometry} A new, modified geometry.
 	 */
 	modify( geometry, cutOffAngle, tryKeepNormals = true ) {
 

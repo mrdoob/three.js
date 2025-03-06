@@ -191,7 +191,7 @@ class InterleavedBufferAttribute {
 	}
 
 	/**
-	 * Sets the given value tothe given component of the vector at the given index.
+	 * Sets the given value to the given component of the vector at the given index.
 	 *
 	 * @param {number} index - The index into the buffer attribute.
 	 * @param {number} component - The component index.

@@ -22,7 +22,7 @@ class IESSpotLight extends SpotLight {
 		super( color, intensity, distance, angle, penumbra, decay );
 
 		/**
-		 * TOOD
+		 * TODO
 		 *
 		 * @type {?Texture}
 		 * @default null
