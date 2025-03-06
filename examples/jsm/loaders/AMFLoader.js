@@ -236,7 +236,7 @@ class AMFLoader extends Loader {
 
 		function loadMeshVolume( node ) {
 
-			const volume = { name: '', triangles: [], materialid: null };
+			const volume = { name: '', triangles: [], materialId: null };
 
 			let currVolumeNode = node.firstElementChild;
 
