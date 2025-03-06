@@ -2944,13 +2944,13 @@ class WebGLRenderer {
 					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
 						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
-	
+
 					}
-	
+
 					if ( ! capabilities.textureTypeReadable( textureType ) ) {
-	
+
 						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
-	
+
 					}
 
 					const glBuffer = _gl.createBuffer();
