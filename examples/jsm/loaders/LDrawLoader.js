@@ -1839,7 +1839,7 @@ class LDrawLoader extends Loader {
 			this.setMaterials( [] );
 
 			this.partsCache
-				.parseModel( text, this.materialLibrary )
+				.parseModel( text )
 				.then( group => {
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
@@ -1857,7 +1857,7 @@ class LDrawLoader extends Loader {
 	parse( text, onLoad, onError ) {
 
 		this.partsCache
-			.parseModel( text, this.materialLibrary )
+			.parseModel( text )
 			.then( group => {
 
 				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
