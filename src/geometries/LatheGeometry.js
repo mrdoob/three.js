@@ -25,7 +25,7 @@ class LatheGeometry extends BufferGeometry {
 	/**
 	 * Constructs a new lathe geometry.
 	 *
-	 * @param {Array<Vector2>} [points] - An array of points in 2D space. The x-coordinate of each point
+	 * @param {Array<Vector2|Vector3>} [points] - An array of points in 2D space. The x-coordinate of each point
 	 * must be greater than zero.
 	 * @param {number} [segments=12] - The number of circumference segments to generate.
 	 * @param {number} [phiStart=0] - The starting angle in radians.

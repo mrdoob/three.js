@@ -310,7 +310,7 @@ class Skeleton {
 	 * Setups the skeleton by the given JSON and bones.
 	 *
 	 * @param {Object} json - The skeleton as serialized JSON.
-	 * @param {Array<Bone>} bones - An array of bones.
+	 * @param {Object<string, Bone>} bones - An array of bones.
 	 * @return {Skeleton} A reference of this instance.
 	 */
 	fromJSON( json, bones ) {

@@ -22,7 +22,7 @@ class MarchingCubes extends Mesh {
 	 * @param {Material} material - The cube's material.
 	 * @param {boolean} [enableUvs=false] - Whether texture coordinates should be animated or not.
 	 * @param {boolean} [enableColors=false] - Whether colors should be animated or not.
-	 * @param {boolean} [maxPolyCount=10000] - The maximum size of the geometry buffers.
+	 * @param {number} [maxPolyCount=10000] - The maximum size of the geometry buffers.
 	 */
 	constructor( resolution, material, enableUvs = false, enableColors = false, maxPolyCount = 10000 ) {
 

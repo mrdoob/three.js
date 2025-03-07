@@ -806,7 +806,7 @@ export default ShadowNode;
  * @tsl
  * @function
  * @param {Light} light - The shadow casting light.
- * @param {LightShadow} shadow - The light shadow.
+ * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
 export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );

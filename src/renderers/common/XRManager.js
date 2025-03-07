@@ -229,7 +229,7 @@ class XRManager extends EventDispatcher {
 		 * The current XR reference space type.
 		 *
 		 * @private
-		 * @type {string}
+		 * @type {XRReferenceSpaceType}
 		 * @default 'local-floor'
 		 */
 		this._referenceSpaceType = 'local-floor';
@@ -439,7 +439,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the reference space type.
 	 *
-	 * @return {string} The reference space type.
+	 * @return {XRReferenceSpaceType} The reference space type.
 	 */
 	getReferenceSpaceType() {
 
@@ -452,7 +452,7 @@ class XRManager extends EventDispatcher {
 	 *
 	 * This method can not be used during a XR session.
 	 *
-	 * @param {string} type - The reference space type.
+	 * @param {XRReferenceSpaceType} type - The reference space type.
 	 */
 	setReferenceSpaceType( type ) {
 

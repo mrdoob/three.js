@@ -79,7 +79,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		 * An array that holds objects defining the varying and attribute data in
 		 * context of Transform Feedback.
 		 *
-		 * @type {Object<string,Map<string,Object>>}
+		 * @type {Array<Object<string,AttributeNode|string>>}
 		 */
 		this.transforms = [];
 

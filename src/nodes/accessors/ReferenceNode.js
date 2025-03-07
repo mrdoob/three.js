@@ -388,7 +388,7 @@ export default ReferenceNode;
  * @function
  * @param {string} name - The name of the property the node refers to.
  * @param {string} type - The uniform type that should be used to represent the property value.
- * @param {?Object} object - The object the property belongs to.
+ * @param {?Object} [object] - The object the property belongs to.
  * @returns {ReferenceNode}
  */
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
