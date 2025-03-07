@@ -118,8 +118,6 @@ class AsciiEffect {
 		}
 
 
-		const aDefaultCharList = ( ' .,:;i1tfLCG08@' ).split( '' );
-		const aDefaultColorCharList = ( ' CGO08@' ).split( '' );
 		const strFont = 'courier new, monospace';
 
 		const oCanvasImg = renderer.domElement;
@@ -138,9 +136,19 @@ class AsciiEffect {
 
 		}
 
-		let aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
+		let aCharList;
+		if ( charSet ) {
 
-		if ( charSet ) aCharList = charSet;
+			aCharList = ( charSet ).split( '' );
+
+		} else {
+
+			const aDefaultCharList = ( ' .,:;i1tfLCG08@' ).split( '' );
+			const aDefaultColorCharList = ( ' CGO08@' ).split( '' );
+			aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
+
+		}
+
 
 		// Setup dom
 
