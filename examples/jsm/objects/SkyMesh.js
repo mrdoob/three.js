@@ -9,34 +9,85 @@ import {
 import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
+ * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight]{@link https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight}
+ * aka The Preetham Model, the de facto standard for analytical skydomes.
  *
- * First implemented by Simon Wallner
- * http://simonwallner.at/project/atmospheric-scattering/
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link SkyMesh}.
  *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ * More references:
  *
- * Three.js integration by zz85 http://twitter.com/blurspline
+ * - {@link http://simonwallner.at/project/atmospheric-scattering/}
+ * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
+ *
+ * ```js
+ * const sky = new SkyMesh();
+ * sky.scale.setScalar( 10000 );
+ * scene.add( sky );
+ * ```
+ *
+ * @augments Mesh
 */
-
 class SkyMesh extends Mesh {
 
+	/**
+	 * Constructs a new skydome.
+	 */
 	constructor() {
 
 		const material = new NodeMaterial();
 
 		super( new BoxGeometry( 1, 1, 1 ), material );
 
+		/**
+		 * The turbidity uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.turbidity = uniform( 2 );
+
+		/**
+		 * The rayleigh uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.rayleigh = uniform( 1 );
+
+		/**
+		 * The mieCoefficient uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.mieCoefficient = uniform( 0.005 );
+
+		/**
+		 * The mieDirectionalG uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.mieDirectionalG = uniform( 0.8 );
+
+		/**
+		 * The sun position uniform.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.sunPosition = uniform( new Vector3() );
+
+		/**
+		 * The up position.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.upUniform = uniform( new Vector3( 0, 1, 0 ) );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSky = true;
 
 		const vertexNode = /*@__PURE__*/ Fn( () => {
