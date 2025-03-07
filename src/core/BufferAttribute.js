@@ -92,7 +92,7 @@ class BufferAttribute {
 		 * `0.0f - +1.0f` in the GLSL attribute. If `normalized` is `false`, the values will be converted
 		 * to floats unmodified, i.e. `65535` becomes `65535.0f`.
 		 *
-		 * @type {number}
+		 * @type {boolean}
 		 */
 		this.normalized = normalized;
 

@@ -102,7 +102,7 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 /**
  * @param  {Array<BufferGeometry>} geometries
  * @param  {boolean} useGroups
- * @return {BufferGeometry}
+ * @return {?BufferGeometry}
  */
 function mergeGeometries( geometries, useGroups = false ) {
 
@@ -297,7 +297,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 /**
  * @param {Array<BufferAttribute>} attributes
- * @return {BufferAttribute}
+ * @return {?BufferAttribute}
  */
 function mergeAttributes( attributes ) {
 

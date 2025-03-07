@@ -559,7 +559,7 @@ class Color {
 	 * Converts the colors RGB values into the HSL format and stores them into the
 	 * given target object.
 	 *
-	 * @param {{h:0,s:0,l:0}} target - The target object that is used to store the method's result.
+	 * @param {{h:number,s:number,l:number}} target - The target object that is used to store the method's result.
 	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
 	 * @return {{h:number,s:number,l:number}} The HSL representation of this color.
 	 */

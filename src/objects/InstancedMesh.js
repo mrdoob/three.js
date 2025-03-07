@@ -71,7 +71,7 @@ class InstancedMesh extends Mesh {
 		 * {@link Texture#needsUpdate} flag to true if you modify instanced data
 		 * via {@link InstancedMesh#setMorphAt}.
 		 *
-		 * @type {?InstancedBufferAttribute}
+		 * @type {?DataTexture}
 		 * @default null
 		 */
 		this.morphTexture = null;

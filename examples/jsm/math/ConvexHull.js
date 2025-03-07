@@ -328,7 +328,7 @@ class ConvexHull {
 	 *
 	 * @private
 	 * @param {Face} face - The target face.
-	 * @return {ConvexHull} A reference to this convex hull.
+	 * @return {VertexNode|undefined} A reference to this convex hull.
 	 */
 	_removeAllVerticesFromFace( face ) {
 
@@ -1391,7 +1391,7 @@ class VertexNode {
 		 * Reference to the previous vertex in the double linked list.
 		 *
 		 * @private
-		 * @type {?Vector3}
+		 * @type {?VertexNode}
 		 * @default null
 		 */
 		this.prev = null;
@@ -1400,7 +1400,7 @@ class VertexNode {
 		 * Reference to the next vertex in the double linked list.
 		 *
 		 * @private
-		 * @type {?Vector3}
+		 * @type {?VertexNode}
 		 * @default null
 		 */
 		this.next = null;
