@@ -1352,7 +1352,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( index !== null ) {
 
-			this.setIndex( index.clone( data ) );
+			this.setIndex( index.clone() );
 
 		}
 
