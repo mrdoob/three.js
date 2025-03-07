@@ -15,6 +15,7 @@ class OculusHandModel extends Object3D {
 		this.envMap = null;
 		this.loader = loader;
 		this.onLoad = onLoad;
+		this.path = null;
 
 		this.mesh = null;
 
