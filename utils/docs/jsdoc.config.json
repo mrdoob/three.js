@@ -29,6 +29,7 @@
             "examples/jsm/materials",
             "examples/jsm/math",
             "examples/jsm/modifiers",
+            "examples/jsm/objects",
             "examples/jsm/renderers",
             "examples/jsm/textures",
             "examples/jsm/tsl",
@@ -40,7 +41,9 @@
             "examples/jsm/helpers/TextureHelperGPU.js",
             "examples/jsm/lines/webgpu",
             "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
-            "examples/jsm/modifiers/CurveModifierGPU.js"
+            "examples/jsm/modifiers/CurveModifierGPU.js",
+            "examples/jsm/objects/Water2.js",
+            "examples/jsm/objects/Water2Mesh.js"
         ]
     }
 }

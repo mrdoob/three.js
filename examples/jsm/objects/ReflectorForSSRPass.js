@@ -15,8 +15,19 @@ import {
 	HalfFloatType
 } from 'three';
 
+/**
+ * A special version of {@link Reflector} for usage with {@link SSRPass}.
+ *
+ * @augments Mesh
+ */
 class ReflectorForSSRPass extends Mesh {
 
+	/**
+	 * Constructs a new reflector.
+	 *
+	 * @param {BufferGeometry} geometry - The reflector's geometry.
+	 * @param {ReflectorForSSRPass~Options} [options] - The configuration options.
+	 */
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
@@ -240,9 +251,25 @@ class ReflectorForSSRPass extends Mesh {
 
 		};
 
+		/**
+		 * Returns the reflector's internal render target.
+		 *
+		 * @return {WebGLRenderTarget} The internal render target
+		 */
 		this.getRenderTarget = function () {
 
 			return renderTarget;
+
+		};
+
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
+		this.dispose = function () {
+
+			renderTarget.dispose();
+			scope.material.dispose();
 
 		};
 
@@ -348,5 +375,17 @@ ReflectorForSSRPass.ReflectorShader = {
 		}
 	`,
 };
+
+/**
+ * Constructor options of `ReflectorForSSRPass`.
+ *
+ * @typedef {Object} ReflectorForSSRPass~Options
+ * @property {number|Color|string} [color=0x7F7F7F] - The reflector's color.
+ * @property {number} [textureWidth=512] - The texture width. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [textureHeight=512] - The texture height. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [clipBias=0] - The clip bias.
+ * @property {Object} [shader] - Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.
+ * @property {boolean} [useDepthTexture=true] - Whether to store depth values in a texture or not.
+ **/
 
 export { ReflectorForSSRPass };

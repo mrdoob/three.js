@@ -18,16 +18,59 @@ import {
 
 import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn } from 'three/tsl';
 
+/**
+ * Creates a simulated lens flare that tracks a light.
+ *
+ * Note that this class can only be used with {@link WebGPURenderer}.
+ * When using {@link WebGLRenderer}, use {@link Lensflare}.
+ *
+ * ```js
+ * const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+ *
+ * const lensflare = new LensflareMesh();
+ * lensflare.addElement( new LensflareElement( textureFlare0, 512, 0 ) );
+ * lensflare.addElement( new LensflareElement( textureFlare1, 512, 0 ) );
+ * lensflare.addElement( new LensflareElement( textureFlare2, 60, 0.6 ) );
+ *
+ * light.add( lensflare );
+ * ```
+ *
+ * @augments Mesh
+ */
 class LensflareMesh extends Mesh {
 
+	/**
+	 * Constructs a new lensflare mesh.
+	 */
 	constructor() {
 
 		super( LensflareMesh.Geometry, new MeshBasicNodeMaterial( { opacity: 0, transparent: true } ) );
 
-		this.isLensflare = true;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLensflareMesh = true;
 
 		this.type = 'LensflareMesh';
+
+		/**
+		 * Overwritten to disable view-frustum culling by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.frustumCulled = false;
+
+		/**
+		 * Overwritten to make sure lensflares a rendered last.
+		 *
+		 * @type {number}
+		 * @default Infinity
+		 */
 		this.renderOrder = Infinity;
 
 		//
@@ -146,7 +189,11 @@ class LensflareMesh extends Mesh {
 
 		} )();
 
-
+		/**
+		 * Adds the given lensflare element to this instance.
+		 *
+		 * @param {LensflareElement} element - The element to add.
+		 */
 		this.addElement = function ( element ) {
 
 			elements.push( element );
@@ -264,6 +311,10 @@ class LensflareMesh extends Mesh {
 
 		};
 
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			material1a.dispose();
