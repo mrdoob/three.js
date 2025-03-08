@@ -199,7 +199,7 @@ class PointerLockControls extends Controls {
 	/**
 	 * Activates the pointer lock.
 	 * 
-	 * @param {boolean} unadjustedMovement - Whether to disable OS-level adjustment for mouse acceleration and accesses raw mouse input instead or not.
+	 * @param {boolean} [unadjustedMovement=false] - Whether to disable OS-level adjustment for mouse acceleration and accesses raw mouse input instead or not.
 	 */
 	lock( unadjustedMovement = false ) {
 
