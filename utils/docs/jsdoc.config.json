@@ -33,6 +33,7 @@
             "examples/jsm/renderers",
             "examples/jsm/textures",
             "examples/jsm/tsl",
+            "examples/jsm/webxr",
             "src"
         ],
         "exclude": [
