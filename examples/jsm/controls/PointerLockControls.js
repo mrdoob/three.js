@@ -198,10 +198,14 @@ class PointerLockControls extends Controls {
 
 	/**
 	 * Activates the pointer lock.
+	 * 
+	 * @param {boolean} unadjustedMovement - Whether to access raw mouse input instead of OS level acceleration.
 	 */
-	lock() {
+	lock(unadjustedMovement = false) {
 
-		this.domElement.requestPointerLock();
+		this.domElement.requestPointerLock({
+			unadjustedMovement
+		});
 
 	}
 
