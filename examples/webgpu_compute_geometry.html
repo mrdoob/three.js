@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec4, storage, Fn, If, uniform, instanceIndex, objectWorldMatrix, color, screenUV, attribute } from 'three/tsl';
+			import { vec4, storage, vec3, rotate, Fn, deltaTime, If, uniform, instanceIndex, objectWorldMatrix, color, screenUV, attribute } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -40,6 +40,8 @@
 			let raycaster, pointer;
 			let stats;
 
+			let mesh;
+
 			const pointerPosition = uniform( vec4( 0 ) );
 			const elasticity = uniform( .4 ); // elasticity ( how "strong" the spring is )
 			const damping = uniform( .94 ); // damping factor ( energy loss )
@@ -52,7 +54,7 @@
 
 				const count = geometry.attributes.position.count;
 
-				// replace geometry attributes for storage buffer attributes
+				// Create storage buffer attribute for modified position.
 
 				const positionBaseAttribute = geometry.attributes.position;
 				const positionStorageBufferAttribute = new THREE.StorageBufferAttribute( count, 3 );
@@ -60,24 +62,27 @@
 
 				geometry.setAttribute( 'storagePosition', positionStorageBufferAttribute );
 
-				// attributes
+				// Attributes
 
 				const positionAttribute = storage( positionBaseAttribute, 'vec3', count );
 				const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec3', count );
 
 				const speedAttribute = storage( speedBufferAttribute, 'vec3', count );
 
-				// vectors
+				// Vectors
 
+				// Base vec3 position of the mesh
 				const basePosition = positionAttribute.element( instanceIndex );
+				// Current compute position of the mesh
 				const currentPosition = positionStorageAttribute.element( instanceIndex );
+				// Speed of the position
 				const currentSpeed = speedAttribute.element( instanceIndex );
 
 				//
 
 				const computeInit = Fn( () => {
 
-					// copy position to storage
+					// Modified storage position starts out the same as the base position.
 
 					currentPosition.assign( basePosition );
 
@@ -111,6 +116,8 @@
 					currentSpeed.mulAssign( damping );
 
 					currentPosition.addAssign( currentSpeed );
+
+					basePosition.assign( rotate( basePosition, vec3( 0.0, deltaTime.mul( 0.5 ), 0.0 ) ) );
 
 				} )().compute( count );
 
@@ -154,7 +161,7 @@
 
 					// apply the material to the mesh
 
-					const mesh = gltf.scene.children[ 0 ];
+					mesh = gltf.scene.children[ 0 ];
 					mesh.scale.setScalar( .1 );
 					mesh.material = material;
 					scene.add( mesh );
