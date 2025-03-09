@@ -57,8 +57,9 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		const scope = this;
 
-		const verticesArray = [];
+		const meshOutVerticesArray = [];
 		const uvArray = [];
+
 
 		for ( let i = 0, l = shapes.length; i < l; i ++ ) {
 
@@ -69,7 +70,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		// build geometry
 
-		this.setAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
+		this.setAttribute( 'position', new Float32BufferAttribute( meshOutVerticesArray, 3 ) );
 		this.setAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 		this.computeVertexNormals();
@@ -78,7 +79,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		function addShape( shape ) {
 
-			const placeholder = [];
+			const uniqueShapeVertices = [];
 
 			// options
 
@@ -162,14 +163,44 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			function cleanPoints( points ) {
 
-			const faces = ShapeUtils.triangulateShape( vertices, holes );
+				const THRESHOLD = 0.0002;
+				const THRESHOLD_SQ = THRESHOLD * THRESHOLD;
+				let prevPos = points[ 0 ];
+				for ( let i = 1; i <= points.length; i ++ ) {
+
+					const currentIndex = i % points.length;
+					const currentPos = points[ currentIndex ];
+					const dx = currentPos.x - prevPos.x;
+					const dy = currentPos.y - prevPos.y;
+					const distSq = dx * dx + dy * dy;
+
+					if ( distSq <= THRESHOLD_SQ ) {
+
+						points.splice( currentIndex, 1 );
+						if ( currentIndex == 0 ) break;
+						i --;
+						continue;
+
+					}
+
+					prevPos = currentPos;
+
+				}
+
+			}
+
+			cleanPoints( vertices );
+			holes.forEach( cleanPoints );
+
+			const numHoles = holes.length;
 
 			/* Vertices */
 
 			const contour = vertices; // vertices has all points but contour has only points of circumference
 
-			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0; h < numHoles; h ++ ) {
 
 				const ahole = holes[ h ];
 
@@ -178,6 +209,11 @@ class ExtrudeGeometry extends BufferGeometry {
 			}
 
 
+			/**
+			 * @param {Vector2} pt
+			 * @param {Vector2} vec
+			 * @param {number} size
+			 * @returns {Vector2} pt + (vec * size) */
 			function scalePt2( pt, vec, size ) {
 
 				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
@@ -186,7 +222,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
-			const vlen = vertices.length, flen = faces.length;
+			const vlen = vertices.length;
 
 
 			// Find directions for point movement
@@ -316,6 +352,7 @@ class ExtrudeGeometry extends BufferGeometry {
 			}
 
 
+			/**contourMovements[i] refers to the bevelVec of contour vertices [i-1] -> [i] -> [i+1], wrapping around the array bounds. Which is to say, the normalized vector pointing "outside" of the contour ("left" when the differential is "forward").*/
 			const contourMovements = [];
 
 			for ( let i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
@@ -333,7 +370,7 @@ class ExtrudeGeometry extends BufferGeometry {
 			const holesMovements = [];
 			let oneHoleMovements, verticesMovements = contourMovements.concat();
 
-			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
 
 				const ahole = holes[ h ];
 
@@ -354,6 +391,8 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			const contractedContourVertices = [];
+			const expandedHoleVertices = [];
 
 			// Loop bevelSegments, 1 for the front, 1 for the back
 
@@ -361,38 +400,61 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				//for ( b = bevelSegments; b > 0; b -- ) {
 
+				/**Proportion of the way through the bevel. [0,slightly less than 1] */
 				const t = b / bevelSegments;
+				/**Decays smoothly from bevelThickness to almost 0.*/
 				const z = bevelThickness * Math.cos( t * Math.PI / 2 );
+				/**Grows smoothly from 0 to almost bevelSize, plus bevelOffset.*/
 				const bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
 
 				// contract shape
 
 				for ( let i = 0, il = contour.length; i < il; i ++ ) {
 
+					/**Contour point, beveled straight outwards bs units.*/
 					const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
 					v( vert.x, vert.y, - z );
+					if ( t == 0 ) contractedContourVertices.push( vert );
 
 				}
 
 				// expand holes
 
-				for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
+				for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
 
 					const ahole = holes[ h ];
 					oneHoleMovements = holesMovements[ h ];
-
+					const oneHoleVertices = [];
 					for ( let i = 0, il = ahole.length; i < il; i ++ ) {
 
 						const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 						v( vert.x, vert.y, - z );
+						if ( t == 0 ) oneHoleVertices.push( vert );
 
 					}
+
+					if ( t == 0 ) expandedHoleVertices.push( oneHoleVertices );
 
 				}
 
 			}
+
+			const USE_CDT = true;
+
+			let faces;
+			if ( USE_CDT ) {
+
+				faces = ShapeUtils.triangulateShapeConstrainedDelaunay( contractedContourVertices, expandedHoleVertices );
+
+			} else {
+
+				faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
+
+			}
+
+			const flen = faces.length;
 
 			const bs = bevelSize + bevelOffset;
 
@@ -400,6 +462,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			for ( let i = 0; i < vlen; i ++ ) {
 
+				//If beveled, move vert "outward" bevelSize + offset units.
 				const vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
 				if ( ! extrudeByPath ) {
@@ -512,7 +575,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			function buildLidFaces() {
 
-				const start = verticesArray.length / 3;
+				const start = meshOutVerticesArray.length / 3;
 
 				if ( bevelEnabled ) {
 
@@ -562,7 +625,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				}
 
-				scope.addGroup( start, verticesArray.length / 3 - start, 0 );
+				scope.addGroup( start, meshOutVerticesArray.length / 3 - start, 0 );
 
 			}
 
@@ -570,7 +633,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			function buildSideFaces() {
 
-				const start = verticesArray.length / 3;
+				const start = meshOutVerticesArray.length / 3;
 				let layeroffset = 0;
 				sidewalls( contour, layeroffset );
 				layeroffset += contour.length;
@@ -586,7 +649,7 @@ class ExtrudeGeometry extends BufferGeometry {
 				}
 
 
-				scope.addGroup( start, verticesArray.length / 3 - start, 1 );
+				scope.addGroup( start, meshOutVerticesArray.length / 3 - start, 1 );
 
 
 			}
@@ -623,21 +686,27 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			function v( x, y, z ) {
 
-				placeholder.push( x );
-				placeholder.push( y );
-				placeholder.push( z );
+				uniqueShapeVertices.push( x );
+				uniqueShapeVertices.push( y );
+				uniqueShapeVertices.push( z );
 
 			}
 
 
+			/**Creates vertex and UV definitions in the final mesh buffers for a 3-gon face on the top of the extruded mesh.
+			 *
+			 * Uses vertex indices from the uniqueShapeVertices array.
+			 * @param {number} a
+			 * @param {number} b
+			 * @param {number} c*/
 			function f3( a, b, c ) {
 
 				addVertex( a );
 				addVertex( b );
 				addVertex( c );
 
-				const nextIndex = verticesArray.length / 3;
-				const uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+				const nextIndex = meshOutVerticesArray.length / 3;
+				const uvs = uvgen.generateTopUV( scope, meshOutVerticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
 				addUV( uvs[ 0 ] );
 				addUV( uvs[ 1 ] );
@@ -645,6 +714,13 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			/**Creates vertex and UV definitions in the final mesh buffers for a 4-gon face on the side of the extruded mesh.
+			 *
+			 * Uses vertex indices from the uniqueShapeVertices array.
+			 * @param {number} a
+			 * @param {number} b
+			 * @param {number} c
+			 * @param {number} d*/
 			function f4( a, b, c, d ) {
 
 				addVertex( a );
@@ -656,8 +732,8 @@ class ExtrudeGeometry extends BufferGeometry {
 				addVertex( d );
 
 
-				const nextIndex = verticesArray.length / 3;
-				const uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+				const nextIndex = meshOutVerticesArray.length / 3;
+				const uvs = uvgen.generateSideWallUV( scope, meshOutVerticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
 				addUV( uvs[ 0 ] );
 				addUV( uvs[ 1 ] );
@@ -669,11 +745,14 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			/**Copies the specified triad of X,Y,Z values from uniqueVertices and appends them to verticesArray.
+			 * @param {number} index Index of the triad in uniqueVertices.
+			*/
 			function addVertex( index ) {
 
-				verticesArray.push( placeholder[ index * 3 + 0 ] );
-				verticesArray.push( placeholder[ index * 3 + 1 ] );
-				verticesArray.push( placeholder[ index * 3 + 2 ] );
+				meshOutVerticesArray.push( uniqueShapeVertices[ index * 3 + 0 ] );
+				meshOutVerticesArray.push( uniqueShapeVertices[ index * 3 + 1 ] );
+				meshOutVerticesArray.push( uniqueShapeVertices[ index * 3 + 2 ] );
 
 			}
 
