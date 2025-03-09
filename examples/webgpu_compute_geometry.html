@@ -117,7 +117,7 @@
 
 					currentPosition.addAssign( currentSpeed );
 
-					basePosition.assign( rotate( basePosition, vec3( 0.0, deltaTime.mul( 0.5 ), 0.0 ) ) );
+					basePosition.assign( rotate( basePosition, vec3( 0.0, deltaTime.mul( 0.25 ), 0.0 ) ) );
 
 				} )().compute( count );
 
