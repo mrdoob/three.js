@@ -306,7 +306,7 @@
 					transparent:true,
 					opacity:0.8,
 					side:THREE.DoubleSide
-				})
+				});
 
 				waterMesh = new THREE.Mesh( geometry, material );
 				waterMesh.rotation.x = - Math.PI * 0.5;
@@ -535,7 +535,7 @@
 						 
 
 						let decal = 0.001;
-						let limit = BOUNDS_HALF-0.2
+						let limit = BOUNDS_HALF-0.2;
 
 						if ( pos.x < - limit ) {
 
@@ -563,11 +563,11 @@
 
 						// duck orientation test
 
-						let startNormal = new THREE.Vector3(pixels[ 1 ], 1, - pixels[ 2 ] ).normalize()
+						let startNormal = new THREE.Vector3(pixels[ 1 ], 1, - pixels[ 2 ] ).normalize();
 				
 						let dir = startPos.sub(pos);
 						dir.y = 0;
-						dir.normalize()
+						dir.normalize();
 
 						let yAxis = new THREE.Vector3(0, 1, 0);
 						let zAxis = new THREE.Vector3(0, 0, -1);

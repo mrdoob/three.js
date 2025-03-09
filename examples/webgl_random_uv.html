@@ -219,7 +219,7 @@
 					get 'threshold'() { return uniforms.threshold.value; },
 					set 'threshold'( v ) {  uniforms.threshold.value = v; uniformsIn.threshold.value = v; render(); }
 
-				}
+				};
 
 				gui = new GUI();
 				gui.add( material, 'roughness', 0, 1, 0.01 ).onChange(render);
