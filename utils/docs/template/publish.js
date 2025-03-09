@@ -399,6 +399,8 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 				let navItems = '';
 
+				links.sort();
+
 				for ( const link of links ) {
 
 					navItems += link;

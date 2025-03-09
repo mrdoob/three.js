@@ -33,7 +33,7 @@
             "examples/jsm/renderers",
             "examples/jsm/textures",
             "examples/jsm/tsl",
-            "examples/jsm/webxr",
+            "examples/jsm/utils",
             "src"
         ],
         "exclude": [
@@ -44,7 +44,8 @@
             "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
             "examples/jsm/modifiers/CurveModifierGPU.js",
             "examples/jsm/objects/Water2.js",
-            "examples/jsm/objects/Water2Mesh.js"
+            "examples/jsm/objects/Water2Mesh.js",
+            "examples/jsm/utils/ShadowMapViewerGPU.js"
         ]
     }
 }
