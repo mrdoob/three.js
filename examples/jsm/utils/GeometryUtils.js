@@ -1,13 +1,13 @@
 import { Vector3 } from 'three';
 
+/** @module GeometryUtils */
 
 /**
- * Generates 2D-Coordinates in a very fast way.
+ * Generates 2D-Coordinates along a Hilbert curve.
  *
- * Based on work by:
- * @link http://www.openprocessing.org/sketch/15493
+ * Based on work by: {@link http://www.openprocessing.org/sketch/15493}
  *
- * @param {Vector3} center - Center of Hilbert curve.
+ * @param {Vector3} [center] - Center of Hilbert curve.
  * @param {number} [size=10] - Total width of Hilbert curve.
  * @param {number} [iterations=10] - Number of subdivisions.
  * @param {number} [v0=0] - Corner index -X, -Z.
@@ -52,12 +52,11 @@ function hilbert2D( center = new Vector3( 0, 0, 0 ), size = 10, iterations = 1, 
 }
 
 /**
- * Generates 3D-Coordinates in a very fast way.
+ * Generates 3D-Coordinates along a Hilbert curve.
  *
- * Based on work by:
- * @link https://openprocessing.org/user/5654
+ * Based on work by: {@link https://openprocessing.org/user/5654}
  *
- * @param {Vector3} [center=new Vector3( 0, 0, 0 )] - Center of Hilbert curve.
+ * @param {Vector3} [center] - Center of Hilbert curve.
  * @param {number} [size=10] - Total width of Hilbert curve.
  * @param {number} [iterations=1] - Number of subdivisions.
  * @param {number} [v0=0] - Corner index -X, +Y, -Z.
@@ -119,12 +118,12 @@ function hilbert3D( center = new Vector3( 0, 0, 0 ), size = 10, iterations = 1, 
 }
 
 /**
- * Generates a Gosper curve (lying in the XY plane)
+ * Generates a Gosper curve (lying in the XY plane).
  *
- * https://gist.github.com/nitaku/6521802
+ * Reference: {@link https://gist.github.com/nitaku/6521802}
  *
  * @param {number} [size=1] - The size of a single gosper island.
- * @return {Array<[number, number, number]>} The gosper island points.
+ * @return {Array<number>} The gosper island points.
  */
 function gosper( size = 1 ) {
 

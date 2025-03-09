@@ -2,14 +2,19 @@ import {
 	Vector2
 } from 'three';
 
-/**
- * tool for "unwrapping" and debugging three.js geometries UV mapping
- *
- * Sample usage:
- *	document.body.appendChild( UVsDebug( new THREE.SphereGeometry( 10, 10, 10, 10 ) ) );
- *
- */
+/** @module UVsDebug */
 
+/**
+ * Function for "unwrapping" and debugging three.js geometries UV mapping.
+ *
+ * ```js
+ * document.body.appendChild( UVsDebug( new THREE.SphereGeometry() ) );
+ * ```
+ *
+ * @param {BufferGeometry} geometry - The geometry whose uv coordinates should be inspected.
+ * @param {number} [size=1024] - The size of the debug canvas.
+ * @return {HTMLCanvasElement} A canvas element with visualized uv coordinates.
+ */
 function UVsDebug( geometry, size = 1024 ) {
 
 	// handles wrapping of uv.x > 1 only
