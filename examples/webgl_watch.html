@@ -61,7 +61,7 @@
 				threshold: 0,
 				strength: 0.08,
 				radius: 0.0,
-				postProcess:false,
+				postProcess:false
 			}
 
 			init();
@@ -83,7 +83,7 @@
 				renderer.toneMappingExposure = 0.7;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.VSMShadowMap;
-				container.appendChild( renderer.domElement )
+				container.appendChild( renderer.domElement );
 
 				new RGBELoader()
 					.setPath( 'textures/equirectangular/' )
@@ -101,7 +101,7 @@
 						// model
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/' );
-						loader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) )
+						loader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
 						loader.load( 'rolex.glb', function ( gltf ) {
 
 							gltf.scene.rotation.x = Math.PI*0.25
@@ -168,14 +168,14 @@
 				
 
 				pointLight = new THREE.PointLight( 0x7b8cad, 1, 0, 2 );
-				pointLight.position.set(0.3, -0.2, -0.2)
+				pointLight.position.set(0.3, -0.2, -0.2);
 				scene.add( pointLight );
 
 				
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				moveCamera()
+				moveCamera();
 
 			}
 
@@ -192,7 +192,7 @@
 				    theta: controls.getAzimuthalAngle()
 				}
 
-				const tween = new TWEEN.Tween( tmp )
+				new TWEEN.Tween( tmp )
 					.to( { distance:1, theta: -Math.PI*0.2 }, 6000 )
 					.easing( TWEEN.Easing.Quadratic.Out )
 					.onUpdate( function( n ) { 

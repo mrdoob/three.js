@@ -79,9 +79,9 @@
 				// add ground plane
 				let plane = new THREE.PlaneGeometry( 2, 2 );
 				plane.rotateX( -Math.PI*0.5 );
-				ground = new THREE.Mesh( plane, new THREE.ShadowMaterial({opacity:0.5}) )
+				ground = new THREE.Mesh( plane, new THREE.ShadowMaterial({opacity:0.5}) );
 				ground.receiveShadow = true;
-				ground.position.z = -0.5
+				ground.position.z = -0.5;
 				scene.add( ground );
 
 
@@ -114,7 +114,7 @@
 						// model
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/' );
-						loader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) )
+						loader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
 						loader.load( 'ShaderBall2.glb', function ( gltf ) {
 
 							const shaderBall = gltf.scene.children[0];
@@ -217,7 +217,7 @@
 					set 'disolve'( v ) {  uniforms.disolve.value = v; uniformsIn.disolve.value = v; ground.material.opacity = (1-v)*0.5; render(); },
 
 					get 'threshold'() { return uniforms.threshold.value; },
-					set 'threshold'( v ) {  uniforms.threshold.value = v; uniformsIn.threshold.value = v; render(); },
+					set 'threshold'( v ) {  uniforms.threshold.value = v; uniformsIn.threshold.value = v; render(); }
 
 				}
 
