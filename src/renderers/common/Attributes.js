@@ -39,7 +39,7 @@ class Attributes extends DataMap {
 
 		const attributeData = super.delete( attribute );
 
-		if ( attributeData !== undefined ) {
+		if ( attributeData !== null ) {
 
 			this.backend.destroyAttribute( attribute );
 
