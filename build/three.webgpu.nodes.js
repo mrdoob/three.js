@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, DynamicDrawUsage, InterleavedBufferAttribute, NoColorSpace, UnsignedIntType, IntType, Sphere, BackSide, Euler, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, SRGBColorSpace, MeshNormalMaterial, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, BufferGeometry, BufferAttribute, RenderTarget, CubeUVReflectionMapping, OrthographicCamera, PerspectiveCamera, HalfFloatType, RGBAFormat, LinearSRGBColorSpace, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, arrayNeedsUint32, Uint32BufferAttribute, Uint16BufferAttribute, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, WebXRController, RAD2DEG, PCFShadowMap, FrontSide, Frustum, DataTexture, RedIntegerFormat, RedFormat, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, UnsignedShortType, ByteType, ShortType, warnOnce, createCanvasElement, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipmapNearestFilter, NeverCompare, AlwaysCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, UnsignedIntType, IntType, Sphere, BackSide, Euler, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, LessCompare, VSMShadowMap, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, WebXRController, RAD2DEG, PCFShadowMap, Frustum, FrontSide, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, warnOnce, createCanvasElement, ReverseSubtractEquation, SubtractEquation, AddEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, ZeroFactor, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LinearTransfer, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneGeometry, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RenderTargetArray, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
@@ -6749,8 +6749,8 @@ class VarNode extends Node {
 	 * Constructs a new variable node.
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
-	 * @param {?string} name - The name of the variable in the shader.
-	 * @param {?boolean} readOnly - The read-only flag.
+	 * @param {?string} [name=null] - The name of the variable in the shader.
+	 * @param {boolean} [readOnly=false] - The read-only flag.
 	 */
 	constructor( node, name = null, readOnly = false ) {
 
@@ -7385,7 +7385,7 @@ let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {?ReferenceBaseNode} referenceNode - The reference node.
+	 * @param {ReferenceBaseNode} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -8307,7 +8307,7 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
-		 * @type {Function}
+		 * @type {?Function}
 		 */
 		this.onInitFunction = null;
 
@@ -8502,7 +8502,7 @@ class CacheNode extends Node {
  * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
- * @param {boolean} parent - Whether this node refers to a shared parent cache or not.
+ * @param {boolean} [parent] - Whether this node refers to a shared parent cache or not.
  * @returns {CacheNode}
  */
 const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
@@ -9089,7 +9089,7 @@ class AttributeNode extends Node {
  * @tsl
  * @function
  * @param {string} name - The name of the attribute.
- * @param {?string} nodeType - The node type.
+ * @param {string} [nodeType] - The node type.
  * @returns {AttributeNode}
  */
 const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
@@ -10454,7 +10454,7 @@ class UniformArrayNode extends BufferNode {
  * @tsl
  * @function
  * @param {Array<any>} values - Array-like data.
- * @param {?string} nodeType - The data type of the array elements.
+ * @param {?string} [nodeType] - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
 const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
@@ -11913,7 +11913,7 @@ class ReferenceNode extends Node {
  * @function
  * @param {string} name - The name of the property the node refers to.
  * @param {string} type - The uniform type that should be used to represent the property value.
- * @param {?Object} object - The object the property belongs to.
+ * @param {?Object} [object] - The object the property belongs to.
  * @returns {ReferenceNode}
  */
 const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
@@ -13395,14 +13395,14 @@ class InstanceNode extends Node {
 		/**
 		 * The node that represents the instance matrix data.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 */
 		this.instanceMatrixNode = null;
 
 		/**
 		 * The node that represents the instance color data.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 */
 		this.instanceColorNode = null;
 
@@ -13418,14 +13418,14 @@ class InstanceNode extends Node {
 		/**
 		 * A reference to a buffer that is used by `instanceMatrixNode`.
 		 *
-		 * @type {InstancedInterleavedBuffer}
+		 * @type {?InstancedInterleavedBuffer}
 		 */
 		this.buffer = null;
 
 		/**
 		 * A reference to a buffer that is used by `instanceColorNode`.
 		 *
-		 * @type {InstancedBufferAttribute}
+		 * @type {?InstancedBufferAttribute}
 		 */
 		this.bufferColor = null;
 
@@ -14238,7 +14238,7 @@ class LoopNode extends Node {
 
 			}
 
-			const internalParam = { start, end, condition };
+			const internalParam = { start, end};
 
 			//
 
@@ -16415,7 +16415,9 @@ class NodeMaterial extends Material {
 
 			//
 
-			if ( this.outputNode !== null ) resultNode = this.outputNode;
+			const isCustomOutput = this.outputNode !== null;
+
+			if ( isCustomOutput ) resultNode = this.outputNode;
 
 			// MRT
 
@@ -16425,6 +16427,8 @@ class NodeMaterial extends Material {
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
+
+					if ( isCustomOutput ) output.assign( resultNode );
 
 					resultNode = mrt;
 
@@ -17119,7 +17123,7 @@ class NodeMaterial extends Material {
 const _defaultValues$d = /*@__PURE__*/ new LineBasicMaterial();
 
 /**
- * Node material version of `LineBasicMaterial`.
+ * Node material version of {@link LineBasicMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -17134,7 +17138,7 @@ class LineBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new line basic node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -17160,7 +17164,7 @@ class LineBasicNodeMaterial extends NodeMaterial {
 const _defaultValues$c = /*@__PURE__*/ new LineDashedMaterial();
 
 /**
- * Node material version of `LineDashedMaterial`.
+ * Node material version of  {@link LineDashedMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -17175,7 +17179,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new line dashed node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -17353,7 +17357,7 @@ class Line2NodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new node material for wide line rendering.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters={}] - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -17890,7 +17894,7 @@ const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
 const _defaultValues$a = /*@__PURE__*/ new MeshNormalMaterial();
 
 /**
- * Node material version of `MeshNormalMaterial`.
+ * Node material version of {@link MeshNormalMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -17905,7 +17909,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh normal node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -18012,10 +18016,23 @@ const equirectUV = /*@__PURE__*/ nodeProxy( EquirectUVNode );
  */
 class CubeRenderTarget extends WebGLCubeRenderTarget {
 
+	/**
+	 * Constructs a new cube render target.
+	 *
+	 * @param {number} [size=1] - The size of the render target.
+	 * @param {RenderTarget~Options} [options] - The configuration object.
+	 */
 	constructor( size = 1, options = {} ) {
 
 		super( size, options );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCubeRenderTarget = true;
 
 	}
@@ -18115,7 +18132,7 @@ class CubeMapNode extends TempNode {
 		 * A reference to the internal cube texture.
 		 *
 		 * @private
-		 * @type {CubeTexture}
+		 * @type {?CubeTexture}
 		 * @default null
 		 */
 		this._cubeTexture = null;
@@ -18567,7 +18584,7 @@ class BasicLightingModel extends LightingModel {
 const _defaultValues$9 = /*@__PURE__*/ new MeshBasicMaterial();
 
 /**
- * Node material version of `MeshBasicMaterial`.
+ * Node material version of {@link MeshBasicMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -18582,7 +18599,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh basic node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -18797,7 +18814,7 @@ class PhongLightingModel extends BasicLightingModel {
 const _defaultValues$8 = /*@__PURE__*/ new MeshLambertMaterial();
 
 /**
- * Node material version of `MeshLambertMaterial`.
+ * Node material version of {@link MeshLambertMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -18812,7 +18829,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -18872,7 +18889,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 const _defaultValues$7 = /*@__PURE__*/ new MeshPhongMaterial();
 
 /**
- * Node material version of `MeshPhongMaterial`.
+ * Node material version of {@link MeshPhongMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -18887,7 +18904,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -20638,6 +20655,11 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
 */
 class PMREMGenerator {
 
+	/**
+	 * Constructs a new PMREM generator.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		this._renderer = renderer;
@@ -21179,6 +21201,7 @@ class PMREMGenerator {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 *
+	 * @private
 	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
 	 * @param {number} lodIn - The input level-of-detail.
 	 * @param {number} lodOut - The output level-of-detail.
@@ -21804,7 +21827,7 @@ class PMREMNode extends TempNode {
  * Returns `true` if the given cube map image has been fully loaded.
  *
  * @private
- * @param {Array<(Image|Object)>} image - The cube map image.
+ * @param {?Array<(Image|Object)>} [image] - The cube map image.
  * @return {boolean} Whether the given cube map is ready or not.
  */
 function isCubeMapReady( image ) {
@@ -21996,7 +22019,7 @@ const createIrradianceContext = ( normalWorldNode ) => {
 const _defaultValues$6 = /*@__PURE__*/ new MeshStandardMaterial();
 
 /**
- * Node material version of `MeshStandardMaterial`.
+ * Node material version of {@link MeshStandardMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -22011,7 +22034,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh standard node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -22170,7 +22193,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 const _defaultValues$5 = /*@__PURE__*/ new MeshPhysicalMaterial();
 
 /**
- * Node material version of `MeshPhysicalMaterial`.
+ * Node material version of {@link MeshPhysicalMaterial}.
  *
  * @augments MeshStandardNodeMaterial
  */
@@ -22185,7 +22208,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	/**
 	 * Constructs a new mesh physical node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -22751,7 +22774,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	/**
 	 * Constructs a new mesh SSS node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -22904,7 +22927,7 @@ class ToonLightingModel extends LightingModel {
 const _defaultValues$4 = /*@__PURE__*/ new MeshToonMaterial();
 
 /**
- * Node material version of `MeshToonMaterial`.
+ * Node material version of {@link MeshToonMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -22919,7 +22942,7 @@ class MeshToonNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh toon node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -23007,7 +23030,7 @@ const matcapUV = /*@__PURE__*/ nodeImmutable( MatcapUVNode );
 const _defaultValues$3 = /*@__PURE__*/ new MeshMatcapMaterial();
 
 /**
- * Node material version of `MeshMatcapMaterial`.
+ * Node material version of {@link MeshMatcapMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -23022,7 +23045,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh normal node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -23171,7 +23194,7 @@ const rotate = /*@__PURE__*/ nodeProxy( RotateNode );
 const _defaultValues$2 = /*@__PURE__*/ new SpriteMaterial();
 
 /**
- * Node material version of `SpriteMaterial`.
+ * Node material version of {@link SpriteMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -23357,7 +23380,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 const _defaultValues$1 = /*@__PURE__*/ new PointsMaterial();
 
 /**
- * Node material version of `PointsMaterial`.
+ * Node material version of {@link PointsMaterial}.
  *
  * @augments SpriteNodeMaterial
  */
@@ -23548,7 +23571,7 @@ class ShadowMaskModel extends LightingModel {
 const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
 /**
- * Node material version of `ShadowMaterial`.
+ * Node material version of {@link ShadowMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -23563,7 +23586,7 @@ class ShadowNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new shadow node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -23794,7 +23817,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new volume node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -23938,7 +23961,7 @@ class Animation {
 	/**
 	 * Returns the user-level animation loop.
 	 *
-	 * @return {Function} The animation loop.
+	 * @return {?Function} The animation loop.
 	 */
 	getAnimationLoop() {
 
@@ -23949,7 +23972,7 @@ class Animation {
 	/**
 	 * Defines the user-level animation loop.
 	 *
-	 * @param {Function} callback - The animation loop.
+	 * @param {?Function} callback - The animation loop.
 	 */
 	setAnimationLoop( callback ) {
 
@@ -24581,7 +24604,7 @@ class RenderObject {
 	/**
 	 * Returns the draw parameters for the render object.
 	 *
-	 * @return {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} The draw parameters.
+	 * @return {?{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} The draw parameters.
 	 */
 	getDrawParameters() {
 
@@ -24980,7 +25003,7 @@ class RenderObjects {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} passId - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 * @return {RenderObject} The render object.
 	 */
 	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
@@ -25069,7 +25092,7 @@ class RenderObjects {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} passId - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 * @return {RenderObject} The render object.
 	 */
 	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
@@ -25230,13 +25253,13 @@ class Attributes extends DataMap {
 	 * Deletes the data for the given attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The attribute.
-	 * @return {Object} The deleted attribute data.
+	 * @return {Object|null} The deleted attribute data.
 	 */
 	delete( attribute ) {
 
 		const attributeData = super.delete( attribute );
 
-		if ( attributeData !== undefined ) {
+		if ( attributeData !== null ) {
 
 			this.backend.destroyAttribute( attribute );
 
@@ -27136,8 +27159,8 @@ class RenderList {
 	/**
 	 * Sorts the internal render lists.
 	 *
-	 * @param {function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
-	 * @param {function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
+	 * @param {?function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
+	 * @param {?function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
 	 */
 	sort( customOpaqueSort, customTransparentSort ) {
 
@@ -28453,7 +28476,7 @@ class StructTypeNode extends Node {
 	 * Creates an instance of StructTypeNode.
 	 *
 	 * @param {Object} membersLayout - The layout of the members for the struct.
-	 * @param {string} [name=null] - The optional name of the struct.
+	 * @param {?string} [name=null] - The optional name of the struct.
 	 */
 	constructor( membersLayout, name = null ) {
 
@@ -28469,7 +28492,7 @@ class StructTypeNode extends Node {
 		/**
 		 * The name of the struct.
 		 *
-		 * @type {string}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = name;
@@ -28606,7 +28629,7 @@ class StructNode extends Node {
  * @tsl
  * @function
  * @param {Object} membersLayout - The layout of the struct members.
- * @param {string} [name=null] - The name of the struct.
+ * @param {?string} [name=null] - The name of the struct.
  * @returns {Function} The struct function.
  */
 const struct = ( membersLayout, name = null ) => {
@@ -29540,7 +29563,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Second texture node. When not set, the shader will sample from `textureXNode` instead.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.textureYNode = textureYNode;
@@ -29548,7 +29571,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Third texture node. When not set, the shader will sample from `textureXNode` instead.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.textureZNode = textureZNode;
@@ -29701,8 +29724,8 @@ class ReflectorNode extends TextureNode {
 		 * A reference to the internal reflector base node which holds the actual implementation.
 		 *
 		 * @private
-		 * @type {?ReflectorBaseNode}
-		 * @default null
+		 * @type {ReflectorBaseNode}
+		 * @default ReflectorBaseNode
 		 */
 		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
 
@@ -30170,6 +30193,8 @@ const _geometry = /*@__PURE__*/ new QuadGeometry();
  *
  * The intended usage is to reuse a single quad mesh for rendering
  * subsequent passes by just reassigning the `material` reference.
+ *
+ * Note: This module can only be used with `WebGPURenderer`.
  *
  * @augments Mesh
  */
@@ -30876,7 +30901,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * The buffer struct type.
 		 *
-		 * @type {?structTypeNode}
+		 * @type {?StructTypeNode}
 		 * @default null
 		 */
 		this.structTypeNode = structTypeNode;
@@ -37751,7 +37776,7 @@ class ShadowNode extends ShadowBaseNode {
  * @tsl
  * @function
  * @param {Light} light - The shadow casting light.
- * @param {LightShadow} shadow - The light shadow.
+ * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
 const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
@@ -38167,9 +38192,17 @@ class AnalyticLightNode extends LightingNode {
 	 *
 	 * @abstract
 	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Object|undefined} The direct light data (color and direction).
 	 */
 	setupDirect( /*builder*/ ) { }
 
+	/**
+	 * Sets up the direct rect area lighting for the analytic light node.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Object|undefined} The direct rect area light data.
+	 */
 	setupDirectRectArea( /*builder*/ ) { }
 
 	/**
@@ -40854,9 +40887,9 @@ class NodeBuilderState {
 	/**
 	 * Constructs a new node builder state.
 	 *
-	 * @param {?string} vertexShader - The native vertex shader code.
-	 * @param {?string} fragmentShader - The native fragment shader code.
-	 * @param {?string} computeShader - The native compute shader code.
+	 * @param {string} vertexShader - The native vertex shader code.
+	 * @param {string} fragmentShader - The native fragment shader code.
+	 * @param {string} computeShader - The native compute shader code.
 	 * @param {Array<NodeAttribute>} nodeAttributes - An array of node attributes.
 	 * @param {Array<BindGroup>} bindings - An array of bind groups.
 	 * @param {Array<Node>} updateNodes - An array of nodes that implement their `update()` method.
@@ -42408,8 +42441,10 @@ class NodeBuilder {
 		/**
 		 * This dictionary holds the node variables of this builder.
 		 * The variables are maintained in an array for each shader stage.
+		 * This dictionary is also used to count the number of variables
+		 * according to their type (const, vars).
 		 *
-		 * @type {Object<string,Array<NodeVar>>}
+		 * @type {Object<string,Array<NodeVar>|number>}
 		 */
 		this.vars = {};
 
@@ -43038,7 +43073,7 @@ class NodeBuilder {
 	 * Only relevant for WebGL and its `WEBGL_multi_draw` extension.
 	 *
 	 * @abstract
-	 * @return {string} The drawIndex shader string.
+	 * @return {?string} The drawIndex shader string.
 	 */
 	getDrawIndex() {
 
@@ -44258,7 +44293,7 @@ class NodeBuilder {
 	 *
 	 * @abstract
 	 * @param {string} op - The operator name to resolve.
-	 * @return {string} The resolved operator name.
+	 * @return {?string} The resolved operator name.
 	 */
 	getFunctionOperator( /* op */ ) {
 
@@ -47551,7 +47586,7 @@ class XRManager extends EventDispatcher {
 		 * The current XR reference space type.
 		 *
 		 * @private
-		 * @type {string}
+		 * @type {XRReferenceSpaceType}
 		 * @default 'local-floor'
 		 */
 		this._referenceSpaceType = 'local-floor';
@@ -47761,7 +47796,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the reference space type.
 	 *
-	 * @return {string} The reference space type.
+	 * @return {XRReferenceSpaceType} The reference space type.
 	 */
 	getReferenceSpaceType() {
 
@@ -47774,7 +47809,7 @@ class XRManager extends EventDispatcher {
 	 *
 	 * This method can not be used during a XR session.
 	 *
-	 * @param {string} type - The reference space type.
+	 * @param {XRReferenceSpaceType} type - The reference space type.
 	 */
 	setReferenceSpaceType( type ) {
 
@@ -48517,20 +48552,27 @@ const _vector4 = /*@__PURE__*/ new Vector4();
 class Renderer {
 
 	/**
+	 * Renderer options.
+	 *
+	 * @typedef {Object} Renderer~Options
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
+	 * to overwrite the default.
+	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
+	 * @property {number} [colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
+	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
+	 */
+
+	/**
 	 * Constructs a new renderer.
 	 *
 	 * @param {Backend} backend - The backend the renderer is targeting (e.g. WebGPU or WebGL 2).
-	 * @param {Object} parameters - The configuration parameter.
-	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
-	 * to overwrite the default.
-	 * @param {?Function} [parameters.getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
-	 * @param {number} [parameters.colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
-	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
+	 * @param {Renderer~Options} [parameters] - The configuration parameter.
+
 	 */
 	constructor( backend, parameters = {} ) {
 
@@ -48723,7 +48765,7 @@ class Renderer {
 		 * This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 		 *
 		 * @private
-		 * @type {Function}
+		 * @type {?Function}
 		 */
 		this._getFallback = getFallback;
 
@@ -49151,7 +49193,7 @@ class Renderer {
 		 * Debug configuration.
 		 * @typedef {Object} DebugConfig
 		 * @property {boolean} checkShaderErrors - Whether shader errors should be checked or not.
-		 * @property {Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
+		 * @property {?Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
 		 * @property {Function} getShaderAsync - Allows the get the raw shader code for the given scene, camera and 3D object.
 		 */
 
@@ -49290,8 +49332,8 @@ class Renderer {
 	 * @async
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
-	 * @param {Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @return {Promise<Array>} A Promise that resolves when the compile has been finished.
+	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @return {Promise<Array|undefined>} A Promise that resolves when the compile has been finished.
 	 */
 	async compileAsync( scene, camera, targetScene = null ) {
 
@@ -49510,9 +49552,8 @@ class Renderer {
 	 * @private
 	 * @param {Object} bundle - Render bundle data.
 	 * @param {Scene} sceneRef - The scene the render bundle belongs to.
-	 * @param {LightsNode} lightsNode - The current lights node.
 	 */
-	_renderBundle( bundle, sceneRef, lightsNode ) {
+	_renderBundle( bundle, sceneRef ) {
 
 		const { bundleGroup, camera, renderList } = bundle;
 
@@ -49544,9 +49585,15 @@ class Renderer {
 
 			this._currentRenderBundle = renderBundle;
 
-			const opaqueObjects = renderList.opaque;
+			const {
+				lightsNode,
+				transparentDoublePass: transparentDoublePassObjects,
+				transparent: transparentObjects,
+				opaque: opaqueObjects
+			} = renderList;
 
 			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
@@ -49872,7 +49919,7 @@ class Renderer {
 			opaque: opaqueObjects
 		} = renderList;
 
-		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
+		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef );
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
@@ -49979,7 +50026,7 @@ class Renderer {
 	 * for best compatibility.
 	 *
 	 * @async
-	 * @param {Function} callback - The application's animation loop.
+	 * @param {?Function} callback - The application's animation loop.
 	 * @return {Promise} A Promise that resolves when the set has been executed.
 	 */
 	async setAnimationLoop( callback ) {
@@ -50042,7 +50089,7 @@ class Renderer {
 	 * Returns the renderer's size in logical pixels. This method does not honor the pixel ratio.
 	 *
 	 * @param {Vector2} target - The method writes the result in this target object.
-	 * @return {Vector2} The drawing buffer size.
+	 * @return {Vector2} The renderer's size in logical pixels.
 	 */
 	getSize( target ) {
 
@@ -50069,10 +50116,10 @@ class Renderer {
 	 * This method allows to define the drawing buffer size by specifying
 	 * width, height and pixel ratio all at once. The size of the drawing
 	 * buffer is computed with this formula:
-	 * ````
+	 * ```js
 	 * size.x = width * pixelRatio;
 	 * size.y = height * pixelRatio;
-	 *```
+	 * ```
 	 *
 	 * @param {number} width - The width in logical pixels.
 	 * @param {number} height - The height in logical pixels.
@@ -50401,6 +50448,8 @@ class Renderer {
 			renderContext.stencil = renderTarget.stencilBuffer;
 			// #30329
 			renderContext.clearColorValue = this.backend.getClearColor();
+			renderContext.activeCubeFace = this.getActiveCubeFace();
+			renderContext.activeMipmapLevel = this.getActiveMipmapLevel();
 
 		}
 
@@ -50847,7 +50896,7 @@ class Renderer {
 	}
 
 	/**
-	 * Initializes the given textures. Useful for preloading a texture rather than waiting until first render
+	 * Initializes the given texture. Useful for preloading a texture rather than waiting until first render
 	 * (which can cause noticeable lags due to decode and GPU upload overhead).
 	 *
 	 * This method can only be used if the renderer has been initialized.
@@ -50870,7 +50919,7 @@ class Renderer {
 	 * Copies the current bound framebuffer into the given texture.
 	 *
 	 * @param {FramebufferTexture} framebufferTexture - The texture.
-	 * @param {Vector2|Vector4} rectangle - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
+	 * @param {?Vector2|Vector4} [rectangle=null] - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
 	 */
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
@@ -50930,20 +50979,21 @@ class Renderer {
 	}
 
 	/**
-	 * Copies data of source texture into a destination texture.
+	 * Copies data of the given source texture into a destination texture.
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
 	 * @param {Box2|Box3} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
 	 * @param {Vector2|Vector3} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
-	 * @param {number} level - The mipmap level to copy.
+	 * @param {number} [srcLevel=0] - The source mip level to copy from.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 		this._textures.updateTexture( srcTexture );
 		this._textures.updateTexture( dstTexture );
 
-		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
+		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, srcLevel, dstLevel );
 
 	}
 
@@ -51103,13 +51153,12 @@ class Renderer {
 	 * @private
 	 * @param {Array<Object>} bundles - Array with render bundle data.
 	 * @param {Scene} sceneRef - The scene the render bundles belong to.
-	 * @param {LightsNode} lightsNode - The current lights node.
 	 */
-	_renderBundles( bundles, sceneRef, lightsNode ) {
+	_renderBundles( bundles, sceneRef ) {
 
 		for ( const bundle of bundles ) {
 
-			this._renderBundle( bundle, sceneRef, lightsNode );
+			this._renderBundle( bundle, sceneRef );
 
 		}
 
@@ -51198,7 +51247,7 @@ class Renderer {
 	 * @param {Material} material - The object's material.
 	 * @param {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {LightsNode} lightsNode - The current lights node.
-	 * @param {ClippingContext} clippingContext - The clipping context.
+	 * @param {?ClippingContext} clippingContext - The clipping context.
 	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
@@ -52512,7 +52561,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		 * An array that holds objects defining the varying and attribute data in
 		 * context of Transform Feedback.
 		 *
-		 * @type {Object<string,Map<string,Object>>}
+		 * @type {Array<Object<string,AttributeNode|string>>}
 		 */
 		this.transforms = [];
 
@@ -54135,11 +54184,12 @@ class Backend {
 	 * @abstract
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Box3|Box2)} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
-	 * @param {number} [level=0] - The mip level to copy.
+	 * @param {number} [srcLevel=0] - The source mip level to copy from.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0*/ ) {}
+	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0*/ ) {}
 
 	/**
 	* Copies the current bound framebuffer to the given texture.
@@ -55941,7 +55991,7 @@ class WebGLUtils {
 	 *
 	 * @param {number} p - The three.js constant.
 	 * @param {string} [colorSpace=NoColorSpace] - The color space.
-	 * @return {number} The corresponding WebGL constant.
+	 * @return {?number} The corresponding WebGL constant.
 	 */
 	convert( p, colorSpace = NoColorSpace ) {
 
@@ -56901,33 +56951,57 @@ class WebGLTextureUtils {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Box3|Box2)} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
-	 * @param {number} [level=0] - The mip level to copy.
+	 * @param {number} [srcLevel=0] - The source mip level to copy from.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 		const { gl, backend } = this;
 		const { state } = this.backend;
 
 		const { textureGPU: dstTextureGPU, glTextureType, glType, glFormat } = backend.get( dstTexture );
 
-		let width, height, minX, minY;
-		let dstX, dstY;
+		state.bindTexture( glTextureType, dstTextureGPU );
+
+		// gather the necessary dimensions to copy
+		let width, height, depth, minX, minY, minZ;
+		let dstX, dstY, dstZ;
+		const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image;
 
 		if ( srcRegion !== null ) {
 
 			width = srcRegion.max.x - srcRegion.min.x;
 			height = srcRegion.max.y - srcRegion.min.y;
+			depth = srcRegion.isBox3 ? srcRegion.max.z - srcRegion.min.z : 1;
 			minX = srcRegion.min.x;
 			minY = srcRegion.min.y;
+			minZ = srcRegion.isBox3 ? srcRegion.min.z : 0;
 
 		} else {
 
-			width = srcTexture.image.width;
-			height = srcTexture.image.height;
+			const levelScale = Math.pow( 2, - srcLevel );
+			width = Math.floor( image.width * levelScale );
+			height = Math.floor( image.height * levelScale );
+
+			if ( srcTexture.isDataArrayTexture ) {
+
+				depth = image.depth;
+
+			} else if ( srcTexture.isData3DTexture ) {
+
+				depth = Math.floor( image.depth * levelScale );
+
+			} else {
+
+				depth = 1;
+
+			}
+
 			minX = 0;
 			minY = 0;
+			minZ = 0;
 
 		}
 
@@ -56935,36 +57009,36 @@ class WebGLTextureUtils {
 
 			dstX = dstPosition.x;
 			dstY = dstPosition.y;
+			dstZ = dstPosition.z;
 
 		} else {
 
 			dstX = 0;
 			dstY = 0;
+			dstZ = 0;
 
 		}
 
-		state.bindTexture( glTextureType, dstTextureGPU );
 
-		// As another texture upload may have changed pixelStorei
-		// parameters, make sure they are correct for the dstTexture
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
 		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 		gl.pixelStorei( gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
+		// used for copying data from cpu
 		const currentUnpackRowLen = gl.getParameter( gl.UNPACK_ROW_LENGTH );
 		const currentUnpackImageHeight = gl.getParameter( gl.UNPACK_IMAGE_HEIGHT );
 		const currentUnpackSkipPixels = gl.getParameter( gl.UNPACK_SKIP_PIXELS );
 		const currentUnpackSkipRows = gl.getParameter( gl.UNPACK_SKIP_ROWS );
 		const currentUnpackSkipImages = gl.getParameter( gl.UNPACK_SKIP_IMAGES );
 
-		const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
-
 		gl.pixelStorei( gl.UNPACK_ROW_LENGTH, image.width );
 		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, image.height );
 		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, minX );
 		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, minY );
+		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
+		// set up the src texture
+		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
 		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
 			const srcTextureData = backend.get( srcTexture );
@@ -56990,19 +57064,37 @@ class WebGLTextureUtils {
 
 		} else {
 
-			if ( srcTexture.isDataTexture ) {
+			if ( isDst3D ) {
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
+				// copy data into the 3d texture
+				if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
 
-			} else {
+					gl.texSubImage3D( glTextureType, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
 
-				if ( srcTexture.isCompressedTexture ) {
+				} else if ( dstTexture.isCompressedArrayTexture ) {
 
-					gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+					gl.compressedTexSubImage3D( glTextureType, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
 
 				} else {
 
-					gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+					gl.texSubImage3D( glTextureType, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
+
+				}
+
+			} else {
+
+				// copy data into the 2d texture
+				if ( srcTexture.isDataTexture ) {
+
+					gl.texSubImage2D( glTextureType, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
+
+				} else if ( srcTexture.isCompressedTexture ) {
+
+					gl.compressedTexSubImage2D( glTextureType, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
+
+				} else {
+
+					gl.texSubImage2D( glTextureType, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
 
 				}
 
@@ -57010,6 +57102,7 @@ class WebGLTextureUtils {
 
 		}
 
+		// reset values
 		gl.pixelStorei( gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
 		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, currentUnpackImageHeight );
 		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
@@ -57017,11 +57110,16 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
-		if ( level === 0 && dstTexture.generateMipmaps ) gl.generateMipmap( gl.TEXTURE_2D );
+		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+
+			gl.generateMipmap( glTextureType );
+
+		}
 
 		state.unbindTexture();
 
 	}
+
 
 	/**
 	 * Copies the current bound framebuffer to the given texture.
@@ -58063,17 +58161,23 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 class WebGLBackend extends Backend {
 
 	/**
+	 * WebGLBackend options.
+	 *
+	 * @typedef {Object} WebGLBackend~Options
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @property {WebGL2RenderingContext} [context=undefined] - A WebGL 2 rendering context.
+	 */
+
+	/**
 	 * Constructs a new WebGPU backend.
 	 *
-	 * @param {Object} parameters - The configuration parameter.
-	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @param {WebGL2RenderingContext} [parameters.context=undefined] - A WebGL 2 rendering context.
+	 * @param {WebGLBackend~Options} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -59925,13 +60029,14 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Box3|Box2)} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
-	 * @param {number} [level=0] - The mip level to copy.
+	 * @param {number} [srcLevel=0] - The source mip level to copy from.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
-		this.textureUtils.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
+		this.textureUtils.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, srcLevel, dstLevel );
 
 	}
 
@@ -60470,9 +60575,7 @@ const GPUCompareFunction = {
 };
 
 const GPUStoreOp = {
-	Store: 'store',
-	Discard: 'discard'
-};
+	Store: 'store'};
 
 const GPULoadOp = {
 	Load: 'load',
@@ -60480,9 +60583,7 @@ const GPULoadOp = {
 };
 
 const GPUFrontFace = {
-	CCW: 'ccw',
-	CW: 'cw'
-};
+	CCW: 'ccw'};
 
 const GPUCullMode = {
 	None: 'none',
@@ -60532,8 +60633,6 @@ const GPUTextureFormat = {
 	// Packed 32-bit formats
 	RGB9E5UFloat: 'rgb9e5ufloat',
 	RGB10A2Unorm: 'rgb10a2unorm',
-	RG11B10uFloat: 'rgb10a2unorm',
-
 	// 64-bit formats
 
 	RG32Uint: 'rg32uint',
@@ -60549,9 +60648,6 @@ const GPUTextureFormat = {
 	RGBA32Sint: 'rgba32sint',
 	RGBA32Float: 'rgba32float',
 
-	// Depth and stencil formats
-
-	Stencil8: 'stencil8',
 	Depth16Unorm: 'depth16unorm',
 	Depth24Plus: 'depth24plus',
 	Depth24PlusStencil8: 'depth24plus-stencil8',
@@ -60664,10 +60760,6 @@ const GPUBlendOperation = {
 
 const GPUColorWriteFlags = {
 	None: 0,
-	Red: 0x1,
-	Green: 0x2,
-	Blue: 0x4,
-	Alpha: 0x8,
 	All: 0xF
 };
 
@@ -60683,7 +60775,6 @@ const GPUStencilOperation = {
 };
 
 const GPUBufferBindingType = {
-	Uniform: 'uniform',
 	Storage: 'storage',
 	ReadOnlyStorage: 'read-only-storage'
 };
@@ -60703,25 +60794,19 @@ const GPUTextureSampleType = {
 };
 
 const GPUTextureDimension = {
-	OneD: '1d',
 	TwoD: '2d',
 	ThreeD: '3d'
 };
 
 const GPUTextureViewDimension = {
-	OneD: '1d',
 	TwoD: '2d',
 	TwoDArray: '2d-array',
 	Cube: 'cube',
-	CubeArray: 'cube-array',
 	ThreeD: '3d'
 };
 
 const GPUTextureAspect = {
-	All: 'all',
-	StencilOnly: 'stencil-only',
-	DepthOnly: 'depth-only'
-};
+	All: 'all'};
 
 const GPUInputStepMode = {
 	Vertex: 'vertex',
@@ -62225,7 +62310,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.BC1RGBAUnorm || format === GPUTextureFormat.BC1RGBAUnormSRGB ) return { byteLength: 8, width: 4, height: 4 }; // DXT1
 		if ( format === GPUTextureFormat.BC2RGBAUnorm || format === GPUTextureFormat.BC2RGBAUnormSRGB ) return { byteLength: 16, width: 4, height: 4 }; // DXT3
 		if ( format === GPUTextureFormat.BC3RGBAUnorm || format === GPUTextureFormat.BC3RGBAUnormSRGB ) return { byteLength: 16, width: 4, height: 4 }; // DXT5
-		if ( format === GPUTextureFormat.BC4RUnorm || format === GPUTextureFormat.BC4RSNorm ) return { byteLength: 8, width: 4, height: 4 }; // RGTC1
+		if ( format === GPUTextureFormat.BC4RUnorm || format === GPUTextureFormat.BC4RSnorm ) return { byteLength: 8, width: 4, height: 4 }; // RGTC1
 		if ( format === GPUTextureFormat.BC5RGUnorm || format === GPUTextureFormat.BC5RGSnorm ) return { byteLength: 16, width: 4, height: 4 }; // RGTC2
 		if ( format === GPUTextureFormat.BC6HRGBUFloat || format === GPUTextureFormat.BC6HRGBFloat ) return { byteLength: 16, width: 4, height: 4 }; // BPTC (float)
 		if ( format === GPUTextureFormat.BC7RGBAUnorm || format === GPUTextureFormat.BC7RGBAUnormSRGB ) return { byteLength: 16, width: 4, height: 4 }; // BPTC (unorm)
@@ -65558,9 +65643,11 @@ class WebGPUAttributeUtils {
 
 				}
 
+				const bufferOffset = dataOffset * ( isTypedArray ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
 				device.queue.writeBuffer(
 					buffer,
-					0,
+					bufferOffset,
 					array,
 					dataOffset,
 					size
@@ -67277,21 +67364,27 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
 class WebGPUBackend extends Backend {
 
 	/**
+	 * WebGPUBackend options.
+	 *
+	 * @typedef {Object} WebGPUBackend~Options
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
+	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
+	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
+	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
+	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
+	 * @property {string} [powerPreference=undefined] - The power preference.
+	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
+	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
+	 * @property {number} [outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
+	 */
+
+	/**
 	 * Constructs a new WebGPU backend.
 	 *
-	 * @param {Object} parameters - The configuration parameter.
-	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @param {boolean} [parameters.trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
-	 * @param {string} [parameters.powerPreference=undefined] - The power preference.
-	 * @param {Object} [parameters.requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
-	 * @param {GPUDevice} [parameters.device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
-	 * @param {number} [parameters.outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
+	 * @param {WebGPUBackend~Options} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -67614,10 +67707,9 @@ class WebGPUBackend extends Backend {
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.dimensions !== renderTarget.dimensions ||
-			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
+			renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel ||
 			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
-			renderTargetData.samples !== renderTarget.samples ||
-			renderTargetData.loadOp !== colorAttachmentsConfig.loadOp
+			renderTargetData.samples !== renderTarget.samples
 		) {
 
 			descriptors = {};
@@ -67629,23 +67721,25 @@ class WebGPUBackend extends Backend {
 			const onDispose = () => {
 
 				renderTarget.removeEventListener( 'dispose', onDispose );
-
 				this.delete( renderTarget );
 
 			};
 
-			renderTarget.addEventListener( 'dispose', onDispose );
+			if ( renderTarget.hasEventListener( 'dispose', onDispose ) === false ) {
+
+				renderTarget.addEventListener( 'dispose', onDispose );
+
+			}
 
 		}
 
 		const cacheKey = renderContext.getCacheKey();
+		let descriptorBase = descriptors[ cacheKey ];
 
-		let descriptor = descriptors[ cacheKey ];
-
-		if ( descriptor === undefined ) {
+		if ( descriptorBase === undefined ) {
 
 			const textures = renderContext.textures;
-			const colorAttachments = [];
+			const textureViews = [];
 
 			let sliceIndex;
 
@@ -67693,44 +67787,24 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				// only apply the user-defined clearValue to the first color attachment like in beginRender()
-
-				let clearValue = { r: 0, g: 0, b: 0, a: 1 };
-
-				if ( i === 0 && colorAttachmentsConfig.clearValue ) {
-
-					clearValue = colorAttachmentsConfig.clearValue;
-
-				}
-
-				colorAttachments.push( {
+				textureViews.push( {
 					view,
-					depthSlice: sliceIndex,
 					resolveTarget,
-					loadOp: colorAttachmentsConfig.loadOP || GPULoadOp.Load,
-					storeOp: colorAttachmentsConfig.storeOP || GPUStoreOp.Store,
-					clearValue: clearValue
+					depthSlice: sliceIndex
 				} );
 
 			}
 
-
-			descriptor = {
-				colorAttachments,
-			};
+			descriptorBase = { textureViews };
 
 			if ( renderContext.depth ) {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
-
-				const depthStencilAttachment = {
-					view: depthTextureData.texture.createView()
-				};
-				descriptor.depthStencilAttachment = depthStencilAttachment;
+				descriptorBase.depthStencilView = depthTextureData.texture.createView();
 
 			}
 
-			descriptors[ cacheKey ] = descriptor;
+			descriptors[ cacheKey ] = descriptorBase;
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
@@ -67738,8 +67812,41 @@ class WebGPUBackend extends Backend {
 			renderTargetData.activeMipmapLevel = renderContext.activeMipmapLevel;
 			renderTargetData.activeCubeFace = renderContext.activeCubeFace;
 			renderTargetData.dimensions = renderTarget.dimensions;
-			renderTargetData.depthSlice = sliceIndex;
-			renderTargetData.loadOp = colorAttachments[ 0 ].loadOp;
+
+		}
+
+		const descriptor = {
+			colorAttachments: []
+		};
+
+		// Apply dynamic properties to cached views
+		for ( let i = 0; i < descriptorBase.textureViews.length; i ++ ) {
+
+			const viewInfo = descriptorBase.textureViews[ i ];
+
+			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
+			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
+
+				clearValue = colorAttachmentsConfig.clearValue;
+
+			}
+
+			descriptor.colorAttachments.push( {
+				view: viewInfo.view,
+				depthSlice: viewInfo.depthSlice,
+				resolveTarget: viewInfo.resolveTarget,
+				loadOp: colorAttachmentsConfig.loadOp || GPULoadOp.Load,
+				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
+				clearValue: clearValue
+			} );
+
+		}
+
+		if ( descriptorBase.depthStencilView ) {
+
+			descriptor.depthStencilAttachment = {
+				view: descriptorBase.depthStencilView
+			};
 
 		}
 
@@ -68118,7 +68225,6 @@ class WebGPUBackend extends Backend {
 		const renderer = this.renderer;
 
 		let colorAttachments = [];
-
 		let depthStencilAttachment;
 		let clearValue;
 
@@ -68162,29 +68268,35 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderTargetContext.depth;
 			supportsStencil = renderTargetContext.stencil;
 
-			if ( color ) {
+			const clearConfig = {
+				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
+				clearValue: color ? clearValue : undefined
+			};
 
-				const descriptor = this._getRenderPassDescriptor( renderTargetContext, { loadOp: GPULoadOp.Clear, clearValue } );
+			if ( supportsDepth ) {
 
-				colorAttachments = descriptor.colorAttachments;
+				clearConfig.depthLoadOp = depth ? GPULoadOp.Clear : GPULoadOp.Load;
+				clearConfig.depthClearValue = depth ? renderer.getClearDepth() : undefined;
+				clearConfig.depthStoreOp = GPUStoreOp.Store;
+
+			}
+
+			if ( supportsStencil ) {
+
+				clearConfig.stencilLoadOp = stencil ? GPULoadOp.Clear : GPULoadOp.Load;
+				clearConfig.stencilClearValue = stencil ? renderer.getClearStencil() : undefined;
+				clearConfig.stencilStoreOp = GPUStoreOp.Store;
 
 			}
 
-			if ( supportsDepth || supportsStencil ) {
+			const descriptor = this._getRenderPassDescriptor( renderTargetContext, clearConfig );
 
-				const depthTextureData = this.get( renderTargetContext.depthTexture );
-
-				depthStencilAttachment = {
-					view: depthTextureData.texture.createView()
-				};
-
-			}
+			colorAttachments = descriptor.colorAttachments;
+			depthStencilAttachment = descriptor.depthStencilAttachment;
 
 		}
 
-		//
-
-		if ( supportsDepth ) {
+		if ( supportsDepth && depthStencilAttachment && depthStencilAttachment.depthLoadOp === undefined ) {
 
 			if ( depth ) {
 
@@ -68203,7 +68315,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( supportsStencil ) {
+		if ( supportsStencil && depthStencilAttachment && depthStencilAttachment.stencilLoadOp === undefined ) {
 
 			if ( stencil ) {
 
@@ -69116,38 +69228,56 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Box3|Box2)} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
-	 * @param {number} [level=0] - The mip level to copy.
+	 * @param {number} [srcLevel=0] - The mipmap level to copy.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 		let dstX = 0;
 		let dstY = 0;
-		let dstLayer = 0;
+		let dstZ = 0;
 
 		let srcX = 0;
 		let srcY = 0;
-		let srcLayer = 0;
+		let srcZ = 0;
 
 		let srcWidth = srcTexture.image.width;
 		let srcHeight = srcTexture.image.height;
+		let srcDepth = 1;
+
 
 		if ( srcRegion !== null ) {
 
-			srcX = srcRegion.x;
-			srcY = srcRegion.y;
-			srcLayer = srcRegion.z || 0;
-			srcWidth = srcRegion.width;
-			srcHeight = srcRegion.height;
+			if ( srcRegion.isBox3 === true ) {
+
+				srcX = srcRegion.min.x;
+				srcY = srcRegion.min.y;
+				srcZ = srcRegion.min.z;
+				srcWidth = srcRegion.max.x - srcRegion.min.x;
+				srcHeight = srcRegion.max.y - srcRegion.min.y;
+				srcDepth = srcRegion.max.z - srcRegion.min.z;
+
+			} else {
+
+				// Assume it's a Box2
+				srcX = srcRegion.min.x;
+				srcY = srcRegion.min.y;
+				srcWidth = srcRegion.max.x - srcRegion.min.x;
+				srcHeight = srcRegion.max.y - srcRegion.min.y;
+				srcDepth = 1;
+
+			}
 
 		}
+
 
 		if ( dstPosition !== null ) {
 
 			dstX = dstPosition.x;
 			dstY = dstPosition.y;
-			dstLayer = dstPosition.z || 0;
+			dstZ = dstPosition.z || 0;
 
 		}
 
@@ -69159,22 +69289,28 @@ class WebGPUBackend extends Backend {
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				mipLevel: level,
-				origin: { x: srcX, y: srcY, z: srcLayer }
+				mipLevel: srcLevel,
+				origin: { x: srcX, y: srcY, z: srcZ }
 			},
 			{
 				texture: destinationGPU,
-				mipLevel: level,
-				origin: { x: dstX, y: dstY, z: dstLayer }
+				mipLevel: dstLevel,
+				origin: { x: dstX, y: dstY, z: dstZ }
 			},
 			[
 				srcWidth,
 				srcHeight,
-				1
+				srcDepth
 			]
 		);
 
 		this.device.queue.submit( [ encoder.finish() ] );
+
+		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( dstTexture );
+
+		}
 
 	}
 
@@ -69319,7 +69455,7 @@ class IESSpotLight extends SpotLight {
 		super( color, intensity, distance, angle, penumbra, decay );
 
 		/**
-		 * TOOD
+		 * TODO
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -69388,17 +69524,7 @@ class WebGPURenderer extends Renderer {
 	/**
 	 * Constructs a new WebGPU renderer.
 	 *
-	 * @param {Object} parameters - The configuration parameter.
-	 * @param {boolean} [parameters.logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @param {boolean} [parameters.alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @param {boolean} [parameters.depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @param {boolean} [parameters.stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @param {boolean} [parameters.antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @param {number} [parameters.samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @param {boolean} [parameters.forceWebGL=false] - If set to `true`, the renderer uses it WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @param {number} [parameters.outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
-	 * @param {number} [parameters.colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
-	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
+	 * @param {WebGPURenderer~Options} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters = {} ) {
 
@@ -69539,6 +69665,8 @@ class BundleGroup extends Group {
  *
  * postProcessing.outputNode = scenePass;
  * ```
+ *
+ * Note: This module can only be used with `WebGPURenderer`.
  */
 class PostProcessing {
 
@@ -69810,7 +69938,7 @@ class NodeLoader extends Loader {
 	/**
 	 * Constructs a new node loader.
 	 *
-	 * @param {?LoadingManager} manager - A reference to a loading manager.
+	 * @param {LoadingManager} [manager] - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -69993,7 +70121,7 @@ class NodeMaterialLoader extends MaterialLoader {
 	/**
 	 * Constructs a new node material loader.
 	 *
-	 * @param {?LoadingManager} manager - A reference to a loading manager.
+	 * @param {LoadingManager} [manager] - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -70099,7 +70227,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Constructs a new node object loader.
 	 *
-	 * @param {?LoadingManager} manager - A reference to a loading manager.
+	 * @param {LoadingManager} [manager] - A reference to a loading manager.
 	 */
 	constructor( manager ) {
 
@@ -70133,7 +70261,7 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Defines the dictionary of node types.
 	 *
 	 * @param {Object<string,Node.constructor>} value - The node library defined as `<classname,class>`.
-	 * @return {NodeLoader} A reference to this loader.
+	 * @return {NodeObjectLoader} A reference to this loader.
 	 */
 	setNodes( value ) {
 
@@ -70146,7 +70274,7 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Defines the dictionary of node material types.
 	 *
 	 * @param {Object<string,NodeMaterial.constructor>} value - The node material library defined as `<classname,class>`.
-	 * @return {NodeLoader} A reference to this loader.
+	 * @return {NodeObjectLoader} A reference to this loader.
 	 */
 	setNodeMaterials( value ) {
 
