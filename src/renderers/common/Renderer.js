@@ -1075,9 +1075,15 @@ class Renderer {
 
 			this._currentRenderBundle = renderBundle;
 
-			const opaqueObjects = renderList.opaque;
+			const {
+				lightsNode,
+				transparentDoublePass: transparentDoublePassObjects,
+				transparent: transparentObjects,
+				opaque: opaqueObjects
+			} = renderList;
 
 			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
