@@ -2229,7 +2229,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const attributeName = parseNullTerminatedString( buffer, offset );
 
-				if ( attributeName == 0 ) {
+				if ( attributeName === '' ) {
 
 					keepReading = false;
 
