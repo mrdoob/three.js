@@ -180,7 +180,7 @@ class AnalyticLightNode extends LightingNode {
 
 			} else {
 
-				shadowNode = this.setupShadowNode( builder );
+				shadowNode = this.setupShadowNode();
 
 			}
 
