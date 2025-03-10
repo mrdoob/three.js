@@ -173,7 +173,7 @@ class USDZLoader extends Loader {
 
 				if ( filename.endsWith( 'png' ) ) {
 
-					const blob = new Blob( [ zip[ filename ] ], { type: { type: 'image/png' } } );
+					const blob = new Blob( [ zip[ filename ] ], { type: 'image/png' } );
 					data[ filename ] = URL.createObjectURL( blob );
 
 				}
