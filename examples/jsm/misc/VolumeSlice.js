@@ -34,20 +34,21 @@ class VolumeSlice {
 		 */
 		this.volume = volume;
 
-		/**
-		 * The index of the slice, if changed, will automatically call updateGeometry at the next repaint.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		index = index;
-
 		Object.defineProperty( this, 'index', {
 			get: function () {
 
 				return index;
 
 			},
+			/**
+			 * The index of the slice, if changed, will automatically call updateGeometry at the next repaint.
+			 *
+			 * @name VolumeSlice#index
+			 * @type {number}
+			 * @default 0
+			 * @param {number} value
+			 * @return {number}
+			 */
 			set: function ( value ) {
 
 				index = value;
