@@ -2177,6 +2177,19 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Builds the given shader node.
+	 *
+	 * @abstract
+	 * @param {ShaderNodeInternal} shaderNode - The shader node.
+	 * @return {string} The function code.
+	 */
+	buildFunctionCode( /* shaderNode */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	/**
 	 * Generates a code flow based on a child Node.
 	 *
 	 * @param {Node} node - The node to execute.
