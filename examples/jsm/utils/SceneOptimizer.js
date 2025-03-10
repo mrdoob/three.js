@@ -346,7 +346,7 @@ class SceneOptimizer {
 	/**
 	 * Removes the given array of meshes from the scene.
 	 *
-	 * @param {Array<Mesh>} meshesToRemove - The meshes to remove.
+	 * @param {Set<Mesh>} meshesToRemove - The meshes to remove.
 	 */
 	disposeMeshes( meshesToRemove ) {
 
@@ -419,7 +419,7 @@ class SceneOptimizer {
 				reductionRatio: ( ( 1 - totalFinalMeshes / totalOriginalMeshes ) * 100 ).toFixed( 1 ),
 			};
 
-			this.logDebugInfo( stats );
+			this._logDebugInfo( stats );
 
 		}
 
