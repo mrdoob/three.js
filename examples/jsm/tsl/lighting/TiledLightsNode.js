@@ -34,6 +34,13 @@ export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, 
 const _vector3 = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector2();
 
+/**
+ * A custom version of `LightsNode` implementing tiled lighting. This node is used in
+ * {@link TiledLighting} to overwrite the renderer's default lighting with
+ * a custom implementation.
+ *
+ * @augments LightsNode
+ */
 class TiledLightsNode extends LightsNode {
 
 	static get type() {
@@ -42,6 +49,12 @@ class TiledLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Constructs a new tiled lights node.
+	 *
+	 * @param {number} [maxLights=1024] - The maximum number of lights.
+	 * @param {number} [tileSize=32] - The tile size.
+	 */
 	constructor( maxLights = 1024, tileSize = 32 ) {
 
 		super();
@@ -49,7 +62,20 @@ class TiledLightsNode extends LightsNode {
 		this.materialLights = [];
 		this.tiledLights = [];
 
+		/**
+		 * The maximum number of lights.
+		 *
+		 * @type {number}
+		 * @default 1024
+		 */
 		this.maxLights = maxLights;
+
+		/**
+		 * The tile size.
+		 *
+		 * @type {number}
+		 * @default 32
+		 */
 		this.tileSize = tileSize;
 
 		this._bufferSize = null;

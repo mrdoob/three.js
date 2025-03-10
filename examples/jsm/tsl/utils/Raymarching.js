@@ -1,5 +1,7 @@
 import { varying, vec4, modelWorldMatrixInverse, cameraPosition, positionGeometry, float, Fn, Loop, max, min, vec2, vec3 } from 'three/tsl';
 
+/** @module Raymarching */
+
 const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
 
 	const box_min = vec3( - 0.5 );
@@ -21,7 +23,8 @@ const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
 } );
 
 /**
- * Performs raymarching box-area using the specified number of steps and a callback function.
+ * TSL function for performing raymarching in a box-area using the specified number of steps
+ * and a callback function.
  *
  * ```js
  * RaymarchingBox( count, ( { positionRay } ) => {
@@ -33,7 +36,6 @@ const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
  * @function
  * @param {number|Node} steps - The number of steps for raymarching.
  * @param {Function|FunctionNode} callback - The callback function to execute at each step.
- * @returns {void}
  */
 export const RaymarchingBox = ( steps, callback ) => {
 
