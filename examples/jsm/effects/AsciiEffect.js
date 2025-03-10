@@ -101,8 +101,8 @@ class AsciiEffect {
 
 			}
 
-			oAscii.cellSpacing = 0;
-			oAscii.cellPadding = 0;
+			oAscii.cellSpacing = '0';
+			oAscii.cellPadding = '0';
 
 			const oStyle = oAscii.style;
 			oStyle.whiteSpace = 'pre';
