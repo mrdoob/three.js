@@ -715,30 +715,16 @@ class Object3D extends EventDispatcher {
 	 * @fires Object3D#added
 	 * @fires Object3D#childadded
 	 * @param {Object3D} object - The 3D object to add.
+	 * @param {...Object3D} otherObjects - Additional 3D objects to add.
 	 * @return {Object3D} A reference to this instance.
 	 */
-	add( object ) {
-
-		if ( arguments.length > 1 ) {
-
-			for ( let i = 0; i < arguments.length; i ++ ) {
-
-				this.add( arguments[ i ] );
-
-			}
-
-			return this;
-
-		}
+	add( object, ...otherObjects ) {
 
 		if ( object === this ) {
 
 			console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
-			return this;
 
-		}
-
-		if ( object && object.isObject3D ) {
+		} else if ( object && object.isObject3D ) {
 
 			object.removeFromParent();
 			object.parent = this;
@@ -756,6 +742,12 @@ class Object3D extends EventDispatcher {
 
 		}
 
+		for ( let i = 0; i < otherObjects.length; i ++ ) {
+
+			this.add( otherObjects[ i ] );
+
+		}
+
 		return this;
 
 	}
@@ -767,21 +759,10 @@ class Object3D extends EventDispatcher {
 	 * @fires Object3D#removed
 	 * @fires Object3D#childremoved
 	 * @param {Object3D} object - The 3D object to remove.
+	 * @param {...Object3D} otherObjects - Additional objects to remove.
 	 * @return {Object3D} A reference to this instance.
 	 */
-	remove( object ) {
-
-		if ( arguments.length > 1 ) {
-
-			for ( let i = 0; i < arguments.length; i ++ ) {
-
-				this.remove( arguments[ i ] );
-
-			}
-
-			return this;
-
-		}
+	remove( object, ...otherObjects ) {
 
 		const index = this.children.indexOf( object );
 
@@ -795,6 +776,12 @@ class Object3D extends EventDispatcher {
 			_childremovedEvent.child = object;
 			this.dispatchEvent( _childremovedEvent );
 			_childremovedEvent.child = null;
+
+		}
+
+		for ( let i = 0; i < otherObjects.length; i ++ ) {
+
+			this.remove( otherObjects[ i ] );
 
 		}
 
