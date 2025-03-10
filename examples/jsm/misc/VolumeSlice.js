@@ -179,23 +179,26 @@ class VolumeSlice {
 
 		if ( volume.dataType === 'label' ) {
 
-			//this part is currently useless but will be used when colortables will be handled
-			for ( let j = 0; j < jLength; j ++ ) {
+			console.error( 'THREE.VolumeSlice.repaint: label are not supported yet' );
 
-				for ( let i = 0; i < iLength; i ++ ) {
+			// This part is currently useless but will be used when colortables will be handled
 
-					let label = volumeData[ sliceAccess( i, j ) ];
-					label = label >= this.colorMap.length ? ( label % this.colorMap.length ) + 1 : label;
-					const color = this.colorMap[ label ];
-					data[ 4 * pixelCount ] = ( color >> 24 ) & 0xff;
-					data[ 4 * pixelCount + 1 ] = ( color >> 16 ) & 0xff;
-					data[ 4 * pixelCount + 2 ] = ( color >> 8 ) & 0xff;
-					data[ 4 * pixelCount + 3 ] = color & 0xff;
-					pixelCount ++;
+			// for ( let j = 0; j < jLength; j ++ ) {
 
-				}
+			// 	for ( let i = 0; i < iLength; i ++ ) {
 
-			}
+			// 		let label = volumeData[ sliceAccess( i, j ) ];
+			// 		label = label >= this.colorMap.length ? ( label % this.colorMap.length ) + 1 : label;
+			// 		const color = this.colorMap[ label ];
+			// 		data[ 4 * pixelCount ] = ( color >> 24 ) & 0xff;
+			// 		data[ 4 * pixelCount + 1 ] = ( color >> 16 ) & 0xff;
+			// 		data[ 4 * pixelCount + 2 ] = ( color >> 8 ) & 0xff;
+			// 		data[ 4 * pixelCount + 3 ] = color & 0xff;
+			// 		pixelCount ++;
+
+			// 	}
+
+			// }
 
 		} else {
 
