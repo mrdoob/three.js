@@ -112,9 +112,9 @@ class ProgressiveLightMap {
 			object.receiveShadow = true;
 			object.renderOrder = 1000 + ob;
 
-			// Prepare UV boxes for potpack
+			// Prepare UV boxes for potpack (potpack will update x and y)
 			// TODO: Size these by object surface area
-			uv_boxes.push( { w: 1 + ( padding * 2 ), h: 1 + ( padding * 2 ), index: ob } );
+			uv_boxes.push( { w: 1 + ( padding * 2 ), h: 1 + ( padding * 2 ), index: ob, x: 0, y: 0 } );
 
 			this._lightMapContainers.push( { basicMat: object.material, object: object } );
 
