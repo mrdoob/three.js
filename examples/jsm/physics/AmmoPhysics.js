@@ -1,5 +1,5 @@
 /**
- * @classdesc  Can be used to include Ammo.js as a Physics engine into
+ * @classdesc Can be used to include Ammo.js as a Physics engine into
  * `three.js` apps. Make sure to include `ammo.wasm.js` first:
  * ```
  * <script src="jsm/libs/ammo.wasm.js"></script>

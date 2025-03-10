@@ -10,33 +10,111 @@ import {
 } from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 
+/**
+ * This class represents a management component for animated MD2
+ * character assets.
+ */
 class MD2Character {
 
+	/**
+	 * Constructs a new MD2 character.
+	 */
 	constructor() {
 
+		/**
+		 * The mesh scale.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.scale = 1;
+
+		/**
+		 * The FPS
+		 *
+		 * @type {number}
+		 * @default 6
+		 */
 		this.animationFPS = 6;
 
+		/**
+		 * The root 3D object
+		 *
+		 * @type {Object3D}
+		 */
 		this.root = new Object3D();
 
+		/**
+		 * The body mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.meshBody = null;
+
+		/**
+		 * The weapon mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.meshWeapon = null;
 
+		/**
+		 * The body skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
 		this.skinsBody = [];
+
+		/**
+		 * The weapon skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
 		this.skinsWeapon = [];
 
+		/**
+		 * The weapon meshes.
+		 *
+		 * @type {Array<Mesh>}
+		 */
 		this.weapons = [];
 
-		this.activeAnimation = null;
+		/**
+		 * The name of the active animation clip.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.activeAnimationClipName = null;
 
+		/**
+		 * The animation mixer.
+		 *
+		 * @type {?AnimationMixer}
+		 * @default null
+		 */
 		this.mixer = null;
 
+		/**
+		 * The `onLoad` callback function.
+		 *
+		 * @type {Function}
+		 */
 		this.onLoadComplete = function () {};
+
+		// internal
 
 		this.loadCounter = 0;
 
 	}
 
+	/**
+	 * Loads the character model for the given config.
+	 *
+	 * @param {Object} config - The config which defines the model and textures paths.
+	 */
 	loadParts( config ) {
 
 		const scope = this;
@@ -156,6 +234,11 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Sets the animation playback rate.
+	 *
+	 * @param {number} rate - The playback rate to set.
+	 */
 	setPlaybackRate( rate ) {
 
 		if ( rate !== 0 ) {
@@ -170,6 +253,11 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Sets the wireframe material flag.
+	 *
+	 * @param {boolean} wireframeEnabled - Whether to enable wireframe rendering or not.
+	 */
 	setWireframe( wireframeEnabled ) {
 
 		if ( wireframeEnabled ) {
@@ -186,6 +274,12 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Sets the skin defined by the given skin index. This will result in a different texture
+	 * for the body mesh.
+	 *
+	 * @param {number} index - The skin index.
+	 */
 	setSkin( index ) {
 
 		if ( this.meshBody && this.meshBody.material.wireframe === false ) {
@@ -196,6 +290,12 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Sets the weapon defined by the given weapon index. This will result in a different weapon
+	 * hold by the character.
+	 *
+	 * @param {number} index - The weapon index.
+	 */
 	setWeapon( index ) {
 
 		for ( let i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
@@ -213,6 +313,11 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Sets the defined animation clip as the active animation.
+	 *
+	 * @param {string} clipName - The name of the animation clip.
+	 */
 	setAnimation( clipName ) {
 
 		if ( this.meshBody ) {
@@ -240,6 +345,9 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Synchronizes the weapon with the body animation.
+	 */
 	syncWeaponAnimation() {
 
 		const clipName = this.activeClipName;
@@ -265,6 +373,11 @@ class MD2Character {
 
 	}
 
+	/**
+	 * Updates the animations of the mesh. Must be called inside the animation loop.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
 	update( delta ) {
 
 		if ( this.mixer ) this.mixer.update( delta );
