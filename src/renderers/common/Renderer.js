@@ -1041,8 +1041,9 @@ class Renderer {
 	 * @private
 	 * @param {Object} bundle - Render bundle data.
 	 * @param {Scene} sceneRef - The scene the render bundle belongs to.
+	 * @param {LightsNode} lightsNode - The lights node.
 	 */
-	_renderBundle( bundle, sceneRef ) {
+	_renderBundle( bundle, sceneRef, lightsNode ) {
 
 		const { bundleGroup, camera, renderList } = bundle;
 
@@ -1075,7 +1076,6 @@ class Renderer {
 			this._currentRenderBundle = renderBundle;
 
 			const {
-				lightsNode,
 				transparentDoublePass: transparentDoublePassObjects,
 				transparent: transparentObjects,
 				opaque: opaqueObjects
@@ -1408,7 +1408,7 @@ class Renderer {
 			opaque: opaqueObjects
 		} = renderList;
 
-		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef );
+		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
@@ -2642,12 +2642,13 @@ class Renderer {
 	 * @private
 	 * @param {Array<Object>} bundles - Array with render bundle data.
 	 * @param {Scene} sceneRef - The scene the render bundles belong to.
+	 * @param {LightsNode} lightsNode - The current lights node.
 	 */
-	_renderBundles( bundles, sceneRef ) {
+	_renderBundles( bundles, sceneRef, lightsNode ) {
 
 		for ( const bundle of bundles ) {
 
-			this._renderBundle( bundle, sceneRef );
+			this._renderBundle( bundle, sceneRef, lightsNode );
 
 		}
 
