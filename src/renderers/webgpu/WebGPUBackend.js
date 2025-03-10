@@ -67,14 +67,6 @@ class WebGPUBackend extends Backend {
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 		/**
-		 * Whether to track timestamps with a Timestamp Query API or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.trackTimestamp = ( parameters.trackTimestamp === true );
-
-		/**
 		 * A reference to the device.
 		 *
 		 * @type {?GPUDevice}

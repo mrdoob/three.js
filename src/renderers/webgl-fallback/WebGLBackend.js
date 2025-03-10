@@ -168,14 +168,6 @@ class WebGLBackend extends Backend {
 		this.parallel = null;
 
 		/**
-		 * Whether to track timestamps with a Timestamp Query API or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.trackTimestamp = ( parameters.trackTimestamp === true );
-
-		/**
 		 * A reference to the current render context.
 		 *
 		 * @private
