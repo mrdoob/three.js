@@ -61,11 +61,55 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
 	],
 };
 
-
+/**
+ * An exporter for `glTF` 2.0.
+ *
+ * glTF (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/master/specification/2.0}
+ * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
+ * or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
+ * data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
+ * textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
+ *
+ * GLTFExporter supports the [glTF 2.0 extensions]{@link https://github.com/KhronosGroup/glTF/tree/master/extensions/}:
+ *
+ * - KHR_lights_punctual
+ * - KHR_materials_clearcoat
+ * - KHR_materials_dispersion
+ * - KHR_materials_emissive_strength
+ * - KHR_materials_ior
+ * - KHR_materials_iridescence
+ * - KHR_materials_specular
+ * - KHR_materials_sheen
+ * - KHR_materials_transmission
+ * - KHR_materials_unlit
+ * - KHR_materials_volume
+ * - KHR_mesh_quantization
+ * - KHR_texture_transform
+ * - EXT_materials_bump
+ * - EXT_mesh_gpu_instancing
+ *
+ * The following glTF 2.0 extension is supported by an external user plugin:
+ *
+ * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
+ *
+ * ```js
+ * const exporter = new GLTFExporter();
+ * const data = await exporter.parseAsync( scene, options );
+ * ```
+ */
 class GLTFExporter {
 
+	/**
+	 * Constructs a new glTF exporter.
+	 */
 	constructor() {
 
+		/**
+		 * A reference to a texture utils module.
+		 *
+		 * @type {?(WebGLTextureUtils|WebGPUTextureUtils)}
+		 * @default null
+		 */
 		this.textureUtils = null;
 
 		this.pluginCallbacks = [];
@@ -156,6 +200,14 @@ class GLTFExporter {
 
 	}
 
+	/**
+	 * Registers a plugin callback. This API is internally used to implement the various
+	 * glTF extensions but can also used by third-party code to add additional logic
+	 * to the exporter.
+	 *
+	 * @param {function(writer:GLTFWriter)} callback - The callback function to register.
+	 * @return {GLTFExporter} A reference to this exporter.
+	 */
 	register( callback ) {
 
 		if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
@@ -168,6 +220,12 @@ class GLTFExporter {
 
 	}
 
+	/**
+	 * Unregisters a plugin callback.
+	 *
+	 * @param {Function} callback - The callback function to unregister.
+	 * @return {GLTFExporter} A reference to this exporter.
+	 */
 	unregister( callback ) {
 
 		if ( this.pluginCallbacks.indexOf( callback ) !== - 1 ) {
@@ -180,6 +238,15 @@ class GLTFExporter {
 
 	}
 
+	/**
+	 * Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.
+	 *
+	 * Depending on whether you use {@link WebGLRenderer} or {@link WebGPURenderer}, you must inject the
+	 * corresponding texture utils {@link WebGLTextureUtils} or {@link WebGPUTextureUtils}.
+	 *
+	 * @param {WebGLTextureUtils|WebGPUTextureUtils} utils - The texture utils.
+	 * @return {GLTFExporter} A reference to this exporter.
+	 */
 	setTextureUtils( utils ) {
 
 		this.textureUtils = utils;
@@ -189,12 +256,12 @@ class GLTFExporter {
 	}
 
 	/**
-	 * Parse scenes and generate GLTF output
+	 * Parses the given scenes and generates the glTF output.
 	 *
-	 * @param  {Scene|Array<Scene>} input   Scene or Array of THREE.Scenes
-	 * @param  {Function} onDone  Callback on completed
-	 * @param  {Function} onError  Callback on errors
-	 * @param  {Object} options options
+	 * @param {Scene|Array<Scene>} input - A scene or an array of scenes.
+	 * @param {GLTFExporter~OnDone} onDone - A callback function that is executed when the export has finished.
+	 * @param {GLTFExporter~OnError} onError - A callback function that is executed when an error happens.
+	 * @param {GLTFExporter~Options} options - options
 	 */
 	parse( input, onDone, onError, options ) {
 
@@ -213,6 +280,13 @@ class GLTFExporter {
 
 	}
 
+	/**
+	 * Async version of {@link GLTFExporter#parse}.
+	 *
+	 * @param {Scene|Array<Scene>} input - A scene or an array of scenes.
+	 * @param {GLTFExporter~Options} options - options.
+	 * @return {Promise<ArrayBuffer|string>} A Promise that resolved with the exported glTF data.
+	 */
 	parseAsync( input, options ) {
 
 		const scope = this;
@@ -304,6 +378,8 @@ const GLB_CHUNK_TYPE_BIN = 0x004E4942;
 
 /**
  * Compare two arrays
+ *
+ * @private
  * @param  {Array} array1 Array 1 to compare
  * @param  {Array} array2 Array 2 to compare
  * @return {boolean}        Returns true if both arrays are equal
@@ -320,6 +396,8 @@ function equalArray( array1, array2 ) {
 
 /**
  * Converts a string to an ArrayBuffer.
+ *
+ * @private
  * @param  {string} text
  * @return {ArrayBuffer}
  */
@@ -332,6 +410,7 @@ function stringToArrayBuffer( text ) {
 /**
  * Is identity matrix
  *
+ * @private
  * @param {Matrix4} matrix
  * @returns {boolean} Returns true, if parameter is identity matrix
  */
@@ -344,6 +423,7 @@ function isIdentityMatrix( matrix ) {
 /**
  * Get the min and max vectors from the given attribute
  *
+ * @private
  * @param  {BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
  * @param  {number} start Start index
  * @param  {number} count Range to cover
@@ -400,6 +480,7 @@ function getMinMax( attribute, start, count ) {
  * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
  * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
  *
+ * @private
  * @param {number} bufferSize The size the original buffer. Should be an integer.
  * @returns {number} new buffer size with required padding as an integer.
  *
@@ -413,6 +494,7 @@ function getPaddedBufferSize( bufferSize ) {
 /**
  * Returns a buffer aligned to 4-byte boundary.
  *
+ * @private
  * @param {ArrayBuffer} arrayBuffer Buffer to pad
  * @param {number} [paddingByte=0] Should be an integer
  * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
@@ -489,6 +571,8 @@ function getToBlobPromise( canvas, mimeType ) {
 
 /**
  * Writer
+ *
+ * @private
  */
 class GLTFWriter {
 
@@ -991,7 +1075,7 @@ class GLTFWriter {
 	 * @param {number} componentType
 	 * @param {number} start
 	 * @param {number} count
-	 * @param {?number} target Target usage of the BufferView
+	 * @param {number} [target] Target usage of the BufferView
 	 * @return {Object}
 	 */
 	processBufferView( attribute, componentType, start, count, target ) {
@@ -1180,7 +1264,7 @@ class GLTFWriter {
 	/**
 	 * Process attribute to generate an accessor
 	 * @param {BufferAttribute} attribute Attribute to process
-	 * @param {?BufferGeometry} geometry Geometry used for truncated draw range
+	 * @param {?BufferGeometry} [geometry] Geometry used for truncated draw range
 	 * @param {number} [start=0]
 	 * @param {number} [count=Infinity]
 	 * @return {?number} Index of the processed accessor on the "accessors" array
@@ -2511,6 +2595,8 @@ class GLTFWriter {
  * Punctual Lights Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
+ *
+ * @private
  */
 class GLTFLightExtension {
 
@@ -2606,6 +2692,8 @@ class GLTFLightExtension {
  * Unlit Materials Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
+ *
+ * @private
  */
 class GLTFMaterialsUnlitExtension {
 
@@ -2639,6 +2727,8 @@ class GLTFMaterialsUnlitExtension {
  * Clearcoat Materials Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
+ *
+ * @private
  */
 class GLTFMaterialsClearcoatExtension {
 
@@ -2712,6 +2802,8 @@ class GLTFMaterialsClearcoatExtension {
  * Materials dispersion Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_dispersion
+ *
+ * @private
  */
 class GLTFMaterialsDispersionExtension {
 
@@ -2746,6 +2838,8 @@ class GLTFMaterialsDispersionExtension {
  * Iridescence Materials Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence
+ *
+ * @private
  */
 class GLTFMaterialsIridescenceExtension {
 
@@ -2806,6 +2900,8 @@ class GLTFMaterialsIridescenceExtension {
  * Transmission Materials Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
+ *
+ * @private
  */
 class GLTFMaterialsTransmissionExtension {
 
@@ -2851,6 +2947,8 @@ class GLTFMaterialsTransmissionExtension {
  * Materials Volume Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_volume
+ *
+ * @private
  */
 class GLTFMaterialsVolumeExtension {
 
@@ -2904,6 +3002,8 @@ class GLTFMaterialsVolumeExtension {
  * Materials ior Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_ior
+ *
+ * @private
  */
 class GLTFMaterialsIorExtension {
 
@@ -2938,6 +3038,8 @@ class GLTFMaterialsIorExtension {
  * Materials specular Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_specular
+ *
+ * @private
  */
 class GLTFMaterialsSpecularExtension {
 
@@ -2997,6 +3099,8 @@ class GLTFMaterialsSpecularExtension {
  * Sheen Materials Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_sheen
+ *
+ * @private
  */
 class GLTFMaterialsSheenExtension {
 
@@ -3054,6 +3158,8 @@ class GLTFMaterialsSheenExtension {
  * Anisotropy Materials Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_anisotropy
+ *
+ * @private
  */
 class GLTFMaterialsAnisotropyExtension {
 
@@ -3097,6 +3203,8 @@ class GLTFMaterialsAnisotropyExtension {
  * Materials Emissive Strength Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/blob/5768b3ce0ef32bc39cdf1bef10b948586635ead3/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md
+ *
+ * @private
  */
 class GLTFMaterialsEmissiveStrengthExtension {
 
@@ -3132,6 +3240,8 @@ class GLTFMaterialsEmissiveStrengthExtension {
  * Materials bump Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
+ *
+ * @private
  */
 class GLTFMaterialsBumpExtension {
 
@@ -3179,6 +3289,8 @@ class GLTFMaterialsBumpExtension {
  * GPU Instancing Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
+ *
+ * @private
  */
 class GLTFMeshGpuInstancing {
 
@@ -3238,6 +3350,8 @@ class GLTFMeshGpuInstancing {
 
 /**
  * Static utility functions
+ *
+ * @private
  */
 GLTFExporter.Utils = {
 
@@ -3457,5 +3571,31 @@ GLTFExporter.Utils = {
 	}
 
 };
+
+/**
+ * Export options of `GLTFExporter`.
+ *
+ * @typedef {Object} GLTFExporter~Options
+ * @property {boolean} [trs=false] - Export position, rotation and scale instead of matrix per node.
+ * @property {boolean} [onlyVisible=true] - Export only visible 3D objects.
+ * @property {boolean} [binary=false] - Export in binary (.glb) format, returning an ArrayBuffer.
+ * @property {number} [maxTextureSize=Infinity] - Restricts the image maximum size (both width and height) to the given value.
+ * @property {Array<AnimationClip>} [animations=[]] - List of animations to be included in the export.
+ * @property {boolean} [includeCustomExtensions=false] - Export custom glTF extensions defined on an object's `userData.gltfExtensions` property.
+ **/
+
+/**
+ * onDone callback of `GLTFExporter`.
+ *
+ * @callback GLTFExporter~OnDone
+ * @param {ArrayBuffer|string} result - The generated .gltf (JSON) or .glb (binary).
+ */
+
+/**
+ * onError callback of `GLTFExporter`.
+ *
+ * @callback GLTFExporter~OnError
+ * @param {Error} error - The error object.
+ */
 
 export { GLTFExporter };

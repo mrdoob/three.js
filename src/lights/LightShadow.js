@@ -10,7 +10,7 @@ const _lookTarget = /*@__PURE__*/ new Vector3();
 
 /**
  * Abstract base class for light shadow classes. These classes
- * represent the shadow configuration for different ligth types.
+ * represent the shadow configuration for different light types.
  *
  * @abstract
  */

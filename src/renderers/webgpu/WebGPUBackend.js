@@ -369,10 +369,9 @@ class WebGPUBackend extends Backend {
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.dimensions !== renderTarget.dimensions ||
-			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
+			renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel ||
 			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
-			renderTargetData.samples !== renderTarget.samples ||
-			renderTargetData.loadOp !== colorAttachmentsConfig.loadOp
+			renderTargetData.samples !== renderTarget.samples
 		) {
 
 			descriptors = {};
@@ -384,23 +383,25 @@ class WebGPUBackend extends Backend {
 			const onDispose = () => {
 
 				renderTarget.removeEventListener( 'dispose', onDispose );
-
 				this.delete( renderTarget );
 
 			};
 
-			renderTarget.addEventListener( 'dispose', onDispose );
+			if ( renderTarget.hasEventListener( 'dispose', onDispose ) === false ) {
+
+				renderTarget.addEventListener( 'dispose', onDispose );
+
+			}
 
 		}
 
 		const cacheKey = renderContext.getCacheKey();
+		let descriptorBase = descriptors[ cacheKey ];
 
-		let descriptor = descriptors[ cacheKey ];
-
-		if ( descriptor === undefined ) {
+		if ( descriptorBase === undefined ) {
 
 			const textures = renderContext.textures;
-			const colorAttachments = [];
+			const textureViews = [];
 
 			let sliceIndex;
 
@@ -448,44 +449,24 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				// only apply the user-defined clearValue to the first color attachment like in beginRender()
-
-				let clearValue = { r: 0, g: 0, b: 0, a: 1 };
-
-				if ( i === 0 && colorAttachmentsConfig.clearValue ) {
-
-					clearValue = colorAttachmentsConfig.clearValue;
-
-				}
-
-				colorAttachments.push( {
+				textureViews.push( {
 					view,
-					depthSlice: sliceIndex,
 					resolveTarget,
-					loadOp: colorAttachmentsConfig.loadOP || GPULoadOp.Load,
-					storeOp: colorAttachmentsConfig.storeOP || GPUStoreOp.Store,
-					clearValue: clearValue
+					depthSlice: sliceIndex
 				} );
 
 			}
 
-
-			descriptor = {
-				colorAttachments,
-			};
+			descriptorBase = { textureViews };
 
 			if ( renderContext.depth ) {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
-
-				const depthStencilAttachment = {
-					view: depthTextureData.texture.createView()
-				};
-				descriptor.depthStencilAttachment = depthStencilAttachment;
+				descriptorBase.depthStencilView = depthTextureData.texture.createView();
 
 			}
 
-			descriptors[ cacheKey ] = descriptor;
+			descriptors[ cacheKey ] = descriptorBase;
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
@@ -493,8 +474,41 @@ class WebGPUBackend extends Backend {
 			renderTargetData.activeMipmapLevel = renderContext.activeMipmapLevel;
 			renderTargetData.activeCubeFace = renderContext.activeCubeFace;
 			renderTargetData.dimensions = renderTarget.dimensions;
-			renderTargetData.depthSlice = sliceIndex;
-			renderTargetData.loadOp = colorAttachments[ 0 ].loadOp;
+
+		}
+
+		const descriptor = {
+			colorAttachments: []
+		};
+
+		// Apply dynamic properties to cached views
+		for ( let i = 0; i < descriptorBase.textureViews.length; i ++ ) {
+
+			const viewInfo = descriptorBase.textureViews[ i ];
+
+			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
+			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
+
+				clearValue = colorAttachmentsConfig.clearValue;
+
+			}
+
+			descriptor.colorAttachments.push( {
+				view: viewInfo.view,
+				depthSlice: viewInfo.depthSlice,
+				resolveTarget: viewInfo.resolveTarget,
+				loadOp: colorAttachmentsConfig.loadOp || GPULoadOp.Load,
+				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
+				clearValue: clearValue
+			} );
+
+		}
+
+		if ( descriptorBase.depthStencilView ) {
+
+			descriptor.depthStencilAttachment = {
+				view: descriptorBase.depthStencilView
+			};
 
 		}
 
@@ -873,7 +887,6 @@ class WebGPUBackend extends Backend {
 		const renderer = this.renderer;
 
 		let colorAttachments = [];
-
 		let depthStencilAttachment;
 		let clearValue;
 
@@ -917,29 +930,35 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderTargetContext.depth;
 			supportsStencil = renderTargetContext.stencil;
 
-			if ( color ) {
+			const clearConfig = {
+				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
+				clearValue: color ? clearValue : undefined
+			};
 
-				const descriptor = this._getRenderPassDescriptor( renderTargetContext, { loadOp: GPULoadOp.Clear, clearValue } );
+			if ( supportsDepth ) {
 
-				colorAttachments = descriptor.colorAttachments;
+				clearConfig.depthLoadOp = depth ? GPULoadOp.Clear : GPULoadOp.Load;
+				clearConfig.depthClearValue = depth ? renderer.getClearDepth() : undefined;
+				clearConfig.depthStoreOp = GPUStoreOp.Store;
+
+			}
+
+			if ( supportsStencil ) {
+
+				clearConfig.stencilLoadOp = stencil ? GPULoadOp.Clear : GPULoadOp.Load;
+				clearConfig.stencilClearValue = stencil ? renderer.getClearStencil() : undefined;
+				clearConfig.stencilStoreOp = GPUStoreOp.Store;
 
 			}
 
-			if ( supportsDepth || supportsStencil ) {
+			const descriptor = this._getRenderPassDescriptor( renderTargetContext, clearConfig );
 
-				const depthTextureData = this.get( renderTargetContext.depthTexture );
-
-				depthStencilAttachment = {
-					view: depthTextureData.texture.createView()
-				};
-
-			}
+			colorAttachments = descriptor.colorAttachments;
+			depthStencilAttachment = descriptor.depthStencilAttachment;
 
 		}
 
-		//
-
-		if ( supportsDepth ) {
+		if ( supportsDepth && depthStencilAttachment && depthStencilAttachment.depthLoadOp === undefined ) {
 
 			if ( depth ) {
 
@@ -958,7 +977,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( supportsStencil ) {
+		if ( supportsStencil && depthStencilAttachment && depthStencilAttachment.stencilLoadOp === undefined ) {
 
 			if ( stencil ) {
 
@@ -1890,38 +1909,56 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Texture} srcTexture - The source texture.
 	 * @param {Texture} dstTexture - The destination texture.
-	 * @param {?Vector4} [srcRegion=null] - The region of the source texture to copy.
+	 * @param {?(Box3|Box2)} [srcRegion=null] - The region of the source texture to copy.
 	 * @param {?(Vector2|Vector3)} [dstPosition=null] - The destination position of the copy.
-	 * @param {number} [level=0] - The mip level to copy.
+	 * @param {number} [srcLevel=0] - The mipmap level to copy.
+	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 		let dstX = 0;
 		let dstY = 0;
-		let dstLayer = 0;
+		let dstZ = 0;
 
 		let srcX = 0;
 		let srcY = 0;
-		let srcLayer = 0;
+		let srcZ = 0;
 
 		let srcWidth = srcTexture.image.width;
 		let srcHeight = srcTexture.image.height;
+		let srcDepth = 1;
+
 
 		if ( srcRegion !== null ) {
 
-			srcX = srcRegion.x;
-			srcY = srcRegion.y;
-			srcLayer = srcRegion.z || 0;
-			srcWidth = srcRegion.width;
-			srcHeight = srcRegion.height;
+			if ( srcRegion.isBox3 === true ) {
+
+				srcX = srcRegion.min.x;
+				srcY = srcRegion.min.y;
+				srcZ = srcRegion.min.z;
+				srcWidth = srcRegion.max.x - srcRegion.min.x;
+				srcHeight = srcRegion.max.y - srcRegion.min.y;
+				srcDepth = srcRegion.max.z - srcRegion.min.z;
+
+			} else {
+
+				// Assume it's a Box2
+				srcX = srcRegion.min.x;
+				srcY = srcRegion.min.y;
+				srcWidth = srcRegion.max.x - srcRegion.min.x;
+				srcHeight = srcRegion.max.y - srcRegion.min.y;
+				srcDepth = 1;
+
+			}
 
 		}
+
 
 		if ( dstPosition !== null ) {
 
 			dstX = dstPosition.x;
 			dstY = dstPosition.y;
-			dstLayer = dstPosition.z || 0;
+			dstZ = dstPosition.z || 0;
 
 		}
 
@@ -1933,22 +1970,28 @@ class WebGPUBackend extends Backend {
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				mipLevel: level,
-				origin: { x: srcX, y: srcY, z: srcLayer }
+				mipLevel: srcLevel,
+				origin: { x: srcX, y: srcY, z: srcZ }
 			},
 			{
 				texture: destinationGPU,
-				mipLevel: level,
-				origin: { x: dstX, y: dstY, z: dstLayer }
+				mipLevel: dstLevel,
+				origin: { x: dstX, y: dstY, z: dstZ }
 			},
 			[
 				srcWidth,
 				srcHeight,
-				1
+				srcDepth
 			]
 		);
 
 		this.device.queue.submit( [ encoder.finish() ] );
+
+		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( dstTexture );
+
+		}
 
 	}
 

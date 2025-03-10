@@ -342,7 +342,7 @@ export default UniformArrayNode;
  * @tsl
  * @function
  * @param {Array<any>} values - Array-like data.
- * @param {?string} nodeType - The data type of the array elements.
+ * @param {?string} [nodeType] - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );

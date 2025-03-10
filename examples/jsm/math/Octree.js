@@ -81,19 +81,67 @@ function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null )
 
 }
 
+/**
+ * An octree is a hierarchical tree data structure used to partition a three-dimensional
+ * space by recursively subdividing it into eight octants.
+ *
+ * This particular implementation can have up to sixteen levels and stores up to eight triangles
+ * in leaf nodes.
+ *
+ * `Octree` can be used in games to compute collision between the game world and colliders from
+ * the player or other dynamic 3D objects.
+ *
+ *
+ * ```js
+ * const octree = new Octree().fromGraphNode( scene );
+ * const result = octree.capsuleIntersect( playerCollider ); // collision detection
+ * ```
+ */
 class Octree {
 
+	/**
+	 * Constructs a new Octree.
+	 *
+	 * @param {Box3} [box] - The base box with enclose the entire Octree.
+	 */
 	constructor( box ) {
 
+		/**
+		 * The base box with enclose the entire Octree.
+		 *
+		 * @type {Box3}
+		 */
 		this.box = box;
+
+		/**
+		 * The bounds of the Octree. Compared to {@link Octree#box}, no
+		 * margin is applied.
+		 *
+		 * @type {Box3}
+		 */
 		this.bounds = new Box3();
+
+		/**
+		 * Can by used for layers configuration for refine testing.
+		 *
+		 * @type {Layers}
+		 */
+		this.layers = new Layers();
+
+		// private
 
 		this.subTrees = [];
 		this.triangles = [];
-		this.layers = new Layers();
 
 	}
 
+	/**
+	 * Adds the given triangle to the Octree. The triangle vertices are clamped if they exceed
+	 * the bounds of the Octree.
+	 *
+	 * @param {Triangle} triangle - The triangle to add.
+	 * @return {Octree} A reference to this Octree.
+	 */
 	addTriangle( triangle ) {
 
 		this.bounds.min.x = Math.min( this.bounds.min.x, triangle.a.x, triangle.b.x, triangle.c.x );
@@ -109,6 +157,11 @@ class Octree {
 
 	}
 
+	/**
+	 * Prepares {@link Octree#box} for the build.
+	 *
+	 * @return {Octree} A reference to this Octree.
+	 */
 	calcBox() {
 
 		this.box = this.bounds.clone();
@@ -122,6 +175,13 @@ class Octree {
 
 	}
 
+	/**
+	 * Splits the Octree. This method is used recursively when
+	 * building the Octree.
+	 *
+	 * @param {number} level - The current level.
+	 * @return {Octree} A reference to this Octree.
+	 */
 	split( level ) {
 
 		if ( ! this.box ) return;
@@ -187,6 +247,11 @@ class Octree {
 
 	}
 
+	/**
+	 * Builds the Octree.
+	 *
+	 * @return {Octree} A reference to this Octree.
+	 */
 	build() {
 
 		this.calcBox();
@@ -196,6 +261,12 @@ class Octree {
 
 	}
 
+	/**
+	 * Computes the triangles that potentially intersect with the given ray.
+	 *
+	 * @param {Ray} ray - The ray to test.
+	 * @param {Array<Triangle>} triangles - The target array that holds the triangles.
+	 */
 	getRayTriangles( ray, triangles ) {
 
 		for ( let i = 0; i < this.subTrees.length; i ++ ) {
@@ -219,10 +290,16 @@ class Octree {
 
 		}
 
-		return triangles;
-
 	}
 
+	/**
+	 * Computes the intersection between the given capsule and triangle.
+	 *
+	 * @param {Capsule} capsule - The capsule to test.
+	 * @param {Triangle} triangle - The triangle to test.
+	 * @return {Object|false} The intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
 	triangleCapsuleIntersect( capsule, triangle ) {
 
 		triangle.getPlane( _plane );
@@ -277,6 +354,14 @@ class Octree {
 
 	}
 
+	/**
+	 * Computes the intersection between the given sphere and triangle.
+	 *
+	 * @param {Sphere} sphere - The sphere to test.
+	 * @param {Triangle} triangle - The triangle to test.
+	 * @return {Object|false} The intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
 	triangleSphereIntersect( sphere, triangle ) {
 
 		triangle.getPlane( _plane );
@@ -319,6 +404,12 @@ class Octree {
 
 	}
 
+	/**
+	 * Computes the triangles that potentially intersect with the given bounding sphere.
+	 *
+	 * @param {Sphere} sphere - The sphere to test.
+	 * @param {Array<Triangle>} triangles - The target array that holds the triangles.
+	 */
 	getSphereTriangles( sphere, triangles ) {
 
 		for ( let i = 0; i < this.subTrees.length; i ++ ) {
@@ -345,6 +436,12 @@ class Octree {
 
 	}
 
+	/**
+	 * Computes the triangles that potentially intersect with the given capsule.
+	 *
+	 * @param {Capsule} capsule - The capsule to test.
+	 * @param {Array<Triangle>} triangles - The target array that holds the triangles.
+	 */
 	getCapsuleTriangles( capsule, triangles ) {
 
 		for ( let i = 0; i < this.subTrees.length; i ++ ) {
@@ -371,6 +468,13 @@ class Octree {
 
 	}
 
+	/**
+	 * Performs a bounding sphere intersection test with this Octree.
+	 *
+	 * @param {Sphere} sphere - The bounding sphere to test.
+	 * @return {Object|boolean} The intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
 	sphereIntersect( sphere ) {
 
 		_sphere.copy( sphere );
@@ -405,6 +509,13 @@ class Octree {
 
 	}
 
+	/**
+	 * Performs a capsule intersection test with this Octree.
+	 *
+	 * @param {Capsule} capsule - The capsule to test.
+	 * @return {Object|boolean} The intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
 	capsuleIntersect( capsule ) {
 
 		_capsule.copy( capsule );
@@ -439,9 +550,14 @@ class Octree {
 
 	}
 
+	/**
+	 * Performs a ray intersection test with this Octree.
+	 *
+	 * @param {Ray} ray - The ray to test.
+	 * @return {Object|boolean} The nearest intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
 	rayIntersect( ray ) {
-
-		if ( ray.direction.length() === 0 ) return;
 
 		const triangles = [];
 		let triangle, position, distance = 1e100;
@@ -472,6 +588,12 @@ class Octree {
 
 	}
 
+	/**
+	 * Constructs the Octree from the given 3D object.
+	 *
+	 * @param {Object3D} group - The scene graph node.
+	 * @return {Octree} A reference to this Octree.
+	 */
 	fromGraphNode( group ) {
 
 		group.updateWorldMatrix( true, true );
@@ -529,6 +651,11 @@ class Octree {
 
 	}
 
+	/**
+	 * Clears the Octree by making it empty.
+	 *
+	 * @return {Octree} A reference to this Octree.
+	 */
 	clear() {
 
 		this.box = null;

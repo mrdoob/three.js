@@ -62,7 +62,7 @@ class Curve {
 	 * @abstract
 	 * @param {number} t - A interpolation factor representing a position on the curve. Must be in the range `[0,1]`.
 	 * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
-	 * @return {?(Vector2|Vector3)} The position on the curve. It can be a 2D or 3D vector depending on the curve definition.
+	 * @return {(Vector2|Vector3)} The position on the curve. It can be a 2D or 3D vector depending on the curve definition.
 	 */
 	getPoint( /* t, optionalTarget */ ) {
 

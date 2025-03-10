@@ -100,6 +100,11 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
 */
 class PMREMGenerator {
 
+	/**
+	 * Constructs a new PMREM generator.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		this._renderer = renderer;
@@ -641,6 +646,7 @@ class PMREMGenerator {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 *
+	 * @private
 	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
 	 * @param {number} lodIn - The input level-of-detail.
 	 * @param {number} lodOut - The output level-of-detail.

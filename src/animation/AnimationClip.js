@@ -287,11 +287,14 @@ class AnimationClip {
 	 * Parses the `animation.hierarchy` format and returns a new animation clip.
 	 *
 	 * @static
+	 * @deprecated since r175.
 	 * @param {Object} animation - A serialized animation clip as JSON.
 	 * @param {Array<Bones>} bones - An array of bones.
 	 * @return {?AnimationClip} The new animation clip.
 	 */
 	static parseAnimation( animation, bones ) {
+
+		console.warn( 'THREE.AnimationClip: parseAnimation() is deprecated and will be removed with r185' );
 
 		if ( ! animation ) {
 

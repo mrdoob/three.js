@@ -12,27 +12,39 @@
     "plugins": [ "plugins/markdown" ],
     "source": {
         "include": [
+            "examples/jsm/animation",
+            "examples/jsm/capabilities",
+            "examples/jsm/controls",
+            "examples/jsm/csm",
+            "examples/jsm/curves",
+            "examples/jsm/effects",
+            "examples/jsm/environments",
+            "examples/jsm/exporters",
+            "examples/jsm/geometries",
+            "examples/jsm/helpers",
+            "examples/jsm/interactive",
+            "examples/jsm/lighting",
+            "examples/jsm/lights",
+            "examples/jsm/lines",
+            "examples/jsm/materials",
+            "examples/jsm/math",
+            "examples/jsm/modifiers",
+            "examples/jsm/objects",
+            "examples/jsm/renderers",
+            "examples/jsm/textures",
             "examples/jsm/tsl",
-            "src/animation",
-            "src/audio",
-            "src/cameras",
-            "src/core",
-            "src/extras",
-            "src/geometries",
-            "src/helpers",
-            "src/lights",
-            "src/loaders",
-            "src/materials",
-            "src/math",
-            "src/nodes",
-            "src/objects",
-            "src/renderers/common",
-            "src/renderers/webgpu",
-            "src/scenes",
-            "src/textures"
+            "examples/jsm/webxr",
+            "src"
         ],
         "exclude": [
-            "src/extras/PMREMGenerator.js"
+            "src/renderers/common/extras/PMREMGenerator.js",
+            "examples/jsm/helpers/LightProbeHelperGPU.js",
+            "examples/jsm/helpers/TextureHelperGPU.js",
+            "examples/jsm/lines/webgpu",
+            "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
+            "examples/jsm/modifiers/CurveModifierGPU.js",
+            "examples/jsm/objects/Water2.js",
+            "examples/jsm/objects/Water2Mesh.js"
         ]
     }
 }

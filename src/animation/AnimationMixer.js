@@ -543,7 +543,7 @@ class AnimationMixer extends EventDispatcher {
 	 * will be created by this method. Calling this method several times with the
 	 * same clip and root parameters always returns the same action.
 	 *
-	 * @param {AnimationClip|string} clip - An animaion clip or alternatively the name of the animation clip.
+	 * @param {AnimationClip|string} clip - An animation clip or alternatively the name of the animation clip.
 	 * @param {Object3D} [optionalRoot] - An alternative root object.
 	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode] - The blend mode.
 	 * @return {?AnimationAction} The animation action.
@@ -612,7 +612,7 @@ class AnimationMixer extends EventDispatcher {
 	/**
 	 * Returns an existing animation action for the passed clip.
 	 *
-	 * @param {AnimationClip|string} clip - An animaion clip or alternatively the name of the animation clip.
+	 * @param {AnimationClip|string} clip - An animation clip or alternatively the name of the animation clip.
 	 * @param {Object3D} [optionalRoot] - An alternative root object.
 	 * @return {?AnimationAction} The animation action. Returns `null` if no action was found.
 	 */
@@ -833,7 +833,7 @@ class AnimationMixer extends EventDispatcher {
 	 * given clip and an optional root object. Before using this method make
 	 * sure to call {@link AnimationAction#stop} to deactivate the action.
 	 *
-	 * @param {AnimationClip|string} clip - An animaion clip or alternatively the name of the animation clip.
+	 * @param {AnimationClip|string} clip - An animation clip or alternatively the name of the animation clip.
 	 * @param {Object3D} [optionalRoot] - An alternative root object.
 	 */
 	uncacheAction( clip, optionalRoot ) {

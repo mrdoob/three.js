@@ -338,7 +338,7 @@ class MotionController {
   /**
    * @param {Object} xrInputSource - The XRInputSource to build the MotionController around
    * @param {Object} profile - The best matched profile description for the supplied xrInputSource
-   * @param {Object} assetUrl
+   * @param {string} assetUrl
    */
   constructor(xrInputSource, profile, assetUrl) {
     if (!xrInputSource) {

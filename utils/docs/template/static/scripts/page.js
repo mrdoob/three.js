@@ -115,7 +115,7 @@ function updateNavigation() {
 	const filename = window.location.pathname.split( '/' ).pop();
 	const pagename = filename.split( '.' )[ 0 ];
 
-	let target = pagename;
+	let target = pagename.replace( 'module-', '' );
 
 	if ( pagename === 'global' ) {
 

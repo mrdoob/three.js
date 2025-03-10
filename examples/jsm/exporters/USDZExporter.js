@@ -9,26 +9,67 @@ import {
 	zipSync,
 } from '../libs/fflate.module.js';
 
+/**
+ * An exporter for USDZ.
+ *
+ * ```js
+ * const exporter = new USDZExporter();
+ * const arraybuffer = await exporter.parseAsync( scene );
+ * ```
+ */
 class USDZExporter {
 
+	/**
+	 * Constructs a new USDZ exporter.
+	 */
 	constructor() {
 
+		/**
+		 * A reference to a texture utils module.
+		 *
+		 * @type {?(WebGLTextureUtils|WebGPUTextureUtils)}
+		 * @default null
+		 */
 		this.textureUtils = null;
 
 	}
 
+	/**
+	 * Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.
+	 *
+	 * Depending on whether you use {@link WebGLRenderer} or {@link WebGPURenderer}, you must inject the
+	 * corresponding texture utils {@link WebGLTextureUtils} or {@link WebGPUTextureUtils}.
+	 *
+	 * @param {WebGLTextureUtils|WebGPUTextureUtils} utils - The texture utils.
+	 */
 	setTextureUtils( utils ) {
 
 		this.textureUtils = utils;
 
 	}
 
+	/**
+	 * Parse the given 3D object and generates the USDZ output.
+	 *
+	 * @param {Object3D} scene - The 3D object to export.
+	 * @param {USDZExporter~OnDone} onDone - A callback function that is executed when the export has finished.
+	 * @param {USDZExporter~OnError} onError - A callback function that is executed when an error happens.
+	 * @param {USDZExporter~Options} options - The export options.
+	 */
 	parse( scene, onDone, onError, options ) {
 
 		this.parseAsync( scene, options ).then( onDone ).catch( onError );
 
 	}
 
+	/**
+	 * Async version of {@link USDZExporter#parse}.
+	 *
+	 * @async
+	 * @param {Object3D} scene - The 3D object to export.
+	 * @param {USDZExporter~Options} options - The export options.
+	 * @return {Promise<ArrayBuffer>} A Promise that resolved with the exported USDZ data.
+	 */
 	async parseAsync( scene, options = {} ) {
 
 		options = Object.assign( {
@@ -78,7 +119,7 @@ class USDZExporter {
 
 					}
 
-					output += buildXform( object, geometry, material );
+					output += buildXform( object, geometry, materials[ material.uuid ] );
 
 				} else {
 
@@ -755,7 +796,7 @@ function buildCamera( camera ) {
 			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
 			token projection = "orthographic"
 		}
-	
+
 	`;
 
 	} else {
@@ -772,11 +813,37 @@ function buildCamera( camera ) {
 			token projection = "perspective"
 			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
 		}
-	
+
 	`;
 
 	}
 
 }
+
+/**
+ * Export options of `USDZExporter`.
+ *
+ * @typedef {Object} USDZExporter~Options
+ * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
+ * @property {boolean} [includeAnchoringProperties=false] - Whether to include anchoring properties or not.
+ * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
+ * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
+ * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook
+ * which means the asset is modified to accommodate the bugs FB10036297 and FB11442287 (Apple Feedback).
+ **/
+
+/**
+ * onDone callback of `USDZExporter`.
+ *
+ * @callback USDZExporter~OnDone
+ * @param {ArrayBuffer} result - The generated USDZ.
+ */
+
+/**
+ * onError callback of `USDZExporter`.
+ *
+ * @callback USDZExporter~OnError
+ * @param {Error} error - The error object.
+ */
 
 export { USDZExporter };

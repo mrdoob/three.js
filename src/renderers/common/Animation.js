@@ -103,7 +103,7 @@ class Animation {
 	/**
 	 * Defines the user-level animation loop.
 	 *
-	 * @param {Function} callback - The animation loop.
+	 * @param {?Function} callback - The animation loop.
 	 */
 	setAnimationLoop( callback ) {
 

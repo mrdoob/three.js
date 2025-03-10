@@ -8,21 +8,31 @@ import {
 } from 'three';
 
 /**
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
+ * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight]{@link https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight}
+ * aka The Preetham Model, the de facto standard for analytical skydomes.
  *
- * First implemented by Simon Wallner
- * http://simonwallner.at/project/atmospheric-scattering/
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link SkyMesh}.
  *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ * More references:
  *
- * Three.js integration by zz85 http://twitter.com/blurspline
+ * - {@link http://simonwallner.at/project/atmospheric-scattering/}
+ * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
+ *
+ *
+ * ```js
+ * const sky = new Sky();
+ * sky.scale.setScalar( 10000 );
+ * scene.add( sky );
+ * ```
+ *
+ * @augments Mesh
 */
-
 class Sky extends Mesh {
 
+	/**
+	 * Constructs a new skydome.
+	 */
 	constructor() {
 
 		const shader = Sky.SkyShader;
@@ -38,6 +48,13 @@ class Sky extends Mesh {
 
 		super( new BoxGeometry( 1, 1, 1 ), material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSky = true;
 
 	}

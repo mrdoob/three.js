@@ -1,10 +1,3 @@
-/**
- * @author sciecode / https://github.com/sciecode
- *
- * EXR format references:
- * 	https://www.openexr.com/documentation/openexrfilelayout.pdf
- */
-
 import {
 	FloatType,
 	HalfFloatType,
@@ -19,13 +12,41 @@ const NO_COMPRESSION = 0;
 const ZIPS_COMPRESSION = 2;
 const ZIP_COMPRESSION = 3;
 
+/**
+ * An exporter for EXR.
+ *
+ * EXR ( Extended Dynamic Range) is an [open format specification]{@link https://github.com/AcademySoftwareFoundation/openexr}
+ * for professional-grade image storage format of the motion picture industry. The purpose of
+ * format is to accurately and efficiently represent high-dynamic-range scene-linear image data
+ * and associated metadata. The library is widely used in host application software where accuracy
+ * is critical, such as photorealistic rendering, texture access, image compositing, deep compositing,
+ * and DI.
+ *
+ * ```js
+ * const exporter = new EXRExporter();
+ * const result = await exporter.parse( renderer, options );
+ * ```
+ */
 class EXRExporter {
 
+	/**
+	 * This method has two variants.
+	 *
+	 * - When exporting a data texture, it receives two parameters. The texture and the exporter options.
+	 * - When exporting a render target (e.g. a PMREM), it receives three parameters. The renderer, the
+	 * render target and the exporter options.
+	 *
+	 * @async
+	 * @param {(DataTexture|WebGPURenderer|WebGLRenderer)} arg1 - The data texture to export or a renderer.
+	 * @param {(EXRExporter~Options|RenderTarget)} arg2 - The exporter options or a render target.
+	 * @param {EXRExporter~Options} [arg3] - The exporter options.
+	 * @return {Promise<Uint8Array>} A Promise that resolves with the exported EXR.
+	 */
 	async parse( arg1, arg2, arg3 ) {
 
 		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isWebGPURenderer || arg1.isDataTexture ) ) {
 
-			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
+			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer, WebGPURenderer or DataTexture.' );
 
 		} else if ( arg1.isWebGLRenderer || arg1.isWebGPURenderer ) {
 
@@ -583,5 +604,13 @@ function getFloat32( arr, i ) {
 	return arr[ i ];
 
 }
+
+/**
+ * Export options of `EXRExporter`.
+ *
+ * @typedef {Object} EXRExporter~Options
+ * @property {(HalfFloatType|FloatType)} [type=HalfFloatType] - Output data type.
+ * @property {(NO_COMPRESSION|ZIP_COMPRESSION|ZIPS_COMPRESSION)} [type=ZIP_COMPRESSION] - The compression algorithm.
+ **/
 
 export { EXRExporter, NO_COMPRESSION, ZIP_COMPRESSION, ZIPS_COMPRESSION };

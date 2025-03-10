@@ -314,8 +314,10 @@ class NodeBuilder {
 		/**
 		 * This dictionary holds the node variables of this builder.
 		 * The variables are maintained in an array for each shader stage.
+		 * This dictionary is also used to count the number of variables
+		 * according to their type (const, vars).
 		 *
-		 * @type {Object<string,Array<NodeVar>>}
+		 * @type {Object<string,Array<NodeVar>|number>}
 		 */
 		this.vars = {};
 

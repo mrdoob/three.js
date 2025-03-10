@@ -144,7 +144,7 @@ class BufferGeometry extends EventDispatcher {
 		 * Split the geometry into groups, each of which will be rendered in a
 		 * separate draw call. This allows an array of materials to be used with the geometry.
 		 *
-		 * Use `addGroup()` and `clearGroups()` to edtir groups, rather than modifying this array directly.
+		 * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
 		 *
 		 * Every vertex and index must belong to exactly one group — groups must not share vertices or
 		 * indices, and must not leave vertices or indices unused.
@@ -343,7 +343,7 @@ class BufferGeometry extends EventDispatcher {
 	}
 
 	/**
-	 * Applies the given 4x4 tranformation matrix to the geometry.
+	 * Applies the given 4x4 transformation matrix to the geometry.
 	 *
 	 * @param {Matrix4} matrix - The matrix to apply.
 	 * @return {BufferGeometry} A reference to this instance.
@@ -557,7 +557,7 @@ class BufferGeometry extends EventDispatcher {
 
 	/**
 	 * Defines a geometry by creating a `position` attribute based on the given array of points. The array
-	 * can hold 2D or 3D vectoes. When using two-dimensional data, the `z` coordinate for all vertices is
+	 * can hold 2D or 3D vectors. When using two-dimensional data, the `z` coordinate for all vertices is
 	 * set to `0`.
 	 *
 	 * If the method is used with an existing `position` attribute, the vertex data are overwritten with the
@@ -1352,7 +1352,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( index !== null ) {
 
-			this.setIndex( index.clone( data ) );
+			this.setIndex( index.clone() );
 
 		}
 

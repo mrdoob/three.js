@@ -93,7 +93,7 @@ function sortedArray( values, stride, order ) {
  * @param {Array<number>} jsonKeys - A list of JSON keyframes.
  * @param {Array<number>} times - This array will be filled with keyframe times by this function.
  * @param {Array<number>} values - This array will be filled with keyframe values by this function.
- * @param {Object<string, any>} valuePropertyName - A dictionary assigning values to property names.
+ * @param {string} valuePropertyName - The name of the property to use.
  */
 function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 
@@ -451,7 +451,7 @@ class AnimationUtils {
 	 * @param {Array<number>} jsonKeys - A list of JSON keyframes.
 	 * @param {Array<number>} times - This array will be filled with keyframe times by this method.
 	 * @param {Array<number>} values - This array will be filled with keyframe values by this method.
-	 * @param {Object<string, any>} valuePropertyName - A dictionary assigning values to property names.
+	 * @param {string} valuePropertyName - The name of the property to use.
 	 */
 	static flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 
