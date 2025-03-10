@@ -30,8 +30,10 @@
             "examples/jsm/math",
             "examples/jsm/modifiers",
             "examples/jsm/objects",
+            "examples/jsm/physics",
             "examples/jsm/renderers",
             "examples/jsm/textures",
+            "examples/jsm/transpiler",
             "examples/jsm/tsl",
             "examples/jsm/utils",
             "src"
@@ -45,6 +47,8 @@
             "examples/jsm/modifiers/CurveModifierGPU.js",
             "examples/jsm/objects/Water2.js",
             "examples/jsm/objects/Water2Mesh.js",
+            "examples/jsm/libs",
+            "examples/jsm/offscreen",
             "examples/jsm/utils/ShadowMapViewerGPU.js"
         ]
     }
