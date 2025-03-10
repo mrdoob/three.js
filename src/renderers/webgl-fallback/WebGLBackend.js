@@ -358,15 +358,15 @@ class WebGLBackend extends Backend {
 
 			this.set( renderTarget.depthTexture, { textureGPU: depthTexture, glInternalFormat: glInternalFormat } );
 
-			renderTarget.autoAllocateDepthBuffer = false;
-
 			// The multisample_render_to_texture extension doesn't work properly if there
 			// are midframe flushes and an external depth texture.
-			if ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
+			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget.autoAllocateDepthBuffer ) {
 
 				console.warn( 'THREE.WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
 
 			}
+
+			renderTarget.autoAllocateDepthBuffer = false;
 
 		}
 
