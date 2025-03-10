@@ -1,8 +1,5 @@
-// Hybrid radix sort from
-// - https://gist.github.com/sciecode/93ed864dd77c5c8803c6a86698d68dab
-// - https://github.com/mrdoob/three.js/pull/27202#issuecomment-1817640271
-//
-// expects unsigned 32b integer values
+
+/** @module SortUtils */
 
 const POWER = 3;
 const BIT_MAX = 32;
@@ -24,6 +21,18 @@ for ( let i = 0; i < ( ITERATIONS + 1 ); i ++ ) {
 
 const defaultGet = ( el ) => el;
 
+/**
+ * Hybrid radix sort from.
+ *
+ * - {@link https://gist.github.com/sciecode/93ed864dd77c5c8803c6a86698d68dab}
+ * - {@link https://github.com/mrdoob/three.js/pull/27202#issuecomment-1817640271}
+ *
+ * Expects unsigned 32b integer values.
+ *
+ * @function
+ * @param {Array<Object>} arr - The array to sort.
+ * @param {Object} opt - The options
+ */
 export const radixSort = ( arr, opt ) => {
 
 	const len = arr.length;

@@ -1,16 +1,57 @@
 /**
- * @author Deepkolos / https://github.com/deepkolos
+ * A simple pool for managing Web Workers.
  */
-
 export class WorkerPool {
 
+	/**
+	 * Constructs a new Worker pool.
+	 *
+	 * @param {number} [pool=4] - The size of the pool.
+	 */
 	constructor( pool = 4 ) {
 
+		/**
+		 * The size of the pool.
+		 *
+		 * @type {number}
+		 * @default 4
+		 */
 		this.pool = pool;
+
+		/**
+		 * A message queue.
+		 *
+		 * @type {Array<Object>}
+		 */
 		this.queue = [];
+
+		/**
+		 * An array of Workers.
+		 *
+		 * @type {Array<Worker>}
+		 */
 		this.workers = [];
+
+		/**
+		 * An array with resolve functions for messages.
+		 *
+		 * @type {Array<Function>}
+		 */
 		this.workersResolve = [];
+
+		/**
+		 * The current worker status.
+		 *
+		 * @type {number}
+		 */
 		this.workerStatus = 0;
+
+		/**
+		 * A factory function for creating workers.
+		 *
+		 * @type {?Function}
+		 */
+		this.workerCreator = null;
 
 	}
 
@@ -54,18 +95,36 @@ export class WorkerPool {
 
 	}
 
+	/**
+	 * Sets a function that is responsible for creating Workers.
+	 *
+	 * @param {Function} workerCreator - The worker creator function.
+	 */
 	setWorkerCreator( workerCreator ) {
 
 		this.workerCreator = workerCreator;
 
 	}
 
+	/**
+	 * Sets the Worker limit
+	 *
+	 * @param {number} pool - The size of the pool.
+	 */
 	setWorkerLimit( pool ) {
 
 		this.pool = pool;
 
 	}
 
+	/**
+	 * Post a message to an idle Worker. If no Worker is available,
+	 * the message is pushed into a message queue for later processing.
+	 *
+	 * @param {Object} msg - The message.
+	 * @param {Array<ArrayBuffer>} transfer - An array with array buffers for data transfer.
+	 * @return {Promise} A Promise that resolves when the message has been processed.
+	 */
 	postMessage( msg, transfer ) {
 
 		return new Promise( ( resolve ) => {
@@ -89,6 +148,10 @@ export class WorkerPool {
 
 	}
 
+	/**
+	 * Terminates all Workers of this pool. Call this  method whenever this
+	 * Worker pool is no longer used in your app.
+	 */
 	dispose() {
 
 		this.workers.forEach( ( worker ) => worker.terminate() );
