@@ -339,7 +339,7 @@ class MorphBlendMesh extends Mesh {
 	}
 
 	/**
-	 * Updates the animations of thie mesh.
+	 * Updates the animations of the mesh.
 	 *
 	 * @param {number} delta - The delta time in seconds.
 	 */

@@ -119,7 +119,7 @@ class OculusHandModel extends Object3D {
 	}
 
 	/**
-	 * Returns the pointer posiiton which is the position of the index finger tip.
+	 * Returns the pointer position which is the position of the index finger tip.
 	 *
 	 * @return {Vector3|null} The pointer position. Returns `null` if not index finger tip joint was found.
 	 */

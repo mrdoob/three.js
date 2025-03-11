@@ -27,7 +27,7 @@ const _shadowMatrix = new Matrix4();
 class ShadowMesh extends Mesh {
 
 	/**
-	 * Constructs a new shadw mesh.
+	 * Constructs a new shadow mesh.
 	 *
 	 * @param {Mesh} mesh - The shadow-casting reference mesh.
 	 */

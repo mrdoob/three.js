@@ -1,5 +1,5 @@
 /**
- * A utility class for creating a button that allows to initinate
+ * A utility class for creating a button that allows to initiate
  * immersive VR sessions based on WebXR. The button can be created
  * with a factory method and then appended ot the website's DOM.
  *
@@ -227,7 +227,7 @@ class VRButton {
 
 	/**
 	 * Registers a `sessiongranted` event listener. When a session is granted, the {@link VRButton#xrSessionIsGranted}
-	 * flag will evaluate to `true`. This method is automtically called by the module itself so there
+	 * flag will evaluate to `true`. This method is automatically called by the module itself so there
 	 * should be no need to use it on app level.
 	 */
 	static registerSessionGrantedListener() {

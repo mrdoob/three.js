@@ -68,7 +68,7 @@ class ConvexObjectBreaker {
 	 * @param {Object3D} object - The 3D object. It must have a convex geometry.
 	 * @param {number} mass - The 3D object's mass in kg. Must be greater than `0`.
 	 * @param {Vector3} velocity - The 3D object's velocity.
-	 * @param {Vector3} angularVelocity - The 3D object's angualar velocity.
+	 * @param {Vector3} angularVelocity - The 3D object's angular velocity.
 	 * @param {boolean} breakable - Whether the 3D object is breakable or not.
 	 */
 	prepareBreakableObject( object, mass, velocity, angularVelocity, breakable ) {

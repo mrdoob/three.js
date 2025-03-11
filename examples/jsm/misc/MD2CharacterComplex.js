@@ -117,7 +117,7 @@ class MD2CharacterComplex {
 		this.meshWeapon = null;
 
 		/**
-		 * The movement contorls.
+		 * The movement controls.
 		 *
 		 * @type {Object}
 		 * @default null

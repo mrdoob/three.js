@@ -107,7 +107,7 @@ class TDSLoader extends Loader {
 	 *
 	 * @param {ArrayBuffer} arraybuffer - The raw 3DS data as an array buffer.
 	 * @param {string} path - The asset path.
-	 * @return {Group} The parsed assset represented as a group.
+	 * @return {Group} The parsed asset represented as a group.
 	 */
 	parse( arraybuffer, path ) {
 

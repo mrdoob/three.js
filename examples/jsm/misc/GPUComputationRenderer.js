@@ -171,7 +171,7 @@ class GPUComputationRenderer {
 		 * Sets variable dependencies.
 		 *
 		 * @param {Object} variable - The compute variable.
-		 * @param {Array<Object>} dependencies - Ohter compute variables that represents the dependencies.
+		 * @param {Array<Object>} dependencies - Other compute variables that represents the dependencies.
 		 */
 		this.setVariableDependencies = function ( variable, dependencies ) {
 
@@ -377,7 +377,7 @@ class GPUComputationRenderer {
 		this.createShaderMaterial = createShaderMaterial;
 
 		/**
-		 * Creates a new render target from the given paramters.
+		 * Creates a new render target from the given parameters.
 		 *
 		 * @param {number} sizeXTexture - The width of the render target.
 		 * @param {number} sizeYTexture - The height of the render target.

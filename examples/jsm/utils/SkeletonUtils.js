@@ -469,7 +469,7 @@ function parallelTraverse( a, b, callback ) {
  * @typedef {Object} module:SkeletonUtils~RetargetOptions
  * @property {boolean} [useFirstFramePosition=false] - Whether to use the position of the first frame or not.
  * @property {number} [fps] - The FPS of the clip.
- * @property {Object<string,string>} [names] - A dicionary for mapping target to source bone names.
+ * @property {Object<string,string>} [names] - A dictionary for mapping target to source bone names.
  * @property {function(string):string} [getBoneName] - A function for mapping bone names. Alternative to `names`.
  * @property {Array<number>} [trim] - Whether to trim the clip or not. If set the array should hold two values for the start and end.
  * @property {boolean} [preserveBoneMatrix=true] - Whether to preserve bone matrices or not.

@@ -50,7 +50,7 @@ function createMeshesFromInstancedMesh( instancedMesh ) {
 }
 
 /**
- * This function creates a mesh for each geoemtry-group of the given multi-material mesh and
+ * This function creates a mesh for each geometry-group of the given multi-material mesh and
  * adds it to a group.
  *
  * @param {Mesh} mesh - The multi-material mesh.
@@ -129,7 +129,7 @@ function createMeshesFromMultiMaterialMesh( mesh ) {
 
 /**
  * This function represents an alternative way to create 3D objects with multiple materials.
- * Normally, {@link BufferGeometry#groups} are used which might introdues issues e.g. when
+ * Normally, {@link BufferGeometry#groups} are used which might introduce issues e.g. when
  * exporting the object to a 3D format. This function accepts a geometry and an array of
  * materials and creates for each material a mesh that is added to a group.
  *

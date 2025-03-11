@@ -241,7 +241,7 @@ function TubePainter() {
 		setSize: setSize,
 
 		/**
-		 * Updates the internal goemetry buffers so the new painted
+		 * Updates the internal geometry buffers so the new painted
 		 * segments are rendered.
 		 *
 		 * @method

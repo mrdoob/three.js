@@ -161,7 +161,7 @@ export class XREstimatedLight extends Group {
 		this.add( this.lightProbe );
 
 		/**
-		 * Represents the primariy light from the XR environment.
+		 * Represents the primary light from the XR environment.
 		 *
 		 * @type {DirectionalLight}
 		 */
