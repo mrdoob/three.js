@@ -7,7 +7,7 @@ import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 
-import { IntType, UnsignedIntType } from '../../constants.js';
+import { IntType, NearestFilter, UnsignedIntType } from '../../constants.js';
 
 /**
  * This type of uniform node represents a 2D texture.
@@ -561,6 +561,16 @@ class TextureNode extends UniformNode {
 		const textureNode = this.clone();
 		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
 		textureNode.referenceNode = this.getSelf();
+
+		const map = textureNode.value;
+
+		if ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) {
+
+			console.warn( 'THREE.TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
+
+			textureNode.biasNode = null;
+
+		}
 
 		return nodeObject( textureNode );
 
