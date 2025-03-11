@@ -52,7 +52,7 @@ class MorphAnimMesh extends Mesh {
 	}
 
 	/**
-	 * Sets the animation playback directio to "backward".
+	 * Sets the animation playback direction to "backward".
 	 */
 	setDirectionBackward() {
 

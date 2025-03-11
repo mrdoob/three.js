@@ -168,7 +168,7 @@ class IESLoader extends Loader {
 	 * Parses the given IES data.
 	 *
 	 * @param {string} text - The raw IES data.
-	 * @return {DataTexture} THE IES data as a texutre.
+	 * @return {DataTexture} THE IES data as a texture.
 	 */
 	parse( text ) {
 

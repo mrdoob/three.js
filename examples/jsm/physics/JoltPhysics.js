@@ -309,7 +309,7 @@ async function JoltPhysics() {
 		addMesh: addMesh,
 
 		/**
-		 * Set the position of the given mesh which is part of the pyhsics simulation. Calling this
+		 * Set the position of the given mesh which is part of the physics simulation. Calling this
 		 * method will reset the current simulated velocity of the mesh.
 		 *
 		 * @method

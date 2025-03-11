@@ -18,7 +18,7 @@ class RollerCoasterGeometry extends BufferGeometry {
 	/**
 	 * Constructs a new geometry.
 	 *
-	 * @param {Curve} curve - The curve to genereate the geometry along.
+	 * @param {Curve} curve - The curve to generate the geometry along.
  	 * @param {number} divisions - The number of divisions which defines the detail of the geometry.
 	 */
 	constructor( curve, divisions ) {
@@ -243,7 +243,7 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 	/**
 	 * Constructs a new geometry.
 	 *
-	 * @param {Curve} curve - The curve to genereate the geometry along.
+	 * @param {Curve} curve - The curve to generate the geometry along.
  	 * @param {number} divisions - The number of divisions which defines the detail of the geometry.
 	 */
 	constructor( curve, divisions ) {
@@ -430,7 +430,7 @@ class RollerCoasterShadowGeometry extends BufferGeometry {
 	/**
 	 * Constructs a new geometry.
 	 *
-	 * @param {Curve} curve - The curve to genereate the geometry along.
+	 * @param {Curve} curve - The curve to generate the geometry along.
  	 * @param {number} divisions - The number of divisions which defines the detail of the geometry.
 	 */
 	constructor( curve, divisions ) {

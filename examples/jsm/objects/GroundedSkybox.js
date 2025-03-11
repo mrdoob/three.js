@@ -25,7 +25,7 @@ class GroundedSkybox extends Mesh {
 	 * @param {number} height - The height is how far the camera that took the photo was above the ground.
 	 * A larger value will magnify the downward part of the image.
 	 * @param {number} radius - The radius of the skybox. Must be large enough to ensure the scene's camera stays inside.
-	 * @param {number} [resolution=128] - The geometrix resolution of the skybox.
+	 * @param {number} [resolution=128] - The geometry resolution of the skybox.
 	 */
 	constructor( map, height, radius, resolution = 128 ) {
 

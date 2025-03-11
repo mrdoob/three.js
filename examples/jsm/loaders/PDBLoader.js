@@ -82,7 +82,7 @@ class PDBLoader extends Loader {
 
 	/**
 	 * Parses the given PDB data and returns an object holding the atoms and
-	 * bond gometries as well as the raw atom data as JSON.
+	 * bond geometries as well as the raw atom data as JSON.
 	 *
 	 * @param {string} text - The raw PDB data as a string.
 	 * @return {Object} The result object.

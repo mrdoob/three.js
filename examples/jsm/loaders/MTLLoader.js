@@ -87,7 +87,7 @@ class MTLLoader extends Loader {
 	 * Sets the material options.
 	 *
 	 * @param {MTLLoader~MaterialOptions} value - The material options.
-	 * @return {MTLLoader} A referene to this loader.
+	 * @return {MTLLoader} A reference to this loader.
 	 */
 	setMaterialOptions( value ) {
 
@@ -170,7 +170,7 @@ class MTLLoader extends Loader {
  * @typedef {Object} MTLLoader~MaterialOptions
  * @property {(FrontSide|BackSide|DoubleSide)} [side=FrontSide] - Which side to apply the material.
  * @property {(RepeatWrapping|ClampToEdgeWrapping|MirroredRepeatWrapping)} [wrap=RepeatWrapping] - What type of wrapping to apply for textures.
- * @property {boolean} [normalizeRGB=false] - Whether RGB clors should be normalized to `0-1` from `0-255`.
+ * @property {boolean} [normalizeRGB=false] - Whether RGB colors should be normalized to `0-1` from `0-255`.
  * @property {boolean} [ignoreZeroRGBs=false] - Ignore values of RGBs (Ka,Kd,Ks) that are all 0's.
  */
 

@@ -18,7 +18,7 @@ const _color = new Color();
  *
  * ```js
  * const loader = new PLYLoader();
- * const goemetry = await loader.loadAsync( './models/ply/ascii/dolphins.ply' );
+ * const geometry = await loader.loadAsync( './models/ply/ascii/dolphins.ply' );
  * scene.add( new THREE.Mesh( geometry ) );
  * ```
  *

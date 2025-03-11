@@ -72,7 +72,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  *
  * [glTF]{@link https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0}
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf) or binary (.glb)
- * format. External filesstore textures (.jpg, .png) and additional binary data (.bin). A glTF asset may deliver
+ * format. External files store textures (.jpg, .png) and additional binary data (.bin). A glTF asset may deliver
  * one or more scenes, including meshes, materials, textures, skins, skeletons, morph targets, animations, lights,
  * and/or cameras.
  *
@@ -352,7 +352,7 @@ class GLTFLoader extends Loader {
 	}
 
 	/**
-	 * Sets the given meshop decoder. Required for decoding assets
+	 * Sets the given meshopt decoder. Required for decoding assets
 	 * compressed with the `EXT_meshopt_compression` extension.
 	 *
 	 * @param {Object} meshoptDecoder - The meshopt decoder to set.

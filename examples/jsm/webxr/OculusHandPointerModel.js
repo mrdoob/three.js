@@ -440,7 +440,7 @@ class OculusHandPointerModel extends Object3D {
 	}
 
 	/**
-	 * Perfoms an intersection test with the model's raycaster and the given object.
+	 * Performs an intersection test with the model's raycaster and the given object.
 	 *
 	 * @param {Object3D} object - The 3D object to check for intersection with the ray.
 	 * @param {boolean} [recursive=true] - If set to `true`, it also checks all descendants.
@@ -458,7 +458,7 @@ class OculusHandPointerModel extends Object3D {
 	}
 
 	/**
-	 * Perfoms an intersection test with the model's raycaster and the given objects.
+	 * Performs an intersection test with the model's raycaster and the given objects.
 	 *
 	 * @param {Array<Object3D>} objects - The 3D objects to check for intersection with the ray.
 	 * @param {boolean} [recursive=true] - If set to `true`, it also checks all descendants.

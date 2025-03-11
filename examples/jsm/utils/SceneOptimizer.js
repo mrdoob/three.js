@@ -3,7 +3,7 @@ import * as THREE from 'three';
 /**
  * This class can be used to optimized scenes by converting
  * individual meshes into {@link BatchedMesh}. This component
- * is an experimental attempt to implment auto-batching in three.js.
+ * is an experimental attempt to implement auto-batching in three.js.
  */
 class SceneOptimizer {
 
