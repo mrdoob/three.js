@@ -151,5 +151,17 @@ class CompressedTextureLoader extends Loader {
 
 }
 
+/**
+ * Represents the result object type of the `parse()` method.
+ *
+ * @typedef {Object} CompressedTextureLoader~TexData
+ * @property {number} width - The width of the base mip.
+ * @property {number} height - The width of the base mip.
+ * @property {boolean} isCubemap - Whether the data represent a cubemap or not.
+ * @property {number} mipmapCount - The mipmap count.
+ * @property {Array<{data:TypedArray,width:number,height:number}>} mipmaps - An array holding the mipmaps.
+ * Each entry holds the data and the dimensions for each level.
+ * @property {number} format - The texture format.
+ **/
 
 export { CompressedTextureLoader };

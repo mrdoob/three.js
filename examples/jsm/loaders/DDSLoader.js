@@ -9,14 +9,38 @@ import {
 	RGB_BPTC_UNSIGNED_Format
 } from 'three';
 
+/**
+ * A loader for the S3TC texture compression format.
+ *
+ * ```js
+ * const loader = new DDSLoader();
+ *
+ * const map = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
+ * map.colorSpace = THREE.SRGBColorSpace; // only for color textures
+ * ```
+ *
+ * @augments CompressedTextureLoader
+ */
 class DDSLoader extends CompressedTextureLoader {
 
+	/**
+	 * Constructs a new DDS loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Parses the given S3TC texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @param {boolean} loadMipmaps - Whether to load mipmaps or not.
+	 * @return {CompressedTextureLoader~TexData} An object representing the parsed texture data.
+	 */
 	parse( buffer, loadMipmaps ) {
 
 		const dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };

@@ -148,5 +148,25 @@ class DataTextureLoader extends Loader {
 
 }
 
+/**
+ * Represents the result object type of the `parse()` method.
+ *
+ * @typedef {Object} DataTextureLoader~TexData
+ * @property {Object} [image] - An object holding width, height and the texture data.
+ * @property {number} [width] - The width of the base mip.
+ * @property {number} [height] - The width of the base mip.
+ * @property {TypedArray} [data] - The texture data.
+ * @property {number} [format] - The texture format.
+ * @property {number} [type] - The texture type.
+ * @property {boolean} [flipY] - If set to `true`, the texture is flipped along the vertical axis when uploaded to the GPU.
+ * @property {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
+ * @property {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
+ * @property {number} [anisotropy=1] - The anisotropy value.
+ * @property {boolean} [generateMipmaps] - Whether to generate mipmaps or not.
+ * @property {string} [colorSpace] - The color space.
+ * @property {number} [magFilter] - The mag filter.
+ * @property {number} [minFilter] - The min filter.
+ * @property {Array<Object>} [mipmaps] - The mipmaps.
+ **/
 
 export { DataTextureLoader };
