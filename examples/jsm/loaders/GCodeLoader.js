@@ -9,26 +9,48 @@ import {
 } from 'three';
 
 /**
- * GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
+ * A loader for the GCode format.
  *
- * Gcode files are composed by commands used by machines to create objects.
+ * GCode files are usually used for 3D printing or CNC applications.
  *
- * @class GCodeLoader
+ * ```js
+ * const loader = new GCodeLoader();
+ * const object = await loader.loadAsync( 'models/gcode/benchy.gcode' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
  */
-
 class GCodeLoader extends Loader {
 
 	/**
-	 * @param {Manager} manager Loading manager.
+	 * Constructs a new GCode loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
 	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * Whether to split layers or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.splitLayer = false;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded GCode asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -63,6 +85,12 @@ class GCodeLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given GCode data and returns a group with lines.
+	 *
+	 * @param {string} data - The raw Gcode data as a string.
+	 * @return {Group} The parsed GCode asset.
+	 */
 	parse( data ) {
 
 		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };

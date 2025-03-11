@@ -1,17 +1,3 @@
-/**
- * Loader for KTX 2.0 GPU Texture containers.
- *
- * KTX 2.0 is a container format for various GPU texture formats. The loader
- * supports Basis Universal GPU textures, which can be quickly transcoded to
- * a wide variety of GPU texture compression formats, as well as some
- * uncompressed DataTexture and Data3DTexture formats.
- *
- * References:
- * - KTX: http://github.khronos.org/KTX-Specification/
- * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
- * - BasisU HDR: https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0
- */
-
 import {
 	CompressedTexture,
 	CompressedArrayTexture,
@@ -79,8 +65,39 @@ let _activeLoaders = 0;
 
 let _zstd;
 
+/**
+ * A loader for KTX 2.0 GPU Texture containers.
+ *
+ * KTX 2.0 is a container format for various GPU texture formats. The loader supports Basis Universal GPU textures,
+ * which can be quickly transcoded to a wide variety of GPU texture compression formats. While KTX 2.0 also allows
+ * other hardware-specific formats, this loader does not yet parse them.
+ *
+ * This loader parses the KTX 2.0 container and transcodes to a supported GPU compressed texture format.
+ * The required WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+ *
+ * This loader relies on Web Assembly which is not supported in older browsers.
+ *
+ * References:
+ * - [KTX specification]{@link http://github.khronos.org/KTX-Specification/}
+ * - [DFD]{@link https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor}
+ * - [BasisU HDR]{@link https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0}
+ *
+ * ```js
+ * const loader = new KTX2Loader();
+ * loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
+ * loader.detectSupport( renderer );
+ * const texture = loader.loadAsync( 'diffuse.ktx2' );
+ * ```
+ *
+ * @augments Loader
+ */
 class KTX2Loader extends Loader {
 
+	/**
+	 * Constructs a new KTX2 loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
@@ -106,6 +123,14 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Sets the transcoder path.
+	 *
+	 * The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+	 *
+	 * @param {string} path - The transcoder path to set.
+	 * @return {KTX2Loader} A reference to this loader.
+	 */
 	setTranscoderPath( path ) {
 
 		this.transcoderPath = path;
@@ -114,14 +139,28 @@ class KTX2Loader extends Loader {
 
 	}
 
-	setWorkerLimit( num ) {
+	/**
+	 * Sets the maximum number of Web Workers to be allocated by this instance.
+	 *
+	 * @param {number} workerLimit - The worker limit.
+	 * @return {KTX2Loader} A reference to this loader.
+	 */
+	setWorkerLimit( workerLimit ) {
 
-		this.workerPool.setWorkerLimit( num );
+		this.workerPool.setWorkerLimit( workerLimit );
 
 		return this;
 
 	}
 
+
+	/**
+	 * Async version of {@link KTX2Loader#detectSupport}.
+	 *
+	 * @async
+	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the support has been detected.
+	 */
 	async detectSupportAsync( renderer ) {
 
 		this.workerConfig = {
@@ -138,6 +177,13 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Detects hardware support for available compressed texture formats, to determine
+	 * the output format for the transcoder. Must be called before loading a texture.
+	 *
+	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
+	 * @return {KTX2Loader} A reference to this loader.
+	 */
 	detectSupport( renderer ) {
 
 		if ( renderer.isWebGPURenderer === true ) {
@@ -171,6 +217,8 @@ class KTX2Loader extends Loader {
 		return this;
 
 	}
+
+	// TODO: Make this method private
 
 	init() {
 
@@ -243,6 +291,15 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded KTX2 texture
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(CompressedTexture)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.workerConfig === null ) {
@@ -264,6 +321,14 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given KTX2 data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw KTX2 data as an array buffer.
+	 * @param {function(CompressedTexture)} onLoad - Executed when the loading/parsing process has been finished.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @returns {Promise} A Promise that resolves when the parsing has been finished.
+	 */
 	parse( buffer, onLoad, onError ) {
 
 		if ( this.workerConfig === null ) {
@@ -323,6 +388,7 @@ class KTX2Loader extends Loader {
 	}
 
 	/**
+	 * @private
 	 * @param {ArrayBuffer} buffer
 	 * @param {?Object} config
 	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
@@ -364,14 +430,16 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the loader is no longer required.
+	 */
 	dispose() {
 
 		this.workerPool.dispose();
 		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
 
 		_activeLoaders --;
-
-		return this;
 
 	}
 

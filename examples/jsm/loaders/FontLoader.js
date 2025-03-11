@@ -4,14 +4,40 @@ import {
 	ShapePath
 } from 'three';
 
+/**
+ * A loader for loading fonts.
+ *
+ * You can convert fonts online using [facetype.js]{@link https://gero3.github.io/facetype.js/}.
+ *
+ * ```js
+ * const loader = new FontLoader();
+ * const font = await loader.loadAsync( 'fonts/helvetiker_regular.typeface.json' );
+ * ```
+ *
+ * @augments Loader
+ */
 class FontLoader extends Loader {
 
+	/**
+	 * Constructs a new font loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded font
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Font)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -30,6 +56,12 @@ class FontLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given font data and returns the resulting font.
+	 *
+	 * @param {Object} json - The raw font data as a JSON object.
+	 * @return {Font} The font.
+	 */
 	parse( json ) {
 
 		return new Font( json );
@@ -38,20 +70,46 @@ class FontLoader extends Loader {
 
 }
 
-//
-
+/**
+ * Class representing a font.
+ */
 class Font {
 
+	/**
+	 * Constructs a new font.
+	 *
+	 * @param {Object} data - The font data as JSON.
+	 */
 	constructor( data ) {
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isFont = true;
 
 		this.type = 'Font';
 
+		/**
+		 * The font data as JSON.
+		 *
+		 * @type {Object}
+		 */
 		this.data = data;
 
 	}
 
+	/**
+	 * Generates geometry shapes from the given text and size. The result of this method
+	 * should be used with {@link ShapeGeometry} to generate the actual geometry data.
+	 *
+	 * @param {string} text - The text.
+	 * @param {number} [size=100] - The text size.
+	 * @return {Array<Shape>} An array of shapes representing the text.
+	 */
 	generateShapes( text, size = 100 ) {
 
 		const shapes = [];

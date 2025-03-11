@@ -13,8 +13,35 @@ import {
 	SRGBColorSpace
 } from 'three';
 
+/**
+ * A loader for the VOX format.
+ *
+ * ```js
+ * const loader = new VOXLoader();
+ * const chunks = await loader.loadAsync( 'models/vox/monu10.vox' );
+ *
+ * for ( let i = 0; i < chunks.length; i ++ ) {
+ *
+ * 	const chunk = chunks[ i ];
+ * 	const mesh = new VOXMesh( chunk );
+ * 	mesh.scale.setScalar( 0.0015 );
+ * 	scene.add( mesh );
+ *
+ * }
+ * ```
+ * @augments Loader
+ */
 class VOXLoader extends Loader {
 
+	/**
+	 * Starts loading from the given URL and passes the loaded VOX asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Array<Object>)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -49,6 +76,12 @@ class VOXLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given VOX data and returns the resulting chunks.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw VOX data as an array buffer.
+	 * @return {Array<Object>} The parsed chunks.
+	 */
 	parse( buffer ) {
 
 		const data = new DataView( buffer );
@@ -173,8 +206,20 @@ class VOXLoader extends Loader {
 
 }
 
+/**
+ * A VOX mesh.
+ *
+ * Instances of this class are created from the loaded chunks of {@link VOXLoader}.
+ *
+ * @augments Mesh
+ */
 class VOXMesh extends Mesh {
 
+	/**
+	 * Constructs a new VOX mesh.
+	 *
+	 * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
+	 */
 	constructor( chunk ) {
 
 		const data = chunk.data;
@@ -279,8 +324,20 @@ class VOXMesh extends Mesh {
 
 }
 
+/**
+ * A VOX 3D texture.
+ *
+ * Instances of this class are created from the loaded chunks of {@link VOXLoader}.
+ *
+ * @augments Data3DTexture
+ */
 class VOXData3DTexture extends Data3DTexture {
 
+	/**
+	 * Constructs a new VOX 3D texture.
+	 *
+	 * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
+	 */
 	constructor( chunk ) {
 
 		const data = chunk.data;

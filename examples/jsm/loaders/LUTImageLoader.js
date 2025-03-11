@@ -8,8 +8,23 @@ import {
 	LinearFilter,
 } from 'three';
 
+/**
+ * A loader for loading LUT images.
+ *
+ * ```js
+ * const loader = new LUTImageLoader();
+ * const map = loader.loadAsync( 'luts/NeutralLUT.png' );
+ * ```
+ *
+ * @augments Loader
+ */
 export class LUTImageLoader extends Loader {
 
+	/**
+	 * Constructs a new LUT loader.
+	 *
+	 * @param {boolean} [flipVertical=false] - Whether to vertically flip the LUT or not.
+	 */
 	constructor( flipVertical = false ) {
 
 		//The NeutralLUT.png has green at the bottom for Unreal ang green at the top for Unity URP Color Lookup
@@ -17,10 +32,25 @@ export class LUTImageLoader extends Loader {
 
 		super();
 
+		/**
+		 * Whether to vertically flip the LUT or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.flip = flipVertical;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded LUT
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function({size:number,texture3D:Data3DTexture})} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new TextureLoader( this.manager );
@@ -36,11 +66,11 @@ export class LUTImageLoader extends Loader {
 
 				if ( texture.image.width < texture.image.height ) {
 
-					imageData = this.getImageData( texture );
+					imageData = this._getImageData( texture );
 
 				} else {
 
-					imageData = this.horz2Vert( texture );
+					imageData = this._horz2Vert( texture );
 
 				}
 
@@ -66,7 +96,42 @@ export class LUTImageLoader extends Loader {
 
 	}
 
-	getImageData( texture ) {
+	/**
+	 * Parses the given LUT data and returns the resulting 3D data texture.
+	 *
+	 * @param {Uint8ClampedArray} dataArray - The raw LUT data.
+	 * @param {number} size - The LUT size.
+	 * @return {{size:number,texture3D:Data3DTexture}} An object representing the parsed LUT.
+	 */
+	parse( dataArray, size ) {
+
+		const data = new Uint8Array( dataArray );
+
+		const texture3D = new Data3DTexture();
+		texture3D.image.data = data;
+		texture3D.image.width = size;
+		texture3D.image.height = size;
+		texture3D.image.depth = size;
+		texture3D.format = RGBAFormat;
+		texture3D.type = UnsignedByteType;
+		texture3D.magFilter = LinearFilter;
+		texture3D.minFilter = LinearFilter;
+		texture3D.wrapS = ClampToEdgeWrapping;
+		texture3D.wrapT = ClampToEdgeWrapping;
+		texture3D.wrapR = ClampToEdgeWrapping;
+		texture3D.generateMipmaps = false;
+		texture3D.needsUpdate = true;
+
+		return {
+			size,
+			texture3D,
+		};
+
+	}
+
+	// internal
+
+	_getImageData( texture ) {
 
 		const width = texture.image.width;
 		const height = texture.image.height;
@@ -90,7 +155,7 @@ export class LUTImageLoader extends Loader {
 
 	}
 
-	horz2Vert( texture ) {
+	_horz2Vert( texture ) {
 
 		const width = texture.image.height;
 		const height = texture.image.width;
@@ -117,32 +182,6 @@ export class LUTImageLoader extends Loader {
 		}
 
 		return context.getImageData( 0, 0, width, height );
-
-	}
-
-	parse( dataArray, size ) {
-
-		const data = new Uint8Array( dataArray );
-
-		const texture3D = new Data3DTexture();
-		texture3D.image.data = data;
-		texture3D.image.width = size;
-		texture3D.image.height = size;
-		texture3D.image.depth = size;
-		texture3D.format = RGBAFormat;
-		texture3D.type = UnsignedByteType;
-		texture3D.magFilter = LinearFilter;
-		texture3D.minFilter = LinearFilter;
-		texture3D.wrapS = ClampToEdgeWrapping;
-		texture3D.wrapT = ClampToEdgeWrapping;
-		texture3D.wrapR = ClampToEdgeWrapping;
-		texture3D.generateMipmaps = false;
-		texture3D.needsUpdate = true;
-
-		return {
-			size,
-			texture3D,
-		};
 
 	}
 
