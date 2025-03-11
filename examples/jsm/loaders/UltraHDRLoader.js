@@ -303,7 +303,7 @@ class UltraHDRLoader extends Loader {
 	 * to the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the files to be loaded. This can also be a data URI.
-	 * @param {function(DataTexture)} onLoad - Executed when the loading process has been finished.
+	 * @param {function(DataTexture, Object)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
 	 * @return {DataTexture} The Ultra HDR texture.

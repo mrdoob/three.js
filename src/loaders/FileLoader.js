@@ -62,8 +62,8 @@ class FileLoader extends Loader {
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function(any)} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 * @return {any|undefined} The cached resource if available.
 	 */
 	load( url, onLoad, onProgress, onError ) {

@@ -14,7 +14,7 @@ class XRHandMeshModel {
 	 *
 	 * @param {XRHandModel} handModel - The hand model.
 	 * @param {Group} controller - The WebXR controller.
-	 * @param {string} path - The model path.
+	 * @param {?string} path - The model path.
 	 * @param {XRHandedness} handedness - The handedness of the XR input source.
 	 * @param {?Loader} [loader=null] - The loader. If not provided, an instance of `GLTFLoader` will be used to load models.
 	 * @param {?Function} [onLoad=null] - A callback that is executed when a controller model has been loaded.
