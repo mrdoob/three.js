@@ -181,7 +181,7 @@ class ViewHelper extends Object3D {
 		 * This method should be called when a click or pointer event
 		 * has happened in the app.
 		 *
-		 * @param {Event} event - The event to process.
+		 * @param {PointerEvent} event - The event to process.
 		 * @return {boolean} Whether an intersection with the helper has been detected or not.
 		 */
 		this.handleClick = function ( event ) {

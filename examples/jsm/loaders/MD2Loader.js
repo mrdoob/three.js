@@ -124,9 +124,9 @@ class MD2Loader extends Loader {
 	 * to the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function({scene:Group})} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 

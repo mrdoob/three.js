@@ -140,7 +140,7 @@ class ShadowMapViewer {
 		 * The position of the viewer. When changing this property, make sure
 		 * to call {@link ShadowMapViewer#update}.
 		 *
-		 * @type {{width:number,height:number}}
+		 * @type {{x:number,y:number, set:function(number,number)}}
 		 * @default true
 		 */
 		this.position = {

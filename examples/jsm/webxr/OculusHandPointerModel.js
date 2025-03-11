@@ -90,7 +90,7 @@ class OculusHandPointerModel extends Object3D {
 		/**
 		 * Whether the model is attached or not.
 		 *
-		 * @type {?boolean}
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.attached = false;

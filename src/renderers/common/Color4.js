@@ -33,7 +33,7 @@ class Color4 extends Color {
 	 * You can also pass a single THREE.Color, hex or
 	 * string argument to this method.
 	 *
-	 * @param {number|string} r - The red value.
+	 * @param {number|string|Color} r - The red value.
 	 * @param {number} g - The green value.
 	 * @param {number} b - The blue value.
 	 * @param {number} [a=1] - The alpha value.
