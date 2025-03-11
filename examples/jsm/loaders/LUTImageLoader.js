@@ -23,22 +23,23 @@ export class LUTImageLoader extends Loader {
 	/**
 	 * Constructs a new LUT loader.
 	 *
-	 * @param {boolean} [flipVertical=false] - Whether to vertically flip the LUT or not.
+	 * @param {LoadingManager} [manager] - The loading manager.
 	 */
-	constructor( flipVertical = false ) {
+	constructor( manager ) {
 
-		//The NeutralLUT.png has green at the bottom for Unreal ang green at the top for Unity URP Color Lookup
-		//post-processing. If you're using lut image strips from a Unity pipeline then pass true to the constructor
-
-		super();
+		super( manager );
 
 		/**
 		 * Whether to vertically flip the LUT or not.
 		 *
+		 * Depending on the LUT's orogin, the texture has green at the bottom (e.g. for Unreal)
+		 * and green at the top (e.g. for Unity URP Color Lookup). If you're using lut image strips
+		 * from a Unity pipeline then set this property to `true`.
+		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.flip = flipVertical;
+		this.flip = false;
 
 	}
 
