@@ -551,6 +551,7 @@ class XRManager extends EventDispatcher {
 		const backend = renderer.backend;
 
 		const gl = renderer.getContext();
+		const attributes = gl.getContextAttributes();
 
 		this._session = session;
 
@@ -620,6 +621,7 @@ class XRManager extends EventDispatcher {
 						colorSpace: renderer.outputColorSpace,
 						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 						stencilBuffer: renderer.stencil,
+						samples: attributes.antialias ? 4 : 0,
 						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
 						resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
 					} );
@@ -965,6 +967,7 @@ function onSessionEnd() {
 
 	renderer.backend.setXRTarget( null );
 	renderer.setOutputRenderTarget( null );
+	renderer.setRenderTarget( null );
 
 	this._session = null;
 	this._xrRenderTarget = null;
