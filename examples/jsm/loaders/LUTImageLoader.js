@@ -32,9 +32,9 @@ export class LUTImageLoader extends Loader {
 		/**
 		 * Whether to vertically flip the LUT or not.
 		 *
-		 * Depending on the LUT's orogin, the texture has green at the bottom (e.g. for Unreal)
-		 * and green at the top (e.g. for Unity URP Color Lookup). If you're using lut image strips
-		 * from a Unity pipeline then set this property to `true`.
+		 * Depending on the LUT's origin, the texture has green at the bottom (e.g. for Unreal)
+		 * or green at the top (e.g. for Unity URP Color Lookup). If you're using lut image strips
+		 * from a Unity pipeline, then set this property to `true`.
 		 *
 		 * @type {boolean}
 		 * @default false
