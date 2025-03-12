@@ -14,34 +14,69 @@ import {
 import { Pass, FullScreenQuad } from './Pass.js';
 import { OutputShader } from '../shaders/OutputShader.js';
 
+/**
+ * This pass is responsible for including tone mapping and color space conversion
+ * into your pass chain. In most cases, this pass should be included at the end
+ * of each pass chain. If a pass requires sRGB input (e.g. like FXAA), the pass
+ * must follow `OutputPass` in the pass chain.
+ *
+ * The tone mapping and color space settings are extracted from the renderer.
+ *
+ * ```js
+ * const outputPass = new OutputPass();
+ * composer.addPass( outputPass );
+ * ```
+ *
+ * @augments Pass
+ */
 class OutputPass extends Pass {
 
+	/**
+	 * Constructs a new output pass.
+	 */
 	constructor() {
 
 		super();
 
-		//
+		/**
+		 * The pass uniforms.
+		 *
+		 * @type {Object}
+		 */
+		this.uniforms = UniformsUtils.clone( OutputShader.uniforms );
 
-		const shader = OutputShader;
-
-		this.uniforms = UniformsUtils.clone( shader.uniforms );
-
+		/**
+		 * The pass material.
+		 *
+		 * @type {RawShaderMaterial}
+		 */
 		this.material = new RawShaderMaterial( {
-			name: shader.name,
+			name: OutputShader.name,
 			uniforms: this.uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
+			vertexShader: OutputShader.vertexShader,
+			fragmentShader: OutputShader.fragmentShader
 		} );
 
-		this.fsQuad = new FullScreenQuad( this.material );
+		// internals
 
-		// internal cache
+		this._fsQuad = new FullScreenQuad( this.material );
 
 		this._outputColorSpace = null;
 		this._toneMapping = null;
 
 	}
 
+	/**
+	 * Performs the output pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
 	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */ ) {
 
 		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
@@ -75,22 +110,26 @@ class OutputPass extends Pass {
 		if ( this.renderToScreen === true ) {
 
 			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		}
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
 	dispose() {
 
 		this.material.dispose();
-		this.fsQuad.dispose();
+		this._fsQuad.dispose();
 
 	}
 
