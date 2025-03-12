@@ -26,28 +26,118 @@ import { generatePdSamplePointInitializer, PoissonDenoiseShader } from '../shade
 import { CopyShader } from '../shaders/CopyShader.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 
+/**
+ * A pass for an GTAO effect.
+ *
+ * `GTAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
+ *
+ * ```js
+ * const gtaoPass = new GTAOPass( scene, camera, width, height );
+ * gtaoPass.output = GTAOPass.OUTPUT.Denoise;
+ * composer.addPass( gtaoPass );
+ * ```
+ *
+ * @augments Pass
+ */
 class GTAOPass extends Pass {
 
-	constructor( scene, camera, width, height, parameters, aoParameters, pdParameters ) {
+	/**
+	 * Constructs a new GTAO pass.
+	 *
+	 * @param {Scene} scene - The scene to compute the AO for.
+	 * @param {Camera} camera - The camera.
+	 * @param {number} [width=512] - The width of the effect.
+	 * @param {number} [height=512] - The height of the effect.
+	 * @param {Object} [parameters] - The pass parameters.
+	 * @param {Object} [aoParameters] - The AO parameters.
+	 * @param {Object} [pdParameters] - The denoise parameters.
+	 */
+	constructor( scene, camera, width = 512, height = 512, parameters, aoParameters, pdParameters ) {
 
 		super();
 
-		this.width = ( width !== undefined ) ? width : 512;
-		this.height = ( height !== undefined ) ? height : 512;
+		/**
+		 * The width of the effect.
+		 *
+		 * @type {number}
+		 * @default 512
+		 */
+		this.width = width;
+
+		/**
+		 * The height of the effect.
+		 *
+		 * @type {number}
+		 * @default 512
+		 */
+		this.height = height;
+
+		/**
+		 * Overwritten to perform a clear operation by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.clear = true;
+
+		/**
+		 * The camera.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
+
+		/**
+		 * The scene to render the AO for.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The output configuration.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.output = 0;
 		this._renderGBuffer = true;
 		this._visibilityCache = new Map();
+
+		/**
+		 * The AO blend intensity.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.blendIntensity = 1.;
 
+		/**
+		 * The number of Poisson Denoise rings.
+		 *
+		 * @type {number}
+		 * @default 2
+		 */
 		this.pdRings = 2.;
+
+		/**
+		 * The Poisson Denoise radius exponent.
+		 *
+		 * @type {number}
+		 * @default 2
+		 */
 		this.pdRadiusExponent = 2.;
+
+		/**
+		 * The Poisson Denoise sample count.
+		 *
+		 * @type {number}
+		 * @default 16
+		 */
 		this.pdSamples = 16;
 
 		this.gtaoNoiseTexture = generateMagicSquareNoise();
-		this.pdNoiseTexture = this.generateNoise();
+		this.pdNoiseTexture = this._generateNoise();
 
 		this.gtaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType } );
 		this.pdRenderTarget = this.gtaoRenderTarget.clone();
@@ -127,9 +217,9 @@ class GTAOPass extends Pass {
 			blendEquationAlpha: AddEquation
 		} );
 
-		this.fsQuad = new FullScreenQuad( null );
+		this._fsQuad = new FullScreenQuad( null );
 
-		this.originalClearColor = new Color();
+		this._originalClearColor = new Color();
 
 		this.setGBuffer( parameters ? parameters.depthTexture : undefined, parameters ? parameters.normalTexture : undefined );
 
@@ -147,6 +237,34 @@ class GTAOPass extends Pass {
 
 	}
 
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The width to set.
+	 */
+	setSize( width, height ) {
+
+		this.width = width;
+		this.height = height;
+
+		this.gtaoRenderTarget.setSize( width, height );
+		this.normalRenderTarget.setSize( width, height );
+		this.pdRenderTarget.setSize( width, height );
+
+		this.gtaoMaterial.uniforms.resolution.value.set( width, height );
+		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
+		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+
+		this.pdMaterial.uniforms.resolution.value.set( width, height );
+		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
 	dispose() {
 
 		this.gtaoNoiseTexture.dispose();
@@ -158,16 +276,30 @@ class GTAOPass extends Pass {
 		this.pdMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
-		this.fsQuad.dispose();
+		this._fsQuad.dispose();
 
 	}
 
+	/**
+	 * A texture holding the computed AO.
+	 *
+	 * @type {Texture}
+	 * @readonly
+	 */
 	get gtaoMap() {
 
 		return this.pdRenderTarget.texture;
 
 	}
 
+	/**
+	 * Configures the GBuffer of this pass. If no arguments are passed,
+	 * the pass creates an internal render target for holding depth
+	 * and normal data.
+	 *
+	 * @param {DepthTexture} [depthTexture] - The depth texture.
+	 * @param {DepthTexture} [normalTexture] - The normal texture.
+	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
 		if ( depthTexture !== undefined ) {
@@ -209,6 +341,12 @@ class GTAOPass extends Pass {
 
 	}
 
+	/**
+	 * Configures the clip box of the GTAO shader with the given AABB.
+	 *
+	 * @param {?Box3} box - The AABB enclosing the scene that should receive AO. When passing
+	 * `null`, to clip box is used.
+	 */
 	setSceneClipBox( box ) {
 
 		if ( box ) {
@@ -227,6 +365,11 @@ class GTAOPass extends Pass {
 
 	}
 
+	/**
+	 * Updates the GTAO material from the given paramter object.
+	 *
+	 * @param {Object} parameters - The GTAO material parameters.
+	 */
 	updateGtaoMaterial( parameters ) {
 
 		if ( parameters.radius !== undefined ) {
@@ -276,6 +419,11 @@ class GTAOPass extends Pass {
 
 	}
 
+	/**
+	 * Updates the Denoise material from the given paramter object.
+	 *
+	 * @param {Object} parameters - The denoise parameters.
+	 */
 	updatePdMaterial( parameters ) {
 
 		let updateShader = false;
@@ -335,15 +483,26 @@ class GTAOPass extends Pass {
 
 	}
 
+	/**
+	 * Performs the GTAO pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		// render normals and depth (honor only meshes, points and lines do not contribute to AO)
 
 		if ( this._renderGBuffer ) {
 
-			this.overrideVisibility();
-			this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
-			this.restoreVisibility();
+			this._overrideVisibility();
+			this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
+			this._restoreVisibility();
 
 		}
 
@@ -354,12 +513,12 @@ class GTAOPass extends Pass {
 		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 		this.gtaoMaterial.uniforms.cameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this.renderPass( renderer, this.gtaoMaterial, this.gtaoRenderTarget, 0xffffff, 1.0 );
+		this._renderPass( renderer, this.gtaoMaterial, this.gtaoRenderTarget, 0xffffff, 1.0 );
 
 		// render poisson denoise
 
 		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
-		this.renderPass( renderer, this.pdMaterial, this.pdRenderTarget, 0xffffff, 1.0 );
+		this._renderPass( renderer, this.pdMaterial, this.pdRenderTarget, 0xffffff, 1.0 );
 
 		// output result to screen
 
@@ -372,7 +531,7 @@ class GTAOPass extends Pass {
 
 				this.copyMaterial.uniforms.tDiffuse.value = readBuffer.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -380,7 +539,7 @@ class GTAOPass extends Pass {
 
 				this.copyMaterial.uniforms.tDiffuse.value = this.gtaoRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -388,7 +547,7 @@ class GTAOPass extends Pass {
 
 				this.copyMaterial.uniforms.tDiffuse.value = this.pdRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -396,7 +555,7 @@ class GTAOPass extends Pass {
 
 				this.depthRenderMaterial.uniforms.cameraNear.value = this.camera.near;
 				this.depthRenderMaterial.uniforms.cameraFar.value = this.camera.far;
-				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -404,7 +563,7 @@ class GTAOPass extends Pass {
 
 				this.copyMaterial.uniforms.tDiffuse.value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -412,11 +571,11 @@ class GTAOPass extends Pass {
 
 				this.copyMaterial.uniforms.tDiffuse.value = readBuffer.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				this.blendMaterial.uniforms.intensity.value = this.blendIntensity;
 				this.blendMaterial.uniforms.tDiffuse.value = this.pdRenderTarget.texture;
-				this.renderPass( renderer, this.blendMaterial, this.renderToScreen ? null : writeBuffer );
+				this._renderPass( renderer, this.blendMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -427,10 +586,12 @@ class GTAOPass extends Pass {
 
 	}
 
-	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	// internals
+
+	_renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		renderer.getClearColor( this.originalClearColor );
+		renderer.getClearColor( this._originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha();
 		const originalAutoClear = renderer.autoClear;
 
@@ -446,19 +607,19 @@ class GTAOPass extends Pass {
 
 		}
 
-		this.fsQuad.material = passMaterial;
-		this.fsQuad.render( renderer );
+		this._fsQuad.material = passMaterial;
+		this._fsQuad.render( renderer );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearColor( this._originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	}
 
-	renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	_renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		renderer.getClearColor( this.originalClearColor );
+		renderer.getClearColor( this._originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha();
 		const originalAutoClear = renderer.autoClear;
 
@@ -481,30 +642,12 @@ class GTAOPass extends Pass {
 		this.scene.overrideMaterial = null;
 
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearColor( this._originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	}
 
-	setSize( width, height ) {
-
-		this.width = width;
-		this.height = height;
-
-		this.gtaoRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
-		this.pdRenderTarget.setSize( width, height );
-
-		this.gtaoMaterial.uniforms.resolution.value.set( width, height );
-		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
-		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
-
-		this.pdMaterial.uniforms.resolution.value.set( width, height );
-		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
-
-	}
-
-	overrideVisibility() {
+	_overrideVisibility() {
 
 		const scene = this.scene;
 		const cache = this._visibilityCache;
@@ -519,7 +662,7 @@ class GTAOPass extends Pass {
 
 	}
 
-	restoreVisibility() {
+	_restoreVisibility() {
 
 		const scene = this.scene;
 		const cache = this._visibilityCache;
@@ -535,7 +678,7 @@ class GTAOPass extends Pass {
 
 	}
 
-	generateNoise( size = 64 ) {
+	_generateNoise( size = 64 ) {
 
 		const simplex = new SimplexNoise();
 

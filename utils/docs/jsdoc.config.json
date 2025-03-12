@@ -33,6 +33,7 @@
             "examples/jsm/modifiers",
             "examples/jsm/objects",
             "examples/jsm/physics",
+            "examples/jsm/postprocessing",
             "examples/jsm/renderers",
             "examples/jsm/textures",
             "examples/jsm/transpiler",
