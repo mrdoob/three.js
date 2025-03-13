@@ -1,8 +1,11 @@
-/**
- * Luminosity
- * http://en.wikipedia.org/wiki/Luminosity
- */
+/** @module LuminosityShader */
 
+/**
+ * Luminosity shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const LuminosityShader = {
 
 	name: 'LuminosityShader',

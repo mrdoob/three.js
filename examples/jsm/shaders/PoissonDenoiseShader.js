@@ -4,12 +4,18 @@ import {
 	Vector3,
 } from 'three';
 
-/**
- * References:
- * https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf
- * https://arxiv.org/pdf/2206.01856.pdf
- */
+/** @module PoissonDenoiseShader */
 
+/**
+ * Poisson Denoise Shader.
+ *
+ * References:
+ * - [Self-Supervised Poisson-Gaussian Denoising]{@link https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf}.
+ * - [Poisson2Sparse: Self-Supervised Poisson Denoising From a Single Image]{@link https://arxiv.org/pdf/2206.01856.pdf}
+ *
+ * @constant
+ * @type {Object}
+ */
 const PoissonDenoiseShader = {
 
 	name: 'PoissonDenoiseShader',

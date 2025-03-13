@@ -1,9 +1,11 @@
-/**
- * Afterimage shader
- * I created this effect inspired by a demo on codepen:
- * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
- */
+/** @module AfterimageShader */
 
+/**
+ * Inspired by [Three.js FBO motion trails]{@link https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&}.
+ *
+ * @constant
+ * @type {Object}
+ */
 const AfterimageShader = {
 
 	name: 'AfterimageShader',
