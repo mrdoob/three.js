@@ -157,11 +157,12 @@ class ViewHelper extends Object3D {
 			//
 
 			const x = domElement.offsetWidth - dim;
+			const y = renderer.isWebGPURenderer ? domElement.offsetHeight - dim : 0;
 
 			renderer.clearDepth();
 
 			renderer.getViewport( viewport );
-			renderer.setViewport( x, 0, dim, dim );
+			renderer.setViewport( x, y, dim, dim );
 
 			renderer.render( this, orthoCamera );
 
