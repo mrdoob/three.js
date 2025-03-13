@@ -2,11 +2,14 @@ import {
 	Color
 } from 'three';
 
-/**
- * Luminosity
- * http://en.wikipedia.org/wiki/Luminosity
- */
+/** @module LuminosityHighPassShader */
 
+/**
+ * Luminosity high pass shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const LuminosityHighPassShader = {
 
 	name: 'LuminosityHighPassShader',

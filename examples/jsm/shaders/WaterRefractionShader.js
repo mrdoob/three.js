@@ -1,3 +1,11 @@
+/** @module WaterRefractionShader */
+
+/**
+ * Basic water refraction shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const WaterRefractionShader = {
 
 	name: 'WaterRefractionShader',

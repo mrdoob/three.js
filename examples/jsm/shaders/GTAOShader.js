@@ -6,36 +6,18 @@ import {
 	Vector3,
 } from 'three';
 
-/**
- * References:
- * - implemented algorithm - GTAO
- *   - https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf
- *   - https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf
- *
- * - other AO algorithms that are not implemented here:
- *   - Screen Space Ambient Occlusion (SSAO), see also SSAOShader.js
- *	 - http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
- *	 - https://learnopengl.com/Advanced-Lighting/SSAO
- *	 - https://creativecoding.soe.ucsc.edu/courses/cmpm164/_schedule/AmbientOcclusion.pdf
- *	 - https://drive.google.com/file/d/1SyagcEVplIm2KkRD3WQYSO9O0Iyi1hfy/edit
- *   - Scalable Ambient Occlusion (SAO), see also SAOShader.js
- *	 - https://casual-effects.com/research/McGuire2012SAO/index.html
- *	   - https://research.nvidia.com/sites/default/files/pubs/2012-06_Scalable-Ambient-Obscurance/McGuire12SAO.pdf
- *   - N8HO
- *	 - https://github.com/N8python/n8ao
- *   - Horizon Based Ambient Occlusion (HBAO)
- *	 - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.577.2286&rep=rep1&type=pdf
- *	 - https://www.derschmale.com/2013/12/20/an-alternative-implementation-for-hbao-2/
- *
- * - further reading
- * 	 - https://ceur-ws.org/Vol-3027/paper5.pdf
- *   - https://www.comp.nus.edu.sg/~lowkl/publications/mssao_visual_computer_2012.pdf
- *   - https://web.ics.purdue.edu/~tmcgraw/papers/mcgraw-ao-2008.pdf
- *   - https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
- *   - https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.390.2463&rep=rep1&type=pdf
- *   - https://www.intel.com/content/www/us/en/developer/articles/technical/adaptive-screen-space-ambient-occlusion.html
- */
+/** @module GTAOShader */
 
+/**
+ * GTAO shader. Use by {@link GTAOPass}.
+ *
+ * References:
+ * - [Practical Realtime Strategies for Accurate Indirect Occlusion]{@link https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf}.
+ * - [Horizon-Based Indirect Lighting (HBIL)]{@link https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf}
+ *
+ * @constant
+ * @type {Object}
+ */
 const GTAOShader = {
 
 	name: 'GTAOShader',
@@ -258,6 +240,12 @@ const GTAOShader = {
 
 };
 
+/**
+ * GTAO depth shader. Use by {@link GTAOPass}.
+ *
+ * @constant
+ * @type {Object}
+ */
 const GTAODepthShader = {
 
 	name: 'GTAODepthShader',
@@ -306,6 +294,12 @@ const GTAODepthShader = {
 
 };
 
+/**
+ * GTAO blend shader. Use by {@link GTAOPass}.
+ *
+ * @constant
+ * @type {Object}
+ */
 const GTAOBlendShader = {
 
 	name: 'GTAOBlendShader',

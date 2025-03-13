@@ -2,6 +2,18 @@ import {
 	Vector2
 } from 'three';
 
+/** @module FXAAShader */
+
+/**
+ * FXAA algorithm from NVIDIA, C# implementation by Jasper Flick, GLSL port by Dave Hoskins.
+ *
+ * References:
+ * - {@link http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf}.
+ * - {@link https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/}.
+ *
+ * @constant
+ * @type {Object}
+ */
 const FXAAShader = {
 
 	name: 'FXAAShader',
@@ -25,10 +37,6 @@ const FXAAShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-
-		// FXAA algorithm from NVIDIA, C# implementation by Jasper Flick, GLSL port by Dave Hoskins
-		// http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
-		// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;

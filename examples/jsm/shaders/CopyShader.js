@@ -1,7 +1,11 @@
-/**
- * Full-screen textured quad shader
- */
+/** @module CopyShader */
 
+/**
+ * Full-screen copy shader pass.
+ *
+ * @constant
+ * @type {Object}
+ */
 const CopyShader = {
 
 	name: 'CopyShader',
