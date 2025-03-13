@@ -156,7 +156,7 @@ class XRManager extends EventDispatcher {
 		 *
 		 * @private
 		 * @type {Array<Object>}
-		 * @default []]
+		 * @default []
 		 */
 		this._layers = [];
 
@@ -697,7 +697,7 @@ class XRManager extends EventDispatcher {
 
 			layer.xrlayer = this._createXRLayer( layer );
 
-			const xrlayers = session.renderState.layers;
+			const xrlayers = this._session.renderState.layers;
 			xrlayers.unshift( layer.xrlayer );
 			this._session.updateRenderState( { layers: xrlayers } );
 
