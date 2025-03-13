@@ -407,6 +407,7 @@ export const rtt = TSL.rtt;
 export const sRGBTransferEOTF = TSL.sRGBTransferEOTF;
 export const sRGBTransferOETF = TSL.sRGBTransferOETF;
 export const sampler = TSL.sampler;
+export const samplerComparison = TSL.samplerComparison;
 export const saturate = TSL.saturate;
 export const saturation = TSL.saturation;
 export const screen = TSL.screen;

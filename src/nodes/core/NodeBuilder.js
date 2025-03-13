@@ -1285,7 +1285,7 @@ class NodeBuilder {
 	 */
 	isReference( type ) {
 
-		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'depthTexture' || type === 'texture3D';
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'samplerComparison' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'depthTexture' || type === 'texture3D';
 
 	}
 
