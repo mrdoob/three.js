@@ -439,7 +439,7 @@ class TextureNode extends UniformNode {
 		const properties = builder.getNodeProperties( this );
 		const textureProperty = super.generate( builder, 'property' );
 
-		if ( output === 'sampler' ) {
+		if ( /^sampler/.test( output ) ) {
 
 			return textureProperty + '_sampler';
 
@@ -762,7 +762,17 @@ export const textureLoad = ( ...params ) => texture( ...params ).setSampler( fal
  *
  * @tsl
  * @function
- * @param {TextureNode|Texture} aTexture - The texture or texture node to convert.
+ * @param {TextureNode|Texture} value - The texture or texture node to convert.
  * @returns {Node}
  */
-export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
+export const sampler = ( value ) => ( value.isNode === true ? value : texture( value ) ).convert( 'sampler' );
+
+/**
+ * Converts a texture or texture node to a sampler comparison.
+ *
+ * @tsl
+ * @function
+ * @param {TextureNode|Texture} value - The texture or texture node to convert.
+ * @returns {Node}
+ */
+export const samplerComparison = ( value ) => ( value.isNode === true ? value : texture( value ) ).convert( 'samplerComparison' );
