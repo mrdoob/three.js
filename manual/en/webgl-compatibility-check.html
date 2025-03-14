@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>WebGL Compatibility Check</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – WebGL Compatibility Check">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>WebGL Compatibility Check</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            Even though this is becoming less and less of a problem, some devices or browsers may still not support WebGL 2.
+            The following method allows you to check if it is supported and display a message to the user if it is not.
+            Import the WebGL support detection module, and run the following before attempting to render anything.
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+import WebGL from 'three/addons/capabilities/WebGL.js';
+
+if ( WebGL.isWebGL2Available() ) {
+
+  // Initiate function or other initializations here
+  animate();
+
+} else {
+
+  const warning = WebGL.getWebGL2ErrorMessage();
+  document.getElementById( 'container' ).appendChild( warning );
+
+}
+</pre>
+          
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
