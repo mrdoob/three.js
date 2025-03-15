@@ -1,4 +1,5 @@
 import terser from '@rollup/plugin-terser';
+import resolve from '@rollup/plugin-node-resolve';
 import MagicString from 'magic-string';
 
 export function glsl() {
@@ -71,7 +72,8 @@ const builds = [
 		},
 		plugins: [
 			glsl(),
-			header()
+			header(),
+			resolve()
 		],
 		preserveEntrySignatures: 'allow-extension',
 		output: [
@@ -91,7 +93,8 @@ const builds = [
 		},
 		plugins: [
 			glsl(),
-			header()
+			header(),
+			resolve()
 		],
 		preserveEntrySignatures: 'allow-extension',
 		output: [
@@ -108,7 +111,8 @@ const builds = [
 			'three.tsl.js': 'src/Three.TSL.js',
 		},
 		plugins: [
-			header()
+			header(),
+			resolve()
 		],
 		preserveEntrySignatures: 'allow-extension',
 		output: [
@@ -129,6 +133,7 @@ const builds = [
 		plugins: [
 			glsl(),
 			header(),
+			resolve(),
 			terser()
 		],
 		preserveEntrySignatures: 'allow-extension',
@@ -150,6 +155,7 @@ const builds = [
 		plugins: [
 			glsl(),
 			header(),
+			resolve(),
 			terser()
 		],
 		preserveEntrySignatures: 'allow-extension',
@@ -168,6 +174,7 @@ const builds = [
 		},
 		plugins: [
 			header(),
+			resolve(),
 			terser()
 		],
 		preserveEntrySignatures: 'allow-extension',
@@ -185,7 +192,8 @@ const builds = [
 		input: 'src/Three.js',
 		plugins: [
 			glsl(),
-			header()
+			header(),
+			resolve()
 		],
 		output: [
 			{
