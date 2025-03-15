@@ -1616,6 +1616,9 @@ class Renderer {
 	 */
 	setDrawingBufferSize( width, height, pixelRatio ) {
 
+		// Renderer can't be resized while presenting in XR.
+		if ( this.xr && this.xr.isPresenting ) return;
+
 		this._width = width;
 		this._height = height;
 
@@ -1638,6 +1641,9 @@ class Renderer {
 	 * @param {boolean} [updateStyle=true] - Whether to update the `style` attribute of the canvas or not.
 	 */
 	setSize( width, height, updateStyle = true ) {
+
+		// Renderer can't be resized while presenting in XR.
+		if ( this.xr && this.xr.isPresenting ) return;
 
 		this._width = width;
 		this._height = height;
