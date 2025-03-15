@@ -1,5 +1,4 @@
 import { Earcut } from './Earcut.js';
-import cdt2d from './cdt2d/cdt2d.js';
 
 /**
  * A class containing utility functions for shapes.
@@ -38,58 +37,6 @@ class ShapeUtils {
 	static isClockWise( pts ) {
 
 		return ShapeUtils.area( pts ) < 0;
-
-	}
-
-	/**
-	 * Triangulates the given shape definition using Constrained Delaunay Triangulation.
-	 *
-	 * @param {Array<Vector2>} contour - An array of 2D points defining the contour.
-	 * @param {Array<Array<Vector2>>} holes - An array that holds arrays of 2D points defining the holes.
-	 * @returns {Array<Array<int>>} An array of int[] where each element defines a triangle with [ v0, v1, v2 ]. Vertex indices refer to all vertices passed into the function, in order (contour first, then each hole).
-	 */
-	static triangulateShapeConstrainedDelaunay( contour, holes ) {
-
-		//cleanUpPoints(contour);
-		//holes.forEach(cleanUpPoints);
-
-		const allPoints = []; //Array of int[]s, where each element defines a vert of the form [x,y]
-		const allEdges = []; //Array of int[]s, where each element defines an edge of the form [prevVert, nextVert]. Edges do not have to be a continuous strip.
-		let totalPoints = 0;
-		for ( let i = 0, il = contour.length; i < il; i ++ ) {
-
-			const point = contour[ i ];
-			allPoints.push( [ point.x, point.y ] );
-			const nextIndex = ( i + 1 ) % il;
-			allEdges.push( [ i, nextIndex ] );
-
-		}
-
-		totalPoints += contour.length;
-
-		holes.forEach( hole => {
-
-			const holeEdges = [];
-			for ( let i = 0, il = hole.length; i < il; i ++ ) {
-
-				const point = hole[ i ];
-				allPoints.push( [ point.x, point.y ] );
-
-				//Reversed
-				const currentIndex_thisHole = i;
-				const nextIndex_thisHole = ( i + 1 ) % il;
-				holeEdges.push( [ totalPoints + currentIndex_thisHole, totalPoints + nextIndex_thisHole ] );
-				//holeEdges.unshift([totalPoints + nextIndex_thisHole, totalPoints + currentIndex_thisHole])
-
-			}
-
-			Array.prototype.push.apply( allEdges, holeEdges ); //Efficient in-place concat
-			totalPoints += hole.length;
-
-		} );
-
-		const res = cdt2d( allPoints, allEdges, { exterior: false, interior: true } ); //Returns an array of int[]s, where each element is of the form [v0, v1, v2], defining a triangle with indices from the points array.
-		return res;
 
 	}
 

@@ -441,18 +441,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
-			const USE_CDT = true;
-
-			let faces;
-			if ( USE_CDT ) {
-
-				faces = ShapeUtils.triangulateShapeConstrainedDelaunay( contractedContourVertices, expandedHoleVertices );
-
-			} else {
-
-				faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
-
-			}
+			const faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
 
 			const flen = faces.length;
 
