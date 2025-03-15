@@ -42949,7 +42949,7 @@ class Loader {
 		 * The [request header]{@link https://developer.mozilla.org/en-US/docs/Glossary/Request_header}
 		 * used in HTTP request.
 		 *
-		 * @type {Object}
+		 * @type {Object<string, any>}
 		 */
 		this.requestHeader = {};
 
@@ -42961,8 +42961,8 @@ class Loader {
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded.
 	 * @param {Function} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 */
 	load( /* url, onLoad, onProgress, onError */ ) {}
 
@@ -42970,7 +42970,7 @@ class Loader {
 	 * A async version of {@link Loader#load}.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
 	 * @return {Promise} A Promise that resolves when the asset has been loaded.
 	 */
 	loadAsync( url, onProgress ) {
@@ -43152,8 +43152,8 @@ class FileLoader extends Loader {
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function(any)} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 * @return {any|undefined} The cached resource if available.
 	 */
 	load( url, onLoad, onProgress, onError ) {
@@ -75397,7 +75397,7 @@ class WebGLRenderer {
 		this._outputColorSpace = colorSpace;
 
 		const gl = this.getContext();
-		gl.drawingBufferColorspace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
+		gl.drawingBufferColorSpace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
 		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
 
 	}
