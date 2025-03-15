@@ -1,11 +1,5 @@
 import earcut from 'earcut';
 
-/**
- * An implementation of the earcut polygon triangulation algorithm. The code
- * is a port of [mapbox/earcut]{@link https://github.com/mapbox/earcut mapbox/earcut} (v2.2.4).
- *
- * @hideconstructor
- */
 class Earcut {
 
 	/**
