@@ -1,4 +1,5 @@
 import terser from '@rollup/plugin-terser';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import MagicString from 'magic-string';
 
 export function glsl() {
@@ -32,6 +33,14 @@ export function glsl() {
 		}
 
 	};
+
+}
+
+function resolve() {
+
+	// The node resolve plugin seems produce unnecessary files during build when processing src
+	// files so limit the plugin to only processing external library files.
+	return nodeResolve( { resolveOnly: pkg => pkg !== 'src' } );
 
 }
 
@@ -71,7 +80,8 @@ const builds = [
 		},
 		plugins: [
 			glsl(),
-			header()
+			header(),
+			resolve()
 		],
 		preserveEntrySignatures: 'allow-extension',
 		output: [
@@ -91,7 +101,8 @@ const builds = [
 		},
 		plugins: [
 			glsl(),
-			header()
+			header(),
+			resolve()
 		],
 		preserveEntrySignatures: 'allow-extension',
 		output: [
@@ -108,7 +119,8 @@ const builds = [
 			'three.tsl.js': 'src/Three.TSL.js',
 		},
 		plugins: [
-			header()
+			header(),
+			resolve()
 		],
 		preserveEntrySignatures: 'allow-extension',
 		output: [
@@ -129,6 +141,7 @@ const builds = [
 		plugins: [
 			glsl(),
 			header(),
+			resolve(),
 			terser()
 		],
 		preserveEntrySignatures: 'allow-extension',
@@ -150,6 +163,7 @@ const builds = [
 		plugins: [
 			glsl(),
 			header(),
+			resolve(),
 			terser()
 		],
 		preserveEntrySignatures: 'allow-extension',
@@ -168,6 +182,7 @@ const builds = [
 		},
 		plugins: [
 			header(),
+			resolve(),
 			terser()
 		],
 		preserveEntrySignatures: 'allow-extension',
@@ -185,7 +200,8 @@ const builds = [
 		input: 'src/Three.js',
 		plugins: [
 			glsl(),
-			header()
+			header(),
+			resolve()
 		],
 		output: [
 			{
