@@ -38,6 +38,8 @@ export function glsl() {
 
 function resolve() {
 
+	// The node resolve plugin seems produce unnecessary files during build when processing src
+	// files so limit the plugin to only processing external library files.
 	return nodeResolve( { resolveOnly: pkg => pkg !== 'src' } );
 
 }
