@@ -104,7 +104,7 @@ class OperatorNode extends TempNode {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '==' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '!' || op === '==' || op === '!=' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
@@ -179,7 +179,7 @@ class OperatorNode extends TempNode {
 			typeA = aNode.getNodeType( builder );
 			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
-			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
+			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
