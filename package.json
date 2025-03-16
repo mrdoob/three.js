@@ -98,7 +98,7 @@
     "chalk": "^5.2.0",
     "concurrently": "^9.0.0",
     "dpdm": "^3.14.0",
-    "earcut": "^3.0.1",
+    "earcut": "3.0.1",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^6.0.0",
