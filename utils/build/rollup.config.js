@@ -1,5 +1,5 @@
 import terser from '@rollup/plugin-terser';
-import resolve from '@rollup/plugin-node-resolve';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import MagicString from 'magic-string';
 
 export function glsl() {
@@ -33,6 +33,12 @@ export function glsl() {
 		}
 
 	};
+
+}
+
+function resolve() {
+
+	return nodeResolve( { resolveOnly: pkg => pkg !== 'src' } );
 
 }
 
