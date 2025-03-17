@@ -1973,8 +1973,10 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 	generate( builder ) {
 
+		const indexType = this.indexNode.getNodeType( builder );
+
 		const nodeSnippet = this.node.build( builder );
-		const indexSnippet = this.indexNode.build( builder, 'uint' );
+		const indexSnippet = this.indexNode.build( builder, indexType === 'int' ? indexType : 'uint' );
 
 		return `${ nodeSnippet }[ ${ indexSnippet } ]`;
 
@@ -4744,7 +4746,7 @@ class OperatorNode extends TempNode {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '==' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '!' || op === '==' || op === '!=' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
@@ -4819,7 +4821,7 @@ class OperatorNode extends TempNode {
 			typeA = aNode.getNodeType( builder );
 			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
-			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
+			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
@@ -14371,7 +14373,7 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 	const y = texelIndex.div( width );
 	const x = texelIndex.sub( y.mul( width ) );
 
-	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth );
+	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth ).xyz;
 
 	return bufferAttrib.mul( influence );
 
@@ -14587,31 +14589,35 @@ class MorphNode extends Node {
 
 			}
 
-			if ( hasMorphPosition === true ) {
+			If( influence.notEqual( 0 ), () => {
 
-				positionLocal.addAssign( getMorph( {
-					bufferMap,
-					influence,
-					stride,
-					width,
-					depth: i,
-					offset: int( 0 )
-				} ) );
+				if ( hasMorphPosition === true ) {
 
-			}
+					positionLocal.addAssign( getMorph( {
+						bufferMap,
+						influence,
+						stride,
+						width,
+						depth: i,
+						offset: int( 0 )
+					} ) );
 
-			if ( hasMorphNormals === true ) {
+				}
 
-				normalLocal.addAssign( getMorph( {
-					bufferMap,
-					influence,
-					stride,
-					width,
-					depth: i,
-					offset: int( 1 )
-				} ) );
+				if ( hasMorphNormals === true ) {
 
-			}
+					normalLocal.addAssign( getMorph( {
+						bufferMap,
+						influence,
+						stride,
+						width,
+						depth: i,
+						offset: int( 1 )
+					} ) );
+
+				}
+
+			} );
 
 		} );
 
@@ -65858,11 +65864,11 @@ class WebGPUAttributeUtils {
 			// patch for INT16 and UINT16
 			if ( attribute.normalized === false ) {
 
-				if ( array.constructor === Int16Array ) {
+				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
 
 					array = new Int32Array( array );
 
-				} else if ( array.constructor === Uint16Array ) {
+				} else if ( array.constructor === Uint16Array || array.constructor === Uint8Array ) {
 
 					array = new Uint32Array( array );
 
