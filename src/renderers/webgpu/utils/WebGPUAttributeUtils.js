@@ -71,11 +71,11 @@ class WebGPUAttributeUtils {
 			// patch for INT16 and UINT16
 			if ( attribute.normalized === false ) {
 
-				if ( array.constructor === Int16Array ) {
+				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
 
 					array = new Int32Array( array );
 
-				} else if ( array.constructor === Uint16Array ) {
+				} else if ( array.constructor === Uint16Array || array.constructor === Uint8Array ) {
 
 					array = new Uint32Array( array );
 
