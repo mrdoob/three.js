@@ -1633,7 +1633,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if (mipmaps && mipmaps.length > 0) {
 
-				setupDepthTexture( renderTargetProperties.__webglFramebuffer[0], renderTarget );
+				setupDepthTexture( renderTargetProperties.__webglFramebuffer[ 0 ], renderTarget );
 
 			} else {
 
@@ -1674,7 +1674,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if (mipmaps && mipmaps.length > 0) {
 
-					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[0] );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ 0 ] );
 
 				} else {
 
@@ -2010,7 +2010,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
-				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+
+				// Handle mipmaps
+				if ( renderTarget.texture.mipmaps && renderTarget.texture.mipmaps.length > 0 ) {
+
+					state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ 0 ] );
+
+				} else {
+
+					state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+
+				}
 
 				for ( let i = 0; i < textures.length; i ++ ) {
 
