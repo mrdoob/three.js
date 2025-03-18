@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p>
+		Three.js uses `matrices` to encode 3D transformations---translations (position), rotations, and scaling. Every instance of [page:Object3D] has a [page:Object3D.matrix matrix] which stores that object's position, rotation, and scale. This page describes how to update an object's transformation.
+		</p>
+
+		<h2>Convenience properties and `matrixAutoUpdate`</h2>
+
+		<p>
+			There are two ways to update an object's transformation:
+		</p>
+		<ol>
+			<li>
+				Modify the object's `position`, `quaternion`, and `scale` properties, and let three.js recompute
+				the object's matrix from these properties:
+				<code>
+object.position.copy( start_position );
+object.quaternion.copy( quaternion );
+				</code>
+				By default, the `matrixAutoUpdate` property is set true, and the matrix will be automatically recalculated.
+				If the object is static, or you wish to manually control when recalculation occurs, better performance can be obtained by setting the property false:
+				<code>
+object.matrixAutoUpdate = false;
+				</code>
+				And after changing any properties, manually update the matrix:
+				<code>
+object.updateMatrix();
+				</code>
+			</li>
+			<li>
+				Modify the object's matrix directly. The [page:Matrix4] class has various methods for modifying the matrix:
+				<code>
+object.matrix.setRotationFromQuaternion( quaternion );
+object.matrix.setPosition( start_position );
+object.matrixAutoUpdate = false;
+				</code>
+				Note that `matrixAutoUpdate` <em>must</em> be set to `false` in this case, and you should make sure <em>not</em> to call `updateMatrix`. Calling `updateMatrix` will clobber the manual changes made to the matrix, recalculating the matrix from `position`, `scale`, and so on.
+			</li>
+		</ol>
+
+		<h2>Object and world matrices</h2>
+		<p>
+		An object's [page:Object3D.matrix matrix] stores the object's transformation <em>relative</em> to the object's [page:Object3D.parent parent]; to get the object's transformation in <em>world</em> coordinates, you must access the object's [page:Object3D.matrixWorld].
+		</p>
+		<p>
+		When either the parent or the child object's transformation changes, you can request that the child object's [page:Object3D.matrixWorld matrixWorld] be updated by calling [page:Object3D.updateMatrixWorld updateMatrixWorld]().
+		</p>
+		<p>
+		An object can be transformed via [page:Object3D.applyMatrix4]. Note: Under-the-hood, this method relies on [page:Matrix4.decompose], and not all matrices are decomposable in this way. For example, if an object has a non-uniformly scaled parent, then the object's world matrix may not be decomposable, and this method may not be appropriate.
+		</p>
+
+		<h2>Rotation and Quaternion</h2>
+		<p>
+		Three.js provides two ways of representing 3D rotations: [page:Euler Euler angles] and [page:Quaternion Quaternions], as well as methods for converting between the two. Euler angles are subject to a problem called "gimbal lock," where certain configurations can lose a degree of freedom (preventing the object from being rotated about one axis). For this reason, object rotations are <em>always</em> stored in the object's [page:Object3D.quaternion quaternion].
+		</p>
+		<p>
+		Previous versions of the library included a `useQuaternion` property which, when set to false, would cause the object's [page:Object3D.matrix matrix] to be calculated from an Euler angle. This practice is deprecated---instead, you should use the [page:Object3D.setRotationFromEuler setRotationFromEuler] method, which will update the quaternion.
+		</p>
+
+	</body>
+</html>

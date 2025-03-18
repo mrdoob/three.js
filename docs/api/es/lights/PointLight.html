@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A light that gets emitted from a single point in all directions. A common
+			use case for this is to replicate the light emitted from a bare
+			lightbulb.<br /><br />
+
+			This light can cast shadows - see [page:PointLightShadow] page for
+			details.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+const light = new THREE.PointLight( 0xff0000, 1, 100 );
+light.position.set( 50, 50, 50 );
+scene.add( light );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lights_pointlights lights / pointlights ]<br />
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_geometry_text geometry / text ]<br />
+			[example:webgl_lensflares lensflares ]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )
+		</h3>
+		<p>
+			[page:Integer color] - (optional) hexadecimal color of the light. Default
+			is 0xffffff (white).<br />
+			[page:Float intensity] - (optional) numeric value of the light's
+			strength/intensity. Default is `1`.<br />
+			[page:Number distance] - Maximum range of the light. Default is `0` (no
+			limit).<br />
+			[page:Float decay] - The amount the light dims along the distance of the
+			light. Default is `2`.<br /><br />
+
+			Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Light Light] class for common properties.</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			If set to `true` light will cast dynamic shadows. *Warning*: This is
+			expensive and requires tweaking to get shadows looking right. See the
+			[page:PointLightShadow] for details. The default is `false`.
+		</p>
+
+		<h3>[property:Float decay]</h3>
+		<p>
+			The amount the light dims along the distance of the light. Default is
+			`2`.<br />
+			In context of physically-correct rendering the default value should not be
+			changed.
+		</p>
+
+		<h3>[property:Float distance]</h3>
+		<p>
+			When distance is zero, light will attenuate according to inverse-square
+			law to infinite distance. When distance is non-zero, light will attenuate
+			according to inverse-square law until near the distance cutoff, where it
+			will then attenuate quickly and smoothly to 0. Inherently, cutoffs are not
+			physically correct.
+		</p>
+		<p>Default is `0.0`.</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The light's luminous intensity measured in candela (cd). Default is `1`.
+			<br /><br />
+			Changing the intensity will also change the light's power.
+		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+			The light's power.<br />
+			Power is the luminous power of the light measured in lumens (lm).
+			<br /><br />
+
+			Changing the power will also change the light's intensity.
+		</p>
+
+		<h3>[property:PointLightShadow shadow]</h3>
+		<p>
+			A [page:PointLightShadow] used to calculate shadows for this light.<br /><br />
+
+			The lightShadow's [page:LightShadow.camera camera] is set to a
+			[page:PerspectiveCamera] with [page:PerspectiveCamera.fov fov] of `90`,
+			[page:PerspectiveCamera.aspect aspect] of `1`, [page:PerspectiveCamera.near near] 
+			clipping plane at `0.5` and [page:PerspectiveCamera.far far] clipping
+			plane at `500`.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Light Light] class for common methods.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
+
+		<h3>[method:this copy]( [param:PointLight source] )</h3>
+		<p>
+			Copies value of all the properties from the [page:PointLight source] to
+			this PointLight.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

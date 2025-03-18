@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This type of render target represents an array of textures.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_rendertarget_texture2darray WebGL / render target / array]<br />
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]( [param:Number width], [param:Number height], [param:Number depth], [param:Object options] )
+		</h3>
+		<p>
+			[page:Number width] - the width of the render target, in pixels. Default is `1`.<br />
+			[page:Number height] - the height of the render target, in pixels. Default is `1`.<br />
+			[page:Number depth] - the depth/layer count of the render target. Default is `1`.<br />
+			[page:Object options] - optional object that holds texture parameters for an
+			auto-generated target texture and depthBuffer/stencilBuffer booleans. See [page:WebGLRenderTarget] for details.<br /><br />
+
+			Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<p>See [page:WebGLRenderTarget] for inherited properties.</p>
+
+		<h3>[property:number depth]</h3>
+		<p>The depth of the render target.</p>
+
+		<h3>[property:DataArrayTexture texture]</h3>
+		<p>
+			The texture property is overwritten with an instance of
+			[page:DataArrayTexture].
+		</p>
+
+		<h2>Methods</h2>
+		<p>See [page:WebGLRenderTarget] for inherited methods.</p>
+
+		<h2>Source</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A special version of [page:Mesh] with instanced rendering support. Use
+			[name] if you have to render a large number of objects with the same
+			geometry and material(s) but with different world transformations. The usage
+			of [name] will help you to reduce the number of draw calls and thus
+			improve the overall rendering performance in your application.
+		</p>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
+			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
+			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
+			[example:webgl_instancing_raycast WebGL / instancing / raycast]
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>
+			[name]( [param:BufferGeometry geometry], [param:Material material],
+			[param:Integer count] )
+		</h3>
+		<p>
+			[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
+			[page:Material material] — a single or an array of
+			[page:Material]. Default is a new [page:MeshBasicMaterial].<br />
+			[page:Integer count] - the number of instances.<br />
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			This bounding box encloses all instances of the [name]. Can be calculated
+			with [page:.computeBoundingBox](). Default is `null`.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			This bounding sphere encloses all instances of the [name]. Can be
+			calculated with [page:.computeBoundingSphere](). Default is `null`.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			The number of instances. The `count` value passed into the constructor
+			represents the maximum number of instances of this mesh. You can change
+			the number of instances at runtime to an integer value in the range [0, count].
+		</p>
+		<p>
+			If you need more instances than the original count value, you have to
+			create a new [name].
+		</p>
+
+		<h3>[property:InstancedBufferAttribute instanceColor]</h3>
+		<p>
+			Represents the colors of all instances. `null` by default. You have to set
+			its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you
+			modify instanced data via [page:.setColorAt]().
+		</p>
+
+		<h3>[property:InstancedBufferAttribute instanceMatrix]</h3>
+		<p>
+			Represents the local transformation of all instances. You have to set its
+			[page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify
+			instanced data via [page:.setMatrixAt]().
+		</p>
+
+		<h3>[property:DataTexture morphTexture]</h3>
+		<p>
+			Represents the morph target weights of all instances. You have to set its
+			[page:Texture.needsUpdate needsUpdate] flag to true if you modify
+			instanced data via [page:.setMorphAt]().
+		</p>
+
+		<h3>[property:Boolean isInstancedMesh]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+			Computes the bounding box of the instanced mesh, and updates the [page:.boundingBox] attribute.
+			The bounding box is not computed by the engine; it must be computed by your app.
+			You may need to recompute the bounding box if an instance is transformed via [page:.setMatrixAt]().
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+			Computes the bounding sphere of the instanced mesh, and updates the [page:.boundingSphere] attribute.
+			The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+			You may need to recompute the bounding sphere if an instance is transformed via [page:.setMatrixAt]().
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
+
+		<h3>
+			[method:undefined getColorAt]( [param:Integer index], [param:Color color] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Color color]: This color object will be set to the color of the
+			defined instance.
+		</p>
+		<p>Get the color of the defined instance.</p>
+
+		<h3>
+			[method:undefined getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: This 4x4 matrix will be set to the local
+			transformation matrix of the defined instance.
+		</p>
+		<p>Get the local transformation matrix of the defined instance.</p>
+
+		<h3>
+			[method:undefined getMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Mesh mesh]: The [page:Mesh.morphTargetInfluences .morphTargetInfluences] property of this mesh will be filled with the morph target weights of the defined instance.
+		</p>
+		<p>Get the morph target weights of the defined instance.</p>
+
+		<h3>
+			[method:undefined setColorAt]( [param:Integer index], [param:Color color] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>[page:Color color]: The color of a single instance.</p>
+		<p>
+			Sets the given color to the defined instance. Make sure you set
+			[page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] to
+			true after updating all the colors.
+		</p>
+
+		<h3>
+			[method:undefined setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: A 4x4 matrix representing the local transformation
+			of a single instance.
+		</p>
+		<p>
+			Sets the given local transformation matrix to the defined instance. Make
+			sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 
+			to true after updating all the matrices.
+		</p>
+		<p>
+			Negatively scaled matrices are not supported.
+		</p>
+
+		<h3>
+			[method:undefined setMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Mesh mesh]: A mesh with [page:Mesh.morphTargetInfluences .morphTargetInfluences] property containing the morph target weights
+			of a single instance.
+		</p>
+		<p>
+			Sets the morph target weights to the defined instance. Make
+			sure you set [page:.morphTexture][page:Texture.needsUpdate .needsUpdate] 
+			to true after updating all the influences.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

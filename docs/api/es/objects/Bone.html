@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A bone which is part of a [page:Skeleton]. The skeleton in turn is used by
+			the [page:SkinnedMesh]. Bones are almost identical to a blank
+			[page:Object3D].
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const root = new THREE.Bone();
+		const child = new THREE.Bone();
+
+		root.add( child );
+		child.position.y = 5;
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( )</h3>
+		<p>Creates a new [name].</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:Boolean isBone]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h3>[property:String type]</h3>
+		<p>Set to 'Bone', this can be used to find all Bones in a scene.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
