@@ -167,7 +167,7 @@ class StackNode extends Node {
 	 * @function
 	 * @deprecated since r168. Use {@link StackNode#Else} instead.
 	 *
-	 * @param  {...any} params
+	 * @param {...any} params
 	 * @returns {StackNode}
 	 */
 	else( ...params ) { // @deprecated, r168
@@ -180,7 +180,7 @@ class StackNode extends Node {
 	/**
 	 * @deprecated since r168. Use {@link StackNode#ElseIf} instead.
 	 *
-	 * @param  {...any} params
+	 * @param {...any} params
 	 * @returns {StackNode}
 	 */
 	elseif( ...params ) { // @deprecated, r168

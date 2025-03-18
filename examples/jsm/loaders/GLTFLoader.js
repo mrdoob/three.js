@@ -3587,7 +3587,7 @@ class GLTFParser {
 	 * be created if necessary, and reused from a cache.
 	 *
 	 * @private
-	 * @param  {Object3D} mesh Mesh, Line, or Points instance.
+	 * @param {Object3D} mesh Mesh, Line, or Points instance.
 	 */
 	assignFinalMaterial( mesh ) {
 

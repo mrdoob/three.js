@@ -282,7 +282,7 @@ export const Break = () => expression( 'break' ).append();
  * @function
  * @deprecated since r168. Use {@link Loop} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {LoopNode}
  */
 export const loop = ( ...params ) => { // @deprecated, r168

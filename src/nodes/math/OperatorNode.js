@@ -637,7 +637,7 @@ addMethodChaining( 'shiftRight', shiftRight );
  * @function
  * @deprecated since r168. Use {@link modInt} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 export const remainder = ( ...params ) => { // @deprecated, r168
