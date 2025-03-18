@@ -24,7 +24,8 @@ import {
 	CompressedTexture,
 	Vector3,
 	Quaternion,
-	REVISION
+	REVISION,
+	ImageUtils
 } from 'three';
 
 /**
@@ -1465,7 +1466,7 @@ class GLTFWriter {
 
 			} else {
 
-				imageDef.uri = canvas.toDataURL( mimeType );
+				imageDef.uri = ImageUtils.getDataURL( canvas, mimeType );
 
 			}
 

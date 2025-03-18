@@ -14,9 +14,10 @@ class ImageUtils {
 	 * Returns a data URI containing a representation of the given image.
 	 *
 	 * @param {(HTMLImageElement|HTMLCanvasElement)} image - The image object.
+	 * @param {string} [type='image/png'] - Indicates the image format.
 	 * @return {string} The data URI.
 	 */
-	static getDataURL( image ) {
+	static getDataURL( image, type = 'image/png' ) {
 
 		if ( /^data:/i.test( image.src ) ) {
 
@@ -59,7 +60,7 @@ class ImageUtils {
 
 		}
 
-		return canvas.toDataURL( 'image/png' );
+		return canvas.toDataURL( type );
 
 	}
 
