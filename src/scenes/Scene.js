@@ -105,7 +105,7 @@ class Scene extends Object3D {
 
 		/**
 		 * Forces everything in the scene to be rendered with the defined material. It is possible
-		 * to exclude materials from override by settings {@link Material#allowOverride} to `false`.
+		 * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
 		 *
 		 * @type {?Material}
 		 * @default null
