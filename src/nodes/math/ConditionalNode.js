@@ -217,7 +217,7 @@ addMethodChaining( 'select', select );
  * @function
  * @deprecated since r168. Use {@link select} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {ConditionalNode}
  */
 export const cond = ( ...params ) => { // @deprecated, r168

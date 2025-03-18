@@ -137,7 +137,7 @@ export const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
  * @function
  * @deprecated since r171. Use {@link blendBurn} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 export const burn = ( ...params ) => { // @deprecated, r171
@@ -152,7 +152,7 @@ export const burn = ( ...params ) => { // @deprecated, r171
  * @function
  * @deprecated since r171. Use {@link blendDodge} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 export const dodge = ( ...params ) => { // @deprecated, r171
@@ -167,7 +167,7 @@ export const dodge = ( ...params ) => { // @deprecated, r171
  * @function
  * @deprecated since r171. Use {@link blendScreen} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 export const screen = ( ...params ) => { // @deprecated, r171
@@ -182,7 +182,7 @@ export const screen = ( ...params ) => { // @deprecated, r171
  * @function
  * @deprecated since r171. Use {@link blendOverlay} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 export const overlay = ( ...params ) => { // @deprecated, r171
