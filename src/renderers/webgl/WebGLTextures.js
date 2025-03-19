@@ -1631,7 +1631,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const mipmaps = renderTarget.texture.mipmaps;
 
-			if (mipmaps && mipmaps.length > 0) {
+			if ( mipmaps && mipmaps.length > 0 ) {
 
 				setupDepthTexture( renderTargetProperties.__webglFramebuffer[ 0 ], renderTarget );
 
@@ -1672,7 +1672,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const mipmaps = renderTarget.texture.mipmaps;
 
-				if (mipmaps && mipmaps.length > 0) {
+				if ( mipmaps && mipmaps.length > 0 ) {
 
 					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ 0 ] );
 
