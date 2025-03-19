@@ -428,6 +428,14 @@ class Material extends EventDispatcher {
 		this.forceSinglePass = false;
 
 		/**
+		 * Whether it's possible to override the material with {@link Scene#overrideMaterial} or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.allowOverride = true;
+
+		/**
 		 * Defines whether 3D objects using this material are visible.
 		 *
 		 * @type {boolean}
