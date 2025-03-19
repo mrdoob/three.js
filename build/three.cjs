@@ -4292,9 +4292,10 @@ class ImageUtils {
 	 * Returns a data URI containing a representation of the given image.
 	 *
 	 * @param {(HTMLImageElement|HTMLCanvasElement)} image - The image object.
+	 * @param {string} [type='image/png'] - Indicates the image format.
 	 * @return {string} The data URI.
 	 */
-	static getDataURL( image ) {
+	static getDataURL( image, type = 'image/png' ) {
 
 		if ( /^data:/i.test( image.src ) ) {
 
@@ -4337,7 +4338,7 @@ class ImageUtils {
 
 		}
 
-		return canvas.toDataURL( 'image/png' );
+		return canvas.toDataURL( type );
 
 	}
 
@@ -16390,6 +16391,14 @@ class Material extends EventDispatcher {
 		this.forceSinglePass = false;
 
 		/**
+		 * Whether it's possible to override the material with {@link Scene#overrideMaterial} or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.allowOverride = true;
+
+		/**
 		 * Defines whether 3D objects using this material are visible.
 		 *
 		 * @type {boolean}
@@ -22786,7 +22795,8 @@ class Scene extends Object3D {
 		this.environmentRotation = new Euler();
 
 		/**
-		 * Forces everything in the scene to be rendered with the defined material.
+		 * Forces everything in the scene to be rendered with the defined material. It is possible
+		 * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
 		 *
 		 * @type {?Material}
 		 * @default null
@@ -33702,6 +33712,10 @@ class Shape extends Path {
 	}
 
 }
+
+/* eslint-disable */
+// copy of mapbox/earcut version 3.0.1
+// https://github.com/mapbox/earcut/tree/v3.0.1
 
 function earcut(data, holeIndices, dim = 2) {
 
@@ -57261,6 +57275,28 @@ class TextureUtils {
 
 }
 
+if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
+		revision: REVISION,
+	} } ) );
+
+}
+
+if ( typeof window !== 'undefined' ) {
+
+	if ( window.__THREE__ ) {
+
+		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+
+	} else {
+
+		window.__THREE__ = REVISION;
+
+	}
+
+}
+
 function WebGLAnimation() {
 
 	let context = null;
@@ -58639,7 +58675,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 						side: BackSide,
 						depthTest: false,
 						depthWrite: false,
-						fog: false
+						fog: false,
+						allowOverride: false
 					} )
 				);
 
@@ -58718,7 +58755,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 						side: FrontSide,
 						depthTest: false,
 						depthWrite: false,
-						fog: false
+						fog: false,
+						allowOverride: false
 					} )
 				);
 
@@ -73815,8 +73853,14 @@ class WebGLRenderer {
 
 				const object = renderItem.object;
 				const geometry = renderItem.geometry;
-				const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
 				const group = renderItem.group;
+				let material = renderItem.material;
+
+				if ( material.allowOverride === true && overrideMaterial !== null ) {
+
+					material = overrideMaterial;
+
+				}
 
 				if ( object.layers.test( camera.layers ) ) {
 

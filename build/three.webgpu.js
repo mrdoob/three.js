@@ -3438,7 +3438,7 @@ const Fn = ( jsFunc, nodeType ) => {
  * @function
  * @deprecated since r168. Use {@link Fn} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 const tslFn = ( ...params ) => { // @deprecated, r168
@@ -5275,7 +5275,7 @@ addMethodChaining( 'shiftRight', shiftRight );
  * @function
  * @deprecated since r168. Use {@link modInt} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 const remainder = ( ...params ) => { // @deprecated, r168
@@ -6579,7 +6579,7 @@ addMethodChaining( 'select', select );
  * @function
  * @deprecated since r168. Use {@link select} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {ConditionalNode}
  */
 const cond = ( ...params ) => { // @deprecated, r168
@@ -14353,7 +14353,7 @@ const Break = () => expression( 'break' ).append();
  * @function
  * @deprecated since r168. Use {@link Loop} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {LoopNode}
  */
 const loop = ( ...params ) => { // @deprecated, r168
@@ -28432,7 +28432,7 @@ class StackNode extends Node {
 	 * @function
 	 * @deprecated since r168. Use {@link StackNode#Else} instead.
 	 *
-	 * @param  {...any} params
+	 * @param {...any} params
 	 * @returns {StackNode}
 	 */
 	else( ...params ) { // @deprecated, r168
@@ -28445,7 +28445,7 @@ class StackNode extends Node {
 	/**
 	 * @deprecated since r168. Use {@link StackNode#ElseIf} instead.
 	 *
-	 * @param  {...any} params
+	 * @param {...any} params
 	 * @returns {StackNode}
 	 */
 	elseif( ...params ) { // @deprecated, r168
@@ -32419,7 +32419,7 @@ const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
  * @function
  * @deprecated since r171. Use {@link blendBurn} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 const burn = ( ...params ) => { // @deprecated, r171
@@ -32434,7 +32434,7 @@ const burn = ( ...params ) => { // @deprecated, r171
  * @function
  * @deprecated since r171. Use {@link blendDodge} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 const dodge = ( ...params ) => { // @deprecated, r171
@@ -32449,7 +32449,7 @@ const dodge = ( ...params ) => { // @deprecated, r171
  * @function
  * @deprecated since r171. Use {@link blendScreen} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 const screen = ( ...params ) => { // @deprecated, r171
@@ -32464,7 +32464,7 @@ const screen = ( ...params ) => { // @deprecated, r171
  * @function
  * @deprecated since r171. Use {@link blendOverlay} instead.
  *
- * @param  {...any} params
+ * @param {...any} params
  * @returns {Function}
  */
 const overlay = ( ...params ) => { // @deprecated, r171
@@ -40730,6 +40730,7 @@ class Background extends DataMap {
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
+				nodeMaterial.allowOverride = false;
 				nodeMaterial.fog = false;
 				nodeMaterial.lights = false;
 				nodeMaterial.vertexNode = viewProj;
@@ -51612,7 +51613,7 @@ class Renderer {
 
 		//
 
-		if ( scene.overrideMaterial !== null ) {
+		if ( material.allowOverride === true && scene.overrideMaterial !== null ) {
 
 			const overrideMaterial = scene.overrideMaterial;
 
