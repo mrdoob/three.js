@@ -1,5 +1,6 @@
 /* eslint-disable */
 // copy of mapbox/earcut version 3.0.1
+// https://github.com/mapbox/earcut/tree/v3.0.1
 
 export default function earcut(data, holeIndices, dim = 2) {
 
