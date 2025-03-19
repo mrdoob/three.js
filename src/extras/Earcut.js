@@ -1,4 +1,4 @@
-import earcut from 'earcut';
+import earcut from './lib/earcut.js';
 
 class Earcut {
 
