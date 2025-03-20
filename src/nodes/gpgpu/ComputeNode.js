@@ -163,19 +163,33 @@ class ComputeNode extends Node {
 
 	}
 
-	generate( builder ) {
+	setup( builder ) {
+
+		const result = this.computeNode.setup( builder );
+
+		const properties = builder.getNodeProperties( this );
+		properties.outputComputeNode = result.outputNode;
+
+		result.outputNode = null;
+
+		return result;
+
+	}
+
+	generate( builder, output ) {
 
 		const { shaderStage } = builder;
 
 		if ( shaderStage === 'compute' ) {
 
-			const snippet = this.computeNode.build( builder, 'void' );
+			this.computeNode.build( builder, 'void' );
 
-			if ( snippet !== '' ) {
+		} else {
 
-				builder.addLineFlowCode( snippet, this );
+			const properties = builder.getNodeProperties( this );
+			const outputComputeNode = properties.outputComputeNode;
 
-			}
+			return outputComputeNode.build( builder, output );
 
 		}
 
