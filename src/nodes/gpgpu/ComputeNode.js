@@ -189,7 +189,11 @@ class ComputeNode extends Node {
 			const properties = builder.getNodeProperties( this );
 			const outputComputeNode = properties.outputComputeNode;
 
-			return outputComputeNode.build( builder, output );
+			if ( outputComputeNode ) {
+
+				return outputComputeNode.build( builder, output );
+
+			}
 
 		}
 

@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeObject, uvec4 } from '../tsl/TSLBase.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { attribute } from '../core/AttributeNode.js';
 import { reference, referenceBuffer } from './ReferenceNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -13,7 +13,6 @@ import { getDataFromObject } from '../core/NodeUtils.js';
 import { storage } from './StorageBufferNode.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { instanceIndex } from '../core/IndexNode.js';
-import { bufferAttribute } from './BufferAttributeNode.js';
 
 const _frameId = new WeakMap();
 
