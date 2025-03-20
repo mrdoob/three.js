@@ -1,864 +1,924 @@
 :root {
-	color-scheme: light dark;
+  color-scheme: light dark;
 }
 
 [hidden] {
-	display: none !important;
+  display: none !important;
 }
 
 body {
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	overflow: hidden;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  margin: 0;
+  overflow: hidden;
 }
 
 hr {
-	border: 0;
-	border-top: 1px solid #ccc;
+  border: 0;
+  border-top: 1px solid #ccc;
 }
 
 button {
-	position: relative;
+  position: relative;
 }
 
 input {
-	vertical-align: middle;
+  vertical-align: middle;
 }
 
-	input[type="color"]::-webkit-color-swatch-wrapper {
-		padding: 0;
-	}
-	input[type="color"]::-webkit-color-swatch {
-		border: none;
-	}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+}
 
 textarea {
-	tab-size: 4;
-	white-space: pre;
-	word-wrap: normal;
+  tab-size: 4;
+  white-space: pre;
+  word-wrap: normal;
 }
 
-	textarea.success {
-		border-color: #8b8 !important;
-	}
+textarea.success {
+  border-color: #8b8 !important;
+}
 
-	textarea.fail {
-		border-color: #f00 !important;
-		background-color: rgba(255,0,0,0.05);
-	}
+textarea.fail {
+  border-color: #f00 !important;
+  background-color: rgba(255, 0, 0, 0.05);
+}
 
-textarea, input { outline: none; } /* osx */
+textarea,
+input {
+  outline: none;
+} /* osx */
 
 .Panel {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 
-	/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
+  /* No support for these yet */
+  -o-user-select: none;
+  user-select: none;
 }
 
 .TabbedPanel {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 
-	/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
-	position: relative;
-	display: block;
-	width: 100%;
-	min-width: 335px;
+  /* No support for these yet */
+  -o-user-select: none;
+  user-select: none;
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 335px;
 }
 
 .TabbedPanel .Tabs {
-	position: relative;
-	z-index: 1; /** Above .Panels **/
-	display: block;
-	width: 100%;
-	white-space: pre;
-	overflow: hidden;
-	overflow-x: auto;
+  position: relative;
+  z-index: 1; /** Above .Panels **/
+  display: block;
+  width: 100%;
+  white-space: pre;
+  overflow: hidden;
+  overflow-x: auto;
 }
 
-	.TabbedPanel .Tabs::-webkit-scrollbar {
-		height: 5px;
-		background: #eee;
-	}
-	.TabbedPanel .Tabs::-webkit-scrollbar-thumb {
-		background: #08f3;
-	}
-	.TabbedPanel .Tabs:hover::-webkit-scrollbar-thumb {
-		background: #08f;
-		cursor: ew-resize;
-	}
+.TabbedPanel .Tabs::-webkit-scrollbar {
+  height: 5px;
+  background: #eee;
+}
+.TabbedPanel .Tabs::-webkit-scrollbar-thumb {
+  background: #08f3;
+}
+.TabbedPanel .Tabs:hover::-webkit-scrollbar-thumb {
+  background: #08f;
+  cursor: ew-resize;
+}
 
-	.TabbedPanel .Tabs .Tab {
-		padding: 10px 9px;
-		text-transform: uppercase;
-	}
+.TabbedPanel .Tabs .Tab {
+  padding: 10px 9px;
+  text-transform: uppercase;
+}
 
-	.TabbedPanel .Panels {
-		position: absolute;
-		top: 40px;
-		display: block;
-		width: 100%;
-	}
+.TabbedPanel .Panels {
+  position: absolute;
+  top: 40px;
+  display: block;
+  width: 100%;
+}
 
 /* Listbox */
 .Listbox {
-	color: #444;
-	background-color: #fff;
-	padding: 0;
-	width: 100%;
-	min-height: 180px;
-	font-size: 12px;
-	cursor: default;
-	overflow: auto;
+  color: #444;
+  background-color: #fff;
+  padding: 0;
+  width: 100%;
+  min-height: 180px;
+  font-size: 12px;
+  cursor: default;
+  overflow: auto;
 }
 
 .Listbox .ListboxItem {
-	padding: 6px;
-	color: #666;
-	white-space: nowrap;
+  padding: 6px;
+  color: #666;
+  white-space: nowrap;
 }
 
 .Listbox .ListboxItem.active {
-	background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 /* CodeMirror */
 
 .CodeMirror {
-
-	position: absolute !important;
-	top: 37px;
-	width: 100% !important;
-	height: calc(100% - 37px) !important;
-
+  position: absolute !important;
+  top: 37px;
+  width: 100% !important;
+  height: calc(100% - 37px) !important;
 }
 
-	.CodeMirror .errorLine {
+.CodeMirror .errorLine {
+  background: rgba(255, 0, 0, 0.25);
+}
 
-		background: rgba(255,0,0,0.25);
-
-	}
-
-	.CodeMirror .esprima-error {
-
-		color: #f00;
-		text-align: right;
-		padding: 0 20px;
-
-	}
+.CodeMirror .esprima-error {
+  color: #f00;
+  text-align: right;
+  padding: 0 20px;
+}
 
 /* outliner */
 
 #outliner .opener {
-	display: inline-block;
-	width: 14px;
-	height: 14px;
-	margin: 0px 4px;
-	vertical-align: top;
-	text-align: center;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0px 4px;
+  vertical-align: top;
+  text-align: center;
 }
 
-	#outliner .opener.open:after {
-		content: '−';
-	}
+#outliner .opener.open:after {
+  content: "−";
+}
 
-	#outliner .opener.closed:after {
-		content: '+';
-	}
+#outliner .opener.closed:after {
+  content: "+";
+}
 
 #outliner .option {
-
-	border: 1px solid transparent;
-
+  border: 1px solid transparent;
 }
 
 #outliner .option.drag {
-
-	border: 1px dashed #999;
-
+  border: 1px dashed #999;
 }
 
 #outliner .option.dragTop {
-
-	border-top: 1px dashed #999;
-
+  border-top: 1px dashed #999;
 }
 
 #outliner .option.dragBottom {
-
-	border-bottom: 1px dashed #999;
-
+  border-bottom: 1px dashed #999;
 }
 
 #outliner .type {
-	display: inline-block;
-	width: 14px;
-	height: 14px;
-	color: #ddd;
-	text-align: center;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  color: #ddd;
+  text-align: center;
 }
 
 #outliner .type:after {
-	content: '●';
+  content: "●";
 }
 
 /* */
 
 #outliner .Scene {
-	color: #8888dd;
+  color: #8888dd;
 }
 
 #outliner .Camera {
-	color: #dd8888;
+  color: #dd8888;
 }
 
 #outliner .Light {
-	color: #dddd88;
+  color: #dddd88;
 }
 
 /* */
 
 #outliner .Object3D {
-	color: #aaaaee;
+  color: #aaaaee;
 }
 
 #outliner .Mesh {
-	color: #8888ee;
+  color: #8888ee;
 }
 
 #outliner .Line {
-	color: #88ee88;
+  color: #88ee88;
 }
 
 #outliner .LineSegments {
-	color: #88ee88;
+  color: #88ee88;
 }
 
 #outliner .Points {
-	color: #ee8888;
+  color: #ee8888;
 }
 
 /* */
 
 #outliner .Geometry {
-	color: #aaeeaa;
+  color: #aaeeaa;
 }
 
 #outliner .Material {
-	color: #eeaaee;
+  color: #eeaaee;
 }
 
 /* */
 
 #outliner .Script:after {
-	content: '◎'
+  content: "◎";
 }
 
 /*  */
 
 button {
-	color: #555;
-	background-color: #ddd;
-	border: 0px;
-	margin: 0px; /* GNOME Web */
-	padding: 5px 8px;
-	font-size: 12px;
-	text-transform: uppercase;
-	cursor: pointer;
-	outline: none;
+  color: #555;
+  background-color: #ddd;
+  border: 0px;
+  margin: 0px; /* GNOME Web */
+  padding: 5px 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
 }
 
-	button:hover {
-		background-color: #fff;
-	}
+button:hover {
+  background-color: #fff;
+}
 
-	button.selected {
-		background-color: #fff;
-	}
+button.selected {
+  background-color: #fff;
+}
 
-input, textarea {
-	border: 1px solid transparent;
-	color: #444;
+input,
+textarea {
+  border: 1px solid transparent;
+  color: #444;
 }
 
 input.Number {
-	color: #08f!important;
-	font-size: 12px;
-	border: 0px;
-	padding: 2px;
+  color: #08f !important;
+  font-size: 12px;
+  border: 0px;
+  padding: 2px;
 }
 
 select {
-	color: #666;
-	background-color: #ddd;
-	border: 0px;
-	text-transform: uppercase;
-	cursor: pointer;
-	outline: none;
+  color: #666;
+  background-color: #ddd;
+  border: 0px;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
 }
 
-	select:hover {
-		background-color: #fff;
-	}
+select:hover {
+  background-color: #fff;
+}
 
 /* UI */
 
 #resizer {
-	position: absolute;
-	z-index: 2; /* Above #sidebar */
-	top: 32px;
-	right: 350px;
-	width: 5px;
-	bottom: 0px;
-	transform: translatex(2.5px);
-	cursor: col-resize;
+  position: absolute;
+  z-index: 2; /* Above #sidebar */
+  top: 32px;
+  right: 350px;
+  width: 5px;
+  bottom: 0px;
+  transform: translatex(2.5px);
+  cursor: col-resize;
 }
 
-	#resizer:hover {
-		background-color: #08f8;
-		transition-property: background-color;
-		transition-delay: 0.1s;
-		transition-duration: 0.2s;
-	}
+#resizer:hover {
+  background-color: #08f8;
+  transition-property: background-color;
+  transition-delay: 0.1s;
+  transition-duration: 0.2s;
+}
 
-	#resizer:active {
-		background-color: #08f;
-	}
+#resizer:active {
+  background-color: #08f;
+}
 
 #viewport {
-	position: absolute;
-	top: 32px;
-	left: 0;
-	right: 350px;
-	bottom: 0;
+  position: absolute;
+  top: 32px;
+  left: 0;
+  right: 350px;
+  bottom: 0;
 }
 
-	#viewport .Text {
-		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
-		pointer-events: none;
-	}
+#viewport .Text {
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
 
 #script {
-	position: absolute;
-	top: 32px;
-	left: 0;
-	right: 350px;
-	bottom: 0;
-	opacity: 0.9;
+  position: absolute;
+  top: 32px;
+  left: 0;
+  right: 350px;
+  bottom: 0;
+  opacity: 0.9;
 }
 
 #player {
-	position: absolute;
-	top: 32px;
-	left: 0;
-	right: 350px;
-	bottom: 0;
+  position: absolute;
+  top: 32px;
+  left: 0;
+  right: 350px;
+  bottom: 0;
 }
 
 #menubar {
-	position: absolute;
-	width: 100%;
-	height: 32px;
-	background: #eee;
-	padding: 0;
-	margin: 0;
-	right: 0;
-	top: 0;
+  position: absolute;
+  width: 100%;
+  height: 32px;
+  background: #eee;
+  padding: 0;
+  margin: 0;
+  right: 0;
+  top: 0;
 }
 
-	#menubar .menu {
-		float: left;
-		cursor: pointer;
-		padding-right: 8px;
-	}
+#menubar .menu {
+  float: left;
+  cursor: pointer;
+  padding-right: 8px;
+}
 
-	#menubar .menu.right {
-		float: right;
-		cursor: auto;
-		padding-right: 0;
-		text-align: right;
-	}
+#menubar .menu.right {
+  float: right;
+  cursor: auto;
+  padding-right: 0;
+  text-align: right;
+}
 
-		#menubar .menu .title {
-			display: inline-block;
-			color: #888;
-			margin: 0;
-			padding: 8px;
-			line-height: 16px;
-		}
+#menubar .menu .title {
+  display: inline-block;
+  color: #888;
+  margin: 0;
+  padding: 8px;
+  line-height: 16px;
+}
 
-		#menubar .menu .key {
-			position: absolute;
-			right: 10px;
-			color: #ccc;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			font-size: 9px;
-			padding: 2px 4px;
-			right: 10px;
-			pointer-events: none;
-		}
+#menubar .menu .key {
+  position: absolute;
+  right: 10px;
+  color: #ccc;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 9px;
+  padding: 2px 4px;
+  right: 10px;
+  pointer-events: none;
+}
 
-		#menubar .menu .options {
-			position: fixed;
-			z-index: 1; /* higher than resizer */
-			display: none;
-			padding: 5px 0;
-			background: #eee;
-			min-width: 150px;
-			max-height: calc(100vh - 80px);
-			overflow: auto;
-		}
+#menubar .menu .options {
+  position: fixed;
+  z-index: 1; /* higher than resizer */
+  display: none;
+  padding: 5px 0;
+  background: #eee;
+  min-width: 150px;
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+}
 
-		#menubar .menu:hover .options {
-			display: block;
-			box-shadow: 0 10px 10px -5px #00000033;
-		}
+#menubar .menu:hover .options {
+  display: block;
+  box-shadow: 0 10px 10px -5px #00000033;
+}
 
-			#menubar .menu .options hr {
-				border-color: #ddd;
-			}
+#menubar .menu .options hr {
+  border-color: #ddd;
+}
 
-			#menubar .menu .options .option {
-				color: #666;
-				background-color: transparent;
-				padding: 5px 10px;
-				margin: 0 !important;
-			}
+#menubar .menu .options .option {
+  color: #666;
+  background-color: transparent;
+  padding: 5px 10px;
+  margin: 0 !important;
+}
 
-				#menubar .menu .options .option:hover {
-					color: #fff;
-					background-color: #08f;
-				}
+#menubar .menu .options .option:hover {
+  color: #fff;
+  background-color: #08f;
+}
 
-				#menubar .menu .options .option:not(.submenu-title):active {
-					color: #666;
-					background: transparent;
-				}
+#menubar .menu .options .option:not(.submenu-title):active {
+  color: #666;
+  background: transparent;
+}
 
-				#menubar .menu .options .option.toggle::before {
+#menubar .menu .options .option.toggle::before {
+  content: " ";
+  display: inline-block;
+  width: 16px;
+}
 
-					content: ' ';
-					display: inline-block;
-					width: 16px;
+#menubar .menu .options .option.toggle-on::before {
+  content: "✔";
+  font-size: 12px;
+}
 
-				}
+#menubar .submenu-title::after {
+  content: "⏵";
+  float: right;
+}
 
-				#menubar .menu .options .option.toggle-on::before {
-
-					content: '✔';
-					font-size: 12px;
-
-				}
-
-				#menubar .submenu-title::after {
-					content: '⏵';
-					float: right;
-				}
-
-		#menubar .menu .options .inactive {
-			color: #bbb;
-			background-color: transparent;
-			padding: 5px 10px;
-			margin: 0 !important;
-			cursor: not-allowed;
-		}
-
-		
+#menubar .menu .options .inactive {
+  color: #bbb;
+  background-color: transparent;
+  padding: 5px 10px;
+  margin: 0 !important;
+  cursor: not-allowed;
+}
 
 #sidebar {
-	position: absolute;
-	right: 0;
-	top: 32px;
-	bottom: 0;
-	width: 350px;
-	background: #eee;
-	overflow: auto;
-	overflow-x: hidden;
+  position: absolute;
+  right: 0;
+  top: 32px;
+  bottom: 0;
+  width: 350px;
+  background: #eee;
+  overflow: auto;
+  overflow-x: hidden;
 }
 
-	#sidebar .Panel {
-		color: #888;
-		padding: 10px;
-		border-top: 1px solid #ccc;
-	}
+#sidebar .Panel {
+  color: #888;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
 
-	#sidebar .Panel.collapsed {
-		margin-bottom: 0;
-	}
+#sidebar .Panel.collapsed {
+  margin-bottom: 0;
+}
 
-	#sidebar .Row {
-		display: flex;
-		align-items: center;
-		min-height: 24px;
-		margin-bottom: 10px;
-	}
+#sidebar .Row {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 10px;
+}
 
-	#sidebar .Row .Label {
-
-		width: 120px;
-
-	}
+#sidebar .Row .Label {
+  width: 120px;
+}
 
 #tabs {
-	background-color: #ddd;
-	border-top: 1px solid #ccc;
+  background-color: #ddd;
+  border-top: 1px solid #ccc;
 }
 
-	#tabs span {
-		color: #aaa;
-		border-right: 1px solid #ccc;
-		padding: 10px;
-	}
+#tabs span {
+  color: #aaa;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+}
 
-	#tabs span.selected {
-		color: #888;
-		background-color: #eee;
-	}
+#tabs span.selected {
+  color: #888;
+  background-color: #eee;
+}
 
 #toolbar {
-	position: absolute;
-	left: 10px;
-	top: 42px;
-	width: 32px;
-	background: #eee;
-	text-align: center;
+  position: absolute;
+  left: 10px;
+  top: 42px;
+  width: 32px;
+  background: #eee;
+  text-align: center;
 }
 
-	#toolbar button, #toolbar input {
-		height: 32px;
-	}
+#toolbar button,
+#toolbar input {
+  height: 32px;
+}
 
-		#toolbar button img {
-			width: 16px;
-			opacity: 0.5;
-		}
+#toolbar button img {
+  width: 16px;
+  opacity: 0.5;
+}
 
 .Outliner {
-	color: #444;
-	background-color: #fff;
-	padding: 0;
-	width: 100%;
-	height: 180px;
-	font-size: 12px;
-	cursor: default;
-	overflow: auto;
-	resize: vertical;
-	outline: none !important;
+  color: #444;
+  background-color: #fff;
+  padding: 0;
+  width: 100%;
+  height: 180px;
+  font-size: 12px;
+  cursor: default;
+  overflow: auto;
+  resize: vertical;
+  outline: none !important;
 }
 
-	.Outliner .option {
-		padding: 4px;
-		color: #666;
-		white-space: nowrap;
-	}
+.Outliner .option {
+  padding: 4px;
+  color: #666;
+  white-space: nowrap;
+}
 
-	.Outliner .option:hover {
-		background-color: rgba(0,0,0,0.02);
-	}
+.Outliner .option:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
 
-	.Outliner .option.active {
-		background-color: rgba(0,0,0,0.04);
-	}
-
+.Outliner .option.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
 
 .TabbedPanel .Tabs {
-	background-color: #ddd;
-	border-top: 1px solid #ccc;
+  background-color: #ddd;
+  border-top: 1px solid #ccc;
 }
 
-	.TabbedPanel .Tab {
-		color: #aaa;
-		border-right: 1px solid #ccc;
-	}
+.TabbedPanel .Tab {
+  color: #aaa;
+  border-right: 1px solid #ccc;
+}
 
-	.TabbedPanel .Tab.selected {
-		color: #888;
-		background-color: #eee;
-	}
+.TabbedPanel .Tab.selected {
+  color: #888;
+  background-color: #eee;
+}
 
 .Listbox {
-	color: #444;
-	background-color: #fff;
+  color: #444;
+  background-color: #fff;
 }
 
 .Panel {
-	color: #888;
+  color: #888;
 }
 
 /* */
 
-@media all and ( max-width: 600px ) {
+@media all and (max-width: 600px) {
+  #resizer {
+    display: none;
+  }
 
-	#resizer {
-		display: none;
-	}
+  #menubar .menu .options {
+    max-height: calc(100% - 80px);
+  }
 
-	#menubar .menu .options {
-		max-height: calc(100% - 80px);
-	}
+  #menubar .menu.right {
+    display: none;
+  }
 
-	#menubar .menu.right {
-		display: none;
-	}
+  #viewport {
+    left: 0;
+    right: 0;
+    top: 32px;
+    height: calc(100% - 352px);
+  }
 
-	#viewport {
-		left: 0;
-		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
-	}
+  #script {
+    left: 0;
+    right: 0;
+    top: 32px;
+    height: calc(100% - 352px);
+  }
 
-	#script {
-		left: 0;
-		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
-	}
+  #player {
+    left: 0;
+    right: 0;
+    top: 32px;
+    height: calc(100% - 352px);
+  }
 
-	#player {
-		left: 0;
-		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
-	}
-
-	#sidebar {
-		left: 0;
-		width: 100%;
-		top: calc(100% - 320px);
-		bottom: 0;
-	}
-
+  #sidebar {
+    left: 0;
+    width: 100%;
+    top: calc(100% - 320px);
+    bottom: 0;
+  }
 }
 
 /* DARK MODE */
 
-@media ( prefers-color-scheme: dark ) {
+@media (prefers-color-scheme: dark) {
+  button {
+    color: #aaa;
+    background-color: #222;
+  }
 
-	button {
-		color: #aaa;
-		background-color: #222;
-	}
+  button:hover {
+    color: #ccc;
+    background-color: #444;
+  }
 
-		button:hover {
-			color: #ccc;
-			background-color: #444;
-		}
+  button.selected {
+    color: #fff;
+    background-color: #08f;
+  }
 
-		button.selected {
-			color: #fff;
-			background-color: #08f;
-		}
+  input,
+  textarea {
+    background-color: #222;
+    border: 1px solid transparent;
+    color: #888;
+  }
 
-	input, textarea {
-		background-color: #222;
-		border: 1px solid transparent;
-		color: #888;
-	}
+  select {
+    color: #aaa;
+    background-color: #222;
+  }
 
-	select {
-		color: #aaa;
-		background-color: #222;
-	}
+  select:hover {
+    color: #ccc;
+    background-color: #444;
+  }
 
-		select:hover {
-			color: #ccc;
-			background-color: #444;
-		}
+  /* UI */
 
-	/* UI */
+  #menubar {
+    background: #111;
+  }
 
-	#menubar {
-		background: #111;
-	}
+  #menubar .menu .key {
+    color: #444;
+    border-color: #444;
+  }
 
-			#menubar .menu .key {
-				color: #444;
-				border-color: #444;
-			}
+  #menubar .menu .options {
+    background: #111;
+  }
 
-			#menubar .menu .options {
-				background: #111;
-			}
+  #menubar .menu .options hr {
+    border-color: #222;
+  }
 
-				#menubar .menu .options hr {
-					border-color: #222;
-				}
+  #menubar .menu .options .option {
+    color: #888;
+  }
 
-				#menubar .menu .options .option {
-					color: #888;
-				}
+  #menubar .menu .options .inactive {
+    color: #444;
+  }
 
-			#menubar .menu .options .inactive {
-				color: #444;
-			}
+  #sidebar {
+    background-color: #111;
+  }
 
-	#sidebar {
-		background-color: #111;
-	}
+  #sidebar .Panel {
+    border-top: 1px solid #222;
+  }
 
-		#sidebar .Panel {
-			border-top: 1px solid #222;
-		}
+  #sidebar .Panel.Material canvas {
+    border: solid 1px #5a5a5a;
+  }
 
-		#sidebar .Panel.Material canvas {
-			border: solid 1px #5A5A5A;
-		}
+  #tabs {
+    background-color: #1b1b1b;
+    border-top: 1px solid #222;
+  }
 
-	#tabs {
-		background-color: #1b1b1b;
-		border-top: 1px solid #222;
-	}
+  #tabs span {
+    color: #555;
+    border-right: 1px solid #222;
+  }
 
-		#tabs span {
-			color: #555;
-			border-right: 1px solid #222;
-		}
+  #tabs span.selected {
+    background-color: #111;
+  }
 
-		#tabs span.selected {
-			background-color: #111;
-		}
+  #toolbar {
+    background-color: #111;
+  }
 
-	#toolbar {
-		background-color: #111;
-	}
+  #toolbar img {
+    filter: invert(1);
+  }
 
-		#toolbar img {
-			filter: invert(1);
-		}
+  .Outliner {
+    background: #222;
+  }
 
-	.Outliner {
-		background: #222;
-	}
+  .Outliner .option {
+    color: #999;
+  }
 
-		.Outliner .option {
-			color: #999;
-		}
+  .Outliner .option:hover {
+    background-color: rgba(21, 60, 94, 0.5);
+  }
 
-		.Outliner .option:hover {
-			background-color: rgba(21,60,94,0.5);
-		}
+  .Outliner .option.active {
+    background-color: rgba(21, 60, 94, 1);
+  }
 
-		.Outliner .option.active {
-			background-color: rgba(21,60,94,1);
-		}
+  .TabbedPanel .Tabs {
+    background-color: #1b1b1b;
+    border-top: 1px solid #222;
+  }
 
-	.TabbedPanel .Tabs {
-		background-color: #1b1b1b;
-		border-top: 1px solid #222;
-	}
+  .TabbedPanel .Tabs::-webkit-scrollbar {
+    background: #111;
+  }
 
-		.TabbedPanel .Tabs::-webkit-scrollbar {
-			background: #111;
-		}
+  .TabbedPanel .Tab {
+    color: #555;
+    border-right: 1px solid #222;
+  }
 
-		.TabbedPanel .Tab {
-			color: #555;
-			border-right: 1px solid #222;
-		}
+  .TabbedPanel .Tab.selected {
+    color: #888;
+    background-color: #111;
+  }
 
-		.TabbedPanel .Tab.selected {
-			color: #888;
-			background-color: #111;
-		}
+  .Listbox {
+    color: #888;
+    background: #222;
+  }
 
-	.Listbox {
-		color: #888;
-		background: #222;
-	}
+  .Listbox .ListboxItem:hover {
+    background-color: rgba(21, 60, 94, 0.5);
+  }
 
-	.Listbox .ListboxItem:hover {
-		background-color: rgba(21,60,94,0.5);
-	}
-
-	.Listbox .ListboxItem.active {
-		background-color: rgba(21,60,94,1);
-	}
-
+  .Listbox .ListboxItem.active {
+    background-color: rgba(21, 60, 94, 1);
+  }
 }
 
 /* Temporary Chrome fix (#24794) */
 
 [draggable="true"] {
-	transform: translate(0, 0);
-	z-index: 0;
+  transform: translate(0, 0);
+  z-index: 0;
 }
 
 /* Agent */
 #agent {
-	position: absolute;
-	left: 50%;
-	bottom: 20px;
-	transform: translateX(-50%);
-	width: 400px;
-	box-sizing: border-box;
-	background-color: #ffffff;
-	padding: 12px;
-	border-radius: 12px;
-	color: #333333;
-	font-family: Arial, sans-serif;
-	z-index: 1000;
-	box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 320px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
 }
 
 #agent textarea {
-	width: 100%;
-	height: 50px;
-	padding: 15px;
-	padding-right: 85px;
-	background-color: #f5f5f5;
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	color: #333333;
-	resize: none;
-	font-size: 14px;
-	box-sizing: border-box;
+  width: 100%;
+  height: 50px;
+  padding: 15px;
+  padding-right: 85px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  color: #333333;
+  resize: none;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
 #agent button {
-	position: absolute;
-	right: 25px;
-	bottom: 25px;
-	background-color: #2196F3;
-	color: white;
-	padding: 8px 16px;
-	border: none;
-	border-radius: 6px;
-	cursor: pointer;
-	font-weight: bold;
-	font-size: 13px;
-	transition: background-color 0.2s, opacity 0.2s;
+  position: absolute;
+  right: 10px;
+  bottom: 12px;
+  background-color: #2196f3;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
 #agent button:hover:not(:disabled) {
-	background-color: #1976D2;
+  background-color: #1976d2;
 }
 
 #agent button:disabled {
-	opacity: 0.5;
-	cursor: default;
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Agent steps visualization */
+.agent-steps {
+  margin-top: 15px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-top: 10px;
+}
+
+.agent-step {
+  display: flex;
+  margin-bottom: 12px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.agent-step-icon {
+  flex: 0 0 24px;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+/* Thinking animation */
+.agent-step-icon:has(
+    + .agent-step-content .agent-step-title:contains("Thinking")
+  ) {
+  animation: pulse 1.5s infinite;
+}
+
+.agent-step-content {
+  flex: 1;
+}
+
+.agent-step-title {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.agent-step-params {
+  font-family: monospace;
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 4px 8px;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.agent-step-message {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-	#agent {
-		background-color: #222;
-		color: #eee;
-		box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-	}
+  #agent {
+    background-color: #222;
+    color: #eee;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
 
-	#agent textarea {
-		background-color: #333;
-		border-color: #444;
-		color: #eee;
-	}
+  #agent textarea {
+    background-color: #333;
+    border-color: #444;
+    color: #eee;
+  }
+
+  .agent-steps {
+    border-color: #444;
+  }
+
+  .agent-step-params {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+  }
 }

@@ -128,5 +128,8 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "dependencies": {
+    "@google/genai": "^0.4.0"
   }
 }
