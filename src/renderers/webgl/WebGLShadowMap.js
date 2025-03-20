@@ -310,7 +310,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			// Check if the original material uses alphaToCoverage
 			if ( material.alphaToCoverage ) {
 
-				result.alphaTest = 0.1;
+				result.alphaTest = 0.5;
 
 			} else {
 
