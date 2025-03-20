@@ -674,9 +674,21 @@ class Node extends EventDispatcher {
 
 				if ( result === undefined ) {
 
-					result = this.generate( builder ) || '';
+					if ( nodeData.generated === undefined ) {
 
-					nodeData.snippet = result;
+						nodeData.generated = true;
+
+						result = this.generate( builder ) || '';
+
+						nodeData.snippet = result;
+
+					} else {
+
+						console.warn( 'THREE.Node: Recursion detected.', this );
+
+						result = '';
+
+					}
 
 				} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
 
