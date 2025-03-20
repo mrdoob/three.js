@@ -32,7 +32,7 @@ class ShadowMaskModel extends LightingModel {
 	 */
 	direct( { lightNode } ) {
 
-		this.shadowNode.assign( lightNode.shadowNode );
+		this.shadowNode.mulAssign( lightNode.shadowNode );
 
 	}
 
