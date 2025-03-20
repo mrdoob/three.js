@@ -911,8 +911,6 @@ Current scene objects: ${currentSceneInfo.objectNames.join(", ")}
               console.log("AGENT: All retries failed, using fallback approach");
 
               // Determine possible next steps based on scene state
-              let fallbackResponse =
-                "I'm having trouble determining the next step. ";
 
               // Check what we have so far to suggest logical next actions
               const existingParts = currentSceneInfo.objectNames;
