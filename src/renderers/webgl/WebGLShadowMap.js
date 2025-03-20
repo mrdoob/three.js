@@ -302,17 +302,31 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		}
 
-		result.alphaMap = material.alphaMap;
-		result.alphaTest = material.alphaTest;
-		result.map = material.map;
+		if ( customMaterial === undefined ) {
 
-		result.clipShadows = material.clipShadows;
-		result.clippingPlanes = material.clippingPlanes;
-		result.clipIntersection = material.clipIntersection;
+			result.alphaMap = material.alphaMap;
+			result.map = material.map;
 
-		result.displacementMap = material.displacementMap;
-		result.displacementScale = material.displacementScale;
-		result.displacementBias = material.displacementBias;
+			// Check if the original material uses alphaToCoverage
+			if ( material.alphaToCoverage ) {
+
+				result.alphaTest = 0.1;
+
+			} else {
+
+				result.alphaTest = material.alphaTest;
+
+			}
+
+			result.clipShadows = material.clipShadows;
+			result.clippingPlanes = material.clippingPlanes;
+			result.clipIntersection = material.clipIntersection;
+
+			result.displacementMap = material.displacementMap;
+			result.displacementScale = material.displacementScale;
+			result.displacementBias = material.displacementBias;
+
+		}
 
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
