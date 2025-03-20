@@ -45,6 +45,15 @@ class ShadowNodeMaterial extends NodeMaterial {
 		 */
 		this.lights = true;
 
+		/**
+		 * Overwritten since shadow materials are transparent
+		 * by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.transparent = true;
+
 		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
