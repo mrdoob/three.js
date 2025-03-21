@@ -258,7 +258,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 
 	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
-	If( all( axis.equals( vec3( 0.0 ) ) ), () => {
+	If( axis.equal( vec3( 0.0 ) ), () => {
 
 		axis.assign( vec3( outputDirection.z, 0.0, outputDirection.x.negate() ) );
 

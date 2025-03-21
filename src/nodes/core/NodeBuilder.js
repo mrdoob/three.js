@@ -412,14 +412,6 @@ class NodeBuilder {
 		 */
 		this.buildStage = null;
 
-		/**
-		 * Whether comparison in shader code are generated with methods or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.useComparisonMethod = false;
-
 	}
 
 	/**

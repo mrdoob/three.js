@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { sub, mul, div } from './OperatorNode.js';
+import { sub, mul, div, equal } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
@@ -126,7 +126,7 @@ class MathNode extends TempNode {
 
 			return 'vec3';
 
-		} else if ( method === MathNode.ALL ) {
+		} else if ( method === MathNode.ALL || method === MathNode.ANY ) {
 
 			return 'bool';
 
@@ -714,9 +714,15 @@ export const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST );
  * @function
  * @param {Node | number} x - The first parameter.
  * @param {Node | number} y - The second parameter.
+ * @deprecated since r175. Use {@link equal} instead.
  * @returns {Node<bool>}
  */
-export const equals = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EQUALS );
+export const equals = ( x, y ) => { // @deprecated, r172
+
+	console.warn( 'THREE.TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
+	return equal( x, y );
+
+};
 
 /**
  * Returns the lesser of two values.
