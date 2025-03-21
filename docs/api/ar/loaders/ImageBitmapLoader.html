@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			محمل لتحميل صورة [page:Image] كـ
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]. يوفر ImageBitmap مسارًا غير متزامن وفعال من حيث الموارد
+			لإعداد القوام للتقديم في WebGL.<br />
+			على عكس [page:FileLoader]، [name] لا يتجنب الطلبات المتعددة المتزامنة
+			إلى نفس عنوان URL.
+		</p>
+		 
+		<p>
+		لاحظ أن [page:Texture.flipY] و [page:Texture.premultiplyAlpha] مع
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] يتم تجاهلهم.
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]
+		يحتاج هذه التكوينات على إنشاء الخريطة البيانية على عكس الصور العادية التي تحتاجها عند تحميلها على وحدة معالجة الرسومات. تحتاج إلى تعيين الخيارات المكافئة عبر [page:ImageBitmapLoader.setOptions] بدلاً من ذلك. راجع
+		[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] للحصول على التفاصيل.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		const loader = new THREE.FileLoader();
+	
+		//load a text file and output the result to the console
+		loader.load(
+			// resource URL
+			'example.txt',
+	
+			// onLoad callback
+			function ( data ) {
+				// output the text to the console
+				console.log( data )
+			},
+	
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+	
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]</p>
+	 
+		<h2>المنشئ (Constructor)</h2>
+	 
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] - [page:LoadingManager loadingManager]
+		للمحمل الذي سيستخدمه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+	 
+		ينشئ جديد [name].
+		</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الصفحة الأساسية [page:Loader] للخصائص المشتركة.</p>
+	 
+		<h3>[property:Boolean isImageBitmapLoader]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى هو من نوع [name].</p>
+	 
+		<h3>[property:String options]</h3>
+		<p>
+		كائن اختياري يضع خيارات لـ
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]
+		طريقة المصنع المستخدمة داخليًا. الافتراضي هو `undefined`.
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الصفحة الأساسية [page:Loader] للطرق المشتركة.</p>
+	 
+		<h3>
+		[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] - المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] - سيتم استدعاؤه عند اكتمال التحميل. الوسيطة
+		ستكون الصورة المحملة [page:Image image].<br />
+		[page:Function onProgress] (اختياري) - هذه وظيفة رد الاتصال
+		غير مدعوم حاليًا.<br />
+		[page:Function onError] (اختياري) - سيتم استدعاؤه عند حدوث خطأ في التحميل.<br />
+		</p>
+		<p>
+		قم ببدء التحميل من عنوان URL وإرجاع كائن الصورة [page:ImageBitmap image]
+		الذي سيحتوي على البيانات.
+		</p>
+	 
+		<h3>[method:this setOptions]( [param:Object options] )</h3>
+		<p>
+		يضع كائن الخيارات لـ
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap].
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

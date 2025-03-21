@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Classe che rappresenta un [link:https://en.wikipedia.org/wiki/Vector_space vettore] 2D.
+
+			Un vettore 2D è una coppia ordinata di numeri (etichettati con x e y), che può essere
+			utilizzata per rappresentare una serie di cose, come:
+		</p>
+
+		<ul>
+			<li>
+				Un punto nello spazio 2D (cioè una posizione su un piano).
+			</li>
+			<li>
+				Una direzione e lunghezza su un piano. In three.js la lunghezza sarà sempre la 
+				[link:https://en.wikipedia.org/wiki/Euclidean_distance distanza Euclidea]
+				(distanza in liena retta) da `(0, 0)` a `(x, y)` e anche la direzione viene misurata da
+				 `(0, 0)` verso `(x, y)`.
+			</li>
+			<li>
+				Qualsiasi coppia di numeri ordinata arbitrariamente.
+			</li>
+		</ul>
+
+		<p>
+			Ci sono altre cose che possono essere rappresentate da un vettore 2D, come i vettori 
+			di quantità di moto, numeri complessi e così via, tuttavia questi sono gli usi comuni in three.js.
+		</p>
+
+		<p>
+			L'iterazione di un'istanza [name] produrrà i suoi componenti `(x, y)` nell'ordine corrispondente.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const a = new THREE.Vector2( 0, 1 );
+
+		// nessun argomento; sarà inizializzato a (0, 0)
+		const b = new THREE.Vector2( );
+
+		const d = a.distanceTo( b );
+		</code>
+
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - il valore x di questo vettore. Il valore predefinito è `0`.<br />
+		[page:Float y] -  il valore y di questo vettore. Il valore predefinito è `0`.<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Float height]</h3>
+		<p>Alternativa per [page:.y y].</p>
+
+		<h3>[property:Boolean isVector2]</h3>
+		<p>
+			Flag di sola lettura per verificare che l'oggetto dato sia di tipo [name].
+		</p>
+
+		<h3>[property:Float width]</h3>
+		<p>lternativa per [page:.x x].</p>
+
+		<h3>[property:Float x]</h3>
+
+		<h3>[property:Float y]</h3>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this add]( [param:Vector2 v] )</h3>
+		<p>Aggiunge [page:Vector2 v] a questo vettore.</p>
+
+		<h3>[method:this addScalar]( [param:Float s] )</h3>
+		<p>Aggiunge il valore scalare [page:Float s] ai valori [page:.x x] e [page:.y y] di questo vettore.</p>
+
+		<h3>[method:this addScaledVector]( [param:Vector2 v], [param:Float s] )</h3>
+		<p>Aggiunge il multiplo di [page:Vector2 v] e [page:Float s] a questo vettore.</p>
+
+		<h3>[method:this addVectors]( [param:Vector2 a], [param:Vector2 b] )</h3>
+		<p>Imposta questo vettore a [page:Vector2 a] + [page:Vector2 b].</p>
+
+		<h3>[method:Float angle]()</h3>
+		<p>
+			Calcola l'angolo in radianti di questo vettore rispetto all'asse x positivo. 
+		</p>
+
+		<h3>[method:Float angleTo]( [param:Vector2 v] )</h3>
+		<p>
+			Restituisce l'angolo tra questo vettore e il vettore [page:Vector2 v] in radianti.
+		</p>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>
+			Moltiplica questo vettore (con un 1 implicito come terza componente) per m.
+		</p>
+
+		<h3>[method:this ceil]()</h3>
+		<p>
+			I componenti [page:.x x] e [page:.y y] di questo vettore vengono arrotondati per eccesso al valore intero più vicino. 
+		</p>
+
+		<h3>[method:this clamp]( [param:Vector2 min], [param:Vector2 max] )</h3>
+		<p>
+		[page:Vector2 min] - i valori minimi x e y.<br />
+		[page:Vector2 max] - i valori massimi x e y nell'intervallo desiderato.<br /><br />
+
+		Se il valore x o y di questo vettore è maggiore del valore x o y del vettore massimo, verrà sostituito dal valore corrispondente.<br /><br />
+		Se il valore x o y di questo vettore è minore del valore x o y del vettore minimo, verrà sostituito dal valore corrispondente.<br /><br />
+		</p>
+
+		<h3>[method:this clampLength]( [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float min] - il valore minimo a cui verrà fissata la lunghezza. <br />
+		[page:Float max] - il valore massimo a cui verrà fissata la lunghezza.<br /><br />
+
+		Se la lunghezza di questo vettore è maggiore del valore massimo, verrà sostituita dal valore massimo.<br /><br />
+		Se la lunghezza di questo vettore è minore del valore minimo, verrà sostituita dal valore minimo.
+		</p>
+
+		<h3>[method:this clampScalar]( [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float min] - il valore minimo a cui verranno fissati i componenti.<br />
+		[page:Float max] - il valore massimo a cui verranno fissati i componenti.<br /><br />
+
+		Se i valori di x o y di questo vettore sono maggiori del valore massimo, verranno sostuiti dal valore massimo.<br /><br />
+		Se i valori di x o y di questo vettore sono minori del valore minimo, verranno sostuiti dal valore minimo.
+		</p>
+
+		<h3>[method:Vector2 clone]()</h3>
+		<p>
+			Restituisce un nuovo Vector2 con gli stessi valori [page:.x x] e [page:.y y] di questo.
+		</p>
+
+		<h3>[method:this copy]( [param:Vector2 v] )</h3>
+		<p>
+			Copia i valori delle proprietà [page:.x x] e [page:.y y] del vettore passate di questo Vector2.
+		</p>
+
+		<h3>[method:Float distanceTo]( [param:Vector2 v] )</h3>
+		<p>Calcola la distanza da questo vettore a [page:Vector2 v].</p>
+
+		<h3>[method:Float manhattanDistanceTo]( [param:Vector2 v] )</h3>
+		<p>
+			Calcola la [link:https://en.wikipedia.org/wiki/Taxicab_geometry distanza Manhattan] da questo vettore a [page:Vector2 v].
+		</p>
+
+		<h3>[method:Float distanceToSquared]( [param:Vector2 v] )</h3>
+		<p>
+			Calcola la distanza al quadrato da questo vettore a [page:Vector2 v]. Se stai semplicemente
+			confrontando la distanza con un'altra distanza, dovresti invece confrontare la distanza al quadrato
+			poiché è leggermente più efficiente da calcolare.
+		</p>
+
+		<h3>[method:this divide]( [param:Vector2 v] )</h3>
+		<p>Divide questo vettore per [page:Vector2 v].</p>
+
+		<h3>[method:this divideScalar]( [param:Float s] )</h3>
+		<p>
+			Divide questo vettore per lo scalare [page:Float s].
+		</p>
+
+		<h3>[method:Float dot]( [param:Vector2 v] )</h3>
+		<p>
+			Calcola il [link:https://en.wikipedia.org/wiki/Dot_product prodotto scalare] di questo vettore e
+	  	[page:Vector2 v].
+		</p>
+
+		<h3>[method:Float cross]( [param:Vector2 v] )</h3>
+		<p>
+			Calcola il [link:https://en.wikipedia.org/wiki/Cross_product prodotto vettoriale] di questo vettore e
+	  	[page:Vector2 v]. Si noti che un 'prodotto vettoriale' in 2D non è ben definito. 
+			Questa funzione calcola un prodotto vettoriale geometrico spesso utilizzato nella grafica 2D.
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Vector2 v] )</h3>
+		<p>Restituisce `true` se il componente di questo vettore e [page:Vector2 v] sono strettamente uguali; `false` altrimenti.</p>
+
+		<h3>[method:this floor]()</h3>
+		<p>I componenti di questo vettore vengono arrotondati per difetto al valore intero più vicino.</p>
+
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - l'array sorgente.<br />
+		[page:Integer offset] - (opzionale) l'offset nell'array. Il valore predefinito è 0.<br /><br />
+
+		Imposta il valore [page:.x x] di questo vettore su `array[ offset ]` e il valore [page:.y y] su `array[ offset + 1 ]`.
+		</p>
+
+		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - l'array sorgente.<br />
+		[page:Integer index] - indice nell'attributo.<br /><br />
+
+		Imposta i valori [page:.x x] e [page:.y y] di questo vettore nell'[page:BufferAttribute attributo].
+		</p>
+
+		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
+		<p>
+		[page:Integer index] - 0 o 1.<br /><br />
+
+		Se l'indice è uguale 0 restituisce il valore [page:.x x]. <br />
+		Se l'indice è uguale 1 restituisce il valore [page:.y y].
+		</p>
+
+		<h3>[method:Float length]()</h3>
+		<p>
+			Calcola la [link:https://en.wikipedia.org/wiki/Euclidean_distance lunghezza Euclidea]
+			(lunghezza in linea retta) da (0, 0) a (x, y).</p>
+
+		<h3>[method:Float manhattanLength]()</h3>
+		<p>
+			Calcola la [link:http://en.wikipedia.org/wiki/Taxicab_geometry lunghezza Manhattan] di questo vettore.
+		</p>
+
+		<h3>[method:Float lengthSq]()</h3>
+		<p>
+			Calcola il quadrato della [link:https://en.wikipedia.org/wiki/Euclidean_distance lunghezza Euclidea]
+			(lunghezza in linea retta) da (0, 0) a (x, y). Se stai comparando le lunghezze dei vettori, dovresti invece
+			confrontare la lunghezza quadrata poiché è leggermente più efficiente da calcolare.
+		</p>
+
+		<h3>[method:this lerp]( [param:Vector2 v], [param:Float alpha] )</h3>
+		<p>
+		[page:Vector2 v] - [page:Vector2] verso cui interpolare.<br />
+		[page:Float alpha] - fattore interpolazione, tipicamente nell'intervallo chiuso `[0, 1]`.<br /><br />
+
+		Interpola linearmente tra questo vettore e [page:Vector2 v], dove alfa è la distanza percentuale
+		lungo la linea - alfa = 0 sarà questo vettore e alfa = 1 sarà [page:Vector2 v].
+		</p>
+
+		<h3>[method:this lerpVectors]( [param:Vector2 v1], [param:Vector2 v2], [param:Float alpha] )</h3>
+		<p>
+		[page:Vector2 v1] - il [page:Vector2] iniziale.<br />
+		[page:Vector2 v2] - [page:Vector2] verso cui interpolare.<br />
+		[page:Float alpha] - fattore interpolazione, tipicamente nell'intervallo chiuso `[0, 1]`.<br /><br />
+
+		Imposta questo vettore per essere il vettore lineare interpolato tra [page:Vector2 v1] e
+		[page:Vector2 v2] dove alfa è la distanza percentuale lungo la linea che collega i due vettori
+		- alfa = 0 sarà [page:Vector2 v1] e alfa = 1 sarà [page:Vector2 v].
+		</p>
+
+		<h3>[method:this negate]()</h3>
+		<p>Inverte questo vettore - cioè imposta x = -x e y = -y.</p>
+
+		<h3>[method:this normalize]()</h3>
+		<p>
+			Converte questo vettore ad un [link:https://en.wikipedia.org/wiki/Unit_vector vettore unitario] - cioè, lo imposta uguale 
+			ad un vettore con la stessa direzione di questo, ma con [page:.length lunghezza] 1.
+		</p>
+
+		<h3>[method:this max]( [param:Vector2 v] )</h3>
+		<p>
+			Se il valore x o y di questo vettore è minore del valore x o y di [page:Vector2 v], sostituisce
+			questo valore con il valore massimo corrispondente.
+		</p>
+
+		<h3>[method:this min]( [param:Vector2 v] )</h3>
+		<p>
+			Se il valore x o y di questo vettore è maggiore del valore x o y di [page:Vector2 v], sostituisce
+			questo valore con il valore minimo corrispondente.
+		</p>
+
+		<h3>[method:this multiply]( [param:Vector2 v] )</h3>
+		<p>Moltiplica questo vettore per [page:Vector2 v].</p>
+
+
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
+		<p>Moltiplica questo vettore per lo scalare [page:Float s].</p>
+
+		<h3>[method:this rotateAround]( [param:Vector2 center], [param:Float angle] )</h3>
+		<p>
+			[page:Vector2 center] - il punto attorno al quale ruotare.<br />
+			[page:Float angle] - l'angolo di rotazione, in radianti.<br /><br />
+
+			Ruota questo vettore attorno al [page:Vector2 centro] di un [page:Float angolo] in radianti.
+		</p>
+
+		<h3>[method:this round]()</h3>
+		<p>I componenti di questo vettore vengono arrotondati al valore intero più vicino.</p>
+
+		<h3>[method:this roundToZero]()</h3>
+		<p>
+			I componenti di questo vettore vengono arrotondati per difetto (per eccesso se negativo, per difetto se positivo) a un valore intero.
+		</p>
+
+		<h3>[method:this set]( [param:Float x], [param:Float y] )</h3>
+		<p>Imposta i componenti [page:.x x] e [page:.y y] di questo.</p>
+
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<p>
+		[page:Integer index] - 0 o 1.<br />
+		[page:Float value] - [page:Float]<br /><br />
+
+		Se l'indice è uguale a 0 imposta [page:.x x] a [page:Float value]. <br />
+		Se l'indice è uguale a 1 imposta [page:.y y] a [page:Float value]. <br />
+		</p>
+
+		<h3>[method:this setLength]( [param:Float l] )</h3>
+		<p>
+			Imposta questo vettore ad un vettore con la stessa direzione di questo, ma con [page:.length lunghezza]
+			[page:Float l].
+		</p>
+
+		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
+		<p>
+			Imposta i valori [page:.x x] e [page:.y y] di questo vettore entrambi uguali allo [page:Float scalare].
+		</p>
+
+		<h3>[method:this setX]( [param:Float x] )</h3>
+		<p>Sostuisce il valore di [page:.x x] di questo vettore con [page:Float x].</p>
+
+		<h3>[method:this setY]( [param:Float y] )</h3>
+		<p>Sostuisce il valore di [page:.y y] di questo vettore con [page:Float y].</p>
+
+		<h3>[method:this sub]( [param:Vector2 v] )</h3>
+		<p>Sottrae [page:Vector2 v] da questo vettore.</p>
+
+		<h3>[method:this subScalar]( [param:Float s] )</h3>
+		<p>Sottrae [page:Float s] dai componenti [page:.x x] e [page:.y y] di questo vettore.</p>
+
+		<h3>[method:this subVectors]( [param:Vector2 a], [param:Vector2 b] )</h3>
+		<p>Imposta questo vettore a [page:Vector2 a] - [page:Vector2 b].</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - (opzionale) array in cui memorizzare questo vettore. Se non viene fornito, verrà creato un nuovo array.<br />
+		[page:Integer offset] - (opzionale) offset opzionale nell'array.<br /><br />
+
+		Restituisce un array [x, y], o copia x e y nell'[page:Array array] fornito.
+		</p>
+
+		<h3>[method:this random]()</h3>
+		<p>
+			Imposta ogni componente di questo vettore ad un valore pseudo-random tra 0 e 1, escludendo 1.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

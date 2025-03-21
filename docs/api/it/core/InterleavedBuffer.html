@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			"Interleaved" significa che più attributi, possibilmente di tipo differente, (ad esempio, posizione, normale, uv, colore) 
+      sono impacchettati in un unico array buffer.
+			<br/><br/>
+      Qui trovi un'introduzione agli array interleaved: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>[example:webgl_buffergeometry_points_interleaved webgl / buffergeometry / points / interleaved]</p>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:TypedArray array], [param:Integer stride] )</h3>
+		<p>
+			[page:TypedArray array] -- Un array tipizzato con un buffer condiviso. Memorizza i dati della geometria.<br/>
+			[page:Integer stride] -- Il numero di elementi typed-array per vertice.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Array array]</h3>
+		<p>
+      Un array tipizzato con un buffer condiviso. Memorizza i dati della geometria.
+		</p>
+
+		<h3>[property:Integer stride]</h3>
+		<p>
+      Il numero di elementi typed-array per vertice.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+      Fornisce il numero totale di elementi in un array.
+		</p>
+
+		<h3>[property:Object updateRange]</h3>
+		<p>
+      Oggetto contente offset e count.<br />
+		  - [page:Number offset]: Il valore predefinito è `0`.<br />
+		  - [page:Number count]: Il valore predefinito è `-1`.<br />
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questa istanza. Viene automaticamente assegnato, non deve essere modificato.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+      Un numero di versione, incrementato ogni volta che la proprietà needsUpdate è impostata a true.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+      Il valore predefinito è `false`.Impostando questo valore a true incrementa la [page:InterleavedBuffer.version versione].
+		</p>
+
+		<h3>[property:Usage usage]</h3>
+		<p>
+      Definisce il modello di utilizzo previsto dell'archivio dati a fini di ottimizzazione. Corrisponde al parametro di utilizzo di
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this copy]( [param:InterleavedBuffer source] ) </h3>
+		<p>
+      Copia un altro [name] in questo [name].
+		</p>
+
+		<h3>[method:this copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
+		<p> Copia i dati da `attribute[index2]` a [page:InterleavedBuffer.array array][index1].</p>
+
+		<h3>[method:this set]( [param:TypedArray value], [param:Integer offset] ) </h3>
+		<p>
+			value - L'array (tipizzato) di origine.<br/>
+			offset - L'offset nell'array di destinazione in corrrispondenza del quale iniziare a scrivere i valori dall'array di origine. L'impostazione predefinita è `0`.<br/><br />
+
+      Memorizza più valori nel buffer, leggendo valori di input dall'array specificato.
+		</p>
+
+		<h3>[method:InterleavedBuffer clone]( [param:Object data] ) </h3>
+		<p>
+			data - Questo oggetto contiene buffer di array condivisi necessari per clonare correttamente le geometrie con attributi interleaved.<br/><br />
+
+      Crea un clone di questo [name].
+		</p>
+
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
+		<p>Imposta [page:InterleavedBuffer.usage usage] a value.</p>
+
+		<h3>[method:Object toJSON]( [param:Object data] ) </h3>
+		<p>
+			data - Questo oggetto contiene buffer di array condivisi necessari per serializzare correttamente le geometrie con attributi interleaved.<br/><br />
+
+      Serializza questo [name].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

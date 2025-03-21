@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			مسابير الضوء هي طريقة بديلة لإضافة الضوء إلى مشهد ثلاثي الأبعاد. على عكس
+			مصادر الضوء الكلاسيكية (على سبيل المثال الاتجاهية ، النقطية أو الأضواء الموجهة) ، الضوء
+			لا تنبعث المسابير. بدلاً من ذلك ، يخزنون معلومات حول الضوء
+			يمر عبر المساحة ثلاثية الأبعاد. أثناء التقديم ، يتم تقريب الضوء الذي يضرب 3D
+			الكائن باستخدام بيانات من مسبار الضوء.
+		</p>
+			
+		<p class="desc">
+			عادةً ما يتم إنشاء مسابير الضوء من خرائط البيئة (الإشعاع). جناح
+			[page:LightProbeGenerator] يمكن استخدامه لإنشاء مسابير ضوء من
+			مثيلات [page:CubeTexture] أو [page:WebGLCubeRenderTarget]. ومع ذلك،
+			يمكن توفير بيانات تقدير الضوء أيضًا في أشكال أخرى على سبيل المثال من قبل WebXR.
+			هذا يتيح تقديم محتوى الواقع المعزز الذي يتفاعل مع
+			إضاءة العالم الحقيقي.
+		</p>
+			
+		<p class="desc">
+			تدعم تطبيق المسبار الحالي في three.js ما يسمى بـ
+			مسابير ضوء ناعمة. هذا النوع من مسبار الضوء هو وظيفيًا مكافئ لـ
+			خريطة بيئة إشعاعية.
+		</p>
+			
+		<h2>أمثلة (Examples)</h2>
+		<p>
+			[example:webgl_lightprobe WebGL / light probe ]<br />
+			[example:webgl_lightprobe_cubecamera WebGL / light probe / cube camera ]
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:SphericalHarmonics3 sh], [param:Float intensity] )</h3>
+		<p>
+			[page:SphericalHarmonics3 sh] - (اختياري) مثيل من
+			[page:SphericalHarmonics3].<br />
+			[page:Float intensity] - (اختياري) قيمة رقمية لـ
+			شدة مسبار الضوء. الافتراضي هو 1.<br /><br />
+			
+			يخلق جديد [name].
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+		<p>
+			انظر قائمة [page:Light Light] الأساسية للخصائص المشتركة. جناح
+			خاصية [page:Light.color color] لا يتم تقديرها حاليًا وبالتالي لديها
+			لا تأثير.
+		</p>
+			
+		<h3>[property:Boolean isLightProbe]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+			
+		<h3>[property:SphericalHarmonics3 sh]</h3>
+		<p>
+			يستخدم مسبار الضوء التجانسات المجالية لتشفير معلومات التحديد.
+		</p>
+			
+		<h2>الطرق (Methods)</h2>
+		<p>انظر قائمة [page:Light Light] الأساسية للطرق المشتركة.</p>
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Un gruppo di oggetti che riceve uno stato di animazione condiviso.<br /><br />
+
+			Per una paronamica dei diversi elementi del sistema di animazione di three.js consultare l'articolo 
+      "Sistema di animazione" nella sezione "Prossimi Passi" del manuale.
+		</p>
+
+		<h2>Utilizzo:</h2>
+
+		<p class="desc">
+      Aggiungi gli oggetti che altrimenti passeresti come root al costruttore o come parametro al metodo
+      [page:AnimationMixer.clipAction clipAction] della classe [page:AnimationMixer AnimationMixer]
+      e passa invece questo oggetto come 'root' della classe [page:AnimationMixer AnimationMixer].<br /><br />
+
+      Si noti che gli oggetti di questa classe appaiono al mixer come unico oggetto,
+      quindi il controllo della cache dei singoli oggetti deve essere effettuato sul gruppo.
+		</p>
+
+
+		<h2>Limitazioni</h2>
+		<p class="desc">
+      Le proprietà di animazione devono essere compatibili tra tutti gli oggetti del gruppo.<br /><br />
+
+      Una singola proprietà può essere controllata tramite un groppo target o direttamente, ma non entrambi.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			[page:Object obj] - un numero arbitrario di mesh che condividono lo stesso stato di animazione.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isAnimationObjectGroup]</h3>
+		<p>
+      Flag di sola lettura per controllare se un determinato oggetto è di tipo [name].
+		</p>
+
+
+		<h3>[property:Object stats]</h3>
+		<p>
+      Un oggetto che contiene alcune informazioni di questo `AnimationObjectGroup` (numero totale, 
+      numero in uso, numero di binding per oggetto)
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			L'[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questo
+			`AnimationObjectGroup`. Viene automaticamente assegnato e non deve essere modificato.
+		</p>
+
+
+		<h2>Metodi</h2>
+
+
+		<h3>[method:undefined add]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+      Agginge un numero arbitrario di oggetti a questo `AnimationObjectGroup`.
+		</p>
+
+		<h3>[method:undefined remove]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+      Rimuove un numero arbitrario di oggetti da questo `AnimationObjectGroup`.
+		</p>
+
+		<h3>[method:undefined uncache]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+      Dealloca tutte le risorse di memoria per gli oggetti passati come parametri di questo `AnimationObjectGroup`.
+		</p>
+
+
+		<h2>Source</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		سطح ثنائي الأبعاد يمتد إلى ما لا نهاية في الفضاء ثلاثي الأبعاد ، ممثلًا
+		في [link:http://mathworld.wolfram.com/HessianNormalForm.html Hessian normal form] 
+		بواسطة متجه طبيعي ذو طول وحدة وثابت.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<p>
+		[page:Vector3 normal] - (اختياري) وحدة طول[page:Vector3] تحدد
+		الطبيعي للطائرة. الافتراضي هو `(1، 0، 0)`. <br />
+		[page:Float constant] - (اختياري) المسافة الموقعة من المنشأ إلى
+		الطائرة. الافتراضي هو `0`.
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Boolean isPlane]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+		 
+		<h3>[property:Vector3 normal]</h3>
+		 
+		<h3>[property:Float constant]</h3>
+		 
+		<h2>الطرق (Methods)</h2>
+		 
+		<h3>
+		[method:this applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )
+		</h3>
+		<p>
+		[page:Matrix4 matrix] - الـ[Page:Matrix4] للتطبيق. <br />
+		[page:Matrix3 optionalNormalMatrix] - (اختياري) محسوب مسبقًا عادي
+		[Page:Matrix3] من Matrix4 قيد التطبيق. <br /><br />
+		 
+		تطبيق Matrix4 على الطائرة. يجب أن تكون المصفوفة تحولًا متجانسًا ومتجانسًا.
+		<br />
+		إذا كنت تزود بـ[page:Matrix3 optionalNormalMatrix] ، فيمكن إنشاؤه
+		هكذا:
+		<code>
+		const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		</code>
+		</p>
+
+		<h3>[method:Plane clone]()</h3>
+		<p>
+		يعيد طائرة جديدة بنفس [page:.normal normal] و
+		[page:.constant constant] كهذا.
+		</p>
+	 
+		<h3>[method:Vector3 coplanarPoint]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3. <br /><br />
+	 
+		يعيد[page:Vector3] متعامدًا على الطائرة ، عن طريق حساب
+		إسقاط المتجه الطبيعي في المنشأ على الطائرة.
+		</p>
+	 
+		<h3>[method:this copy]( [param:Plane plane] )</h3>
+		<p>
+		ينسخ قيم خصائص [page:.normal normal] و[page:.constant constant]
+		للطائرة الممر إلى هذه الطائرة.
+		</p>
+	 
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		يعود بالمسافة الموقعة من[page:Vector3 point] إلى الطائرة.
+		</p>
+	 
+		<h3>[method:Float distanceToSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		يعود بالمسافة الموقعة من[page:Sphere sphere] إلى الطائرة.
+		</p>
+	 
+		<h3>[method:Boolean equals]( [param:Plane plane] )</h3>
+		<p>
+		يتحقق لمعرفة ما إذا كانت طائرتان متساويتين (خصائصهما [page:.normal normal] و
+		[page:.constant constant] تتطابق).
+		</p>
+
+		<h3>
+		[method:Vector3 intersectLine]( [param:Line3 line], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Line3 line] - الـ[page:Line3] للتحقق من التقاطع. <br />
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3. <br /><br />
+		 
+		يعيد نقطة التقاطع للخط الممر والطائرة. يعود
+		فارغ إذا لم يتقاطع الخط. يعود نقطة البداية للخط إذا كان
+		الخط متعامد مع الطائرة.
+		</p>
+		 
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - الـ[page:Box3] للتحقق من التقاطع. <br /><br />
+		 
+		يحدد ما إذا كانت هذه الطائرة تتقاطع مع[page:Box3 box].
+		</p>
+		 
+		<h3>[method:Boolean intersectsLine]( [param:Line3 line] )</h3>
+		<p>
+		[page:Line3 line] - الـ[page:Line3] للتحقق من التقاطع. <br /><br />
+		 
+		يختبر ما إذا كان قطع الخط يتقاطع مع (يمر عبر) الطائرة.
+		</p>
+		 
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - الـ[page:Sphere] للتحقق من التقاطع. <br /><br />
+		 
+		يحدد ما إذا كانت هذه الطائرة تتقاطع مع[page:Sphere sphere].
+		</p>
+		 
+		<h3>[method:this negate]()</h3>
+		<p>ينفي كلاً من المتجه الطبيعي والثابت.</p>
+		 
+		<h3>[method:this normalize]()</h3>
+		<p>
+		يسوي المتجه[page:.normal normal] ، ويضبط
+		قيمة[page:.constant constant] بشكل ملائم.
+		</p>
+		 
+		<h3>
+		[method:Vector3 projectPoint]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - الـ[page:Vector3] للإسقاط على الطائرة. <br />
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3. <br /><br />
+		 
+		يسقط نقطة[page:Vector3 point] على الطائرة.
+		</p>
+
+		<h3>[method:this set]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<p>
+		[page:Vector3 normal] - وحدة طول [page:Vector3] تحدد الطبيعي
+		من الطائرة. <br />
+		[page:Float constant] - المسافة الموقعة من المنشأ إلى الطائرة. <br /><br />
+	 
+		يضع خصائص [page:.normal normal] و[page:.constant constant]
+		لهذه الطائرة عن طريق نسخ القيم من الطبيعي المعطى.
+		</p>
+	 
+		<h3>
+		[method:this setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )
+		</h3>
+		<p>
+		[page:Float x] - قيمة x للمتجه الطبيعي ذو الطول الوحدة. <br />
+		[page:Float y] - قيمة y للمتجه الطبيعي ذو الطول الوحدة. <br />
+		[page:Float z] - قيمة z للمتجه الطبيعي ذو الطول الوحدة. <br />
+		[page:Float w] - قيمة خاصية [page:.constant constant]
+		للطائرة. <br /><br />
+	 
+		قم بتعيين المكونات الفردية التي تحدد الطائرة.
+		</p>
+	 
+		<h3>
+		[method:this setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )
+		</h3>
+		<p>
+		[page:Vector3 a] - أول نقطة على الطائرة. <br />
+		[page:Vector3 b] - نقطة ثانية على الطائرة. <br />
+		[page:Vector3 c] - نقطة ثالثة على الطائرة. <br /><br />
+	 
+		يحدد الطائرة بناءً على 3 نقاط مقدمة. يفترض أن تكون ترتيب التغليف
+		عكس عقارب الساعة ، وتحدد اتجاه
+		[page:.normal normal].
+		</p>
+	 
+		<h3>
+		[method:this setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] )
+		</h3>
+		<p>
+		[page:Vector3 normal] - وحدة طول[page:Vector3] تحدد الطبيعي
+		من الطائرة. <br />
+		[page:Vector3 point] -[page:Vector3]<br /><br />
+	 
+		يضع خصائص الطائرة كما هو محدد بـ[page:Vector3 normal] و
+		نقطة متعامدية عشوائية[page:Vector3 point].
+		</p>
+	 
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
+		<p>
+		[page:Vector3 offset] - المسافة التي يجب تحريك الطائرة بها. <br /><br />
+	 
+		يترجم الطائرة بالمسافة التي يحددها متجه[page:Vector3 offset]
+		. لاحظ أن هذا يؤثر فقط على ثابت الطائرة ولن يؤثر
+		المتجه الطبيعي.
+		</p>
+	 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

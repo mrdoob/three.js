@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A material for drawing geometry by depth. Depth is based off of the camera
+			near and far plane. White is nearest, black is farthest.
+		</p>
+
+		<iframe
+			id="scene"
+			src="scenes/material-browser.html#MeshDepthMaterial"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more
+			properties defining the material's appearance. Any property of the
+			material (including any property inherited from [page:Material]) can be
+			passed in here.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Material] class for common properties.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>
+			The alpha map is a grayscale texture that controls the opacity across the
+			surface (black: fully transparent; white: fully opaque). Default is
+			null.<br /><br />
+
+			Only the color of the texture is used, ignoring the alpha channel if one
+			exists. For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer
+			will use the green channel when sampling this texture due to the extra bit
+			of precision provided for green in DXT-compressed and uncompressed RGB 565
+			formats. Luminance-only and luminance/alpha textures will also still work
+			as expected.
+		</p>
+
+		<h3>[property:Constant depthPacking]</h3>
+		<p>Type for depth packing. Default is [page:Textures BasicDepthPacking].</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			The displacement map affects the position of the mesh's vertices. Unlike
+			other maps which only affect the light and shade of the material the
+			displaced vertices can cast shadows, block other objects, and otherwise
+			act as real geometry. The displacement texture is an image where the value
+			of each pixel (white being the highest) is mapped against, and
+			repositions, the vertices of the mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			How much the displacement map affects the mesh (where black is no
+			displacement, and white is maximum displacement). Without a displacement
+			map set, this value is not applied. Default is `1`.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			The offset of the displacement map's values on the mesh's vertices.
+			The bias is added to the scaled sample of the displacement map.
+			Without a displacement map set, this value is not applied. Default is `0`.
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			The color map. May optionally include an alpha channel, typically combined
+			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest].
+			Default is null.
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+			Render geometry as wireframe. Default is false (i.e. render as smooth
+			shaded).
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>
+			Controls wireframe thickness. Default is `1`.<br /><br />
+
+			Due to limitations of the
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will always be `1` regardless of the set value.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Material] class for common methods.</p>
+
+		<h2>Source</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

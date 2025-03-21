@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Group] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A special version of the Group object that defines clipping planes for descendant objects.
+			ClippingGroups can be nested, with clipping planes accumulating by type: intersection or union.
+		</p>
+
+		<p>Note: ClippingGroup is only supported with WebGPURenderer.</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( )</h3>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Group] class for common properties.</p>
+
+		<h3>[property:Boolean isClippingGroup]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+			User-defined clipping planes specified as THREE.Plane objects in world
+			space. These planes apply to the objects that are children of this ClippingGroup.
+			Points in space whose signed distance to the plane is negative are clipped
+			(not rendered). See the [example:webgpu_clipping webgpu / clipping] example. Default is `[]`.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>Determines if the clipping planes defined by this object are applied. Default is `true`.</p>
+
+		<h3>[property:Boolean clipIntersection]</h3>
+		<p>
+			Changes the behavior of clipping planes so that only their intersection is
+			clipped, rather than their union. Default is `false`.
+		</p>
+
+		<h3>[property:Boolean clipShadows]</h3>
+		<p>
+			Defines whether to clip shadows according to the clipping planes specified
+			by this ClippingGroup. Default is `false`.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h2>Source</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

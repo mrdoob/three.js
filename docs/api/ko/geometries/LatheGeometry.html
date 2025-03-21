@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">꽃병과 같은 축 대칭으로 메쉬를 만듭니다. 선반은 Y축을 중심으로 회전합니다.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#LatheGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		const points = [];
+		for ( let i = 0; i < 10; i ++ ) {
+			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+		}
+		const geometry = new THREE.LatheGeometry( points );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const lathe = new THREE.Mesh( geometry, material );
+		scene.add( lathe );
+		</code>
+
+		<h2>생성자</h2>
+
+		<h3>[name]([param:Array points], [param:Integer segments], [param:Float phiStart], [param:Float phiLength])</h3>
+		<p>
+		points — Vector2의 배열. 각 점의 x 좌표는 0보다 커야 합니다. 기본값은 단순한 다이아몬드 모양을 만드는 (0,-0.5), (0.5,0) 및 (0,0.5)의 배열입니다.<br />
+		segments — 생성할 원주 세그먼트의 수입니다. 기본값은 12 입니다.<br />
+		phiStart — 시작 각도(라디안 단위). 기본값은 0 입니다.<br />
+		phiLength — 선반 섹션의 라디안(0 ~ 2PI) 범위 2PI는 닫힌 선반이고, 2PI 미만이 한 부분입니다. 기본값은 2PI 입니다.
+		</p>
+		<p>
+		이렇게 하면 매개변수를 기반으로 [name]가 생성됩니다.
+		</p>
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		각 생성자 매개 변수에 대한 속성을 가진 개체입니다. 인스턴스화 후에 수정해도 지오메트리는 변경되지 않습니다.
+		</p>
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

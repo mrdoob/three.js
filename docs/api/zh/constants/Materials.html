@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>材质常量（Material Constants）</h1>
+
+		<p class="desc">
+			由这些常量定义的属性对所有的材质类型都生效，除了Texture Combine Operations只应用于
+			[page:MeshBasicMaterial.combine MeshBasicMaterial]，[page:MeshLambertMaterial.combine MeshLambertMaterial]和[page:MeshPhongMaterial.combine MeshPhongMaterial]。<br />
+		</p>
+
+
+		<h2>面</h2>
+		<code>
+		THREE.FrontSide
+		THREE.BackSide
+		THREE.DoubleSide
+		</code>
+		<p>
+			定义了哪一边的面将会被渲染 —— 正面，或是反面，还是两个面都渲染。
+			默认值是[page:Constant FrontSide]（只渲染正面）。
+		</p>
+
+		<h2>混合模式</h2>
+		<code>
+		THREE.NoBlending
+		THREE.NormalBlending
+		THREE.AdditiveBlending
+		THREE.SubtractiveBlending
+		THREE.MultiplyBlending
+		THREE.CustomBlending
+		</code>
+
+
+		<p>
+			这些值控制着源和目标材质中，被发送到WebGLRenderer，来给WebGL使用的包含有RGB和Alpha数据的混合方程。<br />
+			默认值是[page:Constant NormalBlending]。<br />
+			请注意，[page:Constant CustomBlending]必须被设置为自定义混合方程（[page:CustomBlendingEquation Custom Blending Equations]）常量中的值。<br />
+			请查看示例：[example:webgl_materials_blending materials / blending]。<br />
+		</p>
+
+		<h2>深度模式</h2>
+		<code>
+		THREE.NeverDepth
+		THREE.AlwaysDepth
+		THREE.LessDepth
+		THREE.LessEqualDepth
+		THREE.GreaterEqualDepth
+		THREE.GreaterDepth
+		THREE.NotEqualDepth
+		</code>
+		<p>
+			材质使用这些深度函数来比较输入像素和缓冲器中Z-depth的值。
+			如果比较的结果为true，则将绘制像素。<br />
+		[page:Materials NeverDepth] 永远不返回true。<br />
+		[page:Materials AlwaysDepth] 总是返回true。<br />
+		[page:Materials LessDepth] 当输入像素Z-depth小于当前缓冲器Z-depth时，返回true。<br />
+		[page:Materials LessEqualDepth] 为默认值，当输入像素Z-depth小于或等于当前缓冲器Z-depth时，返回true。<br />
+		[page:Materials GreaterEqualDepth] 当输入像素Z-depth大于或等于当前缓冲器Z-depth时，返回true。 <br />
+		[page:Materials GreaterDepth] 当输入像素Z-depth大于当前缓冲器Z-depth时，返回true。<br />
+		[page:Materials NotEqualDepth] 当输入像素Z-depth不等于当前缓冲器Z-depth时，返回true。<br />
+		</p>
+
+		<h2>纹理结合操作</h2>
+		<code>
+		THREE.MultiplyOperation
+		THREE.MixOperation
+		THREE.AddOperation
+		</code>
+		<p>
+			这些常量定义了物体表面颜色与环境贴图（如果存在的话）相结合的结果，
+			用在[page:MeshBasicMaterial.combine MeshBasicMaterial]、[page:MeshLambertMaterial.combine MeshLambertMaterial]和[page:MeshPhongMaterial.combine MeshPhongMaterial]当中。<br />
+		[page:Constant MultiplyOperation] 是默认值，它将环境贴图和物体表面颜色进行相乘。<br />
+		[page:Constant MixOperation] 使用反射率来混和两种颜色。uses reflectivity to blend between the two colors.<br />
+		[page:Constant AddOperation] 用于对两种颜色进行相加。</p>
+
+		<h2>模板函数</h2>
+		<code>
+		THREE.NeverStencilFunc
+		THREE.LessStencilFunc
+		THREE.EqualStencilFunc
+		THREE.LessEqualStencilFunc
+		THREE.GreaterStencilFunc
+		THREE.NotEqualStencilFunc
+		THREE.GreaterEqualStencilFunc
+		THREE.AlwaysStencilFunc
+		</code>
+		<p>
+		材质使用的模板函数，用于决定是否执行一项模板操作.<br />
+		[page:Materials NeverStencilFunc] 一定会返回true.<br />
+		[page:Materials LessStencilFunc] 当模板基准值比当前模板值小的时候返回true.<br />
+		[page:Materials EqualStencilFunc] 当模板基准值和当前模板值一样的时候返回true.<br />
+		[page:Materials LessEqualStencilFunc] 当模板基准值小于等于当前模板值的时候返回true.<br />
+		[page:Materials GreaterStencilFunc] 当模板基准值比当前模板值大的时候返回true.<br />
+		[page:Materials NotEqualStencilFunc] 当模板基准值与当前模板值不相等的时候返回true.<br />
+		[page:Materials GreaterEqualStencilFunc] 当模板基准值比当前模板值大的时候返回true.<br />
+		[page:Materials AlwaysStencilFunc] 一定会返回true.<br />
+		</p>
+
+		<h2>模板操作</h2>
+		<code>
+		THREE.ZeroStencilOp
+		THREE.KeepStencilOp
+		THREE.ReplaceStencilOp
+		THREE.IncrementStencilOp
+		THREE.DecrementStencilOp
+		THREE.IncrementWrapStencilOp
+		THREE.DecrementWrapStencilOp
+		THREE.InvertStencilOp
+		</code>
+		<p>
+		当提供的模板函数通过的时候，材质会在模板缓冲像素上执行怎样的模板操作.<br />
+		[page:Materials ZeroStencilOp] 将模板值设置为0。<br />
+		[page:Materials KeepStencilOp] 不会对模板值进行任何操作。<br />
+		[page:Materials ReplaceStencilOp] 使用模板基准值覆盖模板值。<br />
+		[page:Materials IncrementStencilOp] 将当前模板值加1。<br />
+		[page:Materials DecrementStencilOp] 将当前模板值减1。<br />
+		[page:Materials IncrementWrapStencilOp] 将当前模板值加1，如果这个值超过了255则会设置为0。<br />
+		[page:Materials DecrementWrapStencilOp] 将当前模板值减1，如果这个值低于0则会设置为255<br />
+		[page:Materials InvertStencilOp] 将当前模板值按位反转.<br />
+		</p>
+
+		<h2>GLSL Version</h2>
+		<code>
+		THREE.GLSL1
+		THREE.GLSL3
+		</code>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

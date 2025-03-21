@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">[name] is a simplified version of [page:CSS3DRenderer]. The only transformation that is supported is translation.<br /><br />
+			The renderer is very useful if you want to combine HTML based labels with 3D objects. Here too, the respective DOM elements are wrapped into an instance of `CSS2DObject` and added to the scene graph.<br /><br />
+			`[name]` only supports 100% browser and display zoom.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:css2d_label]<br>
+			[example:webgl_loader_pdb molecules]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:DOMElement element] - A [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement HTMLElement]
+		where the renderer appends its child-elements.
+		This corresponds to the [page:CSS2DRenderer.domElement domElement] property below.
+		If not passed in here, a new div element will be created.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:DOMElement domElement]</h3>
+		<p>
+			A [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement HTMLElement] where the renderer appends its child-elements.<br />
+			This is automatically created by the renderer in the constructor (if not provided already).
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Object getSize]()</h3>
+		<p>
+			Returns an object containing the width and height of the renderer.
+		</p>
+
+		<h3>[method:undefined render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<p>
+			Renders a [page:Scene scene] using a [page:Camera camera].<br />
+		</p>
+
+		<h3>[method:undefined setSize]([param:Number width], [param:Number height])</h3>
+		<p>
+			Resizes the renderer to (width, height).
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/CSS2DRenderer.js examples/jsm/renderers/CSS2DRenderer.js]
+		</p>
+	</body>
+</html>

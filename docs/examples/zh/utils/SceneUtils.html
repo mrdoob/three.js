@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>场景工具（[name]）</h1>
+
+		<p class="desc">一个用于操控场景的实用类。</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import * as SceneUtils from 'three/addons/utils/SceneUtils.js';
+		</code>
+
+		<h2>方法</h2>
+
+		<h3>[method:Group createMeshesFromInstancedMesh]( [param:InstancedMesh instancedMesh] )</h3>
+		<p>
+			instancedMesh -- 实例化网格。
+		</p>
+		<p>
+			为给定的实例化网格的每个实例，创建一个包含新网格的新物体组（Object Group）。
+		</p>
+
+		<h3>[method:Group createMeshesFromMultiMaterialMesh]( [param:Mesh mesh] )</h3>
+		<p>
+		    mesh -- 具有多种材质的网格。
+		</p>
+		<p>
+		为给定的具有多种材质的网格的每个材质，创建一个包含新网格的新物体组[page:Group]。
+		</p>
+
+		<h3>[method:Group createMultiMaterialObject]( [param:BufferGeometry geometry], [param:Array materials] )</h3>
+		<p>
+			geometry -- 材质集的几何。 <br />
+			materials -- 为物体准备的材质。
+		</p>
+		<p>
+			创建一个新组，囊括了在材质中定义的每种材质的新网格。请注意，这和为一个网格定义多种材质的材质数组不同。<br />
+			该方法对于同时需要材质和线框绘制的物体非常有用。
+		</p>
+
+		<h3>[method:undefined sortInstancedMesh]( [param:InstancedMesh mesh], [param:Function compareFn] )</h3>
+		<p>
+		mesh -- InstancedMesh中的实例将呗排序。 <br />
+		compareFn -- 决定排序顺序的比较函数。
+		</p>
+		<p>
+        根据用户定义的回调函数，对[page:InstancedMesh]中的实例进行排序。
+        回调函数会提供两个参数，<i>indexA</i>和<i>indexB</i>，并且必须返回一个数值。
+        有关排序回调函数的更多信息，请参阅[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description Array.prototype.sort]
+		</p>
+		<p>
+        由于性能成本，three.js不会自动对[page:InstancedMesh]实例进行排序。
+        手动排序可能有助于提高透明材质的显示顺序（back to front）和不透明材质的显示顺序（front to back）。
+		</p>
+
+		<h3>[method:Generator traverseGenerator]( [param:Object3D object] )</h3>
+		<p>
+		    object -- 遍历的对象。
+		</p>
+		<p>
+            使用generator实现的 [page:Object3D.traverse]().
+		</p>
+
+		<h3>[method:Generator traverseVisibleGenerator]( [param:Object3D object] )</h3>
+		<p>
+		    object -- 遍历的对象。
+		</p>
+		<p>
+            使用generator实现的 [page:Object3D.traverseVisible]().
+		</p>
+
+		<h3>[method:Generator traverseAncestorsGenerator]( [param:Object3D object] )</h3>
+		<p>
+		    object -- 遍历的对象。
+		</p>
+		<p>
+		    使用generator实现的 [page:Object3D.traverseAncestors]().
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/SceneUtils.js examples/jsm/utils/SceneUtils.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			An exporter for the STL file format. <br /><br />
+			[link:https://en.wikipedia.org/wiki/STL_(file_format) STL] files describe only the surface geometry
+			of a three-dimensional object without any representation of color, texture or other common model attributes.
+			The STL format specifies both ASCII and binary representations, with binary being more compact. 
+			STL files contain no scale information or indexes, and the units are arbitrary.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { STLExporter } from 'three/addons/exporters/STLExporter.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// Instantiate an exporter
+		const exporter = new STLExporter();
+
+		// Configure export options
+		const options = { binary: true }
+
+		// Parse the input and generate the STL encoded output
+		const result = exporter.parse( mesh, options );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:misc_exporter_stl]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Object parse]( [param:Object3D scene], [param:Object options] )</h3>
+
+		<p>
+		[page:Object3D scene] — Scene, Mesh, or other Object3D based class containing Meshes to encode.<br />
+		[page:Options options] — Optional export options<br />
+		<ul>
+			<li>binary - bool. Return an ASCII encoded string or binary data buffer. Default is `false`.</li>
+		</ul>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/STLExporter.js examples/jsm/exporters/STLExporter.js]
+		</p>
+	</body>
+</html>

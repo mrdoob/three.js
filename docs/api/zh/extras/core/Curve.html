@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			用于创建包含插值方法的[name]对象的抽象基类。
+			有关[name]的数组，请参见[page:CurvePath]。
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		创建一个 [name].
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Integer arcLengthDivisions]</h3>
+		<p>确定[page:.GetLength]计算曲线的累积分段长度时的分段量。
+			为确保[page:.getSpacedPoints]等方法时的精度，如果曲线非常大，建议增加[page:.arcLengthDivisions]。默认值为200</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Vector getPoint]( [param:Float t], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float t] - 曲线上的位置。必须在[0,1]范围内 <br>
+			[page:Vector optionalTarget] — (可选) 如果需要, 结果将复制到此向量中，否则将创建一个新向量。 <br /><br />
+
+			返回曲线上给定位置的点。
+		</p>
+
+		<h3>[method:Vector getPointAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float u] - 根据弧长在曲线上的位置。必须在范围[0，1]内。 <br>
+			[page:Vector optionalTarget] — (可选) 如果需要, (可选) 如果需要, 结果将复制到此向量中，否则将创建一个新向量。 <br /><br />
+
+			根据弧长返回曲线上给定位置的点。
+		</p>
+
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 要将曲线划分为的分段数。默认是 *5*.<br /><br />
+			使用getPoint（t）返回一组divisions+1的点
+		</p>
+
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 要将曲线划分为的分段数。默认是 *5*.<br /><br />
+
+			使用getPointAt（u）返回一个分段+1的等距点的数组。
+		</p>
+
+		<h3>[method:Float getLength]()</h3>
+		<p>获取总曲线弧长。</p>
+
+		<h3>[method:Array getLengths]( [param:Integer divisions] )</h3>
+		<p>获取累积段长度的列表。</p>
+
+		<h3>[method:undefined updateArcLengths]()</h3>
+		<p>更新累积段距离缓存。</p>
+
+		<h3>[method:Float getUtoTmapping]( [param:Float u], [param:Float distance] )</h3>
+		<p>
+			给定范围（0..1）内的u，返回范围（0..1）内的[page:Float t]，
+			然后可以用t来使用 [page:.getPoint]给出与曲线末端等距的点。
+		</p>
+
+		<h3>[method:Vector getTangent]( [param:Float t], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float t] -在曲线上的点，必须在范围 [ 0, 1 ]. <br>
+			[page:Vector optionalTarget] — (可选) 如果需要, (可选) 如果需要, 结果将复制到此向量中，否则将创建一个新向量。 <br /><br />
+
+			返回t处的单位向量切线。如果派生曲线未实现其
+			切线求导，将使用相距一个小三角形的两个点来求与其实际梯度的近似值
+		</p>
+
+		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float u] - 根据弧长在曲线上的位置，必须在范围[ 0, 1 ]。 <br>
+			[page:Vector optionalTarget] —(可选) 如果需要, (可选) 如果需要, 结果将复制到此向量中，否则将创建一个新向量。 <br /><br />
+			返回一个点处的切线，该点与 [page:.getTangent]中给定的曲线的端点距离相等
+		</p>
+
+		<h3>[method:Object computeFrenetFrames]( [param:Integer segments], [param:Boolean closed] )</h3>
+		<p>
+			生成Frenet帧。需要三维空间中的曲线定义。用于[page:TubeGeometry]或[page:ExtradeGeometry]等几何图形。
+		</p>
+
+		<h3>[method:Curve clone]()</h3>
+		<p>创建此实例的克隆。</p>
+
+		<h3>[method:this copy]( [param:Curve source] )</h3>
+		<p>将另一个[name]对象复制到此实例。</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>返回此实例的JSON对象表示形式。</p>
+
+		<h3>[method:this fromJSON]( [param:Object json] )</h3>
+		<p>将给定的JSON数据复制到此实例。</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

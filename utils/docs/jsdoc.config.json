@@ -1,6 +1,6 @@
 {
     "opts": {
-            "destination": "docs",
+            "destination": "docs_new",
             "encoding": "utf8",
             "package": "package.json",
             "recurse": true,

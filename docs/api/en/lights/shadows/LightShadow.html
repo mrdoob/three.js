@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Serves as a base class for the other shadow classes.</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+			[page:Camera camera] - the light's view of the world.<br /><br />
+
+			Create a new [name]. This is not intended to be called directly - it is
+			used as a base class by other light shadows.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean autoUpdate]</h3>
+		<p>
+			Enables automatic updates of the light's shadow. Default is `true`. If you
+			do not require dynamic lighting / shadows, you may set this to `false`.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			The light's view of the world. This is used to generate a depth map of the
+			scene; objects behind other objects from the light's perspective will be
+			in shadow.
+		</p>
+
+		<h3>[property:Float bias]</h3>
+		<p>
+			Shadow map bias, how much to add or subtract from the normalized depth
+			when deciding whether a surface is in shadow.<br />
+			The default is `0`. Very tiny adjustments here (in the order of `0.0001`) may
+			help reduce artifacts in shadows
+		</p>
+
+		<h3>[property:Integer blurSamples]</h3>
+		<p>The amount of samples to use when blurring a VSM shadow map.</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The intensity of the shadow. The default is `1`. Valid values are in the range `[0, 1]`.
+		</p>
+
+		<h3>[property:WebGLRenderTarget map]</h3>
+		<p>
+			The depth map generated using the internal camera; a location beyond a
+			pixel's depth is in shadow. Computed internally during rendering.
+		</p>
+
+		<h3>[property:WebGLRenderTarget mapPass]</h3>
+		<p>
+			The distribution map generated using the internal camera; an occlusion is
+			calculated based on the distribution of depths. Computed internally during
+			rendering.
+		</p>
+
+		<h3>[property:Vector2 mapSize]</h3>
+		<p>
+			A [Page:Vector2] defining the width and height of the shadow map.<br /><br />
+
+			Higher values give better quality shadows at the cost of computation time.
+			Values must be powers of 2, up to the
+			[page:WebGLRenderer.capabilities].maxTextureSize for a given device,
+			although the width and height don't have to be the same (so, for example,
+			(512, 1024) is valid). The default is `( 512, 512 )`.
+		</p>
+
+		<h3>[property:Matrix4 matrix]</h3>
+		<p>
+			Model to shadow camera space, to compute location and depth in shadow map.
+			Stored in a [page:Matrix4 Matrix4]. This is computed internally during
+			rendering.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			When set to `true`, shadow maps will be updated in the next `render` call.
+			Default is `false`. If you have set [page:.autoUpdate] to `false`, you
+			will need to set this property to `true` and then make a render call to
+			update the light's shadow.
+		</p>
+
+		<h3>[property:Float normalBias]</h3>
+		<p>
+			Defines how much the position used to query the shadow map is offset along
+			the object normal. The default is `0`. Increasing this value can be used to
+			reduce shadow acne especially in large scenes where light shines onto
+			geometry at a shallow angle. The cost is that shadows may appear
+			distorted.
+		</p>
+
+		<h3>[property:Float radius]</h3>
+		<p>
+			Setting this to values greater than 1 will blur the edges of the
+			shadow.<br />
+
+			High values will cause unwanted banding effects in the shadows - a greater
+			[page:.mapSize mapSize] will allow for a higher value to be used here
+			before these effects become visible.<br />
+			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], 
+			radius has no effect and it is recommended to increase
+			softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
+
+			Note that this has no effect if the [page:WebGLRenderer.shadowMap.type] is
+			set to [page:Renderer BasicShadowMap].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Vector2 getFrameExtents]()</h3>
+		<p>
+			Used internally by the renderer to extend the shadow map to contain all
+			viewports
+		</p>
+
+		<h3>[method:undefined updateMatrices]( [param:Light light] )</h3>
+		<p>
+			Update the matrices for the camera and shadow, used internally by the
+			renderer.<br /><br />
+
+			light -- the light for which the shadow is being rendered.
+		</p>
+
+		<h3>[method:Frustum getFrustum]()</h3>
+		<p>
+			Gets the shadow cameras frustum. Used internally by the renderer to cull
+			objects.
+		</p>
+
+		<h3>[method:number getViewportCount]()</h3>
+		<p>
+			Used internally by the renderer to get the number of viewports that need
+			to be rendered for this shadow.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
+
+		<h3>[method:this copy]( [param:LightShadow source] )</h3>
+		<p>
+			Copies value of all the properties from the [page:LightShadow source] to
+			this Light.
+		</p>
+
+		<h3>[method:LightShadow clone]()</h3>
+		<p>Creates a new LightShadow with the same properties as this one.</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>Serialize this LightShadow.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
+	</body>
+</html>

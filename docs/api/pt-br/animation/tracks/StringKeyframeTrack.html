@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Uma track de valores de keyframes de string.
+		</p>
+
+
+		<h2>Construtor</h2>
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (obrigatório) identificador para o KeyframeTrack.<br />
+			[page:Array times] - (obrigatório) array de tempos de keyframes.<br />
+			[page:Array values] - valores para os keyframes nos tempos especificados.<br />
+			[page:Constant interpolation] - o tipo de interpolação a ser usada. Ver
+			[page:Animation Animation Constants] para valores possíveis. O padrão é
+			[page:Animation InterpolateDiscrete].
+		</p>
+
+
+		<h2>Propriedades</h2>
+
+		<p class="desc">
+			Ver [page:KeyframeTrack] para propriedades herdadas.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			O tipo de interpolação padrão para usar, [page:Animation InterpolateDiscrete].
+		</p>
+
+		<h3>[property:Array ValueBufferType]</h3>
+		<p>
+			Um array normal (sem Float32Array nesse caso, ao contrário de `ValueBufferType` do [page:KeyframeTrack]).
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			String 'string'.
+		</p>
+
+
+		<h2>Métodos</h2>
+
+
+		<p class="desc">
+			Ver [page:KeyframeTrack] para métodos herdados.
+		</p>
+
+		<h3>[method:undefined InterpolantFactoryMethodLinear]()</h3>
+		<p>
+		  O valor deste método aqui é 'undefined', pois não faz sentido para propriedades discretas.
+		</p>
+
+		<h3>[method:undefined InterpolantFactoryMethodSmooth]()</h3>
+		<p>
+			O valor deste método aqui é 'undefined', pois não faz sentido para propriedades discretas.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

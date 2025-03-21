@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Controls] &rarr;
+
+		<h1>第一人称控制器（[name]）</h1>
+
+		<p class="desc">
+			该类是 [page:FlyControls] 的另一个实现。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			请参考[link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_geometry_terrain webgl / geometry / terrain ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera object]: 被控制的摄像机。
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。(可选)
+			</p>
+			<p>
+				创建一个新的 [name] 实例。
+			</p>
+		</p>
+
+		<h2>属性</h2>
+
+		<p>共有属性请参见其基类[page:Controls]。</p>
+
+		<h3>[property:Boolean activeLook]</h3>
+		<p>
+			是否能够环视四周。默认为 *true*。
+		</p>
+
+		<h3>[property:Boolean autoForward]</h3>
+		<p>
+			摄像机是否自动向前移动。默认为 *false*。
+		</p>
+
+		<h3>[property:Boolean constrainVertical]</h3>
+		<p>
+			垂直环视是否约束在[[page:.verticalMin], [page:.verticalMax]]之间。默认值为 *false*。
+		</p>
+
+		<h3>[property:Number heightCoef]</h3>
+		<p>
+			当Y坐标接近[page:.heightMax]时摄像机的移动速度。默认值为 *1*。
+		</p>
+
+		<h3>[property:Number heightMax]</h3>
+		<p>
+			用于调节移动速度的摄像机最大高度限制。默认值为 *1*。
+		</p>
+
+		<h3>[property:Number heightMin]</h3>
+		<p>
+			用于调节移动速度的摄像机最低高度限制。默认值为 *0*。
+		</p>
+
+		<h3>[property:Boolean heightSpeed]</h3>
+		<p>
+			摄像机的高度是否影响向前移动的速度。默认值为 *false*。
+			使用属性 [page:.heightCoef]、 [page:.heightMin] 和 [page:.heightMax] 来进行配置。
+		</p>
+
+		<h3>[property:Boolean lookVertical]</h3>
+		<p>
+			是否能够垂直环视。默认为 *true*。
+		</p>
+
+		<h3>[property:Number lookSpeed]</h3>
+		<p>
+			环视速度。默认为 *0.005*。
+		</p>
+
+		<h3>[property:Boolean mouseDragOn]</h3>
+		<p>
+			鼠标是否被按下。只读属性。
+		</p>
+
+		<h3>[property:Number movementSpeed]</h3>
+		<p>
+			移动速度。默认为 *1*。
+		</p>
+
+		<h3>[property:Number verticalMax]</h3>
+		<p>
+			你能够垂直环视角度的上限。范围在 0 到 Math.PI 弧度之间。默认为 *Math.PI*。
+		</p>
+
+		<h3>[property:Number verticalMin]</h3>
+		<p>
+			你能够垂直环视角度的下限。范围在 0 到 Math.PI 弧度之间。默认为 *0*。
+		</p>
+
+		<h2>方法</h2>
+		
+		<p>共有方法请参见其基类[page:Controls]。</p>
+
+		<h3>[method:undefined handleResize] ()</h3>
+		<p>
+			若应用程序窗口大小发生改变，则应当调用此函数。
+		</p>
+
+		<h3>[method:FirstPersonControls lookAt]( [param:Vector3 vector] )<br />
+		[method:FirstPersonControls lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			<p>
+				<p>
+					vector - 一个表示目标位置的向量。
+				</p>
+				<p>
+					或者，世界空间位置的x、y、z分量。
+				</p>
+			</p>
+			<p>
+				确保控制器将相机方向朝向到所传入的目标的位置。
+			</p>
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FirstPersonControls.js examples/jsm/controls/FirstPersonControls.js]
+		</p>
+	</body>
+</html>

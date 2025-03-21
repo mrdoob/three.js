@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		خاصية الرسم البياني للمشهد المخزنة التي تسمح بالتراكم الموزون ؛ تستخدم داخليا.
+		</p>
+
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:PropertyBinding binding], [param:String typeName], [param:Number valueSize] )</h3>
+		<p>
+			-- binding <br />
+			-- typeName <br />
+			-- valueSize <br />
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+
+		<h3>[property:PropertyBinding binding]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:TypedArray buffer]</h3>
+		<p>
+			 حاجز (buffer)  بحجم [page:PropertyMixer valueSize] * 4. <br /><br />
+			هذا لديه التخطيط: [ incoming | accu0 | accu1 | orig ]<br /><br />
+			يمكن Interpolators استخدام .buffer كـ .result ثم تنتقل البيانات إلى "incoming". <br/>
+			يتم استخدام 'accu0' و 'accu1' مع ​​الإطارات المتداخلة للنتيجة التراكمية ويتم مقارنتها لاكتشاف التغييرات. يقوم "orig" بتخزين الحالة الأصلية للممتلكات.
+		</p>
+
+		<h3>[property:Number cumulativeWeight]</h3>
+		<p>
+			الافتراضي هو *0*.
+		</p>
+
+		<h3>[property:Number valueSize]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Number referenceCount]</h3>
+		<p>
+			الافتراضي هو *0*.
+		</p>
+
+		<h3>[property:Number useCount]</h3>
+		<p>
+			الافتراضي هو *0*.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:undefined accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
+		<p>
+			تجميع البيانات في [page:PropertyMixer.buffer buffer][accuIndex] منطقة 'incoming' في 'accu[i]'.<br />
+
+			إذا كان الوزن *0* فهذا لا يفعل شيئًا.
+		</p>
+
+		<h3>[method:undefined apply]( [param:Number accuIndex] )</h3>
+		<p>
+			تطبيق حالة [page:PropertyMixer.buffer buffer] 'accu[i]' على الربط عند اختلاف الاتهام.
+		</p>
+
+		<h3>[method:undefined saveOriginalState]( )</h3>
+		<p>
+			تذكر حالة الملكية المقيدة وتنسخها إلى كلا المتهمين.
+		</p>
+
+		<h3>[method:undefined restoreOriginalState](  )</h3>
+		<p>
+			تقوم بتطبيق الحالة التي تم التقاطها مسبقًا عبر 'saveOriginalState' إلى binding.
+		</p>
+
+
+		<h2>المصدر (Source)</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

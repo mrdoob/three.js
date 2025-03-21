@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+    	  Oggetto per tenere traccia del tempo. Questa classe utilizza [link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now].
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Boolean autoStart] )</h3>
+		<p>
+		  autoStart — (opzionale) indica se avviare automaticamente l'orologio quando .getDelta() viene chiamato per la prima volta. L'impostazione predefinita è `true`.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean autoStart]</h3>
+		<p>
+      Se impostato, avvia l'orologio automaticamente quando [page:.getDelta]() viene chiamato per la prima volta. Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Float startTime]</h3>
+		<p>
+      Contiene il tempo al quale è stato chiamato l'ultima volta il metodo [page:Clock.start start] dell'orologio. Il valore predefinito è `0`.
+ 		</p>
+
+		<h3>[property:Float oldTime]</h3>
+		<p>
+      Contiene il tempo in cui i metodi [page:Clock.start start], [page:.getElapsedTime]() o [page:.getDelta]() dell'orologio sono stati chiamati per l'ultima volta.
+      Il valore predefinito è `0`.
+ 		</p>
+
+		<h3>[property:Float elapsedTime]</h3>
+		<p>
+      Tiene traccia del tempo totale di esecuzione dell'orologio. Il valore predefinito è `0`.
+ 		</p>
+
+		<h3>[property:Boolean running]</h3>
+		<p>
+      Indica se l'orologio è in esecuzione o meno. Il valore predefinito è `false`.
+ 		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:undefined start]()</h3>
+		<p>
+      Avvia l'orologio. Inoltre imposta [page:.startTime] e [page:.oldTime] sull'ora corrente, imposta [page:.elapsedTime] a `0` e [page:.running] a `true`.
+		</p>
+
+		<h3>[method:undefined stop]()</h3>
+		<p>
+      Ferma l'orologio e imposta [page:Clock.oldTime oldTime] sull'ora corrente.
+		</p>
+
+		<h3>[method:Float getElapsedTime]()</h3>
+		<p>
+      Ottiene i secondi trascorsi da quando l'orologio è stato avviato e imposta [page:.oldTime] sull'ora corrente.<br />
+      Se [page:.autoStart] è `true` e l'orologio non è in esecuzione, avvia anche l'orologio.
+		</p>
+
+		<h3>[method:Float getDelta]()</h3>
+		<p>
+      Ottiene i secondi trascorsi dall'ora in cui è stato impostato [page:.oldTime] e imposta [page:.oldTime] sull'ora corrente.<br />
+      Se [page:.autoStart] è `true` e l'orologio non è in esecuzione, avvia anche l'orologio.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

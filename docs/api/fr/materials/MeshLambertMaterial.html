@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un matériau pour surfaces non brillantes, sans reflets spéculaires.<br /><br />
+
+			Le matériau utilise un modèle [link:https://en.wikipedia.org/wiki/Lambertian_reflectance Lambertien] non basé sur la physique
+			pour calculer la réflectance. Il peut simuler certaines surfaces (comme le bois non traité ou la pierre),
+			mais ne peut pas simuler des surfaces brillantes avec des reflets spéculaires (comme le bois verni). [name] utilise un ombrage par fragment.<br /><br />
+
+			En raison de la simplicité des modèles de réflectance et d'éclairage, les performances seront supérieures
+			lors de l'utilisation de ce matériau par rapport au [page:MeshPhongMaterial], [page:MeshStandardMaterial] ou [page:MeshPhysicalMaterial],
+			au prix d'une certaine précision graphique.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshLambertMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
+		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être passée dans l'objet.<br /><br />
+
+			L'exception est la propriété [page:Hexadecimal color], qui peut être passée comme une chaîne de caractères hexadécimale,
+		 ayant la valeur `0xffffff` (blanc) par défaut. [page:Color.set]( color ) est appelée en interne.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>La carte alpha est une texture en niveaux de gris qui contrôle l'opacité sur la surface
+			(noir : entièrement transparent ; blanc : entièrement opaque). La valeur par défaut est nulle.<br /><br />
+
+			Seule la couleur de la texture est utilisée, en ignorant le canal alpha s'il en existe un.
+			Pour les textures RGB et RGBA, le moteur de rendu [page:WebGLRenderer WebGL] utilisera le
+			canal vert lors de l'échantillonnage de cette texture en raison du peu de précision supplémentaire fourni
+			pour le vert dans les formats RVB 565 compressés DXT et non compressés.
+			Les textures avec uniquement de la luminance ou les textures luminance/alpha fonctionneront également comme prévu.
+		</p>
+
+		<h3>[property:Texture aoMap]</h3>
+		<p>Le canal rouge de cette texture est utilisé comme carte d'occlusion ambiante. La valeur par défaut est nulle.
+		L'aoMap nécessite un deuxième ensemble d'UV.</p>
+
+		<h3>[property:Float aoMapIntensity]</h3>
+		<p>Intensité de l'effet d'occlusion ambiante. La valeur par défaut est 1. Zéro signifie qu'il n'y a pas d'effet d'occlusion.</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+			La texture pour créer une carte en relief. Les valeurs de noir et blanc correspondent à la profondeur perçue par rapport aux lumières.
+			Bump n'affecte pas réellement la géométrie de l'objet, seulement l'éclairage. Si une carte normale est définie, cela sera ignoré.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>A quel point la texture en relief affecte le matériau. Les plages typiques sont 0-1. La valeur par défaut est 1.</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color], couleur du matériau, par défaut en blanc (0xffffff).</p>
+
+		<h3>[property:Integer combine]</h3>
+		<p>
+			Comment combiner le résultat de la couleur de la surface avec la carte d'environnement, le cas échéant.<br /><br />
+
+			Les options sont [page:Materials THREE.MultiplyOperation] (par défaut), [page:Materials THREE.MixOperation],
+			[page :Matériaux TROIS.AddOperation]. Si mix est choisi, la [page:.reflectivity] est utilisée pour
+			mélanger les deux couleurs.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			La carte de déplacement affecte la position des sommets du maillage. Contrairement aux autres cartes
+			qui n'affectent que la lumière et l'ombre du matériau, les sommets déplacés peuvent projeter des ombres,
+			bloquer d'autres objets et agir autrement comme une géométrie réelle. La texture de déplacement est
+			une image sur laquelle la valeur de chaque pixel (le blanc étant le plus élevé) est mappée,
+			et repositionne, les sommets du maillage.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			Dans quelle mesure la carte de déplacement affecte le maillage (où le noir n'est pas un déplacement,
+			et le blanc est le déplacement maximal). Sans carte de déplacement, cette valeur n'est pas appliquée.
+			La valeur par défaut est `1`.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			Le décalage des valeurs de la carte de déplacement sur les sommets du maillage.
+			Le décalage est ajouté après la mise à l'échelle de la carte de déplacement.
+			Sans carte de déplacement, cette valeur n'est pas appliquée. La valeur par défaut
+			est `0`.
+		</p>
+
+		<h3>[property:Color emissive]</h3>
+		<p>
+		Couleur émissive (claire) du matériau, essentiellement une couleur unie non affectée par un autre éclairage.
+		La valeur par défaut est noire.
+		</p>
+
+		<h3>[property:Texture emissiveMap]</h3>
+		<p>
+		Définit la carte émissive (lueur). La valeur par défaut est nulle. La couleur de la carte émissive est modulée par
+		la couleur émissive et l'intensité émissive. Si vous avez une carte émissive, assurez-vous de
+		régler la couleur émissive sur autre chose que le noir.
+		</p>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<p>Intensité de la lumière émissive. Module la couleur émissive. La valeur par défaut est 1.</p>
+
+		<h3>[property:Texture envMap]</h3>
+		<p>La carte de l'environnement. La valeur par défaut est nulle.</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+		Définit si le matériau est rendu avec un ombrage plat. La valeur par défaut est false.
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Si le matériau est affecté par le brouillard (fog) La valeur par défaut est `true`.</p>
+
+		<h3>[property:Texture lightMap]</h3>
+		<p>La carte des lumières (light map).  La valeur par défaut est null. La lightMap nécessite un deuxième ensemble d'UVs.</p>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<p>Intensité de la lumière préparée. La valeur par défaut est 1.</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			La carte des couleurs. Peut éventuellement inclure un canal alpha, généralement combiné avec
+			[page:Material.transparent .transparent] ou [page:Material.alphaTest .alphaTest]. La valeur par défaut est null.
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			La texture pour créer une carte normale. Les valeurs RVB affectent la surface normale pour chaque fragment de pixel et changent
+			la façon dont la couleur est illuminée. Les cartes normales ne changent pas la forme réelle de la surface, seulement l'éclairage.
+			Dans le cas où le matériau a une carte normale créée en utilisant la convention "left handed", le composant y de normalScale
+			devrait être négatif pour compenser les différences de latéralité.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+			Le type de carte d'ombrage.<br /><br />
+
+			Les options sont [page:constant THREE.TangentSpaceNormalMap] (par défaut), et [page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			A quel point la carte normale affecte le matériau. Les plages typiques sont 0-1.
+			La valeur par défaut est un [page:Vector2] défini sur (1,1).
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>A quel point la carte d'environnement affecte la surface ; voir aussi [page:.combine].</p>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<p>
+			L'indice de réfraction (IOR) de l'air (environ 1) divisé par l'indice de réfraction du matériau.
+			Il est utilisé avec les modes de mapping d'environnement [page:Textures THREE.CubeRefractionMapping] et [page:Textures THREE.EquirectangularRefractionMapping].
+			Le rapport de réfraction ne doit pas dépasser 1. La valeur par défaut est `0.98`.
+		</p>
+
+		<h3>[property:Texture specularMap]</h3>
+		<p>Texture spéculaire utilisée par le matériau. La valeur par défaut est null.</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>Rendre la géométrie en fil de fer. La valeur par défaut est "false" (c'est-à-dire rendre sous forme de polygones plats).</p>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<p>
+			Définit l'apparence de la fin de la ligne. les valeurs possibles sont 'butt', 'round' et 'square'.
+			La valeur par défaut est 'round'.<br /><br />
+
+			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			et est ignorée par le moteur de rendu [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<p>
+			Définit l'apparence des jointures de lignes. Les valeurs possibles sont 'round', 'bevel' et 'miter'. La valeur par défaut est 'round'. <br /><br />
+
+			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			et est ignorée par le moteur de rendu [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Contrôle l'épaisseur du filaire. La valeur par défaut est 1.<br /><br />
+
+		A cause des limitations de [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			avec le moteur de rendu [page:WebGLRenderer WebGL] sur la plupart des plateformes, l'épaisseur de ligne (linewidth) sera toujours
+			à 1, indépendamment de la valeur définie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

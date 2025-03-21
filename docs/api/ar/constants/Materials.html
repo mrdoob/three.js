@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>ثوابت المواد الخام (Material Constants)</h1>
+
+		<p class="desc">
+			تحدد هذه الثوابت الخصائص المشتركة بين جميع أنواع المواد الخام، باستثناء عمليات تجميع القوام الخاصة التي تنطبق فقط على
+			[page:MeshBasicMaterial.combine MeshBasicMaterial]،
+			[page:MeshLambertMaterial.combine MeshLambertMaterial] و
+			[page:MeshPhongMaterial.combine MeshPhongMaterial].<br />
+		</p>
+
+		<h2>الجانب (Side)</h2>
+		<code>
+		THREE.FrontSide 
+		THREE.BackSide 
+		THREE.DoubleSide
+		</code>
+		
+		<p>
+			تحدد الجانب الذي سيتم عرضه للوجوه، سواءً الوجه الأمامي، الوجه الخلفي، أو كلاهما. الإعداد الافتراضي هو الوجه الأمامي.
+		</p>
+
+		<h2>وضعية الدمج (Blending Mode)</h2>
+		<code>
+		THREE.NoBlending 
+		THREE.NormalBlending 
+		THREE.AdditiveBlending
+		THREE.SubtractiveBlending 
+		THREE.MultiplyBlending 
+		THREE.CustomBlending
+		</code>
+
+		<p>
+			تحكم هذه الثوابت في معادلات الدمج بين المصدر والوجهة للألوان والألفا التي يتم إرسالها من المواد إلى WebGLRenderer للاستخدام بواسطة WebGL.
+			[page:Constant NormalBlending] هي الإعداد الافتراضي. ويجب تعيين [page:Constant CustomBlending] لاستخدام [page:CustomBlendingEquation Custom Blending Equations].
+			راجع مثال [example:webgl_materials_blending materials / blending].
+		</p>
+
+		<h2>وضعية العمق (Depth Mode)</h2>
+		<code>
+		THREE.NeverDepth
+		THREE.AlwaysDepth 
+		THREE.EqualDepth 
+		THREE.LessDepth
+		THREE.LessEqualDepth 
+		THREE.GreaterEqualDepth 
+		THREE.GreaterDepth
+		THREE.NotEqualDepth
+		</code>
+		<p>
+			تحدد وظيفة العمق التي تستخدمها المواد لمقارنة عمق بيكسلات الإدخال مع قيمة العمق الحالية في الذاكرة المؤقتة للعمق. إذا كانت نتيجة المقارنة صحيحة، فسيتم رسم البكسل.<br />
+			[page:Materials NeverDepth] لن يتم رسم أي بكسل.<br />
+			[page:Materials AlwaysDepth] سيتم رسم كل البكسلات.<br />
+			[page:Materials EqualDepth] سيتم رسم البكسل إذا كان عمق البكسل المدخل مساوٍ لعمق الذاكرة المؤقتة الحالي.<br />
+			[page:Materials LessDepth] سيتم رسم البكسل إذا كان عمق البكسل المدخل أقل من عمق الذاكرة المؤقتة الحالي.<br />
+			[page:Materials LessEqualDepth] هي الإعداد الافتراضي وسيتم رسم البكسل إذا كان عمق البكسل المدخل أقل من أو يساوي عمق الذاكرة المؤقتة الحالي.<br />
+			[page:Materials GreaterEqualDepth] سيتم رسم البكسل إذا كان عمق البكسل المدخل أكبر من أو يساوي عمق الذاكرة المؤقتة الحالي.<br />
+			[page:Materials GreaterDepth] سيتم رسم البكسل إذا كان عمق البكسل المدخل أكبر من عمق الذاكرة المؤقتة الحالي.<br />
+			[page:Materials NotEqualDepth] سيتم رسم البكسل إذا كان عمقالبكسل المدخل لا يساوي عمق الذاكرة المؤقتة الحالي.<br />
+		</p>
+
+		<h2>عمليات تجميع القوام الخاصة بالقوام (Texture Combine Operations)</h2>
+		<code>
+		THREE.MultiplyOperation 
+		THREE.MixOperation 
+		THREE.AddOperation
+		</code>
+		
+		<p>
+			تحدد هذه الثوابت كيفية دمج لون سطح الكائن مع خريطة البيئة (إذا كانت متاحة) في [page:MeshBasicMaterial.combine MeshBasicMaterial]،
+			[page:MeshLambertMaterial.combine MeshLambertMaterial]
+			و [page:MeshPhongMaterial.combine MeshPhongMaterial]. <br />
+			[page:Constant MultiplyOperation] هي الإعداد الافتراضي وتقوم بضرب لون خريطة البيئة بلون سطح الكائن.<br />
+			[page:Constant MixOperation] تستخدم معامل الانعكاسية لدمج اللونين.<br />
+			[page:Constant AddOperation] تقوم بجمع اللونين.
+		</p>
+
+		<h2>دوال القالب (Stencil Functions)</h2>
+		<code>
+		THREE.NeverStencilFunc 
+		THREE.LessStencilFunc 
+		THREE.EqualStencilFunc
+		THREE.LessEqualStencilFunc 
+		THREE.GreaterStencilFunc
+		THREE.NotEqualStencilFunc 
+		THREE.GreaterEqualStencilFunc
+		THREE.AlwaysStencilFunc
+		</code>
+		<p>
+			تحدد الدالة التي يستخدمها المادة لتحديد ما إذا كان يجب أن تنفذ عملية القالب أم لا.<br />
+			[page:Materials NeverStencilFunc] لن يعود بقيمة صحيحة أبدًا.<br />
+			[page:Materials LessStencilFunc] سيعود بقيمة صحيحة إذا كانت قيمة المرجع الختمية أقل من القيمة الحالية للختم.<br />
+			[page:Materials EqualStencilFunc] سيعود بقيمة صحيحة إذا كانت قيمة المرجع الختمية تساوي القيمة الحالية للختم.<br />
+			[page:Materials LessEqualStencilFunc] سيعود بقيمة صحيحة إذا كانت قيمة المرجع الختمية أقل من أو تساوي القيمة الحالية للختم.<br />
+			[page:Materials GreaterStencilFunc] سيعود بقيمة صحيحة إذا كانت قيمة المرجع الختمية أكبر من القيمة الحالية للختم.<br />
+			[page:Materials NotEqualStencilFunc] سيعود بقيمة صحيحة إذا كانت قيمة المرجع الختمية لا تساوي القيمة الحالية للختم.<br />
+			[page:Materials GreaterEqualStencilFunc] سيعود بقيمة صحيحة إذا كانت قيمة المرجع الختمية أكبر من أو تساوي القيمة الحالية للختم.<br />
+			[page:Materials AlwaysStencilFunc] سيعود بقيمة صحيحة دائمًا.<br />
+		</p>
+
+		<h2>عمليات القالب (Stencil Operations)</h2>
+		<code>
+		THREE.ZeroStencilOp 
+		THREE.KeepStencilOp 
+		THREE.ReplaceStencilOp
+		THREE.IncrementStencilOp 
+		THREE.DecrementStencilOp
+		THREE.IncrementWrapStencilOp 
+		THREE.DecrementWrapStencilOp
+		THREE.InvertStencilOp
+		</code>
+		<p>
+			تحدد العملية التي ستقوم بها المادة على ختم البيكسل في الختم إذا مرت الدالة الختمية المقدمة.<br />
+			[page:Materials ZeroStencilOp] سيضبط قيمة الختم على الصفر.<br />
+			[page:Materials KeepStencilOp] لن يقوم بتغيير قيمة الختم الحالية.<br />
+			[page:Materials ReplaceStencilOp] سيقوم بتبديل قيمة الختم بقيمة المرجع الختمية المحددة.<br />
+			[page:Materials IncrementStencilOp] سيزيد قيمة الختم الحالية بمقدار `1`.<br />
+			[page:Materials DecrementStencilOp] سينقص قيمة الختم الحالية بمقدار `1`.<br />
+			[page:Materials IncrementWrapStencilOp] سيزيد قيمة الختم الحالية بمقدار `1`. إذا زادت القيمة بعد ذلك عن `255`، فستضبط على `0`.<br />
+			[page:Materials DecrementWrapStencilOp] سينقص قيمة الختم الحالية بمقدار `1`. إذا انخفضت القيمة بعد ذلك أقل من `0`، فستضبط على `255`.<br />
+			[page:Materials InvertStencilOp] سيقوم بتنفيذ عملية انعكاس بتشكيلة الختم الحالية.<br />
+		</p>
+
+		<h2>نوع خريطة العرض الطبيعي (Normal map type)</h2>
+		<code>
+		THREE.TangentSpaceNormalMap 
+		THREE.ObjectSpaceNormalMap 
+		</code>
+		
+		<p>
+			تحدد نوع خريطة العرض الطبيعي. لـTangentSpaceNormalMap، المعلومات ذات الصلة بالسطح الأساسي. أما بالنسبة لـ ObjectSpaceNormalMap، المعلومات ذات الصلة باتجاه الكائن. الإعداد الافتراضي هو [page:Constant TangentSpaceNormalMap].
+		</p>
+
+		<h2>إصدار GLSL</h2>
+		<code>
+		THREE.GLSL1 
+		THREE.GLSL3 
+		</code>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

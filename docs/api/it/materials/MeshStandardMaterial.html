@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un materiale standard a base fisica, che utilizza il flusso di lavoro Metallic-Roughness.<br /><br />
+
+			Physically based rendering (PBR) è recentemente diventato uno standard in molte applicazioni 3D, come
+			[link:https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/ Unity],
+			[link:https://docs.unrealengine.com/latest/INT/Engine/Rendering/Materials/PhysicallyBased/ Unreal] e
+			[link:http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017 3D Studio Max].<br /><br />
+
+			Questo approccio differisce da quelli precedenti per il fatto che, invece di utilizzare le approssimazioni 
+			per il modo in cui la luce interagisce con una superficie, viene utilizzato un modello fisicamente corretto.
+			L'idea è che, invece di modificare i materiali per ottenere un buon risultato con un'illuminazione
+			specifica, è possibile creare un materiale che reagisca "correttamente" in tutti gli scenari di illuminazione.<br /><br />
+
+			In pratica questo fornisce un risultato dall'aspetto più accurato e realistico rispetto a [page:MeshLambertMaterial]
+			o [page:MeshPhongMaterial], a costo di essere un po' più costoso dal punto di vista computazionale.
+			[name] utilizza l'ombreggiatura per-fragment.<br /><br />
+
+			Si noti che per ottenere risultati migliori si deve sempre specificare una [page:.envMap mappa ambientale]
+			quando si utilizza questo materiale.<br /><br />
+
+			Per un'introduzione non tecnica al concetto di PBR e come impostare il materiale PBR,
+			consulta questi articoli delle persone di [link:https://www.marmoset.co marmoset]:
+
+			<ul>
+				<li>
+					[link:https://www.marmoset.co/posts/basic-theory-of-physically-based-rendering/ Basic Theory of Physically Based Rendering]
+				</li>
+				<li>
+					[link:https://www.marmoset.co/posts/physically-based-rendering-and-you-can-too/ Physically Based Rendering and You Can Too]
+				</li>
+			</ul>
+		</p>
+		<p>
+			Dettagli tecnici dell'approccio utilizzato in three.js (e altri sistemi PBR) possono essere trovati in questo 
+			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf articolo di Disney] (pdf),
+			di Brent Burley.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshStandardMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere passata qui. <br /><br />
+
+			L'eccezione è la proprietà [page:Hexadecimal colore], la quale può essere passata come stringa
+			esadecimale e per impostazione predefinita è `0xffffff` (bianco). [page:Color.set]( color ) viene chiamato internamente.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>La mappa alfa è una texture in scala di grigi che controlla l'opacità sulla superficie
+			(nero: completamente trasparente; bianco: completamente opaco). Il valore predefinito è `null`.<br /><br />
+
+			Viene utilizzato solo il colore della texture, ignorando il canale alfa, se esiste.
+			Per le texuture RGB e RGBA, il renderer [page:WebGLRenderer WebGL] utilizzarà il canale del verde 
+			durante il campionamento di questa texture a causa del bit extra di precisione fornito per il verde
+			nei formati RGB 565 compressi e non compressi DXT. Anche le texture solo luminanza e luminanza/alfa continueranno
+			a funzionare come previsto.
+		</p>
+
+		<h3>[property:Texture aoMap]</h3>
+		<p>Il canale rosso di questa texture viene utilizzato come la mappa di occlusione ambientale. Il valore 
+			predefinito è `null`. AoMap richiede un secondo set di UV.
+		</p>
+
+		<h3>[property:Float aoMapIntensity]</h3>
+		<p>L'intensità dell'effetto di occlusione ambientale. Il valore 
+			predefinito è `1`. Zero non è un effetto di occlusione.</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+			La texture per creare una mappa di rilievo. I valori nero e bianco si associano alla profondità percepita in relazione
+			alle luci. Bump in realtà non influisce sulla geometria dell'oggetto, solo sull'illuminazione. Se viene definita una mappa
+			normale questa verrà ignorata.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>Quanto la mappa di rilievo influisce sul materiale. Gli intervalli tipici sono 0-1. Il valore predefinito è 1.</p>
+
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color Colore] del materiale, il valore predefinito è impostato a bianco (0xffffff).</p>
+
+		<h3>[property:Object defines]</h3>
+		<p>Un oggetto della forma:
+			<code>
+				{ 'STANDARD': '' };
+			</code>
+
+			Questo viene utilizzato dal [page:WebGLRenderer] per selezionare gli shader.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			La mappa di spostamento influisce sulla posizione dei vertici della mesh.
+			A differenza di altre mappe che influenzano solo la luce e l'ombra del materiale, i vertici 
+			spostati possono proiettare ombre, bloccare altri oggetti, e altrimenti agire come una vera
+			geometria. La texture di spostamento è un'immagine in cui il valore di ciascun pixel (il bianco è 
+			il più alto) viene mappato e riposizionato rispetto ai vertici della mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			Quando la mappa di spostamento influenza la mesh (dove il nero non è lo spostamento,
+			e il bianco è lo spostamento massimo). Senza una mappa di spostamento impostata, questo valore
+			non viene applicato.
+			Il valore predefinito è 1.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			L'offset dei valori della mappa di spostamento sui vertici della mesh.
+			Senza una mappa di spostamento impostata, questo valore
+			non viene applicato. Il valore predefinito è 0.
+		</p>
+
+		<h3>[property:Color emissive]</h3>
+		<p>
+			Colore emissivo (chiaro) per il materiale, essenzialmente un colore solido non influenzato 
+			da altre luci. L'impostazione predefinita è nero.
+		</p>
+
+		<h3>[property:Texture emissiveMap]</h3>
+		<p>
+			Imposta la mappa emissiva (bagliore). Il valore predefinito è `null`. Il colore della mappa emissiva
+			è modulato dal colore emissivo e dall'intensità emissiva. Se si dispone di una mappa emissiva, 
+			assicurarsi di impostare il colore emissivo su qualcosa di diverso dal nero. 
+		</p>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<p>Intensità della luce emissiva. Modula il colore emissivo. Il valore predefinito è `1`.</p>
+
+		<h3>[property:Texture envMap]</h3>
+		<p>La mappa ambientale. Per assicurare un rendering fisicamente corretto, è necessario 
+			aggiungere solo le mappe ambientali che sono state processate da [page:PMREMGenerator].
+			Il valore predefinito è `null`.</p>
+		</p>
+
+		<h3>[property:Float envMapIntensity]</h3>
+		<p>Ridimensiona l'effetto della mappa ambientale moltiplicando il suo colore.</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+			Definisce se il materiale viene renderizzato con un'ombreggiatura piatta. Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Indica se il materiale è influenzato dalla nebbia. Il valore predefinito è `true`.</p>
+
+		<h3>[property:Boolean isMeshStandardMaterial]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Texture lightMap]</h3>
+		<p>La mappa della luce. Il valore predefinito è `null`. La lightMap richiede un secondo set di UV.</p>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<p>Intensità della luce. Il valore predefinito è `1`.</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			La mappa colore. Può includere facoltativamente un canale alfa, in genere combinato 
+			con [page:Material.transparent .transparent] o [page:Material.alphaTest .alphaTest]. Il valore predefinito è `null`.
+			Il colore della mappa della texture è modulato dal [page:.color] diffuso.
+		</p>
+
+		<h3>[property:Float metalness]</h3>
+		<p>
+			Quanto un materiale è come un metallo. I materiali non metallici come il legno o la pietra utilizzano il valore 0.0, quelli 
+			metallici utilizzano il valore 1.0, senza (di solito) nulla nel mezzo. Il valore predefinito è 0.0. Un valore tra 0.0 e 1.0 potrebbe
+			essere utilizzato per un aspetto di metallo arrugginito. Se viene fornito anche metalnessMap, entrambi i valori vengono
+			moltiplicati.
+		</p>
+
+		<h3>[property:Texture metalnessMap]</h3>
+		<p>Il canale blu di questa texture viene utilizzato per alterare la metallizzazione del materiale.</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			La texture per creare una mappa normale. I valori RGB influenzano la normale della superficie per ogni frammento di pixel 
+			e cambiano il modo in cui il colore è illuminato. Le mappe normali non modificano la figura effettiva della superficie,
+			ma solo l'illuminazione. Nel caso in cui il materiale abbia una mappa normale creata utilizzando la convezione della mano
+			sinistra, la componente y di normalScale deve essere negata per compensare la diversa mano.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+			Il tipo di mappa normale.<br /><br />
+
+			Le opzioni sono [page:constant THREE.TangentSpaceNormalMap] (impostazione predefinita), e [page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			Quanto la mappa normale influenza il materiale. Gli intervalli tipi sono 0-1.
+			Il valore predefinito è un [page:Vector2] impostato a (1,1).
+		</p>
+
+		<h3>[property:Float roughness]</h3>
+		<p>
+			Quanto ruvido appare il materiale. 0.0 un riflesso speculare uniforme, 1.0 significa completamente diffuso.
+			Il valore predefinito è 1.0. Se viene fornita anche roughnessMap, entrambi i valori vengono moltiplicati.
+		</p>
+
+		<h3>[property:Texture roughnessMap]</h3>
+		<p>Il canale verde di questa texture viene utilizzato per alterare la ruvidezza del materiale.</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>Rendering della geometria come wireframe. Il valore predefinito è `false` (cioè renderizzazione come poligoni piatti).</p>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<p>
+			Definisce l'aspetto delle estremità della linea. I valori possibili sono "butt", "round" e "square". Il valore predefinito è 'round'.<br /><br />
+
+			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<p>
+			Definisce l'aspetto dei punti di unione della linea. I valori possibili sono "round", "bevel" e "miter". Il valore predefinito è 'round'.<br /><br />
+
+			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Controlla lo spessore del wireframe. Il valore predefinito è `1`.<br /><br />
+
+			A causa delle limitazioni del [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf profilo OpenGL Core] 
+			con il renderer [page:WebGLRenderer WebGL] sulla maggior parte delle piattaforme, 
+			la larghezza di riga sarà sempre 1 indipendentemente dal valore impostato.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

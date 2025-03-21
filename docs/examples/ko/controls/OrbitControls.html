@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		궤도 컨트롤을 사용하면 카메라가 대상 주위를 공전 할 수 있습니다.<br>
+
+		이것을 사용하려면, / examples 디렉토리의 모든 파일들이 HTML에 별도의 파일을 포함해야합니다.
+
+		</p>
+
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		</code>
+
+		<h2>코드 예시</h2>
+
+		<code>
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const scene = new THREE.Scene();
+
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+
+		//controls.update()는 카메라 변환설정을 수동으로 변경한 후에 호출해야 합니다.
+		camera.position.set( 0, 20, 100 );
+		controls.update();
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			// 만약 controls.enableDamping, controls.autoRotate 둘 중 하나라도 true로 설정될 경우 필수로 호출되어야 합니다.
+			controls.update();
+
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+		<h2>예시</h2>
+
+		<p>[example:misc_controls_orbit misc / controls / orbit ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			[page:Camera object]: (필수) 제어할 카메라 객체 입니다. 해당 객체가 장면에 포함되지 않을 경우 다른 객체의 자식이 아니여야 합니다..<br><br>
+
+			[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
+		</p>
+
+		<h2>이벤트</h2>
+
+		<h3>change</h3>
+		<p>
+			컨트롤에 의해 카메라가 변환되면 호출됩니다.
+		</p>
+
+		<h3>start</h3>
+		<p>
+			상호 작용이 시작되면 호출됩니다.
+		</p>
+
+		<h3>end</h3>
+		<p>
+			상호 작용이 끝나면 호출됩니다.
+		</p>
+
+		<h2>특성</h2>
+
+		<h3>[property:Boolean autoRotate]</h3>
+		<p>
+			대상 주위를 자동으로 회전하려면 true로 설정합니다.<br> autoRotate를 활성할 경우, 애니메이션 루프에서 [page:.update()]를 호출해야 합니다.
+			Set to true to automatically rotate around the target.<br> Note that if this is enabled, you must call [page:.update]
+			() in your animation loop. If you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display), you must pass the time `deltaTime`, in seconds, to [page:.update]().
+		</p>
+
+		<h3>[property:Float autoRotateSpeed]</h3>
+		<p>
+			[page:.autoRotate]가 true일 경우, 타겟을 기준으로 주위의 회전 속도를 설정합니다. 기본값은 2.0 이고, 60fps에서 회전 당 30초에 해당합니다.
+			<br>만약 [page:.autoRotate]를 활성할 경우, 에니메이션 루프에서 [page:.update]를 호출해야 합니다.
+		</p>
+
+		<h3>
+			[property:Float dampingFactor]</h3>
+		<p> [page:.enableDamping]이 `true`일 경우 에니메이션 루프에서 [page:.update]()를 호출해야만 감쇠 관성를 사용할 수 있습니다. Default is `0.05`.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다; 생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			*false*로 설정할 경우, 컨트롤은 사용자 입력에 응답하지 못합니다. 기본값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Boolean enableDamping]</h3>
+		<p>
+			컨트롤의 가중치를 부여하는 데 사용할 수있는 댐핑 (관성)을 활성화하려면 true로 설정합니다.<br>
+			만약 enableDamping을 활성화 할 경우, 애니메이션 루프에서 [page:.update]를 호출해야 합니다.
+		</p>
+
+		<h3>[property:Boolean enablePan]</h3>
+		<p>
+			카매라 패닝의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Boolean enableRotate]</h3>
+		<p>
+			카메라의 수직 및 수평 회전의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.<br>
+			[page:.minPolarAngle polar angle] 또는 page:.minAzimuthAngle azimuth angle]의 최소 및 최대를 동일한 값으로 설정하여 단일 축을 비활성화 할 수 있습니다.
+			그러면 수직 또는 수평 회전이 해당 값으로 고정됩니다.
+
+		</p>
+
+		<h3>[property:Boolean enableZoom]</h3>
+		<p>
+			카메라 확대 / 축소 (dollying)를 활성화 또는 비활성화를 설정합니다.
+		</p>
+
+		<h3>[property:Float keyPanSpeed]</h3>
+		<p>
+			키보드를 사용할 때 카메라를 패닝하는 속도를 설정합니다. 기본값은 키 누름 당 7.0 픽셀입니다.
+		</p>
+
+		<h3>[property:Object keys]</h3>
+		<p>
+			해당 객체는 카메라 패닝을 제어하기위한 키 코드에 대한 참조를 포함합니다. 기본값은 4 개의 화살표 키입니다.
+			<code>
+controls.keys = {
+	LEFT: 'ArrowLeft', // 왼쪽 화살표
+	UP: 'ArrowUp', // 위쪽 화살표
+	RIGHT: 'ArrowRight', // 오른쪽 화살표
+	BOTTOM: 'ArrowDown' // 아래쪽 화살표
+}
+			 </code>
+			 전체 키코드 목록은 [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code KeyboardEvent.code] 를 참조하세요.
+		</p>
+
+		<h3>[property:Float maxAzimuthAngle]</h3>
+		<p>
+			수평으로 궤도를 얼마나 돌 수 있는지 상한을 설정합니다. [ min, max ] 	의 간격은 ( max - min < 2 PI ) 와 함께 ( max - min < 2 PI ) 의 하위 간격이어야 합니다. 기본값은 무한대입니다.
+		</p>
+
+		<h3>[property:Float maxDistance]</h3>
+		<p>
+			달리 아웃(dolly out)할 수 있는 최대 거리를 설정합니다. ([page:PerspectiveCamera] only). 기본값은 무한대입니다.
+		</p>
+
+		<h3>[property:Float maxPolarAngle]</h3>
+		<p>
+			수직으로 궤도를 얼마나 돌 수 있는지 상한을 설정합니다. 0 부터 Math.PI radians 까지 범위를 가질 수 있습니다. 기본값은 Math.PI 입니다.
+		</p>
+
+		<h3>[property:Float maxZoom]</h3>
+		<p>
+			축소 할 수 있는 범위를 설정합니다.( [page:OrthographicCamera] only ). 기본값은 무한대입니다.
+		</p>
+
+		<h3>[property:Float minAzimuthAngle]</h3>
+		<p>
+			수평으로 궤도를 얼마나 돌 수 있는지 하한을 설정합니다. [ min, max ] 의 간격은 ( max - min < 2 PI ) 와 함께 ( max - min < 2 PI ) 의 하위 간격이어야 합니다. 기본값은 무한대입니다.
+		</p>
+
+		<h3>[property:Float minDistance]</h3>
+		<p>
+			달리 인(dolly in)할 수 있는 최소 거리를 설정합니다. ([page:PerspectiveCamera] only). 기본값은 0 입니다.
+		</p>
+
+		<h3>[property:Float minPolarAngle]</h3>
+		<p>
+			수직으로 궤도를 얼마나 돌 수 있는지 하한을 설정합니다. 0 부터 Math.PI radians 까지 범위를 가질 수 있습니다. 기본값은 0 입니다.
+		</p>
+
+		<h3>[property:Float minZoom]</h3>
+		<p>
+			확대 할 수 있는 범위를 설정합니다. ( [page:OrthographicCamera] only ). 기본값은 0 입니다.
+		</p>
+
+		<h3>
+			[property:Object mouseButtons]</h3>
+		<p>
+			해당 객체는 컨트롤에서 사용하는 마우스 동작에 대한 참조를 포함합니다.
+			<code>
+controls.mouseButtons = {
+	LEFT: THREE.MOUSE.ROTATE,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.PAN
+}
+			</code>
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			제어할 카메라 객체입니다.
+		</p>
+
+		<h3>[property:Float panSpeed]</h3>
+		<p>
+			패닝 속도를 설정합니다. 기본값은 1입니다.
+		</p>
+
+		<h3>[property:Vector3 position0]</h3>
+		<p>
+			해당 프로퍼티는 [page:.saveState] 및 [page:.reset] 메서드에서 내부적으로 사용합니다.
+		</p>
+
+		<h3>[property:Float rotateSpeed]</h3>
+		<p>
+			회전 속도를 설정합니다. 기본값은 1입니다.
+		</p>
+
+		<h3>[property:Boolean screenSpacePanning]</h3>
+		<p>
+		패닝할 떄, 카메라 위치가 변환되는 방식를 정의합니다. 만약 true일 경우, 카메라가 화면 공간에서 이동합니다.
+		Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
+		OrbitControls의 경우 기본값은 true 이고, MapControls의 경우 기본값은 false 입니다.
+		</p>
+
+		<h3>[property:Vector3 target0]</h3>
+		<p>
+			[page:.saveState] 및 [method:rest] 메서드에서 내부적으로 사용합니다.
+		</p>
+
+		<h3>[property:Vector3 target]</h3>
+		<p>
+			컨트롤의 중요 포인트는, [page:.object] 를 중심으로 회전하는 것입니다. 컨트롤의 중요 포인트는 언제든지 수동으로 변경할 수 있습니다.
+		</p>
+
+		<h3>[property:Object touches]</h3>
+		<p>
+			해당 객체는 컨트롤에 사용되는 터치 동작에 대한 참조를 포함합니다.
+			<code>
+controls.touches = {
+	ONE: THREE.TOUCH.ROTATE,
+	TWO: THREE.TOUCH.DOLLY_PAN
+}
+			</code>
+		</p>
+
+		<h3>[property:Float zoom0]</h3>
+		<p>
+			[page:.saveState] 및 [page:.reset] 메서드에서 내부적으로 사용합니다.
+		</p>
+
+		<h3>[property:Float zoomSpeed]</h3>
+		<p>
+			줌잉(Zooming)과 달링(Dollying)의 속도를 설정합니다. 기본값은 1 입니다.
+		</p>
+
+		<h3>[property:Boolean zoomToCursor]</h3>
+		<p>
+		Setting this property to `true` allows to zoom to the cursor's position. Default is `false`.
+		</p>
+
+		<h2>메서드</h2>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			모든 이벤트 리스너를 삭제합니다.
+			Remove all the event listeners.
+		</p>
+
+		<h3>[method:radians getAzimuthalAngle] ()</h3>
+		<p>
+			라디안 단위로 현재 수평 회전값을 가져옵니다.
+		</p>
+
+		<h3>[method:radians getPolarAngle] ()</h3>
+		<p>
+			라디안 단위로 현재 수직 회전값을 가져옵니다.
+		</p>
+
+		<h3>[method:Float getDistance] ()</h3>
+		<p>
+			Returns the distance from the camera to the target.
+		</p>
+
+		<h3>[method:undefined listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
+		</p>
+
+		<h3>[method:undefined reset] ()</h3>
+		<p>
+			컨트롤이 마지막으로 호출된 [page:.saveState] 시점으로 돌리거나, 초기상태로 재설정합니다.
+		</p>
+
+		<h3>[method:undefined saveState] ()</h3>
+		<p>
+			컨트롤의 현재 상태를 저장합니다. 나중에 [page:.reset]을 이용하여 현재 상태로 복구할 수 있습니다.
+		</p>
+
+		<h3>[method:undefined stopListenToKeyEvents] ()</h3>
+		<p>
+			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
+		</p>
+
+		<h3>[method:Boolean update] (  [param:Number deltaTime]  )</h3>
+		<p>
+			컨트롤을 업데이트합니다. 카메라를 수동으로 변환하거나, [page:.autoRotate] 또는 [page:.enableDamping]을 설정할 경우 업데이트 루프에서 호출해야 합니다.
+			Update the controls. Must be called after any manual changes to the camera's transform,
+			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set. `deltaTime`, in seconds, is optional,
+			and is only required if you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display).
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js examples/jsm/controls/OrbitControls.js]
+		</p>
+	</body>
+</html>

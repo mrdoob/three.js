@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>数据数组纹理([name])</h1>
+
+		<p class="desc">
+			直接从原始数据、宽度、高度和深度创建纹理数组。
+		</p>
+
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( data, width, height, depth )</h3>
+		<p>
+      data参数必须是[link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView]。
+      默认继承自[page:Texture Texture]的属性，除了magFilter和minFilter默认为THREE.NearestFilter。
+      属性flipY和generateMipmaps最初设置为false。
+		</p>
+		<p>
+      数据的解释取决于类型和格式：如果类型是THREE.UnsignedByteType，则Uint8Array可用于寻址纹素数据。
+      如果格式为THREE.RGBAFormat，则数据需要为一个纹素提供四个值；红色、绿色、蓝色和Alpha（通常是不透明度）。
+      对于打包类型，THREE.UnsignedShort4444Type和THREE.UnsignedShort5551Type，一个纹素的所有颜色分量都可以作为Uint16Array的整数元素中的位域进行寻址。
+      为了使用THREE.FloatType和THREE.HalfFloatType类型，WebGL实现必须支持相应的扩展OES_texture_float和OES_texture_half_float。
+      为了将THREE.LinearFilter用于基于这些类型的纹素的分量双线性插值，还必须存在WebGL扩展OES_texture_float_linear或OES_texture_half_float_linear。
+		</p>
+
+		<h2>代码示例(Code Example)</h2>
+
+		<p>这将创建一个[name]，其中每个纹理都有不同的颜色。</p>
+
+		<code>
+		// 使用颜色数据创建缓冲区
+
+		const width = 512;
+		const height = 512;
+		const depth = 100;
+
+		const size = width * height;
+		const data = new Uint8Array( 4 * size * depth );
+
+		for ( let i = 0; i < depth; i ++ ) {
+
+			const color = new THREE.Color( Math.random(), Math.random(), Math.random() );
+			const r = Math.floor( color.r * 255 );
+			const g = Math.floor( color.g * 255 );
+			const b = Math.floor( color.b * 255 );
+
+			for ( let j = 0; j < size; j ++ ) {
+
+				const stride = ( i * size + j ) * 4;
+
+				data[ stride ] = r;
+				data[ stride + 1 ] = g;
+				data[ stride + 2 ] = b;
+				data[ stride + 3 ] = 255;
+
+			}
+		}
+
+		//  使用缓冲区创建的颜色数据创建缓冲区[name]
+
+		const texture = new THREE.DataArrayTexture( data, width, height, depth );
+		texture.needsUpdate = true;
+		</code>
+
+		<h2>示例(Examples)</h2>
+
+		<p>
+			[example:webgl_texture2darray WebGL / texture2darray]<br />
+			[example:webgl_rendertarget_texture2darray WebGL / rendertarget / texture2darray]
+		</p>
+
+		<h2>特性(Properties)</h2>
+
+		<p>
+      请参阅基本[page:Texture Texture]类以了解通用属性
+		</p>
+
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+			纹理上传到GPU时是否沿Y轴翻转。默认为false。
+		</p>
+	
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+			是否为纹理生成mipmap（如果可能）。默认为false。
+		</p>
+
+		<h3>[property:Object image]</h3>
+		<p>
+			被包含数据、宽度、高度和深度的对象覆盖。
+		</p>
+
+		<h3>[property:Boolean isDataArrayTexture]</h3>
+		<p>
+      只读标志，用于检查给定对象是否属于[name]类型。
+		</p>
+
+		<h3>[property:number magFilter]</h3>
+		<p>
+      当纹素覆盖多个像素时如何对纹理进行采样。默认值为[page:Textures THREE.NearestFilter]，它使用最近的纹理元素的值。
+			<br /><br />
+		 
+      有关详细信息，请参阅[page:Textures texture constants]页面。
+		</p>
+
+		<h3>[property:number minFilter]</h3>
+		<p>
+      当纹素覆盖少于一个像素时如何对纹理进行采样。默认值为[page:Textures THREE.NearestFilter]，它使用最近的纹理元素的值。
+			<br /><br />
+
+			有关详细信息，请参阅[page:Textures texture constants]页面。
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+      默认为1。
+      指定内存中每个像素行开始的对齐要求。
+      允许的值为1（字节对齐）、2（行对齐到偶数字节）、4（字对齐）和8（行从双字边界开始）。 
+      有关详细信息，请参阅[link:https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glPixelStorei.xhtml glPixelStorei]。
+		</p>
+
+		<h3>[property:number wrapR]</h3>
+		<p>
+      这定义了纹理在深度方向上的包裹方式。<br />
+      默认值为[page:Textures THREE.ClampToEdgeWrapping]，其中边缘被夹紧到外边缘纹素。
+      其他两个选择是[page:Textures THREE.RepeatWrapping]和[page:Textures THREE.MirroredRepeatWrapping]。
+
+			有关详细信息，请参阅[page:Textures texture constants]页面。
+		</p>
+
+		<h2>方法(Methods)</h2>
+
+		<p>
+      有关常用方法， 请参见[page:Texture Texture]类。
+		</p>
+
+		<h2>源代码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

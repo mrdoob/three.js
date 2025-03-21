@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>CCDIK解算器([name])</h1>
+
+	<p class="desc"> 一种基于 <a href="https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm">`CCD Algorithm`</a> 的 IK
+		解算器。<br /><br />
+		[name] 用 CCD 算法解决逆运动学问题。
+		[name] 设计用于与 [page:SkinnedMesh] 配合使用，但也可与 [page:GLTFLoader] 配合使用。
+	</p>
+
+	<iframe id="scene" src="scenes/ccdiksolver-browser.html"></iframe>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { CCDIKSolver } from 'three/addons/animation/CCDIKSolver.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		let ikSolver;
+
+		//
+		// Bones hierarchy:
+		//
+		//   root
+		//     ├── bone0
+		//     │    └── bone1
+		//     │          └── bone2
+		//     │                └── bone3
+		//     └── target
+		//
+		// Positioned as follow on the cylinder:
+		//
+		//        o      <- target      (y =  20)
+		//        
+		//   +----o----+ <- bone3       (y =  12)
+		//   |         |
+		//   |    o    | <- bone2       (y =   4)
+		//   |         |
+		//   |    o    | <- bone1       (y =  -4)
+		//   |         |
+		//   +----oo---+ <- root, bone0 (y = -12)
+		//
+
+		let bones = []
+
+		// "root"
+		let rootBone = new Bone();
+		rootBone.position.y = -12;
+		bones.push( rootBone );
+
+		// "bone0"
+		let prevBone = new Bone();
+		prevBone.position.y = 0;
+		rootBone.add( prevBone );
+		bones.push( prevBone );
+
+		// "bone1", "bone2", "bone3"
+		for ( let i = 1; i <= 3; i ++ ) {
+			const bone = new Bone();
+			bone.position.y = 8;
+			bones.push( bone );
+			
+			prevBone.add( bone );
+			prevBone = bone;
+		}
+
+		// "target"
+		const targetBone = new Bone();
+		targetBone.position.y = 24 + 8
+		rootBone.add( targetBone );
+		bones.push( targetBone );
+
+		//
+		// skinned mesh
+		//
+
+		const mesh = new SkinnedMesh( geometry,	material );
+		const skeleton = new Skeleton( bones );
+
+		mesh.add( bones[ 0 ] ); // "root" bone
+		mesh.bind( skeleton );
+
+		//
+		// ikSolver
+		//
+
+		const iks = [
+			{
+				target: 5, // "target"
+				effector: 4, // "bone3"
+				links: [ { index: 3 }, { index: 2 }, { index: 1 } ] // "bone2", "bone1", "bone0"
+			}
+		];
+		ikSolver = new CCDIKSolver( mesh, iks );
+
+		function render() {
+			ikSolver?.update();
+			renderer.render( scene, camera );
+		}
+		</code>
+
+	<h2>例子</h2>
+
+	<p>
+		[example:webgl_animation_skinning_ik]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:SkinnedMesh mesh], [param:Array iks] )</h3>
+	<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh] 用于 [name] 解决 IK 问题<br />
+		[page:Array iks] — 指定 IK 参数的对象 [page:Object] 数组。target、effector 和 link-index 是 .sculptor.bones
+		中的索引整数。骨骼关系从父级到子级的顺序应为“links[ n ]、 links[ n - 1 ]、...、 links[ 0 ]、effector”。<br />
+	</p>
+	<ul>
+		<li>[page:Integer target] — 目标骨骼</li>
+		<li>[page:Integer effector] — 效应器骨</li>
+		<li>[page:Array links] — 指定链接骨骼的对象[page:Object] 数组
+			<ul>
+				<li>[page:Integer index] — 链接骨骼</li>
+				<li>[page:Vector3 limitation] — （可选）旋转轴。默认值 undefined</li>
+				<li>[page:Vector3 rotationMin] — （可选）旋转最小限制。默认值 undefined</li>
+				<li>[page:Vector3 rotationMax] — （可选）旋转最大限制。默认值 undefined</li>
+				<li>[page:Boolean enabled] — （可选）默认值为 true。</li>
+			</ul>
+		</li>
+		<li>[page:Integer iteration] — （可选）计算的迭代次数。越小速度越快，但精度较差。默认值为 1。</li>
+		<li>[page:Number minAngle] — （可选）一步中的最小旋转角度。默认值 undefined</li>
+		<li>[page:Number maxAngle] — （可选）一步中的最大旋转角度。默认值 undefined</li>
+	</ul>
+	<p>
+		创建一个新的 [name]。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:Array iks]</h3>
+	<p>传递给构造函数的 IK 参数数组。</p>
+
+	<h3>[property:SkinnedMesh mesh]</h3>
+	<p>[page:SkinnedMesh] 传递给构造函数。</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:CCDIKHelper createHelper]()</h3>
+	<p>
+		返回 [page:CCDIKHelper]. 。您可以通过将辅助对象添加到场景来可视化 IK 骨骼。
+	</p>
+
+	<h3>[method:this update]()</h3>
+	<p>
+		通过求解 CCD 算法更新 IK 骨骼四元数。
+	</p>
+
+	<h3>[method:this updateOne]( [param:Object ikParam] )</h3>
+	<p>
+		通过求解 CCD 算法来更新一个 IK 骨骼四元数。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/CCDIKSolver.js examples/jsm/animation/CCDIKSolver.js]
+	</p>
+</body>
+
+</html>

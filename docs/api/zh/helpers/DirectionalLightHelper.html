@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			用于模拟场景中平行光 [page:DirectionalLight] 的辅助对象.
+
+			其中包含了表示光位置的平面和表示光方向的线段.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const light = new THREE.DirectionalLight( 0xFFFFFF );
+		scene.add( light );
+
+		const helper = new THREE.DirectionalLightHelper( light, 5 );
+		scene.add( helper );
+		</code>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:DirectionalLight light], [param:Number size], [param:Hex color] )</h3>
+		<p>
+			[page:DirectionalLight light]-- 被模拟的光源. <br /><br />
+
+			[page:Number size] -- (可选的) 平面的尺寸. 默认为 *1*.<br /><br />
+
+			[page:Hex color] -- (可选的) 如果没有设置颜色将使用光源的颜色.
+		</p>
+
+
+		<h2>属性</h2>
+		<p>请到基类 [page:Object3D] 页面查看公共属性.</p>
+
+
+		<h3>[property:Line lightPlane]</h3>
+		<p>包含表示平行光方向的线网格.</p>
+
+		<h3>[property:DirectionalLight light]</h3>
+		<p>被模拟的光源. 请参考 [page:DirectionalLight directionalLight] .</p>
+
+		<h3>[property:Object matrix]</h3>
+		<p>请参考光源的世界矩阵 [page:Object3D.matrixWorld matrixWorld].</p>
+
+		<h3>[property:Object matrixAutoUpdate]</h3>
+		<p>
+			请查看 [page:Object3D.matrixAutoUpdate] 页面. 这里设置为 *false* 表示辅助对象
+			使用光源的 [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:hex color]</h3>
+		<p>
+			构造函数中传入的颜色值. 默认为 *undefined*. 如果改变该值,
+			辅助对象的颜色将在下一次 [page:.update update] 被调用时更新.
+		</p>
+
+
+		<h2>方法</h2>
+		<p>请到基类 [page:Object3D] 页面查看公共方法.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>销毁该平行光辅助对象.</p>
+
+
+		<h3>[method:undefined update]()</h3>
+		<p>更新辅助对象，与模拟的 [page:.light directionalLight] 光源的位置和方向保持一致.</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

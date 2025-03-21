@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			فئة أساسية مجردة لإنشاء كائن [name] يحتوي على طرق للإدراج. لمجموعة من [name]s انظر [page:CurvePath].
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]()</h3>
+		 
+		<p>ينشئ هذا المُنشئ [name] جديدًا.</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Integer arcLengthDivisions]</h3>
+		<p>
+			يحدد هذا القيمة عدد الشعبات عند حساب طول الشطر التراكمي للمنحنى عبر [page:.getLengths]. لضمان
+			الدقة عند استخدام طرق مثل [page:.getSpacedPoints]، يوصى بزيادة [page:.arcLengthDivisions] إذا كان المنحنى كبيرًا جدًا. الافتراضي هو 200.
+		</p>
+		 
+		<h2>الوظائف (Methods)</h2>
+		 
+		<h3>[method:Vector getPoint]( [param:Float t], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float t] - موقع على المنحنى. يجب أن يكون في النطاق [0، 1].
+			<br />
+			[page:Vector optionalTarget] - (اختياري) إذا تم تحديده، سيتم نسخ النتيجة في هذا الفيكتور، وإلا سيتم إنشاء فيكتور جديد.
+			<br /><br />
+		 
+			يعود بفيكتور لموقع معين على المنحنى.
+		</p>
+		 
+		<h3>[method:Vector getPointAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float u] - موقع على المنحنى وفقًا لطول القوس. يجب أن يكون في النطاق [0، 1]. <br />
+			[page:Vector optionalTarget] - (اختياري) إذا تم تحديده، سيتم نسخ النتيجة في هذا الفيكتور، وإلا سيتم إنشاء فيكتور جديد.
+			<br /><br />
+		 
+			يعود بفيكتور لموقع معين على المنحنى وفقًا لطول القوس.
+		</p>
+		 
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions - عدد الأجزاء التي يتم تقسيم المنحنى إليها. الافتراضي هو `5`.<br /><br />
+		 
+			يعود بمجموعة من divisions + 1 نقطة باستخدام getPoint( t ).
+		</p>
+		 
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions - عدد الأجزاء التي يتم تقسيم المнحنى إليها. الافتراضي هو `5`.<br /><br />
+		 
+			يعود بمجموعة من divisions + 1 نقطة متساوية المسافات باستخدام getPointAt( u ).
+		</p>
+
+		<h3>[method:Float getLength]()</h3>
+		<p>احصل على إجمالي طول قوس المنحنى.</p>
+		
+		<h3>[method:Array getLengths]( [param:Integer divisions] )</h3>
+		<p>احصل على قائمة بطول الشرائح التراكمية.</p>
+		
+		<h3>[method:undefined updateArcLengths]()</h3>
+		<p>
+			تحديث ذاكرة التخزين المؤقت للمسافة الشريطية التراكمية. يجب استدعاء الطريقة
+			في كل مرة يتم فيها تغيير معلمات المنحنى. إذا كان المنحنى المحدث جزءًا من
+			منحنى مكون مثل [page:CurvePath]، يجب
+			استدعاء [page:.updateArcLengths]() على المنحنى المكوَّن أيضًا.
+		</p>
+		
+		<h3>[method:Float getUtoTmapping]( [param:Float u], [param:Float distance] )</h3>
+		<p>
+			بالنظر إلى u في النطاق (0 .. 1) ، يعود [page:Float t] أيضًا في النطاق
+			(0 .. 1). يمكن استخدام u و t لإعطائك نقاط هي
+			متساوية البعد من نهايات المنحنى ، باستخدام [page:.getPoint].
+		</p>
+		
+		<h3>[method:Vector getTangent]( [param:Float t], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float t] - موضع على المنحنى. يجب أن يكون في النطاق [0، 1].
+			<br />
+			[page:Vector optionalTarget] - (اختياري) إذا تم تحديده ، سيتم
+			نسخ النتيجة في هذا Vector ، وإلا سيتم إنشاء Vector جديد.
+			<br /><br />
+		
+			يعود بمتجه وحدة مماس على t. إذا لم يكن المنحنى المشتق
+			تطبيق تفريعه المماس ، سيتم استخدام نقطتين صغيرتين delta بعيدًا للعثور على التدرج الذي يبدو أنه يعطي تقريبًا معقولًا.
+		</p>
+		
+		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
+		<p>
+			[page:Float u] - موقع على المنحنى وفقًا لطول القوس. يجب أن يكون في النطاق [0، 1].
+
+			[page:Vector optionalTarget] - (اختياري) إذا تم تحديده، سيتم نسخ النتيجة في هذا الفيكتور، وإلا سيتم إنشاء فيكتور جديد.
+			
+			يعود الميل في نقطة تبعد مسافة متساوية عن طرفي المنحنى من النقطة المعطاة في [page:.getTangent].
+		</p>
+		
+		<h3>[method:Object computeFrenetFrames]( [param:Integer segments], [param:Boolean closed] )</h3>
+		<p>
+			إنشاء Frenet Frames. يتطلب تعريف منحى في فضاء 3D. مستخدم
+			في هَیْأَات مثل [page:TubeGeometry] أو [page:ExtrudeGeometry].
+		</p>
+		
+		<h3>[method:Curve clone]()</h3>
+		<p>إنشاء نسخة من هذه الحالة.</p>
+		
+		<h3>[method:this copy]( [param:Curve source] )</h3>
+		<p>يلصق كائن [name] آخر إلى هذه الحالة.</p>
+		
+		<h3>[method:Object toJSON]()</h3>
+		<p>يرجع كائن JSON لتمثيل هذه الحالة.</p>
+		
+		<h3>[method:this fromJSON]( [param:Object json] )</h3>
+		<p>يلصق البيانات من كائن JSON المعطى إلى هذه الحالة.</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

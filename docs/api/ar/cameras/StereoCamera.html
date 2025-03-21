@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			كاميرات بتأثير مزدوج [page:PerspectiveCamera] تستخدم لتحقيق تأثيرات مثل 
+			[link:https://en.wikipedia.org/wiki/Anaglyph_3D 3D Anaglyph] أو 
+			[link:https://en.wikipedia.org/wiki/parallax_barrier Parallax Barrier].
+		</p>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+			[example:webgl_effects_stereo effects / stereo ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+		<h3>[name]( )</h3>
+		
+		<h2>الخصائص (Properties)</h2>
+
+		<h3>[property:Float aspect]</h3>
+		<p>العدد الافتراضي هو `1`.</p>
+
+		<h3>[property:Float eyeSep]</h3>
+		<p>العدد الافتراضي هو `0.064`.</p>
+
+		<h3>[property:PerspectiveCamera cameraL]</h3>
+		<p>
+			الكاميرا اليسرى. يتم إضافتها إلى [page:Layers layer 1] - يجب أن يتم إضافة الكائنات التي يتم عرضها
+			بالكاميرا اليسرى إلى هذه الطبقة أيضًا.
+		</p>
+
+		<h3>[property:PerspectiveCamera cameraR]</h3>
+		<p>
+			الكاميرا اليمنى. يتم إضافتها إلى [page:Layers layer 2] - يجب أن يتم إضافة الكائنات التي يتم عرضها 
+			بالكاميرا اليمنى إلى هذه الطبقة أيضًا.
+		</p>
+
+		<h2>الوظائف (Methods)</h2>
+
+		<h3>[method:undefined update]( [param:PerspectiveCamera camera] )</h3>
+		<p>يقوم بتحديث الكاميرات الاستريو بناءً على الكاميرا الممررة كمعامل.</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

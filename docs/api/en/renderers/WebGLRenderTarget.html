@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A
+			[link:https://webglfundamentals.org/webgl/lessons/webgl-render-to-texture.html render target] 
+			is a buffer where the video card draws pixels for a scene
+			that is being rendered in the background. It is used in different effects,
+			such as applying postprocessing to a rendered image before displaying it
+			on the screen.
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]([param:Number width], [param:Number height], [param:Object options])
+		</h3>
+
+		<p>
+			[page:Float width] - The width of the renderTarget. Default is `1`.<br />
+			[page:Float height] - The height of the renderTarget. Default is `1`.<br />
+			options - optional object that holds texture parameters for an
+			auto-generated target texture and depthBuffer/stencilBuffer booleans. For
+			an explanation of the texture parameters see [page:Texture Texture]. The
+			following are valid options:<br /><br />
+
+			[page:Constant wrapS] - default is [page:Textures ClampToEdgeWrapping].
+			<br />
+			[page:Constant wrapT] - default is [page:Textures ClampToEdgeWrapping].
+			<br />
+			[page:Constant magFilter] - default is [page:Textures LinearFilter].
+			<br />
+			[page:Constant minFilter] - default is [page:Textures LinearFilter].
+			<br />
+			[page:Boolean generateMipmaps] - default is `false`.<br />
+			[page:Constant format] - default is [page:Textures RGBAFormat]. <br />
+			[page:Constant type] - default is [page:Textures UnsignedByteType]. <br />
+			[page:Number anisotropy] - default is `1`. See
+			[page:Texture.anisotropy]<br />
+			[page:Constant colorSpace] - default is [page:Textures NoColorSpace].
+			<br />
+			[page:String internalFormat] - default is `null`.<br />
+			[page:Boolean depthBuffer] - default is `true`. <br />
+			[page:Boolean stencilBuffer] - default is `false`.<br />
+			[page:Boolean resolveDepthBuffer] - default is `true`.<br />
+			[page:Boolean resolveStencilBuffer] - default is `true`.<br />
+			[page:Number samples] - default is `0`.<br />
+			[page:Number count] - default is `1`.<br /><br />
+
+			Creates a new [name]
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h3>[property:number width]</h3>
+		<p>The width of the render target.</p>
+
+		<h3>[property:number height]</h3>
+		<p>The height of the render target.</p>
+
+		<h3>[property:Vector4 scissor]</h3>
+		<p>
+			A rectangular area inside the render target's viewport. Fragments that are
+			outside the area will be discarded.
+		</p>
+
+		<h3>[property:Boolean scissorTest]</h3>
+		<p>Indicates whether the scissor test is active or not.</p>
+
+		<h3>[property:Vector4 viewport]</h3>
+		<p>The viewport of this render target.</p>
+
+		<h3>[property:Texture texture]</h3>
+		<p>
+			This texture instance holds the rendered pixels. Use it as input for
+			further processing.
+		</p>
+
+		<h3>[property:Texture textures]</h3>
+		<p>
+			An array holding the [page:WebGLRenderTarget.texture texture] references
+			of multiple render targets configured with the [page:Number count] option.
+		</p>
+
+		<h3>[property:Boolean depthBuffer]</h3>
+		<p>Renders to the depth buffer. Default is true.</p>
+
+		<h3>[property:Boolean stencilBuffer]</h3>
+		<p>Renders to the stencil buffer. Default is false.</p>
+
+		<h3>[property:Boolean resolveDepthBuffer]</h3>
+		<p>
+			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
+			Default is `true`.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
+			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+			Default is `true`.
+		</p>
+
+		<h3>[property:DepthTexture depthTexture]</h3>
+		<p>
+			If set, the scene depth will be rendered to this texture. Default is null.
+		</p>
+
+		<h3>[property:Number samples]</h3>
+		<p>
+			Defines the count of MSAA samples. Default is `0`.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>
+			[method:undefined setSize]( [param:Number width], [param:Number height] )
+		</h3>
+		<p>Sets the size of the render target.</p>
+
+		<h3>[method:WebGLRenderTarget clone]()</h3>
+		<p>Creates a copy of this render target.</p>
+
+		<h3>[method:this copy]( [param:WebGLRenderTarget source] )</h3>
+		<p>
+			Adopts the settings of the given render target. This is a structural copy so 
+			no resources are shared between render targets after the copy. That includes
+			all MRT textures and the depth texture.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
+
+		<p>
+			[page:EventDispatcher EventDispatcher] methods are available on this
+			class.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

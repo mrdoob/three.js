@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:Group] &rarr;
+
+	<h1>XR估计光照([name])</h1>
+
+	<p class="desc">
+		[name] 使用 WebXR 的光照估计来创建光探针、定向光和（可选）模拟用户真实世界环境和照明的环境图。<br>
+		当 WebXR 更新光照和环境估计时，[name] 会自动更新光照探针、定向光和环境贴图。<br><br>
+
+		在创建 WebXR 会话时，将光照估计指定为可选或必需的功能非常重要，否则光照估计将无法工作。<br><br>
+
+		有关浏览器兼容性信息，请参阅 <a
+			href="https://developer.mozilla.org/en-US/docs/Web/API/XRLightProbe#browser_compatibility">此处</a>，因为这仍然是 WebXR
+		中的一个实验功能。<br><br>
+
+		要使用它，就像 /examples 目录中的所有文件一样，您必须在HTML中单独包含该文件。
+	</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+		import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		renderer.xr.enabled = true;
+
+		// Don't add the XREstimatedLight to the scene initially.
+		// It doesn't have any estimated lighting values until an AR session starts.
+		const xrLight = new XREstimatedLight( renderer );
+
+		xrLight.addEventListener( 'estimationstart' , () => {
+
+			scene.add( xrLight );
+
+			if ( xrLight.environment ) {
+
+				scene.environment = xrLight.environment;
+
+			}
+
+		} );
+
+		xrLight.addEventListener( 'estimationend', () => {
+
+			scene.remove( xrLight );
+
+			scene.environment = null;
+
+		} );
+
+		// In order for lighting estimation to work, 'light-estimation' must be included as either
+		// an optional or required feature.
+		document.body.appendChild( XRButton.createButton( renderer, {
+			optionalFeatures: [ 'light-estimation' ]
+		} ) );
+		</code>
+
+	<h2>例子</h2>
+
+	<p>[example:webxr_ar_lighting webxr / light estimation]</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:WebGLRenderer renderer], [param:Boolean environmentEstimation] )</h3>
+	<p>
+		[page:WebGLRenderer renderer]: （必需）用于渲染场景的渲染器。主要用于与 WebXRManager 交互。<br><br>
+
+		environmentEstimation: 如果 `true`，则使用 WebXR 来估计环境地图。
+	</p>
+
+	<h2>事件</h2>
+
+	<h3>estimationstart</h3>
+	<p>
+		当估计的照明值开始更新时触发。
+	</p>
+
+	<h3>estimationend</h3>
+	<p>
+		当估计的照明值停止更新时触发。
+	</p>
+
+	<h2>Properties</h2>
+
+	<h3>[property:Texture environment]</h3>
+	<p>
+		WebXR 估计的环境地图。仅当 environmentEstimation 为 时，此选项才可用 `true`。<br><br>
+
+		它可以用作 [page:Scene.environment] 的 [page:MeshStandardMaterial.envMap] 或 [page:Scene.background]。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XREstimatedLight.js examples/jsm/webxr/XREstimatedLight.js]
+	</p>
+</body>
+
+</html>

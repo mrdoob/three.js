@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Questa classe contiene i parametri che definiscono la nebbia lineare, cioè che cresce linearmente con la distanza.</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+			const scene = new THREE.Scene();
+			scene.fog = new THREE.Fog( 0xcccccc, 10, 15 );
+		</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:Float near], [param:Float far] )</h3>
+		<p>
+			Il parametro colore è passato al costruttore [page:Color] per impostare la proprietà colore.
+			La proprietà colore può essere un intero esadecimale o una stringa CSS.</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isFog]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>Nome opzionale dell'oggetto (non è necessario che sia univoco). Il valore predefinito è una stringa vuota.</p>
+
+		<h3>[property:Color color]</h3>
+		<p>Colore della nebbia. Esempio: Se impostato su nero, gli oggetti lontani saranno neri.</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+			La distanza minima per iniziare ad applicare la nebbia. Gli oggetti che si trovano a meno di 'vicino' 
+			dalla telecamera attiva non saranno influenzati dalla nebbia.
+		</p>
+		<p>Il valore predefinito è 1.</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+			La distanza massima alla quale la nebbia smette di essere calcolata e applicata. Gli oggetti che si trovano a più di 'lontano' 
+			dalla telecamera attiva non saranno influenzati dalla nebbia.
+		<p>Il valore predefinito è 1000.</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Fog clone]()</h3>
+		<p>Restituisce una nuova istanza di nebbia con gli stessi parametri di questa.</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>Restituisce i dati della nebbia nel formato JSON.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

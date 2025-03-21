@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>深度纹理([name])</h1>
+
+		<p class="desc">
+		This class can be used to automatically save the depth information of a rendering into a texture.
+		</p>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_depth_texture depth / texture]
+		</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:Number width], [param:Number height], [param:Constant type], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant format] )</h3>
+
+		<p>
+		[page:Number width] -- 纹理的宽度。<br />
+
+		[page:Number height] -- 纹理的高度。<br />
+
+		[page:Constant type] -- Default is [page:Textures THREE.UnsignedIntType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
+		请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
+
+		[page:Constant mapping] --
+		请参阅[page:Textures mapping mode constants]（映射模式常量）来了解其他选项。<br />
+
+		[page:Constant wrapS] -- 默认值是[page:Textures THREE.ClampToEdgeWrapping].
+		请参阅[page:Textures wrap mode constants]（包裹模式常量）来了解其他选项。<br />
+
+		[page:Constant wrapT] -- 默认值是[page:Textures THREE.ClampToEdgeWrapping].
+		请参阅[page:Textures wrap mode constants]（包裹模式常量）来了解其他选项。<br />
+
+		[page:Constant magFilter] -- 当一个纹素覆盖大于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.LinearFilter]。请参阅[page:Textures magnification filter constants]（放大滤镜常量）来了解其它选项。<br />
+
+		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.LinearMipMapLinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
+
+		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的样本数。
+		默认情况下，这个值为1。设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
+		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br /><br />
+
+		[page:Constant format] -- 这个值必须是[page:Textures DepthFormat]（默认值）或者[page:Textures DepthStencilFormat]。
+		请参阅[page:Textures format constants]（格式常量）来了解详细信息。<br />
+		</p>
+
+
+		<h2>属性</h2>
+
+		<p>
+		共有属性请参见其基类[page:Texture Texture]。
+		—— 以下属性也是texture类中的一部分，但在这里默认值不同。
+		</p>
+
+		<h3>[page:Texture.format format]</h3>
+		<p>
+		[page:Textures DepthFormat]（默认值）或者[page:Textures DepthStencilFormat]中的一个。
+		请参阅[page:Textures format constants]来了解详细信息。<br />
+		</p>
+
+		<h3>[page:Texture.type type]</h3>
+		<p>
+		Default is [page:Textures THREE.UnsignedIntType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
+		请参阅[page:Textures format constants]来了解详细信息。<br />
+		</p>
+
+		<h3>[page:Texture.magFilter magFilter]</h3>
+		<p>
+		当一个纹素覆盖大于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.NearestFilter]。
+		请参阅[page:Textures magnification filter constants]（放大滤镜常量）来了解其他选项。
+		</p>
+
+		<h3>[page:Texture.minFilter minFilter]</h3>
+		<p>
+		当一个纹素覆盖小于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.NearestFilter]。
+		请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其他选项。
+		</p>
+
+		<h3>[page:Texture.flipY flipY]</h3>
+		<p>
+		深度贴图不需要被翻转，因此其默认值为*false*。
+		</p>
+
+		<h3>[page:Texture.generateMipmaps generateMipmaps]</h3>
+		<p>
+		深度贴图不使用mipmap。
+		</p>
+
+		<h3>[property:Boolean isDepthTexture]</h3>
+		<p>
+            只读属性，用于检查给定对象是否为[name]类型。
+		</p>
+
+		<h2>方法</h2>
+
+		<p>
+		共有方法请参见其基类[page:Texture Texture]。
+		</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>光线投射[name]</h1>
+
+		<p class="desc">
+			这个类用于进行[link:https://en.wikipedia.org/wiki/Ray_casting raycasting]（光线投射）。
+			光线投射用于进行鼠标拾取（在三维空间中计算出鼠标移过了什么物体）。
+		</p>
+
+		<h2>代码示例</h2>
+		<code>
+		const raycaster = new THREE.Raycaster();
+		const pointer = new THREE.Vector2();
+
+		function onPointerMove( event ) {
+
+			// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
+
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+		}
+
+		function render() {
+
+			// 通过摄像机和鼠标位置更新射线
+			raycaster.setFromCamera( pointer, camera );
+
+			// 计算物体和射线的焦点
+			const intersects = raycaster.intersectObjects( scene.children );
+
+			for ( let i = 0; i < intersects.length; i ++ ) {
+
+				intersects[ i ].object.material.color.set( 0xff0000 );
+
+			}
+
+			renderer.render( scene, camera );
+
+		}
+
+		window.addEventListener( 'pointermove', onPointerMove );
+
+		window.requestAnimationFrame(render);
+
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
+			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
+			[example:webgl_instancing_raycast Raycasting to a InstancedMesh]<br />
+			[example:webgl_interactive_lines Raycasting to a Line]<br />
+			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
+			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
+			[example:webgl_raycaster_texture Raycast to a Texture]
+		</p>
+
+
+		<p>
+		</p>
+
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] )</h3>
+		<p>
+		[page:Vector3 origin] —— 光线投射的原点向量。<br />
+		[page:Vector3 direction] —— 向射线提供方向的方向向量，应当被标准化。<br />
+		[page:Float near] —— 返回的所有结果比near远。near不能为负值，其默认值为0。<br />
+		[page:Float far] —— 返回的所有结果都比far近。far不能小于near，其默认值为Infinity（正无穷。）</p>
+		<p>
+			这将创建一个新的raycaster对象。<br />
+
+		</p>
+
+
+		<h2>属性</h2>
+
+		<h3>[property:Float far]</h3>
+		<p>
+			raycaster的远距离因数（投射远点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
+			这个值不应当为负，并且应当比near属性大。
+		</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+			raycaster的近距离因数（投射近点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
+			这个值不应当为负，并且应当比far属性小。
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+		The camera to use when raycasting against view-dependent objects such as billboarded objects like [page:Sprites]. This field
+		can be set manually or is set when calling "setFromCamera".
+
+		Defaults to null.
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+		Used by [name] to selectively ignore 3D objects when performing intersection tests. The following code example ensures that
+		only 3D objects on layer *1* will be honored by the instance of [name].
+
+		<code>
+		raycaster.layers.set( 1 );
+		object.layers.enable( 1 );
+		</code>
+
+		</p>
+
+		<h3>[property:Object params]</h3>
+		<p>
+			具有以下属性的对象：
+			<code>
+{
+	Mesh: {},
+	Line: { threshold: 1 },
+	LOD: {},
+	Points: { threshold: 1 },
+	Sprite: {}
+}
+			</code>
+
+		Where threshold is the precision of the raycaster when intersecting objects, in world units.
+		</p>
+
+		<h3>[property:Ray ray]</h3>
+		<p>用于进行光线投射的[Page:Ray]（射线）。</p>
+
+
+		<h2>方法</h2>
+
+		<h3>[method:undefined set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 origin] —— 光线投射的原点向量。<br />
+		[page:Vector3 direction] —— 为光线提供方向的标准化方向向量。
+		</p>
+		<p>
+			使用一个新的原点和方向来更新射线。
+		</p>
+
+		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
+		<p>
+		[page:Vector2 coords] —— 在标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间。<br />
+
+		[page:Camera camera] —— 射线所来源的摄像机。
+		</p>
+		<p>
+			使用一个新的原点和方向来更新射线。
+		</p>
+
+		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
+		<p>
+			[page:WebXRController controller] — The controller to copy the position and direction from.
+		</p>
+		<p>Updates the ray with a new origin and direction.</p>
+
+		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<p>
+		[page:Object3D object] —— 检查与射线相交的物体。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为true。<br />
+		[page:Array optionalTarget] — （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
+		</p>
+		<p>
+			检测所有在射线与物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个。<br>
+			该方法返回一个包含有交叉部分的数组:
+		</p>
+		<code>
+				[ { distance, point, face, faceIndex, object }, ... ]
+		</code>
+		<p>
+			[page:Float distance] —— 射线投射原点和相交部分之间的距离。<br />
+			[page:Vector3 point] —— 相交部分的点（世界坐标）<br />
+			[page:Object face] —— 相交的面<br />
+			[page:Integer faceIndex] —— 相交的面的索引<br />
+			[page:Object3D object] —— 相交的物体<br />
+			[page:Vector2 uv] —— 相交部分的点的UV坐标。<br />
+			[page:Vector2 uv1] —— 相交部分的点的第二组UV坐标<br />
+			[page:Vector3 normal] - 交点处的内插法向量<br />
+			[page:Integer instanceId] – 与InstancedMesh物体相交时的instance索引
+		</p>
+		<p>
+			当计算这条射线是否和物体相交的时候，*Raycaster*将传入的对象委托给[page:Object3D.raycast raycast]方法。
+			这将可以让[page:Mesh mesh]对于光线投射的响应不同于[page:Line lines]和[page:Points pointclouds]。
+		</p>
+		<p>
+			<strong>请注意</strong>：对于网格来说，面必须朝向射线的原点，以便其能够被检测到。
+			用于交互的射线穿过面的背侧时，将不会被检测到。如果需要对物体中面的两侧进行光线投射，
+			你需要将[page:Mesh.material material]中的[page:Material.side side]属性设置为*THREE.DoubleSide*。
+		</p>
+
+		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<p>
+		[page:Array objects] —— 检测和射线相交的一组物体。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为true。<br />
+		[page:Array optionalTarget] —— （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
+		</p>
+		<p>
+			检测所有在射线与这些物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个），相交部分和[page:.intersectObject]所返回的格式是相同的。
+		</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

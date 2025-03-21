@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>텍스쳐 상수</h1>
+
+		<h2>맵핑 모드</h2>
+		<code>
+		THREE.UVMapping
+		THREE.CubeReflectionMapping
+		THREE.CubeRefractionMapping
+		THREE.EquirectangularReflectionMapping
+		THREE.EquirectangularRefractionMapping
+		THREE.CubeUVReflectionMapping
+		</code>
+
+		<p>
+		텍스쳐의 맵핑 모드를 정의합니다.<br />
+		[page:Constant UVMapping]이 기본값이고, 메시의 UV 좌표를 사용해 텍스쳐를 맵핑합니다.<br /><br />
+
+		나머지는 매핑 타입 환경을 정의합니다.<br /><br />
+
+		[page:Constant CubeReflectionMapping] 및 [page:Constant CubeRefractionMapping]은
+		6개의 텍스쳐로 이루어져 하나당 큐프 한 면에 사용되는 [page:CubeTexture CubeTexture]와 함께 사용됩니다.
+		[page:Constant CubeReflectionMapping]은 [page:CubeTexture CubeTexture]의 기본값입니다. <br /><br />
+
+		[page:Constant EquirectangularReflectionMapping] 및 [page:Constant EquirectangularRefractionMapping]은
+		등장방향형도법 환경 맵과 함께 사용됩니다. 맵으로도 불리며, 등장방향형도법 텍스쳐는
+		수평 중심선을 따라 360도 시야를 나타내고 수직 축을 따라 180도 시야를 나타내며
+		이미지의 상단과 하단 가장자리는 맵핑된 구의 북극과 남극에 해당합니다.<br /><br />
+
+		[example:webgl_materials_envmaps materials / envmaps] 예제를 참고하세요.
+		</p>
+
+
+		<h2>랩핑 모드</h2>
+		<code>
+		THREE.RepeatWrapping
+		THREE.ClampToEdgeWrapping
+		THREE.MirroredRepeatWrapping
+		</code>
+		<p>
+		텍스쳐의 [page:Texture.wrapS wrapS] 및 [page:Texture.wrapT wrapT] 프로퍼티를 정의하며 수직, 수평 텍스쳐 래핑을 정의합니다.<br /><br />
+
+		[page:constant RepeatWrapping]를 통해 텍스쳐는 간단하게 무한으로 반복됩니다.<br /><br />
+
+		[page:constant ClampToEdgeWrapping]가 기본값입니다.
+		텍스쳐의 마지막 픽셀은 메시의 끝으로 뻗어나갑니다.<br /><br />
+
+		[page:constant MirroredRepeatWrapping]를 통해 텍스쳐는 무한으로 반복되고 각 반복마다 미러링됩니다.
+		</p>
+
+		<h2>확대 필터</h2>
+		<code>
+		THREE.NearestFilter
+		THREE.LinearFilter
+		</code>
+
+		<p>
+		텍스쳐의 [page:Texture.magFilter magFilter] 프로퍼티와 함께 사용되며,
+		텍스처의 픽셀이 하나의 텍스처 요소(texel)보다 작거나 같은 영역에 매핑될 때
+		사용할 텍스처 확대 함수를 정의합니다.
+		<br /><br />
+
+		[page:constant NearestFilter]는 특정 텍스쳐 좌표와 가장 가까운(맨해튼 거리 단위로) 텍스쳐 요소의 값을 리턴합니다.
+		<br /><br />
+
+		[page:constant LinearFilter]이 기본값이며 지정된 텍스쳐 좌표에 가장 가까운 네 가지 텍스쳐 요소의 가중 평균을 리턴하며,
+		[page:Texture.wrapS wrapS] 및 [page:Texture.wrapT wrapT]의 값과 정확한 맵핑에 따라 텍스처의 다른 부분에서 랩핑되거나 반복된 항목을 포함할 수 있습니다.
+
+		</p>
+
+		<h2>축소 필터</h2>
+		<code>
+		THREE.NearestFilter
+		THREE.NearestMipmapNearestFilter
+		THREE.NearestMipmapLinearFilter
+		THREE.LinearFilter
+		THREE.LinearMipmapNearestFilter
+		THREE.LinearMipmapLinearFilter
+		</code>
+
+		<p>
+		텍스쳐의 [page:Texture.minFilter minFilter]	프로퍼티와 함께 사용하기 위해,
+		텍스처의 픽셀이 하나의 텍스처 요소(texel)보다 큰 영역에 매핑될 때
+		사용할 텍스처 축소 함수를 정의합니다.<br /><br />
+
+		[page:constant NearestFilter] 및 [page:constant LinearFilter]와 함께,
+		아래 네 가지의 함수는 축소에 사용될 수 있습니다:<br /><br />
+
+		[page:constant NearestMipmapNearestFilter]는
+		텍스처링되는 픽셀의 크기와 가장 근접한 mipmap을 선택하고
+		[page:constant NearestFilter] 기준(픽셀의 중심에 가장 가까운 texel)을 사용하여 텍스쳐 값을 생성합니다.
+		<br /><br />
+
+		[page:constant NearestMipmapLinearFilter]는 텍스처링되는 픽셀 크기와 가장 근접한 두 개의 mipmap을 선택하고
+		[page:constant NearstFilter] 기준을 사용하여 각 mipmap에서 텍스쳐 값을 생성합니다. 최종 텍스쳐 값은 이 두 값의 가중 평균입니다.
+		<br /><br />
+
+		[page:constant LinearMipmapNearestFilter]는 텍스쳐링되는 픽셀 크기와 가장 근접한 mipmap을 선택하고
+		[page:constant LineFilter] 기준(픽셀의 중심에 가장 가까운 4개의 texel의 가중 평균)을 사용하여 텍스쳐 값을 생성합니다.
+		<br /><br />
+
+		[page:constant LinearMipmapLinearFilter]가 기본값이며 텍스처링되는 픽셀 크기와 가장 일치하는 두 개의 mipmap을 선택하고
+		[page:constant LinearFilter] 기준을 사용하여 각 mipmap에서 텍스처 값을 생성합니다.
+		최종 텍스처 값은 이 두 값의 가중 평균입니다.<br /><br />
+
+		[example:webgl_materials_texture_filters materials / texture / filters] 예제를 참고하세요.
+		</p>
+
+		<h2>타입</h2>
+		<code>
+		THREE.UnsignedByteType
+		THREE.ByteType
+		THREE.ShortType
+		THREE.UnsignedShortType
+		THREE.IntType
+		THREE.UnsignedIntType
+		THREE.FloatType
+		THREE.HalfFloatType
+		THREE.UnsignedShort4444Type
+		THREE.UnsignedShort5551Type
+		THREE.UnsignedInt248Type
+		THREE.UnsignedInt5999Type
+		</code>
+		<p>
+		텍스쳐의 [page:Texture.type type] 프로퍼티와 함께 사용되며, 정확한 포맷이어야 합니다. 아래 세부 사항을 확인하세요.<br /><br />
+
+		[page:constant UnsignedByteType]이 기본값입니다.
+		</p>
+
+		<h2>포맷</h2>
+		<code>
+		THREE.AlphaFormat
+		THREE.RedFormat
+		THREE.RedIntegerFormat
+		THREE.RGFormat
+		THREE.RGIntegerFormat
+		THREE.RGBFormat
+		THREE.RGBAFormat
+		THREE.RGBAIntegerFormat
+		THREE.LuminanceFormat
+		THREE.LuminanceAlphaFormat
+		THREE.DepthFormat
+		THREE.DepthStencilFormat
+		</code>
+		<p>
+		텍스쳐의 [page:Texture.format format] 프로퍼티와 함께 사용되며 2d 텍스처 또는 *texels*의 요소를 셰이더로 읽는 방법을 정의합니다.
+		<br /><br />
+
+		[page:constant AlphaFormat] red, green 및 blue 요소를 버리고 alpha 요소만 읽어들입니다.<br /><br />
+
+		[page:constant RedFormat] green 및 blue 요소를 버리고 red 요소만 읽어들입니다.<br /><br />
+
+		[page:constant RedIntegerFormat] green 및 blue 요소를 버리고 red 요소만 읽어들입니다.
+		texel은 부동 소수점 대신 정수로 읽어들입니다.
+		<br /><br />
+
+		[page:constant RGFormat] alpha, blue 요소를 버리고 red, green 요소만 읽어들입니다.
+		<br /><br />
+
+		[page:constant RGIntegerFormat] alpha, blue 요소를 버리고 red, green 요소만 읽어들입니다.
+		texel은 부동 소수점 대신 정수로 읽어들입니다.
+		<br /><br />
+
+		[page:constant RGBAFormat]는 기본값이며 red, green, blue 및 alpha 요소를 읽어들입니다.<br /><br />
+
+		[page:constant RGBAIntegerFormat]는 기본값이며 red, green, blue 및 alpha 요소를 읽어들입니다.
+		texel은 부동 소수점 대신 정수로 읽어들입니다.
+		<br /><br />
+
+		[page:constant LuminanceFormat]은 각 요소(element)를 단일 휘도 요소(component)로 읽어들입니다.
+		그 다음에 부동 소수점으로 변환되어 [0,1] 범위에 고정한 다음
+		휘도 값을 적색, 녹색 및 청색 채널에 배치하고 1.0을 알파 채널에 할당하여 RGBA 요소로 조립합니다.<br /><br />
+
+		[page:constant LuminanceAlphaFormat]은 각 요소(element)를 휘도/알파 소수로 읽어들입니다.
+		The same process occurs as for the [page:constant LuminanceFormat]와 같은 절차가 이루어지며, 알파 채널에 *1.0* 이외의 값이 들어갈 수 있다는 점만 다릅니다.
+		<br /><br />
+
+		[page:constant DepthFormat]은 각 요소를 단일 깊이 값으로 일거들이며 부동 소수점으로 변환하고, [0,1]범위에 고정합니다.
+		[page:DepthTexture DepthTexture]의 기본값이기도 합니다.<br /><br />
+
+		[page:constant DepthStencilFormat]는 각 요소를 깊이와 스텐실 값 쌍으로 읽어들입니다.
+		값 쌍 중 깊이 요소는 [page:constant DepthFormat]로 해석됩니다.
+		스텐실 요소는 깊이 + 스텐실 내부 포맷으로 해석됩니다.
+		<br /><br />
+
+		앞서 말한 것처럼 텍스쳐는 정확한 [page:Texture.type type]이 지정되어야 하는 것에 주의하세요
+		[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D]에서 더 자세한 내용을 확인하세요.
+		</p>
+
+		<h2>DDS / ST3C 압축 텍스쳐 포맷</h2>
+		<code>
+		THREE.RGB_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT3_Format
+		THREE.RGBA_S3TC_DXT5_Format
+		</code>
+		<p>
+		[page:CompressedTexture CompressedTexture]의 [page:Texture.format format] 프로퍼티와 함께 사용되며,
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc] 확장 지원이 필요합니다.
+		<br /><br />
+
+		이 확장으로는 네 개의 [link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC] 포맷을 사용할 수 있습니다. 포맷들은 다음과 같습니다:<br />
+		[page:constant RGB_S3TC_DXT1_Format]: RGB 이미지 포맷의 DXT1 압축 이미지.<br />
+		[page:constant RGBA_S3TC_DXT1_Format]: 단순 온/오프 alpha을 가진 RGB 이미지 포맷의 DXT1 압축 이미지.<br />
+		[page:constant RGBA_S3TC_DXT3_Format]: RGB 이미지 포맷의 DXT3 압축 이미지. 32비트 RGBA 텍스쳐와 비교해 4:1의 압축률을 가지고 있습니다.<br />
+		[page:constant RGBA_S3TC_DXT5_Format]: RGB 이미지 포맷의 DXT5 압축 이미지. 마찬가지로 4:1의 압축률을 가지고 있지만 DXT3 압축과는 alpha 압축방식에서 차이가 있습니다.<br />
+		</p>
+
+		<h2>PVRTC 압축 텍스쳐 포맷</h2>
+		<code>
+		THREE.RGB_PVRTC_4BPPV1_Format
+		THREE.RGB_PVRTC_2BPPV1_Format
+		THREE.RGBA_PVRTC_4BPPV1_Format
+		THREE.RGBA_PVRTC_2BPPV1_Format
+		</code>
+		<p>
+		[page:CompressedTexture CompressedTexture]'s [page:Texture.format format] 프로퍼티와 함께 사용되며,
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
+		확장 지원이 필요합니다. <br />
+		PVRTC은 일반적으로 PowerVR 칩셋이 있는 모바일 기기에서만 가능하며 주로 Apple 기기에서 사용됩니다.<br /><br />
+
+		이 확장으로는 네 개의 [link:https://en.wikipedia.org/wiki/PVRTC PVRTC] 포맷을 사용할 수 있습니다. 포맷들은 다음과 같습니다:<br />
+		[page:constant RGB_PVRTC_4BPPV1_Format]: 4비트 모드 RGB 압축. 각 4×4 픽셀당 한 블럭입니다.<br />
+		[page:constant RGB_PVRTC_2BPPV1_Format]: 2비트 모드 RGB 압축. 각 8×4 픽셀당 한 블럭입니다.<br />
+		[page:constant RGBA_PVRTC_4BPPV1_Format]: 4비트 모드 RGBA 압축. 각 4×4 픽셀당 한 블럭입니다.<br />
+		[page:constant RGBA_PVRTC_2BPPV1_Format]: 2비트 모드 RGBA 압축. 각 8×4 픽셀당 한 블럭입니다.<br />
+		</p>
+
+		<h2>ETC 압축 텍스쳐 포맷</h2>
+		<code>
+		THREE.RGB_ETC1_Format
+		THREE.RGB_ETC2_Format
+		THREE.RGBA_ETC2_EAC_Format
+		</code>
+		<p>
+		[page:CompressedTexture CompressedTexture]'s [page:Texture.format format] 프로퍼티와 함께 사용되며,
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+		(ETC1) 혹은 [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
+		(ETC2) 확장 지원이 필요합니다. <br /><br />
+		</p>
+
+		<h2>ASTC 압축 텍스쳐 포맷</h2>
+		<code>
+		THREE.RGBA_ASTC_4x4_Format
+		THREE.RGBA_ASTC_5x4_Format
+		THREE.RGBA_ASTC_5x5_Format
+		THREE.RGBA_ASTC_6x5_Format
+		THREE.RGBA_ASTC_6x6_Format
+		THREE.RGBA_ASTC_8x5_Format
+		THREE.RGBA_ASTC_8x6_Format
+		THREE.RGBA_ASTC_8x8_Format
+		THREE.RGBA_ASTC_10x5_Format
+		THREE.RGBA_ASTC_10x6_Format
+		THREE.RGBA_ASTC_10x8_Format
+		THREE.RGBA_ASTC_10x10_Format
+		THREE.RGBA_ASTC_12x10_Format
+		THREE.RGBA_ASTC_12x12_Format
+		</code>
+		<p>
+		[page:CompressedTexture CompressedTexture]'s [page:Texture.format format] 프로퍼티와 함께 사용되며,
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] 확장 지원이 필요합니다. <br /><br />
+		</p>
+
+		<h2>내부 포맷</h2>
+		<code>
+		'ALPHA'
+		'RGB'
+		'RGBA'
+		'LUMINANCE'
+		'LUMINANCE_ALPHA'
+		'RED_INTEGER'
+		'R8'
+		'R8_SNORM'
+		'R8I'
+		'R8UI'
+		'R16I'
+		'R16UI'
+		'R16F'
+		'R32I'
+		'R32UI'
+		'R32F'
+		'RG8'
+		'RG8_SNORM'
+		'RG8I'
+		'RG8UI'
+		'RG16I'
+		'RG16UI'
+		'RG16F'
+		'RG32I'
+		'RG32UI'
+		'RG32F'
+		'RGB565'
+		'RGB8'
+		'RGB8_SNORM'
+		'RGB8I'
+		'RGB8UI'
+		'RGB16I'
+		'RGB16UI'
+		'RGB16F'
+		'RGB32I'
+		'RGB32UI'
+		'RGB32F'
+		'RGB9_E5'
+		'SRGB8'
+		'R11F_G11F_B10F'
+		'RGBA4'
+		'RGBA8'
+		'RGBA8_SNORM'
+		'RGBA8I'
+		'RGBA8UI'
+		'RGBA16I'
+		'RGBA16UI'
+		'RGBA16F'
+		'RGBA32I'
+		'RGBA32UI'
+		'RGBA32F'
+		'RGB5_A1'
+		'RGB10_A2'
+		'RGB10_A2UI'
+		'SRGB8_ALPHA8'
+		'DEPTH_COMPONENT16'
+		'DEPTH_COMPONENT24'
+		'DEPTH_COMPONENT32F'
+		'DEPTH24_STENCIL8'
+		'DEPTH32F_STENCIL8'
+		</code>
+
+		<p>
+		텍스쳐의 [page:Texture.internalFormat internalFormat] 프로퍼티와 함께 사용되며,
+		텍스쳐 혹은 *texels*의 요소들이 GPU에 어떻게 저장될지 정의합니다.<br /><br />
+
+		[page:constant R8] red 요소를 8비트로 저장합니다.<br /><br />
+
+		[page:constant R8_SNORM] red 요소를 8비트로 저장합니다. 이 요소는 표준 값으로 저장됩니다. <br /><br />
+
+		[page:constant R8I] red 요소를 8비트로 저장합니다. 이 요소는 정수 값으로 저장됩니다. <br /><br />
+
+		[page:constant R8UI] red 요소를 8비트로 저장합니다. 이 요소는 부호 없는 정수 값으로 저장됩니다. <br /><br />
+
+		[page:constant R16I] red 요소를 16비트로 저장합니다. 이 요소는 정수 값으로 저장됩니다. <br /><br />
+
+		[page:constant R16UI] red 요소를 16비트로 저장합니다. 이 요소는 부호 없는 정수 값으로 저장됩니다. <br /><br />
+
+		[page:constant R16F] red 요소를 16비트로 저장합니다. 이 요소는 부동 소수점 값으로 저장됩니다. <br /><br />
+
+		[page:constant R32I] red 요소를 32비트로 저장합니다. 이 요소는 정수 값으로 저장됩니다. <br /><br />
+
+		[page:constant R32UI] sred 요소를 32비트로 저장합니다. 이 요소는 부호 없는 정수 값으로 저장됩니다. <br /><br />
+
+		[page:constant R32F] red 요소를 32비트로 저장합니다. 이 요소는 부동 소수점 값으로 저장됩니다. <br /><br />
+
+		[page:constant RG8] red 및 green 요소를 각각 8비트로 저장합니다.<br /><br />
+
+		[page:constant RG8_SNORM] red 및 green 요소를 각각 8비트로 저장합니다.
+		모든 요소는 표준값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG8I] red 및 green 요소를 각각 8비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG8UI] red 및 green 요소를 각각 8비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG16I] red 및 green 요소를 각각 16비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG16UI] red 및 green 요소를 각각 16비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG16F] red 및 green 요소를 각각 16비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG32I] red 및 green 요소를 각각 32비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG32UI] red 및 green 요소를 각각 32비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RG32F] red 및 green 요소를 각각 32비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB8] red, green, 및 blue 요소를 각각 8비트로 저장합니다.
+
+		[page:constant RGB8_SNORM] red, green, 및 blue 요소를 각각 8비트로 저장합니다.
+		모든 요소는 표준값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB8I] red, green, 및 blue 요소를 각각 8비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB8UI] red, green, 및 blue 요소를 각각 8비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB16I] red, green, 및 blue 요소를 각각 16비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB16UI] red, green, 및 blue 요소를 각각 16비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB16F] red, green, 및 blue 요소를 각각 16비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB32I] red, green, 및 blue 요소를 각각 32비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB32UI] red, green, 및 blue 요소를 각각 32비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB32F] red, green, 및 blue 요소를 각각 32비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant R11F_G11F_B10F] red, green, 및 blue 요소를 각각 11비트, 11비트, 10비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB565] red, green, 및 blue 요소를 각각 5비트, 6비트, 5비트로 저장합니다.<br /><br />
+
+		[page:constant RGB9_E5] red, green, 및 blue 요소를 각각 9비트로 저장합니다.<br /><br />
+
+		[page:constant RGBA8]red, green, blue 및 alpha 요소를 각각 8비트로 저장합니다.<br /><br />
+
+		[page:constant RGBA8_SNORM] red, green, blue 및 alpha 요소를 각각 8비트로 저장합니다.
+		모든 요소는 표준값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA8I] red, green, blue 및 alpha 요소를 각각 8비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA8UI] red, green, blue 및 alpha 요소를 각각 8비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA16I] red, green, blue 및 alpha 요소를 각각 16비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA16UI] red, green, blue 및 alpha 요소를 각각 16비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA16F] red, green, blue 및 alpha 요소를 각각 16비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA32I] red, green, blue 및 alpha 요소를 각각 32비트로 저장합니다.
+		모든 요소는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA32UI] red, green, blue 및 alpha 요소를 각각 32비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGBA32F] red, green, blue 및 alpha 요소를 각각 32비트로 저장합니다.
+		모든 요소는 부동 소수점 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant RGB5_A1] red, green, blue, 및 alpha 요소를 각각 5비트, 5비트, 5비트, 1비트로 저장합니다.<br /><br />
+
+		[page:constant RGB10_A2] red, green, blue, 및 alpha 요소를 각각 10비트, 10비트, 10비트, 2비트로 저장합니다.<br /><br />
+
+		[page:constant RGB10_A2UI] red, green, blue, 및 alpha 요소를 각각 10비트, 10비트, 10비트, 2비트로 저장합니다.
+		모든 요소는 부호 없는 정수 값으로 저장됩니다.
+		<br /><br />
+
+		[page:constant SRGB8] red, green, 및 blue 요소를 각각 8비트로 저장합니다.<br /><br />
+
+		[page:constant SRGB8_ALPHA8] red, green, blue, 및 alpha 요소를 각각 8비트로 저장합니다.<br /><br />
+
+		[page:constant DEPTH_COMPONENT16] 깊이 요소를 16비트로 저장합니다.<br /><br />
+
+		[page:constant DEPTH_COMPONENT24] 깊이 요소를 24비트로 저장합니다.<br /><br />
+
+		[page:constant DEPTH_COMPONENT32F] 깊이 요소를 32비트로 저장합니다. 이 요소는 부동 소수점 값으로 저장됩니다.<br /><br />
+
+		[page:constant DEPTH24_STENCIL8] 깊이, 스텐실 요소를 각각 24비트와 8비트로 저장합니다.
+		스텐실 요소는 부호 없는 정수로 저장됩니다.
+		<br /><br />
+
+		[page:constant DEPTH32F_STENCIL8] 깊이, 스텐실 요소를 각각 32비트와 8비트로 저장합니다.
+		깊이 요소는 부동 소수점으로, 스텐실 요소는 부호 없는 정수로 저장됩니다.
+		<br /><br />
+
+		텍스쳐는 알맞은 [page:Texture.type type]이어야 하며,
+		[page:Texture.format format]도 마찬가지로 정확해야 합니다.
+
+		[page:Texture.format format], [page:Texture.internalFormat internalFormat],
+		및 [page:Texture.type type]과의 조합과 관련된 세부 내용에 관해서는
+		[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D],
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texImage3D WebGL2RenderingContext.texImage3D]를 참고하세요.<br /><br />
+
+		내부 포맷과 관련된 심화 정보에 대해서는 직접
+		[link:https://www.khronos.org/registry/webgl/specs/latest/2.0/ WebGL2 Specification] 및
+		[link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0 Specification]를 확인해보세요.
+		</p>
+
+		<h2>Depth Packing</h2>
+		<code>
+		THREE.BasicDepthPacking
+		THREE.RGBADepthPacking
+		</code>
+		<p>
+			For use with the [page:MeshDepthMaterial.depthPacking depthPacking] property of `MeshDepthMaterial`.
+		</p>
+
+		<h2>Color Space</h2>
+		<code>
+		THREE.NoColorSpace = ""
+		THREE.SRGBColorSpace = "srgb"
+		THREE.LinearSRGBColorSpace = "srgb-linear"
+		</code>
+		<p>
+		Used to define the color space of textures (and the output color space of the renderer).<br /><br />
+
+		If the color space type is changed after the texture has already been used by a material,
+		you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

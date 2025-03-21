@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			يقوم بإنشاء كائن صوتي غير موضعي (عام).<br /><br />
+
+			يستخدم هذا [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+		</p>
+
+		<h2>مثال التعليمة البرمجية</h2>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		const listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create a global audio source
+		const sound = new THREE.Audio( listener );
+
+		// load a sound and set it as the Audio object's buffer
+		const audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop( true );
+			sound.setVolume( 0.5 );
+			sound.play();
+		});
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:AudioListener listener] )</h3>
+		<p>
+		listener — (ضرورية) كائن [page:AudioListener AudioListener].
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+		<h3>[property:Boolean autoplay]</h3>
+		<p>ما إذا كان سيتم بدء التشغيل تلقائيًا. الافتراضي هو *false*.</p>
+
+		<h3>[property:AudioContext context]</h3>
+		<p>الـ[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] من [page:AudioListener listener] المعطاة في المنشئ.</p>
+
+		<h3>[property:Number detune]</h3>
+		<p>تعديل درجة الصوت ، مقاسة بالسنت. +/- 100 نصف نغمة. +/- 1200 هو *octave*. الافتراضي هو *0*.</p>
+
+		<h3>[property:Array filters]</h3>
+		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects.
+			In most cases, the array contains instances of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
+
+		<h3>[property:GainNode gain]</h3>
+		<p>[link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] تم إنشاؤه باستخدام [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</p>
+
+		<h3>[property:Boolean hasPlaybackControl]</h3>
+		<p>ما إذا كان يمكن التحكم في التشغيل باستخدام طرق [page:Audio.play play]() و [page:Audio.pause pause]() وما إلى ذلك. الافتراضي هو *true*.</p>
+
+		<h3>[property:Boolean isPlaying]</h3>
+		<p>ما إذا كان الصوت قيد التشغيل حاليًا.</p>
+
+		<h3>[property:AudioListener listener]</h3>
+		<p>مرجع إلى كائن المستمع لهذا الصوت.</p>
+
+		<h3>[property:Number playbackRate]</h3>
+		<p>سرعة التشغيل. الافتراضي هو *1*.</p>
+
+		<h3>[property:Number offset]</h3>
+		<p>إزاحة للوقت الذي يجب أن يبدأ فيه التشغيل داخل المخزن المؤقت للصوت. مثل المعلمة *offset* لـ [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). القيمة الافتراضية هي *0*.</p>
+
+		<h3>[property:Number duration]</h3>
+		<p>يتجاوز مدة الصوت. مثل المعلمة *duration* لـ[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). الافتراضي هو *undefined* لتشغيل المخزن المؤقت بالكامل.</p>
+
+		<h3>[property:AudioNode source]</h3>
+		<p>[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode]  تم إنشاؤها باستخدام [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createBufferSource AudioContext.createBufferSource]().</p>
+
+		<h3>[property:String sourceType]</h3>
+		<p>نوع مصدر الصوت. الافتراضي هو السلسلة 'empty'.</p>
+
+		<h3>[property:String type]</h3>
+		<p>سلسلة تشير إلى النوع ، مضبوطة على 'Audio'.</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+		<h3>[method:this connect]()</h3>
+		<p>
+		متصل بـ [page:Audio.source]. يستخدم هذا داخليًا عند التهيئة وعند ضبط / إزالة المرشحات.
+		</p>
+
+		<h3>[method:this disconnect]()</h3>
+		<p>
+		قطع الاتصال من [page:Audio.source]. يستخدم هذا داخليًا عند تعيين / إزالة المرشحات.
+		</p>
+
+		<h3>[method:BiquadFilterNode getFilter]()</h3>
+		<p>
+		إرجاع العنصر الأول من الجدول [page:Audio.filters filters].
+		</p>
+
+		<h3>[method:Array getFilters]()</h3>
+		<p>
+		تُرجع جدول (مصفوفة)  [page:Audio.filters filters].
+		</p>
+
+		<h3>[method:Boolean getLoop]()</h3>
+		<p>
+		تقوم بإرجاع القيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] (ما إذا كان يجب تكرار التشغيل).
+		</p>
+
+		<h3>[method:GainNode getOutput]()</h3>
+		<p>
+		ترجع [page:Audio.gain gainNode].
+		</p>
+
+		<h3>[method:Float getPlaybackRate]()</h3>
+		<p>
+		ترجع القيمة الخاصة بـ[page:Audio.playbackRate playbackRate].
+		</p>
+
+		<h3>[method:Float getVolume]()</h3>
+		<p>
+		إعادة الحجم الحالي.
+		</p>
+
+		<h3>[method:this play]( delay )</h3>
+		<p>
+		إذا كانت [page:Audio.hasPlaybackControl hasPlaybackControl] تحمل قيمة *true* ، يبدأ التشغيل.
+		</p>
+
+		<h3>[method:this pause]()</h3>
+		<p>
+		إذا كانت [page:Audio.hasPlaybackControl hasPlaybackControl] تحمل قيمة *true* ، يقوم بإقاف التشغيل.
+		</p>
+
+		<h3>[method:undefined onEnded]()</h3>
+		<p>
+		يتم مناداته تلقائيًا عند انتهاء التشغيل.
+		</p>
+
+		<h3>[method:this setBuffer]( audioBuffer )</h3>
+		<p>
+		تقوم بإعداد [page:Audio.source source] إلى *audioBuffer* ، وتقوم بتعيين [page:Audio.sourceType sourceType] إلى 'buffer'.<br />
+		إذا كان [page:Audio.autoplay autoplay] ، يبدأ التشغيل أيضًا.
+		</p>
+
+		<h3>[method:this setFilter]( filter )</h3>
+		<p>
+		Applies a single filter node to the audio.
+		</p>
+
+		<h3>[method:this setFilters]( [param:Array value] )</h3>
+		<p>
+		value - arrays of filters.<br />
+		Applies an array of filter nodes to the audio.
+		</p>
+
+		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
+		<p>
+		يضبط [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] على *value* (ما إذا كان يجب تكرار التشغيل).
+		</p>
+
+		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
+		<p>
+		يضبط [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart] على *value*.
+		</p>
+
+		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
+		<p>
+		يضبط [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd] على *value*.
+		</p>
+
+		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
+		<p>
+		يطبق الكائن المحدد من النوع [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement HTMLMediaElement] كمصدر لهذا الصوت.<br />
+		يحدد أيضًا [page:Audio.hasPlaybackControl hasPlaybackControl] إلى false.
+		</p>
+
+		<h3>[method:this setMediaStreamSource]( mediaStream )</h3>
+		<p>
+		يطبق الكائن المحدد من النوع [link:https://developer.mozilla.org/en-US/docs/Web/API/MediaStream MediaStream] كمصدر لهذا الصوت.<br />
+		يحدد أيضًا [page:Audio.hasPlaybackControl hasPlaybackControl] إلى false.
+		</p>
+
+		<h3>[method:this setNodeSource]( audioNode )</h3>
+		<p>
+		يقوم بإعداد [page:Audio.source source] إلى audioBuffer ، ويقوم بتعيين [page:Audio.sourceType sourceType] على 'audioNode'.<br />
+		يضبط أيضًا [page:Audio.hasPlaybackControl hasPlaybackControl] إلى false.
+		</p>
+
+		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
+		<p>
+		إذا تم تمكين [page:Audio.hasPlaybackControl hasPlaybackControl] ، فيتم ضبط [page:Audio.playbackRate playbackRate] على *value*.
+		</p>
+
+		<h3>[method:this setVolume]( [param:Float value] )</h3>
+		<p>
+		تضبط مستوى الصوت.
+		</p>
+
+		<h3>[method:this stop]()</h3>
+		<p>
+		إذا تم تمكين [page:Audio.hasPlaybackControl hasPlaybackControl] ، فسيتوقف عن التشغيل.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A loader for loading a JSON resource in the [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].<br /><br />
+
+			此加载器内部使用[page:FileLoader]进行加载文件。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const loader = new THREE.ObjectLoader();
+
+		loader.load(
+			// 资源的URL
+			"models/json/example.json",
+
+			// onLoad回调
+			// Here the loaded data is assumed to be an object
+			function ( obj ) {
+				// Add the loaded object to the scene
+				scene.add( obj );
+			},
+
+			// onProgress回调
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError回调
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
+
+
+		// 或者，解析先前加载的JSON结构
+		const object = loader.parse( a_json_object );
+
+		scene.add( object );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgpu_materials_lightmap WebGL / materials / lightmap]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器所使用的[page:LoadingManager loadingManager]，默认值为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 文件的URL或者路径，也可以为
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数为将要加载的[page:Object3D object].<br />
+		[page:Function onProgress] — 将在加载过程中进行调用。参数为XMLHttpRequest实例，实例包含[page:Integer total]和[page:Integer loaded]字节。<br />
+		[page:Function onError] — 在加载错误时被调用。<br />
+		</p>
+		<p>
+			从URL中进行加载，并将被解析的响应内容传递给onLoad。
+		</p>
+
+
+		<h3>[method:Object3D parse]( [param:Object json], [param:Function onLoad]  )</h3>
+		<p>
+		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
+		[page:Function onLoad] — 当解析完成时被调用，其中参数被解析为[page:Object3D object].<br /><br />
+
+			解析一个<em>JSON</em>结构，并返回一个threejs对象.
+		内部使用[page:.load]()进行加载, 但也可以直接用于解析先前加载的JSON结构。
+		</p>
+
+		<h3>[method:Object parseGeometries]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
+
+			此函数以JSON结构，用[page:.parse]()去解析[page:BufferGeometry geometries]。
+		</p>
+
+		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+
+		此函数通过[page:.parse()来使用[page:MaterialLoader]，以解析JSON结构中任意材质。
+		</p>
+
+		<h3>[method:Object parseAnimations]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+
+		此函数通过[page:.parse]()来使用[page:AnimationClip.parse]()， 以解析JSON结构中任意动画。
+		</p>
+
+		<h3>[method:Object parseImages]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+
+			此函数通过[page:.parse]()来使用[page:ImageLoader]， 以解析JSON结构中任意图片。
+		</p>
+
+		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+			此函数通过[page:.parse]()来解析JSON结构中任意纹理。
+		</p>
+
+		<h3>[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )</h3>
+		<p>
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br />
+		[page:BufferGeometry geometries] — required. The geometries of the JSON.<br />
+		[page:Material materials] — required. The materials of the JSON.<br />
+		[page:AnimationClip animations] — required. The animations of the JSON.<br /><br />
+
+		此函数通过[page:.parse]()来解析JSON结构中任意对象。
+		</p>
+
+		<h2>源</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

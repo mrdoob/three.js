@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			오디오 데이터를 분석하기 위해 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]를 사용하는
+			AudioAnalyser 오브젝트를 만듭니다.<br /><br />
+
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API]를 사용합니다.
+
+		</p>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		const listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create an Audio source
+		const sound = new THREE.Audio( listener );
+
+		// load a sound and set it as the Audio object's buffer
+		const audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop(true);
+			sound.setVolume(0.5);
+			sound.play();
+		});
+
+		// create an AudioAnalyser, passing in the sound and desired fftSize
+		const analyser = new THREE.AudioAnalyser( sound, 32 );
+
+		// get the average frequency of the sound
+		const data = analyser.getAverageFrequency();
+		</code>
+
+		<h2>예제</h2>
+
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</p>
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( audio, [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize fftSize] )</h3>
+		<p>
+		새 [page:AudioAnalyser AudioAnalyser]를 만듭니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:AnalyserNode analyser]</h3>
+		<p>오디오를 분석하는데 사용하는 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]입니다.</p>
+
+		<h3>[property:Integer fftSize]</h3>
+		<p>
+			주파수 영역을 결정하는 데 사용되는 FFT(고속 푸리에 변환)의 크기를 나타내는 최대 2048까지의 0이 아닌 두 개의 크기.
+			자세한 내용은 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize this page]를 참고하세요.
+		</p>
+
+		<h3>[property:Uint8Array data]</h3>
+		<p>
+		A Uint8Array with size determined by 
+		분석 데이터 저장에 사용되는 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/frequencyBinCount analyser.frequencyBinCount]로
+		결정된 크기의 Uint8Array.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:Uint8Array getFrequencyData]()</h3>
+		<p>
+		웹 오디오의 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData getByteFrequencyData] 메서드를 사용합니다.
+		해당 페이지를 확인하세요.
+		</p>
+
+		<h3>[method:Number getAverageFrequency]()</h3>
+		<p>
+		[page:AudioAnalyser.getFrequencyData getFrequencyData]메서드에서 리턴된 주파수 평균값입니다.
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa classe memorizza i dati per un attributo (come le posizioni dei vertici, gli indici delle facce, le normali,
+      i colori, le coordinate UV e alcuni attributi personalizzati) associato ad una [page:BufferGeometry],
+      che consente un passaggio più efficiente dei dati alla GPU. Consulta questa pagina per i dettagli ed un esempo di
+      utilizzo. Quando si lavora con dati di tipo vettoriale, i metodi helper <i>.fromBufferAttribute( attribute, index )</i>
+      sulle classi [page:Vector2.fromBufferAttribute Vector2],
+      [page:Vector3.fromBufferAttribute Vector3],
+      [page:Vector4.fromBufferAttribute Vector4] e [page:Color.fromBufferAttribute Color] possono essere utili.
+		</p>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:TypedArray array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
+		<p>
+		  [page:TypedArray array] -- Deve essere un [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/TypedArray TypedArray].
+		  Utilizzato per istanziare il buffer. <br />
+      Questo array dovrebbe avere gli elementi <code>itemSize * numVertices</code>
+      dove numVertices è il numero di vertici della [page:BufferGeometry BufferGeometry] associata.<br /><br />
+
+      [page:Integer itemSize] -- il numero di valori dell'array che deve essere associato ad un particolare vertice.
+      Per esempio, se questo atttibuto memorizza un vettore a 3 componenti (come posizione, normale o colore), 
+      itemSize dovrebbe essere 3.<br /><br />
+
+      [page:Boolean normalized] -- (opzionale) Si applica solo ai dati interi. Indica il modo in cui i dati sottostanti 
+      del buffer si adattano ai valori del codice GLSL. Ad esempio, se l'[page:TypedArray array] è un'istanza di UInt16Array,
+      e [page:Boolean normalized] è a true, i valori `0 - +65535` nei dati dell'array saranno mappati su 0.0f - +1.0f nell'attributo GLSL.
+      Un Int16Array (con segno) sarà mappato da -32768 - +32767 a -1.0f - +1.0f. Se [page:Boolean normalized] è a false, i valori 
+      verranno convertiti in float non modificati, p.e. 32767 diventa 32767.0f.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:TypedArray array]</h3>
+		<p>
+      L'[page:TypedArray array] contente i dati memorizzati nel buffer.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+      Memorizza la lunghezza dell'[page:BufferAttribute.array array] divisa per [page:BufferAttribute.itemSize itemSize]. Read-only property.<br /><br />
+
+      Se il buffer memorizza un vettore a 3 componenti (come una posizione, una normale o un colore),
+      questo conterà il numero dei vettori memorizzati.
+		</p>
+
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
+		</p>
+
+		<h3>[property:Boolean isBufferAttribute]</h3>
+		<p>
+      Flag di sola lettura per verificare se un dato oggetto è di tipo [name].
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>
+      La lunghezza dei vettori che vengono memorizzati nell'[page:BufferAttribute.array array].
+    </p>
+
+		<h3>[property:String name]</h3>
+		<p>
+      Un nome opzionale per questa istanza dell'attributo. Il valore predefinito è una stringa vuota.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+      Flag che indica che questo attributo è stato modificato e deve essere rinviato alla GPU.
+      Impostalo a true quando modifichi il valore dell'array.<br /><br />
+
+      Impostando questa proprietà a true incrementa, inoltre, la [page:BufferAttribute.version versione].
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+      Indica il modo in cui i dati sottostanti del buffer si adattano ai valori del codice shader GLSL.
+      Vedi il costruttore sopra per i dettagli.
+		</p>
+
+		<h3>[property:Function onUploadCallback]</h3>
+		<p>
+      Una funzione di callback che viene eseguita dopo che il Renderer ha trasferito i dati dell'array dell'attributo
+      alla GPU. 
+		</p>
+
+		<h3>[property:Object updateRange]</h3>
+		<p>Oggetto contenente:<br />
+			[page:Integer offset]: Il valore predefinito è `0`. Posizione da cui inizia l'aggiornamento.<br />
+			[page:Integer count]: Il valore predefinito è `-1`, il che significa non utilizzare intervalli di aggiornamento. <br /><br />
+
+      Può essere utilizzato solo per aggiornare alcuni componenti dei vettori memorizzati (per esempio, solo
+      il componente relativo al colore).
+		</p>
+
+		<h3>[property:Usage usage]</h3>
+		<p>
+      Definisce il modello di utilizzo previsto per l'archivio dati a fini di ottimizzazione. Corrisponde al paramentro `usage`
+      di [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+      Il valore predefinito è [page:BufferAttributeUsage StaticDrawUsage]. Vedi le [page:BufferAttributeUsage costanti] di utilizzo 
+      per tutti i valori possibili. <br /><br />
+
+      Nota: Dopo l'utilizzo iniziale di un buffer, il suo utilizzo non può essere modificato. Invece, istanziane uno nuovo e imposta
+      l'utilizzo desiderato prima del rendering successivo.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+      Un numero di versione, incrementato ogni volta che la proprietà [page:BufferAttribute.needsUpdate needsUpdate] viene impostata a true.
+    </p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>
+      Applica la matrice [page:Matrix3 m] ad ogni elemento Vector3 di questo BufferAttribute.
+    </p>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>
+      Applica la matrice [page:Matrix4 m] ad ogni elemento Vector3 di questo BufferAttribute.  
+    </p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>
+      Applica la matrice normale [page:Matrix3 m] ad ogni elemento Vector3 di questo BufferAttribute.
+    </p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>
+      Applica la matrice [page:Matrix4 m] ad ogni elemento Vector3 di questo BufferAttribute, interpretando gli elementi come vettori direzionali.
+    </p>
+
+		<h3>[method:BufferAttribute clone]() </h3>
+		<p>Restituisce una copia di questo bufferAttribute.</p>
+
+		<h3>[method:this copy]( [param:BufferAttribute bufferAttribute] )</h3>
+		<p>Copia un altro BufferAttribute in questo BufferAttribute.</p>
+
+		<h3>[method:this copyArray]( array ) </h3>
+		<p>
+      Copia l'array fornito qui (il quale può essere un normale array o un array tipizzato)
+      nell'[page:BufferAttribute.array array].<br /><br />
+
+      Vedi [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]
+      per le note sui requisiti se si copia un TypedArray.
+		</p>
+
+		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<p>Copia un vettore da bufferAttribute[index2] a [page:BufferAttribute.array array][index1].</p>
+
+		<h3>[method:Number getComponent]( [param:Integer index], [param:Integer component] ) </h3>
+		<p>Returns the given component of the vector at the given index.</p>
+
+		<h3>[method:Number getX]( [param:Integer index] ) </h3>
+		<p>Restituisce il componente x del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:Number getY]( [param:Integer index] ) </h3>
+		<p>Restituisce il componente y del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
+		<p>Restituisce il componente z del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:Number getW]( [param:Integer index] ) </h3>
+		<p>Restituisce il componente w del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this onUpload]( [param:Function callback] ) </h3>
+		<p>
+      Imposta il valore della proprietà onUploadCallback.<br /><br />
+      Nel [example:webgl_buffergeometry WebGL / Buffergeometry] questo metodo viene utilizzato per 
+      liberare memoria dopo che il buffer è stato trasferito alla GPU.
+		</p>
+
+		<h3>[method:this set] ( [param:Array value], [param:Integer offset] ) </h3>
+		<p>
+		  value -- un [page:Array] o [page:TypedArray] dal quale copiare i valori. <br />
+		  offset -- (opzionale) indice dell'[page:BufferAttribute.array array] da cui iniziare la copia.<br /><br />
+
+      Chiama [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]( [page:Array value], [page:Integer offset] )
+      sull'[page:BufferAttribute.array array].<br /><br />
+
+      In particolare, si veda questa pagina per i requisiti sul [page:Array value]
+      che deve essere un [page:TypedArray].
+		</p>
+
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
+		<p>
+      Imposta [page:BufferAttribute.usage usage] a value. Vedi le [page:BufferAttributeUsage costanti] di utilizzo per tutti i possibili valori di input.<br /><br />
+
+      Nota: Dopo l'utilizzo iniziale di un buffer, il suo utilizzo non può cambiare. Invece, istanziane uno nuovo e 
+      imposta l'utilizzo desiderato prima del rendering successivo.
+		</p>
+		
+		<h3>[method:Number setComponent]( [param:Integer index], [param:Integer component], [param:Float value] ) </h3>
+		<p>Sets the given component of the vector at the given index.</p>
+
+		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
+		<p>Imposta il componente x del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this setY]( [param:Integer index], [param:Float y] ) </h3>
+		<p>Imposta il componente y del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<p>Imposta il componente z del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this setW]( [param:Integer index], [param:Float w] ) </h3>
+		<p>Imposta il componente w del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<p>Imposta i componenti x e y del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<p>Imposta i componenti x, y e z del vettore in corrispondenza dell'indice specificato.</p>
+
+		<h3>[method:this setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<p>Imposta i componenti x, y, z e w del vettore in corrispondenza dell'indice specificato.</p>
+
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

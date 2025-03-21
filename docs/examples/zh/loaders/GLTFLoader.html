@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>GLTF加载器（[name]）</h1>
+
+		<p class="desc">用于载入<em>glTF 2.0</em>资源的加载器。<br /><br />
+		[link:https://www.khronos.org/gltf glTF]（gl传输格式）是一种开放格式的规范
+		（[link:https://github.com/KhronosGroup/glTF/tree/master/specification/2.0 open format specification]），
+		用于更高效地传输、加载3D内容。该类文件以JSON（.gltf）格式或二进制（.glb）格式提供，
+		外部文件存储贴图（.jpg、.png）和额外的二进制数据（.bin）。一个glTF组件可传输一个或多个场景，
+		包括网格、材质、贴图、蒙皮、骨架、变形目标、动画、灯光以及摄像机。
+		</p>
+
+		<p>
+			[name] uses [page:ImageBitmapLoader] whenever possible. Be advised that image bitmaps are not automatically GC-collected when they are no longer referenced,
+			and they require special handling during the disposal process. More information in the [link:https://threejs.org/docs/#manual/en/introduction/How-to-dispose-of-objects How to dispose of objects] guide.
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		</code>
+
+
+		<h2>扩展</h2>
+
+		<p>
+			GLTFLoader支持下列glTF 2.0扩展（[link:https://github.com/KhronosGroup/glTF/tree/master/extensions/ glTF 2.0 extensions]）：
+		</p>
+
+		<ul>
+			<li>KHR_draco_mesh_compression</li>
+			<li>KHR_materials_clearcoat</li>
+			<li>KHR_materials_dispersion</li>
+			<li>KHR_materials_ior</li>
+			<li>KHR_materials_specular</li>
+			<li>KHR_materials_transmission</li>
+			<li>KHR_materials_iridescence</li>
+			<li>KHR_materials_unlit</li>
+			<li>KHR_materials_volume</li>
+			<li>KHR_mesh_quantization</li>
+			<li>KHR_lights_punctual</li>
+			<li>KHR_texture_basisu</li>
+			<li>KHR_texture_transform</li>
+			<li>EXT_texture_webp</li>
+			<li>EXT_meshopt_compression</li>
+			<li>EXT_mesh_gpu_instancing</li>
+		</ul>
+
+		<p>
+			The following glTF 2.0 extension is supported by an external user plugin
+		</p>
+
+		<ul>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]<sup>1</sup></li>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions MSFT_texture_dds]</li>
+		</ul>
+
+		<p><i>
+			<sup>1</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
+		</i></p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// Instantiate a loader
+		const loader = new GLTFLoader();
+
+		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
+		loader.setDRACOLoader( dracoLoader );
+
+		// Load a glTF resource
+		loader.load(
+			// resource URL
+			'models/gltf/duck/duck.gltf',
+			// called when the resource is loaded
+			function ( gltf ) {
+
+				scene.add( gltf.scene );
+
+				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array&lt;THREE.Group&gt;
+				gltf.cameras; // Array&lt;THREE.Camera&gt;
+				gltf.asset; // Object
+
+			},
+			// called while loading is progressing
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_gltf]
+		</p>
+
+		<h2>纹理</h2>
+
+		<p>纹理中包含的颜色信息（.map, .emissiveMap, 和 .specularMap）在glTF中总是使用sRGB颜色空间，而顶点颜色和材质属性（.color, .emissive, .specular）
+		则使用线性颜色空间。在典型的渲染工作流程中，纹理会被渲染器转换为线性颜色空间，进行光照计算，然后最终输出会被转换回 sRGB
+		颜色空间并显示在屏幕上。除非你需要使用线性颜色空间进行后期处理，否则请在使用glTF的时候将[page:WebGLRenderer]进行如下配置：</p>
+
+		<code>
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
+		</code>
+
+		<p>假设渲染器的配置如上所示，则GLTFLoader将可以正确地自动配置从.gltf或.glb文件中引用的纹理。
+		当从外部加载纹理（例如，使用[page:TextureLoader]）并将纹理应用到glTF模型，则必须给定对应的颜色空间与朝向：</p>
+
+		<code>
+		// If texture is used for color information, set colorspace.
+		texture.colorSpace = THREE.SRGBColorSpace;
+
+		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+		texture.flipY = false;
+		</code>
+
+		<h2>自定义扩展</h2>
+
+		<p>
+			来自未知扩展的元数据会被保存到Object3D、Group和Material实例中上的“.userData.gltfExtensions”，
+			或被附加到 response “gltf”对象。示例：
+		</p>
+
+		<code>
+		loader.load('foo.gltf', function ( gltf ) {
+
+			const scene = gltf.scene;
+
+			const mesh = scene.children[ 3 ];
+
+			const fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+
+			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
+				.then( function ( fooBuffer ) { ... } );
+
+		} );
+		</code>
+
+		<br>
+		<hr>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 该加载器将要使用的 [page:LoadingManager loadingManager] 。默认为 [page:LoadingManager THREE.DefaultLoadingManager]。
+		</p>
+		<p>
+		创建一个新的[name]。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 包含有<em>.gltf</em>/<em>.glb</em>文件路径/URL的字符串。<br />
+		[page:Function onLoad] — 加载成功完成后将会被调用的函数。该函数接收[page:Function parse]所返回的已加载的JSON响应。<br />
+		[page:Function onProgress] — （可选）加载正在进行过程中会被调用的函数。其参数将会是XMLHttpRequest实例，包含有总字节数.[page:Integer total]与已加载的字节数.[page:Integer loaded]。<br />
+		[page:Function onError] — （可选）若在加载过程发生错误，将被调用的函数。该函数接收error来作为参数。<br />
+		</p>
+		<p>
+		开始从url加载，并使用解析过的响应内容调用回调函数。
+		</p>
+
+		<h3>[method:this setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
+		<p>
+		[page:DRACOLoader dracoLoader] — DRACOLoader的实例，用于解码使用KHR_draco_mesh_compression扩展压缩过的文件。
+		</p>
+		<p>
+		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
+		</p>
+
+		<h3>[method:undefined parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
+		<p>
+		[page:ArrayBuffer data] — 需要解析的glTF文件，值为一个ArrayBuffer或<em>JSON</em>字符串。<br />
+		[page:String path] — 用于找到后续glTF资源（如纹理和.bin数据文件）的基础路径。<br />
+		[page:Function onLoad] — 解析成功完成后将会被调用的函数。<br />
+		[page:Function onError] — （可选）若在解析过程发生错误，将被调用的函数。该函数接收error来作为参数。<br />
+		</p>
+		<p>
+		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:Object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js examples/jsm/loaders/GLTFLoader.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>纹理常量（Texture Constants）</h1>
+
+	<h2>映射模式</h2>
+	<code>
+		THREE.UVMapping
+		THREE.CubeReflectionMapping
+		THREE.CubeRefractionMapping
+		THREE.EquirectangularReflectionMapping
+		THREE.EquirectangularRefractionMapping
+		THREE.CubeUVReflectionMapping
+		</code>
+
+	<p>
+		这些常量定义了纹理贴图的映射模式。<br />
+		[page:Constant UVMapping]是默认值，纹理使用网格的坐标来进行映射。<br /><br />
+		其它的值定义了环境映射的类型。<br /><br />
+
+		[page:Constant CubeReflectionMapping] 和 [page:Constant CubeRefractionMapping] 用于 [page:CubeTexture CubeTexture] ——
+		由6个纹理组合而成，每个纹理都是立方体的一个面。
+
+		对于[page:CubeTexture CubeTexture]来说，[page:Constant CubeReflectionMapping]是其默认值。<br /><br />
+
+		[page:Constant EquirectangularReflectionMapping] 和 [page:Constant EquirectangularRefractionMapping]
+		用于等距圆柱投影的环境贴图，也被叫做经纬线映射贴图。等距圆柱投影贴图表示沿着其水平中线360°的视角，以及沿着其垂直轴向180°的视角。贴图顶部和底部的边缘分别对应于它所映射的球体的北极和南极。
+		<br /><br />
+
+		请查看示例：[example:webgl_materials_envmaps materials / envmaps] 。
+	</p>
+
+
+	<h2>包裹模式</h2>
+	<code>
+		THREE.RepeatWrapping
+		THREE.ClampToEdgeWrapping
+		THREE.MirroredRepeatWrapping
+		</code>
+	<p>
+		这些常量定义了纹理贴图的 [page:Texture.wrapS wrapS] 和 [page:Texture.wrapT wrapT] 属性，定义了水平和垂直方向上纹理的包裹方式。
+		<br /><br />
+
+		使用[page:constant RepeatWrapping]，纹理将简单地重复到无穷大。
+		With [page:constant RepeatWrapping] the texture will simply repeat to infinity.<br /><br />
+
+		[page:constant ClampToEdgeWrapping]是默认值，纹理中的最后一个像素将延伸到网格的边缘。<br /><br />
+
+		使用[page:constant MirroredRepeatWrapping]， 纹理将重复到无穷大，在每次重复时将进行镜像。
+	</p>
+
+	<h2>放大滤镜（Magnification Filters）</h2>
+	<code>
+		THREE.NearestFilter
+		THREE.LinearFilter
+		</code>
+
+	<p>
+		这些常量用于纹理的[page:Texture.magFilter magFilter]属性，它们定义了当被纹理化的像素映射到小于或者等于1纹理元素（texel）的区域时，将要使用的纹理放大函数。<br /><br />
+
+		[page:constant NearestFilter]返回与指定纹理坐标（在曼哈顿距离之内）最接近的纹理元素的值。<br /><br />
+
+		[page:constant LinearFilter]是默认值，返回距离指定的纹理坐标最近的四个纹理元素的加权平均值，
+		并且可以包含纹理的其他部分中，被包裹或者被重复的项目，具体取决于 [page:Texture.wrapS wrapS] 和 [page:Texture.wrapT wrapT] 的值，and on the exact mapping。
+		</p>
+
+	<h2>缩小滤镜（Minification Filters）</h2>
+	<code>
+		THREE.NearestFilter
+		THREE.NearestMipmapNearestFilter
+		THREE.NearestMipmapLinearFilter
+		THREE.LinearFilter
+		THREE.LinearMipmapNearestFilter
+		THREE.LinearMipmapLinearFilter
+	</code>
+
+	<p>
+		这些常量用于纹理的[page:Texture.minFilter minFilter]属性，它们定义了当被纹理化的像素映射到大于1纹理元素（texel）的区域时，将要使用的纹理缩小函数。<br /><br />
+
+		除了[page:constant NearestFilter] 和 [page:constant LinearFilter]，
+		下面的四个函数也可以用于缩小：<br /><br />
+
+		[page:constant NearestMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，
+		并以[page:constant NearestFilter]（最靠近像素中心的纹理元素）为标准来生成纹理值。
+		<br /><br />
+
+		[page:constant NearestMipmapLinearFilter]选择与被纹理化像素的尺寸最接近的两个mipmap，
+		并以[page:constant NearestFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。
+		<br /><br />
+
+		[page:constant LinearMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，
+		并以[page:constant LinearFilter]（最靠近像素中心的四个纹理元素的加权平均值）为标准来生成纹理值。
+		<br /><br />
+
+		[page:constant LinearMipmapLinearFilter]是默认值，它选择与被纹理化像素的尺寸最接近的两个mipmap，
+		并以[page:constant LinearFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。<br /><br />
+
+		请查看示例：[example:webgl_materials_texture_filters materials / texture / filters]。
+	</p>
+
+	<h2>类型</h2>
+	<code>
+		THREE.UnsignedByteType
+		THREE.ByteType
+		THREE.ShortType
+		THREE.UnsignedShortType
+		THREE.IntType
+		THREE.UnsignedIntType
+		THREE.FloatType
+		THREE.HalfFloatType
+		THREE.UnsignedShort4444Type
+		THREE.UnsignedShort5551Type
+		THREE.UnsignedInt248Type
+		THREE.UnsignedInt5999Type
+		</code>
+	<p>
+		这些常量用于纹理的[page:Texture.type type]属性，这些属性必须与正确的格式相对应。详情请查看下方。<br /><br />
+
+		[page:constant UnsignedByteType] 是默认值。
+	</p>
+
+	<h2>格式</h2>
+	<code>
+		THREE.AlphaFormat
+		THREE.RedFormat
+		THREE.RedIntegerFormat
+		THREE.RGFormat
+		THREE.RGIntegerFormat
+		THREE.RGBFormat
+		THREE.RGBAFormat
+		THREE.RGBAIntegerFormat
+		THREE.LuminanceFormat
+		THREE.LuminanceAlphaFormat
+		THREE.DepthFormat
+		THREE.DepthStencilFormat
+	</code>
+	<p>
+		这些常量用于纹理的[page:Texture.format format]属性，它们定义了shader（着色器）将如何读取的2D纹理或者*texels*（纹理元素）的元素。.<br /><br />
+
+		[page:constant AlphaFormat] 丢弃红、绿、蓝分量，仅读取Alpha分量。<br /><br />
+
+		[page:constant RedFormat] discards the green and blue components and reads just the red component.<br /><br />
+
+		[page:constant RedIntegerFormat] discards the green and blue components and reads just the red component.
+		The texels are read as integers instead of floating point.
+		<br /><br />
+
+		[page:constant RGFormat] discards the alpha, and blue components and reads the red, and green components.
+		<br /><br />
+
+		[page:constant RGIntegerFormat] discards the alpha, and blue components and reads the red, and green components.
+		The texels are read as integers instead of floating point.
+		<br /><br />
+
+		[page:constant RGBAFormat] 是默认值，它将读取红、绿、蓝和Alpha分量。<br /><br />
+
+		[page:constant RGBAIntegerFormat] is the default and reads the red, green, blue and alpha components.
+		The texels are read as integers instead of floating point.
+		<br /><br />
+
+		[page:constant LuminanceFormat] 将每个元素作为单独的亮度分量来读取。
+		将其转换为范围限制在[0,1]区间的浮点数，然后通过将亮度值放入红、绿、蓝通道，并将1.0赋给Alpha通道，来组装成一个RGBA元素。<br /><br />
+
+		[page:constant LuminanceAlphaFormat] 将每个元素同时作为亮度分量和Alpha分量来读取。
+		和上面[page:constant LuminanceFormat]的处理过程是一致的，除了Alpha分量具有除了*1.0*以外的值。<br /><br />
+
+		[page:constant DepthFormat]将每个元素作为单独的深度值来读取，将其转换为范围限制在[0,1]区间的浮点数。
+		它是[page:DepthTexture DepthTexture]的默认值。<br /><br />
+
+		[page:constant DepthStencilFormat]将每个元素同时作为一对深度值和模板值来读取。
+		其中的深度分量解释为[page:constant DepthFormat]。
+		模板分量基于深度+模板的内部格式来进行解释。
+
+		<br /><br />
+		请注意，纹理必须具有正确的[page:Texture.type type]设置，正如上一节所描述的那样。
+		请参阅[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D]
+		来获得有关详细信息。
+	</p>
+
+	<h2>DDS / ST3C 压缩纹理格式</h2>
+	<code>
+		THREE.RGB_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT3_Format
+		THREE.RGBA_S3TC_DXT5_Format
+		</code>
+	<p>
+		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，
+		需要获得[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc]
+		扩展的支持。<br /><br />
+
+		通过这个扩展，这里的四种[link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC]格式将可以使用：<br />
+
+		[page:constant RGB_S3TC_DXT1_Format]：RGB图像格式的DXT1压缩图像。
+		[page:constant RGBA_S3TC_DXT1_Format]：RGB图像格式的DXT1压缩图像，Alpha仅具有是/否透明两个值。<br />
+		[page:constant RGBA_S3TC_DXT3_Format]：RGBA图像格式的DXT3压缩图像，和32位RGBA纹理贴图相比，它提供了4:1的压缩比。<br />
+		[page:constant RGBA_S3TC_DXT5_Format]：RGBA图像格式的DXT5压缩图像，它也提供了4:1的压缩比，但与DX3格式的不同之处在于其Alpha是如何被压缩的。<br />
+	</p>
+
+	<h2>PVRTC 压缩纹理格式（PVRTC Compressed Texture Formats）</h2>
+	<code>
+		THREE.RGB_PVRTC_4BPPV1_Format
+		THREE.RGB_PVRTC_2BPPV1_Format
+		THREE.RGBA_PVRTC_4BPPV1_Format
+		THREE.RGBA_PVRTC_2BPPV1_Format
+		</code>
+	<p>
+		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，需要获得
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
+		扩展的支持。<br />
+		PVRTC通常只在具有PowerVR芯片的移动设备上可用，这些设备主要是苹果设备。<br /><br />
+
+
+		通过这个扩展，这里的四种[link:https://en.wikipedia.org/wiki/PVRTC PVRTC]格式将可以使用：<br />
+
+		[page:constant RGB_PVRTC_4BPPV1_Format]：4位模式下的RGB压缩，每4x4像素一个块。<br />
+		[page:constant RGB_PVRTC_2BPPV1_Format]：2位模式下的RGB压缩，每8x4像素一个块。<br />
+		[page:constant RGBA_PVRTC_4BPPV1_Format]: 4位模式下的RGBA压缩，每4x4像素一个块。<br />
+		[page:constant RGBA_PVRTC_2BPPV1_Format]: 2位模式下的RGB压缩，每8x4像素一个块。<br />
+	</p>
+
+	<h2>ETC 压缩纹理格式</h2>
+	<code>
+		THREE.RGB_ETC1_Format
+		THREE.RGB_ETC2_Format
+		THREE.RGBA_ETC2_EAC_Format
+		</code>
+		<p>
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+		(ETC1) or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
+		(ETC2) extensions. <br /><br />
+		</p>
+
+	<h2>ASTC Compressed Texture Format</h2>
+	<code>
+		THREE.RGBA_ASTC_4x4_Format
+		THREE.RGBA_ASTC_5x4_Format
+		THREE.RGBA_ASTC_5x5_Format
+		THREE.RGBA_ASTC_6x5_Format
+		THREE.RGBA_ASTC_6x6_Format
+		THREE.RGBA_ASTC_8x5_Format
+		THREE.RGBA_ASTC_8x6_Format
+		THREE.RGBA_ASTC_8x8_Format
+		THREE.RGBA_ASTC_10x5_Format
+		THREE.RGBA_ASTC_10x6_Format
+		THREE.RGBA_ASTC_10x8_Format
+		THREE.RGBA_ASTC_10x10_Format
+		THREE.RGBA_ASTC_12x10_Format
+		THREE.RGBA_ASTC_12x12_Format
+	</code>
+	<p>
+	For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+	these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension. <br /><br />
+	</p>
+
+	<h2>Internal Formats</h2>
+	<code>
+	'ALPHA'
+	'RGB'
+	'RGBA'
+	'LUMINANCE'
+	'LUMINANCE_ALPHA'
+	'RED_INTEGER'
+	'R8'
+	'R8_SNORM'
+	'R8I'
+	'R8UI'
+	'R16I'
+	'R16UI'
+	'R16F'
+	'R32I'
+	'R32UI'
+	'R32F'
+	'RG8'
+	'RG8_SNORM'
+	'RG8I'
+	'RG8UI'
+	'RG16I'
+	'RG16UI'
+	'RG16F'
+	'RG32I'
+	'RG32UI'
+	'RG32F'
+	'RGB565'
+	'RGB8'
+	'RGB8_SNORM'
+	'RGB8I'
+	'RGB8UI'
+	'RGB16I'
+	'RGB16UI'
+	'RGB16F'
+	'RGB32I'
+	'RGB32UI'
+	'RGB32F'
+	'RGB9_E5'
+	'SRGB8'
+	'R11F_G11F_B10F'
+	'RGBA4'
+	'RGBA8'
+	'RGBA8_SNORM'
+	'RGBA8I'
+	'RGBA8UI'
+	'RGBA16I'
+	'RGBA16UI'
+	'RGBA16F'
+	'RGBA32I'
+	'RGBA32UI'
+	'RGBA32F'
+	'RGB5_A1'
+	'RGB10_A2'
+	'RGB10_A2UI'
+	'SRGB8_ALPHA8'
+	'DEPTH_COMPONENT16'
+	'DEPTH_COMPONENT24'
+	'DEPTH_COMPONENT32F'
+	'DEPTH24_STENCIL8'
+	'DEPTH32F_STENCIL8'
+	</code>
+
+	<p>
+	For use with a texture's [page:Texture.internalFormat internalFormat]	property,
+	these define how elements of a texture, or *texels*, are stored on the GPU.<br /><br />
+
+	[page:constant R8] stores the red component on 8 bits.<br /><br />
+
+	[page:constant R8_SNORM] stores the red component on 8 bits. The component is stored as normalized. <br /><br />
+
+	[page:constant R8I] stores the red component on 8 bits. The component is stored as an integer. <br /><br />
+
+	[page:constant R8UI] stores the red component on 8 bits. The component is stored as an unsigned integer. <br /><br />
+
+	[page:constant R16I] stores the red component on 16 bits. The component is stored as an integer. <br /><br />
+
+	[page:constant R16UI] stores the red component on 16 bits. The component is stored as an unsigned integer. <br /><br />
+
+	[page:constant R16F] stores the red component on 16 bits. The component is stored as floating point. <br /><br />
+
+	[page:constant R32I] stores the red component on 32 bits. The component is stored as an integer. <br /><br />
+
+	[page:constant R32UI] stores the red component on 32 bits. The component is stored as an unsigned integer. <br /><br />
+
+	[page:constant R32F] stores the red component on 32 bits. The component is stored as floating point. <br /><br />
+
+	[page:constant RG8] stores the red and green components on 8 bits each.<br /><br />
+
+	[page:constant RG8_SNORM] stores the red and green components on 8 bits each.
+	Every component is stored as normalized.
+	<br /><br />
+
+	[page:constant RG8I] stores the red and green components on 8 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RG8UI] stores the red and green components on 8 bits each.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RG16I] stores the red and green components on 16 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RG16UI] stores the red and green components on 16 bits each.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RG16F] stores the red and green components on 16 bits each.
+	Every component is stored as floating point.
+	<br /><br />
+
+	[page:constant RG32I] stores the red and green components on 32 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RG32UI] stores the red and green components on 32 bits.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RG32F] stores the red and green components on 32 bits.
+	Every component is stored as floating point.
+	<br /><br />
+
+	[page:constant RGB8] stores the red, green, and blue components on 8 bits each.
+
+	[page:constant RGB8_SNORM] stores the red, green, and blue components on 8 bits each.
+	Every component is stored as normalized.
+	<br /><br />
+
+	[page:constant RGB8I] stores the red, green, and blue components on 8 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RGB8UI] stores the red, green, and blue components on 8 bits each.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RGB16I] stores the red, green, and blue components on 16 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RGB16UI] stores the red, green, and blue components on 16 bits each.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RGB16F] stores the red, green, and blue components on 16 bits each.
+	Every component is stored as floating point
+	<br /><br />
+
+	[page:constant RGB32I] stores the red, green, and blue components on 32 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RGB32UI] stores the red, green, and blue components on 32 bits each.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RGB32F] stores the red, green, and blue components on 32 bits each.
+	Every component is stored as floating point
+	<br /><br />
+
+	[page:constant R11F_G11F_B10F] stores the red, green, and blue components respectively on 11 bits, 11 bits, and 10bits.
+	Every component is stored as floating point.
+	<br /><br />
+
+	[page:constant RGB565] stores the red, green, and blue components respectively on 5 bits, 6 bits, and 5 bits.<br /><br />
+
+	[page:constant RGB9_E5] stores the red, green, and blue components on 9 bits each.<br /><br />
+
+	[page:constant RGBA8] stores the red, green, blue, and alpha components on 8 bits each.<br /><br />
+
+	[page:constant RGBA8_SNORM] stores the red, green, blue, and alpha components on 8 bits.
+	Every component is stored as normalized.
+	<br /><br />
+
+	[page:constant RGBA8I] stores the red, green, blue, and alpha components on 8 bits each.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RGBA8UI] stores the red, green, blue, and alpha components on 8 bits.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RGBA16I] stores the red, green, blue, and alpha components on 16 bits.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RGBA16UI] stores the red, green, blue, and alpha components on 16 bits.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RGBA16F] stores the red, green, blue, and alpha components on 16 bits.
+	Every component is stored as floating point.
+	<br /><br />
+
+	[page:constant RGBA32I] stores the red, green, blue, and alpha components on 32 bits.
+	Every component is stored as an integer.
+	<br /><br />
+
+	[page:constant RGBA32UI] stores the red, green, blue, and alpha components on 32 bits.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant RGBA32F] stores the red, green, blue, and alpha components on 32 bits.
+	Every component is stored as floating point.
+	<br /><br />
+
+	[page:constant RGB5_A1] stores the red, green, blue, and alpha components respectively on 5 bits, 5 bits, 5 bits, and 1 bit.<br /><br />
+
+	[page:constant RGB10_A2] stores the red, green, blue, and alpha components respectively on 10 bits, 10 bits, 10 bits and 2 bits.<br /><br />
+
+	[page:constant RGB10_A2UI] stores the red, green, blue, and alpha components respectively on 10 bits, 10 bits, 10 bits and 2 bits.
+	Every component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant SRGB8] stores the red, green, and blue components on 8 bits each.<br /><br />
+
+	[page:constant SRGB8_ALPHA8] stores the red, green, blue, and alpha components on 8 bits each.<br /><br />
+
+	[page:constant DEPTH_COMPONENT16] stores the depth component on 16bits.<br /><br />
+
+	[page:constant DEPTH_COMPONENT24] stores the depth component on 24bits.<br /><br />
+
+	[page:constant DEPTH_COMPONENT32F] stores the depth component on 32bits. The component is stored as floating point.<br /><br />
+
+	[page:constant DEPTH24_STENCIL8] stores the depth, and stencil components respectively on 24 bits and 8 bits.
+	The stencil component is stored as an unsigned integer.
+	<br /><br />
+
+	[page:constant DEPTH32F_STENCIL8] stores the depth, and stencil components respectively on 32 bits and 8 bits.
+	The depth component is stored as floating point, and the stencil component as an unsigned integer.
+	<br /><br />
+
+	Note that the texture must have the correct [page:Texture.type type] set,
+	as well as the correct [page:Texture.format format].
+
+	See [link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D], and
+	[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texImage3D WebGL2RenderingContext.texImage3D],
+	for more details regarding the possible combination of [page:Texture.format format], [page:Texture.internalFormat internalFormat],
+	and [page:Texture.type type].<br /><br />
+
+	For more in-depth information regarding internal formats, you can also refer directly
+	to the [link:https://www.khronos.org/registry/webgl/specs/latest/2.0/ WebGL2 Specification] and
+	to the [link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0 Specification].
+	</p>
+
+	<h2>Depth Packing</h2>
+	<code>
+	THREE.BasicDepthPacking
+	THREE.RGBADepthPacking
+	</code>
+	<p>
+		For use with the [page:MeshDepthMaterial.depthPacking depthPacking] property of `MeshDepthMaterial`.
+	</p>
+
+	<h2>Color Space</h2>
+	<code>
+	THREE.NoColorSpace = ""
+	THREE.SRGBColorSpace = "srgb"
+	THREE.LinearSRGBColorSpace = "srgb-linear"
+	</code>
+	<p>
+	Used to define the color space of textures (and the output color space of the renderer).<br /><br />
+
+	If the color space type is changed after the texture has already been used by a material,
+	you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
+	</p>
+
+	<h2>源代码</h2>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+	</p>
+</body>
+
+</html>

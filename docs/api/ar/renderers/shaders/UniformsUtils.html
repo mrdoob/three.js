@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">يوفر دوال المساعدة لإدارة الزي الموحد.</p>
+
+		<h2>الطرق (Methods)</h2>
+		
+		<h3>[method:Object clone]( [param:Object src] )</h3>
+		<p>
+		src -- كائن يمثل تعريفات الزي الموحد. <br /><br />
+		
+		يستنسخ تعريفات الزي الموحد المعطاة عن طريق إجراء نسخة عميقة. هذا يعني
+		إذا كان [page:Uniform.value value] من الزي الموحد يشير إلى كائن مثل
+		[page:Vector3] أو [page:Texture]، فإن الزي الموحد المستنسخ سيشير إلى مرجع
+		كائن جديد.
+		</p>
+		
+		<h3>[method:Object merge]( [param:Array uniforms] )</h3>
+		<p>
+		uniforms -- مصفوفة من الكائنات التي تحتوي على تعريفات الزي الموحد. <br /><br />
+		
+		تدمج تعريفات الزي الموحد المعطاة في كائن واحد. نظرًا لأن
+		الطريقة تستخدم داخليًا [page:.clone](), فهو يؤدي نسخًا عميقًا عند
+		إنتاج تعريفات الزي الموحد المدمجة.
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

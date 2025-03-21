@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] est une classe de géométrie pour un cuboïde rectangulaire avec une largeur 'width', une hauteur 'height', et une profondeur 'depth' données.
+			À la création, le cuboïde est centré sur l'origine, chaque arrête est parallèle à l'un des axes.
+		</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#BoxGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code : </h2>
+
+		<code>const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+		</code>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]([param:Float width], [param:Float height], [param:Float depth], [param:Integer widthSegments], [param:Integer heightSegments], [param:Integer depthSegments])</h3>
+		<p>
+		width — Largeur; c'est-à-dire la longueur des arêtes parallèles à l'axe X. Optionnel; par défaut à 1.<br />
+		height — Hauteur; c'est-à-dire la longueur des arêtes parallèles à l'axe Y. Optionnel; par défaut à 1.<br />
+		depth — Profondeur; c'est-à-dire la longueur des arêtes parallèles à l'axe Z. Optionnel; par défaut à 1.<br />
+		widthSegments — Nombre de faces rectangulaires segmentées sur la largeur des côtés. Optionnel; par défaut à 1.<br />
+		heightSegments — Nombre de faces rectangulaires segmentées sur la hauteur des côtés. Optionnel; par défaut à 1.<br />
+		depthSegments — Nombre de faces rectangulaires segmentées le long de la profondeur des côtés. Optionnel; par défaut à 1.<br />
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] Pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[page:Layers] 对象将 [page:Object3D] 分配给编号为0到31的32个层中的1个或多个，
+			这些层在内部存储为 [link:https://en.wikipedia.org/wiki/Mask_(computing) 位掩码] ，
+			默认情况下，所有 [page:Object3D] 都是层0的成员。<br /><br />
+
+			图层对象可以用于控制对象的显示。当 [page:Camera camera] 的内容被渲染时与其共享图层相同的物体会被显示。每个对象都需要与一个
+			[page:Camera camera] 共享图层。<br /><br />
+
+			每个继承自 [page:Object3D] 的对象都有一个 [page:Object3D.layers] 对象。
+		</p>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+			创建一个新的图层对象，该对象默认与第 0 图层关联。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Integer mask]</h3>
+		<p>
+			用 bit mask 表示当前图层对象与 0 - 31 中的哪些图层相对应。所属层所对应的比特位为 1，其他位位 0。
+		</p>
+
+
+		<h2>方法</h2>
+
+		<h3>[method:undefined disable]( [param:Integer layer] )</h3>
+		<p>
+			layer - 一个 0 - 31 的整数。<br /><br />
+
+			删除图层对象与参数指定图层的对应关系。
+		</p>
+
+		<h3>[method:undefined enable]( [param:Integer layer] )</h3>
+		<p>
+			layer - 一个 0 - 31 的整数。<br /><br />
+
+			增加图层对象与参数指定图层的对应关系。
+		</p>
+
+		<h3>[method:undefined set]( [param:Integer layer] )</h3>
+		<p>
+			layer - 一个 0 - 31 的整数。<br /><br />
+
+			删除图层对象已有的所有对应关系，增加与参数指定的图层的对应关系。
+		</p>
+
+		<h3>[method:Boolean test]( [param:Layers layers] )</h3>
+		<p>
+			layers - 一个图层对象。<br /><br />
+
+			如果传入图层对象与当前对象属于相同的一组图层，则返回 true，否则返回 false。
+		</p>
+
+		<h3>[method:Boolean isEnabled]( [param:Integer layer] )</h3>
+		<p>
+			layer - an integer from 0 to 31.<br /><br />
+
+			Returns true if the given layer is enabled.
+		</p>
+
+		<h3>[method:undefined toggle]( [param:Integer layer] )</h3>
+		<p>
+			layer - 一个 0 - 31 的整数。<br /><br />
+
+			根据参数切换对象所属图层。
+		</p>
+
+		<h3>[method:undefined enableAll]()</h3>
+		<p>
+			Add membership to all layers.
+		</p>
+
+ 		<h3>[method:undefined disableAll]()</h3>
+		<p>
+			Remove membership from all layers.
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>三维矩阵（[name]）</h1>
+
+		<p class="desc">
+			一个表示3X3矩阵[link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].的类。
+		</p>
+
+		<h2>代码示例</h2>
+		<code>
+const m = new Matrix3();
+		</code>
+
+		<h2>注意行优先列优先的顺序。</h2>
+		<p>
+			[page:set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+			而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在数组当中。<br /><br />
+
+			这意味着
+		<code>
+m.set( 11, 12, 13,
+       21, 22, 23,
+       31, 32, 33 );
+		</code>
+		元素数组[page:.elements elements]将存储为:
+		<code>
+m.elements = [ 11, 21, 31,
+              12, 22, 32,
+              13, 23, 33 ];
+		</code>
+		在内部，所有的计算都是使用列优先顺序进行的。然而，由于实际的排序在数学上没有什么不同，
+		而且大多数人习惯于以行优先顺序考虑矩阵，所以three.js文档以行为主的顺序显示矩阵。
+		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13],
+			[param:Number n21], [param:Number n22], [param:Number n23],
+			[param:Number n31], [param:Number n32], [param:Number n33] )</h3>
+		<p>
+			Creates a 3x3 matrix with the given arguments in row-major order. If no arguments are provided, the constructor initializes
+			the [name] to the 3x3 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+		</p>
+
+
+		<h2>属性（Properties）</h2>
+
+		<h3>[property:Array elements]</h3>
+		<p>
+			矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
+		</p>
+
+
+
+		<h2>方法（Methods）</h2>
+
+		<h3>[method:Matrix3 clone]()</h3>
+		<p>创建一个新的矩阵，元素 [page:.elements elements] 与该矩阵相同。</p>
+
+		<h3>[method:this copy]( [param:Matrix3 m] )</h3>
+		<p>将矩阵[page:Matrix3 m]的元素复制到当前矩阵中。</p>
+
+		<h3>[method:Float determinant]()</h3>
+		<p>
+			计算并返回矩阵的行列式[link:https://en.wikipedia.org/wiki/Determinant determinant] 。
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
+		<p>如果矩阵[page:Matrix3 m] 与当前矩阵所有对应元素相同则返回true。</p>
+
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<p>
+		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
+		</p>
+
+		<div style="text-align: center">
+		<math>
+			<mrow>
+				<mi>xAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>d</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>,
+
+		<math>
+			<mrow>
+				<mi>yAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>h</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>, and
+
+		<math>
+			<mrow>
+				<mi>zAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+		</div>
+
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - 用来存储设置元素数据的数组<br />
+		[page:Integer offset] - (可选参数) 数组的偏移量，默认值为 0。<br /><br />
+
+		使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
+		</p>
+
+		<h3>[method:this invert]()</h3>
+		<p>
+		将当前矩阵翻转为它的逆矩阵，使用 [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method] 解析方式。你不能对行或列为 0 的矩阵进行翻转，如果你尝试这样做，该方法将生成一个零矩阵。
+		</p>
+
+		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+		[page:Matrix4 m] - [page:Matrix4]<br /><br />
+
+		将这个矩阵设置为给定矩阵的正规矩阵[link:https://en.wikipedia.org/wiki/Normal_matrix normal matrix]（左上角的3x3）。
+		正规矩阵是矩阵[page:Matrix4 m]的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] 的转置[link:https://en.wikipedia.org/wiki/Transpose transpose]。
+		</p>
+
+		<h3>[method:this identity]()</h3>
+		<p>
+			将此矩阵重置为3x3单位矩阵:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] — Rotation angle in radians. Positive values rotate counterclockwise.<br /><br />
+
+		Sets this matrix as a 2D rotational transformation by [page:Float theta] radians.
+		The resulting matrix will be:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - the amount to scale in the X axis.<br />
+		[page:Float y] - the amount to scale in the Y axis.<br />
+
+		Sets this matrix as a 2D scale transform:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+		</p>
+
+		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
+		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Vector2 v] a translation transform from vector.<br />
+		or<br />
+		[page:Float x] - the amount to translate in the X axis.<br />
+		[page:Float y] - the amount to translate in the Y axis.<br />
+
+		Sets this matrix as a 2D translation transform:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
+		<p>将当前矩阵乘以矩阵[page:Matrix3 m]。</p>
+
+		<h3>[method:this multiplyMatrices]( [param:Matrix3 a], [param:Matrix3 b] )</h3>
+		<p>设置当前矩阵为矩阵[page:Matrix3 a] x 矩阵[page:Matrix3 b]。</p>
+
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
+		<p>当前矩阵所有的元素乘以该缩放值*s*</p>
+
+		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )</h3>
+		<p>
+		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
+		<p>将矩阵[page:Matrix3 m]乘以当前矩阵。</p>
+
+		<h3>[method:this setFromMatrix4]( [param:Matrix4 m] )</h3>
+		<p>根据参数 [page:Matrix4 m] 左上 3x3 的矩阵值，设置当前矩阵的值。</p>
+
+		<h3>[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )</h3>
+		<p>
+		[page:Float tx] - x偏移量<br />
+		[page:Float ty] - y偏移量<br />
+		[page:Float sx] - x方向的重复比例<br />
+		[page:Float sy] - y方向的重复比例<br />
+		[page:Float rotation] - 旋转, 弧度。Positive values rotate counterclockwise<br />
+		[page:Float cx] - 旋转中心x<br />
+		[page:Float cy] - 旋转中心y<br /><br />
+
+		使用偏移，重复，旋转和中心点位置设置UV变换矩阵。
+		</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - (可选参数) 存储矩阵元素的数组，如果未指定会创建一个新的数组。<br />
+		[page:Integer offset] - (可选参数) 存放矩阵元素数组的偏移量。<br /><br />
+
+		使用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]格式将此矩阵的元素写入数组中。
+		</p>
+
+		<h3>[method:this transpose]()</h3>
+		<p>将该矩阵转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]。</p>
+
+		<h3>[method:this transposeIntoArray]( [param:Array array] )</h3>
+		<p>
+		[page:Array array] -  用于存储当前矩阵转置结果的数组。<br /><br />
+
+		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组 array 中，但不改变当前矩阵，
+		并返回当前矩阵。
+		</p>
+
+		<h2>源码（Source）</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

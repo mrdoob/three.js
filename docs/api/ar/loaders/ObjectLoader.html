@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			محمل لتحميل مورد JSON في
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].<br /><br />
+			يستخدم هذا [page:FileLoader] داخليًا لتحميل الملفات.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		const loader = new THREE.ObjectLoader();
+	
+		loader.load(
+			// resource URL
+			"models/json/example.json",
+	
+			// onLoad callback
+			// Here the loaded data is assumed to be an object
+			function ( obj ) {
+				// Add the loaded object to the scene
+				scene.add( obj );
+			},
+	
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+	
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
+	
+	
+		// Alternatively, to parse a previously loaded JSON structure
+		const object = loader.parse( a_json_object );
+	
+		scene.add( object );
+		</code>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>[example:webgpu_materials_lightmap WebGL / materials / lightmap]</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — [page:LoadingManager loadingManager]
+		للمحمل الذي سيتم استخدامه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		ينشئ [name] جديد.
+		</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للخصائص المشتركة.</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للطرق المشتركة.</p>
+	 
+		<h3>
+		[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] — المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — سيتم استدعاؤه عند اكتمال التحميل. الحجة
+		سيكون ال [page:Object3D object] المحمّل.<br />
+		[page:Function onProgress] (اختياري) — سيتم استدعاؤه أثناء تقدم التحميل. الحجة ستكون مثيل ProgressEvent، والذي
+		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
+		.[page:Integer loaded]. إذا لم يضبط الخادم رأس Content-Length
+		؛ سيكون .[page:Integer total] 0.<br />
+		[page:Function onError] (اختياري) — سيتم استدعاؤه عند حدوث خطأ في التحميل.<br />
+		</p>
+		<p>
+		ابدأ التحميل من url واستدعِ onLoad مع محتوى الاستجابة المحلل.
+		</p>
+	 
+		<h3>
+		[method:Object3D parse]( [param:Object json], [param:Function onLoad] )
+		</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br /><br />
+		[page:Function onLoad] — سيتم استدعاؤه عند اكتمال التحليل. ال
+		الحجة ستكون ال [page:Object3D object] المحلل.<br /><br />
+		قم بتحليل هيكل `JSON` وإرجاع كائن three.js. يستخدم هذا
+		داخليًا بواسطة [page:.load]() ولكن يمكن أيضًا استخدامه مباشرة لتحليل
+		هيكل JSON محمّل مسبقًا.
+		</p>
+		 
+		<h3>[method:Object parseGeometries]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br /><br />
+		 
+		يستخدم هذا بواسطة [page:.parse]() لتحليل أي [page:BufferGeometry geometries] في هيكل JSON.
+		</p>
+		 
+		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br /><br />
+		 
+		يستخدم هذا بواسطة [page:.parse]() لتحليل أي مواد في ال JSON
+		هيكل باستخدام [page:MaterialLoader].
+		</p>
+		 
+		<h3>[method:Object parseAnimations]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br /><br />
+		 
+		يستخدم هذا بواسطة [page:.parse]() لتحليل أي رسوم متحركة في ال JSON
+		هيكل، باستخدام [page:AnimationClip.parse]().
+		</p>
+		 
+		<h3>[method:Object parseImages]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br /><br />
+		 
+		يستخدم هذا بواسطة [page:.parse]() لتحليل أي صور في هيكل JSON،
+		باستخدام [page:ImageLoader].
+		</p>
+		 
+		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br /><br />
+		 
+		يستخدم هذا بواسطة [page:.parse]() لتحليل أي نسيج في ال JSON
+		هيكل.
+		</p>
+		 
+		<h3>
+		[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )
+		</h3>
+		<p>
+		[page:Object json] — مطلوب. مصدر JSON للتحليل.<br />
+		[page:BufferGeometry geometries] — مطلوب. الهندسات الخاصة بـ
+		JSON.<br />
+		[page:Material materials] — مطلوب. المواد الخاصة بـ JSON.<br />
+		[page:AnimationClip animations] — مطلوب. الرسوم المتحركة الخاصة بـ JSON.<br /><br />
+		 
+		يستخدم هذا بواسطة [page:.parse]() لتحليل أي كائنات ثُنائية الأبعاد في ال JSON
+		هيكل.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

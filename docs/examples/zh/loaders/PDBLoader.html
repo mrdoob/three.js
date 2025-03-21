@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:Loader] &rarr;
+
+	<h1>PDB加载器([name])</h1>
+
+	<p class="desc">用于加载 `.pdb` 资源的加载器。<br>
+		[link:http://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format) 蛋白质数据库] 文件格式是描述分子三​​维结构的文本文件。
+	</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// instantiate a loader
+		const loader = new PDBLoader();
+
+		// load a PDB resource
+		loader.load(
+			// resource URL
+			'models/pdb/caffeine.pdb',
+			// called when the resource is loaded
+			function ( pdb ) {
+
+				const geometryAtoms = pdb.geometryAtoms;
+				const geometryBonds = pdb.geometryBonds;
+				const json = pdb.json;
+
+				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
+
+			},
+			// called when loading is in progress
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+	<h2>例子</h2>
+	<p>
+		[example:webgl_loader_pdb]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:LoadingManager manager] )</h3>
+	<p>
+		[page:LoadingManager manager] — 加载器使用的 [page:LoadingManager loadingManager] 。默认值为 [page:LoadingManager
+		THREE.DefaultLoadingManager]。
+	</p>
+	<p>
+		创建一个新的 [name]。
+	</p>
+
+	<h2>属性</h2>
+	<p>有关公共属性，请参阅 [page:Loader] 基类。</p>
+
+	<h2>Methods</h2>
+	<p>有关常用方法，请参阅 [page:Loader] 基类。</p>
+
+	<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function
+		onError] )</h3>
+	<p>
+		[page:String url] — 包含 `.pdb` 文件路径/URL 的字符串。<br />
+		[page:Function onLoad] — （可选）加载成功完成后调用的函数。该函数接收具有以下属性的对象。[page:BufferGeometry geometryAtoms]、[page:BufferGeometry
+		geometryBonds] 和 [page:Object JSON] 结构。<br />
+		[page:Function onProgress] — （可选）加载过程中调用的函数。参数将是 XMLHttpRequest 实例，其中包含 .[page:Integer total] 和 .[page:Integer
+		loaded] 字节。如果服务器没有设置 Content-Length，.[page:Integer total] 将为 0。<br />
+		[page:Function onError] —（可选）加载期间发生错误时调用的函数。该函数接收错误作为参数。<br />
+	</p>
+	<p>
+		开始从 url 加载并使用解析后的响应内容调用 onLoad。
+	</p>
+
+	<h3>[method:Object parse]( [param:String text] )</h3>
+	<p>
+		[page:String text] — 要解析的文本 `pdb` 结构。
+	</p>
+	<p>
+		解析 `pdb` 文本并返回JSON结构。<br />
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/PDBLoader.js examples/jsm/loaders/PDBLoader.js]
+	</p>
+</body>
+
+</html>

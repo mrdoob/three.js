@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		فئة تمثل متجه 2D [link:https://en.wikipedia.org/wiki/Vector_space]. متجه 2D هو زوج مرتب من الأرقام (مسمى x و y)، والذي يمكن استخدامه لتمثيل عدد من الأشياء، مثل:
+		</p>
+			
+		<ul>
+		<li>نقطة في الفضاء 2D (أي موضع على مستوى).</li>
+		<li>
+		اتجاه وطول عبر مستوى. في three.js سيكون الطول دائمًا [link:https://en.wikipedia.org/wiki/Euclidean_distance الطول الإقليدي] (طول الخط المستقيم) من `(0، 0)` إلى `(x، y)` ويتم قياس الاتجاه أيضًا من `(0، 0)` نحو `(x، y)`.
+		</li>
+		<li>أي زوج مرتب عشوائي من الأرقام.</li>
+		</ul>
+			
+		<p>
+		هناك أشياء أخرى يمكن استخدام متجه 2D لتمثيلها، مثل المتجهات الزخمية، والأعداد المركبة وما إلى ذلك، ومع ذلك فإن هذه هي الاستخدامات الأكثر شيوعًا في three.js.
+		</p>
+			
+		<p>
+		التكرار عبر نسخة [name] سيعود بمكوناته `(x، y)` بالترتيب المقابل.
+		</p>
+			
+		<h2>مثال للكود</h2>
+
+		<code>
+		const a = new THREE.Vector2( 0, 1 );
+
+		//no arguments; will be initialised to (0, 0)
+		const b = new THREE.Vector2( );
+
+		const d = a.distanceTo( b );
+		</code>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - قيمة x لهذا المتجه. الافتراضي هو `0`.<br />
+		[page:Float y] - قيمة y لهذا المتجه. الافتراضي هو `0`.<br /><br />
+		
+		ينشئ نسخة جديدة من [name].
+		</p>
+		
+		<h2>الخصائص (Properties)</h2>
+		
+		<h3>[property:Float height]</h3>
+		<p>اسم آخر لـ [page:.y y].</p>
+		
+		<h3>[property:Boolean isVector2]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى من نوع [name].</p>
+		
+		<h3>[property:Float width]</h3>
+		<p>اسم آخر لـ [page:.x x].</p>
+		
+		<h3>[property:Float x]</h3>
+		
+		<h3>[property:Float y]</h3>
+		
+		<h2>الطرق (Methods)</h2>
+		
+		<h3>[method:this add]( [param:Vector2 v] )</h3>
+		<p>يضيف [page:Vector2 v] إلى هذا المتجه.</p>
+		
+		<h3>[method:this addScalar]( [param:Float s] )</h3>
+		<p>
+		يضيف القيمة القياسية [page:Float s] إلى قيم [page:.x x] و [page:.y y] لهذا المتجه.
+		</p>
+		
+		<h3>[method:this addScaledVector]( [param:Vector2 v], [param:Float s] )</h3>
+		<p>
+		يضيف الضعف من [page:Vector2 v] و [page:Float s] إلى هذا المتجه.
+		</p>
+		
+		<h3>[method:this addVectors]( [param:Vector2 a], [param:Vector2 b] )</h3>
+		<p>يضبط هذا المتجه على [page:Vector2 a] + [page:Vector2 b].</p>
+		
+		<h3>[method:Float angle]()</h3>
+		<p>
+		يحسب الزاوية بالراديان لهذا المتجه بالنسبة للمحور x الموجب.
+		</p>
+
+		<h3>[method:Float angleTo]( [param:Vector2 v] )</h3>
+		<p>
+		يعود بالزاوية بين هذا المتجه والمتجه [page:Vector2 v] بالراديان.
+		</p>
+		
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>
+		يضرب هذا المتجه (مع 1 ضمني كمكون الثالث) في m.
+		</p>
+		
+		<h3>[method:this ceil]()</h3>
+		<p>
+		تتم جولة مكونات [page:.x x] و [page:.y y] لهذا المتجه إلى أعلى إلى أقرب قيمة صحيحة.
+		</p>
+		
+		<h3>[method:this clamp]( [param:Vector2 min], [param:Vector2 max] )</h3>
+		<p>
+		[page:Vector2 min] - الحد الأدنى لقيم x و y.<br />
+		[page:Vector2 max] - الحد الأقصى لقيم x و y في النطاق المطلوب<br /><br />
+		
+		إذا كانت قيمة x أو y لهذا المتجه أكبر من قيمة x أو y للمتجه max، يتم استبدالها بالقيمة المقابلة. <br /><br />
+		إذا كانت قيمة x أو y لهذا المتجه أقل من قيمة x أو y للمتجه min، يتم استبدالها بالقيمة المقابلة.
+		</p>
+		
+		<h3>[method:this clampLength]( [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float min] - الحد الأدنى الذي سيتم تثبيت الطول عليه <br />
+		[page:Float max] - الحد الأقصى الذي سيتم تثبيت الطول عليه<br /><br />
+		
+		إذا كان طول هذا المتجه أكبر من قيمة max، يتم استبداله بالقيمة max. <br /><br />
+		إذا كان طول هذا المتجه أقل من قيمة min، يتم استبداله بالقيمة min.
+		</p>
+		
+		<h3>[method:this clampScalar]( [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float min] - الحد الأدنى الذي ستُثبَّت عليه العناصر
+		<br />
+		[page:Float max] - الحد الأقصى الذي سُتثبَّت عليه العناصر<br /><br />
+		
+		إذا كانت قيم x أو y لهذا المتجه أكبر من قيمة max، يتم استبدالها بالقيمة max. <br /><br />
+		إذا كانت قيم x أو y لهذا المتجه أقل من قيمة min، يتم استبدالها بالقيمة min.
+		</p>
+		
+		<h3>[method:Vector2 clone]()</h3>
+		<p>
+		يعود بـ Vector2 جديد بنفس قيم [page:.x x] و [page:.y y] كهذا.
+		</p>
+		
+		<h3>[method:this copy]( [param:Vector2 v] )</h3>
+		<p>
+		ينسخ قيم خصائص [page:.x x] و [page:.y y] لـ Vector2 الممرر إلى هذا Vector2.
+		</p>
+		
+		<h3>[method:Float distanceTo]( [param:Vector2 v] )</h3>
+		<p>يحسب المسافة من هذا المتجه إلى [page:Vector2 v].</p>
+		
+		<h3>[method:Float manhattanDistanceTo]( [param:Vector2 v] )</h3>
+		<p>
+		يحسب [link:https://en.wikipedia.org/wiki/Taxicab_geometry مسافة مانهاتن] من هذا المتجه إلى [page:Vector2 v].
+		</p>
+		
+		<h3>[method:Float distanceToSquared]( [param:Vector2 v] )</h3>
+		<p>
+		يحسب المسافة المربعة من هذا المتجه إلى [page:Vector2 v]. إذا كنت تقارن فقط المسافة مع مسافة أخرى، يجب عليك مقارنة المسافة المربعة بدلاً من ذلك لأنه أكثر كفاءة قليلاً في الحساب.
+		</p>
+		
+		<h3>[method:this divide]( [param:Vector2 v] )</h3>
+		<p>يقسم هذا المتجه على [page:Vector2 v].</p>
+		
+		<h3>[method:this divideScalar]( [param:Float s] )</h3>
+		<p>يقسم هذا المتجه على العدد القياسي [page:Float s].</p>
+		
+		<h3>[method:Float dot]( [param:Vector2 v] )</h3>
+		<p>
+		يحسب [link:https://en.wikipedia.org/wiki/Dot_product حاصل الضرب النقطي] لهذا المتجه و [page:Vector2 v].
+		</p>
+		
+		<h3>[method:Float cross]( [param:Vector2 v] )</h3>
+		<p>
+		يحسب [link:https://en.wikipedia.org/wiki/Cross_product حاصل الضرب المتقاطع] لهذا المتجه و [page:Vector2 v]. يرجى ملاحظة أن "حاصل الضرب المتقاطع" في 2D غير محدد بشكل جيد. تحسب هذه الوظيفة حاصل ضرب متقاطع هندسي يستخدم في الغالب في رسومات 2D
+		</p>
+		
+		<h3>[method:Boolean equals]( [param:Vector2 v] )</h3>
+		<p>
+		يعود بـ `true` إذا كانت مكونات هذا المتجه و [page:Vector2 v] متطابقة بدقة؛ `false` في حالة عدم ذلك.
+		</p>
+		
+		<h3>[method:this floor]()</h3>
+		<p>
+		تتم جولة مكونات هذا المتجه إلى أسفل إلى أقرب قيمة صحيحة.
+		</p>
+		
+		<h3>
+		[method:this fromArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - المصفوفة المصدر.<br />
+		[page:Integer offset] - (اختياري) إزاحة في المصفوفة. الافتراضي هو 0.<br /><br />
+		
+		يضبط قيمة [page:.x x] لهذا المتجه على `array[ offset ]` وقيمة [page:.y y] على `array[ offset + 1 ]`.
+		</p>
+		
+		<h3>
+		[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )
+		</h3>
+		<p>
+		[page:BufferAttribute attribute] - السمة المصدر.<br />
+		[page:Integer index] - فهرس في السمة.<br /><br />
+		
+		يضبط قيم [page:.x x] و [page:.y y] لهذا المتجه من [page:BufferAttribute attribute].
+		</p>
+		
+		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
+		<p>
+		[page:Integer index] - 0 أو 1.<br /><br />
+		
+		إذا كان index يساوي 0 يعود بقيمة [page:.x x]. <br />
+		إذا كان index يساوي 1 يعود بقيمة [page:.y y].
+		</p>
+		
+		<h3>[method:Float length]()</h3>
+		<p>
+		يحسب [link:https://en.wikipedia.org/wiki/Euclidean_distance الطول الإقليدي] (طول الخط المستقيم) من (0، 0) إلى (x، y).
+		</p>
+		
+		<h3>[method:Float manhattanLength]()</h3>
+		<p>
+		يحسب [link:http://en.wikipedia.org/wiki/Taxicab_geometry طول مانهاتن] لهذا المتجه.
+		</p>
+
+		<h3>[method:Float lengthSq]()</h3>
+		<p>
+		يحسب مربع [link:https://en.wikipedia.org/wiki/Euclidean_distance الطول الإقليدي] (طول الخط المستقيم) من (0، 0) إلى (x، y). إذا كنت تقارن أطوال المتجهات، يجب عليك مقارنة الطول المربع بدلاً من ذلك لأنه أكثر كفاءة قليلاً في الحساب.
+		</p>
+		
+		<h3>[method:this lerp]( [param:Vector2 v], [param:Float alpha] )</h3>
+		<p>
+		[page:Vector2 v] - [page:Vector2] للتداخل نحوه.<br />
+		[page:Float alpha] - عامل التداخل، عادة في الفترة المغلقة `[0، 1]`.<br /><br />
+		
+		يتداخل بشكل خطي بين هذا المتجه و [page:Vector2 v]، حيث alpha هو نسبة المسافة على طول الخط - سيكون alpha = 0 هذا المتجه، وسيكون alpha = 1 [page:Vector2 v].
+		</p>
+		
+		<h3>
+		[method:this lerpVectors]( [param:Vector2 v1], [param:Vector2 v2], [param:Float alpha] )
+		</h3>
+		<p>
+		[page:Vector2 v1] - [page:Vector2] البداية.<br />
+		[page:Vector2 v2] - [page:Vector2] للتداخل نحوه.<br />
+		[page:Float alpha] - عامل التداخل، عادة في الفترة المغلقة `[0، 1]`.<br /><br />
+		
+		يضبط هذا المتجه ليكون المتجه المُركب بشكل خطي بين [page:Vector2 v1] و [page:Vector2 v2] حيث alpha هو نسبة المسافة على طول الخط الذي يربط بين المتجهين - سيكون alpha = 0 [page:Vector2 v1]، وسيكون alpha = 1 [page:Vector2 v2].
+		</p>
+		
+		<h3>[method:this negate]()</h3>
+		<p>يعكس هذا المتجه - أي يضع x = -x و y = -y.</p>
+		
+		<h3>[method:this normalize]()</h3>
+		<p>
+		يحول هذا المتجه إلى [link:https://en.wikipedia.org/wiki/Unit_vector متجه وحدة] -
+		أي يضعه مساوٍ لمتجه بنفس الاتجاه
+		كهذا، ولكن [page:.length length] 1.
+		</p>
+		
+		<h3>[method:this max]( [param:Vector2 v] )</h3>
+		<p>
+		إذا كانت قيمة x أو y لهذا المتجه أقل من قيمة x أو y لـ [page:Vector2 v]، استبدل تلك القيمة بالقيمة العظمى المقابلة.
+		</p>
+		
+		<h3>[method:this min]( [param:Vector2 v] )</h3>
+		<p>
+		إذا كانت قيمة x أو y لهذا المتجه أكبر من قيمة x أو y لـ [page:Vector2 v]، استبدل تلك القيمة بالقيمة الدنيا المقابلة.
+		</p>
+		
+		<h3>[method:this multiply]( [param:Vector2 v] )</h3>
+		<p>يضرب هذا المتجه في [page:Vector2 v].</p>
+		
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
+		<p>يضرب هذا المتجه في العدد القياسي [page:Float s].</p>
+		
+		<h3>
+		[method:this rotateAround]( [param:Vector2 center], [param:Float angle] )
+		</h3>
+		<p>
+		[page:Vector2 center] - النقطة التي يتم التدوير حولها.<br />
+		[page:Float angle] - الزاوية التي يتم التدوير بها، بالراديان.<br /><br />
+		
+		يدور هذا المتجه حول [page:Vector2 center] بـ [page:Float angle] راديان.
+		</p>
+		
+		<h3>[method:this round]()</h3>
+		<p>
+		تتم جولة مكونات هذا المتجه إلى أقرب قيمة صحيحة.
+		</p>
+		
+		<h3>[method:this roundToZero]()</h3>
+		<p>
+		تتم جولة مكونات هذا المتجه نحو الصفر (لأعلى إذا كان سالبًا، لأسفل إذا كان موجبًا) إلى قيمة صحيحة.
+		</p>
+		
+		<h3>[method:this set]( [param:Float x], [param:Float y] )</h3>
+		<p>يضبط مكونات [page:.x x] و [page:.y y] لهذا المتجه.</p>
+		
+		<h3>
+		[method:this setComponent]( [param:Integer index], [param:Float value] )
+		</h3>
+		<p>
+		[page:Integer index] - 0 أو 1.<br />
+		[page:Float value] - [page:Float]<br /><br />
+		
+		إذا كان index يساوي 0 ضع [page:.x x] على [page:Float value]. <br />
+		إذا كان index يساوي 1 ضع [page:.y y] على [page:Float value]
+		</p>
+		
+		<h3>[method:this setLength]( [param:Float l] )</h3>
+		<p>
+		يضبط هذا المتجه على متجه بنفس الاتجاه كهذا، ولكن [page:.length length] [page:Float l].
+		</p>
+		
+		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
+		<p>
+		يضبط قيم [page:.x x] و [page:.y y] لهذا المتجه على حد سواء مساوية لـ [page:Float scalar].
+		</p>
+		
+		<h3>[method:this setX]( [param:Float x] )</h3>
+		<p>يستبدل قيمة [page:.x x] لهذا المتجه بـ [page:Float x].</p>
+		
+		<h3>[method:this setY]( [param:Float y] )</h3>
+		<p>يستبدل قيمة [page:.y y] لهذا المتجه بـ [page:Float y].</p>
+		
+		<h3>[method:this sub]( [param:Vector2 v] )</h3>
+		<p>يطرح [page:Vector2 v] من هذا المتجه.</p>
+		
+		<h3>[method:this subScalar]( [param:Float s] )</h3>
+		<p>
+		يطرح [page:Float s] من مكونات [page:.x x] و [page:.y y] لهذا المتجه.
+		</p>
+		
+		<h3>[method:this subVectors]( [param:Vector2 a], [param:Vector2 b] )</h3>
+		<p>يضبط هذا المتجه على [page:Vector2 a] - [page:Vector2 b].</p>
+		
+		<h3>
+		[method:Array toArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - (اختياري) مصفوفة لتخزين هذا المتجه فيها. إذا لم يتم توفير هذا، سيتم إنشاء مصفوفة جديدة.<br />
+		[page:Integer offset] - (اختياري) إزاحة اختيارية في المصفوفة.<br /><br />
+		
+		يرجع مصفوفة [x، y]، أو ينسخ x و y في المصفوفة المعطاة من نوع [page:Array array].
+		</p>
+		
+		<h3>[method:this random]()</h3>
+		<p>
+		يضبط كل مكون من مكونات هذا المتجه على قيمة شبه عشوائية بين 0 و 1، باستثناء 1.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

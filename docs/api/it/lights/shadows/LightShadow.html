@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Serve come classe base per le altri classi shadow (ombra).
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+		[page:Camera camera] - la visione del mondo da parte della luce.<br /><br />
+
+		Crea una nuova [name]. Questa classe non deve essere chiamata direttamente - viene usata come classe base
+    da altre ombre di luce.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean autoUpdate]</h3>
+		<p>
+      Abilita gli aggiornamenti automatici dell'ombra della luce. Il valore predefinito è `true`.
+      Se non hai bisogno di luci/ombre, puoi impostarlo su `false`.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+      La visione del mondo da parte della luce. Viene utilizzata per generare un mappa di profondità della scena;
+      gli oggetti dietro ad altri oggetti dalla prospettiva della luce saranno in ombra.
+		</p>
+
+		<h3>[property:Float bias]</h3>
+		<p>
+      Bias della mappa delle ombre, quanto aggiungere o sottrarre dalla profondità normalizzata quando si decide se una superficie è in ombra.<br />
+      Il valore predefinito è 0. Piccole regolazioni qui (nell'ordine di 0,0001) possono aiutare a ridurre gli artefatti nelle ombre.
+		</p>
+
+		<h3>[property:Integer blurSamples]</h3>
+		<p>
+      La quantità di campioni da utilizzare durante la sfocatura di una mappa ombra VSM.
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The intensity of the shadow. The default is `1`. Valid values are in the range `[0, 1]`.
+		</p>
+
+		<h3>[property:WebGLRenderTarget map]</h3>
+		<p>
+      La mappa di profondità generata usando la telecamera interna; una posizione oltre la profondità di un pixel è in ombra.
+      Calcolato internamente durante il rendering.
+		</p>
+
+		<h3>[property:WebGLRenderTarget mapPass]</h3>
+		<p>
+      La mappa di distribuzione generata usando la telecamera interna; un'occlusione viene calcolata in base alla distribuzione
+      della profondità. Calcolato internamente durante il rendering. 
+		</p>
+
+		<h3>[property:Vector2 mapSize]</h3>
+		<p>
+      Un [Page:Vector2] che definisce la larghezza e l'altezza della mappa dell'ombra.<br /><br />
+
+      Valori più alti danno una maggior qualità alle ombre a scapito del tempo di calcolo. I valori 
+      devono essere potenze di 2, fino a [page:WebGLRenderer.capabilities].maxTextureSize per un determinato
+      dispositivo, sebbene la larghezza e l'altezza non debbano essere le stesse (quindi, per esempio  (512, 1024)
+      è valido). Il valore predefinito è *( 512, 512 )*.
+		</p>
+
+		<h3>[property:Matrix4 matrix]</h3>
+		<p>
+      Modello per lo spazio delle ombre della telecamera, per calcolare la posizione e la profondità nella mappa delle ombre.
+      Memorizzato in una [page:Matrix4 Matrix4]. Questa viene calcolata internamente durante il rendering.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+      Quando viene impostato a `true`, le mappe d'ombra saranno aggiornate nella successiva chiamata del `render`.
+      L'impostazione predefinita è `false`.
+      Se si è impostato [page:.autoUpdate] a `false`, sarà necessario impostare questa proprietà su `true` e quindi 
+      eseguire una chiamata di rendering  per aggiornare l'ombra della luce.
+		</p>
+
+		<h3>[property:Float normalBias]</h3>
+		<p>
+      Definisce di quanto la posizione utilizzata per interrogare la mappa delle ombre è sfalsata rispetto 
+      alla normale dell'oggetto. Il valore predefinito è 0. Aumentando questo valore si può ridurre l'acne dell'ombra,
+      soprattutto nelle scene di grandi dimensioni in cui la luce illumina la geometria con un angolo poco profondo.
+      Il costo è che le ombre possono apparire distorte.
+		</p>
+
+		<h3>[property:Float radius]</h3>
+		<p>
+      Impostando questo valore maggiore di 1 si sfocheranno i bordi dell'ombra.<br />
+
+      Valori alti causeranno degli effetti di banding indesiderati nelle ombre - un [page:.mapSize mapSize]
+      maggiore consentirà di utilizzare un valore più elevato qui prima che questi effetti diventino visibili.<br />
+      Se [page:WebGLRenderer.shadowMap.type] è impostato a [page:Renderer PCFSoftShadowMap], il raggio non ha effetto e
+      si consiglia di aumentare la morbidezza diminuendo invece [page:.mapSize mapSize].<br /><br />
+
+      Si noti che questo non ha effetto se [page:WebGLRenderer.shadowMap.type] è impostato a [page:Renderer BasicShadowMap].
+		</p>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Vector2 getFrameExtents]()</h3>
+		<p>
+      Utilizzato internamente dal renderer per estendere la mappa d'ombra in modo da contenere tutti i viewport.
+		</p>
+
+		<h3>[method:undefined updateMatrices]( [param:Light light] )</h3>
+		<p>
+      Aggiorna le matrici per la telecamera e l'ombra, utilizzato internamente dal renderer.<br /><br />
+
+		  light -- la luce per la quale viene renderizzata l'ombra.
+		</p>
+
+		<h3>[method:Frustum getFrustum]()</h3>
+		<p>
+      Ottiene il frustum delle telecamere ombra. Utilizzato internamente dal renderer per tagliare gli oggetti.
+		</p>
+
+		<h3>[method:number getViewportCount]()</h3>
+		<p>
+      Utilizzato internamente dal renderer per ottenere il numero di viewport che devono essere renderizzate per questa ombra.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+      Elimina le texture di questa ombra ([page:LightShadow.map map] e [page:LightShadow.mapPass mapPass]).
+		</p>
+
+		<h3>[method:this copy]( [param:LightShadow source] )</h3>
+		<p>
+      Copia il valore di tutte le proprietà dalla [page:LightShadow sorgente] della Light.
+		</p>
+
+		<h3>[method:LightShadow clone]()</h3>
+		<p>
+      Crea una nuova LightShadow con le stesse proprietà di questa.
+		</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+      Serializza questa LightShadow.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
+	</body>
+</html>

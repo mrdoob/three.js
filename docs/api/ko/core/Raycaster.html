@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		이 클래스는 [link:https://en.wikipedia.org/wiki/Ray_casting raycasting]을 보조하기 위해 만들어졌습니다.
+		레이캐스팅은 여러 개체 중 마우스로 선택(마우스가 3d 공간의 객체 위에서 작동하는)하는 기능을 담당합니다.
+		</p>
+
+		<h2>코드 예제</h2>
+		<code>
+		const raycaster = new THREE.Raycaster();
+		const pointer = new THREE.Vector2();
+
+		function onPointerMove( event ) {
+
+			// calculate pointer position in normalized device coordinates
+			// (-1 to +1) for both components
+
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+		}
+
+		function render() {
+
+			// update the picking ray with the camera and pointer position
+			raycaster.setFromCamera( pointer, camera );
+
+			// calculate objects intersecting the picking ray
+			const intersects = raycaster.intersectObjects( scene.children );
+
+			for ( let i = 0; i < intersects.length; i ++ ) {
+
+				intersects[ i ].object.material.color.set( 0xff0000 );
+
+			}
+
+			renderer.render( scene, camera );
+
+		}
+
+		window.addEventListener( 'pointermove', onPointerMove );
+
+		window.requestAnimationFrame(render);
+
+		</code>
+
+		<h2>예제</h2>
+
+		<p>
+			[example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
+			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
+			[example:webgl_instancing_raycast Raycasting to a InstancedMesh]<br />
+			[example:webgl_interactive_lines Raycasting to a Line]<br />
+			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
+			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
+			[example:webgl_raycaster_texture Raycast to a Texture]
+		</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] )</h3>
+		<p>
+		[page:Vector3 origin] — 레이캐스팅이 활용되는 시점 벡터입니다.<br />
+		[page:Vector3 direction] — 레이 방향을 가지고 있는 방향 벡터입니다. 정규화되어야 합니다.<br />
+		[page:Float near] — near보다 바깥 범위에 있는 결과값들입니다. 음수가 될 수 없습니다. 기본값은 0입니다.<br />
+		[page:Float far] — far 안쪽 범위에 있는 결과값들입니다. near보다 작을 수 없습니다. 기본값은 무한대입니다.
+		</p>
+		<p>
+		새 레이캐스터 객체를 만듭니다.<br />
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Float far]</h3>
+		<p>
+		레이캐스터의 far 요소입니다. 이 값은 거리에 비례해 버려지는 객체들을 나타냅니다.
+		이 값은 음수가 될 수 없으며 near 프로퍼티보다 커야합니다.
+		</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+		레이캐스터의 near 요소입니다. 이 값은 거리에 비례해 버려지는 객체들을 나타냅니다.
+		이 값은 음수가 될 수 없으며 far 프로퍼티보다 작아야 합니다.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+		[page:Sprites]같은 빌보드객체처럼 뷰에 의존하는 객체에 대항 레이캐스팅 시에 사용되는 카메라입니다.
+		이 값은 수동으로 설정하거나 "setFromCamera"를 호출해야 합니다.
+
+		기본값은 null입니다.
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+		[name]에서 인터섹션 테스트 시에 3d 객체를 선택적으로 무시할 때 사용됩니다. 아래 코드 예제에서 *1* 레이어에 있는 3D 객체들만 [name]의 인스턴스가 될 것입니다.
+
+		<code>
+		raycaster.layers.set( 1 );
+		object.layers.enable( 1 );
+		</code>
+
+		</p>
+
+		<h3>[property:Object params]</h3>
+		<p>
+		다음과 같은 프로퍼티를 가지고 있는 객체입니다:
+
+			<code>
+{
+	Mesh: {},
+	Line: { threshold: 1 },
+	LOD: {},
+	Points: { threshold: 1 },
+	Sprite: {}
+}
+			</code>
+
+			여기서 threshold는 객체를 교차할 때 레이캐스터의 정밀도(월드 단위)입니다.
+		</p>
+
+		<h3>[property:Ray ray]</h3>
+		<p>레이캐스팅에 사용되는 [Page:Ray]입니다.</p>
+
+
+		<h2>메서드</h2>
+
+		<h3>[method:undefined set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 origin] — 레이캐스팅이 활용되는 시점 벡터입니다.<br />
+		[page:Vector3 direction] — 레이 방향을 정하는 정규화된 방향 벡터입니다.
+		</p>
+		<p>
+		새 시점과 방향으로 레이를 업데이트합니다. 이 메서드는 인자의 값만을 복사한다는 점에 주의하세요.
+		</p>
+
+		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
+		<p>
+		[page:Vector2 coords] — 마우스의 2D 좌표이며 정규화 디바이스 좌표입니다(NDC)---X 및 Y 컴포넌트는 -1 과 1 사이입니다.<br />
+		[page:Camera camera] — 레이의 시점이 되는 카메라입니다.
+		</p>
+		<p>
+		레이의 새 시점과 방향을 업데이트합니다.
+		</p>
+
+		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
+		<p>
+			[page:WebXRController controller] — The controller to copy the position and direction from.
+		</p>
+		<p>Updates the ray with a new origin and direction.</p>
+
+		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<p>
+		[page:Object3D object] — 레이와의 교차 체크를 하는 객체입니다.<br />
+		[page:Boolean recursive] — true라면, 모든 자식들도 함게 체크합니다. false라면 해당 객체와의 교차만 체크합니다. 기본값은 true입니다.<br />
+		[page:Array optionalTarget] — (생략가능) 결과값을 설정할 타겟입니다. 아니면 [page:Array]가 인스턴스화됩니다. 이 값을 설정하면, 모든 요청 전에 배열을 제거해야합니다 (예를 들어 array.length = 0;).
+		</p>
+		<p>
+			자식 항목이 포함되거나 포함되지 않은 객체와 레이 사이의 모든 교차를 체크합니다. 교차는 거리별로 가장 가까운 거리부터 리턴됩니다. 교차 배열은 아래와 같이 리턴됩니다.
+		</p>
+		<code>
+				[ { distance, point, face, faceIndex, object }, ... ]
+		</code>
+		<p>
+			[page:Float distance] – 레이의 시점과 교차 간의 거리<br />
+			[page:Vector3 point] – 월드 좌표에서의 교차점<br />
+			[page:Object face] – 교차면<br />
+			[page:Integer faceIndex] – 교차 면의 인덱스<br />
+			[page:Object3D object] – 교차된 객체<br />
+			[page:Vector2 uv] - 교차점의 U,V 좌표<br />
+			[page:Vector2 uv1] - 교차점의 U,V 2차 좌표<br />
+			[page:Vector3 normal] - 교차점에서 보간된 법선 벡터<br />
+			[page:Integer instanceId] – InstancedMesh에 교차하는 레이의 인스턴스 인덱스 넘버입니다.
+		</p>
+		<p>
+		*Raycaster*는 레이가 객체에 교차하는지 아닌지 판단할 때의 전달받은 객체의 [page:Object3D.raycast raycast] 메서드를 대신합니다. 이는 [page:Line lines]과 [page:Points pointclouds]와 달리 [page:Mesh meshes]가 레이캐스팅에 다르게 반응할 수 있게 합니다.
+		</p>
+		<p>
+		메쉬의 면은 [page:.ray ray]의 시점에서 탐지 가능할 수 있도록 마주보고 있어야 하는 것에 주의하세요;
+		면의 뒤쪽을 통과하는 레이 교차는 탐지디지 않을 것입니다.
+		객체의 양 면을 레이캐스팅하고 싶다면, [page:Mesh.material material]의 [page:Material.side side] 프로퍼티를 *THREE.DoubleSide*로 설정해야합니다.
+		</p>
+
+		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<p>
+		[page:Array objects] — 레이의 교차를 체크하기 위한 객체입니다.<br />
+		[page:Boolean recursive] — true면 객체의 모든 자식들도 체크합니다. 아니면 객체만의 교차를 체크합니다. 기본값은 true입니다.<br />
+		[page:Array optionalTarget] — (생략가능) 결과값을 설정할 타겟입니다. 아니면 [page:Array]가 인스턴스화됩니다. 이 값을 설정하면, 모든 요청 전에 배열을 제거해야합니다 (예를 들어 array.length = 0;).
+		</p>
+		<p>
+			자식 항목이 포함되거나 포함되지 않은 객체와 레이 사이의 모든 교차를 체크합니다. 교차는 거리별로 가장 가까운 거리부터 리턴됩니다. 교차는 [page:.intersectObject]와 같은 방식으로 리턴됩니다.
+		</p>
+
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

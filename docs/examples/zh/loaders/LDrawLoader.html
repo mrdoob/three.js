@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:Loader] &rarr;
+
+	<h1>LDraw加载器([name])</h1>
+
+	<p class="desc"> 用于加载 `LDraw` 资源。<br /><br />
+		[link:https://ldraw.org LDraw] (LEGO Draw) 是一种
+		[link:https://ldraw.org/article/218.html 开放格式规范] ，用于描述 LEGO 和其他建筑套装 3D 模型。</p>
+
+	<p>LDraw 资源（通常扩展名为 .ldr、.dat 或 .txt 的文本文件）可以仅描述单个构造件或整个模型。对于模型，LDraw 文件可以引用其他 LDraw 文件，这些文件是从使用 [page:Function
+		setPartsLibraryPath] 设置的库路径加载的。您通常下载 LDraw 官方零件库，解压到一个文件夹并将 setPartsLibraryPath 指向它。
+	</p>
+
+	<p>库部件将通过子文件夹“parts”、“p” 和 “models” 中的反复试验来加载。这些文件访问对于 Web 环境来说并不是最佳的，因此我们制作了一个脚本工具来将 LDraw
+		文件及其所有依赖项打包到一个文件中，这样加载速度会更快。请参阅“打包 LDraw 模型”部分。LDrawLoader 示例加载多个打包文件。由于官方零件库较大，因此不包含在内。</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
+			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
+		</code>
+
+	<h2>扩展</h2>
+
+	<p>
+		[name] 支持以下扩展：
+	</p>
+
+	<ul>
+		<li>!COLOUR: 颜色和表面光洁度声明。</li>
+		<li>BFC: 背面剔除规范。</li>
+		<li>!CATEGORY: 模型/零件类别声明。</li>
+		<li>!KEYWORDS: 模型/零件关键字声明。</li>
+	</ul>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// Instantiate a loader
+		const loader = new LDrawLoader();
+
+		// Optionally set library parts path
+		// loader.setPartsLibraryPath( path to library );
+
+		// Load a LDraw resource
+		loader.load(
+			// resource URL
+			'models/car.ldr_Packed.mpd',
+			// called when the resource is loaded
+			function ( group ) {
+
+				// Optionally, use LDrawUtils.mergeObject() from
+				// 'examples/jsm/utils/LDrawUtils.js' to merge all
+				// geometries by material (it gives better runtime
+				// performance, but building steps are lost)
+				// group = LDrawUtils.mergeObject( group );
+
+				scene.add( group );
+
+			},
+			// called while loading is progressing
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+	<h2>例子</h2>
+
+	<p>
+		[example:webgl_loader_ldraw]
+	</p>
+
+	<h2>包装 LDraw 模型</h2>
+
+	<p>要将模型及其所有引用文件打包，请下载 [link:https://www.ldraw.org/parts/latest-parts.html 官方 LDraw 零件库]
+		并使用以下节点脚本：[link:https://github.com/mrdoob/three.js/blob/master/utils/packLDrawModel.js utils/packLDrawModel.js]
+		它包含有关如何设置文件和执行文件的说明。</p>
+
+	<h2>.userData 中的元数据</h2>
+
+	<p>[name] 返回一个包含对象层次结构的 [page:Group] 。根据每个子对象类型，其 .userData 成员将包含以下成员：<br />
+		在 [page:Group]中， userData 成员将包含：<br />
+	<ul>
+		<li>.numBuildingSteps: 仅在 [page:Group] 根部，表示模型中构建步骤的总数。这些可用于设置对象的可见性以显示不同的构建步骤，这在示例中完成。</li>
+		<li>.buildingStep: 表示该步骤的构建索引。</li>
+		<li>.category: 如果不为空，则包含该作品或模型的 [page:String] 类别。</li>
+		<li>.keywords: 如果不为空，则包含该作品或模型的 [page:String] 关键字数组。</li>
+	</ul>
+	</p>
+	<p>在 [page:Material] 中，userData 成员将包含：
+	<ul>
+		<li>.code: 表示该材料的 LDraw 代码。</li>
+		<li>.edgeMaterial: 仅在 [page:Mesh] 材质中，表示属于相同颜色代码的边的 [page:LineBasicMaterial] （在LDraw格式中，每个表面材质也与一个边缘材质相关）</li>
+		<li>.conditionalEdgeMaterial: 仅在 [page:LineSegments] 材质中，表示属于相同颜色代码的条件边的 [page:Material]。</li>
+	</ul>
+	</p>
+
+	<br>
+	<hr>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:LoadingManager manager] )</h3>
+	<p>
+		[page:LoadingManager manager] — 加载器使用的 [page:LoadingManager loadingManager] 。默认值为 [page:LoadingManager
+		THREE.DefaultLoadingManager]。
+	</p>
+	<p>
+		创建一个新的 [name]。
+	</p>
+
+	<h2>Properties</h2>
+	<p>有关公共属性，请参阅 [page:Loader] 基类。</p>
+
+	<h2>Methods</h2>
+	<p>有关常用方法，请参阅 [page:Loader] 基类。</p>
+
+	<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function
+		onError] )</h3>
+	<p>
+		[page:String url] — 包含 LDraw 文件的路径/URL 的字符串。<br />
+		[page:Function onLoad] — 加载成功完成后调用的函数。该函数接收从 [page:Function parse] 返回的加载的 JSON 响应。<br />
+		[page:Function onProgress] — （可选）加载过程中调用的函数。参数将是 XMLHttpRequest 实例，其中包含 .[page:Integer total] 和 .[page:Integer
+		loaded] 字节。如果服务器没有设置 Content-Length，.[page:Integer total] 将为 0。<br />
+		[page:Function onError] — （可选）加载期间发生错误时调用的函数。该函数接收错误作为参数。<br />
+	</p>
+	<p>
+		开始从 url 加载并使用解析的响应内容调用回调函数。
+	</p>
+
+	<h3>[method:this setPartsLibraryPath]( [param:String path] )</h3>
+	<p>
+		[page:String path] — 用于加载引用零件的库零件文件的路径。这与 [page:Loader.setPath] 不同，后者指示加载主资源的路径。<br />
+	</p>
+	<p>
+		必须在 [page:.load] 之前调用此方法，除非要加载的模型不引用库部件（通常它将是一个所有部件都打包在单个文件中的模型）。
+	</p>
+
+	<h3>[method:this setFileMap]( [param:Map fileMap] )</h3>
+	<p>
+		[page:Map map] — 设置从 [page:String] 到 [page:String] 的映射，将引用的库文件名映射到新文件名。如果未指定
+		fileMap（默认值），则将通过子文件夹“parts”、“p”和“models”中的反复试验来访问库部件。
+	</p>
+
+	<h3>[method:undefined parse]( [param:String text], [param:String path], [param:Function onLoad], [param:Function
+		onError] )</h3>
+	<p>
+		[page:String text] — 要解析的 LDraw 资源，作为字符串。<br />
+		[page:String path] — 从中查找其他引用的 LDraw 资源文件的基本路径。<br />
+		[page:Function onLoad] — 解析完成时调用的函数。<br />
+	</p>
+	<p>
+		将 LDraw 文件内容解析为字符串，并在完成时触发 [page:Function onLoad] 回调。[page:Function onLoad] 的参数将是一个 [page:Group]，其中包含
+		[page:Group]、[page:Mesh] 和
+		[page:LineSegments] 的层次结构（以及 .userData 字段中的其他零件数据）。
+	</p>
+
+	<h3>[method:Material getMaterial]( [param:String colourCode] )</h3>
+	<p>
+		[page:String colourCode] — 用于获取关联 [page:Material] 的颜色代码。
+	</p>
+
+	<h3>[method:String getMainMaterial]()</h3>
+	<p>
+		返回主 LDraw 颜色的 [page:Material]。
+	</p>
+
+	<p>对于已加载的 LDraw 资源，返回与主颜色代码关联的 [page:Material]。此方法可用于修改模型或暴露模型的零件的主要材质。
+	</p>
+
+	<p>
+		主要颜色代码是为 LDraw
+		零件着色的标准方法。三角形为“16”，边为“24”。通常，完整的模型不会暴露主要颜色（也就是说，没有零件在顶层使用代码“16”，因为它们被分配了其他特定颜色）另一方面，LDraw零件文件将暴露代码“16”可以着色，并且可以有附加的固定颜色。
+	</p>
+
+	<h3>[method:String getMainEdgeMaterial]()</h3>
+	<p>
+		返回边缘主 LDraw 颜色的 [page:Material]。
+	</p>
+
+	<h3>[method:void preloadMaterials]( [param:String path] )</h3>
+	<p>
+		[page:String path] — LDraw 材料资源的路径。
+	</p>
+
+	<p>此异步方法从单个 LDraw 文件预加载材质。在官方零件库中，有一个特殊文件，始终首先加载（LDConfig.ldr）并包含所有标准颜色代码。此方法旨在与未打包的文件一起使用，例如在预加载材料并按需加载部件的编辑器中。</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/LDrawLoader.js examples/jsm/loaders/LDrawLoader.js]
+	</p>
+</body>
+
+</html>

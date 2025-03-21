@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">用于模拟方向的3维箭头对象.</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const dir = new THREE.Vector3( 1, 2, 0 );
+
+		//normalize the direction vector (convert to vector of length 1)
+		dir.normalize();
+
+		const origin = new THREE.Vector3( 0, 0, 0 );
+		const length = 1;
+		const hex = 0xffff00;
+
+		const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+		scene.add( arrowHelper );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_shadowmesh WebGL / shadowmesh]
+		</p>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]([param:Vector3 dir], [param:Vector3 origin], [param:Number length], [param:Number hex], [param:Number headLength], [param:Number headWidth] )</h3>
+		<p>
+		[page:Vector3 dir] -- 基于箭头原点的方向. 必须为单位向量. <br />
+		[page:Vector3 origin] -- 箭头的原点.<br />
+		[page:Number length] -- 箭头的长度. 默认为 *1*.<br />
+		[page:Number hex] -- 定义的16进制颜色值. 默认为 0xffff00.<br />
+		[page:Number headLength] -- 箭头头部(锥体)的长度. 默认为箭头长度的0.2倍(0.2 * length).<br />
+		[page:Number headWidth] -- The width of the head of the arrow. Default is 0.2 * headLength.<br />
+		</p>
+
+		<h2>属性</h2>
+		<p>请到基类 [page:Object3D] 页面查看公共属性.</p>
+
+
+		<h3>[property:Line line]</h3>
+		<p>包含箭头辅助对象的线段部分.</p>
+
+		<h3>[property:Mesh cone]</h3>
+		<p>包含箭头辅助对象的锥体部分.</p>
+
+		<h2>方法</h2>
+		<p>请到基类 [page:Object3D] 页面查看公共方法.</p>
+
+		<h3>[method:undefined setColor]([param:Color color])</h3>
+		<p>
+		color -- 所需的颜色。<br /><br />
+
+		设置箭头辅助对象的颜色.
+		</p>
+
+		<h3>[method:undefined setLength]([param:Number length], [param:Number headLength], [param:Number headWidth])</h3>
+		<p>
+		length -- 要设置的长度.<br />
+		headLength -- 要设置的箭头头部(锥体)的长度.<br />
+		headWidth -- The width of the head of the arrow.<br /><br />
+
+		设置箭头辅助对象的长度.
+		</p>
+
+		<h3>[method:undefined setDirection]([param:Vector3 dir])</h3>
+		<p>
+		dir -- 要设置的方向. 必须为单位向量.<br /><br />
+
+		设置箭头辅助对象的方向.
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

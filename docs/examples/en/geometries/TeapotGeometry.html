@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] tessellates the famous Utah teapot database by Martin Newell.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+			const geometry = new TeapotGeometry( 50, 18 );
+			const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+			const teapot = new THREE.Mesh( geometry, material );
+			scene.add( teapot );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]([param:Integer size], [param:Integer segments], [param:Boolean bottom], [param:Boolean lid], [param:Boolean body],
+			[param:Boolean fitLid], [param:Boolean blinn])
+		</h3>
+		<p>
+			size — Relative scale of the teapot. Optional; Defaults to `50`.<br>
+			segments — Number of line segments to subdivide each patch edge. Optional; Defaults to `10`.<br>
+			bottom — Whether the bottom of the teapot is generated or not. Optional; Defaults to `true`.<br>
+			lid — Whether the lid is generated or not. Optional; Defaults to `true`.<br>
+			body — Whether the body is generated or not. Optional; Defaults to `true`.<br>
+			fitLid — Whether the lid is slightly stretched to prevent gaps between the body and lid or not. Optional; Defaults to `true`.<br>
+			blinn — Whether the teapot is scaled vertically for better aesthetics or not. Optional; Defaults to `true`.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/TeapotGeometry.js examples/jsm/geometries/TeapotGeometry.js]
+		</p>
+	</body>
+</html>

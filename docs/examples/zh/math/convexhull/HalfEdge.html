@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>半边([name])</h1>
+
+	<p class="desc">
+		半边数据结构的基础，也被称为双连通边列表 (DCEL)。
+	</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
+			import { HalfEdge } from 'three/addons/math/ConvexHull.js';
+		</code>
+
+
+	<h2>构造函数</h2>
+
+
+	<h3>[name]( [param:VertexNode vertex], [param:Face face] )</h3>
+	<p>
+		[page:VertexNode vertex] - [page:VertexNode] 对其目标顶点的引用<br />
+		[page:Face face] - [page:Face] 对其面的引用<br /><br />
+
+		创建一个 [name] 实例。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:VertexNode vertex]</h3>
+	<p>
+		对目标顶点的引用。可以通过查询其孪生顶点或前一个半边的目的地来获得原点。默认值 undefined。
+	</p>
+
+	<h3>[property:HalfEdge prev]</h3>
+	<p>
+		对同一面的前一半边的引用。默认值为 null。
+	</p>
+
+	<h3>[property:HalfEdge next]</h3>
+	<p>
+		对同一面的下一半边的引用。默认值为 null。
+	</p>
+
+	<h3>[property:HalfEdge twin]</h3>
+	<p>
+		对应到达相对面的孪生半边的引用。默认值为 null。
+	</p>
+
+	<h3>[property:Face face]</h3>
+	<p>
+		每个半边限定一个面，因此具有对该面的引用。默认值 undefined。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:VertexNode head]()</h3>
+	<p>返回目标顶点。</p>
+
+	<h3>[method:VertexNode tail]()</h3>
+	<p>返回原点顶点</p>
+
+	<h3>[method:Float length]()</h3>
+	<p>返回边的 [link:https://en.wikipedia.org/wiki/Euclidean_distance 欧几里得长度]
+		(直线长度)。</p>
+
+	<h3>[method:Float lengthSquared]()</h3>
+	<p>返回边的 [link:https://en.wikipedia.org/wiki/Euclidean_distance 欧几里得长度]
+		(直线长度)的平方。</p>
+
+	<h3>[method:this setTwin]( [param:HalfEdge edge] )</h3>
+	<p>
+		[page:HalfEdge edge] - 任何半边缘。<br /><br />
+
+		设置这个半边的孪生边。还确保给定半边的孪生引用被正确设置。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
+	</p>
+</body>
+
+</html>

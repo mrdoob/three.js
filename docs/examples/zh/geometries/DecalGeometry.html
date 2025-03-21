@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>贴花几何体（[name]）</h1>
+
+		<p class="desc">[name] 可被用于创建贴花网格物体，以达到不同的目的，例如：为模型增加独特的细节、进行动态的视觉环境改变或覆盖接缝。</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
+		</code>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const geometry =  new DecalGeometry( mesh, position, orientation, size );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_decals WebGL / decals]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Mesh mesh], [param:Vector3 position], [param:Euler orientation], [param:Vector3 size] )</h3>
+		<p>
+		mesh — 一个网格对象。<br />
+		position — 贴花投影器的位置。<br />
+		orientation — 贴花投影器的朝向。<br />
+		size — 贴花投影器的尺寸。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/DecalGeometry.js examples/jsm/geometries/DecalGeometry.js]
+		</p>
+	</body>
+</html>

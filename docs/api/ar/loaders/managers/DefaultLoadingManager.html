@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			نسخة عالمية من [page:LoadingManager LoadingManager]، يستخدمها
+			معظم المحملات عندما لم يتم تحديد مدير مخصص. <br /><br />
+		 
+			هذا سيكون كافيًا لمعظم الأغراض، ولكن قد يكون هناك أوقات عندما
+			ترغب في مديري تحميل منفصلين للقول، القوام والنماذج.
+		</p>
+		 
+		<h2>مثال للكود</h2>
+		 
+		<p>
+		يمكنك تعيين [page:LoadingManager.onStart onStart]،
+		[page:LoadingManager.onLoad onLoad]، [page:LoadingManager.onProgress onProgress]،
+		[page:LoadingManager.onStart onError] وظائف لل
+		مدير. ستطبق هذه على أي محملات تستخدم
+		DefaultLoadingManager.<br /><br />
+		 
+		يجب عدم الخلط بين هذه الوظائف المسماة بشكل مشابه
+		من المحملات الفردية، لأنها مخصصة لعرض المعلومات
+		حول الحالة العامة للتحميل، بدلاً من التعامل مع البيانات
+		التي تم تحميلها.
+		</p>
+		<code>
+THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+	console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+};
+				
+THREE.DefaultLoadingManager.onLoad = function ( ) {
+	console.log( 'Loading Complete!');
+};
+				
+THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+	console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+};
+				
+THREE.DefaultLoadingManager.onError = function ( url ) {
+	console.log( 'There was an error loading ' + url );
+};
+		</code>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>
+		انظر صفحة [page:LoadingManager LoadingManager] لتفاصيل
+		الخصائص.
+		</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>
+		انظر صفحة [page:LoadingManager LoadingManager] لتفاصيل الطرق.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		</p>
+	</body>
+</html>

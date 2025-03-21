@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Classe abstraite pour les caméras. Cette classe doit toujours être héritée lorsque vous créez une nouvelle caméra.
+		</p>
+
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+			Crée une nouvelle [name]. Notez que cette classe n'est pas censée être appelée directement;
+			vous aurez sans doute besoin d'une [page:PerspectiveCamera] ou d'une [page:OrthographicCamera] à la place.
+		</p>
+
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Object3D] pour connaître les propriétés communes.</p>
+
+		<h3>[property:Boolean isCamera]</h3>
+		<p>
+			Flag en lecture seul qui permet de vérifier si un objet donné est de type [name].
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+		Les [page:Layers layers] dont la caméra font partie. C'est une propriété héritée
+		de [page:Object3D].<br /><br />
+
+		Les objets doivent partager au moins une layer avec la caméra pour être visibles
+		quand le point de vue de la caméra est rendu.
+		</p>
+
+		<h3>[property:Matrix4 matrixWorldInverse]</h3>
+		<p>
+			C'est l'inverse de matrixWorld. MatrixWorld contient la matrice qui contient
+			les transformations de cette Caméra.
+		</p>
+
+		<h3>[property:Matrix4 projectionMatrix]</h3>
+		<p>C'est la matrice qui contient la projection.</p>
+
+		<h3>[property:Matrix4 projectionMatrixInverse]</h3>
+		<p>L'inverse de projectionMatrix.</p>
+
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Object3D] pour connaître les propriétés communes.</p>
+
+		<h3>[method:Camera clone]( )</h3>
+		<p>
+			Retourne une nouvelle caméra avec les mêmes propriétés que celle-ci.
+		</p>
+
+		<h3>[method:this copy]( [param:Camera source], [param:Boolean recursive] )</h3>
+		<p>
+		Copie les propriétés de la caméra source dans celle-ci.
+		</p>
+
+		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — le résultat sera copié dans ce Vector3. <br /><br />
+
+		Retourne un [page:Vector3] représentant la direction du monde vers laquelle la caméra pointe.
+		(Note: Une caméra regarde l'inverse de son axe-Z local ).<br /><br />
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

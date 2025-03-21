@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		كائن مع وظائف مختلفة للمساعدة في الرسوم المتحركة ، ويستخدم داخليًا.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:Array convertArray]( array, type, forceClone )</h3>
+		<p>
+		يحول مصفوفة إلى نوع معين.
+		</p>
+
+		<h3>[method:Array flattenJSON]( jsonKeys, times, values, valuePropertyName )</h3>
+		<p>
+		تستخدم لتحليل تنسيقات AOS keyframe.
+		</p>
+
+		<h3>[method:Array getKeyframeOrder]( times )</h3>
+		<p>
+		تُرجع مصفوفة يمكن من خلالها فرز الأوقات والقيم.
+		</p>
+
+		<h3>[method:Boolean isTypedArray]( object )</h3>
+		<p>
+		ترجاع *true* إذا كان الكائن مصفوفة مكتوبة (typed array.).
+		</p>
+
+		<h3>[method:AnimationClip makeClipAdditive]( [param:AnimationClip targetClip], [param:Number referenceFrame], [param:AnimationClip referenceClip], [param:Number fps] )</h3>
+		<p>
+		Converts the keyframes of the given animation clip to an additive format.
+		</p>
+
+		<h3>[method:Array sortedArray]( values, stride, order )</h3>
+		<p>
+		يفرز المصفوفة التي تم إرجاعها مسبقًا بناءا [page:AnimationUtils.getKeyframeOrder getKeyframeOrder].
+		</p>
+
+		<h3>[method:AnimationClip subclip]( [param:AnimationClip clip], [param:String name], [param:Number startFrame], [param:Number endFrame], [param:Number fps] )</h3>
+		<p>
+		ينشئ مقطعًا جديدًا ، يحتوي فقط على جزء من المقطع الأصلي بين الإطارات المحددة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

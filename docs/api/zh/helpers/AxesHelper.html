@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">用于简单模拟3个坐标轴的对象. <br />
+			红色代表 X 轴. 绿色代表 Y 轴. 蓝色代表 Z 轴.</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const axesHelper = new THREE.AxesHelper( 5 );
+		scene.add( axesHelper );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_buffergeometry_compression WebGL / buffergeometry / compression]<br/>
+			[example:webgl_geometry_convex WebGL / geometry / convex]<br/>
+			[example:webgl_loader_nrrd WebGL / loader / nrrd]
+		</p>
+
+		<h2>构造函数（Constructor）</h2>
+		<h3>[name]( [param:Number size] )</h3>
+		<p>
+		[page:Number size] -- (可选的) 表示代表轴的线段长度. 默认为 `1`.
+		</p>
+
+		<h2>属性（Properties）</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共属性.</p>
+
+		<h2>方法（Methods）</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
+
+		<h3>
+			[method:this setColors]( [param:Color xAxisColor], [param:Color yAxisColor], [param:Color zAxisColor] )
+		</h3>
+		<p>
+			将轴颜色设置为 [page:Color xAxisColor], [page:Color yAxisColor],[page:Color zAxisColor]。
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			释放此实例分配的GPU相关资源。每当应用程序中不再使用此实例时，请调用此方法。
+		</p>
+
+		<h2>源码（Source）</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

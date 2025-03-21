@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			L'AnimationMixer et un lecteur d'animations pour un objet ciblé dans la scène. Quand
+			plusieurs objets sont animés indépendamment, un AnimationMixer peut être utilisé pour
+			chaque objet.<br /><br />
+
+			Pour un aperçu des différents éléments du système d'animation de three.js consultez
+			l'article "Système d'Animation" dans le section "Étapes Suivantes" du manuel.
+		</p>
+
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]( [param:Object3D rootObject] )</h3>
+		<p>
+			[page:Object3D rootObject] - l'objet duquel les animations doivent être jouées par ce mixer.<br />
+		</p>
+
+
+		<h2>Propriétés</h2>
+
+
+		<h3>[property:Number time]</h3>
+		<p>
+			La durée du mixer global (en secondes; commençant à `0` à la création du mixer).
+		</p>
+
+		<h3>[property:Number timeScale]</h3>
+		<p>
+			Un facteur de mise à l'échelle pour le [page:.time mixer time].<br /><br />
+
+			Note: Mettre le timeScale du mixer à `0` puis le remettre à après `1` et un moyen de mettre en pause/reprendre
+			toutes les actions contrôlées par ce mixer.
+		</p>
+
+
+		<h2>Méthodes</h2>
+
+
+		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			Renvoie une [page:AnimationAction] pour le clip passé en paramètre, utilisant optionnellement un objet racine
+			différent de celui du mixer. Le premier paramètre peut être un objet [page:AnimationClip]
+			ou le nom d'un AnimationClip.<br /><br />
+
+			Si une action correspondant au clip et aux paramètres racine n'existe pas encore, elle sera créée
+			par cette méthode. Appeler cette méthode plusieurs fois avec le même clip est les mêmes paramètres racine retournera
+			toujours la même instance du clip.
+		</p>
+
+		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			Renvoie un [page:AnimationAction] existant pour le clip passé en paramètre, utilisant optionnellement un objet racine
+			différent de celui du mixer.<br /><br />
+
+			Le premier paramètre peut être un objet de l'[page:AnimationClip] ou le nom d'un AnimationClip.
+		</p>
+
+		<h3>[method:Object3D getRoot]()</h3>
+		<p>
+			Renvoie l'objet racine de ce mixer.
+		</p>
+
+		<h3>[method:this stopAllAction]()</h3>
+		<p>
+			Désactive toutes les actions précédemment programmées pour ce mixer.
+		</p>
+
+		<h3>[method:this update]([param:Number deltaTimeInSeconds]) </h3>
+		<p>
+			Augmente la durée du mixer global et met à jour les animations en fonction de cette durée.<br /><br />
+
+			Cela est généralement fait dans la boucle de rendu, en utilisant [page:Clock.getDelta clock.getDelta] mis à l'échelle par le [page:.timeScale timeScale] du mixer.
+		</p>
+
+		<h3>[method:this setTime]([param:Number timeInSeconds]) </h3>
+		<p>
+			Fixe le mixer global à une durée spécifique et met à jour les animations en fonction de cette durée.<br /><br />
+
+			C'est utile quand vous avez besoin de vous rendre à un moment précis d'une animation. Le paramètre d'entrée sera mis à l'échelle par le [page:.timeScale timeScale] du mixer.
+		</p>
+
+		<h3>[method:undefined uncacheClip]([param:AnimationClip clip])</h3>
+
+		<p>
+			Désalloue toutes les ressources mémoires d'un clip. Appelez [page:AnimationAction.stop]() pour toutes les actions concernées avant d'utiliser cette méthode.
+		</p>
+
+		<h3>[method:undefined uncacheRoot]([param:Object3D root]) </h3>
+		<p>
+			Désalloue toutes les ressources mémoires d'un objet racine. Appelez [page:AnimationAction.stop]() pour toutes les actions concernées avant d'utiliser cette méthode.
+		</p>
+
+		<h3>[method:undefined uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			Désalloue toutes les ressources mémoires d'une action. Appelez [page:AnimationAction.stop]() pour désactiver l'action avant d'utiliser cette méthode.
+		</p>
+
+
+		<h2>Source</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Represents the data source of a texture.
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Any data] )</h3>
+		<p>
+			[page:Any data] -- The data definition of a texture. Default is *null*.
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Any data]</h3>
+		<p>
+		The actual data of a texture. The type of this property depends on the texture that uses this instance.
+		</p>
+
+		<h3>[property:Boolean isCubeTexture]</h3>
+		<p>
+			只读属性，用于检查给定对象是否为[name]类型。
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			When the property is set to `true`, the engine allocates the memory for the texture (if necessary) and triggers the actual texture upload to the GPU next time the source is used.
+		</p>
+
+		<h3>[property:Boolean dataReady]</h3>
+		<p>
+			This property is only relevant when [page:.needUpdate] is set to `true` and provides more control on how texture data should be processed.
+			When `dataReady` is set to `false`, the engine performs the memory allocation (if necessary) but does not transfer the data into the GPU memory. Default is `true`.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
+		This gets automatically assigned, so this shouldn't be edited.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		This starts at *0* and counts how many times [page:Source.needsUpdate .needsUpdate] is set to *true*.
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- optional object containing metadata.<br />
+		Convert the data source to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
