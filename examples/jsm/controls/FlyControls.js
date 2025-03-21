@@ -89,13 +89,15 @@ class FlyControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );
