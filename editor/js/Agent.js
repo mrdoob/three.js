@@ -27,7 +27,11 @@ class Agent {
 		this.generateRandomColor = this.generateRandomColor.bind( this );
 		this.generateUniqueObjectName = this.generateUniqueObjectName.bind( this );
 
-		this.init();
+		this.editor.signals.storageLoaded.add( () => {
+
+			this.init();
+
+		} );
 
 	}
 
