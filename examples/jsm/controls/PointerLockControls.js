@@ -109,13 +109,15 @@ class PointerLockControls extends Controls {
 
 		if ( this.domElement !== null ) {
 
-			this.connect();
+			this.connect( this.domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		this.domElement.ownerDocument.addEventListener( 'mousemove', this._onMouseMove );
 		this.domElement.ownerDocument.addEventListener( 'pointerlockchange', this._onPointerlockChange );

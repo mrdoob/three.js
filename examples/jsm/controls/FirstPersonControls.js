@@ -164,7 +164,7 @@ class FirstPersonControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 			this.handleResize();
 
@@ -174,7 +174,9 @@ class FirstPersonControls extends Controls {
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );

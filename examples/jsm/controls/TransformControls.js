@@ -358,13 +358,15 @@ class TransformControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
