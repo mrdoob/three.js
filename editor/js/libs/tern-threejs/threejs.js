@@ -1300,7 +1300,7 @@
       "prototype": {
         "!proto": "THREE.Line.prototype"
       },
-      "!doc": "An axis object to visualize the 3 axes in a simple way. <br>\n\t\t\tThe X axis is red. The Y axis is green. The Z axis is blue.",
+      "!doc": "An axis object to visualize the the 3 axes in a simple way. <br>\n\t\t\tThe X axis is red. The Y axis is green. The Z axis is blue.",
       "!type": "fn(size: number)"
     },
     "BoundingBoxHelper": {
