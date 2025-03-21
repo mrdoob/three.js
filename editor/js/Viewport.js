@@ -582,7 +582,7 @@ function Viewport( editor ) {
 
 				break;
 
-			case 'ModelViewer':
+			case 'Room':
 
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 

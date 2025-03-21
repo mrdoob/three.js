@@ -233,7 +233,7 @@ function SidebarScene( editor ) {
 		'None': '',
 		'Background': 'Background',
 		'Equirectangular': 'Equirect',
-		'ModelViewer': 'ModelViewer'
+		'Room': 'Room'
 
 	} ).setWidth( '150px' );
 	environmentType.setValue( 'None' );
@@ -435,7 +435,7 @@ function SidebarScene( editor ) {
 
 			} else if ( scene.environment.isRenderTargetTexture === true ) {
 
-				environmentType.setValue( 'ModelViewer' );
+				environmentType.setValue( 'Room' );
 
 			}
 
