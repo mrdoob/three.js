@@ -403,7 +403,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	/**
 	 * Generates a WGSL variable that holds the texture dimension of the given texture.
-	 * It also returns information about the the number of layers (elements) of an arrayed
+	 * It also returns information about the number of layers (elements) of an arrayed
 	 * texture as well as the cube face count of cube textures.
 	 *
 	 * @param {Texture} texture - The texture to generate the function for.

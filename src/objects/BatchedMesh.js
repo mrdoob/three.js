@@ -446,7 +446,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Validates the instance defined by the given ID.
 	 *
-	 * @param {number} instanceId - The the instance to validate.
+	 * @param {number} instanceId - The instance to validate.
 	 */
 	validateInstanceId( instanceId ) {
 
@@ -462,7 +462,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Validates the geometry defined by the given ID.
 	 *
-	 * @param {number} geometryId - The the geometry to validate.
+	 * @param {number} geometryId - The geometry to validate.
 	 */
 	validateGeometryId( geometryId ) {
 

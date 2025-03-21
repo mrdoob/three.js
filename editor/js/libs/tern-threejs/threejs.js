@@ -1300,7 +1300,7 @@
       "prototype": {
         "!proto": "THREE.Line.prototype"
       },
-      "!doc": "An axis object to visualize the the 3 axes in a simple way. <br>\n\t\t\tThe X axis is red. The Y axis is green. The Z axis is blue.",
+      "!doc": "An axis object to visualize the 3 axes in a simple way. <br>\n\t\t\tThe X axis is red. The Y axis is green. The Z axis is blue.",
       "!type": "fn(size: number)"
     },
     "BoundingBoxHelper": {
@@ -3557,7 +3557,7 @@
         },
         "clampPoint": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the closets point on the edge of the sphere."
+          "!doc": "Clamps a point within the sphere. If the point is outside the sphere, it will clamp it to the closets point on the edge of the sphere."
         },
         "translate": {
           "!type": "fn(offset: +THREE.Vector3) -> +THREE.Sphere",

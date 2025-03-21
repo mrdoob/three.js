@@ -1,5 +1,5 @@
 /**
- * A class that creates a ASCII effect.
+ * A class that creates an ASCII effect.
  *
  * The ASCII generation is based on [jsascii]{@link https://github.com/hassadee/jsascii/blob/master/jsascii.js}.
  */

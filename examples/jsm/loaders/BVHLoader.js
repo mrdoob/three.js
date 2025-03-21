@@ -384,11 +384,11 @@ class BVHLoader extends Loader {
 		}
 
 		/*
-			builds a AnimationClip from the keyframe data saved in each bone.
+			builds an AnimationClip from the keyframe data saved in each bone.
 
 			bone: bvh root node
 
-			returns: a AnimationClip containing position and quaternion tracks
+			returns: an AnimationClip containing position and quaternion tracks
 		*/
 		function toTHREEAnimation( bones ) {
 

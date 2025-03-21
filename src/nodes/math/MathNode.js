@@ -930,7 +930,7 @@ export const saturate = ( value ) => clamp( value );
  * @function
  * @param {Node<vec2|vec3|vec4>} I - The incident vector.
  * @param {Node<vec2|vec3|vec4>} N - The normal vector.
- * @param {Node<float>} eta - The the ratio of indices of refraction.
+ * @param {Node<float>} eta - The ratio of indices of refraction.
  * @returns {Node<vec2|vec3|vec4>}
  */
 export const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT );
