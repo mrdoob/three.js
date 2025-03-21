@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>边缘几何体（[name]）</h1>
+
+		<p class="desc">这可以作为一个辅助对象来查看[page:BufferGeometry geometry]的边缘。</p>
+
+		<h2>代码示例</h2>
+		<code>
+		const geometry = new THREE.BoxGeometry( 100, 100, 100 );
+		const edges = new THREE.EdgesGeometry( geometry );
+		const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+		scene.add( line );
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_helpers helpers]
+		</p>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:BufferGeometry geometry], [param:Integer thresholdAngle] )</h3>
+		<p>
+		geometry — 任何一个几何体对象。<br />
+		thresholdAngle — 仅当相邻面的法线之间的角度（单位为角度）超过这个值时，才会渲染边缘。默认值为1。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

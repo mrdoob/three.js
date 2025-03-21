@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">경로 모양에서 돌출된 형상을 만듭니다.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#ExtrudeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>코드 예제</h2>
+
+
+		<code>
+		const length = 12, width = 8;
+
+		const shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		const extrudeSettings = {
+			steps: 2,
+			depth: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelOffset: 0,
+			bevelSegments: 1
+		};
+
+		const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material ) ;
+		scene.add( mesh );
+		</code>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]([param:Array shapes], [param:Object options])</h3>
+		<p>
+		shapes — 모양 또는 모양의 배열입니다. <br />
+		options — 다음 매개변수를 포함할 수 있는 객체입니다.
+
+			<ul>
+				<li>curveSegments — int. 곡선의 점 수. 기본값은 12 입니다.</li>
+				<li>steps — int. 돌출된 스플라인의 깊이를 따라 세그먼트를 세분화하는 데 사용되는 점 수입니다. 기본값은 1 입니다.</li>
+				<li>depth — float. 모양을 돌출시킬 깊이입니다. 기본값은 1 입니다.</li>
+				<li>bevelEnabled — bool. 모양에 베벨링을 적용합니다. 기본값은 true 입니다.</li>
+				<li>bevelThickness — float. 베벨이 원래 모양으로 들어가는 깊이입니다. 기본값은 0.2 입니다.</li>
+				<li>bevelSize — float. 베벨이 확장되는 모양 윤곽선으로부터의 거리입니다. 기본값은 bevelThickness - 0.1 입니다.</li>
+				<li>bevelOffset — float. 경사가 시작되는 모양 윤곽선으로부터의 거리입니다. 기본값은 0 입니다.</li>
+				<li>bevelSegments — int. 베벨 레이어 수. 기본값은 3 입니다.</li>
+				<li>extrudePath — THREE.Curve. 모양이 돌출되어야 하는 3D 스플라인 경로입니다. 경로 돌출에는 베벨이 지원되지 않습니다.</li>
+				<li>UVGenerator —  Object. UV 제너레이터 기능을 제공하는 객체</li>
+			</ul>
+
+		</p>
+		<p>
+			이 객체는 2D 모양을 3D 형상으로 돌출시킵니다.
+		</p>
+
+		<p>
+			이 지오메트리로 메시를 생성할 때 면과 돌출된 면에 별도의 재질을 사용하려는 경우 여러 재질을 사용할 수 있습니다. 첫 번째 재질이 얼굴에 적용됩니다. 두 번째 재료는 측면에 적용됩니다.
+		</p>
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		각 생성자 매개 변수에 대한 속성을 가진 개체입니다. 인스턴스화 후에 수정해도 지오메트리는 변경되지 않습니다.
+		</p>
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

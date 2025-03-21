@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Create a smooth 3d spline curve from a series of points using the
+			[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom] algorithm.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		//Create a closed wavey loop
+		const curve = new THREE.CatmullRomCurve3( [
+			new THREE.Vector3( -10, 0, 10 ),
+			new THREE.Vector3( -5, 5, 5 ),
+			new THREE.Vector3( 0, 0, 0 ),
+			new THREE.Vector3( 5, -5, 5 ),
+			new THREE.Vector3( 10, 0, 10 )
+		] );
+
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+		const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+		// Create the final object to add to the scene
+		const curveObject = new THREE.Line( geometry, material );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_geometry_extrude_splines WebGL / geometry / extrude / splines]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]( [param:Array points], [param:Boolean closed], [param:String curveType], [param:Float tension] )
+		</h3>
+		<p>
+			points – An array of [page:Vector3] points<br />
+			closed – Whether the curve is closed. Default is `false`.<br />
+			curveType – Type of the curve. Default is `centripetal`.<br />
+			tension – Tension of the curve. Default is `0.5`.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Curve] class for common properties.</p>
+
+		<h3>[property:Array points]</h3>
+		<p>
+			The array of [page:Vector3] points that define the curve. It needs at
+			least two entries.
+		</p>
+
+		<h3>[property:Boolean closed]</h3>
+		<p>The curve will loop back onto itself when this is true.</p>
+
+		<h3>[property:String curveType]</h3>
+		<p>Possible values are `centripetal`, `chordal` and `catmullrom`.</p>
+
+		<h3>[property:Float tension]</h3>
+		<p>When [page:.curveType] is `catmullrom`, defines catmullrom's tension.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Curve] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

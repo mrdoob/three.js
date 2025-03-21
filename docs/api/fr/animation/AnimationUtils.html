@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Un objet avec de nombreuses fonctions qui peuvent aider à manipuler les animations, utilisé en interne.
+		</p>
+
+
+		<h2>Méthodes</h2>
+
+
+		<h3>[method:Array convertArray]( array, type, forceClone )</h3>
+		<p>
+		Convertis un tableau en un type spécifique.
+		</p>
+
+		<h3>[method:Array flattenJSON]( jsonKeys, times, values, valuePropertyName )</h3>
+		<p>
+		Utilisé pour l'analyse des formats de keyframes AOS.
+		</p>
+
+		<h3>[method:Array getKeyframeOrder]( times )</h3>
+		<p>
+		Retourne un tableau dans lequel les durées et les valeurs peuvent-être triées.
+		</p>
+
+		<h3>[method:Boolean isTypedArray]( object )</h3>
+		<p>
+		Renvoie `true` si l'objet est un tableau typé.
+		</p>
+
+		<h3>[method:AnimationClip makeClipAdditive]( [param:AnimationClip targetClip], [param:Number referenceFrame], [param:AnimationClip referenceClip], [param:Number fps] )</h3>
+		<p>
+		Convertis les keyframes de l'animation passée en paramètre en un format additif.
+		</p>
+
+		<h3>[method:Array sortedArray]( values, stride, order )</h3>
+		<p>
+		Trie le tableau précédemment renvoyé par [page:AnimationUtils.getKeyframeOrder getKeyframeOrder].
+		</p>
+
+		<h3>[method:AnimationClip subclip]( [param:AnimationClip clip], [param:String name], [param:Number startFrame], [param:Number endFrame], [param:Number fps] )</h3>
+		<p>
+		Crée un nouveau clip, ne contenant que les segments du clip original compris dans l'intervalle de frames passée en paramètre.
+		</p>
+
+		<h2>Source</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

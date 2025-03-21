@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr; [page:PerspectiveCamera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name]은 미리 설정해놓은 카메라로 장면을 효율적으로 렌더릴할 때 사용될 수 있습니다. VR 장면을 렌더링할 때 중요한 퍼포먼스적 측면이기도 합니다.<br />
+			[name] 인스턴스는 항상 하위 카메라들의 배열을 가지고 있습니다.
+			각 하위 카메라에는 이 카메라로 렌더링되는 뷰포트 부분을 결정하는 *뷰포트* 속성을 반드시 정의해야 합니다.
+		</p>
+
+		<h2>예제</h2>
+
+		<p>[example:webgl_camera_array camera / array ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Array array] )</h3>
+		<p>
+			카메라 배열.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:PerspectiveCamera]를 참고하세요.</p>
+
+		<h3>[property:Array cameras]</h3>
+		<p>
+			카메라 배열.
+		</p>
+
+		<h3>[property:Boolean isArrayCamera]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:PerspectiveCamera]를 참고하세요.</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

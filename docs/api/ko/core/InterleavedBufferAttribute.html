@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+
+		</p>
+
+		<h2>생성자</h2>
+		<h3>[name]( [param:InterleavedBuffer interleavedBuffer], [param:Integer itemSize], [param:Integer offset], [param:Boolean normalized] )</h3>
+		<p>
+		</p>
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:InterleavedBuffer data]</h3>
+		<p>
+			생성자로 전달된 [page:InterleavedBuffer InterleavedBuffer] 인스턴스입니다.
+		</p>
+
+		<h3>[property:TypedArray array]</h3>
+		<p>
+			[page:InterleavedBufferAttribute.data data].array의 값입니다.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			[page:InterleavedBufferAttribute.data data].count의 값입니다.
+
+			버퍼가 3-컴포넌트 항목(위치, 법선, 색상 등의)을 저장하고 있을 때,
+			저장된 항목들의 수를 카운팅합니다.
+		</p>
+
+		<h3>[property:Boolean isInterleavedBufferAttribute]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>
+			각 항목을 구성하는 값의 수입니다.
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		이 속성 인스턴스의 임시 이름입니다. 기본값은 빈 문자열입니다.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			기본값은 *false*입니다. *true*로 설정하면 모든 인터리브 버퍼(특정 속성 데이터만이 아닌)를 GPU에 다시 전송합니다.
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+			기본값은 *false*입니다.
+		</p>
+
+		<h3>[property:Integer offset]</h3>
+		<p>
+			항목이 시작하는 기저 배열 버퍼의 오프셋입니다.
+		</p>
+
+		<h2>메서드</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>[page:Matrix4 m] 매트릭스를 이 InterleavedBufferAttribute의 모든 Vector3 엘레먼트에 적용합니다.</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>[page:Matrix3 m] 노멀 매트릭스를 이 InterleavedBufferAttribute의 모든 Vector3 엘레먼트에 적용합니다.</p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>[page:Matrix4 m] 매트릭스를 이 InterleavedBufferAttribute의 모든 Vector3 엘레먼트에 적용하고, 엘레먼트를 방향 벡터로 이동합니다.</p>
+
+		<h3>[method:Number getX]( [param:Integer index] ) </h3>
+		<p>해당 index의 항목의 x 컴포넌트를 리턴합니다.</p>
+
+		<h3>[method:Number getY]( [param:Integer index] ) </h3>
+		<p>해당 index의 항목의 y 컴포넌트를 리턴합니다.</p>
+
+		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
+		<p>해당 index의 항목의 z 컴포넌트를 리턴합니다.</p>
+
+		<h3>[method:Number getW]( [param:Integer index] ) </h3>
+		<p>해당 index의 항목의 w 컴포넌트를 리턴합니다.</p>
+
+		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
+		<p>해당 index의 항목의 x 컴포넌트를 설정합니다.</p>
+
+		<h3>[method:this setY]( [param:Integer index], [param:Float y] ) </h3>
+		<p>해당 index의 항목의 y 컴포넌트를 설정합니다.</p>
+
+		<h3>[method:this setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<p>해당 index의 항목의 z 컴포넌트를 설정합니다.</p>
+
+		<h3>[method:this setW]( [param:Integer index], [param:Float w] ) </h3>
+		<p>해당 index의 항목의 w 컴포넌트를 설정합니다.</p>
+
+		<h3>[method:this setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<p>해당 index의 항목의 x, y 컴포넌트를 설정합니다.</p>
+
+		<h3>[method:this setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<p>해당 index의 항목의 x, y, z 컴포넌트를 설정합니다.</p>
+
+		<h3>[method:this setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<p>해당 index의 항목의 x, y, z, w 컴포넌트를 설정합니다.</p>
+
+
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

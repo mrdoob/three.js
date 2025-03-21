@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			محمل لتحميل صورة [page:Image]. يتم استخدام هذا داخليًا من قبل
+			[page:CubeTextureLoader]، [page:ObjectLoader] و [page:TextureLoader].
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		// instantiate a loader
+		const loader = new THREE.ImageLoader();
+	
+		// load a image resource
+		loader.load(
+			// resource URL
+			'image.png',
+	
+			// onLoad callback
+			function ( image ) {
+				// use the image, e.g. draw part of it on a canvas
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( '2d' );
+				context.drawImage( image, 100, 100 );
+			},
+	
+			// onProgress callback currently not supported
+			undefined,
+	
+			// onError callback
+			function () {
+				console.error( 'An error happened.' );
+			}
+		);
+		</code>
+		 
+		<p>
+		يرجى ملاحظة أن three.js r84 قام بإسقاط دعم أحداث التقدم لـ ImageLoader.
+		لـ ImageLoader يدعم أحداث التقدم ، انظر
+		[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639 هذا الموضوع].
+		</p>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>
+		[example:webgl_loader_obj WebGL / loader / obj]<br />
+		[example:webgl_shaders_ocean WebGL / shaders / ocean]
+		</p>
+	 
+		<h2>المنشئ (Constructor)</h2>
+	 
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] - [page:LoadingManager loadingManager]
+		للمحمل الذي سيستخدمه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+	 
+		ينشئ جديد [name].
+		</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الصفحة الأساسية [page:Loader] للخصائص المشتركة.</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الصفحة الأساسية [page:Loader] للطرق المشتركة.</p>
+	 
+		<h3>
+		[method:HTMLImageElement load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] - المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] - سيتم استدعاؤه عند اكتمال التحميل. الوسيطة
+		ستكون الصورة المحملة [page:Image image].<br />
+		[page:Function onProgress] (اختياري) - هذه وظيفة رد الاتصال
+		غير مدعوم حاليًا.<br />
+		[page:Function onError] (اختياري) - سيتم استدعاؤه عند حدوث خطأ في التحميل.<br />
+		</p>
+		<p>
+		قم ببدء التحميل من عنوان URL وإرجاع كائن الصورة [page:Image image]
+		الذي سيحتوي على البيانات.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

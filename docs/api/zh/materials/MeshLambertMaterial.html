@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>Lambert网格材质([name])</h1>
+
+		<p class="desc"> 一种非光泽表面的材质，没有镜面高光。<br /><br />
+			该材质使用基于非物理的[link:https://en.wikipedia.org/wiki/Lambertian_reflectance Lambertian]模型来计算反射率。
+			这可以很好地模拟一些表面（例如未经处理的木材或石材），但不能模拟具有镜面高光的光泽表面（例如涂漆木材）。 [name] uses per-fragment shading。<br /><br />
+
+			由于反射率和光照模型的简单性，[page:MeshPhongMaterial]，[page:MeshStandardMaterial]或者[page:MeshPhysicalMaterial]
+			上使用这种材质时会以一些图形精度为代价，得到更高的性能。
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshLambertMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>[page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
+		</p>
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>alpha贴图是一张灰度纹理，用于控制整个表面的不透明度。（黑色：完全透明；白色：完全不透明）。
+			默认值为null。<br /><br />
+
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。
+			对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。
+			Luminance-only以及luminance/alpha纹理也仍然有效。
+		</p>
+
+		<h3>[property:Texture aoMap]</h3>
+		<p> 该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UV。</p>
+
+		<h3>[property:Float aoMapIntensity]</h3>
+		<p> 环境光遮蔽效果的强度。范围为 0-1，其中 `0` 表示禁用环境光遮蔽。当强度为 `1` 且 [page:.aoMap] 红色通道也为 `1`时，环境光在表面上完全被遮蔽。默认值为`1`。
+		</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p> 用于创建凹凸贴图的纹理。黑色和白色值映射到与光照相关的感知深度。凹凸实际上不会影响对象的几何形状，只影响光照。如果定义了法线贴图，则将忽略该贴图。
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p> 凹凸贴图会对材质产生多大影响。典型范围是0-1。默认值为1。</p>
+
+		<h3>[property:Color color]</h3>
+		<p> 材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
+
+		<h3>[property:Integer combine]</h3>
+		<p> 如何将表面颜色的结果与环境贴图（如果有）结合起来。<br /><br />
+
+			选项为[page:Materials THREE.MultiplyOperation]（默认值），[page:Materials THREE.MixOperation]，
+			[page:Materials THREE.AddOperation]。如果选择多个，则使用[page:.reflectivity]在两种颜色之间进行混合。
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p> 位移贴图会影响网格顶点的位置，与仅影响材质的光照和阴影的其他贴图不同，移位的顶点可以投射阴影，阻挡其他对象，
+			以及充当真实的几何体。位移纹理是指：网格的所有顶点被映射为图像中每个像素的值（白色是最高的），并且被重定位。
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p> 位移贴图对网格的影响程度（黑色是无位移，白色是最大位移）。如果没有设置位移贴图，则不会应用此值。默认值为1。
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			位移贴图在网格顶点上的偏移量。如果没有设置位移贴图，则不会应用此值。默认值为0。
+		</p>
+
+		<h3>[property:Color emissive]</h3>
+		<p> 材质的放射（光）颜色，基本上是不受其他光照影响的固有颜色。默认为黑色。
+		</p>
+
+		<h3>[property:Texture emissiveMap]</h3>
+		<p> 设置放射（发光）贴图。默认值为null。放射贴图颜色由放射颜色和强度所调节。
+			如果你有一个放射贴图，请务必将放射颜色设置为黑色以外的其他颜色。
+		</p>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<p> 放射光强度。调节发光颜色。默认为1。</p>
+
+		<h3>[property:Texture envMap]</h3>
+		<p> 环境贴图。默认值为null。</p>
+
+		<h3>[property:Euler envMapRotation]</h3>
+		<p>
+			环境贴图的旋转（以弧度为单位）。默认值为 `(0,0,0)`。
+		</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
+		<h3>[property:Texture lightMap]</h3>
+		<p>光照贴图。默认值为null。lightMap需要第二组UV。</p>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<p>烘焙光的强度。默认值为1。</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			颜色贴图。可以选择包括一个alpha通道，通常与[page:Material.transparent .transparent]
+			或[page:Material.alphaTest .alphaTest]。默认为null。
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			用于创建法线贴图的纹理。RGB 值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+			如果材质的法线贴图使用左手惯例编写，则应将 normalScale 的 y 分量取反以补偿不同的手性。
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p> 法线贴图的类型。<br /><br />
+			选项为[page:constant THREE.TangentSpaceNormalMap]（默认）和[page:constant THREE.ObjectSpaceNormalMap]。
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p> 环境贴图对表面的影响程度; 见[page:.combine]。默认值为1，有效范围介于0（无反射）和1（完全反射）之间。</p>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<p>空气的折射率（IOR）（约为1）除以材质的折射率。它与环境映射模式[page:Textures THREE.CubeRefractionMapping]
+			和[page:Textures THREE.EquirectangularRefractionMapping]一起使用。
+			折射率不应超过 1。默认值为 *0.98*。
+		</p>
+
+		<h3>[property:Texture specularMap]</h3>
+		<p>材质使用的高光贴图。默认值为null。</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<p>定义线两端的外观。可选值为 'butt'，'round' 和 'square'。默认为'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
+		</p>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<p>
+			定义线连接节点的样式。可选值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p> 控制线框宽度。默认值为1。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
+			大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material]。</p>
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

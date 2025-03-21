@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		كائن لتتبع الوقت. يستخدم هذا
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now].
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Boolean autoStart] )</h3>
+		<p>
+		autoStart — (اختياري) ما إذا كان يجب تشغيل الساعة تلقائيًا عندما
+		[page:.getDelta]() يتم استدعاؤه لأول مرة. الافتراضي هو `true`.
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+
+		<h3>[property:Boolean autoStart]</h3>
+		<p>
+		إذا تم تعيينه، يبدأ الساعة تلقائيًا عندما يتم استدعاء [page:.getDelta]()
+		لأول مرة. الافتراضي هو `true`.
+		</p>
+
+		<h3>[property:Float startTime]</h3>
+		<p>
+		يحمل الوقت الذي تم فيه استدعاء طريقة [page:Clock.start start] للساعة
+		آخر مرة. الافتراضي هو `0`.
+		</p>
+
+		<h3>[property:Float oldTime]</h3>
+		<p>
+		يحمل الوقت الذي تم فيه استدعاء طرق [page:Clock.start start],
+		[page:.getElapsedTime]() أو [page:.getDelta]() للساعة آخر مرة.
+		الافتراضي هو `0`.
+		</p>
+
+		<h3>[property:Float elapsedTime]</h3>
+		<p>
+		يتبع المجموع الكلي للوقت الذي كانت تعمل فيه الساعة. الافتراضي هو
+		`0`.
+		</p>
+
+		<h3>[property:Boolean running]</h3>
+		<p>ما إذا كانت الساعة تعمل أم لا. الافتراضي هو `false`.</p>
+
+		<h2>الوظائف (Methods)</h2>
+
+		<h3>[method:undefined start]()</h3>
+		<p>
+		يبدأ الساعة. كما يضبط [page:.startTime] و [page:.oldTime] على
+		الوقت الحالي، ويضبط [page:.elapsedTime] على `0` و [page:.running] على
+		`true`.
+		</p>
+
+		<h3>[method:undefined stop]()</h3>
+		<p>
+		يوقف الساعة ويضبط [page:Clock.oldTime oldTime] على الوقت الحالي.
+		</p>
+
+		<h3>[method:Float getElapsedTime]()</h3>
+		<p>
+		احصل على المجموع الكلي للثواني التي مرت منذ بدء تشغيل الساعة وضبط [page:.oldTime] على
+		الوقت الحالي.<br />
+		إذا كان [page:.autoStart] هو `true` والساعة لا تعمل، فإنه يبدأ أيضًا
+		ساعة.
+		</p>
+
+		<h3>[method:Float getDelta]()</h3>
+		<p>
+		احصل على المجموع الكلي للثواني التي مرت منذ ضبط [page:.oldTime] وضبط
+		[page:.oldTime] على الوقت الحالي.<br />
+		إذا كان [page:.autoStart] هو `true` والساعة لا تعمل، فإنه يبدأ أيضًа
+		ساعة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

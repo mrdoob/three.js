@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		يستخدمه [page:CubeCamera] كـ [page:WebGLRenderTarget].
+		</p>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>انظر [page:CubeCamera] للحصول على أمثلة.</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]([param:Number size], [param:Object options])</h3>
+		<p>
+		[page:Float size] - الحجم ، بالبكسل. الافتراضي هو `1`.<br />
+		options - (اختياري) كائن يحمل معلمات القوام لـ
+		قوام الهدف المُنشأ تلقائيًا وعمق المخزن/مخططات المخزن booleans. لـ
+		شرح معلمات القوام انظر [page:Texture Texture]. التالي هي خيارات صالحة:<br /><br />
+		 
+		[page:Constant wrapS] - الافتراضي هو [page:Textures ClampToEdgeWrapping].
+		<br />
+		[page:Constant wrapT] - الافتراضي هو [page:Textures ClampToEdgeWrapping].
+		<br />
+		[page:Constant magFilter] - الافتراضي هو [page:Textures .LinearFilter].
+		<br />
+		[page:Constant minFilter] - الافتراضي هو [page:Textures LinearFilter].
+		<br />
+		[page:Boolean generateMipmaps] - الافتراضي هو `false`.<br />
+		[page:Constant format] - الافتراضي هو [page:Textures RGBAFormat]. <br />
+		[page:Constant type] - الافتراضي هو [page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - الافتراضي هو `1`. انظر
+		[page:Texture.anisotropy]<br />
+		[page:Constant colorSpace] - الافتراضي هو [page:Textures NoColorSpace].
+		<br />
+		[page:Boolean depthBuffer] - الافتراضي هو `true`.<br />
+		[page:Boolean stencilBuffer] - الافتراضي هو `false`.<br /><br />
+		 
+		ينشئ [name] جديدًا
+		</p>
+		 
+
+		<h2>الخصائص (Properties)</h2>
+
+		<p>انظر [page:WebGLRenderTarget] للخصائص الموروثة.</p>
+	 
+		<h2>الطرق (Methods)</h2>
+	 
+		<p>انظر [page:WebGLRenderTarget] للطرق الموروثة.</p>
+	 
+		<h3>
+		[method:this fromEquirectangularTexture]( [param:WebGLRenderer renderer], [param:Texture texture] )
+		</h3>
+		<p>
+		[page:WebGLRenderer renderer] — المُعالج.<br />
+		[page:Texture texture] — القوام الإستوائي المستطيل.
+		</p>
+		<p>
+		استخدم هذه الطريقة إذا كنت ترغب في تحويل بانوراما إستوائية مستطيلة إلى
+		تنسيق cubemap.
+		</p>
+	 
+		<h3>
+		[method:undefined clear]( [param:WebGLRenderer renderer], [param:Boolean color], 
+		[param:Boolean depth], [param:Boolean stencil] )
+		</h3>
+		<p>
+		اتصل بهذا لمسح لون هدف العرض وعمقه و/أو مخططات
+		المخزنات. يتم تعيين مخزن اللون على لون المسح الحالي للمُعالج.
+		المعاملات الافتراضية هي `true`.
+		</p>
+	 
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

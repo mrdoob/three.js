@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>插值器（[name]）</h1>
+
+		<p class="desc">
+		A参数样本上插值的抽象基类 <br /><br />
+
+		参数域是一维的，通常是数据定义的曲线上的时间或路径。<br /><br />
+
+		示例值可以具有任何维度，派生类可以对数据应用特殊的解释。<br /><br />
+
+		该类提供间隔查找的模板方法，将实际的插值延迟到派生类。<br /><br />
+
+		对于最多两个点之间的访问时间复杂度为O(1)，对于随机访问时间复杂度为O(log N)，其中N为位置数。<br /><br />
+
+		相关:	[link:http://www.oodesign.com/template-method-pattern.html http://www.oodesign.com/template-method-pattern.html]
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( parameterPositions, sampleValues, sampleSize, resultBuffer )</h3>
+		<p>
+		parameterPositions -- array of positions<br />
+		sampleValues -- array of samples<br />
+		sampleSize -- number of samples<br />
+		resultBuffer -- buffer to store the interpolation results.<br /><br />
+
+		注意: 这不是设计为直接调用的。
+		</p>
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:null parameterPositions]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:null resultBuffer]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:null sampleValues]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Object settings]</h3>
+		<p>
+		Optional, subclass-specific settings structure.
+		</p>
+
+		<h3>[property:null valueSize]</h3>
+		<p>
+
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Array evaluate]( [param:Number t] )</h3>
+		<p>
+			计算补间函数在位置 *t* 的值。
+		</p>
+
+		<h2>源码（Source）</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

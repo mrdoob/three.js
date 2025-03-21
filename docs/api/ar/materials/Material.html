@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		الفئة الأساسية المجردة للمواد.<br /><br />
+			
+		تصف المواد مظهر [page:Object objects]. هم
+		محددة بطريقة (غالبًا) مستقلة عن المصور ، لذلك لا تضطر إلى
+		إعادة كتابة المواد إذا قررت استخدام مصور مختلف.<br /><br />
+			
+		تمتلك الخصائص والطرق التالية من جميع أنواع المواد الأخرى
+		(على الرغم من أنها قد تكون لها افتراضات مختلفة).
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]()</h3>
+		<p>هذا ينشئ مادة عامة.</p>
+			
+		<h2>الخصائص (Properties)</h2>
+
+		<h3>[property:Boolean alphaHash]</h3>
+		<p>
+			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
+			The material will not be rendered if opacity is lower than a random threshold.
+			Randomization introduces some grain or noise, but approximates alpha blending without
+			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+		</p>
+			
+		<h3>[property:Float alphaTest]</h3>
+		<p>
+		يحدد قيمة ألفا التي يجب استخدامها عند تشغيل اختبار ألفا. المادة
+		لن يتم عرضه إذا كانت الشفافية أقل من هذه القيمة. الافتراضي هو
+		`0`.
+		</p>
+			
+		<h3>[property:Boolean alphaToCoverage]</h3>
+		<p>
+		يمكّن ألفا للتغطية. يمكن استخدامه فقط مع سياقات MSAA-enabled
+		(وهذا يعني عند إنشاء المصور بمعامل `antialias` مضبوطًا على
+		`true`). الافتراضي هو `false`.
+		</p>
+			
+		<h3>[property:Integer blendDst]</h3>
+		<p>
+		وجهة المزج. الافتراضي هو [page:CustomBlendingEquation OneMinusSrcAlphaFactor]. 
+		انظر عوامل الوجهة [page:CustomBlendingEquation constants] لجميع القِيَم المحتملة.<br />
+		يجب تعيين [page:Constant blending] للمادة على [page:Materials CustomBlending] 
+		لهذا لديه أي تأثير.
+		</p>
+
+		<h3>[property:Integer blendDstAlpha]</h3>
+		<p>
+		شفافية [page:.blendDst]. يستخدم قيمة [page:.blendDst] إذا
+		null. الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Integer blendEquation]</h3>
+		<p>
+		معادلة المزج للاستخدام عند تطبيق المزج. الافتراضي هو
+		[page:CustomBlendingEquation AddEquation]. انظر معادلة المزج
+		[page:CustomBlendingEquation constants] لجميع القيم الممكنة.<br />
+		يجب تعيين [page:Constant blending] للمادة على [page:Materials CustomBlending] 
+		لهذا لديه أي تأثير.
+		</p>
+		
+		<h3>[property:Integer blendEquationAlpha]</h3>
+		<p>
+		شفافية [page:.blendEquation]. يستخدم قيمة [page:.blendEquation]
+		إذا كان null. الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Blending blending]</h3>
+		<p>
+		أي مزج للاستخدام عند عرض الكائنات بهذه المادة. <br />
+		يجب تعيين هذا على [page:Materials CustomBlending] لاستخدام مخصص
+		[page:Constant blendSrc]، [page:Constant blendDst] أو [page:Constant blendEquation].<br />
+		انظر وضع المزج [page:Materials constants] لجميع القيم الممكنة.
+		الافتراضي هو [page:Materials NormalBlending].
+		</p>
+		
+		<h3>[property:Integer blendSrc]</h3>
+		<p>
+		مصدر المزج. الافتراضي هو [page:CustomBlendingEquation SrcAlphaFactor].
+		انظر عوامل المصدر [page:CustomBlendingEquation constants] للكل
+		القِيَم المحتملة.<br />
+		يجب تعيين [page:Constant blending] للمادة على [page:Materials CustomBlending] 
+		لهذا لديه أي تأثير.
+		</p>
+		
+		<h3>[property:Integer blendSrcAlpha]</h3>
+		<p>
+		شفافية [page:.blendSrc]. يستخدم قيمة [page:.blendSrc] إذا
+		null. الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Boolean clipIntersection]</h3>
+		<p>
+		تغير سلوك مستويات القطع بحيث يتم قطع تقاطعها فقط
+		، بدلاً من اتحادهم. الافتراضي هو `false`.
+		</p>
+		
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+		مستويات القطع المحددة من قبل المستخدم محددة كـ THREE.Plane objects في العالم
+		الفضاء. تنطبق هذه المستويات على الكائنات التي يتم إرفاق هذه المادة بها.
+		يتم قطع النقاط في الفضاء التي يكون مسافتها الموقعة إلى المستوى سلبية
+		(غير معروض). هذا يتطلب [page:WebGLRenderer.localClippingEnabled] إلى
+		كن `true`. انظر [example:webgl_clipping_intersection WebGL / clipping /intersection] مثال. الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Boolean clipShadows]</h3>
+		<p>
+		يحدد ما إذا كان يجب قطع الظلال وفقًا للمستويات القطع المحددة
+		على هذه المادة. الافتراضي هو `false`.
+		</p>
+		
+		<h3>[property:Boolean colorWrite]</h3>
+		<p>
+		سواء كان يجب عرض لون المادة. يمكن استخدام هذا بالتزامن
+		مع خاصية [page:Integer renderOrder] لشبكة لإنشاء غير مرئية
+		الأشياء التي تحجب الأشياء الأخرى. الافتراضي هو `true`.
+		</p>
+		
+		<h3>[property:Object defines]</h3>
+		<p>
+		تعريفات مخصصة لإدخالها في المظلل. يتم تمرير هذه في شكل
+		محدد كائن حرفي ، بأزواج من المفتاح / القيمة. `{ MY_CUSTOM_DEFINE: '' , PI2:
+		Math.PI * 2 }`. يتم تعريف الأزواج في كل من قمة وشظية المظللات.
+		الافتراضي هو `undefined`.
+		</p>
+		
+		<h3>[property:Integer depthFunc]</h3>
+		<p>
+		أي دالة عمق للاستخدام. الافتراضي هو [page:Materials LessEqualDepth].
+		انظر وضع العمق [page:Materials constants] لجميع القيم الممكنة.
+		</p>
+		
+		<h3>[property:Boolean depthTest]</h3>
+		<p>
+		سواء كان يجب تمكين اختبار العمق عند عرض هذه المادة. افتراضي
+		هو `true`.
+		</p>
+		
+		<h3>[property:Boolean depthWrite]</h3>
+		<p>
+		سواء كان عرض هذه المادة له أي تأثير على مخزن العمق.
+		الافتراضي هو `true`.<br /><br />
+		
+		عند رسم تراكبات 2D ، يمكن أن يكون من المفيد تعطيل كتابة العمق في
+		لطبقة عدة أشياء معًا دون إنشاء فنون فهرس z.
+		</p>
+
+		<h3>[property:Boolean forceSinglePass]</h3>
+		<p>
+		سواء كان يجب عرض الأشياء الشفافة ذات الجانبين بمرور واحد
+		أم لا. الافتراضي هو `false`.<br /><br />
+		
+		يعرض المحرك الأشياء الشفافة ذات الجانبين بمكالمتين رسم
+		(الوجوه الخلفية أولاً ، ثم الوجوه الأمامية) للتخفيف من التحولات الشفافة.
+		هناك سيناريوهات ومع ذلك حيث لا ينتج هذا النهج عن مكاسب في الجودة
+		ولكن لا يزال يضاعف المكالمات الرسمية على سبيل المثال عند عرض نباتات مسطحة مثل
+		رشات العشب. في هذه الحالات ، قم بتعيين علامة `forceSinglePass` على `true` إلى
+		تعطيل التقديم المزدوج لتجنب مشاكل الأداء.
+		</p>
+		
+		<h3>[property:Boolean isMaterial]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+		
+		<h3>[property:Boolean stencilWrite]</h3>
+		<p>
+		سواء كانت تتم عمليات الشبكة ضد مخزن الشبكة. في
+		لإجراء كتابات أو مقارنات ضد مخزن الشبكة هذه
+		القيمة يجب أن تكون `true`. الافتراضي هو `false`.
+		</p>
+		
+		<h3>[property:Integer stencilWriteMask]</h3>
+		<p>
+		قناع البت المستخدم عند الكتابة إلى مخزن الشبكة. الافتراضي هو `0xFF`.
+		</p>
+		
+		<h3>[property:Integer stencilFunc]</h3>
+		<p>
+		دالة المقارنة بالشبكة التي يجب استخدامها. الافتراضي هو [page:Materials AlwaysStencilFunc]. 
+		انظر دالة شبكية [page:Materials constants] لـ
+		جميع القيم الممكنة.
+		</p>
+		
+		<h3>[property:Integer stencilRef]</h3>
+		<p>
+		القيمة المستخدمة عند إجراء مقارنات شبكية أو شبكية
+		عمليات. الافتراضي هو `0`.
+		</p>
+		
+		<h3>[property:Integer stencilFuncMask]</h3>
+		<p>
+		قناع البت المستخدم عند المقارنة مع مخزن الشبكة. الافتراضي هو
+		`0xFF`.
+		</p>
+		
+		<h3>[property:Integer stencilFail]</h3>
+		<p>
+		العملية الشبكية التي يجب تنفيذها عندما تعود دالة المقارنة
+		خطأ. الافتراضي هو [page:Materials KeepStencilOp]. انظر شبكية
+		عمليات [page:Materials constants] لجميع القيم الممكنة.
+		</p>
+		
+		<h3>[property:Integer stencilZFail]</h3>
+		<p>
+		العملية الشبكية التي يجب تنفيذها عندما تعود دالة المقارنة
+		صحيح ولكن اختبار العمق يفشل. الافتراضي هو [page:Materials KeepStencilOp].
+		انظر عمليات شبكية [page:Materials constants] لجميع المحتمل
+		القِيَم.
+		</p>
+
+		<h3>[property:Integer stencilZPass]</h3>
+		<p>
+		العملية الشبكية التي يجب تنفيذها عندما تعود دالة المقارنة
+		صحيح واختبار العمق يمر. الافتراضي هو [page:Materials KeepStencilOp].
+		انظر عمليات الشبكة [page:Materials constants] لجميع القيم الممكنة
+		</p>
+		
+		<h3>[property:Integer id]</h3>
+		<p>رقم فريد لهذه المادة.</p>
+		
+		<h3>[property:String name]</h3>
+		<p>
+		اسم اختياري للكائن (لا يحتاج إلى أن يكون فريدًا). الافتراضي هو
+		سلسلة فارغة.
+		</p>
+		
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>يحدد أن المادة تحتاج إلى إعادة التجميع.</p>
+		
+		<h3>[property:Float opacity]</h3>
+		<p>
+		عائم في نطاق `0.0` - `1.0` يشير إلى مدى شفافية
+		المادة. قيمة `0.0` تشير إلى الشفافية الكاملة ، `1.0` هو كامل
+		غير شفاف.<br />
+		إذا لم يتم تعيين خاصية [page:Boolean transparent] للمادة على
+		`true`، ستظل المادة غير شفافة تمامًا وسيؤثر هذا القيمة فقط
+		تأثير لونه. <br />
+		الافتراضي هو `1.0`.
+		</p>
+		
+		<h3>[property:Boolean polygonOffset]</h3>
+		<p>
+		سواء كان يجب استخدام إزاحة المضلع. الافتراضي هو `false`. هذا يتوافق مع
+		`GL_POLYGON_OFFSET_FILL` ميزة WebGL.
+		</p>
+		
+		<h3>[property:Integer polygonOffsetFactor]</h3>
+		<p>تعيين عامل إزاحة المضلع. الافتراضي هو `0`.</p>
+		
+		<h3>[property:Integer polygonOffsetUnits]</h3>
+		<p>تعيين وحدات إزاحة المضلع. الافتراضي هو `0`.</p>
+		
+		<h3>[property:String precision]</h3>
+		<p>
+		تجاوز دقة المصور الافتراضية لهذه المادة. يمكن أن يكون
+		`"highp"`، `"mediump"` أو `"lowp"`. الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Boolean premultipliedAlpha]</h3>
+		<p>
+		سواء كان يجب ضرب قيمة ألفا (الشفافية). انظر
+		[Example:webgl_materials_physical_transmission WebGL / Materials / Physical / Transmission] 
+		لمثال على الفرق. الافتراضي هو `false`.
+		</p>
+		
+		<h3>[property:Boolean dithering]</h3>
+		<p>
+		سواء كان يجب تطبيق التدرج على اللون لإزالة مظهر
+		الفرقة. الافتراضي هو `false`.
+		</p>
+
+		<h3>[property:Integer shadowSide]</h3>
+		<p>
+		يحدد أي جانب من الوجوه يلقي الظلال. عند التعيين، يمكن أن يكون [page:Materials THREE.FrontSide]،
+		[page:Materials THREE.BackSide]، أو [page:Materials THREE.DoubleSide].
+		الافتراضي هو `null`. <br />
+		إذا كان `null`، يتم تحديد الجانب الذي يلقي الظلال على النحو التالي: <br />
+		</p>
+	 
+		<table>
+			<thead>
+				<tr>
+					<th>[page:Material.side]</th>
+					<th>Side casting shadows</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>THREE.FrontSide</td>
+					<td>back side</td>
+				</tr>
+				<tr>
+					<td>THREE.BackSide</td>
+					<td>front side</td>
+				</tr>
+				<tr>
+					<td>THREE.DoubleSide</td>
+					<td>both sides</td>
+				</tr>
+			</tbody>
+		</table>
+	 
+		<h3>[property:Integer side]</h3>
+		<p>
+		يحدد أي جانب من الوجوه سيتم عرضه - الأمامية، الخلفية أو كلاهما.
+		الافتراضي هو [page:Materials THREE.FrontSide]. خيارات أخرى هي
+		[page:Materials THREE.BackSide] أو [page:Materials THREE.DoubleSide].
+		</p>
+	 
+		<h3>[property:Boolean toneMapped]</h3>
+		<p>
+		يحدد ما إذا كانت هذه المادة معدلة نغمة وفقًا لإعدادات [page:WebGLRenderer.toneMapping toneMapping] للمُصير.
+		الافتراضي هو `true`.
+		</p>
+	 
+		<h3>[property:Boolean transparent]</h3>
+		<p>
+		يحدد ما إذا كانت هذه المادة شفافة. له تأثير على
+		التصيير كما تحتاج الأشياء الشفافة إلى معاملة خاصة وتُصاغ
+		بعد الأشياء غير الشفافة. <br />
+		عند تعيينه على true، يتم التحكم في مدى شفافية المادة
+		عن طريق تعيين خاصية [page:Float opacity] الخاصة به. <br />
+		الافتراضي هو `false`.
+		</p>
+
+		<h3>[property:String type]</h3>
+		<p>
+		القيمة هي السلسلة 'Material'. يجب عدم تغيير هذا، ويمكن استخدامه
+		للعثور على جميع الكائنات من هذا النوع في المشهد.
+		</p>
+	 
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] من
+		هذه الحالة المادية. يتم تعيين هذا تلقائيًا، لذلك يجب عدم تحريره.
+		</p>
+	 
+		<h3>[property:Integer version]</h3>
+		<p>
+		يبدأ هذا في `0` ويحسب كم مرة يتم تعيين [page:Material.needsUpdate .needsUpdate] إلى `true`.
+		</p>
+	 
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>
+		يحدد ما إذا كان يتم استخدام تلوين الرأس. الافتراضي هو `false`. يدعم المحرك
+		ألوان RGB و RGBA للرأس اعتمادًا على ما إذا كان يتم استخدام سمة مخزنة لونية
+		ذات ثلاثة (RGB) أو أربعة (RGBA) مكونات.
+		</p>
+	 
+		<h3>[property:Boolean visible]</h3>
+		<p>يحدد ما إذا كانت هذه المادة مرئية. الافتراضي هو `true`.</p>
+	 
+		<h3>[property:Object userData]</h3>
+		<p>
+		كائن يمكن استخدامه لتخزين بيانات مخصصة حول المادة. يجب ألا يحتوي على
+		مراجع إلى الوظائف لأنها لن تتم نسخها.
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>
+		طرق [page:EventDispatcher EventDispatcher] متاحة على هذه
+		الفئة.
+		</p>
+	 
+		<h3>[method:Material clone]( )</h3>
+		<p>يرجع مادة جديدة بنفس المعلمات كهذه المادة.</p>
+	 
+		<h3>[method:this copy]( [param:material material] )</h3>
+		<p>انسخ المعلمات من المادة المارة إلى هذه المادة.</p>
+	 
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يحرر الموارد المتعلقة بوحدة معالجة الرسومات التي تم تخصيصها بواسطة هذه الحالة. اتصل بهذه
+		الطريقة كلما لم يعد هذه الحالة مستخدمة في التطبيق الخاص بك.
+		</p>
+		<p>
+		يجب التخلص من نسج المادة من خلال طريقة dispose() من
+		[page:Texture Texture].
+		</p>
+
+		<h3>
+			[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )
+		</h3>
+		<p>
+		رد الاتصال الاختياري الذي يتم تنفيذه مباشرة قبل تجميع برنامج الشادر. يتم استدعاء هذه الدالة مع شفرة مصدر الشادر كمعلمة. مفيد لتعديل المواد المدمجة.
+		</p>
+		<p>
+		على عكس الخصائص، لا يتم دعم رد الاتصال بواسطة [page:Material.clone .clone]()، 
+		[page:Material.copy .copy]() و [page:Material.toJSON .toJSON]().
+		</p>
+		<p>
+			This callback is only supported in `WebGLRenderer` (not `WebGPURenderer`). 
+		</p>
+		<p>
+			[example:webgl_materials_modified WebGL / materials / modified]<br />
+			[example:webgl_shadow_contact WebGL / shadow / contact]
+		</p>
+
+		<h3>
+			[method:undefined onBeforeRender]( [param:WebGLRenderer renderer], [param:Scene scene], [param:Camera camera], [param:BufferGeometry geometry], [param:Object3D object], [param:Group group] )
+		</h3>
+		<p>
+			An optional callback that is executed immediately before the material is used to 
+			render a 3D object.
+		</p>
+		<p>
+			Unlike properties, the callback is not supported by [page:Material.clone .clone](), 
+			[page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+		</p>
+		<p>
+			This callback is only supported in `WebGLRenderer` (not `WebGPURenderer`). 
+		</p>
+		 
+		<h3>[method:String customProgramCacheKey]()</h3>
+		<p>
+		في حالة استخدام onBeforeCompile، يمكن استخدام هذا الرد الاتصال لتحديد
+		قيم إعدادات المستخدمة في onBeforeCompile، بحيث يمكن لـ three.js إعادة استخدام
+		شادر مخزن في ذاكرة التخزين المؤقت أو إعادة تجميع شادر لهذه المادة حسب الحاجة.
+		</p>
+		 
+		<p>
+		على سبيل المثال، إذا كان onBeforeCompile يحتوي على جملة شرطية مثل:<br />
+		 
+		<code>
+		if ( black ) { 
+			shader.fragmentShader = shader.fragmentShader.replace('gl_FragColor = vec4(1)', 
+			'gl_FragColor = vec4(0)') 
+		}
+		</code>
+		 
+		فيجب تعيين customProgramCacheKey مثل هذا:<br />
+		 
+		<code>
+		material.customProgramCacheKey = function() { 
+			return black ? '1' : '0';
+		}
+		</code>
+		</p>
+		 
+		<p>
+		على عكس الخصائص، لا يتم دعم رد الاتصال بواسطة [page:Material.clone .clone]()، 
+		[page:Material.copy .copy]() و [page:Material.toJSON .toJSON]().
+		</p>
+		 
+		<h3>[method:undefined setValues]( [param:Object values] )</h3>
+		<p>
+		values - حاوية بالمعلمات.<br />
+		يضبط الخصائص بناءً على `values`.
+		</p>
+		 
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta - كائن يحتوي على بيانات تعريفية مثل الملمس أو الصور للمادة.<br />
+		تحويل المادة إلى three.js
+		[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+		 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

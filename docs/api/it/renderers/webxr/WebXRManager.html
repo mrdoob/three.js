@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Questa classe rappresenta un'astrazione dell'API WebXR Device ed è utilizzata internamente da [page:WebGLRenderer].
+			[name] inoltre fornisce un'interfaccia pubblica che permette agli utenti di abilitare e disabilitare XR ed 
+			eseguire attività relative a XR come ad esempio il recupero dei controller.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean cameraAutoUpdate]</h3>
+		<p>
+			Indica se la telecamera XR del manager deve essere aggiornata automaticamente o no. Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			Questo flag notifica al renderer di essere pronto per il rendering XR. L'impostazione predefinita è `false`. 
+			Impostalo a `true` se stai utilizzando XR nella tua applicazione.
+		</p>
+
+		<h3>[property:Boolean isPresenting]</h3>
+		<p>
+			Indica se la presentazione XR è attiva o meno. Il valore predefinito è `false`. Questo flag è di sola 
+			lettura e impostato automaticamente da [name].
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:ArrayCamera getCamera]()</h3>
+		<p>
+			Restituisce un'istanza di [page:ArrayCamera] che rappresenta la telecamera XR sessione XR attiva.
+			Per ogni vista contiene un oggetto telecamera separato nella sua proprietà [page:ArrayCamera.cameras telecamere].
+		</p>
+		<p>
+			Il `fov` della telecamera non viene utilizzato attualmente e non riflette il fov della telecamera XR. Se hai bisogno del fov a 
+			livello di app, devi calcolare manualmente dalle matrici di proiezione della telecamera XR.
+		</p>
+
+		<h3>[method:Group getController]( [param:Integer index] )</h3>
+		<p>
+		[page:Integer index] — L'indice del controller. <br /><br />
+
+		Restituisce un [page:Group gruppo] che rappresenta il cosidetto spazio *target ray* del controller XR.
+		Utilizza questo spazio per visualizzare gli oggetti 3D che supportano l'utente nel puntare attività come 
+		l'intersezione dell'interfaccia utente.
+		</p>
+
+		<h3>[method:Group getControllerGrip]( [param:Integer index] )</h3>
+		<p>
+		[page:Integer index] — L'indice del controller. <br /><br />
+
+		Restituisce un [page:Group gruppo] che rappresenta il cosidetto spazio `grip` del controller XR.
+		Utilizza questo spazio se l'utente terrà altri oggetti 3D come una spada laser.
+		</p>
+
+		<p>
+		Nota: Se vuoi mostrare qualcosa nella mano dell'utente e offrire un raggio di puntamento allo stesso tempo, ti consigliamo di allegare 
+		l'oggetto tenuto in mano al gruppo restituito da [page:.getControllerGrip]() e il raggio al gruppo restituito da [page:.getController](). 
+		L'idea è quella di avere due gruppi diversi in due coordinate delle spazio diverse per lo stesso controller WebXR.
+		</p>
+
+		<h3>[method:Float getFoveation]()</h3>
+		<p>
+			Restituisce la quantità di foveazione utilizzata dal compositore XR per il livello di proiezione.
+		</p>
+
+		<h3>[method:Group getHand]( [param:Integer index] )</h3>
+		<p>
+		[page:Integer index] — L'indice del controller. <br /><br />
+
+		Restituisce un [page:Group gruppo] che rappresenta il cosidetto spazio `hand` o `joint` per il controller XR.
+		Utilizza questo spazio per visualizzare le mani dell'utente quando vengono utilizzati i controller non fisici.
+		</p>
+
+		<h3>[method:String getReferenceSpace]()</h3>
+		<p>
+			Restituisce lo spazio di riferimento.
+		</p>
+
+		<h3>[method:XRSession getSession]()</h3>
+		<p>
+			Restituisce l'oggetto `XRSession` il quale permette una maggiore gestione delle sessioni WebXR attive a livello di applicazione.
+		</p>
+
+		<h3>[method:undefined setFoveation]( [param:Float foveation] )</h3>
+		<p>
+		[page:Float foveation] — Il foveazione da impostare.<br /><br />
+
+		Specifica la quantità di foveazione utilizzata dal compositore XR per il livello. Deve essere un valore tra `0` e `1`.
+		</p>
+
+		<h3>[method:undefined setFramebufferScaleFactor]( [param:Float factor], [param:Boolean limited] )</h3>
+		<p>
+		[page:Float factor] — Il fattore di scala del framebuffer da impostare.<br /><br />
+		[page:Boolean limited] — Indica se il fattore di scala del framebuffer deve essere ridotto al 
+		limite nativo se il valore risulta superiore alle capacità del dispositivo. Il valore predefinito è `false`.<br /><br />
+
+		Specifica il fattore di ridimensionamento da utilizzare per determinare la dimensione del framebuffer durante il rendering 
+		su un dispositivo XR. Il valore è relativo alla risoluzione del dispositivo XR predefinito. Il valore predefinito è `1`. 
+		Un valore di `0.5` specificherebbe un framebuffer con il 50% della risoluzione nativa del display.
+		</p>
+
+		<p>
+		Nota: Non è possibile modificare il fattore di scala del framebuffer durante la presentazione del contenuto.
+		</p>
+
+		<h3>[method:undefined setReferenceSpace]( [param:XRReferenceSpace referenceSpace] )</h3>
+		<p>
+		[page:XRReferenceSpace referenceSpace] — Uno spazio personalizzato di riferimento.<br /><br />
+
+		Può essere utilizzato per configurare uno spazio personalizzato di riferimento il quale sovrascrive 
+		lo spazio di riferimento predefinito.
+		</p>
+
+		<h3>[method:undefined setReferenceSpaceType]( [param:String referenceSpaceType] )</h3>
+		<p>
+		[page:String referenceSpaceType] — Il tipo dello spazio di riferimento da impostare.<br /><br />
+
+		Può essere utilizzare per configurare una relazione spaziale con l'ambiente fisico dell'utente. A seconda di come l'utente 
+		si muove nello spazio 3D, l'impostazione di uno spazio di riferimento appropriato può migliorare il tracciamento.
+		Il valore predefinito è `local-floor`.
+		Consultare l'[link:https://developer.mozilla.org/en-US/docs/Web/API/XRReferenceSpaceType MDN] per i possibli valori e i relativi casi d'uso.
+		</p>
+
+		<h3>[method:undefined updateCamera]( [param:PerspectiveCamera camera] )</h3>
+		<p>
+			Aggiorna lo stato della telecamera XR. Utilizza questo metodo a livello di app, se imposti [page:.cameraAutoUpdate] a `false`.
+			Questo metodo richiede la telecamera non XR della scena come parametro. La trasformazione della telecamera passata viene automaticamente 
+			regolata sulla posizione della telecamera XR quando si chiama questo metodo.
+		</p>
+
+		<p>
+		Nota: Non è possibile modificare il tipo dello spazio di riferimento durante la presentazione del contenuto XR.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

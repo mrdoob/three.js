@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:MeshStandardMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			An extension of the [page:MeshStandardMaterial], providing more advanced
+			physically-based rendering properties:
+		</p>
+
+		<ul>
+			<li>
+				<b>Anisotropy:</b> Ability to represent the anisotropic property of materials 
+				as observable with brushed metals.
+			</li>
+			<li>
+				<b>Clearcoat:</b> Some materials — like car paints, carbon fiber, and
+				wet surfaces — require a clear, reflective layer on top of another layer
+				that may be irregular or rough. Clearcoat approximates this effect,
+				without the need for a separate transparent surface.
+			</li>
+			<li>
+				<b>Iridescence:</b> Allows to render the effect where hue varies 
+				depending on the viewing angle and illumination angle. This can be seen on
+				soap bubbles, oil films, or on the wings of many insects.
+			</li>
+			<li>
+				<b>Physically-based transparency:</b> One limitation of
+				[page:Material.opacity .opacity] is that highly transparent materials
+				are less reflective. Physically-based [page:.transmission] provides a
+				more realistic option for thin, transparent surfaces like glass.
+			</li>
+			<li>
+				<b>Advanced reflectivity:</b> More flexible reflectivity for
+				non-metallic materials.
+			</li>
+			<li>
+				<b>Sheen:</b> Can be used for representing cloth and fabric materials.
+			</li>
+		</ul>
+
+		<p>
+			As a result of these complex shading features, MeshPhysicalMaterial has a
+			higher performance cost, per pixel, than other three.js materials. Most
+			effects are disabled by default, and add cost as they are enabled. For
+			best results, always specify an [page:.envMap environment map] when using
+			this material.
+		</p>
+
+		<iframe
+			id="scene"
+			src="scenes/material-browser.html#MeshPhysicalMaterial"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_loader_gltf_anisotropy loader / gltf / anisotropy]<br />
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_loader_gltf_iridescence loader / gltf / iridescence]<br />
+			[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
+			[example:webgl_materials_physical_transmission materials / physical / transmission]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more
+			properties defining the material's appearance. Any property of the
+			material (including any property inherited from [page:Material] and
+			[page:MeshStandardMaterial]) can be passed in here.<br /><br />
+
+			The exception is the property [page:Hexadecimal color], which can be
+			passed in as a hexadecimal string and is `0xffffff` (white) by default.
+			[page:Color.set]( color ) is called internally.
+		</p>
+
+		<h2>Properties</h2>
+		<p>
+			See the base [page:Material] and [page:MeshStandardMaterial] classes for
+			common properties.
+		</p>
+
+		<h3>[property:Float anisotropy]</h3>
+		<p>
+			The anisotropy strength. Default is `0.0`.
+		</p>
+
+		<h3>[property:Texture anisotropyMap]</h3>
+		<p>
+			Red and green channels represent the anisotropy direction in `[-1, 1]` tangent,
+			bitangent space, to be rotated by [page:.anisotropyRotation]. The blue channel
+			contains strength as `[0, 1]` to be multiplied by [page:.anisotropy]. Default is `null`.
+		</p>
+
+		<h3>[property:Float anisotropyRotation]</h3>
+		<p>
+			The rotation of the anisotropy in tangent, bitangent space, measured in radians
+			counter-clockwise from the tangent. When [page:.anisotropyMap] is present, this
+			property provides additional rotation to the vectors in the texture. Default is `0.0`.
+		</p>
+
+		<h3>[property:Color attenuationColor]</h3>
+		<p>
+			The color that white light turns into due to absorption when reaching the
+			attenuation distance. Default is `white` (0xffffff).
+		</p>
+
+		<h3>[property:Float attenuationDistance]</h3>
+		<p>
+			Density of the medium given as the average distance that light travels in
+			the medium before interacting with a particle. The value is given in world
+			space units, and must be greater than zero. Default is `Infinity`.
+		</p>
+
+		<h3>[property:Float clearcoat]</h3>
+		<p>
+			Represents the intensity of the clear coat layer, from `0.0` to `1.0`. Use
+			clear coat related properties to enable multilayer materials that have a
+			thin translucent layer over the base layer. Default is `0.0`.
+		</p>
+
+		<h3>[property:Texture clearcoatMap]</h3>
+		<p>
+			The red channel of this texture is multiplied against [page:.clearcoat],
+			for per-pixel control over a coating's intensity. Default is `null`.
+		</p>
+
+		<h3>[property:Texture clearcoatNormalMap]</h3>
+		<p>
+			Can be used to enable independent normals for the clear coat layer.
+			Default is `null`.
+		</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>
+			How much [page:.clearcoatNormalMap] affects the clear coat layer, from
+			`(0,0)` to `(1,1)`. Default is `(1,1)`.
+		</p>
+
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p>
+			Roughness of the clear coat layer, from `0.0` to `1.0`. Default is `0.0`.
+		</p>
+
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+			The green channel of this texture is multiplied against
+			[page:.clearcoatRoughness], for per-pixel control over a coating's
+			roughness. Default is `null`.
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p>
+			An object of the form:
+			<code>
+			{ 
+				'STANDARD': '',
+				'PHYSICAL': '', 
+			};
+			</code>
+
+			This is used by the [page:WebGLRenderer] for selecting shaders.
+		</p>
+
+		<h3>[property:Float dispersion]</h3>
+		<p>
+			Defines the strength of the angular separation of colors (chromatic aberration) transmitting through a relatively clear volume.
+			Any value zero or larger is valid, the typical range of realistic values is `[0, 1]`.
+			Default is `0` (no dispersion).
+			This property can be only be used with transmissive objects, see [page:.transmission].
+		</p>
+
+		<h3>[property:Float ior]</h3>
+		<p>
+			Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
+			Default is `1.5`.
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+			Degree of reflectivity, from `0.0` to `1.0`. Default is `0.5`, which
+			corresponds to an index-of-refraction of 1.5.<br />
+
+			This models the reflectivity of non-metallic materials. It has no effect
+			when [page:MeshStandardMaterial.metalness metalness] is `1.0`
+		</p>
+
+		<h3>[property:Float iridescence]</h3>
+		<p>
+			The intensity of the [link:https://en.wikipedia.org/wiki/Iridescence iridescence] layer, simulating RGB color shift based on the angle between the surface and the viewer, from `0.0` to `1.0`. Default is `0.0`.
+		</p>
+
+		<h3>[property:Texture iridescenceMap]</h3>
+		<p>
+			The red channel of this texture is multiplied against
+			[page:.iridescence], for per-pixel control over iridescence.
+			Default is `null`.
+		</p>
+
+		<h3>[property:Float iridescenceIOR]</h3>
+		<p>
+			Strength of the iridescence RGB color shift effect, represented by an index-of-refraction. Between `1.0` to `2.333`.
+			Default is `1.3`.
+		</p>
+
+		<h3>[property:Array iridescenceThicknessRange]</h3>
+		<p>
+			Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
+			Thickness of iridescence layer has an equivalent effect of the one [page:.thickness] has on [page:.ior].
+			Default is `[100, 400]`.<br />
+
+			If [page:.iridescenceThicknessMap] is not defined, iridescence thickness will use only the second element of the given array.
+		</p>
+
+		<h3>[property:Texture iridescenceThicknessMap]</h3>
+		<p>
+			A texture that defines the thickness of the iridescence layer, stored in the green channel.
+			Minimum and maximum values of thickness are defined by [page:.iridescenceThicknessRange] array:<br/>
+			<ul>
+				<li>`0.0` in the green channel will result in thickness equal to first element of the array.</li>
+				<li>`1.0` in the green channel will result in thickness equal to second element of the array.</li>
+				<li>Values in-between will linearly interpolate between the elements of the array.</li>
+			</ul>
+			Default is `null`.
+		</p>
+
+		<h3>[property:Float sheen]</h3>
+		<p>
+			The intensity of the sheen layer, from `0.0` to `1.0`. Default is `0.0`.
+		</p>
+
+		<h3>[property:Float sheenRoughness]</h3>
+		<p>Roughness of the sheen layer, from `0.0` to `1.0`. Default is `1.0`.</p>
+
+		<h3>[property:Texture sheenRoughnessMap]</h3>
+		<p>
+			The alpha channel of this texture is multiplied against
+			[page:.sheenRoughness], for per-pixel control over sheen roughness.
+			Default is `null`.
+		</p>
+
+		<h3>[property:Color sheenColor]</h3>
+		<p>The sheen tint. Default is `0x000000`, black.</p>
+
+		<h3>[property:Texture sheenColorMap]</h3>
+		<p>
+			The RGB channels of this texture are multiplied against
+			[page:.sheenColor], for per-pixel control over sheen tint. Default is
+			`null`.
+		</p>
+
+		<h3>[property:Float specularIntensity]</h3>
+		<p>
+			A float that scales the amount of specular reflection for non-metals only.
+			When set to zero, the model is effectively Lambertian. From `0.0` to
+			`1.0`. Default is `1.0`.
+		</p>
+
+		<h3>[property:Texture specularIntensityMap]</h3>
+		<p>
+			The alpha channel of this texture is multiplied against
+			[page:.specularIntensity], for per-pixel control over specular intensity.
+			Default is `null`.
+		</p>
+
+		<h3>[property:Color specularColor]</h3>
+		<p>
+			A [page:Color] that tints the specular reflection at normal incidence for
+			non-metals only. Default is `0xffffff`, white.
+		</p>
+
+		<h3>[property:Texture specularColorMap]</h3>
+		<p>
+			The RGB channels of this texture are multiplied against
+			[page:.specularColor], for per-pixel control over specular color. Default
+			is `null`.
+		</p>
+
+		<h3>[property:Float thickness]</h3>
+		<p>
+			The thickness of the volume beneath the surface. The value is given in the
+			coordinate space of the mesh. If the value is `0` the material is
+			thin-walled. Otherwise the material is a volume boundary. Default is `0`.
+		</p>
+
+		<h3>[property:Texture thicknessMap]</h3>
+		<p>
+			A texture that defines the thickness, stored in the green channel. This will
+			be multiplied by [page:.thickness]. Default is `null`.
+		</p>
+
+		<h3>[property:Float transmission]</h3>
+		<p>
+			Degree of transmission (or optical transparency), from `0.0` to `1.0`.
+			Default is `0.0`.<br />
+
+			Thin, transparent or semitransparent, plastic or glass materials remain
+			largely reflective even if they are fully transmissive. The transmission
+			property can be used to model these materials.<br />
+
+			When transmission is non-zero, [page:Material.opacity opacity] should be
+			set to `1`.
+		</p>
+
+		<h3>[property:Texture transmissionMap]</h3>
+		<p>
+			The red channel of this texture is multiplied against
+			[page:.transmission], for per-pixel control over optical transparency.
+			Default is `null`.
+		</p>
+
+		<h2>Methods</h2>
+		<p>
+			See the base [page:Material] and [page:MeshStandardMaterial] classes for
+			common methods.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

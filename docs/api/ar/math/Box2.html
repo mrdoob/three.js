@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			يمثل مربعًا محدودًا بمحاور (AABB) في الفضاء ثنائي الأبعاد.
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:Vector2 min], [param:Vector2 max] )</h3>
+		<p>
+		[page:Vector2 min] - (اختياري) [page:Vector2] يمثل الحد السفلي (x، y) للمربع. الافتراضي هو (+ Infinity، + Infinity).<br />
+			
+		[page:Vector2 max] - (اختياري) [page:Vector2] يمثل الحد العلوي (x، y) للمربع. الافتراضي هو (- Infinity، - Infinity).<br /><br />
+			
+		ينشئ [name] محدودًا بواسطة min و max.
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+			
+		<h3>[property:Vector2 min]</h3>
+		<p>
+		[page:Vector2] يمثل الحد السفلي (x، y) للمربع.<br />
+		الافتراضي هو (+ Infinity، + Infinity).
+		</p>
+			
+		<h3>[property:Vector2 max]</h3>
+		<p>
+		[page:Vector2] يمثل الحد العلوي (x، y) للمربع.<br />
+		الافتراضي هو (- Infinity، - Infinity).
+		</p>
+			
+		<h2>الطرق (Methods)</h2>
+			
+		<h3>
+		[method:Vector2 clampPoint]( [param:Vector2 point], [param:Vector2 target] )
+		</h3>
+		<p>
+		[page:Vector2 point] - [page:Vector2] للتثبيت. <br />
+		[page:Vector2 target] — سيتم نسخ النتيجة في هذا Vector2.<br /><br />
+			
+		[link:https://en.wikipedia.org/wiki/Clamping_(graphics) يثبت] [page:Vector2 point] داخل حدود هذا المربع.<br />
+		</p>
+			
+		<h3>[method:Box2 clone]()</h3>
+		<p>
+		يعود بـ [page:Box2] جديد مع نفس [page:.min min] و [page:.max max] كهذا المربع.
+		</p>
+			
+		<h3>[method:Boolean containsBox]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - [page:Box2 Box2] للاختبار للتضمين.<br /><br />
+			
+		يعود بـ true إذا كان هذا المربع يشمل كامل [page:Box2 box]. إذا كان هذا و [page:Box2 box] متطابقان، <br />
+		فإن هذه الوظيفة تعود أيضًا بـ true.
+		</p>
+			
+		<h3>[method:Boolean containsPoint]( [param:Vector2 point] )</h3>
+		<p>
+		[page:Vector2 point] - [page:Vector2] للاختبار للتضمين.<br /><br />
+			
+		يعود بـ true إذا كانت [page:Vector2 point] المحددة تقع داخل أو على حدود هذا المربع.
+		</p>
+
+		<h3>[method:this copy]( [param:Box2 box] )</h3>
+		<p>
+		ينسخ [page:.min min] و [page:.max max] من [page:Box2 box] إلى هذا المربع.
+		</p>
+		
+		<h3>[method:Float distanceToPoint]( [param:Vector2 point] )</h3>
+		<p>
+		[page:Vector2 point] - [page:Vector2] لقياس المسافة إليها.<br /><br />
+		
+		يعود بالمسافة من أي حافة لهذا المربع إلى النقطة المحددة. إذا كانت [page:Vector2 point] داخل هذا المربع، فستكون المسافة 0.
+		</p>
+		
+		<h3>[method:Boolean equals]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - مربع للمقارنة مع هذا المربع.<br /><br />
+		
+		يعود بـ true إذا كان هذا المربع و [page:Box2 box] يشتركان في نفس الحدود السفلى والعليا.
+		</p>
+		
+		<h3>[method:this expandByPoint]( [param:Vector2 point] )</h3>
+		<p>
+		[page:Vector2 point] - [page:Vector2] التي يجب تضمينها في المربع.<br /><br />
+		
+		يوسع حدود هذا المربع لتضمين [page:Vector2 point].
+		</p>
+		
+		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
+		<p>
+		[page:Float scalar] - المسافة التي يتم توسيع المربع بها.<br /><br />
+		
+		يوسع كل بُعد من أبعاد المربع بواسطة [page:Float scalar]. إذا كانت سالبة، فستتقلص أبعاد المربع.
+		</p>
+		
+		<h3>[method:this expandByVector]( [param:Vector2 vector] )</h3>
+		<p>
+		[page:Vector2 vector] - [page:Vector2] لتوسيع المربع بها.<br /><br />
+		
+		يوسع هذا المربع بشكل متساوٍ بواسطة [page:Vector2 vector]. سيتم توسيع عرض هذا المربع بمكون x من [page:Vector2 vector] في كلا الاتجاهين. ستتم توسيع ارتفاع هذا المربع بمكون y من [page:Vector2 vector] في كلا الاتجاهين.
+		</p>
+
+		<h3>[method:Vector2 getCenter] ([param:Vector2 target])</h3>
+		<p>
+		[page:Vector2 target] — سيتم نسخ النتيجة في هذا Vector2.<br /><br />
+		
+		يعود نقطة المركز للصندوق كـ [page:Vector2].
+		</p>
+		
+		<h3>[method:Vector2 getParameter] ([param:Vector2 point], [param:Vector2 target])</h3>
+		<p>
+		[page:Vector2 point] - [page:Vector2].<br />
+		[page:Vector2 target] — سيتم نسخ النتيجة في هذا Vector2.<br /><br />
+		
+		يعود نقطة كنسبة من عرض وارتفاع هذا الصندوق.
+		</p>
+		
+		<h3>[method:Vector2 getSize] ([param:Vector2 target])</h3>
+		<p>
+		[page:Vector2 target] — سيتم نسخ النتيجة في هذا Vector2.<br /><br />
+		
+		يعود عرض وارتفاع هذا الصندوق.
+		</p>
+		
+		<h3>[method:this intersect] ([param:Box2 box])</h3>
+		<p>
+		[page:Box2 box] - مربع للتقاطع معه.<br /><br />
+		
+		يعود تقاطع هذا و [page:Box2 box]، محددًا الحد الأعلى لهذا المربع إلى أقل من حدود المربعين الأعلى والحد الأدنى لهذا المربع إلى أكبر من حدود المربعين الأدنى.
+		</p>
+		
+		<h3>[method:Boolean intersectsBox] ([param:Box2 box])</h3>
+		<p>
+		[page:Box2 box] - مربع للتحقق من التقاطع ضده.<br /><br />
+		
+		يحدد ما إذا كان هذا المربع يتقاطع مع [page:Box2 box].
+		</p>
+		
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		يُرجَع صوابًا إذا كان هذا المربع يشمل صفر نقط داخل حدوده.<br />
+		لاحظ أن المربع الذي يحتوي على حدود سفلى وعلوية متساوية لا يزال يشمل نقطة واحدة، وهي التي تشترك فيها كلا الحدود.
+		</p>
+		
+		<h3>[method:this makeEmpty]()</h3>
+		<p> يجعل هذا المربع فارغًا. </p>
+		
+
+		<h3>[method:this set]([param:Vector2 min], [param:Vector2 max])</h3>
+		<p>
+		[page:Vector2 min] - (مطلوب) [page:Vector2] يمثل الحد الأدنى (x، y) للمربع. <br />
+		[page:Vector2 max] - (مطلوب) [page:Vector2] يمثل الحد الأعلى (x، y) للمربع. <br /><br />
+		
+		يضع الحدود العليا والسفلى (x، y) لهذا المربع.<br />
+		يرجى ملاحظة أن هذه الطريقة تنسخ فقط القيم من الكائنات المعطاة.
+		</p>
+		
+		<h3>[method:this setFromCenterAndSize]([param:Vector2 center], [param:Vector2 size])</h3>
+		<p>
+		[page:Vector2 center] - الموضع المركزي المطلوب للمربع ([page:Vector2]). <br />
+		[page:Vector2 size] - أبعاد x و y المطلوبة للمربع ([page:Vector2]).<br /><br />
+		
+		يضع هذا المربع في مركز [page:Vector2 center] ويضع عرض وارتفاع هذا المربع إلى القيم المحددة في [page:Vector2 size].
+		</p>
+		
+		<h3>[method:this setFromPoints]([param:Array points])</h3>
+		<p>
+		[page:Array points] - مصفوفة من [page:Vector2 Vector2s] التي ستحتوي عليها المربعات الناتجة.<br /><br />
+		
+		يضع الحدود العليا والسفلى لهذا المربع لتشمل جميع النقاط في [page:Array points].
+		</p>
+		
+		<h3>[method:this translate]([param:Vector2 offset])</h3>
+		<p>
+		[page:Vector2 offset] - اتجاه ومسافة التحويل.<br /><br />
+		
+		يضيف [page:Vector2 offset] إلى كلاً من الحدود العليا والسفلى لهذا المربع، مما يؤدي بشكل فعال إلى نقل هذا المربع [page:Vector2 offset] وحدات في مسافة 2D.
+		</p>
+		
+		<h3>[method:this union]([param:Box2 box])</h3>
+		<p>
+		[page:Box2 box] - مربع سيتم دمجه مع هذا المربع.<br /><br />
+		
+		يجمع هذا المربع مع [page:Box2 box]، حيث يضع الحد الأقصى لهذا المربع على أكبر حدود علوية للمربعين والحد الأدنى لهذا المربع على أقل حدود سفلى للمربعين.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

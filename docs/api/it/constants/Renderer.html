@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Costanti WebGLRenderer</h1>
+
+		<h2>Modalità Cull Face</h2>
+		<code>
+		THREE.CullFaceNone
+		THREE.CullFaceBack
+		THREE.CullFaceFront
+		THREE.CullFaceFrontBack
+		</code>
+		<p>
+      [page:constant CullFaceNone] disabilita il face culling.<br />
+      [page:constant CullFaceBack] elimina le facce posteriori (predefinito).<br />
+      [page:constant CullFaceFront] elimina le facce anteriori.<br />
+      [page:constant CullFaceFrontBack] elimina entrambe le facce posteriori e anteriori.
+		</p>
+
+		<h2>Tipi Shadow</h2>
+		<code>
+		THREE.BasicShadowMap
+		THREE.PCFShadowMap
+		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
+		</code>
+		<p>
+      Definiscono la proprietà [page:WebGLRenderer.shadowMap.type shadowMap.type] di WebGLRenderer.<br /><br />
+
+      [page:constant BasicShadowMap] fornisce mappe shadow non filtrate - la più veloce, ma con qualità minore.<br />
+      [page:constant PCFShadowMap] filtra le mappe shadow utilizzando l'algoritmo Percentage-Closer Filtering (PFC) (predefinito).<br />
+      [page:constant PCFSoftShadowMap] filtra le mappe shadow utilizzando l'algoritmo Percentage-Closer Filtering (PFC) 
+      con migliori soft shadow soprattutto quando si utilizzano mappe shadow a bassa risoluzione.<br />
+      [page:constant VSMShadowMap] filtra le mappe shadow utilizzando l'algoritmo Variance Shadow Map (VSM). Quando si utilizza VSMShadowMap,
+      anche tutti i ricevitori shadow proiettano shadow.<br />
+		</p>
+
+		<h2>Mappatura dei Toni</h2>
+		<code>
+		THREE.NoToneMapping
+		THREE.LinearToneMapping
+		THREE.ReinhardToneMapping
+		THREE.CineonToneMapping
+		THREE.ACESFilmicToneMapping
+		THREE.AgXToneMapping
+		THREE.NeutralToneMapping
+		THREE.CustomToneMapping
+		</code>
+		<p>
+      Definiscono la proprietà [page:WebGLRenderer.toneMapping toneMapping] di WebGLRenderer.
+      Viene utilizzato per approssimare l'aspetto della gamma dinamica (HDR) sul medio della
+      gamma dinamica bassa del monitor di un computer o dello schermo di un dispositivo mobile.
+		</p>
+		<p>
+      THREE.LinearToneMapping, THREE.ReinhardToneMapping, THREE.CineonToneMapping, THREE.ACESFilmicToneMapping THREE.AgXToneMapping e THREE.NeutralToneMapping sono implementazioni 
+      integrate della mappatura dei toni.
+      THREE.CustomToneMapping prevede un'implementazione personalizzata modificando il codice GLSL dello shader di frammenti del materiale.
+      Vedi l'esempio [example:webgl_tonemapping WebGL / tonemapping].
+		</p>
+		<p>
+			THREE.NeutralToneMapping is an implementation based on the Khronos 3D Commerce Group standard tone mapping.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>EXR导出器([name])</h1>
+
+	<p class="desc">
+		一个用于 EXR 的导出器。
+		<br /><br />
+		[link:https://www.openexr.com/ EXR] ( Extended Dynamic Range) 是用于电影行业专业级图像存储格式的
+		[link:https://github.com/AcademySoftwareFoundation/openexr 开放格式规范]。 该格式的目的是准确有效地表示高动态范围的线性场景图像数据和相关的元数据。
+		这个库在需要准确性的主机应用软件中广泛使用，如逼真渲染、纹理访问、图像合成、深度合成和数字中间处理。
+	</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { EXRExporter } from 'three/addons/exporters/EXRExporter.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// Instantiate a exporter
+		const exporter = new EXRExporter();
+
+		// Parse the input render target data and generate the EXR output
+		const EXR = exporter.parse( renderer, renderTarget, options );
+		downloadFile( EXR );
+		</code>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]()</h3>
+	<p>
+	</p>
+	<p>
+		创建一个新的 [name] 实例。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:null parse]( [param:WebGLRenderer renderer], [param:WebGLRenderTarget renderTarget], [param:Object
+		options] )</h3>
+	<p>
+		[page:Function renderTarget] — 包含用于导出 EXR 图像的数据的 WebGLRenderTarget。<br />
+		[page:Options options] — 导出选项<br />
+	<ul>
+		<li>type - 内部 EXR 数据的输出数据类型。可用选项：<br />
+			<code>
+THREE.HalfFloatType // default option
+THREE.FloatType
+					</code>
+		</li>
+		<li>compression - 内部压缩算法。可用选项：<br />
+			<code>
+NO_COMPRESSION
+ZIP_COMPRESSION // default option
+ZIPS_COMPRESSION
+					</code>
+		</li>
+	</ul>
+	</p>
+	<p>
+		从输入的渲染目标生成一个 .exr 输出。
+	</p>
+
+	<h3>[method:null parse]( [param:DataTexture dataTexture], [param:Object options] )</h3>
+	<p>
+		[page:Function dataTexture] — 包含用于导出 EXR 图像的数据的 DataTexture。<br />
+		[page:Options options] — 导出选项（详情见上文）。<br />
+	</p>
+	<p>
+		从输入的数据纹理生成一个 .exr 输出。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/EXRExporter.js examples/jsm/exporters/EXRExporter.js]
+	</p>
+</body>
+
+</html>

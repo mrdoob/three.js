@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">接收共享动画状态的一组对象。<br /><br />
+
+			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
+		</p>
+
+		<h2>用法:</h2>
+
+		<p class="desc">
+			将本来要作为根对象传入构造器或者动画混合器([page:AnimationMixer AnimationMixer])的[page:AnimationMixer.clipAction clipAction]方法中的对象加入组中，并将这个组对象作为根对象传递。
+			<br /><br />
+
+			注意，这个类的实例作为混合器中的一个对象，因此，必须对组内的单个对象做缓存控制。
+		</p>
+
+
+		<h2>限制</h2>
+		<p class="desc">
+			动画属性必须在组中的所有对象之间兼容。<br /><br />
+
+			单个属性可以通过目标组控制或者直接控制，但不能两者同时。
+		</p>
+
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			[page:Object obj] - 共享同一动画状态的任意数量的网格
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Boolean isAnimationObjectGroup]</h3>
+		<p>
+			只读标志，以检查给定对象是否属于 AnimationObjectGroup 类型。
+		</p>
+
+
+		<h3>[property:Object stats]</h3>
+		<p>
+			一个包含此动画对象组(AnimationObjectGroup)的一些信息的对象 (总数, 使用中的数量，绑定到每个对象上的数量）
+
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			这个动画对象组(AnimationObjectGroup)的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。它是自动分配的，不可被编辑。
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		<h3>[method:undefined add]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			将任意数量的对象添加到这个动画对象组(AnimationObjectGroup)。
+		</p>
+
+		<h3>[method:undefined remove]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			将任意数量的对象从这个动画对象组(AnimationObjectGroup)中删除。
+		</p>
+
+		<h3>[method:undefined uncache]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			释放此动画对象组(AnimationObjectGroup)传递的对象的所有内存资源
+		</p>
+
+
+		<h2>源码</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

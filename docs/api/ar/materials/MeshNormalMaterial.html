@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">مادة تقوم بتعيين المتجهات الطبيعية إلى ألوان RGB.</p>
+
+		<iframe
+			id="scene"
+			src="scenes/material-browser.html#MeshNormalMaterial"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن يحتوي على خاصية واحدة أو أكثر تحدد مظهر المادة. يمكن تمرير أي خاصية من المادة (بما في ذلك أي خاصية موروثة من [page:Material]) هنا.
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Material] للحصول على الخصائص المشتركة.</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+		النسيج لإنشاء خريطة بامب. تقوم القيم السوداء والبيضاء بتعيين العمق المتصور فيما يتعلق بالأضواء. لا يؤثر البامب فعليًا على هندسة الكائن ، فقط على الإضاءة. إذا تم تعريف خريطة طبيعية ، سيتم تجاهل هذا.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>
+		كم يؤثر خريطة البامب على المادة. المدى النموذجي هو 0-1. الافتراضي هو 1.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+		تؤثر خريطة التشويه على موضع رؤوس الشبكة. على عكس الخرائط الأخرى التي تؤثر فقط على ضوء وظل المادة ، يمكن للرؤوس المزحزحة أن تلقي ظلالًا وتحجب كائنات أخرى وتتصرف بطرق أخرى كهندسة حقيقية. نسيج التشويه هو صورة حيث يتم تعيين قيمة كل بكسل (الأبيض هو الأعلى) ضد وإعادة تحديد موضع رؤوس الشبكة.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+		كم يؤثر خريطة التشوه على الشبكة (حيث اللون الأسود لا يوجد تشويه ، واللون الأبيض هو التشويه الأقصى). بدون تعیین خریطۀ تشویه، لا یتم تطبیق هذه القیمۀ. الافتراضی هو 1.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+		إزاحة قيم خريطة التشويه على رؤوس الشبكة. بدون تعيين خريطة تشويه ، لا يتم تطبيق هذه القيمة. الافتراضي هو 0.
+		</p>
+		
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+		تحديد ما إذا كان يتم عرض المادة بظلال مسطحة. الافتراضي هو خطأ.
+		</p>
+		
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+		النسيج لإنشاء خريطة طبيعية. تؤثر قيم RGB على السطح الطبيعي لكل قطعة بكسل وتغير طريقة إضاءة اللون. لا تغير خرائط العادية شكل السطح الفعلي ، فقط الإضاءة. في حال كانت المادة تحتوي على خريطة طبيعية مؤلفة باستخدام اتفاقية اليد اليسرى ، يجب إنكار مكون y من normalScale للتعويض عن اختلاف التوجه.
+		</p>
+		
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+		نوع خريطة العادية. <br /><br />
+		
+		الخيارات هي [page:constant THREE.TangentSpaceNormalMap] (افتراضي) ، و [page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+		
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+		كم يؤثر خريطة العادية على المادة. المدى النموذجي هو 0-1. الافتراضي هو [page:Vector2] مضبوط على (1،1).
+		</p>
+		
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+		عرض الهندسة كإطار سلكي. الافتراضي هو false (أي عرض كظلال ناعمة).
+		</p>
+		
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>
+		التحكم في سمك الإطار السلكى. الافتراضى هو 1.<br /><br />
+		
+		بسبب قصور
+		[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+		مع [page:WebGLRenderer WebGL] renderer على معظم
+		المنصات ستكون linewidth دائمًا 1 بغض النظر عن القيمة المحددة.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى فئة [page:Material] الأساسية للحصول على طرق شائعة.</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

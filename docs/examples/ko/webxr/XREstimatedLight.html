@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:Group] &rarr;
+
+	<h1>[name]</h1>
+
+	<p class="desc">
+		XREstimatedLight은 WebXR의 빛 추정 기능을 사용하여 광도계(light probe), 방향광(directional light) 그리고 (선택적으로) 환경 맵(environment
+		map)을 생성하여 사용자의 현실 세계의 환경과 조명을 모델링합니다.<br>
+		WebXR가 빛과 환경 추정을 업데이트할 때, XREstimatedLight는 자동으로 광도계, 방향광, 그리고 환경 맵을 업데이트합니다.<br><br>
+
+		WebXR 세션을 생성할 때 `light-estimation`을 선택적 또는 필수 기능으로 지정하는 것이 중요합니다. 그렇지 않으면 빛 추정 기능은 작동하지 않습니다.<br><br>
+
+		브라우저 호환성 정보는 여기를 참조하십시오. 이는 아직 WebXR의 실험적 기능입니다. <a
+			href="https://developer.mozilla.org/en-US/docs/Web/API/XRLightProbe#browser_compatibility">여기</a><br><br>
+
+		이를 사용하려면, /examples 디렉토리 내의 모든 파일과 마찬가지로, HTML에 별도로 파일을 포함해야 합니다.
+	</p>
+
+	<h2>가져오기</h2>
+
+	<p>
+		[name]은 애드온이므로 명시적으로 가져와야 합니다.
+		[link:#manual/introduction/Installation 설치 / 애드온]을 참조하십시오.
+	</p>
+
+	<code>
+	import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';  
+	</code>
+
+	<h2>코드 예제</h2>
+
+	<code>
+	renderer.xr.enabled = true;  
+
+	// XREstimatedLight를 초기 시점에 장면에 추가하지 마세요.  
+	// AR 세션이 시작할 때까지 추정된 조명값이 없기 때문입니다.  
+	const xrLight = new XREstimatedLight( renderer );  
+
+	xrLight.addEventListener( 'estimationstart' , () => {  
+
+		scene.add( xrLight );  
+
+		if ( xrLight.environment ) {  
+
+			scene.environment = xrLight.environment;  
+
+		}  
+
+	} );  
+
+	xrLight.addEventListener( 'estimationend', () => {  
+
+		scene.remove( xrLight );  
+
+		scene.environment = null;  
+
+	} );  
+
+	// 조명 추정 기능을 작동하도록 하려면 'light-estimation'을 선택적 또는 필수 기능으로 포함해야 합니다.  
+	document.body.appendChild( XRButton.createButton( renderer, {  
+		optionalFeatures: [ 'light-estimation' ]  
+	} ) );  
+	</code>
+
+	<h2>예제</h2>
+
+	<p>[example:webxr_ar_lighting webxr / light estimation]</p>
+
+	<h2>생성자</h2>
+
+	<h3>[name]( [param:WebGLRenderer renderer], [param:Boolean environmentEstimation] )</h3>
+	<p>
+		[page:WebGLRenderer renderer]: (필수) 장면을 렌더링하는 렌더러. 주로 WebXRManager와 상호작용하는 데 사용됩니다.<br><br>
+
+		environmentEstimation: `true`로 설정하면 WebXR을 사용하여 환경 맵을 추정합니다.
+	</p>
+
+	<h2>이벤트</h2>
+
+	<h3>estimationstart</h3>
+	<p>
+		추정된 조명값이 업데이트 시작할 때 발생합니다.
+	</p>
+
+	<h3>estimationend</h3>
+	<p>
+		추정된 조명값이 업데이트 중지할 때 발생합니다.
+	</p>
+
+	<h2>속성</h2>
+
+	<h3>[property:Texture environment]</h3>
+	<p>
+		WebXR에 의해 추정된 환경 맵입니다. 이는 environmentEstimation이 `true`로 설정된 경우에만 사용할 수 있습니다.<br><br>
+
+		이는 [page:Scene.environment], [page:MeshStandardMaterial.envMap], 또는 [page:Scene.background]로 사용할 수 있습니다.
+	</p>
+
+	<h2>소스</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XREstimatedLight.js
+		examples/jsm/webxr/XREstimatedLight.js]
+	</p>
+</body>
+
+</html>

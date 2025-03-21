@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>CSS 3D渲染器（[name]）</h1>
+
+		<p class="desc">
+			[name]用于通过CSS3的[link:https://www.w3schools.com/cssref/css3_pr_transform.asp transform]属性，
+			将层级的3D变换应用到DOM元素上。
+			如果你希望不借助基于canvas的渲染来在你的网站上应用3D变换，那么这一渲染器十分有趣。
+			同时，它也可以将DOM元素与WebGL的内容相结合。
+			<br /><br />
+			然而，这一渲染器也有一些十分重要的限制：
+			<ul>
+				<li>它不可能使用*three.js*中的材质系统。</li>
+				<li>同时也不可能使用几何体。</li>
+				<li>`[name]` only supports 100% browser and display zoom.</li>
+			</ul>
+			因此，[name]仅仅关注普通的DOM元素，这些元素被包含到了特殊的对象中（*CSS3DObject*或者*CSS3DSprite*），然后被加入到场景图中。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:css3d_molecules molecules]<br />
+			[example:css3d_orthographic orthographic camera]<br />
+			[example:css3d_periodictable periodictable]<br />
+			[example:css3d_sprites sprites]<br />
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>方法</h2>
+
+		<h3>[method:Object getSize]()</h3>
+		<p>
+			返回一个包含有渲染器宽和高的对象。
+		</p>
+
+		<h3>[method:undefined render]( [param:Scene scene], [param:PerspectiveCamera camera] )</h3>
+		<p>
+			使用[page:PerspectiveCamera perspective camera]渲染[page:Scene scene]。<br />
+		</p>
+
+		<h3>[method:undefined setSize]([param:Number width], [param:Number height])</h3>
+		<p>
+			将渲染器尺寸重新调整为(width, height)。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/CSS3DRenderer.js examples/jsm/renderers/CSS3DRenderer.js]
+		</p>
+	</body>
+</html>

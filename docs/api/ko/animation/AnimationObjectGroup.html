@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">애니메이션 상태를 공유 및 저장하는 오브젝트 그룹입니다.<br /><br />
+
+			three.js 애니메이션 시스템의 다양한 엘레먼트에 관해서는 매뉴얼의 "심화과정" 중 "애니메이션 시스템" 문서를 참고하세요.
+		</p>
+
+		<h2>사용:</h2>
+
+		<p class="desc">
+			'root'로 생성자에 넘기거나 'root'로 오브젝트를 넘기는 대신
+			[page:AnimationMixer AnimationMixer]의 [page:AnimationMixer.clipAction clipAction]메서드를 통해 넘긴
+			오브젝트들을 추가합니다.
+			<br /><br />
+
+			이 클래스의 모든 오브젝트들은 믹서의 하나의 오브젝트로 나타날 것이기 때문에,
+			개별 오브젝트의 캐시 컨트롤은 그룹에서 이루어져야 합니다.
+		</p>
+
+
+		<h2>제한</h2>
+		<p class="desc">
+			애니메이션 된 프로퍼티들은 그룹의 모든 오브젝트에서 사용 가능해야합니다.<br /><br />
+
+			단일 프로퍼티는 타겟 그룹 관리 아니면 직접 관리 둘 중 하나로 되어야하며, 동시에는 안 됩니다.
+		</p>
+
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			[page:Object obj] - 같은 애니메이션 상태를 동유하는 메쉬의 임의 숫자.
+		</p>
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Boolean isAnimationObjectGroup]</h3>
+		<p>
+			주어진 객체가 [name] 타입인지 확인하기 위한 읽기 전용 플래그입니다.
+		</p>
+
+
+		<h3>[property:Object stats]</h3>
+		<p>
+			*AnimationObjectGroup* (총 갯수, 사용중인 갯수, 오브젝트별 바인딩 갯수)의 정보를 담고있는 오브젝트
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			*AnimationObjectGroup*의 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID].
+			자동으로 할당괴며 수정이 불가능합니다.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:undefined add]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			*AnimationObjectGroup*에 임의 갯수만큼의 오브젝트를 추가합니다.
+		</p>
+
+		<h3>[method:undefined remove]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			*AnimationObjectGroup*의 임의 갯수만큼의 오브젝트를 제거합니다.
+		</p>
+
+		<h3>[method:undefined uncache]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			*AnimationObjectGroup*의 전달받은 오브젝트들의 모든 메모리 리소스를 할당 해제합니다.
+		</p>
+
+
+		<h2>소스 코드</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Constantes de matériau</h1>
+
+		<p class="desc">
+		Ces constantes définissent des propriétés communes à tous les matériaux,
+		à l'exception de Texture Combine Operations qui s'applique uniquement à [page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] et [page:MeshPhongMaterial.combine MeshPhongMaterial].<br />
+		</p>
+
+
+		<h2>Côté</h2>
+		<code>
+		THREE.FrontSide
+		THREE.BackSide
+		THREE.DoubleSide
+		</code>
+		<p>
+		Définit quel côté des faces sera rendu - avant, arrière ou les deux.
+		La valeur par défaut est [page:Constant FrontSide].
+		</p>
+
+		<h2>Mode de fusion</h2>
+		<code>
+		THREE.NoBlending
+		THREE.NormalBlending
+		THREE.AdditiveBlending
+		THREE.SubtractiveBlending
+		THREE.MultiplyBlending
+		THREE.CustomBlending
+		</code>
+
+
+		<p>
+		Ces constantes contrôlent les équations de mélange source et destination pour le RVB et l'Alpha du matériau envoyés au WebGLRenderer pour être utilisés par WebGL.<br />
+		[page:Constant NormalBlending] est la valeur par défaut.<br />
+		Remarque : [page:Constant CustomBlending] doit être définit pour utiliser [page:CustomBlendingEquation Custom Blending Equations].<br />
+		Voir l'exemple [example:webgl_materials_blending materials / blending].<br />
+		</p>
+
+		<h2>Mode de profondeur</h2>
+		<code>
+		THREE.NeverDepth
+		THREE.AlwaysDepth
+		THREE.EqualDepth
+		THREE.LessDepth
+		THREE.LessEqualDepth
+		THREE.GreaterEqualDepth
+		THREE.GreaterDepth
+		THREE.NotEqualDepth
+		</code>
+		<p>
+		Quelle fonction de profondeur le matériau utilise pour comparer la profondeur Z des pixels entrants à la valeur actuelle du tampon de profondeur Z. Si le résultat de la comparaison est `true`(vrai), le pixel sera dessiné.<br />
+		[page:Materials NeverDepth] ne renvoie jamais `true`.<br />
+		[page:Materials AlwaysDepth] renvoie toujours `true`.<br />
+		[page:Materials EqualDepth] renvoie `true` si la profondeur Z du pixel entrant est égale à la profondeur Z du tampon actuel.<br />
+		[page:Materials LessDepth] renvoie `true` si la profondeur Z du pixel entrant est inférieure à la profondeur Z du tampon actuel.<br />
+		[page:Materials LessEqualDepth] si la profondeur Z du pixel entrant est inférieure ou égale à la profondeur Z du tampon actuel.<br />
+		[page:Materials GreaterEqualDepth] renvoie `true` si la profondeur Z du pixel entrant est supérieure ou égale à la profondeur Z du tampon actuel.<br />
+		[page:Materials GreaterDepth] renvoie `true` si la profondeur Z du pixel entrant est supérieure à la profondeur Z du tampon actuel.<br />
+		[page:Materials NotEqualDepth] renvoie `true` si la profondeur Z du pixel entrant est différente de la profondeur Z du tampon actuel.<br />
+		</p>
+
+		<h2>Opérations de combinaison de textures</h2>
+		<code>
+		THREE.MultiplyOperation
+		THREE.MixOperation
+		THREE.AddOperation
+		</code>
+		<p>
+		Ces constantes définissent comment le résultat de la couleur de la surface est combiné avec la carte d'environnement (environnement map) (si présente), pour [page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] et [page:MeshPhongMaterial.combine MeshPhongMaterial]. <br />
+		[page:Constant MultiplyOperation] est la valeur par défaut qui multiplie la carte d'environnement et la couleur de la surface.<br />
+		[page:Constant MixOperation] utilise la réflectivité pour mélanger les deux couleurs.<br />
+		[page:Constant AddOperation] ajoute les deux couleurs.
+		</p>
+
+		<h2>Fonctions de gabarit</h2>
+		<code>
+		THREE.NeverStencilFunc
+		THREE.LessStencilFunc
+		THREE.EqualStencilFunc
+		THREE.LessEqualStencilFunc
+		THREE.GreaterStencilFunc
+		THREE.NotEqualStencilFunc
+		THREE.GreaterEqualStencilFunc
+		THREE.AlwaysStencilFunc
+		</code>
+		<p>
+		Quelle fonction de gabarit le matériau utilise pour déterminer s'il faut ou non effectuer une opération de gabarit.<br />
+		[page:Materials NeverStencilFunc] ne renvoie jamais `true`.<br />
+		[page:Materials LessStencilFunc] renvoie `true` si la valeur de référence du gabarit est inférieure à la valeur courante du gabarit.<br />
+		[page:Materials EqualStencilFunc] renvoie `true` si la valeur de référence du gabarit est égale à la valeur courante du gabarit.<br />
+		[page:Materials LessEqualStencilFunc] renvoie `true` si la valeur de référence du gabarit est inférieure ou égale à la valeur courante du gabarit.<br />
+		[page:Materials GreaterStencilFunc] renvoie `true` si la valeur de référence du gabarit est supérieure à la valeur courante du gabarit.<br />
+		[page:Materials NotEqualStencilFunc] renvoie `true` si la valeur de référence du gabarit est différente de la valeur courante du gabarit.<br />
+		[page:Materials GreaterEqualStencilFunc] renvoie `true` si la valeur de référence du gabarit est supérieure ou égale à la valeur courante du gabarit.<br />
+		[page:Materials AlwaysStencilFunc] renvoie toujours `true`.<br />
+		</p>
+
+		<h2>Opérations de gabarit</h2>
+		<code>
+		THREE.ZeroStencilOp
+		THREE.KeepStencilOp
+		THREE.ReplaceStencilOp
+		THREE.IncrementStencilOp
+		THREE.DecrementStencilOp
+		THREE.IncrementWrapStencilOp
+		THREE.DecrementWrapStencilOp
+		THREE.InvertStencilOp
+		</code>
+		<p>
+		Quelle opération de gabarit le matériau effectuera sur le pixel du tampon de gabarit si la fonction de gabarit fournie réussit.<br />
+		[page:Materials ZeroStencilOp] définie la valeur du gabarit sur 0.<br />
+		[page:Materials KeepStencilOp] ne change pas la valeur courante du gabarit.<br />
+		[page:Materials ReplaceStencilOp] remplace la valeur du pochoir par la valeur de référence du pochoir spécifiée.<br />
+		[page:Materials IncrementStencilOp] incrémente la valeur courante du gabarit de `1`.<br />
+		[page:Materials DecrementStencilOp] décrémente la valeur courante du gabarit de `1`.<br />
+		[page:Materials IncrementWrapStencilOp] incrémente la valeur courante du gabarit de `1`. Si la valeur incrémentée dépasse `255` elle sera définie à `0`.<br />
+		[page:Materials DecrementWrapStencilOp] décrémente la valeur courante du gabarit de `1`. Si la valeur décrémentée dépasse `0` elle sera définie à `255`.<br />
+		[page:Materials InvertStencilOp] Effectuera une inversion bit à bit de la valeur actuelle du pochoir.<br />
+		</p>
+
+		<h2>Type de carte normale (normal map)</h2>
+		<code>
+		THREE.TangentSpaceNormalMap
+		THREE.ObjectSpaceNormalMap
+		</code>
+		<p>
+		Ces constantes définissent les types de carte normale.
+		Pour TangentSpaceNormalMap, l'information est relative à la surface sous-jacente.
+		For ObjectSpaceNormalMap, l'information est relative à la rotation de l'objet.
+		La valeur par défaut est [page:Constant TangentSpaceNormalMap].
+		</p>
+
+		<h2>Version GLSL</h2>
+		<code>
+		THREE.GLSL1
+		THREE.GLSL3
+		</code>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

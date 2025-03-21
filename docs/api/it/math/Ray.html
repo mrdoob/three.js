@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un raggio che parte da un'origine e si dirige in una determinata direzione. Questo viene utilizzato
+			dal [page:Raycaster] per assistere il raycasting. Il raycasting viene utilizzato per selezionare
+			con il mouse (elaborare su quali oggetti nello spazio 3D si trova il mouse) tra le altre cose.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 origin] - (opzionale) l'origine del [page:Ray raggio]. Il valore predefinito è un [page:Vector3] a (0, 0, 0).<br />
+		[page:Vector3 direction] - [page:Vector3] La direzione del [page:Ray raggio]. Deve essere normalizzato
+		 (con [page:Vector3.normalize]) affinchè i metodi funzionino correttamente.  Il valore predefinito è [page:Vector3] a (0, 0, -1).<br /><br />
+
+		 Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Vector3 origin]</h3>
+		<p>L'origine del [page:Ray raggio]. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.</p>
+
+		<h3>[property:Vector3 direction]</h3>
+		<p>
+			La direzione del [page:Ray raggio].  Deve essere normalizzato (con [page:Vector3.normalize])
+			affinchè i metodi funzionino correttamente. Il valore predefinito è un [page:Vector3] a (0, 0, -1).
+		</p>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix4] )</h3>
+		<p>
+		[page:Matrix4 matrix4] - la [page:Matrix4] da applicare a questo [page:Ray raggio].<br /><br />
+
+		Trasforma questo [page:Ray raggio] con [page:Matrix4].
+		</p>
+
+		<h3>[method:Vector3 at]( [param:Float t], [param:Vector3 target] ) </h3>
+		<p>
+		[page:Float t] - la distanza lungo il [page:Ray raggio] per la quale recuperare una posizione.<br />
+		[page:Vector3 target] — il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Ottiene un [page:Vector3] che corrisponde a una determinata distanza lungo questo [page:Ray raggio].
+		</p>
+
+		<h3>[method:Ray clone]()</h3>
+		<p>
+			Crea un nuovo raggio con [page:.origin origine] e [page:.direction direzione] identiche a questo.
+		</p>
+
+		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - il punto a cui avvicinarsi di più. <br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Ottiene il punto lungo questo [page:Ray raggio] che è il più vicino al [page:Vector3] fornito.
+		</p>
+
+		<h3>[method:this copy]( [param:Ray ray] )</h3>
+		<p>
+			Copia le proprietà [page:.origin origine] e [page:.direction direzione]
+			del [page:Ray raggio] in questo raggio.
+		</p>
+
+		<h3>[method:Float distanceSqToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - il [page:Vector3] per calcolare una distanza.<br /><br />
+
+		Ottiene la distanza al quadrato dell'avvicinamento più vicino tra il [page:Ray raggio] e il [page:Vector3].
+		</p>
+
+		<h3>[method:Float distanceSqToSegment]( [param:Vector3 v0], [param:Vector3 v1], [param:Vector3 optionalPointOnRay], [param:Vector3 optionalPointOnSegment] )</h3>
+		<p>
+		[page:Vector3 v0] - l'inizio del segmento.<br />
+		[page:Vector3 v1] - la fine del segmento.<br />
+		optionalPointOnRay - (opzionale) se viene fornito, riceve il punto su questo
+			[page:Ray raggio] più vicino al segmento.<br />
+		optionalPointOnSegment - (opzionale) se viene fornito, riceve il punto
+		sul segmento più vicino al [page:Ray raggio].<br /><br />
+
+		Ottiene la distanza al quadrato tra questo [page:Ray raggio] e un segmento.
+		</p>
+
+		<h3>[method:Float distanceToPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - il [page:Plane] per ottenere la distanza.<br /><br />
+
+		Ottiene la distanza tra l'[page:.origin origine] e il [page:Plane piano], o `null` se il [page:Ray raggio] non interseca il [page:Plane piano].
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - Il [page:Vector3] su cui calcolare la distanza.<br /><br />
+
+		Ottiene la distanza dell'avvicinamento più vicino tra il [page:Ray raggio] e il [page:Vector3 punto].
+		</p>
+
+
+		<h3>[method:Boolean equals]( [param:Ray ray] )</h3>
+		<p>
+		[page:Ray ray] - il [page:Ray raggio] su cui confrontare.<br /><br />
+
+		Restituisce true se questo e l'altro [page:Ray raggio] hanno [page:.origin origine]
+		e [page:.direction direzione] uguali.
+		</p>
+
+		<h3>[method:Vector3 intersectBox]( [param:Box3 box], [param:Vector3 target] )</h3>
+		<p>
+		[page:Box3 box] - il [page:Box3] con cui intersecare.<br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Interseca questo [page:Ray raggio] con un [page:Box3], restituendo il punto di intersezione o
+		`null` se non ci sono intersezioni.
+		</p>
+
+		<h3>[method:Vector3 intersectPlane]( [param:Plane plane], [param:Vector3 target] )</h3>
+		<p>
+		[page:Plane plane] - il [page:Plane] con cui intersecare.<br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Interseca questo [page:Ray raggio] con un [page:Plane], restituendo il punto di intersezione o
+		`null` se non ci sono intersezioni.
+		</p>
+
+		<h3>[method:Vector3 intersectSphere]( [param:Sphere sphere], [param:Vector3 target] )</h3>
+		<p>
+		[page:Sphere sphere] - la [page:Sphere] con cui intersecare.<br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Interseca questo [page:Ray raggio] con una [page:Sphere], restituendo il punto di intersezione o
+		`null` se non ci sono intersezioni.
+		</p>
+
+		<h3>[method:Vector3 intersectTriangle]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c], [param:Boolean backfaceCulling], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 a], [page:Vector3 b], [page:Vector3 c] - I punti [page:Vector3] che compongono il triangolo.<br />
+		[page:Boolean backfaceCulling] - se utilizzare backface culling o meno.<br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Interseca questo [page:Ray raggio] con un triangolo, restituendo il punto di intersezione o
+		`null` se non ci sono intersezioni.
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - il [page:Box3] con cui intersecare.<br /><br />
+
+		Restituisce true se questo [page:Ray raggio] si interseca con il [page:Box3].
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - il [page:Plane] con cui intersecare.<br /><br />
+
+		Restituisce true se questo [page:Ray raggio] si interseca con il [page:Plane].
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - la [page:Sphere] con cui intersecare.<br /><br />
+
+		Restituisce true se questo [page:Ray raggio] si interseca con la [page:Sphere].
+		</p>
+
+		<h3>[method:this lookAt]( [param:Vector3 v] )</h3>
+		<p>
+		[page:Vector3 v] - Il [page:Vector3] da guardare.<br /><br />
+
+		Regola la direzione del raggio in modo che punti al vettore nelle coordinate world.
+		</p>
+
+		<h3>[method:this recast]( [param:Float t] )</h3>
+		<p>
+		[page:Float t] - La distanza lungo il [page:Ray raggio] da interpolare.<br /><br />
+
+		Sposta l'origine di questo [page:Ray raggio] lungo le sue direzione per la distanza data.
+		</p>
+
+		<h3>[method:this set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 origin] - l'[page:.origin origine] del [page:Ray raggio].<br />
+		[page:Vector3 direction] - la [page:.direction direzione] del [page:Ray raggio].
+		Deve essere normalizzato (con [page:Vector3.normalize]) affinchè i metodi funzionino correttamente.<br /><br />
+
+		Imposta le proprietà [page:.origin origine] e [page:.direction direzione] di questo raggio copiando i valori dagli oggetti dati.
+		</p>
+
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

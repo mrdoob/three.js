@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:MeshStandardMaterial] &rarr;
+
+		<h1>物理网格材质([name])</h1>
+
+		<p class="desc">
+			[page:MeshStandardMaterial]的扩展，提供了更高级的基于物理的渲染属性：
+		</p>
+
+		<ul>
+			<li>
+				<b>各向异性(Anisotropy):</b> 能够表现出拉丝金属所观察到的材料的各向异性特性。
+			</li>
+			<li>
+				<b>清漆(Clearcoat):</b> 有些类似于车漆，碳纤，被水打湿的表面的材质需要在面上再增加一个透明的，具有一定反光特性的面。而且这个面说不定有一定的起伏与粗糙度。Clearcoat 可以在不需要重新创建一个透明的面的情况下做到类似的效果。
+			</li>
+			<li>
+				<b>虹彩(Iridescence):</b> 允许渲染色调根据视角和照明角度而变化的效果。这可以在肥皂泡、油膜或许多昆虫的翅膀上看到。
+			</li>
+			<li>
+				<b>基于物理的透明度</b>:[page:Material.opacity .opacity]属性有一些限制:在透明度比较高的时候，反射也随之减少。使用基于物理的透光性[page:.transmission]属性可以让一些很薄的透明表面，例如玻璃，变得更真实一些。
+			</li>
+			<li>
+				<b>高级光线反射:</b> 为非金属材质提供了更多更灵活的光线反射。
+			</li>
+			<li>
+				<b>光泽(Sheen):</b> 可用于表示布料和织物材料。
+			</li>
+		</ul>
+
+		<p>
+			物理网格材质使用了更复杂的着色器功能，所以在每个像素的渲染都要比three.js中的其他材质更费性能，大部分的特性是默认关闭的，需要手动开启，每开启一项功能在开启的时候才会更耗性能。请注意，为获得最佳效果，您在使用此材质时应始终指定[page:.envMap environment map]。
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_gltf_anisotropy loader / gltf / anisotropy]<br />
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_loader_gltf_iridescence loader / gltf / iridescence]<br />
+			[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
+			[example:webgl_materials_physical_transmission materials / physical / transmission]
+		</p>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]和[page:MeshStandardMaterial]继承的任何属性)<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]和[page:MeshStandardMaterial]。</p>
+
+		<h3>[property:Float anisotropy]</h3>
+		<p>
+			各向异性强度。默认值为 `0.0`。
+		</p>
+
+		<h3>[property:Texture anisotropyMap]</h3>
+		<p>
+			红色和绿色通道表示 `[-1, 1]` 切线、双切线空间中的各向异性方向，将通过 [page:.anisotropyRotation] 进行旋转。蓝色通道包含 `[0, 1]` 的强度，将与 [page:.anisotropy]相乘。默认值为 `null`。
+		</p>
+
+		<h3>[property:Float anisotropyRotation]</h3>
+		<p>
+			切线、双切线空间中各向异性的旋转，以弧度为单位从切线逆时针测量。当存在 [page:.anisotropyMap] 时，此属性为纹理中的矢量提供额外的旋转。默认值为 `0.0`。
+		</p>
+		
+		<h3>[property:Color attenuationColor]</h3>
+		<p>
+			白光到达衰减距离后因吸收而变成的颜色。默认值为 *white* (0xffffff)。
+		</p>
+
+		<h3>[property:Float attenuationDistance]</h3>
+		<p>
+			介质的密度，表示光在与粒子相互作用之前在介质中传播的平均距离。该值以世界空间单位给出，并且必须大于零。默认值为 `Infinity`。
+		</p>
+
+		<h3>[property:Float clearcoat]</h3>
+		<p>
+		表示clear coat层的强度，范围从*0.0*到*1.0*m，当需要在表面加一层薄薄的半透明材质的时候，可以使用与clear coat相关的属性，默认为*0.0*;
+		</p>
+
+		<h3>[property:Texture clearcoatMap]</h3>
+		<p>
+		这个贴图的红色通道值会与[page:.clearcoat]相乘作为整个clear coat的强度值层，默认为*null*。
+		</p>
+
+		<h3>[property:Texture clearcoatNormalMap]</h3>
+		<p>用于为clear coat层设置的独立的法线贴图，默认为*null*。</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>衡量[page:.clearcoatNormalMap]影响clear coat层多少的值，由*(0,0)*到*(1,1)*，默认为*(1,1)*。</p>
+
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p>clear coat层的粗糙度，由*0.0*到*1.0*。 默认为*0.0*</p>
+
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+			此纹理的绿色通道值会与[page:.clearcoatRoughness]相乘，用于改变clear coat的粗糙度，默认为*null*
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p> 如下形式的对象:
+			<code>
+				{
+
+					'STANDARD': ''
+					'PHYSICAL': '',
+
+				};
+			</code>
+			[page:WebGLRenderer]使用它来选择shaders。
+		</p>
+
+		<h3>[property:Float dispersion]</h3>
+		<p>
+			定义穿过相对清晰体积的颜色角分离（色差）的强度。任何零或更大的值都是有效的，实际值的典型范围是 `[0, 1]`。
+			默认值为 `0` (无色散)。
+			此属性只能用于透射对象，请参见 [page:.transmission]。
+		</p>
+
+		<h3>[property:Float ior]</h3>
+		<p>
+			为非金属材质所设置的折射率，范围由*1.0*到*2.333*。默认为*1.5*。
+			<br />
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+			反射率，由*0.0*到*1.0*。默认为*0.5*, 相当于折射率1.5。
+			<br />
+			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial metalness]为*1.0*时，此属性无效。
+		</p>
+		
+		<h3>[property:Float iridescence]</h3>
+		<p>
+			虹彩([link:https://en.wikipedia.org/wiki/Iridescence iridescence])层的强度，根据表面和观察者之间的角度模拟RGB颜色偏移，从 `0.0` 到 `1.0`。默认值为 `0.0`。
+		</p>
+
+		<h3>[property:Texture iridescenceMap]</h3>
+		<p>
+			此纹理的红色通道与 [page:.iridescence] 相乘，以实现对虹彩的每像素控制。默认值为 `null`。
+		</p>
+
+		<h3>[property:Float iridescenceIOR]</h3>
+		<p>
+			虹彩 RGB 色移效果的强度，由折射率表示。在 `1.0` 到 `2.333` 之间。
+			默认值为 `1.3`。
+		</p>
+
+		<h3>[property:Array iridescenceThicknessRange]</h3>
+		<p>
+			由 2 个元素组成的数组，指定虹彩层的最小和最大厚度。
+			虹彩层的厚度与 [page:.thickness] 对 [page:.ior] 的影响相同。默认值为 `[100, 400]`。<br />
+
+			如果未定义 [page:.iridescenceThicknessMap]，则虹彩厚度将仅使用给定数组的第二个元素。
+		</p>
+
+		<h3>[property:Texture iridescenceThicknessMap]</h3>
+		<p>
+			一种定义虹彩层厚度的纹理，存储在绿色通道中。厚度的最小值和最大值由 [page:.iridescenceThicknessRange] 数组定义：<br/>
+			<ul>
+				<li>绿色通道中的 `0.0` 将导致厚度等于数组的第一个元素。</li>
+				<li>绿色通道中的 `1.0` 将导致厚度等于数组的第二个元素。</li>
+				<li>中间的值将在数组元素之间线性插入。</li>
+			</ul>
+			默认值为 `null`。
+		</p>
+
+		<h3>[property:Float sheen]</h3>
+		<p>
+			光泽层的强度,范围是*0.0*到*1.0*。默认为*0.0*。
+		</p>
+
+		<h3>[property:Float sheenRoughness]</h3>
+		<p>
+			光泽层的粗糙度，由*0.0*到*1.0*。默认值是*1.0*。
+		</p>
+
+		<h3>[property:Texture sheenRoughnessMap]</h3>
+		<p>
+			此纹理的透明通道会与[page:.sheenRoughness]相乘，用于改变光泽层的粗糙度，默认为*null*;
+		</p>
+
+		<h3>[property:Color sheenColor]</h3>
+		<p>
+			光泽颜色，默认为*0x000000*黑色。
+		</p>
+
+		<h3>[property:Texture sheenColorMap]</h3>
+		<p>
+			此纹理的RGB通道会与[page:.sheenColor]光泽颜色相乘，最终作为光泽颜色结果，默认为*null*。
+		</p>
+
+		<h3>[property:Float specularIntensity]</h3>
+		<p>
+			用于控制非金属材质高光反射强度的浮点值。漫反射材质对应的值为0。范围从*0.0*到*1.0*。 默认值为*1.0*。
+		</p>
+
+		<h3>[property:Texture specularIntensityMap]</h3>
+		<p>
+			此纹理的alpha通道将与[page:.specularIntensity]相乘，用于逐像素地控制高光强度。默认值为*null*。
+		</p>
+
+		<h3>[property:Color specularColor]</h3>
+		<p>
+			非金属材质在垂直于法线方向观看时的高光反射颜色。默认值为*0xffffff*，白色。
+		</p>
+
+		<h3>[property:Texture specularColorMap]</h3>
+		<p>
+			此纹理的alpha通道将与[page:.specularColor]相乘，用于逐像素地控制高光颜色。默认值为*null*。
+		</p>
+
+		<h3>[property:Float thickness]</h3>
+		<p>
+			表面下体积的厚度。该值在网格的坐标空间中给出。如果该值为 *0*，则材料为薄壁。否则，材质将成为体积边界。默认值为 *0*。
+		</p>
+
+		<h3>[property:Texture thicknessMap]</h3>
+		<p>
+			定义厚度的纹理，存储在 G 通道中。这将与 [page:.thickness] 相乘。默认值为 *null*。
+		</p>
+
+		<h3>[property:Float transmission]</h3>
+		<p>
+		透光率（或者说透光性），范围从*0.0*到*1.0*。默认值是*0.0*。<br />
+
+		很薄的透明或者半透明的塑料、玻璃材质即便在几乎完全透明的情况下仍旧会保留反射的光线，透光性属性用于这种类型的材质。<br />
+
+		当透光率不为0的时候, [page:Material.opacity opacity]透明度应设置为*1*.
+		</p>
+
+		<h3>[property:Texture transmissionMap]</h3>
+		<p>
+			此纹理的红色通道会与透光性[page:.transmission]相乘最为最终的透光性结果。默认为*null*。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material] 和[page:MeshStandardMaterial]。</p>
+
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

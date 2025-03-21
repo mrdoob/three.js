@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">كائن مع عدة وظائف مساعدة للرياضيات.</p>
+
+		<h2>الطرق (Methods)</h2>
+	 
+		<h3>
+		[method:Float clamp]( [param:Float value], [param:Float min], [param:Float max] )
+		</h3>
+		<p>
+		[page:Float value] — القيمة التي يتم تثبيتها.<br />
+		[page:Float min] — الحد الأدنى.<br />
+		[page:Float max] — الحد الأقصى.<br /><br />
+	 
+		يثبت[page:Float value ] ليكون بين[page:Float min ] و
+	 [page:Float max ].
+		</p>
+	 
+		<h3>[method:Float degToRad]( [param:Float degrees] )</h3>
+		<p>تحويل الدرجات إلى راديان.</p>
+	 
+		<h3>
+		[method:Integer euclideanModulo]( [param:Integer n], [param:Integer m] )
+		</h3>
+		<p>
+		[page:Integer n]،[page:Integer m ] - أعداد صحيحة<br /><br />
+	 
+		يحسب نمط إقليدي لـ[page:Integer m ] % [page:Integer n ]، هذا
+		هو:
+		<code>( ( n % m ) + m ) % m</code>
+		</p>
+	 
+		<h3>[method:UUID generateUUID]( )</h3>
+		<p>
+		توليد
+	 	[link:https://en.wikipedia.org/wiki/Universally_unique_identifier UUID]
+		(معرف فريد عالميًا).
+		</p>
+	 
+		<h3>[method:Boolean isPowerOfTwo]( [param:Number n] )</h3>
+		<p>يعود بـ`true` إذا كان [page:Number n] قوة لـ2.</p>
+	 
+		<h3>
+		[method:Float inverseLerp]( [param:Float x], [param:Float y], [param:Float value] )
+		</h3>
+		<p>
+		[page:Float x] - نقطة البداية.<br />
+		[page:Float y] - نقطة النهاية.<br />
+		[page:Float value] - قيمة بين البداية والنهاية.<br /><br />
+	 
+		يعود بالنسبة المئوية في الفترة المغلقة `[0، 1]` للقيمة المعطاة
+		بين نقطة البداية والنهاية.
+		</p>
+	 
+		<h3>
+		[method:Float lerp]( [param:Float x], [param:Float y], [param:Float t] )
+		</h3>
+		<p>
+		[page:Float x] - نقطة البداية. <br />
+		[page:Float y] - نقطة النهاية. <br />
+		[page:Float t] - عامل التداخل في الفترة المغلقة `[0، 1]`.<br /><br />
+	 
+		يعود بقيمة[link:https://en.wikipedia.org/wiki/Linear_interpolation متداخلة خطيًا ] 
+		من نقطتين معروفتين بناءً على الفترة المعطاة -
+	 	[page:Float t ] = 0 سيعود بـ[page:Float x ] و[page:Float t ] = 1 سوف
+		يعود بـ[page:Float y ].
+		</p>
+	 
+		<h3>
+		[method:Float damp]( [param:Float x], [param:Float y], [param:Float lambda], [param:Float dt] )
+		</h3>
+		<p>
+		[page:Float x] - نقطة حالية. <br />
+		[page:Float y] - نقطة الهدف. <br />
+		[page:Float lambda] - قيمة lambda أعلى ستجعل الحركة أكثر
+		فجأة، وقيمة أقل ستجعل الحركة أكثر تدرجًا. <br />
+		[page:Float dt] - وقت دلتا بالثواني.<br /><br />
+	 
+		تداخل عدد من[page:Float x ] نحو[page:Float y ] بطريقة
+		ربيعية باستخدام[page:Float dt ] للحفاظ على حركة مستقلة عن معدل
+		الإطارات. للحصول على التفاصيل، راجع
+	 	[link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ تخميد مستقل عن معدل الإطارات باستخدام lerp].
+		</p>
+	 
+
+		<h3>
+			[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )
+		</h3>
+		<p>
+		[page:Float x] — القيمة التي يتم تعيينها.<br />
+		[page:Float a1] — الحد الأدنى للنطاق A.<br />
+		[page:Float a2] — الحد الأقصى للنطاق A.<br />
+		[page:Float b1] — الحد الأدنى للنطاق B.<br />
+		[page:Float b2] — الحد الأقصى للنطاق B.<br /><br />
+		 
+		تعيين خطي لـ[page:Float x ] من النطاق [[page:Float a1 ], [page:Float a2 ]] إلى النطاق [[page:Float b1 ], [page:Float b2 ]].
+		</p>
+		 
+		<h3>[method:Float pingpong]( [param:Float x], [param:Float length] )</h3>
+		<p>
+		[page:Float x] — القيمة التي يتم تعيينها.<br />
+		[page:Float length] — القيمة الموجبة التي ستتعامل معها الوظيفة.
+		الافتراضي هو 1.<br /><br />
+		 
+		يعود بقيمة تتبادل بين 0 و[param:Float length ].
+		</p>
+		 
+		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
+		<p>
+		يعود بأصغر قوة من 2 أكبر من أو يساوي
+		[page:Number n ].
+		</p>
+		 
+		<h3>[method:Integer floorPowerOfTwo]( [param:Number n] )</h3>
+		<p>
+		يعود بأكبر قوة من 2 أقل من أو يساوي[page:Number n ].
+		</p>
+		 
+		<h3>[method:Float radToDeg]( [param:Float radians] )</h3>
+		<p>تحويل الراديان إلى درجات.</p>
+		 
+		<h3>[method:Float randFloat]( [param:Float low], [param:Float high] )</h3>
+		<p>عشوائية عائمة في الفترة [[page:Float low ], [page:Float high ]].</p>
+		 
+		<h3>[method:Float randFloatSpread]( [param:Float range] )</h3>
+		<p>
+		عشوائية عائمة في الفترة [-[page:Float range ] / 2،[page:Float range ]
+		/ 2].
+		</p>
+		 
+		<h3>
+		[method:Integer randInt]( [param:Integer low], [param:Integer high] )
+		</h3>
+		<p>عشوائية صحيحة في الفترة [[page:Float low ],[page:Float high ]].</p>
+		 
+		<h3>[method:Float seededRandom]( [param:Integer seed] )</h3>
+		<p>
+		عشوائية زائفة محددة عائمة في الفترة `[0، 1]`. هو اختیاری
+		[page:Integer seed ].
+		</p>
+		 
+		<h3>
+			[method:Float smoothstep]( [param:Float x], [param:Float min], [param:Float max] )
+		</h3>
+		<p>
+		[page:Float x] - القيمة التي يتم تقييمها بناءً على موقعها بين الحد
+		الأدنى والأقصى. <br />
+		[page:Float min] - أي قيمة x أدنى من الحد الأدنى ستكون 0.<br />
+		[page:Float max] - أي قيمة x أعلى من الحد الأقصى ستكون 1.<br /><br />
+		 
+		يعود بقيمة بين 0-1 تمثل النسبة المئوية التي انتقلت فيها x بين الحد
+		الأدنى والأقصى، ولكن تم تجانسها أو تبطئها كلما اقترب X من
+		الحد الأدنى والأقصى.<br /><br />
+		 
+		راجع [link:http://en.wikipedia.org/wiki/Smoothstep Smoothstep] للحصول على التفاصيل.
+		</p>
+		 
+		<h3>
+		[method:Float smootherstep]( [param:Float x], [param:Float min], [param:Float max] )
+		</h3>
+		<p>
+		[page:Float x] - القيمة التي يتم تقييمها بناءً على موقعها بين الحد
+		الأدنى والأقصى. <br />
+		[page:Float min] - أي قيمة x أدنى من الحد الأدنى ستكون 0.<br />
+		[page:Float max] - أي قيمة x أعلى من الحد الأقصى ستكون 1.<br /><br />
+		 
+		يعود بقيمة بين 0-1. تغير على smoothstep
+		يحتوي على مشتقات من الطلب 1st و 2nd صفر في x=0 و x=1.
+		</p>
+		 
+		<h3>
+		[method:undefined setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )
+		</h3>
+		<p>
+		[page:Quaternion q] - رباعية لضبطها<br />
+		[page:Float a] - التدوير المطبق على المحور الأول، بالراديان <br />
+		[page:Float b] - التدوير المطبق على المحور الثاني، بالراديان
+		<br />
+		[page:Float c] - التدوير المطبق على المحور الثالث، بالراديان <br />
+		[page:String order] - سلسلة تحدد ترتيب المحاور: 'XYX'، 'XZX'،
+		'YXY'، 'YZY'، 'ZXZ'، أو 'ZYZ'<br /><br />
+		 
+		يضبط رباعية[page:Quaternion q ] من
+		[link:http://en.wikipedia.org/wiki/Euler_angles زوايا أويلر Proper intrinsic ] 
+		المعرفة بزوايا[page:Float a ]،[page:Float b ]، و[page:Float c ]، 
+		والترتیب[page:String order].<br />
+		 
+		يتم تطبیق التدویرات على المحاور بالترتیب المحدد بـ[page:String order]: 
+		يتم تطبیق التدویر بزاویة[page:Float a ] أولًا، ثم بزاویة
+		[page:Float b ]، ثم بزاویة[page:Float c ]. زوایا هی فی رادیان.
+		</p>
+		 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

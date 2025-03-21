@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			此缓冲区属性类不构造 VBO。相反，它使用在构造函数中传递的任何 VBO，以后可以通过 缓冲区属性进行更改。<br /><br />
+			它需要与 VBO 一起传递额外的参数。它们是：GL 上下文、GL 数据类型、每个顶点的组件数、每个组件的字节数和顶点数。<br /><br />
+			此类最常见的用例是当某种 GPGPU 计算干扰甚至产生有问题的 VBO 时。
+		</p>
+
+		<h2>构造方法（Constructor）</h2>
+		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count] )</h3>
+		<p>
+		*buffer* — 必须是 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer].
+		<br />
+		*type* — [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types WebGL数据类型]之一.
+		<br />
+		*itemSize* — 应与特定顶点关联的数组值的数量。例如，如果此属性存储一个3分量向量（例如位置、法线或颜色），则itemSize应为 3。
+		<br />
+		*elementSize* — 1、2 或 4。给定的相应大小（以字节为单位）“类型”参数。
+		<ul>
+			<li>gl.FLOAT: 4</li>
+			<li>gl.UNSIGNED_SHORT: 2</li>
+			<li>gl.SHORT: 2</li>
+			<li>gl.UNSIGNED_INT: 4</li>
+			<li>gl.INT: 4</li>
+			<li>gl.BYTE: 1</li>
+			<li>gl.UNSIGNED_BYTE: 1</li>
+		</ul>
+		*count* — VBO 中预期的顶点数。
+		</p>
+
+		<h2>特性（Properties）</h2>
+
+		<h3>[property:WebGLBuffer buffer]</h3>
+		<p>
+			当前[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]的实例.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			VBO 中的预期顶点数。
+		</p>
+
+		<h3>[property:Boolean isGLBufferAttribute]</h3>
+		<p>
+			只读。值永远为"true"。
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>
+			每个项目（顶点）组成多少个值。
+		</p>
+
+		<h3>[property:Integer elementSize]</h3>
+		<p>
+			存储当前类型属性值的相应大小（以字节为单位）。
+		</p>
+		<p>
+			有关已知类型大小的列表，请参见上面的（构造函数）。
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+			该attribute实例的别名，默认值为空字符串。
+		</p>
+
+		<h3>[property:GLenum type]</h3>
+		<p>
+			描述底层 VBO 内容的[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types WebGL数据类型]
+		</p>
+		<p>
+			将此属性与elementSize一起设置。推荐的方法是使用setType方法。
+		</p>
+
+		<h2>方法（Methods）</h2>
+
+		<h3>[method:this setBuffer]( buffer ) </h3>
+		<p>设置缓冲区属性。</p>
+
+		<h3>[method:this setType]( type, elementSize ) </h3>
+		<p>设置type和elementSize属性。</p>
+
+		<h3>[method:this setItemSize]( itemSize ) </h3>
+		<p>设置itemSize属性。</p>
+
+		<h3>[method:this setCount]( count ) </h3>
+		<p>设置计数属性。</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		版本号，每次将needsUpdate属性设置为true时递增。
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			默认为假。将此设置为 true 增量[page:GLBufferAttribute.version 版本]
+		</p>
+
+		<h2>源代码（Source）</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

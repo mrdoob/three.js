@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>WebGL渲染器常量（WebGLRenderer Constants）</h1>
+
+		<h2>面剔除模式</h2>
+		<code>
+		THREE.CullFaceNone
+		THREE.CullFaceBack
+		THREE.CullFaceFront
+		THREE.CullFaceFrontBack
+		</code>
+		<p>
+		[page:constant CullFaceNone] 禁用面剔除。<br />
+		[page:constant CullFaceBack] 为默认值，剔除背面。<br />
+		[page:constant CullFaceFront] 剔除正面。<br />
+		[page:constant CullFaceFrontBack] 剔除正面和背面。
+		</p>
+
+		<h2>阴影类型</h2>
+		<code>
+		THREE.BasicShadowMap
+		THREE.PCFShadowMap
+		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
+		</code>
+		<p>
+			这些常量定义了WebGLRenderer中[page:WebGLRenderer.shadowMap.type shadowMap.type]的属性。<br /><br />
+
+		[page:constant BasicShadowMap] 能够给出没有经过过滤的阴影映射 —— 速度最快，但质量最差。<br />
+		[page:constant PCFShadowMap] 为默认值，使用Percentage-Closer Filtering (PCF)算法来过滤阴影映射。<br />
+		[page:constant PCFSoftShadowMap] 和PCFShadowMap一样使用 Percentage-Closer Filtering (PCF) 算法过滤阴影映射，但在使用低分辨率阴影图时具有更好的软阴影。<br />
+		[page:constant VSMShadowMap] 使用Variance Shadow Map (VSM)算法来过滤阴影映射。当使用VSMShadowMap时，所有阴影接收者也将会投射阴影。
+		</p>
+
+		<h2>色调映射</h2>
+		<code>
+		THREE.NoToneMapping
+		THREE.LinearToneMapping
+		THREE.ReinhardToneMapping
+		THREE.CineonToneMapping
+		THREE.ACESFilmicToneMapping
+		THREE.AgXToneMapping
+		THREE.NeutralToneMapping
+		THREE.CustomToneMapping
+		</code>
+		<p>
+		这些常量定义了WebGLRenderer中[page:WebGLRenderer.toneMapping toneMapping]的属性。
+
+		这个属性用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围（HDR）效果。<br /><br />
+
+		请查看示例：[example:webgl_tonemapping WebGL / tonemapping]。
+
+		</p>
+		<p>
+			THREE.NeutralToneMapping is an implementation based on the Khronos 3D Commerce Group standard tone mapping.
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

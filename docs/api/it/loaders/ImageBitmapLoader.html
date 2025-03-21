@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Un loader per caricare un'[page:Image] come un'[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
+      Un'ImageBitmap fornisce un percorso asincrono ed efficiente in termini di risorse per preparare le texture per la 
+      visualizzazione in WebGL.<br/>
+      A differenza del [page:FileLoader], [name] non permette richieste multiple concorrenti per lo stesso URL.
+		</p>
+
+		<p>
+      Si noti che [page:Texture.flipY] e [page:Texture.premultiplyAlpha] con [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]
+      vengono ignorati. [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] necessita di queste configurazioni per la creazione 
+      di bitmap a differenza delle immagini regolari per il caricamento su GPU. È invece necessario impostare le opzioni equivalenti tramite 
+      [page:ImageBitmapLoader.setOptions]. Fare riferimento alle [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 specifiche WebGL]
+      per i dettagli.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		// istanzia un loader
+		const loader = new THREE.ImageBitmapLoader();
+
+		// imposta le opzioni se necessario
+		loader.setOptions( { imageOrientation: 'flipY' } );
+
+		// carica un'immagine
+		loader.load(
+			// URL della risorsa
+			'image.png',
+
+			// onLoad callback
+			function ( imageBitmap ) {
+				const texture = new THREE.CanvasTexture( imageBitmap );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
+			},
+
+			// la callback onProgress non è al momento supportata
+			undefined,
+
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — Il [page:LoadingManager loadingManager] del loader da utilizzare. Il valore predefinito è [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Loader] per le proprietà comuni.</p>
+
+		<h3>[property:Boolean isImageBitmapLoader]</h3>
+		<p>
+      Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:String options]</h3>
+		<p>
+      Un oggetto opzionale che imposta le opzioni per il metodo factory 
+      [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap] utilizzato 
+      internamente. Il valore predefinito è `undefined`.
+    </p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Loader] per i metodi comuni.</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — Il path o URL del file. Questo può anche essere un
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — Verrà chiamato quando il caricamento sarà completato. L'argomento sarà l'[page:Image immagine] caricata.<br />
+		[page:Function onProgress] (opzionale) — Questa funzione di callback non è al momento supportata.<br />
+		[page:Function onError] (opzionale) — Verrà chiamato in caso di errori di caricamento.<br />
+		</p>
+		<p>
+      Inizia il caricamento dall'url e restituisce l'oggetto [page:ImageBitmap immagine] che conterrà i dati.
+		</p>
+
+		<h3>[method:this setOptions]( [param:Object options] )</h3>
+		<p>
+      Imposta l'oggetto opzioni per [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

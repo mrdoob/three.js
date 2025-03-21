@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Un matériau qui mappe les vecteurs normaux aux couleurs RVB.</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshNormalMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
+		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être passée dans l'objet.
+		</p>
+
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+			La texture pour créer une carte en relief. Les valeurs de noir et blanc correspondent à la profondeur perçue par rapport aux lumières.
+			Bump n'affecte pas réellement la géométrie de l'objet, seulement l'éclairage. Si une carte normale est définie, cela sera ignoré.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>A quel point la texture en relief affecte le matériau. Les plages typiques sont 0-1. La valeur par défaut est 1.</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			La carte de déplacement affecte la position des sommets du maillage. Contrairement aux autres cartes
+			qui n'affectent que la lumière et l'ombre du matériau, les sommets déplacés peuvent projeter des ombres,
+			bloquer d'autres objets et agir autrement comme une géométrie réelle. La texture de déplacement est
+			une image sur laquelle la valeur de chaque pixel (le blanc étant le plus élevé) est mappée,
+			et repositionne, les sommets du maillage.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			Dans quelle mesure la carte de déplacement affecte le maillage (où le noir n'est pas un déplacement,
+			et le blanc est le déplacement maximal). Sans carte de déplacement, cette valeur n'est pas appliquée.
+			La valeur par défaut est `1`.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			Le décalage des valeurs de la carte de déplacement sur les sommets du maillage.
+			Le décalage est ajouté après la mise à l'échelle de la carte de déplacement.
+			Sans carte de déplacement, cette valeur n'est pas appliquée. La valeur par défaut
+			est `0`.
+		</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+			Définit si le matériau est rendu avec un ombrage plat. La valeur par défaut est false.
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			La texture pour créer une carte normale. Les valeurs RVB affectent la surface normale pour chaque fragment de pixel et changent
+			la façon dont la couleur est illuminée. Les cartes normales ne changent pas la forme réelle de la surface, seulement l'éclairage.
+			Dans le cas où le matériau a une carte normale créée en utilisant la convention "left handed", le composant y de normalScale
+			devrait être négatif pour compenser les différences de latéralité.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+			Le type de carte d'ombrage.<br /><br />
+
+			Les options sont [page:constant THREE.TangentSpaceNormalMap] (par défaut), et [page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			A quel point la carte normale affecte le matériau. Les plages typiques sont 0-1.
+			La valeur par défaut est un [page:Vector2] défini sur (1,1).
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+			Rendre la géométrie en fil de fer. La valeur par défaut est false (c'est-à-dire rendu en ombré lisse).
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Contrôle l'épaisseur du filaire. La valeur par défaut est 1.<br /><br />
+
+		A cause des limitations de [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			avec le moteur de rendu [page:WebGLRenderer WebGL] sur la plupart des plateformes, l'épaisseur de ligne (linewidth) sera toujours
+			à 1, indépendamment de la valeur définie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
+
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

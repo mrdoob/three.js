@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Audio] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Crée un objet audio positionnel.<br /><br />
+
+		La [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API] est utilisée.
+		</p>
+
+		<h2>Exemple de Code</h2>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		const listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create the PositionalAudio object (passing in the listener)
+		const sound = new THREE.PositionalAudio( listener );
+
+		// load a sound and set it as the PositionalAudio object's buffer
+		const audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
+		});
+
+		// create an object for the sound to play from
+		const sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		const material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+		const mesh = new THREE.Mesh( sphere, material );
+		scene.add( mesh );
+
+		// finally add the sound to the mesh
+		mesh.add( sound );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webaudio_orientation webaudio / orientation ]<br />
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_timing webaudio / timing ]
+		</p>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:AudioListener listener] )</h3>
+		<p>
+		listener — (requis) instance d'[page:AudioListener AudioListener].
+		</p>
+
+
+		<h2>Propriétés</h2>
+
+		<p>
+			Voir la classe [page:Audio Audio] pour les propriétés héritées.
+		</p>
+
+		<h3>[property:PannerNode panner]</h3>
+		<p>Le [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode] du PositionalAudio.</p>
+
+
+		<h2>Méthodes</h2>
+
+		<p>
+			Voir la classe [page:Audio Audio] pour les propriétés héritées.
+		</p>
+
+		<h3>[method:PannerNode getOutput]()</h3>
+		<p>
+		Renvoie le [page:PositionalAudio.panner panner].
+		</p>
+
+		<h3>[method:Float getRefDistance]()</h3>
+		<p>
+		Renvoie la valeur de [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
+		</p>
+
+		<h3>[method:this setRefDistance]( [param:Float value] )</h3>
+		<p>
+		Assigne une valeur à [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
+		</p>
+
+		<h3>[method:Float getRolloffFactor]()</h3>
+		<p>
+		Renvoie la valeur de [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
+		</p>
+
+		<h3>[method:this setRolloffFactor]( [param:Float value] )</h3>
+		<p>
+		Assigne une valeur à [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
+		</p>
+
+		<h3>[method:String getDistanceModel]()</h3>
+		<p>
+		Renvoie la valeur de [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</p>
+
+		<h3>[method:this setDistanceModel]( [param:String value] )</h3>
+		<p>
+		Assigne une valeur à [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</p>
+
+		<h3>[method:Float getMaxDistance]()</h3>
+		<p>
+		Renvoie la valeur de [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</p>
+
+		<h3>[method:this setMaxDistance]( [param:Float value] )</h3>
+		<p>
+		Assigne une valeur à [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</p>
+
+		<h3>[method:this setDirectionalCone]( [param:Float coneInnerAngle], [param:Float coneOuterAngle], [param:Float coneOuterGain] )</h3>
+		<p>
+		Cette méthode peut être utilisée pour transformer un son omnidirectionnel en un [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode son directionnel].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			ضوء ينبعث في اتجاه محدد. سيتصرف هذا الضوء كما لو كان بعيدًا لانهائيًا وأن الأشعة المنبعثة منه كلها
+			متوازية. الاستخدام الشائع لهذا هو محاكاة ضوء النهار ؛ الشمس
+			بعيد بما يكفي بحيث يمكن اعتبار موقعه لانهائيًا ، و
+			جميع أشعة الضوء القادمة منه متوازية. <br /> <br />
+			
+			يمكن لهذا الضوء إلقاء الظلال - انظر صفحة [page:DirectionalLightShadow]
+			للتفاصيل.
+		</p>
+			
+		<h2>ملاحظة حول الموقف والهدف والدوران</h2>
+		<p>
+			نقطة شائعة من الالتباس بالنسبة للأضواء الاتجاهية هي أن تحديد
+			لا يؤثر التدوير. هذا لأن DirectionalLight في three.js هو
+			ما يعادل ما يسمى بـ "Target Direct Light" في غيره
+			التطبيقات. <br /> <br />
+			
+			هذا يعني أن اتجاهه يتم حسابه كمؤشر من ضوء
+			[page:Object3D.position position] إلى [page:.target target] الموقف
+			(على عكس "Free Direct Light" التي لديها فقط دوران
+			مكون). <br /> <br />
+			
+			السبب في ذلك هو السماح للضوء بإلقاء الظلال - ال
+			[page:.shadow shadow] تحتاج الكاميرا إلى موقف لحساب الظلال
+			من. <br /> <br />
+			
+			انظر خاصية [page:.target target] أدناه للحصول على تفاصيل حول تحديث
+			الهدف.
+		</p>
+			
+		<h2>مثال للكود</h2>
+			
+		<code>
+		// ضوء اتجاهي أبيض بشدة نصفية يشرق من الأعلى.
+		const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+			
+		<h2>أمثلة (Examples)</h2>
+		<p>
+		[example:misc_controls_fly controls / fly ]<br />
+		[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+		[example:webgl_effects_stereo effects / stereo ]<br />
+		[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
+		[example:webgl_materials_bumpmap materials / bumpmap ]
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:Color color], [param:Float intensity] )</h3>
+		<p>
+		[page:Color color] - (اختياري) مثيل من Color ، سلسلة تمثل
+		لون أو رقم يمثل لونًا. <br />
+		[page:Float intensity] - (اختياري) قيمة عددية لـ
+		شدة مسبار الضوء. الافتراضي هو 1. <br /><br />
+			
+		ينشئ [name] جديدًا.
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+			
+		<p>انظر قائمة [page:Light Light] الأساسية للخصائص المشتركة.</p>
+			
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+		إذا تم تعيينه على `true` فإن الضوء سيلقي ظلالًا ديناميكية. <b>تحذير</b>: هذا هو
+		باهظ الثمن ويتطلب التلاعب لجعل الظلال تبدو صحيحة. انظر
+		[page:DirectionalLightShadow] للتفاصيل. الافتراضي هو `false`.
+		</p>
+
+		<h3>[property:Boolean isDirectionalLight]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى هو من نوع [name].</p>
+		
+		<h3>[property:Vector3 position]</h3>
+		<p>
+		يتم تعيين هذا يساوي [page:Object3D.DEFAULT_UP] (0، 1، 0) ، بحيث
+		الضوء يشرق من الأعلى إلى الأسفل.
+		</p>
+		
+		<h3>[property:DirectionalLightShadow shadow]</h3>
+		<p>
+		[page:DirectionalLightShadow] يستخدم لحساب الظلال لهذا الضوء.
+		</p>
+		
+		<h3>[property:Object3D target]</h3>
+		<p>
+		يشير DirectionalLight من [page:.position position] إلى
+		target.position. الموضع الافتراضي للهدف هو `(0، 0، 0)`. <br />
+		
+		<b>ملاحظة</b>: لتغيير موضع الهدف إلى أي شيء آخر غير
+		الافتراضي ، يجب إضافته إلى [page:Scene scene] باستخدام
+		</p>
+		<code>
+		scene.add( light.target );
+		</code>
+		<p>
+		هذا حتى يتم تحديث [page:Object3D.matrixWorld matrixWorld] الخاص بالهدف
+		تلقائيًا كل إطار. <br /><br />
+		
+		من الممكن أيضًا تعيين الهدف ليكون كائنًا آخر في المشهد
+		(أي شيء يحتوي على خاصية [page:Object3D.position position]) ، مثل:
+		</p>
+		<code>
+		const targetObject = new THREE.Object3D(); 
+		scene.add(targetObject);
+		
+		light.target = targetObject;
+		</code>
+		<p>سيتبع directionalLight الكائن الهدف الآن.</p>
+		
+		<h2>الطرق (Methods)</h2>
+		
+		<p>انظر الفئة الأساسية [page:Light Light] للطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		تحرير الموارد ذات الصلة بوحدة معالجة الرسومات التى تم تخصيصها من قبل هذه الحالة. استدعاء هذه
+		الطریقة كلما لم يعد يستخدم هذه الحال فى تطبیقك.
+		</p>
+		
+		<h3>[method:this copy]( [param:DirectionalLight source] )</h3>
+		<p>
+		ينسخ قيمة جمیع خصائص من [page:DirectionalLight source]
+		إلى هذا DirectionalLight.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

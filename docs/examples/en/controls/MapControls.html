@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:OrbitControls] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] is intended for transforming a camera over a map from bird's eye perspective.
+			The class shares its implementation with [page:OrbitControls] but uses a specific preset for mouse/touch interaction and disables screen space panning by default.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { MapControls } from 'three/addons/controls/MapControls.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const scene = new THREE.Scene();
+
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		camera.position.set( 0, 20, 100 );
+
+		const controls = new MapControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			// required if controls.enableDamping or controls.autoRotate are set to true
+			controls.update();
+
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_controls_map misc / controls / map ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			[page:Camera object]: (required) The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.<br><br>
+
+			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+		</p>
+
+		<h2>Events</h2>
+
+		<p>See the base [page:OrbitControls] class for common events.</p>
+
+		<h2>Properties</h2>
+
+		<p>See the base [page:OrbitControls] class for common properties.</p>
+
+		<h3>
+			[property:Object mouseButtons]</h3>
+		<p>
+			This object contains references to the mouse actions used by the controls.
+			<code>
+controls.mouseButtons = {
+	LEFT: THREE.MOUSE.PAN,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.ROTATE
+}
+			</code>
+		</p>
+
+		<h3>[property:Boolean screenSpacePanning]</h3>
+		<p>
+		Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
+		Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
+		Default is `false`.
+		</p>
+
+		<h3>[property:Object touches]</h3>
+		<p>
+			This object contains references to the touch actions used by the controls.
+			<code>
+controls.touches = {
+	ONE: THREE.TOUCH.PAN,
+	TWO: THREE.TOUCH.DOLLY_ROTATE
+}
+			</code>
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:OrbitControls] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/MapControls.js examples/jsm/controls/MapControls.js]
+		</p>
+	</body>
+</html>

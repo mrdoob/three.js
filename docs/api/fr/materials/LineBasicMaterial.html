@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Un matériau pour dessiner des géométries de style filaire.</p>
+
+		<h2>Exemple de code</h2>
+
+		<code>
+		const material = new THREE.LineBasicMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			linecap: 'round', //ignored by WebGLRenderer
+			linejoin:  'round' //ignored by WebGLRenderer
+		} );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]<br />
+			[example:webgl_buffergeometry_lines WebGL / buffergeometry / lines]<br />
+			[example:webgl_buffergeometry_lines_indexed WebGL / buffergeometry / lines / indexed]<br />
+			[example:webgl_decals WebGL / decals]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs]<br />
+			[example:webgl_geometry_shapes WebGL / geometry / shapes]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor]<br />
+			[example:webgl_interactive_buffergeometry WebGL / interactive / buffergeometry]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter]<br />
+			[example:webgl_lines_colors WebGL / lines / colors]<br />
+			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
+			[example:physics_ammo_rope physics / ammo / rope]
+		</p>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+
+		<p>
+		[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
+		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être passée dans l'objet.<br /><br />
+
+		L'exception est la propriété [page:Hexadecimal color], qui peut être passée comme une chaîne de caractères hexadécimale,
+		 ayant la valeur `0xffffff` (blanc) par défaut. [page:Color.set]( color ) est appelée en interne.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color], couleur du matériau, par défaut en blanc (0xffffff).</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Si le matériau est affecté par le brouillard (fog), la valeur par défaut est `true`</p>
+
+		<h3>[property:Float linewidth]</h3>
+		<p>
+			Contrôle l'épaisseur des lignes, la valeur par défaut est `1`.<br /><br />
+
+			A cause des limitations de [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			avec le moteur de rendu [page:WebGLRenderer WebGL] sur la plupart des plateformes, l'épaisseur de ligne (linewidth) sera toujours
+			à 1, indépendamment de la valeur définie.
+		</p>
+
+		<h3>[property:String linecap]</h3>
+		<p>
+			Définit l'apparence de la fin de la ligne. les valeurs possibles sont 'butt', 'round' et 'square'.
+			La valeur par défaut est 'round'.<br /><br />
+
+			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			et est ignorée par le moteur de rendu [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:String linejoin]</h3>
+		<p>
+			Définit l'apparence des jointures de lignes. Les valeurs possibles sont 'round', 'bevel' et 'miter'. La valeur par défaut est 'round'. <br /><br />
+
+			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			et est ignorée par le moteur de rendu [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			Sets the color of the lines using data from a [page:Texture].
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

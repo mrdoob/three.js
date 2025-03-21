@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>定向包围盒([name])</h1>
+
+	<p class="desc">
+		表示三维空间中的定向包围盒（OBB）。
+	</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { OBB } from 'three/addons/math/OBB.js';
+		</code>
+
+	<h2>例子</h2>
+	<p>
+		[example:webgl_math_obb]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:Vector3 center], [param:Vector3 halfSize], [param:Matrix3 rotation] )</h3>
+	<p>
+		[page:Vector3 center] — [name] 的中心。（可选）<br />
+		[page:Vector3 halfSize] — [name] 沿每个轴的正半宽范围。（可选）<br />
+		[page:Matrix3 rotation] — [name] 的旋转。（可选）
+	</p>
+	<p>
+		创建一个新的 [name]。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:Vector3 center]</h3>
+	<p>
+		[name] 的中心。默认值为 *( 0, 0, 0 )*。
+	</p>
+
+	<h3>[property:Vector3 halfSize]</h3>
+	<p>
+		[name] 沿每个轴的正半宽范围。默认值为 *( 0, 0, 0 )*。
+	</p>
+
+	<h3>[property:Matrix3 rotation]</h3>
+	<p>
+		[name] 的旋转。默认为单位矩阵。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
+	<p>
+		[page:Matrix4 matrix] — 一个 4x4 变换矩阵。
+	</p>
+	<p>
+		将给定的变换矩阵应用于此 [name]。此方法可用于将包围体与 3D 对象的世界矩阵进行转换，以保持两个实体同步。
+	</p>
+
+	<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 clampedPoint] )</h3>
+	<p>
+		[page:Vector3 point] — 应该被限制在该 [name] 范围内的点。<br />
+		[page:Matrix3 clampedPoint] — 结果将被复制到此向量中。
+	</p>
+	<p>
+		将给定点限制在该 [name] 范围内。
+	</p>
+
+	<h3>[method:OBB clone]()</h3>
+	<p>
+		创建此实例的克隆。
+	</p>
+
+	<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+	<p>
+		[page:Vector3 point] — 要测试的点。
+	</p>
+	<p>
+		给定点是否位于此 [name] 内。
+	</p>
+
+	<h3>[method:this copy]( [param:OBB obb] )</h3>
+	<p>
+		[page:OBB obb] — 要复制的 [name]。
+	</p>
+	<p>
+		将给定 [name] 的属性复制到此 [name]。
+	</p>
+
+	<h3>[method:Boolean equals]( [param:OBB obb] )</h3>
+	<p>
+		[page:OBB obb] — 要测试的 [name]。
+	</p>
+	<p>
+		给定的 [name] 是否等于此 [name]。
+	</p>
+
+	<h3>[method:this fromBox3]( [param:Box3 box3] )</h3>
+	<p>
+		[page:Box3 box3] — AABB
+	</p>
+	<p>
+		根据给定的 AABB 定义 [name]。
+	</p>
+
+	<h3>[method:Vector3 getSize]( [param:Vector3 size] )</h3>
+	<p>
+		[page:Vector3 size] — 结果将被复制到此向量中。
+	</p>
+	<p>
+		将此 [name] 的大小返回到给定向量中。
+	</p>
+
+	<h3>[method:Boolean intersectsBox3]( [param:Box3 box3] )</h3>
+	<p>
+		[page:Box3 box3] — 要测试的 AABB。
+	</p>
+	<p>
+		给定的 AABB 是否与此 [name] 相交。
+	</p>
+
+	<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+	<p>
+		[page:Sphere sphere] — 要测试的边界球体。
+	</p>
+	<p>
+		给定的边界球体是否与此 [name] 相交。
+	</p>
+
+	<h3>[method:Boolean intersectsOBB]( [param:OBB obb], [param:Number epsilon] )</h3>
+	<p>
+		[page:OBB obb] — 要测试的 [name]<br />
+		[page:Number epsilon] — 一个可选的数值，用于抵消算术错误。默认为 `Number.EPSILON`。
+	</p>
+	<p>
+		给定的 [name] 是否与此 [name] 相交。
+	</p>
+
+	<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+	<p>
+		[page:Plane plane] — 要测试的平面。
+	</p>
+	<p>
+		给定平面是否与此 [name] 相交。
+	</p>
+
+	<h3>[method:Boolean intersectsRay]( [param:Ray ray] )</h3>
+	<p>
+		[page:Ray ray] — 要测试的射线。
+	</p>
+	<p>
+		给定射线是否与此 [name] 相交。
+	</p>
+
+	<h3>[method:Vector3 intersectRay]( [param:Ray ray], [param:Vector3 intersectionPoint] )</h3>
+	<p>
+		[page:Ray ray] — 要测试的射线。<br />
+		[page:Vector3 intersectionPoint] — 结果将被复制到此向量中。
+	</p>
+	<p>
+		执行 射线/OBB 相交测试并将相交点存储到给定的 3D 向量。如果没有检测到交叉点则返回 `null`。
+	</p>
+
+	<h3>[method:this set]( [param:Vector3 center], [param:Vector3 halfSize], [param:Matrix3 rotation] )</h3>
+	<p>
+		[page:Vector3 center] — [name] 的中心。<br />
+		[page:Vector3 halfSize] — [name] 沿每个轴的正半宽范围。<br />
+		[page:Matrix3 rotation] — [name] 的旋转。
+	</p>
+	<p>
+		定义给定值的 [name]。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/OBB.js examples/jsm/math/OBB.js]
+	</p>
+</body>
+
+</html>

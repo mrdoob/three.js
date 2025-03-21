@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un polyèdre est un solide en trois dimensions à faces planes. Cette classe prendra un tableau de sommets,
+			projetez-les sur une sphère, puis divisez-les jusqu'au niveau de détail souhaité. Cette classe est utilisée
+			par [page:DodecahedronGeometry], [page:IcosahedronGeometry], [page:OctahedronGeometry],
+			et [page:TetrahedronGeometry] pour générer leurs géométries respectives.
+		</p>
+
+		<h2>Exemple de code : </h2>
+<code>
+const verticesOfCube = [
+    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+];
+
+const indicesOfFaces = [
+    2,1,0,    0,3,2,
+    0,4,7,    7,3,0,
+    0,1,5,    5,4,0,
+    1,2,6,    6,5,1,
+    2,3,7,    7,6,2,
+    4,5,6,    6,7,4
+];
+
+const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+</code>
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])</h3>
+		<p>
+		vertices — [page:Array] de points de forme [1,1,1, -1,-1,-1, ... ] <br />
+		indices — [page:Array] d'indices qui composent les faces de forme [0,1,2, 2,3,0, ... ] <br />
+		radius — [page:Float] - Rayon de la forme finale <br />
+		detail — [page:Integer] - Combien de niveaux pour subdiviser la géométrie. Plus il y a de détails, plus la forme est lisse.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

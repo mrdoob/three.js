@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:BufferAttribute] &rarr;
+
+		<h1>BufferAttribute Types</h1>
+
+		<p class="desc">
+			تتوفر في three.js تسعة أنواع من [page:BufferAttribute].
+				تتوافق هذه الموجودات مع [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#Syntax Typed Arrays] في JavaScript.
+		</p>
+
+		<code>
+		THREE.Float32BufferAttribute
+		THREE.Float16BufferAttribute 
+		THREE.Uint32BufferAttribute
+		THREE.Int32BufferAttribute 
+		THREE.Uint16BufferAttribute
+		THREE.Int16BufferAttribute 
+		THREE.Uint8ClampedBufferAttribute
+		THREE.Uint8BufferAttribute 
+		THREE.Int8BufferAttribute
+		</code>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<p>يتم استدعاء كل من الأعلاف بنفس الطريقة.</p>
+
+		<h3>
+			TypedBufferAttribute( [param:Array_or_Integer array], [param:Integer itemSize], [param:Boolean normalized] )
+		</h3>
+		<p>
+			array -- يمكن أن يكون هذا مصفوفة مكتوبة أو غير مكتوبة، أو طول الصحيح. سيتم تحويل قيمة المصفوفة إلى النوع المحدد. إذا تم توفير طول، فسيتم إنشاء TypedArray جديد، والذي سيتم تهيئته بجميع العناصر بقيم صفر.<br /><br />
+
+			itemSize -- عدد القيم التي يجب أن ترتبط بنقطة فريدة. <br /><br />
+
+			normalized -- (اختياري) يشير إلى كيفية تطابق البيانات الأساسية في الذاكرة المؤقتة مع القيم الموجودة في رمز GLSL.
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+
+		<p>انظر صفحة [page:BufferAttribute] للخصائص الموروثة.</p>
+
+		<h2>الوظائف (Methods)</h2>
+
+		<p>انظر صفحة [page:BufferAttribute] للأساليب الموروثة.</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js src/core/BufferAttribute.js]
+		</p>
+	</body>
+</html>

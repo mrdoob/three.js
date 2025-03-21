@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			فئة لتحميل [page:AnimationClip AnimationClips] بتنسيق JSON. هذا
+			يستخدم [page:FileLoader] داخليًا لتحميل الملفات.
+		</p>
+		 
+		<h2>مثال للكود</h2>
+		 
+		<code>			
+		// instantiate a loader
+		const loader = new THREE.AnimationLoader();
+	
+		// load a resource
+		loader.load(
+			// resource URL
+			'animations/animation.js',
+	
+			// onLoad callback
+			function ( animations ) {
+				// animations is an array of AnimationClips
+			},
+	
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+	
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — [page:LoadingManager loadingManager]
+		للمحمل الذي سيتم استخدامه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		ينشئ جديدًا [name].
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للخصائص المشتركة.</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للطرق المشتركة.</p>
+		 
+		<h3>
+		[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] — المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — سيتم استدعاؤه عند اكتمال التحميل. الحجة
+		ستكون المقاطع المحملة [page:AnimationClip animation].<br />
+		[page:Function onProgress] (اختياري) — سيتم استدعاؤه أثناء التقدم في التحميل
+		يتقدم. الحجة ستكون نسخة ProgressEvent، والتي
+		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
+		.[page:Integer loaded]. إذا لم يضبط الخادم رأس Content-Length
+		.[page:Integer total] سيكون 0.<br />
+		[page:Function onError] (اختياري) — سيتم استدعاؤه إذا حدث خطأ في التحميل.<br /><br />
+		ابدأ التحميل من url وأرسل المقطع المحمل إلى onLoad.
+		</p>
+		 
+		<h3>[method:Array parse]( [param:JSON json] )</h3>
+		<p>
+		[page:JSON json] — مطلوب<br /><br />
+		قم بتحليل كائن JSON وإرجاع مصفوفة من مقاطع الرسوم المتحركة. فردي
+		سيتم تحليل المقاطع في الكائن باستخدام [page:AnimationClip.parse].
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

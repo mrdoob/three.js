@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		يتم استخدام [name] داخليًا لتنفيذ تعيين الظلال مع
+		[page:PointLight]s. <br /> <br />
+		 
+		يمكن أيضًا استخدامه لتخصيص رمي الظل لكائن عن طريق تعيين
+		مثيل من [name] إلى [page:Object3D.customDistanceMaterial]. ال
+		يوضح الأمثلة التالية هذا النهج لضمان
+		أجزاء شفافة من الأشياء لا تلقي ظلالًا.
+		</p>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>[example:webgl_shadowmap_pointlight WebGL / shadowmap / pointlight]</p>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>المنشئ (Constructor)</h2>
+
+ 		<h3>[name]( [param:Object parameters] )</h3>
+ 		<p>
+ 		[page:Object parameters] - (اختياري) كائن به واحد أو أكثر
+ 		خصائص تحدد مظهر المادة. يمكن تمرير أي خاصية من
+ 		المادة (بما في ذلك أي خاصية موروثة من [page:Material]) يمكن
+ 		تمريرها هنا.
+ 		</p>
+
+ 		<h2>الخصائص (Properties)</h2>
+ 		<p>انظر فئة [page:Material] الأساسية للخصائص المشتركة.</p>
+
+ 		<h3>[property:Texture alphaMap]</h3>
+ 		<p>
+ 		خريطة الألفا هي نسيج رمادي يتحكم في التعتيم عبر
+ 		السطح (أسود: شفاف تمامًا ؛ أبيض: غير شفاف تمامًا). الافتراضية هى
+ 		null. <br /> <br />
+
+ 		يتم استخدام لون النسيج فقط ، مع تجاهل قناة الألفا إذا كانت واحدة
+ 		موجود. بالنسبة للقوام RGB و RGBA ، سيستخدم [page:WebGLRenderer WebGL] renderer
+ 		قناة اللون الأخضر عند عيّنة هذا القوام بسبب البت الإضافي
+ 		من الدقة المقدمة للأخضر في DXT-compressed وغير المضغوط RGB 565
+ 		التنسيقات. ستعمل قوام الإضاءة فقط وقوام الإضاءة / الألفا أيضًا كما هو متوقع.
+ 		</p>
+
+ 		<h3>[property:Texture displacementMap]</h3>
+ 		<p>
+ 		يؤثر خريطة التشوه على موضع رؤوس الشبكة. على عكس
+ 		الخرائط الأخرى التي تؤثر فقط على الضوء والظل من المادة
+ 		يمكن للرؤوس المشوهة أن تلقي ظلالًا ، وتحجب الأشياء الأخرى ، وغيرها
+ 		يعمل كهندسة حقيقية. نسيج التشوه هو صورة حيث القيمة
+ 		من كل بكسل (الأبيض هو الأعلى) يتم تعيينها ضد ، و
+ 		إعادة تحديد مواقع ، رؤوس الشبكة.
+ 		</p>
+
+ 		<h3>[property:Float displacementScale]</h3>
+ 		<p>
+ 		مدى تأثير خريطة التشوه على الشبكة (حيث الأسود هو لا
+ 		التشوه ، والأبيض هو التشوه الأقصى). بدون تشوه
+ 		تم تعيين خريطة ، لا يتم تطبيق هذه القيمة. الافتراضية هى 1.
+ 		</p>
+
+ 		<h3>[property:Float displacementBias]</h3>
+ 		<p>
+ 		إزاحة قيم خريطة التشوه على رؤوس شبكة المصفوفات.
+ 		بدون تعيين خريطة التشوه ، لا يتم تطبيق هذه القيمة. الافتراضية هى 0.
+ 		</p>
+
+ 		<h3>[property:Texture map]</h3>
+ 		<p>
+ 		خريطة اللون. قد يتضمن اختيارًا قناة ألفا ، عادةً مجتمعة
+ 		مع [page:Material.transparent .transparent] أو [page:Material.alphaTest .alphaTest].
+ 		الافتراضية هى null.
+ 		</p>
+
+ 		<h2>الطرق (Methods)</h2>
+ 		<p>انظر فئة [page:Material] الأساسية للطُرُق المشتركة.</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>圆柱坐标（[name]）</h1>
+
+		<p class="desc">
+			一个点的[link:https://en.wikipedia.org/wiki/Cylindrical_coordinate_system cylindrical coordinates]（圆柱坐标）。
+		</p>
+
+
+		<h2>构造器（Constructor）</h2>
+
+		<h3>[name]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
+		<p>
+		[page:Float radius] - 从原点到x-z平面上一点的距离
+		默认值为 *1.0*.<br />
+		[page:Float theta] - 在x-z平面内的逆时针角度，以z轴正方向的计算弧度。默认值为0。<br />
+		[page:Float y] - x-z平面以上的高度 默认值为 *0*.
+		</p>
+
+
+		<h2>属性（Properties）</h2>
+
+		<h3>[property:Float radius]</h3>
+
+		<h3>[property:Float theta]</h3>
+
+		<h3>[property:Float y]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Cylindrical clone]()</h3>
+		<p>
+			返回一个与当前拥有相同 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性的圆柱坐标。
+		</p>
+
+		<h3>[method:this copy]( [param:Cylindrical other] )</h3>
+		<p>
+			将传入的圆柱坐标对象的 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性赋给当前对象。
+		</p>
+
+		<h3>[method:this set]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
+		<p>设置该对象的 [page:.radius radius], [page:.theta theta]
+		和 [page:.y y] 属性。</p>
+
+		<h3>[method:this setFromVector3]( [param:Vector3 vec3] )</h3>
+		<p>
+			从 [page:Vector3 Vector3] 中取x,y,z,并调用setFromCartesianCoords来设置圆柱坐标的
+			[page:.radius radius]、[page:.theta theta] 和 [page:.y y] 的属性值。
+
+		</p>
+
+		<h3>[method:this setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			使用笛卡尔坐标来设置该圆柱坐标中 [page:.radius radius], [page:.theta theta]
+			以及 [page:.y y] 的属性值。
+		</p>
+
+		<h2>源码（Source）</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

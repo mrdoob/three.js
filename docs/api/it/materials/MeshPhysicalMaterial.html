@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:MeshStandardMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un'estenzione della classe [page:MeshStandardMaterial], che fornisce proprietà di rendering basate sulla fisica più avanzate: 
+		</p>
+
+		<ul>
+			<li>
+				<b>Clearcoat (rivestimento trasparente):</b> Alcuni materiali - come vernici per auto, fibra di carbonio
+				e superfici bagnate - richiedono uno strato trasparente e riflettente sopra un altro strato che può essere irregolare
+				o ruvido. Il rivestimento trasparente approssima questo effetto, senza la necessità di una superficie 
+				trasparente separata.
+			</li>
+			<li>
+				<b>Physically-based transparency (trasparenza fisica):</b> Una limitazione di [page:Material.opacity .opacity]
+				è che materiali molto trasparenti sono meno riflettenti. La [page:.transmission] fisica 
+				fornisce una opzione più realistica per superfici sottili e trasparenti come il vetro.
+			</li>
+			<li>
+				<b>Advanced reflectivity (riflettività avanzata):</b> Riflettività più flessibile per materiali non metallici.
+			</li>
+			<li>
+				<b>Sheen:</b> Can be used for representing cloth and fabric materials.
+			</li>
+		</ul>
+
+		<p>
+			Come risultato di queste complesse caratteristiche di ombreggiatura, MeshPhysicalMaterial
+			ha un elevato costo di prestazioni, per pixel, rispetto ad altri materiali utilizzati in three.js.
+			Molti effetti sono disabilitati per impostazione predefinita, e viene aggiunto un costo quando questi 
+			vengono abilitati. Per ottenere risultati ottimali, specificare sempre una [page:.envMap mappa ambientale]
+			quando si usa questo materiale.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Esempi</h2>
+		<p>
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
+			[example:webgl_materials_physical_transmission materials / physical / transmission]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+		Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material] e [page:MeshStandardMaterial]) può essere passata qui. <br /><br />
+
+		L'eccezione è la proprietà [page:Hexadecimal colore], la quale può essere passata come stringa
+		esadecimale e per impostazione predefinita è `0xffffff` (bianco). [page:Color.set]( color ) viene chiamato internamente.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi le classi base [page:Material] e [page:MeshStandardMaterial] per le proprietà comuni.</p>
+
+		<h3>[property:Color attenuationColor]</h3>
+		<p>
+			Il colore in cui la luce bianca si trasforma a causa dell'assorbimento quando raggiunge la distanza di attenuazione. 
+			Il valore predefinito è `bianco` (0xffffff).
+		</p>
+
+		<h3>[property:Float attenuationDistance]</h3>
+		<p>
+			Densità del mezzo, data come distanza media percorsa dalla luce nel mezzo prima di interagire con una particella.
+			Il valore è indicato nello spazio del mondo. Il valore predefinito è `0`.
+			Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space units, and must be greater than zero. Default is `Infinity`.
+		</p>
+
+		<h3>[property:Float clearcoat]</h3>
+		<p>
+			Rappresenta l'intensità dello strato di vernice trasparente, da `0.0` a `1.0`. Usare le proprietà relative al trasparente per 
+			abilitare i materiali multistrato. Il valore predefinito è `0.0`.
+		</p>
+
+		<h3>[property:Texture clearcoatMap]</h3>
+		<p>
+			Il canale rosso di questa texture è moltiplicato per [page:.clearcoat], 
+			per controllare l'intensità del rivestimento per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Texture clearcoatNormalMap]</h3>
+		<p>Può essere utilizzato per abilitare le normali indipendenti per lo strato di rivestimento trasparente. Il valore predefinito è `null`.</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>Quanto [page:.clearcoatNormalMap] influisce sullo strato di rivestimento trasparente, da `(0,0)` a `(1,1)`. Il valore predefinito è `(1,1)`.</p>
+
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p>Rugosità dello strato di rivestimento trasparente, da `0.0` a `1.0`. Il valore predefinito è `0.0`.</p>
+
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+			Il canale verde di questa texture è moltiplicato per [page:.clearcoatRoughness],
+			per controllare la rugosità del rivestimento per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p>Un oggetto della forma:
+			<code>
+{
+
+	'STANDARD': ''
+	'PHYSICAL': '',
+
+};
+			</code>
+
+			Questo viene utilizzato dal [page:WebGLRenderer] per selezionare gli shader.
+		</p>
+
+		<h3>[property:Float dispersion]</h3>
+		<p>
+			Defines the strength of the angular separation of colors (chromatic aberration) transmitting through a relatively clear volume.
+			Any value zero or larger is valid, the typical range of realistic values is `[0, 1]`.
+			Default is `0` (no dispersion).
+			This property can be only be used with transmissive objects, see [page:.transmission].
+		</p>
+
+		<h3>[property:Float ior]</h3>
+		<p>
+			Indice di rifrazione per materiali non metallici, da `1.0` a `2.333`. Il valore predefinito è `1.5`.<br />
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+			Grado di riflettività, da `0.0` a `1.0`. Il valore predefinito è `0.5`, il quale corrisponde all'indice di rifrazione di 1.5.<br />
+
+			Questo modella la riflettività dei materiali non metallici. Non ha alcun effetto quando [page:MeshStandardMaterial.metalness metalness] è `1.0`.
+		</p>
+
+		<h3>[property:Float sheen]</h3>
+		<p>
+			L'intensità dello strato di lucentezza, da `0.0` a `1.0`. Il valore predefinito è `0.0`.
+		</p>
+
+		<h3>[property:Float sheenRoughness]</h3>
+		<p>
+			Rugosità dello strato di lucentezza, da `0.0` a `1.0`. Il valore predefinito è `1.0`.
+		</p>
+
+		<h3>[property:Texture sheenRoughnessMap]</h3>
+		<p>
+			Il canale alfa di questa texture è moltiplicato per [page:.sheenRoughness],
+			per controllare la rugosità della lucentezza per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Color sheenColor]</h3>
+		<p>
+			La tinta brillante. Il valore predefinito è `0x000000`, nera.
+		</p>
+
+		<h3>[property:Texture sheenColorMap]</h3>
+		<p>
+			I canali RGB della texture sono moltiplicati per [page:.sheenColor],
+			per controllare sulla tinta per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Float specularIntensity]</h3>
+		<p>
+			Un float che ridimensiona la quantità di riflessione speculare solo per i non metalli. Quando è impostato su zero, il modello 
+			è effettivamente Lambertiano. Da `0.0` a `1.0`. Il valore predefinito è `1.0`.
+		</p>
+
+		<h3>[property:Texture specularIntensityMap]</h3>
+		<p>
+			Il canale alfa di questa texture è moltiplicato per [page:.specularIntensity],
+			per controllare l'intensità speculare per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Color specularColor]</h3>
+		<p>
+			Un [page:Color] che tinge la riflessione speculare ad incidenza normale solo per i non metalli.
+			Il valore predefinito è `0xffffff`, bianco.
+		</p>
+
+		<h3>[property:Texture specularColorMap]</h3>
+		<p>
+			I canali RGB di questa texture sono moltiplicati per [page:.specularColor],
+			per controllare il colore speculare per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Float thickness]</h3>
+		<p>
+			Lo spessore del volume sotto la superficie. Il valore è dato nello spazio delle coordinate della mesh.
+			Se il valore è 0 il materiale è a parete sottile. Altrimenti il materiale è un limite di volume. Il valore predefinito è `0`.
+		</p>
+
+		<h3>[property:Texture thicknessMap]</h3>
+		<p>
+			Una texture che definisce lo spessore, memorizzata nel canale G. Questo sarà moltiplicato per [page:.thickness].
+			Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Float transmission]</h3>
+		<p>
+			Grado di trasmissione (o trasparenza ottica), da `0.0` a `1.0`. Il valore predefinito è `0.0`.<br />
+
+			I materiali sottili, trasparenti o semitrasparenti, in plastica o in vetro rimangono ampiamente 
+			riflettenti anche se sono completamente trasmissivi. La proprietà di trasmissione può
+			essere utilizzata per modellare questi materiali.<br />
+
+			Quando la trasmissione è diversa da zero, l'[page:Material.opacity] deve essere impostata a `1`.
+		</p>
+
+		<h3>[property:Texture transmissionMap]</h3>
+		<p>
+			Il canale rosso di questa texture è moltiplicato per [page:.transmission],
+			per controllare la trasparenza ottica per pixel. Il valore predefinito è `null`.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi le classi base [page:Material] e [page:MeshStandardMaterial] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

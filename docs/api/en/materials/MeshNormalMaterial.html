@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">A material that maps the normal vectors to RGB colors.</p>
+
+		<iframe
+			id="scene"
+			src="scenes/material-browser.html#MeshNormalMaterial"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more
+			properties defining the material's appearance. Any property of the
+			material (including any property inherited from [page:Material]) can be
+			passed in here.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Material] class for common properties.</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+			The texture to create a bump map. The black and white values map to the
+			perceived depth in relation to the lights. Bump doesn't actually affect
+			the geometry of the object, only the lighting. If a normal map is defined
+			this will be ignored.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>
+			How much the bump map affects the material. Typical ranges are 0-1.
+			Default is `1`.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			The displacement map affects the position of the mesh's vertices. Unlike
+			other maps which only affect the light and shade of the material the
+			displaced vertices can cast shadows, block other objects, and otherwise
+			act as real geometry. The displacement texture is an image where the value
+			of each pixel (white being the highest) is mapped against, and
+			repositions, the vertices of the mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			How much the displacement map affects the mesh (where black is no
+			displacement, and white is maximum displacement). Without a displacement
+			map set, this value is not applied. Default is `1`.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			The offset of the displacement map's values on the mesh's vertices.
+			The bias is added to the scaled sample of the displacement map.
+			Without a displacement map set, this value is not applied. Default is `0`.
+		</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+			Define whether the material is rendered with flat shading. Default is
+			false.
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			The texture to create a normal map. The RGB values affect the surface
+			normal for each pixel fragment and change the way the color is lit. Normal
+			maps do not change the actual shape of the surface, only the lighting. In
+			case the material has a normal map authored using the left handed
+			convention, the y component of normalScale should be negated to compensate
+			for the different handedness.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+			The type of normal map.<br /><br />
+
+			Options are [page:constant THREE.TangentSpaceNormalMap] (default), and
+			[page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			How much the normal map affects the material. Typical ranges are 0-1.
+			Default is a [page:Vector2] set to (1,1).
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+			Render geometry as wireframe. Default is false (i.e. render as smooth
+			shaded).
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>
+			Controls wireframe thickness. Default is `1`.<br /><br />
+
+			Due to limitations of the
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			with the [page:WebGLRenderer WebGL] renderer on most
+			platforms linewidth will always be `1` regardless of the set value.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Material] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

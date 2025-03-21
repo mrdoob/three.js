@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una classe per il caricamento di una [page:Texture texture].
+      Utilizza internamente l'[page:ImageLoader] per caricare i file.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+
+		// utilizza immediatamente la texture per la creazione del materiale
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
+		</code>
+
+		<h2>Codice di Esempio con le Callback</h2>
+
+		<code>
+		// istanzia un loader
+		const loader = new THREE.TextureLoader();
+
+		// carica una risorsa
+		loader.load(
+			// URL della risorsa
+			'textures/land_ocean_ice_cloud_2048.jpg',
+
+			// onLoad callback
+			function ( texture ) {
+				// nell'esempio viene creato il materiale quando la texture è caricata
+				const material = new THREE.MeshBasicMaterial( {
+					map: texture
+				 } );
+			},
+
+			// la callback onProgress al momento non è supportata
+			undefined,
+
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened.' );
+			}
+		);
+		</code>
+
+		<p>
+      Si noti che la versione r84 di three.js ha eliminato il supporto per gli eventi di avanzamento di TextureLoader. 
+      Per un TextureLoader che supporti gli eventi di avanzamento, vedi [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 questo thread].
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_geometry_cube geometry / cube]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — Il [page:LoadingManager loadingManager] del loader da utilizzare. Il valore predefinito è [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Loader] per le proprietà comuni.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Loader] per i metodi comuni.</p>
+
+		<h3>[method:Texture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — Il path o URL del file. Questo può anche essere un
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] (opzionale) — Verrà chiamato quando il caricamento sarà completato. L'argomento sarà la [page:Texture texture] caricata.<br />
+		[page:Function onProgress] (opzionale) — Questa callback al momento non è supportata.<br />
+		[page:Function onError] (opzionale) — Verrà chiamato in caso di errori di caricamento.<br /><br />
+
+    Inizia il caricamento dall'url e passa la [page:Texture texture] completamente caricata al metodo onLoad.
+    Il metodo, inoltre, restituisce un nuovo oggetto texture che può essere direttamente utilizzato per la creazione del materiale.
+    Se lo fai in questo modo, la texture potrebbe apparire nella scena una volta che il processo di caricamento è terminato.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

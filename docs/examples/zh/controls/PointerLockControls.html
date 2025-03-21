@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Controls] &rarr;
+
+		<h1>指针锁定控制器（[name]）</h1>
+
+		<p class="desc">
+		该类的实现是基于[link:https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API Pointer Lock API]的。
+		对于第一人称3D游戏来说， [name] 是一个非常完美的选择。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			请参阅 [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+		</code>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const controls = new PointerLockControls( camera, document.body );
+
+		// add event listener to show/hide a UI (e.g. the game's menu)
+
+		controls.addEventListener( 'lock', function () {
+
+			menu.style.display = 'none';
+
+		} );
+
+		controls.addEventListener( 'unlock', function () {
+
+			menu.style.display = 'block';
+
+		} );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+			[page:Camera camera]: 渲染场景的摄像机。
+			</p>
+			<p>
+			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+			</p>
+			<p>
+				创建一个新的 [name] 实例。
+			</p>
+		</p>
+
+		<h2>事件</h2>
+
+		<h3>change</h3>
+		<p>
+			当用户移动鼠标时触发。
+		</p>
+
+		<h3>lock</h3>
+		<p>
+			当指针状态为 “locked” （即鼠标被捕获）时触发。
+		</p>
+
+		<h3>unlock</h3>
+		<p>
+			当指针状态为 “unlocked” （即鼠标不再被捕获）时触发。
+		</p>
+
+		<h2>属性</h2>
+
+		<p>共有属性请参见其基类[page:Controls]。</p>
+
+		<h3>[property:Boolean isLocked]</h3>
+		<p>
+			控制器是否被锁定。
+		</p>
+
+		<h3>[property:Float maxPolarAngle]</h3>
+		<p>
+			摄像机的俯仰角上限限制。范围为0到Math.PI弧度之间。默认值为Math.PI。
+		</p>
+
+		<h3>[property:Float minPolarAngle]</h3>
+		<p>
+			摄像机的俯仰角下限限制。范围为0到Math.PI弧度之间。默认值为0。
+		</p>
+
+		<h3>[property:Float pointerSpeed]</h3>
+		<p>
+			指针移动对相机旋转的影响程度的乘数。默认值为1。
+		</p>
+
+		<h2>方法</h2>
+
+		<p>共有方法请参见其基类[page:Controls]。</p>
+
+		<h3>[method:Vector3 getDirection] ( [param:Vector3 target] )</h3>
+		<p>
+			<p>
+				[page:Vector3 target]: 目标向量。
+			</p>
+			<p>
+				返回摄像机的观看方向。
+			</p>
+		</p>
+
+		<h3>[method:undefined lock] ()</h3>
+		<p>
+			激活指针锁定。
+		</p>
+
+		<h3>[method:undefined moveForward] ( [param:Number distance] )</h3>
+		<p>
+			<p>
+				[page:Number distance]: 距离（区分正负）。
+			</p>
+			<p>
+				平行于xz平面，向前移动摄像机。假定camera.up是y朝上。
+			</p>
+		</p>
+
+		<h3>[method:undefined moveRight] ( [param:Number distance] )</h3>
+		<p>
+			<p>
+				[page:Number distance]: 距离（区分正负）。
+			</p>
+			<p>
+				平行于xz平面，向侧面移动摄像机。
+			</p>
+		</p>
+
+		<h3>[method:undefined unlock] ()</h3>
+		<p>
+			退出指针锁定。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js examples/jsm/controls/PointerLockControls.js]
+		</p>
+	</body>
+</html>

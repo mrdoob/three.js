@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] is intended to modify the geometry "dissolving" the edges to give a smoother look.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and therefore must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { EdgeSplitModifier } from 'three/addons/modifiers/EdgeSplitModifier.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 );<br />
+			const modifier = new EdgeSplitModifier();<br />
+			const cutOffAngle = 0.5;<br />
+			const tryKeepNormals = false;<br />
+			<br />
+			modifier.modify( geometry, cutOffAngle, tryKeepNormals );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_modifier_edgesplit misc / modifiers / EdgeSplit ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+			Create a new [name] object.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:undefined modify]( [param:geometry], [param:cutOffAngle], [param:tryKeepNormals] )</h3>
+		<p>
+			Using interpolated vertex normals, the mesh faces will blur at the edges and appear smooth.<br />
+
+			You can control the smoothness by setting the `cutOffAngle`.<br />
+
+			To try to keep the original normals, set `tryKeepNormals` to `true`.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/modifiers/EdgeSplitModifier.js examples/jsm/modifiers/EdgeSplitModifier.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			光源的基类 - 所有其他的光类型都继承了该类描述的属性和方法。
+		</p>
+
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]( [param:Color color], [param:Float intensity] )</h3>
+		<p>
+			[page:Color color] -（可选）一个表示颜色的 Color 的实例、字符串或数字，默认为一个白色（0xffffff）的 [page:Color Color] 对象。<br />
+			[page:Float intensity] -（可选）光照强度。默认值为 1。<br /><br />
+
+			创造一个新的光源。注意，这并不是直接调用的（而是使用它的派生类）。
+		</p>
+
+		<h2>属性（Properties）</h2>
+		<p>
+			公共属性请查看基类 [page:Object3D Object3D]。
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>
+			光源的颜色。如果构造的时候没有传递，默认会创建一个新的 [page:Color] 对象并设置为白色。
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			光照的强度，或者说能量。<br />
+			强度的单位取决于光的类型。<br />
+			默认值为 `1.0`。<br />
+		</p>
+
+		<h3>[property:Boolean isLight]</h3>
+		<p>
+			只读，用于检查对象的类型是否为 [name]。
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>
+			公共方法请查看基类 [page:Object3D Object3D]。
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			释放由该实例分配的 GPU 相关资源。 当这个实例不再在你的应用中使用时，调用这个方法。
+		</p>
+
+		<h3>[method:this copy]( [param:Light source] )</h3>
+		<p>
+		从 [page:Light source] 复制 [page:.color color]、[page:.intensity intensity] 的值到当前光源对象中。
+		</p>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+			以JSON格式返回光数据。
+		</p>
+		<p>
+			meta -- 包含有元数据的对象，例如该对象的材质、纹理或图片。
+			将该light对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

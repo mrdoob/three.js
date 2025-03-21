@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+		<h1>[name]</h1>
+
+		<p class="desc">
+		تسمح لك المشاهد بتحديد ما وأين يتم تجسيده بواسطة three.js.
+		هذا هو المكان الذي تضع فيه الأشياء والأضواء والكاميرات.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]()</h3>
+		<p>إنشاء كائن مشهد جديد.</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Object background]</h3>
+		<p>
+		يحدد خلفية المشهد. الافتراضي هو `null`. المدخلات الصالحة هي:
+		</p>
+		<ul>
+			<li>[page:Color] لتحديد خلفية ملونة موحدة.</li>
+			<li>[page:Texture] لتحديد خلفية ملمس (مسطح).</li>
+			<li>
+			مكعبات القوام ([page:CubeTexture]) أو القوام المستطيلة لـ
+			تحديد صندوق سماء.
+			</li>
+		</ul>
+		ملاحظة: يتم تجاهل أي تكوينات ذات صلة بالكاميرا مثل `zoom` أو `view`.
+		 
+		<h3>[property:Float backgroundBlurriness]</h3>
+		<p>
+		يحدد ضبابية الخلفية. يؤثر فقط على خرائط البيئة
+		المعينة إلى [page:Scene.background]. الإدخال الصالح هو عدد عشري بين `0`
+		و `1`. الافتراضي هو `0`.
+		</p>
+	 
+		<h3>[property:Float backgroundIntensity]</h3>
+		<p>
+		يضعف لون الخلفية. ينطبق فقط على خلفية
+		الملمس. الافتراضي هو `1`.
+		</p>
+	 
+		<h3>[property:Texture environment]</h3>
+		<p>
+		يحدد خريطة البيئة لجميع المواد الفعلية في المشهد. ومع ذلك ،
+		ليس من الممكن الكتابة فوق نسيج موجود معين إلى
+		[page:MeshStandardMaterial.envMap]. الافتراضي هو `null`.
+		</p>
+	 
+		<h3>[property:Fog fog]</h3>
+	 
+		<p>
+		مثيل [page:Fog fog] يحدد نوع الضباب الذي يؤثر على كل شيء
+		تم تجسيده في المشهد. الافتراضي هو `null`.
+		</p>
+	 
+		<h3>[property:Boolean isScene]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معطىً من نوع [name].</p>
+	 
+		<h3>[property:Material overrideMaterial]</h3>
+	 
+		<p>
+		يجبر كل شيء في المشهد على التجسيم باستخدام المادة المحددة.
+		الافتراضي هو `null`.
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+	 
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta - كائن يحتوي على بيانات تعريفية مثل الملمس أو الصور لـ
+		scene. <br />
+		قم بتحويل المشهد إلى three.js
+		[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+	 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

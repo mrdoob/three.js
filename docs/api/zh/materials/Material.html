@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8"/>
+	<base href="../../../"/>
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css"/>
+</head>
+<body>
+<h1>材质([name])</h1>
+
+<p class="desc">材质的抽象基类。<br/><br/>
+	材质描述了对象[page:Object objects]的外观。它们的定义方式与渲染器无关，
+	因此，如果您决定使用不同的渲染器，不必重写材质。<br/><br/>
+	所有其他材质类型都继承了以下属性和方法（尽管它们可能具有不同的默认值）。
+</p>
+
+<h2>构造函数(Constructor)</h2>
+
+
+<h3>[name]()</h3>
+<p>该方法创建一个通用材质。</p>
+
+
+<h2>属性(Properties)</h2>
+
+<h3>[property:Boolean alphaHash]</h3>
+<p>
+启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPass可以有效减少噪点。
+</p>
+
+<h3>[property:Float alphaTest]</h3>
+<p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
+</p>
+
+<h3>[property:Boolean alphaToCoverage]</h3>
+<p>启用 alpha 覆盖。 只能与启用 MSAA 的上下文一起使用（意味着在创建渲染器时将抗锯齿参数 *antialias* 设置为 `true`）。
+	启用此选项将平滑剪裁平面边缘和 alphaTest 剪辑边缘上的锯齿。 默认值为 `false`。
+</p>
+
+<h3>[property:Float blendAlpha]</h3>
+<p>表示恒定混合颜色的 alpha 值。 默认值为 `0`。<br />
+	此属性仅在使用 [page:CustomBlendingEquation ConstantAlpha] 或 [page:CustomBlendingEquation OneMinusConstantAlpha] 自定义混合时有效。
+</p>
+
+<h3>[property:Color blendColor]</h3>
+<p>表示恒定混合颜色的 RGB 值。 默认值为 `0x000000`。<br />
+	此属性仅在使用 [page:CustomBlendingEquation ConstantColor] 或 [page:CustomBlendingEquation OneMinusConstantColor] 自定义混合时有效。
+</p>
+
+<h3>[property:Integer blendDst]</h3>
+<p> 混合目标。默认值为[page:CustomBlendingEquation OneMinusSrcAlphaFactor]。
+	目标因子所有可能的取值请参阅[page:CustomBlendingEquation constants]。
+	必须将材质的[page:Constant blending]设置为[page:Materials CustomBlending]才能生效。<br/>
+</p>
+
+<h3>[property:Integer blendDstAlpha]</h3>
+<p> [page:.blendDst]的透明度。 默认值为 *null*.</p>
+
+<h3>[property:Integer blendEquation]</h3>
+<p> 使用混合时所采用的混合方程式。默认值为[page:CustomBlendingEquation AddEquation]。
+	混合方程式所有可能的取值请参阅[page:CustomBlendingEquation constants]。
+	必须将材质的[page:Constant blending]设置为[page:Materials CustomBlending]才能生效。<br/>
+</p>
+
+<h3>[property:Integer blendEquationAlpha]</h3>
+<p>[page:.blendEquation] 的透明度. 默认值为 *null*.</p>
+
+<h3>[property:Blending blending]</h3>
+<p> 在使用此材质显示对象时要使用何种混合。<br/>
+	必须将其设置为[page:Materials CustomBlending]才能使用自定义[page:Constant blendSrc], [page:Constant blendDst] 或者 [page:Constant
+	blendEquation]。
+	混合模式所有可能的取值请参阅[page:Materials constants]。默认值为[page:Materials NormalBlending]。
+</p>
+
+<h3>[property:Integer blendSrc]</h3>
+<p> 混合源。默认值为[page:CustomBlendingEquation SrcAlphaFactor]。
+	源因子所有可能的取值请参阅[page:CustomBlendingEquation constants]。<br/>
+	必须将材质的[page:Constant blending]设置为[page:Materials CustomBlending]才能生效。
+</p>
+
+<h3>[property:Integer blendSrcAlpha]</h3>
+<p> [page:.blendSrc]的透明度。 默认值为 *null*.</p>
+
+<h3>[property:Boolean clipIntersection]</h3>
+<p>更改剪裁平面的行为，以便仅剪切其交叉点，而不是它们的并集。默认值为 *false*。
+</p>
+
+<h3>[property:Array clippingPlanes]</h3>
+<p>
+	用户定义的剪裁平面，在世界空间中指定为THREE.Plane对象。这些平面适用于所有使用此材质的对象。空间中与平面的有符号距离为负的点被剪裁（未渲染）。
+	这需要[page:WebGLRenderer.localClippingEnabled]为*true*。
+	示例请参阅[example:webgl_clipping_intersection WebGL / clipping /intersection]。默认值为 *null*。
+</p>
+
+<h3>[property:Boolean clipShadows]</h3>
+<p>定义是否根据此材质上指定的剪裁平面剪切阴影。默认值为 *false*。
+</p>
+
+<h3>[property:Boolean colorWrite]</h3>
+<p> 是否渲染材质的颜色。
+	这可以与网格的[page:Integer renderOrder]属性结合使用，以创建遮挡其他对象的不可见对象。默认值为*true*。
+</p>
+
+<h3>[property:Object defines]</h3>
+<p> 注入shader的自定义对象。 以键值对形式的对象传递，{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }。
+	这些键值对在顶点和片元着色器中定义。默认值为*undefined*。
+</p>
+
+<h3>[property:Integer depthFunc]</h3>
+<p> 使用何种深度函数。默认为[page:Materials LessEqualDepth]。
+	深度模式所有可能的取值请查阅[page:Materials constants]。
+</p>
+
+<h3>[property:Boolean depthTest]</h3>
+<p>是否在渲染此材质时启用深度测试。默认为 *true*。
+</p>
+
+<h3>[property:Boolean depthWrite]</h3>
+<p>渲染此材质是否对深度缓冲区有任何影响。默认为*true*。<br/><br/>
+	在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
+</p>
+
+<h3>[property:Boolean forceSinglePass]</h3>
+<p>
+决定双面透明的东西是否强制使用单通道渲染，默认为`false`。<br /><br />
+
+为了减少一些半透明物体的渲染错误，此引擎调用两次绘制来渲染渲染双面透明的东西。
+但是此方案可能会导致在某些情况下使绘制调用次数翻倍，例如渲染一些平面的植物例如草精灵之类的。
+在这些情况下，将`forceSinglePass`设置为`true`来使用单通道渲染来避免性能问题。
+</p>
+
+<h3>[property:Boolean isMaterial]</h3>
+<p>
+	检查这个对象是否为材质[name]的只读标记.
+</p>
+
+<h3>[property:Boolean stencilWrite]</h3>
+<p>
+是否对模板缓冲执行模板操作，如果执行写入或者与模板缓冲进行比较，这个值需要设置为*true*。默认为*false*。
+</p>
+
+<h3>[property:Integer stencilWriteMask]</h3>
+<p>
+写入模板缓冲区时所用的位元遮罩，默认为*0xFF*。
+</p>
+
+<h3>[property:Integer stencilFunc]</h3>
+<p>
+使用模板比较时所用的方法，默认为[page:Materials AlwaysStencilFunc]。在模板函数 [page:Materials constants] 中查看可用的值
+</p>
+
+<h3>[property:Integer stencilRef]</h3>
+<p>
+在进行模板比较或者模板操作的时候所用的基准值，默认为*0*。
+</p>
+
+<h3>[property:Integer stencilFuncMask]</h3>
+<p>
+与模板缓冲进行比较时所使用的位元遮罩，默认为*0xFF*
+</p>
+
+<h3>[property:Integer stencilFail]</h3>
+<p>
+当比较函数没有通过的时候要执行的模板操作，默认为[page:Materials KeepStencilOp]，在模板操作 [page:Materials constants] 查看可用值。
+</p>
+
+<h3>[property:Integer stencilZFail]</h3>
+<p>
+当比较函数通过了但是深度检测没有通过的时候要执行的模板操作， 默认为[page:Materials KeepStencilOp]，在模板操作 [page:Materials constants] 查看可用值。
+</p>
+
+<h3>[property:Integer stencilZPass]</h3>
+<p>
+当比较函数和深度检测都通过时要执行的模板操作，默认为[page:Materials KeepStencilOp]，在模板操作[page:Materials constants] 中查看可用值。
+</p>
+
+<h3>[property:Integer id]</h3>
+<p>此材质实例的唯一编号。</p>
+
+<h3>[property:String name]</h3>
+<p>对象的可选名称（不必是唯一的）。默认值为空字符串。</p>
+
+<h3>[property:Boolean needsUpdate]</h3>
+<p>指定需要重新编译材质。
+</p>
+
+<h3>[property:Float opacity]</h3>
+<p> 在0.0 - 1.0的范围内的浮点数，表明材质的透明度。值*0.0*表示完全透明，*1.0*表示完全不透明。<br/>
+	如果材质的[page:Boolean transparent]属性未设置为*true*，则材质将保持完全不透明，此值仅影响其颜色。
+	默认值为*1.0*。 <br/>
+
+</p>
+
+<h3>[property:Boolean polygonOffset]</h3>
+<p> 是否使用多边形偏移。默认值为*false*。这对应于WebGL的*GL_POLYGON_OFFSET_FILL*功能。
+</p>
+
+<h3>[property:Integer polygonOffsetFactor]</h3>
+<p>设置多边形偏移系数。默认值为*0*。</p>
+
+<h3>[property:Integer polygonOffsetUnits]</h3>
+<p>设置多边形偏移单位。默认值为*0*。</p>
+
+<h3>[property:String precision]</h3>
+<p> 重写此材质渲染器的默认精度。可以是"*highp*", "*mediump*" 或 "*lowp*"。默认值为*null*。
+</p>
+
+<h3>[property:Boolean premultipliedAlpha]</h3>
+<p> 是否预乘alpha（透明度）值。有关差异的示例，请参阅[Example:webgl_materials_physical_transmission WebGL / Materials / Physical / Transmission]。
+	默认值为*false*。
+</p>
+
+<h3>[property:Boolean dithering]</h3>
+<p> 是否对颜色应用抖动以消除条带的外观。默认值为 *false*。
+</p>
+
+<h3>[property:Integer shadowSide]</h3>
+<p> 定义投影的面。设置时，可以是[page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], 或[page:Materials]。默认值为 *null*。
+	 <br/>
+	如果为*null*， 则面投射阴影确定如下： <br/>
+
+<table>
+	<thead>
+	<tr>
+		<th>[page:Material.side]</th>
+		<th>Side casting shadows</th>
+	</tr>
+	</thead>
+	<tbody>
+
+	<tr>
+		<td>THREE.FrontSide</td>
+		<td>背面</td>
+	</tr>
+	<tr>
+		<td>THREE.BackSide</td>
+		<td>前面</td>
+	</tr>
+	<tr>
+		<td>THREE.DoubleSide</td>
+		<td>双面</td>
+	</tr>
+	</tbody>
+</table>
+
+
+</p>
+
+<h3>[property:Integer side]</h3>
+<p> 定义将要渲染哪一面 - 正面，背面或两者。
+	默认为[page:Materials THREE.FrontSide]。其他选项有[page:Materials THREE.BackSide] 和 [page:Materials THREE.DoubleSide]。
+</p>
+
+<h3>[property:Boolean toneMapped]</h3>
+<p>
+	定义这个材质是否会被渲染器的[page:WebGLRenderer.toneMapping toneMapping]设置所影响，默认为 *true* 。
+</p>
+
+<h3>[property:Boolean transparent]</h3>
+<p>
+	定义此材质是否透明。这对渲染有影响，因为透明对象需要特殊处理，并在非透明对象之后渲染。
+	<br/>
+	设置为true时，通过设置材质的[page:Float opacity]属性来控制材质透明的程度。<br/>
+	默认值为*false*。
+</p>
+
+<h3>[property:String type]</h3>
+<p> 值是字符串'Material'。不应该被更改，并且可以用于在场景中查找此类型的所有对象。
+</p>
+
+<h3>[property:String uuid]</h3>
+<p> 此材质实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]，会自动分配，不应该被更改。
+</p>
+
+<h3>[property:Integer version]</h3>
+<p>
+开始为0，会记录[property:Boolean needsUpdate]设置为*true*的次数。
+</p>
+
+<h3>[property:Boolean vertexColors]</h3>
+<p>
+是否使用顶点着色。默认值为false。
+此引擎支持RGB或者RGBA两种顶点颜色，取决于缓冲 attribute 使用的是三分量（RGB）还是四分量（RGBA）。
+</p>
+
+<h3>[property:Boolean visible]</h3>
+<p> 此材质是否可见。默认为*true*。
+</p>
+
+<h3>[property:Object userData]</h3>
+<p> 一个对象，可用于存储有关Material的自定义数据。它不应该包含对函数的引用，因为这些函数不会被克隆。
+</p>
+
+<h2>方法(Methods)</h2>
+
+<p>[page:EventDispatcher EventDispatcher] 方法在此类中可用。</p>
+
+<h3>[method:Material clone]( )</h3>
+<p> 返回与此材质具有相同参数的新材质。</p>
+
+<h3>[method:this copy]( [param:material material] )</h3>
+<p> 将被传入材质中的参数复制到此材质中。</p>
+
+<h3>[method:undefined dispose]()</h3>
+<p> 处理材质。材质的纹理不会被处理。需要通过[page:Texture Texture]处理。
+</p>
+
+<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
+<p> 在编译shader程序之前立即执行的可选回调。此函数使用shader源码作为参数。用于修改内置材质。
+</p>
+<p>
+和其他属性不一样的是，这个回调在[page:Material.clone .clone]()，[page:Material.copy .copy]() 和 [page:Material.toJSON .toJSON]() 中不支持。
+</p>
+<p>
+    这个回调只支持在 `WebGLRenderer` (不支持 `WebGPURenderer`)。
+</p>
+<p>
+  [example:webgl_materials_modified WebGL / materials / modified]<br />
+  [example:webgl_shadow_contact WebGL / shadow / contact]
+</p>
+
+<h3>
+	[method:undefined onBeforeRender]( [param:WebGLRenderer renderer], [param:Scene scene], [param:Camera camera], [param:BufferGeometry geometry], [param:Object3D object], [param:Group group] )
+</h3>
+<p>
+	在使用材质渲染 3D 对象之前立即执行的可选回调。
+</p>
+<p>
+	与属性不同，回调不支持 [page:Material.clone .clone]()、[page:Material.copy .copy]() 和 [page:Material.toJSON .toJSON]()。
+</p>
+<p>
+	此回调仅支持 `WebGLRenderer` (不支持 `WebGPURenderer`)。
+</p>
+
+<h3>[method:String customProgramCacheKey]()</h3>
+<p>
+当用到onBeforeCompile回调的时候，这个回调函数可以用来定义在onBeforeCompile中使用的配置项，这样three.js就可以根据这个回调返回的字符串来判定使用一个缓存的编译好的着色器代码还是根据需求重新编译一段新的着色器代码。
+</p>
+
+<p>
+例如一个onBeforeCompile回调函数包含了下面的条件语句:<br />
+
+<code>if ( black ) {
+
+	shader.fragmentShader = shader.fragmentShader.replace('gl_FragColor = vec4(1)', 'gl_FragColor = vec4(0)')
+
+}
+</code>
+
+那么 customProgramCacheKey 就可以设置为:<br />
+
+<code>material.customProgramCacheKey = function() {
+
+	return black ? '1' : '0';
+
+}
+</code>
+
+</p>
+
+<p>
+	和其他属性不一样的是，这个回调在[page:Material.clone .clone]()，[page:Material.copy .copy]() 和 [page:Material.toJSON .toJSON]() 中不支持。
+</p>
+
+<h3>[method:undefined setValues]( [param:Object values] )</h3>
+<p> values -- 具有参数的容器。
+	根据*values*设置属性。<br/>
+</p>
+
+<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+<p>
+	meta -- 包含有元数据的对象，例如该对象的纹理或图片。
+	将material对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+</p>
+
+<h2>源码(Source)</h2>
+
+<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+</body>
+</html>

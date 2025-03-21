@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Crea una curva 2D a forma di ellisse. Impostando [page:Number xRadius]
+      uguale a [page:Number yRadius] risulterà in un cerchio.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const curve = new THREE.EllipseCurve(
+			0,  0,            // ax, aY
+			10, 10,           // xRadius, yRadius
+			0,  2 * Math.PI,  // aStartAngle, aEndAngle
+			false,            // aClockwise
+			0                 // aRotation
+		);
+
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+		const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+		// Crea l'oggetto finale da aggiungere alla scena
+		const ellipse = new THREE.Line( geometry, material );
+		</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Float aX], [param:Float aY], [param:Float xRadius], [param:Float yRadius], [param:Radians aStartAngle], [param:Radians aEndAngle], [param:Boolean aClockwise], [param:Radians aRotation] )</h3>
+		<p>
+			[page:Float aX] – L'X centro dell'ellipse. Il valore predefinito è `0`.<br/>
+			[page:Float aY] – L'Y centro dell'ellipse. Il valore predefinito è `0`.<br/>
+			[page:Float xRadius] – Il raggio dell'ellisse nella direzione x. Il valore predefinito è `1`.<br/>
+			[page:Float yRadius] – Il raggio dell'ellisse nella direzione y. Il valore predefinito è `1`.<br/>
+			[page:Radians aStartAngle] – L'angolo iniziale della curva in radianti a partire dall'asse X positivo. Il valore predefinito è `0`.<br/>
+			[page:Radians aEndAngle] – L'angolo finale della curva in radianti a partire dall'asse X positivo. Il valore predefinito è `2 x Math.PI`.<br/>
+			[page:Boolean aClockwise] – Se l'ellisse è disegnata in senso orario. Il valore predefinito è `false`.<br/>
+			[page:Radians aRotation]  – L'angolo di rotazione dell'ellisse in radianti, in senso antiorario dall'asse X positivo (opzionale). Il valore predefinito è `0`.<br/><br/>
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe [page:Curve] per le proprità comuni.</p>
+
+		<h3>[property:Float aX]</h3>
+		<p>Il centro X dell'ellisse.</p>
+
+		<h3>[property:Float aY]</h3>
+		<p>Il centro Y dell'ellisse.</p>
+
+		<h3>[property:Radians xRadius]</h3>
+		<p>Il raggio dell'ellisse nella direzione x.</p>
+
+		<h3>[property:Radians yRadius]</h3>
+		<p>Il raggio dell'ellisse nella direzione y.</p>
+
+		<h3>[property:Float aStartAngle]</h3>
+		<p>L'angolo iniziale della curva in radianti a partire dal lato centrale destro.</p>
+
+		<h3>[property:Float aEndAngle]</h3>
+		<p>L'angolo finale della curva in radianti a partire dal lato centrale destro.</p>
+
+		<h3>[property:Boolean aClockwise]</h3>
+		<p>Se l'ellisse è disegnata in senso orario.</p>
+
+		<h3>[property:Float aRotation]</h3>
+		<p>L'angolo di rotazione dell'ellisse in radianti, in senso antiorario dall'asse X positivo (opzionale). Il valore predefinito è `0`.</p>
+
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe [page:Curve] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

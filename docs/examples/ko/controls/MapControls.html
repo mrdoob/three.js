@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:OrbitControls] &rarr;
+
+	<h1>[name]</h1>
+
+	<p class="desc">
+		[name]은 지도 위에서 조망자의 시각으로 카메라를 이동하기 위해 설계되었습니다.
+		이 클래스는 [page:OrbitControls]와 같은 구현을 공유하지만 특정한 마우스/터치 상호작용 프리셋을 사용하고 기본적으로 화면 공간 패닝을 비활성화합니다.
+	</p>
+
+	<h2>가져오기</h2>
+
+	<p>
+		[name]은 애드온으로서 명시적으로 가져와야 합니다.
+		[link:#manual/introduction/Installation 설치 / 애드온]을 참조하십시오.
+	</p>
+
+	<code>
+			import { MapControls } from 'three/addons/controls/MapControls.js';  
+		</code>
+
+	<h2>코드 예제</h2>
+
+	<code>
+		const renderer = new THREE.WebGLRenderer();  
+		renderer.setSize( window.innerWidth, window.innerHeight );  
+		document.body.appendChild( renderer.domElement );  
+  
+		const scene = new THREE.Scene();  
+  
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );  
+		camera.position.set( 0, 20, 100 );  
+  
+		const controls = new MapControls( camera, renderer.domElement );  
+		controls.enableDamping = true;  
+  
+		function animate() {  
+  
+			requestAnimationFrame( animate );  
+  
+			// controls.enableDamping 또는 controls.autoRotate가 true로 설정된 경우 필수  
+			controls.update();  
+  
+			renderer.render( scene, camera );  
+  
+		}  
+		</code>
+
+	<h2>예제</h2>
+
+	<p>[example:misc_controls_map misc / controls / map ]</p>
+
+	<h2>생성자</h2>
+
+	<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+	<p>
+		[page:Camera object]: (필수) 제어할 카메라입니다. 카메라는 다른 객체의 자식이어서는 안 되며, 그 객체가 스케인 자체가 아니라면 됩니다.<br><br>
+
+		[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 요소입니다.
+	</p>
+
+	<h2>이벤트</h2>
+
+	<p>공통 이벤트를 보기 위해 기본 [page:OrbitControls] 클래스를 참조하십시오.</p>
+
+	<h2>속성</h2>
+
+	<p>공통 속성을 보기 위해 기본 [page:OrbitControls] 클래스를 참조하십시오.</p>
+
+	<h3>
+		[property:Object mouseButtons]</h3>
+	<p>
+		이 객체에는 컨트롤에 의해 사용되는 마우스 동작에 대한 참조가 포함되어 있습니다.
+		<code>
+controls.mouseButtons = {  
+	LEFT: THREE.MOUSE.PAN,  
+	MIDDLE: THREE.MOUSE.DOLLY,  
+	RIGHT: THREE.MOUSE.ROTATE  
+}  
+			</code>
+	</p>
+
+	<h3>[property:Boolean screenSpacePanning]</h3>
+	<p>
+		패닝 시 카메라 위치가 어떻게 이동되는지 정의합니다. 만약 true이면, 카메라는 화면 공간에서 패닝합니다.
+		그렇지 않으면, 카메라는 카메라의 위 방향에 수직인 평면에서 패닝합니다.
+		기본값은 `false`입니다.
+	</p>
+
+	<h3>[property:Object touches]</h3>
+	<p>
+		이 객체에는 컨트롤에 의해 사용되는 터치 동작에 대한 참조가 포함되어 있습니다.
+		<code>
+controls.touches = {  
+	ONE: THREE.TOUCH.PAN,  
+	TWO: THREE.TOUCH.DOLLY_ROTATE  
+}  
+			</code>
+	</p>
+
+	<h2>메서드</h2>
+
+	<p>공통 메서드를 보기 위해 기본 [page:OrbitControls] 클래스를 참조하십시오.</p>
+
+	<h2>소스</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/MapControls.js examples/jsm/controls/MapControls.js]
+	</p>
+</body>
+
+</html>

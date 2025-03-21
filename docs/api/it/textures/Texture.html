@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Crea una texture da applicare ad una superficie o come mappa di riflessione o rifrazione.
+		</p>
+
+		<p>
+			Nota: Dopo l'utilizzo iniziale di una texture, le sue dimensioni, formato, e il tipo non possono essere cambiati.
+			Invece, chiama [page:.dispose]() sulla texture e creane una nuova.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		// carica una texture, imposta la modalità wrap per ripetere
+		const texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( 4, 4 );
+		</code>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Integer id]</h3>
+		<p>
+			Sola lettura - numero univoco per questa istanza della texture.
+		</p>
+
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questa istanza dell'oggetto.
+		Questo viene assegnato automaticamente, quindi non deve essere modificato.
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+			Nome opzionale dell'oggetto (non è necessario che sia univoco). Il valore predefinito é una stringa vuota.
+		</p>
+
+		<h3>[property:Image image]</h3>
+		<p>
+			Un oggetto immagine, tipicamente creato utilizzando il metodo [page:TextureLoader.load].
+			Questo può essere qualsiasi tipo di immagine (e.g., PNG, JPG, GIF, DDS) o video (e.g., MP4, OGG/OGV) supportato da three.js.<br /><br />
+
+			Per utilizzare il video come texture è necessario disporre di un elemento video HTML5
+			in riproduzione come sorgente per l'immagine della texture e aggiornare
+			continuamente questa texture finchè il video è in riproduzione -
+			la classe [page:VideoTexture VideoTexture] gestisce questa operazione automaticamente.
+		</p>
+
+		<h3>[property:Array mipmaps]</h3>
+		<p>
+			Array di mipmap specificate dall'utente (opzionale).
+		</p>
+
+		<h3>[property:number mapping]</h3>
+		<p>
+			Come l'immagine viene applicata all'oggetto. Un tipo di oggetto di [page:Textures THREE.UVMapping] è l'impostazione predefinita,
+			dove le coordinate U,V vengono utilizzate per applicare la mappa.<br />
+
+			Vedi la pagina [page:Textures texture constants] per altri tipi di mapping.
+		</p>
+
+		<h3>[property:Integer channel]</h3>
+		<p>
+			Lets you select the uv attribute to map the texture to. `0` for `uv`, `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
+		</p>
+
+		<h3>[property:number wrapS]</h3>
+		<p>
+			Questo definisce come la texture è wrappata orizzontalmente e corrisponde a *U* nel mapping UV.<br />
+			L'impostazione predefinita è [page:Textures THREE.ClampToEdgeWrapping], dove il bordo è fissato ai texel del bordo esterno.
+			Le altre due scelte sono [page:Textures THREE.RepeatWrapping] e [page:Textures THREE.MirroredRepeatWrapping].
+			Vedi la pagina [page:Textures texture constants] per i dettagli.
+		</p>
+
+		<h3>[property:number wrapT]</h3>
+		<p>
+			Questo definisce come la texture è wrappata verticalmente e corrisponde a *V* nel mapping UV.<br />
+			Sono disponibili le stesse scelte di [property:number wrapS].<br /><br />
+
+			NOTA: la piastrellatura delle immagini nelle texture funziona solo se le dimensioni dell'immagine sono potenze di due
+			(2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, ...) in termini di pixel.
+			Le dimensioni individuali non devono essere necessariamente uguali, ma ciascuna deve essere una potenza di due.
+		 	Questa è una limitazione di WebGL, non di three.js.
+		</p>
+
+		<h3>[property:number magFilter]</h3>
+		<p>
+			Come viene campionata la texture quando un texel copre più di un pixel. Il valore predefinito è
+		 	[page:Textures THREE.LinearFilter], che prende i quattro texel più vicini e li interpola bilinearmente.
+		 	L'altra opzione è [page:Textures THREE.NearestFilter], che utilizza il valore del texel più vicino.<br />
+		 	Vedi la pagina [page:Textures texture constants] per i dettagli.
+		</p>
+
+		<h3>[property:number minFilter]</h3>
+		<p>
+			Come viene campionata la texture quando un texel copre meno di un pixel. Il valore predefinito è
+			[page:Textures THREE.LinearMipmapLinearFilter], che utilizza il mipmapping e un filtro trilineare. <br /><br />
+
+			Vedi la pagina [page:Textures texture constants] per tutte le scelte possibili.
+		</p>
+
+		<h3>[property:number anisotropy]</h3>
+		<p>
+			Il numero di campioni prelevati lungo l'asse attravero il pixel che ha la densità di texel più alta.
+		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base,
+		a costo di utilizzare più campioni di texture. Usa [page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]()
+		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.
+		</p>
+
+		<h3>[property:number format]</h3>
+		<p>
+			Il valore predefinito è [page:Textures THREE.RGBAFormat].<br /><br />
+
+			Vedi la pagina [page:Textures texture constants] per i dettagli di altri formati.
+		</p>
+
+		<h3>[property:String internalFormat]</h3>
+		<p>
+			Il valore predefinito è ottenuto utilizzando una combinazione di [page:Texture.format .format] e
+			[page:Texture.type .type].<br />
+
+			Il formato GPU permette allo sviluppatore di specificare come i dati verranno memorizzati nella GPU.<br /><br />
+
+			Vedi la pagina [page:Textures texture constants] per i dettagli relativi a tutti i formati interni supportati.
+		</p>
+
+		<h3>[property:number type]</h3>
+		<p>
+			Questo deve corrispondere al [page:Texture.format .format]. Il valore predefinito è [page:Textures THREE.UnsignedByteType],
+			il quale sarà utilizzato per la maggior parte dei formati della texture.<br /><br />
+
+			Vedi la pagina [page:Textures texture constants] per i dettagli sugli altri formati.
+		</p>
+
+		<h3>[property:Vector2 offset]</h3>
+		<p>
+			Di quanto una singola ripetizione della texture è sfalsata dall'inizio, in ciascuna direzione U e V.
+			L'intervallo tipico è compreso tra `0.0` e `1.0`.
+		</p>
+
+		<h3>[property:Vector2 repeat]</h3>
+		<p>
+			Quante volte la texture è ripetuta sulla superficie, in ogni direzione U e V. Se la proprietà ripeat è
+			impostata su un valore maggiore di 1 in entrambe le direzioni, anche il parametro Wrap corrispondente
+			deve essere impostato su [page:Textures THREE.RepeatWrapping] o [page:Textures THREE.MirroredRepeatWrapping] per ottenere l'effetto
+			di piastrellatura desiderato.
+		</p>
+
+		<h3>[property:number rotation]</h3>
+		<p>
+			Di quanto la texture viene ruotata attorno al punto centrale, in radianti. I valori positivi sono in senso antiorario.
+			Il valore predefinito è `0`.
+		</p>
+
+		<h3>[property:Vector2 center]</h3>
+		<p>
+			Il punto attorno al quale avviene la rotazione. Un valore (0.5, 0.5) che corrisponde al centro della texture. Il
+			valore predefinito è (0, 0), in basso a sinistra.
+		</p>
+
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
+		<p>
+			Indica se aggiornare la [page:Texture.matrix .matrix] uv-transform della texture dalle proprietà della texture
+			[page:Texture.offset .offset], [page:Texture.repeat .repeat], [page:Texture.rotation .rotation], e [page:Texture.center .center].
+			Il valore predefinito è `true`.
+			Impostalo a `false` se stai specificando la matrice uv-transform direttamente.
+		</p>
+
+		<h3>[property:Matrix3 matrix]</h3>
+		<p>
+			La matrice uv-transform della texture. Aggiornata dal renderer delle proprietà della texture [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+			[page:Texture.rotation .rotation], e [page:Texture.center .center] quando la proprietà [page:Texture.matrixAutoUpdate .matrixAutoUpdate] della texture è `true`.
+			Quando la proprietà [page:Texture.matrixAutoUpdate .matrixAutoUpdate] è `false`, questa matrice deve essere impostata manualmente.
+			Il valore predefinito è la matrice identità
+		</p>
+
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+			Indica se generare mipmap (se possibile) per una texture. Il valore predefinito è `true`.
+			Impostalo a false se stai creando il mipmap manualmente.
+		</p>
+
+		<h3>[property:Boolean premultiplyAlpha]</h3>
+		<p>
+		Se impostato a `true`, il canale alfa, se presente, viene moltiplicato nei canali del colore
+		quando la texture viene caricata sulla GPU. Il valore predefinito è `false`.<br /><br />
+
+		Si noti che questa proprietà non ha effetto per [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
+		È invece necessario configurare sulla creazione di bitmap. Vedi [page:ImageBitmapLoader].
+		</p>
+
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+			Se impostato a `true`, la texture viene capovolta lungo l'asse verticale quando caricata sulla GPU. Il valore predefinito è `true`.<br /><br />
+
+			Si noti che questa proprietà non ha effetto per [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
+		È invece necessario configurare sulla creazione di bitmap. Vedi [page:ImageBitmapLoader].
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+			Il valore predefinito è 4. Specifica i requisiti di allineamento per l'inizio di ogni riga di pixel in memoria.
+			I valori consentiti sono 1 (allineamento di byte), 2 (righe allineate a byte pari), 4 (allineamento di parole)
+			e 8 (le righe iniziano su limiti di doppia parola).
+			Vedi [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei] per maggiori informazioni.
+		</p>
+
+		<h3>[property:string colorSpace]</h3>
+		<p>
+		[page:Textures THREE.NoColorSpace] è l'impostazione predefinita.
+		Vedi la pagina [page:Textures texture constants] per i dettagli su altri formati.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+			Questo inizia a `0` e conta quante volte [page:Texture.needsUpdate .needsUpdate] viene impostato a `true`.
+		</p>
+
+		<h3>[property:Function onUpdate]</h3>
+		<p>
+			Una funzione di callback, chiamata quando la texture viene aggiornata (per esempio, quando needsUpdate è stato impostato
+			a true e quindi viene utilizzata la texture).
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			Imposta questo a `true` per attivare un aggiornamento la prossima volta che viene utilizzata la texture.
+			Particolarmente importante per impostare la modalità di wrapping.
+		</p>
+
+		<h3>[property:Object userData]</h3>
+		<p>
+			Un oggetto che può essere utilizzato per memorizzare dati personalizzati della texture.
+			Non deve contenere riferimenti a funzioni poiché queste non verranno clonate.
+		</p>
+
+		<h3>[property:Source source]</h3>
+		<p>
+			La definizione dei dati di una texture. Un riferimento alla sorgente dati può essere condiviso tra le texture.
+			Questo è spesso utile nel contesto di spritesheets in cui più texture rendono gli stessi dati ma con diverse trasformazioni di texture.
+		</p>
+
+		<h2>Metodi</h2>
+
+		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili su questa classe.</p>
+
+		<h3>[method:undefined updateMatrix]()</h3>
+		<p>
+			Aggiorna la [page:Texture.matrix .matrix] uv-transform della texture dalle proprietà della texture
+			[page:Texture.offset .offset], [page:Texture.repeat .repeat], [page:Texture.rotation .rotation], e [page:Texture.center .center].
+		</p>
+
+		<h3>[method:Texture clone]()</h3>
+		<p>
+			Crea una copia della texture. Si noti che non è una "copia profonda", l'immagine è condivisa.
+			Inoltre, la clonazione della texture non la contrassegna automaticamente per il caricamento di una texture.
+			Devi impostare [page:Texture.needsUpdate .needsUpdate] a true non appena la sua proprietà dell'immagine
+			(l'origine dati) è completamente caricata o pronta.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- oggetto opzionale contenente i metadati.<br />
+		Converte l'origine dati nel [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 formato JSON Oggetto/Scena] di three.js.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Libera le risorse relative alla GPU allocate da questa istanza.
+			Chiama questo metodo ogni volta che questa istanza non viene più utilizzata dall'applicazione.
+		</p>
+
+		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>
+		<p>
+			Trasforma l'uv in base al valore delle proprietà [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+			[page:Texture.wrapS .wrapS], [page:Texture.wrapT .wrapT] e [page:Texture.flipY .flipY].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

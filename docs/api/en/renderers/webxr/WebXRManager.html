@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class represents an abstraction of the WebXR Device API and is
+			internally used by [page:WebGLRenderer]. [name] also provides a public
+			interface that allows users to enable/disable XR and perform XR related
+			tasks like for instance retrieving controllers.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean cameraAutoUpdate]</h3>
+		<p>
+			Whether the manager's XR camera should be automatically updated or not.
+			Default is `true`.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			This flag notifies the renderer to be ready for XR rendering. Default is
+			`false`. Set it to `true` if you are going to use XR in your app.
+		</p>
+
+		<h3>[property:Boolean isPresenting]</h3>
+		<p>
+			Whether XR presentation is active or not. Default is `false`. This flag is
+			read-only and automatically set by [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:ArrayCamera getCamera]()</h3>
+		<p>
+			Returns an instance of [page:ArrayCamera] which represents the XR camera
+			of the active XR session. For each view it holds a separate camera object
+			in its [page:ArrayCamera.cameras cameras] property.
+		</p>
+		<p>
+			The camera's `fov` is currently not used and does not reflect the fov of
+			the XR camera. If you need the fov on app level, you have to compute in
+			manually from the XR camera's projection matrices.
+		</p>
+
+		<h3>[method:Group getController]( [param:Integer index] )</h3>
+		<p>
+			[page:Integer index] — The index of the controller. <br /><br />
+
+			Returns a [page:Group] representing the so called *target ray* space of
+			the XR controller. Use this space for visualizing 3D objects that support
+			the user in pointing tasks like UI interaction.
+		</p>
+
+		<h3>[method:Group getControllerGrip]( [param:Integer index] )</h3>
+		<p>
+			[page:Integer index] — The index of the controller. <br /><br />
+
+			Returns a [page:Group] representing the so called `grip` space of the XR
+			controller. Use this space if the user is going to hold other 3D objects
+			like a lightsaber.
+		</p>
+
+		<p>
+			Note: If you want to show something in the user's hand AND offer a
+			pointing ray at the same time, you'll want to attached the handheld object
+			to the group returned by [page:.getControllerGrip]() and the ray to the
+			group returned by [page:.getController](). The idea is to have two
+			different groups in two different coordinate spaces for the same WebXR
+			controller.
+		</p>
+
+		<h3>[method:Float getFoveation]()</h3>
+		<p>
+			Returns the amount of foveation used by the XR compositor for the
+			projection layer.
+		</p>
+
+		<h3>[method:Group getHand]( [param:Integer index] )</h3>
+		<p>
+			[page:Integer index] — The index of the controller. <br /><br />
+
+			Returns a [page:Group] representing the so called `hand` or `joint` space
+			of the XR controller. Use this space for visualizing the user's hands when
+			no physical controllers are used.
+		</p>
+
+		<h3>[method:String getReferenceSpace]()</h3>
+		<p>Returns the reference space.</p>
+
+		<h3>[method:XRSession getSession]()</h3>
+		<p>
+			Returns the `XRSession` object which allows a more fine-grained management
+			of active WebXR sessions on application level.
+		</p>
+
+		<h3>[method:undefined setFoveation]( [param:Float foveation] )</h3>
+		<p>
+			[page:Float foveation] — The foveation to set.<br /><br />
+
+			Specifies the amount of foveation used by the XR compositor for the layer.
+			Must be a value between `0` and `1`.
+		</p>
+
+		<h3>
+			[method:undefined setFramebufferScaleFactor]( [param:Float framebufferScaleFactor] )
+		</h3>
+		<p>
+			[page:Float framebufferScaleFactor] — The framebuffer scale factor to
+			set.<br /><br />
+
+			Specifies the scaling factor to use when determining the size of the
+			framebuffer when rendering to a XR device. The value is relative to the
+			default XR device display resolution. Default is `1`. A value of `0.5`
+			would specify a framebuffer with 50% of the display's native resolution.
+		</p>
+
+		<p>
+			Note: It is not possible to change the framebuffer scale factor while
+			presenting XR content.
+		</p>
+
+		<h3>
+			[method:undefined setReferenceSpace]( [param:XRReferenceSpace referenceSpace] )
+		</h3>
+		<p>
+			[page:XRReferenceSpace referenceSpace] — A custom reference space.<br /><br />
+
+			Can be used to configure a custom reference space which overwrites the
+			default reference space.
+		</p>
+
+		<h3>
+			[method:undefined setReferenceSpaceType]( [param:String referenceSpaceType] )
+		</h3>
+		<p>
+			[page:String referenceSpaceType] — The reference space type to set.<br /><br />
+
+			Can be used to configure a spatial relationship with the user's physical
+			environment. Depending on how the user moves in 3D space, setting an
+			appropriate reference space can improve tracking. Default is
+			`local-floor`. Please check out the
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/XRReferenceSpaceType MDN] 
+			for possible values and their use cases.
+		</p>
+
+		<h3>[method:undefined updateCamera]( [param:PerspectiveCamera camera] )</h3>
+		<p>
+			Updates the state of the XR camera. Use this method on app level if you
+			set [page:.cameraAutoUpdate] to `false`. The method requires the non-XR
+			camera of the scene as a parameter. The passed in camera's transformation
+			is automatically adjusted to the position of the XR camera when calling
+			this method.
+		</p>
+
+		<p>
+			Note: It is not possible to change the reference space type while
+			presenting XR content.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>OBJ导出器([name])</h1>
+
+	<p class="desc">
+		一个用于 [link:https://en.wikipedia.org/wiki/Wavefront_.obj_file OBJ] 文件格式的导出器。
+		<br /><br />
+		[name] 不能将材质数据导出到 MTL 文件中，因此仅支持几何数据。
+	</p>
+
+	<h2>导入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// Instantiate an exporter
+		const exporter = new OBJExporter();
+
+		// Parse the input and generate the OBJ output
+		const data = exporter.parse( scene );
+		downloadFile( data );
+		</code>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]()</h3>
+	<p>
+	</p>
+	<p>
+		创建一个新的 [name] 实例。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:String parse]( [param:Object3D object] )</h3>
+	<p>
+		[page:Object object] — 要导出的 Object3D。
+	</p>
+	<p>
+		生成包含 OBJ 数据的字符串。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/OBJExporter.js examples/jsm/exporters/OBJExporter.js]
+	</p>
+</body>
+
+</html>

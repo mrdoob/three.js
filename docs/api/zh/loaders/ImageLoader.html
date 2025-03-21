@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			用来加载一个[page:Image]的加载器。
+			内部使用[page:FileLoader]来加载文件，并被
+			[page:CubeTextureLoader]、[page:ObjectLoader]、[page:TextureLoader]所使用。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// 初始化一个加载器
+		const loader = new THREE.ImageLoader();
+
+		// 加载一个图片资源
+		loader.load(
+			// 资源URL
+			'image.png',
+
+			// onLoad回调
+			function ( image ) {
+				// use the image, e.g. draw part of it on a canvas
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( '2d' );
+				context.drawImage( image, 100, 100 );
+			},
+
+			// 目前暂不支持onProgress的回调
+			undefined,
+
+			// onError回调
+			function () {
+				console.error( 'An error happened.' );
+			}
+		);
+		</code>
+
+		<p>
+		请注意three.js r84遗弃了ImageLoader进度事件. 对于支持进度事件的ImageLoader
+		请参考[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639 this thread].
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_obj WebGL / loader / obj]<br />
+			[example:webgl_shaders_ocean WebGL / shaders / ocean]
+		</p>
+
+		<h2>构造方法</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]，默认为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:HTMLImageElement load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 文件的URL或者路径，也可以为
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] —加载完成时将调用。回调参数为将要加载的[page:Image image]。<br />
+		[page:Function onProgress] — 此回调函数暂时不支持。<br />
+		[page:Function onError] — 在加载错误时被调用。<br />
+		</p>
+		<p>
+			从URL中进行加载，并返回将包含数据的[page:Image image]对象。
+		</p>
+
+		<h2>源</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

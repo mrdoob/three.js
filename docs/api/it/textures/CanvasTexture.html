@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Crea una texture da un elemento canvas.<br /><br />
+
+			Questa classe è quasi la stessa cosa della classe [page:Texture Texture], tranne per il fatto che imposta 
+			[page:Texture.needsUpdate needsUpdate] a `true` immediatamente.
+		</p>
+
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:HTMLElement canvas], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
+		<p>
+		[page:HTMLElement canvas] -- L'elemento canvas HTML dal quale caricare la texture. <br />
+
+		[page:Constant mapping] --  Come l'immagine viene applicata all'oggetto. Un tipo di oggetto di [page:Textures THREE.UVMapping].
+		Vedi [page:Textures mapping constants] per altre scelte.<br />
+
+		[page:Constant wrapS] -- L'impostazione predefinita è [page:Textures THREE.ClampToEdgeWrapping].
+		Vedi [page:Textures wrap mode constants] per altre scelte.<br />
+
+		[page:Constant wrapT] -- L'impostazione predefinita è [page:Textures THREE.ClampToEdgeWrapping].
+		Vedi [page:Textures wrap mode constants] per altre scelte.<br />
+
+		[page:Constant magFilter] -- Come viene campionata la texture quando un texel copre più di un pixel.
+		L'impostazione predefinita è [page:Textures THREE.LinearFilter]. Vedi [page:Textures magnification filter constants] per altre scelte.<br />
+
+		[page:Constant minFilter] -- Come viene campionata la texture quando un texel copre meno di un pixel.
+		L'impostazione predefinita è [page:Textures THREE.LinearMipmapLinearFilter]. Vedi [page:Textures minification filter constants] per altre scelte.<br />
+
+    [page:Constant format] -- Il formato utilizzato nella texture.
+		Vedi [page:Textures format constants] per altre scelte.<br />
+
+    [page:Constant type] -- L'impostazione predefinita è [page:Textures THREE.UnsignedByteType].
+		Vedi [page:Textures type constants] per altre scelte.<br />
+
+		[page:Number anisotropy] -- Il numero di campioni prelevati lungo l'asse attravero il pixel che ha la densità di texel più alta.
+		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base, 
+		a costo di utilizzare più campioni di texture. Usa [page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 
+		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.<br /><br />
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<p>
+    Vedi la classe base [page:Texture Texture] per le proprietà comuni.
+    </p>
+
+		<h3>[property:Boolean isCanvasTexture]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+
+		<p>
+			True per impostazione predefinita. Ciò è necessario affinchè i dati della texture vengano caricati.
+		</p>
+
+		<h2>Metodi</h2>
+
+    <p>
+			Vedi la classe base [page:Texture Texture] per i metodi comuni.
+    </p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

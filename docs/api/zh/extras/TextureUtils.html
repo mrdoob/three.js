@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">包含纹理实用函数的类。</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Texture contain]( [param:Texture texture], [param:Number aspect] )</h3>
+		<p>
+			在不裁剪或拉伸纹理的情况下，将纹理在其表面内缩放到尽可能大。该方法保留了纹理的原始纵横比。类似于 CSS 中的 `object-fit: contain`。
+		</p>
+
+		<h3>[method:Texture cover]( [param:Texture texture], [param:Number aspect] )</h3>
+		<p>
+			将纹理缩放到尽可能小的尺寸以填充表面，不留空白。该方法保留了纹理的原始纵横比。类似于 CSS 中的 `object-fit: cover`。
+		</p>
+
+		<h3>[method:Texture fill]( [param:Texture texture] )</h3>
+		<p>
+			将纹理配置为默认转换。类似于 CSS 中的 `object-fit: fill`。
+		</p>
+
+		<h3>[method:Number getByteLength]( [param:Number width], [param:Number height], [param:Number format], [param:Number type] )</h3>
+		<p>
+			给定纹理的宽度、高度、格式和类型。确定必须使用多少个字节来表示纹理。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

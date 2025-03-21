@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un osso che è parte di uno [page:Skeleton Scheletro]. Lo scheletro a sua volta viene 
+			utilizzato da [page:SkinnedMesh]. Le ossa sono quasi identiche ad un [page:Object3D] vuoto.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const root = new THREE.Bone();
+		const child = new THREE.Bone();
+
+		root.add( child );
+		child.position.y = 5;
+		</code>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( )</h3>
+		<p>
+		Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Object3D] per le proprietà comuni.</p>
+
+		<h3>[property:Boolean isBone]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+
+		<h3>[property:String type]</h3>
+		<p>Impostato su 'Bone', può essere utilizzato per trovare tutte le ossa in una scena.</p>
+
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
