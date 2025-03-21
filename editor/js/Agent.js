@@ -62,6 +62,37 @@ class Agent {
 
 	createUI() {
 
+		// Create message bubble
+		const messageBubble = document.createElement( 'div' );
+		messageBubble.style.display = 'none';
+		messageBubble.style.padding = '8px 12px';
+		messageBubble.style.borderRadius = '4px';
+		messageBubble.style.marginBottom = '8px';
+		messageBubble.style.fontSize = '14px';
+		messageBubble.style.position = 'relative';
+
+		// Add message container first
+		const messageContainer = document.createElement( 'div' );
+		messageContainer.className = 'message-text';
+		messageContainer.style.marginRight = '20px'; // Make space for the close button
+		messageContainer.style.whiteSpace = 'pre-wrap';
+		messageBubble.appendChild( messageContainer );
+
+		// Add close button
+		const closeButton = document.createElement( 'div' );
+		closeButton.innerHTML = '×';
+		closeButton.style.position = 'absolute';
+		closeButton.style.top = '8px';
+		closeButton.style.right = '8px';
+		closeButton.style.cursor = 'pointer';
+		closeButton.style.fontSize = '18px';
+		closeButton.style.lineHeight = '14px';
+		closeButton.style.zIndex = '1';
+		closeButton.onclick = () => {
+			messageBubble.style.display = 'none';
+		};
+		messageBubble.appendChild( closeButton );
+
 		// Create input area
 		const input = document.createElement( 'textarea' );
 		input.placeholder = 'What do you want to do?';
@@ -111,23 +142,51 @@ class Agent {
 		button.addEventListener( 'click', executeQuery );
 
 		// Append elements
+		this.dom.appendChild( messageBubble );
 		this.dom.appendChild( input );
 		this.dom.appendChild( button );
 
+		// Store references
+		this.messageBubble = messageBubble;
+	}
+
+	showError( message ) {
+		this.showMessage( message, 'error' );
+	}
+
+	showMessage( message, type = 'normal' ) {
+		// Get the message container
+		const messageContainer = this.messageBubble.querySelector( '.message-text' );
+		const closeButton = this.messageBubble.querySelector( 'div:last-child' );
+
+		// Set styles based on message type
+		if ( type === 'error' ) {
+			this.messageBubble.style.backgroundColor = '#ffebee';
+			this.messageBubble.style.color = '#d32f2f';
+			closeButton.style.color = '#d32f2f';
+		} else {
+			this.messageBubble.style.backgroundColor = '#e8f5e9';
+			this.messageBubble.style.color = '#2e7d32';
+			closeButton.style.color = '#2e7d32';
+		}
+
+		// Update message text
+		messageContainer.textContent = message;
+		this.messageBubble.style.display = 'block';
 	}
 
 	async init() {
 
-		// Initialize Google AI
-			const ai = new GoogleGenAI( { apiKey: 'GEMINI_API_KEY' } );
+			// Initialize Google AI
+			const ai = new GoogleGenAI( { apiKey: 'AIzaSyCFpCy19tslP3VeSLAPUM-zQjz6Ka9g5no' } );
 
-		// Get scene information
-		const sceneInfo = this.getSceneInfo();
+			// Get scene information
+			const sceneInfo = this.getSceneInfo();
 
-		// Prepare prompt
+			// Prepare prompt
 		const systemPrompt = `You are a Three.js scene manipulation assistant. Current scene info:
 		
-		${JSON.stringify( sceneInfo, null, 2 )}
+			${JSON.stringify( sceneInfo, null, 2 )}
 
 		Available commands:
 		- AddObject: Add a new object to the scene
@@ -179,8 +238,13 @@ class Agent {
 		- SetMaterialValue: Set material property value
 			Parameters:
 				- object: name of the object (optional - defaults to last modified object)
-				- property: material property to set (e.g. "wireframe")
-				- value: value to set
+				- property: material property to set (e.g. "metalness", "roughness", "wireframe", "transparent", "opacity")
+				- value: value to set (numbers between 0-1 for metalness/roughness/opacity, true/false for wireframe/transparent)
+			Example: Make metallic = { property: "metalness", value: 1.0 }
+			Example: Make rough = { property: "roughness", value: 1.0 }
+			Example: Make reflective = Use MultiCmds to set both metalness=1.0 and roughness=0.0
+			Example: Make transparent = { property: "transparent", value: true, opacity: 0.5 }
+			Note: For reflective surfaces, combine metalness=1.0 with roughness=0.0 using MultiCmds
 		- SetRotation: Set object rotation
 			Parameters:
 				- object: name of the object (optional - defaults to last modified object)
@@ -367,6 +431,8 @@ class Agent {
 
 			const response = await this.chat.sendMessage( { message: query } );
 
+			console.log( 'RESPONSE:', response.text );
+
 			let responseData;
 
 			try {
@@ -396,8 +462,9 @@ class Agent {
 
 			} catch ( e ) {
 
-				console.error( 'AGENT: Failed to parse AI response as JSON:', e );
-				console.error( 'AGENT: Raw response:', response.text );
+				// console.error( 'AGENT: Failed to parse AI response as JSON:', e );
+				// console.error( 'AGENT: Raw response:', response.text );
+				this.showError( response.text );
 				return;
 
 			}
@@ -412,18 +479,22 @@ class Agent {
 				} catch ( e ) {
 
 					console.error( 'AGENT: Failed to execute commands:', e );
+					this.showError( 'Failed to execute command: ' + e.message );
+					return;
 
 				}
 
 			}
 
 			// Log the response
-			console.log( 'AGENT:', responseData.response );
+			// console.log( 'AGENT:', responseData.response );
 			this.signals.agentResponse.dispatch( responseData.response );
+			this.showMessage( responseData.response );
 
 		} catch ( error ) {
 
 			console.error( 'AGENT: Agent error:', error );
+			this.showError( 'Agent error: ' + error.message );
 
 		}
 
@@ -663,8 +734,23 @@ class Agent {
 
 				if ( materialObject && materialObject.material && commandData.params.property ) {
 
-					const value = commandData.params.value ?? true;
-					command = new Commands.SetMaterialValueCommand( this.editor, materialObject, commandData.params.property, value );
+					const property = commandData.params.property;
+					let value = commandData.params.value;
+
+					// Handle special cases for certain property types
+					if ( property.includes( 'map' ) && value === null ) {
+
+						// Handle removing textures
+						value = null;
+
+					} else if ( typeof value === 'string' && !isNaN( value ) ) {
+
+						// Convert numeric strings to numbers
+						value = parseFloat( value );
+
+					}
+
+					command = new Commands.SetMaterialValueCommand( this.editor, materialObject, property, value );
 
 				}
 
@@ -811,11 +897,11 @@ class Agent {
 		} );
 
 		const objects = scene.children.map( obj => ( {
-			type: obj.type,
-			name: obj.name,
+				type: obj.type,
+				name: obj.name,
 			baseName: obj.name.replace( /\d+$/, '' ), // Add base name
-			position: obj.position,
-			rotation: obj.rotation,
+				position: obj.position,
+				rotation: obj.rotation,
 			scale: obj.scale,
 			isMesh: obj.isMesh,
 			isLight: obj.isLight,
