@@ -25574,7 +25574,7 @@ class InstancedMesh extends Mesh {
 	 * {@link InstancedMesh#instanceMatrix} to `true` after updating all the colors.
 	 *
 	 * @param {number} index - The instance index.
-	 * @param {Matrix4} matrix - The local transformation.
+	 * @param {Matrix4} matrix - The the local transformation.
 	 */
 	setMatrixAt( index, matrix ) {
 
@@ -26705,7 +26705,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Validates the instance defined by the given ID.
 	 *
-	 * @param {number} instanceId - The instance to validate.
+	 * @param {number} instanceId - The the instance to validate.
 	 */
 	validateInstanceId( instanceId ) {
 
@@ -26721,7 +26721,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Validates the geometry defined by the given ID.
 	 *
-	 * @param {number} geometryId - The geometry to validate.
+	 * @param {number} geometryId - The the geometry to validate.
 	 */
 	validateGeometryId( geometryId ) {
 
@@ -34009,7 +34009,7 @@ function compareXYSlope(a, b) {
     return result;
 }
 
-// find a bridge between vertices that connects hole with an outer ring and link it
+// find a bridge between vertices that connects hole with an outer ring and and link it
 function eliminateHole(hole, outerNode) {
     const bridge = findHoleBridge(hole, outerNode);
     if (!bridge) {
@@ -42831,7 +42831,7 @@ class Loader {
 	load( /* url, onLoad, onProgress, onError */ ) {}
 
 	/**
-	 * An async version of {@link Loader#load}.
+	 * A async version of {@link Loader#load}.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded.
 	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.

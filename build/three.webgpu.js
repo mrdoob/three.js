@@ -2638,7 +2638,7 @@ class InputNode extends Node {
 	/**
 	 * Constructs a new input node.
 	 *
-	 * @param {any} value - The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+	 * @param {any} value - The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
 	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
 	 */
 	constructor( value, nodeType = null ) {
@@ -2655,7 +2655,7 @@ class InputNode extends Node {
 		this.isInputNode = true;
 
 		/**
-		 * The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+		 * The value of this node. This can be a any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
 		 *
 		 * @type {any}
 		 */
@@ -6212,7 +6212,7 @@ const saturate = ( value ) => clamp( value );
  * @function
  * @param {Node<vec2|vec3|vec4>} I - The incident vector.
  * @param {Node<vec2|vec3|vec4>} N - The normal vector.
- * @param {Node<float>} eta - The ratio of indices of refraction.
+ * @param {Node<float>} eta - The the ratio of indices of refraction.
  * @returns {Node<vec2|vec3|vec4>}
  */
 const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT );
@@ -41005,11 +41005,11 @@ class NodeBuilderState {
 	}
 
 	/**
-	 * This method is used to create an array of bind groups based
+	 * This method is used to create a array of bind groups based
 	 * on the existing bind groups of this state. Shared groups are
 	 * not cloned.
 	 *
-	 * @return {Array<BindGroup>} An array of bind groups.
+	 * @return {Array<BindGroup>} A array of bind groups.
 	 */
 	createBindings() {
 
@@ -63869,7 +63869,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	/**
 	 * Generates a WGSL variable that holds the texture dimension of the given texture.
-	 * It also returns information about the number of layers (elements) of an arrayed
+	 * It also returns information about the the number of layers (elements) of an arrayed
 	 * texture as well as the cube face count of cube textures.
 	 *
 	 * @param {Texture} texture - The texture to generate the function for.
