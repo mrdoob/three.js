@@ -162,9 +162,12 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
-			function cleanPoints( points ) {
+			/**Merges index-adjacent points that are within a threshold distance of each other. Array is modified in-place. Threshold distance is empirical, and scaled based on the magnitude of point coordinates.
+			 * @param {Array<Vector2>} points
+			*/
+			function mergeOverlappingPoints( points ) {
 
-				const THRESHOLD = 0.0002;
+				const THRESHOLD = 1e-10;
 				const THRESHOLD_SQ = THRESHOLD * THRESHOLD;
 				let prevPos = points[ 0 ];
 				for ( let i = 1; i <= points.length; i ++ ) {
@@ -175,10 +178,16 @@ class ExtrudeGeometry extends BufferGeometry {
 					const dy = currentPos.y - prevPos.y;
 					const distSq = dx * dx + dy * dy;
 
-					if ( distSq <= THRESHOLD_SQ ) {
+					const scalingFactorSqrt = Math.max(
+						Math.abs( currentPos.x ),
+						Math.abs( currentPos.y ),
+						Math.abs( prevPos.x ),
+						Math.abs( prevPos.y )
+					);
+					const thesholdSqScaled = THRESHOLD_SQ * scalingFactorSqrt * scalingFactorSqrt;
+					if ( distSq <= thesholdSqScaled ) {
 
 						points.splice( currentIndex, 1 );
-						if ( currentIndex == 0 ) break;
 						i --;
 						continue;
 
@@ -190,8 +199,8 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
-			cleanPoints( vertices );
-			holes.forEach( cleanPoints );
+			mergeOverlappingPoints( vertices );
+			holes.forEach( mergeOverlappingPoints );
 
 			const numHoles = holes.length;
 
