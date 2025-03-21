@@ -1814,9 +1814,11 @@ class NodeBuilder {
 	 * @param {(VaryingNode|PropertyNode)} node - The varying node.
 	 * @param {?string} name - The varying's name.
 	 * @param {string} [type=node.getNodeType( this )] - The varying's type.
+	 * @param {?string} interpolationType - The interpolation type of the varying.
+	 * @param {?string} interpolationSampling - The interpolation sampling type of the varying.
 	 * @return {NodeVar} The node varying.
 	 */
-	getVaryingFromNode( node, name = null, type = node.getNodeType( this ) ) {
+	getVaryingFromNode( node, name = null, type = node.getNodeType( this ), interpolationType = null, interpolationSampling = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 
@@ -1829,7 +1831,7 @@ class NodeBuilder {
 
 			if ( name === null ) name = 'nodeVarying' + index;
 
-			nodeVarying = new NodeVarying( name, type );
+			nodeVarying = new NodeVarying( name, type, interpolationType, interpolationSampling );
 
 			varyings.push( nodeVarying );
 
