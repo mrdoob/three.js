@@ -27,6 +27,8 @@ class Agent {
 		this.generateRandomColor = this.generateRandomColor.bind( this );
 		this.generateUniqueObjectName = this.generateUniqueObjectName.bind( this );
 
+		this.init();
+
 	}
 
 	generateUniqueObjectName( baseName ) {
@@ -110,6 +112,247 @@ class Agent {
 
 	}
 
+	async init() {
+
+		// Initialize Google AI
+			const ai = new GoogleGenAI( { apiKey: 'GEMINI_API_KEY' } );
+
+		// Get scene information
+		const sceneInfo = this.getSceneInfo();
+
+		// Prepare prompt
+		const systemPrompt = `You are a Three.js scene manipulation assistant. Current scene info:
+		
+		${JSON.stringify( sceneInfo, null, 2 )}
+
+		Available commands:
+		- AddObject: Add a new object to the scene
+			Types: box/cube, sphere, directionalLight, pointLight, ambientLight, cylinder
+			Box parameters: 
+				- width, height, depth (default: 1)
+				- widthSegments, heightSegments, depthSegments (default: 1) - controls geometry detail
+			Sphere parameters: 
+				- radius (default: 0.5)
+				- widthSegments (default: 32) - horizontal detail
+				- heightSegments (default: 16) - vertical detail
+			Cylinder parameters:
+				- radiusTop (default: 0.5)
+				- radiusBottom (default: 0.5)
+				- height (default: 1)
+				- radialSegments (default: 32) - horizontal detail
+				- heightSegments (default: 1) - vertical detail
+				- openEnded (default: false)
+			DirectionalLight parameters:
+				- color (default: white)
+				- intensity (default: 1)
+			PointLight parameters:
+				- color (default: white)
+				- intensity (default: 1)
+				- distance (default: 0)
+				- decay (default: 2)
+			AmbientLight parameters:
+				- color (default: white)
+				- intensity (default: 1)
+			Common parameters for all: 
+				- color (use simple color names like "red" or hex values like "#ff0000" - do not use functions or dynamic values)
+				- position (e.g. {x: 0, y: 5, z: 0})
+		- SetPosition: Set object position
+			Parameters:
+				- object: name of the object to move (optional - defaults to last modified object)
+				- position: {x, y, z} (omitted coordinates keep current values)
+				Example: Move right = {x: 2}, Move up = {y: 2}
+		- SetMaterialColor: Change object material color
+			Parameters:
+				- object: name of the object (optional - defaults to last modified object)
+				- color: color value (e.g. "red", "#ff0000", or "random" for a random color)
+				Note: Use "random" keyword for random colors, do not use JavaScript expressions
+		- SetScale: Change object size
+			Parameters:
+				- object: name of the object (optional - defaults to last modified object)
+				- scale: {x, y, z} (values > 1 make bigger, < 1 make smaller)
+				Example: Double size = {x: 2, y: 2, z: 2}
+				Example: Half size = {x: 0.5, y: 0.5, z: 0.5}
+		- SetMaterialValue: Set material property value
+			Parameters:
+				- object: name of the object (optional - defaults to last modified object)
+				- property: material property to set (e.g. "wireframe")
+				- value: value to set
+		- SetRotation: Set object rotation
+			Parameters:
+				- object: name of the object (optional - defaults to last modified object)
+				- rotation: {x, y, z} in radians
+		- SetGeometry: Modify object geometry detail
+			Parameters:
+				- object: name of the object to modify (optional - defaults to last modified object)
+				- widthSegments: number of segments along width (for box/sphere)
+				- heightSegments: number of segments along height (for box/sphere)
+				- depthSegments: number of segments along depth (for box only)
+			Example: High detail sphere = { widthSegments: 64, heightSegments: 32 }
+			Example: High detail box = { widthSegments: 4, heightSegments: 4, depthSegments: 4 }
+		- RemoveObject: Remove an object from the scene
+			Parameters:
+				- object: name of the object to remove
+		- MultiCmds: Execute multiple commands in sequence
+			Parameters:
+				- commands: array of command objects
+			Example - Create multiple objects:
+				{
+					"type": "MultiCmds",
+					"params": {
+						"commands": [
+							{
+								"type": "AddObject",
+								"params": {
+									"type": "cube",
+									"name": "Cube1",
+									"position": {"x": -1.5}
+								}
+							},
+							{
+								"type": "AddObject",
+								"params": {
+									"type": "cube",
+									"name": "Cube2",
+									"position": {"x": -0.5}
+								}
+							},
+							{
+								"type": "AddObject",
+								"params": {
+									"type": "cube",
+									"name": "Cube3",
+									"position": {"x": 0.5}
+								}
+							},
+							{
+								"type": "AddObject",
+								"params": {
+									"type": "cube",
+									"name": "Cube4",
+									"position": {"x": 1.5}
+								}
+							}
+						]
+					}
+				}
+			Example - Create and modify an object:
+				{
+					"type": "MultiCmds",
+					"params": {
+						"commands": [
+							{
+								"type": "AddObject",
+								"params": { "type": "cube", "name": "MyCube" }
+							},
+							{
+								"type": "SetMaterialColor",
+								"params": { "object": "MyCube", "color": "red" }
+							},
+							{
+								"type": "SetScale",
+								"params": { "object": "MyCube", "scale": {"x": 2, "y": 2, "z": 2} }
+							}
+						]
+					}
+				}
+			Example - Modify all objects in the scene:
+				{
+					"type": "MultiCmds",
+					"params": {
+						"commands": [
+							{
+								"type": "SetMaterialColor",
+								"params": { "object": "Box1", "color": "red" }
+							},
+							{
+								"type": "SetMaterialColor",
+								"params": { "object": "Box2", "color": "blue" }
+							}
+						]
+					}
+				}
+			Note: Use MultiCmds when you need to:
+				1. Create multiple objects at once
+				2. Apply multiple modifications to a single object
+				3. Apply modifications to multiple objects
+				4. Any combination of the above
+
+			Important: When working with multiple similar objects (e.g. multiple spheres):
+				- Objects are automatically numbered (e.g. "Sphere1", "Sphere2", etc.)
+				- Use the exact object name including the number when targeting specific objects
+				- To modify all objects of a type, create a MultiCmds command with one command per object
+				- The scene info includes:
+					- objectCounts: how many of each type exist
+					- objectsByType: groups of objects by their base name
+					- spheres: list of all sphere names
+					- boxes: list of all box names
+					- cylinders: list of all cylinder names
+					- directionalLights: list of all directional light names
+					- pointLights: list of all point light names
+					- ambientLights: list of all ambient light names
+
+			Example - Set random colors for all spheres:
+				{
+					"type": "MultiCmds",
+					"params": {
+						"commands": [
+							{
+								"type": "SetMaterialColor",
+								"params": { "object": "Sphere1", "color": "random" }
+							},
+							{
+								"type": "SetMaterialColor",
+								"params": { "object": "Sphere2", "color": "random" }
+							}
+						]
+					}
+				}
+
+		Respond ONLY with a JSON object in this format:
+		{
+			"response": "Your text response to the user explaining what you're doing",
+			"commands": {
+				"type": "command_type",
+				"params": {
+					// command specific parameters
+				}
+			}
+		}
+
+		Important:
+		1. If no commands are needed, set "commands" to null
+		2. Do not include any JavaScript expressions or functions in the JSON
+		3. For random colors, use the "random" keyword instead of Math.random()
+		4. Do not include any other text outside the JSON
+
+		Do not include any other text outside the JSON.`;
+
+		this.chat = await ai.chats.create({
+			model: "gemini-2.0-flash",
+			history: [
+				{
+				role: "user",
+				parts: [{ text: systemPrompt }],
+				},
+				{
+				role: "model",
+				parts: [
+					{
+					text: "I'm ready to help you create and modify your 3D scene.",
+					},
+				],
+				},
+			],
+			config: {
+				temperature: 0.2,
+				maxOutputTokens: 2048
+			},
+		});
+
+		console.log( 'CHAT:', this.chat );
+
+	}
+
 	async processQuery( query ) {
 
 		if ( ! query.trim() ) return;
@@ -118,229 +361,7 @@ class Agent {
 
 			this.signals.agentThinking.dispatch();
 
-			// Initialize Google AI
-			const ai = new GoogleGenAI( { apiKey: 'GEMINI_API_KEY' } );
-
-			// Get scene information
-			const sceneInfo = this.getSceneInfo();
-
-			// Prepare prompt
-			const prompt = `You are a Three.js scene manipulation assistant. Current scene info:
-			${JSON.stringify( sceneInfo, null, 2 )}
-
-			Available commands:
-			- AddObject: Add a new object to the scene
-				Types: box/cube, sphere, directionalLight, pointLight, ambientLight, cylinder
-				Box parameters: 
-					- width, height, depth (default: 1)
-					- widthSegments, heightSegments, depthSegments (default: 1) - controls geometry detail
-				Sphere parameters: 
-					- radius (default: 0.5)
-					- widthSegments (default: 32) - horizontal detail
-					- heightSegments (default: 16) - vertical detail
-				Cylinder parameters:
-					- radiusTop (default: 0.5)
-					- radiusBottom (default: 0.5)
-					- height (default: 1)
-					- radialSegments (default: 32) - horizontal detail
-					- heightSegments (default: 1) - vertical detail
-					- openEnded (default: false)
-				DirectionalLight parameters:
-					- color (default: white)
-					- intensity (default: 1)
-				PointLight parameters:
-					- color (default: white)
-					- intensity (default: 1)
-					- distance (default: 0)
-					- decay (default: 2)
-				AmbientLight parameters:
-					- color (default: white)
-					- intensity (default: 1)
-				Common parameters for all: 
-					- color (use simple color names like "red" or hex values like "#ff0000" - do not use functions or dynamic values)
-					- position (e.g. {x: 0, y: 5, z: 0})
-			- SetPosition: Set object position
-				Parameters:
-					- object: name of the object to move (optional - defaults to last modified object)
-					- position: {x, y, z} (omitted coordinates keep current values)
-					Example: Move right = {x: 2}, Move up = {y: 2}
-			- SetMaterialColor: Change object material color
-				Parameters:
-					- object: name of the object (optional - defaults to last modified object)
-					- color: color value (e.g. "red", "#ff0000", or "random" for a random color)
-					Note: Use "random" keyword for random colors, do not use JavaScript expressions
-			- SetScale: Change object size
-				Parameters:
-					- object: name of the object (optional - defaults to last modified object)
-					- scale: {x, y, z} (values > 1 make bigger, < 1 make smaller)
-					Example: Double size = {x: 2, y: 2, z: 2}
-					Example: Half size = {x: 0.5, y: 0.5, z: 0.5}
-			- SetMaterialValue: Set material property value
-				Parameters:
-					- object: name of the object (optional - defaults to last modified object)
-					- property: material property to set (e.g. "wireframe")
-					- value: value to set
-			- SetRotation: Set object rotation
-				Parameters:
-					- object: name of the object (optional - defaults to last modified object)
-					- rotation: {x, y, z} in radians
-			- SetGeometry: Modify object geometry detail
-				Parameters:
-					- object: name of the object to modify (optional - defaults to last modified object)
-					- widthSegments: number of segments along width (for box/sphere)
-					- heightSegments: number of segments along height (for box/sphere)
-					- depthSegments: number of segments along depth (for box only)
-				Example: High detail sphere = { widthSegments: 64, heightSegments: 32 }
-				Example: High detail box = { widthSegments: 4, heightSegments: 4, depthSegments: 4 }
-			- RemoveObject: Remove an object from the scene
-				Parameters:
-					- object: name of the object to remove
-			- MultiCmds: Execute multiple commands in sequence
-				Parameters:
-					- commands: array of command objects
-				Example - Create multiple objects:
-					{
-						"type": "MultiCmds",
-						"params": {
-							"commands": [
-								{
-									"type": "AddObject",
-									"params": {
-										"type": "cube",
-										"name": "Cube1",
-										"position": {"x": -1.5}
-									}
-								},
-								{
-									"type": "AddObject",
-									"params": {
-										"type": "cube",
-										"name": "Cube2",
-										"position": {"x": -0.5}
-									}
-								},
-								{
-									"type": "AddObject",
-									"params": {
-										"type": "cube",
-										"name": "Cube3",
-										"position": {"x": 0.5}
-									}
-								},
-								{
-									"type": "AddObject",
-									"params": {
-										"type": "cube",
-										"name": "Cube4",
-										"position": {"x": 1.5}
-									}
-								}
-							]
-						}
-					}
-				Example - Create and modify an object:
-					{
-						"type": "MultiCmds",
-						"params": {
-							"commands": [
-								{
-									"type": "AddObject",
-									"params": { "type": "cube", "name": "MyCube" }
-								},
-								{
-									"type": "SetMaterialColor",
-									"params": { "object": "MyCube", "color": "red" }
-								},
-								{
-									"type": "SetScale",
-									"params": { "object": "MyCube", "scale": {"x": 2, "y": 2, "z": 2} }
-								}
-							]
-						}
-					}
-				Example - Modify all objects in the scene:
-					{
-						"type": "MultiCmds",
-						"params": {
-							"commands": [
-								{
-									"type": "SetMaterialColor",
-									"params": { "object": "Box1", "color": "red" }
-								},
-								{
-									"type": "SetMaterialColor",
-									"params": { "object": "Box2", "color": "blue" }
-								}
-							]
-						}
-					}
-				Note: Use MultiCmds when you need to:
-					1. Create multiple objects at once
-					2. Apply multiple modifications to a single object
-					3. Apply modifications to multiple objects
-					4. Any combination of the above
-
-				Important: When working with multiple similar objects (e.g. multiple spheres):
-					- Objects are automatically numbered (e.g. "Sphere1", "Sphere2", etc.)
-					- Use the exact object name including the number when targeting specific objects
-					- To modify all objects of a type, create a MultiCmds command with one command per object
-					- The scene info includes:
-						- objectCounts: how many of each type exist
-						- objectsByType: groups of objects by their base name
-						- spheres: list of all sphere names
-						- boxes: list of all box names
-						- cylinders: list of all cylinder names
-						- directionalLights: list of all directional light names
-						- pointLights: list of all point light names
-						- ambientLights: list of all ambient light names
-
-				Example - Set random colors for all spheres:
-					{
-						"type": "MultiCmds",
-						"params": {
-							"commands": [
-								{
-									"type": "SetMaterialColor",
-									"params": { "object": "Sphere1", "color": "random" }
-								},
-								{
-									"type": "SetMaterialColor",
-									"params": { "object": "Sphere2", "color": "random" }
-								}
-							]
-						}
-					}
-
-			User query: ${query}
-
-			Respond ONLY with a JSON object in this format:
-			{
-				"response": "Your text response to the user explaining what you're doing",
-				"commands": {
-					"type": "command_type",
-					"params": {
-						// command specific parameters
-					}
-				}
-			}
-
-			Important:
-			1. If no commands are needed, set "commands" to null
-			2. Do not include any JavaScript expressions or functions in the JSON
-			3. For random colors, use the "random" keyword instead of Math.random()
-			4. Do not include any other text outside the JSON
-
-			Do not include any other text outside the JSON.`;
-
-			// Get response
-			const response = await ai.models.generateContent( {
-				model: 'gemini-2.0-flash-001',
-				contents: prompt,
-				generationConfig: {
-					temperature: 0.1, // Lower temperature for more consistent JSON output
-					maxOutputTokens: 2048
-				}
-			} );
+			const response = await this.chat.sendMessage( { message: query } );
 
 			let responseData;
 
