@@ -74,7 +74,7 @@ function Viewport( editor ) {
 	let objectRotationOnDown = null;
 	let objectScaleOnDown = null;
 
-	const transformControls = new TransformControls( camera, container.dom );
+	const transformControls = new TransformControls( camera );
 	transformControls.addEventListener( 'axis-changed', function () {
 
 		if ( editor.viewportShading !== 'realistic' ) render();
@@ -274,7 +274,7 @@ function Viewport( editor ) {
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	const controls = new EditorControls( camera, container.dom );
+	const controls = new EditorControls( camera );
 	controls.addEventListener( 'change', function () {
 
 		signals.cameraChanged.dispatch( camera );
@@ -344,6 +344,9 @@ function Viewport( editor ) {
 			container.dom.removeChild( renderer.domElement );
 
 		}
+
+		controls.connect( newRenderer.domElement );
+		transformControls.connect( newRenderer.domElement );
 
 		renderer = newRenderer;
 
@@ -582,7 +585,7 @@ function Viewport( editor ) {
 
 				break;
 
-			case 'ModelViewer':
+			case 'Room':
 
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 

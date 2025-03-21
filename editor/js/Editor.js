@@ -655,7 +655,8 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
-		if ( json.environment === 'ModelViewer' ) {
+		if ( json.environment === 'Room' ||
+			 json.environment === 'ModelViewer' /* DEPRECATED */ ) {
 
 			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
 			this.signals.refreshSidebarEnvironment.dispatch();
@@ -683,13 +684,13 @@ Editor.prototype = {
 
 		}
 
-		// honor modelviewer environment
+		// honor neutral environment
 
 		let environment = null;
 
 		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
 
-			environment = 'ModelViewer';
+			environment = 'Room';
 
 		}
 

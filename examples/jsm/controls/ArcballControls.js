@@ -441,13 +441,15 @@ class ArcballControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		this.domElement.style.touchAction = 'none';
 		this._devPxRatio = window.devicePixelRatio;
