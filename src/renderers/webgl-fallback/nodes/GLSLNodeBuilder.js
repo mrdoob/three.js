@@ -97,14 +97,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 		 */
 		this.builtins = { vertex: [], fragment: [], compute: [] };
 
-		/**
-		 * Whether comparison in shader code are generated with methods or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.useComparisonMethod = true;
-
 	}
 
 	/**
