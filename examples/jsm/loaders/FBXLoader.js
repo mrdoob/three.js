@@ -1039,7 +1039,7 @@ class FBXTreeParser {
 						skeleton.bones[ i ] = bone;
 
 						// In cases where a bone is shared between multiple meshes
-						// duplicate the bone here and and it as a child of the first bone
+						// duplicate the bone here and add it as a child of the first bone
 						if ( subBone !== null ) {
 
 							bone.add( subBone );
@@ -2763,7 +2763,7 @@ class AnimationParser {
 	}
 
 	// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
-	// hierarchy. Each Stack node will be used to create a AnimationClip
+	// hierarchy. Each Stack node will be used to create an AnimationClip
 	parseAnimStacks( layersMap ) {
 
 		const rawStacks = fbxTree.Objects.AnimationStack;
