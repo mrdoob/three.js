@@ -1,5 +1,3 @@
-import { clamp } from './MathUtils.js';
-
 /**
  * Class representing a 4D vector. A 4D vector is an ordered quadruplet of numbers
  * (labeled x, y, z and w), which can be used to represent a number of things, such as:
@@ -35,15 +33,6 @@ class Vector4 {
 	 * @param {number} [w=1] - The w value of this vector.
 	 */
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Vector4.prototype.isVector4 = true;
 
 		/**
 		 * The x value of this vector.
@@ -225,7 +214,6 @@ class Vector4 {
 		return this;
 
 	}
-
 	/**
 	 * Returns the value of the vector component which matches the given index.
 	 *
@@ -283,15 +271,14 @@ class Vector4 {
 	 */
 	add( v ) {
 
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
-		this.w += v.w;
-
+		const vx = v.x, vy = v.y, vz = v.z, vw = v.w;
+		this.x += vx;
+		this.y += vy;
+		this.z += vz;
+		this.w += vw;
 		return this;
 
 	}
-
 	/**
 	 * Adds the given scalar value to all components of this instance.
 	 *
@@ -318,11 +305,12 @@ class Vector4 {
 	 */
 	addVectors( a, b ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
-		this.w = a.w + b.w;
-
+		const ax = a.x, ay = a.y, az = a.z, aw = a.w;
+		const bx = b.x, by = b.y, bz = b.z, bw = b.w;
+		this.x = ax + bx;
+		this.y = ay + by;
+		this.z = az + bz;
+		this.w = aw + bw;
 		return this;
 
 	}
@@ -336,11 +324,11 @@ class Vector4 {
 	 */
 	addScaledVector( v, s ) {
 
-		this.x += v.x * s;
-		this.y += v.y * s;
-		this.z += v.z * s;
-		this.w += v.w * s;
-
+		const vx = v.x * s, vy = v.y * s, vz = v.z * s, vw = v.w * s;
+		this.x += vx;
+		this.y += vy;
+		this.z += vz;
+		this.w += vw;
 		return this;
 
 	}
@@ -353,11 +341,11 @@ class Vector4 {
 	 */
 	sub( v ) {
 
-		this.x -= v.x;
-		this.y -= v.y;
-		this.z -= v.z;
-		this.w -= v.w;
-
+		const vx = v.x, vy = v.y, vz = v.z, vw = v.w;
+		this.x -= vx;
+		this.y -= vy;
+		this.z -= vz;
+		this.w -= vw;
 		return this;
 
 	}
@@ -388,11 +376,12 @@ class Vector4 {
 	 */
 	subVectors( a, b ) {
 
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
-		this.w = a.w - b.w;
-
+		const ax = a.x, ay = a.y, az = a.z, aw = a.w;
+		const bx = b.x, by = b.y, bz = b.z, bw = b.w;
+		this.x = ax - bx;
+		this.y = ay - by;
+		this.z = az - bz;
+		this.w = aw - bw;
 		return this;
 
 	}
@@ -405,11 +394,11 @@ class Vector4 {
 	 */
 	multiply( v ) {
 
-		this.x *= v.x;
-		this.y *= v.y;
-		this.z *= v.z;
-		this.w *= v.w;
-
+		const vx = v.x, vy = v.y, vz = v.z, vw = v.w;
+		this.x *= vx;
+		this.y *= vy;
+		this.z *= vz;
+		this.w *= vw;
 		return this;
 
 	}
@@ -459,11 +448,11 @@ class Vector4 {
 	 */
 	divide( v ) {
 
-		this.x /= v.x;
-		this.y /= v.y;
-		this.z /= v.z;
-		this.w /= v.w;
-
+		const vx = v.x, vy = v.y, vz = v.z, vw = v.w;
+		this.x /= vx;
+		this.y /= vy;
+		this.z /= vz;
+		this.w /= vw;
 		return this;
 
 	}
@@ -493,9 +482,9 @@ class Vector4 {
 
 		// q is assumed to be normalized
 
-		this.w = 2 * Math.acos( q.w );
-
-		const s = Math.sqrt( 1 - q.w * q.w );
+		const qw = q.w;
+		this.w = 2 * Math.acos( qw );
+		const s = Math.sqrt( 1 - qw * qw );
 
 		if ( s < 0.0001 ) {
 
@@ -505,9 +494,10 @@ class Vector4 {
 
 		} else {
 
-			this.x = q.x / s;
-			this.y = q.y / s;
-			this.z = q.z / s;
+			const qx = q.x, qy = q.y, qz = q.z;
+			this.x = qx / s;
+			this.y = qy / s;
+			this.z = qz / s;
 
 		}
 
@@ -720,13 +710,10 @@ class Vector4 {
 	 */
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
-
-		this.x = clamp( this.x, min.x, max.x );
-		this.y = clamp( this.y, min.y, max.y );
-		this.z = clamp( this.z, min.z, max.z );
-		this.w = clamp( this.w, min.w, max.w );
-
+		this.x = Math.max( min.x, Math.min( this.x, max.x ) );
+		this.y = Math.max( min.y, Math.min( this.y, max.y ) );
+		this.z = Math.max( min.z, Math.min( this.z, max.z ) );
+		this.w = Math.max( min.w, Math.min( this.w, max.w ) );
 		return this;
 
 	}
@@ -743,11 +730,10 @@ class Vector4 {
 	 */
 	clampScalar( minVal, maxVal ) {
 
-		this.x = clamp( this.x, minVal, maxVal );
-		this.y = clamp( this.y, minVal, maxVal );
-		this.z = clamp( this.z, minVal, maxVal );
-		this.w = clamp( this.w, minVal, maxVal );
-
+		this.x = Math.max( minVal, Math.min( this.x, maxVal ) );
+		this.y = Math.max( minVal, Math.min( this.y, maxVal ) );
+		this.z = Math.max( minVal, Math.min( this.z, maxVal ) );
+		this.w = Math.max( minVal, Math.min( this.w, maxVal ) );
 		return this;
 
 	}
@@ -765,8 +751,8 @@ class Vector4 {
 	clampLength( min, max ) {
 
 		const length = this.length();
-
-		return this.divideScalar( length || 1 ).multiplyScalar( clamp( length, min, max ) );
+		const clamped = Math.max( min, Math.min( length, max ) );
+		return this.divideScalar( length || 1 ).multiplyScalar( clamped );
 
 	}
 
@@ -894,7 +880,8 @@ class Vector4 {
 	 */
 	manhattanLength() {
 
-		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
+		const x = this.x, y = this.y, z = this.z, w = this.w;
+		return Math.abs( x ) + Math.abs( y ) + Math.abs( z ) + Math.abs( w );
 
 	}
 
@@ -934,11 +921,12 @@ class Vector4 {
 	 */
 	lerp( v, alpha ) {
 
-		this.x += ( v.x - this.x ) * alpha;
-		this.y += ( v.y - this.y ) * alpha;
-		this.z += ( v.z - this.z ) * alpha;
-		this.w += ( v.w - this.w ) * alpha;
-
+		const x = this.x, y = this.y, z = this.z, w = this.w;
+		const vx = v.x, vy = v.y, vz = v.z, vw = v.w;
+		this.x = x + ( vx - x ) * alpha;
+		this.y = y + ( vy - y ) * alpha;
+		this.z = z + ( vz - z ) * alpha;
+		this.w = w + ( vw - w ) * alpha;
 		return this;
 
 	}
@@ -955,11 +943,12 @@ class Vector4 {
 	 */
 	lerpVectors( v1, v2, alpha ) {
 
-		this.x = v1.x + ( v2.x - v1.x ) * alpha;
-		this.y = v1.y + ( v2.y - v1.y ) * alpha;
-		this.z = v1.z + ( v2.z - v1.z ) * alpha;
-		this.w = v1.w + ( v2.w - v1.w ) * alpha;
-
+		const v1x = v1.x, v1y = v1.y, v1z = v1.z, v1w = v1.w;
+		const v2x = v2.x, v2y = v2.y, v2z = v2.z, v2w = v2.w;
+		this.x = v1x + ( v2x - v1x ) * alpha;
+		this.y = v1y + ( v2y - v1y ) * alpha;
+		this.z = v1z + ( v2z - v1z ) * alpha;
+		this.w = v1w + ( v2w - v1w ) * alpha;
 		return this;
 
 	}
@@ -967,14 +956,16 @@ class Vector4 {
 	/**
 	 * Returns `true` if this vector is equal with the given one.
 	 *
-	 * @param {Vector4} v - The vector to test for equality.
+	 * @param {Vector4} v - The vector to test for equaliaty.
 	 * @return {boolean} Whether this vector is equal with the given one.
 	 */
 	equals( v ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+		const x = this.x, y = this.y, z = this.z, w = this.w;
+		return v.x === x && v.y === y && v.z === z && v.w === w;
 
 	}
+
 
 	/**
 	 * Sets this vector's x value to be `array[ offset ]`, y value to be `array[ offset + 1 ]`,
@@ -1059,5 +1050,7 @@ class Vector4 {
 	}
 
 }
+
+Vector4.prototype.isVector4 = true;
 
 export { Vector4 };
