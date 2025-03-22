@@ -956,7 +956,7 @@ class Vector4 {
 	/**
 	 * Returns `true` if this vector is equal with the given one.
 	 *
-	 * @param {Vector4} v - The vector to test for equaliaty.
+	 * @param {Vector4} v - The vector to test for equality.
 	 * @return {boolean} Whether this vector is equal with the given one.
 	 */
 	equals( v ) {
