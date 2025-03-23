@@ -743,23 +743,21 @@ export const equals = ( x, y ) => { // @deprecated, r172
 };
 
 /**
- * Returns the lesser of two values.
+ * Returns the least of the given values.
  *
  * @tsl
  * @function
- * @param {Node | number} x - The y parameter.
- * @param {Node | number} y - The x parameter.
+ * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
 export const min = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN );
 
 /**
- * Returns the greater of two values.
+ * Returns the greatest of the given values.
  *
  * @tsl
  * @function
- * @param {Node | number} x - The y parameter.
- * @param {Node | number} y - The x parameter.
+ * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
 export const max = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX );
