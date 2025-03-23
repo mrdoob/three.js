@@ -187,6 +187,7 @@
 		"webgl_points_sprites",
 		"webgl_points_waves",
 		"webgl_portal",
+		"webgl_query",
 		"webgl_raycaster_bvh",
 		"webgl_raycaster_sprite",
 		"webgl_raycaster_texture",
