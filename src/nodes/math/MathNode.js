@@ -33,6 +33,24 @@ class MathNode extends TempNode {
 
 		super();
 
+		// Allow the max() and min() functions to take an arbitrary number of arguments.
+
+		if ( ( method === MathNode.MAX || method === MathNode.MIN ) && arguments.length > 3 ) {
+
+			let finalOp = new MathNode( method, aNode, bNode );
+
+			for ( let i = 2; i < arguments.length - 1; i ++ ) {
+
+				finalOp = new MathNode( method, finalOp, arguments[ i ] );
+
+			}
+
+			aNode = finalOp;
+			bNode = arguments[ arguments.length - 1 ];
+			cNode = null;
+
+		}
+
 		/**
 		 * The method name.
 		 *
@@ -725,23 +743,21 @@ export const equals = ( x, y ) => { // @deprecated, r172
 };
 
 /**
- * Returns the lesser of two values.
+ * Returns the least of the given values.
  *
  * @tsl
  * @function
- * @param {Node | number} x - The y parameter.
- * @param {Node | number} y - The x parameter.
+ * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
 export const min = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN );
 
 /**
- * Returns the greater of two values.
+ * Returns the greatest of the given values.
  *
  * @tsl
  * @function
- * @param {Node | number} x - The y parameter.
- * @param {Node | number} y - The x parameter.
+ * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
 export const max = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX );
