@@ -34,6 +34,16 @@ class Vector4 {
 	 */
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		Vector4.prototype.isVector4 = true;
+
 		/**
 		 * The x value of this vector.
 		 *
@@ -1051,6 +1061,5 @@ class Vector4 {
 
 }
 
-Vector4.prototype.isVector4 = true;
 
 export { Vector4 };
