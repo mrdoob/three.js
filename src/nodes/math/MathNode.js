@@ -33,6 +33,24 @@ class MathNode extends TempNode {
 
 		super();
 
+		// Allow the max() and min() functions to take an arbitrary number of arguments.
+
+		if ( ( method === MathNode.MAX || method === MathNode.MIN ) && arguments.length > 3 ) {
+
+			let finalOp = new MathNode( method, aNode, bNode );
+
+			for ( let i = 2; i < arguments.length - 1; i ++ ) {
+
+				finalOp = new MathNode( method, finalOp, arguments[ i ] );
+
+			}
+
+			aNode = finalOp;
+			bNode = arguments[ arguments.length - 1 ];
+			cNode = null;
+
+		}
+
 		/**
 		 * The method name.
 		 *
