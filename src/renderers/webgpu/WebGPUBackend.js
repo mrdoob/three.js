@@ -1241,6 +1241,8 @@ class WebGPUBackend extends Backend {
 
 		const draw = () => {
 
+			const indirect = renderObject.getIndirect();
+
 			if ( object.isBatchedMesh === true ) {
 
 				const starts = object._multiDrawStarts;
@@ -1255,6 +1257,14 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				let indirectBuffer = null;
+
+				if ( indirect !== null ) {
+
+					indirectBuffer = this.get( indirect ).buffer;
+
+				}
+
 				for ( let i = 0; i < drawCount; i ++ ) {
 
 					const count = drawInstances ? drawInstances[ i ] : 1;
@@ -1262,7 +1272,17 @@ class WebGPUBackend extends Backend {
 
 					if ( hasIndex === true ) {
 
-						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+
+						if ( indirect !== null ) {
+
+							passEncoderGPU.drawIndexedIndirect( indirectBuffer, i * 5 * Uint32Array.BYTES_PER_ELEMENT );
+
+						} else {
+
+							passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+
+						}
+
 
 					} else {
 
@@ -1278,7 +1298,6 @@ class WebGPUBackend extends Backend {
 
 				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
 
-				const indirect = renderObject.getIndirect();
 
 				if ( indirect !== null ) {
 
