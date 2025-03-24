@@ -1418,6 +1418,18 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the type is an integer type.
+	 *
+	 * @param {string} type - The type.
+	 * @return {boolean} Whether the type is an integer type or not.
+	 */
+	isInteger( type ) {
+
+		return /int|uint/.test( type );
+
+	}
+
+	/**
 	 * Returns the type for a given buffer attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
