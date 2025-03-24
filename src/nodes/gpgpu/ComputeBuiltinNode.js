@@ -181,7 +181,7 @@ export const numWorkgroups = /*@__PURE__*/ computeBuiltin( 'numWorkgroups', 'uve
  * // Execute 12 compute threads with a workgroup size of 3.
  * const computeFn = Fn( () => {
  *
- * 	If( workgroupId.x.modInt( 2 ).equal( 0 ), () => {
+ * 	If( workgroupId.x.mod( 2 ).equal( 0 ), () => {
  *
  * 		storageBuffer.element( instanceIndex ).assign( instanceIndex );
  *

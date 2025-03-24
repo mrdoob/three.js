@@ -1,6 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, int, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * This node represents basic mathematical and logical operations like addition,
@@ -702,13 +702,14 @@ addMethodChaining( 'shiftRight', shiftRight );
  * @function
  * @deprecated since r168. Use {@link mod} instead.
  *
- * @param {...any} params
- * @returns {Function}
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
+ * @returns {OperatorNode}
  */
-export const remainder = ( ...params ) => { // @deprecated, r168
+export const remainder = ( a, b ) => { // @deprecated, r168
 
 	console.warn( 'THREE.TSL: "remainder()" is deprecated. Use "mod( int( ... ) )" instead.' );
-	return mod( ...params );
+	return mod( a, b );
 
 };
 
@@ -717,13 +718,14 @@ export const remainder = ( ...params ) => { // @deprecated, r168
  * @function
  * @deprecated since r175. Use {@link mod} instead.
  *
- * @param {...any} params
- * @returns {Function}
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
+ * @returns {OperatorNode}
  */
-export const modInt = ( ...params ) => { // @deprecated, r175
+export const modInt = ( a, b ) => { // @deprecated, r175
 
 	console.warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
-	return mod( ...params );
+	return mod( a, int( b ) );
 
 };
 
