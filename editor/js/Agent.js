@@ -1,3 +1,4 @@
+import { GoogleGenAI } from '@google/genai';
 import * as Commands from './commands/Commands.js';
 import { Vector3, BoxGeometry, SphereGeometry, MeshStandardMaterial, Mesh, DirectionalLight, PointLight, AmbientLight, Color, CylinderGeometry } from 'three';
 
@@ -179,7 +180,7 @@ class Agent {
 	async init() {
 
 		// Initialize Google AI
-		// const session = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
+		const session = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
 
 		// Get scene information
 		const sceneInfo = this.getSceneInfo();
