@@ -1,4 +1,3 @@
-import { GoogleGenAI } from '@google/genai';
 import * as Commands from './commands/Commands.js';
 import { Vector3, BoxGeometry, SphereGeometry, MeshStandardMaterial, Mesh, DirectionalLight, PointLight, AmbientLight, Color, CylinderGeometry } from 'three';
 
@@ -397,29 +396,18 @@ class Agent {
 
 		Do not include any other text outside the JSON.`;
 
-		this.chat = await ai.chats.create({
-			model: "gemini-2.0-flash",
-			history: [
-				{
-				role: "user",
-				parts: [{ text: systemPrompt }],
-				},
-				{
-				role: "model",
-				parts: [
-					{
-					text: "I'm ready to help you create and modify your 3D scene.",
-					},
-				],
-				},
-			],
-			config: {
-				temperature: 0.2,
-				maxOutputTokens: 2048
-			},
+		// const { available, defaultTemperature, defaultTopK, maxTopK } = await ai.languageModel.capabilities();
+		// console.log( 'Capabilities:', available, defaultTemperature, defaultTopK, maxTopK );
+		
+		// if ( available !== 'readily' ) {
+
+		const session = await ai.languageModel.create({
+			systemPrompt: systemPrompt
 		});
 
-		console.log( 'CHAT:', this.chat );
+		console.log( 'SESSION:', session );
+
+		this.session = session;
 
 	}
 
@@ -429,18 +417,16 @@ class Agent {
 
 		try {
 
-			this.signals.agentThinking.dispatch();
+			this.signals.agentThinking.dispatch();	
 
-			const response = await this.chat.sendMessage( { message: query } );
-
-			console.log( 'RESPONSE:', response.text );
+			const response = await this.session.prompt( query );
 
 			let responseData;
 
 			try {
 
 				// Strip markdown code block markers if present
-				const cleanText = response.text.replace( /^```json\n|\n```$/g, '' )
+				const cleanText = response.replace( /^```json\n|\n```$/g, '' )
 					.replace( /^\s*```\s*|\s*```\s*$/g, '' ) // Remove any remaining code block markers
 					.trim();
 
@@ -450,6 +436,8 @@ class Agent {
 					responseData = JSON.parse( cleanText );
 
 				} catch ( e ) {
+
+					console.log( 'ERROR:', e );
 
 					// If that fails, try to fix common JSON issues
 					const fixedText = cleanText
@@ -464,9 +452,11 @@ class Agent {
 
 			} catch ( e ) {
 
+				console.log( 'ERROR:', e );
+
 				// console.error( 'AGENT: Failed to parse AI response as JSON:', e );
-				// console.error( 'AGENT: Raw response:', response.text );
-				this.showError( response.text );
+				// console.error( 'AGENT: Raw response:', response );
+				this.showError( response );
 				return;
 
 			}
@@ -499,6 +489,8 @@ class Agent {
 			this.showError( 'Agent error: ' + error.message );
 
 		}
+
+		console.log( this.session.tokensSoFar, '/', this.session.tokensLeft );
 
 	}
 
