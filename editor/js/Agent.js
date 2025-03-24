@@ -70,6 +70,8 @@ class Agent {
 		messageBubble.style.marginBottom = '8px';
 		messageBubble.style.fontSize = '14px';
 		messageBubble.style.position = 'relative';
+		messageBubble.style.maxHeight = '400px';  // Add max height
+		messageBubble.style.overflowY = 'auto';   // Add vertical scrollbar when needed
 
 		// Add message container first
 		const messageContainer = document.createElement( 'div' );
