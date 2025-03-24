@@ -1,4 +1,3 @@
-import { GoogleGenAI } from '@google/genai';
 import * as Commands from './commands/Commands.js';
 import { Vector3, BoxGeometry, SphereGeometry, MeshStandardMaterial, Mesh, DirectionalLight, PointLight, AmbientLight, Color, CylinderGeometry } from 'three';
 
