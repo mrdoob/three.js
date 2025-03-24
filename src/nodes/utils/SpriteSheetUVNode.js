@@ -83,8 +83,8 @@ export default SpriteSheetUVNode;
  * @tsl
  * @function
  * @param {Node<vec2>} countNode - The node that defines the number of sprites in the x and y direction (e.g 6x6).
- * @param {Node<vec2>} [uvNode=uv()] - The uv node.
- * @param {Node<float>} [frameNode=float()] - The node that defines the current frame/sprite.
+ * @param {?Node<vec2>} [uvNode=uv()] - The uv node.
+ * @param {?Node<float>} [frameNode=float()] - The node that defines the current frame/sprite.
  * @returns {SpriteSheetUVNode}
  */
-export const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode );
+export const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode ).setParameterLength( 3 );

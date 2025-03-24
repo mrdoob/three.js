@@ -118,21 +118,21 @@ export default ViewportTextureNode;
  *
  * @tsl
  * @function
- * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {?Node} [uvNode=screenUV] - The uv node.
  * @param {?Node} [levelNode=null] - The level node.
  * @param {?Texture} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
  * @returns {ViewportTextureNode}
  */
-export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode ).setParameterLength( 0, 3 );
 
 /**
  * TSL function for creating a viewport texture node with enabled mipmap generation.
  *
  * @tsl
  * @function
- * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {?Node} [uvNode=screenUV] - The uv node.
  * @param {?Node} [levelNode=null] - The level node.
  * @param {?Texture} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
  * @returns {ViewportTextureNode}
  */
-export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
+export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } ).setParameterLength( 0, 3 );

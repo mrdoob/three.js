@@ -307,4 +307,4 @@ export default MorphNode;
  * @param {Mesh} mesh - The mesh holding the morph targets.
  * @returns {MorphNode}
  */
-export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );
+export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode ).setParameterLength( 1 );

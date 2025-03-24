@@ -54,8 +54,8 @@ export default ViewportSharedTextureNode;
  *
  * @tsl
  * @function
- * @param {Node} [uvNode=screenUV] - The uv node.
+ * @param {?Node} [uvNode=screenUV] - The uv node.
  * @param {?Node} [levelNode=null] - The level node.
  * @returns {ViewportSharedTextureNode}
  */
-export const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );
+export const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode ).setParameterLength( 0, 2 );

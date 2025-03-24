@@ -183,4 +183,4 @@ export default Texture3DNode;
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @returns {Texture3DNode}
  */
-export const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );
+export const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode ).setParameterLength( 1, 3 );

@@ -213,11 +213,38 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
 
+	let fn, name = scope, minParams, maxParams;
+
+	function verifyParamsLimit( params ) {
+
+		let tslName;
+
+		if ( name ) tslName = /[a-z]/i.test( name ) ? name + '()' : name;
+		else name = NodeClass.type;
+
+		if ( minParams !== undefined && params.length < minParams ) {
+
+			console.warn( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+
+			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
+
+		} else if ( maxParams !== undefined && params.length > maxParams ) {
+
+			console.warn( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+
+			return params.slice( 0, maxParams );
+
+		}
+
+		return params;
+
+	}
+
 	if ( scope === null ) {
 
-		return ( ...params ) => {
+		fn = ( ...params ) => {
 
-			return assignNode( new NodeClass( ...nodeArray( params ) ) );
+			return assignNode( new NodeClass( ...nodeArray( verifyParamsLimit( params ) ) ) );
 
 		};
 
@@ -225,21 +252,40 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		factor = nodeObject( factor );
 
-		return ( ...params ) => {
+		fn = ( ...params ) => {
 
-			return assignNode( new NodeClass( scope, ...nodeArray( params ), factor ) );
+			return assignNode( new NodeClass( scope, ...nodeArray( verifyParamsLimit( params ) ), factor ) );
 
 		};
 
 	} else {
 
-		return ( ...params ) => {
+		fn = ( ...params ) => {
 
-			return assignNode( new NodeClass( scope, ...nodeArray( params ) ) );
+			return assignNode( new NodeClass( scope, ...nodeArray( verifyParamsLimit( params ) ) ) );
 
 		};
 
 	}
+
+	fn.setParameterLength = ( ...params ) => {
+
+		if ( params.length === 1 ) minParams = maxParams = params[ 0 ];
+		else if ( params.length === 2 ) [ minParams, maxParams ] = params;
+
+		return fn;
+
+	};
+
+	fn.setName = ( value ) => {
+
+		name = value;
+
+		return fn;
+
+	};
+
+	return fn;
 
 };
 
@@ -667,7 +713,7 @@ addMethodChaining( 'toMat4', mat4 );
 
 // basic nodes
 
-export const element = /*@__PURE__*/ nodeProxy( ArrayElementNode );
+export const element = /*@__PURE__*/ nodeProxy( ArrayElementNode ).setParameterLength( 2 );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 

@@ -100,4 +100,4 @@ export default RotateNode;
  * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
  * @returns {RotateNode}
  */
-export const rotate = /*@__PURE__*/ nodeProxy( RotateNode );
+export const rotate = /*@__PURE__*/ nodeProxy( RotateNode ).setParameterLength( 2 );

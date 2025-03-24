@@ -434,7 +434,7 @@ export default OperatorNode;
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
+export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
 
 /**
  * Returns the subtraction of two or more value.
@@ -446,7 +446,7 @@ export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );
+export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
 
 /**
  * Returns the multiplication of two or more value.
@@ -458,7 +458,7 @@ export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' );
+export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
 
 /**
  * Returns the division of two or more value.
@@ -470,7 +470,7 @@ export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' );
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' );
+export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
 
 /**
  * Computes the remainder of dividing the first node by the second, for integer values.
@@ -481,7 +481,7 @@ export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' );
+export const modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'modInt' );
 
 /**
  * Checks if two nodes are equal.
@@ -492,7 +492,7 @@ export const modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' );
+export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
 
 /**
  * Checks if two nodes are not equal.
@@ -503,7 +503,7 @@ export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' );
+export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
 
 /**
  * Checks if the first node is less than the second.
@@ -514,7 +514,7 @@ export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' );
+export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
 
 /**
  * Checks if the first node is greater than the second.
@@ -525,7 +525,7 @@ export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' );
+export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
 
 /**
  * Checks if the first node is less than or equal to the second.
@@ -536,7 +536,7 @@ export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' );
+export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
 
 /**
  * Checks if the first node is greater than or equal to the second.
@@ -547,40 +547,37 @@ export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' );
+export const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
 
 /**
- * Performs logical AND on two nodes.
+ * Performs a logical AND operation on multiple nodes.
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {...Node} nodes - The input nodes to be combined using AND.
  * @returns {OperatorNode}
  */
-export const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' );
+export const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
 
 /**
- * Performs logical OR on two nodes.
+ * Performs a logical OR operation on multiple nodes.
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {...Node} nodes - The input nodes to be combined using OR.
  * @returns {OperatorNode}
  */
-export const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' );
+export const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
 
 /**
  * Performs logical NOT on a node.
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} value - The value.
  * @returns {OperatorNode}
  */
-export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' );
+export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
 
 /**
  * Performs logical XOR on two nodes.
@@ -591,7 +588,7 @@ export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' );
+export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
 
 /**
  * Performs bitwise AND on two nodes.
@@ -602,7 +599,7 @@ export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' );
+export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
 
 /**
  * Performs bitwise NOT on a node.
@@ -613,7 +610,7 @@ export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' );
+export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
 
 /**
  * Performs bitwise OR on two nodes.
@@ -624,7 +621,7 @@ export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' );
+export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
 
 /**
  * Performs bitwise XOR on two nodes.
@@ -635,7 +632,7 @@ export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' );
  * @param {Node} bNode - The second input.
  * @returns {OperatorNode}
  */
-export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' );
+export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
 
 /**
  * Shifts a node to the left.
@@ -646,7 +643,7 @@ export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' );
  * @param {Node} bNode - The value to shift.
  * @returns {OperatorNode}
  */
-export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' );
+export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
 
 /**
  * Shifts a node to the right.
@@ -657,7 +654,7 @@ export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' );
  * @param {Node} bNode - The value to shift.
  * @returns {OperatorNode}
  */
-export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' );
+export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
 
 addMethodChaining( 'add', add );
 addMethodChaining( 'sub', sub );

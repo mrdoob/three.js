@@ -141,7 +141,7 @@ class ScriptableNode extends Node {
 		this.parameters = parameters;
 
 		this._local = new Resources();
-		this._output = scriptableValue();
+		this._output = scriptableValue( null );
 		this._outputs = {};
 		this._source = this.source;
 		this._method = null;
@@ -719,8 +719,8 @@ export default ScriptableNode;
  *
  * @tsl
  * @function
- * @param {?CodeNode} [codeNode=null] - The code node.
- * @param {Object} [parameters={}] - The parameters definition.
+ * @param {CodeNode} [codeNode] - The code node.
+ * @param {?Object} [parameters={}] - The parameters definition.
  * @returns {ScriptableNode}
  */
-export const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode );
+export const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode ).setParameterLength( 1, 2 );
