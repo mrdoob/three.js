@@ -1425,7 +1425,7 @@ class NodeBuilder {
 	 */
 	isInteger( type ) {
 
-		return /int|uint/.test( type );
+		return /int|uint|(i|u)vec/.test( type );
 
 	}
 
