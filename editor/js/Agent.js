@@ -179,13 +179,13 @@ class Agent {
 
 	async init() {
 
-			// Initialize Google AI
-			const ai = new GoogleGenAI( { apiKey: 'AIzaSyCFpCy19tslP3VeSLAPUM-zQjz6Ka9g5no' } );
+		// Initialize Google AI
+		// const session = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
 
-			// Get scene information
-			const sceneInfo = this.getSceneInfo();
+		// Get scene information
+		const sceneInfo = this.getSceneInfo();
 
-			// Prepare prompt
+		// Prepare prompt
 		const systemPrompt = `You are a Three.js scene manipulation assistant. Current scene info:
 		
 			${JSON.stringify( sceneInfo, null, 2 )}
