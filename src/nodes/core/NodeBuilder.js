@@ -266,14 +266,6 @@ class NodeBuilder {
 		 */
 		this.bindings = { vertex: {}, fragment: {}, compute: {} };
 
-
-		/**
-		 * This dictionary holds the declarations for each shader stage.
-		 *
-		 * @type {Object}
-		 */
-		this.declarations = { vertex: {}, fragment: {}, compute: {} };
-
 		/**
 		 * This dictionary maintains the binding indices per bind group.
 		 *
@@ -328,6 +320,13 @@ class NodeBuilder {
 		 * @type {Object<string,Array<NodeVar>|number>}
 		 */
 		this.vars = {};
+
+		/**
+		 * This dictionary holds the declarations for each shader stage.
+		 *
+		 * @type {Object}
+		 */
+		this.declarations = {};
 
 		/**
 		 * Current code flow.
@@ -1869,7 +1868,7 @@ class NodeBuilder {
 	registerDeclaration( node ) {
 
 		const shaderStage = this.shaderStage;
-		const declarations = this.declarations[ shaderStage ];
+		const declarations = this.declarations[ shaderStage ] || ( this.declarations[ shaderStage ] = {} );
 
 		const property = this.getPropertyName( node );
 
@@ -2183,6 +2182,7 @@ class NodeBuilder {
 
 		const previousFlow = this.flow;
 		const previousVars = this.vars;
+		const previousDeclarations = this.declarations;
 		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
 		const previousStack = this.stack;
@@ -2193,6 +2193,7 @@ class NodeBuilder {
 
 		this.flow = flow;
 		this.vars = {};
+		this.declarations = {};
 		this.cache = new NodeCache();
 		this.stack = stack();
 
@@ -2208,6 +2209,7 @@ class NodeBuilder {
 
 		this.flow = previousFlow;
 		this.vars = previousVars;
+		this.declarations = previousDeclarations;
 		this.cache = previousCache;
 		this.stack = previousStack;
 
