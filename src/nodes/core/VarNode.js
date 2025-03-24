@@ -74,12 +74,6 @@ class VarNode extends Node {
 
 	}
 
-	getHash( builder ) {
-
-		return this.name || super.getHash( builder );
-
-	}
-
 	getMemberType( builder, name ) {
 
 		return this.node.getMemberType( builder, name );
