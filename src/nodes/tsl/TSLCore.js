@@ -616,7 +616,7 @@ export const Fn = ( jsFunc, nodeType ) => {
  */
 export const tslFn = ( ...params ) => { // @deprecated, r168
 
-	console.warn( 'TSL.ShaderNode: tslFn() has been renamed to Fn().' );
+	console.warn( 'THREE.TSL: tslFn() has been renamed to Fn().' );
 	return Fn( ...params );
 
 };

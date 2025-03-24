@@ -287,7 +287,7 @@ export const Break = () => expression( 'break' ).append();
  */
 export const loop = ( ...params ) => { // @deprecated, r168
 
-	console.warn( 'TSL.LoopNode: loop() has been renamed to Loop().' );
+	console.warn( 'THREE.TSL: loop() has been renamed to Loop().' );
 	return Loop( ...params );
 
 };

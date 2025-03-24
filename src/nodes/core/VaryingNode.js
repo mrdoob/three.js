@@ -192,14 +192,14 @@ addMethodChaining( 'toVertexStage', vertexStage );
 
 addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'TSL.VaryingNode: .varying() has been renamed to .toVarying().' );
+	console.warn( 'THREE.TSL: .varying() has been renamed to .toVarying().' );
 	return varying( ...params );
 
 } );
 
 addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'TSL.VaryingNode: .vertexStage() has been renamed to .toVertexStage().' );
+	console.warn( 'THREE.TSL: .vertexStage() has been renamed to .toVertexStage().' );
 	return varying( ...params );
 
 } );
