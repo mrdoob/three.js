@@ -230,7 +230,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			console.warn( `THREE.TSL: } "${ tslName }" parameter length exceeds limit.` );
+			console.warn( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
 
 			return params.slice( 0, maxParams );
 
