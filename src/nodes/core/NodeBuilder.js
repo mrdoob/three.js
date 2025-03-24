@@ -266,6 +266,14 @@ class NodeBuilder {
 		 */
 		this.bindings = { vertex: {}, fragment: {}, compute: {} };
 
+
+		/**
+		 * This dictionary holds the declarations for each shader stage.
+		 *
+		 * @type {Object}
+		 */
+		this.declarations = { vertex: {}, fragment: {}, compute: {} };
+
 		/**
 		 * This dictionary maintains the binding indices per bind group.
 		 *
@@ -1226,6 +1234,8 @@ class NodeBuilder {
 
 		const attribute = new NodeAttribute( name, type );
 
+		this.registerDeclaration( attribute );
+
 		attributes.push( attribute );
 
 		return attribute;
@@ -1676,6 +1686,8 @@ class NodeBuilder {
 
 			this.uniforms[ shaderStage ].push( nodeUniform );
 
+			this.registerDeclaration( nodeUniform );
+
 			nodeData.uniform = nodeUniform;
 
 		}
@@ -1744,6 +1756,8 @@ class NodeBuilder {
 				vars.push( nodeVar );
 
 			}
+
+			this.registerDeclaration( nodeVar );
 
 			nodeData.variable = nodeVar;
 
@@ -1825,11 +1839,48 @@ class NodeBuilder {
 
 			varyings.push( nodeVarying );
 
+			this.registerDeclaration( nodeVarying );
+
 			nodeData.varying = nodeVarying;
 
 		}
 
 		return nodeVarying;
+
+	}
+
+	/**
+	 * Registers a node declaration in the current shader stage.
+	 *
+	 * @param {Object} node - The node to be registered.
+	 */
+	registerDeclaration( node ) {
+
+		const shaderStage = this.shaderStage;
+		const declarations = this.declarations[ shaderStage ];
+
+		const property = this.getPropertyName( node );
+
+		let index = 1;
+		let name = property;
+
+		// Automatically renames the property if the name is already in use.
+
+		while ( declarations[ name ] !== undefined ) {
+
+			name = property + '_' + index ++;
+
+		}
+
+		declarations[ name ] = node;
+
+		if ( index > 1 ) {
+
+			node.name = name;
+
+			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+
+		}
 
 	}
 
