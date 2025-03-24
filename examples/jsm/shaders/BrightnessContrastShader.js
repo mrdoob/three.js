@@ -6,7 +6,7 @@
  * Contrast: -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const BrightnessContrastShader = {
 

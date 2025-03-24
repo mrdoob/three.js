@@ -12,7 +12,7 @@ import {
  * - {@link https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/}.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const FXAAShader = {
 
@@ -146,7 +146,7 @@ const FXAAShader = {
 			float nGradient = abs( nLuminance - l.m );
 
 			e.pixelStep = e.isHorizontal ? texSize.y : texSize.x;
-			
+
 			if (pGradient < nGradient) {
 
 				e.pixelStep = -e.pixelStep;
@@ -226,7 +226,7 @@ const FXAAShader = {
 				nDistance = uv.x - nuv.x;
 
 			} else {
-				
+
 				pDistance = puv.y - uv.y;
 				nDistance = uv.y - nuv.y;
 
@@ -287,7 +287,7 @@ const FXAAShader = {
 		void main() {
 
 			gl_FragColor = ApplyFXAA( tDiffuse, resolution.xy, vUv );
-			
+
 		}`
 
 };

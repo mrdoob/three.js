@@ -22,7 +22,7 @@ import {
  * - [Sousa2008, Crysis Next Gen Effects, GDC2008]{@link http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt}.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const GodRaysDepthMaskShader = {
 
@@ -77,7 +77,7 @@ const GodRaysDepthMaskShader = {
  * decreased distance between samples.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const GodRaysGenerateShader = {
 
@@ -201,7 +201,7 @@ const GodRaysGenerateShader = {
  * fGodRayIntensity attenuates the god rays.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const GodRaysCombineShader = {
 

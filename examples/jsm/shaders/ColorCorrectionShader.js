@@ -8,7 +8,7 @@ import {
  * Color correction shader.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const ColorCorrectionShader = {
 

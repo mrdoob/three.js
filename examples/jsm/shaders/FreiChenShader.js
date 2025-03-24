@@ -11,7 +11,7 @@ import {
  * aspect: vec2 of (1/width, 1/height)
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const FreiChenShader = {
 

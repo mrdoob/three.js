@@ -8,7 +8,7 @@ import {
  * Colorify shader.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const ColorifyShader = {
 

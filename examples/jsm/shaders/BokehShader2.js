@@ -11,7 +11,7 @@ import {
  * Requires #define RINGS and SAMPLES integers
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const BokehShader = {
 

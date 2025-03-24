@@ -22,7 +22,7 @@ const meshphong_frag_body = ShaderChunk[ 'meshphong_frag' ].slice( ShaderChunk[ 
  * Based on GDC 2011 – [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const SubsurfaceScatteringShader = {
 

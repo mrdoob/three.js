@@ -8,13 +8,11 @@ import {
  * Luminosity high pass shader.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const LuminosityHighPassShader = {
 
 	name: 'LuminosityHighPassShader',
-
-	shaderID: 'luminosityHighPass',
 
 	uniforms: {
 

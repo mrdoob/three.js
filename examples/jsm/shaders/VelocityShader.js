@@ -10,7 +10,7 @@ import {
  * Mesh velocity shader by @bhouston.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const VelocityShader = {
 
