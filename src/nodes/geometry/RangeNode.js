@@ -169,4 +169,4 @@ export default RangeNode;
  * @param {Node<any>} [maxNode=float()] - A node defining the upper bound of the range.
  * @returns {RangeNode}
  */
-export const range = /*@__PURE__*/ nodeProxy( RangeNode );
+export const range = /*@__PURE__*/ nodeProxy( RangeNode ).setParameterLength( 2 );

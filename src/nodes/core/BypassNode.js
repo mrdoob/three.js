@@ -88,6 +88,6 @@ export default BypassNode;
  * @param {Node} callNode - The call node.
  * @returns {BypassNode}
  */
-export const bypass = /*@__PURE__*/ nodeProxy( BypassNode );
+export const bypass = /*@__PURE__*/ nodeProxy( BypassNode ).setParameterLength( 2 );
 
 addMethodChaining( 'bypass', bypass );

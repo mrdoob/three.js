@@ -173,7 +173,7 @@ export default VaryingNode;
  * @param {?string} name - The name of the varying in the shader.
  * @returns {VaryingNode}
  */
-export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
+export const varying = /*@__PURE__*/ nodeProxy( VaryingNode ).setParameterLength( 1, 2 );
 
 /**
  * Computes a node in the vertex stage.

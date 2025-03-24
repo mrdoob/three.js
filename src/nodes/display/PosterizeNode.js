@@ -62,4 +62,4 @@ export default PosterizeNode;
  * @param {Node} stepsNode - Controls the intensity of the posterization effect. A lower number results in a more blocky appearance.
  * @returns {PosterizeNode}
  */
-export const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode );
+export const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode ).setParameterLength( 2 );

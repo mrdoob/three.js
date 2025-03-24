@@ -140,4 +140,4 @@ export default StorageArrayElementNode;
  * @param {Node} indexNode - The index node that defines the element access.
  * @returns {StorageArrayElementNode}
  */
-export const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode );
+export const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode ).setParameterLength( 2 );

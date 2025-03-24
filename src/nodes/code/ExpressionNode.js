@@ -61,8 +61,8 @@ export default ExpressionNode;
  *
  * @tsl
  * @function
- * @param {string} [snippet=''] - The native code snippet.
- * @param {string} [nodeType='void'] - The node type.
+ * @param {string} [snippet] - The native code snippet.
+ * @param {?string} [nodeType='void'] - The node type.
  * @returns {ExpressionNode}
  */
-export const expression = /*@__PURE__*/ nodeProxy( ExpressionNode );
+export const expression = /*@__PURE__*/ nodeProxy( ExpressionNode ).setParameterLength( 1, 2 );

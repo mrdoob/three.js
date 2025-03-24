@@ -278,10 +278,10 @@ export const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDep
  *
  * @tsl
  * @function
- * @param {Node<float>} value - The perspective depth.
+ * @param {?Node<float>} [value=null] - The perspective depth. If `null` is provided, the current fragment's depth is used.
  * @returns {ViewportDepthNode<float>}
  */
-export const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
+export const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH ).setParameterLength( 0, 1 );
 
 /**
  * TSL object that represents the linear (orthographic) depth value of the current fragment

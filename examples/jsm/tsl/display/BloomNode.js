@@ -457,7 +457,7 @@ class BloomNode extends TempNode {
 
 		//
 
-		const colorTexture = texture();
+		const colorTexture = texture( null );
 		const gaussianCoefficients = uniformArray( coefficients );
 		const invSize = uniform( new Vector2() );
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
