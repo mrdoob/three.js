@@ -222,7 +222,7 @@ addMethodChaining( 'select', select );
  */
 export const cond = ( ...params ) => { // @deprecated, r168
 
-	console.warn( 'TSL.ConditionalNode: cond() has been renamed to select().' );
+	console.warn( 'THREE.TSL: cond() has been renamed to select().' );
 	return select( ...params );
 
 };

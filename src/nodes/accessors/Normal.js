@@ -23,7 +23,7 @@ export const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
 
-		console.warn( 'TSL.NormalNode: Vertex attribute "normal" not found on geometry.' );
+		console.warn( 'THREE.TSL: Vertex attribute "normal" not found on geometry.' );
 
 		return vec3( 0, 1, 0 );
 

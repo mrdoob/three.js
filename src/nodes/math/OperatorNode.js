@@ -1,6 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, int, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * This node represents basic mathematical and logical operations like addition,
@@ -199,6 +199,11 @@ class OperatorNode extends TempNode {
 				typeA = type;
 				typeB = builder.changeComponentType( typeB, 'uint' );
 
+			} else if ( op === '%' ) {
+
+				typeA = type;
+				typeB = builder.isInteger( typeA ) && builder.isInteger( typeB ) ? typeB : typeA;
+
 			} else if ( builder.isMatrix( typeA ) ) {
 
 				if ( typeB === 'float' ) {
@@ -352,6 +357,20 @@ class OperatorNode extends TempNode {
 
 				}
 
+			} else if ( op === '%' ) {
+
+				if ( isGLSL && builder.isInteger( typeB ) === false ) {
+
+					return builder.format( `${ builder.getMethod( 'mod', output ) }( ${ a }, ${ b } )`, type, output );
+
+				} else {
+
+					// WGSL
+
+					return builder.format( `( ${ a } % ${ b } )`, type, output );
+
+				}
+
 			} else if ( op === '!' || op === '~' ) {
 
 				return builder.format( `(${op}${a})`, typeA, output );
@@ -429,8 +448,8 @@ export default OperatorNode;
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
@@ -441,8 +460,8 @@ export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' ).setParameterLeng
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
@@ -453,8 +472,8 @@ export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' ).setParameterLeng
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
@@ -465,31 +484,31 @@ export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' ).setParameterLeng
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
 export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
 
 /**
- * Computes the remainder of dividing the first node by the second, for integer values.
+ * Computes the remainder of dividing the first node by the second one.
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'modInt' );
+export const mod = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
 
 /**
  * Checks if two nodes are equal.
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
@@ -499,8 +518,8 @@ export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterL
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
@@ -510,8 +529,8 @@ export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParamet
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
@@ -521,8 +540,8 @@ export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParamete
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
@@ -532,8 +551,8 @@ export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParam
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
@@ -543,8 +562,8 @@ export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setPa
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
@@ -584,8 +603,8 @@ export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' ).setParameterLeng
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
@@ -595,8 +614,8 @@ export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLen
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
@@ -606,8 +625,8 @@ export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterL
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
@@ -617,8 +636,8 @@ export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterL
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
@@ -628,8 +647,8 @@ export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLe
  *
  * @tsl
  * @function
- * @param {Node} aNode - The first input.
- * @param {Node} bNode - The second input.
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
 export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
@@ -639,8 +658,8 @@ export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterL
  *
  * @tsl
  * @function
- * @param {Node} aNode - The node to shift.
- * @param {Node} bNode - The value to shift.
+ * @param {Node} a - The node to shift.
+ * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
 export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
@@ -650,8 +669,8 @@ export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParame
  *
  * @tsl
  * @function
- * @param {Node} aNode - The node to shift.
- * @param {Node} bNode - The value to shift.
+ * @param {Node} a - The node to shift.
+ * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
 export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
@@ -660,7 +679,7 @@ addMethodChaining( 'add', add );
 addMethodChaining( 'sub', sub );
 addMethodChaining( 'mul', mul );
 addMethodChaining( 'div', div );
-addMethodChaining( 'modInt', modInt );
+addMethodChaining( 'mod', mod );
 addMethodChaining( 'equal', equal );
 addMethodChaining( 'notEqual', notEqual );
 addMethodChaining( 'lessThan', lessThan );
@@ -681,16 +700,34 @@ addMethodChaining( 'shiftRight', shiftRight );
 /**
  * @tsl
  * @function
- * @deprecated since r168. Use {@link modInt} instead.
+ * @deprecated since r168. Use {@link mod} instead.
  *
- * @param {...any} params
- * @returns {Function}
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
+ * @returns {OperatorNode}
  */
-export const remainder = ( ...params ) => { // @deprecated, r168
+export const remainder = ( a, b ) => { // @deprecated, r168
 
-	console.warn( 'TSL.OperatorNode: .remainder() has been renamed to .modInt().' );
-	return modInt( ...params );
+	console.warn( 'THREE.TSL: "remainder()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	return mod( a, b );
+
+};
+
+/**
+ * @tsl
+ * @function
+ * @deprecated since r175. Use {@link mod} instead.
+ *
+ * @param {Node} a - The first input.
+ * @param {Node} b - The second input.
+ * @returns {OperatorNode}
+ */
+export const modInt = ( a, b ) => { // @deprecated, r175
+
+	console.warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	return mod( a, int( b ) );
 
 };
 
 addMethodChaining( 'remainder', remainder );
+addMethodChaining( 'modInt', modInt );

@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { sub, mul, div, equal } from './OperatorNode.js';
+import { sub, mul, div, mod, equal } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
@@ -152,10 +152,6 @@ class MathNode extends TempNode {
 
 			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
 
-		} else if ( method === MathNode.MOD ) {
-
-			return this.aNode.getNodeType( builder );
-
 		} else {
 
 			return this.getInputType( builder );
@@ -219,7 +215,7 @@ class MathNode extends TempNode {
 
 			const params = [];
 
-			if ( method === MathNode.CROSS || method === MathNode.MOD ) {
+			if ( method === MathNode.CROSS ) {
 
 				params.push(
 					a.build( builder, type ),
@@ -233,7 +229,7 @@ class MathNode extends TempNode {
 					b.build( builder, inputType )
 				);
 
-			} else if ( ( coordinateSystem === WebGLCoordinateSystem && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
+			} else if ( coordinateSystem === WebGLCoordinateSystem && ( method === MathNode.MIN || method === MathNode.MAX ) ) {
 
 				params.push(
 					a.build( builder, inputType ),
@@ -336,7 +332,6 @@ MathNode.BITCAST = 'bitcast';
 MathNode.EQUALS = 'equals';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
-MathNode.MOD = 'mod';
 MathNode.STEP = 'step';
 MathNode.REFLECT = 'reflect';
 MathNode.DISTANCE = 'distance';
@@ -763,17 +758,6 @@ export const min = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN ).setParamete
 export const max = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX ).setParameterLength( 2, Infinity );
 
 /**
- * Computes the remainder of dividing the first node by the second one.
- *
- * @tsl
- * @function
- * @param {Node | number} x - The y parameter.
- * @param {Node | number} y - The x parameter.
- * @returns {Node}
- */
-export const mod = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MOD ).setParameterLength( 2 );
-
-/**
  * Generate a step function by comparing two values.
  *
  * @tsl
@@ -1084,7 +1068,6 @@ addMethodChaining( 'fwidth', fwidth );
 addMethodChaining( 'atan2', atan2 );
 addMethodChaining( 'min', min );
 addMethodChaining( 'max', max );
-addMethodChaining( 'mod', mod );
 addMethodChaining( 'step', step );
 addMethodChaining( 'reflect', reflect );
 addMethodChaining( 'distance', distance );

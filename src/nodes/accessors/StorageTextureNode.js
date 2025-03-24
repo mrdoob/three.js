@@ -11,7 +11,7 @@ import { NodeAccess } from '../core/constants.js';
  *
  * const computeTexture = Fn( ( { storageTexture } ) => {
  *
- * 	const posX = instanceIndex.modInt( width );
+ * 	const posX = instanceIndex.mod( width );
  * 	const posY = instanceIndex.div( width );
  * 	const indexUV = uvec2( posX, posY );
  *
