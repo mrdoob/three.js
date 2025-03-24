@@ -6,7 +6,7 @@
  * Requires power-of-2 sized render target with enabled mipmaps.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const DOFMipMapShader = {
 

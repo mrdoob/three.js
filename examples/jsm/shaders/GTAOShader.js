@@ -16,7 +16,7 @@ import {
  * - [Horizon-Based Indirect Lighting (HBIL)]{@link https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf}
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const GTAOShader = {
 
@@ -69,7 +69,7 @@ const GTAOShader = {
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform mat4 cameraProjectionMatrix;
-		uniform mat4 cameraProjectionMatrixInverse;		
+		uniform mat4 cameraProjectionMatrixInverse;
 		uniform mat4 cameraWorldMatrix;
 		uniform float radius;
 		uniform float distanceExponent;
@@ -80,7 +80,7 @@ const GTAOShader = {
 			uniform vec3 sceneBoxMin;
 			uniform vec3 sceneBoxMax;
 		#endif
-		
+
 		#include <common>
 		#include <packing>
 
@@ -94,11 +94,11 @@ const GTAOShader = {
 			return viewSpacePosition.xyz / viewSpacePosition.w;
 		}
 
-		float getDepth(const vec2 uv) {  
+		float getDepth(const vec2 uv) {
 			return textureLod(tDepth, uv.xy, 0.0).DEPTH_SWIZZLING;
 		}
 
-		float fetchDepth(const ivec2 uv) {   
+		float fetchDepth(const ivec2 uv) {
 			return texelFetch(tDepth, uv.xy, 0).DEPTH_SWIZZLING;
 		}
 
@@ -148,7 +148,7 @@ const GTAOShader = {
 			float sampleSceneDepth = getDepth(sampleUv);
 			return vec3(sampleUv, sampleSceneDepth);
 		}
-		
+
 		void main() {
 			float depth = getDepth(vUv.xy);
 			if (depth >= 1.0) {
@@ -174,7 +174,7 @@ const GTAOShader = {
 					return;
 				}
 			#endif
-			
+
 			vec2 noiseResolution = vec2(textureSize(tNoise, 0));
 			vec2 noiseUv = vUv * resolution / noiseResolution;
 			vec4 noiseTexel = textureLod(tNoise, noiseUv, 0.0);
@@ -187,21 +187,21 @@ const GTAOShader = {
 			const int STEPS = (SAMPLES + DIRECTIONS - 1) / DIRECTIONS;
 			float ao = 0.0;
 			for (int i = 0; i < DIRECTIONS; ++i) {
-				
+
 				float angle = float(i) / float(DIRECTIONS) * PI;
-				vec4 sampleDir = vec4(cos(angle), sin(angle), 0., 0.5 + 0.5 * noiseTexel.w); 
+				vec4 sampleDir = vec4(cos(angle), sin(angle), 0., 0.5 + 0.5 * noiseTexel.w);
 				sampleDir.xyz = normalize(kernelMatrix * sampleDir.xyz);
 
 				vec3 viewDir = normalize(-viewPos.xyz);
 				vec3 sliceBitangent = normalize(cross(sampleDir.xyz, viewDir));
 				vec3 sliceTangent = cross(sliceBitangent, viewDir);
 				vec3 normalInSlice = normalize(viewNormal - sliceBitangent * dot(viewNormal, sliceBitangent));
-				
+
 				vec3 tangentToNormalInSlice = cross(normalInSlice, sliceBitangent);
 				vec2 cosHorizons = vec2(dot(viewDir, tangentToNormalInSlice), dot(viewDir, -tangentToNormalInSlice));
-				
+
 				for (int j = 0; j < STEPS; ++j) {
-					vec3 sampleViewOffset = sampleDir.xyz * radiusToUse * sampleDir.w * pow(float(j + 1) / float(STEPS), distanceExponent);	
+					vec3 sampleViewOffset = sampleDir.xyz * radiusToUse * sampleDir.w * pow(float(j + 1) / float(STEPS), distanceExponent);
 
 					vec3 sampleSceneUvDepth = getSceneUvAndDepth(viewPos + sampleViewOffset);
 					vec3 sampleSceneViewPos = getViewPosition(sampleSceneUvDepth.xy, sampleSceneUvDepth.z);
@@ -209,7 +209,7 @@ const GTAOShader = {
 					if (abs(viewDelta.z) < thickness) {
 						float sampleCosHorizon = dot(viewDir, normalize(viewDelta));
 						cosHorizons.x += max(0., (sampleCosHorizon - cosHorizons.x) * mix(1., 2. / float(j + 2), distanceFallOff));
-					}		
+					}
 
 					sampleSceneUvDepth = getSceneUvAndDepth(viewPos - sampleViewOffset);
 					sampleSceneViewPos = getViewPosition(sampleSceneUvDepth.xy, sampleSceneUvDepth.z);
@@ -229,7 +229,7 @@ const GTAOShader = {
 				ao += occlusion;
 			}
 
-			ao = clamp(ao / float(DIRECTIONS), 0., 1.);		
+			ao = clamp(ao / float(DIRECTIONS), 0., 1.);
 		#if SCENE_CLIP_BOX == 1
 			ao = mix(ao, 1., smoothstep(0., radiusToUse, boxDistance));
 		#endif

@@ -4,7 +4,7 @@
  * Full-screen copy shader pass.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const CopyShader = {
 

@@ -4,7 +4,7 @@
  * TODO
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const ExposureShader = {
 

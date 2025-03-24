@@ -5,7 +5,7 @@
  * [GLSL shader by Martins Upitis]{@link http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html}.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const BokehShader = {
 

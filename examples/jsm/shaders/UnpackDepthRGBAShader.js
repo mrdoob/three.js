@@ -4,7 +4,7 @@
  * Unpack RGBA depth shader that shows RGBA encoded depth as monochrome color.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const UnpackDepthRGBAShader = {
 

@@ -11,7 +11,7 @@ import {
  * Used by {@link SAOPass}.
  *
  * @constant
- * @type {Object}
+ * @type {Shader}
  */
 const SAOShader = {
 
