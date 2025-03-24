@@ -1864,6 +1864,8 @@ class NodeBuilder {
 		let index = 1;
 		let name = property;
 
+		// Auto rename if the name is already in use
+
 		while ( declarations[ name ] !== undefined ) {
 
 			name = property + '_' + index ++;
