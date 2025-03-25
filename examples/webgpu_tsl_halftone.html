@@ -152,7 +152,7 @@
 						.mul( mix( mixLow, mixHigh, orientationStrength ) );
 
 					return vec4( color, mask );
-			
+
 				} );
 
 				const halftones = Fn( ( [ input ] ) => {
@@ -202,7 +202,7 @@
 
 						const model = gltf.scene;
 						model.position.y = - 2;
-						model.scale.setScalar( 2.5, 2.5, 2.5 );
+						model.scale.setScalar( 2.5 );
 						model.traverse( ( child ) => {
 
 							if ( child.isMesh )
@@ -211,7 +211,7 @@
 						} );
 
 						scene.add( model );
-			
+
 					}
 				);
 
@@ -243,7 +243,7 @@
 			}
 
 			async function animate() {
-			
+
 				controls.update();
 
 				const time = clock.getElapsedTime();
