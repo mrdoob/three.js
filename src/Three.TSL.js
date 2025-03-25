@@ -129,6 +129,7 @@ export const cubeTexture = TSL.cubeTexture;
 export const dFdx = TSL.dFdx;
 export const dFdy = TSL.dFdy;
 export const dashSize = TSL.dashSize;
+export const debug = TSL.debug;
 export const defaultBuildStages = TSL.defaultBuildStages;
 export const defaultShaderStages = TSL.defaultShaderStages;
 export const defined = TSL.defined;

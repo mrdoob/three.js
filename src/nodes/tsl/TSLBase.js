@@ -23,6 +23,7 @@ export * from '../utils/RemapNode.js'; // .remap(), .remapClamp()
 export * from '../code/ExpressionNode.js'; // expression()
 export * from '../utils/Discard.js'; // Discard(), Return()
 export * from '../display/RenderOutputNode.js'; // .renderOutput()
+export * from '../utils/DebugNode.js'; // debug()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 
