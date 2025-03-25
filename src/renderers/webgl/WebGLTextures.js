@@ -2011,8 +2011,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 
-				// Handle mipmaps
-				if ( renderTarget.texture.mipmaps && renderTarget.texture.mipmaps.length > 0 ) {
+				const mipmaps = renderTarget.texture.mipmaps;
+
+				if ( mipmaps && mipmaps.length > 0 ) {
 
 					state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ 0 ] );
 
