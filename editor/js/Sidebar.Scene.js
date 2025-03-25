@@ -187,9 +187,9 @@ function SidebarScene( editor ) {
 
 	const backgroundColorSpace = new UISelect().setOptions( {
 
-		'': 'No Color Space',
-		'srgb-linear': 'sRGB (linear)',
-		'srgb': 'sRGB',
+		[ THREE.NoColorSpace ]: 'No Color Space',
+		[ THREE.LinearSRGBColorSpace ]: 'srgb-linear',
+		[ THREE.SRGBColorSpace ]: 'srgb',
 
 	} ).setWidth( '150px' );
 	backgroundColorSpace.setValue( THREE.NoColorSpace );
