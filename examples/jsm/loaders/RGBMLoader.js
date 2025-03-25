@@ -64,7 +64,7 @@ class RGBMLoader extends DataTextureLoader {
 	/**
 	 * Sets the maximum range.
 	 *
-	 * @param {number} value - The maximum range to set.
+	 * @param {(7|16)} value - The maximum range to set.
 	 * @return {RGBMLoader} A reference to this loader.
 	 */
 	setMaxRange( value ) {

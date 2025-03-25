@@ -90,7 +90,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	 * Sets the given line positions for this geometry. The length must be a multiple of six since
 	 * each line segment is defined by a start end vertex in the pattern `(xyz xyz)`.
 	 *
-	 * @param {Float32|Array} array - The position data to set.
+	 * @param {Float32Array|Array<number>} array - The position data to set.
 	 * @return {LineSegmentsGeometry} A reference to this geometry.
 	 */
 	setPositions( array ) {
@@ -127,7 +127,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	 * Sets the given line colors for this geometry. The length must be a multiple of six since
 	 * each line segment is defined by a start end color in the pattern `(rgb rgb)`.
 	 *
-	 * @param {Float32|Array} array - The position data to set.
+	 * @param {Float32Array|Array<number>} array - The position data to set.
 	 * @return {LineSegmentsGeometry} A reference to this geometry.
 	 */
 	setColors( array ) {

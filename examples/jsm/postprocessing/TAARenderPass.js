@@ -78,7 +78,7 @@ class TAARenderPass extends SSAARenderPass {
 	 * @param {number} deltaTime - The delta time in seconds.
 	 * @param {boolean} maskActive - Whether masking is active or not.
 	 */
-	render( renderer, writeBuffer, readBuffer, deltaTime ) {
+	render( renderer, writeBuffer, readBuffer, deltaTime/*, maskActive*/ ) {
 
 		if ( this.accumulate === false ) {
 
