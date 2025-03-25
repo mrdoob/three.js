@@ -2261,7 +2261,7 @@ class LDrawLoader extends Loader {
 
 						if ( ! parseLuminance( lineParser.getToken() ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + lineParser.getLineNumberString() + '.' );
 
 						}
 
