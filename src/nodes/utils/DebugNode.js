@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
-import { REVISION } from '../../constants.js';
 
 class DebugNode extends TempNode {
 
