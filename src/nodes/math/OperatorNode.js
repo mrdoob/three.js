@@ -359,15 +359,13 @@ class OperatorNode extends TempNode {
 
 			} else if ( op === '%' ) {
 
-				if ( isGLSL && builder.isInteger( typeB ) === false ) {
+				if ( builder.isInteger( typeB ) ) {
 
-					return builder.format( `${ builder.getMethod( 'mod', output ) }( ${ a }, ${ b } )`, type, output );
+					return builder.format( `( ${ a } % ${ b } )`, type, output );
 
 				} else {
 
-					// WGSL
-
-					return builder.format( `( ${ a } % ${ b } )`, type, output );
+					return builder.format( `${ builder.getMethod( 'mod', output ) }( ${ a }, ${ b } )`, type, output );
 
 				}
 
