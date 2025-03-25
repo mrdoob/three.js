@@ -9,7 +9,7 @@
  * Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const HalftoneShader = {
 

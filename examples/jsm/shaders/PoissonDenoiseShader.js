@@ -14,7 +14,7 @@ import {
  * - [Poisson2Sparse: Self-Supervised Poisson Denoising From a Single Image]{@link https://arxiv.org/pdf/2206.01856.pdf}
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const PoissonDenoiseShader = {
 

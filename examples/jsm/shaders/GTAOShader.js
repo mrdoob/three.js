@@ -16,7 +16,7 @@ import {
  * - [Horizon-Based Indirect Lighting (HBIL)]{@link https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf}
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const GTAOShader = {
 

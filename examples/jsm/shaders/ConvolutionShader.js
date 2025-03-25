@@ -8,7 +8,7 @@ import {
  * Convolution shader ported from o3d sample to WebGL / GLSL.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const ConvolutionShader = {
 

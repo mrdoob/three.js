@@ -17,7 +17,7 @@ import {
  * SSR shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SSRShader = {
 
@@ -249,7 +249,7 @@ const SSRShader = {
  * SSR Depth shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SSRDepthShader = {
 
@@ -324,7 +324,7 @@ const SSRDepthShader = {
  * SSR Blur shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SSRBlurShader = {
 

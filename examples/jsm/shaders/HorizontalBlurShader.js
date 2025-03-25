@@ -11,7 +11,7 @@
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const HorizontalBlurShader = {
 

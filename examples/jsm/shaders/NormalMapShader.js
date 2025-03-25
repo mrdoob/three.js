@@ -7,7 +7,7 @@ import {
 /**
  * Normal map shader, compute normals from heightmap.
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const NormalMapShader = {
 

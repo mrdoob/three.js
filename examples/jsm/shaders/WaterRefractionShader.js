@@ -4,7 +4,7 @@
  * Basic water refraction shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const WaterRefractionShader = {
 

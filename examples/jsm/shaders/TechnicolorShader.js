@@ -6,7 +6,7 @@
  * Demo here: {@link http://charliehoey.com/technicolor_shader/shader_test.html}
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const TechnicolorShader = {
 

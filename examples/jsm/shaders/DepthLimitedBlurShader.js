@@ -10,7 +10,7 @@ import {
  * Used by {@link SAOPass}.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const DepthLimitedBlurShader = {
 

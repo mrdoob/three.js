@@ -4,7 +4,7 @@
  * Inspired by [Three.js FBO motion trails]{@link https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&}.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const AfterimageShader = {
 
