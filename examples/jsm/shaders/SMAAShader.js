@@ -16,7 +16,7 @@ import {
  * SMAA Edges shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SMAAEdgesShader = {
 
@@ -129,7 +129,7 @@ const SMAAEdgesShader = {
  * SMAA Weights shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SMAAWeightsShader = {
 
@@ -391,7 +391,7 @@ const SMAAWeightsShader = {
  * SMAA Blend shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SMAABlendShader = {
 

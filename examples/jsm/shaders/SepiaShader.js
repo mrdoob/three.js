@@ -4,7 +4,7 @@
  * Sepia tone shader based on [glfx.js sepia shader]{@link https://github.com/evanw/glfx.js}.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SepiaShader = {
 

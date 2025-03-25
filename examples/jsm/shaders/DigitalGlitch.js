@@ -4,7 +4,7 @@
  * Digital glitch shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const DigitalGlitch = {
 

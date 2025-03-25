@@ -4,7 +4,7 @@
  * Simple shader for testing.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const BasicShader = {
 

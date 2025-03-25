@@ -12,7 +12,7 @@ import {
  * - {@link https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/}.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const FXAAShader = {
 

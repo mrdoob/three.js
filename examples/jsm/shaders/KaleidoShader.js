@@ -10,7 +10,7 @@
  * angle: initial angle in radians
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const KaleidoShader = {
 

@@ -14,7 +14,7 @@ import {
  * - {@link https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl}
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SSAOShader = {
 
@@ -192,7 +192,7 @@ const SSAOShader = {
  * SSAO depth shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const SSAODepthShader = {
 

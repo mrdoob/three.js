@@ -13,7 +13,7 @@ import {
  * Toon1 shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const ToonShader1 = {
 

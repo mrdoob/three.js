@@ -11,7 +11,7 @@ import {
  * This is not the only approach, therefore it's marked 1.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const VolumeRenderShader1 = {
 

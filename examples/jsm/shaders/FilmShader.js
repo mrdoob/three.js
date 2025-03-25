@@ -6,7 +6,7 @@
  * Used by {@link FilmPass}.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const FilmShader = {
 

@@ -7,7 +7,7 @@
  * Used by {@link OutputPass}.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const OutputShader = {
 

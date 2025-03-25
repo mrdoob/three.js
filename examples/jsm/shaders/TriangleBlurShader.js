@@ -12,7 +12,7 @@ import {
  * perpendicular triangle filters.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const TriangleBlurShader = {
 

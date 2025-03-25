@@ -8,7 +8,7 @@ import {
  * Luminosity high pass shader.
  *
  * @constant
- * @type {Shader}
+ * @type {ShaderMaterial~Shader}
  */
 const LuminosityHighPassShader = {
 
