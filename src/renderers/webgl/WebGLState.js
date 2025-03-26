@@ -95,7 +95,6 @@ function WebGLState( gl, extensions ) {
 					if ( reversed ) {
 
 						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
-						
 
 					} else {
 
