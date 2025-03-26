@@ -365,7 +365,7 @@ class OperatorNode extends TempNode {
 
 				} else {
 
-					return builder.format( `${ builder.getMethod( 'mod', output ) }( ${ a }, ${ b } )`, type, output );
+					return builder.format( `${ builder.getMethod( 'mod', type ) }( ${ a }, ${ b } )`, type, output );
 
 				}
 
@@ -723,7 +723,7 @@ export const remainder = ( a, b ) => { // @deprecated, r168
 export const modInt = ( a, b ) => { // @deprecated, r175
 
 	console.warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
-	return mod( a, int( b ) );
+	return mod( int( a ), int( b ) );
 
 };
 
