@@ -43,7 +43,7 @@ class DebugNode extends TempNode {
 
 		let code = '';
 		code += '// #--- TSL Debug ---#\n';
-		code += builder.flow.code.replace( /\t/g, '' ) + '\n';
+		code += builder.flow.code.replace( /^\t/mg, '' ) + '\n';
 		code += '/* ... */ ' + snippet + ' /* ... */\n';
 		code += '// #-----------------#\n';
 
