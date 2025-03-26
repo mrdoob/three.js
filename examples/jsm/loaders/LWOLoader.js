@@ -351,7 +351,7 @@ class MaterialParser {
 
 		const maps = this.parseTextureNodes( connections.maps );
 
-		this.parseAttributeImageMaps( connections.attributes, textures, maps, materialData.maps );
+		this.parseAttributeImageMaps( connections.attributes, textures, maps );
 
 		const attributes = this.parseAttributes( connections.attributes, maps );
 
@@ -535,7 +535,7 @@ class MaterialParser {
 
 				const mapData = attribute.maps[ 0 ];
 
-				const path = this.getTexturePathByIndex( mapData.imageIndex, textures );
+				const path = this.getTexturePathByIndex( mapData.imageIndex );
 				if ( ! path ) return;
 
 				const texture = this.loadTexture( path );
@@ -822,8 +822,8 @@ class GeometryParser {
 
 		geometry.computeVertexNormals();
 
-		this.parseUVs( geometry, layer, indices );
-		this.parseMorphTargets( geometry, layer, indices );
+		this.parseUVs( geometry, layer );
+		this.parseMorphTargets( geometry, layer );
 
 		// TODO: z may need to be reversed to account for coordinate system change
 		geometry.translate( - layer.pivot[ 0 ], - layer.pivot[ 1 ], - layer.pivot[ 2 ] );
