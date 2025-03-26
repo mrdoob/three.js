@@ -78,21 +78,17 @@ function WebGLState( gl, extensions ) {
 	function DepthBuffer() {
 
 		let locked = false;
-		let reversed = false;
 
+		let currentReversed = false;
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
 
 		return {
 
-			setReversed: function ( value ) {
+			setReversed: function ( reversed ) {
 
-				const changed = value !== reversed;
-
-				reversed = value;
-
-				if ( changed ) {
+				if ( currentReversed !== reversed ) {
 
 					const ext = extensions.get( 'EXT_clip_control' );
 
@@ -106,6 +102,8 @@ function WebGLState( gl, extensions ) {
 
 					}
 
+					currentReversed = reversed;
+
 					const oldDepth = currentDepthClear;
 					currentDepthClear = null;
 					this.setClear( oldDepth );
@@ -116,7 +114,7 @@ function WebGLState( gl, extensions ) {
 
 			getReversed: function () {
 
-				return reversed;
+				return currentReversed;
 
 			},
 
@@ -147,7 +145,7 @@ function WebGLState( gl, extensions ) {
 
 			setFunc: function ( depthFunc ) {
 
-				if ( reversed ) depthFunc = reversedFuncs[ depthFunc ];
+				if ( currentReversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -215,7 +213,7 @@ function WebGLState( gl, extensions ) {
 
 				if ( currentDepthClear !== depth ) {
 
-					if ( reversed ) {
+					if ( currentReversed ) {
 
 						depth = 1 - depth;
 
@@ -235,7 +233,7 @@ function WebGLState( gl, extensions ) {
 				currentDepthMask = null;
 				currentDepthFunc = null;
 				currentDepthClear = null;
-				reversed = false;
+				currentReversed = false;
 
 			}
 
