@@ -220,7 +220,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 		let tslName;
 
 		if ( name ) tslName = /[a-z]/i.test( name ) ? name + '()' : name;
-		else name = NodeClass.type;
+		else tslName = NodeClass.type;
 
 		if ( minParams !== undefined && params.length < minParams ) {
 

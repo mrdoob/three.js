@@ -53,21 +53,21 @@ class LightsNode extends Node {
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalDiffuseNode = vec3().toVar( 'totalDiffuse' );
+		this.totalDiffuseNode = vec3().toVar();
 
 		/**
 		 * A node representing the total specular light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalSpecularNode = vec3().toVar( 'totalSpecular' );
+		this.totalSpecularNode = vec3().toVar();
 
 		/**
 		 * A node representing the outgoing light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.outgoingLightNode = vec3().toVar( 'outgoingLight' );
+		this.outgoingLightNode = vec3().toVar();
 
 		/**
 		 * An array representing the lights in the scene.

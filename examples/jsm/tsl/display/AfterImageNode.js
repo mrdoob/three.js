@@ -41,7 +41,7 @@ class AfterImageNode extends TempNode {
 		 *
 		 * @type {TextureNode}
 		 */
-		this.textureNodeOld = texture();
+		this.textureNodeOld = texture( null );
 
 		/**
 		 * How quickly the after-image fades. A higher value means the after-image

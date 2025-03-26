@@ -140,7 +140,7 @@
 					// context, instanceIndex is a 1-dimensional value derived from the workgroup dimensions.
 			
 					// Cast to int to prevent unintended index overflow upon subtraction.
-					const x = int( index.modInt( WIDTH ) );
+					const x = int( index.mod( WIDTH ) );
 					const y = int( index.div( WIDTH ) );
 
 					// The original shader accesses height via texture uvs. However, unlike with textures, we can't
@@ -205,7 +205,7 @@
 					const newHeight = neighborHeight.mul( viscosity );
 
 					// Get 2-D compute coordinate from one-dimensional instanceIndex.
-					const x = float( instanceIndex.modInt( WIDTH ) ).mul( 1 / WIDTH );
+					const x = float( instanceIndex.mod( WIDTH ) ).mul( 1 / WIDTH );
 					const y = float( instanceIndex.div( WIDTH ) ).mul( 1 / WIDTH );
 
 					// Mouse influence
