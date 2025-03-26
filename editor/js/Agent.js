@@ -192,7 +192,7 @@ class Agent {
 	async init() {
 
 		// Initialize Google AI
-		const ai = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
+		const ai = new GoogleGenAI( { apiKey: 'AIzaSyAHEPxUn9Ow4Lk8oXM4jl3u_stzOIxkkGM' } );
 
 		// Get scene information
 		const sceneInfo = this.getSceneInfo();
@@ -410,7 +410,7 @@ class Agent {
 		Do not include any other text outside the JSON.`;
 
 		this.chat = await ai.chats.create( {
-			model: 'gemini-2.0-flash',
+			model: 'gemini-2.5-pro-exp-03-25',
 			history: [
 				{
 					role: 'user',
