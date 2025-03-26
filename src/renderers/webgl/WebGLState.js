@@ -88,7 +88,11 @@ function WebGLState( gl, extensions ) {
 
 			setReversed: function ( value ) {
 
-				if ( reversed !== value ) {
+				const changed = value !== reversed;
+
+				reversed = value;
+
+				if ( changed ) {
 
 					const ext = extensions.get( 'EXT_clip_control' );
 
@@ -107,8 +111,6 @@ function WebGLState( gl, extensions ) {
 					this.setClear( oldDepth );
 
 				}
-
-				reversed = value;
 
 			},
 
