@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - cameras - reverse depth buffer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				margin: 0;
+				background-color: #000;
+				color: #fff;
+				font-family: Monospace;
+				font-size: 13px;
+				line-height: 24px;
+				overscroll-behavior: none;
+			}
+
+			a {
+				color: #ff0;
+				text-decoration: none;
+			}
+
+			a:hover {
+				text-decoration: underline;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 10px;
+				box-sizing: border-box;
+				text-align: center;
+				-moz-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				pointer-events: none;
+				z-index: 1; /* TODO Solve this in HTML */
+			}
+
+			#container {
+				display: flex;
+			}
+
+			#container_normal,
+			#container_logarithmic,
+			#container_reverse {
+				width: 33%;
+				display: inline-block;
+				position: relative;
+			}
+
+			.container_label {
+				position: absolute;
+				bottom: 1em;
+				width: 100%;
+				color: white;
+				z-index: 10;
+				display: block;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div id="container_normal"><h2 class="container_label">normal z-buffer</h2></div>
+			<div id="container_logarithmic"><h2 class="container_label">logarithmic z-buffer</h2></div>
+			<div id="container_reverse"><h2 class="container_label">reverse z-buffer</h2></div>
+		</div>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - reverse depth buffer<br/>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			// https://webgpu.github.io/webgpu-samples/?sample=reversedZ
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			let stats, camera, scene, normalRenderer, logarithmicRenderer, reverseRenderer;
+			const meshes = [];
+
+			const renderTarget = new THREE.WebGLRenderTarget();
+			renderTarget.setSize( window.innerWidth * 0.33 * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
+			renderTarget.type = THREE.UnsignedByteType;
+			renderTarget.depthTexture = new THREE.DepthTexture();
+			renderTarget.depthTexture.type = THREE.FloatType;
+
+			const blitMesh = new THREE.Mesh(
+				undefined,
+				new THREE.ShaderMaterial( {
+					uniforms: {
+						tDiffuse: new THREE.Uniform( renderTarget.texture )
+					},
+					vertexShader: /* glsl */ `
+						out vec2 vUv;
+
+						void main() {
+
+							vUv = vec2( gl_VertexID << 1 & 2, gl_VertexID & 2 );
+							gl_Position = vec4( vUv * 2.0 - 1.0, 0, 1 );
+
+						}
+					`,
+					fragmentShader: /* glsl */ `
+						uniform sampler2D tDiffuse;
+						in vec2 vUv;
+
+						void main() {
+
+							gl_FragColor = texture( tDiffuse, vUv );
+
+						}
+					`
+				} )
+			);
+			blitMesh.geometry.setDrawRange( 0, 3 );
+			blitMesh.frustumCulled = false;
+
+			init();
+			animate();
+
+			function init() {
+
+				const container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				camera = new THREE.PerspectiveCamera( 72, 0.33 * window.innerWidth / window.innerHeight, 5, 9999 );
+				camera.position.z = 12;
+
+				scene = new THREE.Scene();
+
+				const xCount = 1;
+				const yCount = 5;
+				const numInstances = xCount * yCount;
+
+				const d = 0.0001; // half distance between two planes
+				const o = 0.5; // half x offset to shift planes so they are only partially overlaping
+
+				const positions = new Float32Array( [
+					- 1 - o, - 1, d,
+					1 - o, - 1, d,
+					- 1 - o, 1, d,
+					1 - o, - 1, d,
+					1 - o, 1, d,
+					- 1 - o, 1, d,
+
+					- 1 + o, - 1, - d,
+					1 + o, - 1, - d,
+					- 1 + o, 1, - d,
+					1 + o, - 1, - d,
+					1 + o, 1, - d,
+					- 1 + o, 1, - d,
+				] );
+
+				const colors = new Float32Array( [
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+				] );
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
+
+				for ( let i = 0; i < numInstances; i ++ ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+					meshes.push( mesh );
+					scene.add( mesh );
+
+				}
+
+				let i = 0;
+				for ( let x = 0; x < xCount; x ++ ) {
+
+					for ( let y = 0; y < yCount; y ++ ) {
+
+						const z = - 800 * i;
+						const s = 1 + 50 * i;
+
+						const mesh = meshes[ i ];
+						mesh.position.set(
+							x - xCount / 2 + 0.5,
+							( 4.0 - 0.2 * z ) * ( y - yCount / 2 + 1.0 ),
+							z
+						);
+						mesh.scale.setScalar( s );
+
+						i ++;
+
+					}
+
+				}
+
+				const normalContainer = document.getElementById( 'container_normal' );
+				normalRenderer = new THREE.WebGLRenderer();
+				normalRenderer.setPixelRatio( window.devicePixelRatio );
+				normalRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				normalRenderer.domElement.style.position = 'relative';
+				normalContainer.appendChild( normalRenderer.domElement );
+
+				const logarithmicContainer = document.getElementById( 'container_logarithmic' );
+				logarithmicRenderer = new THREE.WebGLRenderer( { logarithmicDepthBuffer: true } );
+				logarithmicRenderer.setPixelRatio( window.devicePixelRatio );
+				logarithmicRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				logarithmicRenderer.domElement.style.position = 'relative';
+				logarithmicContainer.appendChild( logarithmicRenderer.domElement );
+
+				const reverseContainer = document.getElementById( 'container_reverse' );
+				reverseRenderer = new THREE.WebGLRenderer( { reverseDepthBuffer: true } );
+				reverseRenderer.setPixelRatio( window.devicePixelRatio );
+				reverseRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				reverseRenderer.domElement.style.position = 'relative';
+				reverseContainer.appendChild( reverseRenderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const now = performance.now() / 1000;
+
+				for ( let i = 0; i < meshes.length; i ++ ) {
+
+					const angle = THREE.MathUtils.degToRad( 30 );
+					const halfAngle = angle / 2, s = Math.sin( halfAngle );
+
+					meshes[ i ].quaternion.set( Math.sin( now ) * s, Math.cos( now ) * s, 0, Math.cos( halfAngle ) );
+
+				}
+
+				render();
+
+			}
+
+			function render() {
+
+				normalRenderer.setRenderTarget( renderTarget );
+				normalRenderer.render( scene, camera );
+				normalRenderer.setRenderTarget( null );
+				normalRenderer.render( blitMesh, camera );
+
+				logarithmicRenderer.setRenderTarget( renderTarget );
+				logarithmicRenderer.render( scene, camera );
+				logarithmicRenderer.setRenderTarget( null );
+				logarithmicRenderer.render( blitMesh, camera );
+
+				reverseRenderer.setRenderTarget( renderTarget );
+				reverseRenderer.render( scene, camera );
+				reverseRenderer.setRenderTarget( null );
+				reverseRenderer.render( blitMesh, camera );
+
+				stats.update();
+
+			}
+
+			function onWindowResize() {
+
+				renderTarget.setSize( window.innerWidth * 0.33 * devicePixelRatio, window.innerHeight * devicePixelRatio );
+
+				normalRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				logarithmicRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				reverseRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+
+				camera.aspect = 0.33 * window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+		</script>
+
+	</body>
+</html>
