@@ -70,8 +70,8 @@ class Agent {
 		messageBubble.style.marginBottom = '8px';
 		messageBubble.style.fontSize = '14px';
 		messageBubble.style.position = 'relative';
-		messageBubble.style.maxHeight = '400px';  // Add max height
-		messageBubble.style.overflowY = 'auto';   // Add vertical scrollbar when needed
+		messageBubble.style.maxHeight = '400px'; // Add max height
+		messageBubble.style.overflowY = 'auto'; // Add vertical scrollbar when needed
 
 		// Add message container first
 		const messageContainer = document.createElement( 'div' );
@@ -91,8 +91,11 @@ class Agent {
 		closeButton.style.lineHeight = '14px';
 		closeButton.style.zIndex = '1';
 		closeButton.onclick = () => {
+
 			messageBubble.style.display = 'none';
+
 		};
+
 		messageBubble.appendChild( closeButton );
 
 		// Create input area
@@ -150,37 +153,46 @@ class Agent {
 
 		// Store references
 		this.messageBubble = messageBubble;
+
 	}
 
 	showError( message ) {
+
 		this.showMessage( message, 'error' );
+
 	}
 
 	showMessage( message, type = 'normal' ) {
+
 		// Get the message container
 		const messageContainer = this.messageBubble.querySelector( '.message-text' );
 		const closeButton = this.messageBubble.querySelector( 'div:last-child' );
 
 		// Set styles based on message type
 		if ( type === 'error' ) {
+
 			this.messageBubble.style.backgroundColor = '#ffebee';
 			this.messageBubble.style.color = '#d32f2f';
 			closeButton.style.color = '#d32f2f';
+
 		} else {
+
 			this.messageBubble.style.backgroundColor = '#e8f5e9';
 			this.messageBubble.style.color = '#2e7d32';
 			closeButton.style.color = '#2e7d32';
+
 		}
 
 		// Update message text
 		messageContainer.textContent = message;
 		this.messageBubble.style.display = 'block';
+
 	}
 
 	async init() {
 
 		// Initialize Google AI
-		const session = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
+		const ai = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
 
 		// Get scene information
 		const sceneInfo = this.getSceneInfo();
@@ -397,27 +409,27 @@ class Agent {
 
 		Do not include any other text outside the JSON.`;
 
-		this.chat = await ai.chats.create({
-			model: "gemini-2.0-flash",
+		this.chat = await ai.chats.create( {
+			model: 'gemini-2.0-flash',
 			history: [
 				{
-				role: "user",
-				parts: [{ text: systemPrompt }],
+					role: 'user',
+					parts: [ { text: systemPrompt } ],
 				},
 				{
-				role: "model",
-				parts: [
-					{
-					text: "I'm ready to help you create and modify your 3D scene.",
-					},
-				],
+					role: 'model',
+					parts: [
+						{
+							text: 'I\'m ready to help you create and modify your 3D scene.',
+						},
+					],
 				},
 			],
 			config: {
 				temperature: 0.2,
 				maxOutputTokens: 2048
 			},
-		});
+		} );
 
 		console.log( 'CHAT:', this.chat );
 
@@ -745,7 +757,7 @@ class Agent {
 						// Handle removing textures
 						value = null;
 
-					} else if ( typeof value === 'string' && !isNaN( value ) ) {
+					} else if ( typeof value === 'string' && ! isNaN( value ) ) {
 
 						// Convert numeric strings to numbers
 						value = parseFloat( value );
@@ -899,11 +911,11 @@ class Agent {
 		} );
 
 		const objects = scene.children.map( obj => ( {
-				type: obj.type,
-				name: obj.name,
+			type: obj.type,
+			name: obj.name,
 			baseName: obj.name.replace( /\d+$/, '' ), // Add base name
-				position: obj.position,
-				rotation: obj.rotation,
+			position: obj.position,
+			rotation: obj.rotation,
 			scale: obj.scale,
 			isMesh: obj.isMesh,
 			isLight: obj.isLight,
