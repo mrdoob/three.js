@@ -192,7 +192,7 @@ class Agent {
 	async init() {
 
 		// Initialize Google AI
-		const ai = new GoogleGenAI( { apiKey: 'AIzaSyAHEPxUn9Ow4Lk8oXM4jl3u_stzOIxkkGM' } );
+		const ai = new GoogleGenAI( { apiKey: 'GENAI_API_KEY' } );
 
 		// Get scene information
 		const sceneInfo = this.getSceneInfo();
