@@ -244,9 +244,8 @@
 				for ( let i = 0; i < meshes.length; i ++ ) {
 
 					const angle = THREE.MathUtils.degToRad( 30 );
-					const halfAngle = angle / 2, s = Math.sin( halfAngle );
-
-					meshes[ i ].quaternion.set( Math.sin( now ) * s, Math.cos( now ) * s, 0, Math.cos( halfAngle ) );
+					const axis = new THREE.Vector3( Math.sin( now ), Math.cos( now ), 0 );
+					meshes[ i ].quaternion.setFromAxisAngle( axis, angle );
 
 				}
 
