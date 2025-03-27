@@ -393,7 +393,7 @@ class OperatorNode extends TempNode {
 
 					let snippet = `( ${ a } ${ op } ${ b } )`;
 
-					if ( type === 'bool' ) {
+					if ( ! isGLSL && type === 'bool' ) {
 
 						snippet = `all${ snippet }`;
 
