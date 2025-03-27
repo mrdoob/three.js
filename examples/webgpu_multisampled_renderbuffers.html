@@ -48,7 +48,7 @@
 			const count = 50;
 			const fullRadius = 20; // Radius of the sphere
 			const halfRadius = 10; // Radius of the sphere
-			const positions = Array.from({ length: count }, (_, i) => {
+			const positions = new Array( count ).fill().map( ( _, i ) => {
 
 				const radius = ( i % 2 === 0 ) ? fullRadius : halfRadius;
 
