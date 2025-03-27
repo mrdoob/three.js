@@ -133,6 +133,7 @@ class ConditionalNode extends Node {
 
 		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
+		const functionNode = builder.currentFunctionNode;
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
@@ -153,6 +154,14 @@ class ConditionalNode extends Node {
 			} else {
 
 				ifSnippet = 'return ' + ifSnippet + ';';
+
+				if ( functionNode === null ) {
+
+					console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+
+					ifSnippet = '// ' + ifSnippet;
+
+				}
 
 			}
 
@@ -175,6 +184,14 @@ class ConditionalNode extends Node {
 				} else {
 
 					elseSnippet = 'return ' + elseSnippet + ';';
+
+					if ( functionNode === null ) {
+
+						console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+
+						elseSnippet = '// ' + elseSnippet;
+
+					}
 
 				}
 

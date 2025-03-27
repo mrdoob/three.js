@@ -224,13 +224,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			console.warn( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+			console.error( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			console.warn( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+			console.error( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
 
 			return params.slice( 0, maxParams );
 
@@ -560,7 +560,35 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const Fn = ( jsFunc, nodeType ) => {
+let fnId = 0;
+
+export const Fn = ( jsFunc, layout = null ) => {
+
+	let nodeType = null;
+
+	if ( layout !== null ) {
+
+		if ( typeof layout === 'object' ) {
+
+			nodeType = layout.return;
+
+		} else {
+
+			if ( typeof layout === 'string' ) {
+
+				nodeType = layout;
+
+			} else {
+
+				console.error( 'THREE.TSL: Invalid layout type.' );
+
+			}
+
+			layout = null;
+
+		}
+
+	}
 
 	const shaderNode = new ShaderNode( jsFunc, nodeType );
 
@@ -601,6 +629,35 @@ export const Fn = ( jsFunc, nodeType ) => {
 		return fn;
 
 	};
+
+	if ( layout !== null ) {
+
+		if ( typeof layout.inputs !== 'object' ) {
+
+			const fullLayout = {
+				name: 'fn' + fnId ++,
+				type: nodeType,
+				inputs: []
+			};
+
+			for ( const name in layout ) {
+
+				if ( name === 'return' ) continue;
+
+				fullLayout.inputs.push( {
+					name: name,
+					type: layout[ name ]
+				} );
+
+			}
+
+			layout = fullLayout;
+
+		}
+
+		fn.setLayout( layout );
+
+	}
 
 	return fn;
 

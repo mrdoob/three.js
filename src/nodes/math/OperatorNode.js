@@ -391,7 +391,15 @@ class OperatorNode extends TempNode {
 
 				} else {
 
-					return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
+					let snippet = `( ${ a } ${ op } ${ b } )`;
+
+					if ( ! isGLSL && type === 'bool' && builder.isVector( typeA ) && builder.isVector( typeB ) ) {
+
+						snippet = `all${ snippet }`;
+
+					}
+
+					return builder.format( snippet, type, output );
 
 				}
 
