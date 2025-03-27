@@ -17,12 +17,12 @@ export function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		console.warn( `Redefinition of method chaining ${ name }` );
+		console.warn( `THREE.TSL: Redefinition of method chaining '${ name }'.` );
 		return;
 
 	}
 
-	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
+	if ( typeof nodeElement !== 'function' ) throw new Error( `THREE.TSL: Node element ${ name } is not a function` );
 
 	NodeElements.set( name, nodeElement );
 

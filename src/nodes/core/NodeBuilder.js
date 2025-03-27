@@ -2614,13 +2614,13 @@ class NodeBuilder {
 
 		if ( fromTypeLength === 16 && toTypeLength === 9 ) {
 
-			return `${ this.getType( toType ) }(${ snippet }[0].xyz, ${ snippet }[1].xyz, ${ snippet }[2].xyz)`;
+			return `${ this.getType( toType ) }( ${ snippet }[ 0 ].xyz, ${ snippet }[ 1 ].xyz, ${ snippet }[ 2 ].xyz )`;
 
 		}
 
 		if ( fromTypeLength === 9 && toTypeLength === 4 ) {
 
-			return `${ this.getType( toType ) }(${ snippet }[0].xy, ${ snippet }[1].xy)`;
+			return `${ this.getType( toType ) }( ${ snippet }[ 0 ].xy, ${ snippet }[ 1 ].xy )`;
 
 		}
 
