@@ -393,7 +393,7 @@ class OperatorNode extends TempNode {
 
 					let snippet = `( ${ a } ${ op } ${ b } )`;
 
-					if ( ! isGLSL && type === 'bool' ) {
+					if ( ! isGLSL && type === 'bool' && builder.isVector( typeA ) && builder.isVector( typeB ) ) {
 
 						snippet = `all${ snippet }`;
 
