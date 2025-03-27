@@ -61,6 +61,19 @@
 				display: block;
 				text-align: center;
 			}
+			
+			#depth-warning {
+				position: absolute;
+				top: 40px;
+				width: 100%;
+				padding: 10px;
+				box-sizing: border-box;
+				text-align: center;
+				color: #ff5555;
+				font-weight: bold;
+				z-index: 2;
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -72,6 +85,10 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - reverse depth buffer<br/>
+		</div>
+		
+		<div id="depth-warning">
+			Warning: Your GPU has less than 24-bit depth buffer precision. This example may not display correctly.
 		</div>
 
 		<script type="importmap">
@@ -202,6 +219,17 @@
 				reverseRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
 				reverseRenderer.domElement.style.position = 'relative';
 				reverseContainer.appendChild( reverseRenderer.domElement );
+
+				// Check depth buffer precision
+				const gl = normalRenderer.getContext();
+
+				const depthBits = gl.getParameter( gl.DEPTH_BITS );
+
+				if ( depthBits < 24 ) {
+
+					document.getElementById( 'depth-warning' ).style.display = 'block';
+
+				}
 
 				window.addEventListener( 'resize', onWindowResize );
 
