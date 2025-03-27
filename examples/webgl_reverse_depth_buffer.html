@@ -92,43 +92,6 @@
 			let stats, camera, scene, normalRenderer, logarithmicRenderer, reverseRenderer;
 			const meshes = [];
 
-			const renderTarget = new THREE.WebGLRenderTarget();
-			renderTarget.setSize( window.innerWidth * 0.33 * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
-			renderTarget.type = THREE.UnsignedByteType;
-			renderTarget.depthTexture = new THREE.DepthTexture();
-			renderTarget.depthTexture.type = THREE.FloatType;
-
-			const blitMesh = new THREE.Mesh(
-				undefined,
-				new THREE.ShaderMaterial( {
-					uniforms: {
-						tDiffuse: new THREE.Uniform( renderTarget.texture )
-					},
-					vertexShader: /* glsl */ `
-						out vec2 vUv;
-
-						void main() {
-
-							vUv = vec2( gl_VertexID << 1 & 2, gl_VertexID & 2 );
-							gl_Position = vec4( vUv * 2.0 - 1.0, 0, 1 );
-
-						}
-					`,
-					fragmentShader: /* glsl */ `
-						uniform sampler2D tDiffuse;
-						in vec2 vUv;
-
-						void main() {
-
-							gl_FragColor = texture( tDiffuse, vUv );
-
-						}
-					`
-				} )
-			);
-			blitMesh.geometry.setDrawRange( 0, 3 );
-			blitMesh.frustumCulled = false;
-
 			init();
 			animate();
 
@@ -265,28 +228,15 @@
 
 			function render() {
 
-				normalRenderer.setRenderTarget( renderTarget );
 				normalRenderer.render( scene, camera );
-				normalRenderer.setRenderTarget( null );
-				normalRenderer.render( blitMesh, camera );
-
-				logarithmicRenderer.setRenderTarget( renderTarget );
 				logarithmicRenderer.render( scene, camera );
-				logarithmicRenderer.setRenderTarget( null );
-				logarithmicRenderer.render( blitMesh, camera );
-
-				reverseRenderer.setRenderTarget( renderTarget );
 				reverseRenderer.render( scene, camera );
-				reverseRenderer.setRenderTarget( null );
-				reverseRenderer.render( blitMesh, camera );
 
 				stats.update();
 
 			}
 
 			function onWindowResize() {
-
-				renderTarget.setSize( window.innerWidth * 0.33 * devicePixelRatio, window.innerHeight * devicePixelRatio );
 
 				normalRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
 				logarithmicRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
