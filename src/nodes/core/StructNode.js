@@ -115,6 +115,16 @@ export const struct = ( membersLayout, name = null ) => {
 	struct.layout = structLayout;
 	struct.isStruct = true;
 
+	Object.defineProperty( struct, 'length', {
+
+		get() {
+
+		  	return Object.keys( membersLayout ).length;
+
+		}
+
+	} );
+
 	return struct;
 
 };
