@@ -1,6 +1,6 @@
-import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
+import { Clock, Vector3, Quaternion, Matrix4, LineSegments, LineBasicMaterial, BufferGeometry, BufferAttribute } from 'three';
 
-const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2';
+const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0';
 
 const frameRate = 60;
 
@@ -9,7 +9,7 @@ const ZERO = new Vector3();
 
 let RAPIER = null;
 
-function getCollider( geometry ) {
+function getShape( geometry ) {
 
 	const parameters = geometry.parameters;
 
@@ -28,6 +28,40 @@ function getCollider( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
+    } else if ( geometry.type === 'CylinderGeometry') {
+
+        const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius);
+
+    } else if ( geometry.type === 'CapsuleGeometry') {
+
+        const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.capsule( length / 2, radius);
+
+	} else if ( geometry.type === 'BufferGeometry' ) {
+
+		const vertices = [];
+		const vertex = new Vector3();
+		const position = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+			vertices.push( vertex.x, vertex.y, vertex.z );
+
+		}
+
+		// if the buffer is non-indexed, generate an index buffer
+		const indices = geometry.getIndex() === null
+							? Uint32Array.from( Array( parseInt( vertices.length / 3 ) ).keys() )
+							: geometry.getIndex().array;
+
+		return RAPIER.ColliderDesc.trimesh( vertices, indices );
+
 	}
 
 	return null;
@@ -38,12 +72,12 @@ async function RapierPhysics() {
 
 	if ( RAPIER === null ) {
 
-		RAPIER = await import( RAPIER_PATH );
+		RAPIER = await import( `${RAPIER_PATH}` );
 		await RAPIER.init();
 
 	}
 
-	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/	
+	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/
 
 	const gravity = new Vector3( 0.0, - 9.81, 0.0 );
 	const world = new RAPIER.World( gravity );
@@ -55,9 +89,33 @@ async function RapierPhysics() {
 	const _quaternion = new Quaternion();
 	const _matrix = new Matrix4();
 
+	function addScene( scene ) {
+
+		scene.traverse( function ( child ) {
+
+			if ( child.isMesh ) {
+
+				const physics = child.userData.physics;
+
+				if ( physics ) {
+
+					addMesh( child, physics.mass, physics.restitution );
+
+				}
+
+			}
+
+		} );
+
+	}
+
+    function getBody( mesh ){
+        return meshMap.get( mesh );
+    }
+
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
-		const shape = getCollider( mesh.geometry );
+		const shape = getShape( mesh.geometry );
 
 		if ( shape === null ) return;
 
@@ -68,12 +126,14 @@ async function RapierPhysics() {
 							? createInstancedBody( mesh, mass, shape )
 							: createBody( mesh.position, mesh.quaternion, mass, shape );
 
-		if ( mass > 0 ) {
+		//if ( mass > 0 ) {
 
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
 
-		}
+		//}
+
+        return body;
 
 	}
 
@@ -189,11 +249,39 @@ async function RapierPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+        RAPIER,
+        world,
+		addScene: addScene,
 		addMesh: addMesh,
 		setMeshPosition: setMeshPosition,
-		setMeshVelocity: setMeshVelocity
+		setMeshVelocity: setMeshVelocity,
+        getBody
 	};
 
 }
 
-export { RapierPhysics };
+class RapierDebugRenderer {
+    mesh
+    world
+    enabled = true
+  
+    constructor(scene, world) {
+      this.world = world
+      this.mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0xffffff, vertexColors: true }))
+      this.mesh.frustumCulled = false
+      scene.add(this.mesh)
+    }
+  
+    update() {
+      if (this.enabled) {
+        const { vertices, colors } = this.world.debugRender()
+        this.mesh.geometry.setAttribute('position', new BufferAttribute(vertices, 3))
+        this.mesh.geometry.setAttribute('color', new BufferAttribute(colors, 4))
+        this.mesh.visible = true
+      } else {
+        this.mesh.visible = false
+      }
+    }
+  }
+
+export { RapierPhysics, RapierDebugRenderer };
