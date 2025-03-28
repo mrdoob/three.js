@@ -173,7 +173,7 @@ export default VaryingNode;
  * @param {?string} name - The name of the varying in the shader.
  * @returns {VaryingNode}
  */
-export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
+export const varying = /*@__PURE__*/ nodeProxy( VaryingNode ).setParameterLength( 1, 2 );
 
 /**
  * Computes a node in the vertex stage.
@@ -192,14 +192,14 @@ addMethodChaining( 'toVertexStage', vertexStage );
 
 addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'TSL.VaryingNode: .varying() has been renamed to .toVarying().' );
+	console.warn( 'THREE.TSL: .varying() has been renamed to .toVarying().' );
 	return varying( ...params );
 
 } );
 
 addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'TSL.VaryingNode: .vertexStage() has been renamed to .toVertexStage().' );
+	console.warn( 'THREE.TSL: .vertexStage() has been renamed to .toVertexStage().' );
 	return varying( ...params );
 
 } );

@@ -145,4 +145,4 @@ export default NormalMapNode;
  * @param {?Node<vec2>} [scaleNode=null] - Controls the intensity of the effect.
  * @returns {NormalMapNode}
  */
-export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );
+export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode ).setParameterLength( 1, 2 );

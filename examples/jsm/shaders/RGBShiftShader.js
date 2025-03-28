@@ -10,7 +10,7 @@
  * angle: shift angle in radians
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const RGBShiftShader = {
 

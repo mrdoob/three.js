@@ -151,7 +151,7 @@ class Material extends EventDispatcher {
 		 * Defines the blending equation.
 		 *
 		 * @type {(AddEquation|SubtractEquation|ReverseSubtractEquation|MinEquation|MaxEquation)}
-		 * @default OneMinusSrcAlphaFactor
+		 * @default AddEquation
 		 */
 		this.blendEquation = AddEquation;
 
@@ -174,8 +174,8 @@ class Material extends EventDispatcher {
 		/**
 		 * Defines the blending equation of the alpha channel.
 		 *
-		 * @type {(AddEquation|SubtractEquation|ReverseSubtractEquation|MinEquation|MaxEquation)}
-		 * @default OneMinusSrcAlphaFactor
+		 * @type {?(AddEquation|SubtractEquation|ReverseSubtractEquation|MinEquation|MaxEquation)}
+		 * @default null
 		 */
 		this.blendEquationAlpha = null;
 

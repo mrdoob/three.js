@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeArray, nodeObject, nodeObjects } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeArray, nodeObject, nodeObjects, float } from '../tsl/TSLCore.js';
 
 /**
  * This module represents the call of a {@link FunctionNode}. Developers are usually not confronted
@@ -100,6 +100,24 @@ class FunctionCallNode extends TempNode {
 
 		if ( Array.isArray( parameters ) ) {
 
+			if ( parameters.length > inputs.length ) {
+
+				console.error( 'THREE.TSL: The number of provided parameters exceeds the expected number of inputs in \'Fn()\'.' );
+
+				parameters.length = inputs.length;
+
+			} else if ( parameters.length < inputs.length ) {
+
+				console.error( 'THREE.TSL: The number of provided parameters is less than the expected number of inputs in \'Fn()\'.' );
+
+				while ( parameters.length < inputs.length ) {
+
+					parameters.push( float( 0 ) );
+
+				}
+
+			}
+
 			for ( let i = 0; i < parameters.length; i ++ ) {
 
 				params.push( generateInput( parameters[ i ], inputs[ i ] ) );
@@ -118,7 +136,9 @@ class FunctionCallNode extends TempNode {
 
 				} else {
 
-					throw new Error( `FunctionCallNode: Input '${inputNode.name}' not found in FunctionNode.` );
+					console.error( `THREE.TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
+
+					params.push( generateInput( float( 0 ), inputNode ) );
 
 				}
 
@@ -128,7 +148,7 @@ class FunctionCallNode extends TempNode {
 
 		const functionName = functionNode.build( builder, 'property' );
 
-		return `${functionName}( ${params.join( ', ' )} )`;
+		return `${ functionName }( ${ params.join( ', ' ) } )`;
 
 	}
 

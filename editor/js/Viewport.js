@@ -495,7 +495,7 @@ function Viewport( editor ) {
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundColorSpace, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
 
 		scene.background = null;
 
@@ -511,6 +511,9 @@ function Viewport( editor ) {
 
 				if ( backgroundTexture ) {
 
+					backgroundTexture.colorSpace = backgroundColorSpace;
+					backgroundTexture.needsUpdate = true;
+
 					scene.background = backgroundTexture;
 
 				}
@@ -522,6 +525,8 @@ function Viewport( editor ) {
 				if ( backgroundEquirectangularTexture ) {
 
 					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+					backgroundEquirectangularTexture.colorSpace = backgroundColorSpace;
+					backgroundEquirectangularTexture.needsUpdate = true;
 
 					scene.background = backgroundEquirectangularTexture;
 					scene.backgroundBlurriness = backgroundBlurriness;

@@ -9,7 +9,7 @@
  * - "r" parameter control where "focused" horizontal line lies
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const HorizontalTiltShiftShader = {
 

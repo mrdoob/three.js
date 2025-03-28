@@ -162,14 +162,53 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			/**Merges index-adjacent points that are within a threshold distance of each other. Array is modified in-place. Threshold distance is empirical, and scaled based on the magnitude of point coordinates.
+			 * @param {Array<Vector2>} points
+			*/
+			function mergeOverlappingPoints( points ) {
 
-			const faces = ShapeUtils.triangulateShape( vertices, holes );
+				const THRESHOLD = 1e-10;
+				const THRESHOLD_SQ = THRESHOLD * THRESHOLD;
+				let prevPos = points[ 0 ];
+				for ( let i = 1; i <= points.length; i ++ ) {
+
+					const currentIndex = i % points.length;
+					const currentPos = points[ currentIndex ];
+					const dx = currentPos.x - prevPos.x;
+					const dy = currentPos.y - prevPos.y;
+					const distSq = dx * dx + dy * dy;
+
+					const scalingFactorSqrt = Math.max(
+						Math.abs( currentPos.x ),
+						Math.abs( currentPos.y ),
+						Math.abs( prevPos.x ),
+						Math.abs( prevPos.y )
+					);
+					const thesholdSqScaled = THRESHOLD_SQ * scalingFactorSqrt * scalingFactorSqrt;
+					if ( distSq <= thesholdSqScaled ) {
+
+						points.splice( currentIndex, 1 );
+						i --;
+						continue;
+
+					}
+
+					prevPos = currentPos;
+
+				}
+
+			}
+
+			mergeOverlappingPoints( vertices );
+			holes.forEach( mergeOverlappingPoints );
+
+			const numHoles = holes.length;
 
 			/* Vertices */
 
 			const contour = vertices; // vertices has all points but contour has only points of circumference
 
-			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0; h < numHoles; h ++ ) {
 
 				const ahole = holes[ h ];
 
@@ -186,7 +225,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
-			const vlen = vertices.length, flen = faces.length;
+			const vlen = vertices.length;
 
 
 			// Find directions for point movement
@@ -333,7 +372,7 @@ class ExtrudeGeometry extends BufferGeometry {
 			const holesMovements = [];
 			let oneHoleMovements, verticesMovements = contourMovements.concat();
 
-			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
 
 				const ahole = holes[ h ];
 
@@ -354,6 +393,8 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			const contractedContourVertices = [];
+			const expandedHoleVertices = [];
 
 			// Loop bevelSegments, 1 for the front, 1 for the back
 
@@ -372,27 +413,35 @@ class ExtrudeGeometry extends BufferGeometry {
 					const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
 					v( vert.x, vert.y, - z );
+					if ( t == 0 ) contractedContourVertices.push( vert );
 
 				}
 
 				// expand holes
 
-				for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
+				for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
 
 					const ahole = holes[ h ];
 					oneHoleMovements = holesMovements[ h ];
-
+					const oneHoleVertices = [];
 					for ( let i = 0, il = ahole.length; i < il; i ++ ) {
 
 						const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 						v( vert.x, vert.y, - z );
+						if ( t == 0 ) oneHoleVertices.push( vert );
 
 					}
+
+					if ( t == 0 ) expandedHoleVertices.push( oneHoleVertices );
 
 				}
 
 			}
+
+			const faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
+
+			const flen = faces.length;
 
 			const bs = bevelSize + bevelOffset;
 

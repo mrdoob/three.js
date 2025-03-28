@@ -253,7 +253,7 @@ export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
  */
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
-	console.warn( 'TSL.ViewportNode: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+	console.warn( 'THREE.TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
 
 	return screenSize;
 
@@ -266,7 +266,7 @@ export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r1
  */
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
-	console.warn( 'TSL.ViewportNode: "viewportTopLeft" is deprecated. Use "screenUV" instead.' );
+	console.warn( 'THREE.TSL: "viewportTopLeft" is deprecated. Use "screenUV" instead.' );
 
 	return screenUV;
 
@@ -279,7 +279,7 @@ export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
  */
 export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
-	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "screenUV.flipY()" instead.' );
+	console.warn( 'THREE.TSL: "viewportBottomLeft" is deprecated. Use "screenUV.flipY()" instead.' );
 
 	return screenUV.flipY();
 

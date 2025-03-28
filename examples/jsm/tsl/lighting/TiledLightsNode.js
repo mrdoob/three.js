@@ -197,7 +197,7 @@ class TiledLightsNode extends LightsNode {
 		const tileOffset = element.div( stride );
 		const tileIndex = this._screenTileIndex.mul( int( 2 ) ).add( tileOffset );
 
-		return this._lightIndexes.element( tileIndex ).element( element.modInt( stride ) );
+		return this._lightIndexes.element( tileIndex ).element( element.mod( stride ) );
 
 	}
 
@@ -341,7 +341,7 @@ class TiledLightsNode extends LightsNode {
 			const tileOffset = elementIndex.div( stride );
 			const tileIndex = instanceIndex.mul( int( 2 ) ).add( tileOffset );
 
-			return lightIndexes.element( tileIndex ).element( elementIndex.modInt( stride ) );
+			return lightIndexes.element( tileIndex ).element( elementIndex.mod( stride ) );
 
 		};
 
@@ -352,7 +352,7 @@ class TiledLightsNode extends LightsNode {
 			const tiledBufferSize = bufferSize.clone().divideScalar( tileSize ).floor();
 
 			const tileScreen = vec2(
-				instanceIndex.modInt( tiledBufferSize.width ),
+				instanceIndex.mod( tiledBufferSize.width ),
 				instanceIndex.div( tiledBufferSize.width )
 			).mul( tileSize ).div( screenSize );
 

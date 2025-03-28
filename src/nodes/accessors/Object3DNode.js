@@ -213,57 +213,57 @@ export default Object3DNode;
  *
  * @tsl
  * @function
- * @param {?Object3D} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
-export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
+export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION ).setParameterLength( 1 );
 
 /**
  * TSL function for creating an object 3D node that represents the object's world matrix.
  *
  * @tsl
  * @function
- * @param {?Object3D} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d] - The 3D object.
  * @returns {Object3DNode<mat4>}
  */
-export const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
+export const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX ).setParameterLength( 1 );
 
 /**
  * TSL function for creating an object 3D node that represents the object's position in world space.
  *
  * @tsl
  * @function
- * @param {?Object3D} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
-export const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION );
+export const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION ).setParameterLength( 1 );
 
 /**
  * TSL function for creating an object 3D node that represents the object's scale in world space.
  *
  * @tsl
  * @function
- * @param {?Object3D} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
-export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );
+export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE ).setParameterLength( 1 );
 
 /**
  * TSL function for creating an object 3D node that represents the object's position in view/camera space.
  *
  * @tsl
  * @function
- * @param {?Object3D} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
-export const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+export const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION ).setParameterLength( 1 );
 
 /**
  * TSL function for creating an object 3D node that represents the object's radius.
  *
  * @tsl
  * @function
- * @param {?Object3D} [object3d=null] - The 3D object.
+ * @param {?Object3D} [object3d] - The 3D object.
  * @returns {Object3DNode<vec3>}
  */
-export const objectRadius = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.RADIUS );
+export const objectRadius = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.RADIUS ).setParameterLength( 1 );

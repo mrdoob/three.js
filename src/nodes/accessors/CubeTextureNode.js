@@ -138,4 +138,4 @@ export default CubeTextureNode;
  * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {CubeTextureNode}
  */
-export const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode );
+export const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode ).setParameterLength( 1, 4 ).setName( 'cubeTexture' );

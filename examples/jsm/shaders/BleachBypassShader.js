@@ -6,7 +6,7 @@
  * [Nvidia Shader library]{@link http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass}.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const BleachBypassShader = {
 

@@ -8,7 +8,7 @@
  * The scale factor of 1/0.6 is subjective. See discussion in #19621.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const ACESFilmicToneMappingShader = {
 

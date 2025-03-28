@@ -541,7 +541,7 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the environment blend mode from the current XR session.
 	 *
-	 * @return {?('opaque'|'additive'|'alpha-blend')} The environment blend mode. Returns `null` when used outside of a XR session.
+	 * @return {'opaque'|'additive'|'alpha-blend'|undefined} The environment blend mode. Returns `undefined` when used outside of a XR session.
 	 */
 	getEnvironmentBlendMode() {
 

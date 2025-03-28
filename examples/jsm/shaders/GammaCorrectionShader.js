@@ -7,7 +7,7 @@
  * - {@link http://en.wikipedia.org/wiki/gamma_correction}.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const GammaCorrectionShader = {
 

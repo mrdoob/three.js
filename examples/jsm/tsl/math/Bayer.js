@@ -26,6 +26,6 @@ export const bayer16 = Fn( ( [ uv ] ) => {
 
 	}
 
-	return textureLoad( bayer16Texture, ivec2( uv ).modInt( int( 16 ) ) );
+	return textureLoad( bayer16Texture, ivec2( uv ).mod( int( 16 ) ) );
 
 } );

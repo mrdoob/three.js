@@ -14,7 +14,7 @@ import {
  * - {@link https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl}
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const SSAOShader = {
 
@@ -137,7 +137,7 @@ const SSAOShader = {
 			if ( depth == 1.0 ) {
 
 				gl_FragColor = vec4( 1.0 ); // don't influence background
-				
+
 			} else {
 
 				float viewZ = getViewZ( depth );
@@ -192,7 +192,7 @@ const SSAOShader = {
  * SSAO depth shader.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const SSAODepthShader = {
 

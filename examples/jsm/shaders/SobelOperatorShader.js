@@ -10,7 +10,7 @@ import {
  * As mentioned in the video the Sobel operator expects a grayscale image as input.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const SobelOperatorShader = {
 

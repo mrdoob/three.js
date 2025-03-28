@@ -322,6 +322,13 @@ class NodeBuilder {
 		this.vars = {};
 
 		/**
+		 * This dictionary holds the declarations for each shader stage.
+		 *
+		 * @type {Object}
+		 */
+		this.declarations = {};
+
+		/**
 		 * Current code flow.
 		 * All code generated in this stack will be stored in `.flow`.
 		 *
@@ -1226,6 +1233,8 @@ class NodeBuilder {
 
 		const attribute = new NodeAttribute( name, type );
 
+		this.registerDeclaration( attribute );
+
 		attributes.push( attribute );
 
 		return attribute;
@@ -1404,6 +1413,18 @@ class NodeBuilder {
 	getTypeFromArray( array ) {
 
 		return typeFromArray.get( array.constructor );
+
+	}
+
+	/**
+	 * Returns the type is an integer type.
+	 *
+	 * @param {string} type - The type.
+	 * @return {boolean} Whether the type is an integer type or not.
+	 */
+	isInteger( type ) {
+
+		return /int|uint|(i|u)vec/.test( type );
 
 	}
 
@@ -1676,6 +1697,8 @@ class NodeBuilder {
 
 			this.uniforms[ shaderStage ].push( nodeUniform );
 
+			this.registerDeclaration( nodeUniform );
+
 			nodeData.uniform = nodeUniform;
 
 		}
@@ -1744,6 +1767,8 @@ class NodeBuilder {
 				vars.push( nodeVar );
 
 			}
+
+			this.registerDeclaration( nodeVar );
 
 			nodeData.variable = nodeVar;
 
@@ -1825,11 +1850,48 @@ class NodeBuilder {
 
 			varyings.push( nodeVarying );
 
+			this.registerDeclaration( nodeVarying );
+
 			nodeData.varying = nodeVarying;
 
 		}
 
 		return nodeVarying;
+
+	}
+
+	/**
+	 * Registers a node declaration in the current shader stage.
+	 *
+	 * @param {Object} node - The node to be registered.
+	 */
+	registerDeclaration( node ) {
+
+		const shaderStage = this.shaderStage;
+		const declarations = this.declarations[ shaderStage ] || ( this.declarations[ shaderStage ] = {} );
+
+		const property = this.getPropertyName( node );
+
+		let index = 1;
+		let name = property;
+
+		// Automatically renames the property if the name is already in use.
+
+		while ( declarations[ name ] !== undefined ) {
+
+			name = property + '_' + index ++;
+
+		}
+
+		declarations[ name ] = node;
+
+		if ( index > 1 ) {
+
+			node.name = name;
+
+			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+
+		}
 
 	}
 
@@ -2120,6 +2182,7 @@ class NodeBuilder {
 
 		const previousFlow = this.flow;
 		const previousVars = this.vars;
+		const previousDeclarations = this.declarations;
 		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
 		const previousStack = this.stack;
@@ -2130,6 +2193,7 @@ class NodeBuilder {
 
 		this.flow = flow;
 		this.vars = {};
+		this.declarations = {};
 		this.cache = new NodeCache();
 		this.stack = stack();
 
@@ -2145,6 +2209,7 @@ class NodeBuilder {
 
 		this.flow = previousFlow;
 		this.vars = previousVars;
+		this.declarations = previousDeclarations;
 		this.cache = previousCache;
 		this.stack = previousStack;
 
@@ -2549,13 +2614,13 @@ class NodeBuilder {
 
 		if ( fromTypeLength === 16 && toTypeLength === 9 ) {
 
-			return `${ this.getType( toType ) }(${ snippet }[0].xyz, ${ snippet }[1].xyz, ${ snippet }[2].xyz)`;
+			return `${ this.getType( toType ) }( ${ snippet }[ 0 ].xyz, ${ snippet }[ 1 ].xyz, ${ snippet }[ 2 ].xyz )`;
 
 		}
 
 		if ( fromTypeLength === 9 && toTypeLength === 4 ) {
 
-			return `${ this.getType( toType ) }(${ snippet }[0].xy, ${ snippet }[1].xy)`;
+			return `${ this.getType( toType ) }( ${ snippet }[ 0 ].xy, ${ snippet }[ 1 ].xy )`;
 
 		}
 

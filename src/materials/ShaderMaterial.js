@@ -380,4 +380,15 @@ class ShaderMaterial extends Material {
 
 }
 
+/**
+ * This type represents the fields required to store and run the shader code.
+ *
+ * @typedef {Object} ShaderMaterial~Shader
+ * @property {string} name - The name of the shader.
+ * @property {Object<string, Uniform>} uniforms - The uniforms of the shader.
+ * @property {Object<string, any>} defines - The defines of the shader.
+ * @property {string} vertexShader - The vertex shader code.
+ * @property {string} fragmentShader - The fragment shader code.
+ **/
+
 export { ShaderMaterial };

@@ -4,7 +4,7 @@
  * Blends two textures.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const BlendShader = {
 

@@ -4,9 +4,11 @@
  * Digital glitch shader.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const DigitalGlitch = {
+
+	name: 'DigitalGlitch',
 
 	uniforms: {
 

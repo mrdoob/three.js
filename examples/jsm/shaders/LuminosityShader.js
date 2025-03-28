@@ -4,7 +4,7 @@
  * Luminosity shader.
  *
  * @constant
- * @type {Object}
+ * @type {ShaderMaterial~Shader}
  */
 const LuminosityShader = {
 
