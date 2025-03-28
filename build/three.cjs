@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '175dev';
+const REVISION = '175';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
