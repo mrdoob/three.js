@@ -70,7 +70,7 @@ class JoinNode extends TempNode {
 
 			if ( length >= maxLength ) {
 
-				console.error( 'THREE.TSL: Length of parameters exceeds maximum length of function type.' );
+				console.error( `THREE.TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
 				break;
 
 			}
@@ -81,7 +81,7 @@ class JoinNode extends TempNode {
 
 			if ( length + inputTypeLength > maxLength ) {
 
-				console.error( 'THREE.TSL: Length of joined data exceeds maximum length of output type.' );
+				console.error( `THREE.TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
 
 				inputTypeLength = maxLength - length;
 				inputType = builder.getTypeFromLength( inputTypeLength );
