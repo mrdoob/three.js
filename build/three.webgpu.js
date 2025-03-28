@@ -2234,17 +2234,42 @@ class JoinNode extends TempNode {
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
+		const maxLength = builder.getTypeLength( type );
+
 		const nodes = this.nodes;
 
 		const primitiveType = builder.getComponentType( type );
 
 		const snippetValues = [];
 
+		let length = 0;
+
 		for ( const input of nodes ) {
 
-			let inputSnippet = input.build( builder );
+			if ( length >= maxLength ) {
 
-			const inputPrimitiveType = builder.getComponentType( input.getNodeType( builder ) );
+				console.error( 'THREE.TSL: Length of parameters exceeds maximum length of function type.' );
+				break;
+
+			}
+
+			let inputType = input.getNodeType( builder );
+			let inputTypeLength = builder.getTypeLength( inputType );
+			let inputSnippet;
+
+			if ( length + inputTypeLength > maxLength ) {
+
+				console.error( 'THREE.TSL: Length of joined data exceeds maximum length of output type.' );
+
+				inputTypeLength = maxLength - length;
+				inputType = builder.getTypeFromLength( inputTypeLength );
+
+			}
+
+			length += inputTypeLength;
+			inputSnippet = input.build( builder, inputType );
+
+			const inputPrimitiveType = builder.getComponentType( inputType );
 
 			if ( inputPrimitiveType !== primitiveType ) {
 
@@ -2902,12 +2927,12 @@ function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		console.warn( `Redefinition of method chaining ${ name }` );
+		console.warn( `THREE.TSL: Redefinition of method chaining '${ name }'.` );
 		return;
 
 	}
 
-	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
+	if ( typeof nodeElement !== 'function' ) throw new Error( `THREE.TSL: Node element ${ name } is not a function` );
 
 	NodeElements.set( name, nodeElement );
 
@@ -3109,13 +3134,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			console.warn( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+			console.error( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			console.warn( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+			console.error( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
 
 			return params.slice( 0, maxParams );
 
@@ -3445,7 +3470,35 @@ const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType )
 const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-const Fn = ( jsFunc, nodeType ) => {
+let fnId = 0;
+
+const Fn = ( jsFunc, layout = null ) => {
+
+	let nodeType = null;
+
+	if ( layout !== null ) {
+
+		if ( typeof layout === 'object' ) {
+
+			nodeType = layout.return;
+
+		} else {
+
+			if ( typeof layout === 'string' ) {
+
+				nodeType = layout;
+
+			} else {
+
+				console.error( 'THREE.TSL: Invalid layout type.' );
+
+			}
+
+			layout = null;
+
+		}
+
+	}
 
 	const shaderNode = new ShaderNode( jsFunc, nodeType );
 
@@ -3486,6 +3539,35 @@ const Fn = ( jsFunc, nodeType ) => {
 		return fn;
 
 	};
+
+	if ( layout !== null ) {
+
+		if ( typeof layout.inputs !== 'object' ) {
+
+			const fullLayout = {
+				name: 'fn' + fnId ++,
+				type: nodeType,
+				inputs: []
+			};
+
+			for ( const name in layout ) {
+
+				if ( name === 'return' ) continue;
+
+				fullLayout.inputs.push( {
+					name: name,
+					type: layout[ name ]
+				} );
+
+			}
+
+			layout = fullLayout;
+
+		}
+
+		fn.setLayout( layout );
+
+	}
 
 	return fn;
 
@@ -4657,6 +4739,24 @@ class FunctionCallNode extends TempNode {
 
 		if ( Array.isArray( parameters ) ) {
 
+			if ( parameters.length > inputs.length ) {
+
+				console.error( 'THREE.TSL: The number of provided parameters exceeds the expected number of inputs in \'Fn()\'.' );
+
+				parameters.length = inputs.length;
+
+			} else if ( parameters.length < inputs.length ) {
+
+				console.error( 'THREE.TSL: The number of provided parameters is less than the expected number of inputs in \'Fn()\'.' );
+
+				while ( parameters.length < inputs.length ) {
+
+					parameters.push( float( 0 ) );
+
+				}
+
+			}
+
 			for ( let i = 0; i < parameters.length; i ++ ) {
 
 				params.push( generateInput( parameters[ i ], inputs[ i ] ) );
@@ -4675,7 +4775,9 @@ class FunctionCallNode extends TempNode {
 
 				} else {
 
-					throw new Error( `FunctionCallNode: Input '${inputNode.name}' not found in FunctionNode.` );
+					console.error( `THREE.TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
+
+					params.push( generateInput( float( 0 ), inputNode ) );
 
 				}
 
@@ -4685,7 +4787,7 @@ class FunctionCallNode extends TempNode {
 
 		const functionName = functionNode.build( builder, 'property' );
 
-		return `${functionName}( ${params.join( ', ' )} )`;
+		return `${ functionName }( ${ params.join( ', ' ) } )`;
 
 	}
 
@@ -5086,7 +5188,15 @@ class OperatorNode extends TempNode {
 
 				} else {
 
-					return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
+					let snippet = `( ${ a } ${ op } ${ b } )`;
+
+					if ( ! isGLSL && type === 'bool' && builder.isVector( typeA ) && builder.isVector( typeB ) ) {
+
+						snippet = `all${ snippet }`;
+
+					}
+
+					return builder.format( snippet, type, output );
 
 				}
 
@@ -6638,6 +6748,7 @@ class ConditionalNode extends Node {
 
 		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
+		const functionNode = builder.currentFunctionNode;
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
@@ -6658,6 +6769,14 @@ class ConditionalNode extends Node {
 			} else {
 
 				ifSnippet = 'return ' + ifSnippet + ';';
+
+				if ( functionNode === null ) {
+
+					console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+
+					ifSnippet = '// ' + ifSnippet;
+
+				}
 
 			}
 
@@ -6680,6 +6799,14 @@ class ConditionalNode extends Node {
 				} else {
 
 					elseSnippet = 'return ' + elseSnippet + ';';
+
+					if ( functionNode === null ) {
+
+						console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+
+						elseSnippet = '// ' + elseSnippet;
+
+					}
 
 				}
 
@@ -9158,7 +9285,7 @@ addMethodChaining( 'debug', debug );
 
 function addNodeElement( name/*, nodeElement*/ ) {
 
-	console.warn( 'THREE.TSLBase: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
+	console.warn( 'THREE.TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
 
 }
 
@@ -45027,13 +45154,13 @@ class NodeBuilder {
 
 		if ( fromTypeLength === 16 && toTypeLength === 9 ) {
 
-			return `${ this.getType( toType ) }(${ snippet }[0].xyz, ${ snippet }[1].xyz, ${ snippet }[2].xyz)`;
+			return `${ this.getType( toType ) }( ${ snippet }[ 0 ].xyz, ${ snippet }[ 1 ].xyz, ${ snippet }[ 2 ].xyz )`;
 
 		}
 
 		if ( fromTypeLength === 9 && toTypeLength === 4 ) {
 
-			return `${ this.getType( toType ) }(${ snippet }[0].xy, ${ snippet }[1].xy)`;
+			return `${ this.getType( toType ) }( ${ snippet }[ 0 ].xy, ${ snippet }[ 1 ].xy )`;
 
 		}
 
