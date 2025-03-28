@@ -78,12 +78,12 @@ class MD2CharacterComplex {
 		this.backAcceleration = 600;
 
 		/**
-		 * The character's front decceleration.
+		 * The character's front deceleration.
 		 *
 		 * @type {number}
 		 * @default 600
 		 */
-		this.frontDecceleration = 600;
+		this.frontDeceleration = 600;
 
 		/**
 		 * The character's angular speed.
@@ -684,7 +684,7 @@ class MD2CharacterComplex {
 			if ( this.speed > 0 ) {
 
 				const k = exponentialEaseOut( this.speed / this.maxSpeed );
-				this.speed = MathUtils.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
+				this.speed = MathUtils.clamp( this.speed - k * delta * this.frontDeceleration, 0, this.maxSpeed );
 
 			} else {
 
