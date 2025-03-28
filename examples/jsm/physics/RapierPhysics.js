@@ -261,25 +261,39 @@ async function RapierPhysics() {
 }
 
 class RapierDebugRenderer {
+
     mesh
     world
     enabled = true
   
     constructor(scene, world) {
-      this.world = world
-      this.mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0xffffff, vertexColors: true }))
-      this.mesh.frustumCulled = false
-      scene.add(this.mesh)
+
+      this.world = world;
+      this.mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0xffffff, vertexColors: true }));
+      this.mesh.frustumCulled = false;
+
+      scene.add(this.mesh);
+
     }
   
     update() {
+
       if (this.enabled) {
-        const { vertices, colors } = this.world.debugRender()
-        this.mesh.geometry.setAttribute('position', new BufferAttribute(vertices, 3))
-        this.mesh.geometry.setAttribute('color', new BufferAttribute(colors, 4))
-        this.mesh.visible = true
+
+        const { vertices, colors } = this.world.debugRender();
+
+		this.mesh.geometry.deleteAttribute( 'position' );
+		this.mesh.geometry.deleteAttribute( 'color' );
+
+        this.mesh.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+        this.mesh.geometry.setAttribute('color', new BufferAttribute(colors, 4));
+
+        this.mesh.visible = true;
+
       } else {
-        this.mesh.visible = false
+
+        this.mesh.visible = false;
+		
       }
     }
   }
