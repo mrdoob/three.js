@@ -15,7 +15,7 @@ const hasOwnProp = Object.prototype.hasOwnProperty;
 let data;
 let view;
 
-let outdir = path.normalize( env.opts.destination );
+const outdir = path.normalize( env.opts.destination );
 const themeOpts = ( env.opts.themeOpts ) || {};
 
 function mkdirSync( filepath ) {
@@ -585,14 +585,6 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 		}
 
 	} );
-
-	// update outdir if necessary, then create outdir
-	const packageInfo = ( find( { kind: 'package' } ) || [] )[ 0 ];
-	if ( packageInfo && packageInfo.name ) {
-
-		outdir = path.join( outdir, packageInfo.name, ( packageInfo.version || '' ) );
-
-	}
 
 	fs.mkPath( outdir );
 
