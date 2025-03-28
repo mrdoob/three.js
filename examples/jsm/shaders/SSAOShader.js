@@ -3,13 +3,19 @@ import {
 	Vector2
 } from 'three';
 
-/**
- * References:
- * http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
- * https://learnopengl.com/Advanced-Lighting/SSAO
- * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl
- */
+/** @module SSAOShader */
 
+/**
+ * SSAO shader.
+ *
+ * References:
+ * - {@link http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html}
+ * - {@link https://learnopengl.com/Advanced-Lighting/SSAO}
+ * - {@link https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl}
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSAOShader = {
 
 	name: 'SSAOShader',
@@ -131,7 +137,7 @@ const SSAOShader = {
 			if ( depth == 1.0 ) {
 
 				gl_FragColor = vec4( 1.0 ); // don't influence background
-				
+
 			} else {
 
 				float viewZ = getViewZ( depth );
@@ -182,6 +188,12 @@ const SSAOShader = {
 
 };
 
+/**
+ * SSAO depth shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSAODepthShader = {
 
 	name: 'SSAODepthShader',
@@ -245,6 +257,12 @@ const SSAODepthShader = {
 
 };
 
+/**
+ * SSAO blur shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const SSAOBlurShader = {
 
 	name: 'SSAOBlurShader',

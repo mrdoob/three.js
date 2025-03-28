@@ -1,8 +1,21 @@
 import { TextureLoader } from 'three';
 import { Fn, int, ivec2, textureLoad } from 'three/tsl';
 
+/** @module Bayer */
+
 let bayer16Texture = null;
 
+/**
+ * This TSL function can be used to sample a Bayer16 texture which is a 16x16 texture with a Bayer Matrix pattern.
+ * It can be used for dithering effects but also as an alternative to blue-noise. When used with Ray Marching
+ * specifically in {@link VolumeNodeMaterial#offsetNode}, it reduces banding problem, thus being able to use
+ * fewer steps without affecting the visuals as much.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} uv - The uv to sample the bayer16 texture.
+ * @return {Node<vec4>} The sampled bayer value.
+ */
 export const bayer16 = Fn( ( [ uv ] ) => {
 
 	if ( bayer16Texture === null ) {
@@ -13,6 +26,6 @@ export const bayer16 = Fn( ( [ uv ] ) => {
 
 	}
 
-	return textureLoad( bayer16Texture, ivec2( uv ).modInt( int( 16 ) ) );
+	return textureLoad( bayer16Texture, ivec2( uv ).mod( int( 16 ) ) );
 
 } );

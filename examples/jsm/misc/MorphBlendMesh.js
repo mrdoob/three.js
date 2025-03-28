@@ -3,13 +3,38 @@ import {
 	Mesh
 } from 'three';
 
+/**
+ * A special type of an animated mesh with a more advanced interface
+ * for animation playback. Unlike {@link MorphAnimMesh}. It allows to
+ * playback more than one morph animation at the same time but without
+ * fading options.
+ *
+ * @augments Mesh
+ */
 class MorphBlendMesh extends Mesh {
 
+	/**
+	 * Constructs a new morph blend mesh.
+	 *
+	 * @param {BufferGeometry} [geometry] - The mesh geometry.
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 */
 	constructor( geometry, material ) {
 
 		super( geometry, material );
 
+		/**
+		 * A dictionary of animations.
+		 *
+		 * @type {Object<string,Object>}
+		 */
 		this.animationsMap = {};
+
+		/**
+		 * A list of animations.
+		 *
+		 * @type {Array<Object>}
+		 */
 		this.animationsList = [];
 
 		// prepare default animation
@@ -29,6 +54,14 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Creates a new animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @param {number} start - The start time.
+	 * @param {number} end - The end time.
+	 * @param {number} fps - The FPS.
+	 */
 	createAnimation( name, start, end, fps ) {
 
 		const animation = {
@@ -60,6 +93,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Automatically creates animations based on the values in
+	 * {@link Mesh#morphTargetDictionary}.
+	 *
+	 * @param {number} fps - The FPS of all animations.
+	 */
 	autoCreateAnimations( fps ) {
 
 		const pattern = /([a-z]+)_?(\d+)/i;
@@ -104,6 +143,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the animation playback direction to "forward" for the
+	 * defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 */
 	setAnimationDirectionForward( name ) {
 
 		const animation = this.animationsMap[ name ];
@@ -117,6 +162,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the animation playback direction to "backward" for the
+	 * defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 */
 	setAnimationDirectionBackward( name ) {
 
 		const animation = this.animationsMap[ name ];
@@ -130,6 +181,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the FPS to the given value for the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @param {number} fps - The FPS to set.
+	 */
 	setAnimationFPS( name, fps ) {
 
 		const animation = this.animationsMap[ name ];
@@ -143,6 +200,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the duration to the given value for the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @param {number} duration - The duration to set.
+	 */
 	setAnimationDuration( name, duration ) {
 
 		const animation = this.animationsMap[ name ];
@@ -156,6 +219,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the weight to the given value for the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @param {number} weight - The weight to set.
+	 */
 	setAnimationWeight( name, weight ) {
 
 		const animation = this.animationsMap[ name ];
@@ -168,6 +237,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Sets the time to the given value for the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @param {number} time - The time to set.
+	 */
 	setAnimationTime( name, time ) {
 
 		const animation = this.animationsMap[ name ];
@@ -180,6 +255,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the time for the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @return {number} The time.
+	 */
 	getAnimationTime( name ) {
 
 		let time = 0;
@@ -196,6 +277,12 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the duration for the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 * @return {number} The duration.
+	 */
 	getAnimationDuration( name ) {
 
 		let duration = - 1;
@@ -212,6 +299,11 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Plays the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 */
 	playAnimation( name ) {
 
 		const animation = this.animationsMap[ name ];
@@ -229,6 +321,11 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Stops the defined animation.
+	 *
+	 * @param {string} name - The animation name.
+	 */
 	stopAnimation( name ) {
 
 		const animation = this.animationsMap[ name ];
@@ -241,6 +338,11 @@ class MorphBlendMesh extends Mesh {
 
 	}
 
+	/**
+	 * Updates the animations of the mesh.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
 	update( delta ) {
 
 		for ( let i = 0, il = this.animationsList.length; i < il; i ++ ) {

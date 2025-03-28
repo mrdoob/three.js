@@ -9,41 +9,86 @@ import {
 import { Pass, FullScreenQuad } from './Pass.js';
 import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 
+/**
+ * Pass for creating a glitch effect.
+ *
+ * ```js
+ * const glitchPass = new GlitchPass();
+ * composer.addPass( glitchPass );
+ * ```
+ *
+ * @augments Pass
+ */
 class GlitchPass extends Pass {
 
+	/**
+	 * Constructs a new glitch pass.
+	 *
+	 * @param {number} [dt_size=64] - The size of the displacement texture
+	 * for digital glitch squares.
+	 */
 	constructor( dt_size = 64 ) {
 
 		super();
 
-		const shader = DigitalGlitch;
+		/**
+		 * The pass uniforms.
+		 *
+		 * @type {Object}
+		 */
+		this.uniforms = UniformsUtils.clone( DigitalGlitch.uniforms );
 
-		this.uniforms = UniformsUtils.clone( shader.uniforms );
-
-		this.heightMap = this.generateHeightmap( dt_size );
-
-		this.uniforms[ 'tDisp' ].value = this.heightMap;
-
+		/**
+		 * The pass material.
+		 *
+		 * @type {ShaderMaterial}
+		 */
 		this.material = new ShaderMaterial( {
 			uniforms: this.uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
+			vertexShader: DigitalGlitch.vertexShader,
+			fragmentShader: DigitalGlitch.fragmentShader
 		} );
 
-		this.fsQuad = new FullScreenQuad( this.material );
-
+		/**
+		 * Whether to noticeably increase the effect instensity or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.goWild = false;
-		this.curF = 0;
-		this.generateTrigger();
+
+		// internals
+
+		this._heightMap = this._generateHeightmap( dt_size );
+		this.uniforms[ 'tDisp' ].value = this.heightMap;
+
+		this._fsQuad = new FullScreenQuad( this.material );
+
+		this._curF = 0;
+		this._randX = 0;
+
+		this._generateTrigger();
 
 	}
 
+	/**
+	 * Performs the glitch pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-		this.uniforms[ 'seed' ].value = Math.random();//default seeding
+		this.uniforms[ 'seed' ].value = Math.random(); // default seeding
 		this.uniforms[ 'byp' ].value = 0;
 
-		if ( this.curF % this.randX == 0 || this.goWild == true ) {
+		if ( this._curF % this._randX == 0 || this.goWild == true ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 30;
 			this.uniforms[ 'angle' ].value = MathUtils.randFloat( - Math.PI, Math.PI );
@@ -51,10 +96,10 @@ class GlitchPass extends Pass {
 			this.uniforms[ 'seed_y' ].value = MathUtils.randFloat( - 1, 1 );
 			this.uniforms[ 'distortion_x' ].value = MathUtils.randFloat( 0, 1 );
 			this.uniforms[ 'distortion_y' ].value = MathUtils.randFloat( 0, 1 );
-			this.curF = 0;
-			this.generateTrigger();
+			this._curF = 0;
+			this._generateTrigger();
 
-		} else if ( this.curF % this.randX < this.randX / 5 ) {
+		} else if ( this._curF % this._randX < this._randX / 5 ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 90;
 			this.uniforms[ 'angle' ].value = MathUtils.randFloat( - Math.PI, Math.PI );
@@ -69,30 +114,46 @@ class GlitchPass extends Pass {
 
 		}
 
-		this.curF ++;
+		this._curF ++;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		}
 
 	}
 
-	generateTrigger() {
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
+	dispose() {
 
-		this.randX = MathUtils.randInt( 120, 240 );
+		this.material.dispose();
+
+		this.heightMap.dispose();
+
+		this._fsQuad.dispose();
 
 	}
 
-	generateHeightmap( dt_size ) {
+	// internals
+
+	_generateTrigger() {
+
+		this._randX = MathUtils.randInt( 120, 240 );
+
+	}
+
+	_generateHeightmap( dt_size ) {
 
 		const data_arr = new Float32Array( dt_size * dt_size );
 		const length = dt_size * dt_size;
@@ -107,16 +168,6 @@ class GlitchPass extends Pass {
 		const texture = new DataTexture( data_arr, dt_size, dt_size, RedFormat, FloatType );
 		texture.needsUpdate = true;
 		return texture;
-
-	}
-
-	dispose() {
-
-		this.material.dispose();
-
-		this.heightMap.dispose();
-
-		this.fsQuad.dispose();
 
 	}
 

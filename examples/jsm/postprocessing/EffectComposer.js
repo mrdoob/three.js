@@ -9,10 +9,51 @@ import { CopyShader } from '../shaders/CopyShader.js';
 import { ShaderPass } from './ShaderPass.js';
 import { ClearMaskPass, MaskPass } from './MaskPass.js';
 
+/**
+ * Used to implement post-processing effects in three.js.
+ * The class manages a chain of post-processing passes to produce the final visual result.
+ * Post-processing passes are executed in order of their addition/insertion.
+ * The last pass is automatically rendered to screen.
+ *
+ * This module can only be used with {@link WebGLRenderer}.
+ *
+ * ```js
+ * const composer = new EffectComposer( renderer );
+ *
+ * // adding some passes
+ * const renderPass = new RenderPass( scene, camera );
+ * composer.addPass( renderPass );
+ *
+ * const glitchPass = new GlitchPass();
+ * composer.addPass( glitchPass );
+ *
+ * const outputPass = new OutputPass()
+ * composer.addPass( outputPass );
+ *
+ * function animate() {
+ *
+ * 	composer.render(); // instead of renderer.render()
+ *
+ * }
+ * ```
+ */
 class EffectComposer {
 
+	/**
+	 * Constructs a new effect composer.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} [renderTarget] - This render target and a clone will
+	 * be used as the internal read and write buffers. If not given, the composer creates
+	 * the buffers automatically.
+	 */
 	constructor( renderer, renderTarget ) {
 
+		/**
+		 * The renderer.
+		 *
+		 * @type {WebGLRenderer}
+		 */
 		this.renderer = renderer;
 
 		this._pixelRatio = renderer.getPixelRatio();
@@ -37,20 +78,59 @@ class EffectComposer {
 		this.renderTarget2 = renderTarget.clone();
 		this.renderTarget2.texture.name = 'EffectComposer.rt2';
 
+		/**
+		 * A reference to the internal write buffer. Passes usually write
+		 * their result into this buffer.
+		 *
+		 * @type {WebGLRenderTarget}
+		 */
 		this.writeBuffer = this.renderTarget1;
+
+		/**
+		 * A reference to the internal read buffer. Passes usually read
+		 * the previous render result from this buffer.
+		 *
+		 * @type {WebGLRenderTarget}
+		 */
 		this.readBuffer = this.renderTarget2;
 
+		/**
+		 * Whether the final pass is rendered to the screen (default framebuffer) or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.renderToScreen = true;
 
+		/**
+		 * An array representing the (ordered) chain of post-processing passes.
+		 *
+		 * @type {Array<Pass>}
+		 */
 		this.passes = [];
 
+		/**
+		 * A copy pass used for internal swap operations.
+		 *
+		 * @private
+		 * @type {ShaderPass}
+		 */
 		this.copyPass = new ShaderPass( CopyShader );
 		this.copyPass.material.blending = NoBlending;
 
+		/**
+		 * The intenral clock for managing time data.
+		 *
+		 * @private
+		 * @type {Clock}
+		 */
 		this.clock = new Clock();
 
 	}
 
+	/**
+	 * Swaps the internal read/write buffers.
+	 */
 	swapBuffers() {
 
 		const tmp = this.readBuffer;
@@ -59,6 +139,11 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Adds the given pass to the pass chain.
+	 *
+	 * @param {Pass} pass - The pass to add.
+	 */
 	addPass( pass ) {
 
 		this.passes.push( pass );
@@ -66,6 +151,12 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Inserts the given pass at a given index.
+	 *
+	 * @param {Pass} pass - The pass to insert.
+	 * @param {number} index - The index into the pass chain.
+	 */
 	insertPass( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
@@ -73,6 +164,11 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Removes the given pass from the pass chain.
+	 *
+	 * @param {Pass} pass - The pass to remove.
+	 */
 	removePass( pass ) {
 
 		const index = this.passes.indexOf( pass );
@@ -85,6 +181,12 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Returns `true` if the pass for the given index is the last enabled pass in the pass chain.
+	 *
+	 * @param {number} passIndex - The pass index.
+	 * @return {boolean} Whether the the pass for the given index is the last pass in the pass chain.
+	 */
 	isLastEnabledPass( passIndex ) {
 
 		for ( let i = passIndex + 1; i < this.passes.length; i ++ ) {
@@ -101,6 +203,12 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Executes all enabled post-processing passes in order to produce the final frame.
+	 *
+	 * @param {number} deltaTime - The delta time in seconds. If not given, the composer computes
+	 * its own time delta value.
+	 */
 	render( deltaTime ) {
 
 		// deltaTime value is in seconds
@@ -165,6 +273,12 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Resets the internal state of the EffectComposer.
+	 *
+	 * @param {WebGLRenderTarget} [renderTarget] - This render target has the same purpose like
+	 * the one from the constructor. If set, it is used to setup the read and write buffers.
+	 */
 	reset( renderTarget ) {
 
 		if ( renderTarget === undefined ) {
@@ -189,6 +303,13 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Resizes the internal read and write buffers as well as all passes. Similar to {@link WebGLRenderer#setSize},
+	 * this method honors the current pixel ration.
+	 *
+	 * @param {number} width - The width in logical pixels.
+	 * @param {number} height - The height in logical pixels.
+	 */
 	setSize( width, height ) {
 
 		this._width = width;
@@ -208,6 +329,12 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Sets device pixel ratio. This is usually used for HiDPI device to prevent blurring output.
+	 * Setting the pixel ratio will automatically resize the composer.
+	 *
+	 * @param {number} pixelRatio - The pixel ratio to set.
+	 */
 	setPixelRatio( pixelRatio ) {
 
 		this._pixelRatio = pixelRatio;
@@ -216,6 +343,10 @@ class EffectComposer {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the composer is no longer used in your app.
+	 */
 	dispose() {
 
 		this.renderTarget1.dispose();

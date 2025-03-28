@@ -10,31 +10,127 @@ const _spherical = new Spherical();
 const _target = new Vector3();
 const _targetPosition = new Vector3();
 
+/**
+ * This class is an alternative implementation of {@link FlyControls}.
+ *
+ * @augments Controls
+ */
 class FirstPersonControls extends Controls {
 
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Object3D} object - The object that is managed by the controls.
+	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 */
 	constructor( object, domElement = null ) {
 
 		super( object, domElement );
 
-		// API
-
+		/**
+		 * The movement speed.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.movementSpeed = 1.0;
+
+		/**
+		 * The look around speed.
+		 *
+		 * @type {number}
+		 * @default 0.005
+		 */
 		this.lookSpeed = 0.005;
 
+		/**
+		 * Whether it's possible to vertically look around or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.lookVertical = true;
+
+		/**
+		 * Whether the camera is automatically moved forward or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.autoForward = false;
 
+		/**
+		 * Whether it's possible to look around or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.activeLook = true;
 
+		/**
+		 * Whether or not the camera's height influences the forward movement speed.
+		 * Use the properties `heightCoef`, `heightMin` and `heightMax` for configuration.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.heightSpeed = false;
+
+		/**
+		 * Determines how much faster the camera moves when it's y-component is near `heightMax`.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.heightCoef = 1.0;
+
+		/**
+		 * Lower camera height limit used for movement speed adjustment.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.heightMin = 0.0;
+
+		/**
+		 * Upper camera height limit used for movement speed adjustment.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.heightMax = 1.0;
 
+		/**
+		 * Whether or not looking around is vertically constrained by `verticalMin` and `verticalMax`.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.constrainVertical = false;
+
+		/**
+		 * How far you can vertically look around, lower limit. Range is `0` to `Math.PI` in radians.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.verticalMin = 0;
+
+		/**
+		 * How far you can vertically look around, upper limit. Range is `0` to `Math.PI` in radians.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.verticalMax = Math.PI;
 
+		/**
+		 * Whether the mouse is pressed down or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.mouseDragOn = false;
 
 		// internals
@@ -68,7 +164,7 @@ class FirstPersonControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 			this.handleResize();
 
@@ -78,7 +174,9 @@ class FirstPersonControls extends Controls {
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );
@@ -108,6 +206,9 @@ class FirstPersonControls extends Controls {
 
 	}
 
+	/**
+	 * Must be called if the application window is resized.
+	 */
 	handleResize() {
 
 		if ( this.domElement === document ) {
@@ -124,6 +225,14 @@ class FirstPersonControls extends Controls {
 
 	}
 
+	/**
+	 * Rotates the camera towards the defined target position.
+	 *
+	 * @param {number|Vector3} x - The x coordinate of the target position or alternatively a vector representing the target position.
+	 * @param {number} y - The y coordinate of the target position.
+	 * @param {number} z - The z coordinate of the target position.
+	 * @return {FirstPersonControls} A reference to this controls.
+	 */
 	lookAt( x, y, z ) {
 
 		if ( x.isVector3 ) {

@@ -21,10 +21,20 @@ import { MeshPhysicalMaterial } from 'three';
  *
  * Further extension work might be to use the output of an SSR pass or an HBIL pass from a previous frame.
  * This would then create the possibility of SSR and IR depending on material properties such as `roughness`, `metalness` and `reflectivity`.
-**/
-
+ *
+ * @augments MeshPhysicalMaterial
+ */
 class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 
+	/**
+	 * Constructs a new conditional line material.
+	 *
+	 * @param {Object} [parameters] - An object with one or more properties
+	 * defining the material's appearance. Any property of the material
+	 * (including any property from inherited materials) can be passed
+	 * in here. Color values can be passed any type of value accepted
+	 * by {@link Color#set}.
+	 */
 	constructor( parameters ) {
 
 		const aoPassMap = parameters.aoPassMap;
@@ -37,11 +47,23 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 		this.onBeforeCompile = this._onBeforeCompile;
 		this.customProgramCacheKey = this._customProgramCacheKey;
 		this._aoPassMap = aoPassMap;
+
+		/**
+		 * The scale of the AO pass.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.aoPassMapScale = aoPassMapScale;
 		this._shader = null;
 
 	}
 
+	/**
+	 * A texture representing the AO pass.
+	 *
+	 * @type {Texture}
+	 */
 	get aoPassMap() {
 
 		return this._aoPassMap;

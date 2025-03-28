@@ -10,9 +10,19 @@ import {
 
 import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
 
+/** @module SceneUtils */
+
 const _color = /*@__PURE__*/new Color();
 const _matrix = /*@__PURE__*/new Matrix4();
 
+/**
+ * This function creates a mesh for each instance of the given instanced mesh and
+ * adds it to a group. Each mesh will honor the current 3D transformation of its
+ * corresponding instance.
+ *
+ * @param {InstancedMesh} instancedMesh - The instanced mesh.
+ * @return {Group} A group of meshes.
+ */
 function createMeshesFromInstancedMesh( instancedMesh ) {
 
 	const group = new Group();
@@ -39,6 +49,13 @@ function createMeshesFromInstancedMesh( instancedMesh ) {
 
 }
 
+/**
+ * This function creates a mesh for each geometry-group of the given multi-material mesh and
+ * adds it to a group.
+ *
+ * @param {Mesh} mesh - The multi-material mesh.
+ * @return {Group} A group of meshes.
+ */
 function createMeshesFromMultiMaterialMesh( mesh ) {
 
 	if ( Array.isArray( mesh.material ) === false ) {
@@ -110,6 +127,16 @@ function createMeshesFromMultiMaterialMesh( mesh ) {
 
 }
 
+/**
+ * This function represents an alternative way to create 3D objects with multiple materials.
+ * Normally, {@link BufferGeometry#groups} are used which might introduce issues e.g. when
+ * exporting the object to a 3D format. This function accepts a geometry and an array of
+ * materials and creates for each material a mesh that is added to a group.
+ *
+ * @param {BufferGeometry} geometry - The geometry.
+ * @param {Array<Material>} materials - An array of materials.
+ * @return {Group} A group representing a multi-material object.
+ */
 function createMultiMaterialObject( geometry, materials ) {
 
 	const group = new Group();
@@ -124,6 +151,18 @@ function createMultiMaterialObject( geometry, materials ) {
 
 }
 
+
+/**
+ * Executes a reducer function for each vertex of the given 3D object.
+ * `reduceVertices()` returns a single value: the function's accumulated result.
+ *
+ * @param {Object3D} object - The 3D object that should be processed. It must have a
+ * geometry with a `position` attribute.
+ * @param {function(number,Vector3):number} func - The reducer function. First argument
+ * is the current value, second argument the current vertex.
+ * @param {any} initialValue - The initial value.
+ * @return {any} The result.
+ */
 function reduceVertices( object, func, initialValue ) {
 
 	let value = initialValue;
@@ -174,8 +213,10 @@ function reduceVertices( object, func, initialValue ) {
 }
 
 /**
- * @param {InstancedMesh} mesh
- * @param {function(int, int):int} compareFn
+ * Sorts the instances of the given instanced mesh.
+ *
+ * @param {InstancedMesh} mesh - The instanced mesh to sort.
+ * @param {function(number, number):number} compareFn - A custom compare function for the sort.
  */
 function sortInstancedMesh( mesh, compareFn ) {
 
@@ -246,7 +287,9 @@ function sortInstancedMesh( mesh, compareFn ) {
 }
 
 /**
- * @param {Object3D} object Object to traverse.
+ * Generator based alternative to {@link Object3D#traverse}.
+ *
+ * @param {Object3D} object - Object to traverse.
  * @yields {Object3D} Objects that passed the filter condition.
  */
 function* traverseGenerator( object ) {
@@ -264,6 +307,8 @@ function* traverseGenerator( object ) {
 }
 
 /**
+ * Generator based alternative to {@link Object3D#traverseVisible}.
+ *
  * @param {Object3D} object Object to traverse.
  * @yields {Object3D} Objects that passed the filter condition.
  */
@@ -284,6 +329,8 @@ function* traverseVisibleGenerator( object ) {
 }
 
 /**
+ * Generator based alternative to {@link Object3D#traverseAncestors}.
+ *
  * @param {Object3D} object Object to traverse.
  * @yields {Object3D} Objects that passed the filter condition.
  */

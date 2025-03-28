@@ -6,36 +6,18 @@ import {
 	Vector3,
 } from 'three';
 
-/**
- * References:
- * - implemented algorithm - GTAO
- *   - https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf
- *   - https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf
- *
- * - other AO algorithms that are not implemented here:
- *   - Screen Space Ambient Occlusion (SSAO), see also SSAOShader.js
- *	 - http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
- *	 - https://learnopengl.com/Advanced-Lighting/SSAO
- *	 - https://creativecoding.soe.ucsc.edu/courses/cmpm164/_schedule/AmbientOcclusion.pdf
- *	 - https://drive.google.com/file/d/1SyagcEVplIm2KkRD3WQYSO9O0Iyi1hfy/edit
- *   - Scalable Ambient Occlusion (SAO), see also SAOShader.js
- *	 - https://casual-effects.com/research/McGuire2012SAO/index.html
- *	   - https://research.nvidia.com/sites/default/files/pubs/2012-06_Scalable-Ambient-Obscurance/McGuire12SAO.pdf
- *   - N8HO
- *	 - https://github.com/N8python/n8ao
- *   - Horizon Based Ambient Occlusion (HBAO)
- *	 - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.577.2286&rep=rep1&type=pdf
- *	 - https://www.derschmale.com/2013/12/20/an-alternative-implementation-for-hbao-2/
- *
- * - further reading
- * 	 - https://ceur-ws.org/Vol-3027/paper5.pdf
- *   - https://www.comp.nus.edu.sg/~lowkl/publications/mssao_visual_computer_2012.pdf
- *   - https://web.ics.purdue.edu/~tmcgraw/papers/mcgraw-ao-2008.pdf
- *   - https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
- *   - https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.390.2463&rep=rep1&type=pdf
- *   - https://www.intel.com/content/www/us/en/developer/articles/technical/adaptive-screen-space-ambient-occlusion.html
- */
+/** @module GTAOShader */
 
+/**
+ * GTAO shader. Use by {@link GTAOPass}.
+ *
+ * References:
+ * - [Practical Realtime Strategies for Accurate Indirect Occlusion]{@link https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf}.
+ * - [Horizon-Based Indirect Lighting (HBIL)]{@link https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf}
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const GTAOShader = {
 
 	name: 'GTAOShader',
@@ -87,7 +69,7 @@ const GTAOShader = {
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform mat4 cameraProjectionMatrix;
-		uniform mat4 cameraProjectionMatrixInverse;		
+		uniform mat4 cameraProjectionMatrixInverse;
 		uniform mat4 cameraWorldMatrix;
 		uniform float radius;
 		uniform float distanceExponent;
@@ -98,7 +80,7 @@ const GTAOShader = {
 			uniform vec3 sceneBoxMin;
 			uniform vec3 sceneBoxMax;
 		#endif
-		
+
 		#include <common>
 		#include <packing>
 
@@ -112,11 +94,11 @@ const GTAOShader = {
 			return viewSpacePosition.xyz / viewSpacePosition.w;
 		}
 
-		float getDepth(const vec2 uv) {  
+		float getDepth(const vec2 uv) {
 			return textureLod(tDepth, uv.xy, 0.0).DEPTH_SWIZZLING;
 		}
 
-		float fetchDepth(const ivec2 uv) {   
+		float fetchDepth(const ivec2 uv) {
 			return texelFetch(tDepth, uv.xy, 0).DEPTH_SWIZZLING;
 		}
 
@@ -166,7 +148,7 @@ const GTAOShader = {
 			float sampleSceneDepth = getDepth(sampleUv);
 			return vec3(sampleUv, sampleSceneDepth);
 		}
-		
+
 		void main() {
 			float depth = getDepth(vUv.xy);
 			if (depth >= 1.0) {
@@ -192,7 +174,7 @@ const GTAOShader = {
 					return;
 				}
 			#endif
-			
+
 			vec2 noiseResolution = vec2(textureSize(tNoise, 0));
 			vec2 noiseUv = vUv * resolution / noiseResolution;
 			vec4 noiseTexel = textureLod(tNoise, noiseUv, 0.0);
@@ -205,21 +187,21 @@ const GTAOShader = {
 			const int STEPS = (SAMPLES + DIRECTIONS - 1) / DIRECTIONS;
 			float ao = 0.0;
 			for (int i = 0; i < DIRECTIONS; ++i) {
-				
+
 				float angle = float(i) / float(DIRECTIONS) * PI;
-				vec4 sampleDir = vec4(cos(angle), sin(angle), 0., 0.5 + 0.5 * noiseTexel.w); 
+				vec4 sampleDir = vec4(cos(angle), sin(angle), 0., 0.5 + 0.5 * noiseTexel.w);
 				sampleDir.xyz = normalize(kernelMatrix * sampleDir.xyz);
 
 				vec3 viewDir = normalize(-viewPos.xyz);
 				vec3 sliceBitangent = normalize(cross(sampleDir.xyz, viewDir));
 				vec3 sliceTangent = cross(sliceBitangent, viewDir);
 				vec3 normalInSlice = normalize(viewNormal - sliceBitangent * dot(viewNormal, sliceBitangent));
-				
+
 				vec3 tangentToNormalInSlice = cross(normalInSlice, sliceBitangent);
 				vec2 cosHorizons = vec2(dot(viewDir, tangentToNormalInSlice), dot(viewDir, -tangentToNormalInSlice));
-				
+
 				for (int j = 0; j < STEPS; ++j) {
-					vec3 sampleViewOffset = sampleDir.xyz * radiusToUse * sampleDir.w * pow(float(j + 1) / float(STEPS), distanceExponent);	
+					vec3 sampleViewOffset = sampleDir.xyz * radiusToUse * sampleDir.w * pow(float(j + 1) / float(STEPS), distanceExponent);
 
 					vec3 sampleSceneUvDepth = getSceneUvAndDepth(viewPos + sampleViewOffset);
 					vec3 sampleSceneViewPos = getViewPosition(sampleSceneUvDepth.xy, sampleSceneUvDepth.z);
@@ -227,7 +209,7 @@ const GTAOShader = {
 					if (abs(viewDelta.z) < thickness) {
 						float sampleCosHorizon = dot(viewDir, normalize(viewDelta));
 						cosHorizons.x += max(0., (sampleCosHorizon - cosHorizons.x) * mix(1., 2. / float(j + 2), distanceFallOff));
-					}		
+					}
 
 					sampleSceneUvDepth = getSceneUvAndDepth(viewPos - sampleViewOffset);
 					sampleSceneViewPos = getViewPosition(sampleSceneUvDepth.xy, sampleSceneUvDepth.z);
@@ -247,7 +229,7 @@ const GTAOShader = {
 				ao += occlusion;
 			}
 
-			ao = clamp(ao / float(DIRECTIONS), 0., 1.);		
+			ao = clamp(ao / float(DIRECTIONS), 0., 1.);
 		#if SCENE_CLIP_BOX == 1
 			ao = mix(ao, 1., smoothstep(0., radiusToUse, boxDistance));
 		#endif
@@ -258,6 +240,12 @@ const GTAOShader = {
 
 };
 
+/**
+ * GTAO depth shader. Use by {@link GTAOPass}.
+ *
+ * @constant
+ * @type {Object}
+ */
 const GTAODepthShader = {
 
 	name: 'GTAODepthShader',
@@ -306,6 +294,12 @@ const GTAODepthShader = {
 
 };
 
+/**
+ * GTAO blend shader. Use by {@link GTAOPass}.
+ *
+ * @constant
+ * @type {Object}
+ */
 const GTAOBlendShader = {
 
 	name: 'GTAOBlendShader',

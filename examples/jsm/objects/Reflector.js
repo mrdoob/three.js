@@ -12,16 +12,65 @@ import {
 	HalfFloatType
 } from 'three';
 
+/**
+ * Can be used to create a flat, reflective surface like a mirror.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link ReflectorNode}.
+ *
+ * ```js
+ * const geometry = new THREE.PlaneGeometry( 100, 100 );
+ *
+ * const reflector = new Reflector( geometry, {
+ * 	clipBias: 0.003,
+ * 	textureWidth: window.innerWidth * window.devicePixelRatio,
+ * 	textureHeight: window.innerHeight * window.devicePixelRatio,
+ * 	color: 0xc1cbcb
+ * } );
+ *
+ * scene.add( reflector );
+ * ```
+ *
+ * @augments Mesh
+ */
 class Reflector extends Mesh {
 
+	/**
+	 * Constructs a new reflector.
+	 *
+	 * @param {BufferGeometry} geometry - The reflector's geometry.
+	 * @param {Reflector~Options} [options] - The configuration options.
+	 */
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isReflector = true;
 
 		this.type = 'Reflector';
+
+		/**
+		 * Whether to force an update, no matter if the reflector
+		 * is in view or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.forceUpdate = false;
+
+		/**
+		 * The reflector's virtual camera. This is used to render
+		 * the scene from the mirror's point of view.
+		 *
+		 * @type {PerspectiveCamera}
+		 */
 		this.camera = new PerspectiveCamera();
 
 		const scope = this;
@@ -178,12 +227,21 @@ class Reflector extends Mesh {
 
 		};
 
+		/**
+		 * Returns the reflector's internal render target.
+		 *
+		 * @return {WebGLRenderTarget} The internal render target
+		 */
 		this.getRenderTarget = function () {
 
 			return renderTarget;
 
 		};
 
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			renderTarget.dispose();
@@ -263,5 +321,17 @@ Reflector.ReflectorShader = {
 
 		}`
 };
+
+/**
+ * Constructor options of `Reflector`.
+ *
+ * @typedef {Object} Reflector~Options
+ * @property {number|Color|string} [color=0x7F7F7F] - The reflector's color.
+ * @property {number} [textureWidth=512] - The texture width. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [textureHeight=512] - The texture height. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [clipBias=0] - The clip bias.
+ * @property {Object} [shader] - Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.
+ * @property {number} [multisample=4] - How many samples to use for MSAA. `0` disables MSAA.
+ **/
 
 export { Reflector };

@@ -10,45 +10,147 @@ import {
 import { MD2Loader } from '../loaders/MD2Loader.js';
 import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
 
+/**
+ * This class represents a management component for animated MD2
+ * character assets. It provides a larger API compared to {@link MD2Character}.
+ */
 class MD2CharacterComplex {
 
+	/**
+	 * Constructs a new MD2 character.
+	 */
 	constructor() {
 
+		/**
+		 * The mesh scale.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.scale = 1;
 
-		// animation parameters
-
+		/**
+		 * The FPS
+		 *
+		 * @type {number}
+		 * @default 6
+		 */
 		this.animationFPS = 6;
+
+		/**
+		 * The transition frames.
+		 *
+		 * @type {number}
+		 * @default 15
+		 */
 		this.transitionFrames = 15;
 
-		// movement model parameters
-
+		/**
+		 * The character's maximum speed.
+		 *
+		 * @type {number}
+		 * @default 275
+		 */
 		this.maxSpeed = 275;
+
+		/**
+		 * The character's maximum reverse speed.
+		 *
+		 * @type {number}
+		 * @default - 275
+		 */
 		this.maxReverseSpeed = - 275;
 
+		/**
+		 * The character's front acceleration.
+		 *
+		 * @type {number}
+		 * @default 600
+		 */
 		this.frontAcceleration = 600;
+
+		/**
+		 * The character's back acceleration.
+		 *
+		 * @type {number}
+		 * @default 600
+		 */
 		this.backAcceleration = 600;
 
+		/**
+		 * The character's front decceleration.
+		 *
+		 * @type {number}
+		 * @default 600
+		 */
 		this.frontDecceleration = 600;
 
+		/**
+		 * The character's angular speed.
+		 *
+		 * @type {number}
+		 * @default 2.5
+		 */
 		this.angularSpeed = 2.5;
 
-		// rig
-
+		/**
+		 * The root 3D object
+		 *
+		 * @type {Object3D}
+		 */
 		this.root = new Object3D();
 
+		/**
+		 * The body mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.meshBody = null;
+
+		/**
+		 * The weapon mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.meshWeapon = null;
 
+		/**
+		 * The movement controls.
+		 *
+		 * @type {Object}
+		 * @default null
+		 */
 		this.controls = null;
 
-		// skins
-
+		/**
+		 * The body skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
 		this.skinsBody = [];
+
+		/**
+		 * The weapon skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
 		this.skinsWeapon = [];
 
+		/**
+		 * The weapon meshes.
+		 *
+		 * @type {Array<Mesh>}
+		 */
 		this.weapons = [];
 
+		/**
+		 * The current skin.
+		 *
+		 * @type {Texture}
+		 * @default undefined
+		 */
 		this.currentSkin = undefined;
 
 		//
@@ -79,6 +181,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Toggles shadow casting and receiving on the character's meshes.
+	 *
+	 * @param {boolean} enable - Whether to enable shadows or not.
+	 */
 	enableShadows( enable ) {
 
 		for ( let i = 0; i < this.meshes.length; i ++ ) {
@@ -90,6 +197,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Toggles visibility on the character's meshes.
+	 *
+	 * @param {boolean} enable - Whether the character is visible or not.
+	 */
 	setVisible( enable ) {
 
 		for ( let i = 0; i < this.meshes.length; i ++ ) {
@@ -101,6 +213,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Shares certain resources from a different character model.
+	 *
+	 * @param {MD2CharacterComplex} original - The original MD2 character.
+	 */
 	shareParts( original ) {
 
 		this.animations = original.animations;
@@ -143,6 +260,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Loads the character model for the given config.
+	 *
+	 * @param {Object} config - The config which defines the model and textures paths.
+	 */
 	loadParts( config ) {
 
 		const scope = this;
@@ -241,6 +363,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Sets the animation playback rate.
+	 *
+	 * @param {number} rate - The playback rate to set.
+	 */
 	setPlaybackRate( rate ) {
 
 		if ( this.meshBody ) this.meshBody.duration = this.meshBody.baseDuration / rate;
@@ -248,6 +375,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Sets the wireframe material flag.
+	 *
+	 * @param {boolean} wireframeEnabled - Whether to enable wireframe rendering or not.
+	 */
 	setWireframe( wireframeEnabled ) {
 
 		if ( wireframeEnabled ) {
@@ -264,6 +396,12 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Sets the skin defined by the given skin index. This will result in a different texture
+	 * for the body mesh.
+	 *
+	 * @param {number} index - The skin index.
+	 */
 	setSkin( index ) {
 
 		if ( this.meshBody && this.meshBody.material.wireframe === false ) {
@@ -275,6 +413,12 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Sets the weapon defined by the given weapon index. This will result in a different weapon
+	 * hold by the character.
+	 *
+	 * @param {number} index - The weapon index.
+	 */
 	setWeapon( index ) {
 
 		for ( let i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
@@ -297,6 +441,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Sets the defined animation clip as the active animation.
+	 *
+	 * @param {string} animationName - The name of the animation clip.
+	 */
 	setAnimation( animationName ) {
 
 		if ( animationName === this.activeAnimation || ! animationName ) return;
@@ -336,6 +485,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Updates the animations of the mesh. Must be called inside the animation loop.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
 	updateAnimations( delta ) {
 
 		let mix = 1;
@@ -367,6 +521,9 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Updates the animation state based on the control inputs.
+	 */
 	updateBehaviors() {
 
 		const controls = this.controls;
@@ -476,6 +633,11 @@ class MD2CharacterComplex {
 
 	}
 
+	/**
+	 * Transforms the character model based on the control input.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
 	updateMovementModel( delta ) {
 
 		function exponentialEaseOut( k ) {

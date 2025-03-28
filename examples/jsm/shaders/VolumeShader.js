@@ -3,13 +3,19 @@ import {
 	Vector3
 } from 'three';
 
+/** @module VolumeShader */
+
 /**
  * Shaders to render 3D volumes using raycasting.
  * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
  * This is not the only approach, therefore it's marked 1.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const VolumeRenderShader1 = {
+
+	name: 'VolumeRenderShader1',
 
 	uniforms: {
 		'u_size': { value: new Vector3( 1, 1, 1 ) },

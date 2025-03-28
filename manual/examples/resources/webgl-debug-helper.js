@@ -625,7 +625,7 @@
 
 		}
 
-		// Make a an object that has a copy of every property of the WebGL context
+		// Make an object that has a copy of every property of the WebGL context
 		// but wraps all functions.
 		for ( const propertyName in ctx ) {
 

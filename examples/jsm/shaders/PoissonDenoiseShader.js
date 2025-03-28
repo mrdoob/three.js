@@ -4,12 +4,18 @@ import {
 	Vector3,
 } from 'three';
 
-/**
- * References:
- * https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf
- * https://arxiv.org/pdf/2206.01856.pdf
- */
+/** @module PoissonDenoiseShader */
 
+/**
+ * Poisson Denoise Shader.
+ *
+ * References:
+ * - [Self-Supervised Poisson-Gaussian Denoising]{@link https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf}.
+ * - [Poisson2Sparse: Self-Supervised Poisson Denoising From a Single Image]{@link https://arxiv.org/pdf/2206.01856.pdf}
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const PoissonDenoiseShader = {
 
 	name: 'PoissonDenoiseShader',
@@ -59,7 +65,7 @@ const PoissonDenoiseShader = {
 		uniform float normalPhi;
 		uniform float radius;
 		uniform int index;
-		
+
 		#include <common>
 		#include <packing>
 
@@ -82,9 +88,9 @@ const PoissonDenoiseShader = {
 			vec4 viewSpacePosition = cameraProjectionMatrixInverse * clipSpacePosition;
 			return viewSpacePosition.xyz / viewSpacePosition.w;
 		}
-		
+
 		float getDepth(const vec2 uv) {
-		#if DEPTH_VALUE_SOURCE == 1    
+		#if DEPTH_VALUE_SOURCE == 1
 			return textureLod(tDepth, uv.xy, 0.0).a;
 		#else
 			return textureLod(tDepth, uv.xy, 0.0).r;
@@ -92,7 +98,7 @@ const PoissonDenoiseShader = {
 		}
 
 		float fetchDepth(const ivec2 uv) {
-			#if DEPTH_VALUE_SOURCE == 1    
+			#if DEPTH_VALUE_SOURCE == 1
 				return texelFetch(tDepth, uv.xy, 0).a;
 			#else
 				return texelFetch(tDepth, uv.xy, 0).r;
@@ -139,7 +145,7 @@ const PoissonDenoiseShader = {
 			vec3 sampleNormal = getViewNormal(sampleUv);
 			vec3 neighborColor = sampleTexel.rgb;
 			vec3 viewPosSample = getViewPosition(sampleUv, sampleDepth);
-			
+
 			float normalDiff = dot(viewNormal, sampleNormal);
 			float normalSimilarity = pow(max(normalDiff, 0.), normalPhi);
 			float lumaDiff = abs(getLuminance(neighborColor) - getLuminance(center));
@@ -147,14 +153,14 @@ const PoissonDenoiseShader = {
 			float depthDiff = abs(dot(viewPos - viewPosSample, viewNormal));
 			float depthSimilarity = max(1. - depthDiff / depthPhi, 0.);
 			float w = lumaSimilarity * depthSimilarity * normalSimilarity;
-		
+
 			denoised += w * neighborColor;
 			totalWeight += w;
 		}
-		
+
 		void main() {
-			float depth = getDepth(vUv.xy);	
-			vec3 viewNormal = getViewNormal(vUv);	
+			float depth = getDepth(vUv.xy);
+			vec3 viewNormal = getViewNormal(vUv);
 			if (depth == 1. || dot(viewNormal, viewNormal) == 0.) {
 				discard;
 				return;
@@ -168,7 +174,7 @@ const PoissonDenoiseShader = {
 			vec4 noiseTexel = textureLod(tNoise, noiseUv, 0.0);
       		vec2 noiseVec = vec2(sin(noiseTexel[index % 4] * 2. * PI), cos(noiseTexel[index % 4] * 2. * PI));
     		mat2 rotationMatrix = mat2(noiseVec.x, -noiseVec.y, noiseVec.x, noiseVec.y);
-		
+
 			float totalWeight = 1.0;
 			vec3 denoised = texel.rgb;
 			for (int i = 0; i < SAMPLES; i++) {
@@ -177,8 +183,8 @@ const PoissonDenoiseShader = {
 				vec2 sampleUv = vUv + offset;
 				denoiseSample(center, viewNormal, viewPos, sampleUv, denoised, totalWeight);
 			}
-		
-			if (totalWeight > 0.) { 
+
+			if (totalWeight > 0.) {
 				denoised /= totalWeight;
 			}
 			gl_FragColor = FRAGMENT_OUTPUT;

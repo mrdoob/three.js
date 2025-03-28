@@ -7,17 +7,53 @@ import {
 	DataUtils
 } from 'three';
 
+/**
+ * A loader for the RGBM HDR texture format.
+ *
+ * ```js
+ * const loader = new RGBMLoader();
+ * loader.setMaxRange( 16 );
+ *
+ * const texture = await loader.loadAsync( 'textures/memorial.png' );
+ * ```
+ *
+ * @augments DataTextureLoader
+ */
 class RGBMLoader extends DataTextureLoader {
 
+	/**
+	 * Constructs a new RGBM loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * The texture type.
+		 *
+		 * @type {(HalfFloatType|FloatType)}
+		 * @default HalfFloatType
+		 */
 		this.type = HalfFloatType;
-		this.maxRange = 7; // more information about this property at https://iwasbeingirony.blogspot.com/2010/06/difference-between-rgbm-and-rgbd.html
+
+		/**
+		 * More information about this property at [The difference between RGBM and RGBD]{@link https://iwasbeingirony.blogspot.com/2010/06/difference-between-rgbm-and-rgbd.html}
+		 *
+		 * @type {(7|16)}
+		 * @default 7
+		 */
+		this.maxRange = 7;
 
 	}
 
+	/**
+	 * Sets the texture type.
+	 *
+	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+	 * @return {RGBMLoader} A reference to this loader.
+	 */
 	setDataType( value ) {
 
 		this.type = value;
@@ -25,6 +61,12 @@ class RGBMLoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Sets the maximum range.
+	 *
+	 * @param {(7|16)} value - The maximum range to set.
+	 * @return {RGBMLoader} A reference to this loader.
+	 */
 	setMaxRange( value ) {
 
 		this.maxRange = value;
@@ -32,6 +74,16 @@ class RGBMLoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Starts loading from the given URLs and passes the loaded RGBM cube map
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {Array<string>} urls - The paths/URLs of the files to be loaded. This can also be a data URIs.
+	 * @param {function(CubeTexture)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @return {CubeTexture} The cube texture.
+	 */
 	loadCubemap( urls, onLoad, onProgress, onError ) {
 
 		const texture = new CubeTexture();
@@ -81,6 +133,14 @@ class RGBMLoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Async version of {@link RGBMLoader#loadCubemap}.
+	 *
+	 * @async
+	 * @param {Array<string>} urls - The paths/URLs of the files to be loaded. This can also be a data URIs.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @return {Promise<CubeTexture>} A Promise that resolves with the loaded cube map.
+	 */
 	loadCubemapAsync( urls, onProgress ) {
 
 		return new Promise( ( resolve, reject ) => {
@@ -91,6 +151,12 @@ class RGBMLoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Parses the given RGBM texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @return {DataTextureLoader~TexData} An object representing the parsed texture data.
+	 */
 	parse( buffer ) {
 
 		const img = UPNG.decode( buffer );

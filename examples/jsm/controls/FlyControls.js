@@ -4,21 +4,66 @@ import {
 	Vector3
 } from 'three';
 
+/**
+ * Fires when the camera has been transformed by the controls.
+ *
+ * @event FlyControls#change
+ * @type {Object}
+ */
 const _changeEvent = { type: 'change' };
 
 const _EPS = 0.000001;
 const _tmpQuaternion = new Quaternion();
 
+/**
+ * This class enables a navigation similar to fly modes in DCC tools like Blender.
+ * You can arbitrarily transform the camera in 3D space without any limitations
+ * (e.g. focus on a specific target).
+ *
+ * @augments Controls
+ */
 class FlyControls extends Controls {
 
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Object3D} object - The object that is managed by the controls.
+	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 */
 	constructor( object, domElement = null ) {
 
 		super( object, domElement );
 
+		/**
+		 * The movement speed.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.movementSpeed = 1.0;
+
+		/**
+		 * The rotation speed.
+		 *
+		 * @type {number}
+		 * @default 0.005
+		 */
 		this.rollSpeed = 0.005;
 
+		/**
+		 * If set to `true`, you can only look around by performing a drag interaction.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.dragToLook = false;
+
+		/**
+		 * If set to `true`, the camera automatically moves forward (and does not stop) when initially translated.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.autoForward = false;
 
 		// internals
@@ -44,13 +89,15 @@ class FlyControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );

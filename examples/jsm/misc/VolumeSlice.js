@@ -10,34 +10,45 @@ import {
 } from 'three';
 
 /**
- * This class has been made to hold a slice of a volume data
- * @class
+ * This class has been made to hold a slice of a volume data.
+ *
  * @see {@link Volume}
  */
 class VolumeSlice {
 
 	/**
- 	 * @param {Volume} volume     The associated volume
- 	 * @param {number} [index=0]  The index of the slice
- 	 * @param {string} [axis='z'] For now only 'x', 'y' or 'z' but later it will change to a normal vector
+	 * Constructs a new volume slice.
+	 *
+ 	 * @param {Volume} volume - The associated volume.
+ 	 * @param {number} [index=0] - The index of the slice.
+ 	 * @param {('x'|'y'|'z')} [axis='z'] - For now only 'x', 'y' or 'z' but later it will change to a normal vector.
 	 */
-	constructor( volume, index, axis ) {
+	constructor( volume, index = 0, axis = 'z' ) {
 
 		const slice = this;
+
 		/**
-		 * @member {Volume} volume The associated volume
+		 * The associated volume.
+		 *
+		 * @type {Volume}
 		 */
 		this.volume = volume;
-		/**
-		 * @member {number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
-		 */
-		index = index || 0;
+
 		Object.defineProperty( this, 'index', {
 			get: function () {
 
 				return index;
 
 			},
+			/**
+			 * The index of the slice, if changed, will automatically call updateGeometry at the next repaint.
+			 *
+			 * @name VolumeSlice#index
+			 * @type {number}
+			 * @default 0
+			 * @param {number} value
+			 * @return {number}
+			 */
 			set: function ( value ) {
 
 				index = value;
@@ -46,25 +57,42 @@ class VolumeSlice {
 
 			}
 		} );
-		/**
-		 * @member {string} axis The normal axis
-		 */
-		this.axis = axis || 'z';
 
 		/**
-		 * @member {HTMLCanvasElement} canvas The final canvas used for the texture
+		 * The normal axis.
+		 *
+		 * @type {('x'|'y'|'z')}
 		 */
+		this.axis = axis;
+
 		/**
-		 * @member {CanvasRenderingContext2D} ctx Context of the canvas
+		 * The final canvas used for the texture.
+		 *
+		 * @type {HTMLCanvasElement}
 		 */
 		this.canvas = document.createElement( 'canvas' );
+
 		/**
-		 * @member {HTMLCanvasElement} canvasBuffer The intermediary canvas used to paint the data
+		 * The rendering context of the canvas.
+		 *
+		 * @type {CanvasRenderingContext2D}
 		 */
+		this.ctx;
+
 		/**
-		 * @member {CanvasRenderingContext2D} ctxBuffer Context of the canvas buffer
+		 * The intermediary canvas used to paint the data.
+		 *
+		 * @type {HTMLCanvasElement}
 		 */
 		this.canvasBuffer = document.createElement( 'canvas' );
+
+		/**
+		 * The rendering context of the canvas buffer,
+		 *
+		 * @type {CanvasRenderingContext2D}
+		 */
+		this.ctxBuffer;
+
 		this.updateGeometry();
 
 
@@ -74,39 +102,52 @@ class VolumeSlice {
 		canvasMap.wrapS = canvasMap.wrapT = ClampToEdgeWrapping;
 		canvasMap.colorSpace = SRGBColorSpace;
 		const material = new MeshBasicMaterial( { map: canvasMap, side: DoubleSide, transparent: true } );
+
 		/**
-		 * @member {Mesh} mesh The mesh ready to get used in the scene
+		 * The mesh ready to get used in the scene.
+		 *
+		 * @type {Mesh}
 		 */
 		this.mesh = new Mesh( this.geometry, material );
 		this.mesh.matrixAutoUpdate = false;
+
 		/**
-		 * @member {boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
+		 * If set to `true`, `updateGeometry()` will be triggered at the next repaint.
+		 *
+		 * @type {boolean}
+		 * @default true
 		 */
 		this.geometryNeedsUpdate = true;
 		this.repaint();
 
 		/**
-		 * @member {number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
+		 * Width of slice in the original coordinate system, corresponds to the width of the buffer canvas.
+		 *
+		 * @type {number}
+		 * @default 0
 		 */
+		this.iLength = 0;
 
 		/**
-		 * @member {number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
+		 * Height of slice in the original coordinate system, corresponds to the height of the buffer canvas.
+		 *
+		 * @type {number}
+		 * @default 0
 		 */
+		this.jLength = 0;
 
 		/**
-		 * @member {Function} sliceAccess Function that allow the slice to access right data
+		 * Function that allow the slice to access right data.
+		 *
+		 * @type {?Function}
 		 * @see {@link Volume#extractPerpendicularPlane}
-		 * @param {number} i The first coordinate
-		 * @param {number} j The second coordinate
-		 * @returns {number} the index corresponding to the voxel in volume.data of the given position in the slice
 		 */
-
+		this.sliceAccess = null;
 
 	}
 
 	/**
-	 * Refresh the texture and the geometry if geometryNeedsUpdate is set to true
-	 * @memberof VolumeSlice
+	 * Refresh the texture and the geometry if geometryNeedsUpdate is set to `true`.
 	 */
 	repaint() {
 
@@ -138,23 +179,26 @@ class VolumeSlice {
 
 		if ( volume.dataType === 'label' ) {
 
-			//this part is currently useless but will be used when colortables will be handled
-			for ( let j = 0; j < jLength; j ++ ) {
+			console.error( 'THREE.VolumeSlice.repaint: label are not supported yet' );
 
-				for ( let i = 0; i < iLength; i ++ ) {
+			// This part is currently useless but will be used when colortables will be handled
 
-					let label = volumeData[ sliceAccess( i, j ) ];
-					label = label >= this.colorMap.length ? ( label % this.colorMap.length ) + 1 : label;
-					const color = this.colorMap[ label ];
-					data[ 4 * pixelCount ] = ( color >> 24 ) & 0xff;
-					data[ 4 * pixelCount + 1 ] = ( color >> 16 ) & 0xff;
-					data[ 4 * pixelCount + 2 ] = ( color >> 8 ) & 0xff;
-					data[ 4 * pixelCount + 3 ] = color & 0xff;
-					pixelCount ++;
+			// for ( let j = 0; j < jLength; j ++ ) {
 
-				}
+			// 	for ( let i = 0; i < iLength; i ++ ) {
 
-			}
+			// 		let label = volumeData[ sliceAccess( i, j ) ];
+			// 		label = label >= this.colorMap.length ? ( label % this.colorMap.length ) + 1 : label;
+			// 		const color = this.colorMap[ label ];
+			// 		data[ 4 * pixelCount ] = ( color >> 24 ) & 0xff;
+			// 		data[ 4 * pixelCount + 1 ] = ( color >> 16 ) & 0xff;
+			// 		data[ 4 * pixelCount + 2 ] = ( color >> 8 ) & 0xff;
+			// 		data[ 4 * pixelCount + 3 ] = color & 0xff;
+			// 		pixelCount ++;
+
+			// 	}
+
+			// }
 
 		} else {
 
@@ -191,9 +235,8 @@ class VolumeSlice {
 	}
 
 	/**
-	 * Refresh the geometry according to axis and index
+	 * Refresh the geometry according to axis and index.
 	 * @see {@link Volume#extractPerpendicularPlane}
-	 * @memberof VolumeSlice
 	 */
 	updateGeometry() {
 

@@ -47,34 +47,55 @@ import {
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
-/**
- * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
- * Versions lower than this may load but will probably have errors
- *
- * Needs Support:
- *  Morph normals / blend shape normals
- *
- * FBX format references:
- * 	https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
- *
- * Binary format specification:
- *	https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- */
-
-
 let fbxTree;
 let connections;
 let sceneGraph;
 
+/**
+ * A loader for the FBX format.
+ *
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format.
+ * Versions lower than this may load but will probably have errors.
+ *
+ * Needs Support:
+ * - Morph normals / blend shape normals
+ *
+ * FBX format references:
+ * - [C++ SDK reference]{@link https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html}
+ *
+ * Binary format specification:
+ * - [FBX binary file format specification]{@link https://code.blender.org/2013/08/fbx-binary-file-format-specification/}
+ *
+ * ```js
+ * const loader = new FBXLoader();
+ * const object = await loader.loadAsync( 'models/fbx/stanford-bunny.fbx' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ */
 class FBXLoader extends Loader {
 
+	/**
+	 * Constructs a new FBX loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded FBX asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -113,6 +134,13 @@ class FBXLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given FBX data and returns the resulting group.
+	 *
+	 * @param {Array} FBXBuffer - The raw FBX data as an array buffer.
+	 * @param {string} path - The URL base path.
+	 * @return {Group} An object representing the parsed asset.
+	 */
 	parse( FBXBuffer, path ) {
 
 		if ( isFbxFormatBinary( FBXBuffer ) ) {
@@ -1011,7 +1039,7 @@ class FBXTreeParser {
 						skeleton.bones[ i ] = bone;
 
 						// In cases where a bone is shared between multiple meshes
-						// duplicate the bone here and and it as a child of the first bone
+						// duplicate the bone here and add it as a child of the first bone
 						if ( subBone !== null ) {
 
 							bone.add( subBone );
@@ -2735,7 +2763,7 @@ class AnimationParser {
 	}
 
 	// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
-	// hierarchy. Each Stack node will be used to create a AnimationClip
+	// hierarchy. Each Stack node will be used to create an AnimationClip
 	parseAnimStacks( layersMap ) {
 
 		const rawStacks = fbxTree.Objects.AnimationStack;

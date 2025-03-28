@@ -8,8 +8,19 @@ import {
 } from 'three';
 import { FullScreenQuad } from '../postprocessing/Pass.js';
 
+/**
+ * A class that creates an parallax barrier effect.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link ParallaxBarrierPassNode}.
+ */
 class ParallaxBarrierEffect {
 
+	/**
+	 * Constructs a new parallax barrier effect.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		const _stereo = new StereoCamera();
@@ -72,6 +83,12 @@ class ParallaxBarrierEffect {
 
 		const _quad = new FullScreenQuad( _material );
 
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} width - The width of the effect in logical pixels.
+		 * @param {number} height - The height of the effect in logical pixels.
+		 */
 		this.setSize = function ( width, height ) {
 
 			renderer.setSize( width, height );
@@ -83,6 +100,13 @@ class ParallaxBarrierEffect {
 
 		};
 
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			const currentRenderTarget = renderer.getRenderTarget();
@@ -108,6 +132,10 @@ class ParallaxBarrierEffect {
 
 		};
 
+		/**
+		 * Frees internal resources. This method should be called
+		 * when the effect is no longer required.
+		 */
 		this.dispose = function () {
 
 			_renderTargetL.dispose();

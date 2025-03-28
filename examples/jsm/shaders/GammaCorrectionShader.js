@@ -1,8 +1,14 @@
+/** @module GammaCorrectionShader */
+
 /**
  * Gamma Correction Shader
- * http://en.wikipedia.org/wiki/gamma_correction
+ *
+ * References:
+ * - {@link http://en.wikipedia.org/wiki/gamma_correction}.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const GammaCorrectionShader = {
 
 	name: 'GammaCorrectionShader',

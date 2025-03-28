@@ -16,20 +16,84 @@ import {
 
 const COLOR_SPACE_SVG = SRGBColorSpace;
 
+/**
+ * A loader for the SVG format.
+ *
+ * Scalable Vector Graphics is an XML-based vector image format for two-dimensional graphics
+ * with support for interactivity and animation.
+ *
+ * ```js
+ * const loader = new SVGLoader();
+ * const data = await loader.loadAsync( 'data/svgSample.svg' );
+ *
+ * const paths = data.paths;
+ * const group = new THREE.Group();
+ *
+ * for ( let i = 0; i < paths.length; i ++ ) {
+ *
+ * 	const path = paths[ i ];
+ * 	const material = new THREE.MeshBasicMaterial( {
+ * 		color: path.color,
+ * 		side: THREE.DoubleSide,
+ * 		depthWrite: false
+ * 	} );
+ *
+ * 	const shapes = SVGLoader.createShapes( path );
+ *
+ * 	for ( let j = 0; j < shapes.length; j ++ ) {
+ *
+ * 		const shape = shapes[ j ];
+ * 		const geometry = new THREE.ShapeGeometry( shape );
+ * 		const mesh = new THREE.Mesh( geometry, material );
+ * 		group.add( mesh );
+ *
+ * 	}
+ *
+ * }
+ *
+ * scene.add( group );
+ * ```
+ *
+ * @augments Loader
+ */
 class SVGLoader extends Loader {
 
+	/**
+	 * Constructs a new SVG loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
-		// Default dots per inch
+		/**
+		 * Default dots per inch.
+		 *
+		 * @type {number}
+		 * @default 90
+		 */
 		this.defaultDPI = 90;
 
-		// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
+		/**
+		 * Default unit.
+		 *
+		 * @type {('mm'|'cm'|'in'|'pt'|'pc'|'px')}
+		 * @default 'px'
+		 */
 		this.defaultUnit = 'px';
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded SVG asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function({paths:Array<ShapePath>,xml:string})} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -64,6 +128,13 @@ class SVGLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given SVG data and returns the resulting data.
+	 *
+	 * @param {string} text - The raw SVG data as a string.
+	 * @return {{paths:Array<ShapePath>,xml:string}} An object holding an array of shape paths and the
+	 * SVG XML document.
+	 */
 	parse( text ) {
 
 		const scope = this;
@@ -775,6 +846,7 @@ class SVGLoader extends Loader {
 		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
 		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
 		*/
+
 		function parseRectNode( node ) {
 
 			const x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
@@ -1916,10 +1988,13 @@ class SVGLoader extends Loader {
 
 	}
 
+	/**
+	 * Creates from the given shape path and array of shapes.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {Array<Shape>} An array of shapes.
+	 */
 	static createShapes( shapePath ) {
-
-		// Param shapePath: a shapepath as returned by the parse function of this class
-		// Returns Shape object
 
 		const BIGNUMBER = 999999999;
 
@@ -2360,14 +2435,17 @@ class SVGLoader extends Loader {
 
 	}
 
+	/**
+	 * Returns a stroke style object from the given parameters.
+	 *
+	 * @param {number} [width=1] - The stroke width.
+	 * @param {string} [color='#000'] - The stroke color, as  returned by {@link Color#getStyle}.
+	 * @param {'round'|'bevel'|'miter'|'miter-limit'} [lineJoin='miter'] - The line join style.
+	 * @param {'round'|'square'|'butt'} [lineCap='butt'] - The line cap style.
+	 * @param {number} [miterLimit=4] - Maximum join length, in multiples of the `width` parameter (join is truncated if it exceeds that distance).
+	 * @return {Object} The style object.
+	 */
 	static getStrokeStyle( width, color, lineJoin, lineCap, miterLimit ) {
-
-		// Param width: Stroke width
-		// Param color: As returned by THREE.Color.getStyle()
-		// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
-		// Param lineCap: One of "round", "square" or "butt"
-		// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
-		// Returns style object
 
 		width = width !== undefined ? width : 1;
 		color = color !== undefined ? color : '#000';
@@ -2385,15 +2463,17 @@ class SVGLoader extends Loader {
 
 	}
 
+	/**
+	 * Creates a stroke from an array of points.
+	 *
+	 * @param {Array<Vector2>} points - The points in 2D space. Minimum 2 points. The path can be open or closed (last point equals to first point).
+	 * @param {Object} style - Object with SVG properties as returned by `SVGLoader.getStrokeStyle()`, or `SVGLoader.parse()` in the `path.userData.style` object.
+	 * @param {number} [arcDivisions=12] - Arc divisions for round joins and endcaps.
+	 * @param {number} [minDistance=0.001] - Points closer to this distance will be merged.
+	 * @return {?BufferGeometry} The stroke geometry. UV coordinates are generated ('u' along path. 'v' across it, from left to right).
+	 * Returns `null` if not geometry was generated.
+	 */
 	static pointsToStroke( points, style, arcDivisions, minDistance ) {
-
-		// Generates a stroke with some width around the given path.
-		// The path can be open or closed (last point equals to first point)
-		// Param points: Array of Vector2D (the path). Minimum 2 points.
-		// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object
-		// Params arcDivisions: Arc divisions for round joins and endcaps. (Optional)
-		// Param minDistance: Points closer to this distance will be merged. (Optional)
-		// Returns BufferGeometry with stroke triangles (In plane z = 0). UV coordinates are generated ('u' along path. 'v' across it, from left to right)
 
 		const vertices = [];
 		const normals = [];
@@ -2414,6 +2494,19 @@ class SVGLoader extends Loader {
 
 	}
 
+	/**
+	 * Creates a stroke from an array of points.
+	 *
+	 * @param {Array<Vector2>} points - The points in 2D space. Minimum 2 points.
+	 * @param {Object} style - Object with SVG properties as returned by `SVGLoader.getStrokeStyle()`, or `SVGLoader.parse()` in the `path.userData.style` object.
+	 * @param {number} [arcDivisions=12] - Arc divisions for round joins and endcaps.
+	 * @param {number} [minDistance=0.001] - Points closer to this distance will be merged.
+	 * @param {Array<number>} vertices - An array holding vertices.
+	 * @param {Array<number>} normals - An array holding normals.
+	 * @param {Array<number>} uvs - An array holding uvs.
+	 * @param {number} [vertexOffset=0] - The vertex offset.
+	 * @return {number} The number of vertices.
+	 */
 	static pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs, vertexOffset ) {
 
 		// This function can be called to update existing arrays or buffers.

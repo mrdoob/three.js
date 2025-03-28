@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Matrix3, Vector2, mergeUniforms, Vector3, CubeUVReflectionMapping, Mesh, BoxGeometry, ShaderMaterial, cloneUniforms, BackSide, ColorManagement, SRGBTransfer, PlaneGeometry, FrontSide, getUnlitUniformColorSpace, Euler, Matrix4, IntType, RGBAFormat, HalfFloatType, UnsignedByteType, FloatType, Plane, EquirectangularReflectionMapping, EquirectangularRefractionMapping, WebGLCubeRenderTarget, CubeReflectionMapping, CubeRefractionMapping, PerspectiveCamera, NoToneMapping, MeshBasicMaterial, BufferGeometry, BufferAttribute, WebGLRenderTarget, NoBlending, OrthographicCamera, LinearFilter, LinearSRGBColorSpace, warnOnce, arrayNeedsUint32, Uint32BufferAttribute, Uint16BufferAttribute, Vector4, DataArrayTexture, LessEqualCompare, Texture, DepthTexture, Data3DTexture, CubeTexture, GLSL3, CustomToneMapping, NeutralToneMapping, AgXToneMapping, ACESFilmicToneMapping, CineonToneMapping, ReinhardToneMapping, LinearToneMapping, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, LinearTransfer, AddOperation, MixOperation, MultiplyOperation, ObjectSpaceNormalMap, TangentSpaceNormalMap, NormalBlending, DoubleSide, UniformsUtils, Layers, Frustum, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, NearestFilter, LessEqualDepth, AddEquation, SubtractEquation, ReverseSubtractEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, CullFaceNone, CullFaceBack, CullFaceFront, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessDepth, AlwaysDepth, NeverDepth, MinEquation, MaxEquation, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapNearestFilter, LinearMipmapLinearFilter, NeverCompare, AlwaysCompare, LessCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, NoColorSpace, DepthStencilFormat, getByteLength, UnsignedIntType, UnsignedInt248Type, UnsignedShortType, DepthFormat, createElementNS, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, ByteType, ShortType, AlphaFormat, RGBFormat, LuminanceFormat, LuminanceAlphaFormat, RedFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBAIntegerFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, EventDispatcher, ArrayCamera, WebXRController, RAD2DEG, createCanvasElement, SRGBColorSpace, REVISION, toNormalizedProjectionMatrix, toReversedProjectionMatrix, probeAsync, WebGLCoordinateSystem } from './three.core.js';
+import { Matrix3, Vector2, Color, mergeUniforms, Vector3, CubeUVReflectionMapping, Mesh, BoxGeometry, ShaderMaterial, BackSide, cloneUniforms, Euler, Matrix4, ColorManagement, SRGBTransfer, PlaneGeometry, FrontSide, getUnlitUniformColorSpace, IntType, HalfFloatType, UnsignedByteType, FloatType, RGBAFormat, Plane, EquirectangularReflectionMapping, EquirectangularRefractionMapping, WebGLCubeRenderTarget, CubeReflectionMapping, CubeRefractionMapping, OrthographicCamera, PerspectiveCamera, NoToneMapping, MeshBasicMaterial, NoBlending, WebGLRenderTarget, BufferGeometry, BufferAttribute, LinearSRGBColorSpace, LinearFilter, warnOnce, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Vector4, DataArrayTexture, CubeTexture, Data3DTexture, LessEqualCompare, DepthTexture, Texture, GLSL3, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, CustomToneMapping, NeutralToneMapping, AgXToneMapping, ACESFilmicToneMapping, CineonToneMapping, ReinhardToneMapping, LinearToneMapping, LinearTransfer, AddOperation, MixOperation, MultiplyOperation, UniformsUtils, DoubleSide, NormalBlending, TangentSpaceNormalMap, ObjectSpaceNormalMap, Layers, Frustum, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, NearestFilter, LessEqualDepth, ReverseSubtractEquation, SubtractEquation, AddEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, ZeroFactor, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, MinEquation, MaxEquation, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessCompare, AlwaysCompare, NeverCompare, NoColorSpace, DepthStencilFormat, getByteLength, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedShortType, createElementNS, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, ByteType, ShortType, AlphaFormat, RGBFormat, LuminanceFormat, LuminanceAlphaFormat, RedFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBAIntegerFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, EventDispatcher, ArrayCamera, WebXRController, RAD2DEG, createCanvasElement, SRGBColorSpace, REVISION, toNormalizedProjectionMatrix, toReversedProjectionMatrix, probeAsync, WebGLCoordinateSystem } from './three.core.js';
 export { AdditiveAnimationBlendMode, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BasicShadowMap, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeCamera, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CylinderGeometry, Cylindrical, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualStencilFunc, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, Fog, FogExp2, FramebufferTexture, GLBufferAttribute, GLSL1, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialLoader, MathUtils, Matrix2, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NeverStencilFunc, NormalAnimationBlendMode, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, OctahedronGeometry, Path, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBDepthPacking, RGBIntegerFormat, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RenderTarget, RenderTarget3D, RenderTargetArray, ReplaceStencilOp, RingGeometry, Scene, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGPUCoordinateSystem, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, ZeroStencilOp } from './three.core.js';
 
 function WebGLAnimation() {
@@ -716,10 +716,7 @@ const ShaderChunk = {
 	sprite_frag: fragment$1
 };
 
-/**
- * Uniforms library for shared webgl shaders
- */
-
+// Uniforms library for shared webgl shaders
 const UniformsLib = {
 
 	common: {
@@ -1387,7 +1384,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 						side: BackSide,
 						depthTest: false,
 						depthWrite: false,
-						fog: false
+						fog: false,
+						allowOverride: false
 					} )
 				);
 
@@ -1466,7 +1464,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 						side: FrontSide,
 						depthTest: false,
 						depthWrite: false,
-						fog: false
+						fog: false,
+						allowOverride: false
 					} )
 				);
 
@@ -2711,12 +2710,16 @@ const _origin = /*@__PURE__*/ new Vector3();
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting
- * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+ * Paper: Fast, Accurate Image-Based Lighting:
+ * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
 */
-
 class PMREMGenerator {
 
+	/**
+	 * Constructs a new PMREM generator.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		this._renderer = renderer;
@@ -2742,12 +2745,14 @@ class PMREMGenerator {
 	 * in radians to be applied to the scene before PMREM generation. Optional near
 	 * and far planes ensure the scene is rendered in its entirety.
 	 *
-	 * @param {Scene} scene
-	 * @param {number} sigma
-	 * @param {number} near
-	 * @param {number} far
-	 * @param {Object} [options={}]
-	 * @return {WebGLRenderTarget}
+	 * @param {Scene} scene - The scene to be captured.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
@@ -2787,11 +2792,10 @@ class PMREMGenerator {
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
-	 * The smallest supported equirectangular image size is 64 x 32.
 	 *
-	 * @param {Texture} equirectangular
-	 * @param {?WebGLRenderTarget} [renderTarget=null] - Optional render target.
-	 * @return {WebGLRenderTarget}
+	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
+	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
@@ -2803,11 +2807,10 @@ class PMREMGenerator {
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
-	 * The smallest supported cube size is 16 x 16.
 	 *
-	 * @param {Texture} cubemap
-	 * @param {null} [renderTarget=null] - Optional render target.
-	 * @return {WebGLRenderTarget}
+	 * @param {Texture} cubemap - The cubemap texture to be converted.
+	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
@@ -3130,6 +3133,7 @@ class PMREMGenerator {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 *
+	 * @private
 	 * @param {WebGLRenderTarget} cubeUVRenderTarget
 	 * @param {number} lodIn
 	 * @param {number} lodOut
@@ -8858,17 +8862,17 @@ function WebGLState( gl, extensions ) {
 	function DepthBuffer() {
 
 		let locked = false;
-		let reversed = false;
 
+		let currentReversed = false;
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
 
 		return {
 
-			setReversed: function ( value ) {
+			setReversed: function ( reversed ) {
 
-				if ( reversed !== value ) {
+				if ( currentReversed !== reversed ) {
 
 					const ext = extensions.get( 'EXT_clip_control' );
 
@@ -8882,19 +8886,19 @@ function WebGLState( gl, extensions ) {
 
 					}
 
+					currentReversed = reversed;
+
 					const oldDepth = currentDepthClear;
 					currentDepthClear = null;
 					this.setClear( oldDepth );
 
 				}
 
-				reversed = value;
-
 			},
 
 			getReversed: function () {
 
-				return reversed;
+				return currentReversed;
 
 			},
 
@@ -8925,7 +8929,7 @@ function WebGLState( gl, extensions ) {
 
 			setFunc: function ( depthFunc ) {
 
-				if ( reversed ) depthFunc = reversedFuncs[ depthFunc ];
+				if ( currentReversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -8993,7 +8997,7 @@ function WebGLState( gl, extensions ) {
 
 				if ( currentDepthClear !== depth ) {
 
-					if ( reversed ) {
+					if ( currentReversed ) {
 
 						depth = 1 - depth;
 
@@ -9013,7 +9017,7 @@ function WebGLState( gl, extensions ) {
 				currentDepthMask = null;
 				currentDepthFunc = null;
 				currentDepthClear = null;
-				reversed = false;
+				currentReversed = false;
 
 			}
 
@@ -12523,18 +12527,53 @@ void main() {
 
 }`;
 
+/**
+ * A XR module that manages the access to the Depth Sensing API.
+ */
 class WebXRDepthSensing {
 
+	/**
+	 * Constructs a new depth sensing module.
+	 */
 	constructor() {
 
+		/**
+		 * A texture representing the depth of the user's environment.
+		 *
+		 * @type {?Texture}
+		 */
 		this.texture = null;
+
+		/**
+		 * A plane mesh for visualizing the depth texture.
+		 *
+		 * @type {?Mesh}
+		 */
 		this.mesh = null;
 
+		/**
+		 * The depth near value.
+		 *
+		 * @type {number}
+		 */
 		this.depthNear = 0;
+
+		/**
+		 * The depth near far.
+		 *
+		 * @type {number}
+		 */
 		this.depthFar = 0;
 
 	}
 
+	/**
+	 * Inits the depth sensing module
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {XRWebGLDepthInformation} depthData - The XR depth data.
+	 * @param {XRRenderState} renderState - The XR render state.
+	 */
 	init( renderer, depthData, renderState ) {
 
 		if ( this.texture === null ) {
@@ -12557,6 +12596,12 @@ class WebXRDepthSensing {
 
 	}
 
+	/**
+	 * Returns a plane mesh that visualizes the depth texture.
+	 *
+	 * @param {ArrayCamera} cameraXR - The XR camera.
+	 * @return {?Mesh} The plane mesh.
+	 */
 	getMesh( cameraXR ) {
 
 		if ( this.texture !== null ) {
@@ -12584,6 +12629,9 @@ class WebXRDepthSensing {
 
 	}
 
+	/**
+	 * Resets the module
+	 */
 	reset() {
 
 		this.texture = null;
@@ -12591,6 +12639,11 @@ class WebXRDepthSensing {
 
 	}
 
+	/**
+	 * Returns a texture representing the depth of the user's environment.
+	 *
+	 * @return {?Texture} The depth texture.
+	 */
 	getDepthTexture() {
 
 		return this.texture;
@@ -12599,8 +12652,23 @@ class WebXRDepthSensing {
 
 }
 
+/**
+ * This class represents an abstraction of the WebXR Device API and is
+ * internally used by {@link WebGLRenderer}. `WebXRManager` also provides a public
+ * interface that allows users to enable/disable XR and perform XR related
+ * tasks like for instance retrieving controllers.
+ *
+ * @augments EventDispatcher
+ * @hideconstructor
+ */
 class WebXRManager extends EventDispatcher {
 
+	/**
+	 * Constructs a new WebGL renderer.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGL2RenderingContext} gl - The rendering context.
+	 */
 	constructor( renderer, gl ) {
 
 		super();
@@ -12652,11 +12720,40 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		/**
+		 * Whether the manager's XR camera should be automatically updated or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.cameraAutoUpdate = true;
+
+		/**
+		 * This flag notifies the renderer to be ready for XR rendering. Set it to `true`
+		 * if you are going to use XR in your app.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.enabled = false;
 
+		/**
+		 * Whether XR presentation is active or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.isPresenting = false;
 
+		/**
+		 * Returns a group representing the `target ray` space of the XR controller.
+		 * Use this space for visualizing 3D objects that support the user in pointing
+		 * tasks like UI interaction.
+		 *
+		 * @param {number} index - The index of the controller.
+		 * @return {Group} A group representing the `target ray` space.
+		 */
 		this.getController = function ( index ) {
 
 			let controller = controllers[ index ];
@@ -12672,6 +12769,21 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns a group representing the `grip` space of the XR controller.
+		 * Use this space for visualizing 3D objects that support the user in pointing
+		 * tasks like UI interaction.
+		 *
+		 * Note: If you want to show something in the user's hand AND offer a
+		 * pointing ray at the same time, you'll want to attached the handheld object
+		 * to the group returned by `getControllerGrip()` and the ray to the
+		 * group returned by `getController()`. The idea is to have two
+		 * different groups in two different coordinate spaces for the same WebXR
+		 * controller.
+		 *
+		 * @param {number} index - The index of the controller.
+		 * @return {Group} A group representing the `grip` space.
+		 */
 		this.getControllerGrip = function ( index ) {
 
 			let controller = controllers[ index ];
@@ -12687,6 +12799,14 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns a group representing the `hand` space of the XR controller.
+		 * Use this space for visualizing 3D objects that support the user in pointing
+		 * tasks like UI interaction.
+		 *
+		 * @param {number} index - The index of the controller.
+		 * @return {Group} A group representing the `hand` space.
+		 */
 		this.getHand = function ( index ) {
 
 			let controller = controllers[ index ];
@@ -12776,6 +12896,13 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		/**
+		 * Sets the framebuffer scale factor.
+		 *
+		 * This method can not be used during a XR session.
+		 *
+		 * @param {number} value - The framebuffer scale factor.
+		 */
 		this.setFramebufferScaleFactor = function ( value ) {
 
 			framebufferScaleFactor = value;
@@ -12788,6 +12915,15 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Sets the reference space type. Can be used to configure a spatial relationship with the user's physical
+		 * environment. Depending on how the user moves in 3D space, setting an appropriate reference space can
+		 * improve tracking. Default is `local-floor`.
+		 *
+		 * This method can not be used during a XR session.
+		 *
+		 * @param {string} value - The reference space type.
+		 */
 		this.setReferenceSpaceType = function ( value ) {
 
 			referenceSpaceType = value;
@@ -12800,42 +12936,81 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns the XR reference space.
+		 *
+		 * @return {XRReferenceSpace} The XR reference space.
+		 */
 		this.getReferenceSpace = function () {
 
 			return customReferenceSpace || referenceSpace;
 
 		};
 
+		/**
+		 * Sets a custom XR reference space.
+		 *
+		 * @param {XRReferenceSpace} space - The XR reference space.
+		 */
 		this.setReferenceSpace = function ( space ) {
 
 			customReferenceSpace = space;
 
 		};
 
+		/**
+		 * Returns the current base layer.
+		 *
+		 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
+		 */
 		this.getBaseLayer = function () {
 
 			return glProjLayer !== null ? glProjLayer : glBaseLayer;
 
 		};
 
+		/**
+		 * Returns the current XR binding.
+		 *
+		 * @return {?XRWebGLBinding} The XR binding.
+		 */
 		this.getBinding = function () {
 
 			return glBinding;
 
 		};
 
+		/**
+		 * Returns the current XR frame.
+		 *
+		 * @return {?XRFrame} The XR frame. Returns `null` when used outside a XR session.
+		 */
 		this.getFrame = function () {
 
 			return xrFrame;
 
 		};
 
+		/**
+		 * Returns the current XR session.
+		 *
+		 * @return {?XRSession} The XR session. Returns `null` when used outside a XR session.
+		 */
 		this.getSession = function () {
 
 			return session;
 
 		};
 
+		/**
+		 * After a XR session has been requested usually with one of the `*Button` modules, it
+		 * is injected into the renderer with this method. This method triggers the start of
+		 * the actual XR rendering.
+		 *
+		 * @async
+		 * @param {XRSession} value - The XR session to set.
+		 * @return {Promise} A Promise that resolves when the session has been set.
+		 */
 		this.setSession = async function ( value ) {
 
 			session = value;
@@ -12960,6 +13135,11 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns the environment blend mode from the current XR session.
+		 *
+		 * @return {'opaque'|'additive'|'alpha-blend'|undefined} The environment blend mode. Returns `undefined` when used outside of a XR session.
+		 */
 		this.getEnvironmentBlendMode = function () {
 
 			if ( session !== null ) {
@@ -12970,6 +13150,11 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns the current depth texture computed via depth sensing.
+		 *
+		 * @return {?Texture} The depth texture.
+		 */
 		this.getDepthTexture = function () {
 
 			return depthSensing.getDepthTexture();
@@ -13136,6 +13321,15 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		/**
+		 * Updates the state of the XR camera. Use this method on app level if you
+		 * set cameraAutoUpdate` to `false`. The method requires the non-XR
+		 * camera of the scene as a parameter. The passed in camera's transformation
+		 * is automatically adjusted to the position of the XR camera when calling
+		 * this method.
+		 *
+		 * @param {Camera} camera - The camera.
+		 */
 		this.updateCamera = function ( camera ) {
 
 			if ( session === null ) return;
@@ -13231,12 +13425,27 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		/**
+		 * Returns an instance of {@link ArrayCamera} which represents the XR camera
+		 * of the active XR session. For each view it holds a separate camera object.
+		 *
+		 * The camera's `fov` is currently not used and does not reflect the fov of
+		 * the XR camera. If you need the fov on app level, you have to compute in
+		 * manually from the XR camera's projection matrices.
+		 *
+		 * @return {ArrayCamera} The XR camera.
+		 */
 		this.getCamera = function () {
 
 			return cameraXR;
 
 		};
 
+		/**
+		 * Returns the amount of foveation used by the XR compositor for the projection layer.
+		 *
+		 * @return {number} The amount of foveation.
+		 */
 		this.getFoveation = function () {
 
 			if ( glProjLayer === null && glBaseLayer === null ) {
@@ -13249,6 +13458,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Sets the foveation value.
+		 *
+		 * @param {number} value - A number in the range `[0,1]` where `0` means no foveation (full resolution)
+		 * and `1` means maximum foveation (the edges render at lower resolution).
+		 */
 		this.setFoveation = function ( value ) {
 
 			// 0 = no foveation = full resolution
@@ -13270,12 +13485,22 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns `true` if depth sensing is supported.
+		 *
+		 * @return {boolean} Whether depth sensing is supported or not.
+		 */
 		this.hasDepthSensing = function () {
 
 			return depthSensing.texture !== null;
 
 		};
 
+		/**
+		 * Returns the depth sensing mesh.
+		 *
+		 * @return {Mesh} The depth sensing mesh.
+		 */
 		this.getDepthSensingMesh = function () {
 
 			return depthSensing.getMesh( cameraXR );
@@ -13334,7 +13559,7 @@ class WebXRManager extends EventDispatcher {
 							renderer.setRenderTargetTextures(
 								newRenderTarget,
 								glSubImage.colorTexture,
-								glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture );
+								glSubImage.depthStencilTexture );
 
 							renderer.setRenderTarget( newRenderTarget );
 
@@ -14413,8 +14638,18 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 }
 
+/**
+ * This renderer uses WebGL 2 to display scenes.
+ *
+ * WebGL 1 is not supported since `r163`.
+ */
 class WebGLRenderer {
 
+	/**
+	 * Constructs a new WebGL renderer.
+	 *
+	 * @param {WebGLRenderer~Options} [parameters] - The configuration parameter.
+	 */
 	constructor( parameters = {} ) {
 
 		const {
@@ -14431,6 +14666,13 @@ class WebGLRenderer {
 			reverseDepthBuffer = false,
 		} = parameters;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isWebGLRenderer = true;
 
 		let _alpha;
@@ -14465,13 +14707,36 @@ class WebGLRenderer {
 
 		// public properties
 
+		/**
+		 * A canvas where the renderer draws its output.This is automatically created by the renderer
+		 * in the constructor (if not provided already); you just need to add it to your page like so:
+		 * ```js
+		 * document.body.appendChild( renderer.domElement );
+		 * ```
+		 *
+		 * @type {DOMElement}
+		 */
 		this.domElement = canvas;
 
-		// Debug configuration container
+		/**
+		 * A object with debug configuration settings.
+		 *
+		 * - `checkShaderErrors`: If it is `true`, defines whether material shader programs are
+		 * checked for errors during compilation and linkage process. It may be useful to disable
+		 * this check in production for performance gain. It is strongly recommended to keep these
+		 * checks enabled during development. If the shader does not compile and link - it will not
+		 * work and associated material will not render.
+		 * - `onShaderError(gl, program, glVertexShader,glFragmentShader)`: A callback function that
+		 * can be used for custom error reporting. The callback receives the WebGL context, an instance
+		 * of WebGLProgram as well two instances of WebGLShader representing the vertex and fragment shader.
+		 * Assigning a custom function disables the default error reporting.
+		 *
+		 * @type {Object}
+		 */
 		this.debug = {
 
 			/**
-			 * Enables error checking and reporting when shader programs are being compiled
+			 * Enables error checking and reporting when shader programs are being compiled.
 			 * @type {boolean}
 			 */
 			checkShaderErrors: true,
@@ -14484,28 +14749,104 @@ class WebGLRenderer {
 
 		// clearing
 
+		/**
+		 * Whether the renderer should automatically clear its output before rendering a frame or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClear = true;
+
+		/**
+		 * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
+		 * the color buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClearColor = true;
+
+		/**
+		 * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
+		 * the depth buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClearDepth = true;
+
+		/**
+		 * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
+		 * the stencil buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClearStencil = true;
 
 		// scene graph
 
+		/**
+		 * Whether the renderer should sort objects or not.
+		 *
+		 * Note: Sorting is used to attempt to properly render objects that have some
+		 * degree of transparency. By definition, sorting objects may not work in all
+		 * cases. Depending on the needs of application, it may be necessary to turn
+		 * off sorting and use other methods to deal with transparency rendering e.g.
+		 * manually determining each object's rendering order.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortObjects = true;
 
 		// user-defined clipping
 
+		/**
+		 * User-defined clipping planes specified in world space. These planes apply globally.
+		 * Points in space whose dot product with the plane is negative are cut away.
+		 *
+		 * @type {Array<Plane>}
+		 */
 		this.clippingPlanes = [];
+
+		/**
+		 * Whether the renderer respects object-level clipping planes or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.localClippingEnabled = false;
-
-		// physically based shading
-
-		this._outputColorSpace = SRGBColorSpace;
 
 		// tone mapping
 
+		/**
+		 * The tone mapping technique of the renderer.
+		 *
+		 * @type {(NoToneMapping|LinearToneMapping|ReinhardToneMapping|CineonToneMapping|ACESFilmicToneMapping|CustomToneMapping|AgXToneMapping|NeutralToneMapping)}
+		 * @default NoToneMapping
+		 */
 		this.toneMapping = NoToneMapping;
+
+		/**
+		 * Exposure level of tone mapping.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.toneMappingExposure = 1.0;
+
+		// transmission
+
+		/**
+		 * The normalized resolution scale for the transmission render target, measured in percentage
+		 * of viewport dimensions. Lowering this value can result in significant performance improvements
+		 * when using {@link MeshPhysicalMaterial#transmission}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.transmissionResolutionScale = 1.0;
 
 		// internal properties
 
@@ -14514,6 +14855,8 @@ class WebGLRenderer {
 		let _isContextLost = false;
 
 		// internal state cache
+
+		this._outputColorSpace = SRGBColorSpace;
 
 		let _currentActiveCubeFace = 0;
 		let _currentActiveMipmapLevel = 0;
@@ -14550,9 +14893,6 @@ class WebGLRenderer {
 
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
-
-		// transmission render target scale
-		this.transmissionResolutionScale = 1.0;
 
 		// camera matrices cache
 
@@ -14682,12 +15022,79 @@ class WebGLRenderer {
 
 			info.programs = programCache.programs;
 
+			/**
+			 * Holds details about the capabilities of the current rendering context.
+			 *
+			 * @name WebGLRenderer#capabilities
+			 * @type {WebGLRenderer~Capabilities}
+			 */
 			_this.capabilities = capabilities;
+
+			/**
+			 * Provides methods for retrieving and testing WebGL extensions.
+			 *
+			 * - `get(extensionName:string)`: Used to check whether a WebGL extension is supported
+			 * and return the extension object if available.
+			 * - `has(extensionName:string)`: returns `true` if the extension is supported.
+			 *
+			 * @name WebGLRenderer#extensions
+			 * @type {Object}
+			 */
 			_this.extensions = extensions;
+
+			/**
+			 * Used to track properties of other objects like native WebGL objects.
+			 *
+			 * @name WebGLRenderer#properties
+			 * @type {Object}
+			 */
 			_this.properties = properties;
+
+			/**
+			 * Manages the render lists of the renderer.
+			 *
+			 * @name WebGLRenderer#renderLists
+			 * @type {Object}
+			 */
 			_this.renderLists = renderLists;
+
+
+
+			/**
+			 * Interface for managing shadows.
+			 *
+			 * @name WebGLRenderer#shadowMap
+			 * @type {WebGLRenderer~ShadowMap}
+			 */
 			_this.shadowMap = shadowMap;
+
+			/**
+			 * Interface for managing the WebGL state.
+			 *
+			 * @name WebGLRenderer#state
+			 * @type {Object}
+			 */
 			_this.state = state;
+
+			/**
+			 * Holds a series of statistical information about the GPU memory
+			 * and the rendering process. Useful for debugging and monitoring.
+			 *
+			 * By default these data are reset at each render call but when having
+			 * multiple render passes per frame (e.g. when using post processing) it can
+			 * be preferred to reset with a custom pattern. First, set `autoReset` to
+			 * `false`.
+			 * ```js
+			 * renderer.info.autoReset = false;
+			 * ```
+			 * Call `reset()` whenever you have finished to render a single frame.
+			 * ```js
+			 * renderer.info.reset();
+			 * ```
+			 *
+			 * @name WebGLRenderer#info
+			 * @type {WebGLRenderer~Info}
+			 */
 			_this.info = info;
 
 		}
@@ -14698,22 +15105,38 @@ class WebGLRenderer {
 
 		const xr = new WebXRManager( _this, _gl );
 
+		/**
+		 * A reference to the XR manager.
+		 *
+		 * @type {WebXRManager}
+		 */
 		this.xr = xr;
 
-		// API
-
+		/**
+		 * Returns the rendering context.
+		 *
+		 * @return {WebGL2RenderingContext} The rendering context.
+		 */
 		this.getContext = function () {
 
 			return _gl;
 
 		};
 
+		/**
+		 * Returns the rendering context attributes.
+		 *
+		 * @return {WebGLContextAttributes} The rendering context attributes.
+		 */
 		this.getContextAttributes = function () {
 
 			return _gl.getContextAttributes();
 
 		};
 
+		/**
+		 * Simulates a loss of the WebGL context. This requires support for the `WEBGL_lose_context` extension.
+		 */
 		this.forceContextLoss = function () {
 
 			const extension = extensions.get( 'WEBGL_lose_context' );
@@ -14721,6 +15144,9 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Simulates a restore of the WebGL context. This requires support for the `WEBGL_lose_context` extension.
+		 */
 		this.forceContextRestore = function () {
 
 			const extension = extensions.get( 'WEBGL_lose_context' );
@@ -14728,12 +15154,22 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the pixel ratio.
+		 *
+		 * @return {number} The pixel ratio.
+		 */
 		this.getPixelRatio = function () {
 
 			return _pixelRatio;
 
 		};
 
+		/**
+		 * Sets the given pixel ratio and resizes the canvas if necessary.
+		 *
+		 * @param {number} value - The pixel ratio.
+		 */
 		this.setPixelRatio = function ( value ) {
 
 			if ( value === undefined ) return;
@@ -14744,12 +15180,27 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the renderer's size in logical pixels. This method does not honor the pixel ratio.
+		 *
+		 * @param {Vector2} target - The method writes the result in this target object.
+		 * @return {Vector2} The renderer's size in logical pixels.
+		 */
 		this.getSize = function ( target ) {
 
 			return target.set( _width, _height );
 
 		};
 
+		/**
+		 * Resizes the output canvas to (width, height) with device pixel ratio taken
+		 * into account, and also sets the viewport to fit that size, starting in (0,
+		 * 0). Setting `updateStyle` to false prevents any style changes to the output canvas.
+		 *
+		 * @param {number} width - The width in logical pixels.
+		 * @param {number} height - The height in logical pixels.
+		 * @param {boolean} [updateStyle=true] - Whether to update the `style` attribute of the canvas or not.
+		 */
 		this.setSize = function ( width, height, updateStyle = true ) {
 
 			if ( xr.isPresenting ) {
@@ -14776,12 +15227,31 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the drawing buffer size in physical pixels. This method honors the pixel ratio.
+		 *
+		 * @param {Vector2} target - The method writes the result in this target object.
+		 * @return {Vector2} The drawing buffer size.
+		 */
 		this.getDrawingBufferSize = function ( target ) {
 
 			return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
 
 		};
 
+		/**
+		 * This method allows to define the drawing buffer size by specifying
+		 * width, height and pixel ratio all at once. The size of the drawing
+		 * buffer is computed with this formula:
+		 * ```js
+		 * size.x = width * pixelRatio;
+		 * size.y = height * pixelRatio;
+		 * ```
+		 *
+		 * @param {number} width - The width in logical pixels.
+		 * @param {number} height - The height in logical pixels.
+		 * @param {number} pixelRatio - The pixel ratio.
+		 */
 		this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
 
 			_width = width;
@@ -14796,18 +15266,39 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the current viewport definition.
+		 *
+		 * @param {Vector2} target - The method writes the result in this target object.
+		 * @return {Vector2} The current viewport definition.
+		 */
 		this.getCurrentViewport = function ( target ) {
 
 			return target.copy( _currentViewport );
 
 		};
 
+		/**
+		 * Returns the viewport definition.
+		 *
+		 * @param {Vector4} target - The method writes the result in this target object.
+		 * @return {Vector4} The viewport definition.
+		 */
 		this.getViewport = function ( target ) {
 
 			return target.copy( _viewport );
 
 		};
 
+		/**
+		 * Sets the viewport to render from `(x, y)` to `(x + width, y + height)`.
+		 *
+		 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
+		 * Or alternatively a four-component vector specifying all the parameters of the viewport.
+		 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+		 * @param {number} width - The width of the viewport in logical pixel unit.
+		 * @param {number} height - The height of the viewport in logical pixel unit.
+		 */
 		this.setViewport = function ( x, y, width, height ) {
 
 			if ( x.isVector4 ) {
@@ -14824,12 +15315,27 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the scissor region.
+		 *
+		 * @param {Vector4} target - The method writes the result in this target object.
+		 * @return {Vector4} The scissor region.
+		 */
 		this.getScissor = function ( target ) {
 
 			return target.copy( _scissor );
 
 		};
 
+		/**
+		 * Sets the scissor region to render from `(x, y)` to `(x + width, y + height)`.
+		 *
+		 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the scissor region origin in logical pixel unit.
+		 * Or alternatively a four-component vector specifying all the parameters of the scissor region.
+		 * @param {number} y - The vertical coordinate for the lower left corner of the scissor region origin  in logical pixel unit.
+		 * @param {number} width - The width of the scissor region in logical pixel unit.
+		 * @param {number} height - The height of the scissor region in logical pixel unit.
+		 */
 		this.setScissor = function ( x, y, width, height ) {
 
 			if ( x.isVector4 ) {
@@ -14846,24 +15352,48 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns `true` if the scissor test is enabled.
+		 *
+		 * @return {boolean} Whether the scissor test is enabled or not.
+		 */
 		this.getScissorTest = function () {
 
 			return _scissorTest;
 
 		};
 
+		/**
+		 * Enable or disable the scissor test. When this is enabled, only the pixels
+		 * within the defined scissor area will be affected by further renderer
+		 * actions.
+		 *
+		 * @param {boolean} boolean - Whether the scissor test is enabled or not.
+		 */
 		this.setScissorTest = function ( boolean ) {
 
 			state.setScissorTest( _scissorTest = boolean );
 
 		};
 
+		/**
+		 * Sets a custom opaque sort function for the render lists. Pass `null`
+		 * to use the default `painterSortStable` function.
+		 *
+		 * @param {?Function} method - The opaque sort function.
+		 */
 		this.setOpaqueSort = function ( method ) {
 
 			_opaqueSort = method;
 
 		};
 
+		/**
+		 * Sets a custom transparent sort function for the render lists. Pass `null`
+		 * to use the default `reversePainterSortStable` function.
+		 *
+		 * @param {?Function} method - The opaque sort function.
+		 */
 		this.setTransparentSort = function ( method ) {
 
 			_transparentSort = method;
@@ -14872,30 +15402,60 @@ class WebGLRenderer {
 
 		// Clearing
 
+		/**
+		 * Returns the clear color.
+		 *
+		 * @param {Color} target - The method writes the result in this target object.
+		 * @return {Color} The clear color.
+		 */
 		this.getClearColor = function ( target ) {
 
 			return target.copy( background.getClearColor() );
 
 		};
 
+		/**
+		 * Sets the clear color and alpha.
+		 *
+		 * @param {Color} color - The clear color.
+		 * @param {number} [alpha=1] - The clear alpha.
+		 */
 		this.setClearColor = function () {
 
 			background.setClearColor( ...arguments );
 
 		};
 
+		/**
+		 * Returns the clear alpha. Ranges within `[0,1]`.
+		 *
+		 * @return {number} The clear alpha.
+		 */
 		this.getClearAlpha = function () {
 
 			return background.getClearAlpha();
 
 		};
 
+		/**
+		 * Sets the clear alpha.
+		 *
+		 * @param {number} alpha - The clear alpha.
+		 */
 		this.setClearAlpha = function () {
 
 			background.setClearAlpha( ...arguments );
 
 		};
 
+		/**
+		 * Tells the renderer to clear its color, depth or stencil drawing buffer(s).
+		 * This method initializes the buffers to the current clear color values.
+		 *
+		 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
+		 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
+		 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
+		 */
 		this.clear = function ( color = true, depth = true, stencil = true ) {
 
 			let bits = 0;
@@ -14974,26 +15534,37 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Clears the color buffer. Equivalent to calling `renderer.clear( true, false, false )`.
+		 */
 		this.clearColor = function () {
 
 			this.clear( true, false, false );
 
 		};
 
+		/**
+		 * Clears the depth buffer. Equivalent to calling `renderer.clear( false, true, false )`.
+		 */
 		this.clearDepth = function () {
 
 			this.clear( false, true, false );
 
 		};
 
+		/**
+		 * Clears the stencil buffer. Equivalent to calling `renderer.clear( false, false, true )`.
+		 */
 		this.clearStencil = function () {
 
 			this.clear( false, false, true );
 
 		};
 
-		//
-
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
@@ -15299,6 +15870,18 @@ class WebGLRenderer {
 
 		}
 
+		/**
+		 * Compiles all materials in the scene with the camera. This is useful to precompile shaders
+		 * before the first rendering. If you want to add a 3D object to an existing scene, use the third
+		 * optional parameter for applying the target scene.
+		 *
+		 * Note that the (target) scene's lighting and environment must be configured before calling this method.
+		 *
+		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
+		 * @param {Camera} camera - The camera.
+		 * @param {?Scene} [targetScene=null] - The target scene.
+		 * @return {?Set} The precompiled materials.
+		 */
 		this.compile = function ( scene, camera, targetScene = null ) {
 
 			if ( targetScene === null ) targetScene = scene;
@@ -15394,6 +15977,18 @@ class WebGLRenderer {
 
 		// compileAsync
 
+		/**
+		 * Asynchronous version of {@link WebGLRenderer#compile}.
+		 *
+		 * This method makes use of the `KHR_parallel_shader_compile` WebGL extension. Hence,
+		 * it is recommended to use this version of `compile()` whenever possible.
+		 *
+		 * @async
+		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
+		 * @param {Camera} camera - The camera.
+		 * @param {?Scene} [targetScene=null] - The target scene.
+		 * @return {Promise} A Promise that resolves when the given scene can be rendered without unnecessary stalling due to shader compilation.
+		 */
 		this.compileAsync = function ( scene, camera, targetScene = null ) {
 
 			const materials = this.compile( scene, camera, targetScene );
@@ -15495,6 +16090,20 @@ class WebGLRenderer {
 
 		// Rendering
 
+		/**
+		 * Renders the given scene (or other type of 3D object) using the given camera.
+		 *
+		 * The render is done to a previously specified render target set by calling {@link WebGLRenderer#setRenderTarget}
+		 * or to the canvas as usual.
+		 *
+		 * By default render buffers are cleared before rendering but you can prevent
+		 * this by setting the property `autoClear` to `false`. If you want to prevent
+		 * only certain buffers being cleared you can `autoClearColor`, `autoClearDepth`
+		 * or `autoClearStencil` to `false`. To force a clear, use {@link WebGLRenderer#clear}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			if ( camera !== undefined && camera.isCamera !== true ) {
@@ -15953,8 +16562,14 @@ class WebGLRenderer {
 
 				const object = renderItem.object;
 				const geometry = renderItem.geometry;
-				const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
 				const group = renderItem.group;
+				let material = renderItem.material;
+
+				if ( material.allowOverride === true && overrideMaterial !== null ) {
+
+					material = overrideMaterial;
+
+				}
 
 				if ( object.layers.test( camera.layers ) ) {
 
@@ -16575,18 +17190,34 @@ class WebGLRenderer {
 
 		}
 
+		/**
+		 * Returns the active cube face.
+		 *
+		 * @return {number} The active cube face.
+		 */
 		this.getActiveCubeFace = function () {
 
 			return _currentActiveCubeFace;
 
 		};
 
+		/**
+		 * Returns the active mipmap level.
+		 *
+		 * @return {number} The active mipmap level.
+		 */
 		this.getActiveMipmapLevel = function () {
 
 			return _currentActiveMipmapLevel;
 
 		};
 
+		/**
+		 * Returns the active render target.
+		 *
+		 * @return {?WebGLRenderTarget} The active render target. Returns `null` if no render target
+		 * is currently set.
+		 */
 		this.getRenderTarget = function () {
 
 			return _currentRenderTarget;
@@ -16595,26 +17226,21 @@ class WebGLRenderer {
 
 		this.setRenderTargetTextures = function ( renderTarget, colorTexture, depthTexture ) {
 
-			properties.get( renderTarget.texture ).__webglTexture = colorTexture;
-			properties.get( renderTarget.depthTexture ).__webglTexture = depthTexture;
-
 			const renderTargetProperties = properties.get( renderTarget );
-			renderTargetProperties.__hasExternalTextures = true;
 
-			renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
-
-			if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
+			renderTargetProperties.__autoAllocateDepthBuffer = renderTarget.resolveDepthBuffer === false;
+			if ( renderTargetProperties.__autoAllocateDepthBuffer === false ) {
 
 				// The multisample_render_to_texture extension doesn't work properly if there
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
-				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
-
-					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
-					renderTargetProperties.__useRenderToTexture = false;
-
-				}
+				renderTargetProperties.__useRenderToTexture = false;
 
 			}
+
+			properties.get( renderTarget.texture ).__webglTexture = colorTexture;
+			properties.get( renderTarget.depthTexture ).__webglTexture = renderTargetProperties.__autoAllocateDepthBuffer ? undefined : depthTexture;
+
+			renderTargetProperties.__hasExternalTextures = true;
 
 		};
 
@@ -16627,6 +17253,16 @@ class WebGLRenderer {
 		};
 
 		const _scratchFrameBuffer = _gl.createFramebuffer();
+
+		/**
+		 * Sets the active rendertarget.
+		 *
+		 * @param {?WebGLRenderTarget} renderTarget - The render target to set. When `null` is given,
+		 * the canvas is set as the active render target instead.
+		 * @param {number} [activeCubeFace=0] - The active cube face when using a cube render target.
+		 * Indicates the z layer to render in to when using 3D or array render targets.
+		 * @param {number} [activeMipmapLevel=0] - The active mipmap level.
+		 */
 		this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
 
 			_currentRenderTarget = renderTarget;
@@ -16779,6 +17415,17 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Reads the pixel data from the given render target into the given buffer.
+		 *
+		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {number} x - The `x` coordinate of the copy region's origin.
+		 * @param {number} y - The `y` coordinate of the copy region's origin.
+		 * @param {number} width - The width of the copy region.
+		 * @param {number} height - The height of the copy region.
+		 * @param {TypedArray} buffer - The result buffer.
+		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
+		 */
 		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
@@ -16841,6 +17488,21 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Asynchronous, non-blocking version of {@link WebGLRenderer#readRenderTargetPixels}.
+		 *
+		 * It is recommended to use this version of `readRenderTargetPixels()` whenever possible.
+		 *
+		 * @async
+		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {number} x - The `x` coordinate of the copy region's origin.
+		 * @param {number} y - The `y` coordinate of the copy region's origin.
+		 * @param {number} width - The width of the copy region.
+		 * @param {number} height - The height of the copy region.
+		 * @param {TypedArray} buffer - The result buffer.
+		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
+		 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
+		 */
 		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
@@ -16858,27 +17520,27 @@ class WebGLRenderer {
 
 			if ( framebuffer ) {
 
-				const texture = renderTarget.texture;
-				const textureFormat = texture.format;
-				const textureType = texture.type;
-
-				if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
-
-					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
-
-				}
-
-				if ( ! capabilities.textureTypeReadable( textureType ) ) {
-
-					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
-
-				}
-
 				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
 					// set the active frame buffer to the one we want to read
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+					const texture = renderTarget.texture;
+					const textureFormat = texture.format;
+					const textureType = texture.type;
+
+					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
+
+						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
+
+					}
+
+					if ( ! capabilities.textureTypeReadable( textureType ) ) {
+
+						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
+
+					}
 
 					const glBuffer = _gl.createBuffer();
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
@@ -16914,18 +17576,14 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Copies pixels from the current bound framebuffer into the given texture.
+		 *
+		 * @param {FramebufferTexture} texture - The texture.
+		 * @param {Vector2} position - The start position of the copy operation.
+		 * @param {number} [level=0] - The mip level. The default represents the base mip.
+		 */
 		this.copyFramebufferToTexture = function ( texture, position = null, level = 0 ) {
-
-			// support previous signature with position first
-			if ( texture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyFramebufferToTexture function signature has changed.' );
-
-				position = arguments[ 0 ] || null;
-				texture = arguments[ 1 ];
-
-			}
 
 			const levelScale = Math.pow( 2, - level );
 			const width = Math.floor( texture.image.width * levelScale );
@@ -16944,21 +17602,21 @@ class WebGLRenderer {
 
 		const _srcFramebuffer = _gl.createFramebuffer();
 		const _dstFramebuffer = _gl.createFramebuffer();
+
+		/**
+		 * Copies data of the given source texture into a destination texture.
+		 *
+		 * When using render target textures as `srcTexture` and `dstTexture`, you must make sure both render targets are initialized
+		 * {@link WebGLRenderer#initRenderTarget}.
+		 *
+		 * @param {Texture} srcTexture - The source texture.
+		 * @param {Texture} dstTexture - The destination texture.
+		 * @param {Box2|Box3} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
+		 * @param {Vector2|Vector3} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
+		 * @param {number} srcLevel - The source mipmap level to copy.
+		 * @param {number} dstLevel - The destination mipmap level.
+		 */
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
-
-			// support previous signature with dstPosition first
-			if ( srcTexture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
-
-				dstPosition = arguments[ 0 ] || null;
-				srcTexture = arguments[ 1 ];
-				dstTexture = arguments[ 2 ];
-				dstLevel = arguments[ 3 ] || 0;
-				srcRegion = null;
-
-			}
 
 			// support the previous signature with just a single dst mipmap level
 			if ( dstLevel === null ) {
@@ -17212,20 +17870,6 @@ class WebGLRenderer {
 
 		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
-			// support previous signature with source box first
-			if ( srcTexture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
-
-				srcRegion = arguments[ 0 ] || null;
-				dstPosition = arguments[ 1 ] || null;
-				srcTexture = arguments[ 2 ];
-				dstTexture = arguments[ 3 ];
-				level = arguments[ 4 ] || 0;
-
-			}
-
 			// @deprecated, r170
 			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
 
@@ -17233,6 +17877,13 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Initializes the given WebGLRenderTarget memory. Useful for initializing a render target so data
+		 * can be copied into it using {@link WebGLRenderer#copyTextureToTexture} before it has been
+		 * rendered to.
+		 *
+		 * @param {WebGLRenderTarget} target - The render target.
+		 */
 		this.initRenderTarget = function ( target ) {
 
 			if ( properties.get( target ).__webglFramebuffer === undefined ) {
@@ -17243,6 +17894,12 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Initializes the given texture. Useful for preloading a texture rather than waiting until first
+		 * render (which can cause noticeable lags due to decode and GPU upload overhead).
+		 *
+		 * @param {Texture} texture - The texture.
+		 */
 		this.initTexture = function ( texture ) {
 
 			if ( texture.isCubeTexture ) {
@@ -17267,6 +17924,11 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Can be used to reset the internal WebGL state. This method is mostly
+		 * relevant for applications which share a single WebGL context across
+		 * multiple WebGL libraries.
+		 */
 		this.resetState = function () {
 
 			_currentActiveCubeFace = 0;
@@ -17286,12 +17948,27 @@ class WebGLRenderer {
 
 	}
 
+	/**
+	 * Defines the coordinate system of the renderer.
+	 *
+	 * In `WebGLRenderer`, the value is always `WebGLCoordinateSystem`.
+	 *
+	 * @type {WebGLCoordinateSystem|WebGPUCoordinateSystem}
+	 * @default WebGLCoordinateSystem
+	 * @readonly
+	 */
 	get coordinateSystem() {
 
 		return WebGLCoordinateSystem;
 
 	}
 
+	/**
+	 * Defines the output color space of the renderer.
+	 *
+	 * @type {SRGBColorSpace|LinearSRGBColorSpace}
+	 * @default SRGBColorSpace
+	 */
 	get outputColorSpace() {
 
 		return this._outputColorSpace;
@@ -17303,7 +17980,7 @@ class WebGLRenderer {
 		this._outputColorSpace = colorSpace;
 
 		const gl = this.getContext();
-		gl.drawingBufferColorspace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
+		gl.drawingBufferColorSpace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
 		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
 
 	}

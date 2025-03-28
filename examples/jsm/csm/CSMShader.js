@@ -1,5 +1,13 @@
 import { ShaderChunk } from 'three';
 
+/** @module CSMShader */
+
+/**
+ * The object that holds the GLSL enhancements to enable CSM. This
+ * code is injected into the built-in material shaders by {@link CSM}.
+ *
+ * @type {Object}
+ */
 const CSMShader = {
 	lights_fragment_begin: /* glsl */`
 vec3 geometryPosition = - vViewPosition;
@@ -46,7 +54,8 @@ IncidentLight directLight;
 
 		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS )
 		pointLightShadow = pointLightShadows[ i ];
-		directLight.color *= ( directLight.visible && receiveShadow ) ? getPointShadow( pointShadowMap[ i ], pointLightShadow.shadowMapSize, pointLightShadow.shadowBias, pointLightShadow.shadowRadius, vPointShadowCoord[ i ], pointLightShadow.shadowCameraNear, pointLightShadow.shadowCameraFar ) : 1.0;
+		directLight.color *= ( directLight.visible && receiveShadow ) ? getPointShadow( pointShadowMap[ i ], pointLightShadow.shadowMapSize, pointLightShadow.shadowIntensity, pointLightShadow.shadowBias, pointLightShadow.shadowRadius, vPointShadowCoord[ i ], pointLightShadow.shadowCameraNear, pointLightShadow.shadowCameraFar ) : 1.0;
+
 		#endif
 
 		RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );

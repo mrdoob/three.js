@@ -133,22 +133,49 @@ class SessionLightProbe {
 
 }
 
+/**
+ * This class can be used to represent the environmental light of
+ * a XR session. It relies on the WebXR Lighting Estimation API.
+ *
+ * @augments Group
+ */
 export class XREstimatedLight extends Group {
 
+	/**
+	 * Constructs a new light.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {boolean} [environmentEstimation=true] - Whether to use environment estimation or not.
+	 */
 	constructor( renderer, environmentEstimation = true ) {
 
 		super();
 
+		/**
+		 * The light probe that represents the estimated light.
+		 *
+		 * @type {LightProbe}
+		 */
 		this.lightProbe = new LightProbe();
 		this.lightProbe.intensity = 0;
 		this.add( this.lightProbe );
 
+		/**
+		 * Represents the primary light from the XR environment.
+		 *
+		 * @type {DirectionalLight}
+		 */
 		this.directionalLight = new DirectionalLight();
 		this.directionalLight.intensity = 0;
 		this.add( this.directionalLight );
 
-		// Will be set to a cube map in the SessionLightProbe if environment estimation is
-		// available and requested.
+		/**
+		 * Will be set to a cube map in the SessionLightProbe if environment estimation is
+		 * available and requested.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
 		this.environment = null;
 
 		let sessionLightProbe = null;
@@ -198,7 +225,10 @@ export class XREstimatedLight extends Group {
 
 		} );
 
-		// Done inline to provide access to sessionLightProbe.
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = () => {
 
 			if ( sessionLightProbe ) {

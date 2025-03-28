@@ -4,19 +4,56 @@ import {
 import * as NURBSUtils from '../curves/NURBSUtils.js';
 
 /**
- * NURBS surface object
+ * This class represents a NURBS surface.
  *
- * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
- **/
-
+ * Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weight`.
+ */
 class NURBSSurface {
 
-	constructor( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
+	/**
+	 * Constructs a new NURBS surface.
+	 *
+	 * @param {number} degree1 - The first NURBS degree.
+	 * @param {number} degree2 - The second NURBS degree.
+	 * @param {Array<number>} knots1 - The first knots as a flat array of numbers.
+	 * @param {Array<number>} knots2 - The second knots as a flat array of numbers.
+	 * @param {Array<Array<Vector2|Vector3|Vector4>>} controlPoints - An array^2 holding control points.
+	 */
+	constructor( degree1, degree2, knots1, knots2, controlPoints ) {
 
+		/**
+		 * The first NURBS degree.
+		 *
+		 * @type {number}
+		 */
 		this.degree1 = degree1;
+
+		/**
+		 * The second NURBS degree.
+		 *
+		 * @type {number}
+		 */
 		this.degree2 = degree2;
+
+		/**
+		 * The first knots as a flat array of numbers.
+		 *
+		 * @type {Array<number>}
+		 */
 		this.knots1 = knots1;
+
+		/**
+		 * The second knots as a flat array of numbers.
+		 *
+		 * @type {Array<number>}
+		 */
 		this.knots2 = knots2;
+
+		/**
+		 *  An array holding arrays of control points.
+		 *
+		 * @type {Array<Array<Vector2|Vector3|Vector4>>}
+		 */
 		this.controlPoints = [];
 
 		const len1 = knots1.length - degree1 - 1;
@@ -38,6 +75,13 @@ class NURBSSurface {
 
 	}
 
+	/**
+	 * This method returns a vector in 3D space for the given interpolation factor. This vector lies on the NURBS surface.
+	 *
+	 * @param {number} t1 - The first interpolation factor representing the `u` position on the surface. Must be in the range `[0,1]`.
+	 * @param {number} t2 - The second interpolation factor representing the `v` position on the surface. Must be in the range `[0,1]`.
+	 * @param {Vector3} target - The target vector the result is written to.
+	 */
 	getPoint( t1, t2, target ) {
 
 		const u = this.knots1[ 0 ] + t1 * ( this.knots1[ this.knots1.length - 1 ] - this.knots1[ 0 ] ); // linear mapping t1->u

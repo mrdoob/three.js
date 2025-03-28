@@ -6,14 +6,31 @@ import {
 	IncrementStencilOp
 } from 'three';
 
-/**
- * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
- */
-
 const _shadowMatrix = new Matrix4();
 
+/**
+ * A Shadow Mesh that follows a shadow-casting mesh in the scene,
+ * but is confined to a single plane. This technique can be used as
+ * a very performant alternative to classic shadow mapping. However,
+ * it has serious limitations like:
+ *
+ * - Shadows can only be casted on flat planes.
+ * - No soft shadows support.
+ *
+ * ```js
+ * const cubeShadow = new ShadowMesh( cube );
+ * scene.add( cubeShadow );
+ * ```
+ *
+ * @augments Mesh
+ */
 class ShadowMesh extends Mesh {
 
+	/**
+	 * Constructs a new shadow mesh.
+	 *
+	 * @param {Mesh} mesh - The shadow-casting reference mesh.
+	 */
 	constructor( mesh ) {
 
 		const shadowMaterial = new MeshBasicMaterial( {
@@ -31,15 +48,47 @@ class ShadowMesh extends Mesh {
 
 		super( mesh.geometry, shadowMaterial );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isShadowMesh = true;
 
+		/**
+		 * Represent the world matrix of the reference mesh.
+		 *
+		 * @type {Matrix4}
+		 */
 		this.meshMatrix = mesh.matrixWorld;
 
+		/**
+		 * Overwritten to disable view-frustum culling by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.frustumCulled = false;
+
+		/**
+		 * Overwritten to disable automatic matrix update. The local
+		 * matrix is computed manually in {@link ShadowMesh#update}.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.matrixAutoUpdate = false;
 
 	}
 
+	/**
+	 * Updates the shadow mesh so it follows its shadow-casting reference mesh.
+	 *
+	 * @param {Plane} plane - The plane onto the shadow mesh is projected.
+	 * @param {Vector4} lightPosition4D - The light position.
+	 */
 	update( plane, lightPosition4D ) {
 
 		// based on https://www.opengl.org/archives/resources/features/StencilTalk/tsld021.htm

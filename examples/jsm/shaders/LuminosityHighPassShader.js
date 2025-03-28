@@ -2,16 +2,17 @@ import {
 	Color
 } from 'three';
 
-/**
- * Luminosity
- * http://en.wikipedia.org/wiki/Luminosity
- */
+/** @module LuminosityHighPassShader */
 
+/**
+ * Luminosity high pass shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const LuminosityHighPassShader = {
 
 	name: 'LuminosityHighPassShader',
-
-	shaderID: 'luminosityHighPass',
 
 	uniforms: {
 

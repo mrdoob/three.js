@@ -1,7 +1,11 @@
-/**
- * Exposure shader
- */
+/** @module ExposureShader */
 
+/**
+ * TODO
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const ExposureShader = {
 
 	name: 'ExposureShader',

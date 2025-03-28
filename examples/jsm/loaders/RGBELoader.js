@@ -7,22 +7,49 @@ import {
 	LinearSRGBColorSpace
 } from 'three';
 
-// https://github.com/mrdoob/three.js/issues/5552
-// http://en.wikipedia.org/wiki/RGBE_image_format
-
+/**
+ * A loader for the RGBE HDR texture format.
+ *
+ * ```js
+ * const loader = new RGBELoader();
+ * const envMap = await loader.loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
+ * envMap.mapping = THREE.EquirectangularReflectionMapping;
+ *
+ * scene.environment = envMap;
+ * ```
+ *
+ * @augments DataTextureLoader
+ */
 class RGBELoader extends DataTextureLoader {
 
+	/**
+	 * Constructs a new RGBE loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * The texture type.
+		 *
+		 * @type {(HalfFloatType|FloatType)}
+		 * @default HalfFloatType
+		 */
 		this.type = HalfFloatType;
 
 	}
 
-	// adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
-
+	/**
+	 * Parses the given RGBE texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @return {DataTextureLoader~TexData} An object representing the parsed texture data.
+	 */
 	parse( buffer ) {
+
+		// adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
 		const
 			/* default error routine.  change this to change error handling */
@@ -411,6 +438,12 @@ class RGBELoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Sets the texture type.
+	 *
+	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+	 * @return {RGBELoader} A reference to this loader.
+	 */
 	setDataType( value ) {
 
 		this.type = value;

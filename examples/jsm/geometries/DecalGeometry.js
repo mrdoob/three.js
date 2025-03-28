@@ -9,22 +9,33 @@ import {
 } from 'three';
 
 /**
- * You can use this geometry to create a decal mesh, that serves different kinds of purposes.
- * e.g. adding unique details to models, performing dynamic visual environmental changes or covering seams.
+ * This class can be used to create a decal mesh that serves different kinds of purposes e.g.
+ * adding unique details to models, performing dynamic visual environmental changes or covering seams.
  *
- * Constructor parameter:
+ * Please not that decal projections can be distorted when used around corners. More information at
+ * this GitHub issue: [Decal projections without distortions]{@link https://github.com/mrdoob/three.js/issues/21187}.
  *
- * mesh — Any mesh object
- * position — Position of the decal projector
- * orientation — Orientation of the decal projector
- * size — Size of the decal projector
+ * Reference: [How to project decals]{@link http://blog.wolfire.com/2009/06/how-to-project-decals/}
  *
- * reference: http://blog.wolfire.com/2009/06/how-to-project-decals/
+ * ```js
+ * const geometry = new DecalGeometry( mesh, position, orientation, size );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const mesh = new THREE.Mesh( geometry, material );
+ * scene.add( mesh );
+ * ```
  *
+ * @augments BufferGeometry
  */
-
 class DecalGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new decal geometry.
+	 *
+	 * @param {Mesh} [mesh] - The base mesh the decal should be projected on.
+	 * @param {Vector3} [position] - The position of the decal projector.
+	 * @param {Euler} [orientation] - The orientation of the decal projector.
+	 * @param {Vector3} [size] - Tje scale of the decal projector.
+	 */
 	constructor( mesh = new Mesh(), position = new Vector3(), orientation = new Euler(), size = new Vector3( 1, 1, 1 ) ) {
 
 		super();
