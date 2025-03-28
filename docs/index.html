@@ -93,6 +93,14 @@
 
 				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|it|pt-br|fr)\//.exec( hash );
 
+				if ( hashLanguage[ 1 ] === 'manual' ) {
+
+					// Redirect to the manual
+
+					window.location.href = hash.replace(/^manual\/([^\/]+)\/([^\/]+)\/(.+)$/, '../manual/#$1/$3').toLowerCase();
+
+				}
+
 				if ( hashLanguage === null ) {
 
 					// Route old non-localised api links
