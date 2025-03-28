@@ -6,6 +6,7 @@
 		"webgl_animation_skinning_ik",
 		"webgl_animation_skinning_morph",
 		"webgl_animation_multiple",
+		"webgl_animation_walk",
 		"webgl_camera",
 		"webgl_camera_array",
 		"webgl_camera_logarithmicdepthbuffer",
@@ -187,6 +188,7 @@
 		"webgl_points_sprites",
 		"webgl_points_waves",
 		"webgl_portal",
+		"webgl_random_uv",
 		"webgl_raycaster_bvh",
 		"webgl_raycaster_sprite",
 		"webgl_raycaster_texture",
@@ -212,6 +214,7 @@
 		"webgl_tonemapping",
 		"webgl_video_kinect",
 		"webgl_video_panorama_equirectangular",
+		"webgl_watch",
 		"webgl_water",
 		"webgl_water_flowmap"
 	],
