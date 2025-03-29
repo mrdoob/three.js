@@ -326,22 +326,33 @@ async function RapierPhysics() {
 
 }
 
+/**
+ * This class displays all Rapier Colliders in outline 
+ */
 class RapierDebugRenderer {
 
-    mesh
-    world
-    enabled = true
+	/**
+	 * Constructs a new RapierDebugRenderer.
+	 *
+	 * @param {Scene} scene - A ThreeJS scene.
+	 * @param {RAPIER.world} world - The Rapier world
+	 * @param {boolean} [enabled=true] - Whether to display the outlines
+	 */
   
-    constructor(scene, world) {
+    constructor( scene, world, enabled = true ) {
 
-      this.world = world;
-      this.mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0xffffff, vertexColors: true }));
-      this.mesh.frustumCulled = false;
+		this.enabled = enabled;
+		this.world = world;
+		this.mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0xffffff, vertexColors: true }));
+		this.mesh.frustumCulled = false;
 
-      scene.add(this.mesh);
+		scene.add(this.mesh);
 
     }
   
+	/**
+	 * Call this in the render loop to update the outlines
+	 */
     update() {
 
       if (this.enabled) {

@@ -5,7 +5,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
-
+		<style>
+			body {
+				color: #333;
+			}
+		</style>
 	</head>
 	<body>
 
@@ -40,92 +44,105 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.1, 100 );
-				camera.position.set(2, 5, 15);
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				const ambient = new THREE.HemisphereLight(0x555555, 0xFFFFFF);
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 2, 5, 15 );
 
-				scene.add(ambient);
+				const ambient = new THREE.HemisphereLight( 0x555555, 0xFFFFFF );
 
-				const light = new THREE.DirectionalLight(0xffffff, 3);
+				scene.add( ambient );
 
-				light.position.set(0,12.5,12.5);
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+
+				light.position.set( 0, 12.5, 12.5 );
 				light.castShadow = true;
 				light.shadow.radius = 3;
 				light.shadow.blurSamples = 8;
-				light.shadow.mapSize.width = 1024; 
-				light.shadow.mapSize.height = 1024; 
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
 
 				const size = 10;
-				light.shadow.camera.left = -size;
-				light.shadow.camera.bottom = -size;
+				light.shadow.camera.left = - size;
+				light.shadow.camera.bottom = - size;
 				light.shadow.camera.right = size;
 				light.shadow.camera.top = size;
 				light.shadow.camera.near = 1;
 				light.shadow.camera.far = 50;
 
-				scene.add(light);
-				
-				renderer = new THREE.WebGLRenderer();
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 				renderer.setAnimationLoop( animate );
 
-				const controls = new OrbitControls(camera, renderer.domElement);
-				controls.target = new THREE.Vector3(0, 2, 0);
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target = new THREE.Vector3( 0, 2, 0 );
 				controls.update();
 
 				const geometry = new THREE.BoxGeometry( 20, 0.5, 20 );
-				const material = new THREE.MeshStandardMaterial( { color: 0xFFFFAA } );
-				
+				const material = new THREE.MeshStandardMaterial( { color: 0xFFFFFF } );
+
 				const ground = new THREE.Mesh( geometry, material );
 				ground.receiveShadow = true;
 
-				ground.position.y = -0.25;
+				ground.position.y = - 0.25;
 				ground.userData.physics = { mass: 0 };
 
-				scene.add( ground);
+				scene.add( ground );
 
-				for( let i = 0; i < 10; i++ ) addBody( Math.random()>0.7 );
+				new THREE.TextureLoader().load( 'textures/grid.png', function ( texture ) {
+
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.repeat.set( 20, 20 );
+					ground.material.map = texture;
+					ground.material.needsUpdate = true;
+
+				} );
+
+				for ( let i = 0; i < 10; i ++ ) addBody( Math.random() > 0.7 );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
-				
+
 				initPhysics();
-				
+
 				onWindowResize();
 
 				// Movement input
 				movement = { forward: 0, right: 0 };
 
-				window.addEventListener("keydown", (event) => {
-				
-					if (event.key === "w" || event.key === "ArrowUp") movement.forward = 1;
-					if (event.key === "s" || event.key === "ArrowDown") movement.forward = -1;
-					if (event.key === "a" || event.key === "ArrowLeft") movement.right = -1;
-					if (event.key === "d" || event.key === "ArrowRight") movement.right = 1;
-					
-				});
+				window.addEventListener( 'keydown', ( event ) => {
 
-				window.addEventListener("keyup", (event) => {
-				
-					if (event.key === "w" || event.key === "s" || event.key === "ArrowUp" || event.key === "ArrowDown") movement.forward = 0;
-					if (event.key === "a" || event.key === "d" || event.key === "ArrowLeft" || event.key === "ArrowRight") movement.right = 0;
-				
-				});
+					if ( event.key === 'w' || event.key === 'ArrowUp' ) movement.forward = 1;
+					if ( event.key === 's' || event.key === 'ArrowDown' ) movement.forward = - 1;
+					if ( event.key === 'a' || event.key === 'ArrowLeft' ) movement.right = - 1;
+					if ( event.key === 'd' || event.key === 'ArrowRight' ) movement.right = 1;
+			
+				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );	
+				window.addEventListener( 'keyup', ( event ) => {
+			
+					if ( event.key === 'w' || event.key === 's' || event.key === 'ArrowUp' || event.key === 'ArrowDown' ) movement.forward = 0;
+					if ( event.key === 'a' || event.key === 'd' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' ) movement.right = 0;
+			
+				} );
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function random( min, max ){
+			function random( min, max ) {
 
 				return Math.random() * ( max - min ) + min;
 
 			}
 
-			async function initPhysics(){
+			async function initPhysics() {
 
 				//Initialize physics engine using the script in the jsm/physics folder
 				physics = await RapierPhysics();
@@ -139,44 +156,44 @@
 
 			}
 
-			function addCharacterController(){
+			function addCharacterController() {
 
 				// Character Capsule
-				const geometry = new THREE.CapsuleGeometry(0.3, 1, 8, 8);
-				const material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
-				player = new THREE.Mesh(geometry, material);
+				const geometry = new THREE.CapsuleGeometry( 0.3, 1, 8, 8 );
+				const material = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+				player = new THREE.Mesh( geometry, material );
 				player.castShadow = true;
-				player.position.set(0, 0.8, 0);
+				player.position.set( 0, 0.8, 0 );
 				scene.add( player );
 
 				// Rapier Character Controller
-				characterController = physics.world.createCharacterController(0.01); 
-				characterController.setApplyImpulsesToDynamicBodies(true);
+				characterController = physics.world.createCharacterController( 0.01 );
+				characterController.setApplyImpulsesToDynamicBodies( true );
 				characterController.setCharacterMass( 3 );
-				const colliderDesc = physics.RAPIER.ColliderDesc.capsule(0.5, 0.3).setTranslation( 0, 0.8, 0 );
+				const colliderDesc = physics.RAPIER.ColliderDesc.capsule( 0.5, 0.3 ).setTranslation( 0, 0.8, 0 );
 				player.userData.collider = physics.world.createCollider( colliderDesc );
 
 			}
 
-			function addBody( fixed = true ){
+			function addBody( fixed = true ) {
 			
-				const geometry = (fixed) ? new THREE.BoxGeometry( 1, 1, 1 ) : new THREE.SphereGeometry( 0.25 );
+				const geometry = ( fixed ) ? new THREE.BoxGeometry( 1, 1, 1 ) : new THREE.SphereGeometry( 0.25 );
 				const material = new THREE.MeshStandardMaterial( { color: fixed ? 0xFF0000 : 0x00FF00 } );
 
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 
-				mesh.position.set( random( -10, 10 ), 0.5, random( -10, 10 ) );
+				mesh.position.set( random( - 10, 10 ), 0.5, random( - 10, 10 ) );
 
 				mesh.userData.physics = { mass: fixed ? 0 : 0.5, restitution: fixed ? 0 : 0.3 };
 
-				scene.add(mesh);
+				scene.add( mesh );
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize( ) {
 
-				camera.aspect = window.innerWidth/window.innerHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -186,14 +203,17 @@
 
 			function animate() {
 
+				if ( debugRender ) debugRender.update();
+
 				renderer.render( scene, camera );
 
-				if (physics && characterController) {
+				if ( physics && characterController ) {
+
 					const deltaTime = 1 / 60;
 
 					// Character movement
 					const speed = 2.5 * deltaTime;
-					let moveVector = new physics.RAPIER.Vector3( movement.right * speed, 0, -movement.forward * speed );
+					const moveVector = new physics.RAPIER.Vector3( movement.right * speed, 0, - movement.forward * speed );
 
 					characterController.computeColliderMovement( player.userData.collider, moveVector );
 
@@ -211,8 +231,6 @@
 					player.position.set( position.x, position.y, position.z );
 
 				}
-
-				if (debugRender) debugRender.update();
 
 				stats.update();
 
