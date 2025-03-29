@@ -1,4 +1,5 @@
-import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
+
+import { Clock, Vector3, Quaternion, Matrix4, LineSegments, LineBasicMaterial, BufferGeometry, BufferAttribute } from 'three';
 
 const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0';
 
@@ -27,6 +28,20 @@ function getShape( geometry ) {
 
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
+
+	} else if ( geometry.type === 'CylinderGeometry') {
+
+        const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius);
+
+    } else if ( geometry.type === 'CapsuleGeometry') {
+
+        const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.capsule( length / 2, radius);
 
 	} else if ( geometry.type === 'BufferGeometry' ) {
 
@@ -108,6 +123,10 @@ async function RapierPhysics() {
 
 	}
 
+	function getBody( mesh ){
+        return meshMap.get( mesh );
+    }
+
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getShape( mesh.geometry );
@@ -121,12 +140,14 @@ async function RapierPhysics() {
 			? createInstancedBody( mesh, mass, shape )
 			: createBody( mesh.position, mesh.quaternion, mass, shape );
 
-		if ( mass > 0 ) {
+		//if ( mass > 0 ) {
 
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
 
-		}
+		//}
+
+		return body;
 
 	}
 
@@ -242,6 +263,18 @@ async function RapierPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		RAPIER,
+        world,
+		/**
+		 * Returns the Rapier RigidBody given a ThreeJS mesh that has been added via 
+		 * addScene or addBody
+		 *
+		 *
+		 * @method
+		 * @name RapierPhysics#getBody
+		 * @param {Object3D} mesh A ThreeJS mesh that is included in the physics.
+		 */
+		getBody,
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
 		 * `physics` object in their {@link Object3D#userData} field will be honored.
@@ -293,4 +326,53 @@ async function RapierPhysics() {
 
 }
 
-export { RapierPhysics };
+/**
+ * This class displays all Rapier Colliders in outline 
+ */
+class RapierDebugRenderer {
+
+	/**
+	 * Constructs a new RapierDebugRenderer.
+	 *
+	 * @param {Scene} scene - A ThreeJS scene.
+	 * @param {RAPIER.world} world - The Rapier world
+	 * @param {boolean} [enabled=true] - Whether to display the outlines
+	 */
+  
+    constructor( scene, world, enabled = true ) {
+
+		this.enabled = enabled;
+		this.world = world;
+		this.mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0xffffff, vertexColors: true }));
+		this.mesh.frustumCulled = false;
+
+		scene.add(this.mesh);
+
+    }
+  
+	/**
+	 * Call this in the render loop to update the outlines
+	 */
+    update() {
+
+      if (this.enabled) {
+
+        const { vertices, colors } = this.world.debugRender();
+
+		this.mesh.geometry.deleteAttribute( 'position' );
+		this.mesh.geometry.deleteAttribute( 'color' );
+
+        this.mesh.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+        this.mesh.geometry.setAttribute('color', new BufferAttribute(colors, 4));
+
+        this.mesh.visible = true;
+
+      } else {
+
+        this.mesh.visible = false;
+		
+      }
+    }
+  }
+
+export { RapierPhysics, RapierDebugRenderer };
