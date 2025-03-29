@@ -439,6 +439,27 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
+			//When bevelSegments == 0, the modified vert arrays will not have been populated. We do this here.
+			{
+
+				if ( contractedContourVertices.length == 0 ) {
+
+					contractedContourVertices.push( ...vertices );
+
+				}
+
+				if ( expandedHoleVertices.length == 0 ) {
+
+					for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
+
+						expandedHoleVertices.push( holes[ h ] ); //triangulateShape expects a Vec2[][], ie. an array of holes, with each hole being a Vec2[]
+
+					}
+
+				}
+
+			}
+
 			const faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
 
 			const flen = faces.length;
