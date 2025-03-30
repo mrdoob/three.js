@@ -443,7 +443,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			if ( contractedContourVertices.length == 0 ) {
 
-				contractedContourVertices.push( ...vertices );
+				contractedContourVertices.push( ...contour );
 
 			}
 
