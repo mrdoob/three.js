@@ -83,9 +83,13 @@ export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-	return builder.context.setupNormal().context( { getUV: null } );
+	let node = builder.context.setupNormal().context( { getUV: null } );
 
-}, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
+	if ( builder.material.flatShading !== true ) node = node.mul( faceDirection );
+
+	return node;
+
+}, 'vec3' ).once() )().toVar( 'transformedNormalView' );
 
 /**
  * TSL object that represents the transformed vertex normal in world space of the current rendered object.
@@ -105,9 +109,13 @@ export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) =>
 
 	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-	return builder.context.setupClearcoatNormal().context( { getUV: null } );
+	let node = builder.context.setupClearcoatNormal().context( { getUV: null } );
 
-}, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedClearcoatNormalView' );
+	if ( builder.material.flatShading !== true ) node = node.mul( faceDirection );
+
+	return node;
+
+}, 'vec3' ).once() )().toVar( 'transformedClearcoatNormalView' );
 
 /**
  * Transforms the normal with the given matrix.
