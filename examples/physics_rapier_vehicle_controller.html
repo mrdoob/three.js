@@ -33,11 +33,12 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RapierPhysics, RapierDebugRenderer } from 'three/addons/physics/RapierPhysics.js';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+			import { RapierHelper } from 'three/addons/helpers/RapierHelper.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			let camera, scene, renderer, stats;
-			let physics, debugRender, controls;
+			let physics, physicsHelper, controls;
 			let car, chassis, wheels, movement, vehicleController;
 
 			init();
@@ -153,7 +154,8 @@
 				physics = await RapierPhysics();
 
 				//Optionally display collider outlines
-				debugRender = new RapierDebugRenderer( scene, physics.world );
+				physicsHelper = new RapierHelper( physics.world );
+				scene.add( physicsHelper );
 
 				physics.addScene( scene );
 
@@ -361,7 +363,7 @@
 
 				}
 
-				if ( debugRender ) debugRender.update();
+				if ( physicsHelper ) physicsHelper.update();
 
 				renderer.render( scene, camera );
 

@@ -30,11 +30,12 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RapierPhysics, RapierDebugRenderer } from 'three/addons/physics/RapierPhysics.js';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+			import { RapierHelper } from 'three/addons/helpers/RapierHelper.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			let camera, scene, renderer, stats;
-			let physics, debugRender;
+			let physics, physicsHelper;
 
 			init();
 
@@ -117,12 +118,13 @@
 				//Initialize physics engine using the script in the jsm/physics folder
 				physics = await RapierPhysics();
 
-				//Optionally display collider outlines
-				debugRender = new RapierDebugRenderer( scene, physics.world );
-
 				physics.addScene( scene );
 
 				addBody( );
+
+				//Optionally display collider outlines
+				physicsHelper = new RapierHelper( physics.world );
+				scene.add( physicsHelper );
 
 				setInterval( addBody, 1000 );
 
@@ -157,7 +159,7 @@
 
 			function animate() {
 
-				if ( debugRender ) debugRender.update();
+				if ( physicsHelper ) physicsHelper.update();
 
 				renderer.render( scene, camera );
 
