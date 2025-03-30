@@ -1,5 +1,5 @@
 
-import { Clock, Vector3, Quaternion, Matrix4, LineSegments, LineBasicMaterial, BufferGeometry, BufferAttribute } from 'three';
+import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
 
 const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0';
 
