@@ -85,7 +85,7 @@ export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node = builder.context.setupNormal().context( { getUV: null } );
 
-	if ( builder.material.flatShading === false ) node = node.mul( faceDirection );
+	if ( builder.material.flatShading !== true ) node = node.mul( faceDirection );
 
 	return node;
 
@@ -111,7 +111,7 @@ export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) =>
 
 	let node = builder.context.setupClearcoatNormal().context( { getUV: null } );
 
-	if ( builder.material.flatShading === false ) node = node.mul( faceDirection );
+	if ( builder.material.flatShading !== true ) node = node.mul( faceDirection );
 
 	return node;
 

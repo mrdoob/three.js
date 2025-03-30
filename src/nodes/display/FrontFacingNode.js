@@ -38,7 +38,7 @@ class FrontFacingNode extends Node {
 
 		const { renderer, material } = builder;
 
-		if ( material.flatShading === true ) return true;
+		if ( material.flatShading === true ) return 'true';
 
 		if ( renderer.coordinateSystem === WebGLCoordinateSystem ) {
 
