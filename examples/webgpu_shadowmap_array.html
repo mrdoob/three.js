@@ -40,14 +40,14 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				// Renderer setup
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				// setInterval( animate, 1000 / 30 );
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -56,6 +56,7 @@
 				renderer.toneMappingExposure = 1.2;
 				document.body.appendChild( renderer.domElement );
 			
+				await renderer.init();
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 45, 60, 100 );
 
@@ -83,8 +84,8 @@
 
 				// Set up the tile shadow mapping
 				const tsm = new TileShadowNode( dirLight, camera, scene, {
-					tilesX: 4,
-					tilesY: 4,
+					tilesX: renderer.backend.isWebGPUBackend ? 4 : 2,
+					tilesY: renderer.backend.isWebGPUBackend ? 4 : 2,
 					debug: true
 				} );
 				dirLight.shadow.shadowNode = tsm;
@@ -127,7 +128,7 @@
 
 					object.frustumCulled = false;
 			
-	} );
+				} );
 			
 
 				// Camera controls
@@ -235,8 +236,7 @@
 					new THREE.MeshPhongMaterial( { color: 0xCCCC66, shininess: 20 } )
 				];
 
-				// Create instance meshes for each material
-				const cubeCount = 10; // 30 cubes divided by 3 materials
+				const cubeCount = 10;
 				const cubeInstances = cubeMaterials.map( material => {
 
 					return new THREE.InstancedMesh( cubeGeometry, material, cubeCount );
@@ -300,52 +300,55 @@
 
 				// 5. Trees using instanced mesh for trunks and tops separately
 				const trunkGeometry = new THREE.CylinderGeometry( 0.5, 0.5, 2, 8 );
-				const trunkMaterial = new THREE.MeshPhongMaterial( {
-					color: 0x8B4513,
-					shininess: 2
-				} );
-
 				const topGeometry = new THREE.ConeGeometry( 2, 8, 8 );
-				const topMaterial = new THREE.MeshPhongMaterial( {
-					color: 0x336633,
+				const treeMaterial = new THREE.MeshPhongMaterial( {
+					vertexColors: true,
 					shininess: 5
 				} );
 
 				const treeCount = 40;
-				const trunkInstancedMesh = new THREE.InstancedMesh(
-					trunkGeometry,
-					trunkMaterial,
-					treeCount
-				);
+				const totalInstanceCount = treeCount * 2;
 
-				const topInstancedMesh = new THREE.InstancedMesh(
-					topGeometry,
-					topMaterial,
-					treeCount
-				);
+				const trunkVertexCount = trunkGeometry.attributes.position.count;
+				const trunkIndexCount = trunkGeometry.index ? trunkGeometry.index.count : 0;
+				const topVertexCount = topGeometry.attributes.position.count;
+				const topIndexCount = topGeometry.index ? topGeometry.index.count : 0;
+
+
+				const totalVertexCount = ( trunkVertexCount + topVertexCount ) * 2; // Multiple for safety
+				const totalIndexCount = ( trunkIndexCount + topIndexCount ) * 2;
+				const treeBatchedMesh = new THREE.BatchedMesh( totalInstanceCount, totalVertexCount, totalIndexCount, treeMaterial );
+				treeBatchedMesh.castShadow = true;
+				treeBatchedMesh.perObjectFrustumCulled = false;
+
+				const trunkGeometryId = treeBatchedMesh.addGeometry( trunkGeometry );
+				const topGeometryId = treeBatchedMesh.addGeometry( topGeometry );
+
+				const trunkColor = new THREE.Color( 0x8B4513 );
+				const topColor = new THREE.Color( 0x336633 );
+
 
 				for ( let i = 0; i < treeCount; i ++ ) {
 
 					const x = Math.random() * 300 - 150;
 					const z = Math.random() * 300 - 150;
 
-					// Set trunk position
+					const trunkId = treeBatchedMesh.addInstance( trunkGeometryId );
 					matrix.makeScale( 1, 1, 1 );
 					matrix.setPosition( x, 1, z );
-					trunkInstancedMesh.setMatrixAt( i, matrix );
+					treeBatchedMesh.setMatrixAt( trunkId, matrix );
+					treeBatchedMesh.setColorAt( trunkId, trunkColor );
 
-					// Set top position
+					const topId = treeBatchedMesh.addInstance( topGeometryId );
 					matrix.makeScale( 1, 1, 1 );
 					matrix.setPosition( x, 6, z );
-					topInstancedMesh.setMatrixAt( i, matrix );
+					treeBatchedMesh.setMatrixAt( topId, matrix );
+					treeBatchedMesh.setColorAt( topId, topColor );
 
 				}
 
-				trunkInstancedMesh.castShadow = true;
-				scene.add( trunkInstancedMesh );
+				scene.add( treeBatchedMesh );
 
-				topInstancedMesh.castShadow = true;
-				scene.add( topInstancedMesh );
 
 				// 6. Torus shapes using instanced mesh
 				const torusGeometry = new THREE.TorusGeometry( 3, 1, 16, 50 );
