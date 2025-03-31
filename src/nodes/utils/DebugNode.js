@@ -41,11 +41,14 @@ class DebugNode extends TempNode {
 		const callback = this.callback;
 		const snippet = this.node.build( builder );
 
+		const title = '--- TSL debug - ' + builder.shaderStage + ' shader ---';
+		const border = '-'.repeat( title.length );
+
 		let code = '';
-		code += '// #--- TSL Debug ---#\n';
+		code += '// #' + title + '#\n';
 		code += builder.flow.code.replace( /^\t/mg, '' ) + '\n';
 		code += '/* ... */ ' + snippet + ' /* ... */\n';
-		code += '// #-----------------#\n';
+		code += '// #' + border + '#\n';
 
 		if ( callback !== null ) {
 
