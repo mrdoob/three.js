@@ -1177,26 +1177,31 @@ class WebGLBackend extends Backend {
 			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( this._currentContext );
 			const prevActiveCubeFace = this._currentContext.activeCubeFace;
 
-			const textureData = this.get( renderTarget.depthTexture );
+			if ( isRenderCameraDepthArray ) {
 
-			if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
+				// Clear the depth texture
+				const textureData = this.get( renderTarget.depthTexture );
 
-				textureData.clearedRenderId = this.renderer._nodes.nodeFrame.renderId;
+				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
 
-				const { stencilBuffer } = renderTarget;
+					textureData.clearedRenderId = this.renderer._nodes.nodeFrame.renderId;
 
-				for ( let i = 0, len = cameras.length; i < len; i ++ ) {
+					const { stencilBuffer } = renderTarget;
 
-					this.renderer._activeCubeFace = i;
-					this._currentContext.activeCubeFace = i;
+					for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
-					this._setFramebuffer( this._currentContext );
-					this.clear( false, true, stencilBuffer, this._currentContext, false );
+						this.renderer._activeCubeFace = i;
+						this._currentContext.activeCubeFace = i;
+
+						this._setFramebuffer( this._currentContext );
+						this.clear( false, true, stencilBuffer, this._currentContext, false );
+
+					}
+
+					this.renderer._activeCubeFace = prevActiveCubeFace;
+					this._currentContext.activeCubeFace = prevActiveCubeFace;
 
 				}
-
-				this.renderer._activeCubeFace = prevActiveCubeFace;
-				this._currentContext.activeCubeFace = prevActiveCubeFace;
 
 			}
 
