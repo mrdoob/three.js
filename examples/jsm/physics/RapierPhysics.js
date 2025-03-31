@@ -141,8 +141,8 @@ async function RapierPhysics() {
 
 		if ( mass > 0 ) {
 
-		meshes.push( mesh );
-		meshMap.set( mesh, body );
+			meshes.push( mesh );
+			meshMap.set( mesh, body );
 
 		}
 
