@@ -321,9 +321,9 @@ class TileShadowNode extends ShadowBaseNode {
 				if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
 					if ( useVelocity ) getDataFromObject( object ).useVelocity = true;
-					object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
+					object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 					renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
-					object.onAfterShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
+					object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 				}
 

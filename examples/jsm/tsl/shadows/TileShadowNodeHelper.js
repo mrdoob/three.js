@@ -1,25 +1,14 @@
 import { NodeMaterial, Mesh, PlaneGeometry, DoubleSide, CameraHelper } from 'three/webgpu';
-import {
-
-	Fn,
-	vec4,
-	vec3,
-	texture,
-	uv,
-	positionLocal,
-	vec2,
-	float,
-	screenSize
-} from 'three/tsl';
+import { Fn, vec4, vec3, texture, uv, positionLocal, vec2, float, screenSize } from 'three/tsl';
 
 /**
  * Helper class to manage and display debug visuals for TileShadowNode.
- */
+*/
 class TileShadowNodeHelper {
 
 	/**
      * @param {TileShadowNode} tileShadowNode The TileShadowNode instance to debug.
-     */
+	*/
 	constructor( tileShadowNode ) {
 
 		if ( ! tileShadowNode ) {
@@ -46,7 +35,7 @@ class TileShadowNodeHelper {
 	/**
      * Initializes the debug displays (planes and camera helpers).
      * Should be called after TileShadowNode has initialized its lights and shadow nodes.
-     */
+	*/
 	init() {
 
 		if ( ! this.scene ) {
@@ -140,7 +129,7 @@ class TileShadowNodeHelper {
 						.mul( sampledDepth )
 						.saturate()
 						.rgb,
-					1.0 // Fully opaque
+					1.0
 				);
 
 			} )();
@@ -148,18 +137,17 @@ class TileShadowNodeHelper {
 			this.scene.add( display );
 			this._debugMeshes.push( display );
 
-			// Create camera helper for the corresponding shadow node
 			if ( this.tileShadowNode._shadowNodes[ i ] && this.tileShadowNode._shadowNodes[ i ].shadow ) {
 
 				const camHelper = new CameraHelper( this.tileShadowNode._shadowNodes[ i ].shadow.camera );
-				camHelper.fog = false; // Disable fog for helpers
+				camHelper.fog = false;
 				this.scene.add( camHelper );
 				this._shadowCamHelpers.push( camHelper );
 
 			} else {
 
 				console.warn( `TileShadowNodeHelper: Could not create CameraHelper for tile index ${i}. Shadow node or camera missing.` );
-				this._shadowCamHelpers.push( null ); // Placeholder
+				this._shadowCamHelpers.push( null );
 
 			}
 
@@ -170,7 +158,7 @@ class TileShadowNodeHelper {
 	/**
      * Updates the debug visuals (specifically camera helpers).
      * Should be called within TileShadowNode's update method.
-     */
+	*/
 	update() {
 
 		for ( const helper of this._shadowCamHelpers ) {
@@ -188,7 +176,7 @@ class TileShadowNodeHelper {
 
 	/**
      * Removes all debug objects (planes and helpers) from the scene.
-     */
+	*/
 	dispose() {
 
 		if ( this.scene ) {
