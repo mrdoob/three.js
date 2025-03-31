@@ -135,7 +135,7 @@ async function RapierPhysics() {
 			? createInstancedBody( mesh, mass, shape )
 			: createBody( mesh.position, mesh.quaternion, mass, shape );
 
-		if ( !mesh.userData.physics ) mesh.userData.physics = {};
+		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
 
 		mesh.userData.physics.body = body;
 
