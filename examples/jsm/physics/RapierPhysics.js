@@ -123,10 +123,6 @@ async function RapierPhysics() {
 
 	}
 
-	function getBody( mesh ){
-        return meshMap.get( mesh );
-    }
-
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getShape( mesh.geometry );
@@ -140,12 +136,16 @@ async function RapierPhysics() {
 			? createInstancedBody( mesh, mass, shape )
 			: createBody( mesh.position, mesh.quaternion, mass, shape );
 
-		//if ( mass > 0 ) {
+		if ( !mesh.userData.physics ) mesh.userData.physics = {};
+
+		mesh.userData.physics.body = body;
+
+		if ( mass > 0 ) {
 
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
 
-		//}
+		}
 
 		return body;
 
@@ -265,16 +265,6 @@ async function RapierPhysics() {
 	return {
 		RAPIER,
         world,
-		/**
-		 * Returns the Rapier RigidBody given a ThreeJS mesh that has been added via 
-		 * addScene or addBody
-		 *
-		 *
-		 * @method
-		 * @name RapierPhysics#getBody
-		 * @param {Object3D} mesh A ThreeJS mesh that is included in the physics.
-		 */
-		getBody,
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
 		 * `physics` object in their {@link Object3D#userData} field will be honored.
