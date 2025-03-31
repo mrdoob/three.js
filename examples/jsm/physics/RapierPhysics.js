@@ -122,10 +122,6 @@ async function RapierPhysics() {
 
 	}
 
-	function getBody( mesh ){
-        return meshMap.get( mesh );
-    }
-
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getShape( mesh.geometry );
