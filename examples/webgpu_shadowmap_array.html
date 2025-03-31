@@ -32,8 +32,6 @@
 			import { TileShadowNode } from 'three/addons/TileShadowNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-
 			import Stats from 'stats-gl';
 
 			let camera, scene, renderer, clock;
@@ -78,15 +76,15 @@
 				dirLight.shadow.camera.left = - 180;
 				dirLight.shadow.camera.top	= 180;
 				dirLight.shadow.camera.bottom = - 160;
-				dirLight.shadow.mapSize.width = 1024 * 8;
-				dirLight.shadow.mapSize.height = 1024 * 8;
+				dirLight.shadow.mapSize.width = 1024 * 4;
+				dirLight.shadow.mapSize.height = 1024 * 4;
 				dirLight.shadow.radius = 1;
 				dirLight.shadow.bias = - 0.005;
 
 				// Set up the tile shadow mapping
 				const tsm = new TileShadowNode( dirLight, camera, scene, {
-					tilesX: 2,
-					tilesY: 2,
+					tilesX: 4,
+					tilesY: 4,
 					debug: true
 				} );
 				dirLight.shadow.shadowNode = tsm;
@@ -107,7 +105,6 @@
 
 				planeMaterial.colorNode = Fn( () => {
 
-					const pos = positionWorld.toVar();
 					const noise = mx_fractal_noise_vec3( positionWorld.mul( 0.05 ) ).saturate();
 					// Mix of greens and browns for a more natural ground
 					const green = color( 0.4, 0.7, 0.3 );

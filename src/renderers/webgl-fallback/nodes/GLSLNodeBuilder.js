@@ -393,7 +393,7 @@ ${ flowData.code }
 
 			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
 
-			return `texture( ${ textureProperty }, ${ depthSnippet } ).x`;
+			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
 
