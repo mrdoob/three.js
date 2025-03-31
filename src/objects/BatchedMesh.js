@@ -10,6 +10,7 @@ import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
+import { FrustumArray } from '../math/FrustumArray.js';
 
 function ascIdSort( a, b ) {
 
@@ -79,6 +80,7 @@ class MultiDrawRenderList {
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
 const _frustum = /*@__PURE__*/ new Frustum();
+const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
@@ -1511,8 +1513,9 @@ class BatchedMesh extends Mesh {
 		const indirectTexture = this._indirectTexture;
 		const indirectArray = indirectTexture.image.data;
 
+		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 		// prepare the frustum in the local frame
-		if ( perObjectFrustumCulled ) {
+		if ( perObjectFrustumCulled && ! camera.isArrayCamera ) {
 
 			_matrix
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
@@ -1546,7 +1549,7 @@ class BatchedMesh extends Mesh {
 					let culled = false;
 					if ( perObjectFrustumCulled ) {
 
-						culled = ! _frustum.intersectsSphere( _sphere );
+						culled = ! frustum.intersectsSphere( _sphere, camera );
 
 					}
 
@@ -1603,7 +1606,7 @@ class BatchedMesh extends Mesh {
 						// get the bounds in world space
 						this.getMatrixAt( i, _matrix );
 						this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
-						culled = ! _frustum.intersectsSphere( _sphere );
+						culled = ! frustum.intersectsSphere( _sphere, camera );
 
 					}
 

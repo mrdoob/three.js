@@ -84,8 +84,8 @@
 
 				// Set up the tile shadow mapping
 				const tsm = new TileShadowNode( dirLight, camera, scene, {
-					tilesX: renderer.backend.isWebGPUBackend ? 4 : 2,
-					tilesY: renderer.backend.isWebGPUBackend ? 4 : 2,
+					tilesX: 2,
+					tilesY: 2,
 					debug: true
 				} );
 				dirLight.shadow.shadowNode = tsm;
@@ -123,13 +123,6 @@
 			
 				// Spread various objects across the scene
 				createScenery();
-
-				scene.traverse( function ( object ) {
-
-					object.frustumCulled = false;
-			
-				} );
-			
 
 				// Camera controls
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -223,7 +216,6 @@
 				torusKnot.scale.multiplyScalar( 1 / 18 );
 				torusKnot.position.x = 5;
 				torusKnot.position.y = 5;
-				torusKnot.frustumCulled = false;
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
@@ -320,7 +312,6 @@
 				const treeBatchedMesh = new THREE.BatchedMesh( totalInstanceCount, totalVertexCount, totalIndexCount, treeMaterial );
 				treeBatchedMesh.castShadow = true;
 				treeBatchedMesh.perObjectFrustumCulled = false;
-
 				const trunkGeometryId = treeBatchedMesh.addGeometry( trunkGeometry );
 				const topGeometryId = treeBatchedMesh.addGeometry( topGeometry );
 
