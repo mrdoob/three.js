@@ -78,16 +78,15 @@
 				dirLight.shadow.camera.left = - 180;
 				dirLight.shadow.camera.top	= 180;
 				dirLight.shadow.camera.bottom = - 160;
-				dirLight.shadow.mapSize.width = 1024 * 4;
-				dirLight.shadow.mapSize.height = 1024 * 4;
+				dirLight.shadow.mapSize.width = 1024 * 8;
+				dirLight.shadow.mapSize.height = 1024 * 8;
 				dirLight.shadow.radius = 1;
 				dirLight.shadow.bias = - 0.005;
 
-				const isWebGPU = WebGPU.isAvailable();
 				// Set up the tile shadow mapping
 				const tsm = new TileShadowNode( dirLight, camera, scene, {
-					tilesX: isWebGPU ? 4 : 2,
-					tilesY: isWebGPU ? 4 : 2,
+					tilesX: 2,
+					tilesY: 2,
 					debug: true
 				} );
 				dirLight.shadow.shadowNode = tsm;
