@@ -260,6 +260,14 @@ class MathNode extends TempNode {
 
 				}
 
+				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
+
+					console.warn( `THREE.TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+
+					method = '/*' + method + '*/';
+
+				}
+
 				params.push( a.build( builder, inputType ) );
 				if ( b !== null ) params.push( b.build( builder, inputType ) );
 				if ( c !== null ) params.push( c.build( builder, inputType ) );
