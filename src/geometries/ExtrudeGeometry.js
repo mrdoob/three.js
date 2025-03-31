@@ -394,7 +394,8 @@ class ExtrudeGeometry extends BufferGeometry {
 			}
 
 			let faces;
-			if ( bevelSegments == 0 ) {
+
+			if ( bevelSegments === 0 ) {
 
 				faces = ShapeUtils.triangulateShape( contour, holes );
 
