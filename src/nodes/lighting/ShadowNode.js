@@ -11,7 +11,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { HalfFloatType, LessCompare, RedFormat, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
@@ -370,9 +370,7 @@ class ShadowNode extends ShadowBaseNode {
 		depthTexture.name = 'ShadowDepthTexture';
 		depthTexture.compareFunction = LessCompare;
 
-		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, {
-			format: RedFormat,
-		} );
+		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
 		shadowMap.depthTexture = depthTexture;
 
