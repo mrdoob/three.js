@@ -421,7 +421,7 @@ class ExtrudeGeometry extends BufferGeometry {
 						const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
 						v( vert.x, vert.y, - z );
-						if ( t == 0 ) contractedContourVertices.push( vert );
+						if ( t === 0 ) contractedContourVertices.push( vert );
 
 					}
 
@@ -437,11 +437,11 @@ class ExtrudeGeometry extends BufferGeometry {
 							const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 							v( vert.x, vert.y, - z );
-							if ( t == 0 ) oneHoleVertices.push( vert );
+							if ( t === 0 ) oneHoleVertices.push( vert );
 
 						}
 
-						if ( t == 0 ) expandedHoleVertices.push( oneHoleVertices );
+						if ( t === 0 ) expandedHoleVertices.push( oneHoleVertices );
 
 					}
 
