@@ -1,9 +1,6 @@
 import { RenderTarget, Vector2, QuadMesh, NodeMaterial, RendererUtils, TempNode, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, texture, passTexture, uniform, sign, max, convertToTexture } from 'three/tsl';
 
-const _size = /*@__PURE__*/ new Vector2();
-const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
-
 let _rendererState;
 
 /**
@@ -87,6 +84,22 @@ class AfterImageNode extends TempNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * The size of the effect.
+		 *
+		 * @private
+		 * @type {Vector2}
+		 */
+		this._size = new Vector2();
+
+		/**
+		 * The quad mesh used for compositing the effect.
+		 *
+		 * @private
+		 * @type {QuadMesh}
+		 */
+		this._quadMeshComp = new QuadMesh();
+
 	}
 
 	/**
@@ -134,9 +147,9 @@ class AfterImageNode extends TempNode {
 		this._compRT.texture.type = textureType;
 		this._oldRT.texture.type = textureType;
 
-		renderer.getDrawingBufferSize( _size );
+		renderer.getDrawingBufferSize( this._size );
 
-		this.setSize( _size.x, _size.y );
+		this.setSize( this._size.x, this._size.y );
 
 		const currentTexture = textureNode.value;
 
@@ -145,7 +158,7 @@ class AfterImageNode extends TempNode {
 		// comp
 
 		renderer.setRenderTarget( this._compRT );
-		_quadMeshComp.render( renderer );
+		this._quadMeshComp.render( renderer );
 
 		// Swap the textures
 
@@ -203,7 +216,7 @@ class AfterImageNode extends TempNode {
 		materialComposed.name = 'AfterImage';
 		materialComposed.fragmentNode = afterImg();
 
-		_quadMeshComp.material = materialComposed;
+		this._quadMeshComp.material = materialComposed;
 
 		//
 
