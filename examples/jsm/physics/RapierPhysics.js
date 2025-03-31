@@ -1,4 +1,3 @@
-
 import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
 
 const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0';
@@ -29,19 +28,19 @@ function getShape( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
-	} else if ( geometry.type === 'CylinderGeometry') {
+	} else if ( geometry.type === 'CylinderGeometry' ) {
 
-        const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
 		const length = parameters.length !== undefined ? parameters.length : 0.5;
 
-		return RAPIER.ColliderDesc.cylinder( length / 2, radius);
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius );
 
-    } else if ( geometry.type === 'CapsuleGeometry') {
+	} else if ( geometry.type === 'CapsuleGeometry' ) {
 
-        const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
 		const length = parameters.length !== undefined ? parameters.length : 0.5;
 
-		return RAPIER.ColliderDesc.capsule( length / 2, radius);
+		return RAPIER.ColliderDesc.capsule( length / 2, radius );
 
 	} else if ( geometry.type === 'BufferGeometry' ) {
 
@@ -123,6 +122,10 @@ async function RapierPhysics() {
 
 	}
 
+	function getBody( mesh ){
+        return meshMap.get( mesh );
+    }
+
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getShape( mesh.geometry );
@@ -142,8 +145,8 @@ async function RapierPhysics() {
 
 		if ( mass > 0 ) {
 
-			meshes.push( mesh );
-			meshMap.set( mesh, body );
+		meshes.push( mesh );
+		meshMap.set( mesh, body );
 
 		}
 
@@ -264,7 +267,7 @@ async function RapierPhysics() {
 
 	return {
 		RAPIER,
-        world,
+		world,
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
 		 * `physics` object in their {@link Object3D#userData} field will be honored.
