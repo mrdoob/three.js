@@ -217,6 +217,7 @@ export const lengthSq = TSL.lengthSq;
 export const lessThan = TSL.lessThan;
 export const lessThanEqual = TSL.lessThanEqual;
 export const lightPosition = TSL.lightPosition;
+export const lightShadowMatrix = TSL.lightShadowMatrix;
 export const lightTargetDirection = TSL.lightTargetDirection;
 export const lightTargetPosition = TSL.lightTargetPosition;
 export const lightViewPosition = TSL.lightViewPosition;

@@ -414,6 +414,7 @@
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
 		"webgpu_shadowmap",
+		"webgpu_shadowmap_array",
 		"webgpu_shadowmap_csm",
 		"webgpu_shadowmap_opacity",
 		"webgpu_shadowmap_progressive",

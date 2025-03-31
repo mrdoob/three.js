@@ -228,9 +228,10 @@ class WebGPUPipelineUtils {
 	 * Creates GPU render bundle encoder for the given render context.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
+	 * @param {string} [label='renderBundleEncoder'] - The label.
 	 * @return {GPURenderBundleEncoder} The GPU render bundle encoder.
 	 */
-	createBundleEncoder( renderContext ) {
+	createBundleEncoder( renderContext, label = 'renderBundleEncoder' ) {
 
 		const backend = this.backend;
 		const { utils, device } = backend;
@@ -240,7 +241,7 @@ class WebGPUPipelineUtils {
 		const sampleCount = this._getSampleCount( renderContext );
 
 		const descriptor = {
-			label: 'renderBundleEncoder',
+			label: label,
 			colorFormats: [ colorFormat ],
 			depthStencilFormat,
 			sampleCount

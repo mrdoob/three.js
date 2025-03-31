@@ -1396,6 +1396,7 @@ class Renderer {
 
 		//
 
+		renderContext.camera = camera;
 		this.backend.beginRender( renderContext );
 
 		// process render lists

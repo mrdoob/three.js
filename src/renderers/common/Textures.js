@@ -81,6 +81,7 @@ class Textures extends DataMap {
 			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
+			depthTexture.image.depth = size.depth;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 
@@ -95,6 +96,7 @@ class Textures extends DataMap {
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
+				depthTexture.image.depth = size.depth;
 
 			}
 
