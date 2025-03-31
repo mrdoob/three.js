@@ -28,19 +28,19 @@ function getShape( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
-	} else if ( geometry.type === 'CylinderGeometry') {
+	} else if ( geometry.type === 'CylinderGeometry' ) {
 
-        const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
 		const length = parameters.length !== undefined ? parameters.length : 0.5;
 
-		return RAPIER.ColliderDesc.cylinder( length / 2, radius);
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius );
 
-    } else if ( geometry.type === 'CapsuleGeometry') {
+	} else if ( geometry.type === 'CapsuleGeometry' ) {
 
-        const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
 		const length = parameters.length !== undefined ? parameters.length : 0.5;
 
-		return RAPIER.ColliderDesc.capsule( length / 2, radius);
+		return RAPIER.ColliderDesc.capsule( length / 2, radius );
 
 	} else if ( geometry.type === 'BufferGeometry' ) {
 
@@ -122,9 +122,11 @@ async function RapierPhysics() {
 
 	}
 
-	function getBody( mesh ){
-        return meshMap.get( mesh );
-    }
+	function getBody( mesh ) {
+
+		return meshMap.get( mesh );
+
+	}
 
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
@@ -141,8 +143,8 @@ async function RapierPhysics() {
 
 		//if ( mass > 0 ) {
 
-			meshes.push( mesh );
-			meshMap.set( mesh, body );
+		meshes.push( mesh );
+		meshMap.set( mesh, body );
 
 		//}
 
@@ -263,9 +265,9 @@ async function RapierPhysics() {
 
 	return {
 		RAPIER,
-        world,
+		world,
 		/**
-		 * Returns the Rapier RigidBody given a ThreeJS mesh that has been added via 
+		 * Returns the Rapier RigidBody given a ThreeJS mesh that has been added via
 		 * addScene or addBody
 		 *
 		 *
