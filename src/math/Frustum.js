@@ -2,7 +2,6 @@ import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
 import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
-import { Matrix4 } from './Matrix4.js';
 
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
@@ -118,55 +117,6 @@ class Frustum {
 			throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
 
 		}
-
-		return this;
-
-	}
-
-	// New method to handle camera arrays directly
-	setFromCamera( cameraArray, coordinateSystem = WebGLCoordinateSystem ) {
-
-		const tempFrustum = new Frustum();
-		const _projScreenMatrix = new Matrix4();
-
-		// Initialize with the first camera
-		const firstCamera = cameraArray.cameras[ 0 ];
-		_projScreenMatrix.multiplyMatrices(
-			firstCamera.projectionMatrix,
-			firstCamera.matrixWorldInverse
-		);
-		this.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
-
-		// For each additional camera, expand the frustum
-		for ( let i = 1; i < cameraArray.cameras.length; i ++ ) {
-
-			const camera = cameraArray.cameras[ i ];
-			_projScreenMatrix.multiplyMatrices(
-				camera.projectionMatrix,
-				camera.matrixWorldInverse
-			);
-
-			tempFrustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
-
-			// Expand each plane to be more inclusive
-			for ( let p = 0; p < 6; p ++ ) {
-
-				// Determine which plane is more "outward" (depends on plane index)
-				// For planes 0, 2, 4: the more negative the constant, the more outward
-				// For planes 1, 3, 5: the more positive the constant, the more outward
-				const isEvenPlane = p % 2 === 0;
-
-				if ( ( isEvenPlane && tempFrustum.planes[ p ].constant < this.planes[ p ].constant ) || ( ! isEvenPlane && tempFrustum.planes[ p ].constant > this.planes[ p ].constant ) ) {
-
-					this.planes[ p ].copy( tempFrustum.planes[ p ] );
-
-				}
-
-			}
-
-		}
-
-		console.log( this.planes );
 
 		return this;
 
