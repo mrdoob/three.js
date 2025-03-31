@@ -961,6 +961,20 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Internal to determine if the current render target is a render target array with depth 2D array texture.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {boolean} Whether the render target is a render target array with depth 2D array texture.
+	 *
+	 * @private
+	 */
+	_isRenderCameraDepthArray( renderContext ) {
+
+		return renderContext.depthTexture && renderContext.depthTexture.isDepthArrayTexture && renderContext.camera.isArrayCamera;
+
+	}
+
+	/**
 	 * Executes a draw command for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object to draw.
@@ -1160,7 +1174,7 @@ class WebGLBackend extends Backend {
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			const renderTarget = this._currentContext.renderTarget;
-
+			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( this._currentContext );
 			const prevActiveCubeFace = this._currentContext.activeCubeFace;
 
 			const textureData = this.get( renderTarget.depthTexture );
@@ -1192,8 +1206,7 @@ class WebGLBackend extends Backend {
 
 				if ( object.layers.test( subCamera.layers ) ) {
 
-					if ( renderTarget && renderTarget.depthTexture !== null && renderTarget.depthTexture.isDepthArrayTexture === true ) {
-
+					if ( isRenderCameraDepthArray ) {
 
 						// Update the active layer
 						this.renderer._activeCubeFace = i;
@@ -2103,8 +2116,9 @@ class WebGLBackend extends Backend {
 
 			} else {
 
+				const isRenderCameraDepthArray = this._isRenderCameraDepthArray( descriptor );
 
-				if ( descriptor.depthTexture !== null && descriptor.depthTexture.isDepthArrayTexture ) {
+				if ( isRenderCameraDepthArray ) {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 

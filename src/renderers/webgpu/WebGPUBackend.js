@@ -342,11 +342,20 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Internal to determine if the current render target is a render target array with depth 2D array texture.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {boolean} Whether the render target is a render target array with depth 2D array texture.
+	 *
+	 * @private
+	 */
 	_isRenderCameraDepthArray( renderContext ) {
 
 		return renderContext.depthTexture && renderContext.depthTexture.isDepthArrayTexture && renderContext.camera.isArrayCamera;
 
 	}
+
 	/**
 	 * Returns the render pass descriptor for the given render context.
 	 *
