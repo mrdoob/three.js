@@ -116,6 +116,7 @@ export { Spherical } from './math/Spherical.js';
 export { Cylindrical } from './math/Cylindrical.js';
 export { Plane } from './math/Plane.js';
 export { Frustum } from './math/Frustum.js';
+export { FrustumArray } from './math/FrustumArray.js';
 export { Sphere } from './math/Sphere.js';
 export { Ray } from './math/Ray.js';
 export { Matrix4 } from './math/Matrix4.js';
