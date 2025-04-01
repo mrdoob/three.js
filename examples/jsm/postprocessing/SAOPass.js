@@ -82,7 +82,7 @@ class SAOPass extends Pass {
 		this._oldClearAlpha = 1;
 
 		/**
-		 * The SAO paramter.
+		 * The SAO parameter.
 		 *
 		 * @type {Object}
 		 */

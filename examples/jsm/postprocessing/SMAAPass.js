@@ -12,7 +12,7 @@ import { SMAABlendShader, SMAAEdgesShader, SMAAWeightsShader } from '../shaders/
 
 /**
  * A pass for applying SMAA. Unlike {@link FXAAPass}, `SMAAPass` operates in
- * `linar-srgb` so this pass must be executed before {@link OutputPass}.
+ * `linear-srgb` so this pass must be executed before {@link OutputPass}.
  *
  * ```js
  * const smaaPass = new SMAAPass();

@@ -115,7 +115,7 @@
 
 							const shaderBall = gltf.scene.children[ 0 ];
 
-							// shaderBall is a groop with 3 children : base, inside and logo
+							// shaderBall is a group with 3 children : base, inside and logo
 							// ao map is include in model
 
 							let i = shaderBall.children.length, n = 0;
@@ -125,7 +125,7 @@
 								shaderBall.children[ i ].receiveShadow = true;
 								shaderBall.children[ i ].castShadow = true;
 								shaderBall.children[ i ].renderOrder = n ++;
-			
+
 							}
 
 							material = shaderBall.children[ 0 ].material;
@@ -149,7 +149,7 @@
 								shader.uniforms[ 'debugNoise' ] = { value: 0 };
 
 								shader.fragmentShader = shader.fragmentShader.replace( '#include <clipping_planes_pars_fragment>', '#include <clipping_planes_pars_fragment>' + randomUV );
-								shader.fragmentShader = shader.fragmentShader.replace( '#include <map_fragment>', mapRemplace );
+								shader.fragmentShader = shader.fragmentShader.replace( '#include <map_fragment>', map_fragment );
 
 								// for disolve
 								shader.fragmentShader = shader.fragmentShader.replace( '#include <alphamap_pars_fragment>', alphamap_pars_fragment );
@@ -276,7 +276,7 @@
 				gui.add( setting, 'UseNoiseMap' );
 				gui.add( setting, 'SuslikMethod' );
 				gui.add( setting, 'DebugNoise' );
-			
+
 			}
 
 			function onWindowResize() {
@@ -309,7 +309,7 @@
 			    vec2 ip = floor(p);
 			    vec2 u = fract(p);
 			    u = u*u*(3.0-2.0*u);
-			    
+
 			    float res = mix(
 			        mix(rand(ip),rand(ip+vec2(1.0,0.0)),u.x),
 			        mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);
@@ -324,8 +324,8 @@
 			    float k = 0.0;
 			    if( useNoiseMap == 1.0 ) k = texture2D( noiseMap, 0.005*uv ).x;
 			    else k = directNoise( uv );
-			    
-			    // compute index    
+
+			    // compute index
 			    float index = k*8.0;
 			    float f = fract( index );
 			    float ia = 0.0;
@@ -340,15 +340,15 @@
 			    	ib = ia + 1.0;
 			    }
 
-			    // offsets for the different virtual patterns    
-			    vec2 offa = sin(vec2(3.0,7.0)*ia); // can replace with any other hash    
-			    vec2 offb = sin(vec2(3.0,7.0)*ib); // can replace with any other hash    
+			    // offsets for the different virtual patterns
+			    vec2 offa = sin(vec2(3.0,7.0)*ia); // can replace with any other hash
+			    vec2 offb = sin(vec2(3.0,7.0)*ib); // can replace with any other hash
 
-			    // compute derivatives for mip-mapping    
+			    // compute derivatives for mip-mapping
 			    vec2 dx = dFdx(uv);
 			    vec2 dy = dFdy(uv);
-			    
-			    // sample the two closest virtual patterns    
+
+			    // sample the two closest virtual patterns
 			    vec4 cola = textureGrad( mapper, uv + offa, dx, dy );
 			    vec4 colb = textureGrad( mapper, uv + offb, dx, dy );
 			    if( debugNoise == 1.0 ){
@@ -356,12 +356,12 @@
 			    	colb = vec4( 0.0,0.0,1.0,1.0 );
 			    }
 
-			    // interpolate between the two virtual patterns    
+			    // interpolate between the two virtual patterns
 			    return mix( cola, colb, smoothstep(0.2,0.8,f-0.1*sum(cola-colb)) );
 
 			}`;
 
-			const mapRemplace = /* glsl */ `
+			const map_fragment = /* glsl */ `
 			#ifdef USE_MAP
 
 				if( enableRandom == 1.0 ) diffuseColor *= textureNoTile( map, vMapUv );

@@ -22,11 +22,11 @@ class AnamorphicNode extends TempNode {
 	 * Constructs a new anamorphic node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {Node<float>} tresholdNode - The threshold is one option to control the intensity and size of the effect.
+	 * @param {Node<float>} thresholdNode - The threshold is one option to control the intensity and size of the effect.
 	 * @param {Node<float>} scaleNode - Defines the vertical scale of the flares.
 	 * @param {number} samples - More samples result in larger flares and a more expensive runtime behavior.
 	 */
-	constructor( textureNode, tresholdNode, scaleNode, samples ) {
+	constructor( textureNode, thresholdNode, scaleNode, samples ) {
 
 		super( 'vec4' );
 
@@ -42,7 +42,7 @@ class AnamorphicNode extends TempNode {
 		 *
 		 * @type {Node<float>}
 		 */
-		this.tresholdNode = tresholdNode;
+		this.thresholdNode = thresholdNode;
 
 		/**
 		 * Defines the vertical scale of the flares.
@@ -202,7 +202,7 @@ class AnamorphicNode extends TempNode {
 
 				const uv = vec2( uvNode.x.add( this._invSize.x.mul( i ).mul( this.scaleNode ) ), uvNode.y );
 				const color = sampleTexture( uv );
-				const pass = threshold( color, this.tresholdNode ).mul( softness );
+				const pass = threshold( color, this.thresholdNode ).mul( softness );
 
 				total.addAssign( pass );
 

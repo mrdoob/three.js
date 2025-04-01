@@ -101,7 +101,7 @@
 				vec2 normal = vec2(
 					( texture2D( levelTexture, point1 + vec2( - cellSize.x, 0 ) ).x - texture2D( levelTexture, point1 + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
 					( texture2D( levelTexture, point1 + vec2( 0, - cellSize.y ) ).x - texture2D( levelTexture, point1 + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS );
-			
+
 
 				if ( gl_FragCoord.x < 1.5 ) {
 
@@ -199,7 +199,7 @@
 			};
 
 			init();
-			
+
 
 			async function init() {
 
@@ -239,7 +239,7 @@
 				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
 				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
-			
+
 				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
 				env.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environment = env;
@@ -268,7 +268,7 @@
 						if ( ducks[ i ] ) ducks[ i ].visible = ducksEnabled;
 
 					}
-			
+
 				};
 
 				gui.add( effectController, 'mouseSize', 0.1, 1.0, 0.1 ).onChange( valuesChanger );
@@ -280,13 +280,13 @@
 
 					waterMesh.material.wireframe = v;
 					poolBorder.material.wireframe = v;
-			
+
 				} );
 				gui.add( effectController, 'shadow' ).onChange( addShadow );
-			
+
 				//const buttonSmooth = { smoothWater: function () {smoothWater();} };
 				//gui.add( buttonSmooth, 'smoothWater' );
-			
+
 
 				initWater();
 
@@ -452,7 +452,7 @@
 				} else {
 
 					if ( sun.shadow ) sun.shadow.dispose();
-			
+
 				}
 
 				// debug shadow
@@ -536,7 +536,7 @@
 						sphere.userData.velocity.multiplyScalar( 0.998 );
 						pos.add( sphere.userData.velocity );
 
-			
+
 
 						const decal = 0.001;
 						const limit = BOUNDS_HALF - 0.2;
@@ -568,7 +568,7 @@
 						// duck orientation test
 
 						const startNormal = new THREE.Vector3( pixels[ 1 ], 1, - pixels[ 2 ] ).normalize();
-			
+
 						const dir = startPos.sub( pos );
 						dir.y = 0;
 						dir.normalize();
@@ -605,7 +605,7 @@
 
 				mousedown = false;
 				controls.enabled = true;
-			
+
 			}
 
 			function onPointerMove( event ) {
@@ -698,13 +698,13 @@
 
 					this.extra = {};
 
-					this.addParametre( 'heightmap', null );
-			
+					this.addParameter( 'heightmap', null );
+
 					this.setValues( parameters );
 
 				}
 
-				addParametre( name, value ) {
+				addParameter( name, value ) {
 
 					this.extra[ name ] = value;
 					Object.defineProperty( this, name, {
@@ -713,10 +713,10 @@
 
 							this.extra[ name ] = v;
 							if ( this.userData.shader ) this.userData.shader.uniforms[ name ].value = this.extra[ name ];
-			
+
 						}
 					} );
-			
+
 				}
 
 				onBeforeCompile( shader ) {
@@ -724,7 +724,7 @@
 					for ( const name in this.extra ) {
 
 						shader.uniforms[ name ] = { value: this.extra[ name ] };
-			
+
 					}
 
 					shader.vertexShader = shader.vertexShader.replace( '#include <common>', shaderChange.common );

@@ -119,7 +119,7 @@ class EffectComposer {
 		this.copyPass.material.blending = NoBlending;
 
 		/**
-		 * The intenral clock for managing time data.
+		 * The internal clock for managing time data.
 		 *
 		 * @private
 		 * @type {Clock}
