@@ -64,7 +64,7 @@ export const bitangentWorld = /*@__PURE__*/ getBitangent( normalWorld.cross( tan
  * @tsl
  * @type {Node<vec3>}
  */
-export const transformedBitangentView = /*@__PURE__*/ getBitangent( transformedNormalView.cross( transformedTangentView ) ).normalize().toVar( 'transformedBitangentView' );
+export const transformedBitangentView = /*@__PURE__*/ getBitangent( transformedNormalView.cross( transformedTangentView ), 'v_transformedBitangentView' ).normalize().toVar( 'transformedBitangentView' );
 
 /**
  * TSL object that represents the transformed vertex bitangent in world space of the current rendered object.
