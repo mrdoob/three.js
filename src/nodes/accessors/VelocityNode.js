@@ -205,6 +205,7 @@ function getPreviousMatrix( object, index = 0 ) {
 	if ( matrix === undefined ) {
 
 		objectData[ index ] = matrix = new Matrix4();
+		objectData[ index ].copy( object.matrixWorld );
 
 	}
 
