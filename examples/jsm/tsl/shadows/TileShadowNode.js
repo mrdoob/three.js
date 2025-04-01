@@ -10,14 +10,12 @@ import {
 	RedFormat,
 	ArrayCamera,
 	VSMShadowMap,
-	NodeUtils,
 	RendererUtils,
 	Quaternion
 } from 'three/webgpu';
 
 import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getRenderObjectFunction } from 'three/tsl';
 
-const { getDataFromObject } = NodeUtils;
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
 
