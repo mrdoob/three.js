@@ -92,12 +92,10 @@ class Textures extends DataMap {
 
 			if ( depthTexture ) {
 
-				const depthSize = this.getSize( depthTexture );
-
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = depthSize.depth;
+				depthTexture.image.depth = depthTexture.isDepthArrayTexture ? depthTexture.image.depth : 1;
 
 			}
 
