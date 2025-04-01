@@ -143,6 +143,7 @@ class AfterImageNode extends TempNode {
 		this.textureNodeOld.value = this._oldRT.texture;
 
 		// comp
+		_quadMeshComp.material = this._materialComposed;
 
 		renderer.setRenderTarget( this._compRT );
 		_quadMeshComp.render( renderer );
@@ -202,9 +203,6 @@ class AfterImageNode extends TempNode {
 		const materialComposed = this._materialComposed || ( this._materialComposed = new NodeMaterial() );
 		materialComposed.name = 'AfterImage';
 		materialComposed.fragmentNode = afterImg();
-
-		_quadMeshComp.material = materialComposed;
-
 		//
 
 		const properties = builder.getNodeProperties( this );
