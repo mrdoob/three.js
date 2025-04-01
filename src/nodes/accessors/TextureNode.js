@@ -328,7 +328,7 @@ class TextureNode extends UniformNode {
 
 		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			uvNode = builder.context.getUV( this );
+			uvNode = builder.context.getUV( this, builder );
 
 		}
 
