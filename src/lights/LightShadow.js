@@ -266,6 +266,11 @@ class LightShadow {
 		this.bias = source.bias;
 		this.radius = source.radius;
 
+		this.autoUpdate = source.autoUpdate;
+		this.needsUpdate = source.needsUpdate;
+		this.normalBias = source.normalBias;
+		this.blurSamples = source.blurSamples;
+
 		this.mapSize.copy( source.mapSize );
 
 		return this;

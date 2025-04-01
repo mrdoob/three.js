@@ -53,6 +53,8 @@ class TileShadowNode extends ShadowBaseNode {
 		this.initialLightDirection = new Vector3();
 		this.updateLightDirection();
 
+		this._cameraFrameId = new WeakMap();
+
 		this.shadowSize = {
 			top: light.shadow.camera.top,
 			bottom: light.shadow.camera.bottom,
@@ -170,8 +172,6 @@ class TileShadowNode extends ShadowBaseNode {
 
 			};
 
-			shadowNode.shadow.autoUpdate = false;
-			shadowNode.shadow.needsUpdate = true;
 			this._shadowNodes.push( shadowNode );
 
 		}
@@ -267,8 +267,34 @@ class TileShadowNode extends ShadowBaseNode {
 	 */
 	updateBefore( frame ) {
 
-		this.update();
-		this.updateShadow( frame );
+		const shadow = this.lights[ 0 ].shadow; // so far test only the first light
+
+		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+
+		if ( needsUpdate ) {
+
+			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
+
+				needsUpdate = false;
+
+			}
+
+			this._cameraFrameId[ frame.camera ] = frame.frameId;
+
+		}
+
+		if ( needsUpdate ) {
+
+			this.update();
+			this.updateShadow( frame );
+
+			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
+
+				shadow.needsUpdate = false;
+
+			}
+
+		}
 
 	}
 
