@@ -12,7 +12,7 @@ import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTa
  * @param {string} varyingName - The name of the varying to assign the bitangent to.
  * @returns {Node<vec3>} The bitangent node.
  */
-const getBitangent = Fn( ( [ crossNormalTangent, varyingName ], builder ) => {
+const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], builder ) => {
 
 	let bitangent = crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
