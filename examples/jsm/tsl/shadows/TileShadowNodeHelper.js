@@ -1,15 +1,17 @@
-import { NodeMaterial, Mesh, PlaneGeometry, DoubleSide, CameraHelper } from 'three/webgpu';
+import { Group, NodeMaterial, Mesh, PlaneGeometry, DoubleSide, CameraHelper } from 'three/webgpu';
 import { Fn, vec4, vec3, texture, uv, positionLocal, vec2, float, screenSize } from 'three/tsl';
 
 /**
  * Helper class to manage and display debug visuals for TileShadowNode.
 */
-class TileShadowNodeHelper {
+class TileShadowNodeHelper extends Group {
 
 	/**
      * @param {TileShadowNode} tileShadowNode The TileShadowNode instance to debug.
 	*/
 	constructor( tileShadowNode ) {
+
+		super();
 
 		if ( ! tileShadowNode ) {
 
@@ -18,17 +20,12 @@ class TileShadowNodeHelper {
 		}
 
 		this.tileShadowNode = tileShadowNode;
-		this.scene = tileShadowNode.scene; // Get scene reference
 		this.config = tileShadowNode.config;
 		this.tiles = tileShadowNode.tiles;
 		this._debugMeshes = [];
 		this._shadowCamHelpers = [];
 
-		if ( ! this.scene ) {
-
-			console.warn( 'TileShadowNodeHelper created but scene is not yet available in TileShadowNode.' );
-
-		}
+		this.initialized = false;
 
 	}
 
@@ -37,13 +34,6 @@ class TileShadowNodeHelper {
      * Should be called after TileShadowNode has initialized its lights and shadow nodes.
 	*/
 	init() {
-
-		if ( ! this.scene ) {
-
-			console.error( 'Cannot initialize TileShadowNodeHelper: Scene is not set.' );
-			return;
-
-		}
 
 		if ( this.tileShadowNode._shadowNodes.length !== this.tiles.length ) {
 
@@ -134,14 +124,14 @@ class TileShadowNodeHelper {
 
 			} )();
 
-			this.scene.add( display );
+			this.add( display );
 			this._debugMeshes.push( display );
 
 			if ( this.tileShadowNode._shadowNodes[ i ] && this.tileShadowNode._shadowNodes[ i ].shadow ) {
 
 				const camHelper = new CameraHelper( this.tileShadowNode._shadowNodes[ i ].shadow.camera );
 				camHelper.fog = false;
-				this.scene.add( camHelper );
+				this.add( camHelper );
 				this._shadowCamHelpers.push( camHelper );
 
 			} else {
@@ -153,6 +143,8 @@ class TileShadowNodeHelper {
 
 		}
 
+		this.initialized = true;
+
 	}
 
 	/**
@@ -160,6 +152,12 @@ class TileShadowNodeHelper {
      * Should be called within TileShadowNode's update method.
 	*/
 	update() {
+
+		if ( this.initialized === false ) {
+
+			this.init();
+
+		}
 
 		for ( const helper of this._shadowCamHelpers ) {
 

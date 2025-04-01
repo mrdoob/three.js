@@ -3,7 +3,7 @@ import { DepthTexture } from './DepthTexture.js';
 /**
  * Creates an array of depth textures.
  *
- * @augments Texture
+ * @augments DepthTexture
  */
 class DepthArrayTexture extends DepthTexture {
 

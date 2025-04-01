@@ -30,6 +30,8 @@
 			import { mx_fractal_noise_vec3, positionWorld, Fn, color } from 'three/tsl';
 
 			import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';
+			import { TileShadowNodeHelper } from 'three/addons/tsl/shadows/TileShadowNodeHelper.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import Stats from 'stats-gl';
@@ -37,6 +39,7 @@
 			let camera, scene, renderer, clock;
 			let dirLight, stats;
 			let torusKnot, dirGroup;
+			let tsmHelper;
 
 			init();
 
@@ -83,19 +86,24 @@
 				dirLight.shadow.bias = - 0.005;
 
 				// Set up the tile shadow mapping
-				const tsm = new TileShadowNode( dirLight, camera, scene, {
+				const tsm = new TileShadowNode( dirLight, {
 					tilesX: 2,
 					tilesY: 2,
 					debug: true
 				} );
+
+
 				dirLight.shadow.shadowNode = tsm;
 				scene.add( dirLight );
+
+				tsmHelper = new TileShadowNodeHelper( tsm );
+				scene.add( tsmHelper );
+
 
 				dirGroup = new THREE.Group();
 				dirGroup.add( dirLight );
 				scene.add( dirGroup );
 
-			
 				// Create the ground with enhanced texture
 				const planeGeometry = new THREE.PlaneGeometry( 1500, 1500, 2, 2 );
 				const planeMaterial = new THREE.MeshPhongMaterial( {
@@ -399,6 +407,8 @@
 				dirLight.position.z = Math.cos( time * 0.0001 ) * 30;
 
 				renderer.render( scene, camera );
+
+				tsmHelper.update();
 
 				await renderer.resolveTimestampsAsync();
 				stats.update();

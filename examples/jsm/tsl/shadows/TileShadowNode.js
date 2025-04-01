@@ -8,66 +8,18 @@ import {
 	LessCompare,
 	Vector2,
 	RedFormat,
-	NodeMaterial,
 	ArrayCamera,
 	VSMShadowMap,
 	NodeUtils,
 	RendererUtils,
-	Quaternion } from 'three/webgpu';
+	Quaternion
+} from 'three/webgpu';
 
-import { min, Fn, shadow, vec4, positionWorld, renderGroup, reference, objectPosition } from 'three/tsl';
-import { TileShadowNodeHelper } from './TileShadowNodeHelper.js';
+import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getRenderObjectFunction } from 'three/tsl';
 
 const { getDataFromObject } = NodeUtils;
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
-
-const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
-const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
-
-	let dist = positionWorld.sub( position ).length();
-	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
-	dist = dist.saturate(); // clamp to [ 0, 1 ]
-
-	return dist;
-
-} );
-
-const linearShadowDistance = ( light ) => {
-
-	const camera = light.shadow.camera;
-
-	const nearDistance = reference( 'near', 'float', camera ).setGroup( renderGroup );
-	const farDistance = reference( 'far', 'float', camera ).setGroup( renderGroup );
-
-	const referencePosition = objectPosition( light );
-
-	return linearDistance( referencePosition, nearDistance, farDistance );
-
-};
-
-const getShadowMaterial = ( light ) => {
-
-	let material = shadowMaterialLib.get( light );
-
-	if ( material === undefined ) {
-
-		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
-
-		material = new NodeMaterial();
-		material.colorNode = vec4( 0, 0, 0, 1 );
-		material.depthNode = depthNode;
-		material.isShadowPassMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
-		material.name = 'ShadowMaterial';
-		material.fog = false;
-
-		shadowMaterialLib.set( light, material );
-
-	}
-
-	return material;
-
-};
 
 
 class LwLight extends Object3D {
@@ -82,7 +34,7 @@ class LwLight extends Object3D {
 }
 class TileShadowNode extends ShadowBaseNode {
 
-	constructor( light, camera, scene, options = {} ) {
+	constructor( light, options = {} ) {
 
 		super( light );
 
@@ -94,8 +46,6 @@ class TileShadowNode extends ShadowBaseNode {
 			debug: options.debug !== undefined ? options.debug : false
 		};
 
-		this.scene = scene;
-		this.camera = camera;
 		this.debug = this.config.debug;
 
 		this.originalLight = light;
@@ -114,8 +64,6 @@ class TileShadowNode extends ShadowBaseNode {
 
 		this.lights = [];
 		this._shadowNodes = [];
-
-		this.debugHelper = null;
 
 		this.tiles = this.generateTiles( this.config.tilesX, this.config.tilesY );
 
@@ -155,8 +103,6 @@ class TileShadowNode extends ShadowBaseNode {
 	}
 
 	init( builder ) {
-
-		if ( ! this.camera ) this.camera = builder.camera;
 
 		const light = this.originalLight;
 		const parent = light.parent;
@@ -217,8 +163,8 @@ class TileShadowNode extends ShadowBaseNode {
 
 			cameras.push( lShadow.camera );
 			const shadowNode = shadow( lwLight, lShadow );
-			shadowNode._depthLayer = i;
-			shadowNode.updateBefore = () => {};
+			shadowNode.depthLayer = i;
+			shadowNode.updateBeforeType = NodeUpdateType.NONE;
 
 			shadowNode.setupRenderTarget = () => {
 
@@ -232,21 +178,8 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
-		const camera = new ArrayCamera( cameras );
-		this.cameraArray = camera;
-
-		if ( this.debug ) {
-
-			if ( this.debugHelper ) {
-
-				this.debugHelper.dispose();
-
-			}
-
-			this.debugHelper = new TileShadowNodeHelper( this );
-			this.debugHelper.init();
-
-		}
+		const cameraArray = new ArrayCamera( cameras );
+		this.cameraArray = cameraArray;
 
 	}
 
@@ -283,12 +216,6 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
-		if ( this.debugHelper ) {
-
-			this.debugHelper.update();
-
-		}
-
 	}
 
 	/**
@@ -316,18 +243,8 @@ class TileShadowNode extends ShadowBaseNode {
 			const shadow = light.shadow;
 			shadow.camera.layers.mask = camera.layers.mask;
 			shadow.updateMatrices( light );
-			renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
 
-				if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
-
-					if ( useVelocity ) getDataFromObject( object ).useVelocity = true;
-					object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
-					renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
-					object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
-
-				}
-
-			} );
+			renderer.setRenderObjectFunction( getRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
 		}
@@ -387,14 +304,7 @@ class TileShadowNode extends ShadowBaseNode {
 		return Fn( ( builder ) => {
 
 			this.setupShadowPosition( builder );
-			const shadowValue = this._shadowNodes[ 0 ].toVar( 'shadowValue' );
-			for ( let i = 1; i < this._shadowNodes.length; i ++ ) {
-
-				shadowValue.assign( min( shadowValue, this._shadowNodes[ i ] ) );
-
-			}
-
-			return shadowValue;
+			return min( ...this._shadowNodes ).toVar( 'shadowValue' );
 
 		} )();
 
@@ -432,14 +342,6 @@ class TileShadowNode extends ShadowBaseNode {
 
 
 	dispose() {
-
-		// Dispose debug helper first if it exists
-		if ( this.debugHelper ) {
-
-			this.debugHelper.dispose();
-			this.debugHelper = null;
-
-		}
 
 		// Dispose lights, nodes, and shadow map
 		this.disposeLightsAndNodes();

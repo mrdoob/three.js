@@ -1,8 +1,7 @@
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, vec4, int, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { positionWorld } from '../accessors/Position.js';
 import { transformedNormalWorld } from '../accessors/Normal.js';
 import { mix, sqrt } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -14,56 +13,33 @@ import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
-import { objectPosition } from '../accessors/Object3DNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
-import { BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
 
-const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
-const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
-	let dist = positionWorld.sub( position ).length();
-	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
-	dist = dist.saturate(); // clamp to [ 0, 1 ]
+export const getRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
-	return dist;
+	return ( object, scene, _camera, geometry, material, group, ...params ) => {
 
-} );
+		if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
-const linearShadowDistance = ( light ) => {
+			if ( useVelocity ) {
 
-	const camera = light.shadow.camera;
+				getDataFromObject( object ).useVelocity = true;
 
-	const nearDistance = reference( 'near', 'float', camera ).setGroup( renderGroup );
-	const farDistance = reference( 'far', 'float', camera ).setGroup( renderGroup );
+			}
 
-	const referencePosition = objectPosition( light );
+			object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
-	return linearDistance( referencePosition, nearDistance, farDistance );
+			renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
 
-};
+			object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
-const getShadowMaterial = ( light ) => {
+		}
 
-	let material = shadowMaterialLib.get( light );
-
-	if ( material === undefined ) {
-
-		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
-
-		material = new NodeMaterial();
-		material.colorNode = vec4( 0, 0, 0, 1 );
-		material.depthNode = depthNode;
-		material.isShadowPassMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
-		material.name = 'ShadowMaterial';
-		material.fog = false;
-
-		shadowMaterialLib.set( light, material );
-
-	}
-
-	return material;
+	};
 
 };
 
@@ -268,7 +244,7 @@ class ShadowNode extends ShadowBaseNode {
 		 * @readonly
 		 * @default true
 		 */
-		this._depthLayer = 0;
+		this.depthLayer = 0;
 
 	}
 
@@ -434,7 +410,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			if ( depthTexture.isDepthArrayTexture ) {
 
-				shadowPassVertical = shadowPassVertical.depth( this._depthLayer );
+				shadowPassVertical = shadowPassVertical.depth( this.depthLayer );
 
 			}
 
@@ -442,7 +418,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			if ( depthTexture.isDepthArrayTexture ) {
 
-				shadowPassHorizontal = shadowPassHorizontal.depth( this._depthLayer );
+				shadowPassHorizontal = shadowPassHorizontal.depth( this.depthLayer );
 
 			}
 
@@ -451,11 +427,11 @@ class ShadowNode extends ShadowBaseNode {
 			const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 			let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this._depthLayer } ).context( builder.getSharedContext() );
+			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
 			material.name = 'VSMVertical';
 
 			material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this._depthLayer } ).context( builder.getSharedContext() );
+			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
 			material.name = 'VSMHorizontal';
 
 		}
@@ -480,13 +456,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowDepthTexture = ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
 
-		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow, depthLayer: this._depthLayer } );
+		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow, depthLayer: this.depthLayer } );
 
 		let shadowColor = texture( shadowMap.texture, shadowCoord );
 
 		if ( depthTexture.isDepthArrayTexture ) {
 
-			shadowColor = shadowColor.depth( this._depthLayer );
+			shadowColor = shadowColor.depth( this.depthLayer );
 
 		}
 
@@ -587,25 +563,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		scene.overrideMaterial = getShadowMaterial( light );
 
-		renderer.setRenderObjectFunction( ( object, scene, _camera, geometry, material, group, ...params ) => {
-
-			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
-
-				if ( useVelocity ) {
-
-					getDataFromObject( object ).useVelocity = true;
-
-				}
-
-				object.onBeforeShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
-
-				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
-
-				object.onAfterShadow( renderer, object, camera, shadow.camera, geometry, scene.overrideMaterial, group );
-
-			}
-
-		} );
+		renderer.setRenderObjectFunction( getRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 
 		renderer.setRenderTarget( shadowMap );
 

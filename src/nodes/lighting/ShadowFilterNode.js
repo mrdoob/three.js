@@ -1,9 +1,14 @@
-import { float, vec2, If, Fn } from '../tsl/TSLBase.js';
+import { float, vec2, vec4, If, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { mix, fract, step, max, clamp } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { objectPosition } from '../accessors/Object3DNode.js';
+import { positionWorld } from '../accessors/Position.js';
+
+const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 
 /**
  * A shadow filtering function performing basic filtering. This is in fact an unfiltered version of the shadow map
@@ -207,3 +212,52 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 	return occlusion;
 
 } );
+
+
+
+const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
+
+	let dist = positionWorld.sub( position ).length();
+	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
+	dist = dist.saturate(); // clamp to [ 0, 1 ]
+
+	return dist;
+
+} );
+
+const linearShadowDistance = ( light ) => {
+
+	const camera = light.shadow.camera;
+
+	const nearDistance = reference( 'near', 'float', camera ).setGroup( renderGroup );
+	const farDistance = reference( 'far', 'float', camera ).setGroup( renderGroup );
+
+	const referencePosition = objectPosition( light );
+
+	return linearDistance( referencePosition, nearDistance, farDistance );
+
+};
+
+export const getShadowMaterial = ( light ) => {
+
+	let material = shadowMaterialLib.get( light );
+
+	if ( material === undefined ) {
+
+		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
+
+		material = new NodeMaterial();
+		material.colorNode = vec4( 0, 0, 0, 1 );
+		material.depthNode = depthNode;
+		material.isShadowPassMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
+		material.name = 'ShadowMaterial';
+		material.fog = false;
+
+		shadowMaterialLib.set( light, material );
+
+	}
+
+	return material;
+
+};
+
