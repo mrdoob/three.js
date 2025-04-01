@@ -8,6 +8,7 @@ import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTa
  * Returns the bitangent node and assigns it to a varying if the material is not flat shaded.
  *
  * @tsl
+ * @private
  * @param {Node<vec3>} crossNormalTangent - The cross product of the normal and tangent vectors.
  * @param {string} varyingName - The name of the varying to assign the bitangent to.
  * @returns {Node<vec3>} The bitangent node.
