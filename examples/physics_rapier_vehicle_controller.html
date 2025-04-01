@@ -174,7 +174,8 @@
 
 				mesh.position.y = 1;
 
-				chassis = physics.addMesh( mesh, 10, 0.8 );
+				physics.addMesh( mesh, 10, 0.8 ); // addMesh places the RigidBody in the mesh.userData.physics object
+				chassis = mesh.userData.physics.body;
 
 				vehicleController = physics.world.createVehicleController( chassis );
 
