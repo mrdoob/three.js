@@ -16,7 +16,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> vehicle controller
 			<p>WASD or Arrow keys to move</p>
-    		<p>Space to brake</p>
+			<p>Space to brake</p>
    			<p>R to reset</p>
 		</div>
 
@@ -133,7 +133,7 @@
 					if ( event.key === 'r' ) movement.reset = true;
 					if ( event.key === ' ' ) movement.brake = 1;
 			
-	} );
+				} );
 
 				window.addEventListener( 'keyup', ( event ) => {
 
@@ -142,7 +142,7 @@
 					if ( event.key === 'r' ) movement.reset = false;
 					if ( event.key === ' ' ) movement.brake = 0;
 			
-	} );
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
