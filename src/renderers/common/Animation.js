@@ -34,7 +34,7 @@ class Animation {
 		 *
 		 * @type {Window|XRSession}
 		 */
-		this._context = self;
+		this._context = typeof self !== 'undefined' ? self : null;
 
 		/**
 		 * The user-defined animation loop.
