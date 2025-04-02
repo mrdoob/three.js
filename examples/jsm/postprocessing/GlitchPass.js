@@ -50,7 +50,7 @@ class GlitchPass extends Pass {
 		} );
 
 		/**
-		 * Whether to noticeably increase the effect instensity or not.
+		 * Whether to noticeably increase the effect intensity or not.
 		 *
 		 * @type {boolean}
 		 * @default false

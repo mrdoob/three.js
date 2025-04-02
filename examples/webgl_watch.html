@@ -18,7 +18,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"tween": "./jsm/libs/tween.module.js" 
+					"tween": "./jsm/libs/tween.module.js"
 				}
 			}
 		</script>
@@ -112,15 +112,15 @@
 
 											child.receiveShadow = true;
 										    child.castShadow = true;
-			
+
 										}
-			
+
 									}
 
 									meshs[ child.name ] = child;
-			
+
 								}
-			
+
 							} );
 
 							scene.add( gltf.scene );
@@ -167,7 +167,7 @@
 				shadowCam.left = shadowCam.bottom = - s;
 				// debug shadow
 				//scene.add(  new THREE.CameraHelper(shadowCam) );
-			
+
 				pointLight = new THREE.PointLight( 0x7b8cad, 1, 0, 2 );
 				pointLight.position.set( 0.3, - 0.2, - 0.2 );
 				scene.add( pointLight );
@@ -224,14 +224,14 @@
 					bloomPass.threshold = setting.threshold;
 					bloomPass.strength = setting.strength;
 					bloomPass.radius = setting.radius;
-			
+
 					fxaaPass = new ShaderPass( FXAAShader );
 					const pixelRatio = renderer.getPixelRatio();
 					fxaaPass.material.uniforms[ 'resolution' ].value.set( 1 / ( window.innerWidth * pixelRatio ), 1 / ( window.innerHeight * pixelRatio ) );
 
 					composer = new EffectComposer( renderer );
 					composer.setPixelRatio( pixelRatio );
-			
+
 					composer.addPass( renderPass );
 					composer.addPass( bloomPass );
 					composer.addPass( fxaaPass );
@@ -264,7 +264,7 @@
 				gui.add( setting, 'threshold', 0, 1, 0.01 ).onChange( upBloom );
 				gui.add( setting, 'strength', 0, 3, 0.01 ).onChange( upBloom );
 				gui.add( setting, 'radius', 0, 1, 0.01 ).onChange( upBloom );
-			
+
 			}
 
 			function upMaterial() {
@@ -272,7 +272,7 @@
 				materials.Gold.metalness = materials.Silver.metalness = setting.metalness;
 				materials.Gold.roughness = materials.Silver.roughness = setting.roughness;
 				meshs.glass.material.opacity = setting.opacity;
-			
+
 			}
 
 			function upBloom() {
@@ -291,8 +291,8 @@
 				const minute = currentDate.getMinutes();
 				const second = currentDate.getSeconds();
 				let day = currentDate.getDay();
-				const mounth = currentDate.getMonth();
-				const mili = currentDate.getMilliseconds();
+				const month = currentDate.getMonth();
+				const milli = currentDate.getMilliseconds();
 				if ( hour >= 12 ) hour -= 12;
 				if ( day > 30 ) day = 30;
 
@@ -300,8 +300,8 @@
 				meshs.minute.rotation.y = - minute * 6 * torad;
 				meshs.second.rotation.y = - second * 6 * torad;
 				meshs.mini_03.rotation.y = - day * 12 * torad;
-				meshs.mini_02.rotation.y = - mounth * 30 * torad;
-				meshs.mini_01.rotation.y = - mili * 0.36 * torad;
+				meshs.mini_02.rotation.y = - month * 30 * torad;
+				meshs.mini_01.rotation.y = - milli * 0.36 * torad;
 
 			}
 
@@ -320,9 +320,9 @@
 
 						const pr = renderer.getPixelRatio();
 						fxaaPass.material.uniforms[ 'resolution' ].value.set( 1 / ( width * pr ), 1 / ( height * pr ) );
-			
+
 					}
-			
+
 				}
 
 			}
@@ -334,7 +334,7 @@
 				controls.update();
 
 				TWEEN.update();
-			
+
 				if ( composer ) composer.render();
 				else renderer.render( scene, camera );
 

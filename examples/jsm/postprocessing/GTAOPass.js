@@ -366,7 +366,7 @@ class GTAOPass extends Pass {
 	}
 
 	/**
-	 * Updates the GTAO material from the given paramter object.
+	 * Updates the GTAO material from the given parameter object.
 	 *
 	 * @param {Object} parameters - The GTAO material parameters.
 	 */
@@ -420,7 +420,7 @@ class GTAOPass extends Pass {
 	}
 
 	/**
-	 * Updates the Denoise material from the given paramter object.
+	 * Updates the Denoise material from the given parameter object.
 	 *
 	 * @param {Object} parameters - The denoise parameters.
 	 */

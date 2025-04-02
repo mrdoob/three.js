@@ -82,7 +82,7 @@ class RenderTransitionPass extends Pass {
 	 * Sets the transition factor. Must be in the range `[0,1]`.
 	 * This value determines to what degree both scenes are mixed.
 	 *
-	 * @param {boolenumberan} value - The transition factor.
+	 * @param {boolean|number} value - The transition factor.
 	 */
 	setTransition( value ) {
 
@@ -116,7 +116,7 @@ class RenderTransitionPass extends Pass {
 	 * Sets the texture threshold. This value defined how strong the texture effects
 	 * the transition. Must be in the range `[0,1]` (0 means full effect, 1 means no effect).
 	 *
-	 * @param {boolenumberan} value - The threshold value.
+	 * @param {boolean|number} value - The threshold value.
 	 */
 	setTextureThreshold( value ) {
 

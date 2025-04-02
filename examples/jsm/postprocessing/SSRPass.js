@@ -100,7 +100,7 @@ class SSRPass extends Pass {
 		this.groundReflector = groundReflector;
 
 		/**
-		 * The opactiy.
+		 * The opacity.
 		 *
 		 * @type {number}
 		 * @default 0.5
@@ -221,7 +221,7 @@ class SSRPass extends Pass {
 		this._distanceAttenuation = SSRShader.defines.DISTANCE_ATTENUATION;
 
 		/**
-		 * Whether to use distance attenutation or not.
+		 * Whether to use distance attenuation or not.
 		 *
 		 * @name SSRPass#distanceAttenuation
 		 * @type {boolean}
