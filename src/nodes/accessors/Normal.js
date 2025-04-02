@@ -71,7 +71,19 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+export const normalWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	let normal = normalView.transformDirection( cameraViewMatrix );
+
+	if ( builder.material.flatShading !== true ) {
+
+		normal = varying( normal, 'v_normalWorld' );
+
+	}
+
+	return normal;
+
+}, 'vec3' ).once() )().normalize().toVar( 'normalWorld' );
 
 /**
  * TSL object that represents the transformed vertex normal in view space of the current rendered object.
