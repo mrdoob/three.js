@@ -19,6 +19,10 @@ import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getRenderObjectFunc
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
 
+const _vec3Temp1 = /*@__PURE__*/ new Vector3();
+const _vec3Temp2 = /*@__PURE__*/ new Vector3();
+const _vec3Temp3 = /*@__PURE__*/ new Vector3();
+const _quatTemp1 = /*@__PURE__*/ new Quaternion();
 
 class LwLight extends Object3D {
 
@@ -301,14 +305,14 @@ class TileShadowNode extends ShadowBaseNode {
 
 	syncLightTransformation( lwLight, sourceLight ) {
 
-		const sourceWorldPos = sourceLight.getWorldPosition( new Vector3() );
-		const targetWorldPos = sourceLight.target.getWorldPosition( new Vector3() );
-		const forward = new Vector3().subVectors( targetWorldPos, sourceWorldPos );
+		const sourceWorldPos = sourceLight.getWorldPosition( _vec3Temp1 );
+		const targetWorldPos = sourceLight.target.getWorldPosition( _vec3Temp2 );
+		const forward = _vec3Temp3.subVectors( targetWorldPos, sourceWorldPos );
 		const targetDistance = forward.length();
 		forward.normalize();
 		lwLight.position.copy( sourceWorldPos );
 		lwLight.target.position.copy( sourceWorldPos ).add( forward.multiplyScalar( targetDistance ) );
-		lwLight.quaternion.copy( sourceLight.getWorldQuaternion( new Quaternion() ) );
+		lwLight.quaternion.copy( sourceLight.getWorldQuaternion( _quatTemp1 ) );
 		lwLight.scale.copy( sourceLight.scale );
 		lwLight.updateMatrix();
 		lwLight.updateMatrixWorld( true );
