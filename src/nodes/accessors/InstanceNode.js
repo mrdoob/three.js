@@ -2,7 +2,7 @@ import Node from '../core/Node.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
-import { positionLocal, positionPrevious } from './Position.js';
+import { positionLocal } from './Position.js';
 import { nodeProxy, vec3, mat4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
@@ -163,9 +163,6 @@ class InstanceNode extends Node {
 
 		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
 		positionLocal.assign( instancePosition );
-
-		const instancePositionPrevious = instanceMatrixNode.mul( positionPrevious ).xyz;
-		positionPrevious.assign( instancePositionPrevious );
 
 		// NORMAL
 
