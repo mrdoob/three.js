@@ -58,7 +58,10 @@ const wgslTypeLib = {
 	'texture_multisampled_2d': 'cubeTexture',
 
 	'texture_depth_2d': 'depthTexture',
+	'texture_depth_2d_array': 'depthTexture',
 	'texture_depth_multisampled_2d': 'depthTexture',
+	'texture_depth_cube': 'depthTexture',
+	'texture_depth_cube_array': 'depthTexture',
 
 	'texture_3d': 'texture3D',
 

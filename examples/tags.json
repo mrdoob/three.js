@@ -155,5 +155,6 @@
 	"webgpu_tonemapping": [ "gltf" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
 	"webgpu_ocean": [ "water" ],
-	"webgpu_video_frame": [ "webcodecs" ]
+	"webgpu_video_frame": [ "webcodecs" ],
+	"webgpu_shadowmap_array": [ "tile" ]
 }

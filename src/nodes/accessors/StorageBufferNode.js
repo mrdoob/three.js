@@ -60,6 +60,12 @@ class StorageBufferNode extends BufferNode {
 			nodeType = 'struct';
 			structTypeNode = bufferType.layout;
 
+			if ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) {
+
+				bufferCount = value.count;
+
+			}
+
 		} else if ( bufferType === null && ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) ) {
 
 			nodeType = getTypeFromLength( value.itemSize );

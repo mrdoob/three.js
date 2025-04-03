@@ -343,6 +343,20 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Internal to determine if the current render target is a render target array with depth 2D array texture.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {boolean} Whether the render target is a render target array with depth 2D array texture.
+	 *
+	 * @private
+	 */
+	_isRenderCameraDepthArray( renderContext ) {
+
+		return renderContext.depthTexture && renderContext.depthTexture.isDepthArrayTexture && renderContext.camera.isArrayCamera;
+
+	}
+
+	/**
 	 * Returns the render pass descriptor for the given render context.
 	 *
 	 * @private
@@ -397,6 +411,8 @@ class WebGPUBackend extends Backend {
 
 			let sliceIndex;
 
+			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( renderContext );
+
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
@@ -420,32 +436,60 @@ class WebGPUBackend extends Backend {
 
 				} else if ( renderTarget.isRenderTargetArray ) {
 
-					viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
-					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+					if ( isRenderCameraDepthArray === true ) {
+
+						const cameras = renderContext.camera.cameras;
+						for ( let layer = 0; layer < cameras.length; layer ++ ) {
+
+							const layerViewDescriptor = {
+								...viewDescriptor,
+								baseArrayLayer: layer,
+								arrayLayerCount: 1,
+								dimension: GPUTextureViewDimension.TwoD
+							};
+							const textureView = textureData.texture.createView( layerViewDescriptor );
+							textureViews.push( {
+								view: textureView,
+								resolveTarget: undefined,
+								depthSlice: undefined
+							} );
+
+						}
+
+					} else {
+
+						viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
+						viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+					}
 
 				}
 
-				const textureView = textureData.texture.createView( viewDescriptor );
+				if ( isRenderCameraDepthArray !== true ) {
 
-				let view, resolveTarget;
+					const textureView = textureData.texture.createView( viewDescriptor );
 
-				if ( textureData.msaaTexture !== undefined ) {
+					let view, resolveTarget;
 
-					view = textureData.msaaTexture.createView();
-					resolveTarget = textureView;
+					if ( textureData.msaaTexture !== undefined ) {
 
-				} else {
+						view = textureData.msaaTexture.createView();
+						resolveTarget = textureView;
 
-					view = textureView;
-					resolveTarget = undefined;
+					} else {
+
+						view = textureView;
+						resolveTarget = undefined;
+
+					}
+
+					textureViews.push( {
+						view,
+						resolveTarget,
+						depthSlice: sliceIndex
+					} );
 
 				}
-
-				textureViews.push( {
-					view,
-					resolveTarget,
-					depthSlice: sliceIndex
-				} );
 
 			}
 
@@ -454,7 +498,16 @@ class WebGPUBackend extends Backend {
 			if ( renderContext.depth ) {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
-				descriptorBase.depthStencilView = depthTextureData.texture.createView();
+				const options = {};
+				if ( renderContext.depthTexture.isDepthArrayTexture ) {
+
+					options.dimension = GPUTextureViewDimension.TwoD;
+					options.arrayLayerCount = 1;
+					options.baseArrayLayer = renderContext.activeCubeFace;
+
+				}
+
+				descriptorBase.depthStencilView = depthTextureData.texture.createView( options );
 
 			}
 
@@ -576,14 +629,14 @@ class WebGPUBackend extends Backend {
 
 					colorAttachment.clearValue = i === 0 ? renderContext.clearColorValue : { r: 0, g: 0, b: 0, a: 1 };
 					colorAttachment.loadOp = GPULoadOp.Clear;
-					colorAttachment.storeOp = GPUStoreOp.Store;
 
 				} else {
 
 					colorAttachment.loadOp = GPULoadOp.Load;
-					colorAttachment.storeOp = GPUStoreOp.Store;
 
 				}
+
+				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			}
 
@@ -595,14 +648,14 @@ class WebGPUBackend extends Backend {
 
 				colorAttachment.clearValue = renderContext.clearColorValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
-				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			} else {
 
 				colorAttachment.loadOp = GPULoadOp.Load;
-				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			}
+
+		  	colorAttachment.storeOp = GPUStoreOp.Store;
 
 		}
 
@@ -614,60 +667,235 @@ class WebGPUBackend extends Backend {
 
 				depthStencilAttachment.depthClearValue = renderContext.clearDepthValue;
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
-				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			} else {
 
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			}
+
+		  depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 		}
 
 		if ( renderContext.stencil ) {
 
-			if ( renderContext.clearStencil ) {
+		  if ( renderContext.clearStencil ) {
 
 				depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
-				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 			} else {
 
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
-				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 			}
+
+		  depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 
 		//
 
 		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
-		const currentPass = encoder.beginRenderPass( descriptor );
+
+		// shadow arrays - prepare bundle encoders for each camera in an array camera
+
+		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
+
+			const cameras = renderContext.camera.cameras;
+
+			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length ) {
+
+				this._createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
+
+			} else {
+
+				this._updateDepthLayerDescriptors( renderContext, renderContextData, cameras );
+
+			}
+
+			// Create bundle encoders for each layer
+			renderContextData.bundleEncoders = [];
+			renderContextData.bundleSets = [];
+
+			// Create separate bundle encoders for each camera in the array
+			for ( let i = 0; i < cameras.length; i ++ ) {
+
+				const bundleEncoder = this.pipelineUtils.createBundleEncoder(
+					renderContext,
+					'renderBundleArrayCamera_' + i
+				);
+
+				// Initialize state tracking for this bundle
+				const bundleSets = {
+					attributes: {},
+					bindingGroups: [],
+					pipeline: null,
+					index: null
+				};
+
+				renderContextData.bundleEncoders.push( bundleEncoder );
+				renderContextData.bundleSets.push( bundleSets );
+
+			}
+
+			// We'll complete the bundles in finishRender
+			renderContextData.currentPass = null;
+
+		} else {
+
+			const currentPass = encoder.beginRenderPass( descriptor );
+			renderContextData.currentPass = currentPass;
+
+			if ( renderContext.viewport ) {
+
+				this.updateViewport( renderContext );
+
+			}
+
+			if ( renderContext.scissor ) {
+
+				const { x, y, width, height } = renderContext.scissorValue;
+				currentPass.setScissorRect( x, y, width, height );
+
+			}
+
+		}
 
 		//
 
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
-		renderContextData.currentPass = currentPass;
 		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.renderBundles = [];
 
-		//
+	}
 
-		if ( renderContext.viewport ) {
+	/**
+	 * This method creates layer descriptors for each camera in an array camera
+	 * to prepare for rendering to a depth array texture.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} renderContextData - The render context data.
+	 * @param {Object} descriptor  - The render pass descriptor.
+	 * @param {ArrayCamera} cameras - The array camera.
+	 *
+	 * @private
+	 */
+	_createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
 
-			this.updateViewport( renderContext );
+		const depthStencilAttachment = descriptor.depthStencilAttachment;
+		renderContextData.layerDescriptors = [];
+
+		const depthTextureData = this.get( renderContext.depthTexture );
+		if ( ! depthTextureData.viewCache ) {
+
+			depthTextureData.viewCache = [];
 
 		}
 
-		if ( renderContext.scissor ) {
+		for ( let i = 0; i < cameras.length; i ++ ) {
 
-			const { x, y, width, height } = renderContext.scissorValue;
+			const layerDescriptor = {
+				...descriptor,
+				colorAttachments: [ {
+					...descriptor.colorAttachments[ 0 ],
+					view: descriptor.colorAttachments[ i ].view
+				} ]
+			};
 
-			currentPass.setScissorRect( x, y, width, height );
+			if ( descriptor.depthStencilAttachment ) {
+
+				const layerIndex = i;
+
+				if ( ! depthTextureData.viewCache[ layerIndex ] ) {
+
+					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( {
+						dimension: GPUTextureViewDimension.TwoD,
+						baseArrayLayer: i,
+						arrayLayerCount: 1
+					} );
+
+				}
+
+				layerDescriptor.depthStencilAttachment = {
+					view: depthTextureData.viewCache[ layerIndex ],
+					depthLoadOp: depthStencilAttachment.depthLoadOp || GPULoadOp.Clear,
+					depthStoreOp: depthStencilAttachment.depthStoreOp || GPUStoreOp.Store,
+					depthClearValue: depthStencilAttachment.depthClearValue || 1.0
+				};
+
+				if ( renderContext.stencil ) {
+
+					layerDescriptor.depthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
+					layerDescriptor.depthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
+					layerDescriptor.depthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
+
+				}
+
+			} else {
+
+				layerDescriptor.depthStencilAttachment = { ...depthStencilAttachment };
+
+			}
+
+			renderContextData.layerDescriptors.push( layerDescriptor );
+
+		}
+
+	}
+
+	/**
+	 * This method updates the layer descriptors for each camera in an array camera
+	 * to prepare for rendering to a depth array texture.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} renderContextData - The render context data.
+	 * @param {ArrayCamera} cameras - The array camera.
+	 *
+	 */
+	_updateDepthLayerDescriptors( renderContext, renderContextData, cameras ) {
+
+		for ( let i = 0; i < cameras.length; i ++ ) {
+
+			const layerDescriptor = renderContextData.layerDescriptors[ i ];
+
+			if ( layerDescriptor.depthStencilAttachment ) {
+
+				const depthAttachment = layerDescriptor.depthStencilAttachment;
+
+				if ( renderContext.depth ) {
+
+					if ( renderContext.clearDepth ) {
+
+						depthAttachment.depthClearValue = renderContext.clearDepthValue;
+						depthAttachment.depthLoadOp = GPULoadOp.Clear;
+
+					} else {
+
+						depthAttachment.depthLoadOp = GPULoadOp.Load;
+
+					}
+
+				}
+
+				if ( renderContext.stencil ) {
+
+					if ( renderContext.clearStencil ) {
+
+						depthAttachment.stencilClearValue = renderContext.clearStencilValue;
+						depthAttachment.stencilLoadOp = GPULoadOp.Clear;
+
+					} else {
+
+						depthAttachment.stencilLoadOp = GPULoadOp.Load;
+
+					}
+
+				}
+
+			}
 
 		}
 
@@ -696,7 +924,55 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		renderContextData.currentPass.end();
+		// shadow arrays - Execute bundles for each layer
+
+		const encoder = renderContextData.encoder;
+
+		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
+
+		  const bundles = [];
+
+		  for ( let i = 0; i < renderContextData.bundleEncoders.length; i ++ ) {
+
+				const bundleEncoder = renderContextData.bundleEncoders[ i ];
+				bundles.push( bundleEncoder.finish() );
+
+			}
+
+		  for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
+
+				if ( i < bundles.length ) {
+
+					const layerDescriptor = renderContextData.layerDescriptors[ i ];
+					const renderPass = encoder.beginRenderPass( layerDescriptor );
+
+					if ( renderContext.viewport ) {
+
+						const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+						renderPass.setViewport( x, y, width, height, minDepth, maxDepth );
+
+					}
+
+					if ( renderContext.scissor ) {
+
+						const { x, y, width, height } = renderContext.scissorValue;
+						renderPass.setScissorRect( x, y, width, height );
+
+					}
+
+					renderPass.executeBundles( [ bundles[ i ] ] );
+
+					renderPass.end();
+
+				}
+
+			}
+
+		} else if ( renderContextData.currentPass ) {
+
+		  renderContextData.currentPass.end();
+
+		}
 
 		if ( occlusionQueryCount > 0 ) {
 
@@ -1123,123 +1399,89 @@ class WebGPUBackend extends Backend {
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		const currentSets = renderContextData.currentSets;
-		const passEncoderGPU = renderContextData.currentPass;
+
+		const index = renderObject.getIndex();
+		const hasIndex = ( index !== null );
+
 
 		const drawParams = renderObject.getDrawParameters();
-
 		if ( drawParams === null ) return;
 
 		// pipeline
 
-		if ( currentSets.pipeline !== pipelineGPU ) {
+		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
 
+			// pipeline
 			passEncoderGPU.setPipeline( pipelineGPU );
-
 			currentSets.pipeline = pipelineGPU;
 
-		}
+			// bind groups
+			const currentBindingGroups = currentSets.bindingGroups;
+			for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
-		// bind groups
+				const bindGroup = bindings[ i ];
+				const bindingsData = this.get( bindGroup );
+				if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
 
-		const currentBindingGroups = currentSets.bindingGroups;
-
-		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
-
-			const bindGroup = bindings[ i ];
-			const bindingsData = this.get( bindGroup );
-
-			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
-
-				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
-				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
-
-			}
-
-		}
-
-		// attributes
-
-		const index = renderObject.getIndex();
-
-		const hasIndex = ( index !== null );
-
-		// index
-
-		if ( hasIndex === true ) {
-
-			if ( currentSets.index !== index ) {
-
-				const buffer = this.get( index ).buffer;
-				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
-
-				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
-
-				currentSets.index = index;
-
-			}
-
-		}
-
-		// vertex buffers
-
-		const vertexBuffers = renderObject.getVertexBuffers();
-
-		for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
-
-			const vertexBuffer = vertexBuffers[ i ];
-
-			if ( currentSets.attributes[ i ] !== vertexBuffer ) {
-
-				const buffer = this.get( vertexBuffer ).buffer;
-				passEncoderGPU.setVertexBuffer( i, buffer );
-
-				currentSets.attributes[ i ] = vertexBuffer;
-
-			}
-
-		}
-
-		// occlusion queries - handle multiple consecutive draw calls for an object
-
-		if ( renderContextData.occlusionQuerySet !== undefined ) {
-
-			const lastObject = renderContextData.lastOcclusionObject;
-
-			if ( lastObject !== object ) {
-
-				if ( lastObject !== null && lastObject.occlusionTest === true ) {
-
-					passEncoderGPU.endOcclusionQuery();
-					renderContextData.occlusionQueryIndex ++;
+					passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+					currentBindingGroups[ bindGroup.index ] = bindGroup.id;
 
 				}
 
-				if ( object.occlusionTest === true ) {
+			}
 
-					passEncoderGPU.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
-					renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
+			// attributes
+
+			// index
+
+			if ( hasIndex === true ) {
+
+				if ( currentSets.index !== index ) {
+
+					const buffer = this.get( index ).buffer;
+					const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+					passEncoderGPU.setIndexBuffer( buffer, indexFormat );
+
+					currentSets.index = index;
 
 				}
 
-				renderContextData.lastOcclusionObject = object;
+			}
+			// vertex buffers
+
+			const vertexBuffers = renderObject.getVertexBuffers();
+
+			for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
+
+				const vertexBuffer = vertexBuffers[ i ];
+
+				if ( currentSets.attributes[ i ] !== vertexBuffer ) {
+
+					const buffer = this.get( vertexBuffer ).buffer;
+					passEncoderGPU.setVertexBuffer( i, buffer );
+
+					currentSets.attributes[ i ] = vertexBuffer;
+
+				}
+
+			}
+			// stencil
+
+			if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
+
+				passEncoderGPU.setStencilReference( material.stencilRef );
+				renderContextData.currentStencilRef = material.stencilRef;
 
 			}
 
-		}
 
-		// stencil
+		};
 
-		if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
+		// Define draw function
+		const draw = ( passEncoderGPU, currentSets ) => {
 
-			passEncoderGPU.setStencilReference( material.stencilRef );
-			renderContextData.currentStencilRef = material.stencilRef;
-
-		}
-
-		// draw
-
-		const draw = () => {
+			setPipelineAndBindings( passEncoderGPU, currentSets );
 
 			if ( object.isBatchedMesh === true ) {
 
@@ -1355,18 +1597,45 @@ class WebGPUBackend extends Backend {
 
 					const vp = subCamera.viewport;
 
-					passEncoderGPU.setViewport(
-						Math.floor( vp.x * pixelRatio ),
-						Math.floor( vp.y * pixelRatio ),
-						Math.floor( vp.width * pixelRatio ),
-						Math.floor( vp.height * pixelRatio ),
-						context.viewportValue.minDepth,
-						context.viewportValue.maxDepth
-					);
 
-					passEncoderGPU.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
 
-					draw();
+					let pass = renderContextData.currentPass;
+					let sets = renderContextData.currentSets;
+					if ( renderContextData.bundleEncoders ) {
+
+						const bundleEncoder = renderContextData.bundleEncoders[ i ];
+						const bundleSets = renderContextData.bundleSets[ i ];
+						pass = bundleEncoder;
+						sets = bundleSets;
+
+					}
+
+
+
+					if ( vp ) {
+
+						pass.setViewport(
+							Math.floor( vp.x * pixelRatio ),
+							Math.floor( vp.y * pixelRatio ),
+							Math.floor( vp.width * pixelRatio ),
+							Math.floor( vp.height * pixelRatio ),
+							context.viewportValue.minDepth,
+							context.viewportValue.maxDepth
+						);
+
+					}
+
+
+					// Set camera index binding for this layer
+					if ( cameraIndex && cameraData.indexesGPU ) {
+
+						pass.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
+						sets.bindingGroups[ cameraIndex.index ] = cameraIndex.id;
+
+					}
+
+					draw( pass, sets );
+
 
 				}
 
@@ -1374,7 +1643,38 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			draw();
+		  // Regular single camera rendering
+		  if ( renderContextData.currentPass ) {
+
+				// Handle occlusion queries
+				if ( renderContextData.occlusionQuerySet !== undefined ) {
+
+					const lastObject = renderContextData.lastOcclusionObject;
+					if ( lastObject !== object ) {
+
+						if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+							renderContextData.currentPass.endOcclusionQuery();
+							renderContextData.occlusionQueryIndex ++;
+
+						}
+
+						if ( object.occlusionTest === true ) {
+
+							renderContextData.currentPass.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
+							renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
+
+						}
+
+						renderContextData.lastOcclusionObject = object;
+
+					}
+
+				}
+
+				draw( renderContextData.currentPass, renderContextData.currentSets );
+
+			}
 
 		}
 
