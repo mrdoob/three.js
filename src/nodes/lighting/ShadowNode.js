@@ -36,7 +36,7 @@ import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFil
  * @param {Group} group - The group the object belongs to.
  * @param {...any} params - Additional parameters for rendering.
  */
-export const getRenderShadowObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
+export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
 	return ( object, scene, _camera, geometry, material, group, ...params ) => {
 

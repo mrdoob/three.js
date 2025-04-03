@@ -14,7 +14,7 @@ import {
 	Quaternion
 } from 'three/webgpu';
 
-import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getRenderShadowObjectFunction } from 'three/tsl';
+import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getShadowRenderObjectFunction } from 'three/tsl';
 
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
@@ -285,7 +285,7 @@ class TileShadowNode extends ShadowBaseNode {
 			shadow.camera.layers.mask = camera.layers.mask;
 			shadow.updateMatrices( light );
 
-			renderer.setRenderObjectFunction( getRenderShadowObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+			renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
 		}
