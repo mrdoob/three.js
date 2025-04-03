@@ -34,8 +34,29 @@ class LwLight extends Object3D {
 	}
 
 }
+
+/**
+ * A class that extends `ShadowBaseNode` to implement tiled shadow mapping.
+ * This allows splitting a shadow map into multiple tiles, each with its own light and camera,
+ * to improve shadow quality and performance for large scenes.
+ *
+ * **Note:** This class does not support `VSMShadowMap` at the moment.
+ *
+ * @class
+ * @extends ShadowBaseNode
+ */
 class TileShadowNode extends ShadowBaseNode {
 
+	/**
+	 * Creates an instance of `TileShadowNode`.
+	 *
+	 * @param {Light} light - The original light source used for shadow mapping.
+	 * @param {Object} [options={}] - Configuration options for the tiled shadow node.
+	 * @param {number} [options.tilesX=2] - The number of tiles along the X-axis.
+	 * @param {number} [options.tilesY=2] - The number of tiles along the Y-axis.
+	 * @param {Object} [options.resolution] - The resolution of the shadow map.
+	 * @param {boolean} [options.debug=false] - Whether to enable debug mode.
+	 */
 	constructor( light, options = {} ) {
 
 		super( light );
@@ -73,6 +94,13 @@ class TileShadowNode extends ShadowBaseNode {
 
 	}
 
+	/**
+	 * Generates the tiles for the shadow map based on the specified number of tiles along the X and Y axes.
+	 *
+	 * @param {number} tilesX - The number of tiles along the X-axis.
+	 * @param {number} tilesY - The number of tiles along the Y-axis.
+	 * @returns {Array<Object>} An array of tile objects, each containing the tile's bounds and index.
+	 */
 	generateTiles( tilesX, tilesY ) {
 
 		const tiles = [];
@@ -97,6 +125,9 @@ class TileShadowNode extends ShadowBaseNode {
 
 	}
 
+	/**
+	 * Updates the initial light direction based on the light's target position.
+	 */
 	updateLightDirection() {
 
 		this.initialLightDirection.subVectors(
@@ -106,6 +137,11 @@ class TileShadowNode extends ShadowBaseNode {
 
 	}
 
+	/**
+	 * Initializes the tiled shadow node by creating lights, cameras, and shadow maps for each tile.
+	 *
+	 * @param {Builder} builder - The builder used to create render targets and other resources.
+	 */
 	init( builder ) {
 
 		const light = this.originalLight;
@@ -185,6 +221,9 @@ class TileShadowNode extends ShadowBaseNode {
 
 	}
 
+	/**
+	 * Updates the light transformations and shadow cameras for each tile.
+	 */
 	update() {
 
 		const light = this.originalLight;
@@ -303,7 +342,12 @@ class TileShadowNode extends ShadowBaseNode {
 
 	}
 
-
+	/**
+	 * Synchronizes the transformation of a tile light with the source light.
+	 *
+	 * @param {LwLight} lwLight - The tile light to synchronize.
+	 * @param {Light} sourceLight - The source light to copy transformations from.
+	 */
 	syncLightTransformation( lwLight, sourceLight ) {
 
 		const sourceWorldPos = sourceLight.getWorldPosition( _vec3Temp1 );
@@ -322,6 +366,12 @@ class TileShadowNode extends ShadowBaseNode {
 
 	}
 
+	/**
+	 * Sets up the shadow node for rendering.
+	 *
+	 * @param {Builder} builder - The builder used to set up the shadow node.
+	 * @returns {Node} A node representing the shadow value.
+	 */
 	setup( builder ) {
 
 		if ( this.lights.length === 0 ) {
