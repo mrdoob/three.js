@@ -104,6 +104,7 @@
     "eslint-plugin-compat": "^6.0.0",
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
+    "express": "^4.21.2",
     "failonlyreporter": "^1.0.0",
     "jimp": "^1.6.0",
     "jsdoc": "^4.0.4",
