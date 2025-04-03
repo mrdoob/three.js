@@ -14,7 +14,7 @@ class FrustumArray {
 	/**
 	 * Constructs a new frustum array.
 	 *
-    */
+	 */
 	constructor() {
 
 		/**
@@ -22,7 +22,7 @@ class FrustumArray {
 		 *
 		 * @type {WebGLCoordinateSystem|WebGPUCoordinateSystem}
 		 * @default WebGLCoordinateSystem
-		*/
+		 */
 		this.coordinateSystem = WebGLCoordinateSystem;
 
 	}
@@ -34,7 +34,7 @@ class FrustumArray {
 	 * @param {Object3D} object - The 3D object to test.
 	 * @param {Object} cameraArray - An object with a cameras property containing an array of cameras.
 	 * @return {boolean} Whether the 3D object is visible in any camera.
-	*/
+	 */
 	intersectsObject( object, cameraArray ) {
 
 		if ( ! cameraArray.isArrayCamera || cameraArray.cameras.length === 0 ) {
@@ -76,7 +76,7 @@ class FrustumArray {
 	 * @param {Sprite} sprite - The sprite to test.
 	 * @param {Object} cameraArray - An object with a cameras property containing an array of cameras.
 	 * @return {boolean} Whether the sprite is visible in any camera.
-	*/
+	 */
 	intersectsSprite( sprite, cameraArray ) {
 
 		if ( ! cameraArray || ! cameraArray.cameras || cameraArray.cameras.length === 0 ) {
@@ -118,7 +118,7 @@ class FrustumArray {
 	 * @param {Sphere} sphere - The bounding sphere to test.
 	 * @param {Object} cameraArray - An object with a cameras property containing an array of cameras.
 	 * @return {boolean} Whether the sphere is visible in any camera.
-	*/
+	 */
 	intersectsSphere( sphere, cameraArray ) {
 
 		if ( ! cameraArray || ! cameraArray.cameras || cameraArray.cameras.length === 0 ) {
@@ -160,7 +160,7 @@ class FrustumArray {
 	 * @param {Box3} box - The bounding box to test.
 	 * @param {Object} cameraArray - An object with a cameras property containing an array of cameras.
 	 * @return {boolean} Whether the box is visible in any camera.
-	*/
+	 */
 	intersectsBox( box, cameraArray ) {
 
 		if ( ! cameraArray || ! cameraArray.cameras || cameraArray.cameras.length === 0 ) {
@@ -202,7 +202,7 @@ class FrustumArray {
 	 * @param {Vector3} point - The point to test.
 	 * @param {Object} cameraArray - An object with a cameras property containing an array of cameras.
 	 * @return {boolean} Whether the point is visible in any camera.
-	*/
+	 */
 	containsPoint( point, cameraArray ) {
 
 		if ( ! cameraArray || ! cameraArray.cameras || cameraArray.cameras.length === 0 ) {
@@ -241,7 +241,7 @@ class FrustumArray {
 	 * Returns a new frustum array with copied values from this instance.
 	 *
 	 * @return {FrustumArray} A clone of this instance.
-	*/
+	 */
 	clone() {
 
 		return new FrustumArray();

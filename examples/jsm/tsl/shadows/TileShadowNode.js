@@ -14,7 +14,7 @@ import {
 	Quaternion
 } from 'three/webgpu';
 
-import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getRenderObjectFunction } from 'three/tsl';
+import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getRenderShadowObjectFunction } from 'three/tsl';
 
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
@@ -246,7 +246,7 @@ class TileShadowNode extends ShadowBaseNode {
 			shadow.camera.layers.mask = camera.layers.mask;
 			shadow.updateMatrices( light );
 
-			renderer.setRenderObjectFunction( getRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+			renderer.setRenderObjectFunction( getRenderShadowObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
 		}
@@ -256,7 +256,8 @@ class TileShadowNode extends ShadowBaseNode {
 
 		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {
 
-			this.vsmPass( renderer );
+			console.warn( 'THREE.TileShadowNode: VSM shadow map is not supported yet.' );
+			// this.vsmPass( renderer );
 
 		}
 

@@ -228,7 +228,7 @@ class WebGPUPipelineUtils {
 	 * Creates GPU render bundle encoder for the given render context.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
-	 * @param {string} [label='renderBundleEncoder'] - The label.
+	 * @param {?string} [label='renderBundleEncoder'] - The label.
 	 * @return {GPURenderBundleEncoder} The GPU render bundle encoder.
 	 */
 	createBundleEncoder( renderContext, label = 'renderBundleEncoder' ) {

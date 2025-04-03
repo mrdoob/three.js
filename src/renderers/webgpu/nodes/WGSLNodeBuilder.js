@@ -1661,7 +1661,7 @@ ${ flowData.code }
 
 				} else if ( texture.isDepthTexture === true ) {
 
-					textureType = `texture_depth${multisampled}_2d${texture.isDepthArrayTexture === true ? '_array' : ''}`;
+					textureType = `texture_depth${ multisampled }_2d${ texture.isDepthArrayTexture === true ? '_array' : '' }`;
 
 				} else if ( texture.isVideoTexture === true ) {
 

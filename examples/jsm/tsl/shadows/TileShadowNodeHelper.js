@@ -3,12 +3,12 @@ import { Fn, vec4, vec3, texture, uv, positionLocal, vec2, float, screenSize } f
 
 /**
  * Helper class to manage and display debug visuals for TileShadowNode.
-*/
+ */
 class TileShadowNodeHelper extends Group {
 
 	/**
-     * @param {TileShadowNode} tileShadowNode The TileShadowNode instance to debug.
-	*/
+	 * @param {TileShadowNode} tileShadowNode The TileShadowNode instance to debug.
+	 */
 	constructor( tileShadowNode ) {
 
 		super();
@@ -30,9 +30,9 @@ class TileShadowNodeHelper extends Group {
 	}
 
 	/**
-     * Initializes the debug displays (planes and camera helpers).
-     * Should be called after TileShadowNode has initialized its lights and shadow nodes.
-	*/
+	 * Initializes the debug displays (planes and camera helpers).
+	 * Should be called after TileShadowNode has initialized its lights and shadow nodes.
+	 */
 	init() {
 
 		if ( this.tileShadowNode._shadowNodes.length !== this.tiles.length ) {
@@ -148,9 +148,9 @@ class TileShadowNodeHelper extends Group {
 	}
 
 	/**
-     * Updates the debug visuals (specifically camera helpers).
-     * Should be called within TileShadowNode's update method.
-	*/
+	 * Updates the debug visuals (specifically camera helpers).
+	 * Should be called within TileShadowNode's update method.
+	 */
 	update() {
 
 		if ( this.initialized === false ) {
@@ -174,7 +174,7 @@ class TileShadowNodeHelper extends Group {
 
 	/**
      * Removes all debug objects (planes and helpers) from the scene.
-	*/
+	 */
 	dispose() {
 
 		if ( this.scene ) {

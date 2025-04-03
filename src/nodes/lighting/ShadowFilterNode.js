@@ -213,7 +213,7 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 } );
 
-
+//
 
 const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
 
@@ -238,6 +238,18 @@ const linearShadowDistance = ( light ) => {
 
 };
 
+/**
+ * Retrieves or creates a shadow material for the given light source.
+ *
+ * This function checks if a shadow material already exists for the provided light.
+ * If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it
+ * in the `shadowMaterialLib` for future use.
+ *
+ * @param {Light} light - The light source for which the shadow material is needed.
+ *                         If the light is a point light, a depth node is calculated
+ *                         using the linear shadow distance.
+ * @returns {NodeMaterial} The shadow material associated with the given light.
+ */
 export const getShadowMaterial = ( light ) => {
 
 	let material = shadowMaterialLib.get( light );
@@ -260,4 +272,3 @@ export const getShadowMaterial = ( light ) => {
 	return material;
 
 };
-

@@ -18,8 +18,25 @@ import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../
 import { getDataFromObject } from '../core/NodeUtils.js';
 import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
 
-
-export const getRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
+/**
+ * Creates a function to render shadow objects in a scene.
+ *
+ * @param {Renderer} renderer - The renderer.
+ * @param {LightShadow} shadow - The light shadow object containing shadow properties.
+ * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
+ * @param {boolean} useVelocity - Whether to use velocity data for rendering.
+ * @return {Function} A function that renders shadow objects.
+ *
+ * The returned function has the following parameters:
+ * @param {Object3D} object - The 3D object to render.
+ * @param {Scene} scene - The scene containing the object.
+ * @param {Camera} _camera - The camera used for rendering.
+ * @param {BufferGeometry} geometry - The geometry of the object.
+ * @param {Material} material - The material of the object.
+ * @param {Group} group - The group the object belongs to.
+ * @param {...any} params - Additional parameters for rendering.
+ */
+export const getRenderShadowObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
 	return ( object, scene, _camera, geometry, material, group, ...params ) => {
 
@@ -563,7 +580,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		scene.overrideMaterial = getShadowMaterial( light );
 
-		renderer.setRenderObjectFunction( getRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+		renderer.setRenderObjectFunction( getRenderShadowObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 
 		renderer.setRenderTarget( shadowMap );
 
