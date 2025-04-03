@@ -48,8 +48,10 @@
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "dev-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
+    "dev": "node utils/dev/server.js --internal --port=3333 --dev",
+    "dev-ssl": "node utils/dev/server.js --internal --port=3333 --ssl --dev",
+    "preview": "node utils/dev/server.js --internal --port=8080",
+    "preview-ssl": "node utils/dev/server.js --internal --port=8080 --ssl",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
     "lint-examples": "eslint examples --ext .html",
@@ -96,7 +98,6 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
-    "concurrently": "^9.0.0",
     "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
@@ -107,13 +108,13 @@
     "jimp": "^1.6.0",
     "jsdoc": "^4.0.4",
     "magic-string": "^0.30.0",
+    "mkcert": "^3.2.0",
     "pixelmatch": "^7.0.0",
     "puppeteer": "^22.0.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
-    "rollup-plugin-visualizer": "^5.9.0",
-    "servez": "^2.2.4"
+    "rollup-plugin-visualizer": "^5.9.0"
   },
   "overrides": {
     "jpeg-js": "^0.4.4"
