@@ -1,5 +1,5 @@
 import {
-	GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension, GPUFeatureName
+	GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension, GPUFeatureName, GPUTextureViewDimension
 } from './WebGPUConstants.js';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
@@ -267,6 +267,12 @@ class WebGPUTextureUtils {
 
 				this.createDefaultTexture( texture );
 				return;
+
+			}
+
+			if ( texture.isCubeTexture ) {
+
+				textureDescriptorGPU.textureBindingViewDimension = GPUTextureViewDimension.Cube;
 
 			}
 

@@ -63,8 +63,16 @@ class WebGPUBackend extends Backend {
 
 		// some parameters require default values other than "undefined"
 		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
+		this.parameters.compatibilityMode = ( parameters.compatibilityMode === undefined ) ? false : parameters.compatibilityMode;
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
+
+		/**
+		 * Indicates whether the backend is in compatibility mode or not.
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.compatibilityMode = this.parameters.compatibilityMode;
 
 		/**
 		 * A reference to the device.
@@ -168,7 +176,8 @@ class WebGPUBackend extends Backend {
 		if ( parameters.device === undefined ) {
 
 			const adapterOptions = {
-				powerPreference: parameters.powerPreference
+				powerPreference: parameters.powerPreference,
+				featureLevel: parameters.compatibilityMode ? 'compatibility' : undefined
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
