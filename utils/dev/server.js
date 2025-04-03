@@ -244,14 +244,18 @@ function on_request( req, res ) {
 
 function is_certificate_valid( key_path, crt_path ) {
 
-	if ( ! existsSync( key_path ) ) return false;
-	if ( ! existsSync( crt_path ) ) return false;
+	// invalidate if key/crt not exist
+	if ( ! existsSync( key_path ) || ! existsSync( crt_path ) ) return false;
 
-	const key_diff = new Date() - statSync( key_path ).birthtime;
-	const crt_diff = new Date() - statSync( crt_path ).birthtime;
+	const key_age = ( new Date() - statSync( key_path ).birthtime ) / 86400000; // in days
+	const crt_age = ( new Date() - statSync( crt_path ).birthtime ) / 86400000;
 
-	if ( key_diff < 0 || key_diff >= 86400000 ) return false; // 1day margin
-	if ( crt_diff < 0 || crt_diff >= 86400000 ) return false;
+	// invalidate if ages < 0, caused by system clock error for example
+	if ( key_age < 0 || crt_age < 0 ) return false;
+
+	// invalidate if ages expire soon, e.g. 1 day before expiration
+	const max_age = DEFAULT_CERTIFICATE_VALIDITY - 1;
+	if ( key_age >= max_age || crt_age >= max_age ) return false;
 
 	return true;
 
