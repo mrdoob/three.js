@@ -580,7 +580,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		scene.overrideMaterial = getShadowMaterial( light );
 
-		renderer.setRenderObjectFunction( getRenderShadowObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+		renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 
 		renderer.setRenderTarget( shadowMap );
 
