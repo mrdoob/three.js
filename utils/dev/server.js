@@ -26,7 +26,7 @@ import https from 'node:https';
 import { createCA, createCert } from 'mkcert';
 import { join, extname, relative, basename } from 'node:path';
 import { argv, cwd } from 'node:process';
-import { existsSync, createReadStream, writeFileSync, readFileSync, statSync, unlinkSync, readdirSync } from 'node:fs';
+import { existsSync, createReadStream, writeFileSync, readFileSync, statSync, readdirSync, rmSync } from 'node:fs';
 import { styleText, parseArgs } from 'node:util';
 import { networkInterfaces } from 'node:os';
 
@@ -144,8 +144,8 @@ async function create_server() {
 			domains: [ 'a' ]
 		} );
 
-		if ( existsSync( key_path ) ) unlinkSync( key_path );
-		if ( existsSync( crt_path ) ) unlinkSync( crt_path );
+		rmSync( key_path, { force: true } );
+		rmSync( crt_path, { force: true } );
 
 		writeFileSync( key_path, key, { encoding: 'utf-8' } );
 		writeFileSync( crt_path, cert, { encoding: 'utf-8' } );
