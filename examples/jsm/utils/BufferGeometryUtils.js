@@ -11,7 +11,10 @@ import {
 	Vector3,
 } from 'three';
 
-/** @module BufferGeometryUtils */
+/**
+ * @module BufferGeometryUtils
+ * @three_import import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+ */
 
 /**
  * Computes vertex tangents using the MikkTSpace algorithm. MikkTSpace generates the same tangents consistently,

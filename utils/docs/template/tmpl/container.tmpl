@@ -65,6 +65,12 @@
         <?js= self.partial('augments.tmpl', doc) ?>
     <?js } ?>
 
+    <?js if (doc.import) { ?>
+        <h3 class="subsection-title">Import</h3>
+        <?js= doc.name ?> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.
+        <pre class="prettyprint source lang-js"><code><?js= doc.import ?></code></pre>
+    <?js } ?>
+
     <?js if (doc.requires && doc.requires.length) { ?>
         <h3 class="subsection-title">Requires</h3>
 
