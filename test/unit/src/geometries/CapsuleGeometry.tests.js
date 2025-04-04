@@ -16,7 +16,8 @@ export default QUnit.module( 'Geometries', () => {
 				radius: 2,
 				length: 2,
 				capSegments: 20,
-				radialSegments: 20
+				radialSegments: 20,
+				heightSegments: 1
 			};
 
 			geometries = [
@@ -25,6 +26,7 @@ export default QUnit.module( 'Geometries', () => {
 				new CapsuleGeometry( parameters.radius, parameters.length ),
 				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments ),
 				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments, parameters.radialSegments ),
+				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments, parameters.radialSegments, parameters.heightSegments )
 			];
 
 		} );

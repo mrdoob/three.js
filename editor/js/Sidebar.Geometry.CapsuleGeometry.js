@@ -54,6 +54,16 @@ function GeometryParametersPanel( editor, object ) {
 
 	container.add( radialSegmentsRow );
 
+	// heightSegments
+
+	const heightSegmentsRow = new UIRow();
+	const heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+
+	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/capsule_geometry/heightseg' ) ).setClass( 'Label' ) );
+	heightSegmentsRow.add( heightSegments );
+
+	container.add( heightSegmentsRow );
+
 	//
 
 	function refreshUI() {
@@ -64,6 +74,7 @@ function GeometryParametersPanel( editor, object ) {
 		length.setValue( parameters.length );
 		capSegments.setValue( parameters.capSegments );
 		radialSegments.setValue( parameters.radialSegments );
+		heightSegments.setValue( parameters.heightSegments );
 
 	}
 
@@ -85,7 +96,8 @@ function GeometryParametersPanel( editor, object ) {
 			radius.getValue(),
 			length.getValue(),
 			capSegments.getValue(),
-			radialSegments.getValue()
+			radialSegments.getValue(),
+			heightSegments.getValue()
 		) ) );
 
 	}
