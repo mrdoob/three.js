@@ -1,48 +1,48 @@
 <html lang="en">
 	<head>
-		<title>three.js webgpu - storage pbo external element</title>
+		<title>three.js webgpu - centroid sampling</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<style>
 		body {
-    	margin: 0;
-    	overflow: hidden;
-    	width: 100vw;
-    	height: 100vh;
+			margin: 0;
+			overflow: hidden;
+			width: 100vw;
+			height: 100vh;
 		}
 
 		#demo {
-    	display: flex;
-    	flex-direction: row;
-    	align-items: center;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
 		}
 
 		.renderer-wrapper {
-    	display: flex;
-    	flex-direction: column;
-    	align-items: center;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 		}
 
 		#antialising-disabled {
-    	border-right: 1px solid black;
+			border-right: 1px solid black;
 		}
 
 		canvas {
-    	width: 100%;
-    	height: 100%;
+			width: 100%;
+			height: 100%;
 		}
 	</style>
 	<body>
 		<div id="demo">
-    	<div id="antialising-disabled" class="renderer-wrapper">
-      	<div>antialising disabled</div>
-      </div>
-      <div id="antialising-enabled" class="renderer-wrapper">
-        <div>antialising enabled</div>
-      </div>
-    </div>
+			<div id="antialising-disabled" class="renderer-wrapper">
+				<div>antialising disabled</div>
+			</div>
+			<div id="antialising-enabled" class="renderer-wrapper">
+				<div>antialising enabled</div>
+			</div>
+		</div>
 
 		<script type="importmap">
 			{
@@ -144,12 +144,14 @@
 				};
 
 				const material = new THREE.MeshBasicNodeMaterial();
+				const testUV = varying( uv(), 'testUV' );
 
 				const createShader = ( type, sampling ) => {
 
 					return Fn( () => {
 
-						const testUV = varying( uv(), 'testUV' ).setInterpolation( type, sampling );
+						testUV.setInterpolation( type, sampling );
+
 						return texture( canvasTexture, testUV ).rgb;
 
 					} );
@@ -161,7 +163,7 @@
 
 				const withSampleShader = Fn( () => {
 
-					const testUV = varying( uv(), 'testUV' ).setInterpolation( 'perspective', 'sample' );
+					testUV.setInterpolation( THREE.InterpolationSamplingType.PERSPECTIVE, THREE.InterpolationSamplingMode.SAMPLE );
 
 					return texture( canvasTexture, testUV ).rgb;
 
@@ -169,7 +171,7 @@
 
 				const withInterpolationShader = Fn( () => {
 
-					const testUV = varying( uv(), 'testUV' ).setInterpolation( 'perspective', 'centroid' );
+					testUV.setInterpolation( THREE.InterpolationSamplingType.PERSPECTIVE, THREE.InterpolationSamplingMode.CENTROID );
 
 					return texture( canvasTexture, testUV ).rgb;
 
@@ -203,8 +205,9 @@
 				// Create Standard Renderer
 				rendererAntialiasingDisabled = new THREE.WebGPURenderer( {
 					antialias: false,
-					forceWebGL: forceWebGL,
+					forceWebGL: forceWebGL
 				} );
+
 				rendererAntialiasingDisabled.setPixelRatio( window.devicePixelRatio );
 				rendererAntialiasingDisabled.setSize( window.innerWidth / 2, window.innerHeight );
 				rendererAntialiasingDisabled.setAnimationLoop( animateStandard );
@@ -212,8 +215,9 @@
 				// Create antialiased renderer
 				rendererAntialiasingEnabled = new THREE.WebGPURenderer( {
 					antialias: true,
-					forceWebGL: forceWebGL,
+					forceWebGL: forceWebGL
 				} );
+
 				document.body.querySelector( '#antialising-enabled' ).appendChild( rendererAntialiasingEnabled.domElement );
 				rendererAntialiasingEnabled.setPixelRatio( window.devicePixelRatio );
 				rendererAntialiasingEnabled.setSize( window.innerWidth / 2, window.innerHeight );
@@ -222,51 +226,28 @@
 				document.body.querySelector( '#antialising-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
 				document.body.querySelector( '#antialising-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
 
+				onWindowResize();
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				gui = new GUI();
-				gui.add( effectController, 'sampling', [ 'normal', 'centroid', 'sample', 'flat first', 'flat either' ] ).onChange( () => {
+				gui.add( effectController, 'sampling', [
+					THREE.InterpolationSamplingMode.NORMAL,
+					THREE.InterpolationSamplingMode.CENTROID,
+					THREE.InterpolationSamplingMode.SAMPLE,
+					THREE.InterpolationSamplingMode.FLAT_FIRST,
+					THREE.InterpolationSamplingMode.FLAT_EITHER
+				] ).onChange( () => {
 
-					let shader;
+					const interpolationShaderLib = {
+						[ THREE.InterpolationSamplingMode.NORMAL ]: withoutInterpolationShader,
+						[ THREE.InterpolationSamplingMode.CENTROID ]: withInterpolationShader,
+						[ THREE.InterpolationSamplingMode.SAMPLE ]: withSampleShader,
+						[ THREE.InterpolationSamplingMode.FLAT_FIRST ]: withFlatFirstShader,
+						[ THREE.InterpolationSamplingMode.FLAT_EITHER ]: withFlatEitherShader
+					};
 
-					switch ( effectController.sampling ) {
-
-						case 'centroid': {
-
-							shader = withInterpolationShader;
-							break;
-			
-						}
-
-						case 'sample': {
-
-							shader = withSampleShader;
-							break;
-			
-						}
-
-						case 'normal': {
-
-							shader = withoutInterpolationShader;
-							break;
-			
-						}
-
-						case 'flat first': {
-
-							shader = withFlatFirstShader;
-							break;
-			
-						}
-
-						case 'flat either': {
-
-							shader = withFlatEitherShader;
-							break;
-
-						}
-
-					}
+					const shader = interpolationShaderLib[ effectController.sampling ];
 
 					for ( let i = 0; i < faceMeshes.length; i ++ ) {
 
@@ -289,8 +270,6 @@
 			
 				camera.aspect = aspect;
 				camera.updateProjectionMatrix();
-				rendererAntialiasingDisabled.render( scene, camera );
-				rendererAntialiasingEnabled.render( scene, camera );
 
 			}
 
@@ -306,8 +285,6 @@
 			
 			}
 
-
 		</script>
 	</body>
-
 </html>
