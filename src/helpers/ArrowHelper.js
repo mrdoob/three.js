@@ -1,7 +1,7 @@
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Object3D } from '../core/Object3D.js';
-import { CylinderGeometry } from '../geometries/CylinderGeometry.js';
+import { ConeGeometry } from '../geometries/ConeGeometry.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Mesh } from '../objects/Mesh.js';
@@ -53,7 +53,7 @@ class ArrowHelper extends Object3D {
 			_lineGeometry = new BufferGeometry();
 			_lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-			_coneGeometry = new CylinderGeometry( 0, 0.5, 1, 5, 1 );
+			_coneGeometry = new ConeGeometry( 0.5, 1, 5, 1 );
 			_coneGeometry.translate( 0, - 0.5, 0 );
 
 		}
