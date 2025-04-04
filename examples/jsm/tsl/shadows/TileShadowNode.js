@@ -265,6 +265,8 @@ class TileShadowNode extends ShadowBaseNode {
      */
 	updateShadow( frame ) {
 
+		this.update();
+
 		const { shadowMap, light } = this;
 		const { renderer, scene, camera } = frame;
 		const shadowType = renderer.shadowMap.type;
@@ -329,8 +331,11 @@ class TileShadowNode extends ShadowBaseNode {
 
 		if ( needsUpdate ) {
 
-			this.update();
+			this.onBeforeUpdate();
+
 			this.updateShadow( frame );
+
+			this.onAfterUpdate();
 
 			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
 
@@ -341,6 +346,22 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 	}
+
+	/**
+	 * Called before the shadow map is rendered.
+	 * This method can be overridden by subclasses to perform custom actions.
+	 *
+	 * @abstract
+	 */
+	onBeforeUpdate() {}
+
+	/**
+	 * Called after the shadow map is rendered.
+	 * This method can be overridden by subclasses to perform custom actions.
+	 *
+	 * @abstract
+	 */
+	onAfterUpdate() {}
 
 	/**
 	 * Synchronizes the transformation of a tile light with the source light.

@@ -680,7 +680,11 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( needsUpdate ) {
 
+			this.onBeforeUpdate();
+
 			this.updateShadow( frame );
+
+			this.onAfterUpdate();
 
 			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
 
@@ -691,6 +695,23 @@ class ShadowNode extends ShadowBaseNode {
 		}
 
 	}
+
+
+	/**
+	 * Called before the shadow map is rendered.
+	 * This method can be overridden by subclasses to perform custom actions.
+	 *
+	 * @abstract
+	 */
+	onBeforeUpdate() {}
+
+	/**
+	 * Called after the shadow map is rendered.
+	 * This method can be overridden by subclasses to perform custom actions.
+	 *
+	 * @abstract
+	 */
+	onAfterUpdate() {}
 
 }
 
