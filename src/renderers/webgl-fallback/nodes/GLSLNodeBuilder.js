@@ -30,7 +30,6 @@ const interpolationTypeMap = {
 };
 
 const interpolationModeMap = {
-	'sample': 'centroid',
 	'centroid': 'centroid',
 	'flat first': 'flat',
 	'flat either': 'flat'

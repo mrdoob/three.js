@@ -1609,12 +1609,24 @@ export const TimestampQuery = {
 	RENDER: 'render'
 };
 
+/**
+ * Represents mouse buttons and interaction types in context of controls.
+ *
+ * @type {ConstantsInterpolationSamplingType}
+ * @constant
+ */
 export const InterpolationSamplingType = {
 	PERSPECTIVE: 'perspective',
 	LINEAR: 'linear',
 	FLAT: 'flat'
 };
 
+/**
+ * Represents the different interpolation sampling modes.
+ *
+ * @type {ConstantsInterpolationSamplingMode}
+ * @constant
+ */
 export const InterpolationSamplingMode = {
 	NORMAL: 'normal',
 	CENTROID: 'centroid',
@@ -1652,3 +1664,23 @@ export const InterpolationSamplingMode = {
  * @property {string} COMPUTE - A `compute` timestamp query.
  * @property {string} RENDER - A `render` timestamp query.
  **/
+
+/**
+ * Represents the different interpolation sampling types.
+ *
+ * @typedef {Object} ConstantsInterpolationSamplingType
+ * @property {string} PERSPECTIVE - Perspective-correct interpolation.
+ * @property {string} LINEAR - Linear interpolation.
+ * @property {string} FLAT - Flat interpolation.
+ */
+
+/**
+ * Represents the different interpolation sampling modes.
+ *
+ * @typedef {Object} ConstantsInterpolationSamplingMode
+ * @property {string} NORMAL - Normal sampling mode.
+ * @property {string} CENTROID - Centroid sampling mode.
+ * @property {string} SAMPLE - Sample-specific sampling mode.
+ * @property {string} FLAT_FIRST - Flat interpolation using the first vertex.
+ * @property {string} FLAT_EITHER - Flat interpolation using either vertex.
+ */
