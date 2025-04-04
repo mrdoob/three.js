@@ -311,7 +311,7 @@ class TileShadowNode extends ShadowBaseNode {
 	 */
 	updateBefore( frame ) {
 
-		const shadow = this.lights[ 0 ].shadow; // so far test only the first light
+		const shadow = this.originalLight.shadow;
 
 		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
 
