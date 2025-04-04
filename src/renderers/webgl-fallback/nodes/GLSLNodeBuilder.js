@@ -29,6 +29,12 @@ const interpolationTypeMap = {
 	linear: 'noperspective'
 };
 
+const interpolationModeMap = {
+	'sample': 'centroid',
+	'centroid': 'centroid',
+	'flat first': 'flat',
+	'flat either': 'flat'
+};
 
 const defaultPrecisions = `
 precision highp float;
@@ -783,18 +789,15 @@ ${ flowData.code }
 					if ( varying.interpolationType ) {
 
 						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
+						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
 
-						this.addLineFlowCode( '// test test working' );
-
-						const sampling = varying.interpolationSampling ? varying.interpolationSampling : '';
-
-						snippet += `${interpolationType} ${sampling} out ${type} ${varying.name};\n`;
+						snippet += `${ interpolationType } ${ sampling } out ${ type } ${ varying.name };\n`;
 
 					} else {
 
 						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
-						snippet += `${flat} out ${type} ${varying.name};\n`;
+						snippet += `${ flat } out ${ type } ${ varying.name };\n`;
 
 					}
 
@@ -817,18 +820,16 @@ ${ flowData.code }
 					if ( varying.interpolationType ) {
 
 						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
+						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
 
-						const sampling = varying.interpolationSampling ? varying.interpolationSampling : '';
-
-						snippet += `${interpolationType} ${sampling} in ${type} ${varying.name};\n`;
+						snippet += `${ interpolationType } ${ sampling } in ${ type } ${ varying.name };\n`;
 
 
 					} else {
 
-
 						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
-						snippet += `${flat}in ${type} ${varying.name};\n`;
+						snippet += `${ flat }in ${ type } ${ varying.name };\n`;
 
 					}
 

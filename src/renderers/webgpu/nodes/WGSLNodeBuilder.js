@@ -1562,9 +1562,9 @@ ${ flowData.code }
 
 					if ( varying.interpolationType ) {
 
-						const samplingSnippet = varying.interpolationSampling !== null ? `, ${varying.interpolationSampling} )` : ' )';
+						const samplingSnippet = varying.interpolationSampling !== null ? `, ${ varying.interpolationSampling } )` : ' )';
 
-						attributesSnippet += ` @interpolate( ${varying.interpolationType}${samplingSnippet}`;
+						attributesSnippet += ` @interpolate( ${ varying.interpolationType }${ samplingSnippet }`;
 
 						// Otherwise, optimize interpolation when sensible
 

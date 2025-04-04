@@ -214,3 +214,17 @@ export const TimestampQuery = {
 	COMPUTE: 'compute',
 	RENDER: 'render'
 };
+
+export const InterpolationSamplingType = {
+	PERSPECTIVE: 'perspective',
+	LINEAR: 'linear',
+	FLAT: 'flat'
+};
+
+export const InterpolationSamplingMode = {
+	NORMAL: 'normal',
+	CENTROID: 'centroid',
+	SAMPLE: 'sample',
+	FLAT_FIRST: 'flat first',
+	FLAT_EITHER: 'flat either'
+};
