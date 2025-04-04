@@ -1,42 +1,41 @@
-import { WebGLUniforms } from './WebGLUniforms.js';
-import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
+import { WebGLShader } from './WebGLShader.js';
+import { WebGLUniforms } from './WebGLUniforms.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Vector3 } from '../../math/Vector3.js';
+
 import {
-	NoToneMapping,
+	ACESFilmicToneMapping,
 	AddOperation,
-	MixOperation,
-	MultiplyOperation,
+	AgXToneMapping,
+	CineonToneMapping,
+	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
-	CubeReflectionMapping,
-	PCFSoftShadowMap,
-	PCFShadowMap,
-	VSMShadowMap,
-	AgXToneMapping,
-	ACESFilmicToneMapping,
-	NeutralToneMapping,
-	CineonToneMapping,
 	CustomToneMapping,
-	ReinhardToneMapping,
-	LinearToneMapping,
 	FloatType,
 	HalfFloatType,
-	RedFormat,
-	RGFormat,
 	IntType,
+	LinearToneMapping,
+	LinearTransfer,
+	MixOperation,
+	MultiplyOperation,
+	NeutralToneMapping,
+	NoToneMapping,
+	PCFShadowMap,
+	PCFSoftShadowMap,
+	RedFormat,
+	RedIntegerFormat,
+	ReinhardToneMapping,
+	RGFormat,
+	RGIntegerFormat,
+	ShortType,
+	SRGBTransfer,
 	UnsignedIntType,
 	UnsignedShortType,
-	ShortType,
-	RedIntegerFormat,
-	RGIntegerFormat,
-	LinearTransfer,
-	SRGBTransfer
+	VSMShadowMap
 } from '../../constants.js';
-
-import { Vector3 } from '../../math/Vector3.js';
-import { Matrix3 } from '../../math/Matrix3.js';
-
-import { ColorManagement } from '../../math/ColorManagement.js';
 
 // From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
 const COMPLETION_STATUS_KHR = 0x91B1;
