@@ -5,11 +5,17 @@ import {
 } from 'three';
 
 /**
- * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS
+ * A class that implements a peppers ghost effect.
+ *
+ * Reference: [Reflective Prism]{@link http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS}
  */
-
 class PeppersGhostEffect {
 
+	/**
+	 * Constructs a new peppers ghost effect.
+	 *
+	 * @param {(WebGPURenderer|WebGLRenderer)} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		const scope = this;
@@ -32,6 +38,12 @@ class PeppersGhostEffect {
 		// Initialization
 		renderer.autoClear = false;
 
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} width - The width of the effect in logical pixels.
+		 * @param {number} height - The height of the effect in logical pixels.
+		 */
 		this.setSize = function ( width, height ) {
 
 			_halfWidth = width / 2;
@@ -51,6 +63,13 @@ class PeppersGhostEffect {
 
 		};
 
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();

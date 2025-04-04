@@ -3557,7 +3557,7 @@
         },
         "clampPoint": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the closets point on the edge of the sphere."
+          "!doc": "Clamps a point within the sphere. If the point is outside the sphere, it will clamp it to the closets point on the edge of the sphere."
         },
         "translate": {
           "!type": "fn(offset: +THREE.Vector3) -> +THREE.Sphere",

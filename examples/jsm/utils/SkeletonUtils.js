@@ -9,6 +9,8 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
+/** @module SkeletonUtils */
+
 function getBoneName( bone, options ) {
 
 	if ( options.getBoneName !== undefined ) {
@@ -21,6 +23,14 @@ function getBoneName( bone, options ) {
 
 }
 
+/**
+ * Retargets the skeleton from the given source 3D object to the
+ * target 3D object.
+ *
+ * @param {Object3D} target - The target 3D object.
+ * @param {Object3D} source - The source 3D object.
+ * @param {module:SkeletonUtils~RetargetOptions} options - The options.
+ */
 function retarget( target, source, options = {} ) {
 
 	const quat = new Quaternion(),
@@ -196,6 +206,16 @@ function retarget( target, source, options = {} ) {
 
 }
 
+/**
+ * Retargets the animation clip of the source object to the
+ * target 3D object.
+ *
+ * @param {Object3D} target - The target 3D object.
+ * @param {Object3D} source - The source 3D object.
+ * @param {AnimationClip} clip - The animation clip.
+ * @param {module:SkeletonUtils~RetargetOptions} options - The options.
+ * @return {AnimationClip} The retargeted animation clip.
+ */
 function retargetClip( target, source, clip, options = {} ) {
 
 	options.useFirstFramePosition = options.useFirstFramePosition !== undefined ? options.useFirstFramePosition : false;
@@ -354,6 +374,14 @@ function retargetClip( target, source, clip, options = {} ) {
 
 }
 
+/**
+ * Clones the given 3D object and its descendants, ensuring that any `SkinnedMesh` instances are
+ * correctly associated with their bones. Bones are also cloned, and must be descendants of the
+ * object passed to this method. Other data, like geometries and materials, are reused by reference.
+ *
+ * @param {Object3D} source - The 3D object to clone.
+ * @return {Object3D} The cloned 3D object.
+ */
 function clone( source ) {
 
 	const sourceLookup = new Map();
@@ -434,6 +462,23 @@ function parallelTraverse( a, b, callback ) {
 	}
 
 }
+
+/**
+ * Retarget options of `SkeletonUtils`.
+ *
+ * @typedef {Object} module:SkeletonUtils~RetargetOptions
+ * @property {boolean} [useFirstFramePosition=false] - Whether to use the position of the first frame or not.
+ * @property {number} [fps] - The FPS of the clip.
+ * @property {Object<string,string>} [names] - A dictionary for mapping target to source bone names.
+ * @property {function(string):string} [getBoneName] - A function for mapping bone names. Alternative to `names`.
+ * @property {Array<number>} [trim] - Whether to trim the clip or not. If set the array should hold two values for the start and end.
+ * @property {boolean} [preserveBoneMatrix=true] - Whether to preserve bone matrices or not.
+ * @property {boolean} [preserveBonePositions=true] - Whether to preserve bone positions or not.
+ * @property {boolean} [useTargetMatrix=false] - Whether to use the target matrix or not.
+ * @property {string} [hip='hip'] - The name of the source's hip bone.
+ * @property {Vector3} [hipInfluence=(1,1,1)] - The hip influence.
+ * @property {number} [scale=1] - The scale.
+ **/
 
 export {
 	retarget,

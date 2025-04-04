@@ -234,8 +234,8 @@ class PixelationPassNode extends PassNode {
 	 * @param {Scene} scene - The scene to render.
 	 * @param {Camera} camera - The camera to render the scene with.
 	 * @param {Node<float> | number} [pixelSize=6] - The pixel size.
-	 * @param {Node<float> | number} [normalEdgeStrength=03] - The normal edge strength.
-	 * @param {Node<float> | number} [depthEdgeStrength=03] - The depth edge strength.
+	 * @param {Node<float> | number} [normalEdgeStrength=0.3] - The normal edge strength.
+	 * @param {Node<float> | number} [depthEdgeStrength=0.4] - The depth edge strength.
 	 */
 	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
 
@@ -324,8 +324,8 @@ class PixelationPassNode extends PassNode {
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render the scene with.
  * @param {Node<float> | number} [pixelSize=6] - The pixel size.
- * @param {Node<float> | number} [normalEdgeStrength=03] - The normal edge strength.
- * @param {Node<float> | number} [depthEdgeStrength=03] - The depth edge strength.
+ * @param {Node<float> | number} [normalEdgeStrength=0.3] - The normal edge strength.
+ * @param {Node<float> | number} [depthEdgeStrength=0.4] - The depth edge strength.
  * @returns {PixelationPassNode}
  */
 export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );

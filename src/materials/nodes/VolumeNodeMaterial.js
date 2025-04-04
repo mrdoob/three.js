@@ -18,7 +18,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new volume node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -40,6 +40,15 @@ class VolumeNodeMaterial extends NodeMaterial {
 		 * @default 25
 		 */
 		this.steps = 25;
+
+		/**
+		 * Offsets the distance a ray has been traveled through a volume.
+		 * Can be used to implement dithering to reduce banding.
+		 *
+		 * @type {Node<float>}
+		 * @default null
+		 */
+		this.offsetNode = null;
 
 		/**
 		 * Node used for scattering calculations.

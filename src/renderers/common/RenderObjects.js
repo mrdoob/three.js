@@ -84,7 +84,7 @@ class RenderObjects {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} passId - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 * @return {RenderObject} The render object.
 	 */
 	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
@@ -173,7 +173,7 @@ class RenderObjects {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} passId - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 * @return {RenderObject} The render object.
 	 */
 	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {

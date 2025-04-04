@@ -342,7 +342,7 @@ export default UniformArrayNode;
  * @tsl
  * @function
  * @param {Array<any>} values - Array-like data.
- * @param {?string} nodeType - The data type of the array elements.
+ * @param {?string} [nodeType] - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
@@ -358,7 +358,7 @@ export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArray
  */
 export const uniforms = ( values, nodeType ) => { // @deprecated, r168
 
-	console.warn( 'TSL.UniformArrayNode: uniforms() has been renamed to uniformArray().' );
+	console.warn( 'THREE.TSL: uniforms() has been renamed to uniformArray().' );
 	return nodeObject( new UniformArrayNode( values, nodeType ) );
 
 };

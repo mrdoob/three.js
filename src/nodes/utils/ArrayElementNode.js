@@ -63,8 +63,10 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 	generate( builder ) {
 
+		const indexType = this.indexNode.getNodeType( builder );
+
 		const nodeSnippet = this.node.build( builder );
-		const indexSnippet = this.indexNode.build( builder, 'uint' );
+		const indexSnippet = this.indexNode.build( builder, ! builder.isVector( indexType ) && builder.isInteger( indexType ) ? indexType : 'uint' );
 
 		return `${ nodeSnippet }[ ${ indexSnippet } ]`;
 

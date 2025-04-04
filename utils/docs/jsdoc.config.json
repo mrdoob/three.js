@@ -4,29 +4,32 @@
             "encoding": "utf8",
             "package": "package.json",
             "recurse": true,
-            "template": "utils/docs/template"
+            "template": "utils/docs/template",
+            "themeOpts": {
+                "ignoreInheritedSymbols": true
+            }
     },
     "plugins": [ "plugins/markdown" ],
     "source": {
         "include": [
-            "examples/jsm/tsl",
-            "src/cameras",
-            "src/core/Object3D.js",
-            "src/core/EventDispatcher.js",
-            "src/extras",
-            "src/loaders/nodes", 
-            "src/loaders/Loader.js", 
-            "src/materials/nodes", 
-            "src/materials/Material.js", 
-            "src/nodes", 
-            "src/math/Box3.js", 
-            "src/renderers/common", 
-            "src/renderers/webgpu" ,
-            "src/scenes" ,
-            "src/textures/Texture.js" 
+            "examples/jsm",
+            "src"
         ],
         "exclude": [
-            "src/extras/PMREMGenerator.js"
+            "src/extras/lib",
+            "src/renderers/common/extras/PMREMGenerator.js",
+            "examples/jsm/helpers/LightProbeHelperGPU.js",
+            "examples/jsm/helpers/TextureHelperGPU.js",
+            "examples/jsm/libs",
+            "examples/jsm/lines/webgpu",
+            "examples/jsm/loaders/lwo",
+            "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
+            "examples/jsm/misc/ProgressiveLightMapGPU.js",
+            "examples/jsm/modifiers/CurveModifierGPU.js",
+            "examples/jsm/objects/Water2.js",
+            "examples/jsm/objects/Water2Mesh.js",
+            "examples/jsm/offscreen",
+            "examples/jsm/utils/ShadowMapViewerGPU.js"
         ]
     }
 }

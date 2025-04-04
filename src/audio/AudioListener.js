@@ -9,21 +9,62 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 const _scale = /*@__PURE__*/ new Vector3();
 const _orientation = /*@__PURE__*/ new Vector3();
 
+/**
+ * The class represents a virtual listener of the all positional and non-positional audio effects
+ * in the scene. A three.js application usually creates a single listener. It is a mandatory
+ * constructor parameter for audios entities like {@link Audio} and {@link PositionalAudio}.
+ *
+ * In most cases, the listener object is a child of the camera. So the 3D transformation of the
+ * camera represents the 3D transformation of the listener.
+ *
+ * @augments Object3D
+ */
 class AudioListener extends Object3D {
 
+	/**
+	 * Constructs a new audio listener.
+	 */
 	constructor() {
 
 		super();
 
 		this.type = 'AudioListener';
 
+		/**
+		 * The native audio context.
+		 *
+		 * @type {AudioContext}
+		 * @readonly
+		 */
 		this.context = AudioContext.getContext();
 
+		/**
+		 * The gain node used for volume control.
+		 *
+		 * @type {GainNode}
+		 * @readonly
+		 */
 		this.gain = this.context.createGain();
 		this.gain.connect( this.context.destination );
 
+		/**
+		 * An optional filter.
+		 *
+		 * Defined via {@link AudioListener#setFilter}.
+		 *
+		 * @type {?AudioNode}
+		 * @default null
+		 * @readonly
+		 */
 		this.filter = null;
 
+		/**
+		 * Time delta values required for `linearRampToValueAtTime()` usage.
+		 *
+		 * @type {number}
+		 * @default 0
+		 * @readonly
+		 */
 		this.timeDelta = 0;
 
 		// private
@@ -32,12 +73,24 @@ class AudioListener extends Object3D {
 
 	}
 
+	/**
+	 * Returns the listener's input node.
+	 *
+	 * This method is used by other audio nodes to connect to this listener.
+	 *
+	 * @return {GainNode} The input node.
+	 */
 	getInput() {
 
 		return this.gain;
 
 	}
 
+	/**
+	 * Removes the current filter from this listener.
+	 *
+	 * @return {AudioListener} A reference to this listener.
+	 */
 	removeFilter() {
 
 		if ( this.filter !== null ) {
@@ -53,12 +106,23 @@ class AudioListener extends Object3D {
 
 	}
 
+	/**
+	 * Returns the current set filter.
+	 *
+	 * @return {?AudioNode} The filter.
+	 */
 	getFilter() {
 
 		return this.filter;
 
 	}
 
+	/**
+	 * Sets the given filter to this listener.
+	 *
+	 * @param {AudioNode} value - The filter to set.
+	 * @return {AudioListener} A reference to this listener.
+	 */
 	setFilter( value ) {
 
 		if ( this.filter !== null ) {
@@ -80,12 +144,24 @@ class AudioListener extends Object3D {
 
 	}
 
+	/**
+	 * Returns the applications master volume.
+	 *
+	 * @return {number} The master volume.
+	 */
 	getMasterVolume() {
 
 		return this.gain.gain.value;
 
 	}
 
+	/**
+	 * Sets the applications master volume. This volume setting affects
+	 * all audio nodes in the scene.
+	 *
+	 * @param {number} value - The master volume to set.
+	 * @return {AudioListener} A reference to this listener.
+	 */
 	setMasterVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );

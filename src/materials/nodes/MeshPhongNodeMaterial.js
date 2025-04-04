@@ -10,7 +10,7 @@ import { MeshPhongMaterial } from '../MeshPhongMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshPhongMaterial();
 
 /**
- * Node material version of `MeshPhongMaterial`.
+ * Node material version of {@link MeshPhongMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -25,7 +25,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

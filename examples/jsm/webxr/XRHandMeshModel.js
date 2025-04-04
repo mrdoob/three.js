@@ -2,13 +2,45 @@ import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
 const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/';
 
+/**
+ * Represents one of the hand model types {@link XRHandModelFactory} might produce
+ * depending on the selected profile. `XRHandMeshModel` represents a hand with a
+ * custom asset.
+ */
 class XRHandMeshModel {
 
+	/**
+	 * Constructs a new XR hand mesh model.
+	 *
+	 * @param {XRHandModel} handModel - The hand model.
+	 * @param {Group} controller - The WebXR controller.
+	 * @param {?string} path - The model path.
+	 * @param {XRHandedness} handedness - The handedness of the XR input source.
+	 * @param {?Loader} [loader=null] - The loader. If not provided, an instance of `GLTFLoader` will be used to load models.
+	 * @param {?Function} [onLoad=null] - A callback that is executed when a controller model has been loaded.
+	 */
 	constructor( handModel, controller, path, handedness, loader = null, onLoad = null ) {
 
+		/**
+		 * The WebXR controller.
+		 *
+		 * @type {Group}
+		 */
 		this.controller = controller;
+
+		/**
+		 * The hand model.
+		 *
+		 * @type {XRHandModel}
+		 */
 		this.handModel = handModel;
 
+		/**
+		 * An array of bones representing the bones
+		 * of the hand skeleton.
+		 *
+		 * @type {Array<Bone>}
+		 */
 		this.bones = [];
 
 		if ( loader === null ) {
@@ -80,6 +112,9 @@ class XRHandMeshModel {
 
 	}
 
+	/**
+	 * Updates the mesh based on the tracked XR joints data.
+	 */
 	updateMesh() {
 
 		// XR Joints

@@ -46,7 +46,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Second texture node. When not set, the shader will sample from `textureXNode` instead.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.textureYNode = textureYNode;
@@ -54,7 +54,7 @@ class TriplanarTexturesNode extends Node {
 		/**
 		 * Third texture node. When not set, the shader will sample from `textureXNode` instead.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.textureZNode = textureZNode;
@@ -130,7 +130,7 @@ export default TriplanarTexturesNode;
  * @param {?Node<vec3>} [normalNode=normalLocal] - Normals in local space.
  * @returns {TriplanarTexturesNode}
  */
-export const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode );
+export const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode ).setParameterLength( 1, 6 );
 
 /**
  * TSL function for creating a triplanar textures node.

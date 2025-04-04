@@ -12,10 +12,8 @@ import {
 	UVMapping,
 } from 'three';
 
-// UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-format
-// HDR/EXR to UltraHDR Converter - https://gainmap-creator.monogrid.com/
-
 /**
+ * UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-format
  *
  * Short format brief:
  *
@@ -30,36 +28,68 @@ import {
  * Binary image storages are prefixed with a unique 0xFFD8 16-bit descriptor.
  */
 
-/**
- * Current feature set:
- * - JPEG headers (required)
- * - XMP metadata (required)
- *  - XMP validation (not implemented)
- * - EXIF profile (not implemented)
- * - ICC profile (not implemented)
- * - Binary storage for SDR & HDR images (required)
- * - Gainmap metadata (required)
- * - Non-JPEG image formats (not implemented)
- * - Primary image as an HDR image (not implemented)
- */
 
-/* Calculating this SRGB powers is extremely slow for 4K images and can be sufficiently precalculated for a 3-4x speed boost */
+// Calculating this SRGB powers is extremely slow for 4K images and can be sufficiently precalculated for a 3-4x speed boost
 const SRGB_TO_LINEAR = Array( 1024 )
 	.fill( 0 )
 	.map( ( _, value ) =>
 		Math.pow( ( value / 255 ) * 0.9478672986 + 0.0521327014, 2.4 )
 	);
 
+/**
+ * A loader for the Ultra HDR Image Format.
+ *
+ * Existing HDR or EXR textures can be converted to Ultra HDR with this [tool]{@link https://gainmap-creator.monogrid.com/}.
+ *
+ * Current feature set:
+ * - JPEG headers (required)
+ * - XMP metadata (required)
+ * - XMP validation (not implemented)
+ * - EXIF profile (not implemented)
+ * - ICC profile (not implemented)
+ * - Binary storage for SDR & HDR images (required)
+ * - Gainmap metadata (required)
+ * - Non-JPEG image formats (not implemented)
+ * - Primary image as an HDR image (not implemented)
+ *
+ * ```js
+ * const loader = new UltraHDRLoader();
+ * const texture = await loader.loadAsync( 'textures/equirectangular/ice_planet_close.jpg' );
+ * texture.mapping = THREE.EquirectangularReflectionMapping;
+ *
+ * scene.background = texture;
+ * scene.environment = texture;
+ * ```
+ *
+ * @augments Loader
+ */
 class UltraHDRLoader extends Loader {
 
+	/**
+	 * Constructs a new Ultra HDR loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * The texture type.
+		 *
+		 * @type {(HalfFloatType|FloatType)}
+		 * @default HalfFloatType
+		 */
 		this.type = HalfFloatType;
 
 	}
 
+	/**
+	 * Sets the texture type.
+	 *
+	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+	 * @return {RGBELoader} A reference to this loader.
+	 */
 	setDataType( value ) {
 
 		this.type = value;
@@ -68,6 +98,12 @@ class UltraHDRLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given Ultra HDR texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @param {Function} onLoad - The `onLoad` callback.
+	 */
 	parse( buffer, onLoad ) {
 
 		const xmpMetadata = {
@@ -262,6 +298,16 @@ class UltraHDRLoader extends Loader {
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded Ultra HDR texture
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the files to be loaded. This can also be a data URI.
+	 * @param {function(DataTexture, Object)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @return {DataTexture} The Ultra HDR texture.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const texture = new DataTexture(

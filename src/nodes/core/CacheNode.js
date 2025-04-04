@@ -92,7 +92,7 @@ export default CacheNode;
  * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
- * @param {boolean} parent - Whether this node refers to a shared parent cache or not.
+ * @param {boolean} [parent] - Whether this node refers to a shared parent cache or not.
  * @returns {CacheNode}
  */
 export const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );

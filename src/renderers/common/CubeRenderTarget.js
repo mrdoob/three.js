@@ -20,10 +20,23 @@ import { BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from '..
  */
 class CubeRenderTarget extends WebGLCubeRenderTarget {
 
+	/**
+	 * Constructs a new cube render target.
+	 *
+	 * @param {number} [size=1] - The size of the render target.
+	 * @param {RenderTarget~Options} [options] - The configuration object.
+	 */
 	constructor( size = 1, options = {} ) {
 
 		super( size, options );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isCubeRenderTarget = true;
 
 	}

@@ -31,7 +31,7 @@ class ShapeUtils {
 	/**
 	 * Returns `true` if the given contour uses a clockwise winding order.
 	 *
-	 * @param {Array<Vector2>} pts - An array of 2D points defining a polyong.
+	 * @param {Array<Vector2>} pts - An array of 2D points defining a polygon.
 	 * @return {boolean} Whether the given contour uses a clockwise winding order or not.
 	 */
 	static isClockWise( pts ) {
@@ -41,7 +41,7 @@ class ShapeUtils {
 	}
 
 	/**
-	 * Triangluates the given shape definition.
+	 * Triangulates the given shape definition.
 	 *
 	 * @param {Array<Vector2>} contour - An array of 2D points defining the contour.
 	 * @param {Array<Array<Vector2>>} holes - An array that holds arrays of 2D points defining the holes.

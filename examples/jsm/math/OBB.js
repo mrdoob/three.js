@@ -37,18 +37,51 @@ const matrix = new Matrix4();
 const inverse = new Matrix4();
 const localRay = new Ray();
 
-// OBB
-
+/**
+ * Represents an oriented bounding box (OBB) in 3D space.
+ */
 class OBB {
 
+	/**
+	 * Constructs a new OBB.
+	 *
+	 * @param {Vector3} [center] - The center of the OBB.
+	 * @param {Vector3} [halfSize] - Positive halfwidth extents of the OBB along each axis.
+	 * @param {Matrix3} [rotation] - The rotation of the OBB.
+	 */
 	constructor( center = new Vector3(), halfSize = new Vector3(), rotation = new Matrix3() ) {
 
+		/**
+		 * The center of the OBB.
+		 *
+		 * @type {Vector3}
+		 */
 		this.center = center;
+
+		/**
+		 * Positive halfwidth extents of the OBB along each axis.
+		 *
+		 * @type {Vector3}
+		 */
 		this.halfSize = halfSize;
+
+		/**
+		 * The rotation of the OBB.
+		 *
+		 * @type {Matrix3}
+		 */
 		this.rotation = rotation;
 
 	}
 
+	/**
+	 * Sets the OBBs components to the given values.
+	 *
+	 * @param {Vector3} [center] - The center of the OBB.
+	 * @param {Vector3} [halfSize] - Positive halfwidth extents of the OBB along each axis.
+	 * @param {Matrix3} [rotation] - The rotation of the OBB.
+	 * @return {OBB} A reference to this OBB.
+	 */
 	set( center, halfSize, rotation ) {
 
 		this.center = center;
@@ -59,6 +92,12 @@ class OBB {
 
 	}
 
+	/**
+	 * Copies the values of the given OBB to this instance.
+	 *
+	 * @param {OBB} obb - The OBB to copy.
+	 * @return {OBB} A reference to this OBB.
+	 */
 	copy( obb ) {
 
 		this.center.copy( obb.center );
@@ -69,27 +108,40 @@ class OBB {
 
 	}
 
+	/**
+	 * Returns a new OBB with copied values from this instance.
+	 *
+	 * @return {OBB} A clone of this instance.
+	 */
 	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
-	getSize( result ) {
+	/**
+	 * Returns the size of this OBB.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The size.
+	 */
+	getSize( target ) {
 
-		return result.copy( this.halfSize ).multiplyScalar( 2 );
+		return target.copy( this.halfSize ).multiplyScalar( 2 );
 
 	}
 
 	/**
-	* Reference: Closest Point on OBB to Point in Real-Time Collision Detection
-	* by Christer Ericson (chapter 5.1.4)
-	*
-	* @param {Vector3} point
-	* @param {Vector3} result
-	* @returns {Vector3}
-	*/
-	clampPoint( point, result ) {
+	 * Clamps the given point within the bounds of this OBB.
+	 *
+	 * @param {Vector3} point - The point that should be clamped within the bounds of this OBB.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @returns {Vector3} - The clamped point.
+	 */
+	clampPoint( point, target ) {
+
+		// Reference: Closest Point on OBB to Point in Real-Time Collision Detection
+		// by Christer Ericson (chapter 5.1.4)
 
 		const halfSize = this.halfSize;
 
@@ -98,23 +150,29 @@ class OBB {
 
 		// start at the center position of the OBB
 
-		result.copy( this.center );
+		target.copy( this.center );
 
 		// project the target onto the OBB axes and walk towards that point
 
 		const x = MathUtils.clamp( v1.dot( xAxis ), - halfSize.x, halfSize.x );
-		result.add( xAxis.multiplyScalar( x ) );
+		target.add( xAxis.multiplyScalar( x ) );
 
 		const y = MathUtils.clamp( v1.dot( yAxis ), - halfSize.y, halfSize.y );
-		result.add( yAxis.multiplyScalar( y ) );
+		target.add( yAxis.multiplyScalar( y ) );
 
 		const z = MathUtils.clamp( v1.dot( zAxis ), - halfSize.z, halfSize.z );
-		result.add( zAxis.multiplyScalar( z ) );
+		target.add( zAxis.multiplyScalar( z ) );
 
-		return result;
+		return target;
 
 	}
 
+	/**
+	 * Returns `true` if the given point lies within this OBB.
+	 *
+	 * @param {Vector3} point - The point to test.
+	 * @returns {boolean} - Whether the given point lies within this OBB or not.
+	 */
 	containsPoint( point ) {
 
 		v1.subVectors( point, this.center );
@@ -128,12 +186,24 @@ class OBB {
 
 	}
 
+	/**
+	 * Returns `true` if the given AABB intersects this OBB.
+	 *
+	 * @param {Box3} box3 - The AABB to test.
+	 * @returns {boolean} - Whether the given AABB intersects this OBB or not.
+	 */
 	intersectsBox3( box3 ) {
 
 		return this.intersectsOBB( obb.fromBox3( box3 ) );
 
 	}
 
+	/**
+	 * Returns `true` if the given bounding sphere intersects this OBB.
+	 *
+	 * @param {Sphere} sphere - The bounding sphere to test.
+	 * @returns {boolean} - Whether the given bounding sphere intersects this OBB or not.
+	 */
 	intersectsSphere( sphere ) {
 
 		// find the point on the OBB closest to the sphere center
@@ -147,14 +217,16 @@ class OBB {
 	}
 
 	/**
-	* Reference: OBB-OBB Intersection in Real-Time Collision Detection
-	* by Christer Ericson (chapter 4.4.1)
-	*
-	* @param {OBB} obb
-	* @param {number} [epsilon=Number.EPSILON] - A small value to prevent arithmetic errors
-	* @returns {boolean}
-	*/
+	 * Returns `true` if the given OBB intersects this OBB.
+	 *
+	 * @param {OBB} obb - The OBB to test.
+	 * @param {number} [epsilon=Number.EPSILON] - A small value to prevent arithmetic errors.
+	 * @returns {boolean} - Whether the given OBB intersects this OBB or not.
+	 */
 	intersectsOBB( obb, epsilon = Number.EPSILON ) {
+
+		// Reference: OBB-OBB Intersection in Real-Time Collision Detection
+		// by Christer Ericson (chapter 4.4.1)
 
 		// prepare data structures (the code uses the same nomenclature like the reference)
 
@@ -290,13 +362,15 @@ class OBB {
 	}
 
 	/**
-	* Reference: Testing Box Against Plane in Real-Time Collision Detection
-	* by Christer Ericson (chapter 5.2.3)
-	*
-	* @param {Plane} plane
-	* @returns {boolean}
-	*/
+	 * Returns `true` if the given plane intersects this OBB.
+	 *
+	 * @param {Plane} plane - The plane to test.
+	 * @returns {boolean} Whether the given plane intersects this OBB or not.
+	 */
 	intersectsPlane( plane ) {
+
+		// Reference: Testing Box Against Plane in Real-Time Collision Detection
+		// by Christer Ericson (chapter 5.2.3)
 
 		this.rotation.extractBasis( xAxis, yAxis, zAxis );
 
@@ -317,14 +391,14 @@ class OBB {
 	}
 
 	/**
-	* Performs a ray/OBB intersection test and stores the intersection point
-	* to the given 3D vector. If no intersection is detected, *null* is returned.
-	*
-	* @param {Ray} ray
-	* @param {Vector3} result
-	* @return {?Vector3}
-	*/
-	intersectRay( ray, result ) {
+	 * Performs a ray/OBB intersection test and stores the intersection point
+	 * in the given 3D vector.
+	 *
+	 * @param {Ray} ray - The ray to test.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The intersection point. If no intersection is detected, `null` is returned.
+	 */
+	intersectRay( ray, target ) {
 
 		// the idea is to perform the intersection test in the local space
 		// of the OBB.
@@ -344,11 +418,11 @@ class OBB {
 
 		// perform ray <-> AABB intersection test
 
-		if ( localRay.intersectBox( aabb, result ) ) {
+		if ( localRay.intersectBox( aabb, target ) ) {
 
 			// transform the intersection point back to world space
 
-			return result.applyMatrix4( matrix );
+			return target.applyMatrix4( matrix );
 
 		} else {
 
@@ -359,18 +433,23 @@ class OBB {
 	}
 
 	/**
-	* Performs a ray/OBB intersection test. Returns either true or false if
-	* there is a intersection or not.
-	*
-	* @param {Ray} ray
-	* @returns {boolean}
-	*/
+	 * Returns `true` if the given ray intersects this OBB.
+	 *
+	 * @param {Ray} ray - The ray to test.
+	 * @returns {boolean} Whether the given ray intersects this OBB or not.
+	 */
 	intersectsRay( ray ) {
 
 		return this.intersectRay( ray, v1 ) !== null;
 
 	}
 
+	/**
+	 * Defines an OBB based on the given AABB.
+	 *
+	 * @param {Box3} box3 - The AABB to setup the OBB from.
+	 * @return {OBB} A reference of this OBB.
+	 */
 	fromBox3( box3 ) {
 
 		box3.getCenter( this.center );
@@ -383,6 +462,12 @@ class OBB {
 
 	}
 
+	/**
+	 * Returns `true` if the given OBB is equal to this OBB.
+	 *
+	 * @param {OBB} obb - The OBB to test.
+	 * @returns {boolean} Whether the given OBB is equal to this OBB or not.
+	 */
 	equals( obb ) {
 
 		return obb.center.equals( this.center ) &&
@@ -391,6 +476,14 @@ class OBB {
 
 	}
 
+	/**
+	 * Applies the given transformation matrix to this OBB. This method can be
+	 * used to transform the bounding volume with the world matrix of a 3D object
+	 * in order to keep both entities in sync.
+	 *
+	 * @param {Matrix4} matrix - The matrix to apply.
+	 * @return {OBB} A reference of this OBB.
+	 */
 	applyMatrix4( matrix ) {
 
 		const e = matrix.elements;

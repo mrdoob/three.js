@@ -116,14 +116,41 @@ class USDAParser {
 
 }
 
+/**
+ * A loader for the USDZ format.
+ *
+ * USDZ files that use USDC internally are not yet supported, only USDA.
+ *
+ * ```js
+ * const loader = new USDZLoader();
+ * const model = await loader.loadAsync( 'saeukkang.usdz' );
+ * scene.add( model );
+ * ```
+ *
+ * @augments Loader
+ */
 class USDZLoader extends Loader {
 
+	/**
+	 * Constructs a new USDZ loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded USDZ asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -159,6 +186,12 @@ class USDZLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given USDZ data and returns the resulting group.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw USDZ data as an array buffer.
+	 * @return {Group} The parsed asset as a group.
+	 */
 	parse( buffer ) {
 
 		const parser = new USDAParser();
@@ -173,7 +206,7 @@ class USDZLoader extends Loader {
 
 				if ( filename.endsWith( 'png' ) ) {
 
-					const blob = new Blob( [ zip[ filename ] ], { type: { type: 'image/png' } } );
+					const blob = new Blob( [ zip[ filename ] ], { type: 'image/png' } );
 					data[ filename ] = URL.createObjectURL( blob );
 
 				}

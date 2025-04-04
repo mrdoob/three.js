@@ -4,6 +4,8 @@ import {
 	Vector3
 } from 'three';
 
+/** @module CameraUtils */
+
 const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
 	_vb = /*@__PURE__*/ new Vector3(), // from pe to pb
 	_vc = /*@__PURE__*/ new Vector3(), // from pe to pc
@@ -14,16 +16,17 @@ const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
 	_quat = /*@__PURE__*/ new Quaternion(); // temporary quaternion
 
 
-/** Set a PerspectiveCamera's projectionMatrix and quaternion
+/**
+ * Set projection matrix and the orientation of a perspective camera
  * to exactly frame the corners of an arbitrary rectangle.
  * NOTE: This function ignores the standard parameters;
- * do not call updateProjectionMatrix() after this!
+ * do not call `updateProjectionMatrix()` after this.
  *
- * @param {PerspectiveCamera} camera
- * @param {Vector3} bottomLeftCorner
- * @param {Vector3} bottomRightCorner
- * @param {Vector3} topLeftCorner
- * @param {boolean} [estimateViewFrustum=false]
+ * @param {PerspectiveCamera} camera - The camera.
+ * @param {Vector3} bottomLeftCorner - The bottom-left corner point.
+ * @param {Vector3} bottomRightCorner - The bottom-right corner point.
+ * @param {Vector3} topLeftCorner - The top-left corner point.
+ * @param {boolean} [estimateViewFrustum=false] - If set to `true`, the function tries to estimate the camera's FOV.
  */
 function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorner, estimateViewFrustum = false ) {
 

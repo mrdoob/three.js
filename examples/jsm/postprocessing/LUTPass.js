@@ -56,7 +56,44 @@ const LUTShader = {
 
 };
 
+/**
+ * Pass for color grading via lookup tables.
+ *
+ * ```js
+ * const lutPass = new LUTPass( { lut: lut.texture3D } );
+ * composer.addPass( lutPass );
+ * ```
+ *
+ * @augments ShaderPass
+ */
 class LUTPass extends ShaderPass {
+
+	/**
+	 * Constructs a LUT pass.
+	 *
+	 * @param {{lut:Data3DTexture,intensity:number}} [options={}] - The pass options.
+	 */
+	constructor( options = {} ) {
+
+		super( LUTShader );
+
+		/**
+		 * The LUT as a 3D texture.
+		 *
+		 * @type {?Data3DTexture}
+		 * @default null
+		 */
+		this.lut = options.lut || null;
+
+		/**
+		 * The intensity.
+		 *
+		 * @type {?number}
+		 * @default 1
+		 */
+		this.intensity = 'intensity' in options ? options.intensity : 1;
+
+	}
 
 	set lut( v ) {
 
@@ -92,14 +129,6 @@ class LUTPass extends ShaderPass {
 	get intensity() {
 
 		return this.material.uniforms.intensity.value;
-
-	}
-
-	constructor( options = {} ) {
-
-		super( LUTShader );
-		this.lut = options.lut || null;
-		this.intensity = 'intensity' in options ? options.intensity : 1;
 
 	}
 

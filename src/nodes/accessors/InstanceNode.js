@@ -33,9 +33,9 @@ class InstanceNode extends Node {
 	 *
 	 * @param {number} count - The number of instances.
 	 * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
-	 * @param {InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
+	 * @param {?InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
 	 */
-	constructor( count, instanceMatrix, instanceColor ) {
+	constructor( count, instanceMatrix, instanceColor = null ) {
 
 		super( 'void' );
 
@@ -63,14 +63,15 @@ class InstanceNode extends Node {
 		/**
 		 * The node that represents the instance matrix data.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 */
 		this.instanceMatrixNode = null;
 
 		/**
 		 * The node that represents the instance color data.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
+		 * @default null
 		 */
 		this.instanceColorNode = null;
 
@@ -86,14 +87,14 @@ class InstanceNode extends Node {
 		/**
 		 * A reference to a buffer that is used by `instanceMatrixNode`.
 		 *
-		 * @type {InstancedInterleavedBuffer}
+		 * @type {?InstancedInterleavedBuffer}
 		 */
 		this.buffer = null;
 
 		/**
 		 * A reference to a buffer that is used by `instanceColorNode`.
 		 *
-		 * @type {InstancedBufferAttribute}
+		 * @type {?InstancedBufferAttribute}
 		 */
 		this.bufferColor = null;
 
@@ -217,7 +218,7 @@ export default InstanceNode;
  * @function
  * @param {number} count - The number of instances.
  * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
- * @param {InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
+ * @param {?InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
  * @returns {InstanceNode}
  */
-export const instance = /*@__PURE__*/ nodeProxy( InstanceNode );
+export const instance = /*@__PURE__*/ nodeProxy( InstanceNode ).setParameterLength( 2, 3 );

@@ -12,12 +12,29 @@ import {
 const _box = new Box3();
 const _vector = new Vector3();
 
+/**
+ * A series of vertex pairs, forming line segments.
+ *
+ * This is used in {@link LineSegments2} to describe the shape.
+ *
+ * @augments InstancedBufferGeometry
+ */
 class LineSegmentsGeometry extends InstancedBufferGeometry {
 
+	/**
+	 * Constructs a new line segments geometry.
+	 */
 	constructor() {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLineSegmentsGeometry = true;
 
 		this.type = 'LineSegmentsGeometry';
@@ -32,6 +49,12 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Applies the given 4x4 transformation matrix to the geometry.
+	 *
+	 * @param {Matrix4} matrix - The matrix to apply.
+	 * @return {LineSegmentsGeometry} A reference to this instance.
+	 */
 	applyMatrix4( matrix ) {
 
 		const start = this.attributes.instanceStart;
@@ -63,6 +86,13 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Sets the given line positions for this geometry. The length must be a multiple of six since
+	 * each line segment is defined by a start end vertex in the pattern `(xyz xyz)`.
+	 *
+	 * @param {Float32Array|Array<number>} array - The position data to set.
+	 * @return {LineSegmentsGeometry} A reference to this geometry.
+	 */
 	setPositions( array ) {
 
 		let lineSegments;
@@ -93,6 +123,13 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Sets the given line colors for this geometry. The length must be a multiple of six since
+	 * each line segment is defined by a start end color in the pattern `(rgb rgb)`.
+	 *
+	 * @param {Float32Array|Array<number>} array - The position data to set.
+	 * @return {LineSegmentsGeometry} A reference to this geometry.
+	 */
 	setColors( array ) {
 
 		let colors;
@@ -116,6 +153,12 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Setups this line segments geometry from the given wireframe geometry.
+	 *
+	 * @param {WireframeGeometry} geometry - The geometry that should be used as a data source for this geometry.
+	 * @return {LineSegmentsGeometry} A reference to this geometry.
+	 */
 	fromWireframeGeometry( geometry ) {
 
 		this.setPositions( geometry.attributes.position.array );
@@ -124,6 +167,12 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Setups this line segments geometry from the given edges geometry.
+	 *
+	 * @param {EdgesGeometry} geometry - The geometry that should be used as a data source for this geometry.
+	 * @return {LineSegmentsGeometry} A reference to this geometry.
+	 */
 	fromEdgesGeometry( geometry ) {
 
 		this.setPositions( geometry.attributes.position.array );
@@ -132,6 +181,12 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Setups this line segments geometry from the given mesh.
+	 *
+	 * @param {Mesh} mesh - The mesh geometry that should be used as a data source for this geometry.
+	 * @return {LineSegmentsGeometry} A reference to this geometry.
+	 */
 	fromMesh( mesh ) {
 
 		this.fromWireframeGeometry( new WireframeGeometry( mesh.geometry ) );
@@ -142,6 +197,13 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	/**
+	 * Setups this line segments geometry from the given line segments.
+	 *
+	 * @param {LineSegments} lineSegments - The line segments that should be used as a data source for this geometry.
+	 * Assumes the source geometry is not using indices.
+	 * @return {LineSegmentsGeometry} A reference to this geometry.
+	 */
 	fromLineSegments( lineSegments ) {
 
 		const geometry = lineSegments.geometry;
@@ -227,14 +289,6 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	toJSON() {
 
 		// todo
-
-	}
-
-	applyMatrix( matrix ) {
-
-		console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
-
-		return this.applyMatrix4( matrix );
 
 	}
 

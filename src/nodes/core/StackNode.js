@@ -167,12 +167,12 @@ class StackNode extends Node {
 	 * @function
 	 * @deprecated since r168. Use {@link StackNode#Else} instead.
 	 *
-	 * @param  {...any} params
+	 * @param {...any} params
 	 * @returns {StackNode}
 	 */
 	else( ...params ) { // @deprecated, r168
 
-		console.warn( 'TSL.StackNode: .else() has been renamed to .Else().' );
+		console.warn( 'THREE.TSL: .else() has been renamed to .Else().' );
 		return this.Else( ...params );
 
 	}
@@ -180,12 +180,12 @@ class StackNode extends Node {
 	/**
 	 * @deprecated since r168. Use {@link StackNode#ElseIf} instead.
 	 *
-	 * @param  {...any} params
+	 * @param {...any} params
 	 * @returns {StackNode}
 	 */
 	elseif( ...params ) { // @deprecated, r168
 
-		console.warn( 'TSL.StackNode: .elseif() has been renamed to .ElseIf().' );
+		console.warn( 'THREE.TSL: .elseif() has been renamed to .ElseIf().' );
 		return this.ElseIf( ...params );
 
 	}
@@ -202,4 +202,4 @@ export default StackNode;
  * @param {?StackNode} [parent=null] - The parent stack node.
  * @returns {StackNode}
  */
-export const stack = /*@__PURE__*/ nodeProxy( StackNode );
+export const stack = /*@__PURE__*/ nodeProxy( StackNode ).setParameterLength( 0, 1 );

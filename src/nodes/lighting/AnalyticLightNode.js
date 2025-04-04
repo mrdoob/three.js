@@ -128,9 +128,17 @@ class AnalyticLightNode extends LightingNode {
 	 *
 	 * @abstract
 	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Object|undefined} The direct light data (color and direction).
 	 */
 	setupDirect( /*builder*/ ) { }
 
+	/**
+	 * Sets up the direct rect area lighting for the analytic light node.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Object|undefined} The direct rect area light data.
+	 */
 	setupDirectRectArea( /*builder*/ ) { }
 
 	/**
@@ -172,7 +180,7 @@ class AnalyticLightNode extends LightingNode {
 
 			} else {
 
-				shadowNode = this.setupShadowNode( builder );
+				shadowNode = this.setupShadowNode();
 
 			}
 

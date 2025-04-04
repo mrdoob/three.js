@@ -11,7 +11,7 @@ import { instancedMesh } from '../../nodes/accessors/InstancedMeshNode.js';
 import { batch } from '../../nodes/accessors/BatchNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
-import { skinningReference } from '../../nodes/accessors/SkinningNode.js';
+import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
@@ -257,7 +257,7 @@ class NodeMaterial extends Material {
 		 * simulation would be implemented as compute shaders and managed inside a `Fn` function. This function is
 		 * eventually assigned to `geometryNode`.
 		 *
-		 * @type {Function}
+		 * @type {?Function}
 		 * @default null
 		 */
 		this.geometryNode = null;
@@ -476,7 +476,9 @@ class NodeMaterial extends Material {
 
 			//
 
-			if ( this.outputNode !== null ) resultNode = this.outputNode;
+			const isCustomOutput = this.outputNode !== null;
+
+			if ( isCustomOutput ) resultNode = this.outputNode;
 
 			// MRT
 
@@ -486,6 +488,8 @@ class NodeMaterial extends Material {
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
+
+					if ( isCustomOutput ) output.assign( resultNode );
 
 					resultNode = mrt;
 
@@ -695,7 +699,7 @@ class NodeMaterial extends Material {
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinningReference( object ).append();
+			skinning( object ).append();
 
 		}
 

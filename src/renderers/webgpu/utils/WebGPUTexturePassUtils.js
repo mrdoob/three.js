@@ -343,7 +343,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureGPUDescriptor - The texture descriptor.
 	 * @param {number} baseArrayLayer - The index of the first array layer accessible to the texture view.
-	 * @return {Array} An array of render bundles.
+	 * @return {Array<Object>} An array of render bundles.
 	 */
 	_mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer ) {
 
@@ -414,7 +414,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 * Executes the render bundles.
 	 *
 	 * @param {GPUCommandEncoder} commandEncoder - The GPU command encoder.
-	 * @param {Array} passes - An array of render bundles.
+	 * @param {Array<Object>} passes - An array of render bundles.
 	 */
 	_mipmapRunBundles( commandEncoder, passes ) {
 

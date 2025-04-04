@@ -7,7 +7,7 @@ import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 
-import { IntType, UnsignedIntType } from '../../constants.js';
+import { IntType, NearestFilter, UnsignedIntType } from '../../constants.js';
 
 /**
  * This type of uniform node represents a 2D texture.
@@ -328,7 +328,7 @@ class TextureNode extends UniformNode {
 
 		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			uvNode = builder.context.getUV( this );
+			uvNode = builder.context.getUV( this, builder );
 
 		}
 
@@ -439,7 +439,7 @@ class TextureNode extends UniformNode {
 		const properties = builder.getNodeProperties( this );
 		const textureProperty = super.generate( builder, 'property' );
 
-		if ( output === 'sampler' ) {
+		if ( /^sampler/.test( output ) ) {
 
 			return textureProperty + '_sampler';
 
@@ -561,6 +561,16 @@ class TextureNode extends UniformNode {
 		const textureNode = this.clone();
 		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
 		textureNode.referenceNode = this.getSelf();
+
+		const map = textureNode.value;
+
+		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
+
+			console.warn( 'THREE.TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
+
+			textureNode.biasNode = null;
+
+		}
 
 		return nodeObject( textureNode );
 
@@ -710,6 +720,9 @@ class TextureNode extends UniformNode {
 
 		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode, this.biasNode );
 		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
 
 		return newNode;
 
@@ -730,7 +743,7 @@ export default TextureNode;
  * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
-export const texture = /*@__PURE__*/ nodeProxy( TextureNode );
+export const texture = /*@__PURE__*/ nodeProxy( TextureNode ).setParameterLength( 1, 4 );
 
 /**
  * TSL function for creating a texture node that fetches/loads texels without interpolation.
@@ -752,7 +765,17 @@ export const textureLoad = ( ...params ) => texture( ...params ).setSampler( fal
  *
  * @tsl
  * @function
- * @param {TextureNode|Texture} aTexture - The texture or texture node to convert.
+ * @param {TextureNode|Texture} value - The texture or texture node to convert.
  * @returns {Node}
  */
-export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
+export const sampler = ( value ) => ( value.isNode === true ? value : texture( value ) ).convert( 'sampler' );
+
+/**
+ * Converts a texture or texture node to a sampler comparison.
+ *
+ * @tsl
+ * @function
+ * @param {TextureNode|Texture} value - The texture or texture node to convert.
+ * @returns {Node}
+ */
+export const samplerComparison = ( value ) => ( value.isNode === true ? value : texture( value ) ).convert( 'samplerComparison' );

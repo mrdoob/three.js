@@ -5,7 +5,7 @@ import { LineBasicMaterial } from '../LineBasicMaterial.js';
 const _defaultValues = /*@__PURE__*/ new LineBasicMaterial();
 
 /**
- * Node material version of `LineBasicMaterial`.
+ * Node material version of {@link LineBasicMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -20,7 +20,7 @@ class LineBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new line basic node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

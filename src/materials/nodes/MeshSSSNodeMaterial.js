@@ -83,7 +83,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	/**
 	 * Constructs a new mesh SSS node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

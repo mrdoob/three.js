@@ -23,9 +23,10 @@ export * from '../utils/RemapNode.js'; // .remap(), .remapClamp()
 export * from '../code/ExpressionNode.js'; // expression()
 export * from '../utils/Discard.js'; // Discard(), Return()
 export * from '../display/RenderOutputNode.js'; // .renderOutput()
+export * from '../utils/DebugNode.js'; // debug()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 
-	console.warn( 'THREE.TSLBase: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
+	console.warn( 'THREE.TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
 
 }

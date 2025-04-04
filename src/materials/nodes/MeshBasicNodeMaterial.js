@@ -11,7 +11,7 @@ import { MeshBasicMaterial } from '../MeshBasicMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
 /**
- * Node material version of `MeshBasicMaterial`.
+ * Node material version of {@link MeshBasicMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -26,7 +26,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh basic node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

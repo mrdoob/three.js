@@ -45,7 +45,7 @@ class WebGLUtils {
 	 *
 	 * @param {number} p - The three.js constant.
 	 * @param {string} [colorSpace=NoColorSpace] - The color space.
-	 * @return {number} The corresponding WebGL constant.
+	 * @return {?number} The corresponding WebGL constant.
 	 */
 	convert( p, colorSpace = NoColorSpace ) {
 

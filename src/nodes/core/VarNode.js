@@ -23,8 +23,8 @@ class VarNode extends Node {
 	 * Constructs a new variable node.
 	 *
 	 * @param {Node} node - The node for which a variable should be created.
-	 * @param {?string} name - The name of the variable in the shader.
-	 * @param {?boolean} readOnly - The read-only flag.
+	 * @param {?string} [name=null] - The name of the variable in the shader.
+	 * @param {boolean} [readOnly=false] - The read-only flag.
 	 */
 	constructor( node, name = null, readOnly = false ) {
 
@@ -71,12 +71,6 @@ class VarNode extends Node {
 		 * @default false
 		 */
 		this.readOnly = readOnly;
-
-	}
-
-	getHash( builder ) {
-
-		return this.name || super.getHash( builder );
 
 	}
 

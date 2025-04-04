@@ -76,8 +76,8 @@ class ReflectorNode extends TextureNode {
 		 * A reference to the internal reflector base node which holds the actual implementation.
 		 *
 		 * @private
-		 * @type {?ReflectorBaseNode}
-		 * @default null
+		 * @type {ReflectorBaseNode}
+		 * @default ReflectorBaseNode
 		 */
 		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
 
@@ -273,6 +273,14 @@ class ReflectorBaseNode extends Node {
 		 */
 		this.renderTargets = new WeakMap();
 
+		/**
+		 * Force render even if reflector is facing away from camera.
+		 *
+		 * @type {boolean}
+		 * @default {false}
+		 */
+		this.forceUpdate = false;
+
 	}
 
 	/**
@@ -387,9 +395,10 @@ class ReflectorBaseNode extends Node {
 
 		_view.subVectors( _reflectorWorldPosition, _cameraWorldPosition );
 
-		// Avoid rendering when reflector is facing away
+		// Avoid rendering when reflector is facing away unless forcing an update
+		const isFacingAway = _view.dot( _normal ) > 0;
 
-		if ( _view.dot( _normal ) > 0 ) return;
+		if ( isFacingAway === true && this.forceUpdate === false ) return;
 
 		_view.reflect( _normal ).negate();
 		_view.add( _reflectorWorldPosition );
@@ -473,6 +482,8 @@ class ReflectorBaseNode extends Node {
 		material.visible = true;
 
 		_inReflector = false;
+
+		this.forceUpdate = false;
 
 	}
 

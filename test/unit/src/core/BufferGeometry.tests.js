@@ -528,25 +528,25 @@ export default QUnit.module( 'Core', () => {
 			let normals = getNormalsForVertices( [ - 1, 0, 0, 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === 1,
-				'first normal is pointing to screen since the the triangle was created counter clockwise' );
+				'first normal is pointing to screen since the triangle was created counter clockwise' );
 
 			assert.ok( normals[ 3 ] === 0 && normals[ 4 ] === 0 && normals[ 5 ] === 1,
-				'second normal is pointing to screen since the the triangle was created counter clockwise' );
+				'second normal is pointing to screen since the triangle was created counter clockwise' );
 
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === 1,
-				'third normal is pointing to screen since the the triangle was created counter clockwise' );
+				'third normal is pointing to screen since the triangle was created counter clockwise' );
 
 			// get normals for a clockwise created triangle
 			normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === - 1,
-				'first normal is pointing to screen since the the triangle was created clockwise' );
+				'first normal is pointing to screen since the triangle was created clockwise' );
 
 			assert.ok( normals[ 3 ] === 0 && normals[ 4 ] === 0 && normals[ 5 ] === - 1,
-				'second normal is pointing to screen since the the triangle was created clockwise' );
+				'second normal is pointing to screen since the triangle was created clockwise' );
 
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === - 1,
-				'third normal is pointing to screen since the the triangle was created clockwise' );
+				'third normal is pointing to screen since the triangle was created clockwise' );
 
 			normals = getNormalsForVertices( [ 0, 0, 1, 0, 0, - 1, 1, 1, 0 ], assert );
 

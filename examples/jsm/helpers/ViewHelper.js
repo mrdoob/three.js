@@ -17,15 +17,51 @@ import {
 	Vector4
 } from 'three';
 
+/**
+ * A special type of helper that visualizes the camera's transformation
+ * in a small viewport area as an axes helper. Such a helper is often wanted
+ * in 3D modeling tools or scene editors like the [three.js editor]{@link https://threejs.org/editor}.
+ *
+ * The helper allows to click on the X, Y and Z axes which animates the camera
+ * so it looks along the selected axis.
+ *
+ * @augments Object3D
+ */
 class ViewHelper extends Object3D {
 
+	/**
+	 * Constructs a new view helper.
+	 *
+	 * @param {Camera} camera - The camera whose transformation should be visualized.
+	 * @param {HTMLDOMElement} [domElement] - The DOM element that is used to render the view.
+	 */
 	constructor( camera, domElement ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isViewHelper = true;
 
+		/**
+		 * Whether the helper is currently animating or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.animating = false;
+
+		/**
+		 * The helper's center point.
+		 *
+		 * @type {Vector3}
+		 */
 		this.center = new Vector3();
 
 		const color1 = new Color( '#ff4466' );
@@ -104,6 +140,12 @@ class ViewHelper extends Object3D {
 		const dim = 128;
 		const turnRate = 2 * Math.PI; // turn rate in angles per second
 
+		/**
+		 * Renders the helper in a separate view in the bottom-right corner
+		 * of the viewport.
+		 *
+		 * @param {WebGLRenderer|WebGPURenderer} renderer - The renderer.
+		 */
 		this.render = function ( renderer ) {
 
 			this.quaternion.copy( camera.quaternion ).invert();
@@ -115,11 +157,12 @@ class ViewHelper extends Object3D {
 			//
 
 			const x = domElement.offsetWidth - dim;
+			const y = renderer.isWebGPURenderer ? domElement.offsetHeight - dim : 0;
 
 			renderer.clearDepth();
 
 			renderer.getViewport( viewport );
-			renderer.setViewport( x, 0, dim, dim );
+			renderer.setViewport( x, y, dim, dim );
 
 			renderer.render( this, orthoCamera );
 
@@ -135,6 +178,13 @@ class ViewHelper extends Object3D {
 		const viewport = new Vector4();
 		let radius = 0;
 
+		/**
+		 * This method should be called when a click or pointer event
+		 * has happened in the app.
+		 *
+		 * @param {PointerEvent} event - The event to process.
+		 * @return {boolean} Whether an intersection with the helper has been detected or not.
+		 */
 		this.handleClick = function ( event ) {
 
 			if ( this.animating === true ) return false;
@@ -168,6 +218,13 @@ class ViewHelper extends Object3D {
 
 		};
 
+		/**
+		 * Sets labels for each axis. By default, they are unlabeled.
+		 *
+		 * @param {string|undefined} labelX - The label for the x-axis.
+		 * @param {string|undefined} labelY - The label for the y-axis.
+		 * @param {string|undefined} labelZ - The label for the z-axis.
+		 */
 		this.setLabels = function ( labelX, labelY, labelZ ) {
 
 			options.labelX = labelX;
@@ -178,6 +235,13 @@ class ViewHelper extends Object3D {
 
 		};
 
+		/**
+		 * Sets the label style. Has no effect when the axes are unlabeled.
+		 *
+		 * @param {string} [font='24px Arial'] - The label font.
+		 * @param {string} [color='#000000'] - The label color.
+		 * @param {number} [radius=14] - The label radius.
+		 */
 		this.setLabelStyle = function ( font, color, radius ) {
 
 			options.font = font;
@@ -188,6 +252,12 @@ class ViewHelper extends Object3D {
 
 		};
 
+		/**
+		 * Updates the helper. This method should be called in the app's animation
+		 * loop.
+		 *
+		 * @param {number} delta - The delta time in seconds.
+		 */
 		this.update = function ( delta ) {
 
 			const step = delta * turnRate;
@@ -209,6 +279,10 @@ class ViewHelper extends Object3D {
 
 		};
 
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			geometry.dispose();

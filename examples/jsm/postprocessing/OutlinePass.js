@@ -16,27 +16,137 @@ import {
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
+/**
+ * A pass for rendering outlines around selected objects.
+ *
+ * ```js
+ * const resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
+ * const outlinePass = new OutlinePass( resolution, scene, camera );
+ * composer.addPass( outlinePass );
+ * ```
+ *
+ * @augments Pass
+ */
 class OutlinePass extends Pass {
 
+	/**
+	 * Constructs a new outline pass.
+	 *
+	 * @param {Vector2} [resolution] - The effect's resolution.
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Camera} camera - The camera.
+	 * @param {Array<Object3D>} [selectedObjects] - The selected 3D objects that should receive an outline.
+	 *
+	 */
 	constructor( resolution, scene, camera, selectedObjects ) {
 
 		super();
 
+		/**
+		 * The scene to render.
+		 *
+		 * @type {Object}
+		 */
 		this.renderScene = scene;
+
+		/**
+		 * The camera.
+		 *
+		 * @type {Object}
+		 */
 		this.renderCamera = camera;
+
+		/**
+		 * The selected 3D objects that should receive an outline.
+		 *
+		 * @type {Array<Object3D>}
+		 */
 		this.selectedObjects = selectedObjects !== undefined ? selectedObjects : [];
+
+		/**
+		 * The visible edge color.
+		 *
+		 * @type {Color}
+		 * @default (1,1,1)
+		 */
 		this.visibleEdgeColor = new Color( 1, 1, 1 );
+
+		/**
+		 * The hidden edge color.
+		 *
+		 * @type {Color}
+		 * @default (0.1,0.04,0.02)
+		 */
 		this.hiddenEdgeColor = new Color( 0.1, 0.04, 0.02 );
+
+		/**
+		 * Can be used for an animated glow/pulse effect.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.edgeGlow = 0.0;
+
+		/**
+		 * Whether to use a pattern texture for to highlight selected
+		 * 3D objects or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.usePatternTexture = false;
+
+		/**
+		 * Can be used to highlight selected 3D objects. Requires to set
+		 * {@link OutlinePass#usePatternTexture} to `true`.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.patternTexture = null;
+
+		/**
+		 * The edge thickness.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.edgeThickness = 1.0;
+
+		/**
+		 * The edge strength.
+		 *
+		 * @type {number}
+		 * @default 3
+		 */
 		this.edgeStrength = 3.0;
+
+		/**
+		 * The downsample ratio. The effect can be rendered in a much
+		 * lower resolution than the beauty pass.
+		 *
+		 * @type {number}
+		 * @default 2
+		 */
 		this.downSampleRatio = 2;
+
+		/**
+		 * The pulse period.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.pulsePeriod = 0;
 
 		this._visibilityCache = new Map();
 		this._selectionCache = new Set();
 
+		/**
+		 * The effect's resolution.
+		 *
+		 * @type {Vector2}
+		 * @default (256,256)
+		 */
 		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
 
 		const resx = Math.round( this.resolution.x / this.downSampleRatio );
@@ -51,7 +161,7 @@ class OutlinePass extends Pass {
 		this.depthMaterial.depthPacking = RGBADepthPacking;
 		this.depthMaterial.blending = NoBlending;
 
-		this.prepareMaskMaterial = this.getPrepareMaskMaterial();
+		this.prepareMaskMaterial = this._getPrepareMaskMaterial();
 		this.prepareMaskMaterial.side = DoubleSide;
 		this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
 
@@ -70,7 +180,7 @@ class OutlinePass extends Pass {
 		this.renderTargetBlurBuffer2.texture.name = 'OutlinePass.blur2';
 		this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 
-		this.edgeDetectionMaterial = this.getEdgeDetectionMaterial();
+		this.edgeDetectionMaterial = this._getEdgeDetectionMaterial();
 		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
 		this.renderTargetEdgeBuffer1.texture.name = 'OutlinePass.edge1';
 		this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
@@ -81,15 +191,15 @@ class OutlinePass extends Pass {
 		const MAX_EDGE_THICKNESS = 4;
 		const MAX_EDGE_GLOW = 4;
 
-		this.separableBlurMaterial1 = this.getSeparableBlurMaterial( MAX_EDGE_THICKNESS );
+		this.separableBlurMaterial1 = this._getSeparableBlurMaterial( MAX_EDGE_THICKNESS );
 		this.separableBlurMaterial1.uniforms[ 'texSize' ].value.set( resx, resy );
 		this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = 1;
-		this.separableBlurMaterial2 = this.getSeparableBlurMaterial( MAX_EDGE_GLOW );
+		this.separableBlurMaterial2 = this._getSeparableBlurMaterial( MAX_EDGE_GLOW );
 		this.separableBlurMaterial2.uniforms[ 'texSize' ].value.set( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 		this.separableBlurMaterial2.uniforms[ 'kernelRadius' ].value = MAX_EDGE_GLOW;
 
 		// Overlay material
-		this.overlayMaterial = this.getOverlayMaterial();
+		this.overlayMaterial = this._getOverlayMaterial();
 
 		// copy material
 
@@ -112,7 +222,7 @@ class OutlinePass extends Pass {
 		this._oldClearColor = new Color();
 		this.oldClearAlpha = 1;
 
-		this.fsQuad = new FullScreenQuad( null );
+		this._fsQuad = new FullScreenQuad( null );
 
 		this.tempPulseColor1 = new Color();
 		this.tempPulseColor2 = new Color();
@@ -128,6 +238,10 @@ class OutlinePass extends Pass {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
 	dispose() {
 
 		this.renderTargetMaskBuffer.dispose();
@@ -146,10 +260,16 @@ class OutlinePass extends Pass {
 		this.overlayMaterial.dispose();
 		this.materialCopy.dispose();
 
-		this.fsQuad.dispose();
+		this._fsQuad.dispose();
 
 	}
 
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The width to set.
+	 */
 	setSize( width, height ) {
 
 		this.renderTargetMaskBuffer.setSize( width, height );
@@ -172,7 +292,159 @@ class OutlinePass extends Pass {
 
 	}
 
-	updateSelectionCache() {
+	/**
+	 * Performs the Outline pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+
+		if ( this.selectedObjects.length > 0 ) {
+
+			renderer.getClearColor( this._oldClearColor );
+			this.oldClearAlpha = renderer.getClearAlpha();
+			const oldAutoClear = renderer.autoClear;
+
+			renderer.autoClear = false;
+
+			if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
+
+			renderer.setClearColor( 0xffffff, 1 );
+
+			this._updateSelectionCache();
+
+			// Make selected objects invisible
+			this._changeVisibilityOfSelectedObjects( false );
+
+			const currentBackground = this.renderScene.background;
+			const currentOverrideMaterial = this.renderScene.overrideMaterial;
+			this.renderScene.background = null;
+
+			// 1. Draw Non Selected objects in the depth buffer
+			this.renderScene.overrideMaterial = this.depthMaterial;
+			renderer.setRenderTarget( this.renderTargetDepthBuffer );
+			renderer.clear();
+			renderer.render( this.renderScene, this.renderCamera );
+
+			// Make selected objects visible
+			this._changeVisibilityOfSelectedObjects( true );
+			this._visibilityCache.clear();
+
+			// Update Texture Matrix for Depth compare
+			this._updateTextureMatrix();
+
+			// Make non selected objects invisible, and draw only the selected objects, by comparing the depth buffer of non selected objects
+			this._changeVisibilityOfNonSelectedObjects( false );
+			this.renderScene.overrideMaterial = this.prepareMaskMaterial;
+			this.prepareMaskMaterial.uniforms[ 'cameraNearFar' ].value.set( this.renderCamera.near, this.renderCamera.far );
+			this.prepareMaskMaterial.uniforms[ 'depthTexture' ].value = this.renderTargetDepthBuffer.texture;
+			this.prepareMaskMaterial.uniforms[ 'textureMatrix' ].value = this.textureMatrix;
+			renderer.setRenderTarget( this.renderTargetMaskBuffer );
+			renderer.clear();
+			renderer.render( this.renderScene, this.renderCamera );
+			this._changeVisibilityOfNonSelectedObjects( true );
+			this._visibilityCache.clear();
+			this._selectionCache.clear();
+
+			this.renderScene.background = currentBackground;
+			this.renderScene.overrideMaterial = currentOverrideMaterial;
+
+			// 2. Downsample to Half resolution
+			this._fsQuad.material = this.materialCopy;
+			this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetMaskBuffer.texture;
+			renderer.setRenderTarget( this.renderTargetMaskDownSampleBuffer );
+			renderer.clear();
+			this._fsQuad.render( renderer );
+
+			this.tempPulseColor1.copy( this.visibleEdgeColor );
+			this.tempPulseColor2.copy( this.hiddenEdgeColor );
+
+			if ( this.pulsePeriod > 0 ) {
+
+				const scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01 / this.pulsePeriod ) * ( 1.0 - 0.25 ) / 2;
+				this.tempPulseColor1.multiplyScalar( scalar );
+				this.tempPulseColor2.multiplyScalar( scalar );
+
+			}
+
+			// 3. Apply Edge Detection Pass
+			this._fsQuad.material = this.edgeDetectionMaterial;
+			this.edgeDetectionMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskDownSampleBuffer.texture;
+			this.edgeDetectionMaterial.uniforms[ 'texSize' ].value.set( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
+			this.edgeDetectionMaterial.uniforms[ 'visibleEdgeColor' ].value = this.tempPulseColor1;
+			this.edgeDetectionMaterial.uniforms[ 'hiddenEdgeColor' ].value = this.tempPulseColor2;
+			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
+			renderer.clear();
+			this._fsQuad.render( renderer );
+
+			// 4. Apply Blur on Half res
+			this._fsQuad.material = this.separableBlurMaterial1;
+			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
+			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
+			this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = this.edgeThickness;
+			renderer.setRenderTarget( this.renderTargetBlurBuffer1 );
+			renderer.clear();
+			this._fsQuad.render( renderer );
+			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer1.texture;
+			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
+			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
+			renderer.clear();
+			this._fsQuad.render( renderer );
+
+			// Apply Blur on quarter res
+			this._fsQuad.material = this.separableBlurMaterial2;
+			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
+			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
+			renderer.setRenderTarget( this.renderTargetBlurBuffer2 );
+			renderer.clear();
+			this._fsQuad.render( renderer );
+			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer2.texture;
+			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
+			renderer.setRenderTarget( this.renderTargetEdgeBuffer2 );
+			renderer.clear();
+			this._fsQuad.render( renderer );
+
+			// Blend it additively over the input texture
+			this._fsQuad.material = this.overlayMaterial;
+			this.overlayMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskBuffer.texture;
+			this.overlayMaterial.uniforms[ 'edgeTexture1' ].value = this.renderTargetEdgeBuffer1.texture;
+			this.overlayMaterial.uniforms[ 'edgeTexture2' ].value = this.renderTargetEdgeBuffer2.texture;
+			this.overlayMaterial.uniforms[ 'patternTexture' ].value = this.patternTexture;
+			this.overlayMaterial.uniforms[ 'edgeStrength' ].value = this.edgeStrength;
+			this.overlayMaterial.uniforms[ 'edgeGlow' ].value = this.edgeGlow;
+			this.overlayMaterial.uniforms[ 'usePatternTexture' ].value = this.usePatternTexture;
+
+
+			if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
+
+			renderer.setRenderTarget( readBuffer );
+			this._fsQuad.render( renderer );
+
+			renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
+			renderer.autoClear = oldAutoClear;
+
+		}
+
+		if ( this.renderToScreen ) {
+
+			this._fsQuad.material = this.materialCopy;
+			this.copyUniforms[ 'tDiffuse' ].value = readBuffer.texture;
+			renderer.setRenderTarget( null );
+			this._fsQuad.render( renderer );
+
+		}
+
+	}
+
+	// internals
+
+	_updateSelectionCache() {
 
 		const cache = this._selectionCache;
 
@@ -193,7 +465,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	changeVisibilityOfSelectedObjects( bVisible ) {
+	_changeVisibilityOfSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
 
@@ -214,7 +486,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	changeVisibilityOfNonSelectedObjects( bVisible ) {
+	_changeVisibilityOfNonSelectedObjects( bVisible ) {
 
 		const visibilityCache = this._visibilityCache;
 		const selectionCache = this._selectionCache;
@@ -263,7 +535,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	updateTextureMatrix() {
+	_updateTextureMatrix() {
 
 		this.textureMatrix.set( 0.5, 0.0, 0.0, 0.5,
 			0.0, 0.5, 0.0, 0.5,
@@ -274,146 +546,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
-
-		if ( this.selectedObjects.length > 0 ) {
-
-			renderer.getClearColor( this._oldClearColor );
-			this.oldClearAlpha = renderer.getClearAlpha();
-			const oldAutoClear = renderer.autoClear;
-
-			renderer.autoClear = false;
-
-			if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
-
-			renderer.setClearColor( 0xffffff, 1 );
-
-			this.updateSelectionCache();
-
-			// Make selected objects invisible
-			this.changeVisibilityOfSelectedObjects( false );
-
-			const currentBackground = this.renderScene.background;
-			const currentOverrideMaterial = this.renderScene.overrideMaterial;
-			this.renderScene.background = null;
-
-			// 1. Draw Non Selected objects in the depth buffer
-			this.renderScene.overrideMaterial = this.depthMaterial;
-			renderer.setRenderTarget( this.renderTargetDepthBuffer );
-			renderer.clear();
-			renderer.render( this.renderScene, this.renderCamera );
-
-			// Make selected objects visible
-			this.changeVisibilityOfSelectedObjects( true );
-			this._visibilityCache.clear();
-
-			// Update Texture Matrix for Depth compare
-			this.updateTextureMatrix();
-
-			// Make non selected objects invisible, and draw only the selected objects, by comparing the depth buffer of non selected objects
-			this.changeVisibilityOfNonSelectedObjects( false );
-			this.renderScene.overrideMaterial = this.prepareMaskMaterial;
-			this.prepareMaskMaterial.uniforms[ 'cameraNearFar' ].value.set( this.renderCamera.near, this.renderCamera.far );
-			this.prepareMaskMaterial.uniforms[ 'depthTexture' ].value = this.renderTargetDepthBuffer.texture;
-			this.prepareMaskMaterial.uniforms[ 'textureMatrix' ].value = this.textureMatrix;
-			renderer.setRenderTarget( this.renderTargetMaskBuffer );
-			renderer.clear();
-			renderer.render( this.renderScene, this.renderCamera );
-			this.changeVisibilityOfNonSelectedObjects( true );
-			this._visibilityCache.clear();
-			this._selectionCache.clear();
-
-			this.renderScene.background = currentBackground;
-			this.renderScene.overrideMaterial = currentOverrideMaterial;
-
-			// 2. Downsample to Half resolution
-			this.fsQuad.material = this.materialCopy;
-			this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetMaskBuffer.texture;
-			renderer.setRenderTarget( this.renderTargetMaskDownSampleBuffer );
-			renderer.clear();
-			this.fsQuad.render( renderer );
-
-			this.tempPulseColor1.copy( this.visibleEdgeColor );
-			this.tempPulseColor2.copy( this.hiddenEdgeColor );
-
-			if ( this.pulsePeriod > 0 ) {
-
-				const scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01 / this.pulsePeriod ) * ( 1.0 - 0.25 ) / 2;
-				this.tempPulseColor1.multiplyScalar( scalar );
-				this.tempPulseColor2.multiplyScalar( scalar );
-
-			}
-
-			// 3. Apply Edge Detection Pass
-			this.fsQuad.material = this.edgeDetectionMaterial;
-			this.edgeDetectionMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskDownSampleBuffer.texture;
-			this.edgeDetectionMaterial.uniforms[ 'texSize' ].value.set( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
-			this.edgeDetectionMaterial.uniforms[ 'visibleEdgeColor' ].value = this.tempPulseColor1;
-			this.edgeDetectionMaterial.uniforms[ 'hiddenEdgeColor' ].value = this.tempPulseColor2;
-			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
-			renderer.clear();
-			this.fsQuad.render( renderer );
-
-			// 4. Apply Blur on Half res
-			this.fsQuad.material = this.separableBlurMaterial1;
-			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
-			this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = this.edgeThickness;
-			renderer.setRenderTarget( this.renderTargetBlurBuffer1 );
-			renderer.clear();
-			this.fsQuad.render( renderer );
-			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
-			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
-			renderer.clear();
-			this.fsQuad.render( renderer );
-
-			// Apply Blur on quarter res
-			this.fsQuad.material = this.separableBlurMaterial2;
-			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
-			renderer.setRenderTarget( this.renderTargetBlurBuffer2 );
-			renderer.clear();
-			this.fsQuad.render( renderer );
-			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer2.texture;
-			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
-			renderer.setRenderTarget( this.renderTargetEdgeBuffer2 );
-			renderer.clear();
-			this.fsQuad.render( renderer );
-
-			// Blend it additively over the input texture
-			this.fsQuad.material = this.overlayMaterial;
-			this.overlayMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskBuffer.texture;
-			this.overlayMaterial.uniforms[ 'edgeTexture1' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.overlayMaterial.uniforms[ 'edgeTexture2' ].value = this.renderTargetEdgeBuffer2.texture;
-			this.overlayMaterial.uniforms[ 'patternTexture' ].value = this.patternTexture;
-			this.overlayMaterial.uniforms[ 'edgeStrength' ].value = this.edgeStrength;
-			this.overlayMaterial.uniforms[ 'edgeGlow' ].value = this.edgeGlow;
-			this.overlayMaterial.uniforms[ 'usePatternTexture' ].value = this.usePatternTexture;
-
-
-			if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
-
-			renderer.setRenderTarget( readBuffer );
-			this.fsQuad.render( renderer );
-
-			renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
-			renderer.autoClear = oldAutoClear;
-
-		}
-
-		if ( this.renderToScreen ) {
-
-			this.fsQuad.material = this.materialCopy;
-			this.copyUniforms[ 'tDiffuse' ].value = readBuffer.texture;
-			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
-
-		}
-
-	}
-
-	getPrepareMaskMaterial() {
+	_getPrepareMaskMaterial() {
 
 		return new ShaderMaterial( {
 
@@ -475,7 +608,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	getEdgeDetectionMaterial() {
+	_getEdgeDetectionMaterial() {
 
 		return new ShaderMaterial( {
 
@@ -522,7 +655,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	getSeparableBlurMaterial( maxRadius ) {
+	_getSeparableBlurMaterial( maxRadius ) {
 
 		return new ShaderMaterial( {
 
@@ -579,7 +712,7 @@ class OutlinePass extends Pass {
 
 	}
 
-	getOverlayMaterial() {
+	_getOverlayMaterial() {
 
 		return new ShaderMaterial( {
 

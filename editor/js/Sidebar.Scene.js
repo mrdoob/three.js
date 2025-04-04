@@ -181,7 +181,23 @@ function SidebarScene( editor ) {
 	backgroundEquirectangularTexture.setDisplay( 'none' );
 	backgroundRow.add( backgroundEquirectangularTexture );
 
+	const backgroundColorSpaceRow = new UIRow();
+	backgroundColorSpaceRow.setDisplay( 'none' );
+	backgroundColorSpaceRow.setMarginLeft( '120px' );
+
+	const backgroundColorSpace = new UISelect().setOptions( {
+
+		[ THREE.NoColorSpace ]: 'No Color Space',
+		[ THREE.LinearSRGBColorSpace ]: 'srgb-linear',
+		[ THREE.SRGBColorSpace ]: 'srgb',
+
+	} ).setWidth( '150px' );
+	backgroundColorSpace.setValue( THREE.NoColorSpace );
+	backgroundColorSpace.onChange( onBackgroundChanged );
+	backgroundColorSpaceRow.add( backgroundColorSpace );
+
 	container.add( backgroundRow );
+	container.add( backgroundColorSpaceRow );
 
 	const backgroundEquirectRow = new UIRow();
 	backgroundEquirectRow.setDisplay( 'none' );
@@ -205,6 +221,7 @@ function SidebarScene( editor ) {
 			backgroundColor.getHexValue(),
 			backgroundTexture.getValue(),
 			backgroundEquirectangularTexture.getValue(),
+			backgroundColorSpace.getValue(),
 			backgroundBlurriness.getValue(),
 			backgroundIntensity.getValue(),
 			backgroundRotation.getValue()
@@ -222,6 +239,16 @@ function SidebarScene( editor ) {
 		backgroundEquirectangularTexture.setDisplay( type === 'Equirectangular' ? '' : 'none' );
 		backgroundEquirectRow.setDisplay( type === 'Equirectangular' ? '' : 'none' );
 
+		if ( type === 'Texture' || type === 'Equirectangular' ) {
+
+			backgroundColorSpaceRow.setDisplay( '' );
+
+		} else {
+
+			backgroundColorSpaceRow.setDisplay( 'none' );
+
+		}
+
 	}
 
 	// environment
@@ -233,7 +260,7 @@ function SidebarScene( editor ) {
 		'None': '',
 		'Background': 'Background',
 		'Equirectangular': 'Equirect',
-		'ModelViewer': 'ModelViewer'
+		'Room': 'Room'
 
 	} ).setWidth( '150px' );
 	environmentType.setValue( 'None' );
@@ -412,6 +439,8 @@ function SidebarScene( editor ) {
 
 				}
 
+				backgroundColorSpace.setValue( scene.background.colorSpace );
+
 			}
 
 		} else {
@@ -419,6 +448,7 @@ function SidebarScene( editor ) {
 			backgroundType.setValue( 'None' );
 			backgroundTexture.setValue( null );
 			backgroundEquirectangularTexture.setValue( null );
+			backgroundColorSpace.setValue( THREE.NoColorSpace );
 
 		}
 
@@ -435,7 +465,7 @@ function SidebarScene( editor ) {
 
 			} else if ( scene.environment.isRenderTargetTexture === true ) {
 
-				environmentType.setValue( 'ModelViewer' );
+				environmentType.setValue( 'Room' );
 
 			}
 

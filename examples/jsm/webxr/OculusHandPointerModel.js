@@ -19,13 +19,35 @@ const ZAXIS = /* @__PURE__ */ new Vector3( 0, 0, 1 );
 const CURSOR_RADIUS = 0.02;
 const CURSOR_MAX_DISTANCE = 1.5;
 
+/**
+ * Represents an Oculus hand pointer model.
+ *
+ * @augments Object3D
+ */
 class OculusHandPointerModel extends Object3D {
 
+	/**
+	 * Constructs a new Oculus hand model.
+	 *
+	 * @param {Group} hand - The hand controller.
+	 * @param {Group} controller - The WebXR controller in target ray space.
+	 */
 	constructor( hand, controller ) {
 
 		super();
 
+		/**
+		 * The hand controller.
+		 *
+		 * @type {Group}
+		 */
 		this.hand = hand;
+
+		/**
+		 * The WebXR controller in target ray space.
+		 *
+		 * @type {Group}
+		 */
 		this.controller = controller;
 
 		// Unused
@@ -33,15 +55,61 @@ class OculusHandPointerModel extends Object3D {
 		this.envMap = null;
 		this.mesh = null;
 
+		/**
+		 * The pointer geometry.
+		 *
+		 * @type {?BufferGeometry}
+		 * @default null
+		 */
 		this.pointerGeometry = null;
+
+		/**
+		 * The pointer mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.pointerMesh = null;
+
+		/**
+		 * The pointer object that holds the pointer mesh.
+		 *
+		 * @type {?Object3D}
+		 * @default null
+		 */
 		this.pointerObject = null;
 
+		/**
+		 * Whether the model is pinched or not.
+		 *
+		 * @type {?boolean}
+		 * @default false
+		 */
 		this.pinched = false;
+
+		/**
+		 * Whether the model is attached or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.attached = false;
 
+		/**
+		 * The cursor object.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.cursorObject = null;
 
+		/**
+		 * The internal raycaster used for detecting
+		 * intersections.
+		 *
+		 * @type {?Raycaster}
+		 * @default null
+		 */
 		this.raycaster = null;
 
 		this._onConnected = this._onConnected.bind( this );
@@ -143,6 +211,9 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Creates a pointer mesh and adds it to this model.
+	 */
 	createPointer() {
 
 		let i, j;
@@ -317,6 +388,12 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Overwritten with a custom implementation. Makes sure the internal pointer and raycaster are updated.
+	 *
+	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
+	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
+	 */
 	updateMatrixWorld( force ) {
 
 		super.updateMatrixWorld( force );
@@ -329,24 +406,47 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Returns `true` is the model is pinched.
+	 *
+	 * @return {boolean} Whether the model is pinched or not.
+	 */
 	isPinched() {
 
 		return this.pinched;
 
 	}
 
+	/**
+	 * Sets the attached state.
+	 *
+	 * @param {boolean} attached - Whether the model is attached or not.
+	 */
 	setAttached( attached ) {
 
 		this.attached = attached;
 
 	}
 
+	/**
+	 * Returns `true` is the model is attached.
+	 *
+	 * @return {boolean} Whether the model is attached or not.
+	 */
 	isAttached() {
 
 		return this.attached;
 
 	}
 
+	/**
+	 * Performs an intersection test with the model's raycaster and the given object.
+	 *
+	 * @param {Object3D} object - The 3D object to check for intersection with the ray.
+	 * @param {boolean} [recursive=true] - If set to `true`, it also checks all descendants.
+	 * Otherwise it only checks intersection with the object.
+	 * @return {Array<Raycaster~Intersection>} An array holding the intersection points.
+	 */
 	intersectObject( object, recursive = true ) {
 
 		if ( this.raycaster ) {
@@ -357,6 +457,14 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Performs an intersection test with the model's raycaster and the given objects.
+	 *
+	 * @param {Array<Object3D>} objects - The 3D objects to check for intersection with the ray.
+	 * @param {boolean} [recursive=true] - If set to `true`, it also checks all descendants.
+	 * Otherwise it only checks intersection with the object.
+	 * @return {Array<Raycaster~Intersection>} An array holding the intersection points.
+	 */
 	intersectObjects( objects, recursive = true ) {
 
 		if ( this.raycaster ) {
@@ -367,6 +475,14 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Checks for intersections between the model's raycaster and the given objects. The method
+	 * updates the cursor object to the intersection point.
+	 *
+	 * @param {Array<Object3D>} objects - The 3D objects to check for intersection with the ray.
+	 * @param {boolean} [recursive=false] - If set to `true`, it also checks all descendants.
+	 * Otherwise it only checks intersection with the object.
+	 */
 	checkIntersections( objects, recursive = false ) {
 
 		if ( this.raycaster && ! this.attached ) {
@@ -389,6 +505,11 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Sets the cursor to the given distance.
+	 *
+	 * @param {number} distance - The distance to set the cursor to.
+	 */
 	setCursor( distance ) {
 
 		const direction = new Vector3( 0, 0, - 1 );
@@ -400,6 +521,10 @@ class OculusHandPointerModel extends Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this._onDisconnected();

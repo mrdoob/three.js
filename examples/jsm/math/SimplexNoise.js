@@ -1,17 +1,17 @@
-// Ported from Stefan Gustavson's java implementation
-// http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
-// Read Stefan's excellent paper for details on how this code works.
-//
-// Sean McCullough banksean@gmail.com
-//
-// Added 4D noise
-
 /**
- * You can pass in a random number generator object if you like.
- * It is assumed to have a random() method.
+ * A utility class providing noise functions.
+ *
+ * The code is based on [Simplex noise demystified]{@link https://web.archive.org/web/20210210162332/http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf}
+ * by Stefan Gustavson, 2005.
  */
 class SimplexNoise {
 
+	/**
+	 * Constructs a new simplex noise object.
+	 *
+	 * @param {Object} [r=Math] - A math utility class that holds a `random()` method. This makes it
+	 * possible to pass in custom random number generator.
+	 */
 	constructor( r = Math ) {
 
 		this.grad3 = [[ 1, 1, 0 ], [ - 1, 1, 0 ], [ 1, - 1, 0 ], [ - 1, - 1, 0 ],
@@ -58,24 +58,13 @@ class SimplexNoise {
 
 	}
 
-	dot( g, x, y ) {
-
-		return g[ 0 ] * x + g[ 1 ] * y;
-
-	}
-
-	dot3( g, x, y, z ) {
-
-		return g[ 0 ] * x + g[ 1 ] * y + g[ 2 ] * z;
-
-	}
-
-	dot4( g, x, y, z, w ) {
-
-		return g[ 0 ] * x + g[ 1 ] * y + g[ 2 ] * z + g[ 3 ] * w;
-
-	}
-
+	/**
+	 * A 2D simplex noise method.
+	 *
+	 * @param {number} xin - The x coordinate.
+	 * @param {number} yin - The y coordinate.
+	 * @return {number} The noise value.
+	 */
 	noise( xin, yin ) {
 
 		let n0; // Noise contributions from the three corners
@@ -129,7 +118,7 @@ class SimplexNoise {
 		else {
 
 			t0 *= t0;
-			n0 = t0 * t0 * this.dot( this.grad3[ gi0 ], x0, y0 ); // (x,y) of grad3 used for 2D gradient
+			n0 = t0 * t0 * this._dot( this.grad3[ gi0 ], x0, y0 ); // (x,y) of grad3 used for 2D gradient
 
 		}
 
@@ -138,7 +127,7 @@ class SimplexNoise {
 		else {
 
 			t1 *= t1;
-			n1 = t1 * t1 * this.dot( this.grad3[ gi1 ], x1, y1 );
+			n1 = t1 * t1 * this._dot( this.grad3[ gi1 ], x1, y1 );
 
 		}
 
@@ -147,7 +136,7 @@ class SimplexNoise {
 		else {
 
 			t2 *= t2;
-			n2 = t2 * t2 * this.dot( this.grad3[ gi2 ], x2, y2 );
+			n2 = t2 * t2 * this._dot( this.grad3[ gi2 ], x2, y2 );
 
 		}
 
@@ -157,7 +146,14 @@ class SimplexNoise {
 
 	}
 
-	// 3D simplex noise
+	/**
+	 * A 3D simplex noise method.
+	 *
+	 * @param {number} xin - The x coordinate.
+	 * @param {number} yin - The y coordinate.
+	 * @param {number} zin - The z coordinate.
+	 * @return {number} The noise value.
+	 */
 	noise3d( xin, yin, zin ) {
 
 		let n0; // Noise contributions from the four corners
@@ -257,7 +253,7 @@ class SimplexNoise {
 		else {
 
 			t0 *= t0;
-			n0 = t0 * t0 * this.dot3( this.grad3[ gi0 ], x0, y0, z0 );
+			n0 = t0 * t0 * this._dot3( this.grad3[ gi0 ], x0, y0, z0 );
 
 		}
 
@@ -266,7 +262,7 @@ class SimplexNoise {
 		else {
 
 			t1 *= t1;
-			n1 = t1 * t1 * this.dot3( this.grad3[ gi1 ], x1, y1, z1 );
+			n1 = t1 * t1 * this._dot3( this.grad3[ gi1 ], x1, y1, z1 );
 
 		}
 
@@ -275,7 +271,7 @@ class SimplexNoise {
 		else {
 
 			t2 *= t2;
-			n2 = t2 * t2 * this.dot3( this.grad3[ gi2 ], x2, y2, z2 );
+			n2 = t2 * t2 * this._dot3( this.grad3[ gi2 ], x2, y2, z2 );
 
 		}
 
@@ -284,7 +280,7 @@ class SimplexNoise {
 		else {
 
 			t3 *= t3;
-			n3 = t3 * t3 * this.dot3( this.grad3[ gi3 ], x3, y3, z3 );
+			n3 = t3 * t3 * this._dot3( this.grad3[ gi3 ], x3, y3, z3 );
 
 		}
 
@@ -294,7 +290,15 @@ class SimplexNoise {
 
 	}
 
-	// 4D simplex noise
+	/**
+	 * A 4D simplex noise method.
+	 *
+	 * @param {number} x - The x coordinate.
+	 * @param {number} y - The y coordinate.
+	 * @param {number} z - The z coordinate.
+	 * @param {number} w - The w coordinate.
+	 * @return {number} The noise value.
+	 */
 	noise4d( x, y, z, w ) {
 
 		// For faster and easier lookups
@@ -394,7 +398,7 @@ class SimplexNoise {
 		else {
 
 			t0 *= t0;
-			n0 = t0 * t0 * this.dot4( grad4[ gi0 ], x0, y0, z0, w0 );
+			n0 = t0 * t0 * this._dot4( grad4[ gi0 ], x0, y0, z0, w0 );
 
 		}
 
@@ -403,7 +407,7 @@ class SimplexNoise {
 		else {
 
 			t1 *= t1;
-			n1 = t1 * t1 * this.dot4( grad4[ gi1 ], x1, y1, z1, w1 );
+			n1 = t1 * t1 * this._dot4( grad4[ gi1 ], x1, y1, z1, w1 );
 
 		}
 
@@ -412,7 +416,7 @@ class SimplexNoise {
 		else {
 
 			t2 *= t2;
-			n2 = t2 * t2 * this.dot4( grad4[ gi2 ], x2, y2, z2, w2 );
+			n2 = t2 * t2 * this._dot4( grad4[ gi2 ], x2, y2, z2, w2 );
 
 		}
 
@@ -421,7 +425,7 @@ class SimplexNoise {
 		else {
 
 			t3 *= t3;
-			n3 = t3 * t3 * this.dot4( grad4[ gi3 ], x3, y3, z3, w3 );
+			n3 = t3 * t3 * this._dot4( grad4[ gi3 ], x3, y3, z3, w3 );
 
 		}
 
@@ -430,12 +434,32 @@ class SimplexNoise {
 		else {
 
 			t4 *= t4;
-			n4 = t4 * t4 * this.dot4( grad4[ gi4 ], x4, y4, z4, w4 );
+			n4 = t4 * t4 * this._dot4( grad4[ gi4 ], x4, y4, z4, w4 );
 
 		}
 
 		// Sum up and scale the result to cover the range [-1,1]
 		return 27.0 * ( n0 + n1 + n2 + n3 + n4 );
+
+	}
+
+	// private
+
+	_dot( g, x, y ) {
+
+		return g[ 0 ] * x + g[ 1 ] * y;
+
+	}
+
+	_dot3( g, x, y, z ) {
+
+		return g[ 0 ] * x + g[ 1 ] * y + g[ 2 ] * z;
+
+	}
+
+	_dot4( g, x, y, z, w ) {
+
+		return g[ 0 ] * x + g[ 1 ] * y + g[ 2 ] * z + g[ 3 ] * w;
 
 	}
 

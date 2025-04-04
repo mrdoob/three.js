@@ -5,14 +5,6 @@ import {
 	UniformsUtils
 } from 'three';
 
-/**
- * ------------------------------------------------------------------------------------------
- * Subsurface Scattering shader
- * Based on GDC 2011 – Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look
- * https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
- *------------------------------------------------------------------------------------------
- */
-
 function replaceAll( string, find, replace ) {
 
 	return string.split( find ).join( replace );
@@ -22,6 +14,16 @@ function replaceAll( string, find, replace ) {
 const meshphong_frag_head = ShaderChunk[ 'meshphong_frag' ].slice( 0, ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
 const meshphong_frag_body = ShaderChunk[ 'meshphong_frag' ].slice( ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
 
+/** @module SubsurfaceScatteringShader */
+
+/**
+ * Subsurface Scattering shader.
+ *
+ * Based on GDC 2011 – [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SubsurfaceScatteringShader = {
 
 	name: 'SubsurfaceScatteringShader',

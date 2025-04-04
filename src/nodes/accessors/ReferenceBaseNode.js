@@ -24,7 +24,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	/**
 	 * Constructs a new reference element node.
 	 *
-	 * @param {?ReferenceBaseNode} referenceNode - The reference node.
+	 * @param {ReferenceBaseNode} referenceNode - The reference node.
 	 * @param {Node} indexNode - The index node that defines the element access.
 	 */
 	constructor( referenceNode, indexNode ) {
@@ -351,7 +351,7 @@ export const reference = ( name, type, object ) => nodeObject( new ReferenceBase
  * @param {string} name - The name of the property the node refers to.
  * @param {string} type - The uniform type that should be used to represent the property value.
  * @param {number} count - The number of value inside the array-like object.
- * @param {Object} object - An array-like object the property belongs to.
+ * @param {Object} [object] - An array-like object the property belongs to.
  * @returns {ReferenceBaseNode}
  */
 export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceBaseNode( name, type, object, count ) );

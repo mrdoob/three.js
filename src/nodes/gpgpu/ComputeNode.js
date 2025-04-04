@@ -91,7 +91,7 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
-		 * @type {Function}
+		 * @type {?Function}
 		 */
 		this.onInitFunction = null;
 
@@ -163,7 +163,24 @@ class ComputeNode extends Node {
 
 	}
 
-	generate( builder ) {
+	setup( builder ) {
+
+		const result = this.computeNode.setup( builder );
+
+		if ( result ) {
+
+			const properties = builder.getNodeProperties( this );
+			properties.outputComputeNode = result.outputNode;
+
+			result.outputNode = null;
+
+		}
+
+		return result;
+
+	}
+
+	generate( builder, output ) {
 
 		const { shaderStage } = builder;
 
@@ -174,6 +191,17 @@ class ComputeNode extends Node {
 			if ( snippet !== '' ) {
 
 				builder.addLineFlowCode( snippet, this );
+
+			}
+
+		} else {
+
+			const properties = builder.getNodeProperties( this );
+			const outputComputeNode = properties.outputComputeNode;
+
+			if ( outputComputeNode ) {
+
+				return outputComputeNode.build( builder, output );
 
 			}
 

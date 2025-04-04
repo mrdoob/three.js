@@ -23,7 +23,7 @@ export const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
 
-		console.warn( 'TSL.NormalNode: Vertex attribute "normal" not found on geometry.' );
+		console.warn( 'THREE.TSL: Vertex attribute "normal" not found on geometry.' );
 
 		return vec3( 0, 1, 0 );
 
@@ -71,7 +71,19 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+export const normalWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	let normal = normalView.transformDirection( cameraViewMatrix );
+
+	if ( builder.material.flatShading !== true ) {
+
+		normal = varying( normal, 'v_normalWorld' );
+
+	}
+
+	return normal;
+
+}, 'vec3' ).once() )().normalize().toVar( 'normalWorld' );
 
 /**
  * TSL object that represents the transformed vertex normal in view space of the current rendered object.
@@ -83,9 +95,13 @@ export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-	return builder.context.setupNormal().context( { getUV: null } );
+	let node = builder.context.setupNormal().context( { getUV: null } );
 
-}, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
+	if ( builder.material.flatShading !== true ) node = node.mul( faceDirection );
+
+	return node;
+
+}, 'vec3' ).once() )().toVar( 'transformedNormalView' );
 
 /**
  * TSL object that represents the transformed vertex normal in world space of the current rendered object.
@@ -105,9 +121,13 @@ export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) =>
 
 	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-	return builder.context.setupClearcoatNormal().context( { getUV: null } );
+	let node = builder.context.setupClearcoatNormal().context( { getUV: null } );
 
-}, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedClearcoatNormalView' );
+	if ( builder.material.flatShading !== true ) node = node.mul( faceDirection );
+
+	return node;
+
+}, 'vec3' ).once() )().toVar( 'transformedClearcoatNormalView' );
 
 /**
  * Transforms the normal with the given matrix.

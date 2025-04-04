@@ -96,8 +96,30 @@ li > p {
 }
 
 table {
-    margin-top: 1em;
-    margin-bottom: 1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.desc {
+	padding-left: 0px;
+}
+
+table th,
+table td {
+	text-align: left;
+	vertical-align: top;
+	padding: 8px 6px;
+	border-bottom: var(--border-style);
+}
+
+table th {
+	text-decoration: none;
+}
+table th:first-child,
+table td:first-child {
+	padding-left: 0;
 }
 
 .warning {

@@ -1,3 +1,14 @@
+/** @module OutputShader */
+
+/**
+ * Performs tone mapping and color space conversion for
+ * FX workflows.
+ *
+ * Used by {@link OutputPass}.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const OutputShader = {
 
 	name: 'OutputShader',

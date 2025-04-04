@@ -10,7 +10,7 @@ import { MeshMatcapMaterial } from '../MeshMatcapMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
 /**
- * Node material version of `MeshMatcapMaterial`.
+ * Node material version of {@link MeshMatcapMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -25,7 +25,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh normal node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

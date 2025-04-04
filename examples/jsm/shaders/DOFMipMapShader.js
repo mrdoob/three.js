@@ -1,9 +1,13 @@
-/**
- * Depth-of-field shader using mipmaps
- * - from Matt Handley @applmak
- * - requires power-of-2 sized render target with enabled mipmaps
- */
+/** @module DOFMipMapShader */
 
+/**
+ * Depth-of-field shader using mipmaps from Matt Handley @applmak.
+ *
+ * Requires power-of-2 sized render target with enabled mipmaps.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const DOFMipMapShader = {
 
 	name: 'DOFMipMapShader',

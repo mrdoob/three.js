@@ -7,8 +7,28 @@ import {
 	Vector3
 } from 'three';
 
+/**
+ * Fires when the camera has been transformed by the controls.
+ *
+ * @event TrackballControls#change
+ * @type {Object}
+ */
 const _changeEvent = { type: 'change' };
+
+/**
+ * Fires when an interaction was initiated.
+ *
+ * @event TrackballControls#start
+ * @type {Object}
+ */
 const _startEvent = { type: 'start' };
+
+/**
+ * Fires when an interaction has finished.
+ *
+ * @event TrackballControls#end
+ * @type {Object}
+ */
 const _endEvent = { type: 'end' };
 
 const _EPS = 0.000001;
@@ -25,44 +45,167 @@ const _objectUpDirection = new Vector3();
 const _objectSidewaysDirection = new Vector3();
 const _moveDirection = new Vector3();
 
+/**
+ * This class is similar to {@link OrbitControls}. However, it does not maintain a constant camera
+ * `up` vector. That means if the camera orbits over the “north” and “south” poles, it does not flip
+ * to stay "right side up".
+ *
+ * @augments Controls
+ */
 class TrackballControls extends Controls {
 
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Object3D} object - The object that is managed by the controls.
+	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 */
 	constructor( object, domElement = null ) {
 
 		super( object, domElement );
 
-		// API
-
-		this.enabled = true;
-
+		/**
+		 * Represents the properties of the screen. Automatically set when `handleResize()` is called.
+		 *
+		 * @type {Object}
+		 * @readonly
+		 */
 		this.screen = { left: 0, top: 0, width: 0, height: 0 };
 
+		/**
+		 * The rotation speed.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.rotateSpeed = 1.0;
+
+		/**
+		 * The zoom speed.
+		 *
+		 * @type {number}
+		 * @default 1.2
+		 */
 		this.zoomSpeed = 1.2;
+
+		/**
+		 * The pan speed.
+		 *
+		 * @type {number}
+		 * @default 0.3
+		 */
 		this.panSpeed = 0.3;
 
+		/**
+		 * Whether rotation is disabled or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.noRotate = false;
+
+		/**
+		 * Whether zooming is disabled or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.noZoom = false;
+
+		/**
+		 * Whether panning is disabled or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.noPan = false;
 
+		/**
+		 * Whether damping is disabled or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.staticMoving = false;
+
+		/**
+		 * Defines the intensity of damping. Only considered if `staticMoving` is set to `false`.
+		 *
+		 * @type {number}
+		 * @default 0.2
+		 */
 		this.dynamicDampingFactor = 0.2;
 
+		/**
+		 * How far you can dolly in (perspective camera only).
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.minDistance = 0;
+
+		/**
+		 * How far you can dolly out (perspective camera only).
+		 *
+		 * @type {number}
+		 * @default Infinity
+		 */
 		this.maxDistance = Infinity;
 
+		/**
+		 * How far you can zoom in (orthographic camera only).
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.minZoom = 0;
+
+		/**
+		 * How far you can zoom out (orthographic camera only).
+		 *
+		 * @type {number}
+		 * @default Infinity
+		 */
 		this.maxZoom = Infinity;
 
+		/**
+		 * This array holds keycodes for controlling interactions.
+		 *
+		 * - When the first defined key is pressed, all mouse interactions (left, middle, right) performs orbiting.
+		 * - When the second defined key is pressed, all mouse interactions (left, middle, right) performs zooming.
+		 * - When the third defined key is pressed, all mouse interactions (left, middle, right) performs panning.
+		 *
+		 * Default is *KeyA, KeyS, KeyD* which represents A, S, D.
+		 *
+		 * @type {Array<string>}
+		 */
 		this.keys = [ 'KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/ ];
 
+		/**
+		 * This object contains references to the mouse actions used by the controls.
+		 *
+		 * ```js
+		 * controls.mouseButtons = {
+		 * 	LEFT: THREE.MOUSE.ROTATE,
+		 * 	MIDDLE: THREE.MOUSE.DOLLY,
+		 * 	RIGHT: THREE.MOUSE.PAN
+		 * }
+		 * ```
+		 * @type {Object}
+		 */
 		this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
-		this.state = _STATE.NONE;
-		this.keyState = _STATE.NONE;
 
+		/**
+		 * The focus point of the controls.
+		 *
+		 * @type {Vector3}
+		 */
 		this.target = new Vector3();
 
 		// internals
+
+		this.state = _STATE.NONE;
+		this.keyState = _STATE.NONE;
 
 		this._lastPosition = new Vector3();
 		this._lastZoom = 1;
@@ -114,7 +257,7 @@ class TrackballControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 			this.handleResize();
 
@@ -125,7 +268,9 @@ class TrackballControls extends Controls {
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );
@@ -161,6 +306,9 @@ class TrackballControls extends Controls {
 
 	}
 
+	/**
+	 * Must be called if the application window is resized.
+	 */
 	handleResize() {
 
 		const box = this.domElement.getBoundingClientRect();
@@ -233,6 +381,9 @@ class TrackballControls extends Controls {
 
 	}
 
+	/**
+	 * Resets the controls to its initial state.
+	 */
 	reset() {
 
 		this.state = _STATE.NONE;

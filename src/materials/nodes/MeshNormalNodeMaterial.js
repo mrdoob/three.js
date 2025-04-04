@@ -3,14 +3,16 @@ import { diffuseColor } from '../../nodes/core/PropertyNode.js';
 import { directionToColor } from '../../nodes/utils/Packing.js';
 import { materialOpacity } from '../../nodes/accessors/MaterialNode.js';
 import { transformedNormalView } from '../../nodes/accessors/Normal.js';
+import { colorSpaceToWorking } from '../../nodes/display/ColorSpaceNode.js';
 import { float, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { SRGBColorSpace } from '../../constants.js';
 
 import { MeshNormalMaterial } from '../MeshNormalMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshNormalMaterial();
 
 /**
- * Node material version of `MeshNormalMaterial`.
+ * Node material version of {@link MeshNormalMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -25,7 +27,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh normal node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 
@@ -54,7 +56,9 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-		diffuseColor.assign( vec4( directionToColor( transformedNormalView ), opacityNode ) );
+		// By convention, a normal packed to RGB is in sRGB color space. Convert it to working color space.
+
+		diffuseColor.assign( colorSpaceToWorking( vec4( directionToColor( transformedNormalView ), opacityNode ), SRGBColorSpace ) );
 
 	}
 

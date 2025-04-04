@@ -10,22 +10,83 @@ import { generateUUID } from '../math/MathUtils.js';
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
+/**
+ * Class for representing the armatures in `three.js`. The skeleton
+ * is defined by a hierarchy of bones.
+ *
+ * ```js
+ * const bones = [];
+ *
+ * const shoulder = new THREE.Bone();
+ * const elbow = new THREE.Bone();
+ * const hand = new THREE.Bone();
+ *
+ * shoulder.add( elbow );
+ * elbow.add( hand );
+ *
+ * bones.push( shoulder , elbow, hand);
+ *
+ * shoulder.position.y = -5;
+ * elbow.position.y = 0;
+ * hand.position.y = 5;
+ *
+ * const armSkeleton = new THREE.Skeleton( bones );
+ * ```
+ */
 class Skeleton {
 
+	/**
+	 * Constructs a new skeleton.
+	 *
+	 * @param {Array<Bone>} [bones] - An array of bones.
+	 * @param {Array<Matrix4>} [boneInverses] - An array of bone inverse matrices.
+	 * If not provided, these matrices will be computed automatically via {@link Skeleton#calculateInverses}.
+	 */
 	constructor( bones = [], boneInverses = [] ) {
 
 		this.uuid = generateUUID();
 
+		/**
+		 * An array of bones defining the skeleton.
+		 *
+		 * @type {Array<Bone>}
+		 */
 		this.bones = bones.slice( 0 );
+
+		/**
+		 * An array of bone inverse matrices.
+		 *
+		 * @type {Array<Matrix4>}
+		 */
 		this.boneInverses = boneInverses;
+
+		/**
+		 * An array buffer holding the bone data.
+		 * Input data for {@link Skeleton#boneTexture}.
+		 *
+		 * @type {?Float32Array}
+		 * @default null
+		 */
 		this.boneMatrices = null;
 
+		/**
+		 * A texture holding the bone data for use
+		 * in the vertex shader.
+		 *
+		 * @type {?DataTexture}
+		 * @default null
+		 */
 		this.boneTexture = null;
 
 		this.init();
 
 	}
 
+	/**
+	 * Initializes the skeleton. This method gets automatically called by the constructor
+	 * but depending on how the skeleton is created it might be necessary to call this method
+	 * manually.
+	 */
 	init() {
 
 		const bones = this.bones;
@@ -61,6 +122,10 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Computes the bone inverse matrices. This method resets {@link Skeleton#boneInverses}
+	 * and fills it with new matrices.
+	 */
 	calculateInverses() {
 
 		this.boneInverses.length = 0;
@@ -81,6 +146,9 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Resets the skeleton to the base pose.
+	 */
 	pose() {
 
 		// recover the bind-time world matrices
@@ -124,6 +192,9 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Resets the skeleton to the base pose.
+	 */
 	update() {
 
 		const bones = this.bones;
@@ -152,12 +223,22 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Returns a new skeleton with copied values from this instance.
+	 *
+	 * @return {Skeleton} A clone of this instance.
+	 */
 	clone() {
 
 		return new Skeleton( this.bones, this.boneInverses );
 
 	}
 
+	/**
+	 * Computes a data texture for passing bone data to the vertex shader.
+	 *
+	 * @return {Skeleton} A reference of this instance.
+	 */
 	computeBoneTexture() {
 
 		// layout (1 matrix = 4 pixels)
@@ -184,6 +265,13 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Searches through the skeleton's bone array and returns the first with a
+	 * matching name.
+	 *
+	 * @param {string} name - The name of the bone.
+	 * @return {Bone|undefined} The found bone. `undefined` if no bone has been found.
+	 */
 	getBoneByName( name ) {
 
 		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
@@ -202,6 +290,10 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose( ) {
 
 		if ( this.boneTexture !== null ) {
@@ -214,6 +306,13 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Setups the skeleton by the given JSON and bones.
+	 *
+	 * @param {Object} json - The skeleton as serialized JSON.
+	 * @param {Object<string, Bone>} bones - An array of bones.
+	 * @return {Skeleton} A reference of this instance.
+	 */
 	fromJSON( json, bones ) {
 
 		this.uuid = json.uuid;
@@ -241,6 +340,12 @@ class Skeleton {
 
 	}
 
+	/**
+	 * Serializes the skeleton into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized skeleton.
+	 * @see {@link ObjectLoader#parse}
+	 */
 	toJSON() {
 
 		const data = {

@@ -4,15 +4,20 @@ import {
 } from 'three';
 
 /**
- * Currently contains:
+ * Collection of toon shaders.
  *
- *	toon1
- *	toon2
- *	hatching
- *	dotted
- */
+ * @module TriangleBlurShader
+ * */
 
+/**
+ * Toon1 shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const ToonShader1 = {
+
+	name: 'ToonShader1',
 
 	uniforms: {
 
@@ -85,7 +90,12 @@ const ToonShader1 = {
 		}`
 
 };
-
+/**
+ * Toon2 shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const ToonShader2 = {
 
 	uniforms: {
@@ -154,6 +164,12 @@ const ToonShader2 = {
 
 };
 
+/**
+ * Toon Hatching shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const ToonShaderHatching = {
 
 	uniforms: {
@@ -250,6 +266,12 @@ const ToonShaderHatching = {
 
 };
 
+/**
+ * Toon Dotted shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const ToonShaderDotted = {
 
 	uniforms: {

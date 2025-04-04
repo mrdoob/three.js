@@ -11,13 +11,8 @@ import {
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
-/**
- * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
- * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
- *
- * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
- * implementation, so I have preserved their copyright notices.
- */
+// Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
+// implementation, so I have preserved their copyright notices.
 
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
@@ -84,16 +79,47 @@ import * as fflate from '../libs/fflate.module.js';
 
 // // End of OpenEXR license -------------------------------------------------
 
+
+/**
+ * A loader for the OpenEXR texture format.
+ *
+ * `EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
+ *
+ * ```js
+ * const loader = new EXRLoader();
+ * const texture = await loader.loadAsync( 'textures/memorial.exr' );
+ * ```
+ *
+ * @augments DataTextureLoader
+ */
 class EXRLoader extends DataTextureLoader {
 
+	/**
+	 * Constructs a new EXR loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * The texture type.
+		 *
+		 * @type {(HalfFloatType|FloatType)}
+		 * @default HalfFloatType
+		 */
 		this.type = HalfFloatType;
 
 	}
 
+	/**
+	 * Parses the given EXR texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @return {DataTextureLoader~TexData} An object representing the parsed texture data.
+	 */
 	parse( buffer ) {
 
 		const USHORT_RANGE = ( 1 << 16 );
@@ -2229,7 +2255,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const attributeName = parseNullTerminatedString( buffer, offset );
 
-				if ( attributeName == 0 ) {
+				if ( attributeName === '' ) {
 
 					keepReading = false;
 
@@ -2533,6 +2559,12 @@ class EXRLoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Sets the texture type.
+	 *
+	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+	 * @return {RGBMLoader} A reference to this loader.
+	 */
 	setDataType( value ) {
 
 		this.type = value;

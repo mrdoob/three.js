@@ -104,7 +104,8 @@ class Scene extends Object3D {
 		this.environmentRotation = new Euler();
 
 		/**
-		 * Forces everything in the scene to be rendered with the defined material.
+		 * Forces everything in the scene to be rendered with the defined material. It is possible
+		 * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
 		 *
 		 * @type {?Material}
 		 * @default null

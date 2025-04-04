@@ -1,7 +1,11 @@
-/**
- * Simple test shader
- */
+/** @module BasicShader */
 
+/**
+ * Simple shader for testing.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const BasicShader = {
 
 	name: 'BasicShader',

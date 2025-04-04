@@ -8,32 +8,105 @@ import {
 import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix, diffuseColor } from 'three/tsl';
 
 /**
- * Work based on :
- * https://github.com/Slayvin: Flat mirror for three.js
- * https://home.adelphi.edu/~stemkoski/ : An implementation of water shader based on the flat mirror
- * http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
+ * A basic flat, reflective water effect.
+ *
+ * Note that this class can only be used with {@link WebGPURenderer}.
+ * When using {@link WebGLRenderer}, use {@link Water}.
+ *
+ * References:
+ *
+ * - [Flat mirror for three.js]{@link https://github.com/Slayvin}
+ * - [An implementation of water shader based on the flat mirror]{@link https://home.adelphi.edu/~stemkoski/}
+ * - [Water shader explanations in WebGL]{@link http://29a.ch/slides/2012/webglwater/ }
+ *
+ * @augments Mesh
  */
-
 class WaterMesh extends Mesh {
 
+	/**
+	 * Constructs a new water mesh.
+	 *
+	 * @param {BufferGeometry} geometry - The water mesh's geometry.
+	 * @param {WaterMesh~Options} [options] - The configuration options.
+	 */
 	constructor( geometry, options ) {
 
 		const material = new MeshLambertNodeMaterial();
 
 		super( geometry, material );
 
-		this.isWater = true;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isWaterMesh = true;
 
+		/**
+		 * The effect's resolution scale.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
 		this.resolution = options.resolution !== undefined ? options.resolution : 0.5;
 
 		// Uniforms
 
+		/**
+		 * The water's normal map.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.waterNormals = texture( options.waterNormals );
+
+		/**
+		 * The alpha value.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 1
+		 */
 		this.alpha = uniform( options.alpha !== undefined ? options.alpha : 1.0 );
+
+		/**
+		 * The size value.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 1
+		 */
 		this.size = uniform( options.size !== undefined ? options.size : 1.0 );
+
+		/**
+		 * The sun color.
+		 *
+		 * @type {UniformNode<color>}
+		 * @default 0xffffff
+		 */
 		this.sunColor = uniform( new Color( options.sunColor !== undefined ? options.sunColor : 0xffffff ) );
+
+		/**
+		 * The sun direction.
+		 *
+		 * @type {UniformNode<vec3>}
+		 * @default (0.70707,0.70707,0.0)
+		 */
 		this.sunDirection = uniform( options.sunDirection !== undefined ? options.sunDirection : new Vector3( 0.70707, 0.70707, 0.0 ) );
+
+		/**
+		 * The water color.
+		 *
+		 * @type {UniformNode<color>}
+		 * @default 0x7f7f7f
+		 */
 		this.waterColor = uniform( new Color( options.waterColor !== undefined ? options.waterColor : 0x7f7f7f ) );
+
+		/**
+		 * The distortion scale.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 20
+		 */
 		this.distortionScale = uniform( options.distortionScale !== undefined ? options.distortionScale : 20.0 );
 
 		// TSL
@@ -104,5 +177,19 @@ class WaterMesh extends Mesh {
 	}
 
 }
+
+/**
+ * Constructor options of `WaterMesh`.
+ *
+ * @typedef {Object} WaterMesh~Options
+ * @property {number} [resolution=0.5] - The resolution scale.
+ * @property {?Texture} [waterNormals=null] - The water's normal map.
+ * @property {number} [alpha=1] - The alpha value.
+ * @property {number} [size=1] - The size value.
+ * @property {number|Color|string} [sunColor=0xffffff] - The sun color.
+ * @property {Vector3} [sunDirection=(0.70707,0.70707,0.0)] - The sun direction.
+ * @property {number|Color|string} [waterColor=0x7F7F7F] - The water color.
+ * @property {number} [distortionScale=20] - The distortion scale.
+ **/
 
 export { WaterMesh };

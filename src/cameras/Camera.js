@@ -44,14 +44,14 @@ class Camera extends Object3D {
 		this.projectionMatrix = new Matrix4();
 
 		/**
-		 * The inverse of the camera's prjection matrix.
+		 * The inverse of the camera's projection matrix.
 		 *
 		 * @type {Matrix4}
 		 */
 		this.projectionMatrixInverse = new Matrix4();
 
 		/**
-		 * The coordinate system in which the camrea is used.
+		 * The coordinate system in which the camera is used.
 		 *
 		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
 		 */

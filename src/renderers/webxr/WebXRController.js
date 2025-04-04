@@ -3,16 +3,56 @@ import { Group } from '../../objects/Group.js';
 
 const _moveEvent = { type: 'move' };
 
+/**
+ * Class for representing a XR controller with its
+ * different coordinate systems.
+ *
+ * @private
+ */
 class WebXRController {
 
+	/**
+	 * Constructs a new XR controller.
+	 */
 	constructor() {
 
+		/**
+		 * A group representing the target ray space
+		 * of the XR controller.
+		 *
+		 * @private
+		 * @type {?Group}
+		 * @default null
+		 */
 		this._targetRay = null;
+
+		/**
+		 * A group representing the grip space
+		 * of the XR controller.
+		 *
+		 * @private
+		 * @type {?Group}
+		 * @default null
+		 */
 		this._grip = null;
+
+		/**
+		 * A group representing the hand space
+		 * of the XR controller.
+		 *
+		 * @private
+		 * @type {?Group}
+		 * @default null
+		 */
 		this._hand = null;
 
 	}
 
+	/**
+	 * Returns a group representing the hand space of the XR controller.
+	 *
+	 * @return {Group} A group representing the hand space of the XR controller.
+	 */
 	getHandSpace() {
 
 		if ( this._hand === null ) {
@@ -30,6 +70,11 @@ class WebXRController {
 
 	}
 
+	/**
+	 * Returns a group representing the target ray space of the XR controller.
+	 *
+	 * @return {Group} A group representing the target ray space of the XR controller.
+	 */
 	getTargetRaySpace() {
 
 		if ( this._targetRay === null ) {
@@ -48,6 +93,11 @@ class WebXRController {
 
 	}
 
+	/**
+	 * Returns a group representing the grip space of the XR controller.
+	 *
+	 * @return {Group} A group representing the grip space of the XR controller.
+	 */
 	getGripSpace() {
 
 		if ( this._grip === null ) {
@@ -66,6 +116,13 @@ class WebXRController {
 
 	}
 
+	/**
+	 * Dispatches the given event to the groups representing
+	 * the different coordinate spaces of the XR controller.
+	 *
+	 * @param {Object} event - The event to dispatch.
+	 * @return {WebXRController} A reference to this instance.
+	 */
 	dispatchEvent( event ) {
 
 		if ( this._targetRay !== null ) {
@@ -90,6 +147,12 @@ class WebXRController {
 
 	}
 
+	/**
+	 * Connects the controller with the given XR input source.
+	 *
+	 * @param {XRInputSource} inputSource - The input source.
+	 * @return {WebXRController} A reference to this instance.
+	 */
 	connect( inputSource ) {
 
 		if ( inputSource && inputSource.hand ) {
@@ -115,6 +178,12 @@ class WebXRController {
 
 	}
 
+	/**
+	 * Disconnects the controller from the given XR input source.
+	 *
+	 * @param {XRInputSource} inputSource - The input source.
+	 * @return {WebXRController} A reference to this instance.
+	 */
 	disconnect( inputSource ) {
 
 		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
@@ -141,6 +210,16 @@ class WebXRController {
 
 	}
 
+	/**
+	 * Updates the controller with the given input source, XR frame and reference space.
+	 * This updates the transformations of the groups that represent the different
+	 * coordinate systems of the controller.
+	 *
+	 * @param {XRInputSource} inputSource - The input source.
+	 * @param {XRFrame} frame - The XR frame.
+	 * @param {XRReferenceSpace} referenceSpace - The reference space.
+	 * @return {WebXRController} A reference to this instance.
+	 */
 	update( inputSource, frame, referenceSpace ) {
 
 		let inputPose = null;
@@ -318,8 +397,14 @@ class WebXRController {
 
 	}
 
-	// private method
-
+	/**
+	 * Returns a group representing the hand joint for the given input joint.
+	 *
+	 * @private
+	 * @param {Group} hand - The group representing the hand space.
+	 * @param {XRHandJoint} inputjoint - The XR frame.
+	 * @return {Group} A group representing the hand joint for the given input joint.
+	 */
 	_getHandJoint( hand, inputjoint ) {
 
 		if ( hand.joints[ inputjoint.jointName ] === undefined ) {

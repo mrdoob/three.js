@@ -1,8 +1,11 @@
-/**
- * Unpack RGBA depth shader
- * - show RGBA encoded depth as monochrome color
- */
+/** @module UnpackDepthRGBAShader */
 
+/**
+ * Unpack RGBA depth shader that shows RGBA encoded depth as monochrome color.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const UnpackDepthRGBAShader = {
 
 	name: 'UnpackDepthRGBAShader',

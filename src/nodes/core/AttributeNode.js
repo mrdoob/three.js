@@ -161,7 +161,7 @@ export default AttributeNode;
  * @tsl
  * @function
  * @param {string} name - The name of the attribute.
- * @param {?string} nodeType - The node type.
+ * @param {string} [nodeType] - The node type.
  * @returns {AttributeNode}
  */
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );

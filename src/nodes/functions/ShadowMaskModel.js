@@ -30,18 +30,18 @@ class ShadowMaskModel extends LightingModel {
 	 *
 	 * @param {Object} input - The input data.
 	 */
-	direct( { shadowMask } ) {
+	direct( { lightNode } ) {
 
-		this.shadowNode.mulAssign( shadowMask );
+		this.shadowNode.mulAssign( lightNode.shadowNode );
 
 	}
 
 	/**
 	 * Uses the shadow mask to produce the final color.
 	 *
-	 * @param {ContextNode} context - The current node context.
+	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	finish( context ) {
+	finish( { context } ) {
 
 		diffuseColor.a.mulAssign( this.shadowNode.oneMinus() );
 

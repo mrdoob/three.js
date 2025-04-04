@@ -55,6 +55,8 @@ precision highp isamplerCube;
 precision highp isampler2DArray;
 
 precision lowp sampler2DShadow;
+precision lowp sampler2DArrayShadow;
+precision lowp samplerCubeShadow;
 `;
 
 /**
@@ -91,7 +93,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		 * An array that holds objects defining the varying and attribute data in
 		 * context of Transform Feedback.
 		 *
-		 * @type {Object<string,Map<string,Object>>}
+		 * @type {Array<Object<string,AttributeNode|string>>}
 		 */
 		this.transforms = [];
 
@@ -108,14 +110,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 		 * @type {Object<string,Array<string>>}
 		 */
 		this.builtins = { vertex: [], fragment: [], compute: [] };
-
-		/**
-		 * Whether comparison in shader code are generated with methods or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.useComparisonMethod = true;
 
 	}
 
@@ -409,6 +403,8 @@ ${ flowData.code }
 
 		if ( texture.isDepthTexture ) {
 
+			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
+
 			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
@@ -482,6 +478,12 @@ ${ flowData.code }
 
 		if ( shaderStage === 'fragment' ) {
 
+			if ( depthSnippet ) {
+
+				return `texture( ${ textureProperty }, vec4( ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } ) )`;
+
+			}
+
 			return `texture( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ) )`;
 
 		} else {
@@ -536,14 +538,13 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
-			if ( uniform.type === 'texture' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'texture3D' ) {
 
 				const texture = uniform.node.value;
 
 				let typePrefix = '';
 
-				if ( texture.isDataTexture === true ) {
-
+				if ( texture.isDataTexture === true || texture.isData3DTexture === true ) {
 
 					if ( texture.type === UnsignedIntType ) {
 
@@ -557,9 +558,21 @@ ${ flowData.code }
 
 				}
 
-				if ( texture.compareFunction ) {
+				if ( uniform.type === 'texture3D' ) {
 
-					snippet = `sampler2DShadow ${ uniform.name };`;
+					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
+
+				} else if ( texture.compareFunction ) {
+
+					if ( texture.isDepthArrayTexture === true ) {
+
+						snippet = `sampler2DArrayShadow ${ uniform.name };`;
+
+					} else {
+
+						snippet = `sampler2DShadow ${ uniform.name };`;
+
+					}
 
 				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
@@ -574,10 +587,6 @@ ${ flowData.code }
 			} else if ( uniform.type === 'cubeTexture' ) {
 
 				snippet = `samplerCube ${ uniform.name };`;
-
-			} else if ( uniform.type === 'texture3D' ) {
-
-				snippet = `sampler3D ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -797,7 +806,7 @@ ${ flowData.code }
 
 						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
-						snippet += `${ flat } out ${ type } ${ varying.name };\n`;
+						snippet += `${ flat }out ${ type } ${ varying.name };\n`;
 
 					}
 
@@ -1110,10 +1119,9 @@ ${ flowData.code }
 		for ( let i = 0; i < transforms.length; i ++ ) {
 
 			const transform = transforms[ i ];
-
 			const attributeName = this.getPropertyName( transform.attributeNode );
 
-			snippet += `${ transform.varyingName } = ${ attributeName };\n\t`;
+			if ( attributeName ) snippet += `${ transform.varyingName } = ${ attributeName };\n\t`;
 
 		}
 
@@ -1151,7 +1159,7 @@ ${vars}
 
 ${ this.getSignature() }
 
-// extensions 
+// extensions
 ${shaderData.extensions}
 
 // precision

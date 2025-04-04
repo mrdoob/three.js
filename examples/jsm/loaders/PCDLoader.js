@@ -10,16 +10,57 @@ import {
 	SRGBColorSpace
 } from 'three';
 
+/**
+ * A loader for the Point Cloud Data (PCD) format.
+ *
+ * PCDLoader supports ASCII and (compressed) binary files as well as the following PCD fields:
+ * - x y z
+ * - rgb
+ * - normal_x normal_y normal_z
+ * - intensity
+ * - label
+ *
+ * ```js
+ * const loader = new PCDLoader();
+ *
+ * const points = await loader.loadAsync( './models/pcd/binary/Zaghetto.pcd' );
+ * points.geometry.center(); // optional
+ * points.geometry.rotateX( Math.PI ); // optional
+ * scene.add( points );
+ * ```
+ *
+ * @augments Loader
+ */
 class PCDLoader extends Loader {
 
+	/**
+	 * Constructs a new PCD loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * Whether to use little Endian or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.littleEndian = true;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded PCD asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Points)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -55,6 +96,12 @@ class PCDLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given PCD data and returns a point cloud.
+	 *
+	 * @param {ArrayBuffer} data - The raw PCD data as an array buffer.
+	 * @return {Points} The parsed point cloud.
+	 */
 	parse( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js

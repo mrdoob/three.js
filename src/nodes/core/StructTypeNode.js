@@ -46,7 +46,7 @@ class StructTypeNode extends Node {
 	 * Creates an instance of StructTypeNode.
 	 *
 	 * @param {Object} membersLayout - The layout of the members for the struct.
-	 * @param {string} [name=null] - The optional name of the struct.
+	 * @param {?string} [name=null] - The optional name of the struct.
 	 */
 	constructor( membersLayout, name = null ) {
 
@@ -62,7 +62,7 @@ class StructTypeNode extends Node {
 		/**
 		 * The name of the struct.
 		 *
-		 * @type {string}
+		 * @type {?string}
 		 * @default null
 		 */
 		this.name = name;

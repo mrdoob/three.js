@@ -2,10 +2,14 @@ import {
 	Color
 } from 'three';
 
-/**
- * Colorify shader
- */
+/** @module ColorifyShader */
 
+/**
+ * Colorify shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const ColorifyShader = {
 
 	name: 'ColorifyShader',

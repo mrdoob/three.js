@@ -21,7 +21,7 @@
 
 				<div id="sections">
 					<span class="selected">docs</span>
-					<a href="../examples/#webgl_animation_keyframes">examples</a>
+					<a href="../manual/">manual</a>
 				</div>
 
 				<div id="expandButton"></div>
@@ -38,11 +38,9 @@
 						<option value="ar">ar</option>
 						<option value="ko">한국어</option>
 						<option value="zh">中文</option>
-						<option value="ja">日本語</option>
 						<option value="it">it</option>
 						<option value="pt-br">pt-br</option>
 						<option value="fr">fr</option>
-						<option value="ru">ru</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -93,7 +91,15 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br|fr|ru)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|it|pt-br|fr)\//.exec( hash );
+
+				if ( hashLanguage[ 1 ] === 'manual' ) {
+
+					// Redirect to the manual
+
+					window.location.href = hash.replace(/^manual\/([^\/]+)\/([^\/]+)\/(.+)$/, '../manual/#$1/$3').toLowerCase();
+
+				}
 
 				if ( hashLanguage === null ) {
 

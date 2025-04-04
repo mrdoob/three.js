@@ -15,7 +15,8 @@ const hasOwnProp = Object.prototype.hasOwnProperty;
 let data;
 let view;
 
-let outdir = path.normalize( env.opts.destination );
+const outdir = path.normalize( env.opts.destination );
+const themeOpts = ( env.opts.themeOpts ) || {};
 
 function mkdirSync( filepath ) {
 
@@ -133,7 +134,7 @@ function buildSearchListForData() {
 
 	data().each( ( item ) => {
 
-		if ( item.kind !== 'package' && ! item.inherited ) {
+		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
 			searchList.push( {
 				title: item.longname,
@@ -332,7 +333,7 @@ function generateSourceFiles( sourceFiles, encoding = 'utf8' ) {
 
 }
 
-function buildClassNav( items, itemsSeen, linktoFn ) {
+function buildMainNav( items, itemsSeen, linktoFn ) {
 
 	const coreDirectory = 'src';
 	const addonsDirectory = 'examples/jsm';
@@ -362,7 +363,7 @@ function buildClassNav( items, itemsSeen, linktoFn ) {
 
 				}
 
-				itemNav += `<li data-name="${item.longname}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
+				itemNav += `<li data-name="${item.name}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
 
 				itemsSeen[ item.longname ] = true;
 
@@ -397,6 +398,8 @@ function buildClassNav( items, itemsSeen, linktoFn ) {
 				nav += `<h3>${subCategory}</h3>`;
 
 				let navItems = '';
+
+				links.sort();
 
 				for ( const link of links ) {
 
@@ -493,7 +496,6 @@ function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
 /**
  * Create the navigation sidebar.
  * @param {Object} members The members that will be used to create the sidebar.
- * @param {Array<Object>} members.classes
  * @return {string} The HTML for the navigation sidebar.
  */
 function buildNav( members ) {
@@ -501,7 +503,7 @@ function buildNav( members ) {
 	let nav = '';
 	const seen = {};
 
-	nav += buildClassNav( members.classes, seen, linkto );
+	nav += buildMainNav( [ ...members.classes, ...members.modules ], seen, linkto );
 	nav += buildGlobalsNav( members.globals, seen );
 
 	return nav;
@@ -583,14 +585,6 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 		}
 
 	} );
-
-	// update outdir if necessary, then create outdir
-	const packageInfo = ( find( { kind: 'package' } ) || [] )[ 0 ];
-	if ( packageInfo && packageInfo.name ) {
-
-		outdir = path.join( outdir, packageInfo.name, ( packageInfo.version || '' ) );
-
-	}
 
 	fs.mkPath( outdir );
 
@@ -723,6 +717,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 	view.resolveAuthorLinks = resolveAuthorLinks;
 	view.htmlsafe = htmlsafe;
 	view.outputSourceFiles = outputSourceFiles;
+	view.ignoreInheritedSymbols = themeOpts.ignoreInheritedSymbols;
 
 	// once for all
 	view.nav = buildNav( members );
@@ -755,14 +750,22 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	// set up the lists that we'll use to generate pages
 	const classes = taffy( members.classes );
+	const modules = taffy( members.modules );
 
 	Object.keys( helper.longnameToUrl ).forEach( longname => {
 
 		const myClasses = helper.find( classes, { longname: longname } );
+		const myModules = helper.find( modules, { longname: longname } );
 
 		if ( myClasses.length ) {
 
 			generate( `${myClasses[ 0 ].name}`, myClasses, helper.longnameToUrl[ longname ] );
+
+		}
+
+		if ( myModules.length ) {
+
+			generate( `${myModules[ 0 ].name}`, myModules, helper.longnameToUrl[ longname ] );
 
 		}
 

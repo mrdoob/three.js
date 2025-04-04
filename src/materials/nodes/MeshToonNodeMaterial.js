@@ -6,7 +6,7 @@ import { MeshToonMaterial } from '../MeshToonMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshToonMaterial();
 
 /**
- * Node material version of `MeshToonMaterial`.
+ * Node material version of {@link MeshToonMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -21,7 +21,7 @@ class MeshToonNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh toon node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

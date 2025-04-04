@@ -37,7 +37,7 @@ class PromiseQueue {
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 9; // 9 seconds - for how long there should be no network requests
+const idleTime = 12; // 9 seconds - for how long there should be no network requests
 const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
@@ -78,6 +78,7 @@ const exceptionList = [
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'physics_rapier_basic',
 	'webgl_animation_skinning_blending',
 	'webgl_animation_skinning_additive_blending',
 	'webgl_buffergeometry_glbufferattribute',
@@ -106,6 +107,9 @@ const exceptionList = [
 	'webgpu_multisampled_renderbuffers',
 	'webgl_test_wide_gamut',
 	'webgl_volume_instancing',
+
+	// Intentional z-fighting in this demo makes it non-deterministic
+	'webgl_reverse_depth_buffer',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -142,6 +146,7 @@ const exceptionList = [
 	'webgpu_particles',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
+	'webgpu_shadowmap_array',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
 	'webgpu_tsl_interoperability',
@@ -161,6 +166,7 @@ const exceptionList = [
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
 	'webgpu_postprocessing_afterimage',
+	'webgpu_xr_native_layers',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',

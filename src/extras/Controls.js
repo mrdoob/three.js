@@ -77,8 +77,23 @@ class Controls extends EventDispatcher {
 	/**
 	 * Connects the controls to the DOM. This method has so called "side effects" since
 	 * it adds the module's event listeners to the DOM.
+	 *
+	 * @param {HTMLDOMElement} element - The DOM element to connect to.
 	 */
-	connect() {}
+	connect( element ) {
+
+		if ( element === undefined ) {
+
+			console.warn( 'THREE.Controls: connect() now requires an element.' ); // @deprecated, the warning can be removed with r185
+			return;
+
+		}
+
+		if ( this.domElement !== null ) this.disconnect();
+
+		this.domElement = element;
+
+	}
 
 	/**
 	 * Disconnects the controls from the DOM.

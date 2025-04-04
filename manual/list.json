@@ -1,5 +1,27 @@
 {
 	"en": {
+		"Getting Started": {
+			"Installation": "en/installation",
+			"Creating a Scene": "en/creating-a-scene",
+			"Creating Text": "en/creating-text",
+			"Drawing Lines": "en/drawing-lines",
+			"FAQ": "en/faq",
+			"Libraries and Plugins": "en/libraries-and-plugins",
+			"Loading 3D Models": "en/loading-3d-models",
+			"Uniform Types": "en/uniform-types",
+			"Useful Links": "en/useful-links",
+			"WebGL Compatibility Check": "en/webgl-compatibility-check"
+		},
+		"Next Steps": {
+			"Animation System": "en/animation-system",
+			"Color Management": "en/color-management",
+			"How to create VR content": "en/how-to-create-vr-content",
+			"How to dispose of Objects": "en/how-to-dispose-of-objects",
+			"How to update Things": "en/how-to-update-things",
+			"How to use Post Processing": "en/how-to-use-post-processing",
+			"Matrix Transformations": "en/matrix-transformations"
+		},
+		"---": {},
 		"Basics": {
 			"Fundamentals": "en/fundamentals",
 			"Responsive Design": "en/responsive",

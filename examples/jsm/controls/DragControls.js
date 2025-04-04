@@ -31,18 +31,79 @@ const STATE = {
 	ROTATE: 1
 };
 
+/**
+ * This class can be used to provide a drag'n'drop interaction.
+ *
+ * ```js
+ * const controls = new DragControls( objects, camera, renderer.domElement );
+ *
+ * // add event listener to highlight dragged objects
+ * controls.addEventListener( 'dragstart', function ( event ) {
+ *
+ * 	event.object.material.emissive.set( 0xaaaaaa );
+ *
+ * } );
+ *
+ * controls.addEventListener( 'dragend', function ( event ) {
+ *
+ * 	event.object.material.emissive.set( 0x000000 );
+ *
+ * } );
+ * ```
+ *
+ * @augments Controls
+ */
 class DragControls extends Controls {
 
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Array<Object3D>} objects - An array of draggable 3D objects.
+	 * @param {Camera} camera - The camera of the rendered scene.
+	 * @param {?HTMLDOMElement} [domElement=null] - The HTML DOM element used for event listeners.
+	 */
 	constructor( objects, camera, domElement = null ) {
 
 		super( camera, domElement );
 
+		/**
+		 * An array of draggable 3D objects.
+		 *
+		 * @type {Array<Object3D>}
+		 */
 		this.objects = objects;
 
+		/**
+		 * Whether children of draggable objects can be dragged independently from their parent.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.recursive = true;
+
+		/**
+		 * This option only works if the `objects` array contains a single draggable  group object.
+		 * If set to `true`, the controls does not transform individual objects but the entire group.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.transformGroup = false;
+
+		/**
+		 * The speed at which the object will rotate when dragged in `rotate` mode.
+		 * The higher the number the faster the rotation.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.rotateSpeed = 1;
 
+		/**
+		 * The raycaster used for detecting 3D objects.
+		 *
+		 * @type {Raycaster}
+		 */
 		this.raycaster = new Raycaster();
 
 		// interaction
@@ -61,13 +122,15 @@ class DragControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		this.domElement.addEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
@@ -406,5 +469,33 @@ function findGroup( obj, group = null ) {
 	return findGroup( obj.parent, group );
 
 }
+
+/**
+ * Fires when the user drags a 3D object.
+ *
+ * @event DragControls#drag
+ * @type {Object}
+ */
+
+/**
+ * Fires when the user has finished dragging a 3D object.
+ *
+ * @event DragControls#dragend
+ * @type {Object}
+ */
+
+/**
+ * Fires when the pointer is moved onto a 3D object, or onto one of its children.
+ *
+ * @event DragControls#hoveron
+ * @type {Object}
+ */
+
+/**
+ * Fires when the pointer is moved out of a 3D object.
+ *
+ * @event DragControls#hoveroff
+ * @type {Object}
+ */
 
 export { DragControls };

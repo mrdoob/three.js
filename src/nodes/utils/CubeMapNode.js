@@ -42,7 +42,7 @@ class CubeMapNode extends TempNode {
 		 * A reference to the internal cube texture.
 		 *
 		 * @private
-		 * @type {CubeTexture}
+		 * @type {?CubeTexture}
 		 * @default null
 		 */
 		this._cubeTexture = null;
@@ -53,7 +53,7 @@ class CubeMapNode extends TempNode {
 		 * @private
 		 * @type {CubeTextureNode}
 		 */
-		this._cubeTextureNode = cubeTexture();
+		this._cubeTextureNode = cubeTexture( null );
 
 		const defaultTexture = new CubeTexture();
 		defaultTexture.isRenderTargetTexture = true;
@@ -234,4 +234,4 @@ function mapTextureMapping( texture, mapping ) {
  * @param {Node} envNode - The node representing the environment map.
  * @returns {CubeMapNode}
  */
-export const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );
+export const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode ).setParameterLength( 1 );

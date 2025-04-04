@@ -140,6 +140,11 @@ function SidebarProjectApp( editor ) {
 			toZip[ 'js/app.js' ] = strToU8( content );
 
 		} );
+		loader.load( '../build/three.core.js', function ( content ) {
+
+			toZip[ 'js/three.core.js' ] = strToU8( content );
+
+		} );
 		loader.load( '../build/three.module.js', function ( content ) {
 
 			toZip[ 'js/three.module.js' ] = strToU8( content );

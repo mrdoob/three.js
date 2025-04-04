@@ -1,11 +1,17 @@
 /**
- * Ascii generation is based on https://github.com/hassadee/jsascii/blob/master/jsascii.js
+ * A class that creates an ASCII effect.
  *
- * 16 April 2012 - @blurspline
+ * The ASCII generation is based on [jsascii]{@link https://github.com/hassadee/jsascii/blob/master/jsascii.js}.
  */
-
 class AsciiEffect {
 
+	/**
+	 * Constructs a new ASCII effect.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {string} [charSet=' .:-=+*#%@'] - The char set.
+	 * @param {AsciiEffect~Options} [options] - The configuration parameter.
+	 */
 	constructor( renderer, charSet = ' .:-=+*#%@', options = {} ) {
 
 		// ' .,:;=|iI+hHOE#`$';
@@ -14,12 +20,12 @@ class AsciiEffect {
 
 		// Some ASCII settings
 
-		const fResolution = options[ 'resolution' ] || 0.15; // Higher for more details
+		const fResolution = options[ 'resolution' ] || 0.15;
 		const iScale = options[ 'scale' ] || 1;
-		const bColor = options[ 'color' ] || false; // nice but slows down rendering!
-		const bAlpha = options[ 'alpha' ] || false; // Transparency
-		const bBlock = options[ 'block' ] || false; // blocked characters. like good O dos
-		const bInvert = options[ 'invert' ] || false; // black is white, white is black
+		const bColor = options[ 'color' ] || false;
+		const bAlpha = options[ 'alpha' ] || false;
+		const bBlock = options[ 'block' ] || false;
+		const bInvert = options[ 'invert' ] || false;
 		const strResolution = options[ 'strResolution' ] || 'low';
 
 		let width, height;
@@ -33,6 +39,12 @@ class AsciiEffect {
 		let iWidth, iHeight;
 		let oImg;
 
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} w - The width of the effect in logical pixels.
+		 * @param {number} h - The height of the effect in logical pixels.
+		 */
 		this.setSize = function ( w, h ) {
 
 			width = w;
@@ -44,7 +56,13 @@ class AsciiEffect {
 
 		};
 
-
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			renderer.render( scene, camera );
@@ -52,6 +70,12 @@ class AsciiEffect {
 
 		};
 
+		/**
+		 * The DOM element of the effect. This element must be used instead of the
+		 * default {@link WebGLRenderer#domElement}.
+		 *
+		 * @type {HTMLDivElement}
+		 */
 		this.domElement = domElement;
 
 
@@ -77,8 +101,8 @@ class AsciiEffect {
 
 			}
 
-			oAscii.cellSpacing = 0;
-			oAscii.cellPadding = 0;
+			oAscii.cellSpacing = '0';
+			oAscii.cellPadding = '0';
 
 			const oStyle = oAscii.style;
 			oStyle.whiteSpace = 'pre';
@@ -94,8 +118,6 @@ class AsciiEffect {
 		}
 
 
-		const aDefaultCharList = ( ' .,:;i1tfLCG08@' ).split( '' );
-		const aDefaultColorCharList = ( ' CGO08@' ).split( '' );
 		const strFont = 'courier new, monospace';
 
 		const oCanvasImg = renderer.domElement;
@@ -114,9 +136,19 @@ class AsciiEffect {
 
 		}
 
-		let aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
+		let aCharList;
+		if ( charSet ) {
 
-		if ( charSet ) aCharList = charSet;
+			aCharList = ( charSet ).split( '' );
+
+		} else {
+
+			const aDefaultCharList = ( ' .,:;i1tfLCG08@' ).split( '' );
+			const aDefaultColorCharList = ( ' CGO08@' ).split( '' );
+			aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
+
+		}
+
 
 		// Setup dom
 
@@ -259,5 +291,18 @@ class AsciiEffect {
 	}
 
 }
+
+/**
+ * This type represents configuration settings of `AsciiEffect`.
+ *
+ * @typedef {Object} AsciiEffect~Options
+ * @property {number} [resolution=0.15] - A higher value leads to more details.
+ * @property {number} [scale=1] - The scale of the effect.
+ * @property {boolean} [color=false] - Whether colors should be enabled or not. Better quality but slows down rendering.
+ * @property {boolean} [alpha=false] - Whether transparency should be enabled or not.
+ * @property {boolean} [block=false] - Whether blocked characters should be enabled or not.
+ * @property {boolean} [invert=false] - Whether colors should be inverted or not.
+ * @property {('low'|'medium'|'high')} [strResolution='low'] - The string resolution.
+ **/
 
 export { AsciiEffect };

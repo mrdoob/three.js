@@ -60,4 +60,4 @@ export default BuiltinNode;
  * @param {string} name - The name of the built-in shader variable.
  * @returns {BuiltinNode}
  */
-export const builtin = nodeProxy( BuiltinNode );
+export const builtin = nodeProxy( BuiltinNode ).setParameterLength( 1 );

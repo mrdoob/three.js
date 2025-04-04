@@ -7,7 +7,7 @@ import { MeshLambertMaterial } from '../MeshLambertMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshLambertMaterial();
 
 /**
- * Node material version of `MeshLambertMaterial`.
+ * Node material version of {@link MeshLambertMaterial}.
  *
  * @augments NodeMaterial
  */
@@ -22,7 +22,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 	/**
 	 * Constructs a new mesh lambert node material.
 	 *
-	 * @param {?Object} parameters - The configuration parameter.
+	 * @param {Object} [parameters] - The configuration parameter.
 	 */
 	constructor( parameters ) {
 

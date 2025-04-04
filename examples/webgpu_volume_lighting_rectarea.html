@@ -8,15 +8,11 @@
 	</head>
 
 	<body>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volumetric lighting rect area
 			<br>Improve the quality/performance adjusting the parameters in the Controls
 		</div>
-
-		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
-			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
-			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-		</video>
 
 		<script type="importmap">
 			{
@@ -217,7 +213,7 @@
 				controls.target.copy( meshKnot.position );
 				controls.update();
 
-				// Post-Proccessing
+				// Post-Processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
@@ -232,11 +228,11 @@
 				// Scene Pass
 
 				const scenePass = pass( scene, camera );
-				const sceneLinearDepth = scenePass.getTextureNode( 'depth' );
+				const sceneDepth = scenePass.getTextureNode( 'depth' );
 
-				// Material - Apply oclussion depth of volumetric lighting based on the scene depth
+				// Material - Apply occlusion depth of volumetric lighting based on the scene depth
 
-				volumetricMaterial.depthNode = sceneLinearDepth.sample( screenUV );
+				volumetricMaterial.depthNode = sceneDepth.sample( screenUV );
 
 				// Volumetric Lighting Pass
 
@@ -257,7 +253,6 @@
 				// GUI
 
 				const params = {
-					quality: 1,
 					resolution: volumetricPass.getResolution(),
 					denoise: true
 				};
