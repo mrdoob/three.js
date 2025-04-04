@@ -3,7 +3,10 @@ import {
 	Vector4
 } from 'three';
 
-/** @module NURBSUtils */
+/**
+ * @module NURBSUtils
+ * @three_import import * as NURBSUtils from 'three/addons/curves/NURBSUtils.js';
+ */
 
 /**
  * Finds knot vector span.

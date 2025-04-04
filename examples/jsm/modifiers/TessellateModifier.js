@@ -14,6 +14,8 @@ import {
  * const modifier = new TessellateModifier( 8, 6 );
  * geometry = modifier.modify( geometry );
  * ```
+ *
+ * @three_import import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';
  */
 class TessellateModifier {
 

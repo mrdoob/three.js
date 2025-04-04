@@ -6,7 +6,10 @@ import {
 } from 'three';
 import { texture, uv } from 'three/tsl';
 
-/** @module WebGPUTextureUtils */
+/**
+ * @module WebGPUTextureUtils
+ * @three_import import * as WebGPUTextureUtils from 'three/addons/utils/WebGPUTextureUtils.js';
+ */
 
 let _renderer;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();

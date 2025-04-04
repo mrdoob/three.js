@@ -16,6 +16,7 @@ import {
  * A helper for visualizing the cascades of a CSM instance.
  *
  * @augments Group
+ * @three_import import { CSMHelper } from 'three/addons/csm/CSMHelper.js';
  */
 class CSMHelper extends Group {
 

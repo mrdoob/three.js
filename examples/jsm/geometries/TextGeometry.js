@@ -23,6 +23,7 @@ import {
  * ```
  *
  * @augments ExtrudeGeometry
+ * @three_import import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
  */
 class TextGeometry extends ExtrudeGeometry {
 

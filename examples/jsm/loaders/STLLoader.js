@@ -49,6 +49,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { STLLoader } from 'three/addons/loaders/STLLoader.js';
  */
 class STLLoader extends Loader {
 

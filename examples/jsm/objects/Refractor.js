@@ -33,6 +33,7 @@ import {
  * ```
  *
  * @augments Mesh
+ * @three_import import { Refractor } from 'three/addons/objects/Refractor.js';
  */
 class Refractor extends Mesh {
 

@@ -3,7 +3,10 @@ import {
 	Vector3
 } from 'three';
 
-/** @module GodRaysShader */
+/**
+ * @module GodRaysShader
+ * @three_import import * as GodRaysShader from 'three/addons/shaders/GodRaysShader.js';
+ */
 
 /**
  * God-rays (crepuscular rays)

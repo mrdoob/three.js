@@ -17,6 +17,7 @@ let _rendererState;
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
  * @augments PassNode
+ * @three_import import { traaPass } from 'three/addons/tsl/display/TRAAPassNode.js';
  */
 class TRAAPassNode extends PassNode {
 

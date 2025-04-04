@@ -19,6 +19,7 @@ import { Pass, FullScreenQuad } from './Pass.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
  */
 class RenderPixelatedPass extends Pass {
 

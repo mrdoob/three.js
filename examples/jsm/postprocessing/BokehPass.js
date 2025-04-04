@@ -25,6 +25,7 @@ import { BokehShader } from '../shaders/BokehShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
  */
 class BokehPass extends Pass {
 

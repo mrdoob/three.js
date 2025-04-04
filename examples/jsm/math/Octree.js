@@ -96,6 +96,8 @@ function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null )
  * const octree = new Octree().fromGraphNode( scene );
  * const result = octree.capsuleIntersect( playerCollider ); // collision detection
  * ```
+ *
+ * @three_import import { Octree } from 'three/addons/math/Octree.js';
  */
 class Octree {
 

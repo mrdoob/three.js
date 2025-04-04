@@ -17,6 +17,7 @@ import {
  * ```
  *
  * @augments Object3D
+ * @three_import import { XRPlanes } from 'three/addons/webxr/XRPlanes.js';
  */
 class XRPlanes extends Object3D {
 

@@ -21,6 +21,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
  */
 class SSAARenderPass extends Pass {
 

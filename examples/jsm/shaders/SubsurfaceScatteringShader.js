@@ -14,7 +14,10 @@ function replaceAll( string, find, replace ) {
 const meshphong_frag_head = ShaderChunk[ 'meshphong_frag' ].slice( 0, ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
 const meshphong_frag_body = ShaderChunk[ 'meshphong_frag' ].slice( ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
 
-/** @module SubsurfaceScatteringShader */
+/**
+ * @module SubsurfaceScatteringShader
+ * @three_import import { SubsurfaceScatteringShader } from 'three/addons/shaders/SubsurfaceScatteringShader.js';
+ */
 
 /**
  * Subsurface Scattering shader.

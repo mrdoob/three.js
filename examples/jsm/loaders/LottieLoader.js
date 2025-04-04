@@ -29,6 +29,7 @@ import lottie from '../libs/lottie_canvas.module.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { LottieLoader } from 'three/addons/loaders/LottieLoader.js';
  */
 class LottieLoader extends Loader {
 

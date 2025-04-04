@@ -40,6 +40,7 @@ let _rendererState;
  * ```
  *
  * @augments TempNode
+ * @three_import import { outline } from 'three/addons/tsl/display/OutlineNode.js';
  */
 class OutlineNode extends TempNode {
 

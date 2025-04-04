@@ -23,6 +23,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
  */
 class PDBLoader extends Loader {
 

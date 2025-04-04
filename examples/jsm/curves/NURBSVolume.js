@@ -7,6 +7,8 @@ import * as NURBSUtils from '../curves/NURBSUtils.js';
  * This class represents a NURBS volume.
  *
  * Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weight`.
+ *
+ * @three_import import { NURBSVolume } from 'three/addons/curves/NURBSVolume.js';
  */
 class NURBSVolume {
 

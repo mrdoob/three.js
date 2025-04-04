@@ -11,6 +11,7 @@ import * as NURBSUtils from '../curves/NURBSUtils.js';
  * Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weight`.
  *
  * @augments Curve
+ * @three_import import { NURBSCurve } from 'three/addons/curves/NURBSCurve.js';
  */
 class NURBSCurve extends Curve {
 

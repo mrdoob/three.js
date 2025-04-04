@@ -26,6 +26,7 @@ import { HalftoneShader } from '../shaders/HalftoneShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { HalftonePass } from 'three/addons/postprocessing/HalftonePass.js';
  */
 class HalftonePass extends Pass {
 

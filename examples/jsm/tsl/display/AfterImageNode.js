@@ -10,6 +10,7 @@ let _rendererState;
  * Post processing node for creating an after image effect.
  *
  * @augments TempNode
+ * @three_import import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
  */
 class AfterImageNode extends TempNode {
 

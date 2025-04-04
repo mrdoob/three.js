@@ -24,6 +24,7 @@ import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float,
  * - {@link http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html}
  *
  * @augments Mesh
+ * @three_import import { WaterMesh } from 'three/addons/objects/Water2Mesh.js';
  */
 class WaterMesh extends Mesh {
 

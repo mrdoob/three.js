@@ -20,6 +20,7 @@ import {
  * ```
  *
  * @augments Line
+ * @three_import import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
  */
 class RectAreaLightHelper extends Line {
 

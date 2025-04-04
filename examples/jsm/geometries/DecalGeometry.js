@@ -25,6 +25,7 @@ import {
  * ```
  *
  * @augments BufferGeometry
+ * @three_import import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
  */
 class DecalGeometry extends BufferGeometry {
 

@@ -19,6 +19,7 @@ import { AfterimageShader } from '../shaders/AfterimageShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
  */
 class AfterimagePass extends Pass {
 

@@ -55,6 +55,7 @@ const COLOR_SPACE_SVG = SRGBColorSpace;
  * ```
  *
  * @augments Loader
+ * @three_import import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
  */
 class SVGLoader extends Loader {
 

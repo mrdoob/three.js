@@ -18,6 +18,8 @@ import {
  * const exporter = new PLYExporter();
  * const data = exporter.parse( scene, options );
  * ```
+ *
+ * @three_import import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
  */
 class PLYExporter {
 

@@ -17,6 +17,7 @@ import {
  * ```
  *
  * @augments BufferGeometry
+ * @three_import import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
  */
 class ParametricGeometry extends BufferGeometry {
 

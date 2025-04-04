@@ -26,6 +26,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { XYZLoader } from 'three/addons/loaders/XYZLoader.js';
  */
 class XYZLoader extends Loader {
 

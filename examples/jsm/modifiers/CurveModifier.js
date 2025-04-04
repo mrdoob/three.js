@@ -203,6 +203,8 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
  *
  * This module can only be used with {@link WebGLRenderer}. When using {@link WebGPURenderer},
  * import the class from `CurveModifierGPU.js`.
+ *
+ * @three_import import { Flow } from 'three/addons/modifiers/CurveModifier.js';
  */
 export class Flow {
 
@@ -296,6 +298,7 @@ const _matrix = new Matrix4();
  * This module can only be used with {@link WebGLRenderer}.
  *
  * @augments Flow
+ * @three_import import { InstancedFlow } from 'three/addons/modifiers/CurveModifier.js';
  */
 export class InstancedFlow extends Flow {
 

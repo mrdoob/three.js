@@ -1,4 +1,7 @@
-/** @module SepiaShader */
+/**
+ * @module SepiaShader
+ * @three_import import { SepiaShader } from 'three/addons/shaders/SepiaShader.js';
+ */
 
 /**
  * Sepia tone shader based on [glfx.js sepia shader]{@link https://github.com/evanw/glfx.js}.

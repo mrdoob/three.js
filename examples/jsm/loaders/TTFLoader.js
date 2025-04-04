@@ -17,6 +17,7 @@ import opentype from '../libs/opentype.module.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
  */
 class TTFLoader extends Loader {
 

@@ -15,6 +15,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { FontLoader } from 'three/addons/loaders/FontLoader.js';
  */
 class FontLoader extends Loader {
 

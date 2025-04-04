@@ -33,6 +33,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
  */
 class SAOPass extends Pass {
 

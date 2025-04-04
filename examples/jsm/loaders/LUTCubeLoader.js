@@ -20,6 +20,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
  */
 export class LUTCubeLoader extends Loader {
 

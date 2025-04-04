@@ -9,6 +9,7 @@ let _rendererState;
  * Post processing node for adding an anamorphic flare effect.
  *
  * @augments TempNode
+ * @three_import import { anamorphic } from 'three/addons/tsl/display/AnamorphicNode.js';
  */
 class AnamorphicNode extends TempNode {
 

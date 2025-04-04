@@ -23,6 +23,7 @@ const _color = new Color();
  * ```
  *
  * @augments Loader
+ * @three_import import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
  */
 class PLYLoader extends Loader {
 

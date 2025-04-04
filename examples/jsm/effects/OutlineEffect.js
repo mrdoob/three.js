@@ -21,6 +21,8 @@ import {
  *
  * }
  * ```
+ *
+ * @three_import import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
  */
 class OutlineEffect {
 

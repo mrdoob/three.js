@@ -26,6 +26,7 @@ import {
  * ```
  *
  * @augments Scene
+ * @three_import import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
  */
 class RoomEnvironment extends Scene {
 

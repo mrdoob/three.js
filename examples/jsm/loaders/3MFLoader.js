@@ -48,6 +48,7 @@ const COLOR_SPACE_3MF = SRGBColorSpace;
  * ```
  *
  * @augments Loader
+ * @three_import import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
  */
 class ThreeMFLoader extends Loader {
 

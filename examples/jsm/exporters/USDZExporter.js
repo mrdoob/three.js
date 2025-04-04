@@ -16,6 +16,8 @@ import {
  * const exporter = new USDZExporter();
  * const arraybuffer = await exporter.parseAsync( scene );
  * ```
+ *
+ * @three_import import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
  */
 class USDZExporter {
 

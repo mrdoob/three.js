@@ -15,6 +15,7 @@ import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
  * ```
  *
  * @augments Mesh
+ * @three_import import { GroundedSkybox } from 'three/addons/objects/GroundedSkybox.js';
  */
 class GroundedSkybox extends Mesh {
 

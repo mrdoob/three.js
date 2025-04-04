@@ -20,6 +20,7 @@ import {
  * ```
  *
  * @augments CompressedTextureLoader
+ * @three_import import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
  */
 class DDSLoader extends CompressedTextureLoader {
 

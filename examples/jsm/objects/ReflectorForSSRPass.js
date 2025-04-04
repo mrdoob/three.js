@@ -19,6 +19,7 @@ import {
  * A special version of {@link Reflector} for usage with {@link SSRPass}.
  *
  * @augments Mesh
+ * @three_import import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
  */
 class ReflectorForSSRPass extends Mesh {
 

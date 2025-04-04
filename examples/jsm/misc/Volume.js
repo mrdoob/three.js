@@ -8,6 +8,8 @@ import { VolumeSlice } from '../misc/VolumeSlice.js';
 /**
  * This class had been written to handle the output of the {@link NRRDLoader}.
  * It contains a volume of data and information about it. For now it only handles 3 dimensional data.
+ *
+ * @three_import import { Volume } from 'three/addons/misc/Volume.js';
  */
 class Volume {
 

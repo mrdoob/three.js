@@ -40,6 +40,7 @@ const _size = /*@__PURE__*/ new Vector2();
  * a custom implementation.
  *
  * @augments LightsNode
+ * @three_import import { tiledLights } from 'three/addons/tsl/lighting/TiledLightsNode.js';
  */
 class TiledLightsNode extends LightsNode {
 

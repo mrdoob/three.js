@@ -1,4 +1,7 @@
-/** @module HueSaturationShader */
+/**
+ * @module HueSaturationShader
+ * @three_import import { HueSaturationShader } from 'three/addons/shaders/HueSaturationShader.js';
+ */
 
 /**
  * Hue and saturation adjustment, {@link https://github.com/evanw/glfx.js}.

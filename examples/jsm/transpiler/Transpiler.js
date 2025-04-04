@@ -4,6 +4,8 @@
  * `Transpiler` can only be used to convert GLSL into TSL right now. It is intended
  * to support developers when they want to migrate their custom materials from the
  * current to the new node-based material system.
+ *
+ * @three_import import Transpiler from 'three/addons/transpiler/Transpiler.js';
  */
 class Transpiler {
 

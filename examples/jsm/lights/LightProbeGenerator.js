@@ -15,6 +15,7 @@ import {
  * Utility class for creating instances of {@link LightProbe}.
  *
  * @hideconstructor
+ * @three_import import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';
  */
 class LightProbeGenerator {
 

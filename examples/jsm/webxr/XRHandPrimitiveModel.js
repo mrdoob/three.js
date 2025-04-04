@@ -15,6 +15,8 @@ const _vector = new Vector3();
  * Represents one of the hand model types {@link XRHandModelFactory} might produce
  * depending on the selected profile. `XRHandPrimitiveModel` represents a hand
  * with sphere or box primitives according to the selected `primitive` option.
+ *
+ * @three_import import { XRHandPrimitiveModel } from 'three/addons/webxr/XRHandPrimitiveModel.js';
  */
 class XRHandPrimitiveModel {
 

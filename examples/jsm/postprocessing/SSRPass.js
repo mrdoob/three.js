@@ -34,6 +34,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
  */
 class SSRPass extends Pass {
 

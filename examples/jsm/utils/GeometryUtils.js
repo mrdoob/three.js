@@ -1,6 +1,9 @@
 import { Vector3 } from 'three';
 
-/** @module GeometryUtils */
+/**
+ * @module GeometryUtils
+ * @three_import import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
+ */
 
 /**
  * Generates 2D-Coordinates along a Hilbert curve.

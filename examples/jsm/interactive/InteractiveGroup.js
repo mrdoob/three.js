@@ -34,6 +34,7 @@ const _raycaster = new Raycaster();
  * group.add( mesh1, mesh2, mesh3 );
  * ```
  * @augments Group
+ * @three_import import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';
  */
 class InteractiveGroup extends Group {
 
