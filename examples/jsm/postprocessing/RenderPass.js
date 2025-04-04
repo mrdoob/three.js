@@ -13,6 +13,7 @@ import { Pass } from './Pass.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
  */
 class RenderPass extends Pass {
 

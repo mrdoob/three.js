@@ -30,6 +30,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
  */
 class PCDLoader extends Loader {
 

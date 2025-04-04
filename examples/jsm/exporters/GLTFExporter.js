@@ -97,6 +97,8 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  * const exporter = new GLTFExporter();
  * const data = await exporter.parseAsync( scene, options );
  * ```
+ *
+ * @three_import import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
  */
 class GLTFExporter {
 

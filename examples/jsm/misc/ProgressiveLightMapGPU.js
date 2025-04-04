@@ -18,6 +18,8 @@ import { potpack } from '../libs/potpack.module.js';
  *
  * This class can only be used with {@link WebGPURenderer}.
  * When using {@link WebGLRenderer}, import from `ProgressiveLightMap.js`.
+ *
+ * @three_import import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMapGPU.js';
  */
 class ProgressiveLightMap {
 

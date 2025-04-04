@@ -11,6 +11,8 @@
  * const timer = new Timer();
  * timer.connect( document ); // use Page Visibility API
  * ```
+ *
+ * @three_import import { Timer } from 'three/addons/misc/Timer.js';
  */
 class Timer {
 

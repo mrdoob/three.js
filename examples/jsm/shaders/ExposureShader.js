@@ -1,4 +1,7 @@
-/** @module ExposureShader */
+/**
+ * @module ExposureShader
+ * @three_import import { ExposureShader } from 'three/addons/shaders/ExposureShader.js';
+ */
 
 /**
  * TODO

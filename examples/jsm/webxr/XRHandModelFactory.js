@@ -90,6 +90,8 @@ class XRHandModel extends Object3D {
  * hand.add( handModelFactory.createHandModel( hand ) );
  * scene.add( hand );
  * ```
+ *
+ * @three_import import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
  */
 class XRHandModelFactory {
 

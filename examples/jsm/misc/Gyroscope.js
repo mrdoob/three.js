@@ -19,6 +19,7 @@ const _scaleWorld = new Vector3();
  * respect to the world.
  *
  * @augments Object3D
+ * @three_import import { Gyroscope } from 'three/addons/misc/Gyroscope.js';
  */
 class Gyroscope extends Object3D {
 

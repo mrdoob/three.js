@@ -10,6 +10,7 @@ if ( typeof window !== 'undefined' && isAvailable ) {
  * A utility module with basic WebGPU capability testing.
  *
  * @hideconstructor
+ * @three_import import WebGPU from 'three/addons/capabilities/WebGPU.js';
  */
 class WebGPU {
 

@@ -6,6 +6,7 @@ import { nodeObject, Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } f
  * separates color channels and offsets them from each other.
  *
  * @augments TempNode
+ * @three_import import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
  */
 class RGBShiftNode extends TempNode {
 

@@ -16,6 +16,7 @@ import { Volume } from '../misc/Volume.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
  */
 class NRRDLoader extends Loader {
 

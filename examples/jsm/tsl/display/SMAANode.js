@@ -15,6 +15,7 @@ let _rendererState;
  * Reference: {@link https://github.com/iryoku/smaa/releases/tag/v2.8}.
  *
  * @augments TempNode
+ * @three_import import { smaa } from 'three/addons/tsl/display/SMAANode.js';
  */
 class SMAANode extends TempNode {
 

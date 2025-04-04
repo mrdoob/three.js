@@ -17,6 +17,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
  */
 class TexturePass extends Pass {
 

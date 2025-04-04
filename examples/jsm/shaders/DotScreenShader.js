@@ -2,7 +2,10 @@ import {
 	Vector2
 } from 'three';
 
-/** @module DotScreenShader */
+/**
+ * @module DotScreenShader
+ * @three_import import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
+ */
 
 /**
  * Dot screen shader based on [glfx.js sepia shader]{@link https://github.com/evanw/glfx.js}.

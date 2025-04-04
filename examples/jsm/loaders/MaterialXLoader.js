@@ -156,6 +156,7 @@ MXElements.forEach( element => MtlXLibrary[ element.name ] = element );
  * ```
  *
  * @augments Loader
+ * @three_import import { MaterialXLoader } from 'three/addons/loaders/MaterialXLoader.js';
  */
 class MaterialXLoader extends Loader {
 

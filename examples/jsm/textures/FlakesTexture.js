@@ -1,6 +1,8 @@
 /**
  * Utility class for generating a flakes texture image. This image might be used
  * as a normal map to produce a car paint like effect.
+ *
+ * @three_import import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js';
  */
 class FlakesTexture {
 

@@ -18,6 +18,7 @@ import { float, Fn, getShIrradianceAt, normalWorld, uniformArray, uniform, vec4 
  *
  * @private
  * @augments Mesh
+ * @three_import import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelperGPU.js';
  */
 class LightProbeHelper extends Mesh {
 

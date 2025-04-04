@@ -255,6 +255,8 @@ function addAssetSceneToControllerModel( controllerModel, scene ) {
  * controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
  * scene.add( controllerGrip );
  * ```
+ *
+ * @three_import import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
  */
 class XRControllerModelFactory {
 

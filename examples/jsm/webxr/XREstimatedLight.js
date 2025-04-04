@@ -138,6 +138,7 @@ class SessionLightProbe {
  * a XR session. It relies on the WebXR Lighting Estimation API.
  *
  * @augments Group
+ * @three_import import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';
  */
 export class XREstimatedLight extends Group {
 

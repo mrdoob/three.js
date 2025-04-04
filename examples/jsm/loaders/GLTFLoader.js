@@ -115,6 +115,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
  */
 class GLTFLoader extends Loader {
 

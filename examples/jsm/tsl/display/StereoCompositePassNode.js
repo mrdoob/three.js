@@ -15,6 +15,7 @@ let _rendererState;
  *
  * @abstract
  * @augments PassNode
+ * @three_import import { StereoCompositePassNode } from 'three/addons/tsl/display/StereoCompositePassNode.js';
  */
 class StereoCompositePassNode extends PassNode {
 

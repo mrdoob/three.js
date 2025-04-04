@@ -7,7 +7,8 @@ import {
  * Collection of toon shaders.
  *
  * @module TriangleBlurShader
- * */
+ * @three_import import * as ToonShader from 'three/addons/shaders/ToonShader.js';
+ */
 
 /**
  * Toon1 shader.

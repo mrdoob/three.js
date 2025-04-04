@@ -23,6 +23,7 @@ const CURSOR_MAX_DISTANCE = 1.5;
  * Represents an Oculus hand pointer model.
  *
  * @augments Object3D
+ * @three_import import { OculusHandPointerModel } from 'three/addons/webxr/OculusHandPointerModel.js';
  */
 class OculusHandPointerModel extends Object3D {
 

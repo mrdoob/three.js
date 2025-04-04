@@ -5,6 +5,7 @@ import { rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/ts
  * Post processing node for creating a film grain effect.
  *
  * @augments TempNode
+ * @three_import import { film } from 'three/addons/tsl/display/FilmNode.js';
  */
 class FilmNode extends TempNode {
 

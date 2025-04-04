@@ -27,6 +27,7 @@ const _normalMatrix = new Matrix3();
  * ```
  *
  * @augments LineSegments
+ * @three_import import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';
  */
 class VertexNormalsHelper extends LineSegments {
 

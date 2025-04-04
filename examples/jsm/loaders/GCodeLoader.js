@@ -20,6 +20,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
  */
 class GCodeLoader extends Loader {
 

@@ -2,7 +2,10 @@ import {
 	Vector2
 } from 'three';
 
-/** @module UVsDebug */
+/**
+ * @module UVsDebug
+ * @three_import import { UVsDebug } from 'three/addons/utils/UVsDebug.js';
+ */
 
 /**
  * Function for "unwrapping" and debugging three.js geometries UV mapping.

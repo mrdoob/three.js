@@ -27,6 +27,7 @@ const _viewport = new Vector4();
  * ```
  *
  * @augments Mesh
+ * @three_import import { Wireframe } from 'three/addons/lines/Wireframe.js';
  */
 class Wireframe extends Mesh {
 

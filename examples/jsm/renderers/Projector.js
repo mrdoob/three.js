@@ -124,6 +124,8 @@ class RenderableSprite {
  * This class can project a given scene in 3D space into a 2D representation
  * used for rendering with a 2D API. `Projector` is currently used by {@link SVGRenderer}
  * and was previously used by the legacy `CanvasRenderer`.
+ *
+ * @three_import import { Projector } from 'three/addons/renderers/Projector.js';
  */
 class Projector {
 

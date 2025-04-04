@@ -1,7 +1,10 @@
 import { TextureLoader } from 'three';
 import { Fn, int, ivec2, textureLoad } from 'three/tsl';
 
-/** @module Bayer */
+/**
+ * @module Bayer
+ * @three_import import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
+ */
 
 let bayer16Texture = null;
 

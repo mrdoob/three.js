@@ -6,6 +6,7 @@ import StereoCompositePassNode from './StereoCompositePassNode.js';
  * A render pass node that creates an anaglyph effect.
  *
  * @augments StereoCompositePassNode
+ * @three_import import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
  */
 class AnaglyphPassNode extends StereoCompositePassNode {
 

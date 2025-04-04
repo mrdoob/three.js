@@ -2,7 +2,10 @@ import {
 	Vector2
 } from 'three';
 
-/** @module BokehShader2 */
+/**
+ * @module BokehShader2
+ * @three_import import { BokehShader, BokehDepthShader } from 'three/addons/shaders/BokehShader2.js';
+ */
 
 /**
  * Depth-of-field shader with bokeh ported from

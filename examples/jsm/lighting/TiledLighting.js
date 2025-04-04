@@ -11,6 +11,7 @@ import { tiledLights } from '../tsl/lighting/TiledLightsNode.js';
  * ```
  *
  * @augments Lighting
+ * @three_import import { TiledLighting } from 'three/addons/lighting/TiledLighting.js';
  */
 export class TiledLighting extends Lighting {
 

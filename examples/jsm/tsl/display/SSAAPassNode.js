@@ -15,6 +15,7 @@ let _rendererState;
  * Reference: {@link https://en.wikipedia.org/wiki/Supersampling}
  *
  * @augments PassNode
+ * @three_import import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
  */
 class SSAAPassNode extends PassNode {
 

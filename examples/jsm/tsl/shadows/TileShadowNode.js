@@ -43,7 +43,8 @@ class LwLight extends Object3D {
  * **Note:** This class does not support `VSMShadowMap` at the moment.
  *
  * @class
- * @extends ShadowBaseNode
+ * @augments ShadowBaseNode
+ * @three_import import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';
  */
 class TileShadowNode extends ShadowBaseNode {
 

@@ -19,6 +19,7 @@ import {
  * ```
  *
  * @augments DataTextureLoader
+ * @three_import import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
  */
 class RGBELoader extends DataTextureLoader {
 

@@ -40,6 +40,8 @@ const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
  *
  * scene.add( mesh );
  * ```
+ *
+ * @three_import import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
  */
 class MeshSurfaceSampler {
 

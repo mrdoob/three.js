@@ -41,6 +41,7 @@ const _taskCache = new WeakMap();
  * ```
  *
  * @augments Loader
+ * @three_import import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
  */
 class DRACOLoader extends Loader {
 

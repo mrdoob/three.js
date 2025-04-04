@@ -20,6 +20,7 @@ import { SMAABlendShader, SMAAEdgesShader, SMAAWeightsShader } from '../shaders/
  * ```
  *
  * @augments Pass
+ * @three_import import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
  */
 class SMAAPass extends Pass {
 

@@ -4,6 +4,8 @@ import { Vector2 } from 'three';
  * A helper for {@link SelectionBox}.
  *
  * It visualizes the current selection box with a `div` container element.
+ *
+ * @three_import import { SelectionHelper } from 'three/addons/interactive/SelectionHelper.js';
  */
 class SelectionHelper {
 

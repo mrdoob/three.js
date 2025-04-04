@@ -40,6 +40,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { MDDLoader } from 'three/addons/loaders/MDDLoader.js';
  */
 class MDDLoader extends Loader {
 

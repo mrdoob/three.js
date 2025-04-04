@@ -23,6 +23,7 @@ import { RGBELoader } from '../loaders/RGBELoader.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
  */
 class HDRCubeTextureLoader extends Loader {
 

@@ -12,6 +12,8 @@ import {
  * const lut = new Lut( 'rainbow', 512 );
  * const color = lut.getColor( 0.5 );
  * ```
+ *
+ * @three_import import { Lut } from 'three/addons/math/Lut.js';
  */
 class Lut {
 

@@ -42,6 +42,7 @@ class LwLight extends Object3D {
  * use {@link CSM} instead.
  *
  * @augments ShadowBaseNode
+ * @three_import import { CSMShadowNode } from 'three/addons/csm/CSMShadowNode.js';
  */
 class CSMShadowNode extends ShadowBaseNode {
 

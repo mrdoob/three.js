@@ -26,6 +26,7 @@ import * as fflate from '../libs/fflate.module.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
  */
 class VTKLoader extends Loader {
 

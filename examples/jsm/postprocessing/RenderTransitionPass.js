@@ -16,6 +16,7 @@ import { FullScreenQuad, Pass } from './Pass.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { RenderTransitionPass } from 'three/addons/postprocessing/RenderTransitionPass.js';
  */
 class RenderTransitionPass extends Pass {
 

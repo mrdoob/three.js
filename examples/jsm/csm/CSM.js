@@ -25,6 +25,8 @@ const _up = new Vector3( 0, 1, 0 );
  *
  * This module can only be used with {@link WebGLRenderer}. When using {@link WebGPURenderer},
  * use {@link CSMShadowNode} instead.
+ *
+ * @three_import import { CSM } from 'three/addons/csm/CSM.js';
  */
 export class CSM {
 

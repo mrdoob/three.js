@@ -26,6 +26,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
  */
 class OutlinePass extends Pass {
 

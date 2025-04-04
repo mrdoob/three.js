@@ -19,6 +19,8 @@ import { Color, ColorManagement, SRGBColorSpace } from 'three';
  * const exporter = new DRACOExporter();
  * const data = exporter.parse( mesh, options );
  * ```
+ *
+ * @three_import import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
  */
 class DRACOExporter {
 

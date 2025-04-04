@@ -20,6 +20,7 @@ const _v2 = new Vector3();
  * ```
  *
  * @augments LineSegments
+ * @three_import import { VertexTangentsHelper } from 'three/addons/helpers/VertexTangentsHelper.js';
  */
 class VertexTangentsHelper extends LineSegments {
 

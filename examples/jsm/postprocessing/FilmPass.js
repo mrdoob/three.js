@@ -14,6 +14,7 @@ import { FilmShader } from '../shaders/FilmShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
  */
 class FilmPass extends Pass {
 

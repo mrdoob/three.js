@@ -7,6 +7,7 @@ import { nodeObject, Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, 
  * space conversion.
  *
  * @augments TempNode
+ * @three_import import { sobel } from 'three/addons/tsl/display/SobelOperatorNode.js';
  */
 class SobelOperatorNode extends TempNode {
 

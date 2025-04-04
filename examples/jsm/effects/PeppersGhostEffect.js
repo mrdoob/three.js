@@ -8,6 +8,8 @@ import {
  * A class that implements a peppers ghost effect.
  *
  * Reference: [Reflective Prism]{@link http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS}
+ *
+ * @three_import import { PeppersGhostEffect } from 'three/addons/effects/PeppersGhostEffect.js';
  */
 class PeppersGhostEffect {
 

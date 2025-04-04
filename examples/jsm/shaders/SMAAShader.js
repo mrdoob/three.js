@@ -10,6 +10,7 @@ import {
  * - {@link https://github.com/iryoku/smaa/releases/tag/v2.8}
  *
  * @module SMAAShader
+ * @three_import import { SMAAShader } from 'three/addons/shaders/SMAAShader.js';
  */
 
 /**

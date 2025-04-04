@@ -37,6 +37,8 @@ const _scale = new Vector3();
  * const selectionBox = new SelectionBox( camera, scene );
  * const selectedObjects = selectionBox.select( startPoint, endPoint );
  * ```
+ *
+ * @three_import import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';
  */
 class SelectionBox {
 

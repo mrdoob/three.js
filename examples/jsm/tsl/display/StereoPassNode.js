@@ -9,6 +9,7 @@ let _rendererState;
  * A special render pass node that renders the scene as a stereoscopic image.
  *
  * @augments PassNode
+ * @three_import import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
  */
 class StereoPassNode extends PassNode {
 

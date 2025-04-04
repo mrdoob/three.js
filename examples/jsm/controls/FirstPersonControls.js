@@ -14,6 +14,7 @@ const _targetPosition = new Vector3();
  * This class is an alternative implementation of {@link FlyControls}.
  *
  * @augments Controls
+ * @three_import import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
  */
 class FirstPersonControls extends Controls {
 

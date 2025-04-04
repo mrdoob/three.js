@@ -9,6 +9,7 @@ import {
  * The only type of 3D object that is supported by {@link CSS2DRenderer}.
  *
  * @augments Object3D
+ * @three_import import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
  */
 class CSS2DObject extends Object3D {
 
@@ -103,6 +104,8 @@ const _b = new Vector3();
  * scene graph. All other types of renderable 3D objects (like meshes or point clouds) are ignored.
  *
  * `CSS2DRenderer` only supports 100% browser and display zoom.
+ *
+ * @three_import import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
  */
 class CSS2DRenderer {
 

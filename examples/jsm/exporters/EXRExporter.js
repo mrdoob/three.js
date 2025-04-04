@@ -26,6 +26,8 @@ const ZIP_COMPRESSION = 3;
  * const exporter = new EXRExporter();
  * const result = await exporter.parse( renderer, options );
  * ```
+ *
+ * @three_import import { EXRExporter } from 'three/addons/exporters/EXRExporter.js';
  */
 class EXRExporter {
 
