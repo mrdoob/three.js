@@ -62,7 +62,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -74,6 +73,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = sceneParameters.shadow;
 
@@ -263,8 +263,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update();
 				stats.begin();

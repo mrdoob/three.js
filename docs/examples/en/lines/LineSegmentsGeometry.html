@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr; [page:InstancedBufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A series of vertex pairs, forming line segments.
+		</p>
+
+		<p class="desc">
+			This is used in [page:LineSegments2] to describe the shape.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and therefore must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
+		</code>
+
+		<h2>Example</h2>
+
+		<p>[example:webgl_lines_fat_raycasting WebGL / lines / fat / raycasting ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+			Creates a new geometry.
+			Call [page:LineSegmentsGeometry.setPositions setPositions] to add segments.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:InstancedBufferGeometry] class for common properties.</p>
+
+		<h3>[property:Boolean isLineSegmentsGeometry]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:this fromEdgesGeometry]( [param:EdgesGeometry geometry] )</h3>
+		<p>
+			Copy the vertex positions of an edge geometry into this geometry.
+		</p>
+
+		<h3>[method:this fromLineSegments]( [param:LineSegments lineSegments] )</h3>
+		<p>
+			Copy the vertex positions of a [page:LineSegments] object into this geometry.
+			Assumes the source geometry is not using indices.
+		</p>
+
+		<h3>[method:this fromMesh]( [param:Mesh mesh] )</h3>
+		<p>
+			Copy the vertex positions of a mesh object into this geometry.
+		</p>
+
+		<h3>[method:this fromWireframeGeometry]( [param:WireframeGeometry geometry] )</h3>
+		<p>
+			Copy the vertex positions of a wireframe geometry into this geometry.
+		</p>
+
+		<h3>[method:this setColors]( [param:Array array] )</h3>
+		<p>
+			Replace the per-vertex colors.
+			Every sixtuple describes a segment: `[r1, g1, b1, r2, g2, b2]`.
+			The array can be an `Array` or `Float32Array`.
+		</p>
+
+		<h3>[method:this setPositions]( [param:Array array] )</h3>
+		<p>
+			Replace the vertex positions with a new set.
+			The array can be an `Array` or `Float32Array`.
+			The length must be a multiple of six.
+		</p>
+		<p>
+			See also [page:LineSegmentsGeometry.positions positions].
+		</p>
+
+		<h3>[method:undefined toJSON]()</h3>
+		<p>
+			Unimplemented.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/LineSegmentsGeometry.js examples/jsm/lines/LineSegmentsGeometry.js]
+		</p>
+	</body>
+</html>

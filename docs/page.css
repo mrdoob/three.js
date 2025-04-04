@@ -122,6 +122,10 @@ summary {
 	margin-bottom: 16px;
 }
 
+summary:hover {
+	cursor: pointer;
+}
+
 p {
 	padding-right: 16px;
 }
@@ -152,6 +156,10 @@ ul code {
 	margin: 16px 0;
 }
 
+code {
+	position: relative;
+}
+
 code.inline {
 	display: inline-block;
 	vertical-align: middle;
@@ -159,6 +167,32 @@ code.inline {
 	padding: 0px 5px;
 	background: #F5F5F5;
 	margin: 0;
+}
+
+.copy-btn {
+	cursor: pointer;
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 24px;
+	height: 24px;
+	background-color: transparent;
+	background-image: url('../files/ic_copy_grey_24dp.svg');
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	opacity: 0.9;
+	border: none;
+}
+
+.copy-btn:hover {
+	opacity: 1;
+}
+
+.copy-btn.copied {
+	pointer-events: none;
+	opacity: 1;
+	background-image: url('../files/ic_tick_green_24dp.svg');
 }
 
 table {
@@ -311,4 +345,10 @@ a.param:hover {
 		line-height: 28px;
 	}
 
+	.copy-btn {
+		top: 12px;
+		right: 8px;
+		width: 20px;
+		height: 20px;
+	}
 }

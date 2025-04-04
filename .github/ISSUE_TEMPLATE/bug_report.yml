@@ -34,8 +34,10 @@ body:
     attributes:
       label: Live example
       value: |
-        * [jsfiddle-latest-release](https://jsfiddle.net/g3atw6k5/)
-        * [jsfiddle-dev](https://jsfiddle.net/hjqw94c5/)
+        * [jsfiddle-latest-release WebGLRenderer](https://jsfiddle.net/3mrkqyea/)
+        * [jsfiddle-dev WebGLRenderer](https://jsfiddle.net/gcqx26jv/)
+        * [jsfiddle-latest-release WebGPURenderer](https://jsfiddle.net/mnqr9oj0/)
+        * [jsfiddle-dev WebGPURenderer](https://jsfiddle.net/xno7bmw0/)
     validations:
       required: true
   - type: textarea

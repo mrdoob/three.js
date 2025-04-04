@@ -8,27 +8,76 @@ import {
 	SRGBColorSpace,
 	Vector3
 } from 'three';
-import { Projector } from '../renderers/Projector.js';
-import { RenderableFace } from '../renderers/Projector.js';
-import { RenderableLine } from '../renderers/Projector.js';
-import { RenderableSprite } from '../renderers/Projector.js';
+import {
+	Projector,
+	RenderableFace,
+	RenderableLine,
+	RenderableSprite
+} from '../renderers/Projector.js';
 
+/**
+ * Can be used to wrap SVG elements into a 3D object.
+ *
+ * @augments Object3D
+ * @three_import import { SVGObject } from 'three/addons/renderers/SVGRenderer.js';
+ */
 class SVGObject extends Object3D {
 
+	/**
+	 * Constructs a new SVG object.
+	 *
+	 * @param {SVGElement} node - The SVG element.
+	 */
 	constructor( node ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSVGObject = true;
 
+		/**
+		 * This SVG element.
+		 *
+		 * @type {SVGElement}
+		 */
 		this.node = node;
 
 	}
 
 }
 
+/**
+ * This renderer an be used to render geometric data using SVG. The produced vector
+ * graphics are particular useful in the following use cases:
+ *
+ * - Animated logos or icons.
+ * - Interactive 2D/3D diagrams or graphs.
+ * - Interactive maps.
+ * - Complex or animated user interfaces.
+ *
+ * `SVGRenderer` has various advantages. It produces crystal-clear and sharp output which
+ * is independent of the actual viewport resolution.SVG elements can be styled via CSS.
+ * And they have good accessibility since it's possible to add metadata like title or description
+ * (useful for search engines or screen readers).
+ *
+ * There are, however, some important limitations:
+ * - No advanced shading.
+ * - No texture support.
+ * - No shadow support.
+ *
+ * @three_import import { SVGRenderer } from 'three/addons/renderers/SVGRenderer.js';
+ */
 class SVGRenderer {
 
+	/**
+	 * Constructs a new SVG renderer.
+	 */
 	constructor() {
 
 		let _renderData, _elements, _lights,
@@ -68,16 +117,60 @@ class SVGRenderer {
 			_projector = new Projector(),
 			_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 
+		/**
+		 * The DOM where the renderer appends its child-elements.
+		 *
+		 * @type {DOMElement}
+		 */
 		this.domElement = _svg;
 
+		/**
+		 * Whether to automatically perform a clear before a render call or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClear = true;
+
+		/**
+		 * Whether to sort 3D objects or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortObjects = true;
+
+		/**
+		 * Whether to sort elements or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortElements = true;
 
+		/**
+		 * Number of fractional pixels to enlarge polygons in order to
+		 * prevent anti-aliasing gaps. Range is `[0,1]`.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
 		this.overdraw = 0.5;
 
+		/**
+		 * The output color space.
+		 *
+		 * @type {(SRGBColorSpace|LinearSRGBColorSpace)}
+		 * @default SRGBColorSpace
+		 */
 		this.outputColorSpace = SRGBColorSpace;
 
+		/**
+		 * Provides information about the number of
+		 * rendered vertices and faces.
+		 *
+		 * @type {Object}
+		 */
 		this.info = {
 
 			render: {
@@ -89,6 +182,12 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Sets the render quality. Setting to `high` means This value indicates that the browser
+		 * tries to improve the SVG quality over rendering speed and geometric precision.
+		 *
+		 * @param {('low'|'high')} quality - The quality.
+		 */
 		this.setQuality = function ( quality ) {
 
 			switch ( quality ) {
@@ -100,6 +199,11 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Sets the clear color.
+		 *
+		 * @param {(number|Color|string)} color - The clear color to set.
+		 */
 		this.setClearColor = function ( color ) {
 
 			_clearColor.set( color );
@@ -108,6 +212,12 @@ class SVGRenderer {
 
 		this.setPixelRatio = function () {};
 
+		/**
+		 * Resizes the renderer to the given width and height.
+		 *
+		 * @param {number} width - The width of the renderer.
+		 * @param {number} height - The height of the renderer.
+		 */
 		this.setSize = function ( width, height ) {
 
 			_svgWidth = width; _svgHeight = height;
@@ -122,6 +232,11 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Returns an object containing the width and height of the renderer.
+		 *
+		 * @return {{width:number,height:number}} The size of the renderer.
+		 */
 		this.getSize = function () {
 
 			return {
@@ -131,6 +246,11 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Sets the precision of the data used to create a paths.
+		 *
+		 * @param {number} precision - The precision to set.
+		 */
 		this.setPrecision = function ( precision ) {
 
 			_precision = precision;
@@ -155,6 +275,9 @@ class SVGRenderer {
 
 		}
 
+		/**
+		 * Performs a manual clear with the defined clear color.
+		 */
 		this.clear = function () {
 
 			removeChildNodes();
@@ -162,6 +285,12 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Renders the given scene using the given camera.
+		 *
+		 * @param {Object3D} scene - A scene or any other type of 3D object.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			if ( camera instanceof Camera === false ) {

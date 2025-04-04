@@ -4,18 +4,52 @@ import {
 	Color,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader
+	Loader,
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
+/**
+ * A loader for the VTK format.
+ *
+ * This loader only supports the `POLYDATA` dataset format so far. Other formats
+ * (structured points, structured grid, rectilinear grid, unstructured grid, appended)
+ * are not supported.
+ *
+ * ```js
+ * const loader = new VTKLoader();
+ * const geometry = await loader.loadAsync( 'models/vtk/liver.vtk' );
+ * geometry.computeVertexNormals();
+ *
+ * const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+ * scene.add( mesh );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
+ */
 class VTKLoader extends Loader {
 
+	/**
+	 * Constructs a new VTK loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded VRML asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -51,6 +85,12 @@ class VTKLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given VTK data and returns the resulting geometry.
+	 *
+	 * @param {ArrayBuffer} data - The raw VTK data as an array buffer
+	 * @return {BufferGeometry} The parsed geometry.
+	 */
 	parse( data ) {
 
 		function parseASCII( data ) {
@@ -211,7 +251,7 @@ class VTKLoader extends Loader {
 							const g = parseFloat( result[ 2 ] );
 							const b = parseFloat( result[ 3 ] );
 
-							color.set( r, g, b ).convertSRGBToLinear();
+							color.setRGB( r, g, b, SRGBColorSpace );
 
 							colors.push( color.r, color.g, color.b );
 
@@ -325,7 +365,7 @@ class VTKLoader extends Loader {
 						const g = colors[ 3 * i + 1 ];
 						const b = colors[ 3 * i + 2 ];
 
-						color.set( r, g, b ).convertSRGBToLinear();
+						color.setRGB( r, g, b, SRGBColorSpace );
 
 						newColors.push( color.r, color.g, color.b );
 						newColors.push( color.r, color.g, color.b );
@@ -446,7 +486,6 @@ class VTKLoader extends Loader {
 								indices[ indicesIndex ++ ] = strip[ j + 1 ];
 
 							} else {
-
 
 								indices[ indicesIndex ++ ] = strip[ j ];
 								indices[ indicesIndex ++ ] = strip[ j + 1 ];
@@ -620,7 +659,17 @@ class VTKLoader extends Loader {
 
 							const tmp = xmlToJson( item );
 
-							if ( tmp !== '' ) obj[ nodeName ] = tmp;
+							if ( tmp !== '' ) {
+
+								if ( Array.isArray( tmp[ '#text' ] ) ) {
+
+									tmp[ '#text' ] = tmp[ '#text' ][ 0 ];
+
+								}
+
+								obj[ nodeName ] = tmp;
+
+							}
 
 						} else {
 
@@ -633,7 +682,17 @@ class VTKLoader extends Loader {
 
 							const tmp = xmlToJson( item );
 
-							if ( tmp !== '' ) obj[ nodeName ].push( tmp );
+							if ( tmp !== '' ) {
+
+								if ( Array.isArray( tmp[ '#text' ] ) ) {
+
+									tmp[ '#text' ] = tmp[ '#text' ][ 0 ];
+
+								}
+
+								obj[ nodeName ].push( tmp );
+
+							}
 
 						}
 
@@ -893,6 +952,60 @@ class VTKLoader extends Loader {
 			let points = [];
 			let normals = [];
 			let indices = [];
+
+			if ( json.AppendedData ) {
+
+				const appendedData = json.AppendedData[ '#text' ].slice( 1 );
+				const piece = json.PolyData.Piece;
+
+				const sections = [ 'PointData', 'CellData', 'Points', 'Verts', 'Lines', 'Strips', 'Polys' ];
+				let sectionIndex = 0;
+
+				const offsets = sections.map( s => {
+
+					const sect = piece[ s ];
+
+					if ( sect && sect.DataArray ) {
+
+						const arr = Array.isArray( sect.DataArray ) ? sect.DataArray : [ sect.DataArray ];
+
+						return arr.map( a => a.attributes.offset );
+
+					}
+
+					return [];
+
+				} ).flat();
+
+				for ( const sect of sections ) {
+
+					const section = piece[ sect ];
+
+					if ( section && section.DataArray ) {
+
+						if ( Array.isArray( section.DataArray ) ) {
+
+							for ( const sectionEle of section.DataArray ) {
+
+								sectionEle[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
+								sectionEle.attributes.format = 'binary';
+								sectionIndex ++;
+
+							}
+
+						} else {
+
+							section.DataArray[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
+							section.DataArray.attributes.format = 'binary';
+							sectionIndex ++;
+
+						}
+
+					}
+
+				}
+
+			}
 
 			if ( json.PolyData ) {
 

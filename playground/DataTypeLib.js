@@ -36,7 +36,7 @@ export function getLengthFromType( type ) {
 
 export function getLengthFromNode( value ) {
 
-	let type = getTypeFromNode( value );
+	const type = getTypeFromNode( value );
 
 	return getLengthFromType( type );
 
@@ -46,10 +46,10 @@ export const typeToColorLib = {
 	// gpu
 	string: '#ff0000',
 	float: '#eeeeee',
-	bool: '#00dd00',
-	mat2: '#70d030',
-	mat3: '#70d030',
-	mat4: '#70d030',
+	bool: '#0060ff',
+	mat2: '#d0dc8b',
+	mat3: '#d0dc8b',
+	mat4: '#d0dc8b',
 	// cpu
 	String: '#ff0000',
 	Number: '#eeeeee',
@@ -69,7 +69,7 @@ export function getColorFromType( type ) {
 
 export function getColorFromNode( value ) {
 
-	let type = getTypeFromNode( value );
+	const type = getTypeFromNode( value );
 
 	return getColorFromType( type );
 
@@ -82,6 +82,7 @@ function getTypeFromNode( value ) {
 		if ( value.isMaterial ) return 'Material';
 
 		return value.nodeType === 'ArrayBuffer' ? 'URL' : ( value.nodeType || getTypeFromValue( value.value ) );
+
 	}
 
 }

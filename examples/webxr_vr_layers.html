@@ -106,7 +106,6 @@
 			snellenConfig.quadHeight = .5 * snellenConfig.heightMeters / snellenConfig.cropY;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -123,9 +122,10 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.setClearAlpha( 1 );
 				renderer.setClearColor( new THREE.Color( 0 ), 0 );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
 
 				document.body.appendChild( renderer.domElement );
@@ -196,7 +196,7 @@
 				eyeCharts.add( snellenMeshMipMap );
 
 				// The layers don't participate depth testing between each other. Since the projection
-				// layer is rendered last, any 3D object will incorrecly overlap layers. To avoid this,
+				// layer is rendered last, any 3D object will incorrectly overlap layers. To avoid this,
 				// invisible quads can be placed into the scene to participate in depth testing when the
 				// projection layer is rendered.
 				const dummyMeshLeft = new THREE.Mesh(
@@ -298,20 +298,19 @@
 			}
 			//
 
-			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render( t, frame ) {
+			function animate( t, frame ) {
 
 				const xr = renderer.xr;
 				const session = xr.getSession();
 				const gl = renderer.getContext();
 
 				// Init layers once in immersive mode and video is ready.
-				if ( session && session.renderState.layers === undefined ) {
+				const useLayers = session &&
+					session.enabledFeatures !== undefined &&
+					session.enabledFeatures.includes( 'layers' ) &&
+					XRMediaBinding !== undefined;
+
+				if ( ! useLayers ) {
 
 					errorMesh.visible = true;
 
@@ -319,7 +318,7 @@
 
 				if (
 					session &&
-					session.renderState.layers !== undefined &&
+					useLayers &&
 					session.hasMediaLayer === undefined &&
 					video.readyState >= 2
 				) {

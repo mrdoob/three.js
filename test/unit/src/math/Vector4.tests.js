@@ -272,6 +272,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'divide', ( assert ) => {
+
+			const a = new Vector4( 7, 8, 9, 0 );
+			const b = new Vector4( 2, 2, 3, 4 );
+
+			a.divide( b );
+			assert.equal( a.x, 3.5, 'Check divide x' );
+			assert.equal( a.y, 4.0, 'Check divide y' );
+			assert.equal( a.z, 3.0, 'Check divide z' );
+			assert.equal( a.w, 0.0, 'Check divide w' );
+
+		} );
+
 		QUnit.todo( 'divideScalar', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -287,6 +300,19 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.todo( 'setAxisAngleFromRotationMatrix', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'setFromMatrixPosition', ( assert ) => {
+
+			const a = new Vector4();
+			const m = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+
+			a.setFromMatrixPosition( m );
+			assert.strictEqual( a.x, 7, 'Check x' );
+			assert.strictEqual( a.y, 19, 'Check y' );
+			assert.strictEqual( a.z, 37, 'Check z' );
+			assert.strictEqual( a.w, 53, 'Check w' );
 
 		} );
 

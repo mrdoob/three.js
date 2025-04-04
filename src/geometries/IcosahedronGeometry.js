@@ -1,7 +1,25 @@
 import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
+/**
+ * A geometry class for representing an icosahedron.
+ *
+ * ```js
+ * const geometry = new THREE.IcosahedronGeometry();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const icosahedron = new THREE.Mesh( geometry, material );
+ * scene.add( icosahedron );
+ * ```
+ *
+ * @augments PolyhedronGeometry
+ */
 class IcosahedronGeometry extends PolyhedronGeometry {
 
+	/**
+	 * Constructs a new icosahedron geometry.
+	 *
+	 * @param {number} [radius=1] - Radius of the icosahedron.
+	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a icosahedron.
+	 */
 	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -23,6 +41,13 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 		this.type = 'IcosahedronGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radius: radius,
 			detail: detail
@@ -30,6 +55,13 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {IcosahedronGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new IcosahedronGeometry( data.radius, data.detail );

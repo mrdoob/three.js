@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials - video</title>
+		<title>three.js webgpu - video material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,7 +14,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu video demo<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - video material<br/>
 			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
 
@@ -26,9 +26,10 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -36,8 +37,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let container;
 
@@ -83,7 +82,7 @@
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -252,7 +251,6 @@
 				renderer.render( scene, camera );
 
 			}
-
 
 		</script>
 

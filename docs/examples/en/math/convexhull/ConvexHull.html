@@ -86,7 +86,7 @@
 
 		<h3>[method:this addVertexToFace]( [param:VertexNode vertex], [param:Face face]	)</h3>
 		<p>
-			[page:VertexNodeNode vertex] - The vertex to add.<br />
+			[page:VertexNode vertex] - The vertex to add.<br />
 			[page:Face face] - The target face.<br /><br />
 
 			Adds a vertex to the 'assigned' list of vertices and assigns it to the given face.
@@ -156,7 +156,7 @@
 			[page:Ray ray] - The given ray.<br />
 			[page:Vector3 target] - The target vector representing the intersection point.<br /><br />
 
-			Performs a ray intersection test with this convext hull. If no intersection is found, `null` is returned.
+			Performs a ray intersection test with this convex hull. If no intersection is found, `null` is returned.
 		</p>
 
 		<h3>[method:Boolean intersectsRay]( [param:Ray ray] )</h3>
@@ -210,7 +210,7 @@
 		<p>
 			[page:Object3D object] - [page:Object3D] to compute the convex hull of.<br /><br />
 
-			Computes the convex hull of an [page:Object3D] (including its children),accounting for the world transforms of both the object and its childrens.
+			Computes the convex hull of an [page:Object3D] (including its children),accounting for the world transforms of both the object and its children.
 		</p>
 
 		<h3>[method:this setFromPoints]( [param:Array points] )</h3>

@@ -115,10 +115,6 @@ function SidebarProjectApp( editor ) {
 
 			content = content.replace( '<!-- title -->', title );
 
-			const includes = [];
-
-			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
-
 			let editButton = '';
 
 			if ( config.getKey( 'project/editable' ) ) {
@@ -142,6 +138,11 @@ function SidebarProjectApp( editor ) {
 		loader.load( 'js/libs/app.js', function ( content ) {
 
 			toZip[ 'js/app.js' ] = strToU8( content );
+
+		} );
+		loader.load( '../build/three.core.js', function ( content ) {
+
+			toZip[ 'js/three.core.js' ] = strToU8( content );
 
 		} );
 		loader.load( '../build/three.module.js', function ( content ) {

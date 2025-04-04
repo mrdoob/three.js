@@ -130,7 +130,7 @@
 
 				}
 
-				animate();
+				renderer.setAnimationLoop( animate );
 
 			} );
 
@@ -164,14 +164,6 @@
 		}
 
 		function animate() {
-
-			requestAnimationFrame( animate );
-
-			render();
-
-		}
-
-		function render() {
 
 			const time = clock.getElapsedTime();
 

@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:EventDispatcher] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>[name]</h1>
 
@@ -85,12 +85,7 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
-		</p>
-
+		<p>See the base [page:Controls] class for common properties.</p>
 
 		<h3>[property:Boolean isLocked]</h3>
 		<p>
@@ -114,17 +109,7 @@
 
 		<h2>Methods</h2>
 
-		<p>See the base [page:EventDispatcher] class for common methods.</p>
-
-		<h3>[method:undefined connect] ()</h3>
-		<p>
-			Adds the event listeners of the controls.
-		</p>
-
-		<h3>[method:undefined disconnect] ()</h3>
-		<p>
-			Removes the event listeners of the controls.
-		</p>
+		<p>See the base [page:Controls] class for common methods.</p>
 
 		<h3>[method:Vector3 getDirection] ( [param:Vector3 target] )</h3>
 		<p>

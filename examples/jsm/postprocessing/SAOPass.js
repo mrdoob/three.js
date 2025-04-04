@@ -19,30 +19,74 @@ import {
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SAOShader } from '../shaders/SAOShader.js';
-import { DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
-import { BlurShaderUtils } from '../shaders/DepthLimitedBlurShader.js';
+import { BlurShaderUtils, DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
- * SAO implementation inspired from bhouston previous SAO work
+ * A SAO implementation inspired from @bhouston previous SAO work.
+ *
+ * `SAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
+ *
+ * ```js
+ * const saoPass = new SAOPass( scene, camera );
+ * composer.addPass( saoPass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
  */
-
 class SAOPass extends Pass {
 
+	/**
+	 * Constructs a new SAO pass.
+	 *
+	 * @param {Scene} scene - The scene to compute the AO for.
+	 * @param {Camera} camera - The camera.
+	 * @param {Vector2} [resolution] - The effect's resolution.
+	 */
 	constructor( scene, camera, resolution = new Vector2( 256, 256 ) ) {
 
 		super();
 
+		/**
+		 * The scene to render the AO for.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The camera.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
 
+		/**
+		 * Overwritten to perform a clear operation by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.clear = true;
+
+		/**
+		 * Overwritten to disable the swap.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.needsSwap = false;
 
-		this.originalClearColor = new Color();
+		this._originalClearColor = new Color();
 		this._oldClearColor = new Color();
-		this.oldClearAlpha = 1;
+		this._oldClearAlpha = 1;
 
+		/**
+		 * The SAO parameter.
+		 *
+		 * @type {Object}
+		 */
 		this.params = {
 			output: 0,
 			saoBias: 0.5,
@@ -56,6 +100,12 @@ class SAOPass extends Pass {
 			saoBlurDepthCutoff: 0.01
 		};
 
+		/**
+		 * The effect's resolution.
+		 *
+		 * @type {Vector2}
+		 * @default (256,256)
+		 */
 		this.resolution = new Vector2( resolution.x, resolution.y );
 
 		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType } );
@@ -136,6 +186,17 @@ class SAOPass extends Pass {
 
 	}
 
+	/**
+	 * Performs the SAO pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
 	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
 		// Rendering readBuffer first when rendering to screen
@@ -144,12 +205,12 @@ class SAOPass extends Pass {
 			this.materialCopy.blending = NoBlending;
 			this.materialCopy.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.materialCopy.needsUpdate = true;
-			this.renderPass( renderer, this.materialCopy, null );
+			this._renderPass( renderer, this.materialCopy, null );
 
 		}
 
 		renderer.getClearColor( this._oldClearColor );
-		this.oldClearAlpha = renderer.getClearAlpha();
+		this._oldClearAlpha = renderer.getClearAlpha();
 		const oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
@@ -182,16 +243,16 @@ class SAOPass extends Pass {
 		}
 
 		// render normal and depth
-		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
+		this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
 
 		// Rendering SAO texture
-		this.renderPass( renderer, this.saoMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
+		this._renderPass( renderer, this.saoMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
 
 		// Blurring SAO texture
 		if ( this.params.saoBlur ) {
 
-			this.renderPass( renderer, this.vBlurMaterial, this.blurIntermediateRenderTarget, 0xffffff, 1.0 );
-			this.renderPass( renderer, this.hBlurMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
+			this._renderPass( renderer, this.vBlurMaterial, this.blurIntermediateRenderTarget, 0xffffff, 1.0 );
+			this._renderPass( renderer, this.hBlurMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
 
 		}
 
@@ -222,17 +283,64 @@ class SAOPass extends Pass {
 		}
 
 		// Rendering SAOPass result on top of previous pass
-		this.renderPass( renderer, outputMaterial, this.renderToScreen ? null : readBuffer );
+		this._renderPass( renderer, outputMaterial, this.renderToScreen ? null : readBuffer );
 
-		renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
+		renderer.setClearColor( this._oldClearColor, this._oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
 
 	}
 
-	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The width to set.
+	 */
+	setSize( width, height ) {
+
+		this.saoRenderTarget.setSize( width, height );
+		this.blurIntermediateRenderTarget.setSize( width, height );
+		this.normalRenderTarget.setSize( width, height );
+
+		this.saoMaterial.uniforms[ 'size' ].value.set( width, height );
+		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
+		this.saoMaterial.needsUpdate = true;
+
+		this.vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+		this.vBlurMaterial.needsUpdate = true;
+
+		this.hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+		this.hBlurMaterial.needsUpdate = true;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
+	dispose() {
+
+		this.saoRenderTarget.dispose();
+		this.blurIntermediateRenderTarget.dispose();
+		this.normalRenderTarget.dispose();
+
+		this.normalMaterial.dispose();
+		this.saoMaterial.dispose();
+		this.vBlurMaterial.dispose();
+		this.hBlurMaterial.dispose();
+		this.materialCopy.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
+	// internal
+
+	_renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		renderer.getClearColor( this.originalClearColor );
+		renderer.getClearColor( this._originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha();
 		const originalAutoClear = renderer.autoClear;
 
@@ -253,14 +361,14 @@ class SAOPass extends Pass {
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearColor( this._originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	}
 
-	renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	_renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		renderer.getClearColor( this.originalClearColor );
+		renderer.getClearColor( this._originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha();
 		const originalAutoClear = renderer.autoClear;
 
@@ -283,43 +391,8 @@ class SAOPass extends Pass {
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearColor( this._originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
-
-	}
-
-	setSize( width, height ) {
-
-		this.saoRenderTarget.setSize( width, height );
-		this.blurIntermediateRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
-
-		this.saoMaterial.uniforms[ 'size' ].value.set( width, height );
-		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
-		this.saoMaterial.needsUpdate = true;
-
-		this.vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
-		this.vBlurMaterial.needsUpdate = true;
-
-		this.hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
-		this.hBlurMaterial.needsUpdate = true;
-
-	}
-
-	dispose() {
-
-		this.saoRenderTarget.dispose();
-		this.blurIntermediateRenderTarget.dispose();
-		this.normalRenderTarget.dispose();
-
-		this.normalMaterial.dispose();
-		this.saoMaterial.dispose();
-		this.vBlurMaterial.dispose();
-		this.hBlurMaterial.dispose();
-		this.materialCopy.dispose();
-
-		this.fsQuad.dispose();
 
 	}
 

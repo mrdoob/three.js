@@ -1,7 +1,14 @@
 /**
- * Exposure shader
+ * @module ExposureShader
+ * @three_import import { ExposureShader } from 'three/addons/shaders/ExposureShader.js';
  */
 
+/**
+ * TODO
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const ExposureShader = {
 
 	name: 'ExposureShader',

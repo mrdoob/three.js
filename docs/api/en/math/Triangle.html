@@ -140,6 +140,20 @@
 			triangle. Returns `null` if the triangle is degenerate.
 		</p>
 
+		<h3>
+			[method:Vector getInterpolatedAttribute]( [param:BufferAttribute attribute], [param:Number i1], [param:Vector3 i2], [param:Number i3], [param:Vector3 barycoord], [param:Vector3 target] )
+		</h3>
+		<p>
+			[page:BufferAttribute attribute] - The attribute to interpolate.<br />
+			p1 - Index of first vertex.<br />
+			p2 - Index of second vertex.<br />
+			p3 - Index of third vertex.<br />
+			barycoord - The barycoordinate value to use to interpolate.<br />
+			[page:Vector target] — Result will be copied into this Vector.<br /><br />
+
+			Returns the value barycentrically interpolated for the given attribute and indices.
+		</p>
+
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
 			[page:Box3 box] - Box to check for intersection against.<br /><br />

@@ -82,7 +82,6 @@ function Editor() {
 
 		windowResize: new Signal(),
 
-		showGridChanged: new Signal(),
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
 		refreshSidebarEnvironment: new Signal(),
@@ -92,6 +91,8 @@ function Editor() {
 		viewportShadingChanged: new Signal(),
 
 		intersectionsDetected: new Signal(),
+
+		pathTracerUpdated: new Signal(),
 
 	};
 
@@ -191,30 +192,6 @@ Editor.prototype = {
 		}
 
 		this.signals.objectAdded.dispatch( object );
-		this.signals.sceneGraphChanged.dispatch();
-
-	},
-
-	moveObject: function ( object, parent, before ) {
-
-		if ( parent === undefined ) {
-
-			parent = this.scene;
-
-		}
-
-		parent.add( object );
-
-		// sort children array
-
-		if ( before !== undefined ) {
-
-			var index = parent.children.indexOf( before );
-			parent.children.splice( index, 0, object );
-			parent.children.pop();
-
-		}
-
 		this.signals.sceneGraphChanged.dispatch();
 
 	},
@@ -468,6 +445,7 @@ Editor.prototype = {
 
 			var helper = this.helpers[ object.id ];
 			helper.parent.remove( helper );
+			helper.dispose();
 
 			delete this.helpers[ object.id ];
 
@@ -659,7 +637,16 @@ Editor.prototype = {
 		var loader = new THREE.ObjectLoader();
 		var camera = await loader.parseAsync( json.camera );
 
+		const existingUuid = this.camera.uuid;
+		const incomingUuid = camera.uuid;
+
+		// copy all properties, including uuid
 		this.camera.copy( camera );
+		this.camera.uuid = incomingUuid;
+
+		delete this.cameras[ existingUuid ]; // remove old entry [existingUuid, this.camera]
+		this.cameras[ incomingUuid ] = this.camera; // add new entry [incomingUuid, this.camera]
+
 		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
@@ -667,7 +654,8 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
-		if ( json.environment === 'ModelViewer' ) {
+		if ( json.environment === 'Room' ||
+			 json.environment === 'ModelViewer' /* DEPRECATED */ ) {
 
 			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
 			this.signals.refreshSidebarEnvironment.dispatch();
@@ -695,13 +683,13 @@ Editor.prototype = {
 
 		}
 
-		// honor modelviewer environment
+		// honor neutral environment
 
 		let environment = null;
 
 		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
 
-			environment = 'ModelViewer';
+			environment = 'Room';
 
 		}
 
@@ -754,7 +742,8 @@ Editor.prototype = {
 
 		save: save,
 		saveArrayBuffer: saveArrayBuffer,
-		saveString: saveString
+		saveString: saveString,
+		formatNumber: formatNumber
 
 	}
 
@@ -785,6 +774,12 @@ function saveArrayBuffer( buffer, filename ) {
 function saveString( text, filename ) {
 
 	save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+}
+
+function formatNumber( number ) {
+
+	return new Intl.NumberFormat( 'en-us', { useGrouping: true } ).format( number );
 
 }
 

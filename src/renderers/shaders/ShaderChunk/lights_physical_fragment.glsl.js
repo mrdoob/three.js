@@ -75,6 +75,12 @@ material.roughness = min( material.roughness, 1.0 );
 
 #endif
 
+#ifdef USE_DISPERSION
+
+	material.dispersion = dispersion;
+
+#endif
+
 #ifdef USE_IRIDESCENCE
 
 	material.iridescence = iridescence;

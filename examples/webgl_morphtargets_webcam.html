@@ -116,7 +116,7 @@
 			const scene = new THREE.Scene();
 			scene.scale.x = - 1;
 
-			const environment = new RoomEnvironment( renderer );
+			const environment = new RoomEnvironment();
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			scene.background = new THREE.Color( 0x666666 );
@@ -163,7 +163,7 @@
 
 					}
 
-					renderer.setAnimationLoop( animation );
+					renderer.setAnimationLoop( animate );
 
 				} );
 
@@ -215,7 +215,7 @@
 
 			const transform = new THREE.Object3D();
 
-			function animation() {
+			function animate() {
 
 				if ( video.readyState >= HTMLMediaElement.HAVE_METADATA ) {
 
@@ -298,10 +298,10 @@
 
 						}
 
-					eyeL.rotation.z = eyeScore.leftHorizontal * eyeRotationLimit;
-      					eyeR.rotation.z = eyeScore.rightHorizontal * eyeRotationLimit;
-      					eyeL.rotation.x = eyeScore.leftVertical * eyeRotationLimit;
-      					eyeR.rotation.x = eyeScore.rightVertical * eyeRotationLimit;
+						eyeL.rotation.z = eyeScore.leftHorizontal * eyeRotationLimit;
+						eyeR.rotation.z = eyeScore.rightHorizontal * eyeRotationLimit;
+						eyeL.rotation.x = eyeScore.leftVertical * eyeRotationLimit;
+						eyeR.rotation.x = eyeScore.rightVertical * eyeRotationLimit;
 			
 					}
 

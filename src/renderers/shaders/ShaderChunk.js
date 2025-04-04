@@ -40,7 +40,6 @@ import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl.js';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl.js';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl.js';
 import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl.js';
-import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl.js';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl.js';
 import lights_lambert_fragment from './ShaderChunk/lights_lambert_fragment.glsl.js';
 import lights_lambert_pars_fragment from './ShaderChunk/lights_lambert_pars_fragment.glsl.js';
@@ -169,7 +168,6 @@ export const ShaderChunk = {
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
 	gradientmap_pars_fragment: gradientmap_pars_fragment,
-	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_fragment: lights_lambert_fragment,
 	lights_lambert_pars_fragment: lights_lambert_pars_fragment,

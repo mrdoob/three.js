@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name]为你的场景创建了一个准备就绪的天空环境。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个插件，因此必须明确导入。
+			参见[link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { Sky } from 'three/addons/objects/Sky.js';
+		</code>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const sky = new Sky();<br />
+		sky.scale.setScalar( 450000 );<br />
+
+		const phi = MathUtils.degToRad( 90 );<br />
+		const theta = MathUtils.degToRad( 180 );<br />
+		const sunPosition = new Vector3().setFromSphericalCoords( 1, phi, theta );<br />
+
+		sky.material.uniforms.sunPosition.value = sunPosition;<br />
+
+		scene.add( sky );
+		</code>
+
+		<h2>示例</h2>
+
+		<p>[example:webgl_shaders_sky misc / objects / Sky ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		创建一个[name]实例。
+		</p>
+
+		<h2>属性</h2>
+		<p>
+		[name]实例是一个带有预定义的 [page:ShaderMaterial]材质的[page:Mesh]模型, 因此这里描述的每个属性都应该使用[page:Uniform]s.
+		</p>
+
+		<h3>[property:Number turbidity]</h3>
+		<p>
+		[name]的浑浊度
+		</p>
+		<h3>[property:Number rayleigh]</h3>
+		<p>
+			更详细的解释参见: [link:https://en.wikipedia.org/wiki/Rayleigh_scattering Rayleigh scattering] .
+		</p>
+		<h3>[property:Number mieCoefficient]</h3>
+		<p>
+		[link:https://en.wikipedia.org/wiki/Mie_scattering Mie scattering]数量。
+		</p> 
+		<h3>[property:Number mieDirectionalG]</h3>
+		<p>
+		[link:https://en.wikipedia.org/wiki/Mie_scattering Mie scattering]方向
+		</p>
+		<h3>[property:Vector3 sunPosition]</h3>
+		<p>
+		太阳的位置。
+		</p>
+		<h3>[property:Vector3 up]</h3>
+		<p>
+			太阳从地平线升起的角度，以度为单位。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Sky.js examples/jsm/objects/Sky.js]
+		</p>
+	</body>
+</html>

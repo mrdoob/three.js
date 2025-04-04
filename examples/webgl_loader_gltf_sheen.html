@@ -40,7 +40,6 @@
 			let camera, scene, renderer, controls;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -72,11 +71,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 				container.appendChild( renderer.domElement );
 
-				const environment = new RoomEnvironment( renderer );
+				const environment = new RoomEnvironment();
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene.background = new THREE.Color( 0xbbbbbb );
@@ -106,15 +106,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				controls.update(); // required if damping enabled
-
-				render();
-
-			}
-
-			function render() {
 
 				renderer.render( scene, camera );
 

@@ -2,25 +2,32 @@ import { Command } from '../Command.js';
 
 import { ObjectLoader } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @constructor
- */
 class RemoveObjectCommand extends Command {
 
-	constructor( editor, object ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @constructor
+	 */
+	constructor( editor, object = null ) {
 
 		super( editor );
 
 		this.type = 'RemoveObjectCommand';
-		this.name = 'Remove Object';
 
 		this.object = object;
-		this.parent = ( object !== undefined ) ? object.parent : undefined;
-		if ( this.parent !== undefined ) {
+		this.parent = ( object !== null ) ? object.parent : null;
+
+		if ( this.parent !== null ) {
 
 			this.index = this.parent.children.indexOf( this.object );
+
+		}
+
+		if ( object !== null ) {
+
+			this.name = editor.strings.getKey( 'command/RemoveObject' ) + ': ' + object.name;
+
 
 		}
 

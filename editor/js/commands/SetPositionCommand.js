@@ -1,33 +1,33 @@
 import { Command } from '../Command.js';
 import { Vector3 } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newPosition THREE.Vector3
- * @param optionalOldPosition THREE.Vector3
- * @constructor
- */
 class SetPositionCommand extends Command {
 
-	constructor( editor, object, newPosition, optionalOldPosition ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {THREE.Vector3|null} newPosition
+	 * @param {THREE.Vector3|null} optionalOldPosition
+	 * @constructor
+	 */
+	constructor( editor, object = null, newPosition = null, optionalOldPosition = null ) {
 
 		super( editor );
 
 		this.type = 'SetPositionCommand';
-		this.name = 'Set Position';
+		this.name = editor.strings.getKey( 'command/SetPosition' );
 		this.updatable = true;
 
 		this.object = object;
 
-		if ( object !== undefined && newPosition !== undefined ) {
+		if ( object !== null && newPosition !== null ) {
 
 			this.oldPosition = object.position.clone();
 			this.newPosition = newPosition.clone();
 
 		}
 
-		if ( optionalOldPosition !== undefined ) {
+		if ( optionalOldPosition !== null ) {
 
 			this.oldPosition = optionalOldPosition.clone();
 

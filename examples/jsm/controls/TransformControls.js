@@ -1,6 +1,7 @@
 import {
 	BoxGeometry,
 	BufferGeometry,
+	Controls,
 	CylinderGeometry,
 	DoubleSide,
 	Euler,
@@ -31,37 +32,70 @@ const _unit = {
 	Z: new Vector3( 0, 0, 1 )
 };
 
+/**
+ * Fires if any type of change (object or property change) is performed. Property changes
+ * are separate events you can add event listeners to. The event type is "propertyname-changed".
+ *
+ * @event TransformControls#change
+ * @type {Object}
+ */
 const _changeEvent = { type: 'change' };
-const _mouseDownEvent = { type: 'mouseDown' };
+
+/**
+ * Fires if a pointer (mouse/touch) becomes active.
+ *
+ * @event TransformControls#mouseDown
+ * @type {Object}
+ */
+const _mouseDownEvent = { type: 'mouseDown', mode: null };
+
+/**
+ * Fires if a pointer (mouse/touch) is no longer active.
+ *
+ * @event TransformControls#mouseUp
+ * @type {Object}
+ */
 const _mouseUpEvent = { type: 'mouseUp', mode: null };
+
+/**
+ * Fires if the controlled 3D object is changed.
+ *
+ * @event TransformControls#objectChange
+ * @type {Object}
+ */
 const _objectChangeEvent = { type: 'objectChange' };
 
-class TransformControls extends Object3D {
+/**
+ * This class can be used to transform objects in 3D space by adapting a similar interaction model
+ * of DCC tools like Blender. Unlike other controls, it is not intended to transform the scene's camera.
+ *
+ * `TransformControls` expects that its attached 3D object is part of the scene graph.
+ *
+ * @augments Controls
+ * @three_import import { TransformControls } from 'three/addons/controls/TransformControls.js';
+ */
+class TransformControls extends Controls {
 
-	constructor( camera, domElement ) {
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Camera} camera - The camera of the rendered scene.
+	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 */
+	constructor( camera, domElement = null ) {
 
-		super();
+		super( undefined, domElement );
 
-		if ( domElement === undefined ) {
+		const root = new TransformControlsRoot( this );
+		this._root = root;
 
-			console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
-			domElement = document;
+		const gizmo = new TransformControlsGizmo();
+		this._gizmo = gizmo;
+		root.add( gizmo );
 
-		}
-
-		this.isTransformControls = true;
-
-		this.visible = false;
-		this.domElement = domElement;
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
-
-		const _gizmo = new TransformControlsGizmo();
-		this._gizmo = _gizmo;
-		this.add( _gizmo );
-
-		const _plane = new TransformControlsPlane();
-		this._plane = _plane;
-		this.add( _plane );
+		const plane = new TransformControlsPlane();
+		this._plane = plane;
+		root.add( plane );
 
 		const scope = this;
 
@@ -83,8 +117,8 @@ class TransformControls extends Object3D {
 					if ( propValue !== value ) {
 
 						propValue = value;
-						_plane[ propName ] = value;
-						_gizmo[ propName ] = value;
+						plane[ propName ] = value;
+						gizmo[ propName ] = value;
 
 						scope.dispatchEvent( { type: propName + '-changed', value: value } );
 						scope.dispatchEvent( _changeEvent );
@@ -96,8 +130,8 @@ class TransformControls extends Object3D {
 			} );
 
 			scope[ propName ] = defaultValue;
-			_plane[ propName ] = defaultValue;
-			_gizmo[ propName ] = defaultValue;
+			plane[ propName ] = defaultValue;
+			gizmo[ propName ] = defaultValue;
 
 		}
 
@@ -105,20 +139,171 @@ class TransformControls extends Object3D {
 		// Setting the defined property will automatically trigger change event
 		// Defined properties are passed down to gizmo and plane
 
+		/**
+		 * The camera of the rendered scene.
+		 *
+		 * @name TransformControls#camera
+		 * @type {Camera}
+		 */
 		defineProperty( 'camera', camera );
 		defineProperty( 'object', undefined );
 		defineProperty( 'enabled', true );
+
+		/**
+		 * The current transformation axis.
+		 *
+		 * @name TransformControls#axis
+		 * @type {string}
+		 */
 		defineProperty( 'axis', null );
+
+		/**
+		 * The current transformation axis.
+		 *
+		 * @name TransformControls#mode
+		 * @type {('translate'|'rotate'|'scale')}
+		 * @default 'translate'
+		 */
 		defineProperty( 'mode', 'translate' );
+
+		/**
+		 * By default, 3D objects are continuously translated. If you set this property to a numeric
+		 * value (world units), you can define in which steps the 3D object should be translated.
+		 *
+		 * @name TransformControls#translationSnap
+		 * @type {?number}
+		 * @default null
+		 */
 		defineProperty( 'translationSnap', null );
+
+		/**
+		 * By default, 3D objects are continuously rotated. If you set this property to a numeric
+		 * value (radians), you can define in which steps the 3D object should be rotated.
+		 *
+		 * @name TransformControls#rotationSnap
+		 * @type {?number}
+		 * @default null
+		 */
 		defineProperty( 'rotationSnap', null );
+
+		/**
+		 * By default, 3D objects are continuously scaled. If you set this property to a numeric
+		 * value, you can define in which steps the 3D object should be scaled.
+		 *
+		 * @name TransformControls#scaleSnap
+		 * @type {?number}
+		 * @default null
+		 */
 		defineProperty( 'scaleSnap', null );
+
+		/**
+		 * Defines in which coordinate space transformations should be performed.
+		 *
+		 * @name TransformControls#space
+		 * @type {('world'|'local')}
+		 * @default 'world'
+		 */
 		defineProperty( 'space', 'world' );
+
+		/**
+		 * The size of the helper UI (axes/planes).
+		 *
+		 * @name TransformControls#size
+		 * @type {number}
+		 * @default 1
+		 */
 		defineProperty( 'size', 1 );
+
+		/**
+		 * Whether dragging is currently performed or not.
+		 *
+		 * @name TransformControls#dragging
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		defineProperty( 'dragging', false );
+
+		/**
+		 * Whether the x-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showX
+		 * @type {boolean}
+		 * @default true
+		 */
 		defineProperty( 'showX', true );
+
+		/**
+		 * Whether the y-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showY
+		 * @type {boolean}
+		 * @default true
+		 */
 		defineProperty( 'showY', true );
+
+		/**
+		 * Whether the z-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showZ
+		 * @type {boolean}
+		 * @default true
+		 */
 		defineProperty( 'showZ', true );
+
+		/**
+		 * The minimum allowed X position during translation.
+		 *
+		 * @name TransformControls#minX
+		 * @type {number}
+		 * @default -Infinity
+		 */
+		defineProperty( 'minX', - Infinity );
+
+		/**
+		 * The maximum allowed X position during translation.
+		 *
+		 * @name TransformControls#maxX
+		 * @type {number}
+		 * @default Infinity
+		 */
+		defineProperty( 'maxX', Infinity );
+
+		/**
+		 * The minimum allowed y position during translation.
+		 *
+		 * @name TransformControls#minY
+		 * @type {number}
+		 * @default -Infinity
+		 */
+		defineProperty( 'minY', - Infinity );
+
+		/**
+		 * The maximum allowed Y position during translation.
+		 *
+		 * @name TransformControls#maxY
+		 * @type {number}
+		 * @default Infinity
+		 */
+		defineProperty( 'maxY', Infinity );
+
+		/**
+		 * The minimum allowed z position during translation.
+		 *
+		 * @name TransformControls#minZ
+		 * @type {number}
+		 * @default -Infinity
+		 */
+		defineProperty( 'minZ', - Infinity );
+
+		/**
+		 * The maximum allowed Z position during translation.
+		 *
+		 * @name TransformControls#maxZ
+		 * @type {number}
+		 * @default Infinity
+		 */
+		defineProperty( 'maxZ', Infinity );
 
 		// Reusable utility variables
 
@@ -172,50 +357,46 @@ class TransformControls extends Object3D {
 		this._onPointerMove = onPointerMove.bind( this );
 		this._onPointerUp = onPointerUp.bind( this );
 
+		if ( domElement !== null ) {
+
+			this.connect( domElement );
+
+		}
+
+	}
+
+	connect( element ) {
+
+		super.connect( element );
+
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 
+		this.domElement.style.touchAction = 'none'; // disable touch scroll
+
 	}
 
-	// updateMatrixWorld updates key transformation variables
-	updateMatrixWorld( force ) {
+	disconnect() {
 
-		if ( this.object !== undefined ) {
+		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
+		this.domElement.removeEventListener( 'pointermove', this._onPointerHover );
+		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 
-			this.object.updateMatrixWorld();
+		this.domElement.style.touchAction = 'auto';
 
-			if ( this.object.parent === null ) {
+	}
 
-				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+	/**
+	 * Returns the visual representation of the controls. Add the helper to your scene to
+	 * visually transform the attached  3D object.
+	 *
+	 * @return {TransformControlsRoot} The helper.
+	 */
+	getHelper() {
 
-			} else {
-
-				this.object.parent.matrixWorld.decompose( this._parentPosition, this._parentQuaternion, this._parentScale );
-
-			}
-
-			this.object.matrixWorld.decompose( this.worldPosition, this.worldQuaternion, this._worldScale );
-
-			this._parentQuaternionInv.copy( this._parentQuaternion ).invert();
-			this._worldQuaternionInv.copy( this.worldQuaternion ).invert();
-
-		}
-
-		this.camera.updateMatrixWorld();
-		this.camera.matrixWorld.decompose( this.cameraPosition, this.cameraQuaternion, this._cameraScale );
-
-		if ( this.camera.isOrthographicCamera ) {
-
-			this.camera.getWorldDirection( this.eye ).negate();
-
-		} else {
-
-			this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
-
-		}
-
-		super.updateMatrixWorld( force );
+		return this._root;
 
 	}
 
@@ -393,6 +574,10 @@ class TransformControls extends Object3D {
 
 			}
 
+			object.position.x = Math.max( this.minX, Math.min( this.maxX, object.position.x ) );
+			object.position.y = Math.max( this.minY, Math.min( this.maxY, object.position.y ) );
+			object.position.z = Math.max( this.minZ, Math.min( this.maxZ, object.position.z ) );
+
 		} else if ( mode === 'scale' ) {
 
 			if ( axis.search( 'XYZ' ) !== - 1 ) {
@@ -555,41 +740,46 @@ class TransformControls extends Object3D {
 
 	dispose() {
 
-		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
-		this.domElement.removeEventListener( 'pointermove', this._onPointerHover );
-		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
-		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
+		this.disconnect();
 
-		this.traverse( function ( child ) {
-
-			if ( child.geometry ) child.geometry.dispose();
-			if ( child.material ) child.material.dispose();
-
-		} );
+		this._root.dispose();
 
 	}
 
-	// Set current object
+	/**
+	 * Sets the 3D object that should be transformed and ensures the controls UI is visible.
+	 *
+	 * @param {Object3D} object -  The 3D object that should be transformed.
+	 * @return {TransformControls} A reference to this controls.
+	 */
 	attach( object ) {
 
 		this.object = object;
-		this.visible = true;
+		this._root.visible = true;
 
 		return this;
 
 	}
 
-	// Detach from object
+	/**
+	 * Removes the current 3D object from the controls and makes the helper UI invisible.
+	 *
+	 * @return {TransformControls} A reference to this controls.
+	 */
 	detach() {
 
 		this.object = undefined;
-		this.visible = false;
 		this.axis = null;
+
+		this._root.visible = false;
 
 		return this;
 
 	}
 
+	/**
+	 * Resets the object's position, rotation and scale to when the current transform began.
+	 */
 	reset() {
 
 		if ( ! this.enabled ) return;
@@ -609,50 +799,89 @@ class TransformControls extends Object3D {
 
 	}
 
+	/**
+	 * Returns the raycaster that is used for user interaction. This object is shared between all
+	 * instances of `TransformControls`.
+	 *
+	 * @returns {Raycaster} The internal raycaster.
+	 */
 	getRaycaster() {
 
 		return _raycaster;
 
 	}
 
-	// TODO: deprecate
-
+	/**
+	 * Returns the transformation mode.
+	 *
+	 * @returns {'translate'|'rotate'|'scale'} The transformation mode.
+	 */
 	getMode() {
 
 		return this.mode;
 
 	}
 
+	/**
+	 * Sets the given transformation mode.
+	 *
+	 * @param {'translate'|'rotate'|'scale'} mode - The transformation mode to set.
+	 */
 	setMode( mode ) {
 
 		this.mode = mode;
 
 	}
 
+	/**
+	 * Sets the translation snap.
+	 *
+	 * @param {?number} translationSnap - The translation snap to set.
+	 */
 	setTranslationSnap( translationSnap ) {
 
 		this.translationSnap = translationSnap;
 
 	}
 
+	/**
+	 * Sets the rotation snap.
+	 *
+	 * @param {?number} rotationSnap - The rotation snap to set.
+	 */
 	setRotationSnap( rotationSnap ) {
 
 		this.rotationSnap = rotationSnap;
 
 	}
 
+	/**
+	 * Sets the scale snap.
+	 *
+	 * @param {?number} scaleSnap - The scale snap to set.
+	 */
 	setScaleSnap( scaleSnap ) {
 
 		this.scaleSnap = scaleSnap;
 
 	}
 
+	/**
+	 * Sets the size of the helper UI.
+	 *
+	 * @param {number} size - The size to set.
+	 */
 	setSize( size ) {
 
 		this.size = size;
 
 	}
 
+	/**
+	 * Sets the coordinate space in which transformations are applied.
+	 *
+	 * @param {'world'|'local'} space - The space to set.
+	 */
 	setSpace( space ) {
 
 		this.space = space;
@@ -777,6 +1006,75 @@ const _unitZ = new Vector3( 0, 0, 1 );
 const _v1 = new Vector3();
 const _v2 = new Vector3();
 const _v3 = new Vector3();
+
+class TransformControlsRoot extends Object3D {
+
+	constructor( controls ) {
+
+		super();
+
+		this.isTransformControlsRoot = true;
+
+		this.controls = controls;
+		this.visible = false;
+
+	}
+
+	// updateMatrixWorld updates key transformation variables
+	updateMatrixWorld( force ) {
+
+		const controls = this.controls;
+
+		if ( controls.object !== undefined ) {
+
+			controls.object.updateMatrixWorld();
+
+			if ( controls.object.parent === null ) {
+
+				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+
+			} else {
+
+				controls.object.parent.matrixWorld.decompose( controls._parentPosition, controls._parentQuaternion, controls._parentScale );
+
+			}
+
+			controls.object.matrixWorld.decompose( controls.worldPosition, controls.worldQuaternion, controls._worldScale );
+
+			controls._parentQuaternionInv.copy( controls._parentQuaternion ).invert();
+			controls._worldQuaternionInv.copy( controls.worldQuaternion ).invert();
+
+		}
+
+		controls.camera.updateMatrixWorld();
+		controls.camera.matrixWorld.decompose( controls.cameraPosition, controls.cameraQuaternion, controls._cameraScale );
+
+		if ( controls.camera.isOrthographicCamera ) {
+
+			controls.camera.getWorldDirection( controls.eye ).negate();
+
+		} else {
+
+			controls.eye.copy( controls.cameraPosition ).sub( controls.worldPosition ).normalize();
+
+		}
+
+		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.traverse( function ( child ) {
+
+			if ( child.geometry ) child.geometry.dispose();
+			if ( child.material ) child.material.dispose();
+
+		} );
+
+	}
+
+}
 
 class TransformControlsGizmo extends Object3D {
 

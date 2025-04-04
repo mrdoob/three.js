@@ -54,7 +54,6 @@
 			let controls, gui;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -63,6 +62,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -87,11 +87,11 @@
 
 				}, function ( progress ) {
 
-					console.log ( ( progress.loaded / progress.total * 100 ) + '%' );
+					console.log( ( progress.loaded / progress.total * 100 ) + '%' );
 
 				}, function ( error ) {
 
-					console.log ( error );
+					console.log( error );
 
 				} );
 
@@ -117,8 +117,6 @@
 
 				controls.update();
 				renderer.render( scene, camera );
-
-				requestAnimationFrame( animate );
 
 			}
 

@@ -4,8 +4,24 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Color } from '../math/Color.js';
 
+/**
+ * An axis object to visualize the 3 axes in a simple way.
+ * The X axis is red. The Y axis is green. The Z axis is blue.
+ *
+ * ```js
+ * const axesHelper = new THREE.AxesHelper( 5 );
+ * scene.add( axesHelper );
+ * ```
+ *
+ * @augments LineSegments
+ */
 class AxesHelper extends LineSegments {
 
+	/**
+	 * Constructs a new axes helper.
+	 *
+	 * @param {number} [size=1] - Size of the lines representing the axes.
+	 */
 	constructor( size = 1 ) {
 
 		const vertices = [
@@ -32,6 +48,14 @@ class AxesHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Defines the colors of the axes helper.
+	 *
+	 * @param {number|Color|string} xAxisColor - The color for the x axis.
+	 * @param {number|Color|string} yAxisColor - The color for the y axis.
+	 * @param {number|Color|string} zAxisColor - The color for the z axis.
+	 * @return {AxesHelper} A reference to this axes helper.
+	 */
 	setColors( xAxisColor, yAxisColor, zAxisColor ) {
 
 		const color = new Color();
@@ -55,6 +79,10 @@ class AxesHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.geometry.dispose();

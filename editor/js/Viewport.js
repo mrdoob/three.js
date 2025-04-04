@@ -43,15 +43,18 @@ function Viewport( editor ) {
 
 	// helpers
 
+	const GRID_COLORS_LIGHT = [ 0x999999, 0x777777 ];
+	const GRID_COLORS_DARK = [ 0x555555, 0x888888 ];
+
 	const grid = new THREE.Group();
 
-	const grid1 = new THREE.GridHelper( 30, 30, 0x888888 );
-	grid1.material.color.setHex( 0x888888 );
+	const grid1 = new THREE.GridHelper( 30, 30 );
+	grid1.material.color.setHex( GRID_COLORS_LIGHT[ 0 ] );
 	grid1.material.vertexColors = false;
 	grid.add( grid1 );
 
-	const grid2 = new THREE.GridHelper( 30, 6, 0x222222 );
-	grid2.material.color.setHex( 0x222222 );
+	const grid2 = new THREE.GridHelper( 30, 6 );
+	grid2.material.color.setHex( GRID_COLORS_LIGHT[ 1 ] );
 	grid2.material.vertexColors = false;
 	grid.add( grid2 );
 
@@ -71,7 +74,7 @@ function Viewport( editor ) {
 	let objectRotationOnDown = null;
 	let objectScaleOnDown = null;
 
-	const transformControls = new TransformControls( camera, container.dom );
+	const transformControls = new TransformControls( camera );
 	transformControls.addEventListener( 'axis-changed', function () {
 
 		if ( editor.viewportShading !== 'realistic' ) render();
@@ -139,7 +142,7 @@ function Viewport( editor ) {
 
 	} );
 
-	sceneHelpers.add( transformControls );
+	sceneHelpers.add( transformControls.getHelper() );
 
 	//
 
@@ -149,8 +152,29 @@ function Viewport( editor ) {
 
 	function updateAspectRatio() {
 
-		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		camera.updateProjectionMatrix();
+		for ( const uuid in editor.cameras ) {
+
+			const camera = editor.cameras[ uuid ];
+
+			const aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+
+			if ( camera.isPerspectiveCamera ) {
+
+				camera.aspect = aspect;
+
+			} else {
+
+				camera.left = - aspect;
+				camera.right = aspect;
+
+			}
+
+			camera.updateProjectionMatrix();
+
+			const cameraHelper = editor.helpers[ camera.id ];
+			if ( cameraHelper ) cameraHelper.update();
+
+		}
 
 	}
 
@@ -250,7 +274,7 @@ function Viewport( editor ) {
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	const controls = new EditorControls( camera, container.dom );
+	const controls = new EditorControls( camera );
 	controls.addEventListener( 'change', function () {
 
 		signals.cameraChanged.dispatch( camera );
@@ -289,6 +313,8 @@ function Viewport( editor ) {
 
 		transformControls.setSpace( space );
 
+		render();
+
 	} );
 
 	signals.rendererUpdated.add( function () {
@@ -319,6 +345,9 @@ function Viewport( editor ) {
 
 		}
 
+		controls.connect( newRenderer.domElement );
+		transformControls.connect( newRenderer.domElement );
+
 		renderer = newRenderer;
 
 		renderer.setAnimationLoop( animate );
@@ -330,14 +359,14 @@ function Viewport( editor ) {
 			mediaQuery.addEventListener( 'change', function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
-				updateGridColors( grid1, grid2, event.matches ? [ 0x222222, 0x888888 ] : [ 0x888888, 0x282828 ] );
+				updateGridColors( grid1, grid2, event.matches ? GRID_COLORS_DARK : GRID_COLORS_LIGHT );
 
 				render();
 
 			} );
 
 			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
-			updateGridColors( grid1, grid2, mediaQuery.matches ? [ 0x222222, 0x888888 ] : [ 0x888888, 0x282828 ] );
+			updateGridColors( grid1, grid2, mediaQuery.matches ? GRID_COLORS_DARK : GRID_COLORS_LIGHT );
 
 		}
 
@@ -459,14 +488,14 @@ function Viewport( editor ) {
 
 	signals.materialChanged.add( function () {
 
-		initPT();
+		updatePTMaterials();
 		render();
 
 	} );
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundColorSpace, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
 
 		scene.background = null;
 
@@ -482,6 +511,9 @@ function Viewport( editor ) {
 
 				if ( backgroundTexture ) {
 
+					backgroundTexture.colorSpace = backgroundColorSpace;
+					backgroundTexture.needsUpdate = true;
+
 					scene.background = backgroundTexture;
 
 				}
@@ -493,6 +525,8 @@ function Viewport( editor ) {
 				if ( backgroundEquirectangularTexture ) {
 
 					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+					backgroundEquirectangularTexture.colorSpace = backgroundColorSpace;
+					backgroundEquirectangularTexture.needsUpdate = true;
 
 					scene.background = backgroundEquirectangularTexture;
 					scene.backgroundBlurriness = backgroundBlurriness;
@@ -535,9 +569,13 @@ function Viewport( editor ) {
 
 				useBackgroundAsEnvironment = true;
 
-				scene.environment = scene.background;
-				scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-				scene.environmentRotation.y = scene.backgroundRotation.y;
+				if ( scene.background !== null && scene.background.isTexture ) {
+
+					scene.environment = scene.background;
+					scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+					scene.environmentRotation.y = scene.backgroundRotation.y;
+
+				}
 
 				break;
 
@@ -552,7 +590,7 @@ function Viewport( editor ) {
 
 				break;
 
-			case 'ModelViewer':
+			case 'Room':
 
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
@@ -611,14 +649,9 @@ function Viewport( editor ) {
 
 		const viewportCamera = editor.viewportCamera;
 
-		if ( viewportCamera.isPerspectiveCamera ) {
+		if ( viewportCamera.isPerspectiveCamera || viewportCamera.isOrthographicCamera ) {
 
-			viewportCamera.aspect = editor.camera.aspect;
-			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
-
-		} else if ( viewportCamera.isOrthographicCamera ) {
-
-			// TODO
+			updateAspectRatio();
 
 		}
 
@@ -626,6 +659,7 @@ function Viewport( editor ) {
 
 		controls.enabled = ( viewportCamera === editor.camera );
 
+		initPT();
 		render();
 
 	} );
@@ -637,7 +671,7 @@ function Viewport( editor ) {
 		switch ( viewportShading ) {
 
 			case 'realistic':
-				pathtracer.init( scene, camera );
+				pathtracer.init( scene, editor.viewportCamera );
 				break;
 
 			case 'solid':
@@ -671,18 +705,56 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.showGridChanged.add( function ( value ) {
+	signals.showHelpersChanged.add( function ( appearanceStates ) {
 
-		grid.visible = value;
+		grid.visible = appearanceStates.gridHelper;
 
-		render();
+		sceneHelpers.traverse( function ( object ) {
 
-	} );
+			switch ( object.type ) {
 
-	signals.showHelpersChanged.add( function ( value ) {
+				case 'CameraHelper':
 
-		sceneHelpers.visible = value;
-		transformControls.enabled = value;
+				{
+
+					object.visible = appearanceStates.cameraHelpers;
+					break;
+
+				}
+
+				case 'PointLightHelper':
+				case 'DirectionalLightHelper':
+				case 'SpotLightHelper':
+				case 'HemisphereLightHelper':
+
+				{
+
+					object.visible = appearanceStates.lightHelpers;
+					break;
+
+				}
+
+				case 'SkeletonHelper':
+
+				{
+
+					object.visible = appearanceStates.skeletonHelpers;
+					break;
+
+				}
+
+				default:
+
+				{
+
+					// not a helper, skip.
+
+				}
+
+			}
+
+		} );
+
 
 		render();
 
@@ -748,7 +820,7 @@ function Viewport( editor ) {
 
 		if ( editor.viewportShading === 'realistic' ) {
 
-			pathtracer.init( scene, camera );
+			pathtracer.init( scene, editor.viewportCamera );
 
 		}
 
@@ -774,11 +846,22 @@ function Viewport( editor ) {
 
 	}
 
+	function updatePTMaterials() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.updateMaterials();
+
+		}
+
+	}
+
 	function updatePT() {
 
 		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.update();
+			editor.signals.pathTracerUpdated.dispatch( pathtracer.getSamples() );
 
 		}
 

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr; [page:InstancedBufferGeometry] &rarr; [page:LineSegmentsGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A chain of vertices, forming a polyline.
+		</p>
+
+		<p class="desc">
+			This is used in [page:Line2] to describe the shape.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and therefore must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lines_fat WebGL / lines / fat ]<br />
+			[example:webgl_lines_fat_raycasting WebGL / lines / fat / raycasting ]<br />
+			[example:webgpu_lines_fat WebGPU / lines / fat / raycasting ]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+			Creates a new geometry.
+			Call [page:LineGeometry.setPositions setPositions] to add segments.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegmentsGeometry] class for common properties.</p>
+
+		<h3>[property:Boolean isLineGeometry]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegmentsGeometry] class for common methods.</p>
+
+		<h3>[method:this fromLine]( [param:Line line] )</h3>
+		<p>
+			Copy the vertex positions of a [page:Line] object into this geometry.
+			Assumes the source geometry is not using indices.
+		</p>
+
+		<h3>[method:this setColors]( [param:Array array] )</h3>
+		<p>
+			Replace the per-vertex colors.
+			Every triple describes a line vertex: `[r1, g1, b1]`.
+			The array can be an `Array` or `Float32Array`.
+		</p>
+
+		<h3>[method:this setPositions]( [param:Array array] )</h3>
+		<p>
+			Replace the vertex positions with a new set.
+			The array can be an `Array` or `Float32Array`.
+			The length must be a multiple of three.
+		</p>
+
+		<h3>[method:this setFromPoints]( [param:Array points] )</h3>
+		<p>
+			Replace the vertex positions with an array of points.
+			Can be either a `Vector3` or `Vector2` array.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/LineGeometry.js examples/jsm/lines/LineGeometry.js]
+		</p>
+	</body>
+</html>

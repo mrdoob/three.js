@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Instance Uniform</title>
+		<title>three.js webgpu - instance uniform</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,15 +9,16 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Instance Uniform
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - instance uniform
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -25,12 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshStandardNodeMaterial, NodeUpdateType, Node, nodeObject, uniform, cubeTexture } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { nodeObject, uniform, cubeTexture } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -38,13 +34,13 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			class InstanceUniformNode extends Node {
+			class InstanceUniformNode extends THREE.Node {
 
 				constructor() {
 
 					super( 'vec3' );
 
-					this.updateType = NodeUpdateType.OBJECT;
+					this.updateType = THREE.NodeUpdateType.OBJECT;
 
 					this.uniformNode = uniform( new THREE.Color() );
 
@@ -79,14 +75,6 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -118,7 +106,7 @@
 				const instanceUniform = nodeObject( new InstanceUniformNode() );
 				const cubeTextureNode = cubeTexture( cTexture );
 
-				const material = new MeshStandardNodeMaterial();
+				const material = new THREE.MeshBasicNodeMaterial();
 				material.colorNode = instanceUniform.add( cubeTextureNode );
 				material.emissiveNode = instanceUniform.mul( cubeTextureNode );
 
@@ -134,7 +122,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

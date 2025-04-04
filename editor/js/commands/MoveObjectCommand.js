@@ -1,33 +1,33 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newParent THREE.Object3D
- * @param newBefore THREE.Object3D
- * @constructor
- */
 class MoveObjectCommand extends Command {
 
-	constructor( editor, object, newParent, newBefore ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {THREE.Object3D|null} [newParent=null]
+	 * @param {THREE.Object3D|null} [newBefore=null]
+	 * @constructor
+	 */
+	constructor( editor, object = null, newParent = null, newBefore = null ) {
 
 		super( editor );
 
 		this.type = 'MoveObjectCommand';
-		this.name = 'Move Object';
+		this.name = editor.strings.getKey( 'command/MoveObject' );
 
 		this.object = object;
-		this.oldParent = ( object !== undefined ) ? object.parent : undefined;
-		this.oldIndex = ( this.oldParent !== undefined ) ? this.oldParent.children.indexOf( this.object ) : undefined;
+		this.oldParent = ( object !== null ) ? object.parent : null;
+		this.oldIndex = ( this.oldParent !== null ) ? this.oldParent.children.indexOf( this.object ) : null;
 		this.newParent = newParent;
 
-		if ( newBefore !== undefined ) {
+		if ( newBefore !== null ) {
 
-			this.newIndex = ( newParent !== undefined ) ? newParent.children.indexOf( newBefore ) : undefined;
+			this.newIndex = ( newParent !== null ) ? newParent.children.indexOf( newBefore ) : null;
 
 		} else {
 
-			this.newIndex = ( newParent !== undefined ) ? newParent.children.length : undefined;
+			this.newIndex = ( newParent !== null ) ? newParent.children.length : null;
 
 		}
 

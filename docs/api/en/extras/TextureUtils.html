@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">A class containing utility functions for textures.</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Texture contain]( [param:Texture texture], [param:Number aspect] )</h3>
+		<p>
+			Scales the texture as large as possible within its surface without cropping or stretching the texture. The method preserves the original aspect ratio of the texture. Akin to CSS `object-fit: contain`.
+		</p>
+
+		<h3>[method:Texture cover]( [param:Texture texture], [param:Number aspect] )</h3>
+		<p>
+			Scales the texture to the smallest possible size to fill the surface, leaving no empty space. The method preserves the original aspect ratio of the texture. Akin to CSS `object-fit: cover`.
+		</p>
+
+		<h3>[method:Texture fill]( [param:Texture texture] )</h3>
+		<p>
+			Configures the texture to the default transformation. Akin to CSS `object-fit: fill`.
+		</p>
+
+		<h3>[method:Number getByteLength]( [param:Number width], [param:Number height], [param:Number format], [param:Number type] )</h3>
+		<p>
+			Given the width, height, format, and type of a texture. Determines how
+			many bytes must be used to represent the texture.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

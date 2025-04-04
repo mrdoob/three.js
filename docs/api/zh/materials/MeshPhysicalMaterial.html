@@ -17,7 +17,13 @@
 
 		<ul>
 			<li>
-				<b>Clearcoat:</b> 有些类似于车漆，碳纤，被水打湿的表面的材质需要在面上再增加一个透明的，具有一定反光特性的面。而且这个面说不定有一定的起伏与粗糙度。Clearcoat可以在不需要重新创建一个透明的面的情况下做到类似的效果。
+				<b>各向异性(Anisotropy):</b> 能够表现出拉丝金属所观察到的材料的各向异性特性。
+			</li>
+			<li>
+				<b>清漆(Clearcoat):</b> 有些类似于车漆，碳纤，被水打湿的表面的材质需要在面上再增加一个透明的，具有一定反光特性的面。而且这个面说不定有一定的起伏与粗糙度。Clearcoat 可以在不需要重新创建一个透明的面的情况下做到类似的效果。
+			</li>
+			<li>
+				<b>虹彩(Iridescence):</b> 允许渲染色调根据视角和照明角度而变化的效果。这可以在肥皂泡、油膜或许多昆虫的翅膀上看到。
 			</li>
 			<li>
 				<b>基于物理的透明度</b>:[page:Material.opacity .opacity]属性有一些限制:在透明度比较高的时候，反射也随之减少。使用基于物理的透光性[page:.transmission]属性可以让一些很薄的透明表面，例如玻璃，变得更真实一些。
@@ -26,7 +32,7 @@
 				<b>高级光线反射:</b> 为非金属材质提供了更多更灵活的光线反射。
 			</li>
 			<li>
-				<b>Sheen:</b> Can be used for representing cloth and fabric materials.
+				<b>光泽(Sheen):</b> 可用于表示布料和织物材料。
 			</li>
 		</ul>
 
@@ -55,7 +61,9 @@
 		<h2>例子</h2>
 
 		<p>
+			[example:webgl_loader_gltf_anisotropy loader / gltf / anisotropy]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_loader_gltf_iridescence loader / gltf / iridescence]<br />
 			[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
 			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
@@ -72,14 +80,29 @@
 		<h2>属性(Properties)</h2>
 		<p>共有属性请参见其基类[page:Material]和[page:MeshStandardMaterial]。</p>
 
+		<h3>[property:Float anisotropy]</h3>
+		<p>
+			各向异性强度。默认值为 `0.0`。
+		</p>
+
+		<h3>[property:Texture anisotropyMap]</h3>
+		<p>
+			红色和绿色通道表示 `[-1, 1]` 切线、双切线空间中的各向异性方向，将通过 [page:.anisotropyRotation] 进行旋转。蓝色通道包含 `[0, 1]` 的强度，将与 [page:.anisotropy]相乘。默认值为 `null`。
+		</p>
+
+		<h3>[property:Float anisotropyRotation]</h3>
+		<p>
+			切线、双切线空间中各向异性的旋转，以弧度为单位从切线逆时针测量。当存在 [page:.anisotropyMap] 时，此属性为纹理中的矢量提供额外的旋转。默认值为 `0.0`。
+		</p>
+		
 		<h3>[property:Color attenuationColor]</h3>
 		<p>
-		The color that white light turns into due to absorption when reaching the attenuation distance. Default is *white* (0xffffff).
+			白光到达衰减距离后因吸收而变成的颜色。默认值为 *white* (0xffffff)。
 		</p>
 
 		<h3>[property:Float attenuationDistance]</h3>
 		<p>
-		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space units, and must be greater than zero. Default is `Infinity`.
+			介质的密度，表示光在与粒子相互作用之前在介质中传播的平均距离。该值以世界空间单位给出，并且必须大于零。默认值为 `Infinity`。
 		</p>
 
 		<h3>[property:Float clearcoat]</h3>
@@ -119,6 +142,13 @@
 			[page:WebGLRenderer]使用它来选择shaders。
 		</p>
 
+		<h3>[property:Float dispersion]</h3>
+		<p>
+			定义穿过相对清晰体积的颜色角分离（色差）的强度。任何零或更大的值都是有效的，实际值的典型范围是 `[0, 1]`。
+			默认值为 `0` (无色散)。
+			此属性只能用于透射对象，请参见 [page:.transmission]。
+		</p>
+
 		<h3>[property:Float ior]</h3>
 		<p>
 			为非金属材质所设置的折射率，范围由*1.0*到*2.333*。默认为*1.5*。
@@ -130,6 +160,41 @@
 			反射率，由*0.0*到*1.0*。默认为*0.5*, 相当于折射率1.5。
 			<br />
 			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial metalness]为*1.0*时，此属性无效。
+		</p>
+		
+		<h3>[property:Float iridescence]</h3>
+		<p>
+			虹彩([link:https://en.wikipedia.org/wiki/Iridescence iridescence])层的强度，根据表面和观察者之间的角度模拟RGB颜色偏移，从 `0.0` 到 `1.0`。默认值为 `0.0`。
+		</p>
+
+		<h3>[property:Texture iridescenceMap]</h3>
+		<p>
+			此纹理的红色通道与 [page:.iridescence] 相乘，以实现对虹彩的每像素控制。默认值为 `null`。
+		</p>
+
+		<h3>[property:Float iridescenceIOR]</h3>
+		<p>
+			虹彩 RGB 色移效果的强度，由折射率表示。在 `1.0` 到 `2.333` 之间。
+			默认值为 `1.3`。
+		</p>
+
+		<h3>[property:Array iridescenceThicknessRange]</h3>
+		<p>
+			由 2 个元素组成的数组，指定虹彩层的最小和最大厚度。
+			虹彩层的厚度与 [page:.thickness] 对 [page:.ior] 的影响相同。默认值为 `[100, 400]`。<br />
+
+			如果未定义 [page:.iridescenceThicknessMap]，则虹彩厚度将仅使用给定数组的第二个元素。
+		</p>
+
+		<h3>[property:Texture iridescenceThicknessMap]</h3>
+		<p>
+			一种定义虹彩层厚度的纹理，存储在绿色通道中。厚度的最小值和最大值由 [page:.iridescenceThicknessRange] 数组定义：<br/>
+			<ul>
+				<li>绿色通道中的 `0.0` 将导致厚度等于数组的第一个元素。</li>
+				<li>绿色通道中的 `1.0` 将导致厚度等于数组的第二个元素。</li>
+				<li>中间的值将在数组元素之间线性插入。</li>
+			</ul>
+			默认值为 `null`。
 		</p>
 
 		<h3>[property:Float sheen]</h3>
@@ -179,14 +244,13 @@
 
 		<h3>[property:Float thickness]</h3>
 		<p>
-		The thickness of the volume beneath the surface. The value is given in the coordinate space of the mesh. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary. Default is *0*.
+			表面下体积的厚度。该值在网格的坐标空间中给出。如果该值为 *0*，则材料为薄壁。否则，材质将成为体积边界。默认值为 *0*。
 		</p>
 
 		<h3>[property:Texture thicknessMap]</h3>
 		<p>
-		A texture that defines the thickness, stored in the G channel. This will be multiplied by [page:.thickness]. Default is *null*.
+			定义厚度的纹理，存储在 G 通道中。这将与 [page:.thickness] 相乘。默认值为 *null*。
 		</p>
-
 
 		<h3>[property:Float transmission]</h3>
 		<p>

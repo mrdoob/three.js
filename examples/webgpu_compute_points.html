@@ -14,9 +14,11 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 				}
 			}
 		</script>
@@ -24,17 +26,15 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, attribute, float, vec2, vec3, color, instanceIndex, PointsNodeMaterial } from 'three/nodes';
+
+			import Stats from 'stats-gl';
+
+
+			import { Fn, uniform, instancedArray, float, vec2, vec3, color, instanceIndex } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
-
-			let camera, scene, renderer;
+			let camera, scene, renderer, stats;
 			let computeNode;
 
 			const pointerVector = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
@@ -44,14 +44,6 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.OrthographicCamera( - 1.0, 1.0, 1.0, - 1.0, 0, 1 );
 				camera.position.z = 1;
 
@@ -59,47 +51,41 @@
 
 				// initialize particles
 
-				const particleNum = 300000;
-				const particleSize = 2; // vec2
+				const particlesCount = 300000;
 
-				// create buffers
-
-				const particleBuffer = new StorageInstancedBufferAttribute( particleNum, particleSize );
-				const velocityBuffer = new StorageInstancedBufferAttribute( particleNum, particleSize );
-
-				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
-				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
+				const particleArray = instancedArray( particlesCount, 'vec2' );
+				const velocityArray = instancedArray( particlesCount, 'vec2' );
 
 				// create function
 
-				const computeShaderFn = tslFn( () => {
+				const computeShaderFn = Fn( () => {
 
-					const particle = particleBufferNode.element( instanceIndex );
-					const velocity = velocityBufferNode.element( instanceIndex );
+					const particle = particleArray.element( instanceIndex );
+					const velocity = velocityArray.element( instanceIndex );
 
 					const pointer = uniform( pointerVector );
 					const limit = uniform( scaleVector );
 
-					const position = particle.add( velocity ).temp();
+					const position = particle.add( velocity ).toVar();
 
-					velocity.x = position.x.abs().greaterThanEqual( limit.x ).cond( velocity.x.negate(), velocity.x );
-					velocity.y = position.y.abs().greaterThanEqual( limit.y ).cond( velocity.y.negate(), velocity.y );
+					velocity.x = position.x.abs().greaterThanEqual( limit.x ).select( velocity.x.negate(), velocity.x );
+					velocity.y = position.y.abs().greaterThanEqual( limit.y ).select( velocity.y.negate(), velocity.y );
 
 					position.assign( position.min( limit ).max( limit.negate() ) );
 
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).cond( vec3(), position ) );
+					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec3(), position ) );
 
 				} );
 
 				// compute
 
-				computeNode = computeShaderFn().compute( particleNum );
-				computeNode.onInit = ( { renderer } ) => {
+				computeNode = computeShaderFn().compute( particlesCount );
+				computeNode.onInit( ( { renderer } ) => {
 
-					const precomputeShaderNode = tslFn( () => {
+					const precomputeShaderNode = Fn( () => {
 
 						const particleIndex = float( instanceIndex );
 
@@ -109,39 +95,48 @@
 						const velX = randomAngle.sin().mul( randomSpeed );
 						const velY = randomAngle.cos().mul( randomSpeed );
 
-						const velocity = velocityBufferNode.element( instanceIndex );
+						const velocity = velocityArray.element( instanceIndex );
 
 						velocity.xy = vec2( velX, velY );
 
 					} );
 
-					renderer.compute( precomputeShaderNode().compute( particleNum ) );
+					renderer.computeAsync( precomputeShaderNode().compute( particlesCount ) );
 
-				};
+				} );
 
 				// use a compute shader to animate the point cloud's vertex data.
 
-				const particleNode = attribute( 'particle', 'vec2' );
-
 				const pointsGeometry = new THREE.BufferGeometry();
 				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ), 3 ) ); // single vertex ( not triangle )
-				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
 				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
-				const pointsMaterial = new PointsNodeMaterial();
-				pointsMaterial.colorNode = particleNode.add( color( 0xFFFFFF ) );
-				pointsMaterial.positionNode = particleNode;
+				const pointsMaterial = new THREE.PointsNodeMaterial();
+				pointsMaterial.colorNode = particleArray.element( instanceIndex ).add( color( 0xFFFFFF ) );
+				pointsMaterial.positionNode = particleArray.element( instanceIndex );
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
-				mesh.isInstancedMesh = true;
-				mesh.count = particleNum;
+				mesh.count = particlesCount;
 				scene.add( mesh );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats( {
+					precision: 4,
+					horizontal: false,
+					trackGPU: true,
+					trackCPT: true,
+					logsPerSecond: 10,
+					graphsPerSecond: 60,
+					samplesGraph: 30,
+				} );
+				stats.init( renderer );
+				document.body.appendChild( stats.dom );
+				stats.dom.style.position = 'absolute';
 
 				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'mousemove', onMouseMove );
@@ -181,7 +176,16 @@
 			function animate() {
 
 				renderer.compute( computeNode );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+
 				renderer.render( scene, camera );
+
+
+				renderer.resolveTimestampsAsync().then( () => {
+
+					stats.update();
+
+				} );
 
 			}
 

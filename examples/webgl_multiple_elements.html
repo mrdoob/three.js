@@ -83,7 +83,6 @@
 			const scenes = [];
 
 			init();
-			animate();
 
 			function init() {
 
@@ -156,6 +155,7 @@
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
 				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setAnimationLoop( animate );
 
 			}
 
@@ -173,13 +173,6 @@
 			}
 
 			function animate() {
-
-				render();
-				requestAnimationFrame( animate );
-
-			}
-
-			function render() {
 
 				updateSize();
 

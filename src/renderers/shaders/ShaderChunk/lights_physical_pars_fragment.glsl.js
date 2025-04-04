@@ -6,6 +6,7 @@ struct PhysicalMaterial {
 	float roughness;
 	vec3 specularColor;
 	float specularF90;
+	float dispersion;
 
 	#ifdef USE_CLEARCOAT
 		float clearcoat;
@@ -285,7 +286,7 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 	float result = LTC_ClippedSphereFormFactor( vectorFormFactor );
 
 /*
-	// alternate method of adjusting for horizon clipping (see referece)
+	// alternate method of adjusting for horizon clipping (see reference)
 	// refactoring required
 	float len = length( vectorFormFactor );
 	float z = vectorFormFactor.z / len;
@@ -350,7 +351,7 @@ vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 no
 
 #endif
 
-// This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
+// This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
 float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {

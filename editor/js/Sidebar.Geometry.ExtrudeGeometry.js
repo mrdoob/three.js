@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -15,9 +16,10 @@ function GeometryParametersPanel( editor, object ) {
 	const options = parameters.options;
 	options.curveSegments = options.curveSegments != undefined ? options.curveSegments : 12;
 	options.steps = options.steps != undefined ? options.steps : 1;
-	options.depth = options.depth != undefined ? options.depth : 100;
-	options.bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
-	options.bevelSize = options.bevelSize !== undefined ? options.bevelSize : 4;
+	options.depth = options.depth != undefined ? options.depth : 1;
+	const bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
+	options.bevelThickness = bevelThickness;
+	options.bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 	options.bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 	options.bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
@@ -62,58 +64,105 @@ function GeometryParametersPanel( editor, object ) {
 
 	container.add( enabledRow );
 
-	let thickness, size, offset, segments;
+	// thickness
 
-	if ( options.bevelEnabled === true ) {
+	const thicknessRow = new UIRow();
+	const thickness = new UINumber( options.bevelThickness ).onChange( update );
 
-		// thickness
+	thicknessRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setClass( 'Label' ) );
+	thicknessRow.add( thickness );
 
-		const thicknessRow = new UIRow();
-		thickness = new UINumber( options.bevelThickness ).onChange( update );
+	container.add( thicknessRow );
 
-		thicknessRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setClass( 'Label' ) );
-		thicknessRow.add( thickness );
+	// size
 
-		container.add( thicknessRow );
+	const sizeRow = new UIRow();
+	const size = new UINumber( options.bevelSize ).onChange( update );
 
-		// size
+	sizeRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setClass( 'Label' ) );
+	sizeRow.add( size );
 
-		const sizeRow = new UIRow();
-		size = new UINumber( options.bevelSize ).onChange( update );
+	container.add( sizeRow );
 
-		sizeRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setClass( 'Label' ) );
-		sizeRow.add( size );
+	// offset
 
-		container.add( sizeRow );
+	const offsetRow = new UIRow();
+	const offset = new UINumber( options.bevelOffset ).onChange( update );
 
-		// offset
+	offsetRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setClass( 'Label' ) );
+	offsetRow.add( offset );
 
-		const offsetRow = new UIRow();
-		offset = new UINumber( options.bevelOffset ).onChange( update );
+	container.add( offsetRow );
 
-		offsetRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setClass( 'Label' ) );
-		offsetRow.add( offset );
+	// segments
 
-		container.add( offsetRow );
+	const segmentsRow = new UIRow();
+	const segments = new UIInteger( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
 
-		// segments
+	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setClass( 'Label' ) );
+	segmentsRow.add( segments );
 
-		const segmentsRow = new UIRow();
-		segments = new UIInteger( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
+	container.add( segmentsRow );
 
-		segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setClass( 'Label' ) );
-		segmentsRow.add( segments );
-
-		container.add( segmentsRow );
-
-	}
+	updateBevelRow( options.bevelEnabled );
 
 	const button = new UIButton( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setClass( 'Label' ).setMarginLeft( '120px' );
 	container.add( button );
 
 	//
 
+	function updateBevelRow( enabled ) {
+
+		if ( enabled === true ) {
+
+			thicknessRow.setDisplay( '' );
+			sizeRow.setDisplay( '' );
+			offsetRow.setDisplay( '' );
+			segmentsRow.setDisplay( '' );
+
+		} else {
+
+			thicknessRow.setDisplay( 'none' );
+			sizeRow.setDisplay( 'none' );
+			offsetRow.setDisplay( 'none' );
+			segmentsRow.setDisplay( 'none' );
+
+		}
+
+	}
+
+	function refreshUI() {
+
+		const options = object.geometry.parameters.options;
+
+		curveSegments.setValue( options.curveSegments );
+		steps.setValue( options.steps );
+		depth.setValue( options.depth );
+		enabled.setValue( options.bevelEnabled );
+		thickness.setValue( options.bevelThickness );
+		size.setValue( options.bevelSize );
+		offset.setValue( options.bevelOffset );
+		segments.setValue( options.bevelSegments );
+
+		updateBevelRow( options.bevelEnabled );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
+
+	//
+
 	function update() {
+
+		updateBevelRow( enabled.getValue() );
 
 		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeGeometry(
 			parameters.shapes,
@@ -122,7 +171,7 @@ function GeometryParametersPanel( editor, object ) {
 				steps: steps.getValue(),
 				depth: depth.getValue(),
 				bevelEnabled: enabled.getValue(),
-				bevelThickness: options.bevelThickness,
+				bevelThickness: thickness !== undefined ? thickness.getValue() : options.bevelThickness,
 				bevelSize: size !== undefined ? size.getValue() : options.bevelSize,
 				bevelOffset: offset !== undefined ? offset.getValue() : options.bevelOffset,
 				bevelSegments: segments !== undefined ? segments.getValue() : options.bevelSegments

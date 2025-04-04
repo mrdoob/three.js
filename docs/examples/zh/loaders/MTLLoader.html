@@ -16,7 +16,7 @@
 		用于描述一个或多个 .OBJ 文件中物体表面着色（材质）属性。
 		</p>
 
-		<h2>进口</h2>
+		<h2>导入</h2>
 
 		<p>
 			[name] 是一个附加组件，必须显式导入。
@@ -58,11 +58,11 @@
 		<p>
 			[page:Object options] — required
 			<ul>
-				<li>side: Which side to apply the material. THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide</li>
-				<li>wrap: What type of wrapping to apply for textures. THREE.RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping</li>
-				<li>normalizeRGB: RGBs need to be normalized to 0-1 from 0-255. Default: false, assumed to be already normalized</li>
-				<li>ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's. Default: false</li>
-				<li>invertTrProperty: Use values 1 of Tr field for fully opaque. This option is useful for obj exported from 3ds MAX, vcglib or meshlab. Default: false</li>
+				<li>side: 将要渲染哪一面。 THREE.FrontSide (默认), THREE.BackSide, THREE.DoubleSide</li>
+				<li>wrap: 纹理环绕方式。 THREE.RepeatWrapping (默认), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping</li>
+				<li>normalizeRGB: RGBs 需要从 0-255 归一化为 0-1 默认: false, 认为已归一化</li>
+				<li>ignoreZeroRGBs: 忽略所有 RGB 值（Ka、Kd、Ks）均为 0 的情况。 默认: false</li>
+				<li>invertTrProperty: Tr字段的值为1表示完全不透明。此选项可用于从3DS Max，VCGLIB或MESHLAB导出的OBJ。 默认: false</li>
 			</ul>
 		</p>
 		<p>
@@ -80,7 +80,7 @@
 		</p>
 
 
-		<h2>源码</h2>
+		<h2>源代码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/[name].js examples/jsm/loaders/[name].js]

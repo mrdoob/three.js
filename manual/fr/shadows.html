@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Les ombres dans </title>
+    <title>Les ombres</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Les ombres dans ">
+    <meta name="twitter:title" content="Three.js – Les ombres">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,14 +22,14 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Les ombres dans </h1>
+        <h1>Les ombres</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
           <p>Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule <a href="fundamentals.html">Principes de base</a>.
 Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.
-L'<a href="cameras.html">article précédent qui s'intéressait caméras</a> est à lire ainsi que <a href="lights.html">celui à propos des lumières</a> avant d'entamer cet article-ci.</p>
+L'<a href="cameras.html">article précédent qui s'intéressait aux caméras</a> ainsi que <a href="lights.html">celui à propos des lumières</a> sont à lire avant d'entamer celui-ci.</p>
 <p>Les ombres peuvent être un sujet compliqué. Il existe différentes solutions et toutes ont des compromis, y compris les solutions disponibles dans Three.js.</p>
 <p>Three.js, par défaut, utilise des <em>shadow maps</em>. Comment ça marche ? <em>pour chaque lumière qui projette des ombres, tous les objets marqués pour projeter des ombres sont rendus du point de vue de la lumière</em>. <strong>RELISEZ ENCORE UNE FOIS</strong> pour que ça soit bien clair pour vous.</p>
 <p>En d'autres termes, si vous avez 20 objets et 5 lumières, et que les 20 objets projettent des ombres et que les 5 lumières projettent des ombres, toute votre scène sera dessinée 6 fois. Les 20 objets seront dessinés pour la lumière #1, puis les 20 objets seront dessinés pour la lumière #2, puis #3, et ainsi de suite. Enfin la scène sera dessinée en utilisant les données des 5 premiers rendus.</p>
@@ -87,7 +87,7 @@ const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, s
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeSize = 1;
 const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 </pre>
-<p>Maintenant, nous allons faire un tas de sphères. Pour chaque sphère, nous allons créer une <code class="notranslate" translate="no">base</code> <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> et nous allons créer à la fois le maillage du plan d'ombre et le maillage de la sphère enfants de la base. De cette façon, si nous déplaçons la base, la sphère et l'ombre bougeront. Nous devons placer l'ombre légèrement au-dessus du sol pour éviter les combats en Z. Nous définissons également <code class="notranslate" translate="no">depthWrite</code> sur false pour que les ombres ne se gâchent pas. Nous reviendrons sur ces deux problèmes dans un <a href="transparency.html">autre article</a>. L'ombre est un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> car elle n'a pas besoin d'éclairage.</p>
+<p>Maintenant, nous allons faire un tas de sphères. Pour chaque sphère, nous allons créer une <code class="notranslate" translate="no">base</code> <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> et nous allons créer à la fois le maillage du plan d'ombre et le maillage de la sphère en tant qu'enfants de la base. De cette façon, si nous déplaçons la base, la sphère et l'ombre bougeront. Nous devons placer l'ombre légèrement au-dessus du sol pour éviter le Z-fighting . Nous définissons également <code class="notranslate" translate="no">depthWrite</code> sur false pour que les ombres n'apportent de la confusion dans l'ordre des éléments. Nous reviendrons sur ces deux problèmes dans un <a href="transparency.html">autre article</a>. L'ombre est un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> car elle n'a pas besoin d'éclairage.</p>
 <p>Nous donnons à chaque sphère une teinte différente, puis nous enregistrons la base, le maillage de la sphère, le maillage de l'ombre et la position y initiale de chaque sphère.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const numSpheres = 15;
 for (let i = 0; i &lt; numSpheres; ++i) {
@@ -124,7 +124,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   sphereShadowBases.push({base, sphereMesh, shadowMesh, y: sphereMesh.position.y});
 }
 </pre>
-<p>Nous avons installé 2 lumières. L'un est un <a href="https://threejs.org/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> avec une intensité réglée sur 2 pour vraiment illuminer les choses.</p>
+<p>Nous ajoutons 2 lumières. L'une est une <a href="https://threejs.org/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> avec une intensité réglée sur 2 pour vraiment illuminer les choses.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const skyColor = 0xB1E1FF;  // bleu
   const groundColor = 0xB97A20;  // orange brun
@@ -133,7 +133,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light);
 }
 </pre>
-<p>L'autre est un <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> donc les sphères ont une définition</p>
+<p>L'autre est une <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> afin que les sphères aient une définition.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -144,7 +144,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light.target);
 }
 </pre>
-<p>Il rendrait tel quel mais animons les sphères. Pour chaque sphère, ombre, jeu de base, nous déplaçons la base dans le plan xz, nous déplaçons la sphère de haut en bas en utilisant <a href="https://threejs.org/docs/#api/en/math/Math.abs(Math.sin(time"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>)) qui nous donne une animation rebondissante. Et, nous avons également défini l'opacité du matériau d'ombre de sorte qu'à mesure que chaque sphère monte, son ombre s'estompe.</p>
+<p>Nous pourrions faire un rendu tel quel mais animons les sphères. Pour chaque sphère, ombre et base, nous déplaçons la base dans le plan xz et nous déplaçons la sphère de haut en bas en utilisant <a href="https://threejs.org/docs/#api/en/math/Math.abs(Math.sin(time"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>. Ceci nous donnera une animation de rebond. Enfin nous définirons l'opacité du matériau d'ombre de telle sorte qu'à mesure que chaque sphère monte, son ombre s'estompe.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // convertir en secondes
 
@@ -181,8 +181,8 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 
 <p></p>
 <p>Dans certaines applications, il est courant d'utiliser une ombre ronde ou ovale pour tout, mais bien sûr, vous pouvez également utiliser différentes textures d'ombre de forme. Vous pouvez également donner à l'ombre un bord plus dur. Un bon exemple d'utilisation de ce type d'ombre est <a href="https://www.google.com/search?tbm=isch&amp;q=animal+crossing+pocket+camp+screenshots">Animal Crossing Pocket Camp</a> où vous pouvez voir que chaque personnage a une simple ombre ronde. C'est efficace et pas cher. <a href="https://www.google.com/search?q=monument+valley+screenshots&amp;tbm=isch">Monument Valley</a> semble également utiliser ce type d'ombre pour le personnage principal.</p>
-<p>Donc, en passant aux cartes d'ombre, il y a 3 lumières qui peuvent projeter des ombres. Le <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, le <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> et le <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
-<p>Commençons avec la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> avec l'aide de <a href="lights.html">l'article sur les lumières</a>.</p>
+<p>Passons maintenant aux cartes d'ombre, il y a 3 types de lumières qui peuvent projeter des ombres. La <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, la <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> et la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
+<p>Commençons avec la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> en nous appuyant sur l'exemple de <a href="lights.html">l'article sur les lumières</a>.</p>
 <p>La première chose à faire est d'activer les ombres dans le renderer (moteur de rendu).</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.shadowMap.enabled = true;
@@ -192,7 +192,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 +light.castShadow = true;
 </pre>
 <p>Nous devons également aller sur chaque maillage de la scène et décider s'il doit à la fois projeter des ombres et/ou recevoir des ombres.</p>
-<p>Faisons en sorte que le 'plane' (le sol) ne reçoive que des ombres car nous ne nous soucions pas vraiment de ce qui se passe en dessous.</p>
+<p>Faisons en sorte que le 'plane' (le sol) reçoive uniquement les ombres car nous ne nous intéressons pas vraiment qu'il projette quelque chose en-dessous lui.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mesh = new THREE.Mesh(planeGeo, planeMat);
 mesh.receiveShadow = true;
 </pre>
@@ -207,7 +207,7 @@ const mesh = new THREE.Mesh(sphereGeo, sphereMat);
 mesh.castShadow = true;
 mesh.receiveShadow = true;
 </pre>
-<p>Et puis nous l'exécutons.</p>
+<p>Et puis nous exécutons cela.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadows-directional-light.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/shadows-directional-light.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -230,7 +230,7 @@ scene.add(cameraHelper);
 <p>Ajustez la valeur x cible dans les deux sens et il devrait être assez clair que seul ce qui se trouve à l'intérieur de la boîte de la caméra d'ombre de la lumière est l'endroit où les ombres sont dessinées.</p>
 <p>Nous pouvons ajuster la taille de cette boîte en ajustant la caméra d'ombre de la lumière.</p>
 <p>Ajoutons quelques paramètres à lil-gui pour ajuster les ombres. Étant donné qu'une <a href="https://threejs.org/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> représente la lumière allant dans une direction parallèle, la <a href="https://threejs.org/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> utilise une <a href="https://threejs.org/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> pour sa caméra d'ombre. Nous avons expliqué le fonctionnement d'une caméra orthographique dans <a href="cameras.html">l'article précédent sur les caméras</a>.</p>
-<p>Pour rappel, une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> définit son <em>frustum</em> par ses propriètès <code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>, <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code> et <code class="notranslate" translate="no">zoom</code>.</p>
+<p>Pour rappel, une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> définit son <em>frustum</em> par ses propriétés <code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>, <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code> et <code class="notranslate" translate="no">zoom</code>.</p>
 <p>Créons à nouveau un helper pour lil-gui. Appelons-le <code class="notranslate" translate="no">DimensionGUIHelper</code>
 et passons-lui un objet et 2 propriétés. Il dispose d'une propriété que lil-gui peut ajuster et en réponse définit les deux propriétés, une positive et une négative.
 Nous pouvons l'utiliser pour définir <code class="notranslate" translate="no">left</code> et <code class="notranslate" translate="no">right</code> en tant que <code class="notranslate" translate="no">width</code> et <code class="notranslate" translate="no">up</code>, <code class="notranslate" translate="no">down</code> en tant que <code class="notranslate" translate="no">height</code>.</p>
@@ -249,7 +249,7 @@ Nous pouvons l'utiliser pour définir <code class="notranslate" translate="no">l
   }
 }
 </pre>
-<p>Utilisons aussi le <code class="notranslate" translate="no">MinMaxGUIHelper</code> que nous avons créé dans <a href="cameras.html">l'article sur les caméra</a> pour paramètrer <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>.</p>
+<p>Utilisons aussi le <code class="notranslate" translate="no">MinMaxGUIHelper</code> que nous avons créé dans <a href="cameras.html">l'article sur les caméra</a> pour paramétrer <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
@@ -281,7 +281,7 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 }
 updateCamera();
 </pre>
-<p>Et maintenant que nous avons accès aux propriètès de la caméra d'ombre, jouons avec.</p>
+<p>Et maintenant que nous avons accès aux propriétés de la caméra d'ombre, jouons avec.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadows-directional-light-with-camera-gui.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/shadows-directional-light-with-camera-gui.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -293,17 +293,17 @@ updateCamera();
 <div class="threejs_center"><img src="../resources/images/low-res-shadow-map.png" style="width: 369px"></div>
 
 <p>Que se passe-t-il avec ces ombres basse résolution ?!</p>
-<p>Ce problème est lié à un autre paramètres des ombres. Les textures d'ombre sont des textures dans lesquelles les ombres sont dessinées. Ces textures ont une taille. La zone de la caméra d'ombre que nous avons définie ci-dessus est étirée sur cette taille. Cela signifie que plus la zone que vous définissez est grande, plus vos ombres seront en blocs.</p>
-<p>Vous pouvez définir la résolution de la texture de l'ombre en définissant <code class="notranslate" translate="no">light.shadow.mapSize.width</code> et <code class="notranslate" translate="no">light.shadow.mapSize.height</code>. Ils sont par défaut à 512x512. Plus vous les agrandissez, plus ils prennent de mémoire et plus ils sont lents à s'afficher, vous voulez donc les définir aussi petits que possible tout en faisant fonctionner votre scène. La même chose est vraie avec la zone d'ombre. Plus petite signifie des ombres plus belles, alors réduisez la zone autant que possible tout en couvrant votre scène. Sachez que la machine de chaque utilisateur a une taille de texture maximale autorisée qui est disponible sur le renderer en tant que <a href="/docs/#api/en/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>.</p>
+<p>Ce problème est lié à un autre paramètres des ombres. Les textures d'ombre sont des textures dans lesquelles les ombres sont dessinées. Ces textures ont une taille. La zone de la caméra d'ombre que nous avons définie ci-dessus est étirée sur cette taille. Cela signifie que plus la zone que vous définissez est grande, plus vos ombres seront pixelisées.</p>
+<p>Vous pouvez définir la résolution de la texture de l'ombre en définissant <code class="notranslate" translate="no">light.shadow.mapSize.width</code> et <code class="notranslate" translate="no">light.shadow.mapSize.height</code>. Ils sont par défaut à 512x512. Plus vous les agrandissez, plus ils prennent de mémoire et plus ils sont lents à s'afficher, donc vous devrez les définir aussi petits que possible tout en faisant fonctionner votre scène. La même chose est vraie avec la zone d'ombre. Plus petite signifie des ombres plus belles, alors réduisez la zone autant que possible tout en couvrant votre scène. Sachez que la machine de chaque utilisateur a une taille de texture maximale autorisée qui est disponible sur le renderer en tant que <a href="/docs/#api/en/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>.</p>
 <!--
 Ok but what about `near` and `far` I hear you thinking. Can we set `near` to 0.00001 and far to `100000000`
 -->
-<p>En passant à une <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> la caméra d'ombre devient une <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Contrairement à la caméra d'ombre de la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> où nous pouvons régler manuellement la plupart de ses paramètres, celle de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>est auto-controlée. Le <code class="notranslate" translate="no">fov</code> de la caméra d'ombre est directement connecté au réglage de l'<code class="notranslate" translate="no">angle</code> de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.
+<p>En passant à une <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> la caméra d'ombre devient une <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Contrairement à la caméra d'ombre de la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> où nous pouvons régler manuellement la plupart de ses paramètres, celle de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>est auto-contrôlée. Le <code class="notranslate" translate="no">fov</code> de la caméra d'ombre est directement connecté au réglage de l'<code class="notranslate" translate="no">angle</code> de la <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.
 L'<code class="notranslate" translate="no">aspect</code> est directement définit en fonction de la taille de la zone d'ombre.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 </pre>
-<p>Rajoutons les paramètres <code class="notranslate" translate="no">penumbra</code> et <code class="notranslate" translate="no">angle</code> vu dans <a href="lights.html">l'article sur les lumières</a>.</p>
+<p>Ajoutons les paramètres <code class="notranslate" translate="no">penumbra</code> et <code class="notranslate" translate="no">angle</code> vu dans <a href="lights.html">l'article sur les lumières</a>.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadows-spot-light-with-camera-gui.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/shadows-spot-light-with-camera-gui.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -327,8 +327,8 @@ also blur the result
 
 
 -->
-<p>Et enfin il y a les ombres avec un <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>. Étant donné qu'un <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> brille dans toutes les directions, les seuls paramètres pertinents sont <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>. Sinon, l'ombre PointLight est effectivement constituée de 6 ombres <a href="https://threejs.org/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, chacune pointant vers la face d'un cube autour de la lumière. Cela signifie que les ombres <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> sont beaucoup plus lentes car la scène entière doit être dessinée 6 fois, une pour chaque direction.</p>
-<p>Mettons un cadre autour de notre scène afin que nous puissions voir des ombres sur les murs et le plafond. Nous allons définir la propriété <code class="notranslate" translate="no">side</code> du matériau sur <code class="notranslate" translate="no">THREE.BackSide</code> afin de rendre l'intérieur de la boîte au lieu de l'extérieur. Comme le sol, nous ne le paramétrons pour recevoir des ombres. Nous allons également définir la position de la boîte de sorte que son fond soit légèrement en dessous du sol afin d'éviter un problème de z-fighting.</p>
+<p>Et enfin il y a les ombres avec une <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>. Étant donné qu'une <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> brille dans toutes les directions, les seuls paramètres pertinents sont <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>. Sinon, l'ombre PointLight est effectivement constituée de 6 ombres <a href="https://threejs.org/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, chacune pointant vers la face d'un cube autour de la lumière. Cela signifie que les ombres <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> sont beaucoup plus lentes car la scène entière doit être dessinée 6 fois, une pour chaque direction.</p>
+<p>Plaçons notre scène à l'intérieur d'une boîte afin que nous puissions voir des ombres sur les murs et le plafond. Nous allons définir la propriété <code class="notranslate" translate="no">side</code> du matériau sur <code class="notranslate" translate="no">THREE.BackSide</code> afin de rendre l'intérieur de la boîte au lieu de l'extérieur. Comme avec le sol, nous ne la paramétrons que pour recevoir des ombres. Nous allons également définir la position de la boîte de sorte que son fond soit légèrement en dessous du sol afin d'éviter un problème de z-fighting.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const cubeSize = 30;
   const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);

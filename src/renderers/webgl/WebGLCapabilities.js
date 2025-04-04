@@ -1,4 +1,6 @@
-function WebGLCapabilities( gl, extensions, parameters ) {
+import { FloatType, HalfFloatType, RGBAFormat, UnsignedByteType } from '../../constants.js';
+
+function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 	let maxAnisotropy;
 
@@ -19,6 +21,33 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		}
 
 		return maxAnisotropy;
+
+	}
+
+	function textureFormatReadable( textureFormat ) {
+
+		if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+	function textureTypeReadable( textureType ) {
+
+		const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) );
+
+		if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
+			textureType !== FloatType && ! halfFloatSupportedByExt ) {
+
+			return false;
+
+		}
+
+		return true;
 
 	}
 
@@ -63,6 +92,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	}
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
+	const reverseDepthBuffer = parameters.reverseDepthBuffer === true && extensions.has( 'EXT_clip_control' );
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	const maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -85,8 +115,12 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		getMaxAnisotropy: getMaxAnisotropy,
 		getMaxPrecision: getMaxPrecision,
 
+		textureFormatReadable: textureFormatReadable,
+		textureTypeReadable: textureTypeReadable,
+
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
+		reverseDepthBuffer: reverseDepthBuffer,
 
 		maxTextures: maxTextures,
 		maxVertexTextures: maxVertexTextures,

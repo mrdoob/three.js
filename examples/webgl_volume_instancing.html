@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl2 - volume - instancing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - volume - instancing
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VOXLoader, VOXData3DTexture } from 'three/addons/loaders/VOXLoader.js';
+
+			let renderer, scene, camera, controls, clock;
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 0, 0, 4 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 1.0;
+				controls.enableDamping = true;
+
+				clock = new THREE.Clock();
+
+				// Material
+
+				const vertexShader = /* glsl */`
+					in vec3 position;
+					in mat4 instanceMatrix;
+
+					uniform mat4 modelMatrix;
+					uniform mat4 modelViewMatrix;
+					uniform mat4 projectionMatrix;
+					uniform vec3 cameraPos;
+
+					out vec4 vScreenPosition;
+					out mat4 vInstanceToViewMatrix;
+
+					void main() {
+						vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4( position, 1.0 );
+
+						gl_Position = projectionMatrix * mvPosition;
+						vScreenPosition = vec4( gl_Position.xy, 0.0, gl_Position.w );
+						vInstanceToViewMatrix = modelViewMatrix * instanceMatrix;
+					}
+				`;
+
+				const fragmentShader = /* glsl */`
+					precision highp float;
+					precision highp sampler3D;
+
+					uniform mat4 viewMatrix;
+					uniform mat4 modelViewMatrix;
+					uniform mat4 projectionMatrix;
+
+					in vec4 vScreenPosition;
+					in mat4 vInstanceToViewMatrix;
+
+					out vec4 color;
+
+					uniform sampler3D map;
+
+					uniform float threshold;
+					uniform float steps;
+
+					vec2 hitBox( vec3 orig, vec3 dir ) {
+						const vec3 box_min = vec3( - 0.5 );
+						const vec3 box_max = vec3( 0.5 );
+						vec3 inv_dir = 1.0 / dir;
+						vec3 tmin_tmp = ( box_min - orig ) * inv_dir;
+						vec3 tmax_tmp = ( box_max - orig ) * inv_dir;
+						vec3 tmin = min( tmin_tmp, tmax_tmp );
+						vec3 tmax = max( tmin_tmp, tmax_tmp );
+						float t0 = max( tmin.x, max( tmin.y, tmin.z ) );
+						float t1 = min( tmax.x, min( tmax.y, tmax.z ) );
+						return vec2( t0, t1 );
+					}
+
+					float sample1( vec3 p ) {
+						return texture( map, p ).r;
+					}
+
+					#define epsilon .0001
+
+					vec3 normal( vec3 coord ) {
+						if ( coord.x < epsilon ) return vec3( 1.0, 0.0, 0.0 );
+						if ( coord.y < epsilon ) return vec3( 0.0, 1.0, 0.0 );
+						if ( coord.z < epsilon ) return vec3( 0.0, 0.0, 1.0 );
+						if ( coord.x > 1.0 - epsilon ) return vec3( - 1.0, 0.0, 0.0 );
+						if ( coord.y > 1.0 - epsilon ) return vec3( 0.0, - 1.0, 0.0 );
+						if ( coord.z > 1.0 - epsilon ) return vec3( 0.0, 0.0, - 1.0 );
+
+						float step = 0.01;
+						float x = sample1( coord + vec3( - step, 0.0, 0.0 ) ) - sample1( coord + vec3( step, 0.0, 0.0 ) );
+						float y = sample1( coord + vec3( 0.0, - step, 0.0 ) ) - sample1( coord + vec3( 0.0, step, 0.0 ) );
+						float z = sample1( coord + vec3( 0.0, 0.0, - step ) ) - sample1( coord + vec3( 0.0, 0.0, step ) );
+
+						return normalize( vec3( x, y, z ) );
+					}
+
+					void main() {
+
+						// perform w divide in the fragment shader to avoid interpolation artifacts
+						vec2 screenUv = vScreenPosition.xy / vScreenPosition.w;
+						mat4 invProjectionMatrix = inverse( projectionMatrix );
+						mat4 invInstanceToViewMatrix = inverse( vInstanceToViewMatrix );
+						
+						// get camera ray
+						vec4 temp;
+						vec3 camRayOrigin, camRayEnd;
+						temp = invProjectionMatrix * vec4( screenUv, - 1.0, 1.0 );
+						camRayOrigin = temp.xyz / temp.w;
+
+						temp = invProjectionMatrix * vec4( screenUv, 1.0, 1.0 );
+						camRayEnd = temp.xyz / temp.w;
+						
+						// get local ray
+						vec3 instRayOrigin, instRayDirection, instRayEnd;
+						instRayOrigin = ( invInstanceToViewMatrix * vec4( camRayOrigin, 1.0 ) ).xyz;
+						instRayEnd = ( invInstanceToViewMatrix * vec4( camRayEnd, 1.0 ) ).xyz;
+						instRayDirection = normalize( instRayEnd - instRayOrigin );
+
+						// calculate the start of the ray at the box edge
+						vec2 bounds = hitBox( instRayOrigin, instRayDirection );
+
+						if ( bounds.x > bounds.y ) discard;
+
+						bounds.x = max( bounds.x, 0.0 );
+
+						vec3 p = instRayOrigin + bounds.x * instRayDirection;
+						vec3 inc = 1.0 / abs( instRayDirection );
+						float delta = min( inc.x, min( inc.y, inc.z ) );
+						delta /= 50.0;
+
+						// march through the volume
+						for ( float t = bounds.x; t < bounds.y; t += delta ) {
+
+							float d = sample1( p + 0.5 );
+
+							if ( d > 0.5 ) {
+
+								color.rgb = p * 2.0; // normal( p + 0.5 ); // * 0.5 + ( p * 1.5 + 0.25 );
+								color.a = 1.;
+								break;
+
+							}
+
+							p += instRayDirection * delta;
+
+						}
+
+						if ( color.a == 0.0 ) discard;
+
+						// calculate the final point in the ndc coords
+						vec4 ndc = projectionMatrix * vInstanceToViewMatrix * vec4( p, 1.0 );
+						ndc /= ndc.w;
+
+						// map the ndc coordinate to depth
+						// https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth
+						float far = gl_DepthRange.far;
+						float near = gl_DepthRange.near;
+						gl_FragDepth = ( ( ( far - near ) * ndc.z ) + near + far ) / 2.0;
+
+					}
+				`;
+
+				const loader = new VOXLoader();
+				loader.load( 'models/vox/menger.vox', function ( chunks ) {
+
+					for ( let i = 0; i < chunks.length; i ++ ) {
+
+						const chunk = chunks[ i ];
+
+						const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+						const material = new THREE.RawShaderMaterial( {
+							glslVersion: THREE.GLSL3,
+							uniforms: {
+								map: { value: new VOXData3DTexture( chunk ) },
+								cameraPos: { value: new THREE.Vector3() }
+							},
+							vertexShader,
+							fragmentShader,
+							side: THREE.BackSide
+						} );
+
+						const mesh = new THREE.InstancedMesh( geometry, material, 50000 );
+						mesh.onBeforeRender = function () {
+
+							this.material.uniforms.cameraPos.value.copy( camera.position );
+
+						};
+
+						const transform = new THREE.Object3D();
+
+						for ( let i = 0; i < mesh.count; i ++ ) {
+
+							transform.position.random().subScalar( 0.5 ).multiplyScalar( 150 );
+							transform.rotation.x = Math.random() * Math.PI;
+							transform.rotation.y = Math.random() * Math.PI;
+							transform.rotation.z = Math.random() * Math.PI;
+							transform.updateMatrix();
+
+							mesh.setMatrixAt( i, transform.matrix );
+
+						}
+
+						scene.add( mesh );
+
+					}
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const delta = clock.getDelta();
+				controls.update( delta );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

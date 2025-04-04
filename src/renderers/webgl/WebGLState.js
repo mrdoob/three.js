@@ -2,7 +2,19 @@ import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDe
 import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-function WebGLState( gl ) {
+const reversedFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
+function WebGLState( gl, extensions ) {
 
 	function ColorBuffer() {
 
@@ -67,11 +79,44 @@ function WebGLState( gl ) {
 
 		let locked = false;
 
+		let currentReversed = false;
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
 
 		return {
+
+			setReversed: function ( reversed ) {
+
+				if ( currentReversed !== reversed ) {
+
+					const ext = extensions.get( 'EXT_clip_control' );
+
+					if ( reversed ) {
+
+						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+					} else {
+
+						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.NEGATIVE_ONE_TO_ONE_EXT );
+
+					}
+
+					currentReversed = reversed;
+
+					const oldDepth = currentDepthClear;
+					currentDepthClear = null;
+					this.setClear( oldDepth );
+
+				}
+
+			},
+
+			getReversed: function () {
+
+				return currentReversed;
+
+			},
 
 			setTest: function ( depthTest ) {
 
@@ -99,6 +144,8 @@ function WebGLState( gl ) {
 			},
 
 			setFunc: function ( depthFunc ) {
+
+				if ( currentReversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -166,6 +213,12 @@ function WebGLState( gl ) {
 
 				if ( currentDepthClear !== depth ) {
 
+					if ( currentReversed ) {
+
+						depth = 1 - depth;
+
+					}
+
 					gl.clearDepth( depth );
 					currentDepthClear = depth;
 
@@ -180,6 +233,7 @@ function WebGLState( gl ) {
 				currentDepthMask = null;
 				currentDepthFunc = null;
 				currentDepthClear = null;
+				currentReversed = false;
 
 			}
 
@@ -926,7 +980,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.compressedTexImage2D.apply( gl, arguments );
+			gl.compressedTexImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -940,7 +994,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.compressedTexImage3D.apply( gl, arguments );
+			gl.compressedTexImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -954,7 +1008,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.texSubImage2D.apply( gl, arguments );
+			gl.texSubImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -968,7 +1022,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.texSubImage3D.apply( gl, arguments );
+			gl.texSubImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -982,7 +1036,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.compressedTexSubImage2D.apply( gl, arguments );
+			gl.compressedTexSubImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -996,7 +1050,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.compressedTexSubImage3D.apply( gl, arguments );
+			gl.compressedTexSubImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -1010,7 +1064,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.texStorage2D.apply( gl, arguments );
+			gl.texStorage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -1024,7 +1078,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.texStorage3D.apply( gl, arguments );
+			gl.texStorage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -1038,7 +1092,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.texImage2D.apply( gl, arguments );
+			gl.texImage2D( ...arguments );
 
 		} catch ( error ) {
 
@@ -1052,7 +1106,7 @@ function WebGLState( gl ) {
 
 		try {
 
-			gl.texImage3D.apply( gl, arguments );
+			gl.texImage3D( ...arguments );
 
 		} catch ( error ) {
 
@@ -1150,6 +1204,9 @@ function WebGLState( gl ) {
 
 		gl.depthMask( true );
 		gl.depthFunc( gl.LESS );
+
+		depthBuffer.setReversed( false );
+
 		gl.clearDepth( 1 );
 
 		gl.stencilMask( 0xffffffff );

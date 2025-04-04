@@ -7,6 +7,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Controls] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -66,7 +68,7 @@
 		<p>
 			[page:Camera object]: (required) The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.<br><br>
 
-			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			[page:HTMLDOMElement domElement]: The HTML element used for event listeners. (optional)
 		</p>
 
 		<h2>Events</h2>
@@ -88,6 +90,8 @@
 
 		<h2>Properties</h2>
 
+		<p>See the base [page:Controls] class for common properties.</p>
+
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
 			Set to true to automatically rotate around the target.<br> Note that if this is enabled, you must call [page:.update]
@@ -106,17 +110,6 @@
 		<p>
 			The damping inertia used if [page:.enableDamping] is set to `true`. Default is `0.05`.<br> Note that for this to work, you must
 			call [page:.update] () in your animation loop.
-		</p>
-
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
-		</p>
-
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			When set to `false`, the controls will not respond to user input. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean enableDamping]</h3>
@@ -146,6 +139,11 @@
 		<h3>[property:Float keyPanSpeed]</h3>
 		<p>
 			How fast to pan the camera when the keyboard is used. Default is 7.0 pixels per keypress.
+		</p>
+
+		<h3>[property:Float keyRotateSpeed]</h3>
+		<p>
+			How fast to rotate the camera when the keyboard is used. Default is 1.
 		</p>
 
 		<h3>[property:Object keys]</h3>
@@ -224,11 +222,6 @@ controls.mouseButtons = {
 			</code>
 		</p>
 
-		<h3>[property:Camera object]</h3>
-		<p>
-			The camera being controlled.
-		</p>
-
 		<h3>[property:Float panSpeed]</h3>
 		<p>
 			Speed of panning. Default is 1.
@@ -295,10 +288,7 @@ controls.touches = {
 
 		<h2>Methods</h2>
 
-		<h3>[method:undefined dispose] ()</h3>
-		<p>
-			Remove all the event listeners.
-		</p>
+		<p>See the base [page:Controls] class for common methods.</p>
 
 		<h3>[method:radians getAzimuthalAngle] ()</h3>
 		<p>

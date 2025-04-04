@@ -9,7 +9,7 @@
 </head>
 
 <body>
-	[page:EventDispatcher] &rarr;
+	[page:Controls] &rarr;
 
 	<h1>弧球控制器([name])</h1>
 
@@ -26,7 +26,7 @@
 		要使用此功能，与 /examples 目录中的所有文件一样，您必须将该文件单独包含在 HTML 中。
 	</p>
 
-	<h2>引入</h2>
+	<h2>导入</h2>
 
 	<p>
 		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
@@ -70,9 +70,9 @@
 	<p>
 		[page:Camera camera]：（必填）要控制的相机。相机不能是另一个对象的子对象，除非该对象是场景本身。<br><br>
 
-		[page:HTMLDOMElement domElement]： 用于事件侦听器的 HTML 元素。<br><br>
+		[page:HTMLDOMElement domElement]： 用于事件侦听器的 HTML 元素。(可选)<br><br>
 
-		[page:Scene scene]： 相机渲染的场景。如果未给出，则小控件无法显示。
+		[page:Scene scene]： 相机渲染的场景。如果未给出，则小控件无法显示。(可选)
 	</p>
 
 	<h2>事件</h2>
@@ -93,6 +93,8 @@
 	</p>
 
 	<h2>属性</h2>
+
+	<p>共有属性请参见其基类[page:Controls]。</p>
 
 	<h3>[property:Boolean adjustNearFar]</h3>
 	<p>
@@ -116,19 +118,14 @@
 		设置为 [page:.enableAnimations] 为true 时使用的阻尼惯性。
 	</p>
 
-	<h3>[property:HTMLDOMElement domElement]</h3>
-	<p>
-		HTMLDOMElement 用于监听鼠标/触摸事件。这必须在构造函数中传递；此处更改它不会设置新的事件侦听器。
-	</p>
-
-	<h3>[property:Boolean enabled]</h3>
-	<p>
-		当设置为 时 `false`，小控件将不再响应用户交互。默认为 `true`。
-	</p>
-
 	<h3>[property:Boolean enableAnimations]</h3>
 	<p>
 		设置为 true 以启用旋转（阻尼）和聚焦操作的动画。默认为 true。
+	</p>
+
+	<h3>[property:Boolean enableFocus]</h3>
+	<p>
+		设置为 true 以在双击（或点击）时启用相机聚焦功能。默认值为 true。
 	</p>
 
 	<h3>[property:Boolean enableGrid]</h3>
@@ -201,8 +198,9 @@
 		旋转动画开始时允许的最大角速度。
 	</p>
 
-
 	<h2>方法</h2>
+
+	<p>共有方法请参见其基类[page:Controls]。</p>
 
 	<h3>[method:undefined activateGizmos] ( [param:Boolean isActive] )</h3>
 	<p>
@@ -212,11 +210,6 @@
 	<h3>[method:undefined copyState] ()</h3>
 	<p>
 		将当前状态复制到剪贴板（作为可读的 JSON 文本）。
-	</p>
-
-	<h3>[method:undefined dispose] ()</h3>
-	<p>
-		删除所有事件侦听器，取消任何待处理的动画并清除场景中的小控件和网格。
 	</p>
 
 	<h3>[method:undefined pasteState] ()</h3>
@@ -264,16 +257,10 @@
 		键盘修饰符可以指定为 'CTRL'、'SHIFT' 或 null(如果不再需要) 。
 	</p>
 
-	<h3>[method:undefined update] ()</h3>
-	<p>
-		更新控件。必须在对相机变换进行任何手动更改后调用。
-	</p>
-
 	<h3>[method:Raycaster getRaycaster] ()</h3>
 	<p>
 		返回用于用户交互的 [page:Raycaster] 对象。如果设置了 [name] 的 [page:Object3D.layers .layers] 属性，您还需要使用匹配的值设置 [page:Raycaster.layers
 		.layers] 的 [page:Raycaster] 属性，否则 [name] 将无法按预期工作。
-		won't work as expected.
 	</p>
 
 	<h2>源代码</h2>

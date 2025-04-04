@@ -86,13 +86,13 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -187,8 +187,10 @@
 						mouseHelper.position.copy( p );
 						intersection.point.copy( p );
 
+						const normalMatrix = new THREE.Matrix3().getNormalMatrix( mesh.matrixWorld );
+
 						const n = intersects[ 0 ].face.normal.clone();
-						n.transformDirection( mesh.matrixWorld );
+						n.applyNormalMatrix( normalMatrix );
 						n.multiplyScalar( 10 );
 						n.add( intersects[ 0 ].point );
 
@@ -243,7 +245,7 @@
 					} );
 
 					scene.add( mesh );
-					mesh.scale.set( 10, 10, 10 );
+					mesh.scale.multiplyScalar( 10 );
 
 				} );
 
@@ -266,7 +268,8 @@
 				m.renderOrder = decals.length; // give decals a fixed render order
 
 				decals.push( m );
-				scene.add( m );
+
+				mesh.attach( m );
 
 			}
 
@@ -274,7 +277,7 @@
 
 				decals.forEach( function ( d ) {
 
-					scene.remove( d );
+					mesh.remove( d );
 
 				} );
 
@@ -292,8 +295,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

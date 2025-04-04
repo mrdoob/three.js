@@ -8,7 +8,7 @@
 
 #### JavaScript 3D library
 
-The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
+The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include WebGL and WebGPU renderers but SVG and CSS3D renderers are also available as addons.
 
 [Examples](https://threejs.org/examples/) &mdash;
 [Docs](https://threejs.org/docs/) &mdash;
@@ -43,12 +43,12 @@ scene.add( mesh );
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setSize( width, height );
-renderer.setAnimationLoop( animation );
+renderer.setAnimationLoop( animate );
 document.body.appendChild( renderer.domElement );
 
 // animation
 
-function animation( time ) {
+function animate( time ) {
 
 	mesh.rotation.x = time / 2000;
 	mesh.rotation.y = time / 1000;
@@ -58,7 +58,7 @@ function animation( time ) {
 }
 ```
 
-If everything goes well, you should see [this](https://jsfiddle.net/2nyxkmco/).
+If everything goes well, you should see [this](https://jsfiddle.net/v98k6oze/).
 
 ### Cloning this repository
 

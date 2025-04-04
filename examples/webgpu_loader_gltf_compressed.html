@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - GLTFloader + compressed</title>
+		<title>three.js webgpu - glTF + compressed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,13 +9,15 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GLTFLoader + compression extensions
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - glTF + compression extensions
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -30,8 +32,6 @@
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 
@@ -54,7 +54,7 @@
 
 				//renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

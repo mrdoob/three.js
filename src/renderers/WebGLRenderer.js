@@ -3,9 +3,7 @@ import {
 	BackSide,
 	FrontSide,
 	DoubleSide,
-	RGBAFormat,
 	HalfFloatType,
-	FloatType,
 	UnsignedByteType,
 	NoToneMapping,
 	LinearMipmapLinearFilter,
@@ -19,14 +17,11 @@ import {
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
 	UnsignedShort5551Type,
-	WebGLCoordinateSystem,
-	DisplayP3ColorSpace,
-	LinearDisplayP3ColorSpace
+	WebGLCoordinateSystem
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -57,11 +52,21 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
-import { createCanvasElement } from '../utils.js';
+import { createCanvasElement, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 
+/**
+ * This renderer uses WebGL 2 to display scenes.
+ *
+ * WebGL 1 is not supported since `r163`.
+ */
 class WebGLRenderer {
 
+	/**
+	 * Constructs a new WebGL renderer.
+	 *
+	 * @param {WebGLRenderer~Options} [parameters] - The configuration parameter.
+	 */
 	constructor( parameters = {} ) {
 
 		const {
@@ -75,8 +80,16 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
+			reverseDepthBuffer = false,
 		} = parameters;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isWebGLRenderer = true;
 
 		let _alpha;
@@ -111,13 +124,36 @@ class WebGLRenderer {
 
 		// public properties
 
+		/**
+		 * A canvas where the renderer draws its output.This is automatically created by the renderer
+		 * in the constructor (if not provided already); you just need to add it to your page like so:
+		 * ```js
+		 * document.body.appendChild( renderer.domElement );
+		 * ```
+		 *
+		 * @type {DOMElement}
+		 */
 		this.domElement = canvas;
 
-		// Debug configuration container
+		/**
+		 * A object with debug configuration settings.
+		 *
+		 * - `checkShaderErrors`: If it is `true`, defines whether material shader programs are
+		 * checked for errors during compilation and linkage process. It may be useful to disable
+		 * this check in production for performance gain. It is strongly recommended to keep these
+		 * checks enabled during development. If the shader does not compile and link - it will not
+		 * work and associated material will not render.
+		 * - `onShaderError(gl, program, glVertexShader,glFragmentShader)`: A callback function that
+		 * can be used for custom error reporting. The callback receives the WebGL context, an instance
+		 * of WebGLProgram as well two instances of WebGLShader representing the vertex and fragment shader.
+		 * Assigning a custom function disables the default error reporting.
+		 *
+		 * @type {Object}
+		 */
 		this.debug = {
 
 			/**
-			 * Enables error checking and reporting when shader programs are being compiled
+			 * Enables error checking and reporting when shader programs are being compiled.
 			 * @type {boolean}
 			 */
 			checkShaderErrors: true,
@@ -130,32 +166,104 @@ class WebGLRenderer {
 
 		// clearing
 
+		/**
+		 * Whether the renderer should automatically clear its output before rendering a frame or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClear = true;
+
+		/**
+		 * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
+		 * the color buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClearColor = true;
+
+		/**
+		 * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
+		 * the depth buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClearDepth = true;
+
+		/**
+		 * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
+		 * the stencil buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClearStencil = true;
 
 		// scene graph
 
+		/**
+		 * Whether the renderer should sort objects or not.
+		 *
+		 * Note: Sorting is used to attempt to properly render objects that have some
+		 * degree of transparency. By definition, sorting objects may not work in all
+		 * cases. Depending on the needs of application, it may be necessary to turn
+		 * off sorting and use other methods to deal with transparency rendering e.g.
+		 * manually determining each object's rendering order.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortObjects = true;
 
 		// user-defined clipping
 
+		/**
+		 * User-defined clipping planes specified in world space. These planes apply globally.
+		 * Points in space whose dot product with the plane is negative are cut away.
+		 *
+		 * @type {Array<Plane>}
+		 */
 		this.clippingPlanes = [];
+
+		/**
+		 * Whether the renderer respects object-level clipping planes or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.localClippingEnabled = false;
-
-		// physically based shading
-
-		this._outputColorSpace = SRGBColorSpace;
-
-		// physical lights
-
-		this._useLegacyLights = false;
 
 		// tone mapping
 
+		/**
+		 * The tone mapping technique of the renderer.
+		 *
+		 * @type {(NoToneMapping|LinearToneMapping|ReinhardToneMapping|CineonToneMapping|ACESFilmicToneMapping|CustomToneMapping|AgXToneMapping|NeutralToneMapping)}
+		 * @default NoToneMapping
+		 */
 		this.toneMapping = NoToneMapping;
+
+		/**
+		 * Exposure level of tone mapping.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.toneMappingExposure = 1.0;
+
+		// transmission
+
+		/**
+		 * The normalized resolution scale for the transmission render target, measured in percentage
+		 * of viewport dimensions. Lowering this value can result in significant performance improvements
+		 * when using {@link MeshPhysicalMaterial#transmission}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.transmissionResolutionScale = 1.0;
 
 		// internal properties
 
@@ -164,6 +272,8 @@ class WebGLRenderer {
 		let _isContextLost = false;
 
 		// internal state cache
+
+		this._outputColorSpace = SRGBColorSpace;
 
 		let _currentActiveCubeFace = 0;
 		let _currentActiveMipmapLevel = 0;
@@ -203,12 +313,16 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
+		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
-		const _vector2 = new Vector2();
 		const _vector3 = new Vector3();
 
+		const _vector4 = new Vector4();
+
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
+
+		let _renderBackground = false;
 
 		function getTargetPixelRatio() {
 
@@ -222,10 +336,7 @@ class WebGLRenderer {
 
 		function getContext( contextName, contextAttributes ) {
 
-			const context = canvas.getContext( contextName, contextAttributes );
-			if ( context !== null ) return context;
-
-			return null;
+			return canvas.getContext( contextName, contextAttributes );
 
 		}
 
@@ -292,11 +403,17 @@ class WebGLRenderer {
 			extensions = new WebGLExtensions( _gl );
 			extensions.init();
 
-			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
-
 			utils = new WebGLUtils( _gl, extensions );
 
-			state = new WebGLState( _gl );
+			capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
+
+			state = new WebGLState( _gl, extensions );
+
+			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+
+				state.buffers.depth.setReversed( true );
+
+			}
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -322,12 +439,79 @@ class WebGLRenderer {
 
 			info.programs = programCache.programs;
 
+			/**
+			 * Holds details about the capabilities of the current rendering context.
+			 *
+			 * @name WebGLRenderer#capabilities
+			 * @type {WebGLRenderer~Capabilities}
+			 */
 			_this.capabilities = capabilities;
+
+			/**
+			 * Provides methods for retrieving and testing WebGL extensions.
+			 *
+			 * - `get(extensionName:string)`: Used to check whether a WebGL extension is supported
+			 * and return the extension object if available.
+			 * - `has(extensionName:string)`: returns `true` if the extension is supported.
+			 *
+			 * @name WebGLRenderer#extensions
+			 * @type {Object}
+			 */
 			_this.extensions = extensions;
+
+			/**
+			 * Used to track properties of other objects like native WebGL objects.
+			 *
+			 * @name WebGLRenderer#properties
+			 * @type {Object}
+			 */
 			_this.properties = properties;
+
+			/**
+			 * Manages the render lists of the renderer.
+			 *
+			 * @name WebGLRenderer#renderLists
+			 * @type {Object}
+			 */
 			_this.renderLists = renderLists;
+
+
+
+			/**
+			 * Interface for managing shadows.
+			 *
+			 * @name WebGLRenderer#shadowMap
+			 * @type {WebGLRenderer~ShadowMap}
+			 */
 			_this.shadowMap = shadowMap;
+
+			/**
+			 * Interface for managing the WebGL state.
+			 *
+			 * @name WebGLRenderer#state
+			 * @type {Object}
+			 */
 			_this.state = state;
+
+			/**
+			 * Holds a series of statistical information about the GPU memory
+			 * and the rendering process. Useful for debugging and monitoring.
+			 *
+			 * By default these data are reset at each render call but when having
+			 * multiple render passes per frame (e.g. when using post processing) it can
+			 * be preferred to reset with a custom pattern. First, set `autoReset` to
+			 * `false`.
+			 * ```js
+			 * renderer.info.autoReset = false;
+			 * ```
+			 * Call `reset()` whenever you have finished to render a single frame.
+			 * ```js
+			 * renderer.info.reset();
+			 * ```
+			 *
+			 * @name WebGLRenderer#info
+			 * @type {WebGLRenderer~Info}
+			 */
 			_this.info = info;
 
 		}
@@ -338,22 +522,38 @@ class WebGLRenderer {
 
 		const xr = new WebXRManager( _this, _gl );
 
+		/**
+		 * A reference to the XR manager.
+		 *
+		 * @type {WebXRManager}
+		 */
 		this.xr = xr;
 
-		// API
-
+		/**
+		 * Returns the rendering context.
+		 *
+		 * @return {WebGL2RenderingContext} The rendering context.
+		 */
 		this.getContext = function () {
 
 			return _gl;
 
 		};
 
+		/**
+		 * Returns the rendering context attributes.
+		 *
+		 * @return {WebGLContextAttributes} The rendering context attributes.
+		 */
 		this.getContextAttributes = function () {
 
 			return _gl.getContextAttributes();
 
 		};
 
+		/**
+		 * Simulates a loss of the WebGL context. This requires support for the `WEBGL_lose_context` extension.
+		 */
 		this.forceContextLoss = function () {
 
 			const extension = extensions.get( 'WEBGL_lose_context' );
@@ -361,6 +561,9 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Simulates a restore of the WebGL context. This requires support for the `WEBGL_lose_context` extension.
+		 */
 		this.forceContextRestore = function () {
 
 			const extension = extensions.get( 'WEBGL_lose_context' );
@@ -368,12 +571,22 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the pixel ratio.
+		 *
+		 * @return {number} The pixel ratio.
+		 */
 		this.getPixelRatio = function () {
 
 			return _pixelRatio;
 
 		};
 
+		/**
+		 * Sets the given pixel ratio and resizes the canvas if necessary.
+		 *
+		 * @param {number} value - The pixel ratio.
+		 */
 		this.setPixelRatio = function ( value ) {
 
 			if ( value === undefined ) return;
@@ -384,12 +597,27 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the renderer's size in logical pixels. This method does not honor the pixel ratio.
+		 *
+		 * @param {Vector2} target - The method writes the result in this target object.
+		 * @return {Vector2} The renderer's size in logical pixels.
+		 */
 		this.getSize = function ( target ) {
 
 			return target.set( _width, _height );
 
 		};
 
+		/**
+		 * Resizes the output canvas to (width, height) with device pixel ratio taken
+		 * into account, and also sets the viewport to fit that size, starting in (0,
+		 * 0). Setting `updateStyle` to false prevents any style changes to the output canvas.
+		 *
+		 * @param {number} width - The width in logical pixels.
+		 * @param {number} height - The height in logical pixels.
+		 * @param {boolean} [updateStyle=true] - Whether to update the `style` attribute of the canvas or not.
+		 */
 		this.setSize = function ( width, height, updateStyle = true ) {
 
 			if ( xr.isPresenting ) {
@@ -416,12 +644,31 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the drawing buffer size in physical pixels. This method honors the pixel ratio.
+		 *
+		 * @param {Vector2} target - The method writes the result in this target object.
+		 * @return {Vector2} The drawing buffer size.
+		 */
 		this.getDrawingBufferSize = function ( target ) {
 
 			return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
 
 		};
 
+		/**
+		 * This method allows to define the drawing buffer size by specifying
+		 * width, height and pixel ratio all at once. The size of the drawing
+		 * buffer is computed with this formula:
+		 * ```js
+		 * size.x = width * pixelRatio;
+		 * size.y = height * pixelRatio;
+		 * ```
+		 *
+		 * @param {number} width - The width in logical pixels.
+		 * @param {number} height - The height in logical pixels.
+		 * @param {number} pixelRatio - The pixel ratio.
+		 */
 		this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
 
 			_width = width;
@@ -436,18 +683,39 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the current viewport definition.
+		 *
+		 * @param {Vector2} target - The method writes the result in this target object.
+		 * @return {Vector2} The current viewport definition.
+		 */
 		this.getCurrentViewport = function ( target ) {
 
 			return target.copy( _currentViewport );
 
 		};
 
+		/**
+		 * Returns the viewport definition.
+		 *
+		 * @param {Vector4} target - The method writes the result in this target object.
+		 * @return {Vector4} The viewport definition.
+		 */
 		this.getViewport = function ( target ) {
 
 			return target.copy( _viewport );
 
 		};
 
+		/**
+		 * Sets the viewport to render from `(x, y)` to `(x + width, y + height)`.
+		 *
+		 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
+		 * Or alternatively a four-component vector specifying all the parameters of the viewport.
+		 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+		 * @param {number} width - The width of the viewport in logical pixel unit.
+		 * @param {number} height - The height of the viewport in logical pixel unit.
+		 */
 		this.setViewport = function ( x, y, width, height ) {
 
 			if ( x.isVector4 ) {
@@ -464,12 +732,27 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns the scissor region.
+		 *
+		 * @param {Vector4} target - The method writes the result in this target object.
+		 * @return {Vector4} The scissor region.
+		 */
 		this.getScissor = function ( target ) {
 
 			return target.copy( _scissor );
 
 		};
 
+		/**
+		 * Sets the scissor region to render from `(x, y)` to `(x + width, y + height)`.
+		 *
+		 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the scissor region origin in logical pixel unit.
+		 * Or alternatively a four-component vector specifying all the parameters of the scissor region.
+		 * @param {number} y - The vertical coordinate for the lower left corner of the scissor region origin  in logical pixel unit.
+		 * @param {number} width - The width of the scissor region in logical pixel unit.
+		 * @param {number} height - The height of the scissor region in logical pixel unit.
+		 */
 		this.setScissor = function ( x, y, width, height ) {
 
 			if ( x.isVector4 ) {
@@ -486,24 +769,48 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Returns `true` if the scissor test is enabled.
+		 *
+		 * @return {boolean} Whether the scissor test is enabled or not.
+		 */
 		this.getScissorTest = function () {
 
 			return _scissorTest;
 
 		};
 
+		/**
+		 * Enable or disable the scissor test. When this is enabled, only the pixels
+		 * within the defined scissor area will be affected by further renderer
+		 * actions.
+		 *
+		 * @param {boolean} boolean - Whether the scissor test is enabled or not.
+		 */
 		this.setScissorTest = function ( boolean ) {
 
 			state.setScissorTest( _scissorTest = boolean );
 
 		};
 
+		/**
+		 * Sets a custom opaque sort function for the render lists. Pass `null`
+		 * to use the default `painterSortStable` function.
+		 *
+		 * @param {?Function} method - The opaque sort function.
+		 */
 		this.setOpaqueSort = function ( method ) {
 
 			_opaqueSort = method;
 
 		};
 
+		/**
+		 * Sets a custom transparent sort function for the render lists. Pass `null`
+		 * to use the default `reversePainterSortStable` function.
+		 *
+		 * @param {?Function} method - The opaque sort function.
+		 */
 		this.setTransparentSort = function ( method ) {
 
 			_transparentSort = method;
@@ -512,30 +819,60 @@ class WebGLRenderer {
 
 		// Clearing
 
+		/**
+		 * Returns the clear color.
+		 *
+		 * @param {Color} target - The method writes the result in this target object.
+		 * @return {Color} The clear color.
+		 */
 		this.getClearColor = function ( target ) {
 
 			return target.copy( background.getClearColor() );
 
 		};
 
+		/**
+		 * Sets the clear color and alpha.
+		 *
+		 * @param {Color} color - The clear color.
+		 * @param {number} [alpha=1] - The clear alpha.
+		 */
 		this.setClearColor = function () {
 
-			background.setClearColor.apply( background, arguments );
+			background.setClearColor( ...arguments );
 
 		};
 
+		/**
+		 * Returns the clear alpha. Ranges within `[0,1]`.
+		 *
+		 * @return {number} The clear alpha.
+		 */
 		this.getClearAlpha = function () {
 
 			return background.getClearAlpha();
 
 		};
 
+		/**
+		 * Sets the clear alpha.
+		 *
+		 * @param {number} alpha - The clear alpha.
+		 */
 		this.setClearAlpha = function () {
 
-			background.setClearAlpha.apply( background, arguments );
+			background.setClearAlpha( ...arguments );
 
 		};
 
+		/**
+		 * Tells the renderer to clear its color, depth or stencil drawing buffer(s).
+		 * This method initializes the buffers to the current clear color values.
+		 *
+		 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
+		 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
+		 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
+		 */
 		this.clear = function ( color = true, depth = true, stencil = true ) {
 
 			let bits = 0;
@@ -597,7 +934,12 @@ class WebGLRenderer {
 
 			}
 
-			if ( depth ) bits |= _gl.DEPTH_BUFFER_BIT;
+			if ( depth ) {
+
+				bits |= _gl.DEPTH_BUFFER_BIT;
+
+			}
+
 			if ( stencil ) {
 
 				bits |= _gl.STENCIL_BUFFER_BIT;
@@ -609,32 +951,44 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Clears the color buffer. Equivalent to calling `renderer.clear( true, false, false )`.
+		 */
 		this.clearColor = function () {
 
 			this.clear( true, false, false );
 
 		};
 
+		/**
+		 * Clears the depth buffer. Equivalent to calling `renderer.clear( false, true, false )`.
+		 */
 		this.clearDepth = function () {
 
 			this.clear( false, true, false );
 
 		};
 
+		/**
+		 * Clears the stencil buffer. Equivalent to calling `renderer.clear( false, false, true )`.
+		 */
 		this.clearStencil = function () {
 
 			this.clear( false, false, true );
 
 		};
 
-		//
-
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
+			background.dispose();
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();
@@ -860,7 +1214,35 @@ class WebGLRenderer {
 
 			if ( object.isBatchedMesh ) {
 
-				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+				if ( object._multiDrawInstances !== null ) {
+
+					// @deprecated, r174
+					warnOnce( 'THREE.WebGLRenderer: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+				} else {
+
+					if ( ! extensions.get( 'WEBGL_multi_draw' ) ) {
+
+						const starts = object._multiDrawStarts;
+						const counts = object._multiDrawCounts;
+						const drawCount = object._multiDrawCount;
+						const bytesPerElement = index ? attributes.get( index ).bytesPerElement : 1;
+						const uniforms = properties.get( material ).currentProgram.getUniforms();
+						for ( let i = 0; i < drawCount; i ++ ) {
+
+							uniforms.setValue( _gl, '_gl_DrawID', i );
+							renderer.render( starts[ i ] / bytesPerElement, counts[ i ] );
+
+						}
+
+					} else {
+
+						renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+					}
+
+				}
 
 			} else if ( object.isInstancedMesh ) {
 
@@ -905,12 +1287,24 @@ class WebGLRenderer {
 
 		}
 
+		/**
+		 * Compiles all materials in the scene with the camera. This is useful to precompile shaders
+		 * before the first rendering. If you want to add a 3D object to an existing scene, use the third
+		 * optional parameter for applying the target scene.
+		 *
+		 * Note that the (target) scene's lighting and environment must be configured before calling this method.
+		 *
+		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
+		 * @param {Camera} camera - The camera.
+		 * @param {?Scene} [targetScene=null] - The target scene.
+		 * @return {?Set} The precompiled materials.
+		 */
 		this.compile = function ( scene, camera, targetScene = null ) {
 
 			if ( targetScene === null ) targetScene = scene;
 
 			currentRenderState = renderStates.get( targetScene );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -952,13 +1346,19 @@ class WebGLRenderer {
 
 			}
 
-			currentRenderState.setupLights( _this._useLegacyLights );
+			currentRenderState.setupLights();
 
 			// Only initialize materials in the new scene, not the targetScene.
 
 			const materials = new Set();
 
 			scene.traverse( function ( object ) {
+
+				if ( ! ( object.isMesh || object.isPoints || object.isLine || object.isSprite ) ) {
+
+					return;
+
+				}
 
 				const material = object.material;
 
@@ -986,8 +1386,7 @@ class WebGLRenderer {
 
 			} );
 
-			renderStateStack.pop();
-			currentRenderState = null;
+			currentRenderState = renderStateStack.pop();
 
 			return materials;
 
@@ -995,6 +1394,18 @@ class WebGLRenderer {
 
 		// compileAsync
 
+		/**
+		 * Asynchronous version of {@link WebGLRenderer#compile}.
+		 *
+		 * This method makes use of the `KHR_parallel_shader_compile` WebGL extension. Hence,
+		 * it is recommended to use this version of `compile()` whenever possible.
+		 *
+		 * @async
+		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
+		 * @param {Camera} camera - The camera.
+		 * @param {?Scene} [targetScene=null] - The target scene.
+		 * @return {Promise} A Promise that resolves when the given scene can be rendered without unnecessary stalling due to shader compilation.
+		 */
 		this.compileAsync = function ( scene, camera, targetScene = null ) {
 
 			const materials = this.compile( scene, camera, targetScene );
@@ -1096,6 +1507,20 @@ class WebGLRenderer {
 
 		// Rendering
 
+		/**
+		 * Renders the given scene (or other type of 3D object) using the given camera.
+		 *
+		 * The render is done to a previously specified render target set by calling {@link WebGLRenderer#setRenderTarget}
+		 * or to the canvas as usual.
+		 *
+		 * By default render buffers are cleared before rendering but you can prevent
+		 * this by setting the property `autoClear` to `false`. If you want to prevent
+		 * only certain buffers being cleared you can `autoClearColor`, `autoClearDepth`
+		 * or `autoClearStencil` to `false`. To force a clear, use {@link WebGLRenderer#clear}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			if ( camera !== undefined && camera.isCamera !== true ) {
@@ -1127,7 +1552,7 @@ class WebGLRenderer {
 			if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, _currentRenderTarget );
 
 			currentRenderState = renderStates.get( scene, renderStateStack.length );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -1142,6 +1567,18 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
+			if ( xr.enabled === true && xr.isPresenting === true ) {
+
+				const depthSensingMesh = _this.xr.getDepthSensingMesh();
+
+				if ( depthSensingMesh !== null ) {
+
+					projectObject( depthSensingMesh, camera, - Infinity, _this.sortObjects );
+
+				}
+
+			}
+
 			projectObject( scene, camera, 0, _this.sortObjects );
 
 			currentRenderList.finish();
@@ -1149,6 +1586,13 @@ class WebGLRenderer {
 			if ( _this.sortObjects === true ) {
 
 				currentRenderList.sort( _opaqueSort, _transparentSort );
+
+			}
+
+			_renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( _renderBackground ) {
+
+				background.addToRenderList( currentRenderList, scene );
 
 			}
 
@@ -1168,22 +1612,30 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
-
-			//
-
-			if ( xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false ) {
-
-				background.render( currentRenderList, scene );
-
-			}
-
 			// render scene
 
-			currentRenderState.setupLights( _this._useLegacyLights );
+			const opaqueObjects = currentRenderList.opaque;
+			const transmissiveObjects = currentRenderList.transmissive;
+
+			currentRenderState.setupLights();
 
 			if ( camera.isArrayCamera ) {
 
 				const cameras = camera.cameras;
+
+				if ( transmissiveObjects.length > 0 ) {
+
+					for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+
+						const camera2 = cameras[ i ];
+
+						renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+
+					}
+
+				}
+
+				if ( _renderBackground ) background.render( scene );
 
 				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
@@ -1195,13 +1647,17 @@ class WebGLRenderer {
 
 			} else {
 
+				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
+
+				if ( _renderBackground ) background.render( scene );
+
 				renderScene( currentRenderList, scene, camera );
 
 			}
 
 			//
 
-			if ( _currentRenderTarget !== null ) {
+			if ( _currentRenderTarget !== null && _currentActiveMipmapLevel === 0 ) {
 
 				// resolve multisample renderbuffers to a single-sample texture if necessary
 
@@ -1228,6 +1684,8 @@ class WebGLRenderer {
 			if ( renderStateStack.length > 0 ) {
 
 				currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, currentRenderState.state.camera );
 
 			} else {
 
@@ -1281,7 +1739,7 @@ class WebGLRenderer {
 
 						if ( sortObjects ) {
 
-							_vector3.setFromMatrixPosition( object.matrixWorld )
+							_vector4.setFromMatrixPosition( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
 						}
@@ -1291,7 +1749,7 @@ class WebGLRenderer {
 
 						if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 						}
 
@@ -1309,16 +1767,16 @@ class WebGLRenderer {
 							if ( object.boundingSphere !== undefined ) {
 
 								if ( object.boundingSphere === null ) object.computeBoundingSphere();
-								_vector3.copy( object.boundingSphere.center );
+								_vector4.copy( object.boundingSphere.center );
 
 							} else {
 
 								if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-								_vector3.copy( geometry.boundingSphere.center );
+								_vector4.copy( geometry.boundingSphere.center );
 
 							}
 
-							_vector3
+							_vector4
 								.applyMatrix4( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
@@ -1335,7 +1793,7 @@ class WebGLRenderer {
 
 								if ( groupMaterial && groupMaterial.visible ) {
 
-									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
 
 								}
 
@@ -1343,7 +1801,7 @@ class WebGLRenderer {
 
 						} else if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 						}
 
@@ -1373,8 +1831,6 @@ class WebGLRenderer {
 
 			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
-			if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
-
 			if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
 
 			if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
@@ -1401,18 +1857,18 @@ class WebGLRenderer {
 
 			}
 
-			if ( currentRenderState.state.transmissionRenderTarget === null ) {
+			if ( currentRenderState.state.transmissionRenderTarget[ camera.id ] === undefined ) {
 
-				currentRenderState.state.transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
+				currentRenderState.state.transmissionRenderTarget[ camera.id ] = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
-					stencilBuffer: stencil
+					stencilBuffer: stencil,
+					resolveDepthBuffer: false,
+					resolveStencilBuffer: false,
+					colorSpace: ColorManagement.workingColorSpace,
 				} );
-
-				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget );
-				renderTargetProperties.__isTransmissionRenderTarget = true;
 
 				// debug
 
@@ -1426,10 +1882,10 @@ class WebGLRenderer {
 
 			}
 
-			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget;
+			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[ camera.id ];
 
-			_this.getDrawingBufferSize( _vector2 );
-			transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+			const activeViewport = camera.viewport || _currentViewport;
+			transmissionRenderTarget.setSize( activeViewport.z * _this.transmissionResolutionScale, activeViewport.w * _this.transmissionResolutionScale );
 
 			//
 
@@ -1442,55 +1898,72 @@ class WebGLRenderer {
 
 			_this.clear();
 
+			if ( _renderBackground ) background.render( scene );
+
 			// Turn off the features which can affect the frag color for opaque objects pass.
 			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
 			const currentToneMapping = _this.toneMapping;
 			_this.toneMapping = NoToneMapping;
+
+			// Remove viewport from camera to avoid nested render calls resetting viewport to it (e.g Reflector).
+			// Transmission render pass requires viewport to match the transmissionRenderTarget.
+			const currentCameraViewport = camera.viewport;
+			if ( camera.viewport !== undefined ) camera.viewport = undefined;
+
+			currentRenderState.setupLightsView( camera );
+
+			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
 			renderObjects( opaqueObjects, scene, camera );
 
 			textures.updateMultisampleRenderTarget( transmissionRenderTarget );
 			textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
-			let renderTargetNeedsUpdate = false;
+			if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === false ) { // see #28131
 
-			for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
+				let renderTargetNeedsUpdate = false;
 
-				const renderItem = transmissiveObjects[ i ];
+				for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
 
-				const object = renderItem.object;
-				const geometry = renderItem.geometry;
-				const material = renderItem.material;
-				const group = renderItem.group;
+					const renderItem = transmissiveObjects[ i ];
 
-				if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
+					const object = renderItem.object;
+					const geometry = renderItem.geometry;
+					const material = renderItem.material;
+					const group = renderItem.group;
 
-					const currentSide = material.side;
+					if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
 
-					material.side = BackSide;
-					material.needsUpdate = true;
+						const currentSide = material.side;
 
-					renderObject( object, scene, camera, geometry, material, group );
+						material.side = BackSide;
+						material.needsUpdate = true;
 
-					material.side = currentSide;
-					material.needsUpdate = true;
+						renderObject( object, scene, camera, geometry, material, group );
 
-					renderTargetNeedsUpdate = true;
+						material.side = currentSide;
+						material.needsUpdate = true;
+
+						renderTargetNeedsUpdate = true;
+
+					}
 
 				}
 
-			}
+				if ( renderTargetNeedsUpdate === true ) {
 
-			if ( renderTargetNeedsUpdate === true ) {
+					textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+					textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
-				textures.updateMultisampleRenderTarget( transmissionRenderTarget );
-				textures.updateRenderTargetMipmap( transmissionRenderTarget );
+				}
 
 			}
 
 			_this.setRenderTarget( currentRenderTarget );
 
 			_this.setClearColor( _currentClearColor, _currentClearAlpha );
+
+			if ( currentCameraViewport !== undefined ) camera.viewport = currentCameraViewport;
 
 			_this.toneMapping = currentToneMapping;
 
@@ -1506,8 +1979,14 @@ class WebGLRenderer {
 
 				const object = renderItem.object;
 				const geometry = renderItem.geometry;
-				const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
 				const group = renderItem.group;
+				let material = renderItem.material;
+
+				if ( material.allowOverride === true && overrideMaterial !== null ) {
+
+					material = overrideMaterial;
+
+				}
 
 				if ( object.layers.test( camera.layers ) ) {
 
@@ -1602,8 +2081,6 @@ class WebGLRenderer {
 
 				parameters.uniforms = programCache.getUniforms( material );
 
-				material.onBuild( object, parameters, _this );
-
 				material.onBeforeCompile( parameters, _this );
 
 				program = programCache.acquireProgram( parameters, programCacheKey );
@@ -1682,6 +2159,7 @@ class WebGLRenderer {
 
 			materialProperties.outputColorSpace = parameters.outputColorSpace;
 			materialProperties.batching = parameters.batching;
+			materialProperties.batchingColor = parameters.batchingColor;
 			materialProperties.instancing = parameters.instancing;
 			materialProperties.instancingColor = parameters.instancingColor;
 			materialProperties.instancingMorph = parameters.instancingMorph;
@@ -1768,6 +2246,14 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( ! object.isBatchedMesh && materialProperties.batching === true ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isBatchedMesh && materialProperties.batchingColor === true && object.colorTexture === null ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isBatchedMesh && materialProperties.batchingColor === false && object.colorTexture !== null ) {
 
 					needsProgramChange = true;
 
@@ -1891,7 +2377,23 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+				const reverseDepthBuffer = state.buffers.depth.getReversed();
+
+				if ( reverseDepthBuffer ) {
+
+					_currentProjectionMatrix.copy( camera.projectionMatrix );
+
+					toNormalizedProjectionMatrix( _currentProjectionMatrix );
+					toReversedProjectionMatrix( _currentProjectionMatrix );
+
+					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
+
+				} else {
+
+					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+
+				}
+
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 				const uCamPos = p_uniforms.map.cameraPosition;
@@ -1963,6 +2465,16 @@ class WebGLRenderer {
 				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
 				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
 
+				p_uniforms.setOptional( _gl, object, 'batchingIdTexture' );
+				p_uniforms.setValue( _gl, 'batchingIdTexture', object._indirectTexture, textures );
+
+				p_uniforms.setOptional( _gl, object, 'batchingColorTexture' );
+				if ( object._colorsTexture !== null ) {
+
+					p_uniforms.setValue( _gl, 'batchingColorTexture', object._colorsTexture, textures );
+
+				}
+
 			}
 
 			const morphAttributes = geometry.morphAttributes;
@@ -2023,7 +2535,7 @@ class WebGLRenderer {
 
 				}
 
-				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget );
+				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget[ camera.id ] );
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
@@ -2095,18 +2607,34 @@ class WebGLRenderer {
 
 		}
 
+		/**
+		 * Returns the active cube face.
+		 *
+		 * @return {number} The active cube face.
+		 */
 		this.getActiveCubeFace = function () {
 
 			return _currentActiveCubeFace;
 
 		};
 
+		/**
+		 * Returns the active mipmap level.
+		 *
+		 * @return {number} The active mipmap level.
+		 */
 		this.getActiveMipmapLevel = function () {
 
 			return _currentActiveMipmapLevel;
 
 		};
 
+		/**
+		 * Returns the active render target.
+		 *
+		 * @return {?WebGLRenderTarget} The active render target. Returns `null` if no render target
+		 * is currently set.
+		 */
 		this.getRenderTarget = function () {
 
 			return _currentRenderTarget;
@@ -2115,26 +2643,21 @@ class WebGLRenderer {
 
 		this.setRenderTargetTextures = function ( renderTarget, colorTexture, depthTexture ) {
 
-			properties.get( renderTarget.texture ).__webglTexture = colorTexture;
-			properties.get( renderTarget.depthTexture ).__webglTexture = depthTexture;
-
 			const renderTargetProperties = properties.get( renderTarget );
-			renderTargetProperties.__hasExternalTextures = true;
 
-			renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
-
-			if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
+			renderTargetProperties.__autoAllocateDepthBuffer = renderTarget.resolveDepthBuffer === false;
+			if ( renderTargetProperties.__autoAllocateDepthBuffer === false ) {
 
 				// The multisample_render_to_texture extension doesn't work properly if there
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
-				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
-
-					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
-					renderTargetProperties.__useRenderToTexture = false;
-
-				}
+				renderTargetProperties.__useRenderToTexture = false;
 
 			}
+
+			properties.get( renderTarget.texture ).__webglTexture = colorTexture;
+			properties.get( renderTarget.depthTexture ).__webglTexture = renderTargetProperties.__autoAllocateDepthBuffer ? undefined : depthTexture;
+
+			renderTargetProperties.__hasExternalTextures = true;
 
 		};
 
@@ -2146,6 +2669,17 @@ class WebGLRenderer {
 
 		};
 
+		const _scratchFrameBuffer = _gl.createFramebuffer();
+
+		/**
+		 * Sets the active rendertarget.
+		 *
+		 * @param {?WebGLRenderTarget} renderTarget - The render target to set. When `null` is given,
+		 * the canvas is set as the active render target instead.
+		 * @param {number} [activeCubeFace=0] - The active cube face when using a cube render target.
+		 * Indicates the z layer to render in to when using 3D or array render targets.
+		 * @param {number} [activeMipmapLevel=0] - The active mipmap level.
+		 */
 		this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
 
 			_currentRenderTarget = renderTarget;
@@ -2175,6 +2709,28 @@ class WebGLRenderer {
 
 					// Color and depth texture must be rebound in order for the swapchain to update.
 					textures.rebindTextures( renderTarget, properties.get( renderTarget.texture ).__webglTexture, properties.get( renderTarget.depthTexture ).__webglTexture );
+
+				} else if ( renderTarget.depthBuffer ) {
+
+					// check if the depth texture is already bound to the frame buffer and that it's been initialized
+					const depthTexture = renderTarget.depthTexture;
+					if ( renderTargetProperties.__boundDepthTexture !== depthTexture ) {
+
+						// check if the depth texture is compatible
+						if (
+							depthTexture !== null &&
+							properties.has( depthTexture ) &&
+							( renderTarget.width !== depthTexture.image.width || renderTarget.height !== depthTexture.image.height )
+						) {
+
+							throw new Error( 'WebGLRenderTarget: Attached DepthTexture is initialized to the incorrect size.' );
+
+						}
+
+						// Swap the depth buffer to the currently attached one
+						textures.setupDepthRenderbuffer( renderTarget );
+
+					}
 
 				}
 
@@ -2232,6 +2788,14 @@ class WebGLRenderer {
 
 			}
 
+			// Use a scratch frame buffer if rendering to a mip level to avoid depth buffers
+			// being bound that are different sizes.
+			if ( activeMipmapLevel !== 0 ) {
+
+				framebuffer = _scratchFrameBuffer;
+
+			}
+
 			const framebufferBound = state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 			if ( framebufferBound && useDefaultFramebuffer ) {
@@ -2252,8 +2816,15 @@ class WebGLRenderer {
 			} else if ( isRenderTarget3D ) {
 
 				const textureProperties = properties.get( renderTarget.texture );
-				const layer = activeCubeFace || 0;
-				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel || 0, layer );
+				const layer = activeCubeFace;
+				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel, layer );
+
+			} else if ( renderTarget !== null && activeMipmapLevel !== 0 ) {
+
+				// Only bind the frame buffer if we are using a scratch frame buffer to render to a mipmap.
+				// If we rebind the texture when using a multi sample buffer then an error about inconsistent samples will be thrown.
+				const textureProperties = properties.get( renderTarget.texture );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, textureProperties.__webglTexture, activeMipmapLevel );
 
 			}
 
@@ -2261,6 +2832,17 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Reads the pixel data from the given render target into the given buffer.
+		 *
+		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {number} x - The `x` coordinate of the copy region's origin.
+		 * @param {number} y - The `y` coordinate of the copy region's origin.
+		 * @param {number} width - The width of the copy region.
+		 * @param {number} height - The height of the copy region.
+		 * @param {TypedArray} buffer - The result buffer.
+		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
+		 */
 		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
@@ -2288,17 +2870,14 @@ class WebGLRenderer {
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
-					if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
-					const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) );
-
-					if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
-						textureType !== FloatType && ! halfFloatSupportedByExt ) {
+					if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;
@@ -2326,65 +2905,207 @@ class WebGLRenderer {
 
 		};
 
-		this.copyFramebufferToTexture = function ( position, texture, level = 0 ) {
+		/**
+		 * Asynchronous, non-blocking version of {@link WebGLRenderer#readRenderTargetPixels}.
+		 *
+		 * It is recommended to use this version of `readRenderTargetPixels()` whenever possible.
+		 *
+		 * @async
+		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {number} x - The `x` coordinate of the copy region's origin.
+		 * @param {number} y - The `y` coordinate of the copy region's origin.
+		 * @param {number} width - The width of the copy region.
+		 * @param {number} height - The height of the copy region.
+		 * @param {TypedArray} buffer - The result buffer.
+		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
+		 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
+		 */
+		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
-			const levelScale = Math.pow( 2, - level );
-			const width = Math.floor( texture.image.width * levelScale );
-			const height = Math.floor( texture.image.height * levelScale );
+			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
-			textures.setTexture2D( texture, 0 );
+				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 
-			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, 0, 0, position.x, position.y, width, height );
+			}
 
-			state.unbindTexture();
+			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
+			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
-		};
+				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-		this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0 ) {
+			}
 
-			const width = srcTexture.image.width;
-			const height = srcTexture.image.height;
-			const glFormat = utils.convert( dstTexture.format );
-			const glType = utils.convert( dstTexture.type );
+			if ( framebuffer ) {
 
-			textures.setTexture2D( dstTexture, 0 );
+				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-			// As another texture upload may have changed pixelStorei
-			// parameters, make sure they are correct for the dstTexture
-			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
-			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
-			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
+					// set the active frame buffer to the one we want to read
+					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-			if ( srcTexture.isDataTexture ) {
+					const texture = renderTarget.texture;
+					const textureFormat = texture.format;
+					const textureType = texture.type;
 
-				_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
-			} else {
+						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
 
-				if ( srcTexture.isCompressedTexture ) {
+					}
 
-					_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, srcTexture.mipmaps[ 0 ].width, srcTexture.mipmaps[ 0 ].height, glFormat, srcTexture.mipmaps[ 0 ].data );
+					if ( ! capabilities.textureTypeReadable( textureType ) ) {
+
+						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
+
+					}
+
+					const glBuffer = _gl.createBuffer();
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+
+					// reset the frame buffer to the currently set buffer before waiting
+					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
+
+					// check if the commands have finished every 8 ms
+					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+					_gl.flush();
+
+					await probeAsync( _gl, sync, 4 );
+
+					// read the data and delete the buffer
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
+					_gl.deleteBuffer( glBuffer );
+					_gl.deleteSync( sync );
+
+					return buffer;
 
 				} else {
 
-					_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, glFormat, glType, srcTexture.image );
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: requested read bounds are out of range.' );
 
 				}
 
 			}
 
-			// Generate mipmaps only when copying level 0
-			if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( _gl.TEXTURE_2D );
+		};
+
+		/**
+		 * Copies pixels from the current bound framebuffer into the given texture.
+		 *
+		 * @param {FramebufferTexture} texture - The texture.
+		 * @param {Vector2} position - The start position of the copy operation.
+		 * @param {number} [level=0] - The mip level. The default represents the base mip.
+		 */
+		this.copyFramebufferToTexture = function ( texture, position = null, level = 0 ) {
+
+			const levelScale = Math.pow( 2, - level );
+			const width = Math.floor( texture.image.width * levelScale );
+			const height = Math.floor( texture.image.height * levelScale );
+
+			const x = position !== null ? position.x : 0;
+			const y = position !== null ? position.y : 0;
+
+			textures.setTexture2D( texture, 0 );
+
+			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, 0, 0, x, y, width, height );
 
 			state.unbindTexture();
 
 		};
 
-		this.copyTextureToTexture3D = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
+		const _srcFramebuffer = _gl.createFramebuffer();
+		const _dstFramebuffer = _gl.createFramebuffer();
 
-			const width = Math.round( sourceBox.max.x - sourceBox.min.x );
-			const height = Math.round( sourceBox.max.y - sourceBox.min.y );
-			const depth = sourceBox.max.z - sourceBox.min.z + 1;
+		/**
+		 * Copies data of the given source texture into a destination texture.
+		 *
+		 * When using render target textures as `srcTexture` and `dstTexture`, you must make sure both render targets are initialized
+		 * {@link WebGLRenderer#initRenderTarget}.
+		 *
+		 * @param {Texture} srcTexture - The source texture.
+		 * @param {Texture} dstTexture - The destination texture.
+		 * @param {Box2|Box3} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
+		 * @param {Vector2|Vector3} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
+		 * @param {number} srcLevel - The source mipmap level to copy.
+		 * @param {number} dstLevel - The destination mipmap level.
+		 */
+		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
+
+			// support the previous signature with just a single dst mipmap level
+			if ( dstLevel === null ) {
+
+				if ( srcLevel !== 0 ) {
+
+					// @deprecated, r171
+					warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.' );
+					dstLevel = srcLevel;
+					srcLevel = 0;
+
+				} else {
+
+					dstLevel = 0;
+
+				}
+
+			}
+
+			// gather the necessary dimensions to copy
+			let width, height, depth, minX, minY, minZ;
+			let dstX, dstY, dstZ;
+			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image;
+			if ( srcRegion !== null ) {
+
+				width = srcRegion.max.x - srcRegion.min.x;
+				height = srcRegion.max.y - srcRegion.min.y;
+				depth = srcRegion.isBox3 ? srcRegion.max.z - srcRegion.min.z : 1;
+				minX = srcRegion.min.x;
+				minY = srcRegion.min.y;
+				minZ = srcRegion.isBox3 ? srcRegion.min.z : 0;
+
+			} else {
+
+				const levelScale = Math.pow( 2, - srcLevel );
+				width = Math.floor( image.width * levelScale );
+				height = Math.floor( image.height * levelScale );
+				if ( srcTexture.isDataArrayTexture ) {
+
+					depth = image.depth;
+
+				} else if ( srcTexture.isData3DTexture ) {
+
+					depth = Math.floor( image.depth * levelScale );
+
+				} else {
+
+					depth = 1;
+
+				}
+
+				minX = 0;
+				minY = 0;
+				minZ = 0;
+
+			}
+
+			if ( dstPosition !== null ) {
+
+				dstX = dstPosition.x;
+				dstY = dstPosition.y;
+				dstZ = dstPosition.z;
+
+			} else {
+
+				dstX = 0;
+				dstY = 0;
+				dstZ = 0;
+
+			}
+
+			// Set up the destination target
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 			let glTarget;
@@ -2401,8 +3122,8 @@ class WebGLRenderer {
 
 			} else {
 
-				console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: only supports THREE.DataTexture3D and THREE.DataTexture2DArray.' );
-				return;
+				textures.setTexture2D( dstTexture, 0 );
+				glTarget = _gl.TEXTURE_2D;
 
 			}
 
@@ -2410,51 +3131,192 @@ class WebGLRenderer {
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
-			const unpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
-			const unpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
-			const unpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
-			const unpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
-			const unpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
-
-			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
+			// used for copying data from cpu
+			const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
+			const currentUnpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
+			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+			const currentUnpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
 
 			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, sourceBox.min.y );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, sourceBox.min.z );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, minZ );
 
-			if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
+			// set up the src texture
+			const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
+			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
+			if ( srcTexture.isDepthTexture ) {
 
-				_gl.texSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image.data );
+				const srcTextureProperties = properties.get( srcTexture );
+				const dstTextureProperties = properties.get( dstTexture );
+				const srcRenderTargetProperties = properties.get( srcTextureProperties.__renderTarget );
+				const dstRenderTargetProperties = properties.get( dstTextureProperties.__renderTarget );
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcRenderTargetProperties.__webglFramebuffer );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstRenderTargetProperties.__webglFramebuffer );
+
+				for ( let i = 0; i < depth; i ++ ) {
+
+					// if the source or destination are a 3d target then a layer needs to be bound
+					if ( isSrc3D ) {
+
+						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel, minZ + i );
+						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
+
+					}
+
+					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
+
+				}
+
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
+
+			} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || properties.has( srcTexture ) ) {
+
+				// get the appropriate frame buffers
+				const srcTextureProperties = properties.get( srcTexture );
+				const dstTextureProperties = properties.get( dstTexture );
+
+				// bind the frame buffer targets
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, _srcFramebuffer );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, _dstFramebuffer );
+
+				for ( let i = 0; i < depth; i ++ ) {
+
+					// assign the correct layers and mip maps to the frame buffers
+					if ( isSrc3D ) {
+
+						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, srcTextureProperties.__webglTexture, srcLevel, minZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, srcTextureProperties.__webglTexture, srcLevel );
+
+					}
+
+					if ( isDst3D ) {
+
+						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, dstTextureProperties.__webglTexture, dstLevel, dstZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, dstTextureProperties.__webglTexture, dstLevel );
+
+					}
+
+					// copy the data using the fastest function that can achieve the copy
+					if ( srcLevel !== 0 ) {
+
+						_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST );
+
+					} else if ( isDst3D ) {
+
+						_gl.copyTexSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
+
+					} else {
+
+						_gl.copyTexSubImage2D( glTarget, dstLevel, dstX, dstY, minX, minY, width, height );
+
+					}
+
+				}
+
+				// unbind read, draw buffers
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
 
 			} else {
 
-				if ( dstTexture.isCompressedArrayTexture ) {
+				if ( isDst3D ) {
 
-					_gl.compressedTexSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data );
+					// copy data into the 3d texture
+					if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
+
+						_gl.texSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
+
+					} else if ( dstTexture.isCompressedArrayTexture ) {
+
+						_gl.compressedTexSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
+
+					} else {
+
+						_gl.texSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
+
+					}
 
 				} else {
 
-					_gl.texSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image );
+					// copy data into the 2d texture
+					if ( srcTexture.isDataTexture ) {
+
+						_gl.texSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
+
+					} else if ( srcTexture.isCompressedTexture ) {
+
+						_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
+
+					} else {
+
+						_gl.texSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
+
+					}
 
 				}
 
 			}
 
-			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, unpackRowLen );
-			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, unpackImageHeight );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, unpackSkipPixels );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, unpackSkipRows );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, unpackSkipImages );
+			// reset values
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
+			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, currentUnpackImageHeight );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
-			if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( glTarget );
+			if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+
+				_gl.generateMipmap( glTarget );
+
+			}
 
 			state.unbindTexture();
 
 		};
 
+		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+
+			// @deprecated, r170
+			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
+
+			return this.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
+
+		};
+
+		/**
+		 * Initializes the given WebGLRenderTarget memory. Useful for initializing a render target so data
+		 * can be copied into it using {@link WebGLRenderer#copyTextureToTexture} before it has been
+		 * rendered to.
+		 *
+		 * @param {WebGLRenderTarget} target - The render target.
+		 */
+		this.initRenderTarget = function ( target ) {
+
+			if ( properties.get( target ).__webglFramebuffer === undefined ) {
+
+				textures.setupRenderTarget( target );
+
+			}
+
+		};
+
+		/**
+		 * Initializes the given texture. Useful for preloading a texture rather than waiting until first
+		 * render (which can cause noticeable lags due to decode and GPU upload overhead).
+		 *
+		 * @param {Texture} texture - The texture.
+		 */
 		this.initTexture = function ( texture ) {
 
 			if ( texture.isCubeTexture ) {
@@ -2479,6 +3341,11 @@ class WebGLRenderer {
 
 		};
 
+		/**
+		 * Can be used to reset the internal WebGL state. This method is mostly
+		 * relevant for applications which share a single WebGL context across
+		 * multiple WebGL libraries.
+		 */
 		this.resetState = function () {
 
 			_currentActiveCubeFace = 0;
@@ -2498,12 +3365,27 @@ class WebGLRenderer {
 
 	}
 
+	/**
+	 * Defines the coordinate system of the renderer.
+	 *
+	 * In `WebGLRenderer`, the value is always `WebGLCoordinateSystem`.
+	 *
+	 * @type {WebGLCoordinateSystem|WebGPUCoordinateSystem}
+	 * @default WebGLCoordinateSystem
+	 * @readonly
+	 */
 	get coordinateSystem() {
 
 		return WebGLCoordinateSystem;
 
 	}
 
+	/**
+	 * Defines the output color space of the renderer.
+	 *
+	 * @type {SRGBColorSpace|LinearSRGBColorSpace}
+	 * @default SRGBColorSpace
+	 */
 	get outputColorSpace() {
 
 		return this._outputColorSpace;
@@ -2515,26 +3397,98 @@ class WebGLRenderer {
 		this._outputColorSpace = colorSpace;
 
 		const gl = this.getContext();
-		gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
-		gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
-
-	}
-
-	get useLegacyLights() { // @deprecated, r155
-
-		console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
-		return this._useLegacyLights;
-
-	}
-
-	set useLegacyLights( value ) { // @deprecated, r155
-
-		console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
-		this._useLegacyLights = value;
+		gl.drawingBufferColorSpace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
+		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
 
 	}
 
 }
 
+// JSDoc
+
+/**
+ * WebGLRenderer options.
+ *
+ * @typedef {Object} WebGLRenderer~Options
+ * @property {DOMElement} [canvas=null] - A canvas element where the renderer draws its output. If not passed in here, a new canvas element will be created by the renderer.
+ * @property {WebGL2RenderingContext} [context=null] - Can be used to attach an existing rendering context to this renderer.
+ * @property {('highp'|'mediump'|'lowp')} [precision='highp'] - The default shader precision. Uses `highp` if supported by the device.
+ * @property {boolean} [alpha=false] - Controls the default clear alpha value. When set to`true`, the value is `0`. Otherwise it's `1`.
+ * @property {boolean} [premultipliedAlpha=true] Whether the renderer will assume colors have premultiplied alpha or not.
+ * @property {boolean} [antialias=false] Whether to use the default MSAA or not.
+ * @property {boolean} [stencil=false] Whether the drawing buffer has a stencil buffer of at least 8 bits or not.
+ * @property {boolean} [preserveDrawingBuffer=false] Whether to preserve the buffer until manually cleared or overwritten.
+ * @property {('default'|'low-power'|'high-performance')} [powerPreference='default'] Provides a hint to the user agent indicating what configuration of GPU is suitable for this WebGL context.
+ * @property {boolean} [failIfMajorPerformanceCaveat=false] Whether the renderer creation will fail upon low performance is detected.
+ * @property {boolean} [depth=true] Whether the drawing buffer has a depth buffer of at least 16 bits.
+ * @property {boolean} [logarithmicDepthBuffer=false] Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene.
+ * Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
+ * @property {boolean} [reverseDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
+ * This is a more faster and accurate version than logarithmic depth buffer.
+ **/
+
+/**
+ * WebGLRenderer Capabilities.
+ *
+ * @typedef {Object} WebGLRenderer~Capabilities
+ * @property {Function} getMaxAnisotropy - Returns the maximum available anisotropy.
+ * @property {Function} getMaxPrecision - Returns the maximum available precision for vertex and fragment shaders.
+ * @property {boolean} logarithmicDepthBuffer - `true` if `logarithmicDepthBuffer` was set to `true` in the constructor.
+ * @property {number} maxAttributes - The number of shader attributes that can be used by the vertex shader.
+ * @property {number} maxCubemapSize - Maximum height * width of cube map textures that a shader can use.
+ * @property {number} maxFragmentUniforms - The number of uniforms that can be used by a fragment shader.
+ * @property {number} maxSamples - Maximum number of samples in context of Multisample anti-aliasing (MSAA).
+ * @property {number} maxTextures - The maximum number of textures that can be used by a shader.
+ * @property {number} maxTextureSize - Maximum height * width of a texture that a shader use.
+ * @property {number} maxVaryings - The number of varying vectors that can used by shaders.
+ * @property {number} maxVertexTextures - The number of textures that can be used in a vertex shader.
+ * @property {number} maxVertexUniforms - The maximum number of uniforms that can be used in a vertex shader.
+ * @property {string} precision - The shader precision currently being used by the renderer.
+ * @property {boolean} reverseDepthBuffer - `true` if `reverseDepthBuffer` was set to `true` in the constructor
+ * and the rendering context supports `EXT_clip_control`.
+ * @property {boolean} vertexTextures - `true` if vertex textures can be used.
+ **/
+
+/**
+ * WebGLRenderer Info Memory
+ *
+ * @typedef {Object} WebGLRenderer~InfoMemory
+ * @property {number} geometries - The number of active geometries.
+ * @property {number} textures - The number of active textures.
+ **/
+
+/**
+ * WebGLRenderer Info Render
+ *
+ * @typedef {Object} WebGLRenderer~InfoRender
+ * @property {number} frame - The frame ID.
+ * @property {number} calls - The number of draw calls per frame.
+ * @property {number} triangles - The number of rendered triangles primitives per frame.
+ * @property {number} points - The number of rendered points primitives per frame.
+ * @property {number} lines - The number of rendered lines primitives per frame.
+ **/
+
+/**
+ * WebGLRenderer Info
+ *
+ * @typedef {Object} WebGLRenderer~Info
+ * @property {boolean} [autoReset=true] - Whether to automatically reset the info by the renderer or not.
+ * @property {WebGLRenderer~InfoMemory} memory - Information about allocated objects.
+ * @property {WebGLRenderer~InfoRender} render - Information about rendered objects.
+ * @property {?Array<WebGLProgram>} programs - An array `WebGLProgram`s used for rendering.
+ * @property {Function} reset - Resets the info object for the next frame.
+ **/
+
+/**
+ * WebGLRenderer Shadow Map.
+ *
+ * @typedef {Object} WebGLRenderer~ShadowMap
+ * @property {boolean} [enabled=false] - If set to `true`, use shadow maps in the scene.
+ * @property {boolean} [autoUpdate=true] - Enables automatic updates to the shadows in the scene.
+ * If you do not require dynamic lighting / shadows, you may set this to `false`.
+ * @property {boolean} [needsUpdate=false] - When set to `true`, shadow maps in the scene
+ * will be updated in the next `render` call.
+ * @property {(BasicShadowMap|PCFShadowMap|PCFSoftShadowMap|VSMShadowMap)} [type=PCFShadowMap] - Defines the shadow map type.
+ **/
 
 export { WebGLRenderer };

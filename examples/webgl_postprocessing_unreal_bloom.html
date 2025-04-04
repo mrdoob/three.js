@@ -59,20 +59,11 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const container = document.getElementById( 'container' );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				clock = new THREE.Clock();
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ReinhardToneMapping;
-				container.appendChild( renderer.domElement );
 
 				const scene = new THREE.Scene();
 
@@ -80,15 +71,31 @@
 				camera.position.set( - 5, 2.5, - 3.5 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 3;
-				controls.maxDistance = 8;
-
 				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 100 );
 				camera.add( pointLight );
+
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( 'models/gltf/PrimaryIonDrive.glb' );
+
+				const model = gltf.scene;
+				scene.add( model );
+
+				mixer = new THREE.AnimationMixer( model );
+				const clip = gltf.animations[ 0 ];
+				mixer.clipAction( clip.optimize() ).play();
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				container.appendChild( renderer.domElement );
+
+				//
 
 				const renderScene = new RenderPass( scene, camera );
 
@@ -104,19 +111,19 @@
 				composer.addPass( bloomPass );
 				composer.addPass( outputPass );
 
-				new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
+				//
 
-					const model = gltf.scene;
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					scene.add( model );
+				//
 
-					mixer = new THREE.AnimationMixer( model );
-					const clip = gltf.animations[ 0 ];
-					mixer.clipAction( clip.optimize() ).play();
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.5;
+				controls.minDistance = 3;
+				controls.maxDistance = 8;
 
-					animate();
-
-				} );
+				//
 
 				const gui = new GUI();
 
@@ -166,8 +173,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 

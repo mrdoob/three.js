@@ -44,9 +44,10 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				container.appendChild( renderer.domElement );
 
@@ -128,9 +129,7 @@
 
 				points = new THREE.Points( geometry, material );
 
-				// Choose one:
-				// geometry.boundingSphere = ( new THREE.Sphere() ).set( new THREE.Vector3(), Infinity );
-				points.frustumCulled = false;
+				geometry.boundingSphere = new THREE.Sphere().set( new THREE.Vector3(), 500 );
 
 				scene.add( points );
 
@@ -158,15 +157,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				drawCount = ( Math.max( 5000, drawCount ) + Math.floor( 500 * Math.random() ) ) % particles;
 				points.geometry.setDrawRange( 0, drawCount );
 
@@ -176,6 +166,8 @@
 				points.rotation.y = time * 0.2;
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

@@ -2,10 +2,7 @@ import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
-/**
- * Uniforms library for shared webgl shaders
- */
-
+// Uniforms library for shared webgl shaders
 const UniformsLib = {
 
 	common: {
@@ -130,6 +127,7 @@ const UniformsLib = {
 		} },
 
 		directionalLightShadows: { value: [], properties: {
+			shadowIntensity: 1,
 			shadowBias: {},
 			shadowNormalBias: {},
 			shadowRadius: {},
@@ -150,6 +148,7 @@ const UniformsLib = {
 		} },
 
 		spotLightShadows: { value: [], properties: {
+			shadowIntensity: 1,
 			shadowBias: {},
 			shadowNormalBias: {},
 			shadowRadius: {},
@@ -168,6 +167,7 @@ const UniformsLib = {
 		} },
 
 		pointLightShadows: { value: [], properties: {
+			shadowIntensity: 1,
 			shadowBias: {},
 			shadowNormalBias: {},
 			shadowRadius: {},

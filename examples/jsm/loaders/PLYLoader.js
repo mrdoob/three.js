@@ -3,58 +3,55 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Color
+	Color,
+	SRGBColorSpace
 } from 'three';
-
-/**
- * Description: A THREE loader for PLY ASCII files (known as the Polygon
- * File Format or the Stanford Triangle Format).
- *
- * Limitations: ASCII decoding assumes file is UTF-8.
- *
- * Usage:
- *	const loader = new PLYLoader();
- *	loader.load('./models/ply/ascii/dolphins.ply', function (geometry) {
- *
- *		scene.add( new THREE.Mesh( geometry ) );
- *
- *	} );
- *
- * If the PLY file uses non standard property names, they can be mapped while
- * loading. For example, the following maps the properties
- * “diffuse_(red|green|blue)” in the file to standard color names.
- *
- * loader.setPropertyNameMapping( {
- *	diffuse_red: 'red',
- *	diffuse_green: 'green',
- *	diffuse_blue: 'blue'
- * } );
- *
- * Custom properties outside of the defaults for position, uv, normal
- * and color attributes can be added using the setCustomPropertyNameMapping method.
- * For example, the following maps the element properties “custom_property_a”
- * and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
- * Attribute item sizes are set from the number of element properties in the property array.
- *
- * loader.setCustomPropertyNameMapping( {
- *	customAttribute: ['custom_property_a', 'custom_property_b'],
- * } );
- *
- */
 
 const _color = new Color();
 
+/**
+ * A loader for PLY the PLY format (known as the Polygon
+ * File Format or the Stanford Triangle Format).
+ *
+ * Limitations:
+ *  - ASCII decoding assumes file is UTF-8.
+ *
+ * ```js
+ * const loader = new PLYLoader();
+ * const geometry = await loader.loadAsync( './models/ply/ascii/dolphins.ply' );
+ * scene.add( new THREE.Mesh( geometry ) );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+ */
 class PLYLoader extends Loader {
 
+	/**
+	 * Constructs a new PLY loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
+
+		// internals
 
 		this.propertyNameMapping = {};
 		this.customPropertyMapping = {};
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded PLY asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -90,18 +87,53 @@ class PLYLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets a property name mapping that maps default property names
+	 * to custom ones. For example, the following maps the properties
+	 * “diffuse_(red|green|blue)” in the file to standard color names.
+	 *
+	 * ```js
+	 * loader.setPropertyNameMapping( {
+	 * 	diffuse_red: 'red',
+	 * 	diffuse_green: 'green',
+	 * 	diffuse_blue: 'blue'
+	 * } );
+	 * ```
+	 *
+	 * @param {Object} mapping - The mapping dictionary.
+	 */
 	setPropertyNameMapping( mapping ) {
 
 		this.propertyNameMapping = mapping;
 
 	}
 
+	/**
+	 * Custom properties outside of the defaults for position, uv, normal
+	 * and color attributes can be added using the setCustomPropertyNameMapping method.
+	 * For example, the following maps the element properties “custom_property_a”
+	 * and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
+	 * Attribute item sizes are set from the number of element properties in the property array.
+	 *
+	 * ```js
+	 * loader.setCustomPropertyNameMapping( {
+	 *	customAttribute: ['custom_property_a', 'custom_property_b'],
+	 * } );
+	 * ```
+	 * @param {Object} mapping - The mapping dictionary.
+	 */
 	setCustomPropertyNameMapping( mapping ) {
 
 		this.customPropertyMapping = mapping;
 
 	}
 
+	/**
+	 * Parses the given PLY data and returns the resulting geometry.
+	 *
+	 * @param {ArrayBuffer} data - The raw PLY data as an array buffer.
+	 * @return {BufferGeometry} The parsed geometry.
+	 */
 	parse( data ) {
 
 		function parseHeader( data, headerLength = 0 ) {
@@ -126,19 +158,19 @@ class PLYLoader extends Loader {
 			const lines = headerText.split( /\r\n|\r|\n/ );
 			let currentElement;
 
-			function make_ply_element_property( propertValues, propertyNameMapping ) {
+			function make_ply_element_property( propertyValues, propertyNameMapping ) {
 
-				const property = { type: propertValues[ 0 ] };
+				const property = { type: propertyValues[ 0 ] };
 
 				if ( property.type === 'list' ) {
 
-					property.name = propertValues[ 3 ];
-					property.countType = propertValues[ 1 ];
-					property.itemType = propertValues[ 2 ];
+					property.name = propertyValues[ 3 ];
+					property.countType = propertyValues[ 1 ];
+					property.itemType = propertyValues[ 2 ];
 
 				} else {
 
-					property.name = propertValues[ 1 ];
+					property.name = propertyValues[ 1 ];
 
 				}
 
@@ -468,8 +500,9 @@ class PLYLoader extends Loader {
 					_color.setRGB(
 						element[ cacheEntry.attrR ] / 255.0,
 						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
+						element[ cacheEntry.attrB ] / 255.0,
+						SRGBColorSpace
+					);
 
 					buffer.colors.push( _color.r, _color.g, _color.b );
 
@@ -516,8 +549,9 @@ class PLYLoader extends Loader {
 					_color.setRGB(
 						element[ cacheEntry.attrR ] / 255.0,
 						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
+						element[ cacheEntry.attrB ] / 255.0,
+						SRGBColorSpace
+					);
 					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
 					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
 					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
@@ -573,7 +607,7 @@ class PLYLoader extends Loader {
 
 				switch ( type ) {
 
-					// corespondences for non-specific length types here match rply:
+					// correspondences for non-specific length types here match rply:
 					case 'int8':	case 'char':	return { read: ( at ) => {
 
 						return dataview.getInt8( at );

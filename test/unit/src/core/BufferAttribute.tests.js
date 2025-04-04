@@ -1,8 +1,6 @@
 /* global QUnit */
-
-import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
-
 import {
+	BufferAttribute,
 	Int8BufferAttribute,
 	Uint8BufferAttribute,
 	Uint8ClampedBufferAttribute,
@@ -148,9 +146,9 @@ export default QUnit.module( 'Core', () => {
 			const i = attr.array;
 			const i2 = attr2.array; // should be [4, 5, 6, 7, 8, 9, 1, 2, 3]
 
-			assert.ok( i2[ 0 ] === i[ 3 ] && i2[ 1 ] === i[ 4 ] && i2[ 2 ] === i[ 5 ], 'chunck copied to correct place' );
-			assert.ok( i2[ 3 ] === i[ 6 ] && i2[ 4 ] === i[ 7 ] && i2[ 5 ] === i[ 8 ], 'chunck copied to correct place' );
-			assert.ok( i2[ 6 ] === i[ 0 ] && i2[ 7 ] === i[ 1 ] && i2[ 8 ] === i[ 2 ], 'chunck copied to correct place' );
+			assert.ok( i2[ 0 ] === i[ 3 ] && i2[ 1 ] === i[ 4 ] && i2[ 2 ] === i[ 5 ], 'chunk copied to correct place' );
+			assert.ok( i2[ 3 ] === i[ 6 ] && i2[ 4 ] === i[ 7 ] && i2[ 5 ] === i[ 8 ], 'chunk copied to correct place' );
+			assert.ok( i2[ 6 ] === i[ 0 ] && i2[ 7 ] === i[ 1 ] && i2[ 8 ] === i[ 2 ], 'chunk copied to correct place' );
 
 		} );
 

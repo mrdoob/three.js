@@ -14,43 +14,39 @@
 <body>
 
 	<div id="info">
-
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mesh - batch
-
-	</div>
-
-	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
-		Active Backend: WebGPU
 	</div>
 
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js",
-				"three/addons/": "./jsm/",
-				"three/nodes": "./jsm/nodes/Nodes.js",
-				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
+				"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
 
 	<script type="module">
+
 		import * as THREE from 'three';
 
-		import Stats from 'stats-gl';
+		import Stats from 'three/addons/libs/stats.module.js';
+
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
-		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-		import { MeshNormalNodeMaterial } from 'three/nodes';
+
+		import { transformedNormalView, directionToColor, diffuseColor } from 'three/tsl';
 
 		let camera, scene, renderer;
 		let controls, stats;
 		let gui;
 		let geometries, mesh, material;
 		const ids = [];
-		
+
 		const matrix = new THREE.Matrix4();
 
 		//
@@ -73,6 +69,15 @@
 			perObjectFrustumCulled: true,
 			opacity: 1,
 			useCustomSort: true,
+			randomizeGeometry: ()=>{
+
+				for ( let i = 0; i < api.count; i ++ ) {
+
+					mesh.setGeometryIdAt( i, Math.floor( Math.random() * geometries.length ) );
+		
+				}
+		
+			}
 		};
 
 
@@ -121,9 +126,10 @@
 
 			if ( ! material ) {
 
-				material = new MeshNormalNodeMaterial();
-
-			}
+				material = new THREE.MeshBasicNodeMaterial();
+				material.outputNode = diffuseColor.mul( directionToColor( transformedNormalView ).y.add( 0.5 ) );
+		
+	}
 
 			return material;
 
@@ -155,8 +161,8 @@
 		function initBatchedMesh() {
 
 			const geometryCount = api.count;
-			const vertexCount = api.count * 512;
-			const indexCount = api.count * 1024;
+			const vertexCount = geometries.length * 512;
+			const indexCount = geometries.length * 1024;
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
@@ -168,10 +174,16 @@
 
 			ids.length = 0;
 
+			const geometryIds = [
+				mesh.addGeometry( geometries[ 0 ] ),
+				mesh.addGeometry( geometries[ 1 ] ),
+				mesh.addGeometry( geometries[ 2 ] ),
+			];
 			for ( let i = 0; i < api.count; i ++ ) {
 
-				const id = mesh.addGeometry( geometries[ i % geometries.length ] );
+				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
+				mesh.setColorAt( id, new THREE.Color( Math.random() * 0xffffff ) );
 
 				const rotationMatrix = new THREE.Matrix4();
 				rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
@@ -185,8 +197,6 @@
 
 		}
 
-
-
 		function init( forceWebGL = false ) {
 
 			if ( renderer ) {
@@ -198,17 +208,16 @@
 
 			}
 
-			document.getElementById( 'backend' ).innerText = 'Active Backend: ' + ( forceWebGL ? 'WebGL' : 'WebGPU' );
 			// camera
 
 			const aspect = window.innerWidth / window.innerHeight;
 
 			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
-			camera.position.z = 50;
+			camera.position.z = 30;
 
 			// renderer
 
-			renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
+			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -217,18 +226,7 @@
 			// scene
 
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xffffff );
-
-
-			if ( forceWebGL ) {
-
-				scene.background = new THREE.Color( 0xf10000 );
-
-			} else {
-
-				scene.background = new THREE.Color( 0x0000f1 );
-
-			}
+			scene.background = forceWebGL ? new THREE.Color( 0xffc1c1 ) : new THREE.Color( 0xc1c1ff );
 
 			document.body.appendChild( renderer.domElement );
 
@@ -245,13 +243,8 @@
 
 			// stats
 
-			stats = new Stats( {
-				precision: 3,
-				horizontal: false
-			} );
-			stats.init( renderer );
+			stats = new Stats();
 			document.body.appendChild( stats.dom );
-			stats.dom.style.position = 'absolute';
 
 			// gui
 
@@ -285,14 +278,12 @@
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );
+			gui.add( api, 'randomizeGeometry' );
 
 
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
-
-
-
 
 			function onWindowResize() {
 
@@ -313,7 +304,7 @@
 
 				controls.update();
 
-		
+
 				if ( mesh.isBatchedMesh ) {
 
 					mesh.sortObjects = api.sortObjects;
@@ -355,7 +346,7 @@
 			// initialize options
 			this._options = this._options || {
 				get: el => el.z,
-				aux: new Array( this.maxGeometryCount )
+				aux: new Array( this.maxInstanceCount )
 			};
 
 			const options = this._options;

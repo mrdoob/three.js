@@ -38,7 +38,6 @@
 			const speed = 0.5;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -50,6 +49,7 @@
 				scene = new THREE.Scene();
 
 				timer = new Timer();
+				timer.connect( document );
 
 				const light1 = new THREE.PointLight( 0xff2200, 50000 );
 				light1.position.set( 100, 100, 100 );
@@ -89,7 +89,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setAnimationLoop( animate );
 
 				container.appendChild( renderer.domElement );
 
@@ -116,7 +116,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				timer.update();
 				render();
 

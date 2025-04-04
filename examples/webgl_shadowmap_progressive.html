@@ -39,7 +39,6 @@
 							 'Light Radius': 50, 'Ambient Weight': 0.5, 'Debug Lightmap': false };
 			init();
 			createGUI();
-			animate();
 
 			function init() {
 
@@ -47,6 +46,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -76,12 +76,12 @@
 
 				} );
 				control.attach( lightOrigin );
-				scene.add( control );
+				scene.add( control.getHelper() );
 
 				// create 8 directional lights to speed up the convergence
 				for ( let l = 0; l < lightCount; l ++ ) {
 
-					const dirLight = new THREE.DirectionalLight( 0xffffff, 1.0 / lightCount );
+					const dirLight = new THREE.DirectionalLight( 0xffffff, Math.PI / lightCount );
 					dirLight.name = 'Dir. Light ' + l;
 					dirLight.position.set( 200, 200, 200 );
 					dirLight.castShadow = true;
@@ -142,7 +142,7 @@
 
 					} );
 					control2.attach( object );
-					scene.add( control2 );
+					scene.add( control2.getHelper() );
 					const lightTarget = new THREE.Group();
 					lightTarget.position.set( 0, 20, 0 );
 					for ( let l = 0; l < dirLights.length; l ++ ) {
@@ -152,16 +152,6 @@
 					}
 
 					object.add( lightTarget );
-
-					if ( typeof TESTING !== 'undefined' ) {
-
-						for ( let i = 0; i < 300; i ++ ) {
-
-							render();
-
-						}
-
-					}
 
 				}
 
@@ -182,6 +172,7 @@
 				controls.maxDistance = 500;
 				controls.maxPolarAngle = Math.PI / 1.5;
 				controls.target.set( 0, 100, 0 );
+			
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -206,7 +197,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				// Update the inertia on the orbit controls
 				controls.update();
@@ -256,12 +247,6 @@
 
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-			}
 		</script>
 	</body>
 </html>

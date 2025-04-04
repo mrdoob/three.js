@@ -1,8 +1,6 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { ColorManagement } from '../../math/ColorManagement.js';
-
 import {
 	NoToneMapping,
 	AddOperation,
@@ -21,12 +19,6 @@ import {
 	CustomToneMapping,
 	ReinhardToneMapping,
 	LinearToneMapping,
-	LinearSRGBColorSpace,
-	SRGBColorSpace,
-	LinearDisplayP3ColorSpace,
-	DisplayP3ColorSpace,
-	P3Primaries,
-	Rec709Primaries,
 	FloatType,
 	HalfFloatType,
 	RedFormat,
@@ -36,8 +28,15 @@ import {
 	UnsignedShortType,
 	ShortType,
 	RedIntegerFormat,
-	RGIntegerFormat
+	RGIntegerFormat,
+	LinearTransfer,
+	SRGBTransfer
 } from '../../constants.js';
+
+import { Vector3 } from '../../math/Vector3.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 // From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
 const COMPLETION_STATUS_KHR = 0x91B1;
@@ -63,40 +62,25 @@ function handleSource( string, errorLine ) {
 
 }
 
+const _m0 = /*@__PURE__*/ new Matrix3();
+
 function getEncodingComponents( colorSpace ) {
 
-	const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
-	const encodingPrimaries = ColorManagement.getPrimaries( colorSpace );
+	ColorManagement._getMatrix( _m0, ColorManagement.workingColorSpace, colorSpace );
 
-	let gamutMapping;
+	const encodingMatrix = `mat3( ${ _m0.elements.map( ( v ) => v.toFixed( 4 ) ) } )`;
 
-	if ( workingPrimaries === encodingPrimaries ) {
+	switch ( ColorManagement.getTransfer( colorSpace ) ) {
 
-		gamutMapping = '';
+		case LinearTransfer:
+			return [ encodingMatrix, 'LinearTransferOETF' ];
 
-	} else if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
-
-		gamutMapping = 'LinearDisplayP3ToLinearSRGB';
-
-	} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
-
-		gamutMapping = 'LinearSRGBToLinearDisplayP3';
-
-	}
-
-	switch ( colorSpace ) {
-
-		case LinearSRGBColorSpace:
-		case LinearDisplayP3ColorSpace:
-			return [ gamutMapping, 'LinearTransferOETF' ];
-
-		case SRGBColorSpace:
-		case DisplayP3ColorSpace:
-			return [ gamutMapping, 'sRGBTransferOETF' ];
+		case SRGBTransfer:
+			return [ encodingMatrix, 'sRGBTransferOETF' ];
 
 		default:
-			console.warn( 'THREE.WebGLProgram: Unsupported color space:', colorSpace );
-			return [ gamutMapping, 'LinearTransferOETF' ];
+			console.warn( 'THREE.WebGLProgram: Unsupported color space: ', colorSpace );
+			return [ encodingMatrix, 'LinearTransferOETF' ];
 
 	}
 
@@ -129,7 +113,16 @@ function getShaderErrors( gl, shader, type ) {
 function getTexelEncodingFunction( functionName, colorSpace ) {
 
 	const components = getEncodingComponents( colorSpace );
-	return `vec4 ${functionName}( vec4 value ) { return ${components[ 0 ]}( ${components[ 1 ]}( value ) ); }`;
+
+	return [
+
+		`vec4 ${functionName}( vec4 value ) {`,
+
+		`	return ${components[ 1 ]}( vec4( value.rgb * ${components[ 0 ]}, value.a ) );`,
+
+		'}',
+
+	].join( '\n' );
 
 }
 
@@ -148,7 +141,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 			break;
 
 		case CineonToneMapping:
-			toneMappingName = 'OptimizedCineon';
+			toneMappingName = 'Cineon';
 			break;
 
 		case ACESFilmicToneMapping:
@@ -174,6 +167,30 @@ function getToneMappingFunction( functionName, toneMapping ) {
 	}
 
 	return 'vec3 ' + functionName + '( vec3 color ) { return ' + toneMappingName + 'ToneMapping( color ); }';
+
+}
+
+const _v0 = /*@__PURE__*/ new Vector3();
+
+function getLuminanceFunction() {
+
+	ColorManagement.getLuminanceCoefficients( _v0 );
+
+	const r = _v0.x.toFixed( 4 );
+	const g = _v0.y.toFixed( 4 );
+	const b = _v0.z.toFixed( 4 );
+
+	return [
+
+		'float luminance( const in vec3 rgb ) {',
+
+		`	const vec3 weights = vec3( ${ r }, ${ g }, ${ b } );`,
+
+		'	return dot( weights, rgb );',
+
+		'}'
+
+	].join( '\n' );
 
 }
 
@@ -279,11 +296,7 @@ function resolveIncludes( string ) {
 
 }
 
-const shaderChunkMap = new Map( [
-	[ 'encodings_fragment', 'colorspace_fragment' ], // @deprecated, r154
-	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ], // @deprecated, r154
-	[ 'output_fragment', 'opaque_fragment' ], // @deprecated, r154
-] );
+const shaderChunkMap = new Map();
 
 function includeReplacer( match, include ) {
 
@@ -643,6 +656,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.extensionClipCullDistance ? '#define USE_CLIP_DISTANCE' : '',
 			parameters.batching ? '#define USE_BATCHING' : '',
+			parameters.batchingColor ? '#define USE_BATCHING_COLOR' : '',
 			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
 			parameters.instancingMorph ? '#define USE_INSTANCING_MORPH' : '',
@@ -739,7 +753,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
 			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
 			( parameters.morphColors ) ? '#define USE_MORPHCOLORS' : '',
-			( parameters.morphTargetsCount > 0 ) ? '#define MORPHTARGETS_TEXTURE' : '',
 			( parameters.morphTargetsCount > 0 ) ? '#define MORPHTARGETS_TEXTURE_STRIDE ' + parameters.morphTextureStride : '',
 			( parameters.morphTargetsCount > 0 ) ? '#define MORPHTARGETS_COUNT ' + parameters.morphTargetsCount : '',
 			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
@@ -752,9 +765,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
-			parameters.useLegacyLights ? '#define LEGACY_LIGHTS' : '',
-
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -820,31 +832,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'#endif',
 
-			'#if ( defined( USE_MORPHTARGETS ) && ! defined( MORPHTARGETS_TEXTURE ) )',
-
-			'	attribute vec3 morphTarget0;',
-			'	attribute vec3 morphTarget1;',
-			'	attribute vec3 morphTarget2;',
-			'	attribute vec3 morphTarget3;',
-
-			'	#ifdef USE_MORPHNORMALS',
-
-			'		attribute vec3 morphNormal0;',
-			'		attribute vec3 morphNormal1;',
-			'		attribute vec3 morphNormal2;',
-			'		attribute vec3 morphNormal3;',
-
-			'	#else',
-
-			'		attribute vec3 morphTarget4;',
-			'		attribute vec3 morphTarget5;',
-			'		attribute vec3 morphTarget6;',
-			'		attribute vec3 morphTarget7;',
-
-			'	#endif',
-
-			'#endif',
-
 			'#ifdef USE_SKINNING',
 
 			'	attribute vec4 skinIndex;',
@@ -894,6 +881,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '',
 			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
 
+			parameters.dispersion ? '#define USE_DISPERSION' : '',
+
 			parameters.iridescence ? '#define USE_IRIDESCENCE' : '',
 			parameters.iridescenceMap ? '#define USE_IRIDESCENCEMAP' : '',
 			parameters.iridescenceThicknessMap ? '#define USE_IRIDESCENCE_THICKNESSMAP' : '',
@@ -918,7 +907,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
 			parameters.vertexTangents && parameters.flatShading === false ? '#define USE_TANGENT' : '',
-			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
+			parameters.vertexColors || parameters.instancingColor || parameters.batchingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUv1s ? '#define USE_UV1' : '',
 			parameters.vertexUv2s ? '#define USE_UV2' : '',
@@ -940,11 +929,11 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
-			parameters.useLegacyLights ? '#define LEGACY_LIGHTS' : '',
-
 			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
+			parameters.decodeVideoTextureEmissive ? '#define DECODE_VIDEO_TEXTURE_EMISSIVE' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
@@ -959,6 +948,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			ShaderChunk[ 'colorspace_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputColorSpace ),
+			getLuminanceFunction(),
 
 			parameters.useDepthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',
 

@@ -148,7 +148,7 @@
 
 					createPanel();
 
-					animate();
+					renderer.setAnimationLoop( animate );
 
 				} );
 
@@ -394,8 +394,6 @@
 
 				// Render loop
 
-				requestAnimationFrame( animate );
-
 				for ( let i = 0; i !== numAnimations; ++ i ) {
 
 					const action = allActions[ i ];
@@ -413,9 +411,9 @@
 
 				mixer.update( mixerUpdateDelta );
 
-				stats.update();
-
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

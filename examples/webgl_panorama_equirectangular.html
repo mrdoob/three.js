@@ -10,8 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.<br />
-			drag equirectangular texture into the page.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>
 		</div>
 
 		<script type="importmap">
@@ -36,7 +35,6 @@
 				phi = 0, theta = 0;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -61,52 +59,13 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointerdown', onPointerDown );
 
 				document.addEventListener( 'wheel', onDocumentMouseWheel );
-
-				//
-
-				document.addEventListener( 'dragover', function ( event ) {
-
-					event.preventDefault();
-					event.dataTransfer.dropEffect = 'copy';
-
-				} );
-
-				document.addEventListener( 'dragenter', function () {
-
-					document.body.style.opacity = 0.5;
-
-				} );
-
-				document.addEventListener( 'dragleave', function () {
-
-					document.body.style.opacity = 1;
-
-				} );
-
-				document.addEventListener( 'drop', function ( event ) {
-
-					event.preventDefault();
-
-					const reader = new FileReader();
-					reader.addEventListener( 'load', function ( event ) {
-
-						material.map.image.src = event.target.result;
-						material.map.needsUpdate = true;
-
-					} );
-					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
-
-					document.body.style.opacity = 1;
-
-				} );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -147,7 +106,7 @@
 
 			}
 
-			function onPointerUp() {
+			function onPointerUp( event ) {
 
 				if ( event.isPrimary === false ) return;
 
@@ -169,13 +128,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-				update();
-
-			}
-
-			function update() {
 
 				if ( isUserInteracting === false ) {
 

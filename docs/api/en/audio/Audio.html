@@ -159,11 +159,12 @@
 		<h3>[method:Float getPlaybackRate]()</h3>
 		<p>Return the value of [page:Audio.playbackRate playbackRate].</p>
 
-		<h3>[method:Float getVolume]( value )</h3>
+		<h3>[method:Float getVolume]()</h3>
 		<p>Return the current volume.</p>
 
 		<h3>[method:this play]( delay )</h3>
 		<p>
+			delay (optional) - The delay, in seconds, at which the audio should start playing.<br />
 			If [page:Audio.hasPlaybackControl hasPlaybackControl] is true, starts
 			playback.
 		</p>
@@ -244,8 +245,9 @@
 		<h3>[method:this setVolume]( [param:Float value] )</h3>
 		<p>Set the volume.</p>
 
-		<h3>[method:this stop]()</h3>
+		<h3>[method:this stop]( delay )</h3>
 		<p>
+			delay (optional) - The delay, in seconds, at which the audio should stop playing.<br />
 			If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, stops
 			playback.
 		</p>

@@ -64,7 +64,6 @@
 			let plane, blurPlane, fillPlane;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -233,6 +232,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -277,10 +277,6 @@
 
 			function animate( ) {
 
-				requestAnimationFrame( animate );
-
-				//
-
 				meshes.forEach( mesh => {
 
 					mesh.rotation.x += 0.01;
@@ -313,7 +309,7 @@
 				blurShadow( state.shadow.blur );
 
 				// a second pass to reduce the artifacts
-				// (0.4 is the minimum blur amout so that the artifacts are gone)
+				// (0.4 is the minimum blur amount so that the artifacts are gone)
 				blurShadow( state.shadow.blur * 0.4 );
 
 				// reset and render the normal scene

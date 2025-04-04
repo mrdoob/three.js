@@ -1,0 +1,322 @@
+h3 {
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+/* Below CSS should only affect the page section */
+
+#page {
+	--font-size: 16px;
+	--line-height: 26px;
+	--panel-width: 300px;
+	--page-padding: 24px;
+	--max-width: 960px;
+	--icon-size: 20px;
+	--border-style: 1px solid #E8E8E8;
+	
+	color: var(--text-color);
+	tab-size: 4;
+	overflow: auto;
+	max-width: var(--max-width);
+	margin: 0 auto;
+	padding-top: var(--page-padding);
+	padding-bottom: var(--page-padding);
+	padding-right: var(--page-padding);
+	padding-left: var(--page-padding);
+	word-break: break-word;
+	
+	@font-face {
+		font-family: 'Roboto Mono';
+		src: local('Roboto Mono'), local('RobotoMono-Regular'), url('/files/RobotoMono-Regular.woff2') format('woff2');
+		font-style: normal;
+		font-weight: 400;
+	}
+	
+	@font-face {
+		font-family: 'Inter';
+		font-style: normal;
+		font-weight: 400;
+		src: local('Inter-Regular'), url("/files/Inter-Regular.woff2?v=3.6") format("woff2");
+	}
+	
+	@font-face {
+		font-family: 'Inter';
+		font-style: normal;
+		font-weight: 600;
+		src: local('Inter-SemiBold'), url("/files/Inter-SemiBold.woff2?v=3.6") format("woff2");
+	}
+
+	a {
+		color: var(--color-blue);
+		cursor: pointer;
+		text-decoration: none;
+	}
+	
+	h1 {
+		font-size: 40px;
+		line-height: 48px;
+		font-weight: normal;
+		margin-left: -2px;
+		margin-top: 16px;
+	}
+	
+	h2 {
+		font-size: 28px;
+		line-height: 36px;
+		font-weight: normal;
+		margin-left: -1px;
+		margin-top: 28px;
+	}
+	
+	h3 {
+		font-size: 20px;
+		line-height: 28px;
+		font-weight: normal;
+		margin-top: 32px;
+		margin-bottom: 32px;
+	}
+
+	p,
+	div,
+	table,
+	ol,
+	ul {
+		margin-top: 16px;
+		margin-bottom: 16px;
+	}
+	
+	p {
+		padding-right: 16px;
+	}
+	
+	ul, ol {
+		box-sizing: border-box;
+		padding-left: 24px;
+	}
+	ul li,
+	ol li {
+		padding-left: 4px;
+		margin-bottom: 4px;
+	}
+	
+	li ul,
+	li ol {
+		margin-top: 4px;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	
+	.desc {
+		padding-left: 0px;
+	}
+	
+	table th,
+	table td {
+		text-align: left;
+		vertical-align: top;
+		padding: 16px 8px;
+		border-bottom: var(--border-style);
+		max-width: 480px;
+		min-width: 120px;
+	}
+	
+	table th {
+		text-decoration: none;
+	}
+	table th:first-child,
+	table td:first-child {
+		padding-left: 0;
+	}
+
+	table p {
+		margin: 0;
+	}
+	
+	strong {
+		font-weight: 600;
+	}
+	
+	a.permalink {
+		float: right;
+		margin-left: 5px;
+		display: none;
+	}
+	
+	a.param,
+	span.param {
+		color: #999;
+	}
+	
+	a.param:hover {
+		color: var(--text-color);
+	}
+
+	.method,
+	.member {
+		margin-bottom: 64px;
+	}
+
+	ol.linenums {
+		padding-left: 64px;
+	}
+
+	ol.linenums .selected {
+		background-color: #ddd;
+	}
+
+	code {
+		display: inline-block;
+		vertical-align: middle;
+		border-radius: 4px;
+		padding: 0px 5px;
+		background-color: #F5F5F5;
+	}
+
+	pre {
+		overflow: auto;
+		white-space: pre-wrap;
+		font-size: calc(var(--font-size) - 1px);
+		line-height: calc(var(--line-height) - 1px);
+		position: relative;
+	}
+
+	pre code {
+		background-color: inherit;
+		padding: calc(var(--page-padding) - 6px) var(--page-padding);
+	}
+
+	pre.linenums code {
+		padding: 0px 5px;
+	}
+
+	.link-anchor {
+		color: #ddd;
+		visibility: hidden;
+	}
+
+	.name:hover .link-anchor {
+		visibility: visible;
+	}
+
+	.search-result-item {
+		border-bottom: var(--border-style);
+		display: block;
+		padding: 16px 0;
+	}
+	
+	.search-result-item-description {
+		color: var(--text-color);
+	}
+
+	.copy-btn {
+		cursor: pointer;
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		width: 24px;
+		height: 24px;
+		background-color: transparent;
+		background-image: url('/files/ic_copy_grey_24dp.svg');
+		background-size: contain;
+		background-position: center;
+		background-repeat: no-repeat;
+		opacity: 0.9;
+		border: none;
+	}
+	
+	.copy-btn:hover {
+		opacity: 1;
+	}
+	
+	.copy-btn.copied {
+		pointer-events: none;
+		opacity: 1;
+		background-image: url('/files/ic_tick_green_24dp.svg');
+	}
+
+}
+
+@media (prefers-color-scheme: dark) {
+	
+	#page {
+		--text-color: #bbb;
+		--border-style: 1px solid #444;
+
+		.link-anchor {
+			color: #555;
+		}
+
+		ol.linenums .selected {
+			background-color: #444;
+		}
+
+		code {
+			background-color: #444;
+		}
+	
+	}
+
+}
+
+@media all and ( min-width: 1700px ) {
+	
+	#page {
+		--panel-width: 360px;
+		--font-size: 18px;
+		--line-height: 28px;
+		--max-width: 1080px;
+		--page-padding: 28px;
+		--icon-size: 24px;
+
+		h1 {
+			font-size: 42px;
+			line-height: 50px;
+		}
+
+		h2 {
+			font-size: 32px;
+			line-height: 40px;
+		}
+
+		h3 {
+			font-size: 24px;
+			line-height: 32px;
+		}
+
+	}
+
+}
+
+/* mobile */
+
+@media all and ( max-width: 640px ) {
+
+	#page {
+		--page-padding: 16px;
+		--icon-size: 24px;
+
+		padding: var(--page-padding);
+
+		h1 {
+			font-size: 28px;
+			line-height: 36px;
+			padding-right: 20px;
+			margin-top: 0;
+		}
+
+		h2 {
+			font-size: 24px;
+			line-height: 32px;
+			margin-top: 24px;
+		}
+
+		h3 {
+			font-size: 20px;
+			line-height: 28px;
+		}
+
+	}
+}

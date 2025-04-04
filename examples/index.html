@@ -16,7 +16,6 @@
 				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
 					<span class="selected">examples</span>
 				</div>
 
@@ -55,20 +54,15 @@
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 
-		const sectionLink = document.querySelector( '#sections > a' );
-		const sectionDefaultHref = sectionLink.href;
-
 		const links = {};
 		const validRedirects = new Map();
-		const container = document.createElement( 'div' );
+		const fragment = document.createDocumentFragment();
 
 		let selected = null;
 
 		init();
 
 		async function init() {
-
-			content.appendChild( container );
 
 			viewSrcButton.style.display = 'none';
 
@@ -82,14 +76,14 @@
 				const header = document.createElement( 'h2' );
 				header.textContent = key;
 				header.setAttribute( 'data-category', key );
-				container.appendChild( header );
+				fragment.appendChild( header );
 
 				for ( let i = 0; i < category.length; i ++ ) {
 
 					const file = category[ i ];
 
 					const link = createLink( file, tags[ file ] );
-					container.appendChild( link );
+					fragment.appendChild( link );
 
 					links[ file ] = link;
 					validRedirects.set( file, file + '.html' );
@@ -97,6 +91,8 @@
 				}
 
 			}
+
+			content.appendChild( fragment );
 
 			if ( window.location.hash !== '' ) {
 
@@ -128,10 +124,6 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter( files, tags );
-
-			} else {
-
-				updateLink( '' );
 
 			}
 
@@ -289,25 +281,6 @@
 			}
 
 			layoutList( files );
-
-			updateLink( v );
-
-		}
-
-		function updateLink( search ) {
-
-			// update docs link
-
-			if ( search ) {
-
-				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
-				sectionLink.href = `${link}?q=${search}`;
-
-			} else {
-
-				sectionLink.href = sectionDefaultHref;
-
-			}
 
 		}
 

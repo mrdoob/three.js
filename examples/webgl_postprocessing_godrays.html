@@ -51,7 +51,6 @@
 			const godrayRenderTargetResolutionMultiplier = 1.0 / 4.0;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -93,6 +92,7 @@
 				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
@@ -224,8 +224,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				stats.begin();
 				render();
 				stats.end();
@@ -274,7 +272,7 @@
 
 					screenSpacePosition.x = ( clipPosition.x + 1 ) / 2; // transform from [-1,1] to [0,1]
 					screenSpacePosition.y = ( clipPosition.y + 1 ) / 2; // transform from [-1,1] to [0,1]
-					screenSpacePosition.z = clipPosition.z; // needs to stay in clip space for visibilty checks
+					screenSpacePosition.z = clipPosition.z; // needs to stay in clip space for visibility checks
 
 					// Give it to the god-ray and sun shaders
 

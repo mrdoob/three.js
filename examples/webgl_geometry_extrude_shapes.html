@@ -34,7 +34,6 @@
 			let camera, scene, renderer, controls;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -44,13 +43,13 @@
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.style.color = '#fff';
-				info.style.link = '#f80';
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -181,8 +180,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update();
 				renderer.render( scene, camera );

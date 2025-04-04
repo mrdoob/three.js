@@ -1,24 +1,24 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param attributeName string
- * @param newValue number, string, boolean or object
- * @constructor
- */
 class SetGeometryValueCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {string} [attributeName='']
+	 * @param {number|string|boolean|Object|null} [newValue=null]
+	 * @constructor
+	 */
+	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );
 
 		this.type = 'SetGeometryValueCommand';
-		this.name = `Set Geometry.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetGeometryValue' ) + ': ' + attributeName;
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
+		this.oldValue = ( object !== null ) ? object.geometry[ attributeName ] : null;
 		this.newValue = newValue;
 
 	}

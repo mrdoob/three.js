@@ -4,12 +4,21 @@ import {
 } from 'three';
 
 /**
+ * @module VolumeShader
+ * @three_import import { VolumeRenderShader1 } from 'three/addons/shaders/VolumeShader.js';
+ */
+
+/**
  * Shaders to render 3D volumes using raycasting.
  * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
  * This is not the only approach, therefore it's marked 1.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const VolumeRenderShader1 = {
+
+	name: 'VolumeRenderShader1',
 
 	uniforms: {
 		'u_size': { value: new Vector3( 1, 1, 1 ) },
@@ -257,7 +266,7 @@ const VolumeRenderShader1 = {
 						// note: could allow multiple lights
 						for (int i=0; i<1; i++)
 						{
-								 // Get light direction (make sure to prevent zero devision)
+								 // Get light direction (make sure to prevent zero division)
 								vec3 L = normalize(view_ray);	//lightDirs[i];
 								float lightEnabled = float( length(L) > 0.0 );
 								L = normalize(L + (1.0 - lightEnabled));

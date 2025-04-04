@@ -240,26 +240,26 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					const info = getUniformSize( value );
 
-					// Calculate the chunk offset
-					const chunkOffsetUniform = offset % chunkSize;
+					const chunkOffset = offset % chunkSize; // offset in the current chunk
+					const chunkPadding = chunkOffset % info.boundary; // required padding to match boundary
+					const chunkStart = chunkOffset + chunkPadding; // the start position in the current chunk for the data
+
+					offset += chunkPadding;
 
 					// Check for chunk overflow
-					if ( chunkOffsetUniform !== 0 && ( chunkSize - chunkOffsetUniform ) < info.boundary ) {
+					if ( chunkStart !== 0 && ( chunkSize - chunkStart ) < info.storage ) {
 
 						// Add padding and adjust offset
-						offset += ( chunkSize - chunkOffsetUniform );
+						offset += ( chunkSize - chunkStart );
 
 					}
 
 					// the following two properties will be used for partial buffer updates
-
 					uniform.__data = new Float32Array( info.storage / Float32Array.BYTES_PER_ELEMENT );
 					uniform.__offset = offset;
 
-
 					// Update the global offset
 					offset += info.storage;
-
 
 				}
 

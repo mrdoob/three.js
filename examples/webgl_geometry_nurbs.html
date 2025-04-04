@@ -54,7 +54,6 @@
 			let windowHalfX = window.innerWidth / 2;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -171,9 +170,9 @@
 					object.position.set( - 400, 100, 0 );
 					object.scale.multiplyScalar( 1 );
 					group.add( object );
-			
+
 				}
-			
+
 				// NURBS volume
 				{
 
@@ -314,14 +313,15 @@
 					objectSide.position.set( 400, 100, 0 );
 					objectSide.scale.multiplyScalar( 0.5 );
 					group.add( objectSide );
-			
+
 				}
-			
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -371,7 +371,7 @@
 
 			}
 
-			function onPointerUp() {
+			function onPointerUp( event ) {
 
 				if ( event.isPrimary === false ) return;
 
@@ -383,8 +383,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

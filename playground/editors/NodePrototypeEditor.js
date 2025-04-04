@@ -1,6 +1,6 @@
 import { JavaScriptEditor } from './JavaScriptEditor.js';
 import { ScriptableEditor } from './ScriptableEditor.js';
-import { scriptable } from 'three/nodes';
+import { scriptable } from 'three/tsl';
 
 const defaultCode = `// Addition Node Example
 // Enjoy! :)
@@ -86,6 +86,12 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 	}
 
 	setEditor( editor ) {
+
+		if ( editor === null && this.editor ) {
+
+			this.editor.removeClass( this._prototype );
+
+		}
 
 		super.setEditor( editor );
 

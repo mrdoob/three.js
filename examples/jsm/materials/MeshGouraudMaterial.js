@@ -270,7 +270,13 @@ const GouraudShader = {
 
 			#endif
 
-			#include <lightmap_fragment>
+			#ifdef USE_LIGHTMAP
+
+				vec4 lightMapTexel = texture2D( lightMap, vLightMapUv );
+				vec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;
+				reflectedLight.indirectDiffuse += lightMapIrradiance;
+
+			#endif
 
 			reflectedLight.indirectDiffuse *= BRDF_Lambert( diffuseColor.rgb );
 
@@ -312,6 +318,8 @@ class MeshGouraudMaterial extends ShaderMaterial {
 	constructor( parameters ) {
 
 		super();
+
+		console.warn( 'THREE.MeshGouraudMaterial: MeshGouraudMaterial has been deprecated and will be removed with r183. Use THREE.MeshLambertMaterial instead.' ); // @deprecated r173
 
 		this.isMeshGouraudMaterial = true;
 

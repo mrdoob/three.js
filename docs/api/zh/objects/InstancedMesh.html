@@ -34,7 +34,7 @@
 		</p>
 
 		<h2>属性</h2>
-		<p>See the base [page:Mesh] class for common properties.</p>
+		<p>公共属性请查看基类 [page:Mesh]。</p>
 
 		<h3>[property:Box3 boundingBox]</h3>
 		<p>
@@ -67,14 +67,19 @@
 			如果你要通过 [page:.setMatrixAt]() 来修改实例数据，你必须将它的 [page:BufferAttribute.needsUpdate needsUpdate] 标识为 true 。
 		</p>
 
+		<h3>[property:DataTexture morphTexture]</h3>
+		<p>
+			用于表示所有实例的变形权重。如果你通过 [page:.setMorphAt]() 修改了实例数据，你必须将 [page:Texture.needsUpdate needsUpdate] 标识设置为 true。
+		</p>
+
 		<h3>[property:Boolean isInstancedMesh]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			用来检查对象是否属于 [name] 类型的只读标识。
 		</p>
 
 
 		<h2>方法</h2>
-		<p>See the base [page:Mesh] class for common methods.</p>
+		<p>公共方法请查看基类 [page:Mesh]。</p>
 
 		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
@@ -90,18 +95,18 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-			Frees the internal resources of this instance.
+			释放实例的内部资源。
 		</p>
 
 		<h3>[method:undefined getColorAt]( [param:Integer index], [param:Color color] )</h3>
 		<p>
-			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+			[page:Integer index]: 实例的索引。 值必须在 [0, count] 区间。
 		</p>
 		<p>
-			[page:Color color]: This color object will be set to the color of the defined instance.
+			[page:Color color]: 传入的颜色对象将会被设置为指定的实例的颜色。
 		</p>
 		<p>
-			Get the color of the defined instance.
+			获取已定义实例的颜色。
 		</p>
 
 		<h3>[method:undefined getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
@@ -115,16 +120,26 @@
 			获得已定义实例的本地变换矩阵。
 		</p>
 
+		<h3>
+			[method:undefined getMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: 实例的索引。值必须在 [0, count] 区间。
+		</p>
+		<p>
+			[page:Mesh mesh]: 网格属性 [page:Mesh.morphTargetInfluences .morphTargetInfluences] 将会被填充为已定义实例的变形权重。
+		</p>
+		<p>获取已定义实例的变形权重</p>
+
 		<h3>[method:undefined setColorAt]( [param:Integer index], [param:Color color] )</h3>
 		<p>
-			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+			[page:Integer index]: 实例的索引。值必须在 [0, count] 区间。
 		</p>
 		<p>
-			[page:Color color]: The color of a single instance.
+			[page:Color color]: 单个实例的颜色。
 		</p>
 		<p>
-			Sets the given color to the defined instance.
-			Make sure you set [page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] to true after updating all the colors.
+			设置已定义实例的颜色。请确保在更新颜色后将 [page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] 标识设置为 true。
 		</p>
 
 		<h3>[method:undefined setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
@@ -137,6 +152,19 @@
 		<p>
 			设置给定的本地变换矩阵到已定义的实例。
 			请确保在更新所有矩阵后将 [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 设置为true。
+		</p>
+
+		<h3>
+			[method:undefined setMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: 实例的索引。值必须在 [0, count] 区间。
+		</p>
+		<p>
+			[page:Mesh mesh]: 网格属性 [page:Mesh.morphTargetInfluences .morphTargetInfluences] 包含了单个实例的变形权重。
+		</p>
+		<p>
+		 设置已定义实例的变形权重。请确保在更新所有变形数据后将 [page:.morphTexture][page:Texture.needsUpdate .needsUpdate] 设置为 true。
 		</p>
 
 		<h2>源代码</h2>

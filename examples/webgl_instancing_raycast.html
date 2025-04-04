@@ -37,7 +37,6 @@
 			const white = new THREE.Color().setHex( 0xffffff );
 
 			init();
-			animate();
 
 			function init() {
 
@@ -90,6 +89,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -125,8 +125,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				controls.update();
 
 				raycaster.setFromCamera( mouse, camera );
@@ -149,15 +147,9 @@
 
 				}
 
-				render();
+				renderer.render( scene, camera );
 
 				stats.update();
-
-			}
-
-			function render() {
-
-				renderer.render( scene, camera );
 
 			}
 

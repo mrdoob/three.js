@@ -10,7 +10,7 @@ export default QUnit.module( 'Animation', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const clip = new AnimationClip( 'clip1', 1000, [ {} ] );
-			assert.ok( clip, 'AnimationClip can be instanciated' );
+			assert.ok( clip, 'AnimationClip can be instantiated' );
 
 		} );
 

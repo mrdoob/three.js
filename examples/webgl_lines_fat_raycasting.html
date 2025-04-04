@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 				}
 			}
 		</script>
@@ -26,8 +27,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js';
+			import Stats from 'stats-gl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -40,7 +40,7 @@
 			let line, thresholdLine, segments, thresholdSegments;
 			let renderer, scene, camera, controls;
 			let sphereInter, sphereOnLine;
-			let stats, gpuPanel;
+			let stats;
 			let gui;
 			let clock;
 
@@ -60,7 +60,6 @@
 				worldUnits: true,
 				vertexColors: true,
 
-				//resolution:  // to be set by renderer, eventually
 				alphaToCoverage: true,
 
 			} );
@@ -75,7 +74,6 @@
 				opacity: 0.2,
 				depthTest: false,
 				visible: false,
-				//resolution:  // to be set by renderer, eventually
 
 			} );
 
@@ -93,7 +91,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -101,8 +98,9 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setClearColor( 0x000000, 0.0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -196,12 +194,10 @@
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
-				stats = new Stats();
+				stats = new Stats( { horizontal: false, trackGPU: true } );
+				stats.init( renderer );
 				document.body.appendChild( stats.dom );
-
-				gpuPanel = new GPUStatsPanel( renderer.getContext() );
-				stats.addPanel( gpuPanel );
-				stats.showPanel( 0 );
+			
 				initGui();
 
 			}
@@ -213,10 +209,6 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				// renderer will set this eventually
-				matLine.resolution.set( window.innerWidth, window.innerHeight );
-				matThresholdLine.resolution.set( window.innerWidth, window.innerHeight );
-
 			}
 
 			function onPointerMove( event ) {
@@ -227,10 +219,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				stats.update();
 
 				const delta = clock.getDelta();
 
@@ -278,9 +266,9 @@
 
 				}
 
-				gpuPanel.startQuery();
 				renderer.render( scene, camera );
-				gpuPanel.endQuery();
+
+				stats.update();
 
 			}
 

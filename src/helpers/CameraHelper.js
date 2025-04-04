@@ -5,19 +5,34 @@ import { Color } from '../math/Color.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { WebGLCoordinateSystem } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _camera = /*@__PURE__*/ new Camera();
 
 /**
- *	- shows frustum, line of sight and up of the camera
- *	- suitable for fast updates
- * 	- based on frustum visualization in lightgl.js shadowmap example
- *		https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html
+ * This helps with visualizing what a camera contains in its frustum. It
+ * visualizes the frustum of a camera using a line segments.
+ *
+ * Based on frustum visualization in [lightgl.js shadowmap example]{@link https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html}.
+ *
+ * `CameraHelper` must be a child of the scene.
+ *
+ * ```js
+ * const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+ * const helper = new THREE.CameraHelper( camera );
+ * scene.add( helper );
+ * ```
+ *
+ * @augments LineSegments
  */
-
 class CameraHelper extends LineSegments {
 
+	/**
+	 * Constructs a new arrow helper.
+	 *
+	 * @param {Camera} camera - The camera to visualize.
+	 */
 	constructor( camera ) {
 
 		const geometry = new BufferGeometry();
@@ -104,12 +119,22 @@ class CameraHelper extends LineSegments {
 
 		this.type = 'CameraHelper';
 
+		/**
+		 * The camera being visualized.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
 		if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
 		this.matrix = camera.matrixWorld;
 		this.matrixAutoUpdate = false;
 
+		/**
+		 * This contains the points used to visualize the camera.
+		 *
+		 * @type {Object<string,Array<number>>}
+		 */
 		this.pointMap = pointMap;
 
 		this.update();
@@ -126,6 +151,15 @@ class CameraHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Defines the colors of the helper.
+	 *
+	 * @param {Color} frustum - The frustum line color.
+	 * @param {Color} cone - The cone line color.
+	 * @param {Color} up - The up line color.
+	 * @param {Color} target - The target line color.
+	 * @param {Color} cross - The cross line color.
+	 */
 	setColors( frustum, cone, up, target, cross ) {
 
 		const geometry = this.geometry;
@@ -183,6 +217,9 @@ class CameraHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Updates the helper based on the projection matrix of the camera.
+	 */
 	update() {
 
 		const geometry = this.geometry;
@@ -195,17 +232,19 @@ class CameraHelper extends LineSegments {
 
 		_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
-		// center / target
+		// Adjust z values based on coordinate system
+		const nearZ = this.camera.coordinateSystem === WebGLCoordinateSystem ? - 1 : 0;
 
-		setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
+		// center / target
+		setPoint( 'c', pointMap, geometry, _camera, 0, 0, nearZ );
 		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
-		setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
-		setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
-		setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
+		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
+		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
@@ -216,9 +255,9 @@ class CameraHelper extends LineSegments {
 
 		// up
 
-		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
+		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
@@ -227,15 +266,19 @@ class CameraHelper extends LineSegments {
 		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
-		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
-		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
+		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
+		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
+		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.geometry.dispose();

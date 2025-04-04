@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -56,7 +57,7 @@ function GeometryParametersPanel( editor, object ) {
 	// p
 
 	const pRow = new UIRow();
-	const p = new UINumber( parameters.p ).onChange( update );
+	const p = new UIInteger( parameters.p ).onChange( update );
 
 	pRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/p' ) ).setClass( 'Label' ) );
 	pRow.add( p );
@@ -66,13 +67,37 @@ function GeometryParametersPanel( editor, object ) {
 	// q
 
 	const qRow = new UIRow();
-	const q = new UINumber( parameters.q ).onChange( update );
+	const q = new UIInteger( parameters.q ).onChange( update );
 
 	qRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/q' ) ).setClass( 'Label' ) );
 	qRow.add( q );
 
 	container.add( qRow );
 
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radius.setValue( parameters.radius );
+		tube.setValue( parameters.tube );
+		tubularSegments.setValue( parameters.tubularSegments );
+		radialSegments.setValue( parameters.radialSegments );
+		p.setValue( parameters.p );
+		q.setValue( parameters.q );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

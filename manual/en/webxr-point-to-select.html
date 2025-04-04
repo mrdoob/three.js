@@ -56,7 +56,7 @@ so here we're just hiding the selected object and un-hiding its partner.</p>
 <p>As for the actual implementation of <code class="notranslate" translate="no">ControllerPickHelper</code>, first we need
 to add the VR controller objects to the scene and to those add some 3D lines
 we can use to display where the user is pointing. We save off both the controllers
-and the their lines.</p>
+and their lines.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
   constructor(scene) {
     const pointerGeometry = new THREE.BufferGeometry().setFromPoints([

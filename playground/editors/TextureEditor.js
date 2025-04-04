@@ -1,7 +1,7 @@
 import { LabelElement, ToggleInput, SelectInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { onValidNode, onValidType } from '../NodeEditorUtils.js';
-import { texture, uv } from 'three/nodes';
+import { texture, uv } from 'three/tsl';
 import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from 'three';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 

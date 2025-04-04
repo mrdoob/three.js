@@ -11,10 +11,37 @@ import { Vector3 } from '../math/Vector3.js';
 const _axis = /*@__PURE__*/ new Vector3();
 let _lineGeometry, _coneGeometry;
 
+/**
+ * An 3D arrow object for visualizing directions.
+ *
+ * ```js
+ * const dir = new THREE.Vector3( 1, 2, 0 );
+ *
+ * //normalize the direction vector (convert to vector of length 1)
+ * dir.normalize();
+ *
+ * const origin = new THREE.Vector3( 0, 0, 0 );
+ * const length = 1;
+ * const hex = 0xffff00;
+ *
+ * const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+ * scene.add( arrowHelper );
+ * ```
+ *
+ * @augments Object3D
+ */
 class ArrowHelper extends Object3D {
 
-	// dir is assumed to be normalized
-
+	/**
+	 * Constructs a new arrow helper.
+	 *
+	 * @param {Vector3} [dir=(0, 0, 1)] - The (normalized) direction vector.
+	 * @param {Vector3} [origin=(0, 0, 0)] - Point at which the arrow starts.
+	 * @param {number} [length=1] - Length of the arrow in world units.
+	 * @param {(number|Color|string)} [color=0xffff00] - Color of the arrow.
+	 * @param {number} [headLength=length*0.2] - The length of the head of the arrow.
+	 * @param {number} [headWidth=headLength*0.2] - The width of the head of the arrow.
+	 */
 	constructor( dir = new Vector3( 0, 0, 1 ), origin = new Vector3( 0, 0, 0 ), length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		super();
@@ -33,10 +60,20 @@ class ArrowHelper extends Object3D {
 
 		this.position.copy( origin );
 
+		/**
+		 * The line part of the arrow helper.
+		 *
+		 * @type {Line}
+		 */
 		this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 		this.line.matrixAutoUpdate = false;
 		this.add( this.line );
 
+		/**
+		 * The cone part of the arrow helper.
+		 *
+		 * @type {Mesh}
+		 */
 		this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color, toneMapped: false } ) );
 		this.cone.matrixAutoUpdate = false;
 		this.add( this.cone );
@@ -46,6 +83,11 @@ class ArrowHelper extends Object3D {
 
 	}
 
+	/**
+	 * Sets the direction of the helper.
+	 *
+	 * @param {Vector3} dir - The normalized direction vector.
+	 */
 	setDirection( dir ) {
 
 		// dir is assumed to be normalized
@@ -70,6 +112,13 @@ class ArrowHelper extends Object3D {
 
 	}
 
+	/**
+	 * Sets the length of the helper.
+	 *
+	 * @param {number} length - Length of the arrow in world units.
+	 * @param {number} [headLength=length*0.2] - The length of the head of the arrow.
+	 * @param {number} [headWidth=headLength*0.2] - The width of the head of the arrow.
+	 */
 	setLength( length, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
@@ -81,6 +130,11 @@ class ArrowHelper extends Object3D {
 
 	}
 
+	/**
+	 * Sets the color of the helper.
+	 *
+	 * @param {number|Color|string} color - The color to set.
+	 */
 	setColor( color ) {
 
 		this.line.material.color.set( color );
@@ -99,6 +153,10 @@ class ArrowHelper extends Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.line.geometry.dispose();
@@ -109,6 +167,5 @@ class ArrowHelper extends Object3D {
 	}
 
 }
-
 
 export { ArrowHelper };

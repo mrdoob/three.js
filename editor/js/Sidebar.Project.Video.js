@@ -16,17 +16,25 @@ function SidebarProjectVideo( editor ) {
 
 	// Resolution
 
+	function toDiv2() {
+
+		// Make sure dimensions are divisible by 2 (requirement of libx264)
+
+		this.setValue( 2 * Math.floor( this.getValue() / 2 ) );
+
+	}
+
 	const resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
 	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClass( 'Label' ) );
 
-	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
+	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' ).setStep( 2 ).onChange( toDiv2 );
 	resolutionRow.add( videoWidth );
 
 	resolutionRow.add( new UIText( '×' ).setTextAlign( 'center' ).setFontSize( '12px' ).setWidth( '12px' ) );
 
-	const videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
+	const videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' ).setStep( 2 ).onChange( toDiv2 );
 	resolutionRow.add( videoHeight );
 
 	const videoFPS = new UIInteger( 30 ).setTextAlign( 'center' ).setWidth( '20px' );
@@ -80,13 +88,49 @@ function SidebarProjectVideo( editor ) {
 		output.document.body.style.overflow = 'hidden';
 		output.document.body.appendChild( canvas );
 
-		const progress = document.createElement( 'progress' );
-		progress.style.position = 'absolute';
-		progress.style.top = '10px';
-		progress.style.left = ( ( width - 170 ) / 2 ) + 'px';
-		progress.style.width = '170px';
-		progress.value = 0;
-		output.document.body.appendChild( progress );
+		const status = document.createElement( 'div' );
+		status.style.position = 'absolute';
+		status.style.top = '10px';
+		status.style.left = '10px';
+		status.style.color = 'white';
+		status.style.fontFamily = 'system-ui';
+		status.style.fontSize = '12px';
+		status.style.textShadow = '0 0 2px black';
+		output.document.body.appendChild( status );
+
+		const writeFileStatus = document.createElement( 'span' );
+		status.appendChild( writeFileStatus );
+
+		const encodingText = document.createElement( 'span' );
+		encodingText.textContent = ' encoding'; // TODO: l10n
+		encodingText.hidden = true;
+		status.appendChild( encodingText );
+
+		const encodingStatus = document.createElement( 'span' );
+		encodingStatus.hidden = true;
+		status.appendChild( encodingStatus );
+
+		const videoSizeText = document.createElement( 'span' );
+		videoSizeText.textContent = ' size'; // TODO: l10n
+		videoSizeText.hidden = true;
+		status.appendChild( videoSizeText );
+
+		const videoSizeStatus = document.createElement( 'span' );
+		videoSizeStatus.hidden = true;
+		status.appendChild( videoSizeStatus );
+
+		const completedStatus = document.createElement( 'span' );
+		completedStatus.textContent = ' ✓';
+		completedStatus.hidden = true;
+		status.appendChild( completedStatus );
+
+		const video = document.createElement( 'video' );
+		video.width = width;
+		video.height = height;
+		video.controls = true;
+		video.loop = true;
+		video.hidden = true;
+		output.document.body.appendChild( video );
 
 		//
 
@@ -97,7 +141,21 @@ function SidebarProjectVideo( editor ) {
 
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			progress.value = ( ratio * 0.5 ) + 0.5;
+			encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
+
+		} );
+
+		output.addEventListener( 'unload', function () {
+
+			if ( video.src.startsWith( 'blob:' ) ) {
+
+				URL.revokeObjectURL( video.src );
+
+			} else {
+
+				ffmpeg.exit();
+
+			}
 
 		} );
 
@@ -105,41 +163,57 @@ function SidebarProjectVideo( editor ) {
 		const duration = videoDuration.getValue();
 		const frames = duration * fps;
 
-		let currentTime = 0;
+		//
 
-		for ( let i = 0; i < frames; i ++ ) {
+		await ( async function () {
 
-			player.render( currentTime );
+			let currentTime = 0;
 
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
-			currentTime += 1 / fps;
+			for ( let i = 0; i < frames; i ++ ) {
 
-			progress.value = ( i / frames ) * 0.5;
+				player.render( currentTime );
 
-		}
+				const num = i.toString().padStart( 5, '0' );
 
-		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
+				if ( output.closed ) return;
 
-		const data = ffmpeg.FS( 'readFile', 'out.mp4' );
+				ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
+				currentTime += 1 / fps;
 
-		for ( let i = 0; i < frames; i ++ ) {
+				const frame = i + 1;
+				const progress = Math.floor( frame / frames * 100 );
+				writeFileStatus.textContent = `${ frame } / ${ frames } ( ${ progress }% )`;
 
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'unlink', `tmp.${num}.png` );
+			}
 
-		}
+			encodingText.hidden = false;
+			encodingStatus.hidden = false;
 
-		output.document.body.removeChild( canvas );
-		output.document.body.removeChild( progress );
+			await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 
-		const video = document.createElement( 'video' );
-		video.width = width;
-		video.height = height;
-		video.controls = true;
-		video.loop = true;
-		video.src = URL.createObjectURL( new Blob( [ data.buffer ], { type: 'video/mp4' } ) );
-		output.document.body.appendChild( video );
+			const videoData = ffmpeg.FS( 'readFile', 'out.mp4' );
+
+			for ( let i = 0; i < frames; i ++ ) {
+
+				const num = i.toString().padStart( 5, '0' );
+				ffmpeg.FS( 'unlink', `tmp.${num}.png` );
+
+			}
+
+			ffmpeg.FS( 'unlink', 'out.mp4' );
+
+			output.document.body.removeChild( canvas );
+
+			videoSizeText.hidden = false;
+			videoSizeStatus.textContent = `( ${ formatFileSize( videoData.buffer.byteLength ) } )`;
+			videoSizeStatus.hidden = false;
+
+			completedStatus.hidden = false;
+
+			video.src = URL.createObjectURL( new Blob( [ videoData.buffer ], { type: 'video/mp4' } ) );
+			video.hidden = false;
+
+		} )();
 
 		player.dispose();
 
@@ -149,6 +223,19 @@ function SidebarProjectVideo( editor ) {
 	//
 
 	return container;
+
+}
+
+function formatFileSize( sizeB, K = 1024 ) {
+
+	if ( sizeB === 0 ) return '0B';
+
+	const sizes = [ sizeB, sizeB / K, sizeB / K / K ].reverse();
+	const units = [ 'B', 'KB', 'MB' ].reverse();
+	const index = sizes.findIndex( size => size >= 1 );
+
+	return new Intl.NumberFormat( 'en-us', { useGrouping: true, maximumFractionDigits: 1 } )
+		.format( sizes[ index ] ) + units[ index ];
 
 }
 

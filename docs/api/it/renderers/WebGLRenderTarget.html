@@ -40,8 +40,11 @@
 		[page:Constant type] - il valore predefinito è [page:Textures UnsignedByteType]. <br />
 		[page:Number anisotropy] - il valore predefinito è `1`. Vedi [page:Texture.anisotropy]<br />
 		[page:Constant colorSpace] - il valore predefinito è [page:Textures NoColorSpace]. <br />
+		[page:String internalFormat] - il valore predefinito è `null`.<br />
 		[page:Boolean depthBuffer] - il valore predefinito è `true`. <br />
 		[page:Boolean stencilBuffer] - il valore predefinito è `false`.<br />
+		[page:Boolean resolveDepthBuffer] - il valore predefinito è `true`.<br />
+		[page:Boolean resolveStencilBuffer] - il valore predefinito è `true`.<br />
 		[page:Number samples] - il valore predefinito è 0.<br />
 		[page:Number count] - default is `1`.<br /><br />
 
@@ -99,6 +102,19 @@
 		<h3>[property:Boolean stencilBuffer]</h3>
 		<p>
 			Effettua il rendering al buffer stencil. Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Boolean resolveDepthBuffer]</h3>
+		<p>
+			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
+			Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
+			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+			Il valore predefinito è `true`.
 		</p>
 
 		<h3>[property:DepthTexture depthTexture]</h3>

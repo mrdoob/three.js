@@ -61,10 +61,31 @@
 		<h3>[property:Object image]</h3>
 		<p>Overridden with a object containing width, height, and depth.</p>
 
+		<h3>[property:Set layerUpdates]</h3>
+		<p>
+			A set of all layers which need to be updated in the texture. See
+			[Page:CompressedTextureArray.addLayerUpdate addLayerUpdate].
+		</p>
+
 		<h3>[property:Boolean isCompressedArrayTexture]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h2>Methods</h2>
+
+		<h3>[method:addLayerUpdate addLayerUpdate]( layerIndex )</h3>
+		<p>
+			Describes that a specific layer of the texture needs to be updated.
+			Normally when [page:Texture.needsUpdate needsUpdate] is set to true, the
+			entire compressed texture array is sent to the GPU. Marking specific
+			layers will only transmit subsets of all mipmaps associated with a
+			specific depth in the array which is often much more performant.
+		</p>
+
+		<h3>[method:clearLayerUpdates clearLayerUpdates]()</h3>
+		<p>
+			Resets the layer updates registry. See
+			[Page:CompressedTextureArray.addLayerUpdate addLayerUpdate].
+		</p>
 
 		<p>
 			See the base [page:CompressedTexture CompressedTexture] class for common

@@ -34,7 +34,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.z = 2;
@@ -44,7 +44,7 @@
 				clock = new THREE.Clock();
 
 				const loader = new THREE.TextureLoader();
-				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
+				diffuseMap = await loader.loadAsync( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
 				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
@@ -68,6 +68,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -87,8 +88,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				const elapsedTime = clock.getElapsedTime();
 
 				if ( elapsedTime - last > 0.1 ) {
@@ -104,7 +103,7 @@
 
 					// perform copy from src to dest texture to a random position
 
-					renderer.copyTextureToTexture( position, dataTexture, diffuseMap );
+					renderer.copyTextureToTexture( dataTexture, diffuseMap, null, position );
 
 				}
 

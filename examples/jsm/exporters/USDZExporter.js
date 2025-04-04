@@ -1,6 +1,7 @@
 import {
 	NoColorSpace,
 	DoubleSide,
+	Color,
 } from 'three';
 
 import {
@@ -8,17 +9,77 @@ import {
 	zipSync,
 } from '../libs/fflate.module.js';
 
-import { decompress } from './../utils/TextureUtils.js';
-
+/**
+ * An exporter for USDZ.
+ *
+ * ```js
+ * const exporter = new USDZExporter();
+ * const arraybuffer = await exporter.parseAsync( scene );
+ * ```
+ *
+ * @three_import import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+ */
 class USDZExporter {
 
-	async parse( scene, options = {} ) {
+	/**
+	 * Constructs a new USDZ exporter.
+	 */
+	constructor() {
+
+		/**
+		 * A reference to a texture utils module.
+		 *
+		 * @type {?(WebGLTextureUtils|WebGPUTextureUtils)}
+		 * @default null
+		 */
+		this.textureUtils = null;
+
+	}
+
+	/**
+	 * Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.
+	 *
+	 * Depending on whether you use {@link WebGLRenderer} or {@link WebGPURenderer}, you must inject the
+	 * corresponding texture utils {@link WebGLTextureUtils} or {@link WebGPUTextureUtils}.
+	 *
+	 * @param {WebGLTextureUtils|WebGPUTextureUtils} utils - The texture utils.
+	 */
+	setTextureUtils( utils ) {
+
+		this.textureUtils = utils;
+
+	}
+
+	/**
+	 * Parse the given 3D object and generates the USDZ output.
+	 *
+	 * @param {Object3D} scene - The 3D object to export.
+	 * @param {USDZExporter~OnDone} onDone - A callback function that is executed when the export has finished.
+	 * @param {USDZExporter~OnError} onError - A callback function that is executed when an error happens.
+	 * @param {USDZExporter~Options} options - The export options.
+	 */
+	parse( scene, onDone, onError, options ) {
+
+		this.parseAsync( scene, options ).then( onDone ).catch( onError );
+
+	}
+
+	/**
+	 * Async version of {@link USDZExporter#parse}.
+	 *
+	 * @async
+	 * @param {Object3D} scene - The 3D object to export.
+	 * @param {USDZExporter~Options} options - The export options.
+	 * @return {Promise<ArrayBuffer>} A Promise that resolved with the exported USDZ data.
+	 */
+	async parseAsync( scene, options = {} ) {
 
 		options = Object.assign( {
 			ar: {
 				anchoring: { type: 'plane' },
 				planeAnchoring: { alignment: 'horizontal' }
 			},
+			includeAnchoringProperties: true,
 			quickLookCompatible: false,
 			maxTextureSize: 1024,
 		}, options );
@@ -60,7 +121,7 @@ class USDZExporter {
 
 					}
 
-					output += buildXform( object, geometry, material );
+					output += buildXform( object, geometry, materials[ material.uuid ] );
 
 				} else {
 
@@ -90,7 +151,15 @@ class USDZExporter {
 
 			if ( texture.isCompressedTexture === true ) {
 
-				texture = decompress( texture );
+				if ( this.textureUtils === null ) {
+
+					throw new Error( 'THREE.USDZExporter: setTextureUtils() must be called to process compressed textures.' );
+
+				} else {
+
+					texture = await this.textureUtils.decompress( texture );
+
+				}
 
 			}
 
@@ -192,6 +261,10 @@ function buildHeader() {
 
 function buildSceneStart( options ) {
 
+	const alignment = options.includeAnchoringProperties === true ? `
+		token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+		token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+	` : '';
 	return `def Xform "Root"
 {
 	def Scope "Scenes" (
@@ -205,10 +278,7 @@ function buildSceneStart( options ) {
 			}
 			sceneName = "Scene"
 		)
-		{
-		token preliminary:anchoring:type = "${options.ar.anchoring.type}"
-		token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
-
+		{${alignment}
 `;
 
 }
@@ -576,7 +646,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		inputs.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }_emissive.outputs:rgb>` );
 
-		samplers.push( buildTexture( material.emissiveMap, 'emissive' ) );
+		samplers.push( buildTexture( material.emissiveMap, 'emissive', new Color( material.emissive.r * material.emissiveIntensity, material.emissive.g * material.emissiveIntensity, material.emissive.b * material.emissiveIntensity ) ) );
 
 	} else if ( material.emissive.getHex() > 0 ) {
 
@@ -596,15 +666,15 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		inputs.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }_occlusion.outputs:r>` );
 
-		samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
+		samplers.push( buildTexture( material.aoMap, 'occlusion', new Color( material.aoMapIntensity, material.aoMapIntensity, material.aoMapIntensity ) ) );
 
 	}
 
-	if ( material.roughnessMap !== null && material.roughness === 1 ) {
+	if ( material.roughnessMap !== null ) {
 
 		inputs.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
 
-		samplers.push( buildTexture( material.roughnessMap, 'roughness' ) );
+		samplers.push( buildTexture( material.roughnessMap, 'roughness', new Color( material.roughness, material.roughness, material.roughness ) ) );
 
 	} else {
 
@@ -612,11 +682,11 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.metalnessMap !== null && material.metalness === 1 ) {
+	if ( material.metalnessMap !== null ) {
 
 		inputs.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metallic.outputs:b>` );
 
-		samplers.push( buildTexture( material.metalnessMap, 'metallic' ) );
+		samplers.push( buildTexture( material.metalnessMap, 'metallic', new Color( material.metalness, material.metalness, material.metalness ) ) );
 
 	} else {
 
@@ -639,8 +709,28 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	if ( material.isMeshPhysicalMaterial ) {
 
-		inputs.push( `${ pad }float inputs:clearcoat = ${ material.clearcoat }` );
-		inputs.push( `${ pad }float inputs:clearcoatRoughness = ${ material.clearcoatRoughness }` );
+		if ( material.clearcoatMap !== null ) {
+
+			inputs.push( `${pad}float inputs:clearcoat.connect = </Materials/Material_${material.id}/Texture_${material.clearcoatMap.id}_clearcoat.outputs:r>` );
+			samplers.push( buildTexture( material.clearcoatMap, 'clearcoat', new Color( material.clearcoat, material.clearcoat, material.clearcoat ) ) );
+
+		} else {
+
+			inputs.push( `${pad}float inputs:clearcoat = ${material.clearcoat}` );
+
+		}
+
+		if ( material.clearcoatRoughnessMap !== null ) {
+
+			inputs.push( `${pad}float inputs:clearcoatRoughness.connect = </Materials/Material_${material.id}/Texture_${material.clearcoatRoughnessMap.id}_clearcoatRoughness.outputs:g>` );
+			samplers.push( buildTexture( material.clearcoatRoughnessMap, 'clearcoatRoughness', new Color( material.clearcoatRoughness, material.clearcoatRoughness, material.clearcoatRoughness ) ) );
+
+		} else {
+
+			inputs.push( `${pad}float inputs:clearcoatRoughness = ${material.clearcoatRoughness}` );
+
+		}
+
 		inputs.push( `${ pad }float inputs:ior = ${ material.ior }` );
 
 	}
@@ -708,7 +798,7 @@ function buildCamera( camera ) {
 			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
 			token projection = "orthographic"
 		}
-	
+
 	`;
 
 	} else {
@@ -725,11 +815,37 @@ function buildCamera( camera ) {
 			token projection = "perspective"
 			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
 		}
-	
+
 	`;
 
 	}
 
 }
+
+/**
+ * Export options of `USDZExporter`.
+ *
+ * @typedef {Object} USDZExporter~Options
+ * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
+ * @property {boolean} [includeAnchoringProperties=false] - Whether to include anchoring properties or not.
+ * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
+ * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
+ * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook
+ * which means the asset is modified to accommodate the bugs FB10036297 and FB11442287 (Apple Feedback).
+ **/
+
+/**
+ * onDone callback of `USDZExporter`.
+ *
+ * @callback USDZExporter~OnDone
+ * @param {ArrayBuffer} result - The generated USDZ.
+ */
+
+/**
+ * onError callback of `USDZExporter`.
+ *
+ * @callback USDZExporter~OnError
+ * @param {Error} error - The error object.
+ */
 
 export { USDZExporter };

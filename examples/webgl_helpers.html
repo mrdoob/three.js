@@ -35,13 +35,13 @@
 			let vth;
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -131,8 +131,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const time = - performance.now() * 0.0003;
 

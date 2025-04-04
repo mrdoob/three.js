@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
-// import { ViewportPathtracer } from './Viewport.Pathtracer.js';
+import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function SidebarProjectImage( editor ) {
 
@@ -19,16 +19,33 @@ function SidebarProjectImage( editor ) {
 	// Shading
 
 	const shadingRow = new UIRow();
-	// container.add( shadingRow );
+	container.add( shadingRow );
 
 	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
 
 	const shadingTypeSelect = new UISelect().setOptions( {
-		0: 'Solid',
-		1: 'Realistic'
-	} ).setWidth( '125px' );
-	shadingTypeSelect.setValue( 0 );
+		'solid': 'SOLID',
+		'realistic': 'REALISTIC'
+	} ).setWidth( '170px' ).onChange( refreshShadingRow ).setValue( 'solid' );
 	shadingRow.add( shadingTypeSelect );
+
+	const pathTracerMinSamples = 3;
+	const pathTracerMaxSamples = 65536;
+	const samplesNumber = new UIInteger( 16 ).setRange( pathTracerMinSamples, pathTracerMaxSamples );
+
+	const samplesRow = new UIRow();
+	samplesRow.add( new UIText( strings.getKey( 'sidebar/project/image/samples' ) ).setClass( 'Label' ) );
+	samplesRow.add( samplesNumber );
+
+	container.add( samplesRow );
+
+	function refreshShadingRow() {
+
+		samplesRow.setHidden( shadingTypeSelect.getValue() !== 'realistic' );
+
+	}
+
+	refreshShadingRow();
 
 	// Resolution
 
@@ -51,6 +68,44 @@ function SidebarProjectImage( editor ) {
 	renderButton.setWidth( '170px' );
 	renderButton.setMarginLeft( '120px' );
 	renderButton.onClick( async () => {
+
+		if ( shadingTypeSelect.getValue() === 'realistic' ) {
+
+			let isMaterialsValid = true;
+
+			editor.scene.traverseVisible( ( object ) => {
+
+				if ( object.isMesh ) {
+
+					const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+
+					for ( let i = 0; i < materials.length; i ++ ) {
+
+						const material = materials[ i ];
+
+						if ( ! material.isMeshStandardMaterial ) {
+
+							isMaterialsValid = false;
+							return;
+
+						}
+
+					}
+
+				}
+
+			} );
+
+			if ( isMaterialsValid === false ) {
+
+				alert( strings.getKey( 'prompt/rendering/realistic/unsupportedMaterial' ) );
+				return;
+
+			}
+
+		}
+
+		//
 
 		const json = editor.toJSON();
 		const project = json.project;
@@ -100,16 +155,16 @@ function SidebarProjectImage( editor ) {
 
 		//
 
-		switch ( Number( shadingTypeSelect.getValue() ) ) {
+		switch ( shadingTypeSelect.getValue() ) {
 
-			case 0: // SOLID
+			case 'solid':
 
 				renderer.render( scene, camera );
 				renderer.dispose();
 
 				break;
-			/*
-			case 1: // REALISTIC
+
+			case 'realistic':
 
 				const status = document.createElement( 'div' );
 				status.style.position = 'absolute';
@@ -120,26 +175,41 @@ function SidebarProjectImage( editor ) {
 				status.style.fontSize = '12px';
 				output.document.body.appendChild( status );
 
-				const pathtracer = new ViewportPathtracer( renderer );
-				pathtracer.init( scene, camera );
-				pathtracer.setSize( imageWidth.getValue(), imageHeight.getValue());
+				const pathTracer = new ViewportPathtracer( renderer );
+				pathTracer.init( scene, camera );
+				pathTracer.setSize( imageWidth.getValue(), imageHeight.getValue() );
+
+				const maxSamples = Math.max( pathTracerMinSamples, Math.min( pathTracerMaxSamples, samplesNumber.getValue() ) );
 
 				function animate() {
 
 					if ( output.closed === true ) return;
 
-					requestAnimationFrame( animate );
+					const samples = Math.floor( pathTracer.getSamples() ) + 1;
 
-					pathtracer.update();
+					if ( samples < maxSamples ) {
 
-					// status.textContent = Math.floor( samples );
+						requestAnimationFrame( animate );
+
+					}
+
+					pathTracer.update();
+
+					const progress = Math.floor( samples / maxSamples * 100 );
+
+					status.textContent = `${ samples } / ${ maxSamples } ( ${ progress }% )`;
+
+					if ( progress === 100 ) {
+
+						status.textContent += ' ✓';
+
+					}
 
 				}
 
 				animate();
 
 				break;
-			*/
 
 		}
 

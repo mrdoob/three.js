@@ -28,17 +28,65 @@ function getShape( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
+	} else if ( geometry.type === 'CylinderGeometry' ) {
+
+		const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius );
+
+	} else if ( geometry.type === 'CapsuleGeometry' ) {
+
+		const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.capsule( length / 2, radius );
+
+	} else if ( geometry.type === 'BufferGeometry' ) {
+
+		const vertices = [];
+		const vertex = new Vector3();
+		const position = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+			vertices.push( vertex.x, vertex.y, vertex.z );
+
+		}
+
+		// if the buffer is non-indexed, generate an index buffer
+		const indices = geometry.getIndex() === null
+			? Uint32Array.from( Array( parseInt( vertices.length / 3 ) ).keys() )
+			: geometry.getIndex().array;
+
+		return RAPIER.ColliderDesc.trimesh( vertices, indices );
+
 	}
 
 	return null;
 
 }
 
+/**
+ * @classdesc Can be used to include Rapier as a Physics engine into
+ * `three.js` apps. The API can be initialized via:
+ * ```js
+ * const physics = await RapierPhysics();
+ * ```
+ * The component automatically imports Rapier from a CDN so make sure
+ * to use the component with an active Internet connection.
+ *
+ * @name RapierPhysics
+ * @class
+ * @hideconstructor
+ * @three_import import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+ */
 async function RapierPhysics() {
 
 	if ( RAPIER === null ) {
 
-		RAPIER = await import( RAPIER_PATH );
+		RAPIER = await import( `${RAPIER_PATH}` );
 		await RAPIER.init();
 
 	}
@@ -85,8 +133,12 @@ async function RapierPhysics() {
 		shape.setRestitution( restitution );
 
 		const body = mesh.isInstancedMesh
-							? createInstancedBody( mesh, mass, shape )
-							: createBody( mesh.position, mesh.quaternion, mass, shape );
+			? createInstancedBody( mesh, mass, shape )
+			: createBody( mesh.position, mesh.quaternion, mass, shape );
+
+		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
+
+		mesh.userData.physics.body = body;
 
 		if ( mass > 0 ) {
 
@@ -209,9 +261,54 @@ async function RapierPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		RAPIER,
+		world,
+		/**
+		 * Adds the given scene to this physics simulation. Only meshes with a
+		 * `physics` object in their {@link Object3D#userData} field will be honored.
+		 * The object can be used to store the mass and restitution of the mesh. E.g.:
+		 * ```js
+		 * box.userData.physics = { mass: 1, restitution: 0 };
+		 * ```
+		 *
+		 * @method
+		 * @name RapierPhysics#addScene
+		 * @param {Object3D} scene The scene or any type of 3D object to add.
+		 */
 		addScene: addScene,
+
+		/**
+		 * Adds the given mesh to this physics simulation.
+		 *
+		 * @method
+		 * @name RapierPhysics#addMesh
+		 * @param {Mesh} mesh The mesh to add.
+		 * @param {number} [mass=0] The mass in kg of the mesh.
+		 * @param {number} [restitution=0] The restitution/friction of the mesh.
+		 */
 		addMesh: addMesh,
+
+		/**
+		 * Set the position of the given mesh which is part of the physics simulation. Calling this
+		 * method will reset the current simulated velocity of the mesh.
+		 *
+		 * @method
+		 * @name RapierPhysics#setMeshPosition
+		 * @param {Mesh} mesh The mesh to update the position for.
+		 * @param {Vector3} position - The new position.
+		 * @param {number} [index=0] - If the mesh is instanced, the index represents the instanced ID.
+		 */
 		setMeshPosition: setMeshPosition,
+
+		/**
+		 * Set the velocity of the given mesh which is part of the physics simulation.
+		 *
+		 * @method
+		 * @name RapierPhysics#setMeshVelocity
+		 * @param {Mesh} mesh The mesh to update the velocity for.
+		 * @param {Vector3} velocity - The new velocity.
+		 * @param {number} [index=0] - If the mesh is instanced, the index represents the instanced ID.
+		 */
 		setMeshVelocity: setMeshVelocity
 	};
 

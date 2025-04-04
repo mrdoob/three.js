@@ -80,7 +80,6 @@
 			const clock = new THREE.Clock();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -196,6 +195,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = true;
 
@@ -218,13 +218,19 @@
 						dirLight.visible = ! dirLight.visible;
 						dirLightHelper.visible = ! dirLightHelper.visible;
 
-					}
+					},
+					shadowIntensity: 1
 				};
 
 				const gui = new GUI();
 
 				gui.add( params, 'toggleHemisphereLight' ).name( 'toggle hemisphere light' );
 				gui.add( params, 'toggleDirectionalLight' ).name( 'toggle directional light' );
+				gui.add( params, 'shadowIntensity', 0, 1 ).name( 'shadow intensity' ).onChange( ( value ) => {
+
+					dirLight.shadow.intensity = value;
+
+				} );
 				gui.open();
 
 				//
@@ -245,8 +251,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

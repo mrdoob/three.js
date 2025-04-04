@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - stereo effects</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - stereo effects. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
+			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
+			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Timer } from 'three/addons/misc/Timer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer, postProcessing;
+
+			let stereo, anaglyph, parallaxBarrier;
+
+			let mesh, dummy, timer;
+
+			const position = new THREE.Vector3();
+
+			const params = {
+				effect: 'stereo',
+				eyeSep: 0.064,
+			};
+
+			const effects = { Stereo: 'stereo', Anaglyph: 'anaglyph', ParallaxBarrier: 'parallaxBarrier' };
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 3;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+
+				timer = new Timer();
+				timer.connect( document );
+
+				const geometry = new THREE.SphereGeometry( 0.1, 32, 16 );
+
+				const textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+
+				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+
+				mesh = new THREE.InstancedMesh( geometry, material, 500 );
+				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+			
+				dummy = new THREE.Mesh();
+
+				for ( let i = 0; i < 500; i ++ ) {
+
+					dummy.position.x = Math.random() * 10 - 5;
+					dummy.position.y = Math.random() * 10 - 5;
+					dummy.position.z = Math.random() * 10 - 5;
+					dummy.scale.x = dummy.scale.y = dummy.scale.z = Math.random() * 3 + 1;
+			
+					dummy.updateMatrix();
+
+					mesh.setMatrixAt( i, dummy.matrix );
+
+				}
+
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				postProcessing = new THREE.PostProcessing( renderer );
+				stereo = stereoPass( scene, camera );
+				anaglyph = anaglyphPass( scene, camera );
+				parallaxBarrier = parallaxBarrierPass( scene, camera );
+
+				postProcessing.outputNode = stereo;
+
+				const gui = new GUI();
+				gui.add( params, 'effect', effects ).onChange( update );
+				gui.add( params, 'eyeSep', 0.001, 0.15, 0.001 ).onChange( function ( value ) {
+
+					stereo.stereo.eyeSep = value;
+
+					anaglyph.stereo.eyeSep = value;
+					parallaxBarrier.stereo.eyeSep = value;
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 25;
+
+			}
+
+			function update( value ) {
+
+				if ( value === 'stereo' ) {
+
+					postProcessing.outputNode = stereo;
+
+				} else if ( value === 'anaglyph' ) {
+
+					postProcessing.outputNode = anaglyph;
+
+				} else if ( value === 'parallaxBarrier' ) {
+
+					postProcessing.outputNode = parallaxBarrier;
+
+				}
+
+				postProcessing.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function extractPosition( matrix, position ) {
+
+				position.x = matrix.elements[ 12 ];
+				position.y = matrix.elements[ 13 ];
+				position.z = matrix.elements[ 14 ];
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const elapsedTime = timer.getElapsed() * 0.1;
+
+				for ( let i = 0; i < mesh.count; i ++ ) {
+
+					mesh.getMatrixAt( i, dummy.matrix );
+
+					extractPosition( dummy.matrix, position );
+
+					position.x = 5 * Math.cos( elapsedTime + i );
+					position.y = 5 * Math.sin( elapsedTime + i * 1.1 );
+
+					dummy.matrix.setPosition( position );
+
+					mesh.setMatrixAt( i, dummy.matrix );
+
+					mesh.instanceMatrix.needsUpdate = true;
+
+				}
+
+				postProcessing.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

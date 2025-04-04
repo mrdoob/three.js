@@ -401,6 +401,28 @@
 		على عكس الخصائص، لا يتم دعم رد الاتصال بواسطة [page:Material.clone .clone]()، 
 		[page:Material.copy .copy]() و [page:Material.toJSON .toJSON]().
 		</p>
+		<p>
+			This callback is only supported in `WebGLRenderer` (not `WebGPURenderer`). 
+		</p>
+		<p>
+			[example:webgl_materials_modified WebGL / materials / modified]<br />
+			[example:webgl_shadow_contact WebGL / shadow / contact]
+		</p>
+
+		<h3>
+			[method:undefined onBeforeRender]( [param:WebGLRenderer renderer], [param:Scene scene], [param:Camera camera], [param:BufferGeometry geometry], [param:Object3D object], [param:Group group] )
+		</h3>
+		<p>
+			An optional callback that is executed immediately before the material is used to 
+			render a 3D object.
+		</p>
+		<p>
+			Unlike properties, the callback is not supported by [page:Material.clone .clone](), 
+			[page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+		</p>
+		<p>
+			This callback is only supported in `WebGLRenderer` (not `WebGPURenderer`). 
+		</p>
 		 
 		<h3>[method:String customProgramCacheKey]()</h3>
 		<p>

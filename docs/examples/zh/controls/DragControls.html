@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:EventDispatcher] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>拖放控制器（[name]）</h1>
 
@@ -15,7 +15,7 @@
 		该类被用于提供一个拖放交互。
 		</p>
 
-		<h2>进口</h2>
+		<h2>导入</h2>
 
 		<p>
 			[name] 是一个附加组件，必须显式导入。
@@ -61,7 +61,7 @@
 			[page:Camera camera]: 渲染场景的摄像机。
 			</p>
 			<p>
-			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。(可选)
 			</p>
 			<p>
 				创建一个新的 [name] 实例。
@@ -97,56 +97,39 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:Boolean enabled]</h3>
+		<p>共有属性请参见其基类[page:Controls]。</p>
+
+		<h3>[property:Array objects]</h3>
 		<p>
-			是否启用控制器。
+			可拖放对象的数组。
+		</p>
+
+		<h3>[property:Raycaster raycaster]</h3>
+		<p>
+			内部用于检测拾取对象的光线投射器。
+		</p>
+
+		<h3>[property:Boolean recursive]</h3>
+		<p>
+			可拖放对象的子对象是否可以独立于其父对象进行拖放。 默认值为 `true`。
+		</p>
+
+		<h3>[property:Float rotateSpeed]</h3>
+		<p>
+			执行 `rotate` 时的旋转速度。该值越大旋转速度越快。 默认值为 `1`。
 		</p>
 
 		<h3>[property:Boolean transformGroup]</h3>
 		<p>
-			当[page:DragControls.objects]数组包含一个单个可拖拽的组对象时该选项生效。如果设置为`true`，[name]会转换整个组对象，而不对单个对象做转换。默认值为`false`。
-		</p>
-
-		<h3>[property:String mode]</h3>
-		<p>
-			The current transformation mode. Possible values are `translate`, and `rotate`. Default is `translate`.
+			当 [page:DragControls.objects] 数组包含一个单个可拖拽的组对象时该选项生效。
+			如果设置为`true`，[name]会转换整个组对象，而不对单个对象做转换。默认值为`false`。
 		</p>
 
 		<h2>方法</h2>
 
-		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
+		<p>共有方法请参见其基类[page:Controls]。</p>
 
-		<h3>[method:undefined activate] ()</h3>
-		<p>
-			添加控制器的事件监听。
-		</p>
-
-		<h3>[method:undefined deactivate] ()</h3>
-		<p>
-			移除控制器的事件监听。
-		</p>
-
-		<h3>[method:undefined dispose] ()</h3>
-		<p>
-			若不再需要该控制器，则应当调用此函数。
-		</p>
-
-		<h3>[method:Array getObjects] ()</h3>
-		<p>
-			返回可拖拽的对象数组。
-		</p>
-
-		<h3>[method:Raycaster getRaycaster] ()</h3>
-		<p>
-			返回用于相交测试的内部[page:Raycaster]实例。
-		</p>
-
-		<h3>[method:undefined setObjects] ( [param:Array objects] )</h3>
-		<p>
-			Sets an array of draggable objects by overwriting the existing one.
-		</p>
-
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DragControls.js examples/jsm/controls/DragControls.js]

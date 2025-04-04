@@ -57,7 +57,7 @@
 						{
 							"name": "Camera Normal Matrix",
 							"icon": "video",
-							"nodeType": "mat4",
+							"nodeType": "mat3",
 							"shaderNode": "cameraNormalMatrix"
 						},
 						{
@@ -232,7 +232,7 @@
 						{
 							"name": "Model Normal Matrix",
 							"icon": "box",
-							"nodeType": "vec3",
+							"nodeType": "mat3",
 							"shaderNode": "modelNormalMatrix"
 						},
 						{
@@ -244,7 +244,7 @@
 						{
 							"name": "Model View Matrix",
 							"icon": "box",
-							"nodeType": "vec3",
+							"nodeType": "mat4",
 							"shaderNode": "modelViewMatrix"
 						},
 						{
@@ -256,7 +256,7 @@
 						{
 							"name": "Model World Matrix",
 							"icon": "box",
-							"nodeType": "vec3",
+							"nodeType": "mat4",
 							"shaderNode": "modelWorldMatrix"
 						}
 					]
@@ -280,6 +280,7 @@
 							"name": "Object Normal Matrix",
 							"icon": "3d-cube-sphere",
 							"shaderNode": "objectNormalMatrix",
+							"nodeType": "mat3",
 							"properties": [
 								{
 									"name": "object3d",
@@ -302,6 +303,7 @@
 							"name": "Object View Matrix",
 							"icon": "3d-cube-sphere",
 							"shaderNode": "objectViewMatrix",
+							"nodeType": "mat4",
 							"properties": [
 								{
 									"name": "object3d",
@@ -1220,7 +1222,7 @@
 						{
 							"name": "Max",
 							"icon": "math-function",
-							"description": "Returns the maximun of the two parameters.",
+							"description": "Returns the maximum of the two parameters.",
 							"shaderNode": "max",
 							"nodeType": "node",
 							"properties": [
@@ -1367,7 +1369,7 @@
 									"name": "bNode",
 									"nodeType": "node",
 									"label": "y",
-									"description": "Specify the value to whitch to raise x."
+									"description": "Specify the value to raise x."
 								}
 							]
 						},
@@ -1477,6 +1479,21 @@
 							]
 						},
 						{
+							"name": "Normal Map",
+							"icon": "photo",
+							"description": "Converts a normal map value to a normal vector.",
+							"shaderNode": "normalMap",
+							"nodeType": "node",
+							"properties": [
+								{
+									"name": "node",
+									"nodeType": "vec3",
+									"label": "normal",
+									"description": "Specifies the vector to convert."
+								}
+							]
+						},
+						{
 							"name": "Round",
 							"icon": "math-function",
 							"description": "Round returns a value equal to the nearest integer to x.",
@@ -1514,7 +1531,7 @@
 									"name": "aNode",
 									"nodeType": "node",
 									"label": "x",
-									"description": "Specify the value from wich to extract the sign."
+									"description": "Specify the value from which to extract the sign."
 								}
 							]
 						},

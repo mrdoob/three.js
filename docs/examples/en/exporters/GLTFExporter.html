@@ -41,6 +41,7 @@
 		<ul>
 			<li>KHR_lights_punctual</li>
 			<li>KHR_materials_clearcoat</li>
+			<li>KHR_materials_dispersion</li>
 			<li>KHR_materials_emissive_strength</li>
 			<li>KHR_materials_ior</li>
 			<li>KHR_materials_iridescence</li>		
@@ -51,6 +52,8 @@
 			<li>KHR_materials_volume</li>
 			<li>KHR_mesh_quantization</li>
 			<li>KHR_texture_transform</li>
+			<li>EXT_materials_bump</li>
+			<li>EXT_mesh_gpu_instancing</li>
 		</ul>
 
 		<p>
@@ -135,16 +138,27 @@
 		[page:Function onError] — Will be called if there are any errors during the gltf generation.<br />
 		[page:Options options] — Export options<br />
 		<ul>
-			<li>trs - bool. Export position, rotation and scale instead of matrix per node. Default is false</li>
-			<li>onlyVisible - bool. Export only visible objects. Default is true.</li>
-			<li>binary - bool. Export in binary (.glb) format, returning an ArrayBuffer. Default is false.</li>
-			<li>maxTextureSize - int. Restricts the image maximum size (both width and height) to the given value. Default is Infinity.</li>
-			<li>animations - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.</li>
-			<li>includeCustomExtensions - bool. Export custom glTF extensions defined on an object's `userData.gltfExtensions` property. Default is false.</li>
+			<li>`trs` - bool. Export position, rotation and scale instead of matrix per node. Default is false</li>
+			<li>`onlyVisible` - bool. Export only visible objects. Default is true.</li>
+			<li>`binary` - bool. Export in binary (.glb) format, returning an ArrayBuffer. Default is false.</li>
+			<li>`maxTextureSize` - int. Restricts the image maximum size (both width and height) to the given value. Default is Infinity.</li>
+			<li>`animations` - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.</li>
+			<li>`includeCustomExtensions` - bool. Export custom glTF extensions defined on an object's `userData.gltfExtensions` property. Default is false.</li>
 		</ul>
 		</p>
 		<p>
 		Generates a .gltf (JSON) or .glb (binary) output from the input (Scenes or Objects)
+		</p>
+
+		<h3>[method:Promise parseAsync]( [param:Object3D input], [param:Object options] )</h3>
+
+		<p>
+			Generates a .gltf (JSON) or .glb (binary) output from the input (Scenes or Objects).
+		</p>
+		<p>
+			This is just like the [page:.parse]() method, but instead of
+			accepting callbacks it returns a promise that resolves with the
+			result, and otherwise accepts the same options.
 		</p>
 
 		<h2>Source</h2>

@@ -1,13 +1,12 @@
 import {
 	DoubleSide,
-	LinearFilter,
+	CanvasTexture,
 	Mesh,
 	MeshBasicMaterial,
 	OrthographicCamera,
 	PlaneGeometry,
 	Scene,
 	ShaderMaterial,
-	Texture,
 	UniformsUtils
 } from 'three';
 import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
@@ -17,30 +16,27 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
  * It works for shadow casting lights: DirectionalLight and SpotLight.
  * It renders out the shadow map and displays it on a HUD.
  *
- * Example usage:
- *	1) Import ShadowMapViewer into your app.
+ * This module can only be used with {@link WebGLRenderer}. When using {@link WebGPURenderer},
+ * import the class from `ShadowMapViewerGPU.js`.
  *
- *	2) Create a shadow casting light and name it optionally:
- *		let light = new DirectionalLight( 0xffffff, 1 );
- *		light.castShadow = true;
- *		light.name = 'Sun';
+ * ```js
+ * const lightShadowMapViewer = new ShadowMapViewer( light );
+ * lightShadowMapViewer.position.x = 10;
+ * lightShadowMapViewer.position.y = SCREEN_HEIGHT - ( SHADOW_MAP_HEIGHT / 4 ) - 10;
+ * lightShadowMapViewer.size.width = SHADOW_MAP_WIDTH / 4;
+ * lightShadowMapViewer.size.height = SHADOW_MAP_HEIGHT / 4;
+ * lightShadowMapViewer.update();
+ * ```
  *
- *	3) Create a shadow map viewer for that light and set its size and position optionally:
- *		let shadowMapViewer = new ShadowMapViewer( light );
- *		shadowMapViewer.size.set( 128, 128 );	//width, height  default: 256, 256
- *		shadowMapViewer.position.set( 10, 10 );	//x, y in pixel	 default: 0, 0 (top left corner)
- *
- *	4) Render the shadow map viewer in your render loop:
- *		shadowMapViewer.render( renderer );
- *
- *	5) Optionally: Update the shadow map viewer on window resize:
- *		shadowMapViewer.updateForWindowResize();
- *
- *	6) If you set the position or size members directly, you need to call shadowMapViewer.update();
+ * @three_import import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';
  */
-
 class ShadowMapViewer {
 
+	/**
+	 * Constructs a new shadow map viewer.
+	 *
+	 * @param {Light} light - The shadow casting light.
+	 */
 	constructor( light ) {
 
 		//- Internals
@@ -93,13 +89,9 @@ class ShadowMapViewer {
 			context.fillStyle = 'rgba( 255, 0, 0, 1 )';
 			context.fillText( light.name, 0, 20 );
 
-			const labelTexture = new Texture( labelCanvas );
-			labelTexture.magFilter = LinearFilter;
-			labelTexture.minFilter = LinearFilter;
-			labelTexture.needsUpdate = true;
+			const labelTexture = new CanvasTexture( labelCanvas );
 
-			const labelMaterial = new MeshBasicMaterial( { map: labelTexture, side: DoubleSide } );
-			labelMaterial.transparent = true;
+			const labelMaterial = new MeshBasicMaterial( { map: labelTexture, side: DoubleSide, transparent: true } );
 
 			const labelPlane = new PlaneGeometry( labelCanvas.width, labelCanvas.height );
 			labelMesh = new Mesh( labelPlane, labelMaterial );
@@ -115,11 +107,21 @@ class ShadowMapViewer {
 
 		}
 
-		//- API
-		// Set to false to disable displaying this shadow map
+		/**
+		 * Whether to display the shadow map viewer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.enabled = true;
 
-		// Set the size of the displayed shadow map on the HUD
+		/**
+		 * The size of the viewer. When changing this property, make sure
+		 * to call {@link ShadowMapViewer#update}.
+		 *
+		 * @type {{width:number,height:number}}
+		 * @default true
+		 */
 		this.size = {
 			width: frame.width,
 			height: frame.height,
@@ -136,7 +138,13 @@ class ShadowMapViewer {
 			}
 		};
 
-		// Set the position of the displayed shadow map on the HUD
+		/**
+		 * The position of the viewer. When changing this property, make sure
+		 * to call {@link ShadowMapViewer#update}.
+		 *
+		 * @type {{x:number,y:number, set:function(number,number)}}
+		 * @default true
+		 */
 		this.position = {
 			x: frame.x,
 			y: frame.y,
@@ -155,6 +163,11 @@ class ShadowMapViewer {
 			}
 		};
 
+		/**
+		 * Renders the viewer. This method must be called in the app's animation loop.
+		 *
+		 * @param {WebGLRenderer} renderer - The renderer.
+		 */
 		this.render = function ( renderer ) {
 
 			if ( this.enabled ) {
@@ -176,6 +189,10 @@ class ShadowMapViewer {
 
 		};
 
+		/**
+		 * Resizes the viewer. This method should be called whenever the app's
+		 * window is resized.
+		 */
 		this.updateForWindowResize = function () {
 
 			if ( this.enabled ) {
@@ -192,6 +209,9 @@ class ShadowMapViewer {
 
 		};
 
+		/**
+		 * Updates the viewer.
+		 */
 		this.update = function () {
 
 			this.position.set( this.position.x, this.position.y );

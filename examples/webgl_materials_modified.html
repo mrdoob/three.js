@@ -34,7 +34,6 @@
 			let camera, scene, renderer, stats;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -63,6 +62,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -104,7 +104,7 @@
 
 				};
 
-				// Make sure WebGLRenderer doesnt reuse a single program
+				// Make sure WebGLRenderer doesn't reuse a single program
 
 				material.customProgramCacheKey = function () {
 
@@ -133,8 +133,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 

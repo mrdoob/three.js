@@ -11,7 +11,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Temporal Anti-Aliasing (TAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			When there is no motion in the scene, the TAA render pass accumulates jittered camera samples<br/>
 			across frames to create a high quality anti-aliased result.<br/><br/>
-			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect SSAA levels have one the resulting render quality.
+			Texture interpolation, mipmapping and anisotropic sampling is disabled to emphasize<br/> the effect SSAA levels have one the resulting render quality.
 		</div>
 
 		<div id="container"></div>
@@ -44,7 +44,6 @@
 			const param = { TAAEnabled: '1', TAASampleLevel: 0 };
 
 			init();
-			animate();
 
 			clearGui();
 
@@ -96,6 +95,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -161,8 +161,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				index ++;
 

@@ -314,6 +314,7 @@ ShaderLib.physical = {
 			clearcoatRoughness: { value: 0 },
 			clearcoatRoughnessMap: { value: null },
 			clearcoatRoughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			dispersion: { value: 0 },
 			iridescence: { value: 0 },
 			iridescenceMap: { value: null },
 			iridescenceMapTransform: { value: /*@__PURE__*/ new Matrix3() },

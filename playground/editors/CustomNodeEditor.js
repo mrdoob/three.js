@@ -1,7 +1,7 @@
 import { LabelElement } from 'flow';
 import { Color, Vector2, Vector3, Vector4 } from 'three';
-import * as Nodes from 'three/nodes';
-import { uniform } from 'three/nodes';
+import * as Nodes from 'three/tsl';
+import { uniform } from 'three/tsl';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { createInputLib } from '../NodeEditorUtils.js';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';

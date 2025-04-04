@@ -6,14 +6,47 @@ import { Plane } from './Plane.js';
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
 
+/**
+ * Frustums are used to determine what is inside the camera's field of view.
+ * They help speed up the rendering process - objects which lie outside a camera's
+ * frustum can safely be excluded from rendering.
+ *
+ * This class is mainly intended for use internally by a renderer.
+ */
 class Frustum {
 
+	/**
+	 * Constructs a new frustum.
+	 *
+	 * @param {Plane} [p0] - The first plane that encloses the frustum.
+	 * @param {Plane} [p1] - The second plane that encloses the frustum.
+	 * @param {Plane} [p2] - The third plane that encloses the frustum.
+	 * @param {Plane} [p3] - The fourth plane that encloses the frustum.
+	 * @param {Plane} [p4] - The fifth plane that encloses the frustum.
+	 * @param {Plane} [p5] - The sixth plane that encloses the frustum.
+	 */
 	constructor( p0 = new Plane(), p1 = new Plane(), p2 = new Plane(), p3 = new Plane(), p4 = new Plane(), p5 = new Plane() ) {
 
+		/**
+		 * This array holds the planes that enclose the frustum.
+		 *
+		 * @type {Array<Plane>}
+		 */
 		this.planes = [ p0, p1, p2, p3, p4, p5 ];
 
 	}
 
+	/**
+	 * Sets the frustum planes by copying the given planes.
+	 *
+	 * @param {Plane} [p0] - The first plane that encloses the frustum.
+	 * @param {Plane} [p1] - The second plane that encloses the frustum.
+	 * @param {Plane} [p2] - The third plane that encloses the frustum.
+	 * @param {Plane} [p3] - The fourth plane that encloses the frustum.
+	 * @param {Plane} [p4] - The fifth plane that encloses the frustum.
+	 * @param {Plane} [p5] - The sixth plane that encloses the frustum.
+	 * @return {Frustum} A reference to this frustum.
+	 */
 	set( p0, p1, p2, p3, p4, p5 ) {
 
 		const planes = this.planes;
@@ -29,6 +62,12 @@ class Frustum {
 
 	}
 
+	/**
+	 * Copies the values of the given frustum to this instance.
+	 *
+	 * @param {Frustum} frustum - The frustum to copy.
+	 * @return {Frustum} A reference to this frustum.
+	 */
 	copy( frustum ) {
 
 		const planes = this.planes;
@@ -43,6 +82,13 @@ class Frustum {
 
 	}
 
+	/**
+	 * Sets the frustum planes from the given projection matrix.
+	 *
+	 * @param {Matrix4} m - The projection matrix.
+	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} coordinateSystem - The coordinate system.
+	 * @return {Frustum} A reference to this frustum.
+	 */
 	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem ) {
 
 		const planes = this.planes;
@@ -76,6 +122,14 @@ class Frustum {
 
 	}
 
+	/**
+	 * Returns `true` if the 3D object's bounding sphere is intersecting this frustum.
+	 *
+	 * Note that the 3D object must have a geometry so that the bounding sphere can be calculated.
+	 *
+	 * @param {Object3D} object - The 3D object to test.
+	 * @return {boolean} Whether the 3D object's bounding sphere is intersecting this frustum or not.
+	 */
 	intersectsObject( object ) {
 
 		if ( object.boundingSphere !== undefined ) {
@@ -98,6 +152,12 @@ class Frustum {
 
 	}
 
+	/**
+	 * Returns `true` if the given sprite is intersecting this frustum.
+	 *
+	 * @param {Sprite} sprite - The sprite to test.
+	 * @return {boolean} Whether the sprite is intersecting this frustum or not.
+	 */
 	intersectsSprite( sprite ) {
 
 		_sphere.center.set( 0, 0, 0 );
@@ -108,6 +168,12 @@ class Frustum {
 
 	}
 
+	/**
+	 * Returns `true` if the given bounding sphere is intersecting this frustum.
+	 *
+	 * @param {Sphere} sphere - The bounding sphere to test.
+	 * @return {boolean} Whether the bounding sphere is intersecting this frustum or not.
+	 */
 	intersectsSphere( sphere ) {
 
 		const planes = this.planes;
@@ -130,6 +196,12 @@ class Frustum {
 
 	}
 
+	/**
+	 * Returns `true` if the given bounding box is intersecting this frustum.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {boolean} Whether the bounding box is intersecting this frustum or not.
+	 */
 	intersectsBox( box ) {
 
 		const planes = this.planes;
@@ -156,6 +228,12 @@ class Frustum {
 
 	}
 
+	/**
+	 * Returns `true` if the given point lies within the frustum.
+	 *
+	 * @param {Vector3} point - The point to test.
+	 * @return {boolean} Whether the point lies within this frustum or not.
+	 */
 	containsPoint( point ) {
 
 		const planes = this.planes;
@@ -174,6 +252,11 @@ class Frustum {
 
 	}
 
+	/**
+	 * Returns a new frustum with copied values from this instance.
+	 *
+	 * @return {Frustum} A clone of this instance.
+	 */
 	clone() {
 
 		return new this.constructor().copy( this );

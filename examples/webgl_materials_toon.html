@@ -40,7 +40,6 @@
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
-				animate();
 
 			} );
 
@@ -62,14 +61,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// Materials
 
 				const cubeWidth = 400;
-				const numberOfSphersPerSide = 5;
-				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
-				const stepSize = 1.0 / numberOfSphersPerSide;
+				const numberOfSpheresPerSide = 5;
+				const sphereRadius = ( cubeWidth / numberOfSpheresPerSide ) * 0.8 * 0.5;
+				const stepSize = 1.0 / numberOfSpheresPerSide;
 
 				const geometry = new THREE.SphereGeometry( sphereRadius, 32, 16 );
 
@@ -179,8 +179,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

@@ -45,7 +45,6 @@
 				action = ACTION_NONE;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -138,6 +137,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
@@ -182,8 +182,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				if ( action === ACTION_SELECT ) {
 
 					rayCaster.setFromCamera( mouse, camera );
@@ -193,7 +191,7 @@
 
 						const target = intersects[ 0 ].object;
 						control.attach( target );
-						scene.add( control );
+						scene.add( control.getHelper() );
 
 					}
 

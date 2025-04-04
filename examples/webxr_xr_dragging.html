@@ -40,7 +40,6 @@
 			let controls, group;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -120,11 +119,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( XRButton.createButton( renderer, { 'optionalFeatures': [ 'depth-sensing'] } ) );
+				document.body.appendChild( XRButton.createButton( renderer, {
+					'optionalFeatures': [ 'depth-sensing' ],
+					'depthSensing': { 'usagePreference': [ 'gpu-optimized' ], 'dataFormatPreference': [] }
+				} ) );
 
 				// controllers
 
@@ -269,12 +272,6 @@
 			//
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render() {
 
 				cleanIntersected();
 

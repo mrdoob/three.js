@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:EventDispatcher] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>[name]</h1>
 
@@ -78,9 +78,9 @@
 		<p>
 			[page:Camera camera]: (required) The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.<br><br>
 
-			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.<br><br>
+			[page:HTMLDOMElement domElement]: The HTML element used for event listeners. (optional)<br><br>
 
-			[page:Scene scene]: The scene rendered by the camera. If not given, gizmos cannot be shown.
+			[page:Scene scene]: The scene rendered by the camera. If not given, gizmos cannot be shown. (optional)
 		</p>
 
 		<h2>Events</h2>
@@ -102,9 +102,11 @@
 
 		<h2>Properties</h2>
 
+		<p>See the base [page:Controls] class for common properties.</p>
+
 		<h3>[property:Boolean adjustNearFar]</h3>
 		<p>
-			If true, camera's near and far values will be adjusted every time zoom is performed trying to mantain the same visible portion
+			If true, camera's near and far values will be adjusted every time zoom is performed trying to maintain the same visible portion
 			given by initial near and far values ( [page:PerspectiveCamera] only ).
 			Default is false.
 		</p>
@@ -125,20 +127,14 @@
 			The damping inertia used if [page:.enableAnimations] is set to true.
 		</p>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
-		</p>
-
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			When set to `false`, the controls will not respond to user input. Default is `true`.
-		</p>
-
 		<h3>[property:Boolean enableAnimations]</h3>
 		<p>
 			Set to true to enable animations for rotation (damping) and focus operation. Default is true.
+		</p>
+
+		<h3>[property:Boolean enableFocus]</h3>
+		<p>
+			Enable or disable camera focusing on double-tap (or click) operations. Default is true.
 		</p>
 
 		<h3>[property:Boolean enableGrid]</h3>
@@ -211,8 +207,9 @@
 			Maximum angular velocity allowed on rotation animation start.
 		</p>
 
-
 		<h2>Methods</h2>
+
+		<p>See the base [page:Controls] class for common methods.</p>
 
 		<h3>[method:undefined activateGizmos] ( [param:Boolean isActive] )</h3>
 		<p>
@@ -222,11 +219,6 @@
 		<h3>[method:undefined copyState] ()</h3>
 		<p>
 			Copy the current state to clipboard (as a readable JSON text).
-		</p>
-
-		<h3>[method:undefined dispose] ()</h3>
-		<p>
-			Remove all the event listeners, cancel any pending animation and clean the scene from gizmos and grid.
 		</p>
 
 		<h3>[method:undefined pasteState] ()</h3>
@@ -256,7 +248,7 @@
 
 		<h3>[method:undefined setTbRadius] ( [param:Float value] )</h3>
 		<p>
-			Update the `radiusFactor` value, redraw the gizmo and send a `changeEvent` to visualise the changes.
+			Update the `radiusFactor` value, redraw the gizmo and send a `changeEvent` to visualize the changes.
 		</p>
 
 		<h3>[method:Boolean setMouseAction] ( [param:String operation], mouse, key )</h3>
@@ -272,11 +264,6 @@
 			Removes a mouse action by specifying its mouse/key combination.<br><br>
 			Mouse inputs can be specified as mouse buttons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
-		</p>
-
-		<h3>[method:undefined update] ()</h3>
-		<p>
-			Update the controls. Must be called after any manual changes to the camera's transform.
 		</p>
 
 		<h3>[method:Raycaster getRaycaster] ()</h3>

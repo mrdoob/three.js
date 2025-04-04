@@ -27,13 +27,11 @@
 
 			import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
 
 			init();
-			animate();
-
 
 			function init() {
 
@@ -88,11 +86,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				const controls = new  OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 5;
 
@@ -115,7 +114,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				renderer.render( scene, camera );
 
 			}

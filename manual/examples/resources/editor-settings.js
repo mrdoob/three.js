@@ -70,7 +70,7 @@
 		const linkRE = /(href=)(")(.*?)(")()/g;
 		const imageSrcRE = /((?:image|img)\.src = )(")(.*?)(")()/g;
 		const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
-		const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
+		const loaderArrayLoadRE = /(loader\.load[a-z]*\(\s*\[)([\s\S]*?)(\])/ig;
 		const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
 		const threejsUrlRE = /(.*?)('|")([^"']*?)('|")([^'"]*?)(\/\*\s+threejs.org:\s+url\s+\*\/)/ig;
 		const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;

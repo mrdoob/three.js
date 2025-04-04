@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - fly controls - earth</title>
+		<title>three.js webgpu - fly controls - earth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -30,7 +30,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -38,15 +40,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
+			import { pass } from 'three/tsl';
+			import { film } from 'three/addons/tsl/display/FilmNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { FlyControls } from 'three/addons/controls/FlyControls.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			const radius = 6371;
 			const tilt = 0.41;
@@ -63,7 +62,7 @@
 			let geometry, meshPlanet, meshClouds, meshMoon;
 			let dirLight;
 
-			let composer;
+			let postProcessing;
 
 			const textureLoader = new THREE.TextureLoader();
 
@@ -73,7 +72,6 @@
 			const clock = new THREE.Clock();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -174,17 +172,14 @@
 				starsGeometry[ 1 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
 				const starsMaterials = [
-					new THREE.PointsMaterial( { color: 0x9c9c9c, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x9c9c9c, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x7c7c7c, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x838383, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x5a5a5a, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x5a5a5a, size: 1, sizeAttenuation: false } )
+					new THREE.PointsMaterial( { color: 0x9c9c9c } ),
+					new THREE.PointsMaterial( { color: 0x838383 } ),
+					new THREE.PointsMaterial( { color: 0x5a5a5a } )
 				];
 
 				for ( let i = 10; i < 30; i ++ ) {
 
-					const stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					const stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 3 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
@@ -198,9 +193,10 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -222,15 +218,12 @@
 
 				// postprocessing
 
-				const renderModel = new RenderPass( scene, camera );
-				const effectFilm = new FilmPass( 0.35 );
-				const outputPass = new OutputPass();
+				postProcessing = new THREE.PostProcessing( renderer );
 
-				composer = new EffectComposer( renderer );
+				const scenePass = pass( scene, camera );
+				const scenePassColor = scenePass.getTextureNode();
 
-				composer.addPass( renderModel );
-				composer.addPass( effectFilm );
-				composer.addPass( outputPass );
+				postProcessing.outputNode = film( scenePassColor );
 
 			}
 
@@ -243,13 +236,10 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();
@@ -285,7 +275,7 @@
 				controls.movementSpeed = 0.33 * d;
 				controls.update( delta );
 
-				composer.render( delta );
+				postProcessing.render();
 
 			}
 

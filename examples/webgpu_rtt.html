@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - RTT</title>
+		<title>three.js webgpu - rtt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,15 +8,16 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - rtt
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,14 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uniform, MeshBasicNodeMaterial } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
-			import QuadMesh from 'three/addons/objects/QuadMesh.js';
+			import { texture, uniform, saturation, hue } from 'three/tsl';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -46,14 +40,6 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 3;
 
@@ -66,7 +52,7 @@
 				const uvTexture = loader.load( './textures/uv_grid_opengl.jpg' );
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new MeshBasicNodeMaterial();
+				const materialBox = new THREE.MeshBasicNodeMaterial();
 				materialBox.colorNode = texture( uvTexture );
 
 				//
@@ -76,7 +62,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -93,10 +79,10 @@
 
 				const screenFXNode = uniform( mouse );
 
-				const materialFX = new MeshBasicNodeMaterial();
-				materialFX.colorNode = texture( renderTarget.texture ).rgb.saturation( screenFXNode.x.oneMinus() ).hue( screenFXNode.y );
+				const materialFX = new THREE.MeshBasicNodeMaterial();
+				materialFX.colorNode = hue( saturation( texture( renderTarget.texture ).rgb, screenFXNode.x.oneMinus() ), screenFXNode.y );
 
-				quadMesh = new QuadMesh( materialFX );
+				quadMesh = new THREE.QuadMesh( materialFX );
 
 			}
 

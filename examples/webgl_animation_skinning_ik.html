@@ -35,7 +35,7 @@
 		import { TransformControls } from 'three/addons/controls/TransformControls.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-		import { CCDIKSolver, CCDIKHelper } from './jsm/animation/CCDIKSolver.js';
+		import { CCDIKSolver, CCDIKHelper } from 'three/addons/animation/CCDIKSolver.js';
 		import Stats from 'three/addons/libs/stats.module.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -48,7 +48,7 @@
 		let stats, gui, conf;
 		const v0 = new THREE.Vector3();
 
-		init().then( animate );
+		init();
 
 		async function init() {
 
@@ -70,19 +70,6 @@
 			const ambientLight = new THREE.AmbientLight( 0xffffff, 8 ); // soft white light
 			scene.add( ambientLight );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
-
-			stats = new Stats();
-			document.body.appendChild( stats.dom );
-
-			orbitControls = new OrbitControls( camera, renderer.domElement );
-			orbitControls.minDistance = 0.2;
-			orbitControls.maxDistance = 1.5;
-			orbitControls.enableDamping = true;
-
 			const dracoLoader = new DRACOLoader();
 			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
 			const gltfLoader = new GLTFLoader();
@@ -103,7 +90,7 @@
 			} );
 			scene.add( gltf.scene );
 
-			orbitControls.target.copy( OOI.sphere.position ); // orbit controls lookAt the sphere
+			const targetPosition = OOI.sphere.position.clone(); // for orbit controls
 			OOI.hand_l.attach( OOI.sphere );
 
 			// mirror sphere cube-camera
@@ -112,17 +99,6 @@
 			scene.add( mirrorSphereCamera );
 			const mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: cubeRenderTarget.texture } );
 			OOI.sphere.material = mirrorSphereMaterial;
-
-			transformControls = new TransformControls( camera, renderer.domElement );
-			transformControls.size = 0.75;
-			transformControls.showX = false;
-			transformControls.space = 'world';
-			transformControls.attach( OOI.target_hand_l );
-			scene.add( transformControls );
-
-			// disable orbitControls while using transformControls
-			transformControls.addEventListener( 'mouseDown', () => orbitControls.enabled = false );
-			transformControls.addEventListener( 'mouseUp', () => orbitControls.enabled = true );
 
 			OOI.kira.add( OOI.kira.skeleton.bones[ 0 ] );
 			const iks = [
@@ -153,6 +129,38 @@
 			gui.add( conf, 'ik_solver' ).name( 'IK auto update' );
 			gui.add( conf, 'update' ).name( 'IK manual update()' );
 			gui.open();
+
+			//
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
+			document.body.appendChild( renderer.domElement );
+
+			//
+
+			orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.minDistance = 0.2;
+			orbitControls.maxDistance = 1.5;
+			orbitControls.enableDamping = true;
+			orbitControls.target.copy( targetPosition );
+
+			transformControls = new TransformControls( camera, renderer.domElement );
+			transformControls.size = 0.75;
+			transformControls.showX = false;
+			transformControls.space = 'world';
+			transformControls.attach( OOI.target_hand_l );
+			scene.add( transformControls.getHelper() );
+
+			// disable orbitControls while using transformControls
+			transformControls.addEventListener( 'mouseDown', () => orbitControls.enabled = false );
+			transformControls.addEventListener( 'mouseUp', () => orbitControls.enabled = true );
+
+			//
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -196,8 +204,6 @@
 			renderer.render( scene, camera );
 
 			stats.update(); // fps stats
-
-			requestAnimationFrame( animate );
 
 		}
 

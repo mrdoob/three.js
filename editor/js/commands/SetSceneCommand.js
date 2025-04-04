@@ -3,23 +3,23 @@ import { SetUuidCommand } from './SetUuidCommand.js';
 import { SetValueCommand } from './SetValueCommand.js';
 import { AddObjectCommand } from './AddObjectCommand.js';
 
-/**
- * @param editor Editor
- * @param scene containing children to import
- * @constructor
- */
 class SetSceneCommand extends Command {
 
-	constructor( editor, scene ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Scene|null} [scene=null]
+	 * @constructor
+	 */
+	constructor( editor, scene = null ) {
 
 		super( editor );
 
 		this.type = 'SetSceneCommand';
-		this.name = 'Set Scene';
+		this.name = editor.strings.getKey( 'command/SetScene' );
 
 		this.cmdArray = [];
 
-		if ( scene !== undefined ) {
+		if ( scene !== null ) {
 
 			this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
 			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );

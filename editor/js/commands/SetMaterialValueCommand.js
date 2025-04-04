@@ -1,28 +1,29 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param attributeName string
- * @param newValue number, string, boolean or object
- * @constructor
- */
 class SetMaterialValueCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue, materialSlot ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {string} [attributeName='']
+	 * @param {number|string|boolean|Object|null} [newValue=null]
+	 * @param {number} [materialSlot=-1]
+	 * @constructor
+	 */
+	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {
 
 		super( editor );
 
 		this.type = 'SetMaterialValueCommand';
-		this.name = `Set Material.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetMaterialValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;
 		this.materialSlot = materialSlot;
 
-		this.material = this.editor.getObjectMaterial( object, materialSlot );
+		const material = ( object !== null ) ? editor.getObjectMaterial( object, materialSlot ) : null;
 
-		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ] : undefined;
+		this.oldValue = ( material !== null ) ? material[ attributeName ] : null;
 		this.newValue = newValue;
 
 		this.attributeName = attributeName;
@@ -31,8 +32,10 @@ class SetMaterialValueCommand extends Command {
 
 	execute() {
 
-		this.material[ this.attributeName ] = this.newValue;
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ] = this.newValue;
+		material.needsUpdate = true;
 
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
@@ -41,8 +44,10 @@ class SetMaterialValueCommand extends Command {
 
 	undo() {
 
-		this.material[ this.attributeName ] = this.oldValue;
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ] = this.oldValue;
+		material.needsUpdate = true;
 
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
@@ -63,6 +68,7 @@ class SetMaterialValueCommand extends Command {
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -76,6 +82,7 @@ class SetMaterialValueCommand extends Command {
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
 		this.object = this.editor.objectByUuid( json.objectUuid );
+		this.materialSlot = json.materialSlot;
 
 	}
 

@@ -1,13 +1,4 @@
-if ( self.GPUShaderStage === undefined ) {
-
-	self.GPUShaderStage = { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
-
-}
-
-// statics
-
-let isAvailable = navigator.gpu !== undefined;
-
+let isAvailable = ( typeof navigator !== 'undefined' && navigator.gpu !== undefined );
 
 if ( typeof window !== 'undefined' && isAvailable ) {
 
@@ -15,20 +6,31 @@ if ( typeof window !== 'undefined' && isAvailable ) {
 
 }
 
+/**
+ * A utility module with basic WebGPU capability testing.
+ *
+ * @hideconstructor
+ * @three_import import WebGPU from 'three/addons/capabilities/WebGPU.js';
+ */
 class WebGPU {
 
+	/**
+	 * Returns `true` if WebGPU is available.
+	 *
+	 * @return {boolean} Whether WebGPU is available or not.
+	 */
 	static isAvailable() {
 
 		return Boolean( isAvailable );
 
 	}
 
-	static getStaticAdapter() {
-
-		return isAvailable;
-
-	}
-
+	/**
+	 * Returns a `div` element representing a formatted error message that can be appended in
+	 * web sites if WebGPU isn't supported.
+	 *
+	 * @return {HTMLDivElement} A `div` element representing a formatted error message that WebGPU isn't supported.
+	 */
 	static getErrorMessage() {
 
 		const message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a> yet';

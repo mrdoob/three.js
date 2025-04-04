@@ -162,7 +162,6 @@
 			}
 
 			init();
-			animate();
 
 			function init() {
 
@@ -212,6 +211,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// stats
@@ -290,8 +290,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				render();
 				stats.update();
 
@@ -330,7 +328,7 @@
 				splineCamera.position.copy( position );
 				cameraEye.position.copy( position );
 
-				// using arclength for stablization in look ahead
+				// using arclength for stabilization in look ahead
 
 				tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1, lookAt );
 				lookAt.multiplyScalar( params.scale );

@@ -31,7 +31,7 @@
 			itemSize * numVertices
 			</code>
 			elements, where numVertices is the number of vertices in the associated
-			[page:BufferGemetry BufferGeometry].<br /><br />
+			[page:BufferGeometry BufferGeometry].<br /><br />
 
 			[page:Integer itemSize] -- the number of values of the array that should
 			be associated with a particular vertex. For instance, if this attribute is
@@ -69,6 +69,9 @@
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h3>[property:Integer id]</h3>
+		<p>Unique number for this attribute instance.</p>
 
 		<h3>[property:Integer itemSize]</h3>
 		<p>
@@ -233,10 +236,10 @@
 			Instead, instantiate a new one and set the desired usage before the next
 			render.
 		</p>
-		
+
 		<h3>[method:Number setComponent]( [param:Integer index], [param:Integer component], [param:Float value] ) </h3>
 		<p>Sets the given component of the vector at the given index.</p>
-		
+
 		<h3>[method:this setX]( [param:Integer index], [param:Float x] )</h3>
 		<p>Sets the x component of the vector at the given index.</p>
 

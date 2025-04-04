@@ -12,7 +12,8 @@ import {
 	Points,
 	PointsMaterial,
 	Vector3,
-	Color
+	Color,
+	SRGBColorSpace
 } from 'three';
 
 // o object_name | g group_name
@@ -431,18 +432,54 @@ function ParserState() {
 
 }
 
-//
 
+/**
+ * A loader for the OBJ format.
+ *
+ * The [OBJ format]{@link https://en.wikipedia.org/wiki/Wavefront_.obj_file} is a simple data-format that
+ * represents 3D geometry in a human readable format as the position of each vertex, the UV position of
+ * each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list
+ * of vertices, and texture vertices.
+ *
+ * ```js
+ * const loader = new OBJLoader();
+ * const object = await loader.loadAsync( 'models/monster.obj' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+ */
 class OBJLoader extends Loader {
 
+	/**
+	 * Constructs a new OBJ loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * A reference to a material creator.
+		 *
+		 * @type {?MaterialCreator}
+		 * @default null
+		 */
 		this.materials = null;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded OBJ asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -477,6 +514,12 @@ class OBJLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the material creator for this OBJ. This object is loaded via {@link MTLLoader}.
+	 *
+	 * @param {MaterialCreator} materials - An object that creates the materials for this OBJ.
+	 * @return {OBJLoader} A reference to this loader.
+	 */
 	setMaterials( materials ) {
 
 		this.materials = materials;
@@ -485,6 +528,12 @@ class OBJLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given OBJ data and returns the resulting group.
+	 *
+	 * @param {string} text - The raw OBJ data as a string.
+	 * @return {Group} The parsed OBJ.
+	 */
 	parse( text ) {
 
 		const state = new ParserState();
@@ -534,8 +583,9 @@ class OBJLoader extends Loader {
 							_color.setRGB(
 								parseFloat( data[ 4 ] ),
 								parseFloat( data[ 5 ] ),
-								parseFloat( data[ 6 ] )
-							).convertSRGBToLinear();
+								parseFloat( data[ 6 ] ),
+								SRGBColorSpace
+							);
 
 							state.colors.push( _color.r, _color.g, _color.b );
 

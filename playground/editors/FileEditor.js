@@ -1,6 +1,7 @@
 import { StringInput, Element } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { arrayBuffer, NodeUtils } from 'three/nodes';
+import { NodeUtils } from 'three/webgpu';
+import { arrayBuffer } from 'three/tsl';
 
 export class FileEditor extends BaseNodeEditor {
 

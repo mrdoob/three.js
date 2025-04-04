@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Selective Lights</title>
+		<title>three.js webgpu - selective lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,16 +9,17 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Selective Lights<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - selective lights<br />
 			<b style="color:red">Left: Red lights</b> - <b>Center: All lights</b> - <b style="color:blue">Right: blue light</b>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -26,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { rangeFog, color, lights, texture, normalMap, MeshStandardNodeMaterial } from 'three/nodes';
+			import { fog, rangeFogFactor, color, lights, texture, normalMap } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -34,11 +35,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
@@ -48,19 +44,11 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.z = 7;
 
 				scene = new THREE.Scene();
-				scene.fogNode = rangeFog( color( 0xFF00FF ), 12, 30 );
+				scene.fogNode = fog( color( 0xFF00FF ), rangeFogFactor( 12, 30 ) );
 
 				const sphereGeometry = new THREE.SphereGeometry( 0.1, 16, 8 );
 
@@ -80,7 +68,7 @@
 
 				const addLight = ( hexColor, power = 1700, distance = 100 ) => {
 
-					const material = new MeshStandardNodeMaterial();
+					const material = new THREE.MeshStandardNodeMaterial();
 					material.colorNode = color( hexColor );
 					material.lights = false;
 
@@ -110,20 +98,20 @@
 
 				const geometryTeapot = new TeapotGeometry( .8, 18 );
 
-				const leftObject = new THREE.Mesh( geometryTeapot, new MeshStandardNodeMaterial( { color: 0x555555 } ) );
+				const leftObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardNodeMaterial( { color: 0x555555 } ) );
 				leftObject.material.lightsNode = redLightsNode;
 				leftObject.material.roughnessNode = texture( alphaTexture );
 				leftObject.material.metalness = 0;
 				leftObject.position.x = - 3;
 				scene.add( leftObject );
 
-				const centerObject = new THREE.Mesh( geometryTeapot, new MeshStandardNodeMaterial( { color: 0x555555 } ) );
+				const centerObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardNodeMaterial( { color: 0x555555 } ) );
 				centerObject.material.normalNode = normalMap( texture( normalMapTexture ) );
 				centerObject.material.metalness = .5;
 				centerObject.material.roughness = .5;
 				scene.add( centerObject );
 
-				const rightObject = new THREE.Mesh( geometryTeapot, new MeshStandardNodeMaterial( { color: 0x555555 } ) );
+				const rightObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardNodeMaterial( { color: 0x555555 } ) );
 				rightObject.material.lightsNode = blueLightsNode;
 				rightObject.material.metalnessNode = texture( alphaTexture );
 				rightObject.position.x = 3;
@@ -134,7 +122,7 @@
 
 				//renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

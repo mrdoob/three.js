@@ -24,9 +24,10 @@
 
 			import * as THREE from 'three';
 
+			import { Timer } from 'three/addons/misc/Timer.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let container, stats, clock;
+			let container, stats, timer;
 
 			let camera, scene, renderer;
 
@@ -37,7 +38,6 @@
 			let t = 0;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -50,7 +50,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new Timer();
+				timer.connect( document );
 
 				const geometry = new THREE.BufferGeometry();
 				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
@@ -90,6 +91,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				container.appendChild( renderer.domElement );
 
@@ -117,17 +119,10 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				const delta = clock.getDelta();
-				const time = clock.getElapsedTime();
+				const delta = timer.getDelta();
+				const time = timer.getElapsed();
 
 				line.rotation.x = time * 0.25;
 				line.rotation.y = time * 0.5;
@@ -136,6 +131,8 @@
 				line.morphTargetInfluences[ 0 ] = Math.abs( Math.sin( t ) );
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

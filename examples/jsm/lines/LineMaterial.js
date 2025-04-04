@@ -1,24 +1,10 @@
-/**
- * parameters = {
- *  color: <hex>,
- *  linewidth: <float>,
- *  dashed: <boolean>,
- *  dashScale: <float>,
- *  dashSize: <float>,
- *  dashOffset: <float>,
- *  gapSize: <float>,
- *  resolution: <Vector2>, // to be set by renderer
- * }
- */
-
 import {
 	ShaderLib,
 	ShaderMaterial,
 	UniformsLib,
 	UniformsUtils,
-	Vector2
+	Vector2,
 } from 'three';
-
 
 UniformsLib.line = {
 
@@ -417,14 +403,34 @@ ShaderLib[ 'line' ] = {
 		`
 };
 
+/**
+ * A material for drawing wireframe-style geometries.
+ *
+ * Unlike {@link LineBasicMaterial}, it supports arbitrary line widths and allows using world units
+ * instead of screen space units. This material is used with {@link LineSegments2} and {@link Line2}.
+ *
+ * This module can only be used with {@link WebGLRenderer}. When using {@link WebGPURenderer},
+ * use {@link Line2NodeMaterial}.
+ *
+ * @augments ShaderMaterial
+ * @three_import import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+ */
 class LineMaterial extends ShaderMaterial {
 
+	/**
+	 * Constructs a new line segments geometry.
+	 *
+	 * @param {Object} [parameters] - An object with one or more properties
+	 * defining the material's appearance. Any property of the material
+	 * (including any property from inherited materials) can be passed
+	 * in here. Color values can be passed any type of value accepted
+	 * by {@link Color#set}.
+	 */
 	constructor( parameters ) {
 
 		super( {
 
 			type: 'LineMaterial',
-
 			uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
 
 			vertexShader: ShaderLib[ 'line' ].vertexShader,
@@ -434,12 +440,25 @@ class LineMaterial extends ShaderMaterial {
 
 		} );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLineMaterial = true;
 
 		this.setValues( parameters );
 
 	}
 
+	/**
+	 * The material's color.
+	 *
+	 * @type {Color}
+	 * @default (1,1,1)
+	 */
 	get color() {
 
 		return this.uniforms.diffuse.value;
@@ -452,6 +471,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * Whether the material's sizes (width, dash gaps) are in world units.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
 	get worldUnits() {
 
 		return 'WORLD_UNITS' in this.defines;
@@ -472,6 +497,13 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * Controls line thickness in CSS pixel units when `worldUnits` is `false` (default),
+	 * or in world units when `worldUnits` is `true`.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
 	get linewidth() {
 
 		return this.uniforms.linewidth.value;
@@ -485,6 +517,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * Whether the line is dashed, or solid.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
 	get dashed() {
 
 		return 'USE_DASH' in this.defines;
@@ -511,6 +549,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * The scale of the dashes and gaps.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
 	get dashScale() {
 
 		return this.uniforms.dashScale.value;
@@ -523,6 +567,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * The size of the dash.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
 	get dashSize() {
 
 		return this.uniforms.dashSize.value;
@@ -535,6 +585,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * Where in the dash cycle the dash starts.
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
 	get dashOffset() {
 
 		return this.uniforms.dashOffset.value;
@@ -547,6 +603,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * The size of the gap.
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
 	get gapSize() {
 
 		return this.uniforms.gapSize.value;
@@ -559,6 +621,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * The opacity.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
 	get opacity() {
 
 		return this.uniforms.opacity.value;
@@ -572,6 +640,13 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * The size of the viewport, in screen pixels. This must be kept updated to make
+	 * screen-space rendering accurate.The `LineSegments2.onBeforeRender` callback
+	 * performs the update for visible objects.
+	 *
+	 * @type {Vector2}
+	 */
 	get resolution() {
 
 		return this.uniforms.resolution.value;
@@ -584,6 +659,12 @@ class LineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * Whether to use alphaToCoverage or not. When enabled, this can improve the
+	 * anti-aliasing of line edges when using MSAA.
+	 *
+	 * @type {boolean}
+	 */
 	get alphaToCoverage() {
 
 		return 'USE_ALPHA_TO_COVERAGE' in this.defines;

@@ -15,9 +15,10 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -25,9 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshPhongNodeMaterial, reflector, uv, texture, color } from 'three/nodes';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { reflector, uv, texture, color } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -113,14 +112,14 @@
 
 				//
 
-				const planeBottom = new THREE.Mesh( planeGeo, new MeshPhongNodeMaterial( {
+				const planeBottom = new THREE.Mesh( planeGeo, new THREE.MeshPhongNodeMaterial( {
 					colorNode: groundNode
 				} ) );
 				planeBottom.rotateX( - Math.PI / 2 );
 				planeBottom.add( groundReflector.target );
 				scene.add( planeBottom );
 
-				const planeBack = new THREE.Mesh( planeGeo, new MeshPhongNodeMaterial( {
+				const planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongNodeMaterial( {
 					colorNode: verticalNode
 				} ) );
 				planeBack.position.z = - 50;
@@ -173,7 +172,7 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

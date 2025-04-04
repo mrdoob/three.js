@@ -1,19 +1,31 @@
 import {
 	LinearFilter,
 	Matrix3,
-	Mesh,
 	NearestFilter,
-	OrthographicCamera,
-	PlaneGeometry,
 	RGBAFormat,
-	Scene,
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
 } from 'three';
+import { FullScreenQuad } from '../postprocessing/Pass.js';
 
+/**
+ * A class that creates an anaglyph effect.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link AnaglyphPassNode}.
+ *
+ * @three_import import { AnaglyphEffect } from 'three/addons/effects/AnaglyphEffect.js';
+ */
 class AnaglyphEffect {
 
+	/**
+	 * Constructs a new anaglyph effect.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {number} width - The width of the effect in physical pixels.
+	 * @param {number} height - The height of the effect in physical pixels.
+	 */
 	constructor( renderer, width = 512, height = 512 ) {
 
 		// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
@@ -29,10 +41,6 @@ class AnaglyphEffect {
 			- 0.0879388, 0.73364, - 0.112961,
 			- 0.00155529, - 0.0184503, 1.2264
 		] );
-
-		const _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-		const _scene = new Scene();
 
 		const _stereo = new StereoCamera();
 
@@ -99,9 +107,14 @@ class AnaglyphEffect {
 
 		} );
 
-		const _mesh = new Mesh( new PlaneGeometry( 2, 2 ), _material );
-		_scene.add( _mesh );
+		const _quad = new FullScreenQuad( _material );
 
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} width - The width of the effect in logical pixels.
+		 * @param {number} height - The height of the effect in logical pixels.
+		 */
 		this.setSize = function ( width, height ) {
 
 			renderer.setSize( width, height );
@@ -113,6 +126,13 @@ class AnaglyphEffect {
 
 		};
 
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			const currentRenderTarget = renderer.getRenderTarget();
@@ -132,18 +152,23 @@ class AnaglyphEffect {
 			renderer.render( scene, _stereo.cameraR );
 
 			renderer.setRenderTarget( null );
-			renderer.render( _scene, _camera );
+			_quad.render( renderer );
 
 			renderer.setRenderTarget( currentRenderTarget );
 
 		};
 
+		/**
+		 * Frees internal resources. This method should be called
+		 * when the effect is no longer required.
+		 */
 		this.dispose = function () {
 
 			_renderTargetL.dispose();
 			_renderTargetR.dispose();
-			_mesh.geometry.dispose();
-			_mesh.material.dispose();
+
+			_material.dispose();
+			_quad.dispose();
 
 		};
 

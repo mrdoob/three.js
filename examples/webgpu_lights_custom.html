@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Custom Lighting Model</title>
+		<title>three.js webgpu - custom lighting model</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,15 +8,16 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Custom Lighting Model
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - custom lighting model
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,16 +25,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, lights, toneMapping, MeshStandardNodeMaterial, PointsNodeMaterial, LightingModel } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { color, lights } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			class CustomLightingModel extends LightingModel {
+			class CustomLightingModel extends THREE.LightingModel {
 
 				direct( { lightColor, reflectedLight }, stack ) {
 
@@ -51,33 +47,24 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.z = 2;
+				camera.position.z = 1.5;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
 
 				// lights
 
 				const sphereGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
 
-				const addLight = ( hexColor, intensity = 2, distance = 1 ) => {
+				const addLight = ( hexColor ) => {
 
-					const material = new MeshStandardNodeMaterial();
+					const material = new THREE.NodeMaterial();
 					material.colorNode = color( hexColor );
 					material.lightsNode = lights(); // ignore scene lights
 
 					const mesh = new THREE.Mesh( sphereGeometry, material );
 
-					const light = new THREE.PointLight( hexColor, intensity, distance );
+					const light = new THREE.PointLight( hexColor, 0.1, 1 );
 					light.add( mesh );
 
 					scene.add( light );
@@ -98,15 +85,15 @@
 
 				const points = [];
 
-				for ( let i = 0; i < 3000; i ++ ) {
+				for ( let i = 0; i < 500_000; i ++ ) {
 
-					const point = new THREE.Vector3().random().subScalar( 0.5 ).multiplyScalar( 2 );
+					const point = new THREE.Vector3().random().subScalar( 0.5 ).multiplyScalar( 3 );
 					points.push( point );
 
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new PointsNodeMaterial();
+				const materialPoints = new THREE.PointsNodeMaterial();
 
 				// custom lighting model
 
@@ -122,11 +109,10 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
 				document.body.appendChild( renderer.domElement );
 
 				// controls
@@ -152,7 +138,7 @@
 
 			function animate() {
 
-				const time = Date.now() * 0.0005;
+				const time = Date.now() * 0.001;
 				const scale = .5;
 
 				light1.position.x = Math.sin( time * 0.7 ) * scale;
@@ -166,6 +152,8 @@
 				light3.position.x = Math.sin( time * 0.7 ) * scale;
 				light3.position.y = Math.cos( time * 0.3 ) * scale;
 				light3.position.z = Math.sin( time * 0.5 ) * scale;
+
+				scene.rotation.y = time * 0.1;
 
 				renderer.render( scene, camera );
 

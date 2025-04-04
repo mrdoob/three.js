@@ -46,7 +46,6 @@
 			let camera, scene, renderer, composer, controls, clock, stats, mixer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -66,13 +65,14 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfe3dd );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( 5, 2, 8 );
@@ -185,8 +185,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 

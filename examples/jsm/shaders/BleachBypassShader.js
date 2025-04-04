@@ -1,9 +1,16 @@
+
 /**
- * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
- * - based on Nvidia example
- * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
+ * @module BleachBypassShader
+ * @three_import import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
  */
 
+/**
+ * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass] based on
+ * [Nvidia Shader library]{@link http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass}.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const BleachBypassShader = {
 
 	name: 'BleachBypassShader',
@@ -38,8 +45,7 @@ const BleachBypassShader = {
 
 			vec4 base = texture2D( tDiffuse, vUv );
 
-			vec3 lumCoeff = vec3( 0.25, 0.65, 0.1 );
-			float lum = dot( lumCoeff, base.rgb );
+			float lum = luminance( base.rgb );
 			vec3 blend = vec3( lum );
 
 			float L = min( 1.0, max( 0.0, 10.0 * ( lum - 0.45 ) ) );

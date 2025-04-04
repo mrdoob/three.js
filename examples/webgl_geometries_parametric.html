@@ -26,14 +26,12 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			import * as Curves from 'three/addons/curves/CurveExtras.js';
 			import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
-			import { ParametricGeometries } from 'three/addons/geometries/ParametricGeometries.js';
+			import { plane, klein, mobius } from 'three/addons/geometries/ParametricFunctions.js';
 
 			let camera, scene, renderer, stats;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -66,43 +64,23 @@
 
 				let geometry, object;
 
-				geometry = new ParametricGeometry( ParametricGeometries.plane( 100, 100 ), 10, 10 );
+				geometry = new ParametricGeometry( plane, 10, 10 );
+				geometry.scale( 100, 100, 100 );
 				geometry.center();
 				object = new THREE.Mesh( geometry, material );
-				object.position.set( - 200, 0, 200 );
+				object.position.set( - 200, 0, 0 );
 				scene.add( object );
 
-				geometry = new ParametricGeometry( ParametricGeometries.klein, 20, 20 );
+				geometry = new ParametricGeometry( klein, 20, 20 );
 				object = new THREE.Mesh( geometry, material );
-				object.position.set( 0, 0, 200 );
+				object.position.set( 0, 0, 0 );
 				object.scale.multiplyScalar( 5 );
 				scene.add( object );
 
-				geometry = new ParametricGeometry( ParametricGeometries.mobius, 20, 20 );
+				geometry = new ParametricGeometry( mobius, 20, 20 );
 				object = new THREE.Mesh( geometry, material );
-				object.position.set( 200, 0, 200 );
+				object.position.set( 200, 0, 0 );
 				object.scale.multiplyScalar( 30 );
-				scene.add( object );
-
-				//
-
-				const GrannyKnot = new Curves.GrannyKnot();
-
-				const torus = new ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
-				const sphere = new ParametricGeometries.SphereGeometry( 50, 20, 10 );
-				const tube = new ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true );
-
-				object = new THREE.Mesh( torus, material );
-				object.position.set( - 200, 0, - 200 );
-				scene.add( object );
-
-				object = new THREE.Mesh( sphere, material );
-				object.position.set( 0, 0, - 200 );
-				scene.add( object );
-
-				object = new THREE.Mesh( tube, material );
-				object.position.set( 200, 0, - 200 );
-				object.scale.multiplyScalar( 2 );
 				scene.add( object );
 
 				//
@@ -110,6 +88,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -129,8 +108,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

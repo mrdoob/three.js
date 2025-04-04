@@ -1,42 +1,51 @@
 import { PropertyBinding } from './PropertyBinding.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 
 /**
- *
  * A group of objects that receives a shared animation state.
  *
  * Usage:
  *
- *  - Add objects you would otherwise pass as 'root' to the
- *    constructor or the .clipAction method of AnimationMixer.
- *
- *  - Instead pass this object as 'root'.
- *
- *  - You can also add and remove objects later when the mixer
- *    is running.
+ * - Add objects you would otherwise pass as 'root' to the
+ * constructor or the .clipAction method of AnimationMixer.
+ * - Instead pass this object as 'root'.
+ * - You can also add and remove objects later when the mixer is running.
  *
  * Note:
  *
- *    Objects of this class appear as one object to the mixer,
- *    so cache control of the individual objects must be done
- *    on the group.
+ * - Objects of this class appear as one object to the mixer,
+ * so cache control of the individual objects must be done on the group.
  *
  * Limitation:
  *
- *  - The animated properties must be compatible among the
- *    all objects in the group.
- *
- *  - A single property can either be controlled through a
- *    target group or directly, but not both.
+ * - The animated properties must be compatible among the all objects in the group.
+ * - A single property can either be controlled through a target group or directly, but not both.
  */
-
 class AnimationObjectGroup {
 
+	/**
+	 * Constructs a new animation group.
+	 *
+	 * @param {...Object3D} arguments - An arbitrary number of 3D objects that share the same animation state.
+	 */
 	constructor() {
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isAnimationObjectGroup = true;
 
-		this.uuid = MathUtils.generateUUID();
+		/**
+		 * The UUID of the 3D object.
+		 *
+		 * @type {string}
+		 * @readonly
+		 */
+		this.uuid = generateUUID();
 
 		// cached objects followed by the active ones
 		this._objects = Array.prototype.slice.call( arguments );
@@ -84,6 +93,11 @@ class AnimationObjectGroup {
 
 	}
 
+	/**
+	 * Adds an arbitrary number of objects to this animation group.
+	 *
+	 * @param {...Object3D} arguments - The 3D objects to add.
+	 */
 	add() {
 
 		const objects = this._objects,
@@ -172,6 +186,11 @@ class AnimationObjectGroup {
 
 	}
 
+	/**
+	 * Removes an arbitrary number of objects to this animation group
+	 *
+	 * @param {...Object3D} arguments - The 3D objects to remove.
+	 */
 	remove() {
 
 		const objects = this._objects,
@@ -221,7 +240,11 @@ class AnimationObjectGroup {
 
 	}
 
-	// remove & forget
+	/**
+	 * Deallocates all memory resources for the passed 3D objects of this animation group.
+	 *
+	 * @param {...Object3D} arguments - The 3D objects to uncache.
+	 */
 	uncache() {
 
 		const objects = this._objects,

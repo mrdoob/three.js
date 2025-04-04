@@ -1,22 +1,46 @@
-/**
- * Parametric Surfaces Geometry
- * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
- */
-
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	Vector3
 } from 'three';
 
+/**
+ * This class can be used to generate a geometry based on a parametric surface.
+ *
+ * Reference: [Mesh Generation with Python]{@link https://prideout.net/blog/old/blog/index.html@p=44.html}
+ *
+ * ```js
+ * const geometry = new THREE.ParametricGeometry( klein, 25, 25 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const klein = new THREE.Mesh( geometry, material );
+ * scene.add( klein );
+ * ```
+ *
+ * @augments BufferGeometry
+ * @three_import import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
+ */
 class ParametricGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new parametric geometry.
+	 *
+	 * @param {ParametricGeometry~Func} func - The parametric function. Default is a function that generates a curved plane surface.
+	 * @param {number} [slices=8] - The number of slices to use for the parametric function.
+	 * @param {number} [stacks=8] - The stacks of slices to use for the parametric function.
+	 */
 	constructor( func = ( u, v, target ) => target.set( u, v, Math.cos( u ) * Math.sin( v ) ), slices = 8, stacks = 8 ) {
 
 		super();
 
 		this.type = 'ParametricGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			func: func,
 			slices: slices,
@@ -135,5 +159,14 @@ class ParametricGeometry extends BufferGeometry {
 	}
 
 }
+
+/**
+ * Parametric function definition of `ParametricGeometry`.
+ *
+ * @callback ParametricGeometry~Func
+ * @param {number} u - The `u` coordinate on the surface in the range `[0,1]`.
+ * @param {number} v - The `v` coordinate on the surface in the range `[0,1]`.
+ * @param {Vector3} target - The target vector that is used to store the method's result.
+ */
 
 export { ParametricGeometry };

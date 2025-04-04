@@ -1,7 +1,3 @@
-/**
- * https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts
- */
-
 import {
  	BackSide,
  	BoxGeometry,
@@ -12,9 +8,29 @@ import {
  	Scene,
 } from 'three';
 
+/**
+ * This class represents a scene with a basic room setup that can be used as
+ * input for {@link PMREMGenerator#fromScene}. The resulting PMREM represents the room's
+ * lighting and can be used for Image Based Lighting by assigning it to {@link Scene#environment}
+ * or directly as an environment map to PBR materials.
+ *
+ * The implementation is based on the [EnvironmentScene](https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts)
+ * component from the `model-viewer` project.
+ *
+ * ```js
+ * const environment = new RoomEnvironment();
+ * const pmremGenerator = new THREE.PMREMGenerator( renderer );
+ *
+ * const envMap = pmremGenerator.fromScene( environment ).texture;
+ * scene.environment = envMap;
+ * ```
+ *
+ * @augments Scene
+ * @three_import import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+ */
 class RoomEnvironment extends Scene {
 
-	constructor( renderer = null ) {
+	constructor() {
 
 		super();
 
@@ -24,11 +40,7 @@ class RoomEnvironment extends Scene {
 		const roomMaterial = new MeshStandardMaterial( { side: BackSide } );
 		const boxMaterial = new MeshStandardMaterial();
 
-		let intensity = 5;
-
-		if ( renderer !== null && renderer._useLegacyLights === false ) intensity = 900;
-
-		const mainLight = new PointLight( 0xffffff, intensity, 28, 2 );
+		const mainLight = new PointLight( 0xffffff, 900, 28, 2 );
 		mainLight.position.set( 0.418, 16.199, 0.300 );
 		this.add( mainLight );
 
@@ -112,6 +124,10 @@ class RoomEnvironment extends Scene {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the environment is no longer required.
+	 */
 	dispose() {
 
 		const resources = new Set();

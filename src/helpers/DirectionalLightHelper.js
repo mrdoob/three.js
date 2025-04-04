@@ -9,17 +9,51 @@ const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
 const _v3 = /*@__PURE__*/ new Vector3();
 
+/**
+ * Helper object to assist with visualizing a {@link DirectionalLight}'s
+ * effect on the scene. This consists of plane and a line representing the
+ * light's position and direction.
+ *
+ * ```js
+ * const light = new THREE.DirectionalLight( 0xFFFFFF );
+ * scene.add( light );
+ *
+ * const helper = new THREE.DirectionalLightHelper( light, 5 );
+ * scene.add( helper );
+ * ```
+ *
+ * @augments Object3D
+ */
 class DirectionalLightHelper extends Object3D {
 
+	/**
+	 * Constructs a new directional light helper.
+	 *
+	 * @param {DirectionalLight} light - The light to be visualized.
+	 * @param {number} [size=1] - The dimensions of the plane.
+	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
+	 * the color of the light.
+	 */
 	constructor( light, size, color ) {
 
 		super();
 
+		/**
+		 * The light being visualized.
+		 *
+		 * @type {DirectionalLight}
+		 */
 		this.light = light;
 
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 
+		/**
+		 * The color parameter passed in the constructor.
+		 * If not set, the helper will take the color of the light.
+		 *
+		 * @type {number|Color|string}
+		 */
 		this.color = color;
 
 		this.type = 'DirectionalLightHelper';
@@ -37,12 +71,22 @@ class DirectionalLightHelper extends Object3D {
 
 		const material = new LineBasicMaterial( { fog: false, toneMapped: false } );
 
+		/**
+		 * Contains the line showing the location of the directional light.
+		 *
+		 * @type {Line}
+		 */
 		this.lightPlane = new Line( geometry, material );
 		this.add( this.lightPlane );
 
 		geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
+		/**
+		 * Represents the target line of the directional light.
+		 *
+		 * @type {Line}
+		 */
 		this.targetLine = new Line( geometry, material );
 		this.add( this.targetLine );
 
@@ -50,6 +94,10 @@ class DirectionalLightHelper extends Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.lightPlane.geometry.dispose();
@@ -59,6 +107,10 @@ class DirectionalLightHelper extends Object3D {
 
 	}
 
+	/**
+	 * Updates the helper to match the position and direction of the
+	 * light being visualized.
+	 */
 	update() {
 
 		this.light.updateWorldMatrix( true, false );

@@ -1,20 +1,20 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param cmdArray array containing command objects
- * @constructor
- */
 class MultiCmdsCommand extends Command {
 
-	constructor( editor, cmdArray ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {Array<Command>} [cmdArray=[]]
+	 * @constructor
+	 */
+	constructor( editor, cmdArray = [] ) {
 
 		super( editor );
 
 		this.type = 'MultiCmdsCommand';
-		this.name = 'Multiple Changes';
+		this.name = editor.strings.getKey( 'command/MultiCmds' );
 
-		this.cmdArray = ( cmdArray !== undefined ) ? cmdArray : [];
+		this.cmdArray = cmdArray;
 
 	}
 

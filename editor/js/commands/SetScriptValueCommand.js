@@ -1,28 +1,28 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param script javascript object
- * @param attributeName string
- * @param newValue string, object
- * @constructor
- */
 class SetScriptValueCommand extends Command {
 
-	constructor( editor, object, script, attributeName, newValue ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {string} script
+	 * @param {string} attributeName
+	 * @param {string} newValue
+	 * @constructor
+	 */
+	constructor( editor, object = null, script = '', attributeName = '', newValue = null ) {
 
 		super( editor );
 
 		this.type = 'SetScriptValueCommand';
-		this.name = `Set Script.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetScriptValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;
 		this.script = script;
 
 		this.attributeName = attributeName;
-		this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
+		this.oldValue = ( script !== '' ) ? script[ this.attributeName ] : null;
 		this.newValue = newValue;
 
 	}
@@ -31,7 +31,7 @@ class SetScriptValueCommand extends Command {
 
 		this.script[ this.attributeName ] = this.newValue;
 
-		this.editor.signals.scriptChanged.dispatch();
+		this.editor.signals.scriptChanged.dispatch( this.script );
 
 	}
 
@@ -39,7 +39,7 @@ class SetScriptValueCommand extends Command {
 
 		this.script[ this.attributeName ] = this.oldValue;
 
-		this.editor.signals.scriptChanged.dispatch();
+		this.editor.signals.scriptChanged.dispatch( this.script );
 
 	}
 

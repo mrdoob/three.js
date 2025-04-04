@@ -6,19 +6,62 @@ import {
 	Int32BufferAttribute,
 	Loader,
 	Points,
-	PointsMaterial
+	PointsMaterial,
+	SRGBColorSpace
 } from 'three';
 
+/**
+ * A loader for the Point Cloud Data (PCD) format.
+ *
+ * PCDLoader supports ASCII and (compressed) binary files as well as the following PCD fields:
+ * - x y z
+ * - rgb
+ * - normal_x normal_y normal_z
+ * - intensity
+ * - label
+ *
+ * ```js
+ * const loader = new PCDLoader();
+ *
+ * const points = await loader.loadAsync( './models/pcd/binary/Zaghetto.pcd' );
+ * points.geometry.center(); // optional
+ * points.geometry.rotateX( Math.PI ); // optional
+ * scene.add( points );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+ */
 class PCDLoader extends Loader {
 
+	/**
+	 * Constructs a new PCD loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * Whether to use little Endian or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.littleEndian = true;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded PCD asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Points)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -54,6 +97,12 @@ class PCDLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given PCD data and returns a point cloud.
+	 *
+	 * @param {ArrayBuffer} data - The raw PCD data as an array buffer.
+	 * @return {Points} The parsed point cloud.
+	 */
 	parse( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
@@ -127,15 +176,15 @@ class PCDLoader extends Loader {
 
 			// parse
 
-			PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
-			PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
-			PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
-			PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
-			PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
-			PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
-			PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
-			PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
-			PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
+			PCDheader.version = /^VERSION (.*)/im.exec( PCDheader.str );
+			PCDheader.fields = /^FIELDS (.*)/im.exec( PCDheader.str );
+			PCDheader.size = /^SIZE (.*)/im.exec( PCDheader.str );
+			PCDheader.type = /^TYPE (.*)/im.exec( PCDheader.str );
+			PCDheader.count = /^COUNT (.*)/im.exec( PCDheader.str );
+			PCDheader.width = /^WIDTH (.*)/im.exec( PCDheader.str );
+			PCDheader.height = /^HEIGHT (.*)/im.exec( PCDheader.str );
+			PCDheader.viewpoint = /^VIEWPOINT (.*)/im.exec( PCDheader.str );
+			PCDheader.points = /^POINTS (.*)/im.exec( PCDheader.str );
 
 			// evaluate
 
@@ -279,7 +328,7 @@ class PCDLoader extends Loader {
 					const g = ( ( rgb >> 8 ) & 0x0000ff ) / 255;
 					const b = ( ( rgb >> 0 ) & 0x0000ff ) / 255;
 
-					c.set( r, g, b ).convertSRGBToLinear();
+					c.setRGB( r, g, b, SRGBColorSpace );
 
 					color.push( c.r, c.g, c.b );
 
@@ -346,7 +395,7 @@ class PCDLoader extends Loader {
 					const g = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0;
 					const b = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0;
 
-					c.set( r, g, b ).convertSRGBToLinear();
+					c.setRGB( r, g, b, SRGBColorSpace );
 
 					color.push( c.r, c.g, c.b );
 
@@ -404,7 +453,7 @@ class PCDLoader extends Loader {
 					const g = dataview.getUint8( row + offset.rgb + 1 ) / 255.0;
 					const b = dataview.getUint8( row + offset.rgb + 0 ) / 255.0;
 
-					c.set( r, g, b ).convertSRGBToLinear();
+					c.setRGB( r, g, b, SRGBColorSpace );
 
 					color.push( c.r, c.g, c.b );
 

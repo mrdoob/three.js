@@ -22,7 +22,7 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Graphe de de scène</h1>
+        <h1>Graphe de scène</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
@@ -41,7 +41,7 @@ Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.</p>
 
 <p></p>
 <p>Pour le voir autrement, vous qui vivez sur Terre, n'avez pas à penser à la rotation de la Terre sur son axe ni à sa rotation autour du Soleil. Vous marchez ou conduisez ou nagez ou courez comme si la Terre ne bougeait pas ou ne tournait pas du tout. Vous marchez, conduisez, nagez, courez et vivez dans "l'espace local" de la Terre, même si par rapport au Soleil, vous tournez autour de la Terre à environ 1 600 km/h et autour du Soleil à environ 107000 km/h. Votre position dans le système solaire est similaire à celle de la Lune au-dessus, mais vous n'avez pas à vous en préoccuper. Vous vous souciez de votre position par rapport à la Terre dans son "espace local".</p>
-<p>Mais allons-y une étape à la fois! Imaginez que nous voulions faire un diagramme du Soleil, de la Terre et de la Lune. Nous allons commencer par le Soleil en créant une simpme sphère et en la mettant à l'origine. Remarque : Nous utilisons le Soleil, la Terre et la Lune comme démonstration de l'utilisation d'une scène. Bien sûr, le vrai Soleil, la Terre et la Lune utilisent la physique, mais pour nos besoins, nous allons faire semblant.</p>
+<p>Mais allons-y une étape à la fois! Imaginez que nous voulions faire un diagramme du Soleil, de la Terre et de la Lune. Nous allons commencer par le Soleil en créant une simple sphère et en la mettant à l'origine. Remarque : Nous utilisons le Soleil, la Terre et la Lune comme démonstration de l'utilisation d'une scène. Bien sûr, le vrai Soleil, la Terre et la Lune utilisent la physique, mais pour nos besoins, nous allons faire semblant.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// un tableau d'objets dont la rotation à mettre à jour
 const objects = [];
 
@@ -60,7 +60,7 @@ objects.push(sunMesh);
 </pre>
 <p>Nous utilisons une sphère ayant un faible nombre de polygones (avec seulement 6 segments autour de son équateur) afin de faciliter la visualisation de sa rotation.</p>
 <p>Nous allons réutiliser la même sphère pour les autres astres : nous allons grossir la <code class="notranslate" translate="no">sunMesh</code> 5 fois.</p>
-<p>Nous avons également défini la propriété <code class="notranslate" translate="no">emissive</code> du matériau Phong sur jaune. La propriété émissive d'un matériau Phong est essentiellement la couleur qui sera dessinée sans que la lumière ne frappe la surface. La lumière est ajoutée à cette couleur.</p>
+<p>Nous avons également défini la propriété <code class="notranslate" translate="no">emissive</code> du matériau Phong sur jaune. La propriété émissive d'un matériau Phong est essentiellement la couleur qui sera dessinée lorsque la lumière ne frappe pas la surface. La lumière est ajoutée à cette couleur.</p>
 <p>Mettons aussi une 'point light' au centre de la scène. Nous entrerons dans les détails plus tard, mais pour l'instant, la version simple est une lumière qui émane d'un seul point.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
@@ -69,7 +69,7 @@ objects.push(sunMesh);
   scene.add(light);
 }
 </pre>
-<p>Pour faciliter la visualisation, nous allons placer la caméra directement au-dessus de l'origine en regardant vers le bas. Le moyen le plus simple de le faire est d'utiliser la fonction <code class="notranslate" translate="no">lookAt</code>. Cette fonction oriente la caméra pour "regarder" vers la position que nous passons à <code class="notranslate" translate="no">lookAt</code>. Avant de faire cela, nous devons cependant indiquer à la caméra dans quelle direction "vers son haut" est orienté. Pour la plupart des situations, un Y positif est suffisant, mais puisque nous regardons vers le bas, nous devons dire à la caméra que Z positif est levé.</p>
+<p>Pour faciliter la visualisation, nous allons placer la caméra directement au-dessus de l'origine en regardant vers le bas. Le moyen le plus simple de le faire est d'utiliser la fonction <code class="notranslate" translate="no">lookAt</code>. Cette fonction oriente la caméra pour "regarder" vers la position que nous passons à <code class="notranslate" translate="no">lookAt</code>. Avant de faire cela, nous devons cependant indiquer à la caméra dans quelle direction est orienté son "haut". Pour la plupart des situations, un Y positif est suffisant, mais puisque nous regardons vers le bas, nous devons dire à la caméra que le "haut" est le Z positif.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(0, 50, 0);
 camera.up.set(0, 0, 1);
@@ -96,7 +96,7 @@ objects.push(earthMesh);
 </pre>
 <p>Nous fabriquons un matériau bleu, mais nous lui donnons une petite quantité de bleu émissif pour qu'il apparaisse sur notre fond noir.</p>
 <p>Nous utilisons la même <code class="notranslate" translate="no">sphereGeometry</code> avec notre nouveau <code class="notranslate" translate="no">EarthMaterial</code> bleu pour faire une <code class="notranslate" translate="no">earthMesh</code>.
-Nous positionnons ces 10 unités à gauche du Soleil et l'ajoutons à la scène. L'ajouter à notre tableau <code class="notranslate" translate="no">objects</code>, la met en mouvement également.</p>
+Nous le positionnons 10 unités à gauche du Soleil et l'ajoutons à la scène. Nous l'ajoutons à notre tableau <code class="notranslate" translate="no">objects</code> ce qui le met également en mouvement.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -139,7 +139,7 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>Ici, nous avons fait un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Comme une <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, c'est aussi un nœud, mais contrairement à une <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, il n'a ni matériau ni géométrie. Il ne représente qu'un espace local.</p>
+<p>Ici, nous avons créé un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Comme une <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, c'est aussi un nœud, mais contrairement à une <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, il n'a ni matériau ni géométrie. Il ne représente qu'un espace local.</p>
 <p>Notre nouvelle scène ressemble à ceci :</p>
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
 <p>La  <code class="notranslate" translate="no">sunMesh</code> et la <code class="notranslate" translate="no">earthMesh</code> sont tous les deux des enfants de <code class="notranslate" translate="no">solarSystem</code>. Les trois sont en train de tourner, et comme <code class="notranslate" translate="no">earthMesh</code> n'est pas un enfant de <code class="notranslate" translate="no">sunMesh</code>, elle n'est plus mise à l'échelle.</p>
@@ -200,7 +200,7 @@ objects.forEach((node) =&gt; {
 });
 </pre>
 <p>Dans notre cas, nous voulons que les axes apparaissent même s'ils sont à l'intérieur des sphères.
-Pour cela, nous définissons le <code class="notranslate" translate="no">depthTest</code> de material à false, pour ne pas vérifier s'ils dessinent derrière quelque chose. Nous définissons également leur <code class="notranslate" translate="no">renderOrder</code> sur 1 (la valeur par défaut est 0) afin qu'ils soient dessinés après toutes les sphères. Sinon, une sphère pourrait les recouvrir et les recouvrir.</p>
+Pour cela, nous définissons le <code class="notranslate" translate="no">depthTest</code> de material à false, pour ne pas vérifier s'ils sont dessinés derrière quelque chose. Nous définissons également leur <code class="notranslate" translate="no">renderOrder</code> sur 1 (la valeur par défaut est 0) afin qu'ils soient dessinés après toutes les sphères. Sinon, une sphère pourrait être dessinée dessus et les recouvrir.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -209,7 +209,7 @@ Pour cela, nous définissons le <code class="notranslate" translate="no">depthTe
 <p></p>
 <p>Vous pouvez voir les axes
 <span style="color:red">x (rouge)</span> et
-<span style="color:blue">z (bleu)</span>. Comme nous regardons vers le bas et que chacun de nos objets tourne autour de son axe y, nous ne voyons pas bien l'axe <span style="color:green">y (verte)</span>.</p>
+<span style="color:blue">z (bleu)</span>. Comme nous regardons vers le bas et que chacun de nos objets tourne autour de son axe y, nous ne voyons pas bien l'axe <span style="color:green">y (vert)</span>.</p>
 <p>Il peut être difficile de voir certains d'entre eux, car il y a 2 paires d'axes qui se chevauchent. Le <code class="notranslate" translate="no">sunMesh</code> et le <code class="notranslate" translate="no">solarSystem</code> sont tous les deux à la même position. De même, <code class="notranslate" translate="no">earthMesh</code> et <code class="notranslate" translate="no">earthOrbit</code> sont à la même position. Ajoutons quelques contrôles simples pour nous permettre de les activer/désactiver pour chaque nœud. Pendant que nous y sommes, ajoutons également un autre assistant appelé <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. Il crée une grille 2D sur le plan X,Z. Par défaut, la grille est de 10x10 unités.</p>
 <p>Nous allons également utiliser <a href="https://github.com/georgealways/lil-gui">lil-gui</a>, une librairie d'interface utilisateur très populaire pour les projets Three.js. lil-gui prend un objet et un nom de propriété sur cet objet et, en fonction du type de la propriété, crée automatiquement une interface utilisateur pour manipuler cette propriété.</p>
 <p>Nous voulons créer à la fois un <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> et un <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> pour chaque nœud. Nous avons besoin d'un label pour chaque nœud, nous allons donc nous débarrasser de l'ancienne boucle et faire appel à une fonction pour ajouter les helpers pour chaque nœud.</p>
@@ -279,7 +279,6 @@ class AxisGridHelper {
 <p>Un autre exemple avec un humain dans un jeu vidéo.</p>
 <p><img src="../resources/images/scenegraph-human.svg" align="center"></p>
 <p>Vous pouvez voir que le graphique de la scène devient assez complexe pour un humain. En fait, le graphe ci-dessus est simplifié. Par exemple, vous pouvez l'étendre pour couvrir chaque doigt (au moins 28 autres nœuds) et chaque orteil (encore 28 nœuds) plus ceux pour le visage et la mâchoire, les yeux et peut-être plus.</p>
-<p>Faisons un graphe semi-complexe. On va faire un char. Il aura 6 roues et une tourelle. Il pourra suivre un chemin. Il y aura une sphère qui se déplacera et le char ciblera la sphère.</p>
 <p>Créons une scène un peu plus complexe : nous allons créer un char d'assaut (tank) avec ses six roues et sa tourelle. Le tank suivra un chemin prédéfini. Il y aura aussi une sphère qui tourne autour du tank et ce dernier orientera sa tourelle vers cette cible.</p>
 <p>Voici le graphique de la scène. Les maillages sont colorés en vert, les <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> en bleu, les lumières en or et les caméras en violet. Une caméra n'a pas été ajoutée au graphique de la scène.</p>
 <div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
@@ -294,7 +293,7 @@ targetMesh.rotation.y = time * 13;
 targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 </pre>
-<p>Pour le char, il y a un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">tank</code> qui est utilisé pour déplacer tout ce qui se trouve en dessous. Le code utilise une <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> à laquelle il peut demander des positions le long de cette courbe. 0.0 est le début de la courbe. 1,0 est la fin de la courbe. Il demande la position actuelle où il met le réservoir. Il demande ensuite une position légèrement plus bas dans la courbe et l'utilise pour pointer le réservoir dans cette direction à l'aide de <a href="/docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
+<p>Pour le char, il y a un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">tank</code> qui est utilisé pour déplacer tout ce qui se trouve en dessous. Le code utilise une <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> à laquelle il peut demander des positions le long de cette courbe. 0.0 est le début de la courbe. 1,0 est la fin de la courbe. Il demande la position actuelle où il met le tank. Il demande ensuite une position légèrement plus bas dans la courbe et l'utilise pour pointer le tank dans cette direction à l'aide de <a href="/docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
 const tankTarget = new THREE.Vector2();
 
@@ -322,9 +321,9 @@ turretCamera.lookAt(targetPosition);
 </pre>
 <p>Il y a aussi un <code class="notranslate" translate="no">targetCameraPivot</code> qui est un enfant de <code class="notranslate" translate="no">targetBob</code> donc il flotte
 autour de la cible. Nous le pointons vers le char. Son but est de permettre à la
-<code class="notranslate" translate="no">targetCamera</code> d'être décalé par rapport à la cible elle-même. Si nous faisions de la caméra
+<code class="notranslate" translate="no">targetCamera</code> d'être décalée par rapport à la cible elle-même. Si nous faisions de la caméra
 un enfant de <code class="notranslate" translate="no">targetBob</code>, elle serait à l'intérieur de la cible.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// faire en sorte que la cibleCameraPivot regarde le char
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// faire en sorte que la targetCameraPivot regarde le char
 tank.getWorldPosition(targetPosition);
 targetCameraPivot.lookAt(targetPosition);
 </pre>
@@ -353,8 +352,8 @@ infoElem.textContent = camera.desc;
 </div>
 
 <p></p>
-<p>J'espère que cet article vous aura donné une bonne idée du fonctionnement des graphes de scène et de la façon dont vous devez les utiliser.  Créer des nœuds « Object3D » et savoir leur attacher d'autres nœuds est une étape importante dans l'utilisant un moteur 3D tel que Three.js., car bien souvent, on pourrait penser que des mathématiques complexes sont nécessaires pour faire bouger quelque chose et faire pivoter comme vous le souhaitez (comme calculer le mouvement de la Lune, savoir où calculer la position des roues de la voiture par rapport à son corps). En utilisant un graphe de scène, et comme nous l'avons vu dans cet article, le travail en est grandement simplifié.</p>
-<p>Article suivant :<a href="materials.html">Passons maintenant en revue les materials</a>.</p>
+<p>J'espère que cet article vous aura donné une bonne idée du fonctionnement des graphes de scène et de la façon dont vous devez les utiliser. Créer des nœuds « Object3D » et savoir leur attacher d'autres nœuds est une étape importante dans l'utilisation d'un moteur 3D tel que Three.js., car bien souvent, on pourrait penser que des mathématiques complexes sont nécessaires pour faire bouger et pivoter quelque chose comme vous le souhaitez (comme calculer le mouvement de la Lune, savoir où calculer la position des roues de la voiture par rapport à son corps). En utilisant un graphe de scène, et comme nous l'avons vu dans cet article, le travail en est grandement simplifié.</p>
+<p>Article suivant :<a href="materials.html">Passons maintenant en revue les matériaux</a>.</p>
 
         </div>
       </div>

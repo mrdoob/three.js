@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:EventDispatcher] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>轨迹球控制器（[name]）</h1>
 
@@ -18,7 +18,7 @@
 			</p>
 		</p>
 
-		<h2>进口</h2>
+		<h2>导入</h2>
 
 		<p>
 			[name] 是一个附加组件，必须显式导入。
@@ -41,7 +41,7 @@
 				[page:Camera camera]: 渲染场景的摄像机。
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。(可选)
 			</p>
 			<p>
 				创建一个新的 [name] 实例。
@@ -67,19 +67,11 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
-		</p>
+		<p>共有属性请参见其基类[page:Controls]。</p>
 
 		<h3>[property:Number dynamicDampingFactor]</h3>
 		<p>
 			设置阻尼的强度。仅在[page:.staticMoving staticMoving]设为*false*时考虑。默认为*0.2*。
-		</p>
-
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			是否启用控制器。
 		</p>
 
 		<h3>[property:Array keys]</h3>
@@ -139,11 +131,6 @@
 			是否禁用缩放，默认为*false*。
 		</p>
 
-		<h3>[property:Camera object]</h3>
-		<p>
-			正被控制的摄像机。
-		</p>
-
 		<h3>[property:Number panSpeed]</h3>
 		<p>
 			平移的速度，其默认值为*0.3*。
@@ -170,6 +157,11 @@
 			阻尼是否被禁用。默认为*false*。
 		</p>
 
+		<h3>[property:Vector3 target]</h3>
+		<p>
+			控件的焦点。
+		</p>
+
 		<h3>[property:Number zoomSpeed]</h3>
 		<p>
 			缩放的速度，其默认值为*1.2*。
@@ -177,44 +169,16 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:undefined checkDistances] ()</h3>
-		<p>
-			确保控制器位于 [minDistance, maxDistance] 范围内。由[page:.update update]()调用。
-		</p>
-
-		<h3>[method:undefined dispose] ()</h3>
-		<p>
-			若不再需要该控制器，则应当调用此函数。
-		</p>
+		<p>共有方法请参见其基类[page:Controls]。</p>
 
 		<h3>[method:undefined handleResize] ()</h3>
 		<p>
 			若应用程序窗口大小发生改变，则应当调用此函数。
 		</p>
 
-		<h3>[method:undefined panCamera] ()</h3>
-		<p>
-			如有必要，执行平移。由[page:.update update]()调用。
-		</p>
-
 		<h3>[method:undefined reset] ()</h3>
 		<p>
 			重置控制器到初始状态。
-		</p>
-
-		<h3>[method:undefined rotateCamera] ()</h3>
-		<p>
-			如有必要，旋转相机。由[page:.update update]()调用。
-		</p>
-
-		<h3>[method:undefined update] ()</h3>
-		<p>
-			更新控制器，常被用在动画循环中。
-		</p>
-
-		<h3>[method:undefined zoomCamera] ()</h3>
-		<p>
-			如有必要，执行缩放。由[page:.update update]()调用。
 		</p>
 
 		<h2>源代码</h2>

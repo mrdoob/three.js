@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - shadertoy</title>
+		<title>three.js webgpu - shadertoy</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,21 +8,23 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - ShaderToy
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - shadertoy
 			<br />Shader created by <a href="https://www.shadertoy.com/view/Mt2SzR" target="_blank" rel="noopener">jackdavenport</a> and <a href="https://www.shadertoy.com/view/3tcBzH" target="_blank" rel="noopener">trinketMage</a>.
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="x-shader/x-fragment" id="example1">
+
 			// https://www.shadertoy.com/view/Mt2SzR
 
 			float random(float x) {
@@ -92,6 +94,7 @@
 		</script>
 
 		<script type="x-shader/x-fragment" id="example2">
+
 			// https://www.shadertoy.com/view/3tcBzH
 
 			float rand(vec2 co){
@@ -166,19 +169,14 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import * as Nodes from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import * as TSL from 'three/tsl';
 
-			import Transpiler from './jsm/transpiler/Transpiler.js';
-			import ShaderToyDecoder from './jsm/transpiler/ShaderToyDecoder.js';
-			import TSLEncoder from './jsm/transpiler/TSLEncoder.js';
+			import Transpiler from 'three/addons/transpiler/Transpiler.js';
+			import ShaderToyDecoder from 'three/addons/transpiler/ShaderToyDecoder.js';
+			import TSLEncoder from 'three/addons/transpiler/TSLEncoder.js';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
-			class ShaderToyNode extends Nodes.Node {
+			class ShaderToyNode extends THREE.Node {
 
 				constructor() {
 
@@ -206,7 +204,7 @@
 
 					const jsCode = this.transpile( glsl, true );
 
-					const { mainImage } = eval( jsCode )( Nodes );
+					const { mainImage } = eval( jsCode )( TSL );
 
 					this.mainImage = mainImage;
 
@@ -244,16 +242,6 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
-				//
-
 				const example1Code = document.getElementById( 'example1' ).textContent;
 				const example2Code = document.getElementById( 'example2' ).textContent;
 
@@ -270,15 +258,15 @@
 
 				const geometry = new THREE.PlaneGeometry( 2, 2 );
 
-				const material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = Nodes.oscSine( Nodes.timerLocal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = TSL.oscSine( TSL.time.mul( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
 
 				const quad = new THREE.Mesh( geometry, material );
 				scene.add( quad );
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

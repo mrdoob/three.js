@@ -11,18 +11,68 @@ const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _position = /*@__PURE__*/ new Vector3();
 
+/**
+ * A class for displaying points or point clouds.
+ *
+ * @augments Object3D
+ */
 class Points extends Object3D {
 
+	/**
+	 * Constructs a new point cloud.
+	 *
+	 * @param {BufferGeometry} [geometry] - The points geometry.
+	 * @param {Material|Array<Material>} [material] - The points material.
+	 */
 	constructor( geometry = new BufferGeometry(), material = new PointsMaterial() ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isPoints = true;
 
 		this.type = 'Points';
 
+		/**
+		 * The points geometry.
+		 *
+		 * @type {BufferGeometry}
+		 */
 		this.geometry = geometry;
+
+		/**
+		 * The line material.
+		 *
+		 * @type {Material|Array<Material>}
+		 * @default PointsMaterial
+		 */
 		this.material = material;
+
+		/**
+		 * A dictionary representing the morph targets in the geometry. The key is the
+		 * morph targets name, the value its attribute index. This member is `undefined`
+		 * by default and only set when morph targets are detected in the geometry.
+		 *
+		 * @type {Object<String,number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetDictionary = undefined;
+
+		/**
+		 * An array of weights typically in the range `[0,1]` that specify how much of the morph
+		 * is applied. This member is `undefined` by default and only set when morph targets are
+		 * detected in the geometry.
+		 *
+		 * @type {Array<number>|undefined}
+		 * @default undefined
+		 */
+		this.morphTargetInfluences = undefined;
 
 		this.updateMorphTargets();
 
@@ -39,6 +89,12 @@ class Points extends Object3D {
 
 	}
 
+	/**
+	 * Computes intersection points between a casted ray and this point cloud.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
 	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
@@ -100,6 +156,10 @@ class Points extends Object3D {
 
 	}
 
+	/**
+	 * Sets the values of {@link Points#morphTargetDictionary} and {@link Points#morphTargetInfluences}
+	 * to make sure existing morph targets can influence this 3D object.
+	 */
 	updateMorphTargets() {
 
 		const geometry = this.geometry;
@@ -155,6 +215,8 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 			point: intersectPoint,
 			index: index,
 			face: null,
+			faceIndex: null,
+			barycoord: null,
 			object: object
 
 		} );

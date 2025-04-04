@@ -3,14 +3,46 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 
+/**
+ * A geometry class for representing a cylinder.
+ *
+ * ```js
+ * const geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ * const cylinder = new THREE.Mesh( geometry, material );
+ * scene.add( cylinder );
+ * ```
+ *
+ * @augments BufferGeometry
+ */
 class CylinderGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new cylinder geometry.
+	 *
+	 * @param {number} [radiusTop=1] - Radius of the cylinder at the top.
+	 * @param {number} [radiusBottom=1] - Radius of the cylinder at the bottom.
+	 * @param {number} [height=1] - Height of the cylinder.
+	 * @param {number} [radialSegments=32] - Number of segmented faces around the circumference of the cylinder.
+	 * @param {number} [heightSegments=1] - Number of rows of faces along the height of the cylinder.
+	 * @param {boolean} [openEnded=false] - Whether the base of the cylinder is open or capped.
+	 * @param {number} [thetaStart=0] - Start angle for first segment, in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - The central angle, often called theta, of the circular sector, in radians.
+	 * The default value results in a complete cylinder.
+	 */
 	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
 		this.type = 'CylinderGeometry';
 
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
 		this.parameters = {
 			radiusTop: radiusTop,
 			radiusBottom: radiusBottom,
@@ -133,12 +165,19 @@ class CylinderGeometry extends BufferGeometry {
 
 					// faces
 
-					indices.push( a, b, d );
-					indices.push( b, c, d );
+					if ( radiusTop > 0 || y !== 0 ) {
 
-					// update group counter
+						indices.push( a, b, d );
+						groupCount += 3;
 
-					groupCount += 6;
+					}
+
+					if ( radiusBottom > 0 || y !== heightSegments - 1 ) {
+
+						indices.push( b, c, d );
+						groupCount += 3;
+
+					}
 
 				}
 
@@ -274,6 +313,13 @@ class CylinderGeometry extends BufferGeometry {
 
 	}
 
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {CylinderGeometry} A new instance.
+	 */
 	static fromJSON( data ) {
 
 		return new CylinderGeometry( data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );

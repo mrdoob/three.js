@@ -38,7 +38,6 @@
 			let controls, water, sun, mesh;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -49,6 +48,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				container.appendChild( renderer.domElement );
@@ -190,7 +190,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				render();
 				stats.update();
 

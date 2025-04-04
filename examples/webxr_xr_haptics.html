@@ -39,11 +39,10 @@
 			let controls, group;
 			let audioCtx = null;
 
-			// minor pentatonic scale, so whichever notes is striked would be more pleasant
+			// minor pentatonic scale, so whichever notes is stricken would be more pleasant
 			const musicScale = [ 0, 3, 5, 7, 10 ];
 
 			init();
-			animate();
 
 			function initAudio() {
 
@@ -140,6 +139,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
@@ -208,12 +208,6 @@
 			}
 
 			//
-
-			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
 
 			function handleCollisions() {
 
@@ -300,7 +294,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				handleCollisions();
 

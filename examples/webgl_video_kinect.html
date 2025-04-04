@@ -88,7 +88,6 @@
 			let mouse, center;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -111,6 +110,7 @@
 
 				const texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.NearestFilter;
+				texture.generateMipmaps = false;
 
 				const width = 640, height = 480;
 				const nearClipping = 850, farClipping = 4000;
@@ -166,6 +166,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				mouse = new THREE.Vector3( 0, 0, 1 );
@@ -195,14 +196,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
 
 				camera.position.x += ( mouse.x - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouse.y - camera.position.y ) * 0.05;

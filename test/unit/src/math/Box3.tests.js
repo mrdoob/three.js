@@ -367,7 +367,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), 'Smaller box: correct new maximum' );
 
 			//
-			assert.ok( new Box3().expandByObject( new Mesh() ).isEmpty() === true, 'The AABB of a mesh with inital geometry is empty.' );
+			assert.ok( new Box3().expandByObject( new Mesh() ).isEmpty() === true, 'The AABB of a mesh with initial geometry is empty.' );
 
 		} );
 

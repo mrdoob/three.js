@@ -50,7 +50,7 @@ material.color.set(someColor)    // some other THREE.Color
 material.color.setHSL(h, s, l)   // where h, s, and l are 0 to 1
 material.color.setRGB(r, g, b)   // where r, g, and b are 0 to 1
 </pre>
-<p>Pour le constructeur, vous pouvez passer, soit un nombre hexadécimal, soit une chaine de caractères au format CSS :</p>
+<p>Pour le constructeur, vous pouvez passer, soit un nombre hexadécimal, soit une chaîne de caractères au format CSS :</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const m1 = new THREE.MeshBasicMaterial({color: 0xFF0000});         // rouge
 const m2 = new THREE.MeshBasicMaterial({color: 'red'});            // rouge
 const m3 = new THREE.MeshBasicMaterial({color: '#F00'});           // rouge
@@ -103,8 +103,8 @@ Le <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslat
   </div>
 </div>
 
-<p>Notez que définir la propriété <code class="notranslate" translate="no">émissive</code> sur une couleur sur un
-<a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ou un <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> et régler la <code class="notranslate" translate="no">couleur</code> sur noir
+<p>Notez que définir la propriété <code class="notranslate" translate="no">emissive</code> sur une couleur sur un
+<a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ou un <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> et régler la propriété <code class="notranslate" translate="no">color</code> sur noir
 (et <code class="notranslate" translate="no">shininess</code> à 0 pour Phong) finit par ressembler au <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
 <div class="spread">
   <div>
@@ -133,33 +133,33 @@ Le <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslat
   </div>
 </div>
 
-<p>Pourquoi Three.js propose trois matérieaux similaires si au final <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> peut faire les mêmes choses que <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> et <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ? La raison est simple : le matériau le plus sophistiqué nécessite plus de puissance de la part du GPU. Sur un GPU plus lent comme sur un téléphone mobile, vous souhaitez peut-être améliorer les performances en utilisant un des matériaux moins gourmands calculs GPU. Il en découle que si vous n'avez pas besoin de fonctionnalités supplémentaires, alors il vaut mieux privilégier le matériau le plus simple. Si vous n'avez pas besoin d'éclairage et de la surbrillance spéculaire alors utilisez le <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
+<p>Pourquoi Three.js propose trois matériaux similaires si au final <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> peut faire les mêmes choses que <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> et <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ? La raison est simple : le matériau le plus sophistiqué nécessite plus de puissance de la part du GPU. Sur un GPU plus lent comme sur un téléphone mobile, vous souhaitez peut-être améliorer les performances en utilisant un des matériaux moins gourmand en calculs GPU. Il en découle que si vous n'avez pas besoin de fonctionnalités supplémentaires, alors il vaut mieux privilégier le matériau le plus simple. Si vous n'avez pas besoin d'éclairage et de la surbrillance spéculaire alors utilisez le <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
 <p>Le <a href="/docs/#api/en/materials/MeshToonMaterial"><code class="notranslate" translate="no">MeshToonMaterial</code></a> est similaire au <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>
-avec une grande différence : plutôt que d'ombrager en douceur, il utilise une carte de dégradé (une texture X par 1) pour décider comment ombrager. La valeur par défaut utilise une carte de dégradé dont la luminosité est de 70 % pour les premiers, puis entre 70 % et 100 % pour les suivants. Vous pouvez aussi fournir votre propre carte de dégradé. Cela peut même donner une allure de dessin animé (cartoon) sur deux teintes.</p>
+avec une grande différence : plutôt que d'ombrager en douceur, il utilise une carte de dégradé (une texture X par 1) pour décider comment ombrager. La valeur par défaut utilise une carte de dégradé dont la luminosité est de 70 % pour les premiers 70%, puis 100 % pour la suite. Vous pouvez aussi fournir votre propre carte de dégradé. Cela peut même donner une allure de dessin animé (cartoon) sur deux teintes.</p>
 <div class="spread">
   <div data-diagram="MeshToonMaterial"></div>
 </div>
 
 <p>Ensuite, il y a deux matériaux de <em>rendu physique</em>, souvent abrégé en PBR (<em>Physics-Based Rendering material</em>).</p>
-<p>En effet, les matériaux vus précédemment utilisent des mathématiques simples pour créer des matériaux qui semblent 3D, mais ne réagissent pas comme dans le monde réel. Les deux matériaux PBR utilisent des mathématiques beaucoup plus complexes pour se rapprocher de ce qui se passe réellement dans le monde réel.</p>
-<p>Le premier est <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>. Il differt de <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> et de <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> en utilisant différents paramètres.
+<p>En effet, les matériaux vus précédemment utilisent des mathématiques simples pour créer des matériaux qui semblent en 3D, mais ne réagissent pas comme dans le monde réel. Les deux matériaux PBR utilisent des mathématiques beaucoup plus complexes pour se rapprocher de ce qui se passe réellement dans le monde réel.</p>
+<p>Le premier est <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>. Il diffère de <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> et de <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> en utilisant différents paramètres.
 <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> a un seul paramètre <code class="notranslate" translate="no">shininess</code> alors que <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> utilise deux paramètres <code class="notranslate" translate="no">roughness</code> (rugosité) et <code class="notranslate" translate="no">metalness</code> (métallique).</p>
 <p>Pour faire simple, <a href="/docs/#api/en/materials/MeshStandardMaterial#roughness"><code class="notranslate" translate="no">roughness</code></a> est l'opposé de <code class="notranslate" translate="no">shininess</code>.
 Quelque chose qui a une rugosité élevée, comme une balle de baseball, n'a pas de reflets durs, alors que quelque chose qui n'est pas rugueux, comme une boule de billard, est très brillant. La rugosité varie de 0 à 1.</p>
 <p>L'autre paramètre, <a href="/docs/#api/en/materials/MeshStandardMaterial#metalness"><code class="notranslate" translate="no">metalness</code></a>, indique
 à quel point le matériau est métallique. Les métaux se comportent différemment des non-métaux. 0
 pour le non-métal et 1 pour le métal.</p>
-<p>Voici quelques exemples de <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> avec une <code class="notranslate" translate="no">roughness</code> allant de 0 à 1
-sur la diagonale et une <code class="notranslate" translate="no">metalness</code> allant de 0 à 1 en descendant.</p>
+<p>Voici quelques exemples de <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> avec un <code class="notranslate" translate="no">roughness</code> allant de 0 à 1
+sur la droite et un <code class="notranslate" translate="no">metalness</code> allant de 0 à 1 en descendant.</p>
 <div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
 
-<p>Le <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> est le même que le <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> mais il ajoute un paramètre <code class="notranslate" translate="no">clearcoat</code> (vernis) qui va de 0 à 1 pour savoir quelle couche de brillance appliquée. Et un paramètre <code class="notranslate" translate="no">clearCoatRoughness</code> qui spécifie à quel point la couche de brillance est rugueuse.</p>
+<p>Le <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> est le même que le <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> mais il ajoute un paramètre <code class="notranslate" translate="no">clearcoat</code> (vernis) qui va de 0 à 1 pour savoir quelle couche vernis brillant appliquer. Et un paramètre <code class="notranslate" translate="no">clearCoatRoughness</code> qui spécifie à quel point la couche de vernis brillant est rugueuse.</p>
 <p>Voici la même grille que ci-dessus, mais avec les paramètres <code class="notranslate" translate="no">clearcoat</code> et <code class="notranslate" translate="no">clearCoatRoughness</code> en plus.</p>
 <div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
 
 <p>Voici la liste des divers matériaux standards rangés du plus rapide au plus lent :
 <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> ➡
-<a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>. Les matériaux les plus longs à calculer créent des scènes plus réalistes, mais vous devrez peut-être égallement concevoir votre code pour utiliser les matériaux plus rapides à calculer pour des machines mobiles ou de faible puissance.</p>
+<a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>. Les matériaux les plus longs à calculer créent des scènes plus réalistes, mais vous devrez peut-être également concevoir votre code pour utiliser les matériaux plus rapides à calculer pour des machines mobiles ou de faible puissance.</p>
 <p>Il existe trois matériaux qui ont des utilisations spéciales.</p>
 
 <p><a href="/docs/#api/en/materials/ShadowMaterial"><code class="notranslate" translate="no">ShadowMaterial</code></a>
@@ -173,8 +173,8 @@ Certains effets spéciaux peuvent utiliser ces données que nous aborderons plus
   </div>
 </div>
 
-<p>Le <a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> vous montrera les <em>normals</em> de la géométrie.
-Les <em>Normals</em> sont la direction d'un triangle ou d'un pixel particulier.
+<p>Le <a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> vous montrera les <em>normales</em> de la géométrie.
+Les <em>Normales</em> sont la direction d'un triangle ou d'un pixel particulier.
 <a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> dessine les normales de l'espace de vue (les normales par rapport à la caméra).</p>
 <p><span style="background: red;" class="color">x rouge</span>,
 <span style="background: green;" class="dark-color">y est vert</span>, et

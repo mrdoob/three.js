@@ -10,9 +10,24 @@ const _vector = /*@__PURE__*/ new Vector3();
 const _boneMatrix = /*@__PURE__*/ new Matrix4();
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
-
+/**
+ * A helper object to assist with visualizing a {@link Skeleton}.
+ *
+ * ```js
+ * const helper = new THREE.SkeletonHelper( skinnedMesh );
+ * scene.add( helper );
+ * ```
+ *
+ * @augments LineSegments
+ */
 class SkeletonHelper extends LineSegments {
 
+	/**
+	 * Constructs a new hemisphere light helper.
+	 *
+	 * @param {Object3D} object -  Usually an instance of {@link SkinnedMesh}. However, any 3D object
+	 * can be used if it represents a hierarchy of bones (see {@link Bone}).
+	 */
 	constructor( object ) {
 
 		const bones = getBoneList( object );
@@ -47,11 +62,29 @@ class SkeletonHelper extends LineSegments {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSkeletonHelper = true;
 
 		this.type = 'SkeletonHelper';
 
+		/**
+		 * The object being visualized.
+		 *
+		 * @type {Object3D}
+		 */
 		this.root = object;
+
+		/**
+		 * he list of bones that the helper visualizes.
+		 *
+		 * @type {Array<Bone>}
+		 */
 		this.bones = bones;
 
 		this.matrix = object.matrixWorld;
@@ -94,6 +127,10 @@ class SkeletonHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.geometry.dispose();
@@ -116,7 +153,7 @@ function getBoneList( object ) {
 
 	for ( let i = 0; i < object.children.length; i ++ ) {
 
-		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+		boneList.push( ...getBoneList( object.children[ i ] ) );
 
 	}
 

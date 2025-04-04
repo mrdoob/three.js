@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Storage PBO External Element</title>
+		<title>three.js webgpu - storage pbo external element</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,8 +9,8 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br />This example demonstrate the fetch of external element from a StorageBuffer.
-			<br /> Left canvas is using WebGPU Backend, right canvas is WebGL Backend.
+			<br />This example demonstrates fetching an external element from a StorageBuffer.
+			<br />The left canvas uses the WebGPU Backend, while the right uses the WebGL Backend.
 			<div id="timestamps" style="
 				position: absolute;
 				top: 60px;
@@ -42,9 +42,10 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -52,10 +53,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
+			import { storage, If, vec3, uv, uint, float, Fn, instanceIndex, workgroupBarrier } from 'three/tsl';
 
 			const timestamps = {
 				webgpu: document.getElementById( 'timestamps' ),
@@ -78,10 +76,10 @@
 
 				// texture
 
-				const size = 1024; // non power of two buffer size is not well supported in WebGPU
+				const size = 32; // non power of two buffer size is not well supported in WebGPU
+				const barCount = 32;
 
 				const type = [ 'float', 'vec2', 'vec3', 'vec4' ];
-
 
 				const arrayBufferNodes = [];
 
@@ -90,13 +88,13 @@
 					const typeSize = i + 1;
 					const array = new Array( size * typeSize ).fill( 0 );
 
-					const arrayBuffer = new StorageInstancedBufferAttribute( new Float32Array( array ), typeSize );
+					const arrayBuffer = new THREE.StorageInstancedBufferAttribute( new Float32Array( array ), typeSize );
 
-					arrayBufferNodes.push( storageObject( arrayBuffer, type[ i ], size ) );
+					arrayBufferNodes.push( storage( arrayBuffer, type[ i ], size ).setPBO( true ) );
 
 				}
 
-				const computeInitOrder = tslFn( () => {
+				const computeInitOrder = Fn( () => {
 
 					for ( let i = 0; i < type.length; i ++ ) {
 
@@ -106,11 +104,12 @@
 
 				} );
 
-				const computeInvertOrder = tslFn( () => {
+				const computeInvertOrder = Fn( () => {
 
 					for ( let i = 0; i < type.length; i ++ ) {
 
-						const invertIndex = arrayBufferNodes[ i ].element( uint( size ).sub( instanceIndex ) );
+						const invertIndex = arrayBufferNodes[ i ].element( uint( size - 1 ).sub( instanceIndex ) ).toVar();
+						workgroupBarrier();
 						arrayBufferNodes[ i ].element( instanceIndex ).assign( invertIndex );
 
 					}
@@ -123,9 +122,9 @@
 
 				const compute = computeInvertOrder().compute( size );
 
-				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
+				const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
 
-				material.colorNode = tslFn( () => {
+				material.colorNode = Fn( () => {
 
 					const index = uint( uv().x.mul( size ).floor() ).toVar();
 
@@ -140,7 +139,7 @@
 					If( uv().y.greaterThan( 0.0 ), () => {
 
 						const indexValue = arrayBufferNodes[ 0 ].element( index ).toVar();
-						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+						const value = float( indexValue ).div( float( size ) ).mul( barCount ).floor().div( barCount );
 			
 						color.assign( vec3( value, 0, 0 ) );
 
@@ -149,7 +148,7 @@
 					If( uv().y.greaterThan( 0.25 ), () => {
 
 						const indexValue = arrayBufferNodes[ 1 ].element( index ).toVar();
-						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+						const value = float( indexValue ).div( float( size ) ).mul( barCount ).floor().div( barCount );
 			
 						color.assign( vec3( 0, value, 0 ) );
 
@@ -158,7 +157,7 @@
 					If( uv().y.greaterThan( 0.5 ), () => {
 
 						const indexValue = arrayBufferNodes[ 2 ].element( index ).toVar();
-						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+						const value = float( indexValue ).div( float( size ) ).mul( barCount ).floor().div( barCount );
 			
 						color.assign( vec3( 0, 0, value ) );
 
@@ -167,7 +166,7 @@
 					If( uv().y.greaterThan( 0.75 ), () => {
 
 						const indexValue = arrayBufferNodes[ 3 ].element( index ).toVar();
-						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+						const value = float( indexValue ).div( float( size ) ).mul( barCount ).floor().div( barCount );
 			
 						color.assign( vec3( value, value, value ) );
 
@@ -182,7 +181,7 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				const renderer = new WebGPURenderer( { antialias: false, forceWebGL: forceWebGL, trackTimestamp: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
@@ -219,9 +218,12 @@
 					await renderer.computeAsync( compute );
 					await renderer.renderAsync( scene, camera );
 
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+
 					timestamps[ forceWebGL ? 'webgl' : 'webgpu' ].innerHTML = `
 
-							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Compute ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
 							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
 
 					setTimeout( stepAnimation, 1000 );

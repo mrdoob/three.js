@@ -7,6 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Controls] &rarr;
 
 		<h1>[name]</h1>
 
@@ -37,7 +38,7 @@
 				[page:Camera object]: The camera to be controlled.
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+				[page:HTMLDOMElement domElement]: The HTML element used for event listeners. (optional)
 			</p>
 			<p>
 				Creates a new instance of [name].
@@ -59,17 +60,6 @@
 		<h3>[property:Boolean constrainVertical]</h3>
 		<p>
 			Whether or not looking around is vertically constrained by [[page:.verticalMin], [page:.verticalMax]]. Default is `false`.
-		</p>
-
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
-		</p>
-
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			Whether or not the controls are enabled. Default is `true`.
 		</p>
 
 		<h3>[property:Number heightCoef]</h3>
@@ -113,11 +103,6 @@
 			The movement speed. Default is *1*.
 		</p>
 
-		<h3>[property:Camera object]</h3>
-		<p>
-			The camera to be controlled.
-		</p>
-
 		<h3>[property:Number verticalMax]</h3>
 		<p>
 			How far you can vertically look around, upper limit. Range is 0 to Math.PI radians. Default is `Math.PI`.
@@ -129,11 +114,6 @@
 		</p>
 
 		<h2>Methods</h2>
-
-		<h3>[method:undefined dispose] ()</h3>
-		<p>
-			Should be called if the controls is no longer required.
-		</p>
 
 		<h3>[method:undefined handleResize] ()</h3>
 		<p>
@@ -153,16 +133,6 @@
 			</p>
 			<p>
 				Ensures the controls orient the camera towards the defined target position.
-			</p>
-		</p>
-
-		<h3>[method:undefined update] ( [param:Number delta] )</h3>
-		<p>
-			<p>
-				[page:Number delta]: Time delta value.
-			</p>
-			<p>
-				Updates the controls. Usually called in the animation loop.
 			</p>
 		</p>
 

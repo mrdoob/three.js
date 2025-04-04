@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Skinning</title>
+		<title>three.js webgpu - skinning</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,15 +9,16 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Skinning
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - skinning
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -25,14 +26,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { toneMapping } from 'three/nodes';
+			import { color, screenUV } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 
@@ -42,19 +38,11 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 'lightblue' );
+				scene.backgroundNode = screenUV.y.mix( color( 0x66bbff ), color( 0x4466ff ) );
 				camera.lookAt( 0, 1, 0 );
 
 				clock = new THREE.Clock();
@@ -65,6 +53,9 @@
 				light.power = 2500;
 				camera.add( light );
 				scene.add( camera );
+
+				const ambient = new THREE.AmbientLight( 0x4466ff, 1 );
+				scene.add( ambient );
 
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
@@ -81,11 +72,12 @@
 
 				//renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .15 );
+				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMappingExposure = 0.4;
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

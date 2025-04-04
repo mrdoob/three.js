@@ -108,6 +108,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		}
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const reverseDepthBuffer = renderer.state.buffers.depth.getReversed();
 
 		const IS_INSTANCEDMESH = object.isInstancedMesh === true;
 		const IS_BATCHEDMESH = object.isBatchedMesh === true;
@@ -127,6 +128,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_ANISOTROPY = material.anisotropy > 0;
 		const HAS_CLEARCOAT = material.clearcoat > 0;
+		const HAS_DISPERSION = material.dispersion > 0;
 		const HAS_IRIDESCENCE = material.iridescence > 0;
 		const HAS_SHEEN = material.sheen > 0;
 		const HAS_TRANSMISSION = material.transmission > 0;
@@ -191,6 +193,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			precision: precision,
 
 			batching: IS_BATCHEDMESH,
+			batchingColor: IS_BATCHEDMESH && object._colorsTexture !== null,
 			instancing: IS_INSTANCEDMESH,
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 			instancingMorph: IS_INSTANCEDMESH && object.morphTexture !== null,
@@ -224,6 +227,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			clearcoatMap: HAS_CLEARCOATMAP,
 			clearcoatNormalMap: HAS_CLEARCOAT_NORMALMAP,
 			clearcoatRoughnessMap: HAS_CLEARCOAT_ROUGHNESSMAP,
+
+			dispersion: HAS_DISPERSION,
 
 			iridescence: HAS_IRIDESCENCE,
 			iridescenceMap: HAS_IRIDESCENCEMAP,
@@ -301,6 +306,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
+			reverseDepthBuffer: reverseDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
 
@@ -333,9 +339,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: toneMapping,
-			useLegacyLights: renderer._useLegacyLights,
 
 			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( ColorManagement.getTransfer( material.map.colorSpace ) === SRGBTransfer ),
+			decodeVideoTextureEmissive: HAS_EMISSIVEMAP && ( material.emissiveMap.isVideoTexture === true ) && ( ColorManagement.getTransfer( material.emissiveMap.colorSpace ) === SRGBTransfer ),
 
 			premultipliedAlpha: material.premultipliedAlpha,
 
@@ -348,7 +354,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			index0AttributeName: material.index0AttributeName,
 
 			extensionClipCullDistance: HAS_EXTENSIONS && material.extensions.clipCullDistance === true && extensions.has( 'WEBGL_clip_cull_distance' ),
-			extensionMultiDraw: HAS_EXTENSIONS && material.extensions.multiDraw === true && extensions.has( 'WEBGL_multi_draw' ),
+			extensionMultiDraw: ( HAS_EXTENSIONS && material.extensions.multiDraw === true || IS_BATCHEDMESH ) && extensions.has( 'WEBGL_multi_draw' ),
 
 			rendererExtensionParallelShaderCompile: extensions.has( 'KHR_parallel_shader_compile' ),
 
@@ -505,6 +511,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 18 );
 		if ( parameters.batching )
 			_programLayers.enable( 19 );
+		if ( parameters.dispersion )
+			_programLayers.enable( 20 );
+		if ( parameters.batchingColor )
+			_programLayers.enable( 21 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -517,19 +527,19 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.logarithmicDepthBuffer )
 			_programLayers.enable( 3 );
-		if ( parameters.skinning )
+		if ( parameters.reverseDepthBuffer )
 			_programLayers.enable( 4 );
-		if ( parameters.morphTargets )
+		if ( parameters.skinning )
 			_programLayers.enable( 5 );
-		if ( parameters.morphNormals )
+		if ( parameters.morphTargets )
 			_programLayers.enable( 6 );
-		if ( parameters.morphColors )
+		if ( parameters.morphNormals )
 			_programLayers.enable( 7 );
-		if ( parameters.premultipliedAlpha )
+		if ( parameters.morphColors )
 			_programLayers.enable( 8 );
-		if ( parameters.shadowMapEnabled )
+		if ( parameters.premultipliedAlpha )
 			_programLayers.enable( 9 );
-		if ( parameters.useLegacyLights )
+		if ( parameters.shadowMapEnabled )
 			_programLayers.enable( 10 );
 		if ( parameters.doubleSided )
 			_programLayers.enable( 11 );
@@ -549,8 +559,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 18 );
 		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 19 );
-		if ( parameters.alphaToCoverage )
+		if ( parameters.decodeVideoTextureEmissive )
 			_programLayers.enable( 20 );
+		if ( parameters.alphaToCoverage )
+			_programLayers.enable( 21 );
 
 		array.push( _programLayers.mask );
 

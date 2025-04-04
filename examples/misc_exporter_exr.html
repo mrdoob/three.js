@@ -39,13 +39,13 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -109,7 +109,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				controls.update();
 				renderer.render( scene, camera );
 
@@ -179,7 +178,7 @@
 
 			}
 
-			function exportFile() {
+			async function exportFile() {
 
 				let result, exportType, exportCompression;
 
@@ -196,9 +195,9 @@
 					exportCompression = NO_COMPRESSION;
 
 				if ( params.target == 'pmrem' )
-					result = exporter.parse( renderer, renderTarget, { type: exportType, compression: exportCompression } );
+					result = await exporter.parse( renderer, renderTarget, { type: exportType, compression: exportCompression } );
 				else
-					result = exporter.parse( dataTexture, { type: exportType, compression: exportCompression } );
+					result = await exporter.parse( dataTexture, { type: exportType, compression: exportCompression } );
 
 				saveArrayBuffer( result, params.target + '.exr' );
 

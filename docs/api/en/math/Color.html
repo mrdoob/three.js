@@ -12,7 +12,41 @@
 		<p class="desc">Class representing a color.</p>
 
 		<p>
-			Iterating through a [name] instance will yield its components (r, g, b) in
+			A Color instance is represented by RGB components in the linear <i>working
+			color space</i>, which defaults to `LinearSRGBColorSpace`. Inputs
+			conventionally using `SRGBColorSpace` (such as hexadecimals and CSS
+			strings) are converted to the working color space automatically.
+		</p>
+
+		<p>
+			<code>
+// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setHex( 0x112233 );
+			</code>
+		</p>
+
+		<p>
+			Source color spaces may be specified explicitly, to ensure correct
+			conversions.
+		</p>
+
+		<p>
+			<code>
+// assumed already LinearSRGBColorSpace; no conversion
+const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
+
+// converted explicitly from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
+			</code>
+		</p>
+
+		<p>
+			If THREE.ColorManagement is disabled, no conversions occur. For details,
+			see <i>Color management</i>.
+		</p>
+
+		<p>
+			Iterating through a Color instance will yield its components (r, g, b) in
 			the corresponding order.
 		</p>
 
@@ -50,7 +84,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and
 			[page:Float b] are defined, the red component of the color. If they are
 			not defined, it can be a
-			[link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended), 
+			[link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended),
 			a CSS-style string, or another `Color` instance.<br />
 			[page:Float g] - (optional) If it is defined, the green component of the
 			color.<br />
@@ -58,7 +92,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			color.<br /><br />
 
 			Note that standard method of specifying color in three.js is with a
-			[link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet], 
+			[link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet],
 			and that method is used throughout the rest of the
 			documentation.<br /><br />
 
@@ -91,13 +125,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Float r]</h3>
-		<p>Red channel value between `0` and `1`. Default is `1`.</p>
+		<p>Red channel value between `0.0` and `1.0`. Default is `1`.</p>
 
 		<h3>[property:Float g]</h3>
-		<p>Green channel value between `0` and `1`. Default is `1`.</p>
+		<p>Green channel value between `0.0` and `1.0`. Default is `1`.</p>
 
 		<h3>[property:Float b]</h3>
-		<p>Blue channel value between `0` and `1`. Default is `1`.</p>
+		<p>Blue channel value between `0.0` and `1.0`. Default is `1`.</p>
 
 		<h2>Methods</h2>
 
@@ -134,17 +168,17 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>[method:this convertLinearToSRGB]()</h3>
-		<p>Converts this color from linear space to sRGB space.</p>
+		<p>Converts this color from `LinearSRGBColorSpace` to `SRGBColorSpace`.</p>
 
 		<h3>[method:this convertSRGBToLinear]()</h3>
-		<p>Converts this color from sRGB space to linear space.</p>
+		<p>Converts this color from `SRGBColorSpace` to `LinearSRGBColorSpace`.</p>
 
 		<h3>[method:this copyLinearToSRGB]( [param:Color color] )</h3>
 		<p>
 			[page:Color color] — Color to copy.<br />
 
 			Copies the given color into this color, and then converts this color from
-			linear space to sRGB space.
+			`LinearSRGBColorSpace` to `SRGBColorSpace`.
 		</p>
 
 		<h3>[method:this copySRGBToLinear]( [param:Color color] )</h3>
@@ -152,7 +186,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[page:Color color] — Color to copy.<br />
 
 			Copies the given color into this color, and then converts this color from
-			sRGB space to linear space.
+			`SRGBColorSpace` to `LinearSRGBColorSpace`.
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Color color] )</h3>
@@ -208,11 +242,11 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			object of the form:
 
 			<code>
-			{ 
-				h: 0, 
-				s: 0, 
-				l: 0 
-			} 
+			{
+				h: 0,
+				s: 0,
+				l: 0
+			}
 			</code>
 		</p>
 
@@ -253,9 +287,9 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[page:Float alpha] - interpolation factor, typically in the closed
 			interval `[0, 1]`.<br /><br />
 
-			Sets this color to be the color linearly interpolated between [page:Color color1] 
+			Sets this color to be the color linearly interpolated between [page:Color color1]
 			and [page:Color color2] where alpha is the percent distance along
-			the line connecting the two colors - alpha = 0 will be [page:Color color1], 
+			the line connecting the two colors - alpha = 0 will be [page:Color color1],
 			and alpha = 1 will be [page:Color color2].
 		</p>
 

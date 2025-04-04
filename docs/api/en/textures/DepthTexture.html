@@ -33,10 +33,7 @@
 
 			[page:Number height] -- height of the texture.<br />
 
-			[page:Constant type] -- Default is [page:Textures THREE.UnsignedIntType]
-			when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] 
-			when using [page:Textures DepthStencilFormat].
-			See [page:Textures type constants] for other choices.<br />
+			[page:Constant type] -- Default is [page:Textures THREE.UnsignedIntType]. See [page:DepthTexture DepthTexture.type] for other choices.<br />
 
 			[page:Constant mapping] -- See [page:Textures mapping mode constants] for
 			details.<br />
@@ -87,10 +84,14 @@
 
 		<h3>[page:Texture.type type]</h3>
 		<p>
-			Default is [page:Textures THREE.UnsignedIntType] when using [page:Textures DepthFormat] 
-			and [page:Textures THREE.UnsignedInt248Type] when using
-			[page:Textures DepthStencilFormat]. See [page:Textures format constants]
-			for details.<br />
+			Default is [page:Textures THREE.UnsignedIntType]. The following are options and how they map to internal
+			gl depth format types depending on the stencil format, as well:
+
+			[page:Textures THREE.UnsignedIntType] -- Uses DEPTH_COMPONENT24 or DEPTH24_STENCIL8 internally.<br />
+
+			[page:Textures THREE.FloatType] -- Uses DEPTH_COMPONENT32F or DEPTH32F_STENCIL8 internally.<br />
+
+			[page:Textures THREE.UnsignedShortType] -- Uses DEPTH_COMPONENT16 internally. Stencil buffer is unsupported when using this type.<br />
 		</p>
 
 		<h3>[page:Texture.magFilter magFilter]</h3>

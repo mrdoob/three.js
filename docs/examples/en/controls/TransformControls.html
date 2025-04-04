@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>[name]</h1>
 
@@ -41,7 +41,7 @@
 				[page:Camera camera]: The camera of the rendered scene.
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+				[page:HTMLDOMElement domElement]: The HTML element used for event listeners. (optional)
 			</p>
 			<p>
 				Creates a new instance of [name].
@@ -73,7 +73,7 @@
 
 		<h2>Properties</h2>
 
-		<p>See the base [page:Object3D] class for common properties.</p>
+		<p>See the base [page:Controls] class for common properties.</p>
 
 		<h3>[property:String axis]</h3>
 		<p>
@@ -85,30 +85,14 @@
 			The camera of the rendered scene.
 		</p>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
-		</p>
-
 		<h3>[property:Boolean dragging]</h3>
 		<p>
 			Whether or not dragging is currently performed. Read-only property.
 		</p>
 
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			Whether or not the controls are enabled.
-		</p>
-
 		<h3>[property:String mode]</h3>
 		<p>
 			The current transformation mode. Possible values are "translate", "rotate" and "scale". Default is `translate`.
-		</p>
-
-		<h3>[property:Object3D object]</h3>
-		<p>
-			The 3D object being controlled.
 		</p>
 
 		<h3>[property:Number rotationSnap]</h3>
@@ -148,9 +132,39 @@
 			steps the 3D object should be translated. Default is `null`.
 		</p>
 
+		<h3>[property:Number minX]</h3>
+		<p>
+			The minimum allowed X position during translation. Default is `-Infinity`.
+		</p>
+
+		<h3>[property:Number maxX]</h3>
+		<p>
+			The maximum allowed X position during translation. Default is `Infinity`.
+		</p>
+
+		<h3>[property:Number minY]</h3>
+		<p>
+			The minimum allowed Y position during translation. Default is `-Infinity`.
+		</p>
+
+		<h3>[property:Number maxY]</h3>
+		<p>
+			The maximum allowed Y position during translation. Default is `Infinity`.
+		</p>
+
+		<h3>[property:Number minZ]</h3>
+		<p>
+			The minimum allowed Z position during translation. Default is `-Infinity`.
+		</p>
+
+		<h3>[property:Number maxZ]</h3>
+		<p>
+			The maximum allowed Z position during translation. Default is `Infinity`.
+		</p>
+
 		<h2>Methods</h2>
 
-		<p>See the base [page:Object3D] class for common methods.</p>
+		<p>See the base [page:Controls] class for common methods.</p>
 
 		<h3>[method:TransformControls attach] ( [param:Object3D object] )</h3>
 		<p>
@@ -167,9 +181,10 @@
 			Removes the current 3D object from the controls and makes the helper UI invisible.
 		</p>
 
-		<h3>[method:undefined dispose] ()</h3>
+		<h3>[method:Object3D getHelper] ()</h3>
 		<p>
-			Should be called if the controls is no longer required.
+			Returns the visual representation of the controls. Add the helper to your scene to visually transform the attached 
+			3D object.
 		</p>
 
 		<h3>[method:Raycaster getRaycaster] ()</h3>

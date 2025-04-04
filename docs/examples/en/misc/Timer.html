@@ -16,7 +16,7 @@
 
 			<ul>
 				<li>[name] has an [page:.update]() method that updates its internal state. That makes it possible to call [page:.getDelta]() and [page:.getElapsed]() multiple times per simulation step without getting different values.</li>
-				<li>The class uses the Page Visibility API to avoid large time delta values when the app is inactive (e.g. tab switched or browser hidden).</li>
+				<li>The class can make use of the Page Visibility API to avoid large time delta values when the app is inactive (e.g. tab switched or browser hidden).</li>
 			</ul>
 		</p>
 
@@ -63,6 +63,17 @@
 		<h3>Timer()</h3>
 
 		<h2>Methods</h2>
+
+		<h3>[method:this connect]( [param:Document document] )</h3>
+		<p>
+			Connects the timer to the given document. Calling this method is not mandatory to use the timer
+			but enables the usage of the Page Visibility API to avoid large time delta values.
+		</p>
+
+		<h3>[method:this disconnect]()</h3>
+		<p>
+			Disconnects the timer from the DOM and also disables the usage of the Page Visibility API.
+		</p>
 
 		<h3>[method:Number getDelta]()</h3>
 		<p>

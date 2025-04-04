@@ -25,54 +25,68 @@ const _axis = new Vector3();
 const _vector = new Vector3();
 const _matrix = new Matrix4();
 
-
 /**
- * CCD Algorithm
- *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
+ * This class solves the Inverse Kinematics Problem with a [CCD Algorithm]{@link https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm}.
  *
- * // ik parameter example
- * //
- * // target, effector, index in links are bone index in skeleton.bones.
- * // the bones relation should be
- * // <-- parent                                  child -->
- * // links[ n ], links[ n - 1 ], ..., links[ 0 ], effector
- * iks = [ {
- *	target: 1,
- *	effector: 2,
- *	links: [ { index: 5, limitation: new Vector3( 1, 0, 0 ) }, { index: 4, enabled: false }, { index : 3 } ],
- *	iteration: 10,
- *	minAngle: 0.0,
- *	maxAngle: 1.0,
- * } ];
+ * `CCDIKSolver` is designed to work with instances of {@link SkinnedMesh}.
+ *
+ * @three_import import { CCDIKSolver } from 'three/addons/animation/CCDIKSolver.js';
  */
-
 class CCDIKSolver {
 
 	/**
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Array<Object>} iks
+	 * @param {SkinnedMesh} mesh - The skinned mesh.
+	 * @param {Array<CCDIKSolver~IK>} [iks=[]] - The IK objects.
 	 */
 	constructor( mesh, iks = [] ) {
 
+		/**
+		 * The skinned mesh.
+		 *
+		 * @type {SkinnedMesh}
+		 */
 		this.mesh = mesh;
+
+		/**
+		 * The IK objects.
+		 *
+		 * @type {SkinnedMesh}
+		 */
 		this.iks = iks;
+
+		this._initialQuaternions = [];
+		this._workingQuaternion = new Quaternion();
+
+		for ( const ik of iks ) {
+
+			const chainQuats = [];
+			for ( let i = 0; i < ik.links.length; i ++ ) {
+
+			  chainQuats.push( new Quaternion() );
+
+			}
+
+			this._initialQuaternions.push( chainQuats );
+
+		}
 
 		this._valid();
 
 	}
 
 	/**
-	 * Update all IK bones.
+	 * Updates all IK bones by solving the CCD algorithm.
 	 *
-	 * @return {CCDIKSolver}
+	 * @param {number} [globalBlendFactor=1.0] - Blend factor applied if an IK chain doesn't have its own .blendFactor.
+	 * @return {CCDIKSolver} A reference to this instance.
 	 */
-	update() {
+	update( globalBlendFactor = 1.0 ) {
 
 		const iks = this.iks;
 
 		for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
-			this.updateOne( iks[ i ] );
+			this.updateOne( iks[ i ], globalBlendFactor );
 
 		}
 
@@ -81,14 +95,18 @@ class CCDIKSolver {
 	}
 
 	/**
-	 * Update one IK bone
+	 * Updates one IK bone solving the CCD algorithm.
 	 *
-	 * @param {Object} ik parameter
-	 * @return {CCDIKSolver}
+	 * @param {CCDIKSolver~IK} ik - The IK to update.
+	 * @param {number} [overrideBlend=1.0] - If the IK object does not define `blendFactor`, this value is used.
+	 * @return {CCDIKSolver} A reference to this instance.
 	 */
-	updateOne( ik ) {
+	updateOne( ik, overrideBlend = 1.0 ) {
 
+		const chainBlend = ik.blendFactor !== undefined ? ik.blendFactor : overrideBlend;
 		const bones = this.mesh.skeleton.bones;
+		const chainIndex = this.iks.indexOf( ik );
+		const initialQuaternions = this._initialQuaternions[ chainIndex ];
 
 		// for reference overhead reduction in loop
 		const math = Math;
@@ -103,6 +121,17 @@ class CCDIKSolver {
 		const links = ik.links;
 		const iteration = ik.iteration !== undefined ? ik.iteration : 1;
 
+		if ( chainBlend < 1.0 ) {
+
+			for ( let j = 0; j < links.length; j ++ ) {
+
+			  const linkIndex = links[ j ].index;
+			  initialQuaternions[ j ].copy( bones[ linkIndex ].quaternion );
+
+			}
+
+		}
+
 		for ( let i = 0; i < iteration; i ++ ) {
 
 			let rotated = false;
@@ -111,8 +140,7 @@ class CCDIKSolver {
 
 				const link = bones[ links[ j ].index ];
 
-				// skip this link and following links.
-				// this skip is used for MMD performance optimization.
+				// skip this link and following links
 				if ( links[ j ].enabled === false ) break;
 
 				const limitation = links[ j ].limitation;
@@ -206,18 +234,35 @@ class CCDIKSolver {
 
 		}
 
-		return this;
+		if ( chainBlend < 1.0 ) {
+
+			for ( let j = 0; j < links.length; j ++ ) {
+
+			  const linkIndex = links[ j ].index;
+			  const link = bones[ linkIndex ];
+
+			  this._workingQuaternion.copy( initialQuaternions[ j ] ).slerp( link.quaternion, chainBlend );
+
+			  link.quaternion.copy( this._workingQuaternion );
+			  link.updateMatrixWorld( true );
+
+			}
+
+		}
+
+		  return this;
 
 	}
 
 	/**
-	 * Creates Helper
+	 * Creates a helper for visualizing the CCDIK.
 	 *
-	 * @return {CCDIKHelper}
+	 * @param {number} sphereSize - The sphere size.
+	 * @return {CCDIKHelper} The created helper.
 	 */
-	createHelper() {
+	createHelper( sphereSize ) {
 
-		return new CCDIKHelper( this.mesh, this.iks );
+		return new CCDIKHelper( this.mesh, this.iks, sphereSize );
 
 	}
 
@@ -276,25 +321,51 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
 }
 
 /**
- * Visualize IK bones
+ * Helper for visualizing IK bones.
  *
- * @param {SkinnedMesh} mesh
- * @param {Array<Object>} iks
+ * @augments Object3D
+ * @three_import import { CCDIKHelper } from 'three/addons/animation/CCDIKSolver.js';
  */
 class CCDIKHelper extends Object3D {
 
+	/**
+	 * @param {SkinnedMesh} mesh - The skinned mesh.
+ 	 * @param {Array<CCDIKSolver~IK>} [iks=[]] - The IK objects.
+ 	 * @param {number} [sphereSize=0.25] - The sphere size.
+	 */
 	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 		super();
 
+		/**
+		 * The skinned mesh this helper refers to.
+		 *
+		 * @type {SkinnedMesh}
+		 */
 		this.root = mesh;
+
+		/**
+		 * The IK objects.
+		 *
+		 * @type {Array<CCDIKSolver~IK>}
+		 */
 		this.iks = iks;
 
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
+		/**
+		 * The helpers sphere geometry.
+		 *
+		 * @type {SkinnedMesh}
+		 */
 		this.sphereGeometry = new SphereGeometry( sphereSize, 16, 8 );
 
+		/**
+		 * The material for the target spheres.
+		 *
+		 * @type {MeshBasicMaterial}
+		 */
 		this.targetSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0xff8888 ),
 			depthTest: false,
@@ -302,6 +373,11 @@ class CCDIKHelper extends Object3D {
 			transparent: true
 		} );
 
+		/**
+		 * The material for the effector spheres.
+		 *
+		 * @type {MeshBasicMaterial}
+		 */
 		this.effectorSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0x88ff88 ),
 			depthTest: false,
@@ -309,6 +385,11 @@ class CCDIKHelper extends Object3D {
 			transparent: true
 		} );
 
+		/**
+		 * The material for the link spheres.
+		 *
+		 * @type {MeshBasicMaterial}
+		 */
 		this.linkSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0x8888ff ),
 			depthTest: false,
@@ -316,6 +397,11 @@ class CCDIKHelper extends Object3D {
 			transparent: true
 		} );
 
+		/**
+		 * A global line material.
+		 *
+		 * @type {LineBasicMaterial}
+		 */
 		this.lineMaterial = new LineBasicMaterial( {
 			color: new Color( 0xff0000 ),
 			depthTest: false,
@@ -327,9 +413,6 @@ class CCDIKHelper extends Object3D {
 
 	}
 
-	/**
-	 * Updates IK bones visualization.
-	 */
 	updateMatrixWorld( force ) {
 
 		const mesh = this.root;
@@ -394,7 +477,8 @@ class CCDIKHelper extends Object3D {
 	}
 
 	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+	 * Frees the GPU-related resources allocated by this instance.
+	 * Call this method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
 
@@ -478,5 +562,30 @@ class CCDIKHelper extends Object3D {
 	}
 
 }
+
+/**
+ * This type represents IK configuration objects.
+ *
+ * @typedef {Object} CCDIKSolver~IK
+ * @property {number} target - The target bone index which refers to a bone in the `Skeleton.bones` array.
+ * @property {number} effector - The effector bone index which refers to a bone in the `Skeleton.bones` array.
+ * @property {Array<CCDIKSolver~BoneLink>} links - An array of bone links.
+ * @property {number} [iteration=1] - Iteration number of calculation. Smaller is faster but less precise.
+ * @property {number} [minAngle] - Minimum rotation angle in a step in radians.
+ * @property {number} [maxAngle] - Minimum rotation angle in a step in radians.
+ * @property {number} [blendFactor] - The blend factor.
+ **/
+
+/**
+ * This type represents bone links.
+ *
+ * @typedef {Object} CCDIKSolver~BoneLink
+ * @property {number} index - The index of a linked bone which refers to a bone in the `Skeleton.bones` array.
+ * @property {number} [limitation] - Rotation axis.
+ * @property {number} [rotationMin] - Rotation minimum limit.
+ * @property {number} [rotationMax] - Rotation maximum limit.
+ * @property {boolean} [enabled=true] - Whether the link is enabled or not.
+ **/
+
 
 export { CCDIKSolver, CCDIKHelper };

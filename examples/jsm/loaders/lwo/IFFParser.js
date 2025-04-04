@@ -463,7 +463,7 @@ class IFFParser {
 	}
 
 	// holds various data about texture node image state
-	// Data other thanmipMapLevel unknown
+	// Data other than mipMapLevel unknown
 	parseImageStateForm() {
 
 		this.reader.skip( 8 ); // unknown
@@ -577,7 +577,7 @@ class IFFParser {
 			fileName: ''
 		};
 
-		// seach STIL block
+		// search STIL block
 		while ( true ) {
 
 			var tag = this.reader.getIDTag();
@@ -651,10 +651,13 @@ class IFFParser {
 	// LAYR: number[U2], flags[U2], pivot[VEC12], name[S0], parent[U2]
 	parseLayer( length ) {
 
+		var number = this.reader.getUint16();
+		var flags = this.reader.getUint16(); // If the least significant bit of flags is set, the layer is hidden.
+		var pivot = this.reader.getFloat32Array( 3 ); // Note: this seems to be superfluous, as the geometry is translated when pivot is present
 		var layer = {
-			number: this.reader.getUint16(),
-			flags: this.reader.getUint16(), // If the least significant bit of flags is set, the layer is hidden.
-			pivot: this.reader.getFloat32Array( 3 ), // Note: this seems to be superflous, as the geometry is translated when pivot is present
+			number: number,
+			flags: flags, // If the least significant bit of flags is set, the layer is hidden.
+			pivot: [ - pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] ], // Note: this seems to be superfluous, as the geometry is translated when pivot is present
 			name: this.reader.getString(),
 		};
 
@@ -676,8 +679,8 @@ class IFFParser {
 		this.currentPoints = [];
 		for ( var i = 0; i < length / 4; i += 3 ) {
 
-			// z -> -z to match three.js right handed coords
-			this.currentPoints.push( this.reader.getFloat32(), this.reader.getFloat32(), - this.reader.getFloat32() );
+			// x -> -x to match three.js right handed coords
+			this.currentPoints.push( - this.reader.getFloat32(), this.reader.getFloat32(), this.reader.getFloat32() );
 
 		}
 

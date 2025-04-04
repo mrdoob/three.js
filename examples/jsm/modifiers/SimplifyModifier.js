@@ -1,5 +1,6 @@
 import {
 	BufferGeometry,
+	Color,
 	Float32BufferAttribute,
 	Vector2,
 	Vector3,
@@ -7,18 +8,32 @@ import {
 } from 'three';
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
-/**
- *	Simplification Geometry Modifier
- *    - based on code and technique
- *	  - by Stan Melax in 1998
- *	  - Progressive Mesh type Polygon Reduction Algorithm
- *    - http://www.melax.com/polychop/
- */
-
 const _cb = new Vector3(), _ab = new Vector3();
 
+/**
+ * This class can be used to modify a geometry by simplifying it. A typical use
+ * case for such a modifier is automatic LOD generation.
+ *
+ * The implementation is based on [Progressive Mesh type Polygon Reduction Algorithm]{@link https://web.archive.org/web/20230610044040/http://www.melax.com/polychop/}
+ * by Stan Melax in 1998.
+ *
+ * ```js
+ * const modifier = new SimplifyModifier();
+ * geometry = modifier.modify( geometry );
+ * ```
+ *
+ * @three_import import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
+ */
 class SimplifyModifier {
 
+	/**
+	 * Returns a new, modified version of the given geometry by applying a simplification.
+	 * Please note that the resulting geometry is always non-indexed.
+	 *
+	 * @param {BufferGeometry} geometry - The geometry to modify.
+	 * @param {number} count - The number of vertices to remove.
+	 * @return {BufferGeometry} A new, modified geometry.
+	 */
 	modify( geometry, count ) {
 
 		geometry = geometry.clone();
@@ -28,7 +43,7 @@ class SimplifyModifier {
 		delete geometry.morphAttributes.normal;
 		const attributes = geometry.attributes;
 
-		// this modifier can only process indexed and non-indexed geomtries with at least a position attribute
+		// this modifier can only process indexed and non-indexed geometries with at least a position attribute
 
 		for ( const name in attributes ) {
 
@@ -81,7 +96,7 @@ class SimplifyModifier {
 
 			if ( colorAttribute ) {
 
-				col = new THREE.Color().fromBufferAttribute( colorAttribute, i );
+				col = new Color().fromBufferAttribute( colorAttribute, i );
 
 			}
 
@@ -583,7 +598,7 @@ class Vertex {
 
 		// these will be computed in computeEdgeCostAtVertex()
 		this.collapseCost = 0; // cost of collapsing this vertex, the less the better. aka objdist
-		this.collapseNeighbor = null; // best candinate for collapsing
+		this.collapseNeighbor = null; // best candidate for collapsing
 
 	}
 
