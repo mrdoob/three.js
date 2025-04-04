@@ -12,6 +12,6 @@ const contents = {
     'three.webgpu.nodes.js': `export * from '../src/Three.WebGPU.Nodes.js';`,
 }
 
-await Object.entries( contents ).map( ( [ filename, content ] ) => 
+await Promise.all( Object.entries( contents ).map( ( [ filename, content ] ) => 
     writeFile( `./build/${ filename }`, '// dev build\n' + content + '\n' )
-);
+) );
