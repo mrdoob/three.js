@@ -432,11 +432,17 @@ function buildGlobalsNav( globals, seen ) {
 
 		globals.forEach( ( { kind, longname, name, tags } ) => {
 
-			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) && Array.isArray( tags ) && tags[ 0 ].title === 'tsl' ) {
+			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) && Array.isArray( tags ) ) {
 
-				tslNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
+				const tslTag = tags.find( tag => tag.title === 'tsl' );
 
-				seen[ longname ] = true;
+				if ( tslTag !== undefined ) {
+
+					tslNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
+
+					seen[ longname ] = true;
+
+				}
 
 			}
 
@@ -700,6 +706,24 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 			addSignatureTypes( doclet );
 			addAttribs( doclet );
 			doclet.kind = 'member';
+
+		}
+
+	} );
+
+	// prepare import statements
+	data().each( doclet => {
+
+		if ( doclet.kind === 'class' || doclet.kind === 'module' ) {
+
+			const tags = doclet.tags;
+
+			if ( Array.isArray( tags ) ) {
+
+				const importTag = tags.find( tag => tag.title === 'three_import' );
+				doclet.import = ( importTag !== undefined ) ? importTag.text : null;
+
+			}
 
 		}
 
