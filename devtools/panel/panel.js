@@ -526,11 +526,3 @@ document.head.appendChild(style);
 // Initial UI update
 clearState();
 updateUI();
-
-// Function to send commands to the background script
-function sendCommand(name, data = {}) {
-    backgroundPageConnection.postMessage({
-        name: name,
-        ...data
-    });
-}
