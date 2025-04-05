@@ -534,19 +534,29 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
 
+		let snippet;
+
 		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
 
 		} else if ( depthSnippet ) {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
 		} else {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+
+			if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
+
+				snippet += '.x';
+
+			}
 
 		}
+
+		return snippet;
 
 	}
 
@@ -1661,7 +1671,15 @@ ${ flowData.code }
 
 				} else if ( texture.isDepthTexture === true ) {
 
-					textureType = `texture_depth${ multisampled }_2d${ texture.isDepthArrayTexture === true ? '_array' : '' }`;
+					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
+
+						textureType = `texture${ multisampled }_2d<f32>`;
+
+					} else {
+
+						textureType = `texture_depth${ multisampled }_2d${ texture.isDepthArrayTexture === true ? '_array' : '' }`;
+
+					}
 
 				} else if ( texture.isVideoTexture === true ) {
 
