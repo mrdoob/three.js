@@ -70,6 +70,7 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Create and expose the __THREE_DEVTOOLS__ object
 	const devTools = new DevToolsEventTarget();
+	devTools.isVisible = true; // Initialize visibility state
 	Object.defineProperty(window, '__THREE_DEVTOOLS__', {
 		value: devTools,
 		configurable: false,
@@ -353,6 +354,7 @@ if (!window.__THREE_DEVTOOLS__) {
 			try {
 				// Skip updates if devtools is not visible
 				if ( ! devTools.isVisible ) {
+					// console.log('DevTools: Panel not visible, skipping renderer update'); // Optional debug log
 					return;
 				}
 
@@ -363,10 +365,28 @@ if (!window.__THREE_DEVTOOLS__) {
 					return;
 				}
 
+				const oldProperties = data.properties;
 				const newProperties = getRendererProperties( renderer );
-				if ( JSON.stringify( data.properties ) !== JSON.stringify( newProperties ) ) {
+
+				// Compare relevant properties directly for changes
+				const changed = (
+					!oldProperties || // Update if old properties don't exist yet
+					oldProperties.width !== newProperties.width ||
+					oldProperties.height !== newProperties.height ||
+					oldProperties.drawingBufferWidth !== newProperties.drawingBufferWidth ||
+					oldProperties.drawingBufferHeight !== newProperties.drawingBufferHeight ||
+					JSON.stringify(oldProperties.info?.render) !== JSON.stringify(newProperties.info?.render) || // Compare render stats
+					JSON.stringify(oldProperties.info?.memory) !== JSON.stringify(newProperties.info?.memory) // Compare memory stats
+					// Add other comparisons if needed, or use full stringify as fallback:
+					// || JSON.stringify(oldProperties) !== JSON.stringify(newProperties)
+				);
+
+				if ( changed ) {
+					console.log('DevTools: Renderer properties changed, dispatching update for', renderer.uuid); // Log dispatched updates
 					data.properties = newProperties;
 					dispatchEvent( 'update', data );
+				} else {
+					// console.log('DevTools: Renderer properties unchanged for', renderer.uuid); // Optional: for debugging
 				}
 
 			} catch ( error ) {
@@ -450,6 +470,11 @@ if (!window.__THREE_DEVTOOLS__) {
 		// Handle visibility toggle
 		else if (message.name === 'visibility' && message.uuid !== undefined) {
 			toggleVisibility(message.uuid, message.visible);
+		}
+		// Handle visibility update from panel (via content script)
+		else if ( message.name === 'panel-visibility' ) {
+			devTools.isVisible = message.value;
+			// console.log( 'DevTools: Visibility set to', devTools.isVisible ); // Optional debug log
 		}
 	});
 

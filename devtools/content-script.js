@@ -14,6 +14,8 @@ function injectBridge( target = document ) {
 
 	( target.head || target.documentElement ).appendChild( script );
 
+	return script;
+
 }
 
 // Also inject into any existing iframes
@@ -207,3 +209,19 @@ function handleDevtoolsMessage( message, sender, sendResponse ) {
 window.addEventListener( 'message', handleMainWindowMessage, false );
 window.addEventListener( 'message', handleIframeMessage, false );
 chrome.runtime.onMessage.addListener( handleDevtoolsMessage );
+
+// Listen for messages from the panel
+chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
+
+	if ( message.name === 'visibility' ) {
+
+		// Forward visibility state to the injected script
+		window.postMessage( {
+			id: 'three-devtools',
+			name: 'panel-visibility', // Use a distinct name
+			value: message.value
+		}, '*' );
+
+	}
+
+} );
