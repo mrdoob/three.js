@@ -517,6 +517,9 @@ class WebGLRenderer {
 		}
 
 		initGLContext();
+		console.log(`[WebGLRenderer] Initialized successfully with WebGL version: ${_gl.getParameter(_gl.VERSION)}`);
+		console.log("WebGLRenderer initialized");
+
 
 		// xr
 
