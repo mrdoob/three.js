@@ -376,12 +376,16 @@ if (!window.__THREE_DEVTOOLS__) {
 		}
 		// Handle request for initial state from panel
 		else if ( message.name === 'request-initial-state' ) {
-			// console.log('DevTools: Received request-initial-state, resending objects...');
-			// Resend all known objects to the panel
-			devTools.objects.forEach( ( objectData ) => {
-				dispatchEvent('observe', objectData);
-			});
-			// console.log('DevTools: Finished resending objects.');
+			for (const observedRenderer of observedRenderers) {
+				const data = getObjectData(observedRenderer);
+				if (data) {
+					data.properties = getRendererProperties(observedRenderer);
+					dispatchEvent('renderer', data);
+				}
+			}
+			for (const observedScene of observedScenes) {
+				reloadSceneObjects(observedScene);
+			}
 		}
 	});
 

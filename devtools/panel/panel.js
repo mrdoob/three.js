@@ -387,10 +387,6 @@ function renderObject(obj, container, level = 0) {
 function updateUI() {
 
 	const container = document.getElementById('scene-tree');
-	if (!container) {
-		console.error('Could not find scene-tree container!');
-		return;
-	}
 	container.innerHTML = '';
 
 	// Add version info if available

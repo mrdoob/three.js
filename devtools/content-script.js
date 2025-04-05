@@ -178,7 +178,9 @@ function handleBackgroundMessage( message, sender, sendResponse ) {
 	if ( message.name === 'request-initial-state' ) {
 
 		// console.log( 'Content script: Forwarding message to bridge:', message.name );
-		window.postMessage( message, '*' ); // Forward the message as is to the page
+		// Ensure the message has the correct ID before forwarding to the page
+		message.id = 'three-devtools';
+		window.postMessage( message, '*' ); // Forward the modified message to the page
 
 		// Optional: Forward to iframes too, if needed (might cause duplicates if bridge is in iframe)
 		/*
