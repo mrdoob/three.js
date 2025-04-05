@@ -7,54 +7,12 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 
 		<!-- Write to G-Buffer -->
-		<script id="gbuffer-vert" type="x-shader/x-vertex">
-			in vec3 position;
-			in vec3 normal;
-			in vec2 uv;
+		<script id="gbuffer-output-normal-frag" type="x-shader/x-fragment">
+			#ifdef out_Normal
 
-			out vec3 vNormal;
-			out vec2 vUv;
+				out_Normal = vec4(normal, 1.0);
 
-			uniform mat4 modelViewMatrix;
-			uniform mat4 projectionMatrix;
-			uniform mat3 normalMatrix;
-
-			void main() {
-
-				vUv = uv;
-
-				// get smooth normals
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-				vec3 transformedNormal = normalMatrix * normal;
-				vNormal = normalize( transformedNormal );
-
-				gl_Position = projectionMatrix * mvPosition;
-
-			}
-		</script>
-		<script id="gbuffer-frag" type="x-shader/x-fragment">
-			precision highp float;
-			precision highp int;
-
-			layout(location = 0) out vec4 gColor;
-			layout(location = 1) out vec4 gNormal;
-
-			uniform sampler2D tDiffuse;
-			uniform vec2 repeat;
-
-			in vec3 vNormal;
-			in vec2 vUv;
-
-			void main() {
-
-				// write color to G-Buffer
-				gColor = texture( tDiffuse, vUv * repeat );
-
-				// write normals to G-Buffer
-				gNormal = vec4( normalize( vNormal ), 0.0 );
-
-			}
+			#endif
 		</script>
 
 		<!-- Read G-Buffer and render to screen -->
@@ -82,7 +40,7 @@
 				return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
 			}
 
-			layout(location = 0) out vec4 pc_FragColor;
+			layout(location = 0) out vec4 out_FragColor;
 
 			in vec2 vUv;
 
@@ -94,10 +52,8 @@
 				vec4 diffuse = texture( tDiffuse, vUv );
 				vec4 normal = texture( tNormal, vUv );
 
-				pc_FragColor = mix( diffuse, normal, step( 0.5, vUv.x ) );
-				pc_FragColor.a = 1.0;
-
-				pc_FragColor = LinearTosRGB( pc_FragColor );
+				out_FragColor = mix( LinearTosRGB( diffuse ), normal, step( 0.5, vUv.x ) );
+				out_FragColor.a = 1.0;
 
 			}
 		</script>
@@ -138,6 +94,10 @@
 			gui.add( parameters, 'wireframe' );
 			gui.onChange( render );
 
+			// Extend three's ShaderChunk library
+			THREE.ShaderChunk.normal_fragment_maps += '\n' +
+				document.querySelector( '#gbuffer-output-normal-frag' ).textContent.trim();
+
 			init();
 
 			function init() {
@@ -155,19 +115,21 @@
 					{
 						count: 2,
 						minFilter: THREE.NearestFilter,
-						magFilter: THREE.NearestFilter
+						magFilter: THREE.NearestFilter,
+						type: THREE.HalfFloatType
 					}
 				);
 
-				// Name our G-Buffer attachments for debugging
+				// The G-Buffer texture names will be used to define shader outputs as `out_${name}`
 
-				renderTarget.textures[ 0 ].name = 'diffuse';
-				renderTarget.textures[ 1 ].name = 'normal';
+				renderTarget.textures[ 0 ].name = 'Color';
+				renderTarget.textures[ 1 ].name = 'Normal';
 
 				// Scene setup
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
+				scene.background = new THREE.Color( 0x000000 );
+				scene.add( new THREE.AmbientLight() );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 50 );
 				camera.position.z = 4;
@@ -181,16 +143,7 @@
 
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
-					new THREE.RawShaderMaterial( {
-						name: 'G-Buffer Shader',
-						vertexShader: document.querySelector( '#gbuffer-vert' ).textContent.trim(),
-						fragmentShader: document.querySelector( '#gbuffer-frag' ).textContent.trim(),
-						uniforms: {
-							tDiffuse: { value: diffuse },
-							repeat: { value: new THREE.Vector2( 5, 0.5 ) }
-						},
-						glslVersion: THREE.GLSL3
-					} )
+					new THREE.MeshStandardMaterial( { map: diffuse } )
 				) );
 
 				// PostProcessing setup
