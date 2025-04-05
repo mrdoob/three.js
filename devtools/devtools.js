@@ -4,7 +4,7 @@ try {
 		'Three.js',
 		null,
 		'panel/panel.html',
-		function ( panel ) {
+		function () {
 
 			console.log( 'Three.js DevTools panel created' );
 

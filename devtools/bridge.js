@@ -107,7 +107,6 @@ if (!window.__THREE_DEVTOOLS__) {
 				isRenderer: true,
 				parent: null,
 				children: [],
-				// Add renderer-specific properties
 				properties: {
 					width: renderer.domElement ? renderer.domElement.clientWidth : 0,
 					height: renderer.domElement ? renderer.domElement.clientHeight : 0,
@@ -126,7 +125,6 @@ if (!window.__THREE_DEVTOOLS__) {
 					toneMappingExposure: renderer.toneMappingExposure,
 					shadowMapEnabled: renderer.shadowMap ? renderer.shadowMap.enabled : false,
 					shadowMapType: renderer.shadowMap ? renderer.shadowMap.type : 'None',
-					// Get current info values
 					info: {
 						render: {
 							frame: renderer.info.render.frame,

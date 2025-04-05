@@ -186,7 +186,9 @@ function handleDevtoolsMessage( message, sender, sendResponse ) {
 				iframe.contentWindow.postMessage( message, '*' );
 
 			} catch ( e ) {
+
 				// Ignore cross-origin iframe errors
+
 			}
 
 		} );
