@@ -60,7 +60,7 @@ const observer = new MutationObserver( mutations => {
 					} catch ( e ) {
 
 						// Ignore cross-origin iframe errors
-						console.log( 'DevTools: Could not inject into iframe:', e );
+						// console.log( 'DevTools: Could not inject into iframe:', e );
 
 					}
 
@@ -174,7 +174,7 @@ function handleDevtoolsMessage( message, sender, sendResponse ) {
 	// Forward traverse requests to both main page and iframes
 	if ( message.name === 'traverse' || message.name === 'reload-scene' || message.name === 'visibility' ) {
 
-		console.log( 'Content script: Forwarding message to page:', message );
+		// console.log( 'Content script: Forwarding message to page:', message );
 		window.postMessage( message, '*' );
 
 		// Also try to forward to all iframes

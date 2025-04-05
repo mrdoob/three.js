@@ -12,12 +12,9 @@ if (!window.__THREE_DEVTOOLS__) {
 			this._ready = false;
 			this._backlog = [];
 			this.objects = new Map();
-			
-			// console.log('DevTools: Creating ThreeDevToolsTarget');
 		}
 
 		addEventListener(type, listener, options) {
-			// console.log('DevTools: Adding listener for:', type);
 			super.addEventListener(type, listener, options);
 
 			// If this is the first listener for a type, and we have backlogged events,
@@ -28,18 +25,15 @@ if (!window.__THREE_DEVTOOLS__) {
 		}
 
 		dispatchEvent(event) {
-			console.log('DevTools: Dispatching event:', event.type);
 			if (this._ready || event.type === 'devtools-ready') {
 				if (event.type === 'devtools-ready') {
 					this._ready = true;
-					console.log('DevTools: Processing backlog:', this._backlog.length, 'events');
 					const backlog = this._backlog;
 					this._backlog = [];
 					backlog.forEach(e => super.dispatchEvent(e));
 				}
 				return super.dispatchEvent(event);
 			} else {
-				console.log('DevTools: Backlogging event:', event.type);
 				this._backlog.push(event);
 				return false; // Return false to indicate synchronous handling
 			}
@@ -170,7 +164,7 @@ if (!window.__THREE_DEVTOOLS__) {
 			}
 
 			// Get descriptive name for the object
-			let descriptiveName;
+			let name = obj.name || obj.type || obj.constructor.name;
 			if (obj.isMesh) {
 				const geoType = obj.geometry ? obj.geometry.type : 'Unknown';
 				const matType = obj.material ? 
@@ -178,19 +172,13 @@ if (!window.__THREE_DEVTOOLS__) {
 						obj.material.map(m => m.type).join(', ') : 
 						obj.material.type) : 
 					'Unknown';
-				descriptiveName = `${obj.type || 'Mesh'} <span class="object-details">${geoType} ${matType}</span>`;
-			} else if (obj.isLight) {
-				descriptiveName = `${obj.type || 'Light'}`;
-			} else if (obj.isCamera) {
-				descriptiveName = `${obj.type || 'Camera'}`;
-			} else {
-				descriptiveName = obj.type || obj.constructor.name;
+				name = `${name} <span class="object-details">${geoType} ${matType}</span>`;
 			}
 
 			const data = {
 				uuid: obj.uuid,
 				type: obj.type || obj.constructor.name,
-				name: descriptiveName,
+				name: name,
 				visible: obj.visible !== undefined ? obj.visible : true,
 				isScene: obj.isScene === true,
 				isObject3D: obj.isObject3D === true,
@@ -202,7 +190,6 @@ if (!window.__THREE_DEVTOOLS__) {
 				children: obj.children ? obj.children.map(child => child.uuid) : []
 			};
 			
-			// console.log('DevTools: Object data:', data);
 			return data;
 		} catch (error) {
 			console.warn('DevTools: Error getting object data:', error);
@@ -417,7 +404,6 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Watch for readyState changes
 	document.addEventListener('readystatechange', () => {
-		// console.log('DevTools: Document readyState changed to:', document.readyState);
 		if (document.readyState === 'loading') {
 			devTools.reset();
 		}
@@ -439,7 +425,6 @@ if (!window.__THREE_DEVTOOLS__) {
 
 		// Handle traverse request
 		if (message.name === 'traverse' && message.uuid) {
-			// Find the scene in our objects
 			const scene = Array.from(devTools.objects.values())
 				.find(obj => obj.uuid === message.uuid && obj.isScene);
 			
@@ -532,25 +517,25 @@ if (!window.__THREE_DEVTOOLS__) {
 		const obj = devTools.objects.get(uuid);
 		if (!obj) return;
 		
-			obj.visible = visible;
+		obj.visible = visible;
 		console.log('DevTools: Setting visibility of', obj.type || obj.constructor.name, 'to', visible);
 		
 		// Find the actual Three.js object using our observed scenes
 		if (observedScenes.length > 0) {
 			for (const scene of observedScenes) {
-					let found = false;
+				let found = false;
 				scene.traverse((object) => {
-						if (object.uuid === uuid) {
-							object.visible = visible;
-							// If it's a light, update its helper visibility too
-							if (object.isLight && object.helper) {
-								object.helper.visible = visible;
-							}
-							found = true;
-						console.log('DevTools: Updated visibility in scene object');
+					if (object.uuid === uuid) {
+						object.visible = visible;
+						// If it's a light, update its helper visibility too
+						if (object.isLight && object.helper) {
+							object.helper.visible = visible;
 						}
-					});
-					if (found) break;
+						found = true;
+						console.log('DevTools: Updated visibility in scene object');
+					}
+				});
+				if (found) break;
 			}
 		} else {
 			console.warn('DevTools: No observed scenes found for visibility toggle');
