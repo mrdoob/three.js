@@ -538,7 +538,7 @@ if (!window.__THREE_DEVTOOLS__) {
         console.log('DevTools: Setting visibility of', obj.type || obj.constructor.name, 'to', visible);
         
         // Find the actual Three.js object using our observed scenes
-        if (observedScenes && observedScenes.length > 0) {
+        if (observedScenes.length > 0) {
             for (const scene of observedScenes) {
                     let found = false;
                 scene.traverse((object) => {

@@ -129,14 +129,12 @@ function updateRendererProperties(renderer) {
     const label = rendererElement.querySelector('.label');
     if (label) {
         let detailsText = '';
-        if (props) {
-            const details = [`${props.width}x${props.height}`];
-            if (props.info) {
-                details.push(`${props.info.render.calls} calls`);
-                details.push(`${props.info.render.triangles.toLocaleString()} tris`);
-            }
-            detailsText = `<span class="object-details">${details.join(' ・ ')}</span>`;
+        const details = [`${props.width}x${props.height}`];
+        if (props.info) {
+            details.push(`${props.info.render.calls} calls`);
+            details.push(`${props.info.render.triangles.toLocaleString()} tris`);
         }
+        detailsText = `<span class="object-details">${details.join(' ・ ')}</span>`;
         label.innerHTML = `WebGLRenderer ${detailsText}`;
     }
 
