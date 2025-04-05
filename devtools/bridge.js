@@ -417,72 +417,6 @@ if (!window.__THREE_DEVTOOLS__) {
         }
     }
 
-    // Function to update renderer properties
-    function updateRendererProperties(renderer) {
-        const storedData = devTools.objects.get(renderer.uuid);
-        if (!storedData || !storedData.isRenderer) return;
-
-        const webglInfo = getWebGLInfo(renderer);
-        
-        // Get current info values directly from the renderer
-        const currentInfo = {
-            render: {
-                frame: renderer.info.render.frame,
-                calls: renderer.info.render.calls,
-                triangles: renderer.info.render.triangles,
-                points: renderer.info.render.points,
-                lines: renderer.info.render.lines,
-                geometries: renderer.info.render.geometries,
-                sprites: renderer.info.render.sprites
-            },
-            memory: {
-                geometries: renderer.info.memory.geometries,
-                textures: renderer.info.memory.textures,
-                programs: renderer.info.programs ? renderer.info.programs.length : 0,
-                renderLists: renderer.info.memory.renderLists,
-                renderTargets: renderer.info.memory.renderTargets
-            },
-            webgl: webglInfo || {
-                version: 'unknown',
-                gpu: 'unknown',
-                vendor: 'unknown',
-                maxTextures: 'unknown',
-                maxAttributes: 'unknown',
-                maxTextureSize: 'unknown',
-                maxCubemapSize: 'unknown'
-            }
-        };
-
-        const newProperties = {
-            width: renderer.domElement ? renderer.domElement.clientWidth : 0,
-            height: renderer.domElement ? renderer.domElement.clientHeight : 0,
-            drawingBufferWidth: renderer.domElement ? renderer.domElement.width : 0,
-            drawingBufferHeight: renderer.domElement ? renderer.domElement.height : 0,
-            alpha: renderer.alpha || false,
-            antialias: renderer.antialias || false,
-            autoClear: renderer.autoClear,
-            autoClearColor: renderer.autoClearColor,
-            autoClearDepth: renderer.autoClearDepth,
-            autoClearStencil: renderer.autoClearStencil,
-            localClippingEnabled: renderer.localClippingEnabled,
-            physicallyCorrectLights: renderer.physicallyCorrectLights,
-            outputColorSpace: renderer.outputColorSpace,
-            toneMapping: renderer.toneMapping,
-            toneMappingExposure: renderer.toneMappingExposure,
-            shadowMapEnabled: renderer.shadowMap ? renderer.shadowMap.enabled : false,
-            shadowMapType: renderer.shadowMap ? renderer.shadowMap.type : 'None',
-            info: currentInfo
-        };
-
-        // Always update since info values change frequently
-        storedData.properties = newProperties;
-        dispatchEvent('update', {
-            uuid: renderer.uuid,
-            type: 'WebGLRenderer',
-            properties: newProperties
-        });
-    }
-
     // Watch for readyState changes
     document.addEventListener('readystatechange', () => {
         // console.log('DevTools: Document readyState changed to:', document.readyState);
@@ -557,94 +491,6 @@ if (!window.__THREE_DEVTOOLS__) {
         
         console.warn('DevTools: Could not find object with UUID:', uuid);
         return null;
-    }
-
-    // Function to process scene data
-    function processSceneData(sceneData) {
-                    // Process all objects from the JSON data
-                    if (sceneData.geometries) {
-                        Object.values(sceneData.geometries).forEach(geo => {
-                            if (geo.uuid && !devTools.objects.has(geo.uuid)) {
-                                devTools.objects.set(geo.uuid, {
-                                    uuid: geo.uuid,
-                                    type: geo.type,
-                                    name: '',
-                                    visible: true,
-                                    isGeometry: true,
-                                    parent: null,
-                                    children: []
-                                });
-                                dispatchEvent('observe', devTools.objects.get(geo.uuid));
-                            }
-                        });
-                    }
-                    
-                    if (sceneData.materials) {
-                        Object.values(sceneData.materials).forEach(mat => {
-                            if (mat.uuid && !devTools.objects.has(mat.uuid)) {
-                                devTools.objects.set(mat.uuid, {
-                                    uuid: mat.uuid,
-                                    type: mat.type,
-                                    name: '',
-                                    visible: true,
-                                    isMaterial: true,
-                                    parent: null,
-                                    children: []
-                                });
-                                dispatchEvent('observe', devTools.objects.get(mat.uuid));
-                            }
-                        });
-                    }
-                    
-                    if (sceneData.textures) {
-                        Object.values(sceneData.textures).forEach(tex => {
-                            if (tex.uuid && !devTools.objects.has(tex.uuid)) {
-                                devTools.objects.set(tex.uuid, {
-                                    uuid: tex.uuid,
-                                    type: 'Texture',
-                                    name: '',
-                                    visible: true,
-                                    isTexture: true,
-                                    parent: null,
-                                    children: []
-                                });
-                                dispatchEvent('observe', devTools.objects.get(tex.uuid));
-                            }
-                        });
-                    }
-                    
-                    // Process object hierarchy
-                    function processObject(obj) {
-                        if (!obj || !obj.uuid) return;
-                        
-                        const data = {
-                            uuid: obj.uuid,
-                            type: obj.type,
-                            name: obj.name || '',
-                            visible: obj.visible !== undefined ? obj.visible : true,
-                            isScene: obj.type === 'Scene',
-                            isObject3D: true,
-                            isCamera: obj.type.includes('Camera'),
-                            isLight: obj.type.includes('Light'),
-                            isMesh: obj.type === 'Mesh' || obj.type === 'SkinnedMesh',
-                            parent: obj.parent,
-                            children: obj.children || [],
-                            matrix: obj.matrix,
-                            material: obj.material,
-                            geometry: obj.geometry
-                        };
-                        
-                        if (!devTools.objects.has(obj.uuid)) {
-                            devTools.objects.set(obj.uuid, data);
-                            dispatchEvent('observe', data);
-                        }
-                        
-            if (obj.children) {
-                obj.children.forEach(processObject);
-            }
-        }
-        
-        processObject(sceneData.object);
     }
 
     function dispatchEvent(type, detail) {
@@ -778,10 +624,7 @@ if (!window.__THREE_DEVTOOLS__) {
     // Function to manually reload scene objects
     function reloadSceneObjects(scene) {
         console.log('DevTools: Manually reloading scene objects for scene:', scene.uuid);
-        
-        // Get a set of existing object IDs
-        const existingObjects = new Set(devTools.objects.keys());
-        
+                
         // Track new objects to avoid duplicates
         const processedObjects = new Set();
         
@@ -822,71 +665,8 @@ if (!window.__THREE_DEVTOOLS__) {
         console.log('DevTools: Scene reload complete. Processed', processedObjects.size, 'objects');
     }
 
-    // Function to get simplified scene data
-    function getSimpleSceneData(scene) {
-        function getBasicObjectData(obj) {
-            const data = {
-                uuid: obj.uuid,
-                type: obj.type || obj.constructor.name,
-                name: obj.name || '',
-                visible: obj.visible !== undefined ? obj.visible : true,
-                position: obj.position ? { x: obj.position.x, y: obj.position.y, z: obj.position.z } : null,
-                children: []
-            };
-
-            // Add material info if present
-            if (obj.material) {
-                if (Array.isArray(obj.material)) {
-                    data.materials = obj.material.map(mat => ({
-                        uuid: mat.uuid,
-                        type: mat.type,
-                        name: mat.name || ''
-                    }));
-                } else {
-                    data.material = {
-                        uuid: obj.material.uuid,
-                        type: obj.material.type,
-                        name: obj.material.name || ''
-                    };
-                }
-            }
-
-            // Add geometry info if present
-            if (obj.geometry) {
-                data.geometry = {
-                    uuid: obj.geometry.uuid,
-                    type: obj.geometry.type,
-                    name: obj.geometry.name || ''
-                };
-            }
-
-            // Add specific properties based on object type
-            if (obj.isLight) {
-                data.intensity = obj.intensity;
-                data.color = obj.color ? obj.color.getHex() : null;
-            } else if (obj.isCamera) {
-                data.fov = obj.fov;
-                data.near = obj.near;
-                data.far = obj.far;
-            }
-
-            return data;
-        }
-
-        function traverseScene(obj) {
-            const data = getBasicObjectData(obj);
-            
-            if (obj.children && obj.children.length > 0) {
-                data.children = obj.children.map(child => traverseScene(child));
-            }
-            
-            return data;
-        }
-
-        return {
-            object: traverseScene(scene)
-        };
-    }
 } else {
+
     console.log('DevTools: Bridge already initialized');
+
 } 
