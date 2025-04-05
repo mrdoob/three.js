@@ -172,7 +172,7 @@ if (!window.__THREE_DEVTOOLS__) {
             }
 
             // Get descriptive name for the object
-            let descriptiveName = obj.name || '';
+            let descriptiveName;
             if (obj.isMesh) {
                 const geoType = obj.geometry ? obj.geometry.type : 'Unknown';
                 const matType = obj.material ? 
