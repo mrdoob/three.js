@@ -101,18 +101,24 @@ function handleMainWindowMessage( event ) {
 
 	// Only accept messages from the same frame
 	if ( event.source !== window ) {
+
 		return;
+
 	}
 
 	const message = event.data;
 	if ( ! message || message.id !== 'three-devtools' ) {
+
 		return;
+
 	}
 
 	// Check extension context before sending message
 	if ( ! isExtensionContextValid() ) {
+
 		console.warn( 'Extension context invalidated, cannot send message' );
 		return;
+
 	}
 
 	// Add source information
@@ -131,18 +137,24 @@ function handleIframeMessage( event ) {
 
 	// Skip messages from main window
 	if ( event.source === window ) {
+
 		return;
+
 	}
 
 	const message = event.data;
 	if ( ! message || message.id !== 'three-devtools' ) {
+
 		return;
+
 	}
 
 	// Check extension context before sending message
 	if ( ! isExtensionContextValid() ) {
+
 		console.warn( 'Extension context invalidated, cannot send message' );
 		return;
+
 	}
 
 	// Add source information
