@@ -58,7 +58,8 @@ function handleThreeEvent(message) {
 			updateUI();
 			break;
 		
-		case 'observe':
+		// Handle individual renderer observation
+		case 'renderer':
 			const detail = message.detail;
 			// console.log('Observed object:', detail);
 			
@@ -75,6 +76,43 @@ function handleThreeEvent(message) {
 				
 				updateUI();
 			}
+			break;
+			
+		// Handle a batch of objects for a specific scene
+		case 'scene':
+			const { sceneUuid, objects: batchObjects } = message.detail;
+			console.log('Panel: Received scene batch for', sceneUuid, 'with', batchObjects.length, 'objects');
+
+			// Clear existing objects belonging to this scene (or previously known descendants)
+			// This is a simplified removal, assuming objects don't move between scenes
+			const objectsToRemove = [];
+			state.objects.forEach((obj, uuid) => {
+				if (!obj.isRenderer && obj.uuid !== sceneUuid) { // Keep renderers and the scene root itself initially
+					// Basic check: remove if parent was the scene OR if it's a known descendant (heuristic)
+					// A more robust approach might involve storing/checking full ancestor paths
+					if (obj.parent === sceneUuid || state.scenes.has(obj.parent)) { 
+						objectsToRemove.push(uuid);
+					}
+				}
+			});
+			objectsToRemove.forEach(uuid => {
+				state.objects.delete(uuid);
+				// Also remove from scenes/renderers maps if necessary, although unlikely for non-roots
+				state.scenes.delete(uuid);
+				// state.renderers.delete(uuid); // Renderers shouldn't be removed here
+			});
+
+			// Process the new batch
+			batchObjects.forEach(objData => {
+				state.objects.set(objData.uuid, objData);
+				if (objData.isScene) {
+					state.scenes.set(objData.uuid, objData); // Ensure scene is in the scenes map
+				}
+				// Renderers are handled by separate 'renderer' events
+			});
+
+			// Update UI once after processing the entire batch
+			updateUI();
 			break;
 			
 		case 'update':
@@ -348,12 +386,6 @@ function renderObject(obj, container, level = 0) {
 
 // Function to update the UI
 function updateUI() {
-	console.log('Updating UI with state:', {
-		revision: state.revision,
-		scenesCount: state.scenes.size,
-		renderersCount: state.renderers.size,
-		objectsCount: state.objects.size
-	});
 
 	const container = document.getElementById('scene-tree');
 	if (!container) {

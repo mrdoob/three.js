@@ -206,67 +206,58 @@ if (!window.__THREE_DEVTOOLS__) {
 			return;
 		}
 		
-		// Generate UUID if needed (especially for WebGLRenderer)
+		// Generate UUID if needed
 		if (!obj.uuid) {
 			obj.uuid = generateUUID();
-			// console.log('DevTools: Generated UUID for object:', obj.uuid);
 		}
 		
-		// Skip if already registered
+		// Skip if already registered (essential to prevent loops with batching)
 		if (devTools.objects.has(obj.uuid)) {
-			// console.log('DevTools: Object already registered:', obj.uuid);
 			return;
 		}
 		
-		// console.log('DevTools: Found Three.js object:', obj.type || obj.constructor.name);
-		
-		// Get data for this object
-		const data = getObjectData(obj);
-		if (data) {
-			// console.log('DevTools: Got object data:', data);
-			
-			// If this is a renderer, start periodic updates
-			if (obj.isWebGLRenderer) {
-				// console.log('DevTools: Starting periodic updates for renderer:', obj.uuid);
+		// Handle Renderers individually
+		if (obj.isWebGLRenderer) {
+			const data = getObjectData(obj);
+			if (data) {
 				data.properties = getRendererProperties(obj);
 				observedRenderers.push(obj);
+				devTools.objects.set(obj.uuid, data); // Store locally
+				dispatchEvent('renderer', data); // Send to panel as 'renderer'
 				startRendererMonitoring(obj);
 			}
-			
-			// Store the object data
-			devTools.objects.set(obj.uuid, data);
-			dispatchEvent('observe', data);
-			
-			// If this is a scene, store the reference and traverse its children
-			if (obj.isScene) {
-				// console.log('DevTools: Traversing scene children');
-				
-				// Store the scene reference locally
-				observedScenes.push(obj);
-				
-				// First observe all existing children
-				const processedObjects = new Set([obj.uuid]);
-				
-				function observeObject(object) {
-					if (!processedObjects.has(object.uuid)) {
-						processedObjects.add(object.uuid);
-						const objectData = getObjectData(object);
-						if (objectData) {
-							devTools.objects.set(object.uuid, objectData);
-							dispatchEvent('observe', objectData);
-						}
-						// Process children
-						object.children.forEach(child => observeObject(child));
-					}
+		} 
+		// Handle Scenes via batch
+		else if (obj.isScene) {
+			// Don't add scene to devTools.objects here yet, batch will handle it
+			observedScenes.push(obj); // Track the scene object
+
+			const batchObjects = [];
+			const processedUUIDs = new Set();
+
+			function traverseForBatch(currentObj) {
+				if (!currentObj || !currentObj.uuid || processedUUIDs.has(currentObj.uuid)) return;
+				processedUUIDs.add(currentObj.uuid);
+
+				const objectData = getObjectData(currentObj);
+				if (objectData) {
+					batchObjects.push(objectData);
+					devTools.objects.set(currentObj.uuid, objectData); // Update local cache during batch creation
 				}
-				
-				// Process all children
-				obj.children.forEach(child => observeObject(child));
-				
-				// Start monitoring for changes
-				startSceneMonitoring(obj);
+				// Process children
+				if (currentObj.children && Array.isArray(currentObj.children)) {
+					currentObj.children.forEach(child => traverseForBatch(child));
+				}
 			}
-		}
+
+			traverseForBatch(obj); // Start traversal from the scene
+			
+			// Dispatch the batch as 'scene'
+			dispatchEvent('scene', { sceneUuid: obj.uuid, objects: batchObjects });
+			startSceneMonitoring(obj); // Keep this if it holds scene-specific logic later
+		} 
+		// Ignore other object types arriving directly via 'observe'? 
+		// They should be discovered via scene traversal.
 	});
 
 	// Function to get renderer properties
@@ -546,46 +537,53 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Function to manually reload scene objects
 	function reloadSceneObjects(scene) {
-		console.log('DevTools: Manually reloading scene objects for scene:', scene.uuid);
+		// console.log('DevTools: Manually reloading scene objects for scene:', scene.uuid);
 				
-		// Track new objects to avoid duplicates
-		const processedObjects = new Set();
-		
-		// Recursively observe all objects
-		function observeObject(object) {
-			if (!processedObjects.has(object.uuid)) {
-				processedObjects.add(object.uuid);
-				
-				console.log('DevTools: Processing object during reload:', object.type || object.constructor.name, object.uuid);
-				
-				// Get object data
-				const objectData = getObjectData(object);
-				if (objectData) {
-					if (devTools.objects.has(object.uuid)) {
-						// Update existing object
-						const existingData = devTools.objects.get(object.uuid);
-						existingData.children = objectData.children;
-						dispatchEvent('update', existingData);
-					} else {
-						// Add new object
-						devTools.objects.set(object.uuid, objectData);
-						dispatchEvent('observe', objectData);
-						console.log('DevTools: New object observed during reload:', object.type || object.constructor.name);
-					}
-				}
-				
-				// Process children recursively
-				if (object.children && object.children.length > 0) {
-					console.log('DevTools: Processing', object.children.length, 'children of', object.type || object.constructor.name);
-					object.children.forEach(child => observeObject(child));
-				}
+		const batchObjects = [];
+		const processedUUIDs = new Set(); // Track processed objects within this refresh
+		const currentUUIDsInScene = new Set(); // Track objects found in this traversal
+
+		// Temporarily store old UUIDs known to be under this scene to detect removals
+		const oldUUIDsInScene = new Set();
+		devTools.objects.forEach((objData, uuid) => {
+			if (!objData.isRenderer && (objData.uuid === scene.uuid || objData.parent === scene.uuid)) { // Simple check, might need recursive parent check for deeper trees
+				oldUUIDsInScene.add(uuid);
+			}
+		});
+
+		// Recursively observe all objects, collect data, update local cache
+		function observeAndBatchObject(object) {
+			if (!object || !object.uuid || processedUUIDs.has(object.uuid)) return;
+			processedUUIDs.add(object.uuid);
+			currentUUIDsInScene.add(object.uuid); // Mark as present
+			
+			// console.log('DevTools: Processing object during reload:', object.type || object.constructor.name, object.uuid);
+			
+			// Get object data
+			const objectData = getObjectData(object);
+			if (objectData) {
+				batchObjects.push(objectData); // Add to batch
+				// Update or add to local cache immediately
+				devTools.objects.set(object.uuid, objectData);
+			}
+			
+			// Process children recursively
+			if (object.children && Array.isArray(object.children)) {
+				// console.log('DevTools: Processing', object.children.length, 'children of', object.type || object.constructor.name);
+				object.children.forEach(child => observeAndBatchObject(child));
 			}
 		}
 		
-		// Start with the scene itself to ensure everything is traversed
-		observeObject(scene);
+		// Start traversal from the scene itself
+		observeAndBatchObject(scene);
 		
-		console.log('DevTools: Scene reload complete. Processed', processedObjects.size, 'objects');
+		// Dispatch the batch update for the panel as 'scene'
+		dispatchEvent('scene', { sceneUuid: scene.uuid, objects: batchObjects });
+
+		// TODO: Optionally, detect and dispatch 'remove' events here?
+		// For now, panel handles removal implicitly based on batch content.
+		
+		// console.log('DevTools: Scene reload batch dispatched. Processed', processedUUIDs.size, 'objects');
 	}
 
 } else {
