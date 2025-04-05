@@ -424,22 +424,10 @@ if (!window.__THREE_DEVTOOLS__) {
 		// console.log('DevTools: Manually reloading scene objects for scene:', scene.uuid);
 				
 		const batchObjects = [];
-		const processedUUIDs = new Set(); // Track processed objects within this refresh
-		const currentUUIDsInScene = new Set(); // Track objects found in this traversal
-
-		// Temporarily store old UUIDs known to be under this scene to detect removals
-		const oldUUIDsInScene = new Set();
-		devTools.objects.forEach((objData, uuid) => {
-			if (!objData.isRenderer && (objData.uuid === scene.uuid || objData.parent === scene.uuid)) { // Simple check, might need recursive parent check for deeper trees
-				oldUUIDsInScene.add(uuid);
-			}
-		});
-
+		
 		// Recursively observe all objects, collect data, update local cache
 		function observeAndBatchObject(object) {
-			if (!object || !object.uuid || processedUUIDs.has(object.uuid)) return;
-			processedUUIDs.add(object.uuid);
-			currentUUIDsInScene.add(object.uuid); // Mark as present
+			if (!object || !object.uuid) return; // Simplified check
 			
 			// console.log('DevTools: Processing object during reload:', object.type || object.constructor.name, object.uuid);
 			
