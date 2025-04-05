@@ -6,7 +6,7 @@ const state = {
 	objects: new Map()
 };
 
-console.log('Panel script loaded');
+// console.log('Panel script loaded');
 
 // Create a connection to the background page
 const backgroundPageConnection = chrome.runtime.connect({
@@ -19,32 +19,16 @@ backgroundPageConnection.postMessage({
 	tabId: chrome.devtools.inspectedWindow.tabId
 });
 
-console.log('Connected to background page with tab ID:', chrome.devtools.inspectedWindow.tabId);
+// Request the initial state from the bridge script
+backgroundPageConnection.postMessage({
+	name: 'request-initial-state',
+	tabId: chrome.devtools.inspectedWindow.tabId // Include tabId for routing
+});
 
-// Store collapsed states
-const collapsedSections = new Map();
+// console.log('Connected to background page with tab ID:', chrome.devtools.inspectedWindow.tabId);
 
-// Initialize visibility state
-let isVisible = true;
-
-// Listen for visibility changes
-document.addEventListener( 'visibilitychange', () => {
-
-	isVisible = ! document.hidden;
-	
-	// Send visibility state to content script
-	chrome.tabs.sendMessage( chrome.devtools.inspectedWindow.tabId, {
-		name: 'visibility',
-		value: isVisible
-	} );
-
-} );
-
-// Initial visibility state
-chrome.tabs.sendMessage( chrome.devtools.inspectedWindow.tabId, {
-	name: 'visibility',
-	value: isVisible
-} );
+// Store renderer collapse states
+const rendererCollapsedState = new Map();
 
 // Clear state when panel is reloaded
 function clearState() {
@@ -60,14 +44,14 @@ function clearState() {
 
 // Listen for messages from the background page
 backgroundPageConnection.onMessage.addListener(function (message) {
-	console.log('Panel received message:', message);
+	// console.log('Panel received message:', message);
 	if (message.id === 'three-devtools') {
 		handleThreeEvent(message);
 	}
 });
 
 function handleThreeEvent(message) {
-	console.log('Handling event:', message.type);
+	// console.log('Handling event:', message.type);
 	switch (message.type) {
 		case 'register':
 			state.revision = message.detail.revision;
@@ -76,7 +60,7 @@ function handleThreeEvent(message) {
 		
 		case 'observe':
 			const detail = message.detail;
-			console.log('Observed object:', detail);
+			// console.log('Observed object:', detail);
 			
 			// Only store each unique object once
 			if (!state.objects.has(detail.uuid)) {
@@ -96,16 +80,45 @@ function handleThreeEvent(message) {
 		case 'update':
 			const update = message.detail;
 			if (update.type === 'WebGLRenderer') {
-				console.log('Received renderer update:', {
-					uuid: update.uuid,
-					hasProperties: !!update.properties,
-					hasInfo: !!(update.properties && update.properties.info),
-					timestamp: new Date().toISOString()
-				});
+				// console.log('Received renderer update:', { uuid: update.uuid, hasProperties: !!update.properties });
 				const renderer = state.renderers.get(update.uuid);
 				if (renderer) {
+					// Always update the internal state
 					renderer.properties = update.properties;
-					updateRendererProperties(renderer);
+
+					// Check if the details section is currently open before updating DOM
+					const summaryElement = document.querySelector(`.renderer-summary[data-uuid="${renderer.uuid}"]`);
+					// Find the parent <details> element
+					const detailsElement = summaryElement ? summaryElement.closest('details.renderer-container') : null;
+
+					if (detailsElement && detailsElement.tagName === 'DETAILS') {
+						// Update the summary line text content (size, calls, tris) within the summary element
+						if (summaryElement) {
+							const iconSpan = summaryElement.querySelector('.icon'); // Keep existing icon span for toggle
+							const typeSpan = summaryElement.querySelector('.type');
+							const labelSpan = summaryElement.querySelector('.label');
+							if (iconSpan && labelSpan && typeSpan && renderer.properties) {
+								const props = renderer.properties;
+								const details = [`${props.width}x${props.height}`];
+								if (props.info) {
+									details.push(`${props.info.render.calls} calls`);
+									details.push(`${props.info.render.triangles.toLocaleString()} tris`);
+								}
+								const displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
+								labelSpan.innerHTML = displayName;
+							}
+						}
+
+						// Update properties list only if details are open
+						if (detailsElement.open) {
+							const propsContainer = detailsElement.querySelector('.properties-list');
+							if (propsContainer) {
+								updateRendererProperties(renderer, propsContainer);
+							}
+						}
+					}
+				} else {
+					// console.warn('Renderer update received for unknown UUID:', update.uuid);
 				}
 			}
 			break;
@@ -118,76 +131,42 @@ function handleThreeEvent(message) {
 }
 
 // Function to update just the renderer properties in the UI
-function updateRendererProperties(renderer) {
-	// Find the renderer's properties container
-	const rendererElement = document.querySelector(`[data-uuid="${renderer.uuid}"]`);
-	if (!rendererElement) return;
-
+function updateRendererProperties(renderer, propsContainer) {
 	const props = renderer.properties;
-	
-	// Update the renderer summary line
-	const label = rendererElement.querySelector('.label');
-	if (label) {
-		let detailsText = '';
-		const details = [`${props.width}x${props.height}`];
-		if (props.info) {
-			details.push(`${props.info.render.calls} calls`);
-			details.push(`${props.info.render.triangles.toLocaleString()} tris`);
-		}
-		detailsText = `<span class="object-details">${details.join(' ・ ')}</span>`;
-		label.innerHTML = `WebGLRenderer ${detailsText}`;
-	}
 
-	// Find or create properties container
-	let propsContainer = rendererElement.nextElementSibling;
-	if (!propsContainer || !propsContainer.classList.contains('properties-list')) {
-		propsContainer = document.createElement('div');
-		propsContainer.className = 'properties-list';
-		propsContainer.style.paddingLeft = rendererElement.style.paddingLeft.replace('px', '') + 24 + 'px';
-		rendererElement.parentNode.insertBefore(propsContainer, rendererElement.nextSibling);
-	}
-	
-	// Store current collapse states before clearing
-	const currentSections = propsContainer.querySelectorAll('details');
-	currentSections.forEach(section => {
-		const sectionKey = `${renderer.uuid}-${section.querySelector('summary').textContent}`;
-		collapsedSections.set(sectionKey, !section.open);
-	});
-	
-	// Clear existing properties
+	// Clear existing properties from the specific container
 	propsContainer.innerHTML = '';
 
-	// Create collapsible sections
+	// Create the two-column grid container
+	const gridContainer = document.createElement('div');
+	gridContainer.className = 'properties-grid';
+
+	const leftColumn = document.createElement('div');
+	leftColumn.className = 'properties-column-left';
+
+	const rightColumn = document.createElement('div');
+	rightColumn.className = 'properties-column-right';
+
+	// Function to create sections (no longer collapsible)
 	function createSection(title, properties) {
-		const section = document.createElement('details');
+		const section = document.createElement('div'); // Use div
 		section.className = 'properties-section';
 		
-		// Check if this section was previously collapsed
-		const sectionKey = `${renderer.uuid}-${title}`;
-		const wasCollapsed = collapsedSections.get(sectionKey);
-		// Start collapsed by default unless explicitly opened before
-		section.open = wasCollapsed === undefined ? false : !wasCollapsed;
-
-		const header = document.createElement('summary');
+		const header = document.createElement('div'); // Use div for header
 		header.className = 'properties-header';
 		header.textContent = title;
 		section.appendChild(header);
 
-		// Add change listener to store collapse state
-		section.addEventListener('toggle', () => {
-			collapsedSections.set(sectionKey, !section.open);
-		});
-
 		properties.forEach(([name, value]) => {
-			if (value !== undefined) {
-				const propElem = document.createElement('div');
-				propElem.className = 'property-item';
-				propElem.innerHTML = `
-					<span class="property-name">${name}:</span>
-					<span class="property-value">${value}</span>
-				`;
-				section.appendChild(propElem);
-			}
+			// Always create the element, use '-' for undefined values
+			const displayValue = (value === undefined || value === null) ? '-' : value;
+			const propElem = document.createElement('div');
+			propElem.className = 'property-item';
+			propElem.innerHTML = `
+				<span class="property-name">${name}:</span>
+				<span class="property-value">${displayValue}</span>
+			`;
+			section.appendChild(propElem);
 		});
 
 		return section;
@@ -210,46 +189,35 @@ function updateRendererProperties(renderer) {
 		['Local Clipping', props.localClippingEnabled],
 		['Physically Correct Lights', props.physicallyCorrectLights]
 	];
-	propsContainer.appendChild(createSection('Properties', basicProps));
+	leftColumn.appendChild(createSection('Properties', basicProps));
 
-	// Add real-time stats if available
-	if (props.info) {
-		// WebGL Info section
-		if (props.info.webgl) {
-			const webglInfo = [
-				['Version', props.info.webgl.version],
-				['GPU', props.info.webgl.gpu],
-				['Vendor', props.info.webgl.vendor],
-				['Max Textures', props.info.webgl.maxTextures],
-				['Max Attributes', props.info.webgl.maxAttributes],
-				['Max Texture Size', props.info.webgl.maxTextureSize],
-				['Max Cubemap Size', props.info.webgl.maxCubemapSize]
-			];
-			propsContainer.appendChild(createSection('WebGL', webglInfo));
-		}
+	// Define stats arrays outside the if block, using optional chaining and defaults
+	const renderStats = [
+		['Frame', props.info?.render?.frame ?? '-'],
+		['Draw Calls', props.info?.render?.calls ?? '-'],
+		['Triangles', props.info?.render?.triangles?.toLocaleString() ?? '-'],
+		['Points', props.info?.render?.points ?? '-'],
+		['Lines', props.info?.render?.lines ?? '-'],
+		['Sprites', props.info?.render?.sprites ?? '-'],
+		['Geometries', props.info?.render?.geometries ?? '-']
+	];
 
-		// Render info section
-		const renderStats = [
-			['Frame', props.info.render.frame],
-			['Draw Calls', props.info.render.calls],
-			['Triangles', props.info.render.triangles.toLocaleString()],
-			['Points', props.info.render.points],
-			['Lines', props.info.render.lines],
-			['Sprites', props.info.render.sprites],
-			['Geometries', props.info.render.geometries]
-		];
-		propsContainer.appendChild(createSection('Render Stats', renderStats));
+	const memoryStats = [
+		['Geometries', props.info?.memory?.geometries ?? '-'],
+		['Textures', props.info?.memory?.textures ?? '-'],
+		['Shader Programs', props.info?.memory?.programs ?? '-'],
+		['Render Lists', props.info?.memory?.renderLists ?? '-'],
+		['Render Targets', props.info?.memory?.renderTargets ?? '-']
+	];
 
-		// Memory info section
-		const memoryStats = [
-			['Geometries', props.info.memory.geometries],
-			['Textures', props.info.memory.textures],
-			['Shader Programs', props.info.memory.programs],
-			['Render Lists', props.info.memory.renderLists],
-			['Render Targets', props.info.memory.renderTargets]
-		];
-		propsContainer.appendChild(createSection('Memory', memoryStats));
-	}
+	// Always append stats sections
+	rightColumn.appendChild(createSection('Render Stats', renderStats));
+	rightColumn.appendChild(createSection('Memory', memoryStats));
+
+	// Append columns to the grid container, and grid to the main props container
+	gridContainer.appendChild(leftColumn);
+	gridContainer.appendChild(rightColumn);
+	propsContainer.appendChild(gridContainer);
 }
 
 // Function to get an object icon based on its type
@@ -265,57 +233,90 @@ function getObjectIcon(obj) {
 
 // Function to render an object and its children
 function renderObject(obj, container, level = 0) {
-	const elem = document.createElement('div');
-	elem.className = 'tree-item';
-	elem.style.paddingLeft = `${level * 20}px`;
-	elem.setAttribute('data-uuid', obj.uuid);
-	
 	const icon = getObjectIcon(obj);
 	let displayName = obj.name || obj.type;
 	
-	// Add renderer properties if available
-	if (obj.isRenderer && obj.properties) {
-		const props = obj.properties;
-		const details = [`${props.width}x${props.height}`];
-		if (props.info) {
-			details.push(`${props.info.render.calls} calls`);
-			details.push(`${props.info.render.triangles.toLocaleString()} tris`);
+	// Handle Renderer Specifics
+	if (obj.isRenderer) {
+		// Create <details> element as the main container
+		const detailsElement = document.createElement('details');
+		detailsElement.className = 'renderer-container';
+		detailsElement.setAttribute('data-uuid', obj.uuid);
+		// Set initial state (default collapsed = true)
+		detailsElement.open = !(rendererCollapsedState.get(obj.uuid) ?? true);
+		// Add toggle listener to save state
+		detailsElement.addEventListener('toggle', () => {
+			rendererCollapsedState.set(obj.uuid, !detailsElement.open);
+		});
+
+		// Create the summary element (clickable header) - THIS IS THE FIRST CHILD
+		const summaryElem = document.createElement('summary'); // USE <summary> tag
+		summaryElem.className = 'tree-item renderer-summary'; // Acts as summary
+		summaryElem.style.paddingLeft = `${level * 20}px`;
+		
+		// Update display name in the summary line
+		if (obj.properties) {
+			const props = obj.properties;
+			const details = [`${props.width}x${props.height}`];
+			if (props.info) {
+				details.push(`${props.info.render.calls} calls`);
+				details.push(`${props.info.render.triangles.toLocaleString()} tris`);
+			}
+			displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
 		}
-		displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
-	}
-	
-	// Add object count for scenes
-	if (obj.isScene) {
-		let objectCount = -1;
-		// Count all descendants recursively
-		function countObjects(uuid) {
-			const object = state.objects.get(uuid);
-			if (object) {
-				objectCount++;
-				if (object.children) {
-					object.children.forEach(childId => countObjects(childId));
+		// Use toggle icon instead of paint icon
+		summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
+			<span class="label">${displayName}</span>
+			<span class="type">${obj.type}</span>`;
+		detailsElement.appendChild(summaryElem); // Append summary div FIRST
+
+		// Create the container for properties inside <details> - THIS IS SECOND CHILD
+		const propsContainer = document.createElement('div');
+		propsContainer.className = 'properties-list';
+		propsContainer.style.paddingLeft = summaryElem.style.paddingLeft.replace('px', '') + 24 + 'px';
+		detailsElement.appendChild(propsContainer);
+
+		container.appendChild(detailsElement); // Append details to the main container
+
+		// Call updateRendererProperties to populate the container
+		if (obj.properties) {
+			updateRendererProperties(obj, propsContainer);
+		}
+	} else {
+		// Default rendering for other object types
+		const elem = document.createElement('div');
+		elem.className = 'tree-item';
+		elem.style.paddingLeft = `${level * 20}px`;
+		elem.setAttribute('data-uuid', obj.uuid);
+		
+		let labelContent = `<span class="icon">${icon}</span>
+			<span class="label">${displayName}</span>
+			<span class="type">${obj.type}</span>`;
+
+		if (obj.isScene) {
+			// Add object count for scenes
+			let objectCount = 0;
+			function countObjects(uuid) {
+				const object = state.objects.get(uuid);
+				if (object) {
+					objectCount++; // Increment count for the object itself
+					if (object.children) {
+						object.children.forEach(childId => countObjects(childId));
+					}
 				}
 			}
+			countObjects(obj.uuid);
+			displayName = `${obj.name || obj.type} <span class="object-details">${objectCount} objects</span>`;
+			labelContent = `<span class="icon">${icon}</span>
+				<span class="label">${displayName}</span>
+				<span class="type">${obj.type}</span>`;
 		}
-		countObjects(obj.uuid);
-		displayName = `${displayName} <span class="object-details">${objectCount} objects</span>`;
-	}
-		
-	elem.innerHTML = `
-		<span class="icon">${icon}</span>
-		<span class="label">${displayName}</span>
-		<span class="type">${obj.type}</span>
-	`;
-	
-	container.appendChild(elem);
-
-	// Add renderer properties using the updateRendererProperties function
-	if (obj.isRenderer && obj.properties) {
-		updateRendererProperties(obj);
+		elem.innerHTML = labelContent;
+		container.appendChild(elem);
 	}
 
-	// Handle children
-	if (obj.children && obj.children.length > 0) {
+	// Handle children (excluding children of renderers, as properties are shown in details)
+	if (!obj.isRenderer && obj.children && obj.children.length > 0) {
 		// Create a container for children
 		const childContainer = document.createElement('div');
 		childContainer.className = 'children';
@@ -395,133 +396,6 @@ function updateUI() {
 		container.appendChild(scenesSection);
 	}
 }
-
-// Add styles
-const style = document.createElement('style');
-style.textContent = `
-	body {
-		margin: 0;
-		padding: 16px;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-		font-size: 12px;
-		color: #333;
-		background: #fff;
-	}
-	.info-item {
-		padding: 8px 12px;
-		background: #f5f5f5;
-		border-radius: 4px;
-		margin-bottom: 16px;
-		font-family: monospace;
-		color: #666;
-	}
-	.section {
-		margin-bottom: 24px;
-	}
-	.section h3 {
-		margin: 0 0 8px 0;
-		font-size: 11px;
-		text-transform: uppercase;
-		color: #666;
-		font-weight: 500;
-		border-bottom: 1px solid #eee;
-		padding-bottom: 4px;
-	}
-	.tree-item {
-		display: flex;
-		align-items: center;
-		padding: 2px;
-		cursor: pointer;
-		border-radius: 4px;
-	}
-	.tree-item:hover {
-		background: #e0e0e0;
-	}
-	.tree-item .icon {
-		margin-right: 4px;
-		opacity: 0.7;
-	}
-	.tree-item .label {
-		flex: 1;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.tree-item .label .object-details {
-		color: #aaa;
-		margin-left: 4px;
-		font-weight: normal;
-	}
-	.tree-item .type {
-		margin-left: 8px;
-		opacity: 0.5;
-		font-size: 0.9em;
-	}
-	.children {
-		margin-left: 0;
-	}
-	
-	.properties-list {
-		font-family: monospace;
-		font-size: 11px;
-		margin: 4px 0;
-		padding: 4px 0;
-		border-left: 1px solid #eee;
-	}
-	
-	.properties-section {
-		margin-bottom: 8px;
-	}
-	
-	.properties-header {
-		color: #666;
-		font-weight: bold;
-		padding: 4px 0;
-		cursor: pointer;
-		user-select: none;
-	}
-	
-	.properties-header:hover {
-		background-color: #f5f5f5;
-	}
-	
-	.property-item {
-		padding: 2px 16px;
-		display: flex;
-		align-items: center;
-	}
-	
-	.property-name {
-		color: #666;
-		margin-right: 8px;
-		min-width: 120px;
-	}
-	
-	.property-value {
-		color: #333;
-	}
-	
-	.visibility-btn {
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 2px 6px;
-		font-size: 12px;
-		opacity: 0.5;
-		border-radius: 4px;
-		margin-right: 4px;
-	}
-	
-	.visibility-btn:hover {
-		background: #e0e0e0;
-		opacity: 1;
-	}
-	
-	.tree-item:hover .visibility-btn {
-		opacity: 0.8;
-	}
-`;
-document.head.appendChild(style);
 
 // Initial UI update
 clearState();

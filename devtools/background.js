@@ -1,4 +1,4 @@
-// Store connections between devtools and tabs
+// Map tab IDs to connections
 const connections = new Map();
 
 // Listen for connections from the devtools panel
@@ -10,11 +10,13 @@ chrome.runtime.onConnect.addListener(port => {
 		if (message.name === 'init') {
 			tabId = message.tabId;
 			connections.set(tabId, port);
-			console.log('DevTools connection initialized for tab:', tabId);
 		} else if ((message.name === 'traverse' || message.name === 'reload-scene') && tabId) {
-			console.log('Background: Forwarding', message.name, 'message to tab', tabId, 'with UUID:', message.uuid);
 			// Forward traverse or reload request to content script
 			chrome.tabs.sendMessage(tabId, message);
+		} else if (message.name === 'request-initial-state' && tabId) {
+			chrome.tabs.sendMessage(tabId, message);
+		} else if (tabId === undefined) {
+			console.warn('Background: Message received from panel before init:', message);
 		}
 	});
 
@@ -22,7 +24,6 @@ chrome.runtime.onConnect.addListener(port => {
 	port.onDisconnect.addListener(() => {
 		if (tabId) {
 			connections.delete(tabId);
-			console.log('DevTools connection closed for tab:', tabId);
 		}
 	});
 });
@@ -54,7 +55,6 @@ chrome.webNavigation.onCommitted.addListener(details => {
 	const port = connections.get(tabId);
 	
 	if (port) {
-		console.log('Navigation in tab:', tabId, 'frame:', frameId);
 		port.postMessage({
 			id: 'three-devtools',
 			type: 'committed',

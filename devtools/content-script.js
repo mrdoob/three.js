@@ -1,5 +1,5 @@
 // This script runs in the context of the web page
-console.log( 'Three.js DevTools: Content script loaded at document.readyState:', document.readyState );
+// console.log( 'Three.js DevTools: Content script loaded at document_readyState:', document.readyState ); // Comment out
 
 // Function to inject the bridge script
 function injectBridge( target = document ) {
@@ -31,7 +31,7 @@ function injectIntoIframes() {
 		} catch ( e ) {
 
 			// Ignore cross-origin iframe errors
-			console.log( 'DevTools: Could not inject into iframe:', e );
+			// console.log( 'DevTools: Could not inject into iframe:', e ); // Comment out
 
 		}
 
@@ -62,7 +62,7 @@ const observer = new MutationObserver( mutations => {
 					} catch ( e ) {
 
 						// Ignore cross-origin iframe errors
-						// console.log( 'DevTools: Could not inject into iframe:', e );
+						// console.log( 'DevTools: Could not inject into iframe:', e ); // Comment out
 
 					}
 
@@ -205,23 +205,36 @@ function handleDevtoolsMessage( message, sender, sendResponse ) {
 
 }
 
+// Listener for messages forwarded from the background script (originating from panel)
+function handleBackgroundMessage( message, sender, sendResponse ) {
+
+	// Check if the message is one we need to forward to the bridge
+	// Only forward request-initial-state now
+	if ( message.name === 'request-initial-state' ) {
+
+		// console.log( 'Content script: Forwarding message to bridge:', message.name );
+		window.postMessage( message, '*' ); // Forward the message as is to the page
+
+		// Optional: Forward to iframes too, if needed (might cause duplicates if bridge is in iframe)
+		/*
+		const iframes = document.querySelectorAll('iframe');
+		iframes.forEach(iframe => {
+			try {
+				iframe.contentWindow.postMessage(message, '*');
+			} catch (e) {}
+		});
+		*/
+
+	}
+	// Keep channel open? No, this listener is synchronous for now.
+	// return true;
+
+}
+
 // Add event listeners
 window.addEventListener( 'message', handleMainWindowMessage, false );
 window.addEventListener( 'message', handleIframeMessage, false );
-chrome.runtime.onMessage.addListener( handleDevtoolsMessage );
+// chrome.runtime.onMessage.addListener( handleDevtoolsMessage ); // This seems redundant/incorrectly placed in original code
 
-// Listen for messages from the panel
-chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
-
-	if ( message.name === 'visibility' ) {
-
-		// Forward visibility state to the injected script
-		window.postMessage( {
-			id: 'three-devtools',
-			name: 'panel-visibility', // Use a distinct name
-			value: message.value
-		}, '*' );
-
-	}
-
-} );
+// Use a single listener for messages from the background script
+chrome.runtime.onMessage.addListener( handleBackgroundMessage );

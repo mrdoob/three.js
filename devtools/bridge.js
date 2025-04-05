@@ -40,18 +40,7 @@ if (!window.__THREE_DEVTOOLS__) {
 		}
 
 		reset() {
-			console.log('DevTools: Resetting state');
-			
-			// Clear all monitoring intervals
-			this.objects.forEach((obj, uuid) => {
-				if (obj.isRenderer || obj.isScene) {
-					const interval = monitoringIntervals.get(obj);
-					if (interval) {
-						clearInterval(interval);
-						monitoringIntervals.delete(obj);
-					}
-				}
-			});
+			// console.log('DevTools: Resetting state');
 			
 			// Clear objects map
 			this.objects.clear();
@@ -70,16 +59,12 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Create and expose the __THREE_DEVTOOLS__ object
 	const devTools = new DevToolsEventTarget();
-	devTools.isVisible = true; // Initialize visibility state
 	Object.defineProperty(window, '__THREE_DEVTOOLS__', {
 		value: devTools,
 		configurable: false,
 		enumerable: true,
 		writable: false
 	});
-
-	// Store monitoring intervals without polluting objects
-	const monitoringIntervals = new WeakMap();
 
 	// Declare arrays for tracking observed objects
 	const observedScenes = [];
@@ -209,7 +194,7 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Listen for Three.js registration
 	devTools.addEventListener('register', (event) => {
-		console.log('DevTools: Three.js registered with revision:', event.detail.revision);
+		// console.log('DevTools: Three.js registered with revision:', event.detail.revision);
 		dispatchEvent('register', event.detail);
 	});
 
@@ -221,34 +206,28 @@ if (!window.__THREE_DEVTOOLS__) {
 			return;
 		}
 		
-		console.log('DevTools: Received object:', {
-			type: obj.type || obj.constructor.name,
-			isWebGLRenderer: obj.isWebGLRenderer === true,
-			hasUUID: !!obj.uuid
-		});
-		
 		// Generate UUID if needed (especially for WebGLRenderer)
 		if (!obj.uuid) {
 			obj.uuid = generateUUID();
-			console.log('DevTools: Generated UUID for object:', obj.uuid);
+			// console.log('DevTools: Generated UUID for object:', obj.uuid);
 		}
 		
 		// Skip if already registered
 		if (devTools.objects.has(obj.uuid)) {
-			console.log('DevTools: Object already registered:', obj.uuid);
+			// console.log('DevTools: Object already registered:', obj.uuid);
 			return;
 		}
 		
-		console.log('DevTools: Found Three.js object:', obj.type || obj.constructor.name);
+		// console.log('DevTools: Found Three.js object:', obj.type || obj.constructor.name);
 		
 		// Get data for this object
 		const data = getObjectData(obj);
 		if (data) {
-			console.log('DevTools: Got object data:', data);
+			// console.log('DevTools: Got object data:', data);
 			
 			// If this is a renderer, start periodic updates
 			if (obj.isWebGLRenderer) {
-				console.log('DevTools: Starting periodic updates for renderer:', obj.uuid);
+				// console.log('DevTools: Starting periodic updates for renderer:', obj.uuid);
 				data.properties = getRendererProperties(obj);
 				observedRenderers.push(obj);
 				startRendererMonitoring(obj);
@@ -260,7 +239,7 @@ if (!window.__THREE_DEVTOOLS__) {
 			
 			// If this is a scene, store the reference and traverse its children
 			if (obj.isScene) {
-				console.log('DevTools: Traversing scene children');
+				// console.log('DevTools: Traversing scene children');
 				
 				// Store the scene reference locally
 				observedScenes.push(obj);
@@ -293,13 +272,15 @@ if (!window.__THREE_DEVTOOLS__) {
 	// Function to get renderer properties
 	function getRendererProperties(renderer) {
 		const webglInfo = getWebGLInfo(renderer);
+		const context = renderer.getContext ? renderer.getContext() : null;
+		const contextAttributes = context ? context.getContextAttributes() : null;
 		return {
 			width: renderer.domElement ? renderer.domElement.clientWidth : 0,
 			height: renderer.domElement ? renderer.domElement.clientHeight : 0,
 			drawingBufferWidth: renderer.domElement ? renderer.domElement.width : 0,
 			drawingBufferHeight: renderer.domElement ? renderer.domElement.height : 0,
-			alpha: renderer.alpha || false,
-			antialias: renderer.antialias || false,
+			alpha: contextAttributes ? contextAttributes.alpha : false,
+			antialias: contextAttributes ? contextAttributes.antialias : false,
 			autoClear: renderer.autoClear,
 			autoClearColor: renderer.autoClearColor,
 			autoClearDepth: renderer.autoClearDepth,
@@ -343,25 +324,11 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Function to start renderer monitoring
 	function startRendererMonitoring(renderer) {
-		// Clear any existing monitoring
-		const existingInterval = monitoringIntervals.get(renderer);
-		if (existingInterval) {
-			clearInterval(existingInterval);
-		}
-
 		// Function to monitor renderer properties
 		function monitorRendererProperties() {
 			try {
-				// Skip updates if devtools is not visible
-				if ( ! devTools.isVisible ) {
-					// console.log('DevTools: Panel not visible, skipping renderer update'); // Optional debug log
-					return;
-				}
-
 				const data = devTools.objects.get( renderer.uuid );
 				if ( ! data ) {
-					clearInterval( intervalId );
-					monitoringIntervals.delete( renderer );
 					return;
 				}
 
@@ -377,24 +344,18 @@ if (!window.__THREE_DEVTOOLS__) {
 					oldProperties.drawingBufferHeight !== newProperties.drawingBufferHeight ||
 					JSON.stringify(oldProperties.info?.render) !== JSON.stringify(newProperties.info?.render) || // Compare render stats
 					JSON.stringify(oldProperties.info?.memory) !== JSON.stringify(newProperties.info?.memory) // Compare memory stats
-					// Add other comparisons if needed, or use full stringify as fallback:
-					// || JSON.stringify(oldProperties) !== JSON.stringify(newProperties)
 				);
 
 				if ( changed ) {
-					console.log('DevTools: Renderer properties changed, dispatching update for', renderer.uuid); // Log dispatched updates
 					data.properties = newProperties;
 					dispatchEvent( 'update', data );
 				} else {
-					// console.log('DevTools: Renderer properties unchanged for', renderer.uuid); // Optional: for debugging
 				}
 
 			} catch ( error ) {
 
 				// If we get an "Extension context invalidated" error, stop monitoring
 				if ( error.message.includes( 'Extension context invalidated' ) ) {
-					clearInterval( intervalId );
-					monitoringIntervals.delete( renderer );
 					devTools.reset();
 					return;
 				}
@@ -404,12 +365,11 @@ if (!window.__THREE_DEVTOOLS__) {
 			}
 		}
 
-		const intervalId = setInterval(monitorRendererProperties, 1000);
-		monitoringIntervals.set(renderer, intervalId);
+		// TODO: Trigger monitorRendererProperties some other way, e.g., on demand or via events?
 	}
 
 	// Start periodic renderer checks
-	console.log('DevTools: Starting periodic renderer checks');
+	// console.log('DevTools: Starting periodic renderer checks');
 
 	// Function to check if bridge is available
 	function checkBridgeAvailability() {
@@ -471,10 +431,14 @@ if (!window.__THREE_DEVTOOLS__) {
 		else if (message.name === 'visibility' && message.uuid !== undefined) {
 			toggleVisibility(message.uuid, message.visible);
 		}
-		// Handle visibility update from panel (via content script)
-		else if ( message.name === 'panel-visibility' ) {
-			devTools.isVisible = message.value;
-			// console.log( 'DevTools: Visibility set to', devTools.isVisible ); // Optional debug log
+		// Handle request for initial state from panel
+		else if ( message.name === 'request-initial-state' ) {
+			// console.log('DevTools: Received request-initial-state, resending objects...');
+			// Resend all known objects to the panel
+			devTools.objects.forEach( ( objectData ) => {
+				dispatchEvent('observe', objectData);
+			});
+			// console.log('DevTools: Finished resending objects.');
 		}
 	});
 
@@ -569,64 +533,15 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Function to start scene monitoring
 	function startSceneMonitoring(scene) {
-		// Clear any existing monitoring
-		const existingInterval = monitoringIntervals.get(scene);
-		if (existingInterval) {
-			clearInterval(existingInterval);
-		}
-
-		// Set up monitoring interval
-		const intervalId = setInterval(() => {
-			try {
-				// Clear existing objects except renderers and the scene itself
-				devTools.objects.forEach((obj, uuid) => {
-					if (!obj.isRenderer && uuid !== scene.uuid) {
-						devTools.objects.delete(uuid);
-						dispatchEvent('remove', { uuid });
-					}
-				});
-				
-				// Traverse and recreate the entire object list
-				function traverseScene(object) {
-					const objectData = getObjectData(object);
-					if (objectData) {
-						devTools.objects.set(object.uuid, objectData);
-						dispatchEvent('observe', objectData);
-						
-						// Traverse children
-						object.children.forEach(child => traverseScene(child));
-					}
-				}
-				
-				// Start traversal from scene root
-				traverseScene(scene);
-			} catch (error) {
-				// If we get an "Extension context invalidated" error, stop monitoring
-				if (error.message.includes('Extension context invalidated')) {
-					clearInterval(intervalId);
-					monitoringIntervals.delete(scene);
-					devTools.reset();
-					return;
-				}
-				console.warn('DevTools: Error in scene monitoring:', error);
+		// Keep track of known object UUIDs for this scene (excluding renderers)
+		const knownObjectUUIDs = new Set();
+		devTools.objects.forEach((obj, uuid) => {
+			if (!obj.isRenderer) {
+				knownObjectUUIDs.add(uuid);
 			}
-		}, 1000);
+		});
 
-		monitoringIntervals.set(scene, intervalId);
-
-		// Clean up monitoring when scene is disposed
-		const originalDispose = scene.dispose;
-		scene.dispose = function() {
-			const intervalId = monitoringIntervals.get(this);
-			if (intervalId) {
-				clearInterval(intervalId);
-				monitoringIntervals.delete(this);
-			}
-			
-			if (originalDispose) {
-				originalDispose.call(this);
-			}
-		};
+		// TODO: Trigger scene updates some other way?
 	}
 
 	// Function to manually reload scene objects
@@ -675,6 +590,6 @@ if (!window.__THREE_DEVTOOLS__) {
 
 } else {
 
-	console.log('DevTools: Bridge already initialized');
+	// console.log('DevTools: Bridge already initialized');
 
 } 
