@@ -346,36 +346,8 @@ if (!window.__THREE_DEVTOOLS__) {
 		const message = event.data;
 		if (!message || message.id !== 'three-devtools') return;
 
-		// Handle traverse request
-		if (message.name === 'traverse' && message.uuid) {
-			const scene = Array.from(devTools.objects.values())
-				.find(obj => obj.uuid === message.uuid && obj.isScene);
-			
-			if (scene) {
-				console.log('DevTools: Re-traversing scene:', scene.uuid);
-				// Find the actual scene object in the page
-				const actualScene = findObjectByUUID(message.uuid);
-				if (actualScene) {
-					reloadSceneObjects(actualScene);
-				}
-			}
-		}
-		// Handle reload-scene request
-		else if (message.name === 'reload-scene' && message.uuid) {
-			console.log('DevTools: Received reload request for scene:', message.uuid);
-			const actualScene = findObjectByUUID(message.uuid);
-			if (actualScene) {
-				reloadSceneObjects(actualScene);
-			} else {
-				console.warn('DevTools: Could not find scene for reload:', message.uuid);
-			}
-		}
-		// Handle visibility toggle
-		else if (message.name === 'visibility' && message.uuid !== undefined) {
-			toggleVisibility(message.uuid, message.visible);
-		}
 		// Handle request for initial state from panel
-		else if ( message.name === 'request-initial-state' ) {
+		if ( message.name === 'request-initial-state' ) {
 			for (const observedRenderer of observedRenderers) {
 				const data = getObjectData(observedRenderer);
 				if (data) {
@@ -445,37 +417,6 @@ if (!window.__THREE_DEVTOOLS__) {
 			maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
 			maxCubemapSize: gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE)
 		};
-	}
-
-	// Add visibility toggle function
-	function toggleVisibility(uuid, visible) {
-		// Update our local state
-		const obj = devTools.objects.get(uuid);
-		if (!obj) return;
-		
-		obj.visible = visible;
-		console.log('DevTools: Setting visibility of', obj.type || obj.constructor.name, 'to', visible);
-		
-		// Find the actual Three.js object using our observed scenes
-		if (observedScenes.length > 0) {
-			for (const scene of observedScenes) {
-				let found = false;
-				scene.traverse((object) => {
-					if (object.uuid === uuid) {
-						object.visible = visible;
-						// If it's a light, update its helper visibility too
-						if (object.isLight && object.helper) {
-							object.helper.visible = visible;
-						}
-						found = true;
-						console.log('DevTools: Updated visibility in scene object');
-					}
-				});
-				if (found) break;
-			}
-		} else {
-			console.warn('DevTools: No observed scenes found for visibility toggle');
-		}
 	}
 
 	// Function to manually reload scene objects
