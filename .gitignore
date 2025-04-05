@@ -21,3 +21,6 @@ test/e2e/output-screenshots
 
 **/node_modules
 **/docs_new
+
+utils/dev/server.key
+utils/dev/server.crt
