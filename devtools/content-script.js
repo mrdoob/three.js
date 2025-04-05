@@ -170,41 +170,6 @@ function handleIframeMessage( event ) {
 
 }
 
-// Handle messages from devtools
-function handleDevtoolsMessage( message, sender, sendResponse ) {
-
-	// Forward traverse requests to both main page and iframes
-	if ( message.name === 'traverse' || message.name === 'reload-scene' || message.name === 'visibility' ) {
-
-		// console.log( 'Content script: Forwarding message to page:', message );
-		window.postMessage( message, '*' );
-
-		// Also try to forward to all iframes
-		const iframes = document.querySelectorAll( 'iframe' );
-		iframes.forEach( iframe => {
-
-			try {
-
-				iframe.contentWindow.postMessage( message, '*' );
-
-			} catch ( e ) {
-
-				// Ignore cross-origin iframe errors
-
-			}
-
-		} );
-
-		// Send immediate response to avoid "message channel closed" error
-		sendResponse( { received: true } );
-
-	}
-
-	// Return false to indicate synchronous handling
-	return false;
-
-}
-
 // Listener for messages forwarded from the background script (originating from panel)
 function handleBackgroundMessage( message, sender, sendResponse ) {
 

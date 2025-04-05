@@ -261,10 +261,9 @@ function updateRendererProperties(renderer, propsContainer) {
 // Function to get an object icon based on its type
 function getObjectIcon(obj) {
 	if (obj.isScene) return '🌍';
-	if (obj.isRenderer) return '🎨';
 	if (obj.isCamera) return '📷';
 	if (obj.isLight) return '💡';
-	if (obj.isMesh) return obj.materialType === 'MeshBasicMaterial' ? '⬜' : '🔷';
+	if (obj.isMesh) return '🔷';
 	if (obj.type === 'Group') return '📁';
 	return '📦';
 }

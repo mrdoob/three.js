@@ -224,7 +224,6 @@ if (!window.__THREE_DEVTOOLS__) {
 				observedRenderers.push(obj);
 				devTools.objects.set(obj.uuid, data); // Store locally
 				dispatchEvent('renderer', data); // Send to panel as 'renderer'
-				startRendererMonitoring(obj);
 			}
 		} 
 		// Handle Scenes via batch
@@ -254,7 +253,6 @@ if (!window.__THREE_DEVTOOLS__) {
 			
 			// Dispatch the batch as 'scene'
 			dispatchEvent('scene', { sceneUuid: obj.uuid, objects: batchObjects });
-			startSceneMonitoring(obj); // Keep this if it holds scene-specific logic later
 		} 
 		// Ignore other object types arriving directly via 'observe'? 
 		// They should be discovered via scene traversal.
@@ -311,52 +309,6 @@ if (!window.__THREE_DEVTOOLS__) {
 				}
 			}
 		};
-	}
-
-	// Function to start renderer monitoring
-	function startRendererMonitoring(renderer) {
-		// Function to monitor renderer properties
-		function monitorRendererProperties() {
-			try {
-				const data = devTools.objects.get( renderer.uuid );
-				if ( ! data ) {
-					return;
-				}
-
-				const oldProperties = data.properties;
-				const newProperties = getRendererProperties( renderer );
-
-				// Compare relevant properties directly for changes
-				const changed = (
-					!oldProperties || // Update if old properties don't exist yet
-					oldProperties.width !== newProperties.width ||
-					oldProperties.height !== newProperties.height ||
-					oldProperties.drawingBufferWidth !== newProperties.drawingBufferWidth ||
-					oldProperties.drawingBufferHeight !== newProperties.drawingBufferHeight ||
-					JSON.stringify(oldProperties.info?.render) !== JSON.stringify(newProperties.info?.render) || // Compare render stats
-					JSON.stringify(oldProperties.info?.memory) !== JSON.stringify(newProperties.info?.memory) // Compare memory stats
-				);
-
-				if ( changed ) {
-					data.properties = newProperties;
-					dispatchEvent( 'update', data );
-				} else {
-				}
-
-			} catch ( error ) {
-
-				// If we get an "Extension context invalidated" error, stop monitoring
-				if ( error.message.includes( 'Extension context invalidated' ) ) {
-					devTools.reset();
-					return;
-				}
-
-				console.warn( 'DevTools: Error in renderer monitoring:', error );
-
-			}
-		}
-
-		// TODO: Trigger monitorRendererProperties some other way, e.g., on demand or via events?
 	}
 
 	// Start periodic renderer checks
@@ -520,19 +472,6 @@ if (!window.__THREE_DEVTOOLS__) {
 		} else {
 			console.warn('DevTools: No observed scenes found for visibility toggle');
 		}
-	}
-
-	// Function to start scene monitoring
-	function startSceneMonitoring(scene) {
-		// Keep track of known object UUIDs for this scene (excluding renderers)
-		const knownObjectUUIDs = new Set();
-		devTools.objects.forEach((obj, uuid) => {
-			if (!obj.isRenderer) {
-				knownObjectUUIDs.add(uuid);
-			}
-		});
-
-		// TODO: Trigger scene updates some other way?
 	}
 
 	// Function to manually reload scene objects
