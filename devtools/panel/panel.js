@@ -536,9 +536,3 @@ function sendCommand(name, data = {}) {
         ...data
     });
 }
-
-// Function to reload scene - keep this for potential future use via other UI controls
-function reloadScene(uuid) {
-    console.log('Panel: Sending reload-scene command for scene:', uuid);
-    sendCommand('reload-scene', { uuid });
-}
