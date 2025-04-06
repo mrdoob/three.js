@@ -289,6 +289,7 @@ function getObjectIcon(obj) {
 	if (obj.isScene) return '🌍';
 	if (obj.isCamera) return '📷';
 	if (obj.isLight) return '💡';
+	if (obj.isInstancedMesh) return '🔸';
 	if (obj.isMesh) return '🔷';
 	if (obj.type === 'Group') return '📁';
 	return '📦';

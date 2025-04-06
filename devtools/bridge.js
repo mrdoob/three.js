@@ -150,6 +150,11 @@ if (!window.__THREE_DEVTOOLS__) {
 				return getRendererData(obj);
 			}
 
+			// Special case for InstancedMesh
+			if (obj.isInstancedMesh) {
+				obj.type = 'InstancedMesh';
+			}
+
 			// Get descriptive name for the object
 			let name = obj.name || obj.type || obj.constructor.name;
 			if (obj.isMesh) {
@@ -172,6 +177,7 @@ if (!window.__THREE_DEVTOOLS__) {
 				isCamera: obj.isCamera === true,
 				isLight: obj.isLight === true,
 				isMesh: obj.isMesh === true,
+				isInstancedMesh: obj.isInstancedMesh === true,
 				isRenderer: obj.isWebGLRenderer === true,
 				parent: obj.parent ? obj.parent.uuid : null,
 				children: obj.children ? obj.children.map(child => child.uuid) : []
