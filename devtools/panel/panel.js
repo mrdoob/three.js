@@ -358,7 +358,7 @@ function renderObject(obj, container, level = 0) {
 
 		if (obj.isScene) {
 			// Add object count for scenes
-			let objectCount = 0;
+			let objectCount = -1;
 			function countObjects(uuid) {
 				const object = state.objects.get(uuid);
 				if (object) {
