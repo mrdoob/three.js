@@ -151,12 +151,10 @@ if (!window.__THREE_DEVTOOLS__) {
 			}
 
 			// Special case for InstancedMesh
-			if (obj.isInstancedMesh) {
-				obj.type = 'InstancedMesh';
-			}
+			let type = obj.isInstancedMesh ? 'InstancedMesh' : obj.type || obj.constructor.name;
 
 			// Get descriptive name for the object
-			let name = obj.name || obj.type || obj.constructor.name;
+			let name = obj.name || type || obj.constructor.name;
 			if (obj.isMesh) {
 				const geoType = obj.geometry ? obj.geometry.type : 'Unknown';
 				const matType = obj.material ? 
@@ -164,13 +162,16 @@ if (!window.__THREE_DEVTOOLS__) {
 						obj.material.map(m => m.type).join(', ') : 
 						obj.material.type) : 
 					'Unknown';
+				if (obj.isInstancedMesh) {
+					name = `${name} [${obj.count}]`;
+				}
 				name = `${name} <span class="object-details">${geoType} ${matType}</span>`;
 			}
 
 			const data = {
 				uuid: obj.uuid,
-				type: obj.type || obj.constructor.name,
 				name: name,
+				type: type,
 				visible: obj.visible !== undefined ? obj.visible : true,
 				isScene: obj.isScene === true,
 				isObject3D: obj.isObject3D === true,
