@@ -2081,7 +2081,7 @@ class LDrawLoader extends Loader {
 
 			} else if ( finalMaterialPass ) {
 
-				// see if we can get the final material from from the "getMaterial" function which will attempt to
+				// see if we can get the final material from the "getMaterial" function which will attempt to
 				// parse the "direct" colors
 				material = loader.getMaterial( colorCode );
 				if ( material === null ) {

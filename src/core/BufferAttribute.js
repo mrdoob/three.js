@@ -841,7 +841,7 @@ class Uint32BufferAttribute extends BufferAttribute {
  * Convenient class that can be used when creating a `Float16` buffer attribute with
  * a plain `Array` instance.
  *
- * This class automatically converts to to and from FP16 since `Float16Array` is not
+ * This class automatically converts to and from FP16 since `Float16Array` is not
  * natively supported in JavaScript.
  *
  * @augments BufferAttribute
