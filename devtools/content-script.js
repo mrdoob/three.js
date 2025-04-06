@@ -174,8 +174,8 @@ function handleIframeMessage( event ) {
 function handleBackgroundMessage( message, sender, sendResponse ) {
 
 	// Check if the message is one we need to forward to the bridge
-	// Only forward request-initial-state now
-	if ( message.name === 'request-initial-state' ) {
+	// Only forward request-state now
+	if ( message.name === 'request-state' ) {
 
 		// console.log( 'Content script: Forwarding message to bridge:', message.name );
 		// Ensure the message has the correct ID before forwarding to the page

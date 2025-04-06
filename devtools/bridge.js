@@ -69,6 +69,7 @@ if (!window.__THREE_DEVTOOLS__) {
 	// Declare arrays for tracking observed objects
 	const observedScenes = [];
 	const observedRenderers = [];
+	const sceneObjectCountCache = new Map(); // Cache for object counts per scene
 
 	// Function to get renderer data
 	function getRendererData(renderer) {
@@ -347,41 +348,24 @@ if (!window.__THREE_DEVTOOLS__) {
 		if (!message || message.id !== 'three-devtools') return;
 
 		// Handle request for initial state from panel
-		if ( message.name === 'request-initial-state' ) {
-			for (const observedRenderer of observedRenderers) {
-				const data = getObjectData(observedRenderer);
-				if (data) {
-					data.properties = getRendererProperties(observedRenderer);
-					dispatchEvent('renderer', data);
-				}
-			}
-			for (const observedScene of observedScenes) {
-				reloadSceneObjects(observedScene);
-			}
+		if ( message.name === 'request-state' ) {
+			sendState();
 		}
 	});
 
-	// Helper function to find a Three.js object by UUID
-	function findObjectByUUID(uuid) {
-		console.log('DevTools: Finding object by UUID:', uuid);
-		
-		// Check for scenes we've observed
-		const sceneData = Array.from(devTools.objects.values())
-			.find(obj => obj.uuid === uuid && obj.isScene);
-		
-		if (sceneData) {
-			// For scenes accessed through observe events, they are already available
-			// through the scene object reference passed to the observe handler
-			for (const observedScene of observedScenes) {
-				if (observedScene && observedScene.uuid === uuid) {
-					console.log('DevTools: Found scene in observed scenes');
-					return observedScene;
-				}
+	function sendState() {
+		// Send current renderers
+		for (const observedRenderer of observedRenderers) {
+			const data = getObjectData(observedRenderer);
+			if (data) {
+				data.properties = getRendererProperties(observedRenderer);
+				dispatchEvent('renderer', data);
 			}
 		}
-		
-		console.warn('DevTools: Could not find object with UUID:', uuid);
-		return null;
+		// Send current scenes
+		for (const observedScene of observedScenes) {
+			reloadSceneObjects(observedScene);
+		}
 	}
 
 	function dispatchEvent(type, detail) {
@@ -420,9 +404,8 @@ if (!window.__THREE_DEVTOOLS__) {
 	}
 
 	// Function to manually reload scene objects
-	function reloadSceneObjects(scene) {
-		// console.log('DevTools: Manually reloading scene objects for scene:', scene.uuid);
-				
+	function reloadSceneObjects(scene) {	
+					
 		const batchObjects = [];
 		
 		// Recursively observe all objects, collect data, update local cache
@@ -448,18 +431,20 @@ if (!window.__THREE_DEVTOOLS__) {
 		
 		// Start traversal from the scene itself
 		observeAndBatchObject(scene);
-		
-		// Dispatch the batch update for the panel as 'scene'
-		dispatchEvent('scene', { sceneUuid: scene.uuid, objects: batchObjects });
 
-		// TODO: Optionally, detect and dispatch 'remove' events here?
-		// For now, panel handles removal implicitly based on batch content.
-		
-		// console.log('DevTools: Scene reload batch dispatched. Processed', processedUUIDs.size, 'objects');
+		// --- Caching Logic ---
+		const currentObjectCount = batchObjects.length;
+		const previousObjectCount = sceneObjectCountCache.get(scene.uuid);
+
+		if (currentObjectCount !== previousObjectCount) {
+			console.log(`DevTools: Scene ${scene.uuid} count changed (${previousObjectCount} -> ${currentObjectCount}), dispatching update.`);
+			// Dispatch the batch update for the panel as 'scene'
+			dispatchEvent('scene', { sceneUuid: scene.uuid, objects: batchObjects });
+			// Update the cache
+			sceneObjectCountCache.set(scene.uuid, currentObjectCount);
+		} else {
+			console.log(`DevTools: Scene ${scene.uuid} count unchanged (${currentObjectCount}), skipping dispatch.`);
+		}
 	}
 
-} else {
-
-	// console.log('DevTools: Bridge already initialized');
-
-} 
+}

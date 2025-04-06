@@ -21,9 +21,22 @@ backgroundPageConnection.postMessage({
 
 // Request the initial state from the bridge script
 backgroundPageConnection.postMessage({
-	name: 'request-initial-state',
-	tabId: chrome.devtools.inspectedWindow.tabId // Include tabId for routing
+	name: 'request-state',
+	tabId: chrome.devtools.inspectedWindow.tabId
 });
+
+let intervalId = setInterval(() => {
+	backgroundPageConnection.postMessage({
+		name: 'request-state',
+		tabId: chrome.devtools.inspectedWindow.tabId
+	});
+}, 1000);
+
+backgroundPageConnection.onDisconnect.addListener(() => {
+	console.log('Panel: Connection to background page lost');
+	clearInterval(intervalId);
+	clearState();
+});	
 
 // console.log('Connected to background page with tab ID:', chrome.devtools.inspectedWindow.tabId);
 
@@ -44,7 +57,6 @@ function clearState() {
 
 // Listen for messages from the background page
 backgroundPageConnection.onMessage.addListener(function (message) {
-	// console.log('Panel received message:', message);
 	if (message.id === 'three-devtools') {
 		handleThreeEvent(message);
 	}
@@ -83,32 +95,46 @@ function handleThreeEvent(message) {
 			const { sceneUuid, objects: batchObjects } = message.detail;
 			console.log('Panel: Received scene batch for', sceneUuid, 'with', batchObjects.length, 'objects');
 
-			// Clear existing objects belonging to this scene (or previously known descendants)
-			// This is a simplified removal, assuming objects don't move between scenes
-			const objectsToRemove = [];
+			// 1. Identify UUIDs in the new batch
+			const newObjectUuids = new Set(batchObjects.map(obj => obj.uuid));
+
+			// 2. Identify current object UUIDs associated with this scene that are NOT renderers
+			const currentSceneObjectUuids = new Set();
 			state.objects.forEach((obj, uuid) => {
-				if (!obj.isRenderer && obj.uuid !== sceneUuid) { // Keep renderers and the scene root itself initially
-					// Basic check: remove if parent was the scene OR if it's a known descendant (heuristic)
-					// A more robust approach might involve storing/checking full ancestor paths
-					if (obj.parent === sceneUuid || state.scenes.has(obj.parent)) { 
-						objectsToRemove.push(uuid);
-					}
+				// Use the _sceneUuid property we'll add below, or check if it's the scene root itself
+				if (!obj.isRenderer && (obj._sceneUuid === sceneUuid || uuid === sceneUuid)) {
+					currentSceneObjectUuids.add(uuid);
 				}
-			});
-			objectsToRemove.forEach(uuid => {
-				state.objects.delete(uuid);
-				// Also remove from scenes/renderers maps if necessary, although unlikely for non-roots
-				state.scenes.delete(uuid);
-				// state.renderers.delete(uuid); // Renderers shouldn't be removed here
 			});
 
-			// Process the new batch
-			batchObjects.forEach(objData => {
-				state.objects.set(objData.uuid, objData);
-				if (objData.isScene) {
-					state.scenes.set(objData.uuid, objData); // Ensure scene is in the scenes map
+			// 3. Find UUIDs to remove (in current state for this scene, but not in the new batch)
+			const uuidsToRemove = new Set();
+			currentSceneObjectUuids.forEach(uuid => {
+				if (!newObjectUuids.has(uuid)) {
+					uuidsToRemove.add(uuid);
 				}
-				// Renderers are handled by separate 'renderer' events
+			});
+
+			// 4. Remove stale objects from state
+			uuidsToRemove.forEach(uuid => {
+				state.objects.delete(uuid);
+				// If a scene object itself was somehow removed (unlikely for root), clean up scenes map too
+				if (state.scenes.has(uuid)) {
+					state.scenes.delete(uuid);
+				}
+			});
+
+			// 5. Process the new batch: Add/Update objects and mark their scene association
+			batchObjects.forEach(objData => {
+				// Add a private property to track which scene this object belongs to
+				objData._sceneUuid = sceneUuid;
+				state.objects.set(objData.uuid, objData);
+
+				// Ensure the scene root is in the scenes map
+				if (objData.isScene && objData.uuid === sceneUuid) {
+					state.scenes.set(objData.uuid, objData);
+				}
+				// Note: Renderers are handled separately by 'renderer' events and shouldn't appear in scene batches.
 			});
 
 			// Update UI once after processing the entire batch

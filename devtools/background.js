@@ -10,10 +10,7 @@ chrome.runtime.onConnect.addListener(port => {
 		if (message.name === 'init') {
 			tabId = message.tabId;
 			connections.set(tabId, port);
-		} else if ((message.name === 'traverse' || message.name === 'reload-scene') && tabId) {
-			// Forward traverse or reload request to content script
-			chrome.tabs.sendMessage(tabId, message);
-		} else if (message.name === 'request-initial-state' && tabId) {
+		} else if (message.name === 'request-state' && tabId) {
 			chrome.tabs.sendMessage(tabId, message);
 		} else if (tabId === undefined) {
 			console.warn('Background: Message received from panel before init:', message);
