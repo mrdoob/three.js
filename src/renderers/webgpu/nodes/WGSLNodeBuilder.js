@@ -1586,15 +1586,15 @@ ${ flowData.code }
 
 					} else if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
 
-						let interpolateParams = 'flat';
+						const interpolateParams = [ 'flat' ];
 
 						if ( this.renderer.backend.compatibilityMode ) {
 
-							interpolateParams += ', either';
+							interpolateParams.push( 'either' );
 
 						}
 
-						attributesSnippet += ` @interpolate( ${ interpolateParams } )`;
+						attributesSnippet += ` @interpolate( ${ interpolateParams.join( ', ' ) } )`;
 
 					}
 
