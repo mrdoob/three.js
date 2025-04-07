@@ -283,8 +283,18 @@ class TileShadowNode extends ShadowBaseNode {
 
 			const light = this.lights[ index ];
 			const shadow = light.shadow;
-			shadow.camera.layers.mask = camera.layers.mask;
+
+			const _shadowCameraLayer = shadow.camera.layers.mask;
+
+			if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) !== 0 ) {
+
+				shadow.camera.layers.mask = camera.layers.mask;
+
+			}
+
 			shadow.updateMatrices( light );
+
+			shadow.camera.layers.mask = _shadowCameraLayer;
 
 			renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );

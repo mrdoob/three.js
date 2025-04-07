@@ -569,7 +569,9 @@ class ShadowNode extends ShadowBaseNode {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 
-		if ( shadow.camera.layers.test( 0 ) === true ) {
+		const _shadowCameraLayer = shadow.camera.layers.mask;
+
+		if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) !== 0 ) {
 
 			shadow.camera.layers.mask = camera.layers.mask;
 
@@ -599,6 +601,8 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmPass( renderer );
 
 		}
+
+		shadow.camera.layers.mask = _shadowCameraLayer;
 
 		restoreRendererAndSceneState( renderer, scene, _rendererState );
 
