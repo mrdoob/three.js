@@ -272,9 +272,26 @@ if ( ! window.__THREE_DEVTOOLS__ ) {
 	// Function to get renderer properties
 	function getRendererProperties( renderer ) {
 
+		const parameters = renderer.getContextAttributes ? renderer.getContextAttributes() : {};
+		const context = renderer.getContext();
+
 		return {
 			width: renderer.domElement ? renderer.domElement.clientWidth : 0,
 			height: renderer.domElement ? renderer.domElement.clientHeight : 0,
+			drawingBufferWidth: context.drawingBufferWidth,
+			drawingBufferHeight: context.drawingBufferHeight,
+			alpha: parameters.alpha || false,
+			antialias: parameters.antialias || false,
+			outputColorSpace: renderer.outputColorSpace,
+			toneMapping: renderer.toneMapping,
+			toneMappingExposure: renderer.toneMappingExposure !== undefined ? renderer.toneMappingExposure : 1,
+			shadows: renderer.shadowMap ? renderer.shadowMap.enabled : false,
+			autoClear: renderer.autoClear,
+			autoClearColor: renderer.autoClearColor,
+			autoClearDepth: renderer.autoClearDepth,
+			autoClearStencil: renderer.autoClearStencil,
+			localClipping: renderer.localClippingEnabled,
+			physicallyCorrectLights: renderer.physicallyCorrectLights || false, // Assuming false is default if undefined
 			info: {
 				render: {
 					frame: renderer.info.render.frame,
