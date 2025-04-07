@@ -29,7 +29,7 @@ class DRACOExporter {
 	 *
 	 * @param {(Mesh|Points)} object - The mesh or point cloud to export.
 	 * @param {DRACOExporter~Options} options - The export options.
-	 * @return {ArrayBuffer} The exported Draco.
+	 * @return {Int8Array} The exported Draco.
 	 */
 	parse( object, options = {} ) {
 
