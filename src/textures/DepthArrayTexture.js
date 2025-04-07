@@ -56,7 +56,7 @@ class DepthArrayTexture extends DepthTexture {
 		this.generateMipmaps = false;
 
 		/**
-		 * The depth compare function.
+		 * Code corresponding to the depth compare function.
 		 *
 		 * @type {?(NeverCompare|LessCompare|EqualCompare|LessEqualCompare|GreaterCompare|NotEqualCompare|GreaterEqualCompare|AlwaysCompare)}
 		 * @default null

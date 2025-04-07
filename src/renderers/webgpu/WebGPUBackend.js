@@ -31,6 +31,7 @@ class WebGPUBackend extends Backend {
 	 * @typedef {Object} WebGPUBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
+	 * @property {boolean} [compatibilityMode=false] - Whether the backend should be in compatibility mode or not.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.

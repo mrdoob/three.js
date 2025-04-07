@@ -257,7 +257,8 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			if ( ( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 				( material.displacementMap && material.displacementScale !== 0 ) ||
 				( material.alphaMap && material.alphaTest > 0 ) ||
-				( material.map && material.alphaTest > 0 ) ) {
+				( material.map && material.alphaTest > 0 ) ||
+				( material.alphaToCoverage === true ) ) {
 
 				// in this case we need a unique material instance reflecting the
 				// appropriate state
@@ -303,7 +304,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		}
 
 		result.alphaMap = material.alphaMap;
-		result.alphaTest = material.alphaTest;
+		result.alphaTest = ( material.alphaToCoverage === true ) ? 0.5 : material.alphaTest; // approximate alphaToCoverage by using a fixed alphaTest value
 		result.map = material.map;
 
 		result.clipShadows = material.clipShadows;
