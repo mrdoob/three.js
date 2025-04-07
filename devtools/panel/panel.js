@@ -107,14 +107,6 @@ function handleThreeEvent(message) {
 							labelSpan.innerHTML = displayName;
 						}
 					}
-
-					// Update properties list only if details are open
-					if (detailsElement.open) {
-						const propsContainer = detailsElement.querySelector('.properties-list');
-						if (propsContainer) {
-							updateRendererProperties(renderer, propsContainer);
-						}
-					}
 				}
 			}
 			updateUI();
@@ -179,96 +171,6 @@ function handleThreeEvent(message) {
 	}
 }
 
-// Function to update just the renderer properties in the UI
-function updateRendererProperties(renderer, propsContainer) {
-	const props = renderer.properties;
-
-	// Clear existing properties from the specific container
-	propsContainer.innerHTML = '';
-
-	// Create the two-column grid container
-	const gridContainer = document.createElement('div');
-	gridContainer.className = 'properties-grid';
-
-	const leftColumn = document.createElement('div');
-	leftColumn.className = 'properties-column-left';
-
-	const rightColumn = document.createElement('div');
-	rightColumn.className = 'properties-column-right';
-
-	// Function to create sections (no longer collapsible)
-	function createSection(title, properties) {
-		const section = document.createElement('div'); // Use div
-		section.className = 'properties-section';
-		
-		const header = document.createElement('div'); // Use div for header
-		header.className = 'properties-header';
-		header.textContent = title;
-		section.appendChild(header);
-
-		properties.forEach(([name, value]) => {
-			// Always create the element, use '-' for undefined values
-			const displayValue = (value === undefined || value === null) ? '-' : value;
-			const propElem = document.createElement('div');
-			propElem.className = 'property-item';
-			propElem.innerHTML = `
-				<span class="property-name">${name}:</span>
-				<span class="property-value">${displayValue}</span>
-			`;
-			section.appendChild(propElem);
-		});
-
-		return section;
-	}
-
-	// Basic properties section
-	const basicProps = [
-		['Size', `${props.width}x${props.height}`],
-		['Drawing Buffer', `${props.drawingBufferWidth}x${props.drawingBufferHeight}`],
-		['Alpha', props.alpha],
-		['Antialias', props.antialias],
-		['Output Color Space', props.outputColorSpace],
-		['Tone Mapping', props.toneMapping],
-		['Tone Mapping Exposure', props.toneMappingExposure],
-		['Shadows', props.shadowMapEnabled ? `enabled (${props.shadowMapType})` : 'disabled'],
-		['Auto Clear', props.autoClear],
-		['Auto Clear Color', props.autoClearColor],
-		['Auto Clear Depth', props.autoClearDepth],
-		['Auto Clear Stencil', props.autoClearStencil],
-		['Local Clipping', props.localClippingEnabled],
-		['Physically Correct Lights', props.physicallyCorrectLights]
-	];
-	leftColumn.appendChild(createSection('Properties', basicProps));
-
-	// Define stats arrays outside the if block, using optional chaining and defaults
-	const renderStats = [
-		['Frame', props.info?.render?.frame ?? '-'],
-		['Draw Calls', props.info?.render?.calls ?? '-'],
-		['Triangles', props.info?.render?.triangles?.toLocaleString() ?? '-'],
-		['Points', props.info?.render?.points ?? '-'],
-		['Lines', props.info?.render?.lines ?? '-'],
-		['Sprites', props.info?.render?.sprites ?? '-'],
-		['Geometries', props.info?.render?.geometries ?? '-']
-	];
-
-	const memoryStats = [
-		['Geometries', props.info?.memory?.geometries ?? '-'],
-		['Textures', props.info?.memory?.textures ?? '-'],
-		['Shader Programs', props.info?.memory?.programs ?? '-'],
-		['Render Lists', props.info?.memory?.renderLists ?? '-'],
-		['Render Targets', props.info?.memory?.renderTargets ?? '-']
-	];
-
-	// Always append stats sections
-	rightColumn.appendChild(createSection('Render Stats', renderStats));
-	rightColumn.appendChild(createSection('Memory', memoryStats));
-
-	// Append columns to the grid container, and grid to the main props container
-	gridContainer.appendChild(leftColumn);
-	gridContainer.appendChild(rightColumn);
-	propsContainer.appendChild(gridContainer);
-}
-
 // Function to get an object icon based on its type
 function getObjectIcon(obj) {
 	if (obj.isScene) return '🌍';
@@ -321,11 +223,8 @@ function renderRenderer(obj, container) {
 
 	container.appendChild(detailsElement); // Append details to the main container
 
-	// Call updateRendererProperties to populate the container
-	if (obj.properties) {
-		updateRendererProperties(obj, propsContainer);
-	}
 }
+
 // Function to render an object and its children
 function renderObject(obj, container, level = 0) {
 	const icon = getObjectIcon(obj);
