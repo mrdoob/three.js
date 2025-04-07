@@ -188,7 +188,7 @@ class NodeMaterial extends Material {
 		this.opacityNode = null;
 
 		/**
-		 * This node can be used to to implement a variety of filter-like effects. The idea is
+		 * This node can be used to implement a variety of filter-like effects. The idea is
 		 * to store the current rendering into a texture e.g. via `viewportSharedTexture()`, use it
 		 * to create an arbitrary effect and then assign the node composition to this property.
 		 * Everything behind the object using this material will now be affected by a filter.
