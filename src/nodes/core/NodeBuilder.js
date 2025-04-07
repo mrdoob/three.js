@@ -2710,6 +2710,11 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Prevents the node builder from being used as an iterable in TSL.Fn(), avoiding potential runtime errors.
+	 */
+	*[ Symbol.iterator ]() { }
+
 	// Deprecated
 
 	/**
@@ -2724,6 +2729,7 @@ class NodeBuilder {
 		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );
 
 	}
+
 
 }
 
