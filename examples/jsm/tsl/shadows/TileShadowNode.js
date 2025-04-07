@@ -286,7 +286,7 @@ class TileShadowNode extends ShadowBaseNode {
 
 			const _shadowCameraLayer = shadow.camera.layers.mask;
 
-			if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) !== 0 ) {
+			if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) === 0 ) {
 
 				shadow.camera.layers.mask = camera.layers.mask;
 
