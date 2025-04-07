@@ -182,6 +182,7 @@ function Strings( config ) {
 			'sidebar/geometry/capsule_geometry/length': 'طول',
 			'sidebar/geometry/capsule_geometry/capseg': 'Cap Seg',
 			'sidebar/geometry/capsule_geometry/radialseg': 'Radial Seg',
+			'sidebar/geometry/capsule_geometry/heightseg': 'Height Seg',
 
 			'sidebar/geometry/circle_geometry/radius': 'شعاع',
 			'sidebar/geometry/circle_geometry/segments': 'بخش ها',
@@ -583,6 +584,7 @@ function Strings( config ) {
 			'sidebar/geometry/capsule_geometry/length': 'Length',
 			'sidebar/geometry/capsule_geometry/capseg': 'Cap Seg',
 			'sidebar/geometry/capsule_geometry/radialseg': 'Radial Seg',
+			'sidebar/geometry/capsule_geometry/heightseg': 'Height Seg',
 
 			'sidebar/geometry/circle_geometry/radius': 'Radius',
 			'sidebar/geometry/circle_geometry/segments': 'Segments',
@@ -985,6 +987,7 @@ function Strings( config ) {
 			'sidebar/geometry/capsule_geometry/length': 'Length',
 			'sidebar/geometry/capsule_geometry/capseg': 'Cap Seg',
 			'sidebar/geometry/capsule_geometry/radialseg': 'Radial Seg',
+			'sidebar/geometry/capsule_geometry/heightseg': 'Height Seg',
 
 			'sidebar/geometry/circle_geometry/radius': 'Rayon',
 			'sidebar/geometry/circle_geometry/segments': 'Segments',
@@ -1387,6 +1390,7 @@ function Strings( config ) {
 			'sidebar/geometry/capsule_geometry/length': '长度',
 			'sidebar/geometry/capsule_geometry/capseg': '胶囊分段',
 			'sidebar/geometry/capsule_geometry/radialseg': '半径分段',
+			'sidebar/geometry/capsule_geometry/heightseg': '高度分段',
 
 			'sidebar/geometry/circle_geometry/radius': '半径',
 			'sidebar/geometry/circle_geometry/segments': '分段',
@@ -1789,6 +1793,7 @@ function Strings( config ) {
 			'sidebar/geometry/capsule_geometry/length': '長さ',
 			'sidebar/geometry/capsule_geometry/capseg': 'キャップの分割数',
 			'sidebar/geometry/capsule_geometry/radialseg': '円の分割数',
+			'sidebar/geometry/capsule_geometry/heightseg': '高さの分割数',
 
 			'sidebar/geometry/circle_geometry/radius': '半径',
 			'sidebar/geometry/circle_geometry/segments': 'セグメント',
@@ -2190,6 +2195,7 @@ function Strings( config ) {
 			'sidebar/geometry/capsule_geometry/length': '길이',
 			'sidebar/geometry/capsule_geometry/capseg': '캡 분할 수',
 			'sidebar/geometry/capsule_geometry/radialseg': '방사 분할 수',
+			'sidebar/geometry/capsule_geometry/heightseg': '높이 분할 수',
 
 			'sidebar/geometry/circle_geometry/radius': '반지름',
 			'sidebar/geometry/circle_geometry/segments': '세그먼트',
