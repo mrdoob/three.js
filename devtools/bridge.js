@@ -74,57 +74,11 @@ if (!window.__THREE_DEVTOOLS__) {
 	// Function to get renderer data
 	function getRendererData(renderer) {
 		try {
-			const webglInfo = getWebGLInfo(renderer);
 			const data = {
 				uuid: renderer.uuid || generateUUID(),
 				type: 'WebGLRenderer',
 				name: '',
-				properties: {
-					width: renderer.domElement ? renderer.domElement.clientWidth : 0,
-					height: renderer.domElement ? renderer.domElement.clientHeight : 0,
-					drawingBufferWidth: renderer.domElement ? renderer.domElement.width : 0,
-					drawingBufferHeight: renderer.domElement ? renderer.domElement.height : 0,
-					alpha: renderer.alpha || false,
-					antialias: renderer.antialias || false,
-					autoClear: renderer.autoClear,
-					autoClearColor: renderer.autoClearColor,
-					autoClearDepth: renderer.autoClearDepth,
-					autoClearStencil: renderer.autoClearStencil,
-					localClippingEnabled: renderer.localClippingEnabled,
-					physicallyCorrectLights: renderer.physicallyCorrectLights,
-					outputColorSpace: renderer.outputColorSpace,
-					toneMapping: renderer.toneMapping,
-					toneMappingExposure: renderer.toneMappingExposure,
-					shadowMapEnabled: renderer.shadowMap ? renderer.shadowMap.enabled : false,
-					shadowMapType: renderer.shadowMap ? renderer.shadowMap.type : 'None',
-					info: {
-						render: {
-							frame: renderer.info.render.frame,
-							calls: renderer.info.render.calls,
-							triangles: renderer.info.render.triangles,
-							points: renderer.info.render.points,
-							lines: renderer.info.render.lines,
-							geometries: renderer.info.render.geometries,
-							sprites: renderer.info.render.sprites
-						},
-						memory: {
-							geometries: renderer.info.memory.geometries,
-							textures: renderer.info.memory.textures,
-							programs: renderer.info.programs ? renderer.info.programs.length : 0,
-							renderLists: renderer.info.memory.renderLists,
-							renderTargets: renderer.info.memory.renderTargets
-						},
-						webgl: webglInfo || {
-							version: 'unknown',
-							gpu: 'unknown',
-							vendor: 'unknown',
-							maxTextures: 'unknown',
-							maxAttributes: 'unknown',
-							maxTextureSize: 'unknown',
-							maxCubemapSize: 'unknown'
-						}
-					}
-				}
+				properties: getRendererProperties(renderer)
 			};
 			return data;
 		} catch (error) {
@@ -255,27 +209,9 @@ if (!window.__THREE_DEVTOOLS__) {
 
 	// Function to get renderer properties
 	function getRendererProperties(renderer) {
-		const webglInfo = getWebGLInfo(renderer);
-		const context = renderer.getContext ? renderer.getContext() : null;
-		const contextAttributes = context ? context.getContextAttributes() : null;
 		return {
 			width: renderer.domElement ? renderer.domElement.clientWidth : 0,
 			height: renderer.domElement ? renderer.domElement.clientHeight : 0,
-			drawingBufferWidth: renderer.domElement ? renderer.domElement.width : 0,
-			drawingBufferHeight: renderer.domElement ? renderer.domElement.height : 0,
-			alpha: contextAttributes ? contextAttributes.alpha : false,
-			antialias: contextAttributes ? contextAttributes.antialias : false,
-			autoClear: renderer.autoClear,
-			autoClearColor: renderer.autoClearColor,
-			autoClearDepth: renderer.autoClearDepth,
-			autoClearStencil: renderer.autoClearStencil,
-			localClippingEnabled: renderer.localClippingEnabled,
-			physicallyCorrectLights: renderer.physicallyCorrectLights,
-			outputColorSpace: renderer.outputColorSpace,
-			toneMapping: renderer.toneMapping,
-			toneMappingExposure: renderer.toneMappingExposure,
-			shadowMapEnabled: renderer.shadowMap ? renderer.shadowMap.enabled : false,
-			shadowMapType: renderer.shadowMap ? renderer.shadowMap.type : 'None',
 			info: {
 				render: {
 					frame: renderer.info.render.frame,
@@ -292,15 +228,6 @@ if (!window.__THREE_DEVTOOLS__) {
 					programs: renderer.info.programs ? renderer.info.programs.length : 0,
 					renderLists: renderer.info.memory.renderLists,
 					renderTargets: renderer.info.memory.renderTargets
-				},
-				webgl: webglInfo || {
-					version: 'unknown',
-					gpu: 'unknown',
-					vendor: 'unknown',
-					maxTextures: 'unknown',
-					maxAttributes: 'unknown',
-					maxTextureSize: 'unknown',
-					maxCubemapSize: 'unknown'
 				}
 			}
 		};
