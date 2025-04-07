@@ -509,7 +509,7 @@ class RenderObject {
 
 		const index = this.getIndex();
 		const hasIndex = ( index !== null );
-		const instanceCount = geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count > 1 ? object.count : 1 );
+		const instanceCount = geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count !== undefined ? object.count : 1 );
 
 		if ( instanceCount === 0 ) return null;
 
