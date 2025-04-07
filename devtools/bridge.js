@@ -79,15 +79,6 @@ if (!window.__THREE_DEVTOOLS__) {
 				uuid: renderer.uuid || generateUUID(),
 				type: 'WebGLRenderer',
 				name: '',
-				visible: true,
-				isScene: false,
-				isObject3D: false,
-				isCamera: false,
-				isLight: false,
-				isMesh: false,
-				isRenderer: true,
-				parent: null,
-				children: [],
 				properties: {
 					width: renderer.domElement ? renderer.domElement.clientWidth : 0,
 					height: renderer.domElement ? renderer.domElement.clientHeight : 0,
@@ -179,7 +170,6 @@ if (!window.__THREE_DEVTOOLS__) {
 				isLight: obj.isLight === true,
 				isMesh: obj.isMesh === true,
 				isInstancedMesh: obj.isInstancedMesh === true,
-				isRenderer: obj.isWebGLRenderer === true,
 				parent: obj.parent ? obj.parent.uuid : null,
 				children: obj.children ? obj.children.map(child => child.uuid) : []
 			};
@@ -231,7 +221,7 @@ if (!window.__THREE_DEVTOOLS__) {
 				data.properties = getRendererProperties(obj);
 				observedRenderers.push(obj);
 				devTools.objects.set(obj.uuid, data); // Store locally
-				dispatchEvent('renderer', data); // Send to panel as 'renderer'
+				dispatchEvent('renderer', data);
 			}
 		} 
 		// Handle Scenes via batch
@@ -259,11 +249,8 @@ if (!window.__THREE_DEVTOOLS__) {
 
 			traverseForBatch(obj); // Start traversal from the scene
 			
-			// Dispatch the batch as 'scene'
 			dispatchEvent('scene', { sceneUuid: obj.uuid, objects: batchObjects });
-		} 
-		// Ignore other object types arriving directly via 'observe'? 
-		// They should be discovered via scene traversal.
+		}
 	});
 
 	// Function to get renderer properties
@@ -450,7 +437,7 @@ if (!window.__THREE_DEVTOOLS__) {
 			// Update the cache
 			sceneObjectCountCache.set(scene.uuid, currentObjectCount);
 		} else {
-			console.log(`DevTools: Scene ${scene.uuid} count unchanged (${currentObjectCount}), skipping dispatch.`);
+			// console.log(`DevTools: Scene ${scene.uuid} count unchanged (${currentObjectCount}), skipping dispatch.`);
 		}
 	}
 

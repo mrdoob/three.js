@@ -73,21 +73,52 @@ function handleThreeEvent(message) {
 		// Handle individual renderer observation
 		case 'renderer':
 			const detail = message.detail;
-			// console.log('Observed object:', detail);
-			
+
 			// Only store each unique object once
 			if (!state.objects.has(detail.uuid)) {
 				state.objects.set(detail.uuid, detail);
-				
-				if (detail.isRenderer) {
-					state.renderers.set(detail.uuid, detail);
-				}
-				else if (detail.isScene) {
-					state.scenes.set(detail.uuid, detail);
-				}
-				
-				updateUI();
+				state.renderers.set(detail.uuid, detail);
 			}
+
+			const renderer = state.renderers.get(detail.uuid);
+			if (renderer) {
+				// Always update the internal state
+				renderer.properties = detail.properties;
+
+				// Check if the details section is currently open before updating DOM
+				const summaryElement = document.querySelector(`.renderer-summary[data-uuid="${renderer.uuid}"]`);
+				// Find the parent <details> element
+				const detailsElement = summaryElement ? summaryElement.closest('details.renderer-container') : null;
+
+				if (detailsElement && detailsElement.tagName === 'DETAILS') {
+					// Update the summary line text content (size, draw, tris) within the summary element
+					if (summaryElement) {
+						const iconSpan = summaryElement.querySelector('.icon'); // Keep existing icon span for toggle
+						const typeSpan = summaryElement.querySelector('.type');
+						const labelSpan = summaryElement.querySelector('.label');
+						if (iconSpan && labelSpan && typeSpan && renderer.properties) {
+							const props = renderer.properties;
+							const details = [`${props.width}x${props.height}`];
+							if (props.info) {
+								details.push(`${props.info.render.calls} draws`);
+								details.push(`${props.info.render.triangles.toLocaleString()} triangles`);
+							}
+							const displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
+							labelSpan.innerHTML = displayName;
+						}
+					}
+
+					// Update properties list only if details are open
+					if (detailsElement.open) {
+						const propsContainer = detailsElement.querySelector('.properties-list');
+						if (propsContainer) {
+							updateRendererProperties(renderer, propsContainer);
+						}
+					}
+				}
+			}
+			updateUI();
+
 			break;
 			
 		// Handle a batch of objects for a specific scene
@@ -102,7 +133,7 @@ function handleThreeEvent(message) {
 			const currentSceneObjectUuids = new Set();
 			state.objects.forEach((obj, uuid) => {
 				// Use the _sceneUuid property we'll add below, or check if it's the scene root itself
-				if (!obj.isRenderer && (obj._sceneUuid === sceneUuid || uuid === sceneUuid)) {
+				if (obj._sceneUuid === sceneUuid || uuid === sceneUuid) {
 					currentSceneObjectUuids.add(uuid);
 				}
 			});
@@ -139,52 +170,6 @@ function handleThreeEvent(message) {
 
 			// Update UI once after processing the entire batch
 			updateUI();
-			break;
-			
-		case 'update':
-			const update = message.detail;
-			if (update.type === 'WebGLRenderer') {
-				// console.log('Received renderer update:', { uuid: update.uuid, hasProperties: !!update.properties });
-				const renderer = state.renderers.get(update.uuid);
-				if (renderer) {
-					// Always update the internal state
-					renderer.properties = update.properties;
-
-					// Check if the details section is currently open before updating DOM
-					const summaryElement = document.querySelector(`.renderer-summary[data-uuid="${renderer.uuid}"]`);
-					// Find the parent <details> element
-					const detailsElement = summaryElement ? summaryElement.closest('details.renderer-container') : null;
-
-					if (detailsElement && detailsElement.tagName === 'DETAILS') {
-						// Update the summary line text content (size, calls, tris) within the summary element
-						if (summaryElement) {
-							const iconSpan = summaryElement.querySelector('.icon'); // Keep existing icon span for toggle
-							const typeSpan = summaryElement.querySelector('.type');
-							const labelSpan = summaryElement.querySelector('.label');
-							if (iconSpan && labelSpan && typeSpan && renderer.properties) {
-								const props = renderer.properties;
-								const details = [`${props.width}x${props.height}`];
-								if (props.info) {
-									details.push(`${props.info.render.calls} calls`);
-									details.push(`${props.info.render.triangles.toLocaleString()} tris`);
-								}
-								const displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
-								labelSpan.innerHTML = displayName;
-							}
-						}
-
-						// Update properties list only if details are open
-						if (detailsElement.open) {
-							const propsContainer = detailsElement.querySelector('.properties-list');
-							if (propsContainer) {
-								updateRendererProperties(renderer, propsContainer);
-							}
-						}
-					}
-				} else {
-					// console.warn('Renderer update received for unknown UUID:', update.uuid);
-				}
-			}
 			break;
 			
 		case 'committed':
@@ -295,89 +280,87 @@ function getObjectIcon(obj) {
 	return '📦';
 }
 
+function renderRenderer(obj, container) {
+	// Create <details> element as the main container
+	const detailsElement = document.createElement('details');
+	detailsElement.className = 'renderer-container';
+	detailsElement.setAttribute('data-uuid', obj.uuid);
+	// Set initial state (default collapsed = true)
+	detailsElement.open = !(rendererCollapsedState.get(obj.uuid) ?? true);
+	// Add toggle listener to save state
+	detailsElement.addEventListener('toggle', () => {
+		rendererCollapsedState.set(obj.uuid, !detailsElement.open);
+	});
+
+	// Create the summary element (clickable header) - THIS IS THE FIRST CHILD
+	const summaryElem = document.createElement('summary'); // USE <summary> tag
+	summaryElem.className = 'tree-item renderer-summary'; // Acts as summary
+	summaryElem.style.paddingLeft = '20px';
+	
+	// Update display name in the summary line
+	if (obj.properties) {
+		const props = obj.properties;
+		const details = [`${props.width}x${props.height}`];
+		if (props.info) {
+			details.push(`${props.info.render.calls} draws`);
+			details.push(`${props.info.render.triangles.toLocaleString()} triangles`);
+		}
+		displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
+	}
+	// Use toggle icon instead of paint icon
+	summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
+		<span class="label">${displayName}</span>
+		<span class="type">${obj.type}</span>`;
+	detailsElement.appendChild(summaryElem); // Append summary div FIRST
+
+	// Create the container for properties inside <details> - THIS IS SECOND CHILD
+	const propsContainer = document.createElement('div');
+	propsContainer.className = 'properties-list';
+	propsContainer.style.paddingLeft = summaryElem.style.paddingLeft.replace('px', '') + 24 + 'px';
+	detailsElement.appendChild(propsContainer);
+
+	container.appendChild(detailsElement); // Append details to the main container
+
+	// Call updateRendererProperties to populate the container
+	if (obj.properties) {
+		updateRendererProperties(obj, propsContainer);
+	}
+}
 // Function to render an object and its children
 function renderObject(obj, container, level = 0) {
 	const icon = getObjectIcon(obj);
 	let displayName = obj.name || obj.type;
 	
-	// Handle Renderer Specifics
-	if (obj.isRenderer) {
-		// Create <details> element as the main container
-		const detailsElement = document.createElement('details');
-		detailsElement.className = 'renderer-container';
-		detailsElement.setAttribute('data-uuid', obj.uuid);
-		// Set initial state (default collapsed = true)
-		detailsElement.open = !(rendererCollapsedState.get(obj.uuid) ?? true);
-		// Add toggle listener to save state
-		detailsElement.addEventListener('toggle', () => {
-			rendererCollapsedState.set(obj.uuid, !detailsElement.open);
-		});
+	// Default rendering for other object types
+	const elem = document.createElement('div');
+	elem.className = 'tree-item';
+	elem.style.paddingLeft = `${level * 20}px`;
+	elem.setAttribute('data-uuid', obj.uuid);
+	
+	let labelContent = `<span class="icon">${icon}</span>
+		<span class="label">${displayName}</span>
+		<span class="type">${obj.type}</span>`;
 
-		// Create the summary element (clickable header) - THIS IS THE FIRST CHILD
-		const summaryElem = document.createElement('summary'); // USE <summary> tag
-		summaryElem.className = 'tree-item renderer-summary'; // Acts as summary
-		summaryElem.style.paddingLeft = `${level * 20}px`;
-		
-		// Update display name in the summary line
-		if (obj.properties) {
-			const props = obj.properties;
-			const details = [`${props.width}x${props.height}`];
-			if (props.info) {
-				details.push(`${props.info.render.calls} calls`);
-				details.push(`${props.info.render.triangles.toLocaleString()} tris`);
-			}
-			displayName = `WebGLRenderer <span class="object-details">${details.join(' ・ ')}</span>`;
-		}
-		// Use toggle icon instead of paint icon
-		summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
-			<span class="label">${displayName}</span>
-			<span class="type">${obj.type}</span>`;
-		detailsElement.appendChild(summaryElem); // Append summary div FIRST
-
-		// Create the container for properties inside <details> - THIS IS SECOND CHILD
-		const propsContainer = document.createElement('div');
-		propsContainer.className = 'properties-list';
-		propsContainer.style.paddingLeft = summaryElem.style.paddingLeft.replace('px', '') + 24 + 'px';
-		detailsElement.appendChild(propsContainer);
-
-		container.appendChild(detailsElement); // Append details to the main container
-
-		// Call updateRendererProperties to populate the container
-		if (obj.properties) {
-			updateRendererProperties(obj, propsContainer);
-		}
-	} else {
-		// Default rendering for other object types
-		const elem = document.createElement('div');
-		elem.className = 'tree-item';
-		elem.style.paddingLeft = `${level * 20}px`;
-		elem.setAttribute('data-uuid', obj.uuid);
-		
-		let labelContent = `<span class="icon">${icon}</span>
-			<span class="label">${displayName}</span>
-			<span class="type">${obj.type}</span>`;
-
-		if (obj.isScene) {
-			// Add object count for scenes
-			let objectCount = -1;
-			function countObjects(uuid) {
-				const object = state.objects.get(uuid);
-				if (object) {
-					objectCount++; // Increment count for the object itself
-					if (object.children) {
-						object.children.forEach(childId => countObjects(childId));
-					}
+	if (obj.isScene) {
+		// Add object count for scenes
+		let objectCount = -1;
+		function countObjects(uuid) {
+			const object = state.objects.get(uuid);
+			if (object) {
+				objectCount++; // Increment count for the object itself
+				if (object.children) {
+					object.children.forEach(childId => countObjects(childId));
 				}
 			}
-			countObjects(obj.uuid);
-			displayName = `${obj.name || obj.type} <span class="object-details">${objectCount} objects</span>`;
-			labelContent = `<span class="icon">${icon}</span>
-				<span class="label">${displayName}</span>
-				<span class="type">${obj.type}</span>`;
 		}
-		elem.innerHTML = labelContent;
-		container.appendChild(elem);
+		countObjects(obj.uuid);
+		displayName = `${obj.name || obj.type} <span class="object-details">${objectCount} objects</span>`;
+		labelContent = `<span class="icon">${icon}</span>
+			<span class="label">${displayName}</span>
+			<span class="type">${obj.type}</span>`;
 	}
+	elem.innerHTML = labelContent;
+	container.appendChild(elem);
 
 	// Handle children (excluding children of renderers, as properties are shown in details)
 	if (!obj.isRenderer && obj.children && obj.children.length > 0) {
@@ -431,7 +414,7 @@ function updateUI() {
 		renderersSection.innerHTML = '<h3>Renderers</h3>';
 		
 		state.renderers.forEach(renderer => {
-			renderObject(renderer, renderersSection);
+			renderRenderer(renderer, renderersSection);
 		});
 		
 		container.appendChild(renderersSection);

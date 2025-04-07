@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Three.js DevTools",
-	"version": "1.0",
+	"version": "1.2",
 	"description": "Developer tools extension for Three.js",
 	"devtools_page": "index.html",
 	"background": {
