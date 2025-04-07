@@ -218,25 +218,23 @@ if ( ! window.__THREE_DEVTOOLS__ ) {
 
 		}
 
-		// Handle Renderers individually
 		if ( obj.isWebGLRenderer ) {
 
 			const data = getObjectData( obj );
+
 			if ( data ) {
 
 				data.properties = getRendererProperties( obj );
 				observedRenderers.push( obj );
-				devTools.objects.set( obj.uuid, data ); // Store locally
+				devTools.objects.set( obj.uuid, data );
+
 				dispatchEvent( 'renderer', data );
 
 			}
 
-		}
-		// Handle Scenes via batch
-		else if ( obj.isScene ) {
+		} else if ( obj.isScene ) {
 
-			// Don't add scene to devTools.objects here yet, batch will handle it
-			observedScenes.push( obj ); // Track the scene object
+			observedScenes.push( obj );
 
 			const batchObjects = [];
 			const processedUUIDs = new Set();
