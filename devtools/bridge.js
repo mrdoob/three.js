@@ -307,23 +307,6 @@ if (!window.__THREE_DEVTOOLS__) {
 		}
 	}
 
-	function getWebGLInfo(renderer) {
-		if (!renderer || !renderer.domElement) return null;
-		
-		const gl = renderer.domElement.getContext('webgl2') || renderer.domElement.getContext('webgl');
-		if (!gl) return null;
-
-		return {
-			version: gl.getParameter(gl.VERSION),
-			gpu: gl.getParameter(gl.RENDERER),
-			vendor: gl.getParameter(gl.VENDOR),
-			maxTextures: gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
-			maxAttributes: gl.getParameter(gl.MAX_VERTEX_ATTRIBS),
-			maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
-			maxCubemapSize: gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE)
-		};
-	}
-
 	// Function to manually reload scene objects
 	function reloadSceneObjects(scene) {	
 					
