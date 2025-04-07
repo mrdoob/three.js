@@ -226,20 +226,16 @@ function renderRenderer( obj, container ) {
 	summaryElem.className = 'tree-item renderer-summary'; // Acts as summary
 
 	// Update display name in the summary line
-	if ( obj.properties ) {
+	const props = obj.properties;
+	const details = [ `${props.width}x${props.height}` ];
+	if ( props.info ) {
 
-		const props = obj.properties;
-		const details = [ `${props.width}x${props.height}` ];
-		if ( props.info ) {
-
-			details.push( `${props.info.render.calls} draws` );
-			details.push( `${props.info.render.triangles.toLocaleString()} triangles` );
-
-		}
-
-		displayName = `WebGLRenderer <span class="object-details">${details.join( ' ・ ' )}</span>`;
+		details.push( `${props.info.render.calls} draws` );
+		details.push( `${props.info.render.triangles.toLocaleString()} triangles` );
 
 	}
+
+	const displayName = `WebGLRenderer <span class="object-details">${details.join( ' ・ ' )}</span>`;
 
 	// Use toggle icon instead of paint icon
 	summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
@@ -272,7 +268,6 @@ function renderRenderer( obj, container ) {
 		propsTitle.textContent = 'Properties';
 		propsCol.appendChild( propsTitle );
 		propsCol.appendChild( createPropertyRow( 'Size', `${props.width}x${props.height}` ) );
-		// Display actual values from props
 		propsCol.appendChild( createPropertyRow( 'Drawing Buffer', `${props.drawingBufferWidth}x${props.drawingBufferHeight}` ) );
 		propsCol.appendChild( createPropertyRow( 'Alpha', props.alpha ) );
 		propsCol.appendChild( createPropertyRow( 'Antialias', props.antialias ) );
@@ -426,15 +421,30 @@ function updateUI() {
 	const container = document.getElementById( 'scene-tree' );
 	container.innerHTML = '';
 
-	// Add version info if available
+	const versionInfo = document.createElement( 'div' );
+	versionInfo.className = 'info-item';
+	versionInfo.style.display = 'flex'; // Use flexbox
+	versionInfo.style.justifyContent = 'space-between'; // Align items left and right
+
+	const threeVersionSpan = document.createElement( 'span' );
+
+	// TODO: Why it's not available?
 	if ( state.revision ) {
 
-		const versionInfo = document.createElement( 'div' );
-		versionInfo.className = 'info-item';
-		versionInfo.textContent = `Three.js r${state.revision}`;
-		container.appendChild( versionInfo );
+		threeVersionSpan.textContent = `Three.js r${state.revision}`;
 
 	}
+
+	const manifest = chrome.runtime.getManifest();
+
+	const manifestVersionSpan = document.createElement( 'span' );
+	manifestVersionSpan.textContent = `${manifest.version}`;
+	manifestVersionSpan.style.opacity = '0.5'; // Make it less prominent
+
+	versionInfo.appendChild( threeVersionSpan );
+	versionInfo.appendChild( manifestVersionSpan );
+
+	container.appendChild( versionInfo );
 
 	// Add renderers section
 	if ( state.renderers.size > 0 ) {
