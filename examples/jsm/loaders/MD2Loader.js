@@ -105,6 +105,7 @@ const _normalData = [
  * ```
  *
  * @augments Loader
+ * @three_import import { MD2Loader } from 'three/addons/loaders/MD2Loader.js';
  */
 class MD2Loader extends Loader {
 

@@ -164,6 +164,8 @@ function modifyShader( material, uniforms, numberOfCurves ) {
  *
  * This module can only be used with {@link WebGPURenderer}. When using {@link WebGLRenderer},
  * import the class from `CurveModifier.js`.
+ *
+ * @three_import import { Flow } from 'three/addons/modifiers/CurveModifierGPU.js';
  */
 export class Flow {
 

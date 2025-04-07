@@ -90,6 +90,7 @@ let _zstd;
  * ```
  *
  * @augments Loader
+ * @three_import import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
  */
 class KTX2Loader extends Loader {
 

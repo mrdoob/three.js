@@ -24,6 +24,17 @@ const supports = {
 	storageBuffer: false
 };
 
+const interpolationTypeMap = {
+	perspective: 'smooth',
+	linear: 'noperspective'
+};
+
+const interpolationModeMap = {
+	'centroid': 'centroid',
+	'flat first': 'flat',
+	'flat either': 'flat'
+};
+
 const defaultPrecisions = `
 precision highp float;
 precision highp int;
@@ -783,9 +794,20 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+					if ( varying.interpolationType ) {
 
-					snippet += `${flat}out ${type} ${varying.name};\n`;
+						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
+						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
+
+						snippet += `${ interpolationType } ${ sampling } out ${ type } ${ varying.name };\n`;
+
+					} else {
+
+						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+
+						snippet += `${ flat }out ${ type } ${ varying.name };\n`;
+
+					}
 
 				} else {
 
@@ -802,9 +824,22 @@ ${ flowData.code }
 				if ( varying.needsInterpolation ) {
 
 					const type = this.getType( varying.type );
-					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
-					snippet += `${flat}in ${type} ${varying.name};\n`;
+					if ( varying.interpolationType ) {
+
+						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
+						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
+
+						snippet += `${ interpolationType } ${ sampling } in ${ type } ${ varying.name };\n`;
+
+
+					} else {
+
+						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+
+						snippet += `${ flat }in ${ type } ${ varying.name };\n`;
+
+					}
 
 				}
 

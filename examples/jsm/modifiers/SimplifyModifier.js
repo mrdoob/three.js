@@ -21,6 +21,8 @@ const _cb = new Vector3(), _ab = new Vector3();
  * const modifier = new SimplifyModifier();
  * geometry = modifier.modify( geometry );
  * ```
+ *
+ * @three_import import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
  */
 class SimplifyModifier {
 

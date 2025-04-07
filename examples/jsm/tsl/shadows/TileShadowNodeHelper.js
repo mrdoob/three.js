@@ -3,6 +3,9 @@ import { Fn, vec4, vec3, texture, uv, positionLocal, vec2, float, screenSize } f
 
 /**
  * Helper class to manage and display debug visuals for TileShadowNode.
+ *
+ * @augments Group
+ * @three_import import { TileShadowNodeHelper } from 'three/addons/tsl/shadows/TileShadowNodeHelper.js';
  */
 class TileShadowNodeHelper extends Group {
 
@@ -173,7 +176,7 @@ class TileShadowNodeHelper extends Group {
 	}
 
 	/**
-     * Removes all debug objects (planes and helpers) from the scene.
+	 * Removes all debug objects (planes and helpers) from the scene.
 	 */
 	dispose() {
 

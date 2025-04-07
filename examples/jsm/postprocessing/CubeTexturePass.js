@@ -21,6 +21,7 @@ import { Pass } from './Pass.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { CubeTexturePass } from 'three/addons/postprocessing/CubeTexturePass.js';
  */
 class CubeTexturePass extends Pass {
 

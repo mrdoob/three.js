@@ -10,6 +10,7 @@ import {
  * fading options.
  *
  * @augments Mesh
+ * @three_import import { MorphBlendMesh } from 'three/addons/misc/MorphBlendMesh.js';
  */
 class MorphBlendMesh extends Mesh {
 

@@ -17,6 +17,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { LUTImageLoader } from 'three/addons/loaders/LUTImageLoader.js';
  */
 export class LUTImageLoader extends Loader {
 

@@ -27,7 +27,8 @@ import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelV
  * ```
  *
  * @augments Mesh
-*/
+ * @three_import import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+ */
 class SkyMesh extends Mesh {
 
 	/**

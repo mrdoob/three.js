@@ -18,6 +18,7 @@ import * as fflate from '../libs/fflate.module.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { KMZLoader } from 'three/addons/loaders/KMZLoader.js';
  */
 class KMZLoader extends Loader {
 

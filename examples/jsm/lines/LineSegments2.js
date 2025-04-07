@@ -246,6 +246,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
  * ```
  *
  * @augments Mesh
+ * @three_import import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
  */
 class LineSegments2 extends Mesh {
 

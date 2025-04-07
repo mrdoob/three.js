@@ -48,6 +48,7 @@ const _taskCache = new WeakMap();
  * ```
  *
  * @augments Loader
+ * @three_import import { Rhino3dmLoader } from 'three/addons/loaders/3DMLoader.js';
  */
 class Rhino3dmLoader extends Loader {
 

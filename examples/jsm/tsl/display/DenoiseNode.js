@@ -11,6 +11,7 @@ import { SimplexNoise } from '../../math/SimplexNoise.js';
  * Reference: {@link https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf}.
  *
  * @augments TempNode
+ * @three_import import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
  */
 class DenoiseNode extends TempNode {
 

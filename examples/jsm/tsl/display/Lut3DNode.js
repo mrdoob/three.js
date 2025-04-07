@@ -5,6 +5,7 @@ import { nodeObject, Fn, float, uniform, vec3, vec4, mix } from 'three/tsl';
  * A post processing node for color grading via lookup tables.
  *
  * @augments TempNode
+ * @three_import import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';
  */
 class Lut3DNode extends TempNode {
 

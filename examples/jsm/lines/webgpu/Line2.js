@@ -14,6 +14,7 @@ import { LineGeometry } from '../LineGeometry.js';
  * import the class from `lines/Line2.js`.
  *
  * @augments LineSegments2
+ * @three_import import { Line2 } from 'three/addons/lines/webgpu/Line2.js';
  */
 class Line2 extends LineSegments2 {
 

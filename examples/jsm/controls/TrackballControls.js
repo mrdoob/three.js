@@ -51,6 +51,7 @@ const _moveDirection = new Vector3();
  * to stay "right side up".
  *
  * @augments Controls
+ * @three_import import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
  */
 class TrackballControls extends Controls {
 

@@ -413,6 +413,7 @@ ShaderLib[ 'line' ] = {
  * use {@link Line2NodeMaterial}.
  *
  * @augments ShaderMaterial
+ * @three_import import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
  */
 class LineMaterial extends ShaderMaterial {
 

@@ -1,4 +1,7 @@
-/** @module HorizontalBlurShader */
+/**
+ * @module HorizontalBlurShader
+ * @three_import import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
+ */
 
 /**
  * Two pass Gaussian blur filter (horizontal and vertical blur shaders).

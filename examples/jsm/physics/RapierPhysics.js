@@ -80,6 +80,7 @@ function getShape( geometry ) {
  * @name RapierPhysics
  * @class
  * @hideconstructor
+ * @three_import import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
  */
 async function RapierPhysics() {
 

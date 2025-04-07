@@ -14,6 +14,7 @@ import { DotScreenShader } from '../shaders/DotScreenShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';
  */
 class DotScreenPass extends Pass {
 

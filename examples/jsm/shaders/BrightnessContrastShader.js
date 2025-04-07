@@ -1,4 +1,7 @@
-/** @module BrightnessContrastShader */
+/**
+ * @module BrightnessContrastShader
+ * @three_import import { BrightnessContrastShader } from 'three/addons/shaders/BrightnessContrastShader.js';
+ */
 
 /**
  * Brightness and contrast adjustment {@link https://github.com/evanw/glfx.js}.

@@ -14,6 +14,7 @@ let _rendererState;
  * - {@link https://john-chapman.github.io/2017/11/05/pseudo-lens-flare.html}.
  *
  * @augments TempNode
+ * @three_import import { lensflare } from 'three/addons/tsl/display/LensflareNode.js';
  */
 class LensflareNode extends TempNode {
 

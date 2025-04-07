@@ -43,7 +43,8 @@ class LwLight extends Object3D {
  * **Note:** This class does not support `VSMShadowMap` at the moment.
  *
  * @class
- * @extends ShadowBaseNode
+ * @augments ShadowBaseNode
+ * @three_import import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';
  */
 class TileShadowNode extends ShadowBaseNode {
 
@@ -311,7 +312,7 @@ class TileShadowNode extends ShadowBaseNode {
 	 */
 	updateBefore( frame ) {
 
-		const shadow = this.lights[ 0 ].shadow; // so far test only the first light
+		const shadow = this.originalLight.shadow;
 
 		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
 

@@ -6,7 +6,10 @@ import {
 	Vector3,
 } from 'three';
 
-/** @module GTAOShader */
+/**
+ * @module GTAOShader
+ * @three_import import { GTAOShader } from 'three/addons/shaders/GTAOShader.js';
+ */
 
 /**
  * GTAO shader. Use by {@link GTAOPass}.

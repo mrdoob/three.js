@@ -12,6 +12,7 @@ import { RectAreaLightTexturesLib } from './RectAreaLightTexturesLib.js';
  * ```
  *
  * @hideconstructor
+ * @three_import import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
  */
 class RectAreaLightUniformsLib {
 

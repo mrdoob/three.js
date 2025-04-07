@@ -9,7 +9,10 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-/** @module SkeletonUtils */
+/**
+ * @module SkeletonUtils
+ * @three_import import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+ */
 
 function getBoneName( bone, options ) {
 

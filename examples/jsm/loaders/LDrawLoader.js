@@ -1776,6 +1776,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
  * ```
  *
  * @augments Loader
+ * @three_import import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
  */
 class LDrawLoader extends Loader {
 

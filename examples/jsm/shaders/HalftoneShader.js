@@ -1,4 +1,7 @@
-/** @module HalftoneShader */
+/**
+ * @module HalftoneShader
+ * @three_import import { HalftoneShader } from 'three/addons/shaders/HalftoneShader.js';
+ */
 
 /**
  * RGB Halftone shader.

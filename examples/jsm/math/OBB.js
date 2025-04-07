@@ -39,6 +39,8 @@ const localRay = new Ray();
 
 /**
  * Represents an oriented bounding box (OBB) in 3D space.
+ *
+ * @three_import import { OBB } from 'three/addons/math/OBB.js';
  */
 class OBB {
 

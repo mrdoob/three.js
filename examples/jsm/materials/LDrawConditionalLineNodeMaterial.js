@@ -8,6 +8,7 @@ import { attribute, cameraProjectionMatrix, dot, float, Fn, modelViewMatrix, mod
  * import the class from `LDrawConditionalLineMaterial.js`.
  *
  * @augments NodeMaterial
+ * @three_import import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';
  */
 class LDrawConditionalLineMaterial extends NodeMaterial {
 

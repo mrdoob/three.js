@@ -40,6 +40,7 @@ let _rendererState;
  * postProcessing.outputNode = scenePassColor.add( bloomPass );
  * ```
  * @augments TempNode
+ * @three_import import { bloom } from 'three/addons/tsl/display/BloomNode.js';
  */
 class BloomNode extends TempNode {
 

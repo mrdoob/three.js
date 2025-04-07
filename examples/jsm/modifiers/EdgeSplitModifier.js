@@ -17,6 +17,8 @@ const _C = new Vector3();
  * const modifier = new EdgeSplitModifier();
  * geometry = modifier.modify( geometry, Math.PI * 0.4 );
  * ```
+ *
+ * @three_import import { EdgeSplitModifier } from 'three/addons/modifiers/EdgeSplitModifier.js';
  */
 class EdgeSplitModifier {
 

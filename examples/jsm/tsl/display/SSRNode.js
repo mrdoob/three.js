@@ -11,6 +11,7 @@ let _rendererState;
  * Reference: {@link https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html}
  *
  * @augments TempNode
+ * @three_import import { ssr } from 'three/addons/tsl/display/SSRNode.js';
  */
 class SSRNode extends TempNode {
 

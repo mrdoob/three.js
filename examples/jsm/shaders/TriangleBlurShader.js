@@ -2,7 +2,10 @@ import {
 	Vector2
 } from 'three';
 
-/** @module TriangleBlurShader */
+/**
+ * @module TriangleBlurShader
+ * @three_import import { TriangleBlurShader } from 'three/addons/shaders/TriangleBlurShader.js';
+ */
 
 /**
  * Triangle blur shader based on [glfx.js triangle blur shader]{@link https://github.com/evanw/glfx.js}.

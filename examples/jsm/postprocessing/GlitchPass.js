@@ -18,6 +18,7 @@ import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
  */
 class GlitchPass extends Pass {
 

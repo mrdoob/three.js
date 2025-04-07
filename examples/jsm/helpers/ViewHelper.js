@@ -26,6 +26,7 @@ import {
  * so it looks along the selected axis.
  *
  * @augments Object3D
+ * @three_import import { ViewHelper } from 'three/addons/helpers/ViewHelper.js';
  */
 class ViewHelper extends Object3D {
 

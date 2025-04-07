@@ -26,6 +26,7 @@ import {
  * ```
  *
  * @augments Scene
+ * @three_import import { DebugEnvironment } from 'three/addons/environments/DebugEnvironment.js';
  */
 class DebugEnvironment extends Scene {
 

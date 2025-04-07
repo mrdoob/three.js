@@ -16,6 +16,7 @@ import { ConvexHull } from '../math/ConvexHull.js';
  * ```
  *
  * @augments BufferGeometry
+ * @three_import import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
  */
 class ConvexGeometry extends BufferGeometry {
 

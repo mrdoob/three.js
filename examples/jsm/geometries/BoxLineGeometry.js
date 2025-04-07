@@ -14,6 +14,7 @@ import {
  * ```
  *
  * @augments BufferGeometry
+ * @three_import import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
  */
 class BoxLineGeometry extends BufferGeometry {
 

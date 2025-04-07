@@ -1,4 +1,7 @@
-/** @module FilmShader */
+/**
+ * @module FilmShader
+ * @three_import import { FilmShader } from 'three/addons/shaders/FilmShader.js';
+ */
 
 /**
  * TODO

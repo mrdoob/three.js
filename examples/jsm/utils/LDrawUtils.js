@@ -11,6 +11,8 @@ import { mergeGeometries } from './BufferGeometryUtils.js';
 
 /**
  * Utility class for LDraw models.
+ *
+ * @three_import import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
  */
 class LDrawUtils {
 

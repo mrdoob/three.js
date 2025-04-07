@@ -12,6 +12,7 @@ import {
  * A procedural roller coaster geometry.
  *
  * @augments BufferGeometry
+ * @three_import import { RollerCoasterGeometry } from 'three/addons/misc/RollerCoaster.js';
  */
 class RollerCoasterGeometry extends BufferGeometry {
 
@@ -237,6 +238,7 @@ class RollerCoasterGeometry extends BufferGeometry {
  * A procedural roller coaster lifters geometry.
  *
  * @augments BufferGeometry
+ * @three_import import { RollerCoasterLiftersGeometry } from 'three/addons/misc/RollerCoaster.js';
  */
 class RollerCoasterLiftersGeometry extends BufferGeometry {
 
@@ -424,6 +426,7 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
  * A procedural roller coaster shadow geometry.
  *
  * @augments BufferGeometry
+ * @three_import import { RollerCoasterShadowGeometry } from 'three/addons/misc/RollerCoaster.js';
  */
 class RollerCoasterShadowGeometry extends BufferGeometry {
 
@@ -507,6 +510,7 @@ class RollerCoasterShadowGeometry extends BufferGeometry {
  * A procedural sky geometry.
  *
  * @augments BufferGeometry
+ * @three_import import { SkyGeometry } from 'three/addons/misc/RollerCoaster.js';
  */
 class SkyGeometry extends BufferGeometry {
 
@@ -548,6 +552,7 @@ class SkyGeometry extends BufferGeometry {
  * A procedural trees geometry.
  *
  * @augments BufferGeometry
+ * @three_import import { TreesGeometry } from 'three/addons/misc/RollerCoaster.js';
  */
 class TreesGeometry extends BufferGeometry {
 

@@ -25,6 +25,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { IESLoader } from 'three/addons/loaders/IESLoader.js';
  */
 class IESLoader extends Loader {
 

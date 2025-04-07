@@ -32,6 +32,7 @@ import {
  * ```
  *
  * @augments Mesh
+ * @three_import import { Reflector } from 'three/addons/objects/Reflector.js';
  */
 class Reflector extends Mesh {
 

@@ -27,6 +27,8 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
  * lightShadowMapViewer.size.height = SHADOW_MAP_HEIGHT / 4;
  * lightShadowMapViewer.update();
  * ```
+ *
+ * @three_import import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';
  */
 class ShadowMapViewer {
 

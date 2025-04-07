@@ -3,7 +3,10 @@ import {
 	Vector3
 } from 'three';
 
-/** @module VolumeShader */
+/**
+ * @module VolumeShader
+ * @three_import import { VolumeRenderShader1 } from 'three/addons/shaders/VolumeShader.js';
+ */
 
 /**
  * Shaders to render 3D volumes using raycasting.

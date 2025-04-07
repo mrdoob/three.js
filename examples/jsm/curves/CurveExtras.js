@@ -17,6 +17,7 @@ import {
  * A Granny Knot curve.
  *
  * @augments Curve
+ * @three_import import { GrannyKnot } from 'three/addons/curves/CurveExtras.js';
  */
 class GrannyKnot extends Curve {
 
@@ -47,6 +48,7 @@ class GrannyKnot extends Curve {
  * A heart curve.
  *
  * @augments Curve
+ * @three_import import { HeartCurve } from 'three/addons/curves/CurveExtras.js';
  */
 class HeartCurve extends Curve {
 
@@ -96,6 +98,7 @@ class HeartCurve extends Curve {
  * A Viviani curve.
  *
  * @augments Curve
+ * @three_import import { VivianiCurve } from 'three/addons/curves/CurveExtras.js';
  */
 class VivianiCurve extends Curve {
 
@@ -146,6 +149,7 @@ class VivianiCurve extends Curve {
  * A knot curve.
  *
  * @augments Curve
+ * @three_import import { KnotCurve } from 'three/addons/curves/CurveExtras.js';
  */
 class KnotCurve extends Curve {
 
@@ -179,6 +183,7 @@ class KnotCurve extends Curve {
  * A helix curve.
  *
  * @augments Curve
+ * @three_import import { HelixCurve } from 'three/addons/curves/CurveExtras.js';
  */
 class HelixCurve extends Curve {
 
@@ -212,6 +217,7 @@ class HelixCurve extends Curve {
  * A Trefoil Knot.
  *
  * @augments Curve
+ * @three_import import { TrefoilKnot } from 'three/addons/curves/CurveExtras.js';
  */
 class TrefoilKnot extends Curve {
 
@@ -261,6 +267,7 @@ class TrefoilKnot extends Curve {
  * A torus knot.
  *
  * @augments Curve
+ * @three_import import { TorusKnot } from 'three/addons/curves/CurveExtras.js';
  */
 class TorusKnot extends Curve {
 
@@ -313,6 +320,7 @@ class TorusKnot extends Curve {
  * A Cinquefoil Knot.
  *
  * @augments Curve
+ * @three_import import { CinquefoilKnot } from 'three/addons/curves/CurveExtras.js';
  */
 class CinquefoilKnot extends Curve {
 
@@ -365,6 +373,7 @@ class CinquefoilKnot extends Curve {
  * A Trefoil Polynomial Knot.
  *
  * @augments Curve
+ * @three_import import { TrefoilPolynomialKnot } from 'three/addons/curves/CurveExtras.js';
  */
 class TrefoilPolynomialKnot extends Curve {
 
@@ -421,6 +430,7 @@ function scaleTo( x, y, t ) {
  * A Figure Eight Polynomial Knot.
  *
  * @augments Curve
+ * @three_import import { FigureEightPolynomialKnot } from 'three/addons/curves/CurveExtras.js';
  */
 class FigureEightPolynomialKnot extends Curve {
 
@@ -470,6 +480,7 @@ class FigureEightPolynomialKnot extends Curve {
  * A Decorated Torus Knot 4a.
  *
  * @augments Curve
+ * @three_import import { DecoratedTorusKnot4a } from 'three/addons/curves/CurveExtras.js';
  */
 class DecoratedTorusKnot4a extends Curve {
 
@@ -519,6 +530,7 @@ class DecoratedTorusKnot4a extends Curve {
  * A Decorated Torus Knot 4b.
  *
  * @augments Curve
+ * @three_import import { DecoratedTorusKnot4b } from 'three/addons/curves/CurveExtras.js';
  */
 class DecoratedTorusKnot4b extends Curve {
 
@@ -568,6 +580,7 @@ class DecoratedTorusKnot4b extends Curve {
  * A Decorated Torus Knot 5a.
  *
  * @augments Curve
+ * @three_import import { DecoratedTorusKnot5a } from 'three/addons/curves/CurveExtras.js';
  */
 class DecoratedTorusKnot5a extends Curve {
 
@@ -617,6 +630,7 @@ class DecoratedTorusKnot5a extends Curve {
  * A Decorated Torus Knot 5c.
  *
  * @augments Curve
+ * @three_import import { DecoratedTorusKnot5c } from 'three/addons/curves/CurveExtras.js';
  */
 class DecoratedTorusKnot5c extends Curve {
 

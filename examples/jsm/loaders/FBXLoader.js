@@ -73,6 +73,7 @@ let sceneGraph;
  * ```
  *
  * @augments Loader
+ * @three_import import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
  */
 class FBXLoader extends Loader {
 

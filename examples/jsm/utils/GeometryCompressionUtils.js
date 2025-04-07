@@ -5,7 +5,10 @@ import {
 	Vector3
 } from 'three';
 
-/** @module GeometryCompressionUtils */
+/**
+ * @module GeometryCompressionUtils
+ * @three_import import * as GeometryCompressionUtils from 'three/addons/utils/GeometryCompressionUtils.js';
+ */
 
 // Octahedron and Quantization encodings based on work by: https://github.com/tsherif/mesh-quantization-example
 

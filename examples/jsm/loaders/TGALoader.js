@@ -13,6 +13,7 @@ import {
  * ```
  *
  * @augments DataTextureLoader
+ * @three_import import { TGALoader } from 'three/addons/loaders/TGALoader.js';
  */
 class TGALoader extends DataTextureLoader {
 

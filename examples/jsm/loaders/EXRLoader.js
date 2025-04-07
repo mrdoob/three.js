@@ -92,6 +92,7 @@ import * as fflate from '../libs/fflate.module.js';
  * ```
  *
  * @augments DataTextureLoader
+ * @three_import import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
  */
 class EXRLoader extends DataTextureLoader {
 

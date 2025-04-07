@@ -58,6 +58,7 @@ import { TGALoader } from '../loaders/TGALoader.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
  */
 class ColladaLoader extends Loader {
 

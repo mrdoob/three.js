@@ -46,6 +46,7 @@ import chevrotain from '../libs/chevrotain.module.min.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
  */
 class VRMLLoader extends Loader {
 

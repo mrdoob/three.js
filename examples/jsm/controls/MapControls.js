@@ -12,6 +12,7 @@ import { OrbitControls } from './OrbitControls.js';
  * - Pan: Left mouse, or arrow keys / touch: one-finger move.
  *
  * @augments OrbitControls
+ * @three_import import { MapControls } from 'three/addons/controls/MapControls.js';
  */
 class MapControls extends OrbitControls {
 

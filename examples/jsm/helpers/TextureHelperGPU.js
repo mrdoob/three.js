@@ -20,6 +20,7 @@ import { mergeGeometries } from '../utils/BufferGeometryUtils.js';
  *
  * @private
  * @augments Mesh
+ * @three_import import { TextureHelper } from 'three/addons/helpers/TextureHelperGPU.js';
  */
 class TextureHelper extends Mesh {
 

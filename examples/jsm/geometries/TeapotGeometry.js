@@ -26,6 +26,7 @@ import {
  * ```
  *
  * @augments BufferGeometry
+ * @three_import import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
  */
 class TeapotGeometry extends BufferGeometry {
 

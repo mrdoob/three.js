@@ -20,6 +20,8 @@ const _triangle = new Triangle();
  *
  * This Quickhull 3D implementation is a port of [quickhull3d]{@link https://github.com/maurizzzio/quickhull3d/}
  * by Mauricio Poppe.
+ *
+ * @three_import import { ConvexHull } from 'three/addons/math/ConvexHull.js';
  */
 class ConvexHull {
 
