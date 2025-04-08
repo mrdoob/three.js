@@ -88,7 +88,7 @@ class WebGPUPipelineUtils {
 
 		let blending;
 
-		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent === true ) ) {
+		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent !== false ) ) {
 
 			blending = this._getBlending( material );
 
