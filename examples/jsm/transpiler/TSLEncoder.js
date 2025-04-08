@@ -15,6 +15,7 @@ const opLib = {
 	'<=': 'lessThanEqual',
 	'>=': 'greaterThanEqual',
 	'==': 'equal',
+	'!=': 'notEqual',
 	'&&': 'and',
 	'||': 'or',
 	'^^': 'xor',
