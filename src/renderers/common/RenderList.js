@@ -19,9 +19,15 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	}
+	} else if ( a.z !== b.z ) {
 
-	return a.z - b.z;
+		return a.z - b.z;
+
+	} else {
+
+		return a.id - b.id;
+
+	}
 
 }
 
@@ -44,9 +50,15 @@ function reversePainterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	}
+	} else if ( a.z !== b.z ) {
 
-	return b.z - a.z;
+		return b.z - a.z;
+
+	} else {
+
+		return a.id - b.id;
+
+	}
 
 }
 
