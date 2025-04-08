@@ -19,21 +19,21 @@ class CapsuleGeometry extends LatheGeometry {
 	 * Constructs a new capsule geometry.
 	 *
 	 * @param {number} [radius=1] - Radius of the capsule.
-	 * @param {number} [length=1] - Length of the middle section.
+	 * @param {number} [height=1] - Height of the middle section.
 	 * @param {number} [capSegments=4] - Number of curve segments used to build the caps.
 	 * @param {number} [radialSegments=8] - Number of segmented faces around the circumference of the capsule.
 	 * @param {number} [heightSegments=1] - Number of rows of faces along the height of the capsule.
 	 */
-	constructor( radius = 1, length = 1, capSegments = 4, radialSegments = 8, heightSegments = 1 ) {
+	constructor( radius = 1, height = 1, capSegments = 4, radialSegments = 8, heightSegments = 1 ) {
 
 		const path = new Path();
-		path.absarc( 0, - length / 2, radius, Math.PI * 1.5, 0 );
+		path.absarc( 0, - height / 2, radius, Math.PI * 1.5, 0 );
 
 		if ( heightSegments > 1 ) {
 
 			for ( let i = 1; i < heightSegments; i ++ ) {
 
-				const y = - length / 2 + ( length * i / heightSegments );
+				const y = - height / 2 + ( height * i / heightSegments );
 
 				path.lineTo( radius, y );
 
@@ -41,7 +41,7 @@ class CapsuleGeometry extends LatheGeometry {
 
 		}
 
-		path.absarc( 0, length / 2, radius, 0, Math.PI * 0.5 );
+		path.absarc( 0, height / 2, radius, 0, Math.PI * 0.5 );
 
 		super( path.getPoints( capSegments ), radialSegments );
 
@@ -56,7 +56,7 @@ class CapsuleGeometry extends LatheGeometry {
 		 */
 		this.parameters = {
 			radius: radius,
-			length: length,
+			height: height,
 			capSegments: capSegments,
 			radialSegments: radialSegments,
 			heightSegments: heightSegments,
@@ -73,7 +73,7 @@ class CapsuleGeometry extends LatheGeometry {
 	 */
 	static fromJSON( data ) {
 
-		return new CapsuleGeometry( data.radius, data.length, data.capSegments, data.radialSegments, data.heightSegments );
+		return new CapsuleGeometry( data.radius, data.height, data.capSegments, data.radialSegments, data.heightSegments );
 
 	}
 
