@@ -679,7 +679,7 @@ class Renderer {
 		 *
 		 * @type {XRManager}
 		 */
-		this.xr = new XRManager( this );
+		this.xr = new XRManager( this, parameters.useMultiview );
 
 		/**
 		 * Debug configuration.

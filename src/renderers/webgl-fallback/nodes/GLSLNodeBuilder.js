@@ -947,6 +947,17 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the view id builtin for multiview.
+	 *
+	 * @return {string} The ViewID builtin.
+	 */
+	getViewID() {
+
+		return 'gl_ViewID_OVR';
+
+	}
+
+	/**
 	 * Enables the given extension.
 	 *
 	 * @param {string} name - The extension name.
@@ -1092,6 +1103,20 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Enables multisample multiview.
+	 *
+	 * @param {string} planeCount - The clipping plane count.
+	 */
+	enableMultiview() {
+
+		this.enableExtension( 'GL_OVR_multiview2', 'require', 'fragment' );
+		this.enableExtension( 'GL_OVR_multiview2', 'require', 'vertex' );
+
+		this.builtins[ 'vertex' ].push( `layout(num_views = 2) in` );
+
+	}
+
+	/**
 	 * Registers a transform in context of Transform Feedback.
 	 *
 	 * @param {string} varyingName - The varying name.
@@ -1206,6 +1231,9 @@ void main() {
 		return `#version 300 es
 
 ${ this.getSignature() }
+
+// extensions
+${shaderData.extensions}
 
 // precision
 ${ defaultPrecisions }

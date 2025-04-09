@@ -55,6 +55,8 @@ class XRRenderTarget extends RenderTarget {
 		 */
 		this.autoAllocateDepthBuffer = true;
 
+		this.usesMultiview = false;
+
 	}
 
 	copy( source ) {

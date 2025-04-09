@@ -1189,6 +1189,17 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Overwritten as a NOP since this method is intended for the WebGL 2 backend.
+	 *
+	 * @return {null} Null.
+	 */
+	getViewID() {
+
+		return null;
+
+	}
+
+	/**
 	 * Whether to flip texture data along its vertical axis or not.
 	 *
 	 * @return {boolean} Returns always `false` in context of WGSL.

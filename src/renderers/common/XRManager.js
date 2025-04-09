@@ -9,6 +9,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { WebXRController } from '../webxr/WebXRController.js';
 import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor } from '../../constants.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
+import { DepthArrayTexture } from '../../textures/DepthArrayTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
@@ -33,7 +34,7 @@ class XRManager extends EventDispatcher {
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 */
-	constructor( renderer ) {
+	constructor( renderer, enablemultiviewifpossible = false ) {
 
 		super();
 
@@ -354,6 +355,24 @@ class XRManager extends EventDispatcher {
 		 */
 		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
+		/**
+		 * Whether to use the multiview extension or not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._useMultiviewIfPossible = enablemultiviewifpossible;
+
+		/**
+		 * Whether to use the multiview extension was enabled.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._usesMultiview = false;	
+
 	}
 
 	/**
@@ -561,6 +580,16 @@ class XRManager extends EventDispatcher {
 	getFrame() {
 
 		return this._xrFrame;
+
+	}
+
+	/* Returns if we are rendering to a multiview target.
+	*
+	* @return {'bool'} The state of rendering to multiview.
+	*/
+	usesMultiview() {
+
+		return this._usesMultiview;
 
 	}
 
@@ -819,11 +848,18 @@ class XRManager extends EventDispatcher {
 
 				}
 
-				const projectionlayerInit = {
+				let projectionlayerInit = {
 					colorFormat: gl.RGBA8,
 					depthFormat: glDepthFormat,
 					scaleFactor: this._framebufferScaleFactor
 				};
+
+				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2') ) {
+
+					projectionlayerInit.textureType = 'texture-array';
+					this._usesMultiview = true;	
+
+				}
 
 				const glBinding = new XRWebGLBinding( session, gl );
 				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
@@ -835,6 +871,20 @@ class XRManager extends EventDispatcher {
 				renderer.setPixelRatio( 1 );
 				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
+				let depthTexture;
+				if ( this._usesMultiview ) {
+
+					depthTexture = new DepthArrayTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, 2 );
+					depthTexture.type = depthType;
+					depthTexture.format = depthFormat;
+
+				} else {
+
+					depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat );
+
+				}
+
+
 				this._xrRenderTarget = new XRRenderTarget(
 					glProjLayer.textureWidth,
 					glProjLayer.textureHeight,
@@ -842,7 +892,7 @@ class XRManager extends EventDispatcher {
 						format: RGBAFormat,
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
-						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+						depthTexture: depthTexture,
 						stencilBuffer: renderer.stencil,
 						samples: attributes.antialias ? 4 : 0,
 						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
@@ -850,6 +900,7 @@ class XRManager extends EventDispatcher {
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
+				this._xrRenderTarget.usesMultiview = this._usesMultiview;
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
 
@@ -950,6 +1001,7 @@ class XRManager extends EventDispatcher {
 
 		cameraXR.near = cameraR.near = cameraL.near = depthNear;
 		cameraXR.far = cameraR.far = cameraL.far = depthFar;
+		cameraXR.isMultiViewCamera = this._usesMultiview;
 
 		if ( this._currentDepthNear !== cameraXR.near || this._currentDepthFar !== cameraXR.far ) {
 
@@ -1431,7 +1483,7 @@ function onAnimationFrame( time, frame ) {
 					backend.setXRRenderTargetTextures(
 						this._xrRenderTarget,
 						glSubImage.colorTexture,
-						this._glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture
+						( this._glProjLayer.ignoreDepthValues && !this._usesMultiview ) ? undefined : glSubImage.depthStencilTexture
 					);
 
 				}

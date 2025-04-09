@@ -31,6 +31,8 @@ class ArrayCamera extends PerspectiveCamera {
 		 */
 		this.isArrayCamera = true;
 
+		this.isMultiViewCamera = false;
+
 		/**
 		 * An array of perspective sub cameras.
 		 *
