@@ -19,6 +19,7 @@ import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getShadowRenderObje
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
 
+const _cameraLayers = [];
 const _vec3Temp1 = /*@__PURE__*/ new Vector3();
 const _vec3Temp2 = /*@__PURE__*/ new Vector3();
 const _vec3Temp3 = /*@__PURE__*/ new Vector3();
@@ -279,7 +280,6 @@ class TileShadowNode extends ShadowBaseNode {
 		scene.overrideMaterial = getShadowMaterial( light );
 		renderer.setRenderTarget( this.shadowMap );
 
-		const cameraLayers = [];
 
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
@@ -287,7 +287,7 @@ class TileShadowNode extends ShadowBaseNode {
 			const shadow = light.shadow;
 
 			const _shadowCameraLayer = shadow.camera.layers.mask;
-			cameraLayers.push( _shadowCameraLayer );
+			_cameraLayers.push( _shadowCameraLayer );
 
 			if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) === 0 ) {
 
@@ -319,11 +319,11 @@ class TileShadowNode extends ShadowBaseNode {
 			const light = this.lights[ index ];
 			const shadow = light.shadow;
 
-			shadow.camera.layers.mask = cameraLayers[ index ];
+			shadow.camera.layers.mask = _cameraLayers[ index ];
 
 		}
 
-		cameraLayers.length = 0;
+		_cameraLayers.length = 0;
 
 	}
 
