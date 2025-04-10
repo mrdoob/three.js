@@ -14,14 +14,19 @@
 			a {
 				color: #b3e5fc;
 				text-decoration: underline;
+				pointer-events: all;
 			}
 
-			img {
+			#credits {
 				pointer-events: none;
 				position: absolute;
 				left: 10px;
 				bottom: 10px;
-				width: 70px;
+			}
+
+			img {
+				height: 25px;
+				margin-right: 5px;
 			}
 		</style>
 	</head>
@@ -34,7 +39,10 @@
 			and other tiled data formats. <a href="https://developers.google.com/maps/documentation/tile/3d-tiles">Google Photorealistic Tiles</a> token courtesy of <a href="https://ion.cesium.com/">Cesium Ion</a>.
 		</div>
 
-		<img src="./textures/google_on_non_white_hdpi.png" />
+		<div id="credits">
+			<img src="./textures/google_on_non_white_hdpi.png" />
+			<a href="https://ion.cesium.com/"><img src="./textures/cesiumion.png" /></a>
+		</div>
 
 		<script type="importmap">
 			{
