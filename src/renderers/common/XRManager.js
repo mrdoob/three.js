@@ -801,6 +801,8 @@ class XRManager extends EventDispatcher {
 			this._currentAnimationLoop = renderer._animation.getAnimationLoop();
 			renderer._animation.stop();
 
+			//request reference space for both layers and non layers
+			this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 			//
 
 			if ( this._useLayers === true ) {
@@ -851,7 +853,7 @@ class XRManager extends EventDispatcher {
 
 				this._xrRenderTarget.hasExternalTextures = true;
 
-				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+				
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
 
