@@ -2,7 +2,7 @@
 
 import { CapsuleGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
 
-import { LatheGeometry } from '../../../../src/geometries/LatheGeometry.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
@@ -36,8 +36,8 @@ export default QUnit.module( 'Geometries', () => {
 
 			const object = new CapsuleGeometry();
 			assert.strictEqual(
-				object instanceof LatheGeometry, true,
-				'CapsuleGeometry extends from LatheGeometry'
+				object instanceof BufferGeometry, true,
+				'CapsuleGeometry extends from BufferGeometry'
 			);
 
 		} );
