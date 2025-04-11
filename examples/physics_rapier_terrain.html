@@ -169,10 +169,6 @@
 				return data;
 			}
 
-			function createTerrainShape() {
-				return new Float32Array(heightData);
-			}
-
 			function generateObject() {
 				const numTypes = 3; // cones not working
 				const objectType = Math.ceil(Math.random() * numTypes);
