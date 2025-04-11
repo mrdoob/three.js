@@ -147,17 +147,10 @@ class CapsuleGeometry extends BufferGeometry {
 
 				// normal
 
-				let horizontalNormalComponent = profileRadius; // for cylinder
-				if ( iy < capSegments || iy > capSegments + heightSegments ) {
-
-					horizontalNormalComponent = profileRadius; // for caps
-
-				}
-
 				normal.set(
-					- horizontalNormalComponent * cosTheta,
+					- profileRadius * cosTheta,
 					normalYComponent,
-					horizontalNormalComponent * sinTheta
+					profileRadius * sinTheta
 				);
 				normal.normalize();
 				normals.push( normal.x, normal.y, normal.z );
