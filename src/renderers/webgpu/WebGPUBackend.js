@@ -1,6 +1,5 @@
-/*// debugger tools
+/*// debugger tools */
 import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
-//*/
 
 import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
 
@@ -17,240 +16,77 @@ import { WebGPUCoordinateSystem } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce } from '../../utils.js';
 
-/**
- * A backend implementation targeting WebGPU.
- *
- * @private
- * @augments Backend
- */
 class WebGPUBackend extends Backend {
 
-	/**
-	 * WebGPUBackend options.
-	 *
-	 * @typedef {Object} WebGPUBackend~Options
-	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
-	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
-	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
-	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
-	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
-	 * @property {string} [powerPreference=undefined] - The power preference.
-	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
-	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
-	 * @property {number} [outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
-	 */
-
-	/**
-	 * Constructs a new WebGPU backend.
-	 *
-	 * @param {WebGPUBackend~Options} [parameters] - The configuration parameter.
-	 */
 	constructor( parameters = {} ) {
-
 		super( parameters );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
 		this.isWebGPUBackend = true;
-
-		// some parameters require default values other than "undefined"
 		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
-
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
-		/**
-		 * A reference to the device.
-		 *
-		 * @type {?GPUDevice}
-		 * @default null
-		 */
 		this.device = null;
-
-		/**
-		 * A reference to the context.
-		 *
-		 * @type {?GPUCanvasContext}
-		 * @default null
-		 */
 		this.context = null;
-
-		/**
-		 * A reference to the color attachment of the default framebuffer.
-		 *
-		 * @type {?GPUTexture}
-		 * @default null
-		 */
 		this.colorBuffer = null;
-
-		/**
-		 * A reference to the default render pass descriptor.
-		 *
-		 * @type {?Object}
-		 * @default null
-		 */
 		this.defaultRenderPassdescriptor = null;
 
-		/**
-		 * A reference to a backend module holding common utility functions.
-		 *
-		 * @type {WebGPUUtils}
-		 */
 		this.utils = new WebGPUUtils( this );
-
-		/**
-		 * A reference to a backend module holding shader attribute-related
-		 * utility functions.
-		 *
-		 * @type {WebGPUAttributeUtils}
-		 */
 		this.attributeUtils = new WebGPUAttributeUtils( this );
-
-		/**
-		 * A reference to a backend module holding shader binding-related
-		 * utility functions.
-		 *
-		 * @type {WebGPUBindingUtils}
-		 */
 		this.bindingUtils = new WebGPUBindingUtils( this );
-
-		/**
-		 * A reference to a backend module holding shader pipeline-related
-		 * utility functions.
-		 *
-		 * @type {WebGPUPipelineUtils}
-		 */
 		this.pipelineUtils = new WebGPUPipelineUtils( this );
-
-		/**
-		 * A reference to a backend module holding shader texture-related
-		 * utility functions.
-		 *
-		 * @type {WebGPUTextureUtils}
-		 */
 		this.textureUtils = new WebGPUTextureUtils( this );
-
-		/**
-		 * A map that manages the resolve buffers for occlusion queries.
-		 *
-		 * @type {Map<number,GPUBuffer>}
-		 */
 		this.occludedResolveCache = new Map();
-
 	}
 
-	/**
-	 * Initializes the backend so it is ready for usage.
-	 *
-	 * @async
-	 * @param {Renderer} renderer - The renderer.
-	 * @return {Promise} A Promise that resolves when the backend has been initialized.
-	 */
 	async init( renderer ) {
-
 		await super.init( renderer );
-
-		//
-
 		const parameters = this.parameters;
-
-		// create the device if it is not passed with parameters
-
 		let device;
 
 		if ( parameters.device === undefined ) {
-
-			const adapterOptions = {
-				powerPreference: parameters.powerPreference
-			};
-
+			const adapterOptions = { powerPreference: parameters.powerPreference };
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
 
-			if ( adapter === null ) {
-
-				throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
-
-			}
-
-			// feature support
+			if ( adapter === null ) throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
 
 			const features = Object.values( GPUFeatureName );
+			const supportedFeatures = features.filter( name => adapter.features.has( name ) );
 
-			const supportedFeatures = [];
-
-			for ( const name of features ) {
-
-				if ( adapter.features.has( name ) ) {
-
-					supportedFeatures.push( name );
-
-				}
-
-			}
-
-			const deviceDescriptor = {
-				requiredFeatures: supportedFeatures,
-				requiredLimits: parameters.requiredLimits
-			};
-
-			device = await adapter.requestDevice( deviceDescriptor );
-
+			device = await adapter.requestDevice({ requiredFeatures: supportedFeatures, requiredLimits: parameters.requiredLimits });
 		} else {
-
 			device = parameters.device;
-
 		}
 
 		device.lost.then( ( info ) => {
-
-			const deviceLossInfo = {
+			renderer.onDeviceLost({
 				api: 'WebGPU',
 				message: info.message || 'Unknown reason',
 				reason: info.reason || null,
 				originalEvent: info
-			};
+			});
+		});
 
-			renderer.onDeviceLost( deviceLossInfo );
-
-		} );
-
-		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
-
+		const context = parameters.context !== undefined ? parameters.context : renderer.domElement.getContext( 'webgpu' );
 		this.device = device;
 		this.context = context;
-
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
-
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
-		this.context.configure( {
+		this.context.configure({
 			device: this.device,
 			format: this.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 			alphaMode: alphaMode
-		} );
+		});
+
+		if (typeof window !== 'undefined' && 'checkWebGPUState' in window) {
+			checkWebGPUState();
+		}
 
 		this.updateSize();
-
 	}
 
-	/**
-	 * The coordinate system of the backend.
-	 *
-	 * @type {number}
-	 * @readonly
-	 */
 	get coordinateSystem() {
-
 		return WebGPUCoordinateSystem;
-
 	}
 
 	/**
@@ -2086,5 +1922,6 @@ class WebGPUBackend extends Backend {
 	}
 
 }
+
 
 export default WebGPUBackend;
