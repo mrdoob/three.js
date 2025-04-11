@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Rapier.js terrain heightfield demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #333;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">Rapier.js physics terrain heightfield demo</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"@dimforge/rapier3d": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.15.1/+esm"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import RAPIER from '@dimforge/rapier3d';
+
+			// Heightfield parameters
+			const terrainWidthExtents = 100;
+			const terrainDepthExtents = 100;
+			const terrainWidth = 128;
+			const terrainDepth = 128;
+			const terrainHalfWidth = terrainWidth / 2;
+			const terrainHalfDepth = terrainDepth / 2;
+			const terrainMaxHeight = 8;
+			const terrainMinHeight = -2;
+
+			// Graphics variables
+			let container, stats;
+			let camera, scene, renderer;
+			let terrainMesh;
+			const clock = new THREE.Clock();
+
+			// Physics variables
+			let world;
+			const dynamicObjects = [];
+			let heightData = null;
+
+			let time = 0;
+			const objectTimePeriod = 3;
+			let timeNextSpawn = time + objectTimePeriod;
+			const maxNumObjects = 30;
+
+			async function init() {
+				await RAPIER.init();
+				heightData = generateHeight(terrainWidth, terrainDepth, terrainMinHeight, terrainMaxHeight);
+				initGraphics();
+				initPhysics();
+			}
+
+			function initGraphics() {
+				container = document.getElementById('container');
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.setAnimationLoop(animate);
+				renderer.shadowMap.enabled = true;
+				container.appendChild(renderer.domElement);
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+				camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 2000);
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0xbfd1e5);
+
+				camera.position.y = heightData[terrainHalfWidth + terrainHalfDepth * terrainWidth] * (terrainMaxHeight - terrainMinHeight) + 5;
+				camera.position.z = terrainDepthExtents / 2;
+				camera.lookAt(0, 0, 0);
+
+				const controls = new OrbitControls(camera, renderer.domElement);
+				controls.enableZoom = false;
+
+				const geometry = new THREE.PlaneGeometry(terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1);
+				geometry.rotateX(-Math.PI / 2);
+
+				const vertices = geometry.attributes.position.array;
+				for (let i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
+					vertices[j + 1] = heightData[i];
+				}
+				geometry.computeVertexNormals();
+
+				const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xC7C7C7 });
+				terrainMesh = new THREE.Mesh(geometry, groundMaterial);
+				terrainMesh.receiveShadow = true;
+				terrainMesh.castShadow = true;
+				scene.add(terrainMesh);
+
+				const textureLoader = new THREE.TextureLoader();
+				textureLoader.load('textures/grid.png', function (texture) {
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.repeat.set(terrainWidth - 1, terrainDepth - 1);
+					groundMaterial.map = texture;
+					groundMaterial.needsUpdate = true;
+				});
+
+				const ambientLight = new THREE.AmbientLight(0xbbbbbb);
+				scene.add(ambientLight);
+
+				const light = new THREE.DirectionalLight(0xffffff, 3);
+				light.position.set(100, 100, 50);
+				light.castShadow = true;
+				const dLight = 200;
+				const sLight = dLight * 0.25;
+				light.shadow.camera.left = -sLight;
+				light.shadow.camera.right = sLight;
+				light.shadow.camera.top = sLight;
+				light.shadow.camera.bottom = -sLight;
+				light.shadow.camera.near = dLight / 30;
+				light.shadow.camera.far = dLight;
+				light.shadow.mapSize.x = 1024 * 2;
+				light.shadow.mapSize.y = 1024 * 2;
+				scene.add(light);
+
+				window.addEventListener('resize', onWindowResize);
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
+
+			function initPhysics() {
+				world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 });
+
+				// Create the terrain body
+				const heightfield = createTerrainShape();
+				const terrainBodyDesc = new RAPIER.RigidBodyDesc(RAPIER.RigidBodyType.Fixed);
+				terrainBodyDesc.setTranslation(0, 0, 0);
+				const terrainBody = world.createRigidBody(terrainBodyDesc);
+				const terrainColliderDesc = RAPIER.ColliderDesc.heightfield(
+					terrainWidth - 1, terrainDepth - 1, heightfield,
+					{ x: terrainWidthExtents, y: 1.0, z: terrainDepthExtents }
+				);
+				world.createCollider(terrainColliderDesc, terrainBody);
+			}
+
+			function generateHeight(width, depth, minHeight, maxHeight) {
+				const size = width * depth;
+				const data = new Float32Array(size);
+				const hRange = maxHeight - minHeight;
+				const w2 = width / 2;
+				const d2 = depth / 2;
+				const phaseMult = 12;
+				let p = 0;
+				for (let j = 0; j < depth; j++) {
+					for (let i = 0; i < width; i++) {
+						const radius = Math.sqrt(Math.pow((i - w2) / w2, 2.0) + Math.pow((j - d2) / d2, 2.0));
+						const height = (Math.sin(radius * phaseMult) + 1) * 0.5 * hRange + minHeight;
+						data[p] = height;
+						p++;
+					}
+				}
+				return data;
+			}
+
+			function createTerrainShape() {
+				return new Float32Array(heightData);
+			}
+
+			function generateObject() {
+				const numTypes = 4;
+				const objectType = Math.ceil(Math.random() * numTypes);
+				let threeObject = null;
+				let shapeDesc = null;
+				const objectSize = 3;
+				let radius, height;
+
+				switch (objectType) {
+					case 1: // Sphere
+						radius = 1 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 20), createObjectMaterial());
+						shapeDesc = RAPIER.ColliderDesc.ball(radius);
+						break;
+					case 2: // Box
+						const sx = 1 + Math.random() * objectSize;
+						const sy = 1 + Math.random() * objectSize;
+						const sz = 1 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), createObjectMaterial());
+						shapeDesc = RAPIER.ColliderDesc.cuboid(sx / 2, sy / 2, sz / 2);
+						break;
+					case 3: // Cylinder
+						radius = 1 + Math.random() * objectSize;
+						height = 1 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 20, 1), createObjectMaterial());
+						shapeDesc = RAPIER.ColliderDesc.cylinder(height / 2, radius);
+						break;
+					default: // Cone - approximated as a cylinder for physics
+						radius = 1 + Math.random() * objectSize;
+						height = 2 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 20, 2), createObjectMaterial());
+						shapeDesc = RAPIER.ColliderDesc.cylinder(height / 2, radius);
+						break;
+				}
+
+				threeObject.position.set(
+					(Math.random() - 0.5) * terrainWidth * 0.6,
+					terrainMaxHeight + objectSize + 2,
+					(Math.random() - 0.5) * terrainDepth * 0.6
+				);
+
+				const mass = objectSize * 5;
+				const bodyDesc = new RAPIER.RigidBodyDesc(RAPIER.RigidBodyType.Dynamic);
+				bodyDesc.setTranslation(threeObject.position.x, threeObject.position.y, threeObject.position.z);
+				const body = world.createRigidBody(bodyDesc);
+				shapeDesc.setMass(mass);
+				const collider = world.createCollider(shapeDesc, body);
+
+				threeObject.userData.physicsBody = body;
+				threeObject.receiveShadow = true;
+				threeObject.castShadow = true;
+
+				scene.add(threeObject);
+				dynamicObjects.push(threeObject);
+			}
+
+			function createObjectMaterial() {
+				const c = Math.floor(Math.random() * (1 << 24));
+				return new THREE.MeshPhongMaterial({ color: c });
+			}
+
+			function animate() {
+				render();
+				stats.update();
+			}
+
+			function render() {
+				const deltaTime = clock.getDelta();
+				if (dynamicObjects.length < maxNumObjects && time > timeNextSpawn) {
+					generateObject();
+					timeNextSpawn = time + objectTimePeriod;
+				}
+				updatePhysics(deltaTime);
+				renderer.render(scene, camera);
+				time += deltaTime;
+			}
+
+			function updatePhysics(deltaTime) {
+				world.step();
+				for (let i = 0, il = dynamicObjects.length; i < il; i++) {
+					const objThree = dynamicObjects[i];
+					const objPhys = objThree.userData.physicsBody;
+					const pos = objPhys.translation();
+					const rot = objPhys.rotation();
+					objThree.position.set(pos.x, pos.y, pos.z);
+					objThree.quaternion.set(rot.x, rot.y, rot.z, rot.w);
+				}
+			}
+
+			init();
+		</script>
+	</body>
+</html> 
