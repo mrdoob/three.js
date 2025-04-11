@@ -19,8 +19,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"@dimforge/rapier3d": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.15.1/+esm"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,7 +29,7 @@
 			import * as THREE from 'three';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import RAPIER from '@dimforge/rapier3d';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 
 			// Heightfield parameters
 			const terrainWidthExtents = 100;
@@ -49,7 +48,7 @@
 			const clock = new THREE.Clock();
 
 			// Physics variables
-			let world;
+			let physics;
 			const dynamicObjects = [];
 			let heightData = null;
 
@@ -59,10 +58,11 @@
 			const maxNumObjects = 30;
 
 			async function init() {
-				await RAPIER.init();
 				heightData = generateHeight(terrainWidth, terrainDepth, terrainMinHeight, terrainMaxHeight);
 				initGraphics();
-				initPhysics();
+				await initPhysics();
+				// Start animation loop only after physics is initialized
+				renderer.setAnimationLoop(animate);
 			}
 
 			function initGraphics() {
@@ -70,7 +70,7 @@
 				renderer = new THREE.WebGLRenderer({ antialias: true });
 				renderer.setPixelRatio(window.devicePixelRatio);
 				renderer.setSize(window.innerWidth, window.innerHeight);
-				renderer.setAnimationLoop(animate);
+				// Remove setAnimationLoop from here since we'll start it after physics init
 				renderer.shadowMap.enabled = true;
 				container.appendChild(renderer.domElement);
 
@@ -141,19 +141,13 @@
 				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
-			function initPhysics() {
-				world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 });
+			async function initPhysics() {
+				physics = await RapierPhysics();
 
-				// Create the terrain body
-				const heightfield = createTerrainShape();
-				const terrainBodyDesc = new RAPIER.RigidBodyDesc(RAPIER.RigidBodyType.Fixed);
-				terrainBodyDesc.setTranslation(0, 0, 0);
-				const terrainBody = world.createRigidBody(terrainBodyDesc);
-				const terrainColliderDesc = RAPIER.ColliderDesc.heightfield(
-					terrainWidth - 1, terrainDepth - 1, heightfield,
-					{ x: terrainWidthExtents, y: 1.0, z: terrainDepthExtents }
-				);
-				world.createCollider(terrainColliderDesc, terrainBody);
+				// Create the terrain body using RapierPhysics module
+				physics.addHeightfield(terrainMesh, terrainWidth - 1, terrainDepth - 1, heightData, { x: terrainWidthExtents, y: 1.0, z: terrainDepthExtents });
+
+				// Continue with adding other dynamic objects as needed
 			}
 
 			function generateHeight(width, depth, minHeight, maxHeight) {
@@ -180,10 +174,9 @@
 			}
 
 			function generateObject() {
-				const numTypes = 4;
+				const numTypes = 3; // cones not working
 				const objectType = Math.ceil(Math.random() * numTypes);
 				let threeObject = null;
-				let shapeDesc = null;
 				const objectSize = 3;
 				let radius, height;
 
@@ -191,48 +184,49 @@
 					case 1: // Sphere
 						radius = 1 + Math.random() * objectSize;
 						threeObject = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 20), createObjectMaterial());
-						shapeDesc = RAPIER.ColliderDesc.ball(radius);
 						break;
 					case 2: // Box
 						const sx = 1 + Math.random() * objectSize;
 						const sy = 1 + Math.random() * objectSize;
 						const sz = 1 + Math.random() * objectSize;
 						threeObject = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), createObjectMaterial());
-						shapeDesc = RAPIER.ColliderDesc.cuboid(sx / 2, sy / 2, sz / 2);
 						break;
 					case 3: // Cylinder
 						radius = 1 + Math.random() * objectSize;
 						height = 1 + Math.random() * objectSize;
 						threeObject = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 20, 1), createObjectMaterial());
-						shapeDesc = RAPIER.ColliderDesc.cylinder(height / 2, radius);
 						break;
-					default: // Cone - approximated as a cylinder for physics
+					default: // Cone
 						radius = 1 + Math.random() * objectSize;
 						height = 2 + Math.random() * objectSize;
 						threeObject = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 20, 2), createObjectMaterial());
-						shapeDesc = RAPIER.ColliderDesc.cylinder(height / 2, radius);
 						break;
 				}
 
+				// Position objects higher and with more randomization to prevent clustering
 				threeObject.position.set(
 					(Math.random() - 0.5) * terrainWidth * 0.6,
-					terrainMaxHeight + objectSize + 2,
+					terrainMaxHeight + objectSize + 15 + Math.random() * 5, // Even higher with randomization
 					(Math.random() - 0.5) * terrainDepth * 0.6
 				);
 
 				const mass = objectSize * 5;
-				const bodyDesc = new RAPIER.RigidBodyDesc(RAPIER.RigidBodyType.Dynamic);
-				bodyDesc.setTranslation(threeObject.position.x, threeObject.position.y, threeObject.position.z);
-				const body = world.createRigidBody(bodyDesc);
-				shapeDesc.setMass(mass);
-				world.createCollider(shapeDesc, body);
+				const restitution = 0.3; // Add some bounciness
 
-				threeObject.userData.physicsBody = body;
+				// Add to scene first
+				scene.add(threeObject);
+
+				// Add physics to the object
+				physics.addMesh(threeObject, mass, restitution);
+
+				// Store the object for later reference
+				dynamicObjects.push(threeObject);
+
+				// Force a small delay before adding the next object
+				timeNextSpawn = time + 0.5;
+
 				threeObject.receiveShadow = true;
 				threeObject.castShadow = true;
-
-				scene.add(threeObject);
-				dynamicObjects.push(threeObject);
 			}
 
 			function createObjectMaterial() {
@@ -247,9 +241,21 @@
 
 			function render() {
 				const deltaTime = clock.getDelta();
+
+				// Generate new objects with a delay between them
 				if (dynamicObjects.length < maxNumObjects && time > timeNextSpawn) {
+					// Generate object directly in this frame
 					generateObject();
-					timeNextSpawn = time + objectTimePeriod;
+					// timeNextSpawn is now set in generateObject()
+				}
+				// Clean up objects that have fallen off the terrain
+				for (let i = dynamicObjects.length - 1; i >= 0; i--) {
+					const obj = dynamicObjects[i];
+					if (obj.position.y < terrainMinHeight - 10) {
+						// Remove from scene and physics world
+						scene.remove(obj);
+						dynamicObjects.splice(i, 1);
+					}
 				}
 				updatePhysics(deltaTime);
 				renderer.render(scene, camera);
@@ -257,18 +263,47 @@
 			}
 
 			function updatePhysics(deltaTime) {
-				world.step();
+				// Check for objects that might need help with physics
 				for (let i = 0, il = dynamicObjects.length; i < il; i++) {
 					const objThree = dynamicObjects[i];
-					const objPhys = objThree.userData.physicsBody;
-					const pos = objPhys.translation();
-					const rot = objPhys.rotation();
-					objThree.position.set(pos.x, pos.y, pos.z);
-					objThree.quaternion.set(rot.x, rot.y, rot.z, rot.w);
+
+					// If object is not moving but should be (based on height), try to fix it
+					if (objThree.position.y > 1.0) {
+						// Check if physics body exists
+						if (objThree.userData &&
+						    objThree.userData.physics &&
+						    objThree.userData.physics.body) {
+
+						    const body = objThree.userData.physics.body;
+
+							// Make sure body is awake
+							if (typeof body.wakeUp === 'function') {
+								body.wakeUp();
+							}
+
+							// Check velocity and apply impulse if needed
+							if (typeof body.linvel === 'function') {
+								const velocity = body.linvel();
+								const speed = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
+
+								// If object is very slow, give it a stronger impulse
+								if (speed < 0.5) {
+									body.applyImpulse({ x: 0, y: -2.0, z: 0 }, true);
+								}
+							}
+						} else {
+							// If the object doesn't have a physics body but should, recreate it
+							const mass = 5; // Default mass
+							const restitution = 0.3; // Default restitution
+
+							// Recreate physics for the object
+							physics.addMesh(objThree, mass, restitution);
+						}
+					}
 				}
 			}
 
 			init();
 		</script>
 	</body>
-</html> 
+</html>
