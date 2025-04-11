@@ -225,7 +225,7 @@
 				bodyDesc.setTranslation(threeObject.position.x, threeObject.position.y, threeObject.position.z);
 				const body = world.createRigidBody(bodyDesc);
 				shapeDesc.setMass(mass);
-				const collider = world.createCollider(shapeDesc, body);
+				world.createCollider(shapeDesc, body);
 
 				threeObject.userData.physicsBody = body;
 				threeObject.receiveShadow = true;
