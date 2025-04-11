@@ -29,6 +29,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
  */
 class MTLLoader extends Loader {
 

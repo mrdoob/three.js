@@ -107,6 +107,7 @@ const _EPS = 0.000001;
  * animation loop when animations are on.
  *
  * @augments Controls
+ * @three_import import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
  */
 class ArcballControls extends Controls {
 

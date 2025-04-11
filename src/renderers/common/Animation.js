@@ -32,9 +32,9 @@ class Animation {
 		 * A reference to the context from `requestAnimationFrame()` can
 		 * be called (usually `window`).
 		 *
-		 * @type {Window|XRSession}
+		 * @type {?(Window|XRSession)}
 		 */
-		this._context = self;
+		this._context = typeof self !== 'undefined' ? self : null;
 
 		/**
 		 * The user-defined animation loop.

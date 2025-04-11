@@ -5,6 +5,7 @@ import { nodeObject, Fn, uv, uniform, vec2, vec3, sin, cos, add, vec4, screenSiz
  * Post processing node for creating dot-screen effect.
  *
  * @augments TempNode
+ * @three_import import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
  */
 class DotScreenNode extends TempNode {
 

@@ -62,6 +62,7 @@ const SRGB_TO_LINEAR = Array( 1024 )
  * ```
  *
  * @augments Loader
+ * @three_import import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
  */
 class UltraHDRLoader extends Loader {
 

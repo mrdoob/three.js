@@ -12,6 +12,8 @@ import {
  * A marching cubes implementation.
  *
  * Port of: {@link http://webglsamples.org/blob/blob.html}
+ *
+ * @three_import import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
  */
 class MarchingCubes extends Mesh {
 

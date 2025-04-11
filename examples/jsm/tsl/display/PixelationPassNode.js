@@ -219,6 +219,7 @@ const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStren
  * A special render pass node that renders the scene with a pixelation effect.
  *
  * @augments PassNode
+ * @three_import import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';
  */
 class PixelationPassNode extends PassNode {
 

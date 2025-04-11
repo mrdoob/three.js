@@ -36,6 +36,7 @@ import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, referenc
  * ```
  *
  * @augments Mesh
+ * @three_import import { LensflareMesh } from 'three/addons/objects/LensflareMesh.js';
  */
 class LensflareMesh extends Mesh {
 

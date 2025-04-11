@@ -33,6 +33,7 @@ import {
  * ```
  *
  * @augments Mesh
+ * @three_import import { Lensflare } from 'three/addons/objects/Lensflare.js';
  */
 class Lensflare extends Mesh {
 
@@ -338,6 +339,8 @@ class Lensflare extends Mesh {
 
 /**
  * Represents a single flare that can be added to a {@link Lensflare} container.
+ *
+ * @three_import import { LensflareElement } from 'three/addons/objects/Lensflare.js';
  */
 class LensflareElement {
 

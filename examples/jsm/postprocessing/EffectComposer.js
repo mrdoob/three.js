@@ -36,6 +36,8 @@ import { ClearMaskPass, MaskPass } from './MaskPass.js';
  *
  * }
  * ```
+ *
+ * @three_import import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
  */
 class EffectComposer {
 
@@ -119,7 +121,7 @@ class EffectComposer {
 		this.copyPass.material.blending = NoBlending;
 
 		/**
-		 * The intenral clock for managing time data.
+		 * The internal clock for managing time data.
 		 *
 		 * @private
 		 * @type {Clock}
@@ -185,7 +187,7 @@ class EffectComposer {
 	 * Returns `true` if the pass for the given index is the last enabled pass in the pass chain.
 	 *
 	 * @param {number} passIndex - The pass index.
-	 * @return {boolean} Whether the the pass for the given index is the last pass in the pass chain.
+	 * @return {boolean} Whether the pass for the given index is the last pass in the pass chain.
 	 */
 	isLastEnabledPass( passIndex ) {
 

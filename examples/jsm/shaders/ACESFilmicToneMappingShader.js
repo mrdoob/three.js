@@ -1,4 +1,7 @@
-/** @module ACESFilmicToneMappingShader */
+/**
+ * @module ACESFilmicToneMappingShader
+ * @three_import import { ACESFilmicToneMappingShader } from 'three/addons/shaders/ACESFilmicToneMappingShader.js';
+ */
 
 /**
  * ACES Filmic Tone Mapping Shader by Stephen Hill.

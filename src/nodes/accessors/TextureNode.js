@@ -266,7 +266,7 @@ class TextureNode extends UniformNode {
 	setUpdateMatrix( value ) {
 
 		this.updateMatrix = value;
-		this.updateType = value ? NodeUpdateType.RENDER : NodeUpdateType.NONE;
+		this.updateType = value ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
 
 		return this;
 
@@ -328,7 +328,7 @@ class TextureNode extends UniformNode {
 
 		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			uvNode = builder.context.getUV( this );
+			uvNode = builder.context.getUV( this, builder );
 
 		}
 
@@ -564,7 +564,7 @@ class TextureNode extends UniformNode {
 
 		const map = textureNode.value;
 
-		if ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) {
+		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
 
 			console.warn( 'THREE.TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
 
@@ -720,6 +720,9 @@ class TextureNode extends UniformNode {
 
 		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode, this.biasNode );
 		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
 
 		return newNode;
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - animation - skinning</title>
+		<title>three.js webgl - animation - walk</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -18,10 +18,6 @@
 			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)<br/>
 			use arrows to control characters
 		</div>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -44,11 +40,11 @@
 
 			let scene, renderer, camera, floor, orbitControls;
 			let group, followGroup, model, skeleton, mixer, clock;
-		
+
 			let actions;
 
-			let settings = {
-				show_skeleton:false,
+			const settings = {
+				show_skeleton: false,
 				fixe_transition: true,
 			};
 
@@ -57,17 +53,17 @@
 
 			const controls = {
 
-				key:[0,0],
-				ease : new THREE.Vector3(),
-				position : new THREE.Vector3(),
-				up : new THREE.Vector3(0, 1, 0),
+				key: [ 0, 0 ],
+				ease: new THREE.Vector3(),
+				position: new THREE.Vector3(),
+				up: new THREE.Vector3( 0, 1, 0 ),
 				rotate: new THREE.Quaternion(),
-				current:'Idle',
-				fadeDuration:0.5,
-				runVelocity:5,
-				walkVelocity:1.8,
-				rotateSpeed:0.05,
-				floorDecale:0,
+				current: 'Idle',
+				fadeDuration: 0.5,
+				runVelocity: 5,
+				walkVelocity: 1.8,
+				rotateSpeed: 0.05,
+				floorDecale: 0,
 
 			};
 
@@ -90,24 +86,20 @@
 				scene.fog = new THREE.Fog( 0x5e5d5d, 2, 20 );
 
 				group = new THREE.Group();
-				scene.add(group);
+				scene.add( group );
 
 				followGroup = new THREE.Group();
-				scene.add(followGroup);
-
-				/*const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xb3602b, 0.5 );
-				hemiLight.position.set( 0, 20, 0 );
-				scene.add( hemiLight );*/
+				scene.add( followGroup );
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 5 );
 				dirLight.position.set( - 2, 5, - 3 );
 				dirLight.castShadow = true;
-				let cam = dirLight.shadow.camera;
+				const cam = dirLight.shadow.camera;
 				cam.top = cam.right = 2;
 				cam.bottom = cam.left = - 2;
 				cam.near = 3;
 				cam.far = 8;
-				dirLight.shadow.bias = -0.005;
+				dirLight.shadow.bias = - 0.005;
 				dirLight.shadow.radius = 4;
 				followGroup.add( dirLight );
 				followGroup.add( dirLight.target );
@@ -117,6 +109,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
@@ -149,14 +142,14 @@
 						loadModel();
 						addFloor();
 
-					});
+					} );
 
 			}
 
 			function addFloor() {
 
-				let size = 50;
-				let repeat = 16;
+				const size = 50;
+				const repeat = 16;
 
 				const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
@@ -171,23 +164,23 @@
 				floorN.wrapS = floorN.wrapT = THREE.RepeatWrapping;
 				floorN.anisotropy = maxAnisotropy;
 
-				let mat = new THREE.MeshStandardMaterial( { map:floorT, normalMap:floorN, normalScale:new THREE.Vector2(0.5,0.5), color: 0x404040, depthWrite: false, roughness:0.85 } )
+				const mat = new THREE.MeshStandardMaterial( { map: floorT, normalMap: floorN, normalScale: new THREE.Vector2( 0.5, 0.5 ), color: 0x404040, depthWrite: false, roughness: 0.85 } );
 
-				let g = new THREE.PlaneGeometry( size, size, 50, 50 );
-				g.rotateX( -PI90 );
+				const g = new THREE.PlaneGeometry( size, size, 50, 50 );
+				g.rotateX( - PI90 );
 
 				floor = new THREE.Mesh( g, mat );
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				controls.floorDecale = (size / repeat) * 4;
+				controls.floorDecale = ( size / repeat ) * 4;
 
 				const bulbGeometry = new THREE.SphereGeometry( 0.05, 16, 8 );
-				let bulbLight = new THREE.PointLight( 0xffee88, 2, 500, 2 );
+				const bulbLight = new THREE.PointLight( 0xffee88, 2, 500, 2 );
 
-				let bulbMat = new THREE.MeshStandardMaterial( { emissive: 0xffffee, emissiveIntensity: 1, color: 0x000000 } );
+				const bulbMat = new THREE.MeshStandardMaterial( { emissive: 0xffffee, emissiveIntensity: 1, color: 0x000000 } );
 				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
-				bulbLight.position.set( 1, 0.1, -3 );
+				bulbLight.position.set( 1, 0.1, - 3 );
 				bulbLight.castShadow = true;
 				floor.add( bulbLight );
 
@@ -206,26 +199,32 @@
 
 					model.traverse( function ( object ) {
 
-						if ( object.isMesh ){
-						    if( object.name == 'vanguard_Mesh' ){
-						    	object.castShadow = true;
+						if ( object.isMesh ) {
+
+							if ( object.name == 'vanguard_Mesh' ) {
+
+								object.castShadow = true;
 								object.receiveShadow = true;
 								object.material.shadowSide = THREE.DoubleSide;
 								//object.material.envMapIntensity = 0.5;
 								object.material.metalness = 1.0;
 								object.material.roughness = 0.2;
-								object.material.color.set(1,1,1);
+								object.material.color.set( 1, 1, 1 );
 								object.material.metalnessMap = object.material.map;
-						    } else {
-						    	object.material.metalness = 1;
+
+							} else {
+
+								object.material.metalness = 1;
 								object.material.roughness = 0;
 								object.material.transparent = true;
 								object.material.opacity = 0.8;
-								object.material.color.set(1,1,1);
-						    }
+								object.material.color.set( 1, 1, 1 );
+
+							}
+
 						}
 
-					});
+					} );
 
 					//
 
@@ -244,114 +243,128 @@
 					mixer = new THREE.AnimationMixer( model );
 
 					actions = {
-						Idle:mixer.clipAction( animations[ 0 ] ),
-						Walk:mixer.clipAction( animations[ 3 ] ),
-						Run:mixer.clipAction( animations[ 1 ] )
+						Idle: mixer.clipAction( animations[ 0 ] ),
+						Walk: mixer.clipAction( animations[ 3 ] ),
+						Run: mixer.clipAction( animations[ 1 ] )
 					};
 
-					for( let m in actions ){
-						actions[m].enabled = true;
-						actions[m].setEffectiveTimeScale( 1 );
-						if(m!=='Idle') actions[m].setEffectiveWeight( 0 );
+					for ( const m in actions ) {
+
+						actions[ m ].enabled = true;
+						actions[ m ].setEffectiveTimeScale( 1 );
+						if ( m !== 'Idle' ) actions[ m ].setEffectiveWeight( 0 );
+
 					}
 
 					actions.Idle.play();
 
 					animate();
 
-				});
+				} );
 
 			}
 
 			function updateCharacter( delta ) {
 
-				const fade = controls.fadeDuration
+				const fade = controls.fadeDuration;
 				const key = controls.key;
 				const up = controls.up;
 				const ease = controls.ease;
 				const rotate = controls.rotate;
 				const position = controls.position;
-				const azimut = orbitControls.getAzimuthalAngle();
+				const azimuth = orbitControls.getAzimuthalAngle();
 
-				let active = key[0] === 0 && key[1] === 0 ? false : true;
-				let play = active ? (key[2] ? 'Run' : 'Walk') : 'Idle';
+				const active = key[ 0 ] === 0 && key[ 1 ] === 0 ? false : true;
+				const play = active ? ( key[ 2 ] ? 'Run' : 'Walk' ) : 'Idle';
 
-		        // change animation
+				// change animation
 
-		        if ( controls.current != play ){
+				if ( controls.current != play ) {
 
-		           
 
-		        	const current = actions[play];
-		            const old = actions[controls.current];
-		            controls.current = play;
 
-		            if( settings.fixe_transition ){
-		            	current.reset()
-		            	current.weight = 1.0;
-		            	current.stopFading()
-		            	old.stopFading();
-		            	// sycro if not idle
-                        if ( play !== 'Idle' ) current.time = old.time * ( current.getClip().duration / old.getClip().duration );
-		            	old._scheduleFading( fade, old.getEffectiveWeight(), 0 );
-                        current._scheduleFading( fade, current.getEffectiveWeight(), 1 );	
-			            current.play();
-		            } else {
-		            	setWeight( current, 1.0 );
-			            old.fadeOut(fade);
-			            current.reset().fadeIn( fade ).play();
-		            }
+					const current = actions[ play ];
+					const old = actions[ controls.current ];
+					controls.current = play;
 
-		        }
+					if ( settings.fixe_transition ) {
 
-		        // move object
+						current.reset();
+						current.weight = 1.0;
+						current.stopFading();
+						old.stopFading();
+						// synchro if not idle
+						if ( play !== 'Idle' ) current.time = old.time * ( current.getClip().duration / old.getClip().duration );
+						old._scheduleFading( fade, old.getEffectiveWeight(), 0 );
+						current._scheduleFading( fade, current.getEffectiveWeight(), 1 );
+						current.play();
 
-		        if ( controls.current !== 'Idle' ) {
+					} else {
 
-		            // run/walk velocity
-		            let velocity = controls.current == 'Run' ? controls.runVelocity : controls.walkVelocity;
+						setWeight( current, 1.0 );
+						old.fadeOut( fade );
+						current.reset().fadeIn( fade ).play();
 
-		            // direction with key
-		            ease.set( key[1], 0, key[0] ).multiplyScalar( velocity * delta );
+					}
 
-		            // calculate camera direction
-		            let angle = unwrapRad( Math.atan2( ease.x, ease.z ) + azimut );
-		            rotate.setFromAxisAngle( up, angle );
-		            
-		            // apply camera angle on ease
-		            controls.ease.applyAxisAngle( up, azimut );
+				}
 
-		            position.add( ease );
-		            camera.position.add( ease );
+				// move object
 
-		            group.position.copy( position );
-		            group.quaternion.rotateTowards( rotate, controls.rotateSpeed );
+				if ( controls.current !== 'Idle' ) {
 
-		            orbitControls.target.copy( position ).add({x:0, y:1, z:0});
-		            followGroup.position.copy( position );
+					// run/walk velocity
+					const velocity = controls.current == 'Run' ? controls.runVelocity : controls.walkVelocity;
 
-		            // decale floor at infinie
-		            let dx = ( position.x - floor.position.x );
-		            let dz = ( position.z - floor.position.z );
-		            if( Math.abs(dx) > controls.floorDecale ) floor.position.x += dx;
-		            if( Math.abs(dz) > controls.floorDecale ) floor.position.z += dz;
+					// direction with key
+					ease.set( key[ 1 ], 0, key[ 0 ] ).multiplyScalar( velocity * delta );
 
-			    }
+					// calculate camera direction
+					const angle = unwrapRad( Math.atan2( ease.x, ease.z ) + azimuth );
+					rotate.setFromAxisAngle( up, angle );
 
-				mixer.update( delta );
+					// apply camera angle on ease
+					controls.ease.applyAxisAngle( up, azimuth );
+
+					position.add( ease );
+					camera.position.add( ease );
+
+					group.position.copy( position );
+					group.quaternion.rotateTowards( rotate, controls.rotateSpeed );
+
+					orbitControls.target.copy( position ).add( { x: 0, y: 1, z: 0 } );
+					followGroup.position.copy( position );
+
+					// Move the floor without any limit
+					const dx = ( position.x - floor.position.x );
+					const dz = ( position.z - floor.position.z );
+					if ( Math.abs( dx ) > controls.floorDecale ) floor.position.x += dx;
+					if ( Math.abs( dz ) > controls.floorDecale ) floor.position.z += dz;
+
+				}
+
+				if ( mixer ) mixer.update( delta );
+
 				orbitControls.update();
 
 			}
 
-			function unwrapRad(r) {
-				return Math.atan2(Math.sin(r), Math.cos(r));
+			function unwrapRad( r ) {
+
+				return Math.atan2( Math.sin( r ), Math.cos( r ) );
+
 			}
 
 			function createPanel() {
 
 				const panel = new GUI( { width: 310 } );
 
-				panel.add( settings, 'show_skeleton' ).onChange( (b) => { skeleton.visible = b; } );
+				panel.add( settings, 'show_skeleton' ).onChange( ( b ) => {
+
+					skeleton.visible = b;
+
+				} );
+
 				panel.add( settings, 'fixe_transition' );
 
 			}
@@ -368,12 +381,14 @@
 
 				const key = controls.key;
 				switch ( event.code ) {
-					case 'ArrowUp': case 'KeyW': case 'KeyZ': key[0] = -1; break;
-					case 'ArrowDown': case 'KeyS': key[0] = 1; break;
-					case 'ArrowLeft': case 'KeyA': case 'KeyQ': key[1] = -1; break;
-					case 'ArrowRight': case 'KeyD': key[1] = 1; break;
-					case 'ShiftLeft' : case 'ShiftRight' : key[2] = 1; break;
-				}
+
+					case 'ArrowUp': case 'KeyW': case 'KeyZ': key[ 0 ] = - 1; break;
+					case 'ArrowDown': case 'KeyS': key[ 0 ] = 1; break;
+					case 'ArrowLeft': case 'KeyA': case 'KeyQ': key[ 1 ] = - 1; break;
+					case 'ArrowRight': case 'KeyD': key[ 1 ] = 1; break;
+					case 'ShiftLeft' : case 'ShiftRight' : key[ 2 ] = 1; break;
+
+	}
 
 			}
 
@@ -381,12 +396,14 @@
 
 				const key = controls.key;
 				switch ( event.code ) {
-					case 'ArrowUp': case 'KeyW': case 'KeyZ': key[0] = key[0]<0 ? 0:key[0]; break;
-					case 'ArrowDown': case 'KeyS': key[0] = key[0]>0 ? 0:key[0]; break;
-					case 'ArrowLeft': case 'KeyA': case 'KeyQ': key[1] = key[1]<0 ? 0:key[1]; break;
-					case 'ArrowRight': case 'KeyD': key[1] = key[1]>0 ? 0:key[1]; break;
-					case 'ShiftLeft' : case 'ShiftRight' : key[2] = 0; break;
-				}
+
+					case 'ArrowUp': case 'KeyW': case 'KeyZ': key[ 0 ] = key[ 0 ] < 0 ? 0 : key[ 0 ]; break;
+					case 'ArrowDown': case 'KeyS': key[ 0 ] = key[ 0 ] > 0 ? 0 : key[ 0 ]; break;
+					case 'ArrowLeft': case 'KeyA': case 'KeyQ': key[ 1 ] = key[ 1 ] < 0 ? 0 : key[ 1 ]; break;
+					case 'ArrowRight': case 'KeyD': key[ 1 ] = key[ 1 ] > 0 ? 0 : key[ 1 ]; break;
+					case 'ShiftLeft' : case 'ShiftRight' : key[ 2 ] = 0; break;
+
+	}
 
 			}
 
@@ -402,9 +419,7 @@
 
 				// Render loop
 
-				requestAnimationFrame( animate );
-
-				let delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				updateCharacter( delta );
 

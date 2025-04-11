@@ -1,4 +1,7 @@
-/** @module DigitalGlitch */
+/**
+ * @module DigitalGlitch
+ * @three_import import { DigitalGlitch } from 'three/addons/shaders/DigitalGlitch.js';
+ */
 
 /**
  * Digital glitch shader.

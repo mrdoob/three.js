@@ -15,6 +15,7 @@ const _scale = new Vector3();
  * The base 3D object that is supported by {@link CSS3DRenderer}.
  *
  * @augments Object3D
+ * @three_import import { CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
  */
 class CSS3DObject extends Object3D {
 
@@ -86,6 +87,7 @@ class CSS3DObject extends Object3D {
  * DOM elements as sprites.
  *
  * @augments CSS3DObject
+ * @three_import import { CSS3DSprite } from 'three/addons/renderers/CSS3DRenderer.js';
  */
 class CSS3DSprite extends CSS3DObject {
 
@@ -148,6 +150,8 @@ const _matrix2 = new Matrix4();
  *
  * So `CSS3DRenderer` is just focused on ordinary DOM elements. These elements are wrapped into special
  * 3D objects ({@link CSS3DObject} or {@link CSS3DSprite}) and then added to the scene graph.
+ *
+ * @three_import import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
  */
 class CSS3DRenderer {
 

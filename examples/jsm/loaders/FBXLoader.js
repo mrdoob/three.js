@@ -73,6 +73,7 @@ let sceneGraph;
  * ```
  *
  * @augments Loader
+ * @three_import import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
  */
 class FBXLoader extends Loader {
 
@@ -137,7 +138,7 @@ class FBXLoader extends Loader {
 	/**
 	 * Parses the given FBX data and returns the resulting group.
 	 *
-	 * @param {Array} FBXBuffer - The raw FBX data as an array buffer.
+	 * @param {ArrayBuffer} FBXBuffer - The raw FBX data as an array buffer.
 	 * @param {string} path - The URL base path.
 	 * @return {Group} An object representing the parsed asset.
 	 */

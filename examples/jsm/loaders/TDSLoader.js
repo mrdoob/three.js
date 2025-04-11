@@ -26,6 +26,7 @@ import {
  * scene.add( object );
  *
  * @augments Loader
+ * @three_import import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
  */
 class TDSLoader extends Loader {
 

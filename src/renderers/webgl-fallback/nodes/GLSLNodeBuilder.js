@@ -24,6 +24,17 @@ const supports = {
 	storageBuffer: false
 };
 
+const interpolationTypeMap = {
+	perspective: 'smooth',
+	linear: 'noperspective'
+};
+
+const interpolationModeMap = {
+	'centroid': 'centroid',
+	'flat first': 'flat',
+	'flat either': 'flat'
+};
+
 const defaultPrecisions = `
 precision highp float;
 precision highp int;
@@ -43,6 +54,8 @@ precision highp isamplerCube;
 precision highp isampler2DArray;
 
 precision lowp sampler2DShadow;
+precision lowp sampler2DArrayShadow;
+precision lowp samplerCubeShadow;
 `;
 
 /**
@@ -389,6 +402,8 @@ ${ flowData.code }
 
 		if ( texture.isDepthTexture ) {
 
+			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
+
 			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
@@ -461,6 +476,12 @@ ${ flowData.code }
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
+
+			if ( depthSnippet ) {
+
+				return `texture( ${ textureProperty }, vec4( ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } ) )`;
+
+			}
 
 			return `texture( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ) )`;
 
@@ -542,7 +563,15 @@ ${ flowData.code }
 
 				} else if ( texture.compareFunction ) {
 
-					snippet = `sampler2DShadow ${ uniform.name };`;
+					if ( texture.isDepthArrayTexture === true ) {
+
+						snippet = `sampler2DArrayShadow ${ uniform.name };`;
+
+					} else {
+
+						snippet = `sampler2DShadow ${ uniform.name };`;
+
+					}
 
 				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
@@ -765,9 +794,20 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+					if ( varying.interpolationType ) {
 
-					snippet += `${flat}out ${type} ${varying.name};\n`;
+						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
+						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
+
+						snippet += `${ interpolationType } ${ sampling } out ${ type } ${ varying.name };\n`;
+
+					} else {
+
+						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+
+						snippet += `${ flat }out ${ type } ${ varying.name };\n`;
+
+					}
 
 				} else {
 
@@ -784,9 +824,22 @@ ${ flowData.code }
 				if ( varying.needsInterpolation ) {
 
 					const type = this.getType( varying.type );
-					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
-					snippet += `${flat}in ${type} ${varying.name};\n`;
+					if ( varying.interpolationType ) {
+
+						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
+						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
+
+						snippet += `${ interpolationType } ${ sampling } in ${ type } ${ varying.name };\n`;
+
+
+					} else {
+
+						const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
+
+						snippet += `${ flat }in ${ type } ${ varying.name };\n`;
+
+					}
 
 				}
 

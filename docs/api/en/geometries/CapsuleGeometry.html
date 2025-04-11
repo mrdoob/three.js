@@ -48,7 +48,7 @@ const capsule = new THREE.Mesh( geometry, material ); scene.add( capsule );
 		<h2>Constructor</h2>
 
 		<h3>
-			[name]([param:Float radius], [param:Float length], [param:Integer capSegments], [param:Integer radialSegments])
+			[name]([param:Float radius], [param:Float length], [param:Integer capSegments], [param:Integer radialSegments], [param:Integer heightSegments])
 		</h3>
 		<p>
 			radius — Radius of the capsule. Optional; defaults to `1`.<br />
@@ -57,6 +57,8 @@ const capsule = new THREE.Mesh( geometry, material ); scene.add( capsule );
 			defaults to `4`.<br />
 			radialSegments — Number of segmented faces around the circumference of the
 			capsule. Optional; defaults to `8`.<br />
+			heightSegments — Number of rows of faces along the height of the capsule. Optional;
+			defaults to `1`.<br />
 		</p>
 
 		<h2>Properties</h2>

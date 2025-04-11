@@ -17,6 +17,7 @@ import {
  * ```
  *
  * @augments CompressedTextureLoader
+ * @three_import import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';
  */
 class KTXLoader extends CompressedTextureLoader {
 

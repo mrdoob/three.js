@@ -29,6 +29,8 @@ const _matrix = new Matrix4();
  * This class solves the Inverse Kinematics Problem with a [CCD Algorithm]{@link https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm}.
  *
  * `CCDIKSolver` is designed to work with instances of {@link SkinnedMesh}.
+ *
+ * @three_import import { CCDIKSolver } from 'three/addons/animation/CCDIKSolver.js';
  */
 class CCDIKSolver {
 
@@ -322,6 +324,7 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
  * Helper for visualizing IK bones.
  *
  * @augments Object3D
+ * @three_import import { CCDIKHelper } from 'three/addons/animation/CCDIKSolver.js';
  */
 class CCDIKHelper extends Object3D {
 

@@ -28,6 +28,20 @@ function getShape( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
+	} else if ( geometry.type === 'CylinderGeometry' ) {
+
+		const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius );
+
+	} else if ( geometry.type === 'CapsuleGeometry' ) {
+
+		const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const length = parameters.length !== undefined ? parameters.length : 0.5;
+
+		return RAPIER.ColliderDesc.capsule( length / 2, radius );
+
 	} else if ( geometry.type === 'BufferGeometry' ) {
 
 		const vertices = [];
@@ -66,6 +80,7 @@ function getShape( geometry ) {
  * @name RapierPhysics
  * @class
  * @hideconstructor
+ * @three_import import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
  */
 async function RapierPhysics() {
 
@@ -120,6 +135,10 @@ async function RapierPhysics() {
 		const body = mesh.isInstancedMesh
 			? createInstancedBody( mesh, mass, shape )
 			: createBody( mesh.position, mesh.quaternion, mass, shape );
+
+		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
+
+		mesh.userData.physics.body = body;
 
 		if ( mass > 0 ) {
 
@@ -242,6 +261,8 @@ async function RapierPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		RAPIER,
+		world,
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
 		 * `physics` object in their {@link Object3D#userData} field will be honored.

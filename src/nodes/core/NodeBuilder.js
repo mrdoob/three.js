@@ -26,6 +26,7 @@ import BindGroup from '../../renderers/common/BindGroup.js';
 
 import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { RenderTargetArray } from '../../core/RenderTargetArray.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
@@ -454,6 +455,22 @@ class NodeBuilder {
 	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
+
+	}
+
+	/**
+	 * Factory method for creating an instance of {@link RenderTargetArray} with the given
+	 * dimensions and options.
+	 *
+	 * @param {number} width - The width of the render target.
+	 * @param {number} height - The height of the render target.
+	 * @param {number} depth - The depth of the render target.
+	 * @param {Object} options - The options of the render target.
+	 * @return {RenderTargetArray} The render target.
+	 */
+	createRenderTargetArray( width, height, depth, options ) {
+
+		return new RenderTargetArray( width, height, depth, options );
 
 	}
 
@@ -1831,9 +1848,11 @@ class NodeBuilder {
 	 * @param {(VaryingNode|PropertyNode)} node - The varying node.
 	 * @param {?string} name - The varying's name.
 	 * @param {string} [type=node.getNodeType( this )] - The varying's type.
+	 * @param {?string} interpolationType - The interpolation type of the varying.
+	 * @param {?string} interpolationSampling - The interpolation sampling type of the varying.
 	 * @return {NodeVar} The node varying.
 	 */
-	getVaryingFromNode( node, name = null, type = node.getNodeType( this ) ) {
+	getVaryingFromNode( node, name = null, type = node.getNodeType( this ), interpolationType = null, interpolationSampling = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 
@@ -1846,7 +1865,7 @@ class NodeBuilder {
 
 			if ( name === null ) name = 'nodeVarying' + index;
 
-			nodeVarying = new NodeVarying( name, type );
+			nodeVarying = new NodeVarying( name, type, interpolationType, interpolationSampling );
 
 			varyings.push( nodeVarying );
 
@@ -1883,7 +1902,6 @@ class NodeBuilder {
 
 		}
 
-		declarations[ name ] = node;
 
 		if ( index > 1 ) {
 
@@ -1892,6 +1910,9 @@ class NodeBuilder {
 			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
+
+
+		declarations[ name ] = node;
 
 	}
 
@@ -2689,6 +2710,11 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Prevents the node builder from being used as an iterable in TSL.Fn(), avoiding potential runtime errors.
+	 */
+	*[ Symbol.iterator ]() { }
+
 	// Deprecated
 
 	/**
@@ -2703,6 +2729,7 @@ class NodeBuilder {
 		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );
 
 	}
+
 
 }
 

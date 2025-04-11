@@ -15,6 +15,7 @@ import { Pass, FullScreenQuad } from './Pass.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
  */
 class ShaderPass extends Pass {
 

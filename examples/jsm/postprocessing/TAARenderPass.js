@@ -20,6 +20,7 @@ import { SSAARenderPass } from './SSAARenderPass.js';
  * ```
  *
  * @augments SSAARenderPass
+ * @three_import import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
  */
 class TAARenderPass extends SSAARenderPass {
 

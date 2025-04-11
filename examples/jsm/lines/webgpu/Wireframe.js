@@ -18,6 +18,7 @@ const _end = new Vector3();
  * import the class from `lines/Wireframe.js`.
  *
  * @augments Mesh
+ * @three_import import { Wireframe } from 'three/addons/lines/webgpu/Wireframe.js';
  */
 class Wireframe extends Mesh {
 

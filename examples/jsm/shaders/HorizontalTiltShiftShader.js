@@ -1,4 +1,7 @@
-/** @module HorizontalTiltShiftShader */
+/**
+ * @module HorizontalTiltShiftShader
+ * @three_import import { HorizontalTiltShiftShader } from 'three/addons/shaders/HorizontalTiltShiftShader.js';
+ */
 
 /**
  * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position.

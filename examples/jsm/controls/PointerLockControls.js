@@ -55,6 +55,7 @@ const _PI_2 = Math.PI / 2;
  * ```
  *
  * @augments Controls
+ * @three_import import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
  */
 class PointerLockControls extends Controls {
 
@@ -200,7 +201,7 @@ class PointerLockControls extends Controls {
 
 	/**
 	 * Activates the pointer lock.
-	 * 
+	 *
 	 * @param {boolean} [unadjustedMovement=false] - Disables OS-level adjustment for mouse acceleration, and accesses raw mouse input instead.
 	 * Setting it to true will disable mouse acceleration.
 	 */

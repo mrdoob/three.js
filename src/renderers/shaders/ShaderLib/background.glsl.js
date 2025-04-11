@@ -23,7 +23,7 @@ void main() {
 
 	#ifdef DECODE_VIDEO_TEXTURE
 
-		// use inline sRGB decode until browsers properly support SRGB8_APLHA8 with video textures
+		// use inline sRGB decode until browsers properly support SRGB8_ALPHA8 with video textures
 
 		texColor = vec4( mix( pow( texColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), texColor.rgb * 0.0773993808, vec3( lessThanEqual( texColor.rgb, vec3( 0.04045 ) ) ) ), texColor.w );
 

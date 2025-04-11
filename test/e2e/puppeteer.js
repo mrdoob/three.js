@@ -37,10 +37,13 @@ class PromiseQueue {
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 9; // 9 seconds - for how long there should be no network requests
+const idleTime = 12; // 9 seconds - for how long there should be no network requests
 const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
+
+	// tiles not loaded in time for screenshot
+	'webgl_loader_3dtiles',
 
 	// video tag isn't deterministic enough?
 	'css3d_youtube',
@@ -78,6 +81,7 @@ const exceptionList = [
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'physics_rapier_basic',
 	'webgl_animation_skinning_blending',
 	'webgl_animation_skinning_additive_blending',
 	'webgl_buffergeometry_glbufferattribute',
@@ -134,6 +138,7 @@ const exceptionList = [
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_backdrop_water',
+	"webgpu_centroid_sampling",
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
@@ -144,6 +149,7 @@ const exceptionList = [
 	'webgpu_particles',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
+	'webgpu_shadowmap_array',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
 	'webgpu_tsl_interoperability',

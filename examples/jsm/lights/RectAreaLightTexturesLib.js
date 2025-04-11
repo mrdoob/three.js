@@ -25,6 +25,7 @@ import {
  * in the main build files.
  *
  * @hideconstructor
+ * @three_import import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
  */
 class RectAreaLightTexturesLib {
 

@@ -61,7 +61,7 @@
 				display: block;
 				text-align: center;
 			}
-			
+
 			#depth-warning {
 				position: absolute;
 				top: 40px;
@@ -86,7 +86,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - reverse depth buffer<br/>
 		</div>
-		
+
 		<div id="depth-warning">
 			Warning: Your browser's WebGL provides less than 24-bit depth buffer precision. This example may not display correctly.
 		</div>
@@ -129,7 +129,7 @@
 				const numInstances = xCount * yCount;
 
 				const d = 0.0001; // half distance between two planes
-				const o = 0.5; // half x offset to shift planes so they are only partially overlaping
+				const o = 0.5; // half x offset to shift planes so they are only partially overlapping
 
 				const positions = new Float32Array( [
 					- 1 - o, - 1, d,

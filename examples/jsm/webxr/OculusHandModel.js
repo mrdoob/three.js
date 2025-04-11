@@ -8,6 +8,7 @@ const POINTING_JOINT = 'index-finger-tip';
  * Represents an Oculus hand model.
  *
  * @augments Object3D
+ * @three_import import { OculusHandModel } from 'three/addons/webxr/OculusHandModel.js';
  */
 class OculusHandModel extends Object3D {
 

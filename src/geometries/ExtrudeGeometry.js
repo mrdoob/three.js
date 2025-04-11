@@ -184,8 +184,8 @@ class ExtrudeGeometry extends BufferGeometry {
 						Math.abs( prevPos.x ),
 						Math.abs( prevPos.y )
 					);
-					const thesholdSqScaled = THRESHOLD_SQ * scalingFactorSqrt * scalingFactorSqrt;
-					if ( distSq <= thesholdSqScaled ) {
+					const thresholdSqScaled = THRESHOLD_SQ * scalingFactorSqrt * scalingFactorSqrt;
+					if ( distSq <= thresholdSqScaled ) {
 
 						points.splice( currentIndex, 1 );
 						i --;
@@ -393,53 +393,63 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			}
 
-			const contractedContourVertices = [];
-			const expandedHoleVertices = [];
+			let faces;
 
-			// Loop bevelSegments, 1 for the front, 1 for the back
+			if ( bevelSegments === 0 ) {
 
-			for ( let b = 0; b < bevelSegments; b ++ ) {
+				faces = ShapeUtils.triangulateShape( contour, holes );
 
-				//for ( b = bevelSegments; b > 0; b -- ) {
+			} else {
 
-				const t = b / bevelSegments;
-				const z = bevelThickness * Math.cos( t * Math.PI / 2 );
-				const bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
+				const contractedContourVertices = [];
+				const expandedHoleVertices = [];
 
-				// contract shape
+				// Loop bevelSegments, 1 for the front, 1 for the back
 
-				for ( let i = 0, il = contour.length; i < il; i ++ ) {
+				for ( let b = 0; b < bevelSegments; b ++ ) {
 
-					const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+					//for ( b = bevelSegments; b > 0; b -- ) {
 
-					v( vert.x, vert.y, - z );
-					if ( t == 0 ) contractedContourVertices.push( vert );
+					const t = b / bevelSegments;
+					const z = bevelThickness * Math.cos( t * Math.PI / 2 );
+					const bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
 
-				}
+					// contract shape
 
-				// expand holes
+					for ( let i = 0, il = contour.length; i < il; i ++ ) {
 
-				for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
-
-					const ahole = holes[ h ];
-					oneHoleMovements = holesMovements[ h ];
-					const oneHoleVertices = [];
-					for ( let i = 0, il = ahole.length; i < il; i ++ ) {
-
-						const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+						const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
 						v( vert.x, vert.y, - z );
-						if ( t == 0 ) oneHoleVertices.push( vert );
+						if ( t === 0 ) contractedContourVertices.push( vert );
 
 					}
 
-					if ( t == 0 ) expandedHoleVertices.push( oneHoleVertices );
+					// expand holes
+
+					for ( let h = 0, hl = numHoles; h < hl; h ++ ) {
+
+						const ahole = holes[ h ];
+						oneHoleMovements = holesMovements[ h ];
+						const oneHoleVertices = [];
+						for ( let i = 0, il = ahole.length; i < il; i ++ ) {
+
+							const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+
+							v( vert.x, vert.y, - z );
+							if ( t === 0 ) oneHoleVertices.push( vert );
+
+						}
+
+						if ( t === 0 ) expandedHoleVertices.push( oneHoleVertices );
+
+					}
 
 				}
 
-			}
+				faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
 
-			const faces = ShapeUtils.triangulateShape( contractedContourVertices, expandedHoleVertices );
+			}
 
 			const flen = faces.length;
 

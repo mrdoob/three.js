@@ -1,16 +1,3 @@
-/**
- * @version 1.1.1
- *
- * @desc Load files in LWO3 and LWO2 format on Three.js
- *
- * LWO3 format specification:
- *  https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo3.html
- *
- * LWO2 format specification:
- *  https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo2.html
- *
- **/
-
 import {
 	AddOperation,
 	BackSide,
@@ -61,6 +48,7 @@ let _lwoTree;
  * ```
  *
  * @augments Loader
+ * @three_import import { LWOLoader } from 'three/addons/loaders/LWOLoader.js';
  */
 class LWOLoader extends Loader {
 

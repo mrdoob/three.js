@@ -12,6 +12,7 @@
  * @name AmmoPhysics
  * @class
  * @hideconstructor
+ * @three_import import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
  */
 async function AmmoPhysics() {
 

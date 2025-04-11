@@ -6,6 +6,7 @@ import StereoCompositePassNode from './StereoCompositePassNode.js';
  * A render pass node that creates a parallax barrier effect.
  *
  * @augments StereoCompositePassNode
+ * @three_import import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
  */
 class ParallaxBarrierPassNode extends StereoCompositePassNode {
 

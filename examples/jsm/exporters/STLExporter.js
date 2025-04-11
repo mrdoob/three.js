@@ -12,6 +12,8 @@ import { Vector3 } from 'three';
  * const exporter = new STLExporter();
  * const data = exporter.parse( mesh, { binary: true } );
  * ```
+ *
+ * @three_import import { STLExporter } from 'three/addons/exporters/STLExporter.js';
  */
 class STLExporter {
 

@@ -13,6 +13,7 @@ import { Pass } from './Pass.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { ClearPass } from 'three/addons/postprocessing/ClearPass.js';
  */
 class ClearPass extends Pass {
 

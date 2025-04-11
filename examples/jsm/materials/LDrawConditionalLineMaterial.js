@@ -12,6 +12,7 @@ import {
  * import the class from `LDrawConditionalLineNodeMaterial.js`.
  *
  * @augments ShaderMaterial
+ * @three_import import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';
  */
 class LDrawConditionalLineMaterial extends ShaderMaterial {
 

@@ -7,6 +7,8 @@ import {
  * It can be thought of as a swept sphere, where a sphere is moved along a line segment.
  *
  * Capsules are often used as bounding volumes (next to AABBs and bounding spheres).
+ *
+ * @three_import import { Capsule } from 'three/addons/math/Capsule.js';
  */
 class Capsule {
 

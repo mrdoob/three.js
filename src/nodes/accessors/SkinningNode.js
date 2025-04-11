@@ -178,7 +178,7 @@ class SkinningNode extends Node {
 	}
 
 	/**
-	 * Transforms the given vertex normal via skinning.
+	 * Computes the transformed/skinned vertex position of the previous frame.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Node<vec3>} The skinned position from the previous frame.
@@ -200,7 +200,8 @@ class SkinningNode extends Node {
 	}
 
 	/**
-	 * Returns `true` if bone matrices from the previous frame are required.
+	 * Returns `true` if bone matrices from the previous frame are required. Relevant
+	 * when computing motion vectors with {@link VelocityNode}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether bone matrices from the previous frame are required or not.

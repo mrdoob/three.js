@@ -3,7 +3,10 @@ import {
 	Vector3
 } from 'three';
 
-/** @module VolumeShader */
+/**
+ * @module VolumeShader
+ * @three_import import { VolumeRenderShader1 } from 'three/addons/shaders/VolumeShader.js';
+ */
 
 /**
  * Shaders to render 3D volumes using raycasting.
@@ -263,7 +266,7 @@ const VolumeRenderShader1 = {
 						// note: could allow multiple lights
 						for (int i=0; i<1; i++)
 						{
-								 // Get light direction (make sure to prevent zero devision)
+								 // Get light direction (make sure to prevent zero division)
 								vec3 L = normalize(view_ray);	//lightDirs[i];
 								float lightEnabled = float( length(L) > 0.0 );
 								L = normalize(L + (1.0 - lightEnabled));

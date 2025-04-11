@@ -10,6 +10,7 @@ import {
  * without any transitions or fading between animation changes.
  *
  * @augments Mesh
+ * @three_import import { MorphAnimMesh } from 'three/addons/misc/MorphAnimMesh.js';
  */
 class MorphAnimMesh extends Mesh {
 

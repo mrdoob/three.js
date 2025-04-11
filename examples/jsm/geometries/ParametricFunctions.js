@@ -1,5 +1,8 @@
 
-/** @module ParametricFunctions */
+/**
+ * @module ParametricFunctions
+ * @three_import import * as ParametricFunctions from 'three/addons/geometries/ParametricFunctions.js';
+ */
 
 /**
  * A parametric function representing the Klein bottle.

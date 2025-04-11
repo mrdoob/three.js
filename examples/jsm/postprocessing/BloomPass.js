@@ -21,6 +21,7 @@ import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
  */
 class BloomPass extends Pass {
 

@@ -18,6 +18,7 @@ const _vector = new Vector3();
  * This is used in {@link LineSegments2} to describe the shape.
  *
  * @augments InstancedBufferGeometry
+ * @three_import import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
  */
 class LineSegmentsGeometry extends InstancedBufferGeometry {
 

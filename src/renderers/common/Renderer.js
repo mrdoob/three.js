@@ -22,6 +22,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
 import { Frustum } from '../../math/Frustum.js';
+import { FrustumArray } from '../../math/FrustumArray.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -32,6 +33,8 @@ const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
+const _frustumArray = /*@__PURE__*/ new FrustumArray();
+
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
@@ -1341,8 +1344,14 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
+		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+
+		if ( ! camera.isArrayCamera ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
+
+		}
 
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
@@ -1396,6 +1405,7 @@ class Renderer {
 
 		//
 
+		renderContext.camera = camera;
 		this.backend.beginRender( renderContext );
 
 		// process render lists
@@ -2545,7 +2555,9 @@ class Renderer {
 
 			} else if ( object.isSprite ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+
+				if ( ! object.frustumCulled || frustum.intersectsSprite( object, camera ) ) {
 
 					if ( this.sortObjects === true ) {
 
@@ -2569,7 +2581,9 @@ class Renderer {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+
+				if ( ! object.frustumCulled || frustum.intersectsObject( object, camera ) ) {
 
 					const { geometry, material } = object;
 
