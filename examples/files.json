@@ -509,7 +509,9 @@
 		"physics_rapier_instancing",
 		"physics_rapier_joints",
 		"physics_rapier_character_controller",
-		"physics_rapier_vehicle_controller"
+		"physics_rapier_vehicle_controller",
+		"physics_rapier_terrain"
+
 	],
 	"misc": [
 		"misc_animation_groups",
