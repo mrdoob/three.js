@@ -551,8 +551,8 @@ function generateOutputDefinitions( renderTarget ) {
 	if ( renderTarget === null ) {
 
 		// Create an output declaration for the back buffer.
-		definitions.push( 'layout(location = 0) out lowp vec4 out_FragData;' );
-		definitions.push( '#define gl_FragColor out_FragData' );
+		definitions.push( 'layout( location = 0 ) out lowp vec4 out_FragData0;' );
+		definitions.push( '#define gl_FragColor out_FragData0' );
 
 		return definitions.join( '\n' );
 
@@ -565,7 +565,7 @@ function generateOutputDefinitions( renderTarget ) {
 		const precision = getOutputPrecision( texture );
 		const type = getOutputType( texture );
 
-		definitions.push( `layout(location = ${i}) out ${precision} ${type} out_FragData${i};` );
+		definitions.push( `layout( location = ${i} ) out ${precision} ${type} out_FragData${i};` );
 
 		if ( l > 1 && name !== '' ) {
 

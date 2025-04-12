@@ -1068,7 +1068,6 @@ class WebGLRenderer {
 
 		}
 
-
 		function releaseMaterialProgramReferences( material ) {
 
 			const programs = properties.get( material ).programs;
