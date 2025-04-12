@@ -220,7 +220,7 @@ async function RapierPhysics() {
 		const body = world.createRigidBody( bodyDesc );
 		world.createCollider( shape, body );
 		
-		if ( !mesh.userData.physics ) mesh.userData.physics = {};
+		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
 		mesh.userData.physics.body = body;
 		
 		return body;
