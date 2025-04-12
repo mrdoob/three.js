@@ -476,8 +476,10 @@ ${ this.tab }} )`;
 
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
 			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
-			( afterthought && afterthought.isUnary ) &&
-			( initialization.name === afterthought.expression.property )
+			( afterthought && (
+				( afterthought.isUnary && ( initialization.name === afterthought.expression.property ) ) ||
+				( afterthought.isOperator && ( initialization.name === afterthought.left.property ) )
+			) )
 		) {
 
 			return this.emitLoop( node );
