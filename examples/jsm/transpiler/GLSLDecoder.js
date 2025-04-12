@@ -894,7 +894,7 @@ class GLSLDecoder {
 
 			//
 
-			if ( token.isLiteral ) {
+			if ( token.isLiteral || token.isOperator ) {
 
 				if ( token.str === 'const' ) {
 
