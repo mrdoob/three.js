@@ -46,13 +46,14 @@
 
 			uniform sampler2D tDiffuse;
 			uniform sampler2D tNormal;
+			uniform float splitScreenThreshold;
 
 			void main() {
 
 				vec4 diffuse = texture( tDiffuse, vUv );
 				vec4 normal = texture( tNormal, vUv );
 
-				out_FragColor = mix( LinearTosRGB( diffuse ), normal, step( 0.5, vUv.x ) );
+				out_FragColor = mix( LinearTosRGB( diffuse ), normal, step( splitScreenThreshold, vUv.x ) );
 				out_FragColor.a = 1.0;
 
 			}
@@ -80,18 +81,22 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, controls;
-			let renderTarget;
+			let camera, scene, renderer, controls, postMesh;
+			let multiRenderTarget, basicRenderTarget;
 			let postScene, postCamera;
+
+			const size = new THREE.Vector2();
 
 			const parameters = {
 				samples: 4,
-				wireframe: false
+				wireframe: false,
+				enabled: true
 			};
 
 			const gui = new GUI();
-			gui.add( parameters, 'samples', 0, 4 ).step( 1 );
+			gui.add( parameters, 'samples', 0, 4 ).step( 2 );
 			gui.add( parameters, 'wireframe' );
+			gui.add( parameters, 'enabled' );
 			gui.onChange( render );
 
 			// Extend three's ShaderChunk library
@@ -107,23 +112,18 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				// Create a multi render target with Float buffers
+				// Create a render target with multiple texture attachments
+				multiRenderTarget = new THREE.WebGLRenderTarget( 1, 1, { count: 2 } );
 
-				renderTarget = new THREE.WebGLRenderTarget(
-					window.innerWidth * window.devicePixelRatio,
-					window.innerHeight * window.devicePixelRatio,
-					{
-						count: 2,
-						minFilter: THREE.NearestFilter,
-						magFilter: THREE.NearestFilter,
-						type: THREE.HalfFloatType
-					}
-				);
+				// The texture names will be used to define shader outputs as `out_${name}`
+				multiRenderTarget.textures[ 0 ].name = 'Color';
+				multiRenderTarget.textures[ 1 ].name = 'Normal';
+				multiRenderTarget.textures[ 1 ].type = THREE.HalfFloatType;
+				multiRenderTarget.textures[ 1 ].minFilter = THREE.NearestFilter;
+				multiRenderTarget.textures[ 1 ].magFilter = THREE.NearestFilter;
 
-				// The G-Buffer texture names will be used to define shader outputs as `out_${name}`
-
-				renderTarget.textures[ 0 ].name = 'Color';
-				renderTarget.textures[ 1 ].name = 'Normal';
+				// Create a basic render target to use when MRT is disabled
+				basicRenderTarget = new THREE.WebGLRenderTarget( 1, 1 );
 
 				// Scene setup
 
@@ -151,19 +151,22 @@
 				postScene = new THREE.Scene();
 				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-				postScene.add( new THREE.Mesh(
+				postMesh = new THREE.Mesh(
 					new THREE.PlaneGeometry( 2, 2 ),
 					new THREE.RawShaderMaterial( {
 						name: 'Post-FX Shader',
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {
-							tDiffuse: { value: renderTarget.textures[ 0 ] },
-							tNormal: { value: renderTarget.textures[ 1 ] },
+							tDiffuse: { value: multiRenderTarget.textures[ 0 ] },
+							tNormal: { value: multiRenderTarget.textures[ 1 ] },
+							splitScreenThreshold: { value: 0.5 },
 						},
 						glslVersion: THREE.GLSL3
 					} )
-				) );
+				);
+
+				postScene.add( postMesh );
 
 				// Controls
 
@@ -171,6 +174,7 @@
 				controls.addEventListener( 'change', render );
 
 				window.addEventListener( 'resize', onWindowResize );
+				onWindowResize();
 
 			}
 
@@ -180,9 +184,9 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				const dpr = renderer.getPixelRatio();
-				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderer.getDrawingBufferSize( size );
+				multiRenderTarget.setSize( size.width, size.height );
+				basicRenderTarget.setSize( size.width, size.height );
 
 				render();
 
@@ -190,6 +194,7 @@
 
 			function render() {
 
+				const renderTarget = parameters.enabled ? multiRenderTarget : basicRenderTarget;
 				renderTarget.samples = parameters.samples;
 
 				scene.traverse( function ( child ) {
@@ -202,11 +207,14 @@
 
 				} );
 
-				// render scene into target
+				postMesh.material.uniforms.tDiffuse.value = renderTarget.textures[ 0 ];
+				postMesh.material.uniforms.splitScreenThreshold.value = parameters.enabled ? 0.5 : 1.0;
+
+				// render scene into render target
 				renderer.setRenderTarget( renderTarget );
 				renderer.render( scene, camera );
 
-				// render post FX
+				// render result to screen
 				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
 
