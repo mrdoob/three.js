@@ -31,14 +31,14 @@ function getShape( geometry ) {
 	} else if ( geometry.type === 'CylinderGeometry' ) {
 
 		const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
-		const length = parameters.length !== undefined ? parameters.length : 0.5;
+		const length = parameters.height !== undefined ? parameters.height : 0.5;
 
 		return RAPIER.ColliderDesc.cylinder( length / 2, radius );
 
 	} else if ( geometry.type === 'CapsuleGeometry' ) {
 
 		const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
-		const length = parameters.length !== undefined ? parameters.length : 0.5;
+		const length = parameters.height !== undefined ? parameters.height : 0.5;
 
 		return RAPIER.ColliderDesc.capsule( length / 2, radius );
 
