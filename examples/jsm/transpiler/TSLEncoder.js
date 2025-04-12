@@ -289,7 +289,7 @@ class TSLEncoder {
 
 		} else if ( node.isFor ) {
 
-			code = this.emitLoop( node );
+			code = this.emitFor( node );
 
 		} else if ( node.isVariableDeclaration ) {
 
@@ -467,6 +467,51 @@ ${ this.tab }} )`;
 		this.imports.add( 'Loop' );
 
 		return loopStr;
+
+	}
+
+	emitFor( node ) {
+
+		const { initialization, condition, afterthought } = node;
+
+		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
+			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
+			( afterthought && afterthought.isUnary ) &&
+			( initialization.name === afterthought.expression.property )
+		) {
+
+			return this.emitLoop( node );
+
+		}
+
+		return this.emitForWhile( node );
+
+	}
+
+	emitForWhile( node ) {
+
+		const initialization = this.emitExpression( node.initialization );
+		const condition = this.emitExpression( node.condition );
+		const afterthought = this.emitExpression( node.afterthought );
+
+		this.tab += '\t';
+
+		let forStr = '{\n\n' + this.tab + initialization + ';\n\n';
+		forStr += `${ this.tab }While( ${ condition }, () => {\n\n`;
+
+		forStr += this.emitBody( node.body ) + '\n\n';
+
+		forStr += this.tab + '\t' + afterthought + ';\n\n';
+
+		forStr += this.tab + '} )\n\n';
+
+		this.tab = this.tab.slice( 0, - 1 );
+
+		forStr += this.tab + '}';
+
+		this.imports.add( 'While' );
+
+		return forStr;
 
 	}
 
