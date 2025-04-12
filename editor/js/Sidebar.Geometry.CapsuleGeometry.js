@@ -24,15 +24,15 @@ function GeometryParametersPanel( editor, object ) {
 
 	container.add( radiusRow );
 
-	// length
+	// height
 
-	const lengthRow = new UIRow();
-	const length = new UINumber( parameters.length ).onChange( update );
+	const heightRow = new UIRow();
+	const height = new UINumber( parameters.height ).onChange( update );
 
-	lengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/capsule_geometry/length' ) ).setClass( 'Label' ) );
-	lengthRow.add( length );
+	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/capsule_geometry/height' ) ).setClass( 'Label' ) );
+	heightRow.add( height );
 
-	container.add( lengthRow );
+	container.add( heightRow );
 
 	// capSegments
 
@@ -71,7 +71,7 @@ function GeometryParametersPanel( editor, object ) {
 		const parameters = object.geometry.parameters;
 
 		radius.setValue( parameters.radius );
-		length.setValue( parameters.length );
+		height.setValue( parameters.height );
 		capSegments.setValue( parameters.capSegments );
 		radialSegments.setValue( parameters.radialSegments );
 		heightSegments.setValue( parameters.heightSegments );
@@ -94,7 +94,7 @@ function GeometryParametersPanel( editor, object ) {
 
 		editor.execute( new SetGeometryCommand( editor, object, new THREE.CapsuleGeometry(
 			radius.getValue(),
-			length.getValue(),
+			height.getValue(),
 			capSegments.getValue(),
 			radialSegments.getValue(),
 			heightSegments.getValue()
