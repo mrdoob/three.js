@@ -557,11 +557,7 @@ ${ flowData.code }
 
 				}
 
-				if ( uniform.type === 'texture3D' ) {
-
-					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
-
-				} else if ( texture.compareFunction ) {
+				if ( texture.compareFunction ) {
 
 					if ( texture.isDepthArrayTexture === true ) {
 
@@ -573,9 +569,13 @@ ${ flowData.code }
 
 					}
 
-				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true || texture.isTextureArray === true ) {
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
+
+				} else if ( uniform.type === 'texture3D' ) {
+
+					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
 				} else {
 
@@ -947,17 +947,6 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the view id builtin for multiview.
-	 *
-	 * @return {string} The ViewID builtin.
-	 */
-	getViewID() {
-
-		return 'gl_ViewID_OVR';
-
-	}
-
-	/**
 	 * Enables the given extension.
 	 *
 	 * @param {string} name - The extension name.
@@ -1112,7 +1101,7 @@ ${ flowData.code }
 		this.enableExtension( 'GL_OVR_multiview2', 'require', 'fragment' );
 		this.enableExtension( 'GL_OVR_multiview2', 'require', 'vertex' );
 
-		this.builtins[ 'vertex' ].push( `layout(num_views = 2) in` );
+		this.builtins[ 'vertex' ].push( 'layout(num_views = 2) in' );
 
 	}
 

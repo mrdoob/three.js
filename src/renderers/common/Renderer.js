@@ -1192,7 +1192,7 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
-		frameBufferTarget.setSize( width, height );
+		frameBufferTarget.setSize( width, height, this.getOutputRenderTarget() ? this.getOutputRenderTarget().depth : 1 );
 		frameBufferTarget.viewport.copy( this._viewport );
 		frameBufferTarget.scissor.copy( this._scissor );
 		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );

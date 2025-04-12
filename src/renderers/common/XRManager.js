@@ -33,6 +33,7 @@ class XRManager extends EventDispatcher {
 	 * Constructs a new XR manager.
 	 *
 	 * @param {Renderer} renderer - The renderer.
+	 * @param {boolean} enablemultiviewifpossible - enable multiview if device supports it.
 	 */
 	constructor( renderer, enablemultiviewifpossible = false ) {
 
@@ -371,7 +372,7 @@ class XRManager extends EventDispatcher {
 		 * @type {boolean}
 		 * @readonly
 		 */
-		this._usesMultiview = false;	
+		this._usesMultiview = false;
 
 	}
 
@@ -848,16 +849,16 @@ class XRManager extends EventDispatcher {
 
 				}
 
-				let projectionlayerInit = {
+				const projectionlayerInit = {
 					colorFormat: gl.RGBA8,
 					depthFormat: glDepthFormat,
 					scaleFactor: this._framebufferScaleFactor
 				};
 
-				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2') ) {
+				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2' ) ) {
 
 					projectionlayerInit.textureType = 'texture-array';
-					this._usesMultiview = true;	
+					this._usesMultiview = true;
 
 				}
 
@@ -897,10 +898,12 @@ class XRManager extends EventDispatcher {
 						samples: attributes.antialias ? 4 : 0,
 						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
 						resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
+						depth: this._usesMultiview ? 2 : 1
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
 				this._xrRenderTarget.usesMultiview = this._usesMultiview;
+				this._xrRenderTarget.depth = this._usesMultiview ? 2 : 1;
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
 
@@ -1313,6 +1316,7 @@ function onSessionEnd() {
 	//
 
 	this.isPresenting = false;
+	this._usesMultiview = false;
 
 	renderer._animation.stop();
 
@@ -1483,7 +1487,7 @@ function onAnimationFrame( time, frame ) {
 					backend.setXRRenderTargetTextures(
 						this._xrRenderTarget,
 						glSubImage.colorTexture,
-						( this._glProjLayer.ignoreDepthValues && !this._usesMultiview ) ? undefined : glSubImage.depthStencilTexture
+						( this._glProjLayer.ignoreDepthValues && ! this._usesMultiview ) ? undefined : glSubImage.depthStencilTexture
 					);
 
 				}
