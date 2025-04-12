@@ -499,7 +499,7 @@ ${ this.tab }} )`;
 		this.tab += '\t';
 
 		let forStr = '{\n\n' + this.tab + initialization + ';\n\n';
-		forStr += `${ this.tab }While( ${ condition }, () => {\n\n`;
+		forStr += `${ this.tab }Loop( ${ condition }, () => {\n\n`;
 
 		forStr += this.emitBody( node.body ) + '\n\n';
 
@@ -511,7 +511,7 @@ ${ this.tab }} )`;
 
 		forStr += this.tab + '}';
 
-		this.imports.add( 'While' );
+		this.imports.add( 'Loop' );
 
 		return forStr;
 
