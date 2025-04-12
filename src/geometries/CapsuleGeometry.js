@@ -2,6 +2,9 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
+const _normal = /*@__PURE__*/ new Vector3();
+const _vertex = /*@__PURE__*/ new Vector3();
+
 /**
  * A geometry class for representing a capsule.
  *
@@ -67,9 +70,6 @@ class CapsuleGeometry extends BufferGeometry {
 
 		const numVerticalSegments = capSegments * 2 + heightSegments;
 		const verticesPerRow = radialSegments + 1;
-
-		const normal = new Vector3();
-		const vertex = new Vector3();
 
 		// generate vertices, normals, and uvs
 
@@ -140,20 +140,20 @@ class CapsuleGeometry extends BufferGeometry {
 
 				// vertex
 
-				vertex.x = - profileRadius * cosTheta;
-				vertex.y = profileY;
-				vertex.z = profileRadius * sinTheta;
-				vertices.push( vertex.x, vertex.y, vertex.z );
+				_vertex.x = - profileRadius * cosTheta;
+				_vertex.y = profileY;
+				_vertex.z = profileRadius * sinTheta;
+				vertices.push( _vertex.x, _vertex.y, _vertex.z );
 
 				// normal
 
-				normal.set(
+				_normal.set(
 					- profileRadius * cosTheta,
 					normalYComponent,
 					profileRadius * sinTheta
 				);
-				normal.normalize();
-				normals.push( normal.x, normal.y, normal.z );
+				_normal.normalize();
+				normals.push( _normal.x, _normal.y, _normal.z );
 
 				// uv
 
