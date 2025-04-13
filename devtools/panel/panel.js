@@ -235,7 +235,7 @@ function renderRenderer( obj, container ) {
 
 	}
 
-	const displayName = `WebGLRenderer <span class="object-details">${details.join( ' ・ ' )}</span>`;
+	const displayName = `${obj.type} <span class="object-details">${details.join( ' ・ ' )}</span>`;
 
 	// Use toggle icon instead of paint icon
 	summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
@@ -268,7 +268,6 @@ function renderRenderer( obj, container ) {
 		propsTitle.textContent = 'Properties';
 		propsCol.appendChild( propsTitle );
 		propsCol.appendChild( createPropertyRow( 'Size', `${props.width}x${props.height}` ) );
-		propsCol.appendChild( createPropertyRow( 'Drawing Buffer', `${props.drawingBufferWidth}x${props.drawingBufferHeight}` ) );
 		propsCol.appendChild( createPropertyRow( 'Alpha', props.alpha ) );
 		propsCol.appendChild( createPropertyRow( 'Antialias', props.antialias ) );
 		propsCol.appendChild( createPropertyRow( 'Output Color Space', props.outputColorSpace ) );

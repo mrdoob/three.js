@@ -98,7 +98,7 @@ if ( ! window.__THREE_DEVTOOLS__ ) {
 
 			const data = {
 				uuid: renderer.uuid || generateUUID(),
-				type: 'WebGLRenderer',
+				type: renderer.isWebGLRenderer ? 'WebGLRenderer' : 'WebGPURenderer',
 				name: '',
 				properties: getRendererProperties( renderer )
 			};
@@ -119,7 +119,7 @@ if ( ! window.__THREE_DEVTOOLS__ ) {
 		try {
 
 			// Special case for WebGLRenderer
-			if ( obj.isWebGLRenderer === true ) {
+			if ( obj.isWebGLRenderer === true || obj.isWebGPURenderer === true ) {
 
 				return getRendererData( obj );
 
@@ -218,7 +218,7 @@ if ( ! window.__THREE_DEVTOOLS__ ) {
 
 		}
 
-		if ( obj.isWebGLRenderer ) {
+		if ( obj.isWebGLRenderer || obj.isWebGPURenderer ) {
 
 			const data = getObjectData( obj );
 
@@ -273,13 +273,10 @@ if ( ! window.__THREE_DEVTOOLS__ ) {
 	function getRendererProperties( renderer ) {
 
 		const parameters = renderer.getContextAttributes ? renderer.getContextAttributes() : {};
-		const context = renderer.getContext();
 
 		return {
 			width: renderer.domElement ? renderer.domElement.clientWidth : 0,
 			height: renderer.domElement ? renderer.domElement.clientHeight : 0,
-			drawingBufferWidth: context.drawingBufferWidth,
-			drawingBufferHeight: context.drawingBufferHeight,
 			alpha: parameters.alpha || false,
 			antialias: parameters.antialias || false,
 			outputColorSpace: renderer.outputColorSpace,
