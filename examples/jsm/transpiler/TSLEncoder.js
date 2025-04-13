@@ -61,7 +61,7 @@ class TSLEncoder {
 		this.uniqueNames = false;
 		this.reference = false;
 
-		this._currentVarible = null;
+		this._currentVariable = null;
 
 		this._currentProperties = {};
 		this._lastStatement = null;
@@ -325,7 +325,7 @@ class TSLEncoder {
 
 			if ( node.type === '++' || node.type === '--' ) {
 
-				if ( this._currentVarible === null ) {
+				if ( this._currentVariable === null ) {
 
 					// optimize increment/decrement operator
 					// to avoid creating a new variable
@@ -536,7 +536,7 @@ ${ this.tab }} )`;
 
 		const { name, type, value, next } = node;
 
-		this._currentVarible = node;
+		this._currentVariable = node;
 
 		const valueStr = value ? this.emitExpression( value ) : '';
 
@@ -575,7 +575,7 @@ ${ this.tab }} )`;
 
 		this.addImport( type );
 
-		this._currentVarible = null;
+		this._currentVariable = null;
 
 		return varStr;
 
