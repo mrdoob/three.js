@@ -177,7 +177,8 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
-		this._depthTexture = options.depthTexture;
+		this._depthTexture = null;
+		this.depthTexture = options.depthTexture;
 
 		/**
 		 * The number of MSAA samples.
