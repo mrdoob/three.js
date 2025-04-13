@@ -61,6 +61,8 @@ class TSLEncoder {
 		this.uniqueNames = false;
 		this.reference = false;
 
+		this._currentVarible = null;
+
 		this._currentProperties = {};
 		this._lastStatement = null;
 
@@ -321,9 +323,22 @@ class TSLEncoder {
 
 			let type = unaryLib[ node.type ];
 
-			if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
+			if ( node.type === '++' || node.type === '--' ) {
 
-				type += 'Before';
+				if ( this._currentVarible === null ) {
+
+					// optimize increment/decrement operator
+					// to avoid creating a new variable
+
+					node.after = false;
+
+				}
+
+				if ( node.after === false ) {
+
+					type += 'Before';
+
+				}
 
 			}
 
@@ -521,6 +536,8 @@ ${ this.tab }} )`;
 
 		const { name, type, value, next } = node;
 
+		this._currentVarible = node;
+
 		const valueStr = value ? this.emitExpression( value ) : '';
 
 		let varStr = isRoot ? 'const ' : '';
@@ -557,6 +574,8 @@ ${ this.tab }} )`;
 		}
 
 		this.addImport( type );
+
+		this._currentVarible = null;
 
 		return varStr;
 
