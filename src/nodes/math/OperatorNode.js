@@ -310,15 +310,7 @@ class OperatorNode extends TempNode {
 
 					// WGSL
 
-					if ( builder.isVector( typeA ) ) {
-
-						return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
-
-					} else {
-
-						return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
-
-					}
+					return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
 
 				}
 
