@@ -1,5 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
+import { addMethodChaining, Fn, int, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * This node represents basic mathematical and logical operations like addition,
