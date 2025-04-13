@@ -2,6 +2,16 @@ import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, int, nodeProxy } from '../tsl/TSLCore.js';
 
+const _vectorOperators = {
+	'==': 'equal',
+	'!=': 'notEqual',
+	'<': 'lessThan',
+	'>': 'greaterThan',
+	'<=': 'lessThanEqual',
+	'>=': 'greaterThanEqual',
+	'%': 'mod'
+};
+
 /**
  * This node represents basic mathematical and logical operations like addition,
  * subtraction or comparisons (e.g. `equal()`).
@@ -76,14 +86,26 @@ class OperatorNode extends TempNode {
 	}
 
 	/**
+	 * Returns the operator method name.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} output - The output type.
+	 * @returns {string} The operator method name.
+	 */
+	getOperatorMethod( builder, output ) {
+
+		return builder.getMethod( _vectorOperators[ this.op ], output );
+
+	}
+
+	/**
 	 * This method is overwritten since the node type is inferred from the operator
 	 * and the input node types.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string} output - The current output string.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder, output ) {
+	getNodeType( builder ) {
 
 		const op = this.op;
 
@@ -105,13 +127,13 @@ class OperatorNode extends TempNode {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '==' || op === '!=' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '!' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
-		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+		} else if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
-			const typeLength = output ? builder.getTypeLength( output ) : Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
+			const typeLength = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
@@ -264,20 +286,19 @@ class OperatorNode extends TempNode {
 		const a = aNode.build( builder, typeA );
 		const b = typeof bNode !== 'undefined' ? bNode.build( builder, typeB ) : null;
 
-		const outputLength = builder.getTypeLength( output );
 		const fnOpSnippet = builder.getFunctionOperator( op );
 
 		if ( output !== 'void' ) {
 
 			const isGLSL = builder.renderer.coordinateSystem === WebGLCoordinateSystem;
 
-			if ( op === '==' ) {
+			if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
 				if ( isGLSL ) {
 
-					if ( outputLength > 1 ) {
+					if ( builder.isVector( typeA ) ) {
 
-						return builder.format( `${ builder.getMethod( 'equal', output ) }( ${ a }, ${ b } )`, type, output );
+						return builder.format( `${ this.getOperatorMethod( builder, output ) }( ${ a }, ${ b } )`, type, output );
 
 					} else {
 
@@ -289,71 +310,15 @@ class OperatorNode extends TempNode {
 
 					// WGSL
 
-					if ( outputLength > 1 || ! builder.isVector( typeA ) ) {
+					if ( builder.isVector( typeA ) ) {
 
-						return builder.format( `( ${ a } == ${ b } )`, type, output );
+						return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
 
 					} else {
 
-						return builder.format( `all( ${ a } == ${ b } )`, type, output );
+						return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
 
 					}
-
-				}
-
-			} else if ( op === '<' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'lessThan', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } < ${ b } )`, type, output );
-
-				}
-
-			} else if ( op === '<=' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'lessThanEqual', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } <= ${ b } )`, type, output );
-
-				}
-
-			} else if ( op === '>' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'greaterThan', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } > ${ b } )`, type, output );
-
-				}
-
-			} else if ( op === '>=' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'greaterThanEqual', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } >= ${ b } )`, type, output );
 
 				}
 
@@ -365,7 +330,7 @@ class OperatorNode extends TempNode {
 
 				} else {
 
-					return builder.format( `${ builder.getMethod( 'mod', type ) }( ${ a }, ${ b } )`, type, output );
+					return builder.format( `${ this.getOperatorMethod( builder, type ) }( ${ a }, ${ b } )`, type, output );
 
 				}
 
