@@ -414,7 +414,6 @@ class GLSLDecoder {
 
 		}
 
-
 		// unary operators (after)
 
 		if ( lastToken.isOperator ) {
