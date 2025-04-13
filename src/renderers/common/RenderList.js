@@ -19,10 +19,6 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.material.id !== b.material.id ) {
-
-		return a.material.id - b.material.id;
-
 	} else if ( a.z !== b.z ) {
 
 		return a.z - b.z;

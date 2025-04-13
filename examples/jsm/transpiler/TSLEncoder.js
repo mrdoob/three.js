@@ -15,6 +15,7 @@ const opLib = {
 	'<=': 'lessThanEqual',
 	'>=': 'greaterThanEqual',
 	'==': 'equal',
+	'!=': 'notEqual',
 	'&&': 'and',
 	'||': 'or',
 	'^^': 'xor',
@@ -59,6 +60,8 @@ class TSLEncoder {
 		this.iife = false;
 		this.uniqueNames = false;
 		this.reference = false;
+
+		this._currentVariable = null;
 
 		this._currentProperties = {};
 		this._lastStatement = null;
@@ -320,9 +323,22 @@ class TSLEncoder {
 
 			let type = unaryLib[ node.type ];
 
-			if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
+			if ( node.type === '++' || node.type === '--' ) {
 
-				type += 'Before';
+				if ( this._currentVariable === null ) {
+
+					// optimize increment/decrement operator
+					// to avoid creating a new variable
+
+					node.after = false;
+
+				}
+
+				if ( node.after === false ) {
+
+					type += 'Before';
+
+				}
 
 			}
 
@@ -475,8 +491,10 @@ ${ this.tab }} )`;
 
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
 			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
-			( afterthought && afterthought.isUnary ) &&
-			( initialization.name === afterthought.expression.property )
+			( afterthought && (
+				( afterthought.isUnary && ( initialization.name === afterthought.expression.property ) ) ||
+				( afterthought.isOperator && ( initialization.name === afterthought.left.property ) )
+			) )
 		) {
 
 			return this.emitLoop( node );
@@ -496,7 +514,7 @@ ${ this.tab }} )`;
 		this.tab += '\t';
 
 		let forStr = '{\n\n' + this.tab + initialization + ';\n\n';
-		forStr += `${ this.tab }While( ${ condition }, () => {\n\n`;
+		forStr += `${ this.tab }Loop( ${ condition }, () => {\n\n`;
 
 		forStr += this.emitBody( node.body ) + '\n\n';
 
@@ -508,7 +526,7 @@ ${ this.tab }} )`;
 
 		forStr += this.tab + '}';
 
-		this.imports.add( 'While' );
+		this.imports.add( 'Loop' );
 
 		return forStr;
 
@@ -517,6 +535,8 @@ ${ this.tab }} )`;
 	emitVariables( node, isRoot = true ) {
 
 		const { name, type, value, next } = node;
+
+		this._currentVariable = node;
 
 		const valueStr = value ? this.emitExpression( value ) : '';
 
@@ -554,6 +574,8 @@ ${ this.tab }} )`;
 		}
 
 		this.addImport( type );
+
+		this._currentVariable = null;
 
 		return varStr;
 

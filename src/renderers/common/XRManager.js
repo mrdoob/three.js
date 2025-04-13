@@ -851,8 +851,6 @@ class XRManager extends EventDispatcher {
 
 				this._xrRenderTarget.hasExternalTextures = true;
 
-				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
-
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
 
 				if ( this._supportsLayers ) {
@@ -915,6 +913,8 @@ class XRManager extends EventDispatcher {
 			//
 
 			this.setFoveation( this.getFoveation() );
+
+			this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
 			renderer._animation.setAnimationLoop( this._onAnimationFrame );
 			renderer._animation.setContext( session );
