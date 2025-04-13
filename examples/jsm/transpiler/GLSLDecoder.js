@@ -414,7 +414,6 @@ class GLSLDecoder {
 
 		}
 
-
 		// unary operators (after)
 
 		if ( lastToken.isOperator ) {
@@ -894,7 +893,7 @@ class GLSLDecoder {
 
 			//
 
-			if ( token.isLiteral ) {
+			if ( token.isLiteral || token.isOperator ) {
 
 				if ( token.str === 'const' ) {
 

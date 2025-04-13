@@ -1,6 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, int, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, Fn, int, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * This node represents basic mathematical and logical operations like addition,
@@ -681,6 +681,68 @@ export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParame
  */
 export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
 
+/**
+ * Increments a node by 1.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to increment.
+ * @returns {OperatorNode}
+ */
+export const incrementBefore = Fn( ( [ a ] ) => {
+
+	a.addAssign( 1 );
+	return a;
+
+} );
+
+/**
+ * Decrements a node by 1.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to decrement.
+ * @returns {OperatorNode}
+ */
+export const decrementBefore = Fn( ( [ a ] ) => {
+
+	a.subAssign( 1 );
+	return a;
+
+} );
+
+/**
+ * Increments a node by 1 and returns the previous value.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to increment.
+ * @returns {OperatorNode}
+ */
+export const increment = /*@__PURE__*/ Fn( ( [ a ] ) => {
+
+	const temp = int( a ).toConst();
+	a.addAssign( 1 );
+	return temp;
+
+} );
+
+/**
+ * Decrements a node by 1 and returns the previous value.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to decrement.
+ * @returns {OperatorNode}
+ */
+export const decrement = /*@__PURE__*/ Fn( ( [ a ] ) => {
+
+	const temp = int( a ).toConst();
+	a.subAssign( 1 );
+	return temp;
+
+} );
+
 addMethodChaining( 'add', add );
 addMethodChaining( 'sub', sub );
 addMethodChaining( 'mul', mul );
@@ -702,6 +764,11 @@ addMethodChaining( 'bitOr', bitOr );
 addMethodChaining( 'bitXor', bitXor );
 addMethodChaining( 'shiftLeft', shiftLeft );
 addMethodChaining( 'shiftRight', shiftRight );
+
+addMethodChaining( 'incrementBefore', incrementBefore );
+addMethodChaining( 'decrementBefore', decrementBefore );
+addMethodChaining( 'increment', increment );
+addMethodChaining( 'decrement', decrement );
 
 /**
  * @tsl
