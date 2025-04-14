@@ -214,6 +214,10 @@ class OperatorNode extends TempNode {
 
 					typeA = typeB;
 
+				} else {
+
+					typeA = typeB = 'float';
+
 				}
 
 			} else if ( op === '>>' || op === '<<' ) {
