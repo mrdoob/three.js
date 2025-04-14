@@ -367,7 +367,7 @@ class XRManager extends EventDispatcher {
 		this._useMultiviewIfPossible = multiview;
 
 		/**
-		 * Whether the usage of multiview is actually possible. This flag only evaluates to `true`
+		 * Whether the usage of multiview is actually enabled. This flag only evaluates to `true`
 		 * if multiview has been requested by the application and the `OVR_multiview2` is available.
 		 *
 		 * @private
