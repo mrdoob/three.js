@@ -361,7 +361,7 @@ class WebGLBackend extends Backend {
 
 			// The multisample_render_to_texture extension doesn't work properly if there
 			// are midframe flushes and an external depth texture.
-			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget.autoAllocateDepthBuffer === true && renderTarget.useMultiview === false ) {
+			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget.autoAllocateDepthBuffer === true && renderTarget.multiview === false ) {
 
 				console.warn( 'THREE.WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
 
@@ -2062,7 +2062,7 @@ class WebGLBackend extends Backend {
 
 						} else {
 
-							if ( this.renderer.xr.useMultiview() ) {
+							if ( renderTarget.multiview ) {
 
 								multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
 
@@ -2099,7 +2099,7 @@ class WebGLBackend extends Backend {
 						textureData.renderTarget = descriptor.renderTarget;
 						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
-						if ( this.renderer.xr.useMultiview() ) {
+						if ( renderTarget.multiview ) {
 
 							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
 
@@ -2151,7 +2151,7 @@ class WebGLBackend extends Backend {
 
 				// rebind external XR textures
 
-				if ( ( isXRRenderTarget && hasExternalTextures ) || this.renderer.xr.useMultiview() ) {
+				if ( ( isXRRenderTarget && hasExternalTextures ) || renderTarget.multiview ) {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
@@ -2159,7 +2159,7 @@ class WebGLBackend extends Backend {
 
 					const textureData = this.get( descriptor.textures[ 0 ] );
 
-					if ( this.renderer.xr.useMultiview() ) {
+					if ( renderTarget.multiview ) {
 
 						multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
 
@@ -2187,7 +2187,7 @@ class WebGLBackend extends Backend {
 
 						const textureData = this.get( descriptor.depthTexture );
 
-						if ( this.renderer.xr.useMultiview() ) {
+						if ( renderTarget.multiview ) {
 
 							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
 
@@ -2207,7 +2207,7 @@ class WebGLBackend extends Backend {
 
 			}
 
-			if ( samples > 0 && useMultisampledRTT === false && ! this.renderer.xr.useMultiview() ) {
+			if ( samples > 0 && useMultisampledRTT === false && ! renderTarget.multiview ) {
 
 				if ( msaaFb === undefined ) {
 
@@ -2502,7 +2502,7 @@ class WebGLBackend extends Backend {
 	 */
 	_useMultisampledExtension( renderTarget ) {
 
-		if ( renderTarget.useMultiview === true ) {
+		if ( renderTarget.multiview === true ) {
 
 			return true;
 

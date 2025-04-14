@@ -35,6 +35,7 @@ class RenderTarget extends EventDispatcher {
 	 * @property {?Texture} [depthTexture=null] - Reference to a depth texture.
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
+	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering.
 	 */
 
 	/**
@@ -119,7 +120,8 @@ class RenderTarget extends EventDispatcher {
 			resolveStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
-			count: 1
+			count: 1,
+			multiview: false
 		}, options );
 
 		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
@@ -189,6 +191,14 @@ class RenderTarget extends EventDispatcher {
 		 * @default 0
 		 */
 		this.samples = options.samples;
+
+		/**
+		 * Whether to this target is used in multiview rendering.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.multiview = options.multiview;
 
 	}
 

@@ -77,7 +77,7 @@ class Textures extends DataMap {
 
 		if ( depthTexture === undefined && useDepthTexture ) {
 
-			if ( size.depth > 1 ) {
+			if ( renderTarget.multiview === true && size.depth > 1 ) {
 
 				depthTexture = new DepthArrayTexture();
 
@@ -147,7 +147,7 @@ class Textures extends DataMap {
 
 				const texture = textures[ i ];
 
-				texture.isTextureArray = this.renderer.xr.useMultiview() === true && size.depth > 1;
+				texture.isTextureArray = renderTarget.multiview === true && size.depth > 1;
 				if ( textureNeedsUpdate ) texture.needsUpdate = true;
 
 				this.updateTexture( texture, options );

@@ -901,11 +901,11 @@ class XRManager extends EventDispatcher {
 						samples: attributes.antialias ? 4 : 0,
 						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
 						resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
-						depth: this._useMultiview ? 2 : 1
+						depth: this._useMultiview ? 2 : 1,
+						multiview: this._useMultiview
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
-				this._xrRenderTarget.useMultiview = this._useMultiview;
 				this._xrRenderTarget.depth = this._useMultiview ? 2 : 1;
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );

@@ -55,14 +55,6 @@ class XRRenderTarget extends RenderTarget {
 		 */
 		this.autoAllocateDepthBuffer = true;
 
-		/**
-		 * Whether this render target is used with multiview rendering or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.useMultiview = false;
-
 	}
 
 	copy( source ) {
