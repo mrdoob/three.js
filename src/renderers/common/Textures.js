@@ -147,7 +147,7 @@ class Textures extends DataMap {
 
 				const texture = textures[ i ];
 
-				texture.isTextureArray = size.depth > 1;
+				texture.isTextureArray = this.renderer.xr.useMultiview() === true && size.depth > 1;
 				if ( textureNeedsUpdate ) texture.needsUpdate = true;
 
 				this.updateTexture( texture, options );

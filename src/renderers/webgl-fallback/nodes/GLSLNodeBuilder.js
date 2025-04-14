@@ -569,13 +569,13 @@ ${ flowData.code }
 
 					}
 
+				} else if ( uniform.type === 'texture3D' && texture.isTextureArray === false ) {
+
+					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
+
 				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true || texture.isTextureArray === true ) {
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
-
-				} else if ( uniform.type === 'texture3D' ) {
-
-					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
 				} else {
 
