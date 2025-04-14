@@ -910,6 +910,8 @@ class XRManager extends EventDispatcher {
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
 
+				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
 				if ( this._supportsLayers ) {
 
 					// switch layers to native
@@ -970,8 +972,6 @@ class XRManager extends EventDispatcher {
 			//
 
 			this.setFoveation( this.getFoveation() );
-
-			this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
 			renderer._animation.setAnimationLoop( this._onAnimationFrame );
 			renderer._animation.setContext( session );
