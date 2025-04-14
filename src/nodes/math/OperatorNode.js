@@ -194,7 +194,7 @@ class OperatorNode extends TempNode {
 		const aNode = this.aNode;
 		const bNode = this.bNode;
 
-		const type = this.getNodeType( builder, output );
+		const type = this.getNodeType( builder );
 
 		let typeA = null;
 		let typeB = null;
@@ -210,9 +210,9 @@ class OperatorNode extends TempNode {
 
 					typeB = typeA;
 
-				} else if ( typeA !== typeB ) {
+				} else if ( builder.isVector( typeB ) ) {
 
-					typeA = typeB = 'float';
+					typeA = typeB;
 
 				}
 
