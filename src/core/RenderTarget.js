@@ -3,7 +3,6 @@ import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Source } from '../textures/Source.js';
-import { mx_bilerp_1 } from '../nodes/materialx/lib/mx_noise.js';
 
 /**
  * A render target is a buffer where the video card draws pixels for a scene
