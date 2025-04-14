@@ -1092,9 +1092,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables multisample multiview.
-	 *
-	 * @param {string} planeCount - The clipping plane count.
+	 * Enables multiview.
 	 */
 	enableMultiview() {
 

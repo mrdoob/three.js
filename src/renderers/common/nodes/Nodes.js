@@ -202,7 +202,7 @@ class Nodes extends DataMap {
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
 				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
 				nodeBuilder.clippingContext = renderObject.clippingContext;
-				if ( this.renderer.xr.usesMultiview() ) {
+				if ( this.renderer.xr.useMultiview() ) {
 
 					nodeBuilder.enableMultiview();
 

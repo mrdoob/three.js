@@ -307,7 +307,7 @@ class WebGLTextureUtils {
 		if ( textureType === gl.TEXTURE_3D || textureType === gl.TEXTURE_2D_ARRAY ) {
 
 			// WebGL 2 does not support wrapping for depth 2D array textures
-			if ( ! texture.isDepthArrayTexture && ! texture.isTextureArray ) {
+			if ( texture.isDepthArrayTexture === false && texture.isTextureArray === false ) {
 
 				gl.texParameteri( textureType, gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
 
