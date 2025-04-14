@@ -2,6 +2,7 @@ import Renderer from '../common/Renderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
+import { Color } from '../../math/Color.js';
 /*
 const debugHandler = {
 
@@ -73,6 +74,8 @@ class WebGPURenderer extends Renderer {
 
 		//super( new Proxy( backend, debugHandler ) );
 		super( backend, parameters );
+		this._clearColor = new Color( 0x000000 );
+		this._clearAlpha = 1;
 
 		/**
 		 * The generic default value is overwritten with the
