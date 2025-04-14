@@ -967,6 +967,8 @@ class XRManager extends EventDispatcher {
 					}
 				);
 
+				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
 			}
 
 			//
