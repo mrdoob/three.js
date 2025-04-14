@@ -80,7 +80,7 @@ class RenderTarget extends EventDispatcher {
 		 * @type {number}
 		 * @default 1
 		 */
-		this.depth = 1;//options.depth ? options.depth : 1;
+		this.depth = options.depth ? options.depth : 1;
 
 		/**
 		 * A rectangular area inside the render target's viewport. Fragments that are
@@ -108,7 +108,7 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		const image = { width: width, height: height, depth: 1/*this.depth*/ };
+		const image = { width: width, height: height, depth: this.depth };
 
 		options = Object.assign( {
 			generateMipmaps: false,
