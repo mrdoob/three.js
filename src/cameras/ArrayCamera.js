@@ -32,12 +32,20 @@ class ArrayCamera extends PerspectiveCamera {
 		this.isArrayCamera = true;
 
 		/**
+		 * Whether this camera is used with multiview rendering or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
+		this.isMultiViewCamera = false;
+
+		/**
 		 * An array of perspective sub cameras.
 		 *
 		 * @type {Array<PerspectiveCamera>}
 		 */
 		this.cameras = array;
-		this.index = 0;
 
 	}
 
