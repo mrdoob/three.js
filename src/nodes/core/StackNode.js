@@ -1,6 +1,6 @@
 import Node from './Node.js';
 import { select } from '../math/ConditionalNode.js';
-import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
+import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
@@ -56,6 +56,16 @@ class StackNode extends Node {
 		 * @default null
 		 */
 		this._currentCond = null;
+
+		/**
+		 * The current value node. Only
+		 * relevant for Switch/Case.
+		 *
+		 * @private
+		 * @type {Node}
+		 * @default null
+		 */
+		this._valueNode = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -138,6 +148,65 @@ class StackNode extends Node {
 	Else( method ) {
 
 		this._currentCond.elseNode = new ShaderNode( method );
+
+		return this;
+
+	}
+
+	/**
+	 * Represents a `switch` statement in TSL.
+	 *
+	 * @param {any} expression - Represents the expression.
+	 * @param {Function} method - TSL code which is executed if the condition evaluates to `true`.
+	 * @return {StackNode} A reference to this stack node.
+	 */
+	Switch( expression ) {
+
+		this._valueNode = nodeObject( expression );
+
+		return this;
+
+	}
+
+	/**
+	 * Represents a `case` statement in TSL.
+	 *
+	 * @param {any} value - The value to compare the expression with.
+	 * @param {Function} method - TSL code which is executed if the case block is executed.
+	 * @return {StackNode} A reference to this stack node.
+	 */
+	Case( value, method ) {
+
+		const methodNode = new ShaderNode( method );
+
+		const caseNode = select( this._valueNode.equal( nodeObject( value ) ), methodNode );
+
+		if ( this._currentCond === null ) {
+
+			this._currentCond = caseNode;
+
+			return this.add( this._currentCond );
+
+		} else {
+
+			this._currentCond.elseNode = caseNode;
+			this._currentCond = caseNode;
+
+			return this;
+
+		}
+
+	}
+
+	/**
+	 * Represents the default code block of a Switch/Case statement.
+	 *
+	 * @param {Function} method - TSL code which is executed in the `else` case.
+	 * @return {StackNode} A reference to this stack node.
+	 */
+	Default( method ) {
+
+		this.Else( method );
 
 		return this;
 
