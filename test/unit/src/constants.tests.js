@@ -109,8 +109,6 @@ export default QUnit.module( 'Constants', () => {
 
 		assert.equal( Constants.AlphaFormat, 1021, 'AlphaFormat is equal to 1021' );
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );
-		assert.equal( Constants.LuminanceFormat, 1024, 'LuminanceFormat is equal to 1024' );
-		assert.equal( Constants.LuminanceAlphaFormat, 1025, 'LuminanceAlphaFormat is equal to 1025' );
 		assert.equal( Constants.DepthFormat, 1026, 'DepthFormat is equal to 1026' );
 		assert.equal( Constants.DepthStencilFormat, 1027, 'DepthStencilFormat is equal to 1027' );
 		assert.equal( Constants.RedFormat, 1028, 'RedFormat is equal to 1028' );
