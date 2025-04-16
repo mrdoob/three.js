@@ -58,14 +58,23 @@ class StackNode extends Node {
 		this._currentCond = null;
 
 		/**
-		 * The current value node. Only
+		 * The expression node. Only
 		 * relevant for Switch/Case.
 		 *
 		 * @private
 		 * @type {Node}
 		 * @default null
 		 */
-		this._valueNode = null;
+		this._expressionNode = null;
+
+		/**
+		 * An array representing a sequence of Case() calls.
+		 *
+		 * @private
+		 * @type {Node}
+		 * @default null
+		 */
+		this._cases = [];
 
 		/**
 		 * This flag can be used for type testing.
@@ -162,7 +171,7 @@ class StackNode extends Node {
 	 */
 	Switch( expression ) {
 
-		this._valueNode = nodeObject( expression );
+		this._expressionNode = nodeObject( expression );
 
 		return this;
 
@@ -172,27 +181,53 @@ class StackNode extends Node {
 	 * Represents a `case` statement in TSL.
 	 *
 	 * @param {any} value - The value to compare the expression with.
-	 * @param {Function} method - TSL code which is executed if the case block is executed.
+	 * @param {?Function} [method=null] - TSL code which is executed if the case block is executed.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	Case( value, method ) {
+	Case( value, method = null ) {
 
-		const methodNode = new ShaderNode( method );
+		if ( method === null ) {
 
-		const caseNode = select( this._valueNode.equal( nodeObject( value ) ), methodNode );
+			// store the case to build a condition node at a later point
 
-		if ( this._currentCond === null ) {
+			this._cases.push( this._expressionNode.equal( nodeObject( value ) ) );
 
-			this._currentCond = caseNode;
-
-			return this.add( this._currentCond );
+			return this;
 
 		} else {
 
-			this._currentCond.elseNode = caseNode;
-			this._currentCond = caseNode;
+			const methodNode = new ShaderNode( method );
 
-			return this;
+			let caseNode = this._expressionNode.equal( nodeObject( value ) );
+
+			// process all subsequent cases without a method (optional)
+
+			for ( const c of this._cases ) {
+
+				caseNode = caseNode.or( c );
+
+			}
+
+			this._cases.length = 0;
+
+			// build condition
+
+			const condNode = select( caseNode, methodNode );
+
+			if ( this._currentCond === null ) {
+
+				this._currentCond = condNode;
+
+				return this.add( this._currentCond );
+
+			} else {
+
+				this._currentCond.elseNode = condNode;
+				this._currentCond = condNode;
+
+				return this;
+
+			}
 
 		}
 
