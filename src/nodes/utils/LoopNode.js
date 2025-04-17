@@ -232,58 +232,60 @@ class LoopNode extends Node {
 
 				const deltaOperator = () => condition.includes( '<' ) ? '+=' : '-=';
 
-				switch ( typeof update ) {
+				if ( update !== undefined && update !== null ) {
 
-					case 'undefined':
+					switch ( typeof update ) {
 
-						if ( type === 'int' || type === 'uint' ) {
+						case 'function':
 
-							update = condition.includes( '<' ) ? '++' : '--';
+							const flow = builder.flowStagesNode( properties.updateNode, 'void' );
+							const snippet = flow.code.replace( /\t|;/g, '' );
 
-						} else {
+							updateSnippet = snippet;
 
-							update = deltaOperator() + ' 1.';
+							break;
 
-						}
+						case 'number':
 
-						updateSnippet = name + ' ' + update;
+							updateSnippet = name + ' ' + deltaOperator() + ' ' + builder.generateConst( type, update );
 
-						break;
+							break;
 
-					case 'function':
+						case 'string':
 
-						const flow = builder.flowStagesNode( properties.updateNode, 'void' );
-						const snippet = flow.code.replace( /\t|;/g, '' );
+							updateSnippet = name + ' ' + update;
 
-						updateSnippet = snippet;
+							break;
 
-						break;
+						default:
 
-					case 'number':
+							if ( update.isNode ) {
 
-						updateSnippet = name + ' ' + deltaOperator() + ' ' + builder.generateConst( type, update );
+								updateSnippet = name + ' ' + deltaOperator() + ' ' + update.build( builder );
 
-						break;
+							} else {
 
-					case 'string':
+								console.error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
 
-						updateSnippet = name + ' ' + update;
+								updateSnippet = 'break /* invalid update */';
 
-						break;
+							}
 
-					default:
+					}
 
-						if ( update && update.isNode ) {
+				} else {
 
-							updateSnippet = name + ' ' + deltaOperator() + ' ' + update.build( builder );
+					if ( type === 'int' || type === 'uint' ) {
 
-						} else {
+						update = condition.includes( '<' ) ? '++' : '--';
 
-							console.error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+					} else {
 
-							updateSnippet = 'break /* invalid update */';
+						update = deltaOperator() + ' 1.';
 
-						}
+					}
+
+					updateSnippet = name + ' ' + update;
 
 				}
 
