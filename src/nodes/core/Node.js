@@ -586,7 +586,7 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Executes the build process for the node. The behavior and return value depend on the current build stage:
+	 * This method performs the build of a node. The behavior and return value depend on the current build stage:
 	 * - **setup**: Prepares the node and its children for the build process. This process can also create new nodes. Returns the node itself or a variant.
 	 * - **analyze**: Analyzes the node hierarchy for optimizations in the code generation stage. Returns `null`.
 	 * - **generate**: Generates the shader code for the node. Returns the generated shader string.
