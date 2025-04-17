@@ -705,6 +705,7 @@ export const setCurrentStack = ( stack ) => {
 export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.If( ...params );
+export const Switch = ( ...params ) => currentStack.Switch( ...params );
 
 export function append( node ) {
 
