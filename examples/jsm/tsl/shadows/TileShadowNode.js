@@ -19,6 +19,7 @@ import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getShadowRenderObje
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
 
+const _cameraLayers = [];
 const _vec3Temp1 = /*@__PURE__*/ new Vector3();
 const _vec3Temp2 = /*@__PURE__*/ new Vector3();
 const _vec3Temp3 = /*@__PURE__*/ new Vector3();
@@ -279,11 +280,21 @@ class TileShadowNode extends ShadowBaseNode {
 		scene.overrideMaterial = getShadowMaterial( light );
 		renderer.setRenderTarget( this.shadowMap );
 
+
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
 			const light = this.lights[ index ];
 			const shadow = light.shadow;
-			shadow.camera.layers.mask = camera.layers.mask;
+
+			const _shadowCameraLayer = shadow.camera.layers.mask;
+			_cameraLayers.push( _shadowCameraLayer );
+
+			if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) === 0 ) {
+
+				shadow.camera.layers.mask = camera.layers.mask;
+
+			}
+
 			shadow.updateMatrices( light );
 
 			renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
@@ -302,6 +313,17 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 		restoreRendererAndSceneState( renderer, scene, _rendererState );
+
+		for ( let index = 0; index < this.lights.length; index ++ ) {
+
+			const light = this.lights[ index ];
+			const shadow = light.shadow;
+
+			shadow.camera.layers.mask = _cameraLayers[ index ];
+
+		}
+
+		_cameraLayers.length = 0;
 
 	}
 
