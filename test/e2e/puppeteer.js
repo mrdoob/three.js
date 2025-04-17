@@ -168,6 +168,7 @@ const exceptionList = [
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
+	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_xr_native_layers',
 
