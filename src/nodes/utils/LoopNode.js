@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
+import { nodeObject, nodeArray, Fn } from '../tsl/TSLBase.js';
 
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
@@ -101,8 +101,14 @@ class LoopNode extends Node {
 
 		const stack = builder.addStack(); // TODO: cache() it
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, stack, builder );
+		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder );
 		properties.stackNode = stack;
+
+		if ( typeof this.params[ 0 ].update === 'function' ) {
+
+			properties.updateNode = Fn( this.params[ 0 ].update )( inputs );
+
+		}
 
 		builder.removeStack();
 
@@ -222,30 +228,67 @@ class LoopNode extends Node {
 				const startSnippet = internalParam.start;
 				const endSnippet = internalParam.end;
 
-				let declarationSnippet = '';
-				let conditionalSnippet = '';
-				let updateSnippet = '';
+				let updateSnippet;
 
-				if ( ! update ) {
+				const deltaOperator = () => condition.includes( '<' ) ? '+=' : '-=';
 
-					if ( type === 'int' || type === 'uint' ) {
+				switch ( typeof update ) {
 
-						if ( condition.includes( '<' ) ) update = '++';
-						else update = '--';
+					case 'undefined':
 
-					} else {
+						if ( type === 'int' || type === 'uint' ) {
 
-						if ( condition.includes( '<' ) ) update = '+= 1.';
-						else update = '-= 1.';
+							update = condition.includes( '<' ) ? '++' : '--';
 
-					}
+						} else {
+
+							update = deltaOperator() + ' 1.';
+
+						}
+
+						updateSnippet = name + ' ' + update;
+
+						break;
+
+					case 'function':
+
+						const flow = builder.flowStagesNode( properties.updateNode, 'void' );
+						const snippet = flow.code.replace( /\t|;/g, '' );
+
+						updateSnippet = snippet;
+
+						break;
+
+					case 'number':
+
+						updateSnippet = name + ' ' + deltaOperator() + ' ' + builder.generateConst( type, update );
+
+						break;
+
+					case 'string':
+
+						updateSnippet = name + ' ' + update;
+
+						break;
+
+					default:
+
+						if ( update && update.isNode ) {
+
+							updateSnippet = name + ' ' + deltaOperator() + ' ' + update.build( builder );
+
+						} else {
+
+							console.error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+
+							updateSnippet = 'break /* invalid update */';
+
+						}
 
 				}
 
-				declarationSnippet += builder.getVar( type, name ) + ' = ' + startSnippet;
-
-				conditionalSnippet += name + ' ' + condition + ' ' + endSnippet;
-				updateSnippet += name + ' ' + update;
+				const declarationSnippet = builder.getVar( type, name ) + ' = ' + startSnippet;
+				const conditionalSnippet = name + ' ' + condition + ' ' + endSnippet;
 
 				loopSnippet = `for ( ${ declarationSnippet }; ${ conditionalSnippet }; ${ updateSnippet } )`;
 
