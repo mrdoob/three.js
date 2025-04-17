@@ -68,15 +68,6 @@ class StackNode extends Node {
 		this._expressionNode = null;
 
 		/**
-		 * An array representing a sequence of Case() calls.
-		 *
-		 * @private
-		 * @type {Node}
-		 * @default null
-		 */
-		this._cases = [];
-
-		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -178,56 +169,63 @@ class StackNode extends Node {
 	}
 
 	/**
-	 * Represents a `case` statement in TSL.
+	 * Represents a `case` statement in TSL. The TSL version accepts an arbitrary numbers of values.
+	 * The last parameter must be the callback method that should be executed in the `true` case.
 	 *
-	 * @param {any} value - The value to compare the expression with.
-	 * @param {?Function} [method=null] - TSL code which is executed if the case block is executed.
+	 * @param {...any} params - The values of the `Case()` statement as well as the callback method.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	Case( value, method = null ) {
+	Case( ...params ) {
 
-		if ( method === null ) {
+		const caseNodes = [];
 
-			// store the case to build a condition node at a later point
+		// extract case nodes from the parameter list
 
-			this._cases.push( this._expressionNode.equal( nodeObject( value ) ) );
+		if ( params.length >= 2 ) {
 
-			return this;
+			for ( let i = 0; i < params.length - 1; i ++ ) {
+
+				caseNodes.push( this._expressionNode.equal( nodeObject( params[ i ] ) ) );
+
+			}
 
 		} else {
 
-			const methodNode = new ShaderNode( method );
+			throw new Error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
-			let caseNode = this._expressionNode.equal( nodeObject( value ) );
+		}
 
-			// process all subsequent cases without a method (optional)
+		// extract method
 
-			for ( const c of this._cases ) {
+		const method = params[ params.length - 1 ];
+		const methodNode = new ShaderNode( method );
 
-				caseNode = caseNode.or( c );
+		// chain multiple cases when using Case( 1, 2, 3, () => {} )
 
-			}
+		let caseNode = caseNodes[ 0 ];
 
-			this._cases.length = 0;
+		for ( let i = 1; i < caseNodes.length; i ++ ) {
 
-			// build condition
+			caseNode = caseNode.or( caseNodes[ i ] );
 
-			const condNode = select( caseNode, methodNode );
+		}
 
-			if ( this._currentCond === null ) {
+		// build condition
 
-				this._currentCond = condNode;
+		const condNode = select( caseNode, methodNode );
 
-				return this.add( this._currentCond );
+		if ( this._currentCond === null ) {
 
-			} else {
+			this._currentCond = condNode;
 
-				this._currentCond.elseNode = condNode;
-				this._currentCond = condNode;
+			return this.add( this._currentCond );
 
-				return this;
+		} else {
 
-			}
+			this._currentCond.elseNode = condNode;
+			this._currentCond = condNode;
+
+			return this;
 
 		}
 
