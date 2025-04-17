@@ -104,7 +104,9 @@ class LoopNode extends Node {
 		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder );
 		properties.stackNode = stack;
 
-		if ( typeof this.params[ 0 ].update === 'function' ) {
+		const baseParam = this.params[ 0 ];
+
+		if ( baseParam.isNode !== true && typeof baseParam.update === 'function' ) {
 
 			properties.updateNode = Fn( this.params[ 0 ].update )( inputs );
 
