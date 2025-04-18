@@ -94,8 +94,9 @@ function raycastWorldUnits( lineSegments, intersects ) {
 function raycastScreenSpace( lineSegments, camera, intersects ) {
 
 	const projectionMatrix = camera.projectionMatrix;
-	const resolution = lineSegments.resolution;
 	const matrixWorld = lineSegments.matrixWorld;
+
+	const resolution = lineSegments._resolution;
 
 	const geometry = lineSegments.geometry;
 	const instanceStart = geometry.attributes.instanceStart;
