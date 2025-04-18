@@ -125,7 +125,9 @@ class LightsNode extends Node {
 
 			if ( light.isSpotLight === true ) {
 
-				hashData.push( Number( light.map !== null ) );
+				const hashValue = ( light.map !== null ) ? light.map.id : - 1;
+
+				hashData.push( hashValue );
 
 			}
 
