@@ -753,25 +753,6 @@ const RGBFormat = 1022;
 const RGBAFormat = 1023;
 
 /**
- * reads each element as a single luminance component. This is then converted to a floating point,
- * clamped to the range `[0,1]`, and then assembled into an RGBA element by placing the luminance value
- * in the red, green and blue channels, and attaching 1.0 to the alpha channel.
- *
- * @type {number}
- * @constant
- */
-const LuminanceFormat = 1024;
-
-/**
- * Reads each element as a luminance/alpha double. The same process occurs as for the `LuminanceFormat`,
- * except that the alpha channel may have values other than `1.0`.
- *
- * @type {number}
- * @constant
- */
-const LuminanceAlphaFormat = 1025;
-
-/**
  * Reads each element as a single depth value, converts it to floating point, and clamps to the range `[0,1]`.
  *
  * @type {number}
@@ -57733,10 +57714,6 @@ function getByteLength( width, height, format, type ) {
 		// https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
 		case AlphaFormat:
 			return width * height;
-		case LuminanceFormat:
-			return width * height;
-		case LuminanceAlphaFormat:
-			return width * height * 2;
 		case RedFormat:
 			return ( ( width * height ) / typeByteLength.components ) * typeByteLength.byteLength;
 		case RedIntegerFormat:
@@ -70282,8 +70259,6 @@ function WebGLUtils( gl, extensions ) {
 		if ( p === AlphaFormat ) return gl.ALPHA;
 		if ( p === RGBFormat ) return gl.RGB;
 		if ( p === RGBAFormat ) return gl.RGBA;
-		if ( p === LuminanceFormat ) return gl.LUMINANCE;
-		if ( p === LuminanceAlphaFormat ) return gl.LUMINANCE_ALPHA;
 		if ( p === DepthFormat ) return gl.DEPTH_COMPONENT;
 		if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
 
@@ -76154,8 +76129,6 @@ exports.LoadingManager = LoadingManager;
 exports.LoopOnce = LoopOnce;
 exports.LoopPingPong = LoopPingPong;
 exports.LoopRepeat = LoopRepeat;
-exports.LuminanceAlphaFormat = LuminanceAlphaFormat;
-exports.LuminanceFormat = LuminanceFormat;
 exports.MOUSE = MOUSE;
 exports.Material = Material;
 exports.MaterialLoader = MaterialLoader;
