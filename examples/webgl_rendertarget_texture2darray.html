@@ -38,7 +38,7 @@
 	void main()
 	{
 		float voxel = texture(uTexture, vec3( vUv, uDepth )).r;
-		gl_FragColor.r = voxel * uIntensity;
+		gl_FragColor = voxel * uIntensity;
 	}
 
 	</script>
