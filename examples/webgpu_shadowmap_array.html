@@ -46,7 +46,7 @@
 			async function init() {
 
 				// Renderer setup
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -88,8 +88,7 @@
 				// Set up the tile shadow mapping
 				const tsm = new TileShadowNode( dirLight, {
 					tilesX: 2,
-					tilesY: 2,
-					debug: true
+					tilesY: 2
 				} );
 
 

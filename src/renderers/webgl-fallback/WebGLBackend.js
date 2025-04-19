@@ -970,7 +970,7 @@ class WebGLBackend extends Backend {
 	 */
 	_isRenderCameraDepthArray( renderContext ) {
 
-		return renderContext.depthTexture && renderContext.depthTexture.isDepthArrayTexture && renderContext.camera.isArrayCamera;
+		return renderContext.depthTexture && renderContext.depthTexture.isArrayTexture && renderContext.camera.isArrayCamera;
 
 	}
 
@@ -1991,7 +1991,7 @@ class WebGLBackend extends Backend {
 
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
-			const isRenderTargetArray = renderTarget.isRenderTargetArray === true;
+			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
 			const hasExternalTextures = ( isXRRenderTarget === true && renderTarget.hasExternalTextures === true );
 
@@ -2100,7 +2100,7 @@ class WebGLBackend extends Backend {
 
 						} else {
 
-							if ( descriptor.depthTexture.isDepthArrayTexture ) {
+							if ( descriptor.depthTexture.isArrayTexture ) {
 
 								const layer = this.renderer._activeCubeFace;
 

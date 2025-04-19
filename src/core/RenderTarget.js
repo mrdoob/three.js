@@ -35,6 +35,7 @@ class RenderTarget extends EventDispatcher {
 	 * @property {?Texture} [depthTexture=null] - Reference to a depth texture.
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
+	 * @property {number} [depth=1] - The texture depth.
 	 */
 
 	/**
@@ -47,6 +48,20 @@ class RenderTarget extends EventDispatcher {
 	constructor( width = 1, height = 1, options = {} ) {
 
 		super();
+
+		options = Object.assign( {
+			generateMipmaps: false,
+			internalFormat: null,
+			minFilter: LinearFilter,
+			depthBuffer: true,
+			stencilBuffer: false,
+			resolveDepthBuffer: true,
+			resolveStencilBuffer: true,
+			depthTexture: null,
+			samples: 0,
+			count: 1,
+			depth: 1
+		}, options );
 
 		/**
 		 * This flag can be used for type testing.
@@ -79,7 +94,7 @@ class RenderTarget extends EventDispatcher {
 		 * @type {number}
 		 * @default 1
 		 */
-		this.depth = 1;
+		this.depth = options.depth;
 
 		/**
 		 * A rectangular area inside the render target's viewport. Fragments that are
@@ -107,20 +122,7 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		const image = { width: width, height: height, depth: 1 };
-
-		options = Object.assign( {
-			generateMipmaps: false,
-			internalFormat: null,
-			minFilter: LinearFilter,
-			depthBuffer: true,
-			stencilBuffer: false,
-			resolveDepthBuffer: true,
-			resolveStencilBuffer: true,
-			depthTexture: null,
-			samples: 0,
-			count: 1
-		}, options );
+		const image = { width: width, height: height, depth: options.depth };
 
 		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 

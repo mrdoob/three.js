@@ -23,8 +23,9 @@ class DepthTexture extends Texture {
 	 * @param {number} [minFilter=LinearFilter] - The min filter value.
 	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
 	 * @param {number} [format=DepthFormat] - The texture format.
+	 * @param {number} [depth=1] - The depth of the texture.
 	 */
-	constructor( width, height, type = UnsignedIntType, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, format = DepthFormat ) {
+	constructor( width, height, type = UnsignedIntType, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, format = DepthFormat, depth = 1 ) {
 
 		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
@@ -32,7 +33,9 @@ class DepthTexture extends Texture {
 
 		}
 
-		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+		const image = { width: width, height: height, depth: depth };
+
+		super( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 		/**
 		 * This flag can be used for type testing.
@@ -42,13 +45,6 @@ class DepthTexture extends Texture {
 		 * @default true
 		 */
 		this.isDepthTexture = true;
-
-		/**
-		 * The image property of a depth texture just defines its dimensions.
-		 *
-		 * @type {{width:number,height:number}}
-		 */
-		this.image = { width: width, height: height };
 
 		/**
 		 * If set to `true`, the texture is flipped along the vertical axis when

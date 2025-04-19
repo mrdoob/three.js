@@ -54,6 +54,12 @@ class Texture extends EventDispatcher {
 		 */
 		this.isTexture = true;
 
+		if ( image && image.depth && image.depth > 1 ) {
+
+			this.isArrayTexture = true;
+
+		}
+
 		/**
 		 * The ID of the texture.
 		 *
@@ -431,6 +437,7 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
+		this.isArrayTexture = source.isArrayTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

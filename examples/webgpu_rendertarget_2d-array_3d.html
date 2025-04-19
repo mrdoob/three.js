@@ -211,8 +211,9 @@
 						materialQuad.depthTest = false;
 						materialQuad.outputNode = vec4( texture( mapArray ).depth( uZCoord ).rgb, 1 );
 
-						const fboArray = new THREE.RenderTargetArray( size.width, size.height, size.depth, {
+						const fboArray = new THREE.RenderTarget( size.width, size.height, {
 							depthBuffer: false,
+							depth: size.depth
 						} );
 						fboArray.texture.name = 'RenderTargetArray';
 
