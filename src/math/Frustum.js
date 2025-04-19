@@ -204,29 +204,29 @@ class Frustum {
 	 */
 	intersectsBox( box ) {
 
-		const planes = this.planes;
-
+		const { min, max } = box;
+		const p1 = _vector;
+	
 		for ( let i = 0; i < 6; i ++ ) {
-
-			const plane = planes[ i ];
-
-			// corner at max distance
-
-			_vector.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-			_vector.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-			_vector.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-			if ( plane.distanceToPoint( _vector ) < 0 ) {
-
+	
+			const plane = this.planes[ i ];
+	
+			p1.x = plane.normal.x > 0 ? max.x : min.x;
+			p1.y = plane.normal.y > 0 ? max.y : min.y;
+			p1.z = plane.normal.z > 0 ? max.z : min.z;
+	
+			if ( plane.distanceToPoint( p1 ) <= 0 ) {
+	
 				return false;
-
+	
 			}
-
+	
 		}
-
+	
 		return true;
-
+	
 	}
+	
 
 	/**
 	 * Returns `true` if the given point lies within the frustum.
