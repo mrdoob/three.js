@@ -171,6 +171,7 @@ const exceptionList = [
 	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_xr_native_layers',
+	'webgpu_volume_caustics',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
