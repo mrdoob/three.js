@@ -307,6 +307,7 @@
 		"webgpu_camera",
 		"webgpu_camera_array",
 		"webgpu_camera_logarithmicdepthbuffer",
+		"webgpu_caustics",
 		"webgpu_centroid_sampling",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
