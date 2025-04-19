@@ -2810,6 +2810,13 @@ class Renderer {
 
 				}
 
+				if ( material.castShadowPositionNode && material.castShadowPositionNode.isNode ) {
+
+					overridePositionNode = overrideMaterial.positionNode;
+					overrideMaterial.positionNode = material.castShadowPositionNode;
+
+				}
+
 			}
 
 			material = overrideMaterial;

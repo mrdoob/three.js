@@ -281,6 +281,15 @@ class NodeMaterial extends Material {
 		this.receivedShadowPositionNode = null;
 
 		/**
+		 * Allows to overwrite the geometry position used for shadow map projection which
+		 * is by default {@link positionLocal}, the vertex position in local space.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.castShadowPositionNode = null;
+
+		/**
 		 * This node can be used to influence how an object using this node material
 		 * receive shadows.
 		 *
@@ -1186,6 +1195,7 @@ class NodeMaterial extends Material {
 
 		this.depthNode = source.depthNode;
 		this.receivedShadowPositionNode = source.receivedShadowPositionNode;
+		this.castShadowPositionNode = source.castShadowPositionNode;
 		this.receivedShadowNode = source.receivedShadowNode;
 		this.castShadowNode = source.castShadowNode;
 
