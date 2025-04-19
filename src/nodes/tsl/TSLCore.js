@@ -715,7 +715,8 @@ export const If = ( ...params ) => currentStack.If( ...params );
  *
  * ```js
  * Switch( value )
- * 	.Case( ...compareValues, function )
+ * 	.Case( 1, function )
+ * 	.Case( 2, 3, 4, function )
  * 	.Default( function )
  * ```
  * @tsl
