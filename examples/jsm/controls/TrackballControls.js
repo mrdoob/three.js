@@ -695,6 +695,8 @@ function onPointerMove( event ) {
 
 	}
 
+	this.update();
+
 }
 
 function onPointerUp( event ) {
@@ -870,6 +872,8 @@ function onMouseWheel( event ) {
 
 	event.preventDefault();
 
+	this.dispatchEvent( _startEvent );
+
 	switch ( event.deltaMode ) {
 
 		case 2:
@@ -889,7 +893,8 @@ function onMouseWheel( event ) {
 
 	}
 
-	this.dispatchEvent( _startEvent );
+	this.update();
+
 	this.dispatchEvent( _endEvent );
 
 }

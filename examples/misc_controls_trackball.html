@@ -43,7 +43,9 @@
 			let perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			const params = {
-				orthographicCamera: false
+				orthographicCamera: false,
+				staticMoving: false,
+				onDemandRendering: false
 			};
 
 			const frustumSize = 400;
@@ -99,8 +101,9 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( params.onDemandRendering ? null : animate );
 				document.body.appendChild( renderer.domElement );
+			
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -112,7 +115,23 @@
 
 					controls.dispose();
 
+					params.onDemandRendering && controls.removeEventListener( 'change', render );
+					controls.removeEventListener( 'start', onStart );
+					controls.removeEventListener( 'end', onEnd );
+
 					createControls( value ? orthographicCamera : perspectiveCamera );
+			
+				} );
+
+				gui.add( params, 'staticMoving' ).name( 'static moving' ).onChange( function ( value ) {
+
+					controls.staticMoving = value;
+
+				} );
+
+				gui.add( params, 'onDemandRendering' ).name( 'on demand rendering' ).onChange( function ( value ) {
+
+					renderer.setAnimationLoop( value ? null : animate );
 
 				} );
 
@@ -124,6 +143,25 @@
 
 			}
 
+			function onStart() {
+
+				console.log( 'start' );
+			
+			}
+
+			function onEnd() {
+
+				console.log( 'end' );
+			
+			}
+
+			function onChange() {
+			
+				console.log( 'change' );
+				params.onDemandRendering && render();
+			
+			}
+
 			function createControls( camera ) {
 
 				controls = new TrackballControls( camera, renderer.domElement );
@@ -133,6 +171,10 @@
 				controls.panSpeed = 0.8;
 
 				controls.keys = [ 'KeyA', 'KeyS', 'KeyD' ];
+
+				controls.addEventListener( 'start', onStart );
+				controls.addEventListener( 'change', onChange );
+				controls.addEventListener( 'end', onEnd );
 
 			}
 
