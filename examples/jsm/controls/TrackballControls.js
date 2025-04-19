@@ -232,7 +232,7 @@ class TrackballControls extends Controls {
 
 		// event listeners
 
-		this._onPointerMove = onPointerMove.bind( this );
+		this._onPointerMove = throttle(onPointerMove.bind( this ),16);
 		this._onPointerDown = onPointerDown.bind( this );
 		this._onPointerUp = onPointerUp.bind( this );
 		this._onPointerCancel = onPointerCancel.bind( this );
@@ -651,6 +651,22 @@ class TrackballControls extends Controls {
 	}
 
 }
+
+function throttle (fn, delay){
+	let curTime = Date.now();
+
+	return function(){
+		let context = this,
+		args = arguments,
+		nowTime = Date.now();
+
+		if (nowTime - curTime >= delay) {
+			curTime = Date.now();
+			return fn.apply(context, args);
+		}
+	}
+}
+
 
 function onPointerDown( event ) {
 
