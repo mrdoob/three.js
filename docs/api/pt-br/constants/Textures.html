@@ -147,8 +147,6 @@
 		THREE.RGBFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
-		THREE.LuminanceFormat
-		THREE.LuminanceAlphaFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -176,15 +174,6 @@
 		[page:constant RGBAIntegerFormat] é o padrão e lê os componentes vermelho, verde, azul e alfa.
 		Os texels são lidos como inteiros em vez de ponto flutuante.
 		<br /><br />
-
-		[page:constant LuminanceFormat] lê cada elemento como um único componente de luminância.
-		Este é então convertido em um ponto flutuante, fixado no intervalo [0,1], e então montado
-		em um elemento RGBA, colocando o valor de luminância nos canais vermelho, verde e azul,
-		e anexando 1.0 ao canal alfa.<br /><br />
-
-		[page:constant LuminanceAlphaFormat] lê cada elemento como um duplo de luminância/alfa.
-		O mesmo processo ocorre para o [page:constant LuminanceFormat], exceto que o
-		o canal alfa pode ter valores diferentes de `1.0`.<br /><br />
 
 		[page:constant DepthFormat] lê cada elemento como um único valor de profundidade, converte-o em ponto flutuante e fixa no intervalo [0,1].
 		Este é o padrão para [page:DepthTexture DepthTexture].<br /><br />

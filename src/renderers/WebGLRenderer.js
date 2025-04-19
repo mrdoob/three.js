@@ -1297,7 +1297,7 @@ class WebGLRenderer {
 		 * @param {Object3D} scene - The scene or another type of 3D object to precompile.
 		 * @param {Camera} camera - The camera.
 		 * @param {?Scene} [targetScene=null] - The target scene.
-		 * @return {?Set} The precompiled materials.
+		 * @return {Set<Material>} The precompiled materials.
 		 */
 		this.compile = function ( scene, camera, targetScene = null ) {
 
@@ -2997,7 +2997,7 @@ class WebGLRenderer {
 		 * Copies pixels from the current bound framebuffer into the given texture.
 		 *
 		 * @param {FramebufferTexture} texture - The texture.
-		 * @param {Vector2} position - The start position of the copy operation.
+		 * @param {?Vector2} [position=null] - The start position of the copy operation.
 		 * @param {number} [level=0] - The mip level. The default represents the base mip.
 		 */
 		this.copyFramebufferToTexture = function ( texture, position = null, level = 0 ) {
@@ -3028,10 +3028,10 @@ class WebGLRenderer {
 		 *
 		 * @param {Texture} srcTexture - The source texture.
 		 * @param {Texture} dstTexture - The destination texture.
-		 * @param {Box2|Box3} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
-		 * @param {Vector2|Vector3} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
-		 * @param {number} srcLevel - The source mipmap level to copy.
-		 * @param {number} dstLevel - The destination mipmap level.
+		 * @param {?(Box2|Box3)} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
+		 * @param {?(Vector2|Vector3)} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
+		 * @param {number} [srcLevel=0] - The source mipmap level to copy.
+		 * @param {?number} [dstLevel=null] - The destination mipmap level.
 		 */
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
 

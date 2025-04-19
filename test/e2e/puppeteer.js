@@ -42,6 +42,9 @@ const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
+	// tiles not loaded in time for screenshot
+	'webgl_loader_3dtiles',
+
 	// video tag isn't deterministic enough?
 	'css3d_youtube',
 	'webgl_materials_video',
@@ -165,6 +168,7 @@ const exceptionList = [
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
+	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_xr_native_layers',
 

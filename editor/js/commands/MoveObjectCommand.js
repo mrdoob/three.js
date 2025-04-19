@@ -50,6 +50,9 @@ class MoveObjectCommand extends Command {
 		this.object.parent = this.newParent;
 
 		this.object.dispatchEvent( { type: 'added' } );
+		this.editor.signals.objectChanged.dispatch( this.object );
+		this.editor.signals.objectChanged.dispatch( this.newParent );
+		this.editor.signals.objectChanged.dispatch( this.oldParent );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
 	}
@@ -63,6 +66,9 @@ class MoveObjectCommand extends Command {
 		this.object.parent = this.oldParent;
 
 		this.object.dispatchEvent( { type: 'added' } );
+		this.editor.signals.objectChanged.dispatch( this.object );
+		this.editor.signals.objectChanged.dispatch( this.newParent );
+		this.editor.signals.objectChanged.dispatch( this.oldParent );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
 	}

@@ -187,7 +187,7 @@ class EffectComposer {
 	 * Returns `true` if the pass for the given index is the last enabled pass in the pass chain.
 	 *
 	 * @param {number} passIndex - The pass index.
-	 * @return {boolean} Whether the the pass for the given index is the last pass in the pass chain.
+	 * @return {boolean} Whether the pass for the given index is the last pass in the pass chain.
 	 */
 	isLastEnabledPass( passIndex ) {
 

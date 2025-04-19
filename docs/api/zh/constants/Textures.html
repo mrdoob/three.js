@@ -137,8 +137,6 @@
 		THREE.RGBFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
-		THREE.LuminanceFormat
-		THREE.LuminanceAlphaFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 	</code>
@@ -165,12 +163,6 @@
 		[page:constant RGBAIntegerFormat] is the default and reads the red, green, blue and alpha components.
 		The texels are read as integers instead of floating point.
 		<br /><br />
-
-		[page:constant LuminanceFormat] 将每个元素作为单独的亮度分量来读取。
-		将其转换为范围限制在[0,1]区间的浮点数，然后通过将亮度值放入红、绿、蓝通道，并将1.0赋给Alpha通道，来组装成一个RGBA元素。<br /><br />
-
-		[page:constant LuminanceAlphaFormat] 将每个元素同时作为亮度分量和Alpha分量来读取。
-		和上面[page:constant LuminanceFormat]的处理过程是一致的，除了Alpha分量具有除了*1.0*以外的值。<br /><br />
 
 		[page:constant DepthFormat]将每个元素作为单独的深度值来读取，将其转换为范围限制在[0,1]区间的浮点数。
 		它是[page:DepthTexture DepthTexture]的默认值。<br /><br />

@@ -166,15 +166,16 @@
 
 					const data = {
 						radius: 5,
-						length: 5,
+						height: 5,
 						capSegments: 10,
-						radialSegments: 20
+						radialSegments: 20,
+						heightSegments: 1
 					};
 
 					function generateGeometry() {
 
 						updateGroupGeometry( mesh,
-							new CapsuleGeometry( data.radius, data.length, data.capSegments, data.radialSegments ),
+							new CapsuleGeometry( data.radius, data.height, data.capSegments, data.radialSegments, data.heightSegments ),
 						);
 
 					}
@@ -182,9 +183,10 @@
 					const folder = gui.addFolder( 'THREE.CapsuleGeometry' );
 
 					folder.add( data, 'radius', 1, 30 ).onChange( generateGeometry );
-					folder.add( data, 'length', 1, 30 ).onChange( generateGeometry );
+					folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
 					folder.add( data, 'capSegments', 1, 32 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'radialSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+					folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 
 					generateGeometry();
 

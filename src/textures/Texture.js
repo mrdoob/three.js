@@ -344,6 +344,15 @@ class Texture extends EventDispatcher {
 		this.isRenderTargetTexture = false;
 
 		/**
+		 * Indicates if a texture should be handled like a texture array.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
+		this.isTextureArray = false;
+
+		/**
 		 * Indicates whether this texture should be processed by `PMREMGenerator` or not
 		 * (only relevant for render target textures).
 		 *
@@ -437,7 +446,11 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
+<<<<<<< HEAD
 		this.isArrayTexture = source.isArrayTexture;
+=======
+		this.isTextureArray = source.isTextureArray;
+>>>>>>> upstream/dev
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

@@ -36,6 +36,7 @@ class RenderTarget extends EventDispatcher {
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
 	 * @property {number} [depth=1] - The texture depth.
+	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering.
 	 */
 
 	/**
@@ -179,7 +180,8 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
-		this._depthTexture = options.depthTexture;
+		this._depthTexture = null;
+		this.depthTexture = options.depthTexture;
 
 		/**
 		 * The number of MSAA samples.
@@ -190,6 +192,14 @@ class RenderTarget extends EventDispatcher {
 		 * @default 0
 		 */
 		this.samples = options.samples;
+
+		/**
+		 * Whether to this target is used in multiview rendering.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.multiview = options.multiview;
 
 	}
 

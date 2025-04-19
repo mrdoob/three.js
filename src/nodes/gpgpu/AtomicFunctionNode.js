@@ -150,10 +150,7 @@ const atomicNode = nodeProxy( AtomicFunctionNode );
  */
 export const atomicFunc = ( method, pointerNode, valueNode ) => {
 
-	const node = atomicNode( method, pointerNode, valueNode );
-	node.append();
-
-	return node;
+	return atomicNode( method, pointerNode, valueNode ).toStack();
 
 };
 

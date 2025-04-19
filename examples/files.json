@@ -73,6 +73,7 @@
 		"webgl_lines_fat_wireframe",
 		"webgl_loader_3dm",
 		"webgl_loader_3ds",
+		"webgl_loader_3dtiles",
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
 		"webgl_loader_amf",
@@ -508,7 +509,9 @@
 		"physics_rapier_instancing",
 		"physics_rapier_joints",
 		"physics_rapier_character_controller",
-		"physics_rapier_vehicle_controller"
+		"physics_rapier_vehicle_controller",
+		"physics_rapier_terrain"
+
 	],
 	"misc": [
 		"misc_animation_groups",
