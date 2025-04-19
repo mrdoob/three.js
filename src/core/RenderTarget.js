@@ -61,7 +61,8 @@ class RenderTarget extends EventDispatcher {
 			depthTexture: null,
 			samples: 0,
 			count: 1,
-			depth: 1
+			depth: 1,
+			multiview: false
 		}, options );
 
 		/**

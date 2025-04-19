@@ -54,12 +54,6 @@ class Texture extends EventDispatcher {
 		 */
 		this.isTexture = true;
 
-		if ( image && image.depth && image.depth > 1 ) {
-
-			this.isArrayTexture = true;
-
-		}
-
 		/**
 		 * The ID of the texture.
 		 *
@@ -350,7 +344,7 @@ class Texture extends EventDispatcher {
 		 * @readonly
 		 * @default false
 		 */
-		this.isTextureArray = false;
+		this.isArrayTexture = image && image.depth && image.depth > 1 ? true : false;
 
 		/**
 		 * Indicates whether this texture should be processed by `PMREMGenerator` or not
