@@ -35,7 +35,10 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			import Stats from 'three/addons/libs/stats.module.js';
+
 			let camera, scene, renderer, controls;
+			let stats;
 			let gltf;
 
 			init();
@@ -162,6 +165,11 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				// stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -181,7 +189,9 @@
 
 			}
 
-			async function animate() {
+			function animate() {
+
+				stats.update();
 
 				for ( const mesh of gltf.children ) {
 
