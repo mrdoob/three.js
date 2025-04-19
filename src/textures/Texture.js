@@ -446,11 +446,7 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
-<<<<<<< HEAD
 		this.isArrayTexture = source.isArrayTexture;
-=======
-		this.isTextureArray = source.isTextureArray;
->>>>>>> upstream/dev
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

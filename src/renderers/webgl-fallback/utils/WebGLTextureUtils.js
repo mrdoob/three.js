@@ -112,11 +112,7 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
-<<<<<<< HEAD
 		} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-=======
-		} else if ( texture.isDepthArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true || texture.isTextureArray === true ) {
->>>>>>> upstream/dev
 
 			glTextureType = gl.TEXTURE_2D_ARRAY;
 
@@ -311,11 +307,7 @@ class WebGLTextureUtils {
 		if ( textureType === gl.TEXTURE_3D || textureType === gl.TEXTURE_2D_ARRAY ) {
 
 			// WebGL 2 does not support wrapping for depth 2D array textures
-<<<<<<< HEAD
 			if ( ! texture.isArrayTexture ) {
-=======
-			if ( texture.isDepthArrayTexture !== true && texture.isTextureArray === false ) {
->>>>>>> upstream/dev
 
 				gl.texParameteri( textureType, gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
 
@@ -417,11 +409,7 @@ class WebGLTextureUtils {
 
 		this.setTextureParameters( glTextureType, texture );
 
-<<<<<<< HEAD
 		if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
-=======
-		if ( texture.isDepthArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture || texture.isTextureArray ) {
->>>>>>> upstream/dev
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 

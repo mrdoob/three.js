@@ -52,6 +52,34 @@ class WebGPUPipelineUtils {
 	}
 
 	/**
+	 *
+	 * Helper function to get the blending operation.
+	 *
+	 * @private
+	 * @param {number} blendProperty - The blend property.
+	 * @param {?number} [index=0] - The index of the blend property.
+	 * @return {number} The blend operation.
+	 */
+	_getBlendProperty( blendProperty, index = 0 ) {
+
+
+		if ( Array.isArray( blendProperty ) === true ) {
+
+			blendProperty = blendProperty[ index ];
+
+			if ( blendProperty === undefined ) {
+
+				blendProperty = null;
+
+			}
+
+		}
+
+		return blendProperty;
+
+	}
+
+	/**
 	 * Creates a render pipeline for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -84,15 +112,6 @@ class WebGPUPipelineUtils {
 
 		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
 
-		// blending
-
-		let blending;
-
-		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent !== false ) ) {
-
-			blending = this._getBlending( material );
-
-		}
 
 		// stencil
 
@@ -121,9 +140,28 @@ class WebGPUPipelineUtils {
 
 				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
 
+				// blending
+
+				let blend;
+
+				if ( material.transparent === true && material.blending !== NoBlending ) {
+
+					const premultipliedAlpha = material.premultipliedAlpha;
+					const blending = this._getBlendProperty( material.blending, i ) || NormalBlending;
+					const blendEquation = this._getBlendProperty( material.blendEquation, i ) || AddEquation;
+					const blendSrc = this._getBlendProperty( material.blendSrc, i ) || SrcAlphaFactor;
+					const blendDst = this._getBlendProperty( material.blendDst, i ) || OneMinusSrcAlphaFactor;
+					const blendEquationAlpha = this._getBlendProperty( material.blendEquationAlpha, i );
+					const blendSrcAlpha = this._getBlendProperty( material.blendSrcAlpha, i );
+					const blendDstAlpha = this._getBlendProperty( material.blendDstAlpha, i );
+
+					blend = this._getBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha );
+
+				}
+
 				targets.push( {
 					format: colorFormat,
-					blend: blending,
+					blend: blend,
 					writeMask: colorWriteMask
 				} );
 
@@ -131,11 +169,31 @@ class WebGPUPipelineUtils {
 
 		} else {
 
+
 			const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+
+			// blending
+
+			let blend;
+
+			if ( material.transparent === true && material.blending !== NoBlending ) {
+
+				const premultipliedAlpha = material.premultipliedAlpha;
+				const blending = this._getBlendProperty( material.blending ) || NormalBlending;
+				const blendEquation = this._getBlendProperty( material.blendEquation ) || AddEquation;
+				const blendSrc = this._getBlendProperty( material.blendSrc ) || SrcAlphaFactor;
+				const blendDst = this._getBlendProperty( material.blendDst ) || OneMinusSrcAlphaFactor;
+				const blendEquationAlpha = this._getBlendProperty( material.blendEquationAlpha );
+				const blendSrcAlpha = this._getBlendProperty( material.blendSrcAlpha );
+				const blendDstAlpha = this._getBlendProperty( material.blendDstAlpha );
+
+				blend = this._getBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha );
+
+			}
 
 			targets.push( {
 				format: colorFormat,
-				blend: blending,
+				blend: blend,
 				writeMask: colorWriteMask
 			} );
 
@@ -292,24 +350,27 @@ class WebGPUPipelineUtils {
 	 * for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Material} material - The material.
+	 * @param {number} blending - The blending type.
+	 * @param {number} blendEquation - The blending equation.
+	 * @param {number} blendSrc - Only relevant for custom blending. The RGB source blending factor.
+	 * @param {number} blendDst - Only relevant for custom blending. The RGB destination blending factor.
+	 * @param {number} blendEquationAlpha - Only relevant for custom blending. The blending equation for alpha.
+	 * @param {number} blendSrcAlpha - Only relevant for custom blending. The alpha source blending factor.
+	 * @param {number} blendDstAlpha - Only relevant for custom blending. The alpha destination blending factor.
+	 * @param {boolean} premultipliedAlpha - Whether premultiplied alpha is enabled or not.
 	 * @return {Object} The blending state.
 	 */
-	_getBlending( material ) {
+	_getBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
 		let color, alpha;
 
-		const blending = material.blending;
-		const blendSrc = material.blendSrc;
-		const blendDst = material.blendDst;
-		const blendEquation = material.blendEquation;
 
 
 		if ( blending === CustomBlending ) {
 
-			const blendSrcAlpha = material.blendSrcAlpha !== null ? material.blendSrcAlpha : blendSrc;
-			const blendDstAlpha = material.blendDstAlpha !== null ? material.blendDstAlpha : blendDst;
-			const blendEquationAlpha = material.blendEquationAlpha !== null ? material.blendEquationAlpha : blendEquation;
+			blendSrcAlpha = blendSrcAlpha !== null ? blendSrcAlpha : blendSrc;
+			blendDstAlpha = blendDstAlpha !== null ? blendDstAlpha : blendDst;
+			blendEquationAlpha = blendEquationAlpha !== null ? blendEquationAlpha : blendEquation;
 
 			color = {
 				srcFactor: this._getBlendFactor( blendSrc ),
@@ -325,7 +386,6 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			const premultipliedAlpha = material.premultipliedAlpha;
 
 			const setBlend = ( srcRGB, dstRGB, srcAlpha, dstAlpha ) => {
 

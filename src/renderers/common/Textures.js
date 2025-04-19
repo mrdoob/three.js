@@ -77,15 +77,7 @@ class Textures extends DataMap {
 
 		if ( depthTexture === undefined && useDepthTexture ) {
 
-			if ( renderTarget.multiview === true && size.depth > 1 ) {
-
-				depthTexture = new DepthArrayTexture();
-
-			} else {
-
-				depthTexture = new DepthTexture();
-
-			}
+			depthTexture = new DepthTexture();
 
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
 			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
