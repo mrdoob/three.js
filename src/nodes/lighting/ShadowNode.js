@@ -365,6 +365,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
+		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
