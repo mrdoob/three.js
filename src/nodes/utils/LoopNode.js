@@ -332,7 +332,7 @@ export default LoopNode;
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
@@ -341,7 +341,7 @@ export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params
  * @function
  * @returns {ExpressionNode}
  */
-export const Continue = () => expression( 'continue' ).append();
+export const Continue = () => expression( 'continue' ).toStack();
 
 /**
  * TSL function for creating a `Break()` expression.
@@ -350,7 +350,7 @@ export const Continue = () => expression( 'continue' ).append();
  * @function
  * @returns {ExpressionNode}
  */
-export const Break = () => expression( 'break' ).append();
+export const Break = () => expression( 'break' ).toStack();
 
 // Deprecated
 
