@@ -3,6 +3,11 @@ import { createElementNS } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { getByteLength } from '../../extras/TextureUtils.js';
+import {
+	LuminanceFormat, NoColorSpace, LinearSRGBColorSpace, RGBAFormat,
+	UnsignedByteType
+} from '../../constants.js';
+
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
@@ -2105,7 +2110,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	function verifyColorSpace( texture, image ) {
-
+        if ( format === LuminanceFormat ) {
+			// LuminanceFormat must use NoColorSpace (since sRGB with RED not allowed in WebGL2)
+			if ( colorSpace !== NoColorSpace ) {
+				console.warn( 'THREE.WebGLTextures: LuminanceFormat textures must use NoColorSpace.' );
+			}
+		}
+		
 		const colorSpace = texture.colorSpace;
 		const format = texture.format;
 		const type = texture.type;
