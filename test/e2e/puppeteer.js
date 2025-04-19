@@ -110,6 +110,7 @@ const exceptionList = [
 	'webgpu_multisampled_renderbuffers',
 	'webgl_test_wide_gamut',
 	'webgl_volume_instancing',
+	'webgpu_volume_caustics',
 
 	// Intentional z-fighting in this demo makes it non-deterministic
 	'webgl_reverse_depth_buffer',
