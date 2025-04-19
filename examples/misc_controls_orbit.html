@@ -36,8 +36,18 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, controls, scene, renderer;
+			const params = {
+				orthographicCamera: false,
+				staticMoving: false,
+				onDemandRendering: false
+			
+			};
+
+			const frustumSize = 400;
+
+			let perspectiveCamera, orthographicCamera, controls, scene, renderer;
 
 			init();
 			//render(); // remove when using animation loop
@@ -51,28 +61,19 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( params.onDemandRendering ? null : animate );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 400, 200, 0 );
+
+				const aspect = window.innerWidth / window.innerHeight;
+				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
+				perspectiveCamera.position.set( 400, 200, 0 );
+
+				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+				orthographicCamera.position.set( 400, 200, 0 );
 
 				// controls
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.listenToKeyEvents( window ); // optional
-
-				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
-
-				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-				controls.dampingFactor = 0.05;
-
-				controls.screenSpacePanning = false;
-
-				controls.minDistance = 100;
-				controls.maxDistance = 500;
-
-				controls.maxPolarAngle = Math.PI / 2;
+				createControls();
 
 				// world
 
@@ -108,15 +109,89 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				const gui = new GUI();
+
+				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( function ( value ) {
+
+					controls.dispose();
+
+					params.onDemandRendering && controls.removeEventListener( 'change', render );
+					controls.removeEventListener( 'start', onStart );
+					controls.removeEventListener( 'end', onEnd );
+
+					createControls( value ? orthographicCamera : perspectiveCamera );
+
+				} );
+				gui.add( params, 'staticMoving' ).name( 'static moving' ).onChange( function ( value ) {
+			
+					controls.enableDamping = value;
+			
+				} );
+				gui.add( params, 'onDemandRendering' ).name( 'on demand rendering' ).onChange( function ( value ) {
+
+					renderer.setAnimationLoop( value ? null : animate );
+
+				} );
+
+			}
+
+			function createControls() {
+			
+				controls = new OrbitControls( params.orthographicCamera ? orthographicCamera : perspectiveCamera, renderer.domElement );
+				controls.listenToKeyEvents( window ); // optional
+
+				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+
+				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+				controls.dampingFactor = 0.05;
+
+				controls.screenSpacePanning = false;
+
+				controls.minDistance = 100;
+				controls.maxDistance = 500;
+
+				controls.maxPolarAngle = Math.PI / 2;
+
+				controls.addEventListener( 'start', onStart );
+				controls.addEventListener( 'change', onChange );
+				controls.addEventListener( 'end', onEnd );
+			
 			}
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				const aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera.aspect = aspect;
+				perspectiveCamera.updateProjectionMatrix();
+
+				orthographicCamera.left = - frustumSize * aspect / 2;
+				orthographicCamera.right = frustumSize * aspect / 2;
+				orthographicCamera.top = frustumSize / 2;
+				orthographicCamera.bottom = - frustumSize / 2;
+				orthographicCamera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+			}
+
+			function onStart() {
+			
+				console.log( 'start' );
+			
+			}
+
+			function onChange() {
+			
+				console.log( 'change' );
+				params.onDemandRendering && render();
+			
+			}
+
+			function onEnd() {
+
+				console.log( 'end' );
+			
 			}
 
 			function animate() {
@@ -129,6 +204,7 @@
 
 			function render() {
 
+				const camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 				renderer.render( scene, camera );
 
 			}
