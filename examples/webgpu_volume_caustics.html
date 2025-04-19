@@ -57,7 +57,7 @@
 
 				scene = new THREE.Scene();
 
-				// light
+				// Light
 
 				const spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( .2, .3, .2 );
@@ -76,7 +76,7 @@
 				spotLight.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				scene.add( spotLight );
 
-				// model / textures
+				// Model / Textures
 
 				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
@@ -90,7 +90,7 @@
 				causticMap.wrapS = causticMap.wrapT = THREE.RepeatWrapping;
 				causticMap.colorSpace = THREE.SRGBColorSpace;
 
-				// objects / material
+				// Material
 
 				const duck = gltf.children[ 0 ];
 				duck.material = new THREE.MeshPhysicalNodeMaterial();
@@ -104,7 +104,7 @@
 				duck.material.roughness = .1;
 				duck.castShadow = true;
 
-				// tsl shader
+				// TSL Shader
 
 				const causticOcclusion = uniform( 1 );
 
@@ -151,13 +151,13 @@
 
 				} )();
 
-				// gui
+				// GUI
 
 				const gui = new GUI();
 				gui.add( causticOcclusion, 'value', 0, 20 ).name( 'caustic occlusion' );
 				gui.addColor( duck.material, 'color' ).name( 'material color' );
 
-				// ground
+				// Ground
 
 				const textureLoader = new THREE.TextureLoader();
 				const map = textureLoader.load( 'textures/hardwood2_diffuse.jpg' );
@@ -172,7 +172,7 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				// renderer
+				// Renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
@@ -295,13 +295,12 @@
 
 				postProcessing.outputNode = scenePassColor;
 
-
-				// stats
+				// Stats
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				// controls
+				// Controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.z = - .05;
@@ -333,7 +332,6 @@
 
 				controls.update();
 
-				//renderer.render( scene, camera );
 				postProcessing.render();
 
 			}
