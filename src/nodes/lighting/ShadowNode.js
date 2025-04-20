@@ -17,6 +17,12 @@ import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
 import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
+
+//
+
+const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
+const _shadowRenderObjectKeys = [];
 
 /**
  * Creates a function to render shadow objects in a scene.
@@ -38,25 +44,44 @@ import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFil
  */
 export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
-	return ( object, scene, _camera, geometry, material, group, ...params ) => {
+	_shadowRenderObjectKeys[ 0 ] = renderer;
+	_shadowRenderObjectKeys[ 1 ] = shadow;
 
-		if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+	let renderObjectFunction = _shadowRenderObjectLibrary.get( _shadowRenderObjectKeys );
 
-			if ( useVelocity ) {
+	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
 
-				getDataFromObject( object ).useVelocity = true;
+		renderObjectFunction = ( object, scene, _camera, geometry, material, group, ...params ) => {
+
+			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( useVelocity ) {
+
+					getDataFromObject( object ).useVelocity = true;
+
+				}
+
+				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
-			object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		};
 
-			renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+		renderObjectFunction.shadowType = shadowType;
+		renderObjectFunction.useVelocity = useVelocity;
 
-			object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		_shadowRenderObjectLibrary.set( _shadowRenderObjectKeys, renderObjectFunction );
 
-		}
+	}
 
-	};
+	_shadowRenderObjectKeys[ 0 ] = null;
+	_shadowRenderObjectKeys[ 1 ] = null;
+
+	return renderObjectFunction;
 
 };
 
