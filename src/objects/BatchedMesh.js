@@ -1455,7 +1455,6 @@ class BatchedMesh extends Mesh {
 		this._maxIndexCount = source._maxIndexCount;
 
 		this._geometryInitialized = source._geometryInitialized;
-		this._geometryCount = source._geometryCount;
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
 
