@@ -994,10 +994,8 @@ class ObjectLoader extends Loader {
 					}
 
 					return {
-						boxInitialized: info.boxInitialized,
+						...info,
 						boundingBox: box,
-
-						sphereInitialized: info.sphereInitialized,
 						boundingSphere: sphere
 					};
 
