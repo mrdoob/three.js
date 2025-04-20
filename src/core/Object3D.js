@@ -1295,13 +1295,15 @@ class Object3D extends EventDispatcher {
 			object.reservedRanges = this._reservedRanges;
 
 			object.geometryInfo = this._geometryInfo.map( info => ( {
-				boxInitialized: info.boxInitialized,
-				boxMin: info.boundingBox ? info.boundingBox.min.toArray() : null,
-				boxMax: info.boundingBox ? info.boundingBox.max.toArray() : null,
-
-				sphereInitialized: info.sphereInitialized,
-				sphereRadius: info.boundingSphere ? info.boundingSphere.radius : null,
-				sphereCenter: info.boundingSphere ? info.boundingSphere.center.toArray() : null
+				...info,
+				boundingBox: info.boundingBox ? {
+					min: info.boundingBox.min.toArray(),
+					max: info.boundingBox.max.toArray()
+				} : undefined,
+				boundingSphere: info.boundingSphere ? {
+					radius: info.boundingSphere.radius,
+					center: info.boundingSphere.center.toArray()
+				} : undefined
 			} ) );
 			object.instanceInfo = this._instanceInfo.map( info => ( { ...info } ) );
 

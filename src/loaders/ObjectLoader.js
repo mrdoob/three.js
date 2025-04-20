@@ -975,20 +975,30 @@ class ObjectLoader extends Loader {
 
 				object._geometryInfo = data.geometryInfo.map( info => {
 
-					const box = new Box3();
-					box.min.fromArray( info.boxMin );
-					box.max.fromArray( info.boxMax );
+					let box = null;
+					let sphere = null;
+					if ( info.boundingBox !== undefined ) {
 
-					const sphere = new Sphere();
-					sphere.radius = info.sphereRadius;
-					sphere.center.fromArray( info.sphereCenter );
+						box = new Box3();
+						box.min.fromArray( info.boundingBox.min );
+						box.max.fromArray( info.boundingBox.max );
+
+					}
+
+					if ( info.boundingSphere !== undefined ) {
+
+						sphere = new Sphere();
+						sphere.radius = info.boundingSphere.radius;
+						sphere.center.fromArray( info.boundingSphere.center );
+
+					}
 
 					return {
 						boxInitialized: info.boxInitialized,
-						box: box,
+						boundingBox: box,
 
 						sphereInitialized: info.sphereInitialized,
-						sphere: sphere
+						boundingSphere: sphere
 					};
 
 				} );
