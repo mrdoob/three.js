@@ -973,37 +973,65 @@ class ObjectLoader extends Loader {
 				object._drawRanges = data.drawRanges;
 				object._reservedRanges = data.reservedRanges;
 
-				object._visibility = data.visibility;
-				object._active = data.active;
-				object._bounds = data.bounds.map( bound => {
+				object._geometryInfo = data.geometryInfo.map( info => {
 
 					const box = new Box3();
-					box.min.fromArray( bound.boxMin );
-					box.max.fromArray( bound.boxMax );
+					box.min.fromArray( info.boxMin );
+					box.max.fromArray( info.boxMax );
 
 					const sphere = new Sphere();
-					sphere.radius = bound.sphereRadius;
-					sphere.center.fromArray( bound.sphereCenter );
+					sphere.radius = info.sphereRadius;
+					sphere.center.fromArray( info.sphereCenter );
 
 					return {
-						boxInitialized: bound.boxInitialized,
+						boxInitialized: info.boxInitialized,
 						box: box,
 
-						sphereInitialized: bound.sphereInitialized,
+						sphereInitialized: info.sphereInitialized,
 						sphere: sphere
 					};
 
 				} );
+				object._instanceInfo = data.instanceInfo;
+
+				object._availableInstanceIds = data._availableInstanceIds;
+				object._availableGeometryIds = data._availableGeometryIds;
+
+				object._nextIndexStart = data.nextIndexStart;
+				object._nextVertexStart = data.nextVertexStart;
+				object._geometryCount = data.geometryCount;
 
 				object._maxInstanceCount = data.maxInstanceCount;
 				object._maxVertexCount = data.maxVertexCount;
 				object._maxIndexCount = data.maxIndexCount;
 
 				object._geometryInitialized = data.geometryInitialized;
-				object._geometryCount = data.geometryCount;
 
 				object._matricesTexture = getTexture( data.matricesTexture.uuid );
-				if ( data.colorsTexture !== undefined ) object._colorsTexture = getTexture( data.colorsTexture.uuid );
+
+				object._indirectTexture = getTexture( data.indirectTexture.uuid );
+
+				if ( data.colorsTexture !== undefined ) {
+
+					object._colorsTexture = getTexture( data.colorsTexture.uuid );
+
+				}
+
+				if ( data.boundingSphere !== undefined ) {
+
+					object.boundingSphere = new Sphere();
+					object.boundingSphere.center.fromArray( data.boundingSphere.center );
+					object.boundingSphere.radius = data.boundingSphere.radius;
+
+				}
+
+				if ( data.boundingBox !== undefined ) {
+
+					object.boundingBox = new Box3();
+					object.boundingBox.min.fromArray( data.boundingBox.min );
+					object.boundingBox.max.fromArray( data.boundingBox.max );
+
+				}
 
 				break;
 
