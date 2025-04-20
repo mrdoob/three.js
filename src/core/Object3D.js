@@ -1294,8 +1294,6 @@ class Object3D extends EventDispatcher {
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
 
-			object.visibility = this._visibility;
-			object.active = this._active;
 			object.geometryInfo = this._geometryInfo.map( info => ( {
 				boxInitialized: info.boxInitialized,
 				boxMin: info.boundingBox ? info.boundingBox.min.toArray() : null,
@@ -1333,8 +1331,8 @@ class Object3D extends EventDispatcher {
 			if ( this.boundingSphere !== null ) {
 
 				object.boundingSphere = {
-					center: object.boundingSphere.center.toArray(),
-					radius: object.boundingSphere.radius
+					center: this.boundingSphere.center.toArray(),
+					radius: this.boundingSphere.radius
 				};
 
 			}
@@ -1342,8 +1340,8 @@ class Object3D extends EventDispatcher {
 			if ( this.boundingBox !== null ) {
 
 				object.boundingBox = {
-					min: object.boundingBox.min.toArray(),
-					max: object.boundingBox.max.toArray()
+					min: this.boundingBox.min.toArray(),
+					max: this.boundingBox.max.toArray()
 				};
 
 			}
