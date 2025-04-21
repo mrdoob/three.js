@@ -27,7 +27,7 @@
 
 			import * as THREE from 'three';
 
-			import { uniform, refract, div, positionViewDirection, positionLocal, normalView, texture, Fn, vec2, vec3 } from 'three/tsl';
+			import { uniform, refract, div, positionViewDirection, positionLocal, normalView, texture, Fn, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -84,12 +84,6 @@
 
 				// objects / material
 
-				const duckTest = gltf.children[ 0 ].clone();
-				duckTest.position.x = .3;
-				duckTest.castShadow = true;
-				duckTest.visible = false;
-				gltf.add( duckTest );
-
 				const duck = gltf.children[ 0 ];
 				duck.material = new THREE.MeshPhysicalNodeMaterial();
 				duck.material.side = THREE.DoubleSide;
@@ -134,16 +128,59 @@
 
 				} )();
 
+				//
+
+				const textureLoader = new THREE.TextureLoader();
+
+				// glass
+
+				const colorMap = textureLoader.load( 'textures/colors.png' );
+				colorMap.wrapS = colorMap.wrapT = THREE.RepeatWrapping;
+				colorMap.colorSpace = THREE.SRGBColorSpace;
+
+				const glassMaterial = new THREE.MeshPhysicalNodeMaterial();
+				glassMaterial.map = colorMap;
+				glassMaterial.side = THREE.DoubleSide;
+				glassMaterial.transparent = true;
+				glassMaterial.color = new THREE.Color( 0xffffff );
+				glassMaterial.transmission = 1;
+				glassMaterial.ior = 1.5;
+				glassMaterial.metalness = 0;
+				glassMaterial.roughness = .1;
+				glassMaterial.castShadowNode = vec4( texture( colorMap ).rgb, .8 );
+
+				const glass = new THREE.Mesh( new THREE.PlaneGeometry( .2, .2 ), glassMaterial );
+				glass.position.y = .1;
+				glass.castShadow = true;
+				glass.visible = false;
+				scene.add( glass );
+
 				// gui
 
 				const gui = new GUI();
 				gui.add( causticOcclusion, 'value', 0, 20 ).name( 'caustic occlusion' );
 				gui.addColor( duck.material, 'color' ).name( 'material color' );
-				gui.add( duckTest, 'visible' ).name( 'duck test' );
+				gui.add( { model: 'duck' }, 'model', [
+					'duck',
+					'glass'
+				] ).onChange( model => {
+
+					duck.visible = glass.visible = false;
+
+					if ( model === 'duck' ) {
+
+						duck.visible = true;
+
+					} else if ( model === 'glass' ) {
+
+						glass.visible = true;
+
+					}
+
+				} );
 
 				// ground
 
-				const textureLoader = new THREE.TextureLoader();
 				const map = textureLoader.load( 'textures/hardwood2_diffuse.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.repeat.set( 10, 10 );
