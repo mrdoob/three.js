@@ -614,6 +614,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 
+		renderer.setClearColor( 0x000000, 0 );
+
 		renderer.setRenderTarget( shadowMap );
 
 		this.renderShadow( frame );
