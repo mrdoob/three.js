@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - KTX2 texture loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			* {
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+			}
+
+			body {
+				background-color: #fff;
+				color: #444;
+			}
+
+			a {
+				color: #08f;
+			}
+
+			#content {
+				position: absolute;
+				top: 0; width: 100%;
+				z-index: 1;
+				padding: 3em 0 0 0;
+			}
+
+			#c {
+				position: absolute;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			.list-item {
+				display: inline-block;
+				margin: 1em;
+				padding: 1em;
+				box-shadow: 1px 2px 4px 0px rgba(0,0,0,0.25);
+			}
+
+			.list-item > div:nth-child(1) {
+				width: 200px;
+				height: 200px;
+			}
+
+			.list-item > div:nth-child(2) {
+				color: #888;
+				font-family: sans-serif;
+				font-size: large;
+				width: 200px;
+				margin-top: 0.5em;
+			}
+		</style>
+	</head>
+	<body>
+
+		<canvas id="c"></canvas>
+
+		<div id="content">
+			<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - KTX2 texture loader - webgl</div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { TextureHelper } from 'three/addons/helpers/TextureHelper.js';
+
+			let canvas, renderer;
+
+			const scenes = [];
+
+			const textures = [
+				// 2D uncompressed
+				{ path: '2d_rgba8.ktx2' },
+				{ path: '2d_rgba8_linear.ktx2' },
+				// '2d_rgba8_displayp3.ktx2',
+				{ path: '2d_rgba16_linear.ktx2' },
+				{ path: '2d_rgba32_linear.ktx2' },
+
+				// 2D compressed
+				{ path: '2d_astc4x4.ktx2' },
+				{ path: '2d_bc1.ktx2' },
+				{ path: '2d_bc3.ktx2' },
+				{ path: '2d_bc5.ktx2', supported: false },
+				{ path: '2d_bc7.ktx2', supported: false },
+				// '2d_etc1.ktx2',
+				// '2d_etc2.ktx2',
+
+				// 2D universal
+				{ path: '2d_etc1s.ktx2' },
+				{ path: '2d_uastc.ktx2' },
+
+				// 3D uncompressed
+				// '3d_rgba8.ktx2'
+			]
+
+			init();
+
+			async function init() {
+
+				canvas = document.getElementById( 'c' );
+
+				renderer = new THREE.WebGLRenderer( { canvas, antialias: true } );
+				renderer.setClearColor( 0xffffff, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+				const loader = new KTX2Loader()
+					.setTranscoderPath( 'jsm/libs/basis/' )
+					.setPath( 'textures/ktx2/' )
+					.detectSupport( renderer );
+
+				const geometry = flipY( new THREE.PlaneGeometry( 1, 1 ) );
+
+				const content = document.getElementById( 'content' );
+
+				for ( const { path, supported } of textures ) {
+
+					const scene = new THREE.Scene();
+
+					// make a list item
+					const element = document.createElement( 'div' );
+					element.className = 'list-item';
+
+					const sceneElement = document.createElement( 'div' );
+					element.appendChild( sceneElement );
+
+					const descriptionElement = document.createElement( 'div' );
+					descriptionElement.innerText = path
+					element.appendChild( descriptionElement );
+
+					// the element that represents the area we want to render the scene
+					scene.userData.element = sceneElement;
+					content.appendChild( element );
+
+					const camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
+					camera.position.z = 2;
+					scene.userData.camera = camera;
+
+					let subject;
+
+					try {
+
+						const texture = await loader.loadAsync( supported === false ? 'missing_three_support.ktx2' : path );
+
+						if ( texture.isCubeTexture || texture.isArrayTexture ) {
+
+							subject = new TextureHelper( texture );
+
+						} else {
+
+							subject = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({ map: texture }) )
+
+						}
+
+					} catch (e) {
+
+						console.error( `Failed to load ${path}`, e );
+
+						subject = new THREE.Object3D(); // TODO: Display visible error.
+
+					}
+
+					scene.add( subject );
+
+					scenes.push( scene );
+
+				}
+
+				renderer.setAnimationLoop( animate );
+
+
+			}
+
+			function updateSize() {
+
+				const width = canvas.clientWidth;
+				const height = canvas.clientHeight;
+
+				if ( canvas.width !== width || canvas.height !== height ) {
+
+					renderer.setSize( width, height, false );
+
+				}
+
+			}
+
+			/** Correct UVs to be compatible with `flipY=false` textures. */
+			function flipY( geometry ) {
+
+				const uv = geometry.attributes.uv;
+
+				for ( let i = 0; i < uv.count; i ++ ) {
+
+					uv.setY( i, 1 - uv.getY( i ) );
+
+				}
+
+				return geometry;
+
+			}
+
+			function animate() {
+
+				updateSize();
+
+				canvas.style.transform = `translateY(${window.scrollY}px)`;
+
+				renderer.setClearColor( 0xffffff );
+				renderer.setScissorTest( false );
+				renderer.clear();
+
+				renderer.setClearColor( 0xe0e0e0 );
+				renderer.setScissorTest( true );
+
+				scenes.forEach( function ( scene ) {
+
+					// get the element that is a place holder for where we want to
+					// draw the scene
+					const element = scene.userData.element;
+
+					// get its position relative to the page's viewport
+					const rect = element.getBoundingClientRect();
+
+					// check if it's offscreen. If so skip it
+					if ( rect.bottom < 0 || rect.top > renderer.domElement.clientHeight ||
+						 rect.right < 0 || rect.left > renderer.domElement.clientWidth ) {
+
+						return; // it's off screen
+
+					}
+
+					// set the viewport
+					const width = rect.right - rect.left;
+					const height = rect.bottom - rect.top;
+					const left = rect.left;
+					const bottom = renderer.domElement.clientHeight - rect.bottom;
+
+					renderer.setViewport( left, bottom, width, height );
+					renderer.setScissor( left, bottom, width, height );
+
+					const camera = scene.userData.camera;
+
+					renderer.render( scene, camera );
+
+				} );
+
+			}
+
+		</script>
+
+	</body>
+</html>
