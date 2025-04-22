@@ -24,6 +24,7 @@ import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 
 /**
  * Base class for all node materials.
@@ -778,7 +779,7 @@ class NodeMaterial extends Material {
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
+			colorNode = colorNode.mul( vertexColor() );
 
 		}
 
