@@ -2,7 +2,6 @@ import { Material } from '../Material.js';
 import { NormalBlending } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../../nodes/core/NodeUtils.js';
-import { attribute } from '../../nodes/core/AttributeNode.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAO } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
