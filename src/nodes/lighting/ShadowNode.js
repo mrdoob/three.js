@@ -390,6 +390,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
+		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
@@ -612,6 +613,8 @@ class ShadowNode extends ShadowBaseNode {
 		scene.overrideMaterial = getShadowMaterial( light );
 
 		renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+
+		renderer.setClearColor( 0x000000, 0 );
 
 		renderer.setRenderTarget( shadowMap );
 
