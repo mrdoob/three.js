@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
 /**
@@ -10,9 +10,9 @@ import { nodeProxy } from '../tsl/TSLCore.js';
  *
  * This node can only be used with a WebGPU backend.
  *
- * @augments TempNode
+ * @augments Node
  */
-class AtomicFunctionNode extends TempNode {
+class AtomicFunctionNode extends Node {
 
 	static get type() {
 
@@ -52,6 +52,14 @@ class AtomicFunctionNode extends TempNode {
 		 */
 		this.valueNode = valueNode;
 
+		/**
+		 * Creates a list of the parents for this node for detecting if the node needs to return a value.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	/**
@@ -81,6 +89,8 @@ class AtomicFunctionNode extends TempNode {
 
 	generate( builder ) {
 
+		const parents = builder.getNodeProperties( this ).parents;
+
 		const method = this.method;
 
 		const type = this.getNodeType( builder );
@@ -101,8 +111,9 @@ class AtomicFunctionNode extends TempNode {
 		}
 
 		const methodSnippet = `${ builder.getMethod( method, type ) }( ${ params.join( ', ' ) } )`;
+		const isVoid = parents.length === 1 && parents[ 0 ].isStackNode === true;
 
-		if ( b !== null ) {
+		if ( isVoid ) {
 
 			builder.addLineFlowCode( methodSnippet, this );
 
