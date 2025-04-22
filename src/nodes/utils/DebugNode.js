@@ -68,7 +68,7 @@ class DebugNode extends TempNode {
 
 export default DebugNode;
 
-/*
+/**
  * TSL function for creating a debug node.
  *
  * @tsl
