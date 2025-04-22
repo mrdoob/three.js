@@ -1692,12 +1692,7 @@ ${ flowData.code }
 
 				if ( this.isCustomStruct( uniform ) ) {
 
-					const isStructArray = bufferNode.value &&
-					bufferNode.value.array &&
-					typeof bufferNode.value.itemSize === 'number' &&
-					bufferNode.value.array.length > bufferNode.value.itemSize;
-
-					bufferSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var<${ bufferAccessMode }> ${ uniform.name } : ${ isStructArray ? `array<${ bufferType }>` : bufferType };` );
+					bufferSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var<${ bufferAccessMode }> ${ uniform.name } : ${ bufferType };` );
 
 				} else {
 
