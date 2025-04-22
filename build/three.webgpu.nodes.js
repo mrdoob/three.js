@@ -251,7 +251,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.renderer.nodes.modelViewMatrix !== null || builder.renderer.nodes.modelNormalViewMatrix !== null )
+		if ( builder.renderer.overrideNodes.modelViewMatrix !== null || builder.renderer.overrideNodes.modelNormalViewMatrix !== null )
 			return true;
 
 		return false;
@@ -1126,6 +1126,14 @@ class Node extends EventDispatcher {
 		this.global = false;
 
 		/**
+		 * Create a list of parents for this node during the build process.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.parents = false;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -1680,6 +1688,14 @@ class Node extends EventDispatcher {
 				for ( const childNode of Object.values( properties ) ) {
 
 					if ( childNode && childNode.isNode === true ) {
+
+						if ( childNode.parents === true ) {
+
+							const childProperties = builder.getNodeProperties( childNode );
+							childProperties.parents = childProperties.parents || [];
+							childProperties.parents.push( this );
+
+						}
 
 						childNode.build( builder );
 
@@ -3232,6 +3248,8 @@ class ShaderCallNodeInternal extends Node {
 		this.shaderNode = shaderNode;
 		this.inputNodes = inputNodes;
 
+		this.isShaderCallNodeInternal = true;
+
 	}
 
 	getNodeType( builder ) {
@@ -3536,7 +3554,11 @@ const Fn = ( jsFunc, layout = null ) => {
 
 		}
 
-		return shaderNode.call( inputs );
+		const fnCall = shaderNode.call( inputs );
+
+		if ( nodeType === 'void' ) fnCall.toStack();
+
+		return fnCall;
 
 	};
 
@@ -3591,21 +3613,6 @@ const Fn = ( jsFunc, layout = null ) => {
 
 };
 
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link Fn} instead.
- *
- * @param {...any} params
- * @returns {Function}
- */
-const tslFn = ( ...params ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: tslFn() has been renamed to Fn().' );
-	return Fn( ...params );
-
-};
-
 //
 
 addMethodChaining( 'toGlobal', ( node ) => {
@@ -3626,10 +3633,44 @@ const setCurrentStack = ( stack ) => {
 
 const getCurrentStack = () => currentStack;
 
+/**
+ * Represent a conditional node using if/else statements.
+ *
+ * ```js
+ * If( condition, function )
+ * 	.ElseIf( condition, function )
+ * 	.Else( function )
+ * ```
+ * @tsl
+ * @function
+ * @param {...any} params - The parameters for the conditional node.
+ * @returns {StackNode} The conditional node.
+ */
 const If = ( ...params ) => currentStack.If( ...params );
+
+/**
+ * Represent a conditional node using switch/case statements.
+ *
+ * ```js
+ * Switch( value )
+ * 	.Case( 1, function )
+ * 	.Case( 2, 3, 4, function )
+ * 	.Default( function )
+ * ```
+ * @tsl
+ * @function
+ * @param {...any} params - The parameters for the conditional node.
+ * @returns {StackNode} The conditional node.
+ */
 const Switch = ( ...params ) => currentStack.Switch( ...params );
 
-function append( node ) {
+/**
+ * Add the given node to the current stack.
+ *
+ * @param {Node} node - The node to add.
+ * @returns {Node} The node that was added to the stack.
+ */
+function Stack( node ) {
 
 	if ( currentStack ) currentStack.add( node );
 
@@ -3637,7 +3678,7 @@ function append( node ) {
 
 }
 
-addMethodChaining( 'append', append );
+addMethodChaining( 'toStack', Stack );
 
 // types
 
@@ -3700,447 +3741,42 @@ const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
 
-/**
- * ArrayNode represents a collection of nodes, typically created using the {@link array} function.
- * ```js
- * const colors = array( [
- * 	vec3( 1, 0, 0 ),
- * 	vec3( 0, 1, 0 ),
- * 	vec3( 0, 0, 1 )
- * ] );
- *
- * const redColor = tintColors.element( 0 );
- *
- * @augments TempNode
- */
-class ArrayNode extends TempNode {
-
-	static get type() {
-
-		return 'ArrayNode';
-
-	}
-
-	/**
-	 * Constructs a new array node.
-	 *
-	 * @param {?string} nodeType - The data type of the elements.
-	 * @param {number} count - Size of the array.
-	 * @param {?Array<Node>} [values=null] - Array default values.
-	 */
-	constructor( nodeType, count, values = null ) {
-
-		super( nodeType );
-
-		/**
-		 * Array size.
-		 *
-		 * @type {number}
-		 */
-		this.count = count;
-
-		/**
-		 * Array default values.
-		 *
-		 * @type {?Array<Node>}
-		 */
-		this.values = values;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isArrayNode = true;
-
-	}
-
-	/**
-	 * Returns the node's type.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The type of the node.
-	 */
-	getNodeType( builder ) {
-
-		if ( this.nodeType === null ) {
-
-			this.nodeType = this.values[ 0 ].getNodeType( builder );
-
-		}
-
-		return this.nodeType;
-
-	}
-
-	/**
-	 * Returns the node's type.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The type of the node.
-	 */
-	getElementType( builder ) {
-
-		return this.getNodeType( builder );
-
-	}
-
-	/**
-	 * This method builds the output node and returns the resulting array as a shader string.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The generated shader string.
-	 */
-	generate( builder ) {
-
-		const type = this.getNodeType( builder );
-
-		return builder.generateArray( type, this.count, this.values );
-
-	}
-
-}
+// deprecated
 
 /**
- * TSL function for creating an array node.
- *
  * @tsl
  * @function
- * @param {string|Array<Node>} nodeTypeOrValues - A string representing the element type (e.g., 'vec3')
- * or an array containing the default values (e.g., [ vec3() ]).
- * @param {?number} [count] - Size of the array.
- * @returns {ArrayNode}
+ * @deprecated since r176. Use {@link Stack} instead.
+ *
+ * @param {Node} node - The node to add.
+ * @returns {Function}
  */
-const array = ( ...params ) => {
+const append = ( node ) => { // @deprecated, r176
 
-	let node;
-
-	if ( params.length === 1 ) {
-
-		const values = params[ 0 ];
-
-		node = new ArrayNode( null, values.length, values );
-
-	} else {
-
-		const nodeType = params[ 0 ];
-		const count = params[ 1 ];
-
-		node = new ArrayNode( nodeType, count );
-
-	}
-
-	return nodeObject( node );
+	console.warn( 'THREE.TSL: append() has been renamed to Stack().' );
+	return Stack( node );
 
 };
 
-addMethodChaining( 'toArray', ( node, count ) => array( Array( count ).fill( node ) ) );
+addMethodChaining( 'append', ( node ) => { // @deprecated, r176
+
+	console.warn( 'THREE.TSL: .append() has been renamed to .toStack().' );
+	return Stack( node );
+
+} );
 
 /**
- * This node can be used to group single instances of {@link UniformNode}
- * and manage them as a uniform buffer.
- *
- * In most cases, the predefined nodes `objectGroup`, `renderGroup` and `frameGroup`
- * will be used when defining the {@link UniformNode#groupNode} property.
- *
- * - `objectGroup`: Uniform buffer per object.
- * - `renderGroup`: Shared uniform buffer, updated once per render call.
- * - `frameGroup`: Shared uniform buffer, updated once per frame.
- *
- * @augments Node
- */
-class UniformGroupNode extends Node {
-
-	static get type() {
-
-		return 'UniformGroupNode';
-
-	}
-
-	/**
-	 * Constructs a new uniform group node.
-	 *
-	 * @param {string} name - The name of the uniform group node.
-	 * @param {boolean} [shared=false] - Whether this uniform group node is shared or not.
-	 * @param {number} [order=1] - Influences the internal sorting.
-	 */
-	constructor( name, shared = false, order = 1 ) {
-
-		super( 'string' );
-
-		/**
-		 * The name of the uniform group node.
-		 *
-		 * @type {string}
-		 */
-		this.name = name;
-
-		/**
-		 * Whether this uniform group node is shared or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.shared = shared;
-
-		/**
-		 * Influences the internal sorting.
-		 * TODO: Add details when this property should be changed.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.order = order;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isUniformGroup = true;
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		data.name = this.name;
-		data.version = this.version;
-		data.shared = this.shared;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		this.name = data.name;
-		this.version = data.version;
-		this.shared = data.shared;
-
-	}
-
-}
-
-/**
- * TSL function for creating a uniform group node with the given name.
- *
  * @tsl
  * @function
- * @param {string} name - The name of the uniform group node.
- * @returns {UniformGroupNode}
- */
-const uniformGroup = ( name ) => new UniformGroupNode( name );
-
-/**
- * TSL function for creating a shared uniform group node with the given name and order.
+ * @deprecated since r168. Use {@link Fn} instead.
  *
- * @tsl
- * @function
- * @param {string} name - The name of the uniform group node.
- * @param {number} [order=0] - Influences the internal sorting.
- * @returns {UniformGroupNode}
+ * @param {...any} params
+ * @returns {Function}
  */
-const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, true, order );
+const tslFn = ( ...params ) => { // @deprecated, r168
 
-/**
- * TSL object that represents a shared uniform group node which is updated once per frame.
- *
- * @tsl
- * @type {UniformGroupNode}
- */
-const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
-
-/**
- * TSL object that represents a shared uniform group node which is updated once per render.
- *
- * @tsl
- * @type {UniformGroupNode}
- */
-const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
-
-/**
- * TSL object that represents a uniform group node which is updated once per object.
- *
- * @tsl
- * @type {UniformGroupNode}
- */
-const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
-
-/**
- * Class for representing a uniform.
- *
- * @augments InputNode
- */
-class UniformNode extends InputNode {
-
-	static get type() {
-
-		return 'UniformNode';
-
-	}
-
-	/**
-	 * Constructs a new uniform node.
-	 *
-	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
-	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
-	 */
-	constructor( value, nodeType = null ) {
-
-		super( value, nodeType );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isUniformNode = true;
-
-		/**
-		 * The name or label of the uniform.
-		 *
-		 * @type {string}
-		 * @default ''
-		 */
-		this.name = '';
-
-		/**
-		 * The uniform group of this uniform. By default, uniforms are
-		 * managed per object but they might belong to a shared group
-		 * which is updated per frame or render call.
-		 *
-		 * @type {UniformGroupNode}
-		 */
-		this.groupNode = objectGroup;
-
-	}
-
-	/**
-	 * Sets the {@link UniformNode#name} property.
-	 *
-	 * @param {string} name - The name of the uniform.
-	 * @return {UniformNode} A reference to this node.
-	 */
-	label( name ) {
-
-		this.name = name;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the {@link UniformNode#groupNode} property.
-	 *
-	 * @param {UniformGroupNode} group - The uniform group.
-	 * @return {UniformNode} A reference to this node.
-	 */
-	setGroup( group ) {
-
-		this.groupNode = group;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the {@link UniformNode#groupNode}.
-	 *
-	 * @return {UniformGroupNode} The uniform group.
-	 */
-	getGroup() {
-
-		return this.groupNode;
-
-	}
-
-	/**
-	 * By default, this method returns the result of {@link Node#getHash} but derived
-	 * classes might overwrite this method with a different implementation.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The uniform hash.
-	 */
-	getUniformHash( builder ) {
-
-		return this.getHash( builder );
-
-	}
-
-	onUpdate( callback, updateType ) {
-
-		const self = this.getSelf();
-
-		callback = callback.bind( self );
-
-		return super.onUpdate( ( frame ) => {
-
-			const value = callback( frame, self );
-
-			if ( value !== undefined ) {
-
-				this.value = value;
-
-			}
-
-	 	}, updateType );
-
-	}
-
-	generate( builder, output ) {
-
-		const type = this.getNodeType( builder );
-
-		const hash = this.getUniformHash( builder );
-
-		let sharedNode = builder.getNodeFromHash( hash );
-
-		if ( sharedNode === undefined ) {
-
-			builder.setHashNode( this, hash );
-
-			sharedNode = this;
-
-		}
-
-		const sharedNodeType = sharedNode.getInputType( builder );
-
-		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.label );
-		const propertyName = builder.getPropertyName( nodeUniform );
-
-		if ( builder.context.label !== undefined ) delete builder.context.label;
-
-		return builder.format( propertyName, type, output );
-
-	}
-
-}
-
-/**
- * TSL function for creating a uniform node.
- *
- * @tsl
- * @function
- * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {string} [arg2] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
- * @returns {UniformNode}
- */
-const uniform = ( arg1, arg2 ) => {
-
-	const nodeType = getConstNodeType( arg2 || arg1 );
-
-	// @TODO: get ConstNode from .traverse() in the future
-	const value = ( arg1 && arg1.isNode === true ) ? ( arg1.node && arg1.node.value ) || arg1.value : arg1;
-
-	return nodeObject( new UniformNode( value, nodeType ) );
+	console.warn( 'THREE.TSL: tslFn() has been renamed to Fn().' );
+	return Fn( ...params );
 
 };
 
@@ -4487,6 +4123,450 @@ const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'At
  * @type {PropertyNode<float>}
  */
 const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
+
+/**
+ * This node can be used to group single instances of {@link UniformNode}
+ * and manage them as a uniform buffer.
+ *
+ * In most cases, the predefined nodes `objectGroup`, `renderGroup` and `frameGroup`
+ * will be used when defining the {@link UniformNode#groupNode} property.
+ *
+ * - `objectGroup`: Uniform buffer per object.
+ * - `renderGroup`: Shared uniform buffer, updated once per render call.
+ * - `frameGroup`: Shared uniform buffer, updated once per frame.
+ *
+ * @augments Node
+ */
+class UniformGroupNode extends Node {
+
+	static get type() {
+
+		return 'UniformGroupNode';
+
+	}
+
+	/**
+	 * Constructs a new uniform group node.
+	 *
+	 * @param {string} name - The name of the uniform group node.
+	 * @param {boolean} [shared=false] - Whether this uniform group node is shared or not.
+	 * @param {number} [order=1] - Influences the internal sorting.
+	 */
+	constructor( name, shared = false, order = 1 ) {
+
+		super( 'string' );
+
+		/**
+		 * The name of the uniform group node.
+		 *
+		 * @type {string}
+		 */
+		this.name = name;
+
+		/**
+		 * Whether this uniform group node is shared or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.shared = shared;
+
+		/**
+		 * Influences the internal sorting.
+		 * TODO: Add details when this property should be changed.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.order = order;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isUniformGroup = true;
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.name = this.name;
+		data.version = this.version;
+		data.shared = this.shared;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.name = data.name;
+		this.version = data.version;
+		this.shared = data.shared;
+
+	}
+
+}
+
+/**
+ * TSL function for creating a uniform group node with the given name.
+ *
+ * @tsl
+ * @function
+ * @param {string} name - The name of the uniform group node.
+ * @returns {UniformGroupNode}
+ */
+const uniformGroup = ( name ) => new UniformGroupNode( name );
+
+/**
+ * TSL function for creating a shared uniform group node with the given name and order.
+ *
+ * @tsl
+ * @function
+ * @param {string} name - The name of the uniform group node.
+ * @param {number} [order=0] - Influences the internal sorting.
+ * @returns {UniformGroupNode}
+ */
+const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, true, order );
+
+/**
+ * TSL object that represents a shared uniform group node which is updated once per frame.
+ *
+ * @tsl
+ * @type {UniformGroupNode}
+ */
+const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
+
+/**
+ * TSL object that represents a shared uniform group node which is updated once per render.
+ *
+ * @tsl
+ * @type {UniformGroupNode}
+ */
+const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
+
+/**
+ * TSL object that represents a uniform group node which is updated once per object.
+ *
+ * @tsl
+ * @type {UniformGroupNode}
+ */
+const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
+
+/**
+ * Class for representing a uniform.
+ *
+ * @augments InputNode
+ */
+class UniformNode extends InputNode {
+
+	static get type() {
+
+		return 'UniformNode';
+
+	}
+
+	/**
+	 * Constructs a new uniform node.
+	 *
+	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 */
+	constructor( value, nodeType = null ) {
+
+		super( value, nodeType );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isUniformNode = true;
+
+		/**
+		 * The name or label of the uniform.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.name = '';
+
+		/**
+		 * The uniform group of this uniform. By default, uniforms are
+		 * managed per object but they might belong to a shared group
+		 * which is updated per frame or render call.
+		 *
+		 * @type {UniformGroupNode}
+		 */
+		this.groupNode = objectGroup;
+
+	}
+
+	/**
+	 * Sets the {@link UniformNode#name} property.
+	 *
+	 * @param {string} name - The name of the uniform.
+	 * @return {UniformNode} A reference to this node.
+	 */
+	label( name ) {
+
+		this.name = name;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the {@link UniformNode#groupNode} property.
+	 *
+	 * @param {UniformGroupNode} group - The uniform group.
+	 * @return {UniformNode} A reference to this node.
+	 */
+	setGroup( group ) {
+
+		this.groupNode = group;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the {@link UniformNode#groupNode}.
+	 *
+	 * @return {UniformGroupNode} The uniform group.
+	 */
+	getGroup() {
+
+		return this.groupNode;
+
+	}
+
+	/**
+	 * By default, this method returns the result of {@link Node#getHash} but derived
+	 * classes might overwrite this method with a different implementation.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The uniform hash.
+	 */
+	getUniformHash( builder ) {
+
+		return this.getHash( builder );
+
+	}
+
+	onUpdate( callback, updateType ) {
+
+		const self = this.getSelf();
+
+		callback = callback.bind( self );
+
+		return super.onUpdate( ( frame ) => {
+
+			const value = callback( frame, self );
+
+			if ( value !== undefined ) {
+
+				this.value = value;
+
+			}
+
+	 	}, updateType );
+
+	}
+
+	generate( builder, output ) {
+
+		const type = this.getNodeType( builder );
+
+		const hash = this.getUniformHash( builder );
+
+		let sharedNode = builder.getNodeFromHash( hash );
+
+		if ( sharedNode === undefined ) {
+
+			builder.setHashNode( this, hash );
+
+			sharedNode = this;
+
+		}
+
+		const sharedNodeType = sharedNode.getInputType( builder );
+
+		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.label );
+		const propertyName = builder.getPropertyName( nodeUniform );
+
+		if ( builder.context.label !== undefined ) delete builder.context.label;
+
+		return builder.format( propertyName, type, output );
+
+	}
+
+}
+
+/**
+ * TSL function for creating a uniform node.
+ *
+ * @tsl
+ * @function
+ * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+ * @param {string} [arg2] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @returns {UniformNode}
+ */
+const uniform = ( arg1, arg2 ) => {
+
+	const nodeType = getConstNodeType( arg2 || arg1 );
+
+	// @TODO: get ConstNode from .traverse() in the future
+	const value = ( arg1 && arg1.isNode === true ) ? ( arg1.node && arg1.node.value ) || arg1.value : arg1;
+
+	return nodeObject( new UniformNode( value, nodeType ) );
+
+};
+
+/**
+ * ArrayNode represents a collection of nodes, typically created using the {@link array} function.
+ * ```js
+ * const colors = array( [
+ * 	vec3( 1, 0, 0 ),
+ * 	vec3( 0, 1, 0 ),
+ * 	vec3( 0, 0, 1 )
+ * ] );
+ *
+ * const redColor = tintColors.element( 0 );
+ *
+ * @augments TempNode
+ */
+class ArrayNode extends TempNode {
+
+	static get type() {
+
+		return 'ArrayNode';
+
+	}
+
+	/**
+	 * Constructs a new array node.
+	 *
+	 * @param {?string} nodeType - The data type of the elements.
+	 * @param {number} count - Size of the array.
+	 * @param {?Array<Node>} [values=null] - Array default values.
+	 */
+	constructor( nodeType, count, values = null ) {
+
+		super( nodeType );
+
+		/**
+		 * Array size.
+		 *
+		 * @type {number}
+		 */
+		this.count = count;
+
+		/**
+		 * Array default values.
+		 *
+		 * @type {?Array<Node>}
+		 */
+		this.values = values;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isArrayNode = true;
+
+	}
+
+	/**
+	 * Returns the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The type of the node.
+	 */
+	getNodeType( builder ) {
+
+		if ( this.nodeType === null ) {
+
+			this.nodeType = this.values[ 0 ].getNodeType( builder );
+
+		}
+
+		return this.nodeType;
+
+	}
+
+	/**
+	 * Returns the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The type of the node.
+	 */
+	getElementType( builder ) {
+
+		return this.getNodeType( builder );
+
+	}
+
+	/**
+	 * This method builds the output node and returns the resulting array as a shader string.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The generated shader string.
+	 */
+	generate( builder ) {
+
+		const type = this.getNodeType( builder );
+
+		return builder.generateArray( type, this.count, this.values );
+
+	}
+
+}
+
+/**
+ * TSL function for creating an array node.
+ *
+ * @tsl
+ * @function
+ * @param {string|Array<Node>} nodeTypeOrValues - A string representing the element type (e.g., 'vec3')
+ * or an array containing the default values (e.g., [ vec3() ]).
+ * @param {?number} [count] - Size of the array.
+ * @returns {ArrayNode}
+ */
+const array = ( ...params ) => {
+
+	let node;
+
+	if ( params.length === 1 ) {
+
+		const values = params[ 0 ];
+
+		node = new ArrayNode( null, values.length, values );
+
+	} else {
+
+		const nodeType = params[ 0 ];
+		const count = params[ 1 ];
+
+		node = new ArrayNode( nodeType, count );
+
+	}
+
+	return nodeObject( node );
+
+};
+
+addMethodChaining( 'toArray', ( node, count ) => array( Array( count ).fill( node ) ) );
 
 /**
  * These node represents an assign operation. Meaning a node is assigned
@@ -7216,7 +7296,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
  * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
-const Var = ( node, name = null ) => createVar( node, name ).append();
+const Var = ( node, name = null ) => createVar( node, name ).toStack();
 
 /**
  * TSL function for creating a const node.
@@ -7227,7 +7307,7 @@ const Var = ( node, name = null ) => createVar( node, name ).append();
  * @param {?string} name - The name of the constant in the shader.
  * @returns {VarNode}
  */
-const Const = ( node, name = null ) => createVar( node, name, true ).append();
+const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
 
 // Method chaining
 
@@ -9172,7 +9252,7 @@ const expression = /*@__PURE__*/ nodeProxy( ExpressionNode ).setParameterLength(
  * @param {?ConditionalNode} conditional - An optional conditional node. It allows to decide whether the discard should be executed or not.
  * @return {Node} The `discard` expression.
  */
-const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) ).append();
+const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) ).toStack();
 
 /**
  * Represents a `return` shader operation in TSL.
@@ -9181,7 +9261,7 @@ const Discard = ( conditional ) => ( conditional ? select( conditional, expressi
  * @function
  * @return {ExpressionNode} The `return` expression.
  */
-const Return = () => expression( 'return' ).append();
+const Return = () => expression( 'return' ).toStack();
 
 addMethodChaining( 'discard', Discard );
 
@@ -9353,7 +9433,7 @@ class DebugNode extends TempNode {
 
 		if ( callback !== null ) {
 
-			callback( code );
+			callback( builder, code );
 
 		} else {
 
@@ -9367,6 +9447,15 @@ class DebugNode extends TempNode {
 
 }
 
+/**
+ * TSL function for creating a debug node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node to debug.
+ * @param {?Function} [callback=null] - Optional callback function to handle the debug output.
+ * @returns {DebugNode}
+ */
 const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) );
 
 addMethodChaining( 'debug', debug );
@@ -9539,10 +9628,10 @@ class AttributeNode extends Node {
  * @tsl
  * @function
  * @param {string} name - The name of the attribute.
- * @param {string} [nodeType] - The node type.
+ * @param {?string} [nodeType=null] - The node type.
  * @returns {AttributeNode}
  */
-const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
+const attribute = ( name, nodeType = null ) => nodeObject( new AttributeNode( name, nodeType ) );
 
 /**
  * TSL function for creating an uv attribute node with the given index.
@@ -11533,7 +11622,7 @@ const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectU
  */
 const modelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.renderer.nodes.modelViewMatrix || mediumpModelViewMatrix;
+	return builder.renderer.overrideNodes.modelViewMatrix || mediumpModelViewMatrix;
 
 } ).once() )().toVar( 'modelViewMatrix' );
 
@@ -11876,7 +11965,7 @@ const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix 
  */
 const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) => {
 
-	const modelNormalViewMatrix = builder.renderer.nodes.modelNormalViewMatrix;
+	const modelNormalViewMatrix = builder.renderer.overrideNodes.modelNormalViewMatrix;
 
 	if ( modelNormalViewMatrix !== null ) {
 
@@ -15515,7 +15604,7 @@ class LoopNode extends Node {
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
@@ -15524,7 +15613,7 @@ const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int'
  * @function
  * @returns {ExpressionNode}
  */
-const Continue = () => expression( 'continue' ).append();
+const Continue = () => expression( 'continue' ).toStack();
 
 /**
  * TSL function for creating a `Break()` expression.
@@ -15533,7 +15622,7 @@ const Continue = () => expression( 'continue' ).append();
  * @function
  * @returns {ExpressionNode}
  */
-const Break = () => expression( 'break' ).append();
+const Break = () => expression( 'break' ).toStack();
 
 // Deprecated
 
@@ -17121,6 +17210,111 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 } );
 
 /**
+ * An attribute node for representing vertex colors.
+ *
+ * @augments AttributeNode
+ */
+class VertexColorNode extends AttributeNode {
+
+	static get type() {
+
+		return 'VertexColorNode';
+
+	}
+
+	/**
+	 * Constructs a new vertex color node.
+	 *
+	 * @param {number} index - The attribute index.
+	 */
+	constructor( index ) {
+
+		super( null, 'vec4' );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isVertexColorNode = true;
+
+		/**
+		 * The attribute index to enable more than one sets of vertex colors.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.index = index;
+
+	}
+
+	/**
+	 * Overwrites the default implementation by honoring the attribute index.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The attribute name.
+	 */
+	getAttributeName( /*builder*/ ) {
+
+		const index = this.index;
+
+		return 'color' + ( index > 0 ? index : '' );
+
+	}
+
+	generate( builder ) {
+
+		const attributeName = this.getAttributeName( builder );
+		const geometryAttribute = builder.hasGeometryAttribute( attributeName );
+
+		let result;
+
+		if ( geometryAttribute === true ) {
+
+			result = super.generate( builder );
+
+		} else {
+
+			// Vertex color fallback should be white
+			result = builder.generateConst( this.nodeType, new Vector4( 1, 1, 1, 1 ) );
+
+		}
+
+		return result;
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.index = this.index;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.index = data.index;
+
+	}
+
+}
+
+/**
+ * TSL function for creating a reference node.
+ *
+ * @tsl
+ * @function
+ * @param {number} [index=0] - The attribute index.
+ * @returns {VertexColorNode}
+ */
+const vertexColor = ( index = 0 ) => nodeObject( new VertexColorNode( index ) );
+
+/**
  * Base class for all node materials.
  *
  * @augments Material
@@ -17373,7 +17567,16 @@ class NodeMaterial extends Material {
 		 * @type {?Node<float>}
 		 * @default null
 		 */
-		this.shadowPositionNode = null;
+		this.receivedShadowPositionNode = null;
+
+		/**
+		 * Allows to overwrite the geometry position used for shadow map projection which
+		 * is by default {@link positionLocal}, the vertex position in local space.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.castShadowPositionNode = null;
 
 		/**
 		 * This node can be used to influence how an object using this node material
@@ -17456,6 +17659,26 @@ class NodeMaterial extends Material {
 		 * @default null
 		 */
 		this.vertexNode = null;
+
+		// Deprecated properties
+
+		Object.defineProperty( this, 'shadowPositionNode', { // @deprecated, r176
+
+			get: () => {
+
+				return this.receivedShadowPositionNode;
+
+			},
+
+			set: ( value ) => {
+
+				console.warn( 'THREE.NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
+
+				this.receivedShadowPositionNode = value;
+
+			}
+
+		} );
 
 	}
 
@@ -17727,7 +17950,7 @@ class NodeMaterial extends Material {
 
 		if ( depthNode !== null ) {
 
-			depth.assign( depthNode ).append();
+			depth.assign( depthNode ).toStack();
 
 		}
 
@@ -17788,13 +18011,13 @@ class NodeMaterial extends Material {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			morphReference( object ).append();
+			morphReference( object ).toStack();
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinning( object ).append();
+			skinning( object ).toStack();
 
 		}
 
@@ -17810,13 +18033,13 @@ class NodeMaterial extends Material {
 
 		if ( object.isBatchedMesh ) {
 
-			batch( object ).append();
+			batch( object ).toStack();
 
 		}
 
 		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
-			instancedMesh( object ).append();
+			instancedMesh( object ).toStack();
 
 		}
 
@@ -17844,7 +18067,7 @@ class NodeMaterial extends Material {
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
+			colorNode = colorNode.mul( vertexColor() );
 
 		}
 
@@ -18260,7 +18483,8 @@ class NodeMaterial extends Material {
 		this.geometryNode = source.geometryNode;
 
 		this.depthNode = source.depthNode;
-		this.shadowPositionNode = source.shadowPositionNode;
+		this.receivedShadowPositionNode = source.receivedShadowPositionNode;
+		this.castShadowPositionNode = source.castShadowPositionNode;
 		this.receivedShadowNode = source.receivedShadowNode;
 		this.castShadowNode = source.castShadowNode;
 
@@ -32057,111 +32281,6 @@ const instancedArray = ( count, type = 'float' ) => {
 };
 
 /**
- * An attribute node for representing vertex colors.
- *
- * @augments AttributeNode
- */
-class VertexColorNode extends AttributeNode {
-
-	static get type() {
-
-		return 'VertexColorNode';
-
-	}
-
-	/**
-	 * Constructs a new vertex color node.
-	 *
-	 * @param {number} [index=0] - The attribute index.
-	 */
-	constructor( index = 0 ) {
-
-		super( null, 'vec4' );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isVertexColorNode = true;
-
-		/**
-		 * The attribute index to enable more than one sets of vertex colors.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.index = index;
-
-	}
-
-	/**
-	 * Overwrites the default implementation by honoring the attribute index.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The attribute name.
-	 */
-	getAttributeName( /*builder*/ ) {
-
-		const index = this.index;
-
-		return 'color' + ( index > 0 ? index : '' );
-
-	}
-
-	generate( builder ) {
-
-		const attributeName = this.getAttributeName( builder );
-		const geometryAttribute = builder.hasGeometryAttribute( attributeName );
-
-		let result;
-
-		if ( geometryAttribute === true ) {
-
-			result = super.generate( builder );
-
-		} else {
-
-			// Vertex color fallback should be white
-			result = builder.generateConst( this.nodeType, new Vector4( 1, 1, 1, 1 ) );
-
-		}
-
-		return result;
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		data.index = this.index;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		this.index = data.index;
-
-	}
-
-}
-
-/**
- * TSL function for creating a reference node.
- *
- * @tsl
- * @function
- * @param {number} index - The attribute index.
- * @returns {VertexColorNode}
- */
-const vertexColor = ( index ) => nodeObject( new VertexColorNode( index ) );
-
-/**
  * A node for representing the uv coordinates of points.
  *
  * Can only be used with a WebGL backend. In WebGPU, point
@@ -32567,7 +32686,7 @@ const textureStore = ( value, uvNode, storeNode ) => {
 
 	const node = storageTexture( value, uvNode, storeNode );
 
-	if ( storeNode !== null ) node.append();
+	if ( storeNode !== null ) node.toStack();
 
 	return node;
 
@@ -36437,7 +36556,7 @@ const barrier = nodeProxy( BarrierNode );
  * @function
  * @returns {BarrierNode}
  */
-const workgroupBarrier = () => barrier( 'workgroup' ).append();
+const workgroupBarrier = () => barrier( 'workgroup' ).toStack();
 
 /**
  * TSL function for creating a storage barrier. All invocations must
@@ -36448,7 +36567,7 @@ const workgroupBarrier = () => barrier( 'workgroup' ).append();
  * @function
  * @returns {BarrierNode}
  */
-const storageBarrier = () => barrier( 'storage' ).append();
+const storageBarrier = () => barrier( 'storage' ).toStack();
 
 /**
  * TSL function for creating a texture barrier. All invocations must
@@ -36459,7 +36578,7 @@ const storageBarrier = () => barrier( 'storage' ).append();
  * @function
  * @returns {BarrierNode}
  */
-const textureBarrier = () => barrier( 'texture' ).append();
+const textureBarrier = () => barrier( 'texture' ).toStack();
 
 /**
  * Represents an element of a 'workgroup' scoped buffer.
@@ -36671,9 +36790,9 @@ const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Wo
  *
  * This node can only be used with a WebGPU backend.
  *
- * @augments TempNode
+ * @augments Node
  */
-class AtomicFunctionNode extends TempNode {
+class AtomicFunctionNode extends Node {
 
 	static get type() {
 
@@ -36713,6 +36832,14 @@ class AtomicFunctionNode extends TempNode {
 		 */
 		this.valueNode = valueNode;
 
+		/**
+		 * Creates a list of the parents for this node for detecting if the node needs to return a value.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	/**
@@ -36742,6 +36869,9 @@ class AtomicFunctionNode extends TempNode {
 
 	generate( builder ) {
 
+		const properties = builder.getNodeProperties( this );
+		const parents = properties.parents;
+
 		const method = this.method;
 
 		const type = this.getNodeType( builder );
@@ -36762,14 +36892,23 @@ class AtomicFunctionNode extends TempNode {
 		}
 
 		const methodSnippet = `${ builder.getMethod( method, type ) }( ${ params.join( ', ' ) } )`;
+		const isVoid = parents.length === 1 && parents[ 0 ].isStackNode === true;
 
-		if ( b !== null ) {
+		if ( isVoid ) {
 
 			builder.addLineFlowCode( methodSnippet, this );
 
-		}
+		} else {
 
-		return methodSnippet;
+			if ( properties.constNode === undefined ) {
+
+				properties.constNode = expression( methodSnippet, type ).toConst();
+
+			}
+
+			return properties.constNode.build( builder );
+
+		}
 
 	}
 
@@ -36809,10 +36948,7 @@ const atomicNode = nodeProxy( AtomicFunctionNode );
  */
 const atomicFunc = ( method, pointerNode, valueNode ) => {
 
-	const node = atomicNode( method, pointerNode, valueNode );
-	node.append();
-
-	return node;
+	return atomicNode( method, pointerNode, valueNode ).toStack();
 
 };
 
@@ -37540,7 +37676,7 @@ class ShadowBaseNode extends Node {
 
 		// Use assign inside an Fn()
 
-		shadowPositionWorld.assign( material.shadowPositionNode || context.shadowPositionWorld || positionWorld );
+		shadowPositionWorld.assign( material.receivedShadowPositionNode || context.shadowPositionWorld || positionWorld );
 
 	}
 
@@ -38033,6 +38169,11 @@ const getShadowMaterial = ( light ) => {
 
 };
 
+//
+
+const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
+const _shadowRenderObjectKeys = [];
+
 /**
  * Creates a function to render shadow objects in a scene.
  *
@@ -38053,25 +38194,44 @@ const getShadowMaterial = ( light ) => {
  */
 const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
-	return ( object, scene, _camera, geometry, material, group, ...params ) => {
+	_shadowRenderObjectKeys[ 0 ] = renderer;
+	_shadowRenderObjectKeys[ 1 ] = shadow;
 
-		if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+	let renderObjectFunction = _shadowRenderObjectLibrary.get( _shadowRenderObjectKeys );
 
-			if ( useVelocity ) {
+	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
 
-				getDataFromObject( object ).useVelocity = true;
+		renderObjectFunction = ( object, scene, _camera, geometry, material, group, ...params ) => {
+
+			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( useVelocity ) {
+
+					getDataFromObject( object ).useVelocity = true;
+
+				}
+
+				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
-			object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		};
 
-			renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+		renderObjectFunction.shadowType = shadowType;
+		renderObjectFunction.useVelocity = useVelocity;
 
-			object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		_shadowRenderObjectLibrary.set( _shadowRenderObjectKeys, renderObjectFunction );
 
-		}
+	}
 
-	};
+	_shadowRenderObjectKeys[ 0 ] = null;
+	_shadowRenderObjectKeys[ 1 ] = null;
+
+	return renderObjectFunction;
 
 };
 
@@ -38380,6 +38540,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
+		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
@@ -38602,6 +38763,8 @@ class ShadowNode extends ShadowBaseNode {
 		scene.overrideMaterial = getShadowMaterial( light );
 
 		renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+
+		renderer.setClearColor( 0x000000, 0 );
 
 		renderer.setRenderTarget( shadowMap );
 
@@ -41052,6 +41215,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	Schlick_to_F0: Schlick_to_F0,
 	ScriptableNodeResources: ScriptableNodeResources,
 	ShaderNode: ShaderNode,
+	Stack: Stack,
 	Switch: Switch,
 	TBNViewMatrix: TBNViewMatrix,
 	VSMShadowFilter: VSMShadowFilter,
@@ -50210,7 +50374,15 @@ class Renderer {
 		 */
 		this.info = new Info();
 
-		this.nodes = {
+		/**
+		 * Stores override nodes for specific transformations or calculations.
+		 * These nodes can be used to replace default behavior in the rendering pipeline.
+		 *
+		 * @type {Object}
+		 * @property {?Node} modelViewMatrix - An override node for the model-view matrix.
+		 * @property {?Node} modelNormalViewMatrix - An override node for the model normal view matrix.
+		 */
+		this.overrideNodes = {
 			modelViewMatrix: null,
 			modelNormalViewMatrix: null
 		};
@@ -50959,6 +51131,43 @@ class Renderer {
 	async waitForGPU() {
 
 		await this.backend.waitForGPU();
+
+	}
+
+	/**
+	 * Enables or disables high precision for model-view and normal-view matrices.
+	 * When enabled, will use CPU 64-bit precision for higher precision instead of GPU 32-bit for higher performance.
+	 *
+	 * NOTE: 64-bit precision is not compatible with `InstancedMesh` and `SkinnedMesh`.
+	 *
+	 * @param {boolean} value - Whether to enable or disable high precision.
+	 * @type {boolean}
+	 */
+	set highPrecision( value ) {
+
+		if ( value === true ) {
+
+			this.overrideNodes.modelViewMatrix = highpModelViewMatrix;
+			this.overrideNodes.modelNormalViewMatrix = highpModelNormalViewMatrix;
+
+		} else if ( this.highPrecision ) {
+
+			this.overrideNodes.modelViewMatrix = null;
+			this.overrideNodes.modelNormalViewMatrix = null;
+
+		}
+
+	}
+
+	/**
+	 * Returns whether high precision is enabled or not.
+	 *
+	 * @return {boolean} Whether high precision is enabled or not.
+	 * @type {boolean}
+	 */
+	get highPrecision() {
+
+		return this.overrideNodes.modelViewMatrix === highpModelViewMatrix && this.overrideNodes.modelNormalViewMatrix === highpModelNormalViewMatrix;
 
 	}
 
@@ -52787,6 +52996,13 @@ class Renderer {
 
 					overrideColorNode = overrideMaterial.colorNode;
 					overrideMaterial.colorNode = material.castShadowNode;
+
+				}
+
+				if ( material.castShadowPositionNode && material.castShadowPositionNode.isNode ) {
+
+					overridePositionNode = overrideMaterial.positionNode;
+					overrideMaterial.positionNode = material.castShadowPositionNode;
 
 				}
 
@@ -66391,7 +66607,16 @@ ${ flowData.code }
 
 	isCustomStruct( nodeUniform ) {
 
-		return nodeUniform.value.isStorageBufferAttribute && nodeUniform.node.structTypeNode !== null;
+		const attribute = nodeUniform.value;
+		const bufferNode = nodeUniform.node;
+
+		const isAttributeStructType = ( attribute.isBufferAttribute || attribute.isInstancedBufferAttribute ) && bufferNode.structTypeNode !== null;
+
+		const isStructArray =
+			( bufferNode.value && bufferNode.value.array ) &&
+			( typeof bufferNode.value.itemSize === 'number' && bufferNode.value.array.length > bufferNode.value.itemSize );
+
+		return isAttributeStructType && ! isStructArray;
 
 	}
 
