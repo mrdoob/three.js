@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import { expression } from '../code/ExpressionNode.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
 /**
@@ -89,7 +90,8 @@ class AtomicFunctionNode extends Node {
 
 	generate( builder ) {
 
-		const parents = builder.getNodeProperties( this ).parents;
+		const properties = builder.getNodeProperties( this );
+		const parents = properties.parents;
 
 		const method = this.method;
 
@@ -117,9 +119,17 @@ class AtomicFunctionNode extends Node {
 
 			builder.addLineFlowCode( methodSnippet, this );
 
-		}
+		} else {
 
-		return methodSnippet;
+			if ( properties.constNode === undefined ) {
+
+				properties.constNode = expression( methodSnippet, type ).toConst();
+
+			}
+
+			return properties.constNode.build( builder );
+
+		}
 
 	}
 
