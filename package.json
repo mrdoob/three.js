@@ -43,8 +43,8 @@
     "> 1%, not dead, not ie 11, not op_mini all"
   ],
   "scripts": {
-    "start": "npm run dev",
-    "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
+    "start": "pnpm run dev",
+    "test": "pnpm run lint && pnpm run test-unit && pnpm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
@@ -59,8 +59,8 @@
     "lint-manual": "eslint manual --ignore-pattern 3rdparty --ignore-pattern prettify.js --ignore-pattern shapefile.js",
     "lint-test": "eslint test --ignore-pattern vendor",
     "lint-utils": "eslint utils --ignore-pattern prettify --ignore-pattern fuse",
-    "lint": "npm run lint-core",
-    "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-playground -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",
+    "lint": "pnpm run lint-core",
+    "lint-fix": "pnpm run lint-core -- --fix && pnpm run lint-addons -- --fix && pnpm run lint-examples -- --fix && pnpm run lint-docs -- --fix && pnpm run lint-editor -- --fix && pnpm run lint-playground -- --fix && pnpm run lint-manual -- --fix && pnpm run lint-test -- --fix && pnpm run lint-utils -- --fix",
     "test-unit": "qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
     "test-unit-addons": "qunit -r failonlyreporter -f !-webonly test/unit/three.addons.unit.js",
     "test-e2e": "node test/e2e/puppeteer.js",
@@ -128,5 +128,10 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "puppeteer"
+    ]
   }
 }
