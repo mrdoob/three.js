@@ -88,6 +88,14 @@ class Node extends EventDispatcher {
 		this.global = false;
 
 		/**
+		 * Create a list of parents for this node during the build process.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.parents = false;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -642,6 +650,14 @@ class Node extends EventDispatcher {
 				for ( const childNode of Object.values( properties ) ) {
 
 					if ( childNode && childNode.isNode === true ) {
+
+						if ( childNode.parents === true ) {
+
+							const childProperties = builder.getNodeProperties( childNode );
+							childProperties.parents = childProperties.parents || [];
+							childProperties.parents.push( this );
+
+						}
 
 						childNode.build( builder );
 
