@@ -117,9 +117,16 @@ class AtomicFunctionNode extends Node {
 
 			builder.addLineFlowCode( methodSnippet, this );
 
-		}
+		} else {
 
-		return methodSnippet;
+			const nodeVar = builder.getVarFromNode( this, null, type );
+			const propertyName = builder.getPropertyName( nodeVar );
+
+			builder.addLineFlowCode( `${ propertyName } = ${ methodSnippet }`, this );
+
+			return propertyName;
+
+		}
 
 	}
 
