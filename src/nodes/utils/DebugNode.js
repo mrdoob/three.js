@@ -52,7 +52,7 @@ class DebugNode extends TempNode {
 
 		if ( callback !== null ) {
 
-			callback( code );
+			callback( builder, code );
 
 		} else {
 
