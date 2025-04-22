@@ -74,7 +74,7 @@ export default DebugNode;
  * @tsl
  * @function
  * @param {Node} node - The node to debug.
- * @param {?function} [callback=null] - Optional callback function to handle the debug output.
+ * @param {?Function} [callback=null] - Optional callback function to handle the debug output.
  * @returns {DebugNode}
  */
 export const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) );
