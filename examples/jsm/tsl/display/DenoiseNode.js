@@ -219,10 +219,10 @@ class DenoiseNode extends TempNode {
 					const offset = rotationMatrix.mul( sampleDir.xy.mul( float( 1.0 ).add( sampleDir.z.mul( this.radius.sub( 1 ) ) ) ) ).div( this._resolution );
 					const sampleUv = uvNode.add( offset );
 
-					const result = denoiseSample( center, viewNormal, viewPosition, sampleUv );
+					const sampleResult = denoiseSample( center, viewNormal, viewPosition, sampleUv );
 
-					denoised.addAssign( result.xyz );
-					totalWeight.addAssign( result.w );
+					denoised.addAssign( sampleResult.xyz );
+					totalWeight.addAssign( sampleResult.w );
 
 				} );
 
