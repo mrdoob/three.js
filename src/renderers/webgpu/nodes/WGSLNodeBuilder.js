@@ -1591,7 +1591,16 @@ ${ flowData.code }
 
 	isCustomStruct( nodeUniform ) {
 
-		return nodeUniform.value.isStorageBufferAttribute && nodeUniform.node.structTypeNode !== null;
+		const attribute = nodeUniform.value;
+		const bufferNode = nodeUniform.node;
+
+		const isAttributeStructType = ( attribute.isBufferAttribute || attribute.isInstancedBufferAttribute ) && bufferNode.structTypeNode !== null;
+
+		const isStructArray =
+			( bufferNode.value && bufferNode.value.array ) &&
+			( typeof bufferNode.value.itemSize === 'number' && bufferNode.value.array.length > bufferNode.value.itemSize );
+
+		return isAttributeStructType && ! isStructArray;
 
 	}
 
