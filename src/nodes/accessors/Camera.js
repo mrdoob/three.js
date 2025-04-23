@@ -4,6 +4,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
+import { Euler, Quaternion } from '../../Three.Core.js';
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -28,6 +29,40 @@ export const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' )
  * @type {UniformNode<float>}
  */
 export const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.far );
+
+/**
+ * TSL object that represents the world rotation of the camera used for the current render.
+ *
+ * @tsl
+ * @type {UniformNode<vec3>}
+ */
+export const cameraWorldRotation = /*@__PURE__*/ ( ()=> {
+
+	let quaternion = null; // the quaternion object is lazy-loaded
+
+	let euler = null; // the euler object is lazy-loaded
+
+	return uniform( 'vec3' ).label( 'cameraWorldRotation' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) =>{
+
+		if ( quaternion == null ) {
+
+			quaternion = new Quaternion();
+
+		}
+
+		if ( euler == null ) {
+
+			euler = new Euler();
+
+		}
+
+		camera.getWorldQuaternion( quaternion );
+
+		return ( euler ).setFromQuaternion( quaternion );
+
+	} );
+
+} )();
 
 /**
  * TSL object that represents the projection matrix of the camera used for the current render.

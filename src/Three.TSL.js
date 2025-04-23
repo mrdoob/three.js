@@ -104,6 +104,7 @@ export const cameraProjectionMatrix = TSL.cameraProjectionMatrix;
 export const cameraProjectionMatrixInverse = TSL.cameraProjectionMatrixInverse;
 export const cameraViewMatrix = TSL.cameraViewMatrix;
 export const cameraWorldMatrix = TSL.cameraWorldMatrix;
+export const cameraWorldRotation = TSL.cameraWorldRotation;
 export const cbrt = TSL.cbrt;
 export const cdl = TSL.cdl;
 export const ceil = TSL.ceil;
