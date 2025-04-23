@@ -31,25 +31,31 @@
 			import { color, instanceIndex, struct, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView } from 'three/tsl';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+ 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			// Dimensions of simulation grid.
 			const WIDTH = 128;
 
 			// Water size in system units.
-			const BOUNDS = 512;
+			const BOUNDS = 6;
 			const BOUNDS_HALF = BOUNDS * 0.5;
 
-			const waterMaxHeight = 10;
+			const waterMaxHeight = 0.1;
 
 			let container, stats;
-			let camera, scene, renderer;
+			let camera, scene, renderer, controls;
 			let mouseMoved = false;
 			const mouseCoords = new THREE.Vector2();
 			const raycaster = new THREE.Raycaster();
 			let effectController;
 
-			let waterMesh, meshRay;
+			let sun;
+			let waterMesh;
+			let poolBorder;
+			let meshRay;
 			let computeHeight, computeSmooth, computeSphere;
 
 			const NUM_SPHERES = 100;
@@ -75,31 +81,28 @@
 
 			}
 
-			function init() {
+			async function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
-				camera.position.set( 0, 200, 350 );
+				camera.position.set( 0, 2.00, 4 );
 				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
-				const sun = new THREE.DirectionalLight( 0xFFFFFF, 3.0 );
-				sun.position.set( 300, 400, 175 );
+				sun = new THREE.DirectionalLight( 0xFFFFFF, 4.0 );
+ 				sun.position.set( - 1, 2.6, 1.4 );
 				scene.add( sun );
-
-				const sun2 = new THREE.DirectionalLight( 0x40A040, 2.0 );
-				sun2.position.set( - 100, 350, - 200 );
-				scene.add( sun2 );
 
 				//
 
 				effectController = {
 					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
-					mouseSize: uniform( 30.0 ).label( 'mouseSize' ),
-					viscosity: uniform( 0.95 ).label( 'viscosity' ),
+					mouseDeep: uniform( 0.01 ).label( 'mouseDeep' ),
+					mouseSize: uniform( 0.2 ).label( 'mouseSize' ),
+					viscosity: uniform( 0.9 ).label( 'viscosity' ),
 					spheresEnabled: true,
 					wireframe: false
 				};
@@ -191,7 +194,7 @@
 
 				computeHeight = Fn( () => {
 
-					const { viscosity, mousePos, mouseSize } = effectController;
+					const { viscosity, mousePos, mouseSize, mouseDeep } = effectController;
 
 					const height = heightStorage.element( instanceIndex ).toVar();
 					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
@@ -213,7 +216,8 @@
 					// Get length of position in range [ -BOUNDS / 2, BOUNDS / 2 ], offset by mousePos, then scale.
 					const mousePhase = clamp( length( ( vec2( x, y ).sub( centerVec ) ).mul( BOUNDS ).sub( mousePos ) ).mul( Math.PI ).div( mouseSize ), 0.0, Math.PI );
 
-					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( 0.28 ) );
+					// "Indent" water down by scaled distance from center of mouse impact
+					newHeight.subAssign( cos( mousePhase ).add( 1.0 ).mul( mouseDeep ) );
 
 					prevHeightStorage.element( instanceIndex ).assign( height );
 					heightStorage.element( instanceIndex ).assign( newHeight );
@@ -242,12 +246,16 @@
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
 				// material: make a THREE.ShaderMaterial clone of THREE.MeshPhongMaterial, with customized position shader.
-				const waterMaterial = new THREE.MeshPhongNodeMaterial();
+				const waterMaterial = new THREE.MeshStandardNodeMaterial( {
+					color: 0x9bd2ec,
+ 					metalness: 0.9,
+ 					roughness: 0,
+ 					transparent: true,
+ 					opacity: 0.8,
+ 					side: THREE.DoubleSide
+				} );
 
 				waterMaterial.lights = true;
-				waterMaterial.colorNode = color( 0x0040C0 );
-				waterMaterial.specularNode = color( 0x111111 );
-				waterMaterial.shininess = Math.max( 50, 1e-4 );
 				waterMaterial.positionNode = Fn( () => {
 
 					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
@@ -266,6 +274,15 @@
 
 				scene.add( waterMesh );
 
+				// Pool border
+				const borderGeom = new THREE.TorusGeometry( 4.2, 0.1, 12, 4 );
+ 				borderGeom.rotateX( Math.PI * 0.5 );
+ 				borderGeom.rotateY( Math.PI * 0.25 );
+ 				poolBorder = new THREE.Mesh( borderGeom, new THREE.MeshStandardMaterial( { color: 0x908877, roughness: 0.2 } ) );
+ 				scene.add( poolBorder );
+ 				borderGeom.receiveShadow = true;
+ 				borderGeom.castShadow = true;
+
 				// THREE.Mesh just for mouse raycasting
 				const geometryRay = new THREE.PlaneGeometry( BOUNDS, BOUNDS, 1, 1 );
 				meshRay = new THREE.Mesh( geometryRay, new THREE.MeshBasicMaterial( { color: 0xFFFFFF, visible: false } ) );
@@ -275,7 +292,7 @@
 				scene.add( meshRay );
 
 				// Create sphere THREE.InstancedMesh
-				const sphereGeometry = new THREE.SphereGeometry( 4, 24, 12 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.1, 0.1, 0.1 );
 				const sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFF00 } );
 			
 				// Initialize sphere mesh instance position and velocity.
@@ -388,9 +405,22 @@
 				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
 				scene.add( sphereMesh );
 
+				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
+ 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
+ 				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
+
+ 				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
+ 				env.mapping = THREE.EquirectangularReflectionMapping;
+ 				scene.environment = env;
+ 				scene.background = env;
+ 				scene.backgroundBlurriness = 0.3;
+ 				scene.environmentIntensity = 1.25;
+
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
@@ -403,7 +433,7 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
-				gui.add( effectController.mouseSize, 'value', 1.0, 100.0, 1.0 ).name( 'Mouse Size' );
+				gui.add( effectController.mouseSize, 'value', 0.1, 1, 0.1 ).name( 'Mouse Size' );
 				gui.add( effectController.viscosity, 'value', 0.9, 0.999, 0.001 ).name( 'viscosity' );
 				const buttonCompute = {
 					smoothWater: function () {
