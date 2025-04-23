@@ -128,6 +128,7 @@ class USDAParser {
  * ```
  *
  * @augments Loader
+ * @three_import import { USDZLoader } from 'three/addons/loaders/USDZLoader.js';
  */
 class USDZLoader extends Loader {
 

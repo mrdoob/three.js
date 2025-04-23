@@ -24,6 +24,7 @@ import * as fflate from '../libs/fflate.module.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
  */
 class AMFLoader extends Loader {
 

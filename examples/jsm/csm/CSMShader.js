@@ -1,6 +1,9 @@
 import { ShaderChunk } from 'three';
 
-/** @module CSMShader */
+/**
+ * @module CSMShader
+ * @three_import import { CSMShader } from 'three/addons/csm/CSMShader.js';
+ */
 
 /**
  * The object that holds the GLSL enhancements to enable CSM. This

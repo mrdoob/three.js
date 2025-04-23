@@ -1,5 +1,8 @@
 
-/** @module SortUtils */
+/**
+ * @module SortUtils
+ * @three_import import * as SortUtils from 'three/addons/utils/SortUtils.js';
+ */
 
 const POWER = 3;
 const BIT_MAX = 32;

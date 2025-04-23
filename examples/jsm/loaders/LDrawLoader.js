@@ -1776,6 +1776,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
  * ```
  *
  * @augments Loader
+ * @three_import import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
  */
 class LDrawLoader extends Loader {
 
@@ -2080,7 +2081,7 @@ class LDrawLoader extends Loader {
 
 			} else if ( finalMaterialPass ) {
 
-				// see if we can get the final material from from the "getMaterial" function which will attempt to
+				// see if we can get the final material from the "getMaterial" function which will attempt to
 				// parse the "direct" colors
 				material = loader.getMaterial( colorCode );
 				if ( material === null ) {

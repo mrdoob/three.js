@@ -28,6 +28,20 @@ function getShape( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
+	} else if ( geometry.type === 'CylinderGeometry' ) {
+
+		const radius = parameters.radiusBottom !== undefined ? parameters.radiusBottom : 0.5;
+		const length = parameters.height !== undefined ? parameters.height : 0.5;
+
+		return RAPIER.ColliderDesc.cylinder( length / 2, radius );
+
+	} else if ( geometry.type === 'CapsuleGeometry' ) {
+
+		const radius = parameters.radius !== undefined ? parameters.radius : 0.5;
+		const length = parameters.height !== undefined ? parameters.height : 0.5;
+
+		return RAPIER.ColliderDesc.capsule( length / 2, radius );
+
 	} else if ( geometry.type === 'BufferGeometry' ) {
 
 		const vertices = [];
@@ -66,6 +80,7 @@ function getShape( geometry ) {
  * @name RapierPhysics
  * @class
  * @hideconstructor
+ * @three_import import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
  */
 async function RapierPhysics() {
 
@@ -120,6 +135,10 @@ async function RapierPhysics() {
 		const body = mesh.isInstancedMesh
 			? createInstancedBody( mesh, mass, shape )
 			: createBody( mesh.position, mesh.quaternion, mass, shape );
+
+		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
+
+		mesh.userData.physics.body = body;
 
 		if ( mass > 0 ) {
 
@@ -190,6 +209,24 @@ async function RapierPhysics() {
 
 	}
 
+	function addHeightfield( mesh, width, depth, heights, scale ) {
+
+		const shape = RAPIER.ColliderDesc.heightfield( width, depth, heights, scale );
+		
+		const bodyDesc = RAPIER.RigidBodyDesc.fixed();
+		bodyDesc.setTranslation( mesh.position.x, mesh.position.y, mesh.position.z );
+		bodyDesc.setRotation( mesh.quaternion );
+		
+		const body = world.createRigidBody( bodyDesc );
+		world.createCollider( shape, body );
+		
+		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
+		mesh.userData.physics.body = body;
+		
+		return body;
+
+	}
+
 	//
 
 	const clock = new Clock();
@@ -242,6 +279,8 @@ async function RapierPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		RAPIER,
+		world,
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
 		 * `physics` object in their {@link Object3D#userData} field will be honored.
@@ -288,7 +327,25 @@ async function RapierPhysics() {
 		 * @param {Vector3} velocity - The new velocity.
 		 * @param {number} [index=0] - If the mesh is instanced, the index represents the instanced ID.
 		 */
-		setMeshVelocity: setMeshVelocity
+		setMeshVelocity: setMeshVelocity,
+
+		/**
+		 * Adds a heightfield terrain to the physics simulation.
+		 * 
+		 * @method
+		 * @name RapierPhysics#addHeightfield
+		 * @param {Mesh} mesh - The Three.js mesh representing the terrain.
+		 * @param {number} width - The number of vertices along the width (x-axis) of the heightfield.
+		 * @param {number} depth - The number of vertices along the depth (z-axis) of the heightfield.
+		 * @param {Float32Array} heights - Array of height values for each vertex in the heightfield.
+		 * @param {Object} scale - Scale factors for the heightfield dimensions.
+		 * @param {number} scale.x - Scale factor for width.
+		 * @param {number} scale.y - Scale factor for height.
+		 * @param {number} scale.z - Scale factor for depth.
+		 * @returns {RigidBody} The created Rapier rigid body for the heightfield.
+		 */
+		addHeightfield: addHeightfield
+
 	};
 
 }

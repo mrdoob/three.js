@@ -83,6 +83,7 @@ const _EPS = 0.000001;
  * ```
  *
  * @augments Controls
+ * @three_import import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
  */
 class OrbitControls extends Controls {
 

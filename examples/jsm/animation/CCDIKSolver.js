@@ -13,7 +13,7 @@ import {
 	Vector3
 } from 'three';
 
-const _q = new Quaternion();
+const _quaternion = new Quaternion();
 const _targetPos = new Vector3();
 const _targetVec = new Vector3();
 const _effectorPos = new Vector3();
@@ -29,6 +29,8 @@ const _matrix = new Matrix4();
  * This class solves the Inverse Kinematics Problem with a [CCD Algorithm]{@link https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm}.
  *
  * `CCDIKSolver` is designed to work with instances of {@link SkinnedMesh}.
+ *
+ * @three_import import { CCDIKSolver } from 'three/addons/animation/CCDIKSolver.js';
  */
 class CCDIKSolver {
 
@@ -192,8 +194,8 @@ class CCDIKSolver {
 				_axis.crossVectors( _effectorVec, _targetVec );
 				_axis.normalize();
 
-				_q.setFromAxisAngle( _axis, angle );
-				link.quaternion.multiply( _q );
+				_quaternion.setFromAxisAngle( _axis, angle );
+				link.quaternion.multiply( _quaternion );
 
 				// TODO: re-consider the limitation specification
 				if ( limitation !== undefined ) {
@@ -322,6 +324,7 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
  * Helper for visualizing IK bones.
  *
  * @augments Object3D
+ * @three_import import { CCDIKHelper } from 'three/addons/animation/CCDIKSolver.js';
  */
 class CCDIKHelper extends Object3D {
 

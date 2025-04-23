@@ -17,6 +17,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { SavePass } from 'three/addons/postprocessing/SavePass.js';
  */
 class SavePass extends Pass {
 

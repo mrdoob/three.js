@@ -17,6 +17,7 @@ import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
  * ```
  *
  * @augments LineSegmentsGeometry
+ * @three_import import { LineLineGeometry2 } from 'three/addons/lines/LineGeometry.js';
  */
 class LineGeometry extends LineSegmentsGeometry {
 

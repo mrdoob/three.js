@@ -21,6 +21,7 @@ import {
  * ```
  *
  * @augments Line
+ * @three_import import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
  */
 class PositionalAudioHelper extends Line {
 

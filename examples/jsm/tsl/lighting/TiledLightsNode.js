@@ -40,6 +40,7 @@ const _size = /*@__PURE__*/ new Vector2();
  * a custom implementation.
  *
  * @augments LightsNode
+ * @three_import import { tiledLights } from 'three/addons/tsl/lighting/TiledLightsNode.js';
  */
 class TiledLightsNode extends LightsNode {
 
@@ -233,8 +234,8 @@ class TiledLightsNode extends LightsNode {
 		const lightingModel = builder.context.reflectedLight;
 
 		// force declaration order, before of the loop
-		lightingModel.directDiffuse.append();
-		lightingModel.directSpecular.append();
+		lightingModel.directDiffuse.toStack();
+		lightingModel.directSpecular.toStack();
 
 		super.setupLights( builder, lightNodes );
 
@@ -261,7 +262,7 @@ class TiledLightsNode extends LightsNode {
 
 			} );
 
-		} )().append();
+		}, 'void' )();
 
 	}
 

@@ -31,6 +31,7 @@ import {
  * ```
  *
  * @augments Loader
+ * @three_import import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
  */
 class BVHLoader extends Loader {
 

@@ -101,7 +101,7 @@
 				vec2 normal = vec2(
 					( texture2D( levelTexture, point1 + vec2( - cellSize.x, 0 ) ).x - texture2D( levelTexture, point1 + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
 					( texture2D( levelTexture, point1 + vec2( 0, - cellSize.y ) ).x - texture2D( levelTexture, point1 + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS );
-			
+
 
 				if ( gl_FragCoord.x < 1.5 ) {
 
@@ -157,14 +157,13 @@
 			const BOUNDS_HALF = BOUNDS * 0.5;
 
 			let tmpHeightmap = null;
-			let tmpQuat = new THREE.Quaternion()
-			let tmpQuatX = new THREE.Quaternion()
-			let tmpQuatZ = new THREE.Quaternion()
+			const tmpQuat = new THREE.Quaternion();
+			const tmpQuatX = new THREE.Quaternion();
+			const tmpQuatZ = new THREE.Quaternion();
 			let duckModel = null;
 
 			let container, stats;
 			let camera, scene, renderer, controls;
-			let mouseMoved = false;
 			let mousedown = false;
 			const mouseCoords = new THREE.Vector2();
 			const raycaster = new THREE.Raycaster();
@@ -175,7 +174,6 @@
 			let meshRay;
 			let gpuCompute;
 			let heightmapVariable;
-			let waterUniforms;
 			let smoothShader;
 			let readWaterLevelShader;
 			let readWaterLevelRenderTarget;
@@ -194,14 +192,14 @@
 				mouseSize: 0.2,
 				mouseDeep: 0.01,
 				viscosity: 0.93,
-				speed:5,
+				speed: 5,
 				ducksEnabled: ducksEnabled,
-				wireframe:false,
-				shadow:false,
+				wireframe: false,
+				shadow: false,
 			};
 
 			init();
-			
+
 
 			async function init() {
 
@@ -215,10 +213,10 @@
 				scene = new THREE.Scene();
 
 				sun = new THREE.DirectionalLight( 0xFFFFFF, 4.0 );
-				sun.position.set(  -1, 2.6, 1.4 );
+				sun.position.set( - 1, 2.6, 1.4 );
 				scene.add( sun );
 
-				renderer = new THREE.WebGLRenderer({antialias:true, stencil:false});
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -240,16 +238,16 @@
 
 				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
-				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) )
-				
-				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb') ]);
+				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
+
+				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
 				env.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environment = env;
 				scene.background = env;
 				scene.backgroundBlurriness = 0.3;
 				scene.environmentIntensity = 1.25;
 
-				duckModel = model.scene.children[0];
+				duckModel = model.scene.children[ 0 ];
 				duckModel.receiveShadow = true;
 				duckModel.castShadow = true;
 
@@ -265,8 +263,12 @@
 					ducksEnabled = effectController.ducksEnabled;
 
 					let i = NUM_DUCK;
-					while(i--){ if ( ducks[ i ] ) ducks[ i ].visible = ducksEnabled; }
-				
+					while ( i -- ) {
+
+						if ( ducks[ i ] ) ducks[ i ].visible = ducksEnabled;
+
+					}
+
 				};
 
 				gui.add( effectController, 'mouseSize', 0.1, 1.0, 0.1 ).onChange( valuesChanger );
@@ -274,15 +276,17 @@
 				gui.add( effectController, 'viscosity', 0.9, 0.999, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, 'speed', 1, 6, 1 );
 				gui.add( effectController, 'ducksEnabled' ).onChange( valuesChanger );
-				gui.add( effectController, 'wireframe' ).onChange( (v)=>{ 
-					waterMesh.material.wireframe = v; 
-					poolBorder.material.wireframe = v; 
-				});
+				gui.add( effectController, 'wireframe' ).onChange( ( v )=>{
+
+					waterMesh.material.wireframe = v;
+					poolBorder.material.wireframe = v;
+
+				} );
 				gui.add( effectController, 'shadow' ).onChange( addShadow );
-				
+
 				//const buttonSmooth = { smoothWater: function () {smoothWater();} };
 				//gui.add( buttonSmooth, 'smoothWater' );
-				
+
 
 				initWater();
 
@@ -290,7 +294,7 @@
 
 				valuesChanger();
 
-				animate();
+				renderer.setAnimationLoop( animate );
 
 			}
 
@@ -299,14 +303,14 @@
 
 				const geometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
 
-				const material = new WaterMaterial({
-					color:0x9bd2ec,
-					metalness:0.9,
-					roughness:0,
-					transparent:true,
-					opacity:0.8,
-					side:THREE.DoubleSide
-				});
+				const material = new WaterMaterial( {
+					color: 0x9bd2ec,
+					metalness: 0.9,
+					roughness: 0,
+					transparent: true,
+					opacity: 0.8,
+					side: THREE.DoubleSide
+				} );
 
 				waterMesh = new THREE.Mesh( geometry, material );
 				waterMesh.rotation.x = - Math.PI * 0.5;
@@ -318,12 +322,12 @@
 
 				scene.add( waterMesh );
 
-				// pool border 
-				const borderGeom = new THREE.TorusGeometry(4.2, 0.1, 12, 4);
-				borderGeom.rotateX(Math.PI*0.5);
-				borderGeom.rotateY(Math.PI*0.25);
-				poolBorder = new THREE.Mesh( borderGeom, new THREE.MeshStandardMaterial( { color: 0x908877, roughness:0.2 } ));
-				scene.add(poolBorder);
+				// pool border
+				const borderGeom = new THREE.TorusGeometry( 4.2, 0.1, 12, 4 );
+				borderGeom.rotateX( Math.PI * 0.5 );
+				borderGeom.rotateY( Math.PI * 0.25 );
+				poolBorder = new THREE.Mesh( borderGeom, new THREE.MeshStandardMaterial( { color: 0x908877, roughness: 0.2 } ) );
+				scene.add( poolBorder );
 				borderGeom.receiveShadow = true;
 				borderGeom.castShadow = true;
 
@@ -432,23 +436,23 @@
 				renderer.shadowMap.enabled = v;
 				sun.castShadow = v;
 
-				if(v){
+				if ( v ) {
 
 					renderer.shadowMap.type = THREE.VSMShadowMap;
-					let shadow = sun.shadow;
+					const shadow = sun.shadow;
 					shadow.mapSize.width = shadow.mapSize.height = 2048;
 					shadow.radius = 2;
 					shadow.bias = - 0.0005;
-					let shadowCam = shadow.camera, s = 5;
+					const shadowCam = shadow.camera, s = 5;
 					shadowCam.near = 0.1;
 					shadowCam.far = 6;
 					shadowCam.right = shadowCam.top	= s;
-					shadowCam.left = shadowCam.bottom = -s;
+					shadowCam.left = shadowCam.bottom = - s;
 
 				} else {
 
-					if(sun.shadow) sun.shadow.dispose();
-					
+					if ( sun.shadow ) sun.shadow.dispose();
+
 				}
 
 				// debug shadow
@@ -521,7 +525,7 @@
 
 						const pos = sphere.position;
 
-						let startPos = pos.clone();
+						const startPos = pos.clone();
 
 						// Set height
 						pos.y = pixels[ 0 ];
@@ -532,10 +536,10 @@
 						sphere.userData.velocity.multiplyScalar( 0.998 );
 						pos.add( sphere.userData.velocity );
 
-						 
 
-						let decal = 0.001;
-						let limit = BOUNDS_HALF-0.2;
+
+						const decal = 0.001;
+						const limit = BOUNDS_HALF - 0.2;
 
 						if ( pos.x < - limit ) {
 
@@ -563,18 +567,18 @@
 
 						// duck orientation test
 
-						let startNormal = new THREE.Vector3(pixels[ 1 ], 1, - pixels[ 2 ] ).normalize();
-				
-						let dir = startPos.sub(pos);
+						const startNormal = new THREE.Vector3( pixels[ 1 ], 1, - pixels[ 2 ] ).normalize();
+
+						const dir = startPos.sub( pos );
 						dir.y = 0;
 						dir.normalize();
 
-						let yAxis = new THREE.Vector3(0, 1, 0);
-						let zAxis = new THREE.Vector3(0, 0, -1);
+						const yAxis = new THREE.Vector3( 0, 1, 0 );
+						const zAxis = new THREE.Vector3( 0, 0, - 1 );
 						tmpQuatX.setFromUnitVectors( zAxis, dir );
 						tmpQuatZ.setFromUnitVectors( yAxis, startNormal );
-						tmpQuat.multiplyQuaternions( tmpQuatZ,tmpQuatX );
-						sphere.quaternion.slerp(tmpQuat, 0.017);
+						tmpQuat.multiplyQuaternions( tmpQuatZ, tmpQuatX );
+						sphere.quaternion.slerp( tmpQuat, 0.017 );
 
 					}
 
@@ -591,18 +595,22 @@
 
 			}
 
-			function onPointerDown( event ) {
+			function onPointerDown() {
+
 				mousedown = true;
+
 			}
 
-			function onPointerUp( event ) {
+			function onPointerUp() {
+
 				mousedown = false;
 				controls.enabled = true;
+
 			}
 
 			function onPointerMove( event ) {
 
-				let dom = renderer.domElement;
+				const dom = renderer.domElement;
 				mouseCoords.set( ( event.clientX / dom.clientWidth ) * 2 - 1, - ( event.clientY / dom.clientHeight ) * 2 + 1 );
 
 			}
@@ -621,7 +629,7 @@
 
 						const point = intersects[ 0 ].point;
 						uniforms[ 'mousePos' ].value.set( point.x, point.z );
-						if(controls.enabled) controls.enabled = false;
+						if ( controls.enabled ) controls.enabled = false;
 
 					} else {
 
@@ -639,7 +647,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				render();
 				stats.update();
 
@@ -649,7 +656,7 @@
 
 				raycast();
 
-				frame++
+				frame ++;
 
 				if ( frame >= 7 - effectController.speed ) {
 
@@ -660,7 +667,7 @@
 					if ( ducksEnabled ) duckDynamics();
 
 					// Get compute output in custom uniform
-					if( waterMesh ) waterMesh.material.heightmap = tmpHeightmap;
+					if ( waterMesh ) waterMesh.material.heightmap = tmpHeightmap;
 
 					frame = 0;
 
@@ -691,28 +698,33 @@
 
 					this.extra = {};
 
-					this.addParametre( 'heightmap', null );
-					
+					this.addParameter( 'heightmap', null );
+
 					this.setValues( parameters );
 
 				}
 
-				addParametre( name, value ){
+				addParameter( name, value ) {
 
 					this.extra[ name ] = value;
 					Object.defineProperty( this, name, {
 						get: () => ( this.extra[ name ] ),
 						set: ( v ) => {
+
 							this.extra[ name ] = v;
-							if( this.userData.shader ) this.userData.shader.uniforms[name].value = this.extra[ name ];
+							if ( this.userData.shader ) this.userData.shader.uniforms[ name ].value = this.extra[ name ];
+
 						}
-					});
+					} );
+
 				}
 
-				onBeforeCompile( shader ){
+				onBeforeCompile( shader ) {
 
-					for(let name in this.extra ) {
-						shader.uniforms[ name ] = { value: this.extra[name] };
+					for ( const name in this.extra ) {
+
+						shader.uniforms[ name ] = { value: this.extra[ name ] };
+
 					}
 
 					shader.vertexShader = shader.vertexShader.replace( '#include <common>', shaderChange.common );
@@ -729,8 +741,8 @@
 
 			const shaderChange = {
 
-				heightmap_frag : /* glsl */`
-			    #include <common>
+				heightmap_frag: /* glsl */`
+				#include <common>
 
 				uniform vec2 mousePos;
 				uniform float mouseSize;
@@ -769,30 +781,30 @@
 					gl_FragColor = heightmapValue;
 
 				}
-			    `,
-			    // FOR MATERIAL
-			    common : /* glsl */`
+				`,
+				// FOR MATERIAL
+				common: /* glsl */`
 				#include <common>
 				uniform sampler2D heightmap;
 				`,
-			    beginnormal_vertex : /* glsl */`
-			    vec2 cellSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
-			    vec3 objectNormal = vec3(
+				beginnormal_vertex: /* glsl */`
+				vec2 cellSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
+				vec3 objectNormal = vec3(
 				( texture2D( heightmap, uv + vec2( - cellSize.x, 0 ) ).x - texture2D( heightmap, uv + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
 				( texture2D( heightmap, uv + vec2( 0, - cellSize.y ) ).x - texture2D( heightmap, uv + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS,
 				1.0 );
 				#ifdef USE_TANGENT
 					vec3 objectTangent = vec3( tangent.xyz );
 				#endif
-			    `,
-			    begin_vertex : /* glsl */`
-			    float heightValue = texture2D( heightmap, uv ).x;
-			    vec3 transformed = vec3( position.x, position.y, heightValue );
-			    #ifdef USE_ALPHAHASH
+				`,
+				begin_vertex: /* glsl */`
+				float heightValue = texture2D( heightmap, uv ).x;
+				vec3 transformed = vec3( position.x, position.y, heightValue );
+				#ifdef USE_ALPHAHASH
 					vPosition = vec3( position );
 				#endif
-			    `,
-			}
+				`,
+			};
 
 		</script>
 	</body>

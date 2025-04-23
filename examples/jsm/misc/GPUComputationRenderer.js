@@ -98,6 +98,8 @@ import { FullScreenQuad } from '../postprocessing/Pass.js';
  * gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
  * gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
  * ```
+ *
+ * @three_import import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
  */
 class GPUComputationRenderer {
 

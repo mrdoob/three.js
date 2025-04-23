@@ -38,6 +38,7 @@ import { SimplexNoise } from '../math/SimplexNoise.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
  */
 class GTAOPass extends Pass {
 
@@ -366,7 +367,7 @@ class GTAOPass extends Pass {
 	}
 
 	/**
-	 * Updates the GTAO material from the given paramter object.
+	 * Updates the GTAO material from the given parameter object.
 	 *
 	 * @param {Object} parameters - The GTAO material parameters.
 	 */
@@ -420,7 +421,7 @@ class GTAOPass extends Pass {
 	}
 
 	/**
-	 * Updates the Denoise material from the given paramter object.
+	 * Updates the Denoise material from the given parameter object.
 	 *
 	 * @param {Object} parameters - The denoise parameters.
 	 */

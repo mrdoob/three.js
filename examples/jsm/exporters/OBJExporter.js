@@ -16,6 +16,8 @@ import {
  * const exporter = new OBJExporter();
  * const data = exporter.parse( scene );
  * ```
+ *
+ * @three_import import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
  */
 class OBJExporter {
 

@@ -155,8 +155,6 @@
 		THREE.RGBFormat
 		THREE.RGBAFormat 
 		THREE.RGBAIntegerFormat
-		THREE.LuminanceFormat 
-		THREE.LuminanceAlphaFormat 
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -192,16 +190,6 @@
 			blue and alpha components. The texels are read as integers instead of
 			floating point.
 			<br /><br />
-
-			[page:constant LuminanceFormat] reads each element as a single luminance
-			component. This is then converted to a floating point, clamped to the
-			range [0,1], and then assembled into an RGBA element by placing the
-			luminance value in the red, green and blue channels, and attaching 1.0 to
-			the alpha channel.<br /><br />
-
-			[page:constant LuminanceAlphaFormat] reads each element as a
-			luminance/alpha double. The same process occurs as for the [page:constant LuminanceFormat], except that the alpha channel may have values other than
-			`1.0`.<br /><br />
 
 			[page:constant DepthFormat] reads each element as a single depth value,
 			converts it to floating point, and clamps to the range [0,1]. This is the

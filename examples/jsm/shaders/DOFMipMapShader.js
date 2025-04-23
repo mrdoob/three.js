@@ -1,4 +1,7 @@
-/** @module DOFMipMapShader */
+/**
+ * @module DOFMipMapShader
+ * @three_import import { DOFMipMapShader } from 'three/addons/shaders/DOFMipMapShader.js';
+ */
 
 /**
  * Depth-of-field shader using mipmaps from Matt Handley @applmak.

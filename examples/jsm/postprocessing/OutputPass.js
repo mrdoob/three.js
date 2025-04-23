@@ -28,6 +28,7 @@ import { OutputShader } from '../shaders/OutputShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
  */
 class OutputPass extends Pass {
 

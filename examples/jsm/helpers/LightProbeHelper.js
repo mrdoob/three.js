@@ -16,6 +16,7 @@ import {
  * ```
  *
  * @augments Mesh
+ * @three_import import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelper.js';
  */
 class LightProbeHelper extends Mesh {
 

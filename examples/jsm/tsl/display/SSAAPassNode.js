@@ -15,6 +15,7 @@ let _rendererState;
  * Reference: {@link https://en.wikipedia.org/wiki/Supersampling}
  *
  * @augments PassNode
+ * @three_import import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
  */
 class SSAAPassNode extends PassNode {
 
@@ -113,7 +114,7 @@ class SSAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -229,7 +230,7 @@ class SSAAPassNode extends PassNode {
 
 		//
 
-		RendererUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

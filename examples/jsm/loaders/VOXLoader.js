@@ -30,6 +30,7 @@ import {
  * }
  * ```
  * @augments Loader
+ * @three_import import { VOXLoader } from 'three/addons/loaders/VOXLoader.js';
  */
 class VOXLoader extends Loader {
 

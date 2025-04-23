@@ -29,8 +29,23 @@ import lottie from '../libs/lottie_canvas.module.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { LottieLoader } from 'three/addons/loaders/LottieLoader.js';
  */
 class LottieLoader extends Loader {
+
+	/**
+	 * Constructs a new Lottie loader.
+	 *
+	 * @deprecated The loader has been deprecated and will be removed with r186. Use lottie-web instead and create your animated texture manually.
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
+
+		super( manager );
+
+		console.warn( 'THREE.LottieLoader: The loader has been deprecated and will be removed with r186. Use lottie-web instead and create your animated texture manually.' );
+
+	}
 
 	/**
 	 * Sets the texture quality.

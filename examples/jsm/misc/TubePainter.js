@@ -21,6 +21,7 @@ import {
  *
  * @name TubePainter
  * @class
+ * @three_import import { TubePainter } from 'three/addons/misc/TubePainter.js';
  */
 function TubePainter() {
 

@@ -448,6 +448,7 @@ function ParserState() {
  * ```
  *
  * @augments Loader
+ * @three_import import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
  */
 class OBJLoader extends Loader {
 

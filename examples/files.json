@@ -307,6 +307,8 @@
 		"webgpu_camera",
 		"webgpu_camera_array",
 		"webgpu_camera_logarithmicdepthbuffer",
+		"webgpu_caustics",
+		"webgpu_centroid_sampling",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
 		"webgpu_compute_audio",
@@ -419,6 +421,7 @@
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
 		"webgpu_shadowmap",
+		"webgpu_shadowmap_array",
 		"webgpu_shadowmap_csm",
 		"webgpu_shadowmap_opacity",
 		"webgpu_shadowmap_progressive",
@@ -451,6 +454,7 @@
 		"webgpu_tsl_vfx_tornado",
 		"webgpu_video_frame",
 		"webgpu_video_panorama",
+		"webgpu_volume_caustics",
 		"webgpu_volume_cloud",
 		"webgpu_volume_lighting",
 		"webgpu_volume_lighting_rectarea",
@@ -503,7 +507,13 @@
 		"physics_ammo_terrain",
 		"physics_ammo_volume",
 		"physics_jolt_instancing",
-		"physics_rapier_instancing"
+		"physics_rapier_basic",
+		"physics_rapier_instancing",
+		"physics_rapier_joints",
+		"physics_rapier_character_controller",
+		"physics_rapier_vehicle_controller",
+		"physics_rapier_terrain"
+
 	],
 	"misc": [
 		"misc_animation_groups",

@@ -21,6 +21,7 @@ const _tmpQuaternion = new Quaternion();
  * (e.g. focus on a specific target).
  *
  * @augments Controls
+ * @three_import import { FlyControls } from 'three/addons/controls/FlyControls.js';
  */
 class FlyControls extends Controls {
 

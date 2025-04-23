@@ -23,6 +23,7 @@ import {
  * ```
  *
  * @augments Mesh
+ * @three_import import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
  */
 class HTMLMesh extends Mesh {
 

@@ -16,6 +16,7 @@ import UTIF from '../libs/utif.module.js';
  * ```
  *
  * @augments DataTextureLoader
+ * @three_import import { TIFFLoader } from 'three/addons/loaders/TIFFLoader.js';
  */
 class TIFFLoader extends DataTextureLoader {
 

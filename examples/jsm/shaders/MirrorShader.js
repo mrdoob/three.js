@@ -1,4 +1,7 @@
-/** @module MirrorShader */
+/**
+ * @module MirrorShader
+ * @three_import import { MirrorShader } from 'three/addons/shaders/MirrorShader.js';
+ */
 
 /**
  * Copies half the input to the other half.

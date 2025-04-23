@@ -5,6 +5,7 @@ import { nodeObject, Fn, float, uv, convertToTexture, vec4, If, int, clamp, sub,
  * Post processing node for creating a transition effect between scenes.
  *
  * @augments TempNode
+ * @three_import import { transition } from 'three/addons/tsl/display/TransitionNode.js';
  */
 class TransitionNode extends TempNode {
 

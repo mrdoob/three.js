@@ -23,6 +23,7 @@ const _shadowMatrix = new Matrix4();
  * ```
  *
  * @augments Mesh
+ * @three_import import { ShadowMesh } from 'three/addons/objects/ShadowMesh.js';
  */
 class ShadowMesh extends Mesh {
 

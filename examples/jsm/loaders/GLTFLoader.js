@@ -115,6 +115,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * ```
  *
  * @augments Loader
+ * @three_import import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
  */
 class GLTFLoader extends Loader {
 
@@ -1580,7 +1581,6 @@ class GLTFTextureWebPExtension {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
-		this.isSupported = null;
 
 	}
 
@@ -1609,46 +1609,7 @@ class GLTFTextureWebPExtension {
 
 		}
 
-		return this.detectSupport().then( function ( isSupported ) {
-
-			if ( isSupported ) return parser.loadTextureImage( textureIndex, extension.source, loader );
-
-			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
-
-				throw new Error( 'THREE.GLTFLoader: WebP required by asset but unsupported.' );
-
-			}
-
-			// Fall back to PNG or JPEG.
-			return parser.loadTexture( textureIndex );
-
-		} );
-
-	}
-
-	detectSupport() {
-
-		if ( ! this.isSupported ) {
-
-			this.isSupported = new Promise( function ( resolve ) {
-
-				const image = new Image();
-
-				// Lossy test image. Support for lossy images doesn't guarantee support for all
-				// WebP images, unfortunately.
-				image.src = 'data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA';
-
-				image.onload = image.onerror = function () {
-
-					resolve( image.height === 1 );
-
-				};
-
-			} );
-
-		}
-
-		return this.isSupported;
+		return parser.loadTextureImage( textureIndex, extension.source, loader );
 
 	}
 
@@ -1667,7 +1628,6 @@ class GLTFTextureAVIFExtension {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.EXT_TEXTURE_AVIF;
-		this.isSupported = null;
 
 	}
 
@@ -1696,44 +1656,7 @@ class GLTFTextureAVIFExtension {
 
 		}
 
-		return this.detectSupport().then( function ( isSupported ) {
-
-			if ( isSupported ) return parser.loadTextureImage( textureIndex, extension.source, loader );
-
-			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
-
-				throw new Error( 'THREE.GLTFLoader: AVIF required by asset but unsupported.' );
-
-			}
-
-			// Fall back to PNG or JPEG.
-			return parser.loadTexture( textureIndex );
-
-		} );
-
-	}
-
-	detectSupport() {
-
-		if ( ! this.isSupported ) {
-
-			this.isSupported = new Promise( function ( resolve ) {
-
-				const image = new Image();
-
-				// Lossy test image.
-				image.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAABcAAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQAMAAAAABNjb2xybmNseAACAAIABoAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAAB9tZGF0EgAKCBgABogQEDQgMgkQAAAAB8dSLfI=';
-				image.onload = image.onerror = function () {
-
-					resolve( image.height === 1 );
-
-				};
-
-			} );
-
-		}
-
-		return this.isSupported;
+		return parser.loadTextureImage( textureIndex, extension.source, loader );
 
 	}
 
@@ -2294,7 +2217,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 }
 
-const _q = new Quaternion();
+const _quaternion = new Quaternion();
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
@@ -2302,7 +2225,7 @@ class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
 		const result = super.interpolate_( i1, t0, t, t1 );
 
-		_q.fromArray( result ).normalize().toArray( result );
+		_quaternion.fromArray( result ).normalize().toArray( result );
 
 		return result;
 

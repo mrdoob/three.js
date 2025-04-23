@@ -18,6 +18,7 @@ import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
  */
 class GlitchPass extends Pass {
 
@@ -50,7 +51,7 @@ class GlitchPass extends Pass {
 		} );
 
 		/**
-		 * Whether to noticeably increase the effect instensity or not.
+		 * Whether to noticeably increase the effect intensity or not.
 		 *
 		 * @type {boolean}
 		 * @default false

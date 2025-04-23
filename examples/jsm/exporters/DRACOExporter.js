@@ -19,6 +19,8 @@ import { Color, ColorManagement, SRGBColorSpace } from 'three';
  * const exporter = new DRACOExporter();
  * const data = exporter.parse( mesh, options );
  * ```
+ *
+ * @three_import import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
  */
 class DRACOExporter {
 
@@ -27,7 +29,7 @@ class DRACOExporter {
 	 *
 	 * @param {(Mesh|Points)} object - The mesh or point cloud to export.
 	 * @param {DRACOExporter~Options} options - The export options.
-	 * @return {ArrayBuffer} The exported Draco.
+	 * @return {Int8Array} The exported Draco.
 	 */
 	parse( object, options = {} ) {
 

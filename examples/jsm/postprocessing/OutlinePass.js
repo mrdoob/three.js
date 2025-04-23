@@ -26,6 +26,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * ```
  *
  * @augments Pass
+ * @three_import import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
  */
 class OutlinePass extends Pass {
 
@@ -557,7 +558,8 @@ class OutlinePass extends Pass {
 			},
 
 			vertexShader:
-				`#include <morphtarget_pars_vertex>
+				`#include <batching_pars_vertex>
+				#include <morphtarget_pars_vertex>
 				#include <skinning_pars_vertex>
 
 				varying vec4 projTexCoord;
@@ -566,6 +568,7 @@ class OutlinePass extends Pass {
 
 				void main() {
 
+					#include <batching_vertex>
 					#include <skinbase_vertex>
 					#include <begin_vertex>
 					#include <morphtarget_vertex>

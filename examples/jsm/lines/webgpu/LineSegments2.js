@@ -94,8 +94,9 @@ function raycastWorldUnits( lineSegments, intersects ) {
 function raycastScreenSpace( lineSegments, camera, intersects ) {
 
 	const projectionMatrix = camera.projectionMatrix;
-	const resolution = lineSegments.resolution;
 	const matrixWorld = lineSegments.matrixWorld;
+
+	const resolution = lineSegments._resolution;
 
 	const geometry = lineSegments.geometry;
 	const instanceStart = geometry.attributes.instanceStart;
@@ -234,6 +235,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
  * import the class from `lines/LineSegments2.js`.
  *
  * @augments Mesh
+ * @three_import import { LineSegments2 } from 'three/addons/lines/webgpu/LineSegments2.js';
  */
 class LineSegments2 extends Mesh {
 

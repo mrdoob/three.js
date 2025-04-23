@@ -2,7 +2,10 @@ import {
 	Vector2
 } from 'three';
 
-/** @module NormalMapShader */
+/**
+ * @module NormalMapShader
+ * @three_import import { NormalMapShader } from 'three/addons/shaders/NormalMapShader.js';
+ */
 
 /**
  * Normal map shader, compute normals from heightmap.

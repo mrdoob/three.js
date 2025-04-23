@@ -26,6 +26,7 @@ import {
  * - [Water shader explanations in WebGL]{@link http://29a.ch/slides/2012/webglwater/ }
  *
  * @augments Mesh
+ * @three_import import { Water } from 'three/addons/objects/Water.js';
  */
 class Water extends Mesh {
 

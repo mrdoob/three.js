@@ -27,7 +27,8 @@ import {
  * ```
  *
  * @augments Mesh
-*/
+ * @three_import import { Sky } from 'three/addons/objects/Sky.js';
+ */
 class Sky extends Mesh {
 
 	/**

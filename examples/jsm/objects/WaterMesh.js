@@ -20,6 +20,7 @@ import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, text
  * - [Water shader explanations in WebGL]{@link http://29a.ch/slides/2012/webglwater/ }
  *
  * @augments Mesh
+ * @three_import import { WaterMesh } from 'three/addons/objects/WaterMesh.js';
  */
 class WaterMesh extends Mesh {
 
@@ -152,7 +153,7 @@ class WaterMesh extends Mesh {
 
 		material.opacityNode = this.alpha;
 
-		material.shadowPositionNode = positionWorld.add( distortion );
+		material.receivedShadowPositionNode = positionWorld.add( distortion );
 
 		material.setupOutgoingLight = () => diffuseColor.rgb; // backwards compatibility
 

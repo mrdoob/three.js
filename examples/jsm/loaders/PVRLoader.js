@@ -17,6 +17,7 @@ import {
  * ```
  *
  * @augments CompressedTextureLoader
+ * @three_import import { PVRLoader } from 'three/addons/loaders/PVRLoader.js';
  */
 class PVRLoader extends CompressedTextureLoader {
 

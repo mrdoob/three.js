@@ -7,6 +7,8 @@ import * as NURBSUtils from '../curves/NURBSUtils.js';
  * This class represents a NURBS surface.
  *
  * Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weight`.
+ *
+ * @three_import import { NURBSSurface } from 'three/addons/curves/NURBSSurface.js';
  */
 class NURBSSurface {
 

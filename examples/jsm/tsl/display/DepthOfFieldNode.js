@@ -5,6 +5,7 @@ import { convertToTexture, nodeObject, Fn, uv, uniform, vec2, vec4, clamp } from
  * Post processing node for creating depth of field (DOF) effect.
  *
  * @augments TempNode
+ * @three_import import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
  */
 class DepthOfFieldNode extends TempNode {
 

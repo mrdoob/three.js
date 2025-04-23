@@ -17,6 +17,7 @@ let _rendererState;
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
  * @augments PassNode
+ * @three_import import { traaPass } from 'three/addons/tsl/display/TRAAPassNode.js';
  */
 class TRAAPassNode extends PassNode {
 
@@ -153,7 +154,7 @@ class TRAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -291,7 +292,7 @@ class TRAAPassNode extends PassNode {
 
 		velocityOutput.setProjectionMatrix( null );
 
-		RendererUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

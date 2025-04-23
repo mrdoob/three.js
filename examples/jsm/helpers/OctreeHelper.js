@@ -14,6 +14,7 @@ import {
  * ```
  *
  * @augments LineSegments
+ * @three_import import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
  */
 class OctreeHelper extends LineSegments {
 

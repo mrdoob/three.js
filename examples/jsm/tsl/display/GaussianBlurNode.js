@@ -35,6 +35,7 @@ const unpremult = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * Post processing node for creating a gaussian blur effect.
  *
  * @augments TempNode
+ * @three_import import { gaussianBlur, premultipliedGaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
  */
 class GaussianBlurNode extends TempNode {
 
