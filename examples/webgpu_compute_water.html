@@ -57,8 +57,9 @@
 			let poolBorder;
 			let meshRay;
 			let computeHeight, computeSmooth, computeSphere;
+			let duckModel = null;
 
-			const NUM_SPHERES = 100;
+			const NUM_DUCKS = 100;
 
 			const simplex = new SimplexNoise();
 
@@ -299,32 +300,32 @@
 				// position<vec3> + velocity<vec2> + unused<vec3> = 8 floats per sphere.
 				// for structs arrays must be enclosed in multiple of 4
 
-				const sphereStride = 8;
-				const sphereArray = new Float32Array( NUM_SPHERES * sphereStride );
+				const duckStride = 8;
+				const duckInstanceDataArray = new Float32Array( NUM_DUCKS * duckStride );
 
 				// Only hold velocity in x and z directions.
 				// The sphere is wedded to the surface of the water, and will only move vertically with the water.
 
-				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
+				for ( let i = 0; i < NUM_DUCKS; i ++ ) {
 
-					sphereArray[ i * sphereStride + 0 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
-					sphereArray[ i * sphereStride + 1 ] = 0;
-					sphereArray[ i * sphereStride + 2 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					duckInstanceDataArray[ i * duckStride + 0 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					duckInstanceDataArray[ i * duckStride + 1 ] = 0;
+					duckInstanceDataArray[ i * duckStride + 2 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
 
 				}
 
-				const SphereStruct = struct( {
+				const DuckStruct = struct( {
 					position: 'vec3',
 					velocity: 'vec2'
 				} );
 
 				// Sphere Instance Storage
-				const sphereVelocityStorage = instancedArray( sphereArray, SphereStruct ).label( 'SphereData' );
+				const duckInstanceDataStorage = instancedArray( duckInstanceDataArray, DuckStruct ).label( 'DuckInstanceData' );
 
 				computeSphere = Fn( () => {
 
-					const instancePosition = sphereVelocityStorage.element( instanceIndex ).get( 'position' );
-					const velocity = sphereVelocityStorage.element( instanceIndex ).get( 'velocity' );
+					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' );
+					const velocity = duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' );
 
 					// Bring position from range of [ -BOUNDS/2, BOUNDS/2 ] to [ 0, BOUNDS ]
 					const tempX = instancePosition.x.add( BOUNDS_HALF );
@@ -390,11 +391,11 @@
 					instancePosition.assign( newPosition );
 					velocity.assign( vec2( newVelocity.x, newVelocity.z ) );
 
-				} )().compute( NUM_SPHERES );
+				} )().compute( NUM_DUCKS );
 
 				sphereMaterial.positionNode = Fn( () => {
 
-					const instancePosition = sphereVelocityStorage.element( instanceIndex ).get( 'position' );
+					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' );
 
 					const newPosition = positionLocal.add( instancePosition );
 
@@ -402,8 +403,7 @@
 			
 				} )();
 
-				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
-				scene.add( sphereMesh );
+				console.log( duckModel );
 
 				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
  				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
@@ -415,6 +415,25 @@
  				scene.background = env;
  				scene.backgroundBlurriness = 0.3;
  				scene.environmentIntensity = 1.25;
+
+				duckModel = model.scene.children[ 0 ];
+				duckModel.receiveShadow = true;
+				duckModel.castShadow = true;
+				duckModel.material.positionNode = Fn( () => {
+
+					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' );
+
+					const newPosition = positionLocal.add( instancePosition );
+
+					return newPosition;
+
+				} )();
+
+				const sphereMesh = new THREE.InstancedMesh( duckModel.geometry, duckModel.material, NUM_DUCKS );
+			
+				scene.add( sphereMesh );
+
+				console.log( duckModel );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
