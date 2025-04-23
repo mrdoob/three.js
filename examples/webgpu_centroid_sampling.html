@@ -158,8 +158,8 @@
 
 				};
 
-				const withFlatFirstShader = createShader( 'flat', 'first' );
-				const withFlatEitherShader = createShader( 'flat', 'either' );
+				const withFlatFirstShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.FLAT_FIRST );
+				const withFlatEitherShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.FLAT_EITHER );
 
 				const withSampleShader = Fn( () => {
 
