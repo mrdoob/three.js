@@ -703,8 +703,12 @@ class RenderObject {
 		}
 
 		if ( object.isBatchedMesh ) {
+			
+			if ( object._matricesTexture !== null ) {
 
-			cacheKey += object._matricesTexture.uuid + ',';
+				cacheKey += object._matricesTexture.uuid + ',';
+
+			}
 
 			if ( object._colorsTexture !== null ) {
 
