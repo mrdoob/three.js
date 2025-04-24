@@ -85,7 +85,7 @@ camera.position.z = 5;
 
 		<p>The third thing we need is a `Mesh`. A mesh is an object that takes a geometry, and applies a material to it, which we then can insert to our scene, and move freely around.</p>
 
-		<p>By default, when we call `scene.add()`, the thing we add will be added to the coordinates `(0,0,0)`. This would cause both the camera and the cube to be inside each other. To avoid this, we simply move the camera out a bit.</p>
+		<p>By default, when we call `scene.add()`, the object is added to the coordinates `(0,0,0)`. However, this result in the camera, which is also at the coordinates `(0,0,0)`, to be inside the cube. We could tell Three.js to render the inside of the cube by passing `{ color: 0x00ff00, side: THREE.BackSide }` to our `MeshBasicMaterial`, but since our cube will look much better from the outside, we'll just move the camera back a bit.</p>
 
 		<h2>Rendering the scene</h2>
 
