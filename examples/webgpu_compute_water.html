@@ -34,6 +34,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
  			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			// Dimensions of simulation grid.
@@ -42,15 +43,27 @@
 			// Water size in system units.
 			const BOUNDS = 6;
 			const BOUNDS_HALF = BOUNDS * 0.5;
+			const limit = BOUNDS_HALF - 0.2;
 
 			const waterMaxHeight = 0.1;
 
 			let container, stats;
 			let camera, scene, renderer, controls;
 			let mouseMoved = false;
+			let mouseDown = false;
 			const mouseCoords = new THREE.Vector2();
 			const raycaster = new THREE.Raycaster();
-			let effectController;
+			let frame = 0;
+
+			const effectController = {
+				mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
+				mouseDeep: uniform( 0.01 ).label( 'mouseDeep' ),
+				mouseSize: uniform( 0.2 ).label( 'mouseSize' ),
+				viscosity: uniform( 0.93 ).label( 'viscosity' ),
+				ducksEnabled: true,
+				wireframe: false,
+				speed: 5,
+			};
 
 			let sun;
 			let waterMesh;
@@ -98,15 +111,6 @@
 				scene.add( sun );
 
 				//
-
-				effectController = {
-					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
-					mouseDeep: uniform( 0.01 ).label( 'mouseDeep' ),
-					mouseSize: uniform( 0.2 ).label( 'mouseSize' ),
-					viscosity: uniform( 0.9 ).label( 'viscosity' ),
-					spheresEnabled: true,
-					wireframe: false
-				};
 
 				// Initialize height storage buffers
 				const heightArray = new Float32Array( WIDTH * WIDTH );
@@ -269,9 +273,11 @@
 				} )();
 
 				waterMesh = new THREE.Mesh( waterGeometry, waterMaterial );
-				waterMesh.rotation.x = - Math.PI / 2;
+				waterMesh.rotation.x = - Math.PI * 0.5;
 				waterMesh.matrixAutoUpdate = false;
 				waterMesh.updateMatrix();
+				waterMesh.receiveShadow = true;
+				waterMesh.castShadow = true;
 
 				scene.add( waterMesh );
 
@@ -291,10 +297,6 @@
 				meshRay.matrixAutoUpdate = false;
 				meshRay.updateMatrix();
 				scene.add( meshRay );
-
-				// Create sphere THREE.InstancedMesh
-				const sphereGeometry = new THREE.SphereGeometry( 0.1, 0.1, 0.1 );
-				const sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFF00 } );
 			
 				// Initialize sphere mesh instance position and velocity.
 				// position<vec3> + velocity<vec2> + unused<vec3> = 8 floats per sphere.
@@ -328,18 +330,20 @@
 					const velocity = duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' );
 
 					// Bring position from range of [ -BOUNDS/2, BOUNDS/2 ] to [ 0, BOUNDS ]
-					const tempX = instancePosition.x.add( BOUNDS_HALF );
-					const tempZ = instancePosition.z.add( BOUNDS_HALF );
 
-					// Bring position from range [ 0, BOUNDS ] to [ 0, WIDTH ]
-					// ( i.e bring geometry range into 'heightmap' range )
-					// WIDTH = 128, BOUNDS = 512... same as dividing by 4
-					tempX.mulAssign( WIDTH / BOUNDS );
-					tempZ.mulAssign( WIDTH / BOUNDS );
+					// Bring position from range [ -BOUNDS/2, BOUNDS/2 ] to [ 0, WIDTH ]
+
+					const tempX = instancePosition.x.mul( 0.5 ).div( BOUNDS_HALF );
+					tempX.addAssign( 0.5 );
+					const newX = tempX.mul( WIDTH );
+
+					const tempZ = instancePosition.z.mul( 0.5 ).div( BOUNDS_HALF );
+					tempZ.addAssign( 0.5 );
+					const newZ = tempZ.mul( WIDTH );
 
 					// Can only access storage buffers with uints
-					const xCoord = uint( floor( tempX ) );
-					const zCoord = uint( floor( tempZ ) );
+					const xCoord = uint( floor( newX ) );
+					const zCoord = uint( floor( newZ ) );
 
 					// Get one dimensional index
 					const heightInstanceIndex = zCoord.mul( WIDTH ).add( xCoord );
@@ -363,27 +367,29 @@
 
 					const newPosition = instancePosition.add( newVelocity ).toVar();
 
-					// Reverse velocity and reset position when exceeding bounds.
-					If( newPosition.x.lessThan( - BOUNDS_HALF ), () => {
+					const decal = float( 0.001 ).toVar( 'decal' );
 
-						newPosition.x = float( - BOUNDS_HALF ).add( 0.001 );
+					// Reverse velocity and reset position when exceeding bounds.
+					If( newPosition.x.lessThan( - limit ), () => {
+
+						newPosition.x = float( - limit ).add( decal );
 						newVelocity.x.mulAssign( - 0.3 );
 			
-					} ).ElseIf( newPosition.x.greaterThan( BOUNDS_HALF ), () => {
+					} ).ElseIf( newPosition.x.greaterThan( limit ), () => {
 
-						newPosition.x = float( BOUNDS_HALF ).sub( 0.001 );
+						newPosition.x = float( limit ).sub( decal );
 						newVelocity.x.mulAssign( - 0.3 );
 			
 					} );
 
-					If( newPosition.z.lessThan( - BOUNDS_HALF ), () => {
+					If( newPosition.z.lessThan( - limit ), () => {
 
-						newPosition.z = float( - BOUNDS_HALF ).add( 0.001 );
+						newPosition.z = float( - limit ).add( decal );
 						newVelocity.z.mulAssign( - 0.3 );
 			
-					} ).ElseIf( newPosition.z.greaterThan( BOUNDS_HALF ), () => {
+					} ).ElseIf( newPosition.z.greaterThan( limit ), () => {
 
-						newPosition.z = float( BOUNDS_HALF ).sub( 0.001 );
+						newPosition.z = float( limit ).sub( decal );
 						newVelocity.z.mulAssign( - 0.3 );
 			
 					} );
@@ -392,18 +398,6 @@
 					velocity.assign( vec2( newVelocity.x, newVelocity.z ) );
 
 				} )().compute( NUM_DUCKS );
-
-				sphereMaterial.positionNode = Fn( () => {
-
-					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' );
-
-					const newPosition = positionLocal.add( instancePosition );
-
-					return newPosition;
-			
-				} )();
-
-				console.log( duckModel );
 
 				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
  				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
@@ -429,11 +423,9 @@
 
 				} )();
 
-				const sphereMesh = new THREE.InstancedMesh( duckModel.geometry, duckModel.material, NUM_DUCKS );
+				const duckMesh = new THREE.InstancedMesh( duckModel.geometry, duckModel.material, NUM_DUCKS );
 			
-				scene.add( sphereMesh );
-
-				console.log( duckModel );
+				scene.add( duckMesh );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -443,16 +435,23 @@
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
+				controls = new OrbitControls( camera, container );
+
+				container.style.touchAction = 'none';
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
+				container.addEventListener( 'pointerdown', onPointerDown );
+				container.addEventListener( 'pointerup', onPointerUp );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 				gui.add( effectController.mouseSize, 'value', 0.1, 1, 0.1 ).name( 'Mouse Size' );
+				gui.add( effectController.mouseDeep, 'value', 0.01, 1, 0.01 ).name( 'Mouse Deep' );
 				gui.add( effectController.viscosity, 'value', 0.9, 0.999, 0.001 ).name( 'viscosity' );
 				const buttonCompute = {
 					smoothWater: function () {
@@ -461,16 +460,20 @@
 
 					}
 				};
-				gui.add( buttonCompute, 'smoothWater' );
-				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
+				//gui.add( buttonCompute, 'smoothWater' );
+				gui.add( effectController, 'speed', 1, 6, 1 );
+				gui.add( effectController, 'ducksEnabled' ).onChange( () => {
 			
-					sphereMesh.visible = effectController.spheresEnabled;
+					duckMesh.visible = effectController.ducksEnabled;
 			
 				} );
 				gui.add( effectController, 'wireframe' ).onChange( () => {
 			
 					waterMesh.material.wireframe = ! waterMesh.material.wireframe;
+					poolBorder.material.wireframe = ! poolBorder.material.wireframe;
+					duckModel.material.wireframe = ! duckModel.material.wireframe;
 					waterMesh.material.needsUpdate = true;
+					poolBorder.material.needsUpdate = true;
 			
 				} );
 
@@ -492,6 +495,19 @@
 
 			}
 
+			function onPointerDown( event ) {
+
+				mouseDown = true;
+			
+			}
+
+			function onPointerUp( event ) {
+
+				mouseDown = false;
+				controls.enabled = true;
+
+			}
+
 			function onPointerMove( event ) {
 
 				if ( event.isPrimary === false ) return;
@@ -507,9 +523,9 @@
 
 			}
 
-			function render() {
+			function raycast() {
 
-				if ( mouseMoved ) {
+				if ( mouseDown ) {
 
 					raycaster.setFromCamera( mouseCoords, camera );
 
@@ -519,27 +535,43 @@
 
 						const point = intersects[ 0 ].point;
 						effectController.mousePos.value.set( point.x, point.z );
+						if ( controls.enabled ) {
+
+							controls.enabled = false;
+			
+						}
 
 					} else {
 
 						effectController.mousePos.value.set( 10000, 10000 );
 
 					}
-
-					mouseMoved = false;
-
+			
 				} else {
 
 					effectController.mousePos.value.set( 10000, 10000 );
-
-				}
 			
-				renderer.computeAsync( computeHeight );
+				}
 
-				if ( effectController.spheresEnabled ) {
+			}
 
-					renderer.computeAsync( computeSphere );
+			function render() {
 
+				raycast();
+				frame ++;
+
+				if ( frame >= 7 - effectController.speed ) {
+
+					renderer.computeAsync( computeHeight );
+
+					if ( effectController.ducksEnabled ) {
+
+						renderer.computeAsync( computeSphere );
+
+					}
+
+					frame = 0;
+			
 				}
 
 				renderer.render( scene, camera );
