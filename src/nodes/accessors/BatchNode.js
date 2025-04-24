@@ -107,7 +107,7 @@ class BatchNode extends Node {
 				textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
 			);
 
-		}	 
+		}
 
 
 		const colorsTexture = this.batchMesh._colorsTexture;
