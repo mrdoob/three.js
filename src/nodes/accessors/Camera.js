@@ -4,7 +4,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
-import { Euler, Quaternion } from '../../Three.Core.js';
+import { Quaternion } from '../../Three.Core.js';
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -31,18 +31,16 @@ export const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' )
 export const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.far );
 
 /**
- * TSL object that represents the world rotation of the camera used for the current render.
+ * TSL object that represents the world quaternion of the camera used for the current render.
  *
  * @tsl
- * @type {UniformNode<vec3>}
+ * @type {UniformNode<vec4>}
  */
-export const cameraWorldRotation = /*@__PURE__*/ ( ()=> {
+export const cameraWorldQuaternion = /*@__PURE__*/ ( ()=> {
 
 	let quaternion = null; // the quaternion object is lazy-loaded
 
-	let euler = null; // the euler object is lazy-loaded
-
-	return uniform( 'vec3' ).label( 'cameraWorldRotation' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) =>{
+	return uniform( 'vec4' ).label( 'cameraWorldQuaternion' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) =>{
 
 		if ( quaternion == null ) {
 
@@ -50,15 +48,7 @@ export const cameraWorldRotation = /*@__PURE__*/ ( ()=> {
 
 		}
 
-		if ( euler == null ) {
-
-			euler = new Euler();
-
-		}
-
-		camera.getWorldQuaternion( quaternion );
-
-		return ( euler ).setFromQuaternion( quaternion );
+		return camera.getWorldQuaternion( quaternion );
 
 	} );
 
