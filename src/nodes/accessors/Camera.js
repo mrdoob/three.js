@@ -30,23 +30,19 @@ export const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' )
  */
 export const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.far );
 
+const _quaternion = new Quaternion();
+
 /**
  * TSL object that represents the world quaternion of the camera used for the current render.
  *
  * @tsl
  * @type {UniformNode<vec4>}
  */
-export const cameraWorldQuaternion = /*@__PURE__*/ ( Fn( ( ) => {
+export const cameraWorldQuaternion = /*@__PURE__*/ uniform( 'vec4' ).label( 'cameraWorldQuaternion' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) =>{
 
-	const quaternion = new Quaternion();
+	return camera.getWorldQuaternion( _quaternion );
 
-	return uniform( 'vec4' ).label( 'cameraWorldQuaternion' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) =>{
-
-		return camera.getWorldQuaternion( quaternion );
-
-	} );
-
-} ).once() )();
+} );
 
 /**
  * TSL object that represents the projection matrix of the camera used for the current render.
