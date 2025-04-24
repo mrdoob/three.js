@@ -61,9 +61,7 @@
 				const shadowPlane = new THREE.Mesh(
 					new THREE.PlaneGeometry( 10, 10 ),
 					new THREE.ShadowMaterial( {
-						color: 0x444444,
-						polygonOffset: true,
-						polygonOffsetFactor: - 0.01
+						color: 0x444444
 					} ),
 				);
 				shadowPlane.rotation.x = - Math.PI / 2;
@@ -76,6 +74,7 @@
 				);
 				floorCollider.position.y = - 2.5;
 				floorCollider.userData.physics = { mass: 0 };
+				floorCollider.visible = false;
 				scene.add( floorCollider );
 
 				//
