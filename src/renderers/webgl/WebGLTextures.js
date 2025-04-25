@@ -889,6 +889,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								}
 
+								texture.clearUpdateRanges();
+
 								_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
 								_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
 								_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
