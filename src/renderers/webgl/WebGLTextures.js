@@ -828,7 +828,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const y = Math.floor( pixelStart / image.width );
 
 				// Assumes update ranges refer to contiguous memory
-				// TODO: split multi-row updates into multiple calls?
 				const width = pixelCount;
 				const height = 1;
 
