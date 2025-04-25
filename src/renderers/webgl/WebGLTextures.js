@@ -859,8 +859,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							} else {
 
+								const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
 								const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
 								const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+
+								_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 
 								const componentStride = 4; // only RGBA supported
 
@@ -886,6 +889,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								}
 
+								_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
 								_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
 								_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
 
