@@ -778,6 +778,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let mipmap;
 			const mipmaps = texture.mipmaps;
+			const updateRanges = texture.updateRanges;
 
 			const useTexStorage = ( texture.isVideoTexture !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
@@ -852,7 +853,43 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( dataReady ) {
 
-							state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+							if ( updateRanges.length === 0 ) {
+
+								state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+
+							} else {
+
+								const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+								const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+
+								const componentStride = 4; // only RGBA supported
+
+								for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+									const range = updateRanges[ i ];
+
+									const pixelStart = Math.floor( range.start / componentStride );
+									const pixelCount = Math.ceil( range.count / componentStride );
+
+									const x = pixelStart % image.width;
+									const y = Math.floor( pixelStart / image.width );
+
+									// Assumes update ranges refer to contiguous memory
+									// TODO: split multi-row updates into multiple calls?
+									const width = pixelCount;
+									const height = 1;
+
+									_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, x );
+									_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, y );
+
+									state.texSubImage2D( _gl.TEXTURE_2D, 0, x, y, width, height, glFormat, glType, image.data );
+
+								}
+
+								_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+								_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+
+							}
 
 						}
 
