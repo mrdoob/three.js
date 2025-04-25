@@ -758,7 +758,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		} else {
 
 			// Before applying update ranges, we merge any adjacent / overlapping
-			// ranges to reduce load on `gl.bufferSubData`. Empirically, this has led
+			// ranges to reduce load on `gl.texSubImage2D`. Empirically, this has led
 			// to performance improvements for applications which make heavy use of
 			// update ranges. Likely due to GPU command overhead.
 			//
@@ -780,13 +780,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const previousRange = updateRanges[ mergeIndex ];
 				const range = updateRanges[ i ];
 
-				// We add one here to merge adjacent ranges. This is safe because ranges
-				// operate over positive integers.
+				// Only merge if in the same row and overlapping/adjacent
 				const previousEnd = previousRange.start + previousRange.count;
 				const currentRow = getRow( range.start, image.width, componentStride );
 				const previousRow = getRow( previousRange.start, image.width, componentStride );
 
-				// Only merge if in the same row and overlapping/adjacent
+				// We add one here to merge adjacent ranges. This is safe because ranges
+				// operate over positive integers.
 				if (
 					range.start <= previousEnd + 1 &&
 					currentRow === previousRow &&
