@@ -594,12 +594,14 @@ class BatchedMesh extends Mesh {
 
 		const matricesTexture = this._matricesTexture;
 		_matrix.identity().toArray( matricesTexture.image.data, drawId * 16 );
+		matricesTexture.addUpdateRange( drawId * 16, 16 );
 		matricesTexture.needsUpdate = true;
 
 		const colorsTexture = this._colorsTexture;
 		if ( colorsTexture ) {
 
 			_whiteColor.toArray( colorsTexture.image.data, drawId * 4 );
+			colorsTexture.addUpdateRange( drawId * 4, 4 );
 			colorsTexture.needsUpdate = true;
 
 		}
@@ -1078,6 +1080,7 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
 		matrix.toArray( matricesArray, instanceId * 16 );
+		matricesTexture.addUpdateRange( instanceId * 16, 16 );
 		matricesTexture.needsUpdate = true;
 
 		return this;
@@ -1116,6 +1119,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		color.toArray( this._colorsTexture.image.data, instanceId * 4 );
+		this._colorsTexture.addUpdateRange( instanceId * 4, 4 );
 		this._colorsTexture.needsUpdate = true;
 
 		return this;
