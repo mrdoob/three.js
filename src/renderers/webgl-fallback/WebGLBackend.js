@@ -10,6 +10,7 @@ import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
+import { WebGLShader } from '../webgl/WebGLShader.js';
 
 import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
@@ -1406,10 +1407,7 @@ class WebGLBackend extends Backend {
 		const gl = this.gl;
 		const { stage, code } = program;
 
-		const shader = stage === 'fragment' ? gl.createShader( gl.FRAGMENT_SHADER ) : gl.createShader( gl.VERTEX_SHADER );
-
-		gl.shaderSource( shader, code );
-		gl.compileShader( shader );
+		const shader = stage === 'fragment' ? WebGLShader( gl, gl.FRAGMENT_SHADER, code ) : WebGLShader( gl, gl.VERTEX_SHADER, code );
 
 		this.set( program, {
 			shaderGPU: shader
