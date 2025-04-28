@@ -619,6 +619,7 @@ export const Fn = ( jsFunc, layout = null ) => {
 	};
 
 	fn.shaderNode = shaderNode;
+	fn.id = shaderNode.id;
 
 	fn.setLayout = ( layout ) => {
 

@@ -5,6 +5,7 @@ import { smoothstep } from '../math/MathNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
 import { texture } from '../accessors/TextureNode.js';
+import { float } from '../tsl/TSLBase.js';
 
 /**
  * Module for representing spot lights as nodes.
@@ -91,6 +92,23 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
+	getSpotLightCoord( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+		let projectionUV = properties.projectionUV;
+
+		if ( projectionUV === undefined ) {
+
+			projectionUV = lightProjectionUV( this.light, builder.context.positionWorld );
+
+			properties.projectionUV = projectionUV;
+
+		}
+
+		return projectionUV;
+
+	}
+
 	setupDirect( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
@@ -99,7 +117,8 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const lightDirection = lightVector.normalize();
 		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
-		const spotAttenuation = this.getSpotAttenuation( angleCos );
+
+		const spotAttenuation = light.attenuationNode ? light.attenuationNode( this ) : this.getSpotAttenuation( angleCos );
 
 		const lightDistance = lightVector.length();
 
@@ -113,7 +132,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		if ( light.map ) {
 
-			const spotLightCoord = lightProjectionUV( light, builder.context.positionWorld );
+			const spotLightCoord = this.getSpotLightCoord( builder );
 			const projectedTexture = texture( light.map, spotLightCoord.xy ).onRenderUpdate( () => light.map );
 
 			const inSpotLightMap = spotLightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
