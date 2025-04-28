@@ -477,6 +477,13 @@ class FBXTreeParser {
 
 		}
 
+		if ( fileName === undefined ) {
+
+			console.warn( 'FBXLoader: Undefined filename, creating placeholder texture.' );
+			return new Texture();
+
+		}
+
 		const texture = loader.load( fileName );
 
 		// revert to initial path
