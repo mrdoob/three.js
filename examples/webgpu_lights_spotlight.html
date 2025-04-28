@@ -107,7 +107,7 @@
 
 					} );
 
-					const penumbraCos = uniform( 'float' ).onRenderUpdate( () => Math.cos( light.angle * ( 1 - Math.min( light.penumbra, .999 ) ) ) );
+					const penumbraCos = uniform( 'float' ).onRenderUpdate( () => Math.min( Math.cos( light.angle * ( 1 - light.penumbra ) ), .99999 ) );
 					const spotLightCoord = lightNode.getSpotLightCoord( builder );
 					const coord = spotLightCoord.xyz.div( spotLightCoord.w );
 
