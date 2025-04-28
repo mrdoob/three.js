@@ -26,6 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { Fn, vec2, length, abs, max, min, div, mul, clamp, acos } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -86,13 +87,35 @@
 
 				}
 
+				const boxAttenuationFn = Fn( ( [ lightNode ], builder ) => {
+
+					const sdBox = Fn( ( [ p, b ] ) => {
+
+						const d = vec2( abs( p ).sub( b ) ).toVar();
+
+						return length( max( d, 0.0 ) ).add( min( max( d.x, d.y ), 0.0 ) );
+
+					} );
+
+					const penumbraCos = lightNode.penumbraCosNode;
+					const spotLightCoord = lightNode.getSpotLightCoord( builder );
+					const coord = spotLightCoord.xyz.div( spotLightCoord.w );
+
+					const boxDist = sdBox( coord.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
+					const angleFactor = div( 1.0, acos( penumbraCos ).sub( 1.0 ) );
+					const attenuation = clamp( mul( 2.0, boxDist ).mul( angleFactor ), 0.0, 1.0 );
+
+					return attenuation;
+
+				} );
+
 				spotLight = new THREE.SpotLight( 0xffffff, 100 );
+				spotLight.map = textures[ 'disturb.jpg' ];
 				spotLight.position.set( 2.5, 5, 2.5 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 1;
 				spotLight.decay = 2;
 				spotLight.distance = 0;
-				spotLight.map = textures[ 'disturb.jpg' ];
 
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
@@ -150,7 +173,8 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					shadows: true
+					shadows: true,
+					customAttenuation: false
 				};
 
 				gui.add( params, 'map', textures ).onChange( function ( val ) {
@@ -202,7 +226,6 @@
 
 				} );
 
-
 				gui.add( params, 'shadows' ).onChange( function ( val ) {
 
 					renderer.shadowMap.enabled = val;
@@ -216,6 +239,12 @@
 						}
 
 					} );
+
+				} );
+
+				gui.add( params, 'customAttenuation' ).name( 'custom attenuation' ).onChange( function ( val ) {
+
+					spotLight.attenuationNode = val ? boxAttenuationFn : null;
 
 				} );
 
