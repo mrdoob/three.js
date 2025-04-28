@@ -5,7 +5,6 @@ import { smoothstep } from '../math/MathNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
 import { texture } from '../accessors/TextureNode.js';
-import { float } from '../tsl/TSLBase.js';
 
 /**
  * Module for representing spot lights as nodes.
