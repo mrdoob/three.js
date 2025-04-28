@@ -714,6 +714,32 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns a serialized structure of the bounding box.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			min: this.min.toArray(),
+			max: this.max.toArray()
+		};
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding box.
+	 *
+	 * @param {Object} json - The serialized json to set the box from.
+	 */
+	fromJSON( json ) {
+
+		this.min.fromArray( json.min );
+		this.max.fromArray( json.max );
+
+	}
+
 }
 
 const _points = [
