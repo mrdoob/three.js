@@ -26,7 +26,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, vec2, length, uniform, abs, max, min, sub, div, saturate, acos } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -94,30 +93,6 @@
 
 				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
 				scene.add( ambient );
-
-				const boxAttenuationFn = Fn( ( [ lightNode ], builder ) => {
-
-					const light = lightNode.light;
-
-					const sdBox = Fn( ( [ p, b ] ) => {
-
-						const d = vec2( abs( p ).sub( b ) ).toVar();
-
-						return length( max( d, 0.0 ) ).add( min( max( d.x, d.y ), 0.0 ) );
-
-					} );
-
-					const penumbraCos = uniform( 'float' ).onRenderUpdate( () => Math.min( Math.cos( light.angle * ( 1 - light.penumbra ) ), .99999 ) );
-					const spotLightCoord = lightNode.getSpotLightCoord( builder );
-					const coord = spotLightCoord.xyz.div( spotLightCoord.w );
-
-					const boxDist = sdBox( coord.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
-					const angleFactor = div( -1.0, sub( 1.0, acos( penumbraCos ) ).sub( 1.0 ) );
-					const attenuation = saturate( boxDist.mul( - 2.0 ).mul( angleFactor ) );
-
-					return attenuation;
-
-				} );
 
 				spotLight = new THREE.SpotLight( 0xffffff, 100 );
 				spotLight.map = textures[ 'disturb.jpg' ];
@@ -251,16 +226,6 @@
 					} );
 
 				} );
-
-				gui.add( params, 'customAttenuation' ).name( 'custom attenuation' ).onChange( function ( val ) {
-
-					spotLight.attenuationNode = val ? boxAttenuationFn : null;
-
-					aspectGUI.setValue( 1 ).enable( val );
-
-				} );
-
-				const aspectGUI = gui.add( spotLight.shadow, 'aspect', 0, 2 ).enable( false );
 
 				gui.open();
 
