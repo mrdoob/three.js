@@ -5,6 +5,8 @@
 [![NPM Downloads][npm-downloads]][npmtrends-url]
 [![DeepScan][deepscan]][deepscan-url]
 [![Discord][discord]][discord-url]
+[![GitMCP][gitmcp]][gitmcp-url]
+
 
 #### JavaScript 3D library
 
@@ -83,4 +85,6 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [deepscan-url]: https://deepscan.io/dashboard#view=project&tid=16600&pid=19901&bid=525701
 [discord]: https://img.shields.io/discord/685241246557667386
 [discord-url]: https://discord.gg/56GBJwAnUS
+[gitmcp]: https://img.shields.io/endpoint?url=https://gitmcp.io/badge/mrdoob/three.js
+[gitmcp-url]: https://gitmcp.io/mrdoob/three.js "Documentation compatible with GitMCP"
 
