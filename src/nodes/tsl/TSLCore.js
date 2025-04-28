@@ -85,7 +85,7 @@ const shaderNodeHandler = {
 
 				prop = parseSwizzleAndSort( prop.slice( 3 ).toLowerCase() );
 
-				return ( value ) => nodeObject( new SetNode( node, prop, value ) );
+				return ( value ) => nodeObject( new SetNode( node, prop, nodeObject( value ) ) );
 
 			} else if ( /^flip[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
 

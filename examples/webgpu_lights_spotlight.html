@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, vec2, length, abs, max, min, div, mul, clamp, acos } from 'three/tsl';
+			import { Fn, vec2, length, uniform, abs, max, min, sub, div, saturate, acos } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -40,6 +40,8 @@
 			init();
 
 			function init() {
+
+				// Renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -58,6 +60,8 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 7, 4, 1 );
 
+				// Controls
+
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
@@ -65,8 +69,7 @@
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
-				scene.add( ambient );
+				// Textures
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
 				const filenames = [ 'disturb.jpg', 'colors.png', 'uv_grid_opengl.jpg' ];
@@ -87,7 +90,14 @@
 
 				}
 
+				// Lights
+
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
+				scene.add( ambient );
+
 				const boxAttenuationFn = Fn( ( [ lightNode ], builder ) => {
+
+					const light = lightNode.light;
 
 					const sdBox = Fn( ( [ p, b ] ) => {
 
@@ -97,13 +107,13 @@
 
 					} );
 
-					const penumbraCos = lightNode.penumbraCosNode;
+					const penumbraCos = uniform( 'float' ).onRenderUpdate( () => Math.min( Math.cos( light.angle * ( 1 - light.penumbra ) ), .99999 ) );
 					const spotLightCoord = lightNode.getSpotLightCoord( builder );
 					const coord = spotLightCoord.xyz.div( spotLightCoord.w );
 
 					const boxDist = sdBox( coord.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
-					const angleFactor = div( 1.0, acos( penumbraCos ).sub( 1.0 ) );
-					const attenuation = clamp( mul( 2.0, boxDist ).mul( angleFactor ), 0.0, 1.0 );
+					const angleFactor = div( -1.0, sub( 1.0, acos( penumbraCos ) ).sub( 1.0 ) );
+					const attenuation = saturate( boxDist.mul( - 2.0 ).mul( angleFactor ) );
 
 					return attenuation;
 
@@ -140,7 +150,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				//
+				// Models
 
 				new PLYLoader().load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
@@ -246,7 +256,11 @@
 
 					spotLight.attenuationNode = val ? boxAttenuationFn : null;
 
+					aspectGUI.setValue( 1 ).enable( val );
+
 				} );
+
+				const aspectGUI = gui.add( spotLight.shadow, 'aspect', 0, 2 ).enable( false );
 
 				gui.open();
 
