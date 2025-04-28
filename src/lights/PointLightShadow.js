@@ -32,6 +32,8 @@ class PointLightShadow extends LightShadow {
 		 */
 		this.isPointLightShadow = true;
 
+		this.shadowLimit = 500;
+
 		this._frameExtents = new Vector2( 4, 2 );
 
 		this._viewportCount = 6;
@@ -87,7 +89,7 @@ class PointLightShadow extends LightShadow {
 		const camera = this.camera;
 		const shadowMatrix = this.matrix;
 
-		const far = light.distance || camera.far;
+		const far = light.distance || this.shadowLimit;
 
 		if ( far !== camera.far ) {
 
