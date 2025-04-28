@@ -732,11 +732,13 @@ class Box3 {
 	 * Returns a serialized structure of the bounding box.
 	 *
 	 * @param {Object} json - The serialized json to set the box from.
+	 * @return {Box3} A reference to this bounding box.
 	 */
 	fromJSON( json ) {
 
 		this.min.fromArray( json.min );
 		this.max.fromArray( json.max );
+		return this;
 
 	}
 
