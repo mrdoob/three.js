@@ -220,6 +220,7 @@ class ComputeNode extends Node {
 	/**
 	 * TODO
 	 *
+	 * @param {BufferAttribute} indirect - The attribute holding indirect workgroup values.
 	 * @return {ComputeNode} A reference to this node.
 	 */
 	setIndirect( indirect ) {
