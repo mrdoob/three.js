@@ -60,6 +60,14 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
+		 * @type {?BufferAttribute}
+		 * @default null
+		 */
+		this.indirect = null;
+
+		/**
+		 * TODO
+		 *
 		 * @type {number}
 		 */
 		this.dispatchCount = 0;
@@ -206,6 +214,28 @@ class ComputeNode extends Node {
 			}
 
 		}
+
+	}
+
+	/**
+	 * TODO
+	 *
+	 */
+	setIndirect( indirect ) {
+
+		this.indirect = indirect;
+
+		return this;
+
+	}
+
+	/**
+	 * TODO
+	 *
+	 */
+	getIndirect() {
+
+		return this.indirect;
 
 	}
 
