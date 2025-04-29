@@ -220,6 +220,7 @@ class ComputeNode extends Node {
 	/**
 	 * TODO
 	 *
+	 * @return {ComputeNode} A reference to this node.
 	 */
 	setIndirect( indirect ) {
 
@@ -232,6 +233,7 @@ class ComputeNode extends Node {
 	/**
 	 * TODO
 	 *
+	 * @return {?BufferAttribute} The indirect attribute. Returns `null` if no indirect attribute is defined.
 	 */
 	getIndirect() {
 
