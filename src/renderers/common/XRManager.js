@@ -875,7 +875,7 @@ class XRManager extends EventDispatcher {
 				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
 				const depth = this._useMultiview ? 2 : 1;
-				const depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, depthFormat, depth );
+				const depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, depth );
 
 				this._xrRenderTarget = new XRRenderTarget(
 					glProjLayer.textureWidth,
