@@ -1299,10 +1299,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( boundingSphere !== null ) {
 
-			data.data.boundingSphere = {
-				center: boundingSphere.center.toArray(),
-				radius: boundingSphere.radius
-			};
+			data.data.boundingSphere = boundingSphere.toJSON();
 
 		}
 
