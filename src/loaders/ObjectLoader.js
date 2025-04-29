@@ -985,9 +985,7 @@ class ObjectLoader extends Loader {
 
 					if ( info.boundingSphere !== undefined ) {
 
-						sphere = new Sphere();
-						sphere.radius = info.boundingSphere.radius;
-						sphere.center.fromArray( info.boundingSphere.center );
+						sphere = new Sphere().fromJSON( info.boundingSphere );
 
 					}
 
@@ -1025,9 +1023,7 @@ class ObjectLoader extends Loader {
 
 				if ( data.boundingSphere !== undefined ) {
 
-					object.boundingSphere = new Sphere();
-					object.boundingSphere.center.fromArray( data.boundingSphere.center );
-					object.boundingSphere.radius = data.boundingSphere.radius;
+					object.boundingSphere = new Sphere().fromJSON( data.boundingSphere );
 
 				}
 
