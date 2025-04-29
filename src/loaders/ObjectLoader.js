@@ -979,9 +979,7 @@ class ObjectLoader extends Loader {
 					let sphere = null;
 					if ( info.boundingBox !== undefined ) {
 
-						box = new Box3();
-						box.min.fromArray( info.boundingBox.min );
-						box.max.fromArray( info.boundingBox.max );
+						box = new Box3().fromJSON( info.boundingBox );
 
 					}
 
@@ -1035,9 +1033,7 @@ class ObjectLoader extends Loader {
 
 				if ( data.boundingBox !== undefined ) {
 
-					object.boundingBox = new Box3();
-					object.boundingBox.min.fromArray( data.boundingBox.min );
-					object.boundingBox.max.fromArray( data.boundingBox.max );
+					object.boundingBox = new Box3().fromJSON( data.boundingBox );
 
 				}
 

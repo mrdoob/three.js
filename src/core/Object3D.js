@@ -1296,10 +1296,7 @@ class Object3D extends EventDispatcher {
 
 			object.geometryInfo = this._geometryInfo.map( info => ( {
 				...info,
-				boundingBox: info.boundingBox ? {
-					min: info.boundingBox.min.toArray(),
-					max: info.boundingBox.max.toArray()
-				} : undefined,
+				boundingBox: info.boundingBox ? info.boundingBox.toJSON() : undefined,
 				boundingSphere: info.boundingSphere ? {
 					radius: info.boundingSphere.radius,
 					center: info.boundingSphere.center.toArray()
@@ -1341,10 +1338,7 @@ class Object3D extends EventDispatcher {
 
 			if ( this.boundingBox !== null ) {
 
-				object.boundingBox = {
-					min: this.boundingBox.min.toArray(),
-					max: this.boundingBox.max.toArray()
-				};
+				object.boundingBox = this.boundingBox.toJSON();
 
 			}
 
