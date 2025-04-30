@@ -2,7 +2,6 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthArrayTexture } from '../../textures/DepthArrayTexture.js';
 import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector3();
@@ -77,15 +76,7 @@ class Textures extends DataMap {
 
 		if ( depthTexture === undefined && useDepthTexture ) {
 
-			if ( renderTarget.multiview === true && size.depth > 1 ) {
-
-				depthTexture = new DepthArrayTexture();
-
-			} else {
-
-				depthTexture = new DepthTexture();
-
-			}
+			depthTexture = new DepthTexture();
 
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
 			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
@@ -106,7 +97,7 @@ class Textures extends DataMap {
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = depthTexture.isDepthArrayTexture ? depthTexture.image.depth : 1;
+				depthTexture.image.depth = depthTexture.isArrayTexture ? depthTexture.image.depth : 1;
 
 			}
 
@@ -147,7 +138,6 @@ class Textures extends DataMap {
 
 				const texture = textures[ i ];
 
-				texture.isTextureArray = renderTarget.multiview === true && size.depth > 1;
 				if ( textureNeedsUpdate ) texture.needsUpdate = true;
 
 				this.updateTexture( texture, options );

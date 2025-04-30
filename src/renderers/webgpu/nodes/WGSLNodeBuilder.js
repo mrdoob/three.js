@@ -453,7 +453,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
 
-			if ( texture.isDataArrayTexture || texture.isDepthArrayTexture || texture.isData3DTexture ) {
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 				textureData.arrayLayerCount = new VarNode(
 					new ExpressionNode(
@@ -536,7 +536,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		let snippet;
 
-		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
+		if ( texture.isVideoTexture === true ) {
 
 			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
 
@@ -566,12 +566,25 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {string} valueSnippet - A WGSL snippet that represent the new texel value.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureStore( texture, textureProperty, uvIndexSnippet, valueSnippet ) {
+	generateTextureStore( texture, textureProperty, uvIndexSnippet, depthSnippet, valueSnippet ) {
 
-		return `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+		let snippet;
+
+		if ( depthSnippet ) {
+
+			snippet = `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, ${ valueSnippet } )`;
+
+		} else {
+
+			snippet = `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+
+		}
+
+		return snippet;
 
 	}
 
@@ -676,7 +689,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'fragment' ) {
 
-			if ( texture.isDepthArrayTexture ) {
+			if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
 
 				return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } )`;
 
@@ -1681,10 +1694,6 @@ ${ flowData.code }
 
 					textureType = 'texture_cube<f32>';
 
-				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true || texture.isTextureArray === true ) {
-
-					textureType = 'texture_2d_array<f32>';
-
 				} else if ( texture.isDepthTexture === true ) {
 
 					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
@@ -1693,9 +1702,13 @@ ${ flowData.code }
 
 					} else {
 
-						textureType = `texture_depth${ multisampled }_2d${ texture.isDepthArrayTexture === true ? '_array' : '' }`;
+						textureType = `texture_depth${ multisampled }_2d${ texture.isArrayTexture === true ? '_array' : '' }`;
 
 					}
+
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+					textureType = 'texture_2d_array<f32>';
 
 				} else if ( texture.isVideoTexture === true ) {
 

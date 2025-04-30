@@ -4,7 +4,7 @@ import {
 	ShadowBaseNode,
 	Plane,
 	Line3,
-	DepthArrayTexture,
+	DepthTexture,
 	LessCompare,
 	Vector2,
 	RedFormat,
@@ -159,10 +159,10 @@ class TileShadowNode extends ShadowBaseNode {
 		// Clear existing lights/nodes if re-initializing
 		this.disposeLightsAndNodes();
 
-		const depthTexture = new DepthArrayTexture( shadowWidth, shadowHeight, tileCount );
+		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
-		const shadowMap = builder.createRenderTargetArray( shadowWidth, shadowHeight, tileCount, { format: RedFormat } );
+		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount } );
 		shadowMap.depthTexture = depthTexture;
 		shadowMap.texture.name = 'ShadowTexture';
 		this.shadowMap = shadowMap;

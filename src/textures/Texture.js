@@ -347,7 +347,7 @@ class Texture extends EventDispatcher {
 		 * @readonly
 		 * @default false
 		 */
-		this.isTextureArray = false;
+		this.isArrayTexture = image && image.depth && image.depth > 1 ? true : false;
 
 		/**
 		 * Indicates whether this texture should be processed by `PMREMGenerator` or not
@@ -470,7 +470,7 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
-		this.isTextureArray = source.isTextureArray;
+		this.isArrayTexture = source.isArrayTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
