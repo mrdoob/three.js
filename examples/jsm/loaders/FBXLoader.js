@@ -76,7 +76,11 @@ let sceneGraph;
  * @three_import import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
  */
 class FBXLoader extends Loader {
-
+	/**
+	 * @type {function(LoadingManager): TextureLoader}
+	 * A factory function that creates a new `TextureLoader` instance.
+	 */
+	textureLoaderFactory = (manager)=> new TextureLoader(manager);
 	/**
 	 * Constructs a new FBX loader.
 	 *
@@ -170,7 +174,7 @@ class FBXLoader extends Loader {
 
 		// console.log( fbxTree );
 
-		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = this.textureLoaderFactory( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
