@@ -18,10 +18,11 @@ class IESSpotLightNode extends SpotLightNode {
 	/**
 	 * Overwrites the default implementation to compute an IES conform spot attenuation.
 	 *
+	 * @param {NodeBuilder} builder - The node builder.
 	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
 	 * @return {Node<float>} The spot attenuation.
 	 */
-	getSpotAttenuation( angleCosine ) {
+	getSpotAttenuation( builder, angleCosine ) {
 
 		const iesMap = this.light.iesMap;
 
