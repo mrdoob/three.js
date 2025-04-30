@@ -375,6 +375,16 @@ class XRManager extends EventDispatcher {
 		 */
 		this._useMultiview = false;
 
+		/**
+		 * Stores params and video elements for equirect layers
+		 */
+		this._mediaLayers = [];
+
+		/**
+		 * Stores the created equrect layers for updating render state
+		 */
+		this._createdMediaLayers = [];
+
 	}
 
 	/**
@@ -594,6 +604,31 @@ class XRManager extends EventDispatcher {
 
 		return this._useMultiview;
 
+	}	
+
+	/**
+	 * Sets up params for an equirect native video layer. 
+	 * @param {*} video The video element 
+	 * @param {*} layout The layout to use either mono/stereo-left-right/stereo-top-bottom
+	 * @param {*} transform A transform param for the layer
+	 * @param {*} is180 If it's a 180 video
+	 * @param {*} params Extra params for the layer to add but not needed.
+	 */
+	createMediaLayer(video, layout = "mono", transform = {}, is180 = false, params = {}) {
+		const angleFactor = is180 ? 1 : 2;
+
+		this._mediaLayers.push({
+			video: video, 
+			params: {
+				layout: layout,
+				centralHorizontalAngle: Math.PI * angleFactor,
+				transform: new XRRigidTransform(
+					{},
+					transform
+				),
+				...params
+			}
+		});
 	}
 
 	createQuadLayer( width, height, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = [] ) {
@@ -657,7 +692,7 @@ class XRManager extends EventDispatcher {
 
 			const xrlayers = this._session.renderState.layers;
 			xrlayers.unshift( layer.xrlayer );
-			this._session.updateRenderState( { layers: xrlayers } );
+			this._session.updateRenderState( { layers: [...this._createdMediaLayers, ...xrlayers] } );
 
 		} else {
 
@@ -731,7 +766,7 @@ class XRManager extends EventDispatcher {
 
 			const xrlayers = this._session.renderState.layers;
 			xrlayers.unshift( layer.xrlayer );
-			this._session.updateRenderState( { layers: xrlayers } );
+			this._session.updateRenderState( { layers: [...this._createdMediaLayers, ...xrlayers] } );
 
 		} else {
 
@@ -918,9 +953,26 @@ class XRManager extends EventDispatcher {
 
 					}
 
+					//Creates the equirect media layers on session creation
+					if (this._mediaLayers.length) {
+						
+						const mediaBinding = new XRMediaBinding( session );
+
+						this._createdMediaLayers = this._mediaLayers.map(layer => {
+							return  mediaBinding.createEquirectLayer(
+								layer.video,
+								{
+									space: this._referenceSpace,
+									...layer.params
+								}
+							);
+						});
+					}
+
+
 				}
 
-				session.updateRenderState( { layers: layersArray } );
+				session.updateRenderState( { layers:  [...this._createdMediaLayers, ...layersArray] } );
 
 			} else {
 
