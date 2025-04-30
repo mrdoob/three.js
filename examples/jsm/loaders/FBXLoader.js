@@ -169,8 +169,8 @@ class FBXLoader extends Loader {
 		}
 
 		// console.log( fbxTree );
-
-		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const scope = this;
+		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin ).setRequestHeader( scope.requestHeader ).setWithCredentials( scope.withCredentials );
 
 		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
