@@ -18,12 +18,6 @@
 			<source src="textures/MaryOculus.mp4">
 		</video>
 
-		<script src="https://immersive-web.github.io/webxr-layers-polyfill/build/webxr-layers-polyfill.js"></script>
-
-		<script>
-			let layersPolyfill = new WebXRLayersPolyfill();
-		</script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -36,7 +30,7 @@
 
 		<script type="module">
 
-			console.log(navigator.userAgent);
+			
 
 			import * as THREE from 'three';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
