@@ -74,6 +74,7 @@ body:
         - Firefox
         - Safari
         - Edge
+        - Meta Quest Browser
   - type: dropdown
     id: os
     attributes:
