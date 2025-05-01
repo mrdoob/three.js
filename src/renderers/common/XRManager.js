@@ -616,22 +616,26 @@ class XRManager extends EventDispatcher {
 	 */
 	createMediaLayer( video, layout = 'mono', transform = {}, is180 = false, params = {} ) {
 
-		const angleFactor = is180 ? 1 : 2;
+		if ( this._useLayers ) {
 
-		this._mediaLayers.push( {
+			const angleFactor = is180 ? 1 : 2;
 
-			video: video,
-			params: {
-				layout: layout,
-				centralHorizontalAngle: Math.PI * angleFactor,
-				transform: new XRRigidTransform(
-					{},
-					transform
-				),
-				...params
-			}
+			this._mediaLayers.push( {
 
-		} );
+				video: video,
+				params: {
+					layout: layout,
+					centralHorizontalAngle: Math.PI * angleFactor,
+					transform: new XRRigidTransform(
+						{},
+						transform
+					),
+					...params
+				}
+
+			} );
+
+		}
 
 	}
 
