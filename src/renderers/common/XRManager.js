@@ -376,12 +376,18 @@ class XRManager extends EventDispatcher {
 		this._useMultiview = false;
 
 		/**
-		 * Stores params and video elements for equirect layers
+		 * Stores params and video elements for equirect layers.
+		 *
+		 * @private
+		 * @type {Array<Object>}
 		 */
 		this._mediaLayers = [];
 
 		/**
-		 * Stores the created equrect layers for updating render state
+		 * Stores the created equrect layers for updating render state.
+		 *
+		 * @private
+		 * @type {Array<XREquirectLayer>}
 		 */
 		this._createdMediaLayers = [];
 
@@ -608,11 +614,12 @@ class XRManager extends EventDispatcher {
 
 	/**
 	 * Sets up params for an equirect native video layer.
-	 * @param {*} video The video element
-	 * @param {*} layout The layout to use either mono/stereo-left-right/stereo-top-bottom
-	 * @param {*} transform A transform param for the layer
-	 * @param {*} is180 If it's a 180 video
-	 * @param {*} params Extra params for the layer to add but not needed.
+	 *
+	 * @param {HTMLVideoElement} video The video element.
+	 * @param {('default'|'mono'|'stereo'|'stereo-left-right'|'stereo-top-bottom')} [layout='mono'] The layout to use either mono/stereo-left-right/stereo-top-bottom.
+	 * @param {Object} [transform={}] A transform param for the layer.
+	 * @param {boolean} [is180=false] If it's a 180 video.
+	 * @param {Object} [params={}] Extra params for the layer to add but not needed.
 	 */
 	createMediaLayer( video, layout = 'mono', transform = {}, is180 = false, params = {} ) {
 
