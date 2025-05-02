@@ -169,17 +169,8 @@ class FBXLoader extends Loader {
 		}
 
 		// console.log( fbxTree );
-		let textureLoader = this.manager.getHandler( this.resourcePath || path );
 
-		if ( textureLoader === null ) {
-
-			textureLoader = new TextureLoader( this.manager );
-
-		}
-		if ( textureLoader.setPath ) textureLoader.setPath( this.resourcePath || path );
-		if ( textureLoader.setCrossOrigin ) textureLoader.setCrossOrigin( this.crossOrigin );
-		if ( textureLoader.setRequestHeader ) textureLoader.setRequestHeader( this.requestHeader );
-		if ( textureLoader.setWithCredentials ) textureLoader.setWithCredentials( this.withCredentials );
+		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
@@ -446,11 +437,10 @@ class FBXTreeParser {
 	// load a texture specified as a blob or data URI, or via an external URL using TextureLoader
 	loadTexture( textureNode, images ) {
 
-		const nonNativeExtensions = new Set( [ 'tga', 'tif', 'tiff', 'exr', 'dds', 'hdr', 'ktx2' ] );
-
 		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
 
-		const loader = nonNativeExtensions.has( extension ) ? this.manager.getHandler( `.${extension}` ) : this.textureLoader;
+		let loader = this.manager.getHandler( `.${extension}` );
+		if ( loader === null) loader = this.textureLoader;
 
 		if ( ! loader ) {
 
