@@ -169,7 +169,7 @@ class FBXLoader extends Loader {
 		}
 
 		// console.log( fbxTree );
-		let textureLoader = this.manager.getHandler( url );
+		let textureLoader = this.manager.getHandler( this.resourcePath || path );
 
 		if ( textureLoader === null ) {
 
