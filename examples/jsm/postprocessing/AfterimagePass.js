@@ -4,7 +4,8 @@ import {
 	NoBlending,
 	ShaderMaterial,
 	UniformsUtils,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	MathUtils
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -43,7 +44,7 @@ class AfterimagePass extends Pass {
 		 */
 		this.uniforms = UniformsUtils.clone( AfterimageShader.uniforms );
 
-		this.uniforms[ 'damp' ].value = damp;
+		this.damp = damp;
 
 		/**
 		 * The composition material.
@@ -86,6 +87,28 @@ class AfterimagePass extends Pass {
 
 		this._compFsQuad = new FullScreenQuad( this.compFsMaterial );
 		this._copyFsQuad = new FullScreenQuad( this.copyFsMaterial );
+
+	}
+
+	/**
+	 * Get the damping intensity. A higher value means a stronger after image effect.
+	 * 
+	 * @type {number}
+	 */
+	get damp() {
+
+		return this.uniforms[ 'damp' ].value;
+
+	}
+
+	/**
+	 * Set the damping intensity. A higher value means a stronger after image effect.
+	 * 
+	 * @type {number}
+	 */
+	set damp( value ) {
+
+		this.uniforms[ 'damp' ].value = MathUtils.clamp(value, 0.0, 1.0);
 
 	}
 
