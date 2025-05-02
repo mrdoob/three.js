@@ -76,18 +76,7 @@ let sceneGraph;
  * @three_import import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
  */
 class FBXLoader extends Loader {
-	/**
-	 * Sets the given TextureLoader instance to this loader.
-	 * Used to override the default TextureLoader
-	 * with a custom implementation for cases such as authenticated texture fetching. 	 
-	 *
-	 * @param {TextureLoader} textureLoader - The Texture loader to set.
-	 * @return {FBXLoader} A reference to this loader.
-	 */
-	setTextureLoader = (textureLoader)=> {
-		this.textureLoader = textureLoader;
-		return this;
-	}
+
 	/**
 	 * Constructs a new FBX loader.
 	 *
@@ -180,8 +169,17 @@ class FBXLoader extends Loader {
 		}
 
 		// console.log( fbxTree );
+		let textureLoader = this.manager.getHandler( url );
 
-		const textureLoader = (this.textureLoader ?? new TextureLoader( this.manager )).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		if ( textureLoader === null ) {
+
+			textureLoader = new TextureLoader( this.manager );
+
+		}
+		if ( loader.setPath ) loader.setPath( this.resourcePath || path );
+		if ( loader.setCrossOrigin ) loader.setCrossOrigin( this.crossOrigin );
+		if ( loader.setRequestHeader ) loader.setRequestHeader( this.requestHeader );
+		if ( loader.setWithCredentials ) loader.setWithCredentials( this.withCredentials );
 
 		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
