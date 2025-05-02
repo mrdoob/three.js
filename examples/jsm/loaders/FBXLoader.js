@@ -76,7 +76,7 @@ let sceneGraph;
  * @three_import import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
  */
 class FBXLoader extends Loader {
-/**
+	/**
 	 * Sets the given TextureLoader instance to this loader.
 	 * Used to override the default TextureLoader
 	 * with a custom implementation for cases such as authenticated texture fetching. 	 
