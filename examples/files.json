@@ -342,6 +342,7 @@
 		"webgpu_lights_ies_spotlight",
 		"webgpu_lights_phong",
 		"webgpu_lights_physical",
+		"webgpu_lights_projector",
 		"webgpu_lights_rectarealight",
 		"webgpu_lights_selective",
 		"webgpu_lights_spotlight",

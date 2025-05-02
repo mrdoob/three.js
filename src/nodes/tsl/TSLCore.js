@@ -621,6 +621,9 @@ export const Fn = ( jsFunc, layout = null ) => {
 	fn.shaderNode = shaderNode;
 	fn.id = shaderNode.id;
 
+	fn.getNodeType = ( ...params ) => shaderNode.getNodeType( ...params );
+	fn.getCacheKey = ( ...params ) => shaderNode.getCacheKey( ...params );
+
 	fn.setLayout = ( layout ) => {
 
 		shaderNode.setLayout( layout );

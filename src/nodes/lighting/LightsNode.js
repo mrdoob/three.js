@@ -126,9 +126,9 @@ class LightsNode extends Node {
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : - 1;
-				const hashAttenuation = ( light.attenuationNode ) ? light.attenuationNode.id : - 1;
+				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : - 1;
 
-				hashData.push( hashMap, hashAttenuation );
+				hashData.push( hashMap, hashColorNode );
 
 			}
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - spotlight</title>
+		<title>three.js webgpu - projector light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - spotlight<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - projector light<br />
 		</div>
 
 		<script type="importmap">
@@ -23,9 +23,15 @@
 			}
 		</script>
 
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
+			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+		</video>
+
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { Fn, color, mx_worley_noise_float, time } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -34,7 +40,7 @@
 
 			let renderer, scene, camera;
 
-			let spotLight, lightHelper;
+			let projectorLight, lightHelper;
 
 			init();
 
@@ -71,47 +77,41 @@
 				// Textures
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
-				const filenames = [ 'disturb.jpg', 'colors.png', 'uv_grid_opengl.jpg' ];
-
-				const textures = { none: null };
-
-				for ( let i = 0; i < filenames.length; i ++ ) {
-
-					const filename = filenames[ i ];
-
-					const texture = loader.load( filename );
-					texture.minFilter = THREE.LinearFilter;
-					texture.magFilter = THREE.LinearFilter;
-					texture.generateMipmaps = false;
-					texture.colorSpace = THREE.SRGBColorSpace;
-
-					textures[ filename ] = texture;
-
-				}
 
 				// Lights
+
+				const causticEffect = Fn( ( [ projectorUV ] ) => {
+
+					const waterLayer0 = mx_worley_noise_float( projectorUV.mul( 10 ).add( time ) );
+
+					const caustic = waterLayer0.mul( color( 0x5abcd8 ) ).mul( 2 );
+
+					return caustic;
+
+				} );
+
 
 				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
 				scene.add( ambient );
 
-				spotLight = new THREE.SpotLight( 0xffffff, 100 );
-				spotLight.map = textures[ 'disturb.jpg' ];
-				spotLight.position.set( 2.5, 5, 2.5 );
-				spotLight.angle = Math.PI / 6;
-				spotLight.penumbra = 1;
-				spotLight.decay = 2;
-				spotLight.distance = 0;
+				projectorLight = new THREE.ProjectorLight( 0xffffff, 100 );
+				projectorLight.colorNode = causticEffect;
+				projectorLight.position.set( 2.5, 5, 2.5 );
+				projectorLight.angle = Math.PI / 6;
+				projectorLight.penumbra = 1;
+				projectorLight.decay = 2;
+				projectorLight.distance = 0;
 
-				spotLight.castShadow = true;
-				spotLight.shadow.mapSize.width = 1024;
-				spotLight.shadow.mapSize.height = 1024;
-				spotLight.shadow.camera.near = 1;
-				spotLight.shadow.camera.far = 10;
-				spotLight.shadow.focus = 1;
-				spotLight.shadow.bias = - .003;
-				scene.add( spotLight );
+				projectorLight.castShadow = true;
+				projectorLight.shadow.mapSize.width = 1024;
+				projectorLight.shadow.mapSize.height = 1024;
+				projectorLight.shadow.camera.near = 1;
+				projectorLight.shadow.camera.far = 10;
+				projectorLight.shadow.focus = 1;
+				projectorLight.shadow.bias = - .003;
+				scene.add( projectorLight );
 
-				lightHelper = new THREE.SpotLightHelper( spotLight );
+				lightHelper = new THREE.SpotLightHelper( projectorLight );
 				scene.add( lightHelper );
 
 				//
@@ -150,64 +150,101 @@
 				const gui = new GUI();
 
 				const params = {
-					map: textures[ 'disturb.jpg' ],
-					color: spotLight.color.getHex(),
-					intensity: spotLight.intensity,
-					distance: spotLight.distance,
-					angle: spotLight.angle,
-					penumbra: spotLight.penumbra,
-					decay: spotLight.decay,
-					focus: spotLight.shadow.focus,
+					type: 'procedural',
+					color: projectorLight.color.getHex(),
+					intensity: projectorLight.intensity,
+					distance: projectorLight.distance,
+					angle: projectorLight.angle,
+					penumbra: projectorLight.penumbra,
+					decay: projectorLight.decay,
+					focus: projectorLight.shadow.focus,
 					shadows: true,
-					customAttenuation: false
 				};
 
-				gui.add( params, 'map', textures ).onChange( function ( val ) {
+				let videoTexture, mapTexture;
 
-					spotLight.map = val;
+				gui.add( params, 'type', [ 'procedural', 'video', 'texture' ] ).onChange( function ( val ) {
+
+					projectorLight.colorNode = null;
+					projectorLight.map = null;
+
+					if ( val === 'procedural' ) {
+
+						projectorLight.colorNode = causticEffect;
+
+						focus.setValue( 1 );
+
+					} else if ( val === 'video' ) {
+
+						if ( videoTexture === undefined ) {
+
+							const video = document.getElementById( 'video' );
+							video.play();
+
+							videoTexture = new THREE.VideoTexture( video );
+
+						}
+
+						projectorLight.map = videoTexture;
+
+						focus.setValue( .46 );
+
+					} else if ( val === 'texture' ) {
+
+						mapTexture = loader.load( 'colors.png' );
+						mapTexture.minFilter = THREE.LinearFilter;
+						mapTexture.magFilter = THREE.LinearFilter;
+						mapTexture.generateMipmaps = false;
+						mapTexture.colorSpace = THREE.SRGBColorSpace;
+
+						projectorLight.map = mapTexture;
+
+						focus.setValue( 1 );
+
+					}
 
 				} );
 
 				gui.addColor( params, 'color' ).onChange( function ( val ) {
 
-					spotLight.color.setHex( val );
+					projectorLight.color.setHex( val );
 
 				} );
 
 				gui.add( params, 'intensity', 0, 500 ).onChange( function ( val ) {
 
-					spotLight.intensity = val;
+					projectorLight.intensity = val;
 
 				} );
 
 
 				gui.add( params, 'distance', 0, 20 ).onChange( function ( val ) {
 
-					spotLight.distance = val;
+					projectorLight.distance = val;
 
 				} );
 
 				gui.add( params, 'angle', 0, Math.PI / 3 ).onChange( function ( val ) {
 
-					spotLight.angle = val;
+					projectorLight.angle = val;
 
 				} );
 
 				gui.add( params, 'penumbra', 0, 1 ).onChange( function ( val ) {
 
-					spotLight.penumbra = val;
+					projectorLight.penumbra = val;
 
 				} );
 
 				gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
 
-					spotLight.decay = val;
+					projectorLight.decay = val;
 
 				} );
 
-				gui.add( params, 'focus', 0, 1 ).onChange( function ( val ) {
+				const focus = gui.add( params, 'focus', 0, 1 ).onChange( function ( val ) {
 
-					spotLight.shadow.focus = val;
+					projectorLight.shadow.focus = val;
 
 				} );
 
@@ -244,8 +281,8 @@
 
 				const time = performance.now() / 3000;
 
-				spotLight.position.x = Math.cos( time ) * 2.5;
-				spotLight.position.z = Math.sin( time ) * 2.5;
+				projectorLight.position.x = Math.cos( time ) * 2.5;
+				projectorLight.position.z = Math.sin( time ) * 2.5;
 
 				lightHelper.update();
 
