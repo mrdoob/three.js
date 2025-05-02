@@ -176,10 +176,10 @@ class FBXLoader extends Loader {
 			textureLoader = new TextureLoader( this.manager );
 
 		}
-		if ( loader.setPath ) loader.setPath( this.resourcePath || path );
-		if ( loader.setCrossOrigin ) loader.setCrossOrigin( this.crossOrigin );
-		if ( loader.setRequestHeader ) loader.setRequestHeader( this.requestHeader );
-		if ( loader.setWithCredentials ) loader.setWithCredentials( this.withCredentials );
+		if ( textureLoader.setPath ) textureLoader.setPath( this.resourcePath || path );
+		if ( textureLoader.setCrossOrigin ) textureLoader.setCrossOrigin( this.crossOrigin );
+		if ( textureLoader.setRequestHeader ) textureLoader.setRequestHeader( this.requestHeader );
+		if ( textureLoader.setWithCredentials ) textureLoader.setWithCredentials( this.withCredentials );
 
 		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
