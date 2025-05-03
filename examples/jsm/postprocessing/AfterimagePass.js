@@ -4,8 +4,7 @@ import {
 	NoBlending,
 	ShaderMaterial,
 	UniformsUtils,
-	WebGLRenderTarget,
-	MathUtils
+	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -91,7 +90,7 @@ class AfterimagePass extends Pass {
 	}
 
 	/**
-	 * Get the damping intensity. A higher value means a stronger after image effect.
+	 * The damping intensity, from 0.0 to 1.0. A higher value means a stronger after image effect.
 	 * 
 	 * @type {number}
 	 */
@@ -101,14 +100,9 @@ class AfterimagePass extends Pass {
 
 	}
 
-	/**
-	 * Set the damping intensity. A higher value means a stronger after image effect.
-	 * 
-	 * @type {number}
-	 */
 	set damp( value ) {
 
-		this.uniforms[ 'damp' ].value = MathUtils.clamp(value, 0.0, 1.0);
+		this.uniforms[ 'damp' ].value = value;
 
 	}
 
