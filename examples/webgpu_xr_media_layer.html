@@ -78,15 +78,6 @@
 
 				}
 
-			
-
-				const material1 = new THREE.MeshBasicMaterial( { map: texture } );
-
-				const mesh1 = new THREE.Mesh( geometry1, material1 );
-				mesh1.rotation.y = - Math.PI / 2;
-				mesh1.layers.set( 1 ); // display in left eye only
-				scene.add( mesh1 );
-
 				// right
 
 				const geometry2 = new THREE.SphereGeometry( 500, 60, 40 );
@@ -101,14 +92,6 @@
 					uvs2[ i ] += 0.5;
 
 				}
-
-				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
-
-				const mesh2 = new THREE.Mesh( geometry2, material2 );
-				mesh2.rotation.y = - Math.PI / 2;
-				mesh2.layers.set( 2 ); // display in right eye only
-				scene.add( mesh2 );
-
 			
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -117,18 +100,18 @@
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
 
-				//quest specific
-				//renderer.xr.setFramebufferScaleFactor( 1.5 );
-				//renderer.xr.setFoveation(1);
+				const mediaLayer = renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 });
+				//modify geometries for left and right
+				mediaLayer.children[0].geometry = geometry1;
+				mediaLayer.children[1].geometry = geometry2;
 
-				renderer.xr.createMediaLayer(video, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 });
+				scene.add(mediaLayer);
 
 				renderer.xr.addEventListener("sessionstart", async () => {
 					const session = renderer.xr.getSession();
 					
 					if (renderer.xr._supportsLayers) {
-						mesh1.layers.disableAll();
-						mesh2.layers.disableAll();
+						mediaLayer.children.forEach(mesh => mesh.layers.disableAll());
 					}
 					
 					if (session.supportedFrameRates) {
@@ -148,8 +131,7 @@
 				});
 
 				renderer.xr.addEventListener("sessionend", async () => {
-					mesh1.layers.enableAll();
-					mesh2.layers.enableAll();
+					mediaLayer.children.forEach(mesh => mesh.layers.enableAll());
 				});
 
 				renderer.setClearColor(0x000, 1);
