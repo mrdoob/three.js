@@ -14,11 +14,14 @@ import { ShaderPass } from './ShaderPass.js';
  */
 class FXAAPass extends ShaderPass {
 
-  constructor() {
+	/**
+	 * Constructs a new FXAA pass.
+	 */
+	constructor() {
 
-    super( FXAAShader );
+		super( FXAAShader );
 
-  }
+	}
 
 	/**
 	 * Sets the size of the pass.
@@ -26,11 +29,11 @@ class FXAAPass extends ShaderPass {
 	 * @param {number} width - The width to set.
 	 * @param {number} height - The width to set.
 	 */
-  setSize(width, height) {
+	setSize(width, height) {
 
-    this.material.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		this.material.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
-  }
+	}
 
 }
 
