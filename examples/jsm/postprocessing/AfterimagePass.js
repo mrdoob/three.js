@@ -91,7 +91,7 @@ class AfterimagePass extends Pass {
 
 	/**
 	 * The damping intensity, from 0.0 to 1.0. A higher value means a stronger after image effect.
-	 * 
+	 *
 	 * @type {number}
 	 */
 	get damp() {
@@ -154,7 +154,7 @@ class AfterimagePass extends Pass {
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 
