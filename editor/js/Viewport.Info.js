@@ -33,6 +33,7 @@ function ViewportInfo( editor ) {
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
+	signals.objectChanged.add( update );
 	signals.geometryChanged.add( update );
 	signals.sceneRendered.add( updateFrametime );
 
