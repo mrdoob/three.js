@@ -6,7 +6,7 @@ import { ShaderPass } from './ShaderPass.js';
  *
  * ```js
  * const fxaaPass = new FXAAPass();
- * composer.addPass( smaaPass );
+ * composer.addPass( fxaaPass );
  * ```
  *
  * @augments ShaderPass
