@@ -65341,13 +65341,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
-		} else if ( this.isFilteredTexture( texture ) ) {
-
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
-
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0' );
+			return this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, '0', depthSnippet );
 
 		}
 
@@ -65384,13 +65380,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @param {string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @return {string} The WGSL snippet.
 	 */
-	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
 
-		if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false ) {
+		if ( this.isUnfilterable( texture ) === false ) {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
@@ -65819,7 +65814,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			snippet = this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage );
+			snippet = this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
 
 		}
 
@@ -66012,7 +66007,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.store = node.isStorageTextureNode === true;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( node.value ) === false && texture.store === false ) {
+				if ( this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
 					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -66757,7 +66752,7 @@ ${ flowData.code }
 
 				const texture = uniform.node.value;
 
-				if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
+				if ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
 
 					if ( this.isSampleCompare( texture ) ) {
 
