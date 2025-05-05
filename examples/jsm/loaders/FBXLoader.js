@@ -442,16 +442,6 @@ class FBXTreeParser {
 		let loader = this.manager.getHandler( `.${extension}` );
 		if ( loader === null) loader = this.textureLoader;
 
-		if ( ! loader ) {
-
-			console.warn(
-				`FBXLoader: ${extension.toUpperCase()} loader not found, creating placeholder texture for`,
-				textureNode.RelativeFilename
-			);
-			return new Texture();
-
-		}
-
 		const loaderPath = loader.path;
 
 		if ( ! loaderPath ) {
