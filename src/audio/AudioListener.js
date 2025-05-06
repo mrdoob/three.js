@@ -7,7 +7,9 @@ import { AudioContext } from './AudioContext.js';
 const _position = /*@__PURE__*/ new Vector3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
 const _scale = /*@__PURE__*/ new Vector3();
-const _orientation = /*@__PURE__*/ new Vector3();
+
+const _forward = /*@__PURE__*/ new Vector3();
+const _up = /*@__PURE__*/ new Vector3();
 
 /**
  * The class represents a virtual listener of the all positional and non-positional audio effects
@@ -175,13 +177,14 @@ class AudioListener extends Object3D {
 		super.updateMatrixWorld( force );
 
 		const listener = this.context.listener;
-		const up = this.up;
 
 		this.timeDelta = this._clock.getDelta();
 
 		this.matrixWorld.decompose( _position, _quaternion, _scale );
 
-		_orientation.set( 0, 0, - 1 ).applyQuaternion( _quaternion );
+		// the initial forward and up directions must be orthogonal
+		_forward.set( 0, 0, - 1 ).applyQuaternion( _quaternion );
+		_up.set( 0, 1, 0 ).applyQuaternion( _quaternion );
 
 		if ( listener.positionX ) {
 
@@ -192,17 +195,17 @@ class AudioListener extends Object3D {
 			listener.positionX.linearRampToValueAtTime( _position.x, endTime );
 			listener.positionY.linearRampToValueAtTime( _position.y, endTime );
 			listener.positionZ.linearRampToValueAtTime( _position.z, endTime );
-			listener.forwardX.linearRampToValueAtTime( _orientation.x, endTime );
-			listener.forwardY.linearRampToValueAtTime( _orientation.y, endTime );
-			listener.forwardZ.linearRampToValueAtTime( _orientation.z, endTime );
-			listener.upX.linearRampToValueAtTime( up.x, endTime );
-			listener.upY.linearRampToValueAtTime( up.y, endTime );
-			listener.upZ.linearRampToValueAtTime( up.z, endTime );
+			listener.forwardX.linearRampToValueAtTime( _forward.x, endTime );
+			listener.forwardY.linearRampToValueAtTime( _forward.y, endTime );
+			listener.forwardZ.linearRampToValueAtTime( _forward.z, endTime );
+			listener.upX.linearRampToValueAtTime( _up.x, endTime );
+			listener.upY.linearRampToValueAtTime( _up.y, endTime );
+			listener.upZ.linearRampToValueAtTime( _up.z, endTime );
 
 		} else {
 
 			listener.setPosition( _position.x, _position.y, _position.z );
-			listener.setOrientation( _orientation.x, _orientation.y, _orientation.z, up.x, up.y, up.z );
+			listener.setOrientation( _forward.x, _forward.y, _forward.z, _up.x, _up.y, _up.z );
 
 		}
 
