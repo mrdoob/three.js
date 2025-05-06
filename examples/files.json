@@ -28,7 +28,6 @@
 		"webgl_geometry_convex",
 		"webgl_geometry_csg",
 		"webgl_geometry_cube",
-		"webgl_geometry_dynamic",
 		"webgl_geometry_extrude_shapes",
 		"webgl_geometry_extrude_splines",
 		"webgl_geometry_minecraft",
