@@ -534,7 +534,6 @@
 		"misc_exporter_usdz",
 		"misc_exporter_exr",
 		"misc_exporter_ktx2",
-		"misc_lookat",
 		"misc_raycaster_helper"
 	],
 	"css2d": [
