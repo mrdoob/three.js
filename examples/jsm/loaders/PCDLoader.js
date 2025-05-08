@@ -106,12 +106,7 @@ class PCDLoader extends Loader {
 	 * @param {number} size - Field size.
 	 * @returns {number} Field value.
 	 */
-	_getDataView(
-		dataview,
-		offset,
-		type,
-		size,
-	) {
+	_getDataView( dataview, offset, type, size ) {
 
 		switch ( type ) {
 
