@@ -26745,7 +26745,7 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _box$1 = /*@__PURE__*/ new Box3();
 const _sphere$2 = /*@__PURE__*/ new Sphere();
 const _vector$5 = /*@__PURE__*/ new Vector3();
-const _forward = /*@__PURE__*/ new Vector3();
+const _forward$1 = /*@__PURE__*/ new Vector3();
 const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
@@ -28203,7 +28203,7 @@ class BatchedMesh extends Mesh {
 			// get the camera position in the local frame
 			_matrix$1.copy( this.matrixWorld ).invert();
 			_vector$5.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix$1 );
-			_forward.set( 0, 0, -1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix$1 );
+			_forward$1.set( 0, 0, -1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix$1 );
 
 			for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
 
@@ -28227,7 +28227,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const geometryInfo = geometryInfoList[ geometryId ];
-						const z = _temp.subVectors( _sphere$2.center, _vector$5 ).dot( _forward );
+						const z = _temp.subVectors( _sphere$2.center, _vector$5 ).dot( _forward$1 );
 						_renderList.push( geometryInfo.start, geometryInfo.count, z, i );
 
 					}
@@ -49031,7 +49031,9 @@ function now() {
 const _position$1 = /*@__PURE__*/ new Vector3();
 const _quaternion$1 = /*@__PURE__*/ new Quaternion();
 const _scale$1 = /*@__PURE__*/ new Vector3();
-const _orientation$1 = /*@__PURE__*/ new Vector3();
+
+const _forward = /*@__PURE__*/ new Vector3();
+const _up = /*@__PURE__*/ new Vector3();
 
 /**
  * The class represents a virtual listener of the all positional and non-positional audio effects
@@ -49199,13 +49201,14 @@ class AudioListener extends Object3D {
 		super.updateMatrixWorld( force );
 
 		const listener = this.context.listener;
-		const up = this.up;
 
 		this.timeDelta = this._clock.getDelta();
 
 		this.matrixWorld.decompose( _position$1, _quaternion$1, _scale$1 );
 
-		_orientation$1.set( 0, 0, -1 ).applyQuaternion( _quaternion$1 );
+		// the initial forward and up directions must be orthogonal
+		_forward.set( 0, 0, -1 ).applyQuaternion( _quaternion$1 );
+		_up.set( 0, 1, 0 ).applyQuaternion( _quaternion$1 );
 
 		if ( listener.positionX ) {
 
@@ -49216,17 +49219,17 @@ class AudioListener extends Object3D {
 			listener.positionX.linearRampToValueAtTime( _position$1.x, endTime );
 			listener.positionY.linearRampToValueAtTime( _position$1.y, endTime );
 			listener.positionZ.linearRampToValueAtTime( _position$1.z, endTime );
-			listener.forwardX.linearRampToValueAtTime( _orientation$1.x, endTime );
-			listener.forwardY.linearRampToValueAtTime( _orientation$1.y, endTime );
-			listener.forwardZ.linearRampToValueAtTime( _orientation$1.z, endTime );
-			listener.upX.linearRampToValueAtTime( up.x, endTime );
-			listener.upY.linearRampToValueAtTime( up.y, endTime );
-			listener.upZ.linearRampToValueAtTime( up.z, endTime );
+			listener.forwardX.linearRampToValueAtTime( _forward.x, endTime );
+			listener.forwardY.linearRampToValueAtTime( _forward.y, endTime );
+			listener.forwardZ.linearRampToValueAtTime( _forward.z, endTime );
+			listener.upX.linearRampToValueAtTime( _up.x, endTime );
+			listener.upY.linearRampToValueAtTime( _up.y, endTime );
+			listener.upZ.linearRampToValueAtTime( _up.z, endTime );
 
 		} else {
 
 			listener.setPosition( _position$1.x, _position$1.y, _position$1.z );
-			listener.setOrientation( _orientation$1.x, _orientation$1.y, _orientation$1.z, up.x, up.y, up.z );
+			listener.setOrientation( _forward.x, _forward.y, _forward.z, _up.x, _up.y, _up.z );
 
 		}
 
