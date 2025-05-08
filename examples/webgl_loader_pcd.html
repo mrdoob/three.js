@@ -76,6 +76,7 @@
 							'binary_compressed/pcl_logo.pcd',
 						] ).name( 'type' ).onChange( e => {
 
+							gui.destroy();
 							scene.remove( points );
 							loadPointCloud( e );
 			
