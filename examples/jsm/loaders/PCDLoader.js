@@ -106,38 +106,65 @@ class PCDLoader extends Loader {
 	 * @param {number} size - Field size.
 	 * @returns {number} Field value.
 	 */
-	getDataView(
+	_getDataView(
 		dataview,
 		offset,
 		type,
 		size,
 	) {
-		switch (type) {
+
+		switch ( type ) {
+
 			case 'F': {
-				if (size === 8) {
-					return dataview.getFloat64(offset, this.littleEndian);
+
+				if ( size === 8 ) {
+
+					return dataview.getFloat64( offset, this.littleEndian );
+
 				}
-				return dataview.getFloat32(offset, this.littleEndian);
+
+				return dataview.getFloat32( offset, this.littleEndian );
+
 			}
+
 			case 'I': {
-				if (size === 1) {
-					return dataview.getInt8(offset);
+
+				if ( size === 1 ) {
+
+					return dataview.getInt8( offset );
+
 				}
-				if (size === 2) {
-					return dataview.getInt16(offset, this.littleEndian);
+
+				if ( size === 2 ) {
+
+					return dataview.getInt16( offset, this.littleEndian );
+
 				}
-				return dataview.getInt32(offset, this.littleEndian);
+
+				return dataview.getInt32( offset, this.littleEndian );
+
 			}
+
 			case 'U': {
-				if (size === 1) {
-					return dataview.getUint8(offset);
+
+				if ( size === 1 ) {
+
+					return dataview.getUint8( offset );
+
 				}
-				if (size === 2) {
-					return dataview.getUint16(offset, this.littleEndian);
+
+				if ( size === 2 ) {
+
+					return dataview.getUint16( offset, this.littleEndian );
+
 				}
-				return dataview.getUint32(offset, this.littleEndian);
+
+				return dataview.getUint32( offset, this.littleEndian );
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -424,9 +451,9 @@ class PCDLoader extends Loader {
 					const xIndex = PCDheader.fields.indexOf( 'x' );
 					const yIndex = PCDheader.fields.indexOf( 'y' );
 					const zIndex = PCDheader.fields.indexOf( 'z' );
-					position.push( this.getDataView( dataview, ( PCDheader.points * offset.x ) + PCDheader.size[ xIndex ] * i, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
-					position.push( this.getDataView( dataview, ( PCDheader.points * offset.y ) + PCDheader.size[ yIndex ] * i, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
-					position.push( this.getDataView( dataview, ( PCDheader.points * offset.z ) + PCDheader.size[ zIndex ] * i, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
+					position.push( this._getDataView( dataview, ( PCDheader.points * offset.x ) + PCDheader.size[ xIndex ] * i, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					position.push( this._getDataView( dataview, ( PCDheader.points * offset.y ) + PCDheader.size[ yIndex ] * i, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					position.push( this._getDataView( dataview, ( PCDheader.points * offset.z ) + PCDheader.size[ zIndex ] * i, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
@@ -449,16 +476,16 @@ class PCDLoader extends Loader {
 					const xIndex = PCDheader.fields.indexOf( 'normal_x' );
 					const yIndex = PCDheader.fields.indexOf( 'normal_y' );
 					const zIndex = PCDheader.fields.indexOf( 'normal_z' );
-					normal.push( this.getDataView( dataview, ( PCDheader.points * offset.normal_x ) + PCDheader.size[ xIndex ] * i, PCDheader.type[xIndex], PCDheader.size[xIndex] ) );
-					normal.push( this.getDataView( dataview, ( PCDheader.points * offset.normal_y ) + PCDheader.size[ yIndex ] * i, PCDheader.type[yIndex], PCDheader.size[yIndex] ) );
-					normal.push( this.getDataView( dataview, ( PCDheader.points * offset.normal_z ) + PCDheader.size[ zIndex ] * i, PCDheader.type[zIndex], PCDheader.size[zIndex] ) );
+					normal.push( this._getDataView( dataview, ( PCDheader.points * offset.normal_x ) + PCDheader.size[ xIndex ] * i, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					normal.push( this._getDataView( dataview, ( PCDheader.points * offset.normal_y ) + PCDheader.size[ yIndex ] * i, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					normal.push( this._getDataView( dataview, ( PCDheader.points * offset.normal_z ) + PCDheader.size[ zIndex ] * i, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
 				if ( offset.intensity !== undefined ) {
 
 					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
-					intensity.push( this.getDataView( dataview, ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, PCDheader.type[intensityIndex], PCDheader.size[intensityIndex] ) );
+					intensity.push( this._getDataView( dataview, ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, PCDheader.type[ intensityIndex ], PCDheader.size[ intensityIndex ] ) );
 
 				}
 
@@ -487,9 +514,9 @@ class PCDLoader extends Loader {
 					const xIndex = PCDheader.fields.indexOf( 'x' );
 					const yIndex = PCDheader.fields.indexOf( 'y' );
 					const zIndex = PCDheader.fields.indexOf( 'z' );
-					position.push( this.getDataView( dataview, row + offset.x, PCDheader.type[xIndex], PCDheader.size[xIndex] ) );
-					position.push( this.getDataView( dataview, row + offset.y, PCDheader.type[yIndex], PCDheader.size[yIndex] ) );
-					position.push( this.getDataView( dataview, row + offset.z, PCDheader.type[zIndex], PCDheader.size[zIndex] ) );
+					position.push( this._getDataView( dataview, row + offset.x, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					position.push( this._getDataView( dataview, row + offset.y, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					position.push( this._getDataView( dataview, row + offset.z, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
@@ -510,16 +537,16 @@ class PCDLoader extends Loader {
 					const xIndex = PCDheader.fields.indexOf( 'normal_x' );
 					const yIndex = PCDheader.fields.indexOf( 'normal_y' );
 					const zIndex = PCDheader.fields.indexOf( 'normal_z' );
-					normal.push( this.getDataView( dataview, row + offset.normal_x, PCDheader.type[xIndex], PCDheader.size[xIndex] ) );
-					normal.push( this.getDataView( dataview, row + offset.normal_y, PCDheader.type[yIndex], PCDheader.size[yIndex] ) );
-					normal.push( this.getDataView( dataview, row + offset.normal_z, PCDheader.type[zIndex], PCDheader.size[zIndex] ) );
+					normal.push( this._getDataView( dataview, row + offset.normal_x, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					normal.push( this._getDataView( dataview, row + offset.normal_y, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					normal.push( this._getDataView( dataview, row + offset.normal_z, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
 				if ( offset.intensity !== undefined ) {
 
 					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
-					intensity.push( this.getDataView( dataview, row + offset.intensity, PCDheader.type[intensityIndex], PCDheader.size[intensityIndex] ) );
+					intensity.push( this._getDataView( dataview, row + offset.intensity, PCDheader.type[ intensityIndex ], PCDheader.size[ intensityIndex ] ) );
 
 				}
 
