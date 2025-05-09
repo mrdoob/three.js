@@ -231,11 +231,11 @@ class PCDLoader extends Loader {
 
 			const buffer = new Uint8Array( binaryData );
 
-			let data = '', line = '', i = 0, headerEnd = false;
+			let data = '', line = '', i = 0, end = false;
 
 			const max = buffer.length;
 
-			while ( i < max && headerEnd === false ) {
+			while ( i < max && end === false ) {
 
 				const char = String.fromCharCode( buffer[ i ++ ] );
 
@@ -243,7 +243,7 @@ class PCDLoader extends Loader {
 
 					if ( line.trim().toLowerCase().startsWith( 'data' ) ) {
 
-						headerEnd = true;
+						end = true;
 
 					}
 
