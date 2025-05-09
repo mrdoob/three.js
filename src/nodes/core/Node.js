@@ -636,9 +636,7 @@ class Node extends EventDispatcher {
 				//const stackNodesBeforeSetup = builder.stack.nodes.length;
 
 				properties.initialized = true;
-
-				const outputNode = this.setup( builder ); // return a node or null
-				const isNodeOutput = outputNode && outputNode.isNode === true;
+				properties.outputNode = this.setup( builder ) || properties.outputNode || null;
 
 				/*if ( isNodeOutput && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
@@ -665,17 +663,9 @@ class Node extends EventDispatcher {
 
 				}
 
-				if ( isNodeOutput ) {
-
-					outputNode.build( builder );
-
-				}
-
-				properties.outputNode = outputNode;
-
 			}
 
-			result = properties.outputNode || null;
+			result = properties.outputNode;
 
 		} else if ( buildStage === 'analyze' ) {
 
