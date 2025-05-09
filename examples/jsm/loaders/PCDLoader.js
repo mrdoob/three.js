@@ -225,9 +225,40 @@ class PCDLoader extends Loader {
 
 		}
 
-		function parseHeader( data ) {
+		function parseHeader( binaryData ) {
 
 			const PCDheader = {};
+
+			const buffer = new Uint8Array( binaryData );
+
+			let data = '', line = '', i = 0, headerEnd = false;
+
+			const max = buffer.length;
+
+			while ( i < max && headerEnd === false ) {
+
+				const char = String.fromCharCode( buffer[ i ++ ] );
+
+				if ( char === '\n' || char === '\r' ) {
+
+					if ( line.trim().toLowerCase().startsWith( 'data' ) ) {
+
+						headerEnd = true;
+
+					}
+
+					line = '';
+
+				} else {
+
+					line += char;
+
+				}
+
+				data += char;
+
+			}
+
 			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
 			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.slice( result1 - 1 ) );
 
@@ -333,11 +364,9 @@ class PCDLoader extends Loader {
 
 		}
 
-		const textData = new TextDecoder().decode( data );
+		// parse header
 
-		// parse header (always ascii format)
-
-		const PCDheader = parseHeader( textData );
+		const PCDheader = parseHeader( data );
 
 		// parse data
 
@@ -354,6 +383,7 @@ class PCDLoader extends Loader {
 		if ( PCDheader.data === 'ascii' ) {
 
 			const offset = PCDheader.offset;
+			const textData = new TextDecoder().decode( data );
 			const pcdData = textData.slice( PCDheader.headerLen );
 			const lines = pcdData.split( '\n' );
 
