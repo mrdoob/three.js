@@ -1674,9 +1674,7 @@ class Node extends EventDispatcher {
 				//const stackNodesBeforeSetup = builder.stack.nodes.length;
 
 				properties.initialized = true;
-
-				const outputNode = this.setup( builder ); // return a node or null
-				const isNodeOutput = outputNode && outputNode.isNode === true;
+				properties.outputNode = this.setup( builder ) || properties.outputNode || null;
 
 				/*if ( isNodeOutput && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
@@ -1703,17 +1701,9 @@ class Node extends EventDispatcher {
 
 				}
 
-				if ( isNodeOutput ) {
-
-					outputNode.build( builder );
-
-				}
-
-				properties.outputNode = outputNode;
-
 			}
 
-			result = properties.outputNode || null;
+			result = properties.outputNode;
 
 		} else if ( buildStage === 'analyze' ) {
 
@@ -7077,7 +7067,13 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
+
 		this.node.build( builder );
+
+		builder.setContext( previousContext );
 
 	}
 
@@ -7087,11 +7083,9 @@ class ContextNode extends Node {
 
 		builder.setContext( { ...builder.context, ...this.value } );
 
-		const node = this.node.build( builder );
+		this.node.build( builder );
 
 		builder.setContext( previousContext );
-
-		return node;
 
 	}
 
@@ -46903,7 +46897,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
-		const dotNL = normalView.dot( lightDirectionNode );
+		const dotNL = normalWorld.dot( lightDirectionNode );
 		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
 
 		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
@@ -68414,6 +68408,35 @@ class WebGPUPipelineUtils {
 		 */
 		this.backend = backend;
 
+		/**
+		 * A Weak Map that tracks the active pipeline for render or compute passes.
+		 *
+		 * @private
+		 * @type {WeakMap<(GPURenderPassEncoder|GPUComputePassEncoder),(GPURenderPipeline|GPUComputePipeline)>}
+		 */
+		this._activePipelines = new WeakMap();
+
+	}
+
+	/**
+	 * Sets the given pipeline for the given pass. The method makes sure to only set the
+	 * pipeline when necessary.
+	 *
+	 * @param {(GPURenderPassEncoder|GPUComputePassEncoder)} pass - The pass encoder.
+	 * @param {(GPURenderPipeline|GPUComputePipeline)} pipeline - The pipeline.
+	 */
+	setPipeline( pass, pipeline ) {
+
+		const currentPipeline = this._activePipelines.get( pass );
+
+		if ( currentPipeline !== pipeline ) {
+
+			pass.setPipeline( pipeline );
+
+			this._activePipelines.set( pass, pipeline );
+
+		}
+
 	}
 
 	/**
@@ -70732,7 +70755,8 @@ class WebGPUBackend extends Backend {
 		// pipeline
 
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		passEncoderGPU.setPipeline( pipelineGPU );
+
+		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 
 		// bind groups
 
@@ -70828,7 +70852,7 @@ class WebGPUBackend extends Backend {
 		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
 
 			// pipeline
-			passEncoderGPU.setPipeline( pipelineGPU );
+			this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 			currentSets.pipeline = pipelineGPU;
 
 			// bind groups
@@ -71059,8 +71083,8 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-		  // Regular single camera rendering
-		  if ( renderContextData.currentPass ) {
+			// Regular single camera rendering
+			if ( renderContextData.currentPass ) {
 
 				// Handle occlusion queries
 				if ( renderContextData.occlusionQuerySet !== undefined ) {
