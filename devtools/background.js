@@ -45,6 +45,18 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 	if ( sender.tab ) {
 
 		const tabId = sender.tab.id;
+
+		// If three.js is detected, show a badge
+		if ( message.name === 'register' && message.detail && message.detail.revision ) {
+
+			const revision = String( parseInt( message.detail.revision, 10 ) );
+
+			chrome.action.setBadgeText( { tabId: tabId, text: revision } ).catch( () => { /* Tab might be gone */ } );
+			chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => { /* Tab might be gone */ } );
+			chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: '#049ef4' } ).catch( () => { /* Tab might be gone */ } );
+
+		}
+
 		const port = connections.get( tabId );
 		if ( port ) {
 
@@ -75,6 +87,14 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 chrome.webNavigation.onCommitted.addListener( details => {
 
 	const { tabId, frameId } = details;
+
+	// Clear badge on navigation, only for top-level navigation
+	if ( frameId === 0 ) {
+
+		chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => { /* Tab might be gone */ } );
+
+	}
+
 	const port = connections.get( tabId );
 
 	if ( port ) {
@@ -84,6 +104,20 @@ chrome.webNavigation.onCommitted.addListener( details => {
 			type: 'committed',
 			frameId: frameId
 		} );
+
+	}
+
+} );
+
+// Clear badge when a tab is closed
+chrome.tabs.onRemoved.addListener( ( tabId, removeInfo ) => {
+
+	chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => { /* Tab might be gone */ } );
+
+	// Clean up connection if it exists for the closed tab
+	if ( connections.has( tabId ) ) {
+
+		connections.delete( tabId );
 
 	}
 

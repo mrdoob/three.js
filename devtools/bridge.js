@@ -393,13 +393,13 @@
 
 		}
 
-		function dispatchEvent( type, detail ) {
+		function dispatchEvent( name, detail ) {
 
 			try {
 
 				window.postMessage( {
 					id: 'three-devtools',
-					type: type,
+					name: name,
 					detail: detail
 				}, '*' );
 
