@@ -3,10 +3,10 @@
  * tools extension.
  */
 
-(function () {
+( function () {
 
 	// Only initialize if not already initialized
-	if (!window.__THREE_DEVTOOLS__) {
+	if ( ! window.__THREE_DEVTOOLS__ ) {
 
 		// Create our custom EventTarget with logging
 		class DevToolsEventTarget extends EventTarget {
@@ -20,38 +20,38 @@
 
 			}
 
-			addEventListener(type, listener, options) {
+			addEventListener( type, listener, options ) {
 
-				super.addEventListener(type, listener, options);
+				super.addEventListener( type, listener, options );
 
 				// If this is the first listener for a type, and we have backlogged events,
 				// check if we should process them
-				if (type !== 'devtools-ready' && this._backlog.length > 0) {
+				if ( type !== 'devtools-ready' && this._backlog.length > 0 ) {
 
-					this.dispatchEvent(new CustomEvent('devtools-ready'));
+					this.dispatchEvent( new CustomEvent( 'devtools-ready' ) );
 
 				}
 
 			}
 
-			dispatchEvent(event) {
+			dispatchEvent( event ) {
 
-				if (this._ready || event.type === 'devtools-ready') {
+				if ( this._ready || event.type === 'devtools-ready' ) {
 
-					if (event.type === 'devtools-ready') {
+					if ( event.type === 'devtools-ready' ) {
 
 						this._ready = true;
 						const backlog = this._backlog;
 						this._backlog = [];
-						backlog.forEach(e => super.dispatchEvent(e));
+						backlog.forEach( e => super.dispatchEvent( e ) );
 
 					}
 
-					return super.dispatchEvent(event);
+					return super.dispatchEvent( event );
 
 				} else {
 
-					this._backlog.push(event);
+					this._backlog.push( event );
 					return false; // Return false to indicate synchronous handling
 
 				}
@@ -81,12 +81,12 @@
 
 		// Create and expose the __THREE_DEVTOOLS__ object
 		const devTools = new DevToolsEventTarget();
-		Object.defineProperty(window, '__THREE_DEVTOOLS__', {
+		Object.defineProperty( window, '__THREE_DEVTOOLS__', {
 			value: devTools,
 			configurable: false,
 			enumerable: true,
 			writable: false
-		});
+		} );
 
 		// Declare arrays for tracking observed objects
 		const observedScenes = [];
@@ -94,7 +94,7 @@
 		const sceneObjectCountCache = new Map(); // Cache for object counts per scene
 
 		// Function to get renderer data
-		function getRendererData(renderer) {
+		function getRendererData( renderer ) {
 
 			try {
 
@@ -102,13 +102,13 @@
 					uuid: renderer.uuid || generateUUID(),
 					type: renderer.isWebGLRenderer ? 'WebGLRenderer' : 'WebGPURenderer',
 					name: '',
-					properties: getRendererProperties(renderer)
+					properties: getRendererProperties( renderer )
 				};
 				return data;
 
-			} catch (error) {
+			} catch ( error ) {
 
-				console.warn('DevTools: Error getting renderer data:', error);
+				console.warn( 'DevTools: Error getting renderer data:', error );
 				return null;
 
 			}
@@ -116,14 +116,14 @@
 		}
 
 		// Function to get object hierarchy
-		function getObjectData(obj) {
+		function getObjectData( obj ) {
 
 			try {
 
 				// Special case for WebGLRenderer
-				if (obj.isWebGLRenderer === true || obj.isWebGPURenderer === true) {
+				if ( obj.isWebGLRenderer === true || obj.isWebGPURenderer === true ) {
 
-					return getRendererData(obj);
+					return getRendererData( obj );
 
 				}
 
@@ -132,15 +132,15 @@
 
 				// Get descriptive name for the object
 				let name = obj.name || type || obj.constructor.name;
-				if (obj.isMesh) {
+				if ( obj.isMesh ) {
 
 					const geoType = obj.geometry ? obj.geometry.type : 'Unknown';
 					const matType = obj.material ?
-						(Array.isArray(obj.material) ?
-							obj.material.map(m => m.type).join(', ') :
-							obj.material.type) :
+						( Array.isArray( obj.material ) ?
+							obj.material.map( m => m.type ).join( ', ' ) :
+							obj.material.type ) :
 						'Unknown';
-					if (obj.isInstancedMesh) {
+					if ( obj.isInstancedMesh ) {
 
 						name = `${name} [${obj.count}]`;
 
@@ -162,14 +162,14 @@
 					isMesh: obj.isMesh === true,
 					isInstancedMesh: obj.isInstancedMesh === true,
 					parent: obj.parent ? obj.parent.uuid : null,
-					children: obj.children ? obj.children.map(child => child.uuid) : []
+					children: obj.children ? obj.children.map( child => child.uuid ) : []
 				};
 
 				return data;
 
-			} catch (error) {
+			} catch ( error ) {
 
-				console.warn('DevTools: Error getting object data:', error);
+				console.warn( 'DevTools: Error getting object data:', error );
 				return null;
 
 			}
@@ -179,100 +179,100 @@
 		// Generate a UUID for objects that don't have one
 		function generateUUID() {
 
-			const array = new Uint8Array(16);
-			crypto.getRandomValues(array);
-			array[6] = (array[6] & 0x0f) | 0x40; // Set version to 4
-			array[8] = (array[8] & 0x3f) | 0x80; // Set variant to 10
-			return [...array].map((b, i) => (i === 4 || i === 6 || i === 8 || i === 10 ? '-' : '') + b.toString(16).padStart(2, '0')).join('');
+			const array = new Uint8Array( 16 );
+			crypto.getRandomValues( array );
+			array[ 6 ] = ( array[ 6 ] & 0x0f ) | 0x40; // Set version to 4
+			array[ 8 ] = ( array[ 8 ] & 0x3f ) | 0x80; // Set variant to 10
+			return [ ...array ].map( ( b, i ) => ( i === 4 || i === 6 || i === 8 || i === 10 ? '-' : '' ) + b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
 
 		}
 
 		// Listen for Three.js registration
-		devTools.addEventListener('register', (event) => {
+		devTools.addEventListener( 'register', ( event ) => {
 
 			// console.log('DevTools: Three.js registered with revision:', event.detail.revision);
-			dispatchEvent('register', event.detail);
+			dispatchEvent( 'register', event.detail );
 
-		});
+		} );
 
 		// Listen for object observations
-		devTools.addEventListener('observe', (event) => {
+		devTools.addEventListener( 'observe', ( event ) => {
 
 			const obj = event.detail;
-			if (!obj) {
+			if ( ! obj ) {
 
-				console.warn('DevTools: Received observe event with null/undefined detail');
+				console.warn( 'DevTools: Received observe event with null/undefined detail' );
 				return;
 
 			}
 
 			// Generate UUID if needed
-			if (!obj.uuid) {
+			if ( ! obj.uuid ) {
 
 				obj.uuid = generateUUID();
 
 			}
 
 			// Skip if already registered (essential to prevent loops with batching)
-			if (devTools.objects.has(obj.uuid)) {
+			if ( devTools.objects.has( obj.uuid ) ) {
 
 				return;
 
 			}
 
-			if (obj.isWebGLRenderer || obj.isWebGPURenderer) {
+			if ( obj.isWebGLRenderer || obj.isWebGPURenderer ) {
 
-				const data = getObjectData(obj);
+				const data = getObjectData( obj );
 
-				if (data) {
+				if ( data ) {
 
-					data.properties = getRendererProperties(obj);
-					observedRenderers.push(obj);
-					devTools.objects.set(obj.uuid, data);
+					data.properties = getRendererProperties( obj );
+					observedRenderers.push( obj );
+					devTools.objects.set( obj.uuid, data );
 
-					dispatchEvent('renderer', data);
+					dispatchEvent( 'renderer', data );
 
 				}
 
-			} else if (obj.isScene) {
+			} else if ( obj.isScene ) {
 
-				observedScenes.push(obj);
+				observedScenes.push( obj );
 
 				const batchObjects = [];
 				const processedUUIDs = new Set();
 
-				function traverseForBatch(currentObj) {
+				function traverseForBatch( currentObj ) {
 
-					if (!currentObj || !currentObj.uuid || processedUUIDs.has(currentObj.uuid)) return;
-					processedUUIDs.add(currentObj.uuid);
+					if ( ! currentObj || ! currentObj.uuid || processedUUIDs.has( currentObj.uuid ) ) return;
+					processedUUIDs.add( currentObj.uuid );
 
-					const objectData = getObjectData(currentObj);
-					if (objectData) {
+					const objectData = getObjectData( currentObj );
+					if ( objectData ) {
 
-						batchObjects.push(objectData);
-						devTools.objects.set(currentObj.uuid, objectData); // Update local cache during batch creation
+						batchObjects.push( objectData );
+						devTools.objects.set( currentObj.uuid, objectData ); // Update local cache during batch creation
 
 					}
 
 					// Process children
-					if (currentObj.children && Array.isArray(currentObj.children)) {
+					if ( currentObj.children && Array.isArray( currentObj.children ) ) {
 
-						currentObj.children.forEach(child => traverseForBatch(child));
+						currentObj.children.forEach( child => traverseForBatch( child ) );
 
 					}
 
 				}
 
-				traverseForBatch(obj); // Start traversal from the scene
+				traverseForBatch( obj ); // Start traversal from the scene
 
-				dispatchEvent('scene', { sceneUuid: obj.uuid, objects: batchObjects });
+				dispatchEvent( 'scene', { sceneUuid: obj.uuid, objects: batchObjects } );
 
 			}
 
-		});
+		} );
 
 		// Function to get renderer properties
-		function getRendererProperties(renderer) {
+		function getRendererProperties( renderer ) {
 
 			const parameters = renderer.getContextAttributes ? renderer.getContextAttributes() : {};
 
@@ -319,22 +319,22 @@
 		// Function to check if bridge is available
 		function checkBridgeAvailability() {
 
-			const hasDevTools = window.hasOwnProperty('__THREE_DEVTOOLS__');
+			const hasDevTools = window.hasOwnProperty( '__THREE_DEVTOOLS__' );
 			const devToolsValue = window.__THREE_DEVTOOLS__;
 
 			// If we have devtools and we're interactive or complete, trigger ready
-			if (hasDevTools && devToolsValue && (document.readyState === 'interactive' || document.readyState === 'complete')) {
+			if ( hasDevTools && devToolsValue && ( document.readyState === 'interactive' || document.readyState === 'complete' ) ) {
 
-				devTools.dispatchEvent(new CustomEvent('devtools-ready'));
+				devTools.dispatchEvent( new CustomEvent( 'devtools-ready' ) );
 
 			}
 
 		}
 
 		// Watch for readyState changes
-		document.addEventListener('readystatechange', () => {
+		document.addEventListener( 'readystatechange', () => {
 
-			if (document.readyState === 'loading') {
+			if ( document.readyState === 'loading' ) {
 
 				devTools.reset();
 
@@ -342,130 +342,130 @@
 
 			checkBridgeAvailability();
 
-		});
+		} );
 
 		// Watch for page unload to reset state
-		window.addEventListener('beforeunload', () => {
+		window.addEventListener( 'beforeunload', () => {
 
 			devTools.reset();
 
-		});
+		} );
 
 		// Listen for messages from the content script
-		window.addEventListener('message', function (event) {
+		window.addEventListener( 'message', function ( event ) {
 
 			// Only accept messages from the same frame
-			if (event.source !== window) return;
+			if ( event.source !== window ) return;
 
 			const message = event.data;
-			if (!message || message.id !== 'three-devtools') return;
+			if ( ! message || message.id !== 'three-devtools' ) return;
 
 			// Handle request for initial state from panel
-			if (message.name === 'request-state') {
+			if ( message.name === 'request-state' ) {
 
 				sendState();
 
 			}
 
-		});
+		} );
 
 		function sendState() {
 
 			// Send current renderers
-			for (const observedRenderer of observedRenderers) {
+			for ( const observedRenderer of observedRenderers ) {
 
-				const data = getObjectData(observedRenderer);
-				if (data) {
+				const data = getObjectData( observedRenderer );
+				if ( data ) {
 
-					data.properties = getRendererProperties(observedRenderer);
-					dispatchEvent('renderer', data);
+					data.properties = getRendererProperties( observedRenderer );
+					dispatchEvent( 'renderer', data );
 
 				}
 
 			}
 
 			// Send current scenes
-			for (const observedScene of observedScenes) {
+			for ( const observedScene of observedScenes ) {
 
-				reloadSceneObjects(observedScene);
+				reloadSceneObjects( observedScene );
 
 			}
 
 		}
 
-		function dispatchEvent(type, detail) {
+		function dispatchEvent( type, detail ) {
 
 			try {
 
-				window.postMessage({
+				window.postMessage( {
 					id: 'three-devtools',
 					type: type,
 					detail: detail
-				}, '*');
+				}, '*' );
 
-			} catch (error) {
+			} catch ( error ) {
 
 				// If we get an "Extension context invalidated" error, stop all monitoring
-				if (error.message.includes('Extension context invalidated')) {
+				if ( error.message.includes( 'Extension context invalidated' ) ) {
 
-					console.log('DevTools: Extension context invalidated, stopping monitoring');
+					console.log( 'DevTools: Extension context invalidated, stopping monitoring' );
 					devTools.reset();
 					return;
 
 				}
 
-				console.warn('DevTools: Error dispatching event:', error);
+				console.warn( 'DevTools: Error dispatching event:', error );
 
 			}
 
 		}
 
 		// Function to manually reload scene objects
-		function reloadSceneObjects(scene) {
+		function reloadSceneObjects( scene ) {
 
 			const batchObjects = [];
 
 			// Recursively observe all objects, collect data, update local cache
-			function observeAndBatchObject(object) {
+			function observeAndBatchObject( object ) {
 
-				if (!object || !object.uuid) return; // Simplified check
+				if ( ! object || ! object.uuid ) return; // Simplified check
 
 				// console.log('DevTools: Processing object during reload:', object.type || object.constructor.name, object.uuid);
 
 				// Get object data
-				const objectData = getObjectData(object);
-				if (objectData) {
+				const objectData = getObjectData( object );
+				if ( objectData ) {
 
-					batchObjects.push(objectData); // Add to batch
+					batchObjects.push( objectData ); // Add to batch
 					// Update or add to local cache immediately
-					devTools.objects.set(object.uuid, objectData);
+					devTools.objects.set( object.uuid, objectData );
 
 				}
 
 				// Process children recursively
-				if (object.children && Array.isArray(object.children)) {
+				if ( object.children && Array.isArray( object.children ) ) {
 
 					// console.log('DevTools: Processing', object.children.length, 'children of', object.type || object.constructor.name);
-					object.children.forEach(child => observeAndBatchObject(child));
+					object.children.forEach( child => observeAndBatchObject( child ) );
 
 				}
 
 			}
 
 			// Start traversal from the scene itself
-			observeAndBatchObject(scene);
+			observeAndBatchObject( scene );
 
 			// --- Caching Logic ---
 			const currentObjectCount = batchObjects.length;
-			const previousObjectCount = sceneObjectCountCache.get(scene.uuid);
+			const previousObjectCount = sceneObjectCountCache.get( scene.uuid );
 
-			if (currentObjectCount !== previousObjectCount) {
+			if ( currentObjectCount !== previousObjectCount ) {
 
-				console.log(`DevTools: Scene ${scene.uuid} count changed (${previousObjectCount} -> ${currentObjectCount}), dispatching update.`);
+				console.log( `DevTools: Scene ${scene.uuid} count changed (${previousObjectCount} -> ${currentObjectCount}), dispatching update.` );
 				// Dispatch the batch update for the panel as 'scene'
-				dispatchEvent('scene', { sceneUuid: scene.uuid, objects: batchObjects });
+				dispatchEvent( 'scene', { sceneUuid: scene.uuid, objects: batchObjects } );
 				// Update the cache
-				sceneObjectCountCache.set(scene.uuid, currentObjectCount);
+				sceneObjectCountCache.set( scene.uuid, currentObjectCount );
 
 			} else {
 				// console.log(`DevTools: Scene ${scene.uuid} count unchanged (${currentObjectCount}), skipping dispatch.`);
@@ -475,4 +475,4 @@
 
 	}
 
-})();
+} )();
