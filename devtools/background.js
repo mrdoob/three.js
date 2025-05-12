@@ -32,6 +32,8 @@ chrome.runtime.onConnect.addListener( port => {
 		if ( tabId ) {
 
 			connections.delete( tabId );
+			// Clear badge if devtools panel is closed for this tab
+			chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => { /* Tab might be gone */ } );
 
 		}
 
@@ -41,6 +43,19 @@ chrome.runtime.onConnect.addListener( port => {
 
 // Listen for messages from the content script
 chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
+
+	if ( message.scheme ) {
+
+		chrome.action.setIcon( {
+			path: {
+				16: `icons/16-${message.scheme}.png`,
+				32: `icons/32-${message.scheme}.png`,
+				48: `icons/48-${message.scheme}.png`,
+				128: `icons/128-${message.scheme}.png`
+			}
+		} );
+
+	}
 
 	if ( sender.tab ) {
 

@@ -205,3 +205,15 @@ window.addEventListener( 'message', handleIframeMessage, false );
 
 // Use a single listener for messages from the background script
 chrome.runtime.onMessage.addListener( handleBackgroundMessage );
+
+// Icon color scheme
+const isLightTheme = window.matchMedia( '(prefers-color-scheme: light)' ).matches;
+
+chrome.runtime.sendMessage( { scheme: isLightTheme ? 'light' : 'dark' } );
+
+window.matchMedia( '(prefers-color-scheme: light)' ).onchange = ( event ) => {
+
+	chrome.runtime.sendMessage( { scheme: event.matches ? 'light' : 'dark' } );
+
+};
+

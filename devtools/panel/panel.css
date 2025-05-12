@@ -1,18 +1,33 @@
+:root {
+	color-scheme: light dark;
+}
+
 body {
+	background: light-dark( #fff, #333 );
+	color: light-dark( #333, #e0e0e0 );
 	margin: 0;
-	padding: 16px;
+	padding: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 12px;
-	color: #333;
-	background: #fff;
 }
+
+hr {
+	color: light-dark( #333, #e0e0e0 );
+}
+
+#scene-tree {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
 .info-item {
 	padding: 8px 12px;
-	background: #f5f5f5;
+	background: light-dark( #f5f5f5, #333 );
 	border-radius: 4px;
 	margin-bottom: 16px;
 	font-family: monospace;
-	color: #666;
+	color: light-dark( #666, #aaa );
 }
 .section {
 	margin-bottom: 24px;
@@ -21,20 +36,20 @@ body {
 	margin: 0 0 8px 0;
 	font-size: 11px;
 	text-transform: uppercase;
-	color: #666;
+	color: light-dark( #666, #aaa );
 	font-weight: 500;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid light-dark( #eee, #444 );
 	padding-bottom: 4px;
 }
+
 .tree-item {
+	padding: 4px;
+	cursor: pointer;
 	display: flex;
 	align-items: center;
-	padding: 2px;
-	/* cursor: pointer; Let summary handle this */
-	border-radius: 4px;
 }
 .tree-item:hover {
-	background: #e0e0e0;
+	background: light-dark( #f0f0f0, #555 );
 }
 .tree-item .icon {
 	margin-right: 4px;
@@ -56,6 +71,7 @@ body {
 	opacity: 0.5;
 	font-size: 0.9em;
 }
+
 .children {
 	margin-left: 0;
 }
@@ -65,7 +81,7 @@ body {
 	cursor: pointer;
 }
 .renderer-summary:hover {
-	background: #e0e0e0;
+	background: light-dark( #f0f0f0, #555 );
 }
 
 /* Hide default details marker when using custom summary */
