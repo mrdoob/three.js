@@ -97,6 +97,7 @@ class VaryingNode extends Node {
 
 		this.interpolationType = type;
 		this.interpolationSampling = sampling;
+
 		return this;
 
 	}

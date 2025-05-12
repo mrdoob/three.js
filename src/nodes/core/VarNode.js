@@ -92,6 +92,8 @@ class VarNode extends Node {
 
 	}
 
+	/*
+	// TODO: Check 'webgpu_tsl_raging_sea' example
 	analyze( builder, output ) {
 
 		if ( output && output.isStackNode ) {
@@ -104,7 +106,7 @@ class VarNode extends Node {
 
 		}
 
-	}
+	}*/
 
 	generate( builder ) {
 
