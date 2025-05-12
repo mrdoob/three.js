@@ -48,9 +48,6 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 
 		chrome.action.setIcon( {
 			path: {
-				16: `icons/16-${message.scheme}.png`,
-				32: `icons/32-${message.scheme}.png`,
-				48: `icons/48-${message.scheme}.png`,
 				128: `icons/128-${message.scheme}.png`
 			}
 		} );
