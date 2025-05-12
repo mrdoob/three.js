@@ -1,6 +1,8 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
+const _errorMap = new WeakMap();
+
 /**
  * A loader for loading images as an [ImageBitmap]{@link https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap}.
  * An `ImageBitmap` provides an asynchronous and resource efficient pathway to prepare
@@ -111,13 +113,27 @@ class ImageBitmapLoader extends Loader {
 
 				cached.then( imageBitmap => {
 
-					if ( onLoad ) onLoad( imageBitmap );
+					// The code checks if there is an error for the cached promise. If so, throw
+					// a new error to force the code flow into the catch() block.
 
+					if ( _errorMap.has( cached ) === true ) {
+
+						throw new Error();
+
+					} else {
+
+						if ( onLoad ) onLoad( imageBitmap );
+
+						scope.manager.itemEnd( url );
+
+					}
+
+				} ).catch( () => {
+
+					if ( onError ) onError( _errorMap.get( cached ) );
+
+					scope.manager.itemError( url );
 					scope.manager.itemEnd( url );
-
-				} ).catch( e => {
-
-					if ( onError ) onError( e );
 
 				} );
 				return;
@@ -162,6 +178,8 @@ class ImageBitmapLoader extends Loader {
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
+
+			_errorMap.set( promise, e );
 
 			Cache.remove( url );
 
