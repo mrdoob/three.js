@@ -76,8 +76,7 @@ backgroundPageConnection.onMessage.addListener( function ( message ) {
 
 function handleThreeEvent( message ) {
 
-	// console.log('Handling event:', message.type);
-	switch ( message.type ) {
+	switch ( message.name ) {
 
 		case 'register':
 			state.revision = message.detail.revision;
