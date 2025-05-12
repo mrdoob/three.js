@@ -118,7 +118,10 @@ class ImageBitmapLoader extends Loader {
 
 					if ( _errorMap.has( cached ) === true ) {
 
-						throw new Error();
+						if ( onError ) onError( _errorMap.get( cached ) );
+
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
 
 					} else {
 
@@ -126,16 +129,12 @@ class ImageBitmapLoader extends Loader {
 
 						scope.manager.itemEnd( url );
 
+						return imageBitmap;
+
 					}
 
-				} ).catch( () => {
-
-					if ( onError ) onError( _errorMap.get( cached ) );
-
-					scope.manager.itemError( url );
-					scope.manager.itemEnd( url );
-
 				} );
+
 				return;
 
 			}
