@@ -150,13 +150,15 @@ class VaryingNode extends Node {
 
 		this.setupVarying( builder );
 
+		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+
 	}
 
 	analyze( builder ) {
 
 		this.setupVarying( builder );
 
-		return this.node.analyze( builder );
+		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
 
 	}
 

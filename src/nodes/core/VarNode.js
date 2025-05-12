@@ -92,6 +92,20 @@ class VarNode extends Node {
 
 	}
 
+	analyze( builder, output ) {
+
+		if ( output && output.isStackNode ) {
+
+			this.node.build( builder, output );
+
+		} else {
+
+			super.analyze( builder, output );
+
+		}
+
+	}
+
 	generate( builder ) {
 
 		const { node, name, readOnly } = this;

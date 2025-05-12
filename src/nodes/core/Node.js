@@ -506,10 +506,15 @@ class Node extends EventDispatcher {
 	 * This stage analyzes the node hierarchy and ensures descendent nodes are built.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?Node} output - The target output node.
 	 */
-	analyze( builder ) {
+	analyze( builder, output = null ) {
 
 		const usageCount = builder.increaseUsage( this );
+
+		const nodeData = builder.getDataFromNode( this, 'any' );
+		nodeData.stages = nodeData.stages || {};
+		nodeData.stages[ builder.shaderStage ] = true;
 
 		if ( usageCount === 1 ) {
 
@@ -521,7 +526,7 @@ class Node extends EventDispatcher {
 
 				if ( childNode && childNode.isNode === true ) {
 
-					childNode.build( builder );
+					childNode.build( builder, output );
 
 				}
 
@@ -600,7 +605,7 @@ class Node extends EventDispatcher {
 	 * - **generate**: Generates the shader code for the node. Returns the generated shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {?string} [output=null] - Can be used to define the output type.
+	 * @param {string|Node|null} [output=null] - Can be used to define the output type.
 	 * @return {Node|string|null} The result of the build process, depending on the build stage.
 	 */
 	build( builder, output = null ) {
@@ -669,7 +674,7 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'analyze' ) {
 
-			this.analyze( builder );
+			this.analyze( builder, output );
 
 		} else if ( buildStage === 'generate' ) {
 
