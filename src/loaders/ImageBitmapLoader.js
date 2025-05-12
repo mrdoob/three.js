@@ -113,8 +113,7 @@ class ImageBitmapLoader extends Loader {
 
 				cached.then( imageBitmap => {
 
-					// The code checks if there is an error for the cached promise. If so, throw
-					// a new error to force the code flow into the catch() block.
+					// check if there is an error for the cached promise
 
 					if ( _errorMap.has( cached ) === true ) {
 
