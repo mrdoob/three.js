@@ -113,7 +113,7 @@ chrome.webNavigation.onCommitted.addListener( details => {
 
 		port.postMessage( {
 			id: 'three-devtools',
-			type: 'committed',
+			name: 'committed',
 			frameId: frameId
 		} );
 
