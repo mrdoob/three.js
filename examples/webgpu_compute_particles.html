@@ -210,16 +210,16 @@
 
 					if ( intersects.length > 0 ) {
 
-					const { point } = intersects[ 0 ];
+						const { point } = intersects[ 0 ];
 
-					// move to uniform
+						// move to uniform
 
-					clickPosition.value.copy( point );
-					clickPosition.value.y = - 1;
+						clickPosition.value.copy( point );
+						clickPosition.value.y = - 1;
 
-					// compute
+						// compute
 
-					renderer.computeAsync( computeHit );
+						renderer.computeAsync( computeHit );
 
 					}
 
