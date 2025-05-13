@@ -348,6 +348,11 @@ class FBXTreeParser {
 				type = 'image/tga';
 				break;
 
+			case 'webp':
+
+				type = 'image/webp';
+				break;
+
 			default:
 
 				console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
