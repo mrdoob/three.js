@@ -40,6 +40,15 @@ class AssignNode extends TempNode {
 		 */
 		this.sourceNode = sourceNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isAssignNode = true;
+
 	}
 
 	/**
