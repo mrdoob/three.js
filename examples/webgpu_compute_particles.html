@@ -121,13 +121,13 @@
 
 					If( position.y.lessThan( 0 ), () => {
 
-					position.y = 0;
-					velocity.y = velocity.y.negate().mul( bounce );
+						position.y = 0;
+						velocity.y = velocity.y.negate().mul( bounce );
 
-					// floor friction
+						// floor friction
 
-					velocity.x = velocity.x.mul( .9 );
-					velocity.z = velocity.z.mul( .9 );
+						velocity.x = velocity.x.mul( .9 );
+						velocity.z = velocity.z.mul( .9 );
 
 					} );
 
