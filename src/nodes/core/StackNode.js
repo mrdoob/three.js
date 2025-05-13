@@ -266,8 +266,9 @@ class StackNode extends Node {
 			} else if ( buildStage === 'generate' ) {
 
 				const stages = builder.getDataFromNode( node, 'any' ).stages;
+				const parents = stages && stages[ builder.shaderStage ];
 
-				if ( node.isVarNode && stages && stages[ builder.shaderStage ].length === 1 && stages[ builder.shaderStage ][ 0 ].isStackNode ) {
+				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
 
 					continue; // skip var nodes that are only used in .toVarying()
 
