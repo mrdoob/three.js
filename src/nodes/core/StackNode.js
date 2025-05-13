@@ -267,11 +267,13 @@ class StackNode extends Node {
 
 				const stages = builder.getDataFromNode( node, 'any' ).stages;
 
-				if ( ! stages || stages[ builder.shaderStage ] === true ) {
+				if ( node.isVarNode && stages && stages[ builder.shaderStage ].length === 1 && stages[ builder.shaderStage ][ 0 ].isStackNode ) {
 
-					node.build( builder, 'void' );
+					continue; // skip var nodes that are only used in .toVarying()
 
 				}
+
+				node.build( builder, 'void' );
 
 			}
 

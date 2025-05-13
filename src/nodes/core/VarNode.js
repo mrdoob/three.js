@@ -72,6 +72,15 @@ class VarNode extends Node {
 		 */
 		this.readOnly = readOnly;
 
+		/**
+		 *
+		 * Add this flag to the node system to indicate that this node require parents.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	getMemberType( builder, name ) {
@@ -91,22 +100,6 @@ class VarNode extends Node {
 		return this.node.getNodeType( builder );
 
 	}
-
-	/*
-	// TODO: Check 'webgpu_tsl_raging_sea' example
-	analyze( builder, output ) {
-
-		if ( output && output.isStackNode ) {
-
-			this.node.build( builder, output );
-
-		} else {
-
-			super.analyze( builder, output );
-
-		}
-
-	}*/
 
 	generate( builder ) {
 

@@ -512,9 +512,14 @@ class Node extends EventDispatcher {
 
 		const usageCount = builder.increaseUsage( this );
 
-		const nodeData = builder.getDataFromNode( this, 'any' );
-		nodeData.stages = nodeData.stages || {};
-		nodeData.stages[ builder.shaderStage ] = true;
+		if ( this.parents === true ) {
+
+			const nodeData = builder.getDataFromNode( this, 'any' );
+			nodeData.stages = nodeData.stages || {};
+			nodeData.stages[ builder.shaderStage ] = nodeData.stages[ builder.shaderStage ] || [];
+			nodeData.stages[ builder.shaderStage ].push( output );
+
+		}
 
 		if ( usageCount === 1 ) {
 
@@ -526,7 +531,7 @@ class Node extends EventDispatcher {
 
 				if ( childNode && childNode.isNode === true ) {
 
-					childNode.build( builder, output );
+					childNode.build( builder, this );
 
 				}
 
