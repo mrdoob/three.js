@@ -2054,7 +2054,11 @@ class WebGLBackend extends Backend {
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
-						if ( isRenderTarget3D || isRenderTargetArray ) {
+						if ( renderTarget.multiview ) {
+
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
+
+						} else if ( isRenderTarget3D || isRenderTargetArray ) {
 
 							const layer = this.renderer._activeCubeFace;
 
@@ -2062,11 +2066,7 @@ class WebGLBackend extends Backend {
 
 						} else {
 
-							if ( renderTarget.multiview ) {
-
-								multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
-
-							} else if ( hasExternalTextures && useMultisampledRTT ) {
+							if ( hasExternalTextures && useMultisampledRTT ) {
 
 								multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
