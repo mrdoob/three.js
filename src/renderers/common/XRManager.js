@@ -1297,7 +1297,7 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
-	renderer.XRResetState();
+	renderer._resetXRState();
 
 	this._session = null;
 	this._xrRenderTarget = null;
