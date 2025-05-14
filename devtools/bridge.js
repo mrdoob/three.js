@@ -344,6 +344,17 @@
 
 		} );
 
+		// Check if THREE is in the global scope (Old versions)
+		window.addEventListener( 'load', () => {
+
+			if ( window.THREE && window.THREE.REVISION) {
+	
+				dispatchEvent( 'register', { revision: THREE.REVISION } );
+	
+			}
+	
+		} );
+
 		// Watch for page unload to reset state
 		window.addEventListener( 'beforeunload', () => {
 
