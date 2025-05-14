@@ -2229,7 +2229,7 @@ class Renderer {
 	 * Resets the renderer to the initial state before WebXR started.
 	 *
 	 */
-	XRResetState() {
+	_resetXRState() {
 
 		this.backend.setXRTarget( null );
 		this.setOutputRenderTarget( null );
