@@ -1544,10 +1544,20 @@ class Node extends EventDispatcher {
 	 * This stage analyzes the node hierarchy and ensures descendent nodes are built.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?Node} output - The target output node.
 	 */
-	analyze( builder ) {
+	analyze( builder, output = null ) {
 
 		const usageCount = builder.increaseUsage( this );
+
+		if ( this.parents === true ) {
+
+			const nodeData = builder.getDataFromNode( this, 'any' );
+			nodeData.stages = nodeData.stages || {};
+			nodeData.stages[ builder.shaderStage ] = nodeData.stages[ builder.shaderStage ] || [];
+			nodeData.stages[ builder.shaderStage ].push( output );
+
+		}
 
 		if ( usageCount === 1 ) {
 
@@ -1559,7 +1569,7 @@ class Node extends EventDispatcher {
 
 				if ( childNode && childNode.isNode === true ) {
 
-					childNode.build( builder );
+					childNode.build( builder, this );
 
 				}
 
@@ -1638,7 +1648,7 @@ class Node extends EventDispatcher {
 	 * - **generate**: Generates the shader code for the node. Returns the generated shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {?string} [output=null] - Can be used to define the output type.
+	 * @param {string|Node|null} [output=null] - Can be used to define the output type.
 	 * @return {Node|string|null} The result of the build process, depending on the build stage.
 	 */
 	build( builder, output = null ) {
@@ -1707,7 +1717,7 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'analyze' ) {
 
-			this.analyze( builder );
+			this.analyze( builder, output );
 
 		} else if ( buildStage === 'generate' ) {
 
@@ -4600,6 +4610,15 @@ class AssignNode extends TempNode {
 		 */
 		this.sourceNode = sourceNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isAssignNode = true;
+
 	}
 
 	/**
@@ -7201,6 +7220,15 @@ class VarNode extends Node {
 		 */
 		this.readOnly = readOnly;
 
+		/**
+		 *
+		 * Add this flag to the node system to indicate that this node require parents.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	getMemberType( builder, name ) {
@@ -7427,6 +7455,7 @@ class VaryingNode extends Node {
 
 		this.interpolationType = type;
 		this.interpolationSampling = sampling;
+
 		return this;
 
 	}
@@ -7480,13 +7509,15 @@ class VaryingNode extends Node {
 
 		this.setupVarying( builder );
 
+		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+
 	}
 
 	analyze( builder ) {
 
 		this.setupVarying( builder );
 
-		return this.node.analyze( builder );
+		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
 
 	}
 
@@ -24938,7 +24969,11 @@ class ShadowMaskModel extends LightingModel {
 	 */
 	direct( { lightNode } ) {
 
-		this.shadowNode.mulAssign( lightNode.shadowNode );
+		if ( lightNode.shadowNode !== null ) {
+
+			this.shadowNode.mulAssign( lightNode.shadowNode );
+
+		}
 
 	}
 
@@ -29141,6 +29176,7 @@ class Textures extends DataMap {
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
+			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 
@@ -29888,9 +29924,32 @@ class StackNode extends Node {
 
 		setCurrentStack( this );
 
+		const buildStage = builder.buildStage;
+
 		for ( const node of this.nodes ) {
 
-			node.build( builder, 'void' );
+			if ( buildStage === 'setup' ) {
+
+				node.build( builder );
+
+			} else if ( buildStage === 'analyze' ) {
+
+				node.build( builder, this );
+
+			} else if ( buildStage === 'generate' ) {
+
+				const stages = builder.getDataFromNode( node, 'any' ).stages;
+				const parents = stages && stages[ builder.shaderStage ];
+
+				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
+
+					continue; // skip var nodes that are only used in .toVarying()
+
+				}
+
+				node.build( builder, 'void' );
+
+			}
 
 		}
 
@@ -45572,27 +45631,53 @@ class NodeBuilder {
 	 * @param {Node} node - The node to execute.
 	 * @param {?string} output - Expected output type. For example 'vec3'.
 	 * @param {?string} propertyName - The property name to assign the result.
-	 * @return {Object}
+	 * @return {Object|Node|null} The code flow or node.build() result.
 	 */
 	flowNodeFromShaderStage( shaderStage, node, output = null, propertyName = null ) {
 
+		const previousTab = this.tab;
+		const previousCache = this.cache;
 		const previousShaderStage = this.shaderStage;
+		const previousContext = this.context;
 
 		this.setShaderStage( shaderStage );
 
-		const flowData = this.flowChildNode( node, output );
+		const context = { ...this.context };
+		delete context.nodeBlock;
 
-		if ( propertyName !== null ) {
+		this.cache = this.globalCache;
+		this.tab = '\t';
+		this.context = context;
 
-			flowData.code += `${ this.tab + propertyName } = ${ flowData.result };\n`;
+		let result = null;
+
+		if ( this.buildStage === 'generate' ) {
+
+			const flowData = this.flowChildNode( node, output );
+
+			if ( propertyName !== null ) {
+
+				flowData.code += `${ this.tab + propertyName } = ${ flowData.result };\n`;
+
+			}
+
+			this.flowCode[ shaderStage ] = this.flowCode[ shaderStage ] + flowData.code;
+
+			result = flowData;
+
+		} else {
+
+			result = node.build( this );
 
 		}
 
-		this.flowCode[ shaderStage ] = this.flowCode[ shaderStage ] + flowData.code;
-
 		this.setShaderStage( previousShaderStage );
 
-		return flowData;
+		this.cache = previousCache;
+		this.tab = previousTab;
+		this.context = previousContext;
+
+		return result;
 
 	}
 
@@ -47440,7 +47525,7 @@ class Nodes extends DataMap {
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
 				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
 				nodeBuilder.clippingContext = renderObject.clippingContext;
-				if ( this.renderer.getRenderTarget() ? this.renderer.getRenderTarget().multiview : false ) {
+				if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
 
 					nodeBuilder.enableMultiview();
 
@@ -47648,6 +47733,7 @@ class Nodes extends DataMap {
 			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
 			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
+			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
 			cacheKeyData.callId = callId;
@@ -49973,9 +50059,7 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
-	renderer.backend.setXRTarget( null );
-	renderer.setOutputRenderTarget( null );
-	renderer.setRenderTarget( null );
+	renderer.XRResetState();
 
 	this._session = null;
 	this._xrRenderTarget = null;
@@ -50013,6 +50097,8 @@ function onSessionEnd() {
 
 			layer.plane.material = layer.material;
 			layer.material.map = layer.renderTarget.texture;
+			layer.material.map.offset.y = 1;
+			layer.material.map.repeat.y = -1;
 			delete layer.xrlayer;
 
 		}
@@ -50025,7 +50111,6 @@ function onSessionEnd() {
 	this._useMultiview = false;
 
 	renderer._animation.stop();
-
 	renderer._animation.setAnimationLoop( this._currentAnimationLoop );
 	renderer._animation.setContext( this._currentAnimationContext );
 	renderer._animation.start();
@@ -52458,6 +52543,21 @@ class Renderer {
 	getOutputRenderTarget() {
 
 		return this._outputRenderTarget;
+
+	}
+
+	/**
+	 * Resets the renderer to the initial state before WebXR started.
+	 *
+	 */
+	XRResetState() {
+
+		this.backend.setXRTarget( null );
+		this.setOutputRenderTarget( null );
+		this.setRenderTarget( null );
+
+		this._frameBufferTarget.dispose();
+		this._frameBufferTarget = null;
 
 	}
 

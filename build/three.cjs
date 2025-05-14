@@ -7140,6 +7140,14 @@ class Texture extends EventDispatcher {
 		this.userData = {};
 
 		/**
+		 * This can be used to only update a subregion or specific rows of the texture (for example, just the
+		 * first 3 rows). Use the `addUpdateRange()` function to add ranges to this array.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.updateRanges = [];
+
+		/**
 		 * This starts at `0` and counts how many times {@link Texture#needsUpdate} is set to `true`.
 		 *
 		 * @type {number}
@@ -7246,6 +7254,27 @@ class Texture extends EventDispatcher {
 	updateMatrix() {
 
 		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+	}
+
+	/**
+	 * Adds a range of data in the data texture to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
 
 	}
 
@@ -20120,6 +20149,15 @@ class Mesh extends Object3D {
 		 */
 		this.morphTargetInfluences = undefined;
 
+		/**
+		 * The number of instances of this mesh.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
 		this.updateMorphTargets();
 
 	}
@@ -24068,6 +24106,15 @@ class Sprite extends Object3D {
 		 * @default (0.5,0.5)
 		 */
 		this.center = new Vector2( 0.5, 0.5 );
+
+		/**
+		 * The number of instances of this sprite.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
 
 	}
 
@@ -48399,6 +48446,8 @@ const TEXTURE_FILTER = {
 	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
 
+const _errorMap = new WeakMap();
+
 /**
  * A loader for loading images as an [ImageBitmap]{@link https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap}.
  * An `ImageBitmap` provides an asynchronous and resource efficient pathway to prepare
@@ -48409,7 +48458,7 @@ const TEXTURE_FILTER = {
  *
  * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
  *
- * Also note that unlike {@link FileLoader}, this loader does not avoid multiple concurrent requests to the same URL.
+ * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
@@ -48509,15 +48558,27 @@ class ImageBitmapLoader extends Loader {
 
 				cached.then( imageBitmap => {
 
-					if ( onLoad ) onLoad( imageBitmap );
+					// check if there is an error for the cached promise
 
-					scope.manager.itemEnd( url );
+					if ( _errorMap.has( cached ) === true ) {
 
-				} ).catch( e => {
+						if ( onError ) onError( _errorMap.get( cached ) );
 
-					if ( onError ) onError( e );
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if ( onLoad ) onLoad( imageBitmap );
+
+						scope.manager.itemEnd( url );
+
+						return imageBitmap;
+
+					}
 
 				} );
+
 				return;
 
 			}
@@ -48560,6 +48621,8 @@ class ImageBitmapLoader extends Loader {
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
+
+			_errorMap.set( promise, e );
 
 			Cache.remove( url );
 
@@ -68784,6 +68847,115 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function getRow( index, rowLength, componentStride ) {
+
+		return Math.floor( Math.floor( index / componentStride ) / rowLength );
+
+	}
+
+	function updateTexture( texture, image, glFormat, glType ) {
+
+		const componentStride = 4; // only RGBA supported
+
+		const updateRanges = texture.updateRanges;
+
+		if ( updateRanges.length === 0 ) {
+
+			state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+
+		} else {
+
+			// Before applying update ranges, we merge any adjacent / overlapping
+			// ranges to reduce load on `gl.texSubImage2D`. Empirically, this has led
+			// to performance improvements for applications which make heavy use of
+			// update ranges. Likely due to GPU command overhead.
+			//
+			// Note that to reduce garbage collection between frames, we merge the
+			// update ranges in-place. This is safe because this method will clear the
+			// update ranges once updated.
+
+			updateRanges.sort( ( a, b ) => a.start - b.start );
+
+			// To merge the update ranges in-place, we work from left to right in the
+			// existing updateRanges array, merging ranges. This may result in a final
+			// array which is smaller than the original. This index tracks the last
+			// index representing a merged range, any data after this index can be
+			// trimmed once the merge algorithm is completed.
+			let mergeIndex = 0;
+
+			for ( let i = 1; i < updateRanges.length; i ++ ) {
+
+				const previousRange = updateRanges[ mergeIndex ];
+				const range = updateRanges[ i ];
+
+				// Only merge if in the same row and overlapping/adjacent
+				const previousEnd = previousRange.start + previousRange.count;
+				const currentRow = getRow( range.start, image.width, componentStride );
+				const previousRow = getRow( previousRange.start, image.width, componentStride );
+
+				// We add one here to merge adjacent ranges. This is safe because ranges
+				// operate over positive integers.
+				if (
+					range.start <= previousEnd + 1 &&
+					currentRow === previousRow &&
+					getRow( range.start + range.count - 1, image.width, componentStride ) === currentRow // ensure range doesn't spill
+				) {
+
+					previousRange.count = Math.max(
+						previousRange.count,
+						range.start + range.count - previousRange.start
+					);
+
+				} else {
+
+					++ mergeIndex;
+					updateRanges[ mergeIndex ] = range;
+
+				}
+
+
+			}
+
+			// Trim the array to only contain the merged ranges.
+			updateRanges.length = mergeIndex + 1;
+
+			const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
+			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+
+				const pixelStart = Math.floor( range.start / componentStride );
+				const pixelCount = Math.ceil( range.count / componentStride );
+
+				const x = pixelStart % image.width;
+				const y = Math.floor( pixelStart / image.width );
+
+				// Assumes update ranges refer to contiguous memory
+				const width = pixelCount;
+				const height = 1;
+
+				_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, x );
+				_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, y );
+
+				state.texSubImage2D( _gl.TEXTURE_2D, 0, x, y, width, height, glFormat, glType, image.data );
+
+			}
+
+			texture.clearUpdateRanges();
+
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+
+		}
+
+	}
+
 	function uploadTexture( textureProperties, texture, slot ) {
 
 		let textureType = _gl.TEXTURE_2D;
@@ -68897,7 +69069,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( dataReady ) {
 
-							state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+							updateTexture( texture, image, glFormat, glType );
 
 						}
 

@@ -7138,6 +7138,14 @@ class Texture extends EventDispatcher {
 		this.userData = {};
 
 		/**
+		 * This can be used to only update a subregion or specific rows of the texture (for example, just the
+		 * first 3 rows). Use the `addUpdateRange()` function to add ranges to this array.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.updateRanges = [];
+
+		/**
 		 * This starts at `0` and counts how many times {@link Texture#needsUpdate} is set to `true`.
 		 *
 		 * @type {number}
@@ -7244,6 +7252,27 @@ class Texture extends EventDispatcher {
 	updateMatrix() {
 
 		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+	}
+
+	/**
+	 * Adds a range of data in the data texture to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
 
 	}
 
@@ -20118,6 +20147,15 @@ class Mesh extends Object3D {
 		 */
 		this.morphTargetInfluences = undefined;
 
+		/**
+		 * The number of instances of this mesh.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
 		this.updateMorphTargets();
 
 	}
@@ -24066,6 +24104,15 @@ class Sprite extends Object3D {
 		 * @default (0.5,0.5)
 		 */
 		this.center = new Vector2( 0.5, 0.5 );
+
+		/**
+		 * The number of instances of this sprite.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
 
 	}
 
@@ -48397,6 +48444,8 @@ const TEXTURE_FILTER = {
 	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
 
+const _errorMap = new WeakMap();
+
 /**
  * A loader for loading images as an [ImageBitmap]{@link https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap}.
  * An `ImageBitmap` provides an asynchronous and resource efficient pathway to prepare
@@ -48407,7 +48456,7 @@ const TEXTURE_FILTER = {
  *
  * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
  *
- * Also note that unlike {@link FileLoader}, this loader does not avoid multiple concurrent requests to the same URL.
+ * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
@@ -48507,15 +48556,27 @@ class ImageBitmapLoader extends Loader {
 
 				cached.then( imageBitmap => {
 
-					if ( onLoad ) onLoad( imageBitmap );
+					// check if there is an error for the cached promise
 
-					scope.manager.itemEnd( url );
+					if ( _errorMap.has( cached ) === true ) {
 
-				} ).catch( e => {
+						if ( onError ) onError( _errorMap.get( cached ) );
 
-					if ( onError ) onError( e );
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if ( onLoad ) onLoad( imageBitmap );
+
+						scope.manager.itemEnd( url );
+
+						return imageBitmap;
+
+					}
 
 				} );
+
 				return;
 
 			}
@@ -48558,6 +48619,8 @@ class ImageBitmapLoader extends Loader {
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
+
+			_errorMap.set( promise, e );
 
 			Cache.remove( url );
 
