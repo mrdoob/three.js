@@ -108,7 +108,6 @@ class AnalyticLightNode extends LightingNode {
 	 * Returns a node representing a direction vector which points from the current
 	 * position in view space to the light's position in view space.
 	 *
-	 * @abstract
 	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
 	 * @return {Node<vec3>} The light vector node.
 	 */
