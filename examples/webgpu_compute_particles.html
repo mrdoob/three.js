@@ -46,7 +46,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const particleCount = 500_000;
+			const particleCount = 200_000;
 
 			const gravity = uniform( - .00098 );
 			const bounce = uniform( .8 );
@@ -70,7 +70,7 @@
 				const { innerWidth, innerHeight } = window;
 
 				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 1000 );
-				camera.position.set( 0, 10, 30 );
+				camera.position.set( 0, 5, 20 );
 
 				scene = new THREE.Scene();
 
@@ -96,12 +96,9 @@
 					
 					position.x = offset.sub( x ).mul( separation );
 					position.z = offset.sub( z ).mul( separation );
-					
-					const randX = hash( instanceIndex );
-					const randY = hash( instanceIndex.add( 2 ) );
-					const randZ = hash( instanceIndex.add( 3 ) );
-					
-					color.assign( vec3( randX, randY.mul( 0.5 ), randZ ) );
+
+					color.x = hash( instanceIndex );
+					color.y = hash( instanceIndex.add( 2 ) );
 
 				} )().compute( particleCount );
 
@@ -151,10 +148,10 @@
 
 				//
 
-				const helper = new THREE.GridHelper( 60, 40, 0x303030, 0x303030 );
+				const helper = new THREE.GridHelper( 90, 45, 0x303030, 0x303030 );
 				scene.add( helper );
 
-				const geometry = new THREE.PlaneGeometry( 1000, 1000 );
+				const geometry = new THREE.PlaneGeometry( 200, 200 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				const plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
@@ -178,7 +175,7 @@
 
 				renderer.computeAsync( computeInit );
 
-				// click event
+				// Hit
 
 				const computeHit = Fn( () => {
 
@@ -206,7 +203,7 @@
 
 					raycaster.setFromCamera( pointer, camera );
 
-					const intersects = raycaster.intersectObjects( [ plane ], false );
+					const intersects = raycaster.intersectObject( plane, false );
 
 					if ( intersects.length > 0 ) {
 
@@ -225,30 +222,20 @@
 
 				}
 
-				// events
-
 				renderer.domElement.addEventListener( 'pointermove', onMove );
 
-				//
+				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 				controls.minDistance = 5;
 				controls.maxDistance = 200;
 				controls.target.set( 0, -8, 0 );
 				controls.update();
 				
-				controls.addEventListener( 'start', function () {
-					
-					isOrbitControlsActive = true;
-					
-				} );
-				
-				controls.addEventListener( 'end', function () {
-					
-					isOrbitControlsActive = false;
-					
-				} );
-				
+				controls.addEventListener( 'start', () => { isOrbitControlsActive = true; } );
+				controls.addEventListener( 'end', () => { isOrbitControlsActive = false; } );
+
 				controls.touches = {
 					ONE: null,
 					TWO: THREE.TOUCH.DOLLY_PAN
@@ -283,6 +270,8 @@
 			async function animate() {
 
 				stats.update();
+
+				controls.update();
 
 				await renderer.computeAsync( computeParticles );
 				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
