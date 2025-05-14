@@ -214,6 +214,7 @@ class RenderTarget extends EventDispatcher {
 		if ( options.mapping !== undefined ) values.mapping = options.mapping;
 		if ( options.wrapS !== undefined ) values.wrapS = options.wrapS;
 		if ( options.wrapT !== undefined ) values.wrapT = options.wrapT;
+		if ( options.wrapR !== undefined ) values.wrapR = options.wrapR;
 		if ( options.magFilter !== undefined ) values.magFilter = options.magFilter;
 		if ( options.minFilter !== undefined ) values.minFilter = options.minFilter;
 		if ( options.format !== undefined ) values.format = options.format;
