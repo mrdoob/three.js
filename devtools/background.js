@@ -32,8 +32,6 @@ chrome.runtime.onConnect.addListener( port => {
 		if ( tabId ) {
 
 			connections.delete( tabId );
-			// Clear badge if devtools panel is closed for this tab
-			chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => { /* Tab might be gone */ } );
 
 		}
 
