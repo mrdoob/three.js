@@ -202,7 +202,7 @@ class Nodes extends DataMap {
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
 				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
 				nodeBuilder.clippingContext = renderObject.clippingContext;
-				if ( this.renderer.getRenderTarget() ? this.renderer.getRenderTarget().multiview : false ) {
+				if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
 
 					nodeBuilder.enableMultiview();
 
@@ -410,6 +410,7 @@ class Nodes extends DataMap {
 			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
 			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
+			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
 			cacheKeyData.callId = callId;
