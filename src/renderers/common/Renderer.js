@@ -2226,6 +2226,21 @@ class Renderer {
 	}
 
 	/**
+	 * Resets the renderer to the initial state before WebXR started.
+	 *
+	 */
+	XRResetState() {
+
+		this.backend.setXRTarget( null );
+		this.setOutputRenderTarget( null );
+		this.setRenderTarget( null );
+
+		this._frameBufferTarget.dispose();
+		this._frameBufferTarget = null;
+
+	}
+
+	/**
 	 * Callback for {@link Renderer#setRenderObjectFunction}.
 	 *
 	 * @callback renderObjectFunction
