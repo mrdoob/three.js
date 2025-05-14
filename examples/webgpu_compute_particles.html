@@ -144,7 +144,7 @@
 				material.alphaTestNode = uv().mul( 2 ).distance( vec2( 1 ) );
 				material.transparent = false;
 
-				const particles = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				const particles = new THREE.Sprite( material );
 				particles.count = particleCount;
 				particles.frustumCulled = false;
 				scene.add( particles );
