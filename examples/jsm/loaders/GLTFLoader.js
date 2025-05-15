@@ -405,7 +405,7 @@ class GLTFLoader extends Loader {
 	}
 
 	/**
-	 * Parses the given FBX data and returns the resulting group.
+	 * Parses the given glTF data and returns the generated data to `onLoad`, with the root Object3D in the `.scene` property.
 	 *
 	 * @param {string|ArrayBuffer} data - The raw glTF data.
 	 * @param {string} path - The URL base path.
@@ -619,7 +619,8 @@ const EXTENSIONS = {
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 	EXT_TEXTURE_AVIF: 'EXT_texture_avif',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
-	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing'
+	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing',
+	GODOT_SINGLE_ROOT: 'GODOT_single_root',
 };
 
 /**
@@ -4479,18 +4480,28 @@ class GLTFParser {
 
 		const extensions = this.extensions;
 		const sceneDef = this.json.scenes[ sceneIndex ];
-		const parser = this;
-
-		// Loader returns Group, not Scene.
-		// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
-		const scene = new Group();
-		if ( sceneDef.name ) scene.name = parser.createUniqueName( sceneDef.name );
-
-		assignExtrasToUserData( scene, sceneDef );
-
-		if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
-
 		const nodeIds = sceneDef.nodes || [];
+		const parser = this;
+		const extensionsUsed = this.json.extensionsUsed;
+		const isSingleRoot = Array.isArray( extensionsUsed ) ? extensionsUsed.includes( EXTENSIONS.GODOT_SINGLE_ROOT ) : false;
+
+		let scene;
+		if ( isSingleRoot ) {
+
+			if ( nodeIds.length !== 1 ) {
+				throw new Error( 'THREE.GLTFLoader: glTF file with the single root flag must have exactly one scene root node. File is invalid.' );
+			}
+
+		} else {
+			// Loader returns Group, not Scene.
+			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
+			scene = new Group();
+			if ( sceneDef.name ) scene.name = parser.createUniqueName( sceneDef.name );
+
+			assignExtrasToUserData( scene, sceneDef );
+
+			if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
+		}
 
 		const pending = [];
 
@@ -4502,9 +4513,17 @@ class GLTFParser {
 
 		return Promise.all( pending ).then( function ( nodes ) {
 
-			for ( let i = 0, il = nodes.length; i < il; i ++ ) {
+			if ( isSingleRoot ) {
 
-				scene.add( nodes[ i ] );
+				scene = nodes[ 0 ];
+
+			} else {
+
+				for ( let i = 0, il = nodes.length; i < il; i ++ ) {
+
+					scene.add( nodes[ i ] );
+
+				}
 
 			}
 
