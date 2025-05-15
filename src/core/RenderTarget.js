@@ -294,12 +294,7 @@ class RenderTarget extends EventDispatcher {
 				this.textures[ i ].image.width = width;
 				this.textures[ i ].image.height = height;
 				this.textures[ i ].image.depth = depth;
-
-				if ( this.textures[ i ].image.depth > 1 ) {
-
-					this.textures[ i ].isArrayTexture = true;
-
-				}
+				this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
 
 			}
 

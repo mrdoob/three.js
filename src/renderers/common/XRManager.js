@@ -786,6 +786,8 @@ class XRManager extends EventDispatcher {
 		const quaternionObject = new Quaternion();
 
 		const wasPresenting = this.isPresenting;
+		const rendererOutputTarget = this._renderer.getOutputRenderTarget();
+		const rendererFramebufferTarget = this._renderer._frameBufferTarget;
 		this.isPresenting = false;
 
 		for ( const layer of this._layers ) {
@@ -804,6 +806,8 @@ class XRManager extends EventDispatcher {
 					glSubImage.colorTexture,
 					glSubImage.depthStencilTexture );
 
+				this._renderer.setOutputRenderTarget( layer.renderTarget );
+
 			}
 
 			this._renderer.setRenderTarget( layer.renderTarget );
@@ -813,6 +817,8 @@ class XRManager extends EventDispatcher {
 
 		this.isPresenting = wasPresenting;
 		this._renderer.setRenderTarget( null );
+		this._renderer.setOutputRenderTarget( rendererOutputTarget );
+		this._renderer._frameBufferTarget = rendererFramebufferTarget;
 
 	}
 
