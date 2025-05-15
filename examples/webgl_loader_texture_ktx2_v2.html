@@ -27,6 +27,10 @@
 				padding: 3em 0 0 0;
 			}
 
+			section {
+				padding: 1em;
+			}
+
 			#c {
 				position: absolute;
 				left: 0;
@@ -83,29 +87,41 @@
 
 			const scenes = [];
 
-			const textures = [
-				// 2D uncompressed
-				{ path: '2d_rgba8.ktx2' },
-				{ path: '2d_rgba8_linear.ktx2' },
-				// '2d_rgba8_displayp3.ktx2',
-				{ path: '2d_rgba16_linear.ktx2' },
-				{ path: '2d_rgba32_linear.ktx2' },
+			const sections = [
+				{
+					title: 'Uncompressed',
+					description: 'Lorem ipsum dolorem...',
+					textures: [
+						{ path: '2d_rgba8.ktx2' },
+						{ path: '2d_rgba8_linear.ktx2' },
+						// { path: '2d_rgba8_displayp3.ktx2' },
+						{ path: '2d_rgba16_linear.ktx2' },
+						{ path: '2d_rgba32_linear.ktx2' },
+						// { path: '3d_rgba8.ktx2', supported: false }
+					]
+				},
+				{
+					title: 'Compressed',
+					description: 'Lorem ipsum dolorem...',
+					textures: [
+						{ path: '2d_astc4x4.ktx2' },
+						{ path: '2d_bc1.ktx2' },
+						{ path: '2d_bc3.ktx2' },
+						// { path: '2d_bc5.ktx2', supported: false },
+						// { path: '2d_bc7.ktx2', supported: false },
+						// { path: '2d_etc1.ktx2', supported: false },
+						// { path: '2d_etc2.ktx2', supported: false },
+					]
+				},
 
-				// 2D compressed
-				{ path: '2d_astc4x4.ktx2' },
-				{ path: '2d_bc1.ktx2' },
-				{ path: '2d_bc3.ktx2' },
-				{ path: '2d_bc5.ktx2', supported: false },
-				{ path: '2d_bc7.ktx2', supported: false },
-				// '2d_etc1.ktx2',
-				// '2d_etc2.ktx2',
-
-				// 2D universal
-				{ path: '2d_etc1s.ktx2' },
-				{ path: '2d_uastc.ktx2' },
-
-				// 3D uncompressed
-				// '3d_rgba8.ktx2'
+				{
+					title: 'Universal',
+					description: 'Lorem ipsum dolorem...',
+					textures: [
+						{ path: '2d_etc1s.ktx2' },
+						{ path: '2d_uastc.ktx2' },
+					]
+				},
 			]
 
 			init();
@@ -127,56 +143,72 @@
 
 				const content = document.getElementById( 'content' );
 
-				for ( const { path, supported } of textures ) {
+				for ( const section of sections ) {
 
-					const scene = new THREE.Scene();
+					const sectionElement = document.createElement( 'section' );
 
-					// make a list item
-					const element = document.createElement( 'div' );
-					element.className = 'list-item';
+					const sectionHeader = document.createElement( 'h2' );
+					sectionHeader.textContent = section.title;
+					sectionElement.appendChild( sectionHeader );
 
-					const sceneElement = document.createElement( 'div' );
-					element.appendChild( sceneElement );
+					const sectionDescription = document.createElement( 'p' );
+					sectionDescription.textContent = section.description;
+					sectionElement.appendChild( sectionDescription );
 
-					const descriptionElement = document.createElement( 'div' );
-					descriptionElement.innerText = path
-					element.appendChild( descriptionElement );
+					for ( const { path, supported } of section.textures ) {
 
-					// the element that represents the area we want to render the scene
-					scene.userData.element = sceneElement;
-					content.appendChild( element );
+						const scene = new THREE.Scene();
 
-					const camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
-					camera.position.z = 2;
-					scene.userData.camera = camera;
+						// make a list item
+						const element = document.createElement( 'div' );
+						element.className = 'list-item';
 
-					let subject;
+						const sceneElement = document.createElement( 'div' );
+						element.appendChild( sceneElement );
 
-					try {
+						const labelElement = document.createElement( 'div' );
+						labelElement.innerText = path
+						element.appendChild( labelElement );
 
-						const texture = await loader.loadAsync( supported === false ? 'missing_three_support.ktx2' : path );
+						// the element that represents the area we want to render the scene
+						scene.userData.element = sceneElement;
+						sectionElement.appendChild( element );
 
-						if ( texture.isCubeTexture || texture.isArrayTexture ) {
+						const camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
+						camera.position.z = 2;
+						scene.userData.camera = camera;
 
-							subject = new TextureHelper( texture );
+						let subject;
 
-						} else {
+						try {
 
-							subject = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({ map: texture }) )
+							const texture = await loader.loadAsync( supported === false ? 'missing_three_support.ktx2' : path );
+
+							if ( texture.isCubeTexture || texture.isArrayTexture ) {
+
+								subject = new TextureHelper( texture );
+
+							} else {
+
+								subject = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({ map: texture }) )
+
+							}
+
+						} catch (e) {
+
+							console.error( `Failed to load ${path}`, e );
+
+							subject = new THREE.Object3D(); // TODO: Display visible error.
 
 						}
 
-					} catch (e) {
+						scene.add( subject );
 
-						console.error( `Failed to load ${path}`, e );
-
-						subject = new THREE.Object3D(); // TODO: Display visible error.
+						scenes.push( scene );
 
 					}
 
-					scene.add( subject );
-
-					scenes.push( scene );
+					content.appendChild( sectionElement );
 
 				}
 
