@@ -124,7 +124,7 @@
 				const roughness = uniform( .9 );
 				const radius = uniform( 0.2 );
 
-				const reflection = reflector( { resolution: .25, depth: true, bounces: false } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolution: .5, depth: true, bounces: false } ); // 0.5 is half of the rendering view
 				const reflectionDepth = reflection.getDepthNode();
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
