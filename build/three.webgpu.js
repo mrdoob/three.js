@@ -37345,6 +37345,7 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+const _hashData = [];
 
 /**
  * This node represents the scene's lighting and manages the lighting model's life cycle
@@ -37434,27 +37435,31 @@ class LightsNode extends Node {
 	 */
 	customCacheKey() {
 
-		const hashData = [];
 		const lights = this._lights;
 
 		for ( let i = 0; i < lights.length; i ++ ) {
 
 			const light = lights[ i ];
 
-			hashData.push( light.id );
+			_hashData.push( light.id );
+			_hashData.push( light.castShadow ? 1 : 0 );
 
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : -1;
 				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : -1;
 
-				hashData.push( hashMap, hashColorNode );
+				_hashData.push( hashMap, hashColorNode );
 
 			}
 
 		}
 
-		return hashArray( hashData );
+		const cacheKey = hashArray( _hashData );
+
+		_hashData.length = 0;
+
+		return cacheKey;
 
 	}
 
@@ -39422,24 +39427,19 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
-	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
-	 * `light.id` and `light.castShadow` into the cache key.
-	 *
-	 * @return {number} The custom cache key.
-	 */
-	customCacheKey() {
-
-		return hash$1( this.light.id, this.light.castShadow ? 1 : 0 );
-
-	}
-
 	getHash() {
 
 		return this.light.uuid;
 
 	}
 
+	/**
+	 * Returns a node representing a direction vector which points from the current
+	 * position in view space to the light's position in view space.
+	 *
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Node<vec3>} The light vector node.
+	 */
 	getLightVector( builder ) {
 
 		return lightViewPosition( this.light ).sub( builder.context.positionView || positionView );
@@ -49665,6 +49665,8 @@ class XRManager extends EventDispatcher {
 		const quaternionObject = new Quaternion();
 
 		const wasPresenting = this.isPresenting;
+		const rendererOutputTarget = this._renderer.getOutputRenderTarget();
+		const rendererFramebufferTarget = this._renderer._frameBufferTarget;
 		this.isPresenting = false;
 
 		for ( const layer of this._layers ) {
@@ -49683,6 +49685,8 @@ class XRManager extends EventDispatcher {
 					glSubImage.colorTexture,
 					glSubImage.depthStencilTexture );
 
+				this._renderer.setOutputRenderTarget( layer.renderTarget );
+
 			}
 
 			this._renderer.setRenderTarget( layer.renderTarget );
@@ -49692,6 +49696,8 @@ class XRManager extends EventDispatcher {
 
 		this.isPresenting = wasPresenting;
 		this._renderer.setRenderTarget( null );
+		this._renderer.setOutputRenderTarget( rendererOutputTarget );
+		this._renderer._frameBufferTarget = rendererFramebufferTarget;
 
 	}
 
@@ -62285,7 +62291,11 @@ class WebGLBackend extends Backend {
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
-						if ( isRenderTarget3D || isRenderTargetArray ) {
+						if ( renderTarget.multiview ) {
+
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
+
+						} else if ( isRenderTarget3D || isRenderTargetArray ) {
 
 							const layer = this.renderer._activeCubeFace;
 
@@ -62293,11 +62303,7 @@ class WebGLBackend extends Backend {
 
 						} else {
 
-							if ( renderTarget.multiview ) {
-
-								multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
-
-							} else if ( hasExternalTextures && useMultisampledRTT ) {
+							if ( hasExternalTextures && useMultisampledRTT ) {
 
 								multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
