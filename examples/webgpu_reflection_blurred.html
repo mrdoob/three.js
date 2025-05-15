@@ -124,7 +124,7 @@
 				const roughness = uniform( .9 );
 				const radius = uniform( 0.2 );
 
-				const reflection = reflector( { resolution: 1, depth: true, bounces: false } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolution: .25, depth: true, bounces: false } ); // 0.5 is half of the rendering view
 				const reflectionDepth = reflection.getDepthNode();
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
@@ -141,6 +141,7 @@
 					// blur the reflection
 
 					const reflectionBlurred = hashBlur( reflection, radiusRange, {
+						repeats: 40,
 						mask: reflectionDepth,
 						premultipliedAlpha: true
 					} );
@@ -183,6 +184,7 @@
 				gui = new GUI();
 				gui.add( roughness, 'value', 0, 1 ).name( 'roughness' );
 				gui.add( radius, 'value', 0, 1 ).name( 'radius' );
+				gui.add( reflection.reflector, 'resolution', .25, 1 ).name( 'resolution' );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
