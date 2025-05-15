@@ -37,6 +37,7 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 		 * @type {DataArrayTexture}
 		 */
 		this.texture = new DataArrayTexture( null, width, height, depth );
+		this._setTextureOptions( options );
 
 		this.texture.isRenderTargetTexture = true;
 
