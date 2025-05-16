@@ -2563,7 +2563,7 @@ class Renderer {
 	 * @param {number} y - The `y` coordinate of the copy region's origin.
 	 * @param {number} width - The width of the copy region.
 	 * @param {number} height - The height of the copy region.
-	 * @param {number} [textureIndex=0] - The texture index of a MRT render target.
+	 * @param {number} [textureIndex=0] - The texture index of an MRT render target.
 	 * @param {number} [faceIndex=0] - The active cube face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
 	 */
