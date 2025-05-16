@@ -827,7 +827,7 @@ function buildCamera( camera ) {
  *
  * @typedef {Object} USDZExporter~Options
  * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
- * @property {boolean} [includeAnchoringProperties=false] - Whether to include anchoring properties or not.
+ * @property {boolean} [includeAnchoringProperties=true] - Whether to include anchoring properties or not.
  * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
  * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
  * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook
