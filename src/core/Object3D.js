@@ -1246,7 +1246,7 @@ class Object3D extends EventDispatcher {
 			};
 
 			output.metadata = {
-				version: 4.6,
+				version: 4.7,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
