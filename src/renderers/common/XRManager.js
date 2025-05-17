@@ -637,6 +637,8 @@ class XRManager extends EventDispatcher {
 				resolveStencilBuffer: false
 			} );
 
+		renderTarget.autoAllocateDepthBuffer = true;
+
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
 		material.map = renderTarget.texture;
 		material.map.offset.y = 1;
@@ -726,6 +728,8 @@ class XRManager extends EventDispatcher {
 				resolveStencilBuffer: false
 			} );
 
+		renderTarget.autoAllocateDepthBuffer = true;
+
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
 		material.map = renderTarget.texture;
 		material.map.offset.y = 1;
@@ -794,7 +798,6 @@ class XRManager extends EventDispatcher {
 
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget.hasExternalTextures = layer.renderTarget.isXRRenderTarget;
-			layer.renderTarget.autoAllocateDepthBuffer = ! layer.renderTarget.isXRRenderTarget;
 
 			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
 
@@ -804,13 +807,17 @@ class XRManager extends EventDispatcher {
 				this._renderer.backend.setXRRenderTargetTextures(
 					layer.renderTarget,
 					glSubImage.colorTexture,
-					glSubImage.depthStencilTexture );
+					undefined );
 
 				this._renderer.setOutputRenderTarget( layer.renderTarget );
+				this._renderer.setRenderTarget( null );
+
+			} else {
+
+				this._renderer.setRenderTarget( layer.renderTarget );
 
 			}
 
-			this._renderer.setRenderTarget( layer.renderTarget );
 			layer.rendercall();
 
 		}
@@ -1442,7 +1449,6 @@ function createXRLayer( layer ) {
 
 		return this._glBinding.createQuadLayer( {
 			transform: new XRRigidTransform( layer.translation, layer.quaternion ),
-			depthFormat: this._gl.DEPTH_COMPONENT,
 			width: layer.width / 2,
 			height: layer.height / 2,
 			space: this._referenceSpace,
@@ -1454,7 +1460,6 @@ function createXRLayer( layer ) {
 
 		return this._glBinding.createCylinderLayer( {
 			transform: new XRRigidTransform( layer.translation, layer.quaternion ),
-			depthFormat: this._gl.DEPTH_COMPONENT,
 			radius: layer.radius,
 			centralAngle: layer.centralAngle,
 			aspectRatio: layer.aspectRatio,
