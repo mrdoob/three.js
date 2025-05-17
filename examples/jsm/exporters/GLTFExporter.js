@@ -2408,6 +2408,9 @@ class GLTFWriter {
 
 		if ( object.isSkinnedMesh ) this.skins.push( object );
 
+		const nodeIndex = json.nodes.push( nodeDef ) - 1;
+		nodeMap.set( object, nodeIndex );
+
 		if ( object.children.length > 0 ) {
 
 			const children = [];
@@ -2418,9 +2421,9 @@ class GLTFWriter {
 
 				if ( child.visible || options.onlyVisible === false ) {
 
-					const nodeIndex = await this.processNodeAsync( child );
+					const childNodeIndex = await this.processNodeAsync( child );
 
-					if ( nodeIndex !== null ) children.push( nodeIndex );
+					if ( childNodeIndex !== null ) children.push( childNodeIndex );
 
 				}
 
@@ -2436,8 +2439,6 @@ class GLTFWriter {
 
 		} );
 
-		const nodeIndex = json.nodes.push( nodeDef ) - 1;
-		nodeMap.set( object, nodeIndex );
 		return nodeIndex;
 
 	}
