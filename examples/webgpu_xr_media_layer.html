@@ -34,6 +34,9 @@
 
 			import * as THREE from 'three';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			let camera, scene, renderer;
 
@@ -49,8 +52,12 @@
 
 				} );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.layers.enable( 1 ); // render left view when no stereo available
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 2000 );
+				
+				camera.layers.enable( 1 );
+				camera.target = new THREE.Vector3(0, 0, 0);
+				camera.rotation.reorder('YXZ');
+                camera.layers.enable(1);
 
 				// video
 
@@ -61,7 +68,7 @@
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x101010 );
+				scene.background = new THREE.Color( 0x505050 );
 
 				// left
 
@@ -93,9 +100,10 @@
 
 				}
 			
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, multiview: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true,  colorBufferType: THREE.UnsignedByteType, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor(0x000, 1);
 				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
@@ -107,34 +115,17 @@
 
 				scene.add(mediaLayer);
 
-				renderer.xr.addEventListener("sessionstart", async () => {
-					const session = renderer.xr.getSession();
-					
-					if (renderer.xr._supportsLayers) {
-						mediaLayer.children.forEach(mesh => mesh.layers.disableAll());
-					}
-					
-					if (session.supportedFrameRates) {
-						console.log("supported framerates ", session.supportedFrameRates);
-						session.addEventListener('frameratechange', (event) => {
-							console.log("XRFrame rate is now " + session.frameRate)
-						});
+				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989, 3 ) );
 
-						session.updateTargetFrameRate(session.supportedFrameRates[session.supportedFrameRates.length - 1]).then((() => {
-								
-						})).catch(console.warn)
-					}
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				light.position.set( 1, 1, 1 ).normalize();
+				scene.add( light );
 
-					
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.update();
+
 
 				
-				});
-
-				renderer.xr.addEventListener("sessionend", async () => {
-					mediaLayer.children.forEach(mesh => mesh.layers.enableAll());
-				});
-
-				renderer.setClearColor(0x000, 1);
 				texture.anisotropy = renderer.backend.capabilities.getMaxAnisotropy();
 
 				container.appendChild( renderer.domElement );
@@ -145,7 +136,72 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				const controller1 = renderer.xr.getController( 0 );
+
+				controller1.addEventListener( 'connected', function ( event ) {
+
+					this.add( buildController( event.data ) );
+
+				} );
+				controller1.addEventListener( 'disconnected', function () {
+
+					this.remove( this.children[ 0 ] );
+
+				} );
+				scene.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
+
+				controller2.addEventListener( 'connected', function ( event ) {
+
+					this.add( buildController( event.data ) );
+
+				} );
+				controller2.addEventListener( 'disconnected', function () {
+
+					this.remove( this.children[ 0 ] );
+
+				} );
+				scene.add( controller2 );
+
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
 			}
+
+			function buildController( data ) {
+
+				let geometry, material;
+
+				switch ( data.targetRayMode ) {
+
+					case 'tracked-pointer':
+
+						geometry = new THREE.BufferGeometry();
+						geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+						geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
+
+						material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
+
+						return new THREE.Line( geometry, material );
+
+					case 'gaze':
+
+						geometry = new THREE.RingGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
+						return new THREE.Mesh( geometry, material );
+
+					}
+
+				}
 
 			function onWindowResize() {
 

@@ -1027,11 +1027,16 @@ class XRManager extends EventDispatcher {
 
 						} );
 
+						//disable 2D media mesh layers to be replaced with native media layers
+						for ( const mediaLayer of this._mediaLayers ) {
+
+							mediaLayer.group.children.forEach( mesh => mesh.layers.disableAll() );
+
+						}
+
 					}
 
 				}
-
-				//console.log("created layers ", [ ...this._createdMediaLayers, ...layersArray ]);
 
 				session.updateRenderState( { layers: [ ...this._createdMediaLayers, ...layersArray ] } );
 
@@ -1414,6 +1419,13 @@ function onSessionEnd() {
 			layer.plane.material = layer.material;
 			layer.material.map = layer.renderTarget.texture;
 			delete layer.xrlayer;
+
+		}
+
+		//reenable 2D media mesh layers on session end
+		for ( const mediaLayer of this._mediaLayers ) {
+
+			mediaLayer.group.children.forEach( mesh => mesh.layers.enableAll() );
 
 		}
 
