@@ -4489,10 +4489,13 @@ class GLTFParser {
 		if ( isSingleRoot ) {
 
 			if ( nodeIds.length !== 1 ) {
+
 				throw new Error( 'THREE.GLTFLoader: glTF file with the single root flag must have exactly one scene root node. File is invalid.' );
+
 			}
 
 		} else {
+
 			// Loader returns Group, not Scene.
 			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
 			scene = new Group();
@@ -4501,6 +4504,7 @@ class GLTFParser {
 			assignExtrasToUserData( scene, sceneDef );
 
 			if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
+
 		}
 
 		const pending = [];
