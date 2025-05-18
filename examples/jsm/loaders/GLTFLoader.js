@@ -405,7 +405,7 @@ class GLTFLoader extends Loader {
 	}
 
 	/**
-	 * Parses the given glTF data and returns the generated data to `onLoad`, with the root Object3D in the `.scene` property.
+	 * Parses the given glTF data and returns the generated data to `onLoad`.
 	 *
 	 * @param {string|ArrayBuffer} data - The raw glTF data.
 	 * @param {string} path - The URL base path.
