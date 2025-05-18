@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-	<title>three.js - WebGPU - Compute Cloth</title>
+	<title>three.js webgpu - compute cloth</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,7 +8,7 @@
 <body>
 
 <div id="info">
-	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute - Cloth<br/>
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - compute cloth<br/>
 	Simple cloth simulation with a verlet system running in compute shaders
 </div>
 
@@ -27,7 +27,7 @@
 
 	import * as THREE from 'three';
 
-	import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, varying, vec3, cross, triNoise3D, time } from 'three/tsl';
+	import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, vec3, cross, triNoise3D, time } from 'three/tsl';
 
 	import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -461,8 +461,7 @@
 			sheenColor: new THREE.Color( 0xffffff ),
 		} );
 
-		const vNormal = varying( vec3( 0 ), 'v_normalView' ); // v_normalView is the name of the varying that is used by three's nodeMaterial fragment shading nodes
-		clothMaterial.positionNode = Fn( () => {
+		clothMaterial.positionNode = Fn( ( { material } ) => {
 
 			// gather the position of the 4 verlet vertices and calculate the center position and normal from that
 			const vertexIds = attribute( 'vertexIds' );
@@ -480,7 +479,9 @@
 			const bitangent = bottom.sub( top ).normalize();
 
 			const normal = cross( tangent, bitangent );
-			vNormal.assign( transformNormalToView( normal ) );
+
+			// send the normalView from the vertex shader to the fragment shader
+			material.normalNode = transformNormalToView( normal ).toVertexStage();
 
 			return v0.add( v1 ).add( v2 ).add( v3 ).mul( 0.25 );
 	
