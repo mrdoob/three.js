@@ -481,7 +481,7 @@
 			const normal = cross( tangent, bitangent );
 
 			// send the normalView from the vertex shader to the fragment shader
-			material.normalNode = transformNormalToView( normal ).toVertexStage();
+			material.normalNode = transformNormalToView( normal ).toVarying();
 
 			return v0.add( v1 ).add( v2 ).add( v3 ).mul( 0.25 );
 	
