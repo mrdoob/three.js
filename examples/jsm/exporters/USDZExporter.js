@@ -315,16 +315,16 @@ function buildXform( object, geometry, material ) {
 
 	}
 
-	return `def Xform "${ name }" (
-	prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
-	prepend apiSchemas = ["MaterialBindingAPI"]
-)
-{
-	matrix4d xformOp:transform = ${ transform }
-	uniform token[] xformOpOrder = ["xformOp:transform"]
+	return `			def Xform "${ name }" (
+				prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
+				prepend apiSchemas = ["MaterialBindingAPI"]
+			)
+			{
+				matrix4d xformOp:transform = ${ transform }
+				uniform token[] xformOpOrder = ["xformOp:transform"]
 
-	rel material:binding = </Materials/Material_${ material.id }>
-}
+				rel material:binding = </Materials/Material_${ material.id }>
+			}
 
 `;
 
