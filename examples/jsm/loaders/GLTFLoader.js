@@ -620,7 +620,7 @@ const EXTENSIONS = {
 	EXT_TEXTURE_AVIF: 'EXT_texture_avif',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
 	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing',
-	GODOT_SINGLE_ROOT: 'GODOT_single_root',
+	GODOT_SINGLE_ROOT: 'GODOT_single_root'
 };
 
 /**
