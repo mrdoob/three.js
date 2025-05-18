@@ -41,7 +41,7 @@
 	const clothNumSegmentsY = 30;
 	const sphereRadius = 0.15;
 
-	let vertexPositionBuffer, vertexForceBuffer, vertexSpringCountBuffer, vertexSpringPointerBuffer, vertexIsFixedBuffer;
+	let vertexPositionBuffer, vertexForceBuffer, vertexParamsBuffer;
 	let springVertexIdBuffer, springRestLengthBuffer, springForceBuffer;
 	let springListBuffer;
 	let computeSpringForces, computeVertexForces;
@@ -108,8 +108,9 @@
 
 		window.addEventListener( 'resize', onWindowResize );
 		controls.update();
-		
+	
 		renderer.setAnimationLoop( render );
+
 	}
 
 	function setupVerletGeometry() {
@@ -195,10 +196,12 @@
 		// this is so the compute shader that accumulates the spring forces for each vertex can efficiently iterate over all springs affecting that vertex
 
 		const vertexPositionArray = new Float32Array( vertexCount * 3 );
-		const vertexIsFixedArray = new Uint32Array( vertexCount );
-		const vertexSpringCountArray = new Uint32Array( vertexCount );
-		const vertexSpringPointerArray = new Uint32Array( vertexCount );
-		// the vertexSpringPointerArray will hold the index of the first springId in the springListArray that is affecting that vertex
+		const vertexParamsArray = new Uint32Array( vertexCount * 3 );
+		// the params Array holds three values for each verlet vertex:
+		// x: isFixed, y: springCount, z: springPointer
+		// isFixed is 1 if the verlet is marked as immovable, 0 if not
+		// springCount is the number of springs connected to that vertex
+		// springPointer is the index of the first spring in the springListArray that is connected to that vertex
 
 		for ( let i = 0; i < vertexCount; i ++ ) {
 
@@ -206,24 +209,22 @@
 			vertexPositionArray[ i * 3 ] = vertex.position.x;
 			vertexPositionArray[ i * 3 + 1 ] = vertex.position.y;
 			vertexPositionArray[ i * 3 + 2 ] = vertex.position.z;
-			vertexIsFixedArray[ i ] = vertex.isFixed ? 1 : 0;
+			vertexParamsArray[ i * 3 ] = vertex.isFixed ? 1 : 0;
 			if ( ! vertex.isFixed ) {
 
-				vertexSpringCountArray[ i ] = vertex.springIds.length;
-				vertexSpringPointerArray[ i ] = springListArray.length;
+				vertexParamsArray[ i * 3 + 1 ] = vertex.springIds.length;
+				vertexParamsArray[ i * 3 + 2 ] = springListArray.length;
 				springListArray.push( ...vertex.springIds );
 	
 			}
 	
 		}
 
-		vertexPositionBuffer = instancedArray( vertexPositionArray, 'vec3' );
+		vertexPositionBuffer = instancedArray( vertexPositionArray, 'vec3' ).setPBO( true ); // setPBO(true) is only important for the WebGL Fallback
 		vertexForceBuffer = instancedArray( vertexCount, 'vec3' );
-		vertexSpringCountBuffer = instancedArray( vertexSpringCountArray, 'uint' );
-		vertexSpringPointerBuffer = instancedArray( vertexSpringPointerArray, 'uint' );
-		vertexIsFixedBuffer = instancedArray( vertexIsFixedArray, 'uint' );
+		vertexParamsBuffer = instancedArray( vertexParamsArray, 'uvec3' );
 
-		springListBuffer = instancedArray( new Uint32Array( springListArray ), 'uint' );
+		springListBuffer = instancedArray( new Uint32Array( springListArray ), 'uint' ).setPBO( true );
 
 	}
 
@@ -245,9 +246,9 @@
 	
 		}
 
-		springVertexIdBuffer = instancedArray( springVertexIdArray, 'uvec2' );
+		springVertexIdBuffer = instancedArray( springVertexIdArray, 'uvec2' ).setPBO( true );
 		springRestLengthBuffer = instancedArray( springRestLengthArray, 'float' );
-		springForceBuffer = instancedArray( springCount, 'vec3' );
+		springForceBuffer = instancedArray( springCount * 3, 'vec3' ).setPBO( true );
 
 	}
 
@@ -309,7 +310,11 @@
 	
 			} );
 
-			const isFixed = vertexIsFixedBuffer.element( instanceIndex ).equal( uint( 1 ) );
+			const params = vertexParamsBuffer.element( instanceIndex ).toVar();
+			const isFixed = params.x;
+			const springCount = params.y;
+			const springPointer = params.z;
+
 			If( isFixed, () => {
 
 				// don't need to calculate vertex forces if the vertex is set as immovable
@@ -319,8 +324,6 @@
 
 			const position = vertexPositionBuffer.element( instanceIndex ).toVar( 'vertexPosition' );
 			const force = vertexForceBuffer.element( instanceIndex ).toVar( 'vertexForce' );
-			const springCount = vertexSpringCountBuffer.element( instanceIndex );
-			const springPointer = vertexSpringPointerBuffer.element( instanceIndex );
 
 			force.mulAssign( dampeningUniform );
 
