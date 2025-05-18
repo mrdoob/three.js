@@ -13,7 +13,7 @@ import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
-import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
@@ -228,6 +228,15 @@ class NodeMaterial extends Material {
 		 * @default null
 		 */
 		this.alphaTestNode = null;
+
+
+		/**
+		 * Discards the fragment if the mask value is `false`.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskNode = null;
 
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
@@ -774,6 +783,14 @@ class NodeMaterial extends Material {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
+		// MASK
+
+		if ( this.maskNode !== null ) {
+
+			bool( this.maskNode ).discard();
+
+		}
+
 		// VERTEX COLORS
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
@@ -1194,6 +1211,7 @@ class NodeMaterial extends Material {
 		this.backdropNode = source.backdropNode;
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
+		this.maskNode = source.maskNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;
