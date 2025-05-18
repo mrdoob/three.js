@@ -97,7 +97,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * - EXT_texture_webp
  * - EXT_meshopt_compression
  * - EXT_mesh_gpu_instancing
- * - GODOT_SINGLE_ROOT
+ * - GODOT_single_root
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
