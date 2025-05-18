@@ -4492,7 +4492,7 @@ class GLTFParser {
 
 			if ( nodeIds.length !== 1 ) {
 
-				throw new Error( 'THREE.GLTFLoader: glTF files using the GODOT_SINGLE_ROOT extension must have exactly one scene root node. File is invalid.' );
+				throw new Error( 'THREE.GLTFLoader: glTF files using the GODOT_single_root extension must have exactly one scene root node. File is invalid.' );
 
 			}
 
