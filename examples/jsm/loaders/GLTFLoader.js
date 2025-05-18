@@ -97,6 +97,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * - EXT_texture_webp
  * - EXT_meshopt_compression
  * - EXT_mesh_gpu_instancing
+ * - GODOT_SINGLE_ROOT
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
@@ -4483,14 +4484,15 @@ class GLTFParser {
 		const nodeIds = sceneDef.nodes || [];
 		const parser = this;
 		const extensionsUsed = this.json.extensionsUsed;
-		const isSingleRoot = Array.isArray( extensionsUsed ) ? extensionsUsed.includes( EXTENSIONS.GODOT_SINGLE_ROOT ) : false;
+		const isGodotSingleRoot = Array.isArray( extensionsUsed ) ? extensionsUsed.includes( EXTENSIONS.GODOT_SINGLE_ROOT ) : false;
 
 		let scene;
-		if ( isSingleRoot ) {
+
+		if ( isGodotSingleRoot ) {
 
 			if ( nodeIds.length !== 1 ) {
 
-				throw new Error( 'THREE.GLTFLoader: glTF file with the single root flag must have exactly one scene root node. File is invalid.' );
+				throw new Error( 'THREE.GLTFLoader: glTF files using the GODOT_SINGLE_ROOT extension must have exactly one scene root node. File is invalid.' );
 
 			}
 
@@ -4517,7 +4519,7 @@ class GLTFParser {
 
 		return Promise.all( pending ).then( function ( nodes ) {
 
-			if ( isSingleRoot ) {
+			if ( isGodotSingleRoot ) {
 
 				scene = nodes[ 0 ];
 
