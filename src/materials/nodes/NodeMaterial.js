@@ -782,7 +782,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		// Instanced colors
+		// INSTANCED COLORS
 
 		if ( object.instanceColor ) {
 
@@ -800,7 +800,6 @@ class NodeMaterial extends Material {
 
 		}
 
-
 		// COLOR
 
 		diffuseColor.assign( colorNode );
@@ -812,13 +811,19 @@ class NodeMaterial extends Material {
 
 		// ALPHA TEST
 
+		let alphaTestNode;
+
 		if ( this.alphaTestNode !== null || this.alphaTest > 0 ) {
 
-			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
+			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+		} else {
+
+			alphaTestNode = float( 0 );
 
 		}
+
+		diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
 		// ALPHA HASH
 
