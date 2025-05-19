@@ -1,0 +1,464 @@
+<html lang="en">
+<head>
+	<title>three.js webgpu - compute cloth</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+<body>
+
+<div id="info">
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - fluid particles
+</div>
+
+<script type="importmap">
+	{
+		"imports": {
+			"three": "../build/three.webgpu.js",
+			"three/webgpu": "../build/three.webgpu.js",
+			"three/tsl": "../build/three.tsl.js",
+			"three/addons/": "./jsm/"
+		}
+	}
+</script>
+
+<script type="module">
+
+	import * as THREE from 'three';
+
+	import { Fn, If, Return, instancedArray, instanceIndex, uniform, attribute, uint, float, clamp, struct, atomicStore, int, ivec3, array, vec3, atomicAdd, Loop, atomicLoad, max, pow, mat3, vec4 } from 'three/tsl';
+
+	import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+	import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+	import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+
+	let renderer, scene, camera, controls;
+
+	const clock = new THREE.Clock();
+
+	const maxParticles = 8192 * 16;
+	const gridSize = new THREE.Vector3( 64, 64, 64 );
+	const fixedPointMultiplier = 1e7;
+
+	let particleCountUniform, stiffnessUniform, restDensityUniform, dynamicViscosityUniform, dtUniform, gravityUniform;
+	let particleBuffer, cellBuffer, cellBufferFloat;
+	let clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel;
+	let particleMesh;
+
+	const params = {
+		particleCount: 8192 * 4,
+	};
+
+	init();
+
+	async function init() {
+
+		renderer = new THREE.WebGPURenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		renderer.toneMappingExposure = 1.35;
+		document.body.appendChild( renderer.domElement );
+
+		scene = new THREE.Scene();
+
+		camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.01, 10 );
+		camera.position.set( - 1.6, - 0.1, - 1.6 );
+
+		controls = new OrbitControls( camera, renderer.domElement );
+
+		controls.target.set( 0, - 0.1, 0 );
+		controls.minDistance = 1;
+		controls.maxDistance = 3;
+
+		const rgbeLoader = new RGBELoader().setPath( 'textures/equirectangular/' );
+
+		const hdrTexture = await rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+		hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+		scene.background = hdrTexture;
+		scene.backgroundBlurriness = 0.5;
+		scene.environment = hdrTexture;
+
+		setupParticles();
+
+		const gui = new GUI();
+		gui.add( params, 'particleCount', 8192, maxParticles, 1024 ).onChange( value => {
+
+			p2g1Kernel.count = value;
+			p2g2Kernel.count = value;
+			g2pKernel.count = value;
+			p2g1Kernel.updateDispatchCount();
+			p2g2Kernel.updateDispatchCount();
+			g2pKernel.updateDispatchCount();
+			particleMesh.count = value;
+			particleCountUniform.value = value;
+
+		} );
+
+
+		window.addEventListener( 'resize', onWindowResize );
+		controls.update();
+	
+		renderer.setAnimationLoop( render );
+
+	}
+
+	function setupBuffers() {
+
+		const particleStruct = struct( {
+			position: { type: 'vec3' },
+			mass: { type: 'float' },
+			velocity: { type: 'vec3' },
+			C: { type: 'mat3' },
+		} );
+		const particleStructSize = 20;
+		const particleArray = new Float32Array( maxParticles * particleStructSize );
+
+		for ( let i = 0; i < maxParticles; i ++ ) {
+
+			particleArray[ i * particleStructSize ] = ( Math.random() * 0.8 + 0.1 ) * gridSize.x;
+			particleArray[ i * particleStructSize + 1 ] = ( Math.random() * 0.8 + 0.1 ) * gridSize.y;
+			particleArray[ i * particleStructSize + 2 ] = ( Math.random() * 0.8 + 0.1 ) * gridSize.z;
+			particleArray[ i * particleStructSize + 3 ] = 1.0 - Math.random() * 0.002;
+	
+		}
+
+		particleBuffer = instancedArray( particleArray, particleStruct ).setPBO( true );
+
+		const cellCount = gridSize.x * gridSize.y * gridSize.z;
+
+		const cellStruct = struct( {
+			x: { type: 'int', atomic: true },
+			y: { type: 'int', atomic: true },
+			z: { type: 'int', atomic: true },
+			mass: { type: 'int', atomic: true },
+		} );
+
+		cellBuffer = instancedArray( cellCount, cellStruct ).setPBO( true );
+		cellBufferFloat = instancedArray( cellCount, 'vec4' ).setPBO( true );
+
+	}
+
+	function setupUniforms() {
+
+		particleCountUniform = uniform( params.particleCount, 'uint' );
+		stiffnessUniform = uniform( 3 );
+		restDensityUniform = uniform( 0.5 );
+		dynamicViscosityUniform = uniform( 0.1 );
+		dtUniform = uniform( 1 / 60 );
+		gravityUniform = uniform( new THREE.Vector3( 0, - 9.81, 0 ) );
+
+	}
+
+	function setupComputeShaders() {
+
+		const encodeFixedPoint = ( f32 ) => {
+
+			return int( f32.mul( fixedPointMultiplier ) );
+	
+		};
+
+		const decodeFixedPoint = ( i32 ) => {
+
+			return float( i32 ).div( fixedPointMultiplier );
+	
+		};
+
+		const cellCount = gridSize.x * gridSize.y * gridSize.z;
+		clearGridKernel = Fn( () => {
+
+			If( instanceIndex.greaterThanEqual( uint( cellCount ) ), () => {
+
+				Return();
+	
+			} );
+
+			atomicStore( cellBuffer.element( instanceIndex ).get( 'x' ), 0 );
+			atomicStore( cellBuffer.element( instanceIndex ).get( 'y' ), 0 );
+			atomicStore( cellBuffer.element( instanceIndex ).get( 'z' ), 0 );
+			atomicStore( cellBuffer.element( instanceIndex ).get( 'mass' ), 0 );
+	
+		} )().debug().compute( cellCount );
+
+		p2g1Kernel = Fn( () => {
+
+			If( instanceIndex.greaterThanEqual( particleCountUniform ), () => {
+
+				Return();
+	
+			} );
+			const particlePosition = particleBuffer.element( instanceIndex ).get( 'position' ).toConst( 'particlePosition' );
+			const particleVelocity = particleBuffer.element( instanceIndex ).get( 'velocity' ).toConst( 'particleVelocity' );
+			const C = particleBuffer.element( instanceIndex ).get( 'C' ).toConst( 'C' );
+
+			const cellIndex = ivec3( particlePosition ).sub( 1 ).toConst( 'cellIndex' );
+			const cellDiff = particlePosition.fract().sub( 0.5 ).toConst( 'cellDiff' );
+			const w0 = float( 0.5 ).mul( float( 0.5 ).sub( cellDiff ) ).mul( float( 0.5 ).sub( cellDiff ) );
+			const w1 = float( 0.75 ).sub( cellDiff.mul( cellDiff ) );
+			const w2 = float( 0.5 ).mul( float( 0.5 ).add( cellDiff ) ).mul( float( 0.5 ).add( cellDiff ) );
+			const weights = array( [ w0, w1, w2 ] ).toConst( 'weights' );
+
+			Loop( { start: 0, end: 3, type: 'int', name: 'gx', condition: '<' }, ( { gx } ) => {
+
+				Loop( { start: 0, end: 3, type: 'int', name: 'gy', condition: '<' }, ( { gy } ) => {
+
+					Loop( { start: 0, end: 3, type: 'int', name: 'gz', condition: '<' }, ( { gz } ) => {
+
+						const weight = weights.element( gx ).x.mul( weights.element( gy ).y ).mul( weights.element( gz ).z );
+						const cellX = cellIndex.add( ivec3( gx, gy, gz ) ).toConst();
+						const cellDist = vec3( cellX ).add( 0.5 ).sub( particlePosition ).toConst( 'cellDist' );
+						const Q = C.mul( cellDist );
+
+						const massContrib = weight; // assuming particle mass = 1.0
+						const velContrib = massContrib.mul( particleVelocity.add( Q ) ).toConst( 'velContrib' );
+						const cellPtr = cellX.x.mul( int( gridSize.y * gridSize.z ) ).add( cellX.y.mul( int( gridSize.z ) ) ).add( cellX.z ).toConst();
+						const cell = cellBuffer.element( cellPtr );
+
+						atomicAdd( cell.get( 'x' ), encodeFixedPoint( velContrib.x ) );
+						atomicAdd( cell.get( 'y' ), encodeFixedPoint( velContrib.y ) );
+						atomicAdd( cell.get( 'z' ), encodeFixedPoint( velContrib.z ) );
+						atomicAdd( cell.get( 'mass' ), encodeFixedPoint( massContrib ) );
+	
+					} );
+	
+				} );
+	
+			} );
+	
+		} )().debug().compute( params.particleCount );
+
+		p2g2Kernel = Fn( () => {
+
+			If( instanceIndex.greaterThanEqual( particleCountUniform ), () => {
+
+				Return();
+	
+			} );
+			const particlePosition = particleBuffer.element( instanceIndex ).get( 'position' ).toConst( 'particlePosition' );
+
+			const cellIndex = ivec3( particlePosition ).sub( 1 ).toConst( 'cellIndex' );
+			const cellDiff = particlePosition.fract().sub( 0.5 ).toConst( 'cellDiff' );
+			const w0 = float( 0.5 ).mul( float( 0.5 ).sub( cellDiff ) ).mul( float( 0.5 ).sub( cellDiff ) );
+			const w1 = float( 0.75 ).sub( cellDiff.mul( cellDiff ) );
+			const w2 = float( 0.5 ).mul( float( 0.5 ).add( cellDiff ) ).mul( float( 0.5 ).add( cellDiff ) );
+			const weights = array( [ w0, w1, w2 ] ).toConst( 'weights' );
+
+			const density = float( 0 ).toVar( 'density' );
+			Loop( { start: 0, end: 3, type: 'int', name: 'gx', condition: '<' }, ( { gx } ) => {
+
+				Loop( { start: 0, end: 3, type: 'int', name: 'gy', condition: '<' }, ( { gy } ) => {
+
+					Loop( { start: 0, end: 3, type: 'int', name: 'gz', condition: '<' }, ( { gz } ) => {
+
+						const weight = weights.element( gx ).x.mul( weights.element( gy ).y ).mul( weights.element( gz ).z );
+						const cellX = cellIndex.add( ivec3( gx, gy, gz ) ).toConst();
+						const cellPtr = cellX.x.mul( int( gridSize.y * gridSize.z ) ).add( cellX.y.mul( int( gridSize.z ) ) ).add( cellX.z ).toConst();
+						const cell = cellBuffer.element( cellPtr );
+						const mass = decodeFixedPoint( atomicLoad( cell.get( 'mass' ) ) );
+						density.addAssign( mass.mul( weight ) );
+	
+					} );
+	
+				} );
+	
+			} );
+
+			const volume = float( 1 ).div( density );
+			const pressure = max( 0.0, pow( density.div( restDensityUniform ), 5.0 ).sub( 1 ).mul( stiffnessUniform ) ).toConst( 'pressure' );
+			const stress = mat3( pressure.negate(), 0, 0, 0, pressure.negate(), 0, 0, 0, pressure.negate() ).toVar( 'stress' );
+			const dudv = particleBuffer.element( instanceIndex ).get( 'C' ).toConst( 'C' );
+
+			const strain = dudv.add( dudv.transpose() );
+			stress.addAssign( strain.mul( dynamicViscosityUniform ) );
+			const eq16Term0 = volume.mul( - 4 ).mul( stress ).mul( dtUniform );
+
+			Loop( { start: 0, end: 3, type: 'int', name: 'gx', condition: '<' }, ( { gx } ) => {
+
+				Loop( { start: 0, end: 3, type: 'int', name: 'gy', condition: '<' }, ( { gy } ) => {
+
+					Loop( { start: 0, end: 3, type: 'int', name: 'gz', condition: '<' }, ( { gz } ) => {
+
+						const weight = weights.element( gx ).x.mul( weights.element( gy ).y ).mul( weights.element( gz ).z );
+						const cellX = cellIndex.add( ivec3( gx, gy, gz ) ).toConst();
+						const cellDist = vec3( cellX ).add( 0.5 ).sub( particlePosition ).toConst( 'cellDist' );
+						const momentum = eq16Term0.mul( weight ).mul( cellDist ).toConst( 'momentum' );
+
+						const cellPtr = cellX.x.mul( int( gridSize.y * gridSize.z ) ).add( cellX.y.mul( int( gridSize.z ) ) ).add( cellX.z ).toConst();
+						const cell = cellBuffer.element( cellPtr );
+						atomicAdd( cell.get( 'x' ), encodeFixedPoint( momentum.x ) );
+						atomicAdd( cell.get( 'y' ), encodeFixedPoint( momentum.y ) );
+						atomicAdd( cell.get( 'z' ), encodeFixedPoint( momentum.z ) );
+	
+					} );
+	
+				} );
+	
+			} );
+	
+		} )().debug().compute( params.particleCount );
+
+		updateGridKernel = Fn( () => {
+
+			If( instanceIndex.greaterThanEqual( uint( cellCount ) ), () => {
+
+				Return();
+	
+			} );
+			const cell = cellBuffer.element( instanceIndex );
+			const mass = decodeFixedPoint( atomicLoad( cell.get( 'mass' ) ) ).toConst();
+			If( mass.lessThanEqual( 0 ), () => {
+
+				Return();
+
+			} );
+
+			const vx = decodeFixedPoint( atomicLoad( cell.get( 'x' ) ) ).div( mass ).toVar();
+			const vy = decodeFixedPoint( atomicLoad( cell.get( 'y' ) ) ).div( mass ).toVar();
+			const vz = decodeFixedPoint( atomicLoad( cell.get( 'z' ) ) ).div( mass ).toVar();
+
+			const x = int( instanceIndex ).div( int( gridSize.z * gridSize.y ) );
+			const y = int( instanceIndex ).div( int( gridSize.z ) ).mod( int( gridSize.y ) );
+			const z = int( instanceIndex ).mod( int( gridSize.z ) );
+
+			If( x.lessThan( int( 2 ) ).or( x.greaterThan( int( gridSize.x ).sub( int( 2 ) ) ) ), () => {
+
+				vx.assign( 0 );
+	
+			} );
+			If( y.lessThan( int( 2 ) ).or( y.greaterThan( int( gridSize.y ).sub( int( 2 ) ) ) ), () => {
+
+				vy.assign( 0 );
+	
+			} );
+			If( z.lessThan( int( 2 ) ).or( z.greaterThan( int( gridSize.z ).sub( int( 2 ) ) ) ), () => {
+
+				vz.assign( 0 );
+	
+			} );
+
+			cellBufferFloat.element( instanceIndex ).assign( vec4( vx, vy, vz, mass ) );
+	
+		} )().debug().compute( cellCount );
+
+		g2pKernel = Fn( () => {
+
+			If( instanceIndex.greaterThanEqual( particleCountUniform ), () => {
+
+				Return();
+	
+			} );
+			const particleMass = particleBuffer.element( instanceIndex ).get( 'mass' ).toConst( 'particleMass' );
+			const particlePosition = particleBuffer.element( instanceIndex ).get( 'position' ).toVar( 'particlePosition' );
+			const particleVelocity = vec3( 0 ).toVar();
+
+			particleVelocity.addAssign( gravityUniform.mul( dtUniform ) );
+
+			const cellIndex = ivec3( particlePosition ).sub( 1 ).toConst( 'cellIndex' );
+			const cellDiff = particlePosition.fract().sub( 0.5 ).toConst( 'cellDiff' );
+
+			const w0 = float( 0.5 ).mul( float( 0.5 ).sub( cellDiff ) ).mul( float( 0.5 ).sub( cellDiff ) );
+			const w1 = float( 0.75 ).sub( cellDiff.mul( cellDiff ) );
+			const w2 = float( 0.5 ).mul( float( 0.5 ).add( cellDiff ) ).mul( float( 0.5 ).add( cellDiff ) );
+			const weights = array( [ w0, w1, w2 ] ).toConst( 'weights' );
+
+			const B = mat3( 0 ).toVar( 'B' );
+			Loop( { start: 0, end: 3, type: 'int', name: 'gx', condition: '<' }, ( { gx } ) => {
+
+				Loop( { start: 0, end: 3, type: 'int', name: 'gy', condition: '<' }, ( { gy } ) => {
+
+					Loop( { start: 0, end: 3, type: 'int', name: 'gz', condition: '<' }, ( { gz } ) => {
+
+						const weight = weights.element( gx ).x.mul( weights.element( gy ).y ).mul( weights.element( gz ).z );
+						const cellX = cellIndex.add( ivec3( gx, gy, gz ) ).toConst();
+						const cellDist = vec3( cellX ).add( 0.5 ).sub( particlePosition ).toConst( 'cellDist' );
+						const cellPtr = cellX.x.mul( int( gridSize.y * gridSize.z ) ).add( cellX.y.mul( int( gridSize.z ) ) ).add( cellX.z ).toConst();
+
+						const weightedVelocity = cellBufferFloat.element( cellPtr ).xyz.mul( weight ).toConst( 'weightedVelocity' );
+						const term = mat3(
+							weightedVelocity.mul( cellDist.x ),
+							weightedVelocity.mul( cellDist.y ),
+							weightedVelocity.mul( cellDist.z )
+						);
+						B.addAssign( term );
+						particleVelocity.addAssign( weightedVelocity );
+	
+					} );
+	
+				} );
+	
+			} );
+
+			particleVelocity.mulAssign( particleMass ); // to ensure difference between particles
+
+			particleBuffer.element( instanceIndex ).get( 'C' ).assign( B.mul( 4 ) );
+			particlePosition.addAssign( particleVelocity.mul( dtUniform ) );
+			particlePosition.assign( clamp( particlePosition, vec3( 2 ), vec3( gridSize ).sub( 1 ) ) );
+
+			const wallStiffness = 0.3;
+			const xN = particlePosition.add( particleVelocity.mul( dtUniform ).mul( 3.0 ) ).toConst( 'xN' );
+			const wallMin = vec3( 3 ).toConst( 'wallMin' );
+			const wallMax = vec3( gridSize ).sub( 3 ).toConst( 'wallMax' );
+			particleVelocity.addAssign( wallMin.sub( xN ).max( 0.0 ).mul( wallStiffness ) );
+			particleVelocity.addAssign( wallMax.sub( xN ).min( 0.0 ).mul( wallStiffness ) );
+
+			particleBuffer.element( instanceIndex ).get( 'position' ).assign( particlePosition );
+			particleBuffer.element( instanceIndex ).get( 'velocity' ).assign( particleVelocity );
+	
+		} )().debug().compute( params.particleCount );
+
+	}
+
+	function setupMesh() {
+
+		const geometry = BufferGeometryUtils.mergeVertices( new THREE.IcosahedronGeometry( 0.5, 1 ) );
+		console.log( geometry );
+		const material = new THREE.MeshStandardNodeMaterial( {} );
+		material.positionNode = Fn( () => {
+
+			const particlePosition = particleBuffer.element( instanceIndex ).get( 'position' );
+			return attribute( 'position' ).add( particlePosition );
+	
+		} )();
+		particleMesh = new THREE.Mesh( geometry, material );
+		particleMesh.count = params.particleCount;
+		particleMesh.scale.multiplyScalar( 1 / 64 );
+		particleMesh.frustumCulled = false;
+		scene.add( particleMesh );
+
+	}
+
+	function setupParticles() {
+
+		setupBuffers();
+		setupUniforms();
+		setupComputeShaders();
+		setupMesh();
+
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
+
+	async function render() {
+
+		const deltaTime = Math.min( clock.getDelta(), 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
+		dtUniform.value = deltaTime;
+
+		await renderer.computeAsync( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
+
+		await renderer.renderAsync( scene, camera );
+
+	}
+
+
+</script>
+</body>
+</html>
