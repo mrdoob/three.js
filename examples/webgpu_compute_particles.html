@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, If, uniform, float, uv, vec2, vec3, hash,
+			import { Fn, If, uniform, float, uv, vec2, vec3, hash, shapeCircle,
 				instancedArray, instanceIndex } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -133,13 +133,14 @@
 				computeParticles = computeUpdate().compute( particleCount );
 
 				// create particles
-				
+
 				const material = new THREE.SpriteNodeMaterial();
 				material.colorNode = uv().mul( colors.element( instanceIndex ) );
 				material.positionNode = positions.toAttribute();
 				material.scaleNode = size;
-				material.alphaTestNode = uv().mul( 2 ).distance( vec2( 1 ) );
-				material.transparent = false;
+				material.opacityNode = shapeCircle();
+				material.alphaToCoverage = true;
+				material.transparent = true;
 
 				const particles = new THREE.Sprite( material );
 				particles.count = particleCount;
