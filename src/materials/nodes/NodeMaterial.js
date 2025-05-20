@@ -455,7 +455,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const vertexNode = this.vertexNode || this.setupVertex( builder );
+		const mvp = this.setupVertex( builder );
+
+		const vertexNode = this.vertexNode || mvp;
 
 		builder.stack.outputNode = vertexNode;
 
