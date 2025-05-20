@@ -26,7 +26,7 @@
 
 	import * as THREE from 'three';
 
-	import { Fn, If, Return, instancedArray, instanceIndex, uniform, attribute, uint, float, clamp, struct, atomicStore, int, ivec3, array, vec3, atomicAdd, Loop, atomicLoad, max, pow, mat3, vec4 } from 'three/tsl';
+	import { Fn, If, Return, instancedArray, instanceIndex, uniform, attribute, uint, float, clamp, struct, atomicStore, int, ivec3, array, vec3, atomicAdd, Loop, atomicLoad, max, pow, mat3, vec4, cross } from 'three/tsl';
 
 	import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -38,13 +38,17 @@
 	const clock = new THREE.Clock();
 
 	const maxParticles = 8192 * 16;
-	const gridSize = new THREE.Vector3( 64, 64, 64 );
+	const gridSize1d = 64;
+	const gridSize = new THREE.Vector3( gridSize1d, gridSize1d, gridSize1d );
 	const fixedPointMultiplier = 1e7;
 
 	let particleCountUniform, stiffnessUniform, restDensityUniform, dynamicViscosityUniform, dtUniform, gravityUniform;
 	let particleBuffer, cellBuffer, cellBufferFloat;
 	let clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel;
 	let particleMesh;
+	const mouseCoord = new THREE.Vector3();
+	const prevMouseCoord = new THREE.Vector3();
+	let mouseRayOriginUniform, mouseRayDirectionUniform, mouseVelocityUniform;
 
 	const params = {
 		particleCount: 8192 * 4,
@@ -64,11 +68,11 @@
 		scene = new THREE.Scene();
 
 		camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.01, 10 );
-		camera.position.set( - 1.6, - 0.1, - 1.6 );
+		camera.position.set( - 1.6, 1.6, - 1.6 );
 
 		controls = new OrbitControls( camera, renderer.domElement );
 
-		controls.target.set( 0, - 0.1, 0 );
+		//controls.target.set( 0, - 0.1, 0 );
 		controls.minDistance = 1;
 		controls.maxDistance = 3;
 
@@ -147,7 +151,12 @@
 		restDensityUniform = uniform( 0.5 );
 		dynamicViscosityUniform = uniform( 0.1 );
 		dtUniform = uniform( 1 / 60 );
-		gravityUniform = uniform( new THREE.Vector3( 0, - 9.81, 0 ) );
+		gravityUniform = uniform( new THREE.Vector3( 0, - (9.81 * 9.81), 0 ) );
+		mouseRayOriginUniform = uniform( new THREE.Vector3( 0, 0, 0 ) );
+		mouseRayDirectionUniform = uniform( new THREE.Vector3( 0, 0, 0 ) );
+
+
+		mouseVelocityUniform = uniform( new THREE.Vector3( 0, 0, 0 ) );
 
 	}
 
@@ -352,8 +361,6 @@
 			const particlePosition = particleBuffer.element( instanceIndex ).get( 'position' ).toVar( 'particlePosition' );
 			const particleVelocity = vec3( 0 ).toVar();
 
-			particleVelocity.addAssign( gravityUniform.mul( dtUniform ) );
-
 			const cellIndex = ivec3( particlePosition ).sub( 1 ).toConst( 'cellIndex' );
 			const cellDiff = particlePosition.fract().sub( 0.5 ).toConst( 'cellDiff' );
 
@@ -391,6 +398,12 @@
 
 			particleVelocity.mulAssign( particleMass ); // to ensure difference between particles
 
+			particleVelocity.addAssign( gravityUniform.mul( dtUniform ) );
+
+			const dist = cross(mouseRayDirectionUniform, particlePosition.sub(mouseRayOriginUniform)).length();
+			const force = dist.mul(0.05).oneMinus().max(0.0);
+			particleVelocity.addAssign(mouseVelocityUniform.mul(force));
+
 			particleBuffer.element( instanceIndex ).get( 'C' ).assign( B.mul( 4 ) );
 			particlePosition.addAssign( particleVelocity.mul( dtUniform ) );
 			particlePosition.assign( clamp( particlePosition, vec3( 2 ), vec3( gridSize ).sub( 1 ) ) );
@@ -422,10 +435,34 @@
 		} )();
 		particleMesh = new THREE.Mesh( geometry, material );
 		particleMesh.count = params.particleCount;
-		particleMesh.scale.multiplyScalar( 1 / 64 );
+		particleMesh.scale.multiplyScalar( 1 / gridSize1d );
+		particleMesh.position.set(-0.5, 0, -0.5);
 		particleMesh.frustumCulled = false;
 		scene.add( particleMesh );
 
+	}
+
+	function setupMouse() {
+		const raycaster = new THREE.Raycaster();
+		const raycastPlane = new THREE.Plane(new THREE.Vector3( 0, 1, 0 ) );
+
+		const onMove = ( event ) => {
+
+			const pointer = new THREE.Vector2( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+			raycaster.setFromCamera( pointer, camera );
+			raycaster.ray.origin.x += 0.5;
+			raycaster.ray.origin.z += 0.5;
+			raycaster.ray.origin.multiplyScalar( gridSize1d );
+			mouseRayOriginUniform.value.copy(raycaster.ray.origin);
+			mouseRayDirectionUniform.value.copy(raycaster.ray.direction);
+
+			raycaster.ray.intersectPlane(raycastPlane, mouseCoord);
+
+		};
+
+		// events
+
+		renderer.domElement.addEventListener( 'pointermove', onMove );
 	}
 
 	function setupParticles() {
@@ -434,6 +471,7 @@
 		setupUniforms();
 		setupComputeShaders();
 		setupMesh();
+		setupMouse();
 
 	}
 
@@ -449,8 +487,11 @@
 
 	async function render() {
 
-		const deltaTime = Math.min( clock.getDelta(), 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
+		const deltaTime = THREE.MathUtils.clamp(clock.getDelta(), 0.00001, 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
 		dtUniform.value = deltaTime;
+
+		mouseVelocityUniform.value.copy(mouseCoord).sub(prevMouseCoord).multiplyScalar(2);
+		prevMouseCoord.copy(mouseCoord);
 
 		await renderer.computeAsync( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
 
