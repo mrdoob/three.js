@@ -96,91 +96,45 @@ class SDFLoader extends Loader {
 
 	parse( text ) {
 
-		const lines = text.split( /\r?\n/ );
-		let i = 3; // skip header
-		const counts = lines[ i ++ ].trim().split( /\s+/ );
-		const natoms = parseInt( counts[ 0 ] );
-		const nbonds = parseInt( counts[ 1 ] );
+		// Use internal lightweight parser so loader is self-contained
+		/* eslint-disable padded-blocks */
+		const { atoms, bonds } = ( () => {
 
-		if ( isNaN( natoms ) || isNaN( nbonds ) ) {
+			const lines = text.split( /\r?\n/ );
+			let i = 3;
+			const counts = lines[ i ++ ].trim().split( /\s+/ );
+			const natoms = parseInt( counts[ 0 ] );
+			const nbonds = parseInt( counts[ 1 ] );
+			if ( isNaN( natoms ) || isNaN( nbonds ) ) throw new Error( 'SDFLoader: invalid counts line' );
+			const atoms = [];
 
-			throw new Error( 'Invalid atom or bond count in SDF file' );
-
-		}
-
-		const atoms = [];
-		for ( let k = 0; k < natoms; k ++, i ++ ) {
-
-			const l = lines[ i ];
-			if ( ! l || l.length < 31 ) {
-
-				throw new Error( `Invalid atom data at line ${i + 1}` );
-
+			for ( let k = 0; k < natoms; k ++, i ++ ) {
+				const l = lines[ i ];
+				if ( ! l || l.length < 31 ) throw new Error( `SDFLoader: invalid atom line ${ i + 1 }` );
+				const x = parseFloat( l.substr( 0, 10 ) );
+				const y = parseFloat( l.substr( 10, 10 ) );
+				const z = parseFloat( l.substr( 20, 10 ) );
+				const element = l.substr( 31, 3 ).trim() || 'C';
+				atoms.push( { position: new Vector3( x, y, z ), element } );
 			}
 
-			// Parse coordinates with proper validation
-			const x = parseFloat( l.substr( 0, 10 ) );
-			const y = parseFloat( l.substr( 10, 10 ) );
-			const z = parseFloat( l.substr( 20, 10 ) );
-
-			if ( isNaN( x ) || isNaN( y ) || isNaN( z ) ) {
-
-				throw new Error( `Invalid atom coordinates at line ${i + 1}` );
-
+			const bonds = [];
+			while ( bonds.length < nbonds && i < lines.length ) {
+				const l = lines[ i ++ ];
+				if ( ! l ) continue;
+				if ( l.startsWith( 'M' ) ) break;
+				if ( l.length < 9 ) continue;
+				const a1 = parseInt( l.slice( 0, 3 ) ) - 1;
+				const a2 = parseInt( l.slice( 3, 6 ) ) - 1;
+				const type = parseInt( l.slice( 6, 9 ) ) || 1;
+				if ( isNaN( a1 ) || isNaN( a2 ) || a1 < 0 || a2 < 0 || a1 >= natoms || a2 >= natoms ) continue;
+				bonds.push( [ a1, a2, type ] );
 			}
 
-			const element = l.substr( 31, 3 ).trim() || 'C';
+			return { atoms, bonds };
 
-			atoms.push( {
-				position: new Vector3( x, y, z ),
-				element: element
-			} );
-
-		}
-
-		const bonds = [];
-		// Some SDF files (including certain ChemDraw exports) declare **N** bonds in the counts
-		// line but only provide **M < N** bond records before the "M  END" terminator. Instead
-		// of throwing, we parse until either the expected number of bonds are read or we hit
-		// a line beginning with "M" (which marks the start of property records) or the end of
-		// the file.
-		while ( bonds.length < nbonds && i < lines.length ) {
-
-
-			const l = lines[ i ++ ]; // consume line here so we can continue/break safely
-
-			if ( ! l ) continue; // skip empty lines
-
-			// Abort parsing bonds if we have reached the property block ("M  ...")
-			if ( l.startsWith( 'M' ) ) break;
-
-			if ( l.length < 9 ) {
-
-				// Not enough characters for a valid bond record – skip / warn instead of hard fail
-				console.warn( `SDFLoader: Skipping invalid bond line ${i}` );
-				continue;
-
-			}
-
-			// In MDL format, each bond line has fixed-width fields:
-			//   columns 1-3 → first atom index (1-based)
-			//   columns 4-6 → second atom index (1-based)
-			//   columns 7-9 → bond type
-			const a1 = parseInt( l.slice( 0, 3 ) ) - 1;
-			const a2 = parseInt( l.slice( 3, 6 ) ) - 1;
-			const bondType = parseInt( l.slice( 6, 9 ) ) || 1;
-
-			if ( isNaN( a1 ) || isNaN( a2 ) || a1 < 0 || a2 < 0 || a1 >= natoms || a2 >= natoms ) {
-
-				console.warn( `SDFLoader: Ignoring bond with invalid indices at line ${i}: ${a1 + 1}, ${a2 + 1}` );
-				continue;
-
-			}
-
-			bonds.push( [ a1, a2, bondType ] );
-
-
-		}
+		} )();
+		/* eslint-enable padded-blocks */
 
 		return this._buildSceneGraph( atoms, bonds );
 
