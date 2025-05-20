@@ -12,8 +12,12 @@ import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.j
 
 function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
 
-	assert.ok( refVector.x - rayDirection.x <= Number.EPSILON && refVector.y - rayDirection.y <= Number.EPSILON && refVector.z - rayDirection.z <= Number.EPSILON, 'camera is pointing to' +
-		' the same direction as expected' );
+	assert.ok(
+		refVector.x - rayDirection.x <= Number.EPSILON &&
+		refVector.y - rayDirection.y <= Number.EPSILON &&
+		refVector.z - rayDirection.z <= Number.EPSILON,
+		'camera is pointing to the same direction as expected'
+	);
 
 }
 
@@ -141,7 +145,7 @@ export default QUnit.module( 'Core', () => {
 
 			const raycaster = new Raycaster();
 			const rayDirection = raycaster.ray.direction;
-			const camera = new PerspectiveCamera( 90, 1, 1, 1000 );
+			const camera = new PerspectiveCamera( 90, 1, 0.1, 1000 );
 
 			raycaster.setFromCamera( {
 				x: 0,
