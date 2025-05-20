@@ -13,6 +13,7 @@ const refreshUniforms = [
 	'anisotropyMap',
 	'anisotropyRotation',
 	'aoMap',
+	'aoMapIntensity',
 	'attenuationColor',
 	'attenuationDistance',
 	'bumpMap',
@@ -25,8 +26,10 @@ const refreshUniforms = [
 	'dispersion',
 	'displacementMap',
 	'emissive',
+	'emissiveIntensity',
 	'emissiveMap',
 	'envMap',
+	'envMapIntensity',
 	'gradientMap',
 	'ior',
 	'iridescence',
@@ -34,6 +37,7 @@ const refreshUniforms = [
 	'iridescenceMap',
 	'iridescenceThicknessMap',
 	'lightMap',
+	'lightMapIntensity',
 	'map',
 	'matcap',
 	'metalness',
@@ -1906,7 +1910,7 @@ class Node extends EventDispatcher {
 				type,
 				meta,
 				metadata: {
-					version: 4.6,
+					version: 4.7,
 					type: 'Node',
 					generator: 'Node.toJSON'
 				}
@@ -17551,6 +17555,15 @@ class NodeMaterial extends Material {
 		 */
 		this.alphaTestNode = null;
 
+
+		/**
+		 * Discards the fragment if the mask value is `false`.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskNode = null;
+
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
 		 * attribute data, morphing or skinning. This node property allows to overwrite
@@ -17768,7 +17781,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const vertexNode = this.vertexNode || this.setupVertex( builder );
+		const mvp = this.setupVertex( builder );
+
+		const vertexNode = this.vertexNode || mvp;
 
 		builder.stack.outputNode = vertexNode;
 
@@ -18096,6 +18111,14 @@ class NodeMaterial extends Material {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
+		// MASK
+
+		if ( this.maskNode !== null ) {
+
+			bool( this.maskNode ).discard();
+
+		}
+
 		// VERTEX COLORS
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
@@ -18104,7 +18127,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		// Instanced colors
+		// INSTANCED COLORS
 
 		if ( object.instanceColor ) {
 
@@ -18122,7 +18145,6 @@ class NodeMaterial extends Material {
 
 		}
 
-
 		// COLOR
 
 		diffuseColor.assign( colorNode );
@@ -18134,13 +18156,19 @@ class NodeMaterial extends Material {
 
 		// ALPHA TEST
 
+		let alphaTestNode;
+
 		if ( this.alphaTestNode !== null || this.alphaTest > 0 ) {
 
-			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
+			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+		} else {
+
+			alphaTestNode = float( 0 );
 
 		}
+
+		diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
 		// ALPHA HASH
 
@@ -18511,6 +18539,7 @@ class NodeMaterial extends Material {
 		this.backdropNode = source.backdropNode;
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
+		this.maskNode = source.maskNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;
@@ -39731,18 +39760,19 @@ const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
  */
 const shapeCircle = Fn( ( [ coord = uv() ], { renderer, material } ) => {
 
-	const alpha = float( 1 ).toVar();
 	const len2 = lengthSq( coord.mul( 2 ).sub( 1 ) );
+
+	let alpha;
 
 	if ( material.alphaToCoverage && renderer.samples > 1 ) {
 
 		const dlen = float( len2.fwidth() ).toVar();
 
-		alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+		alpha = smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus();
 
 	} else {
 
-		len2.greaterThan( 1.0 ).discard();
+		alpha = select( len2.greaterThan( 1.0 ), 0, 1 );
 
 	}
 
@@ -49516,6 +49546,8 @@ class XRManager extends EventDispatcher {
 				resolveStencilBuffer: false
 			} );
 
+		renderTarget.autoAllocateDepthBuffer = true;
+
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
 		material.map = renderTarget.texture;
 		material.map.offset.y = 1;
@@ -49605,6 +49637,8 @@ class XRManager extends EventDispatcher {
 				resolveStencilBuffer: false
 			} );
 
+		renderTarget.autoAllocateDepthBuffer = true;
+
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
 		material.map = renderTarget.texture;
 		material.map.offset.y = 1;
@@ -49673,7 +49707,6 @@ class XRManager extends EventDispatcher {
 
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget.hasExternalTextures = layer.renderTarget.isXRRenderTarget;
-			layer.renderTarget.autoAllocateDepthBuffer = ! layer.renderTarget.isXRRenderTarget;
 
 			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
 
@@ -49683,13 +49716,17 @@ class XRManager extends EventDispatcher {
 				this._renderer.backend.setXRRenderTargetTextures(
 					layer.renderTarget,
 					glSubImage.colorTexture,
-					glSubImage.depthStencilTexture );
+					undefined );
 
 				this._renderer.setOutputRenderTarget( layer.renderTarget );
+				this._renderer.setRenderTarget( null );
+
+			} else {
+
+				this._renderer.setRenderTarget( layer.renderTarget );
 
 			}
 
-			this._renderer.setRenderTarget( layer.renderTarget );
 			layer.rendercall();
 
 		}
@@ -50321,7 +50358,6 @@ function createXRLayer( layer ) {
 
 		return this._glBinding.createQuadLayer( {
 			transform: new XRRigidTransform( layer.translation, layer.quaternion ),
-			depthFormat: this._gl.DEPTH_COMPONENT,
 			width: layer.width / 2,
 			height: layer.height / 2,
 			space: this._referenceSpace,
@@ -50333,7 +50369,6 @@ function createXRLayer( layer ) {
 
 		return this._glBinding.createCylinderLayer( {
 			transform: new XRRigidTransform( layer.translation, layer.quaternion ),
-			depthFormat: this._gl.DEPTH_COMPONENT,
 			radius: layer.radius,
 			centralAngle: layer.centralAngle,
 			aspectRatio: layer.aspectRatio,
