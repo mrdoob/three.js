@@ -59,11 +59,13 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 		// If three.js is detected, show a badge
 		if ( message.name === 'register' && message.detail && message.detail.revision ) {
 
-			const revision = String( parseInt( message.detail.revision, 10 ) );
+			const revision = String( message.detail.revision );
+			const number = revision.replace( /\D+$/, '' );
+			const isDev = revision.includes( 'dev' );
 
-			chrome.action.setBadgeText( { tabId: tabId, text: revision } ).catch( () => { /* Tab might be gone */ } );
+			chrome.action.setBadgeText( { tabId: tabId, text: number } ).catch( () => { /* Tab might be gone */ } );
 			chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => { /* Tab might be gone */ } );
-			chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: '#049ef4' } ).catch( () => { /* Tab might be gone */ } );
+			chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: isDev ? '#ff0098' : '#049ef4' } ).catch( () => { /* Tab might be gone */ } );
 
 		}
 
