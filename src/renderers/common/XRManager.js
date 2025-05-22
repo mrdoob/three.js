@@ -807,7 +807,6 @@ class XRManager extends EventDispatcher {
 
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget.hasExternalTextures = layer.renderTarget.isXRRenderTarget;
-			renderer.setSize( layer.renderTarget.width, layer.renderTarget.height, false, false );
 
 			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
 
@@ -819,7 +818,7 @@ class XRManager extends EventDispatcher {
 					glSubImage.colorTexture,
 					undefined );
 
-
+				renderer._setXRLayerSize( layer.renderTarget.width, layer.renderTarget.height );
 				renderer.setOutputRenderTarget( layer.renderTarget );
 				renderer.setRenderTarget( null );
 				renderer._frameBufferTarget = null;
@@ -854,7 +853,7 @@ class XRManager extends EventDispatcher {
 		renderer.setRenderTarget( null );
 		renderer.setOutputRenderTarget( rendererOutputTarget );
 		renderer._frameBufferTarget = rendererFramebufferTarget;
-		renderer.setSize( rendererSize.x, rendererSize.y, false, false );
+		renderer._setXRLayerSize( rendererSize.x, rendererSize.y );
 		renderer._quad = rendererQuad;
 		this.isPresenting = wasPresenting;
 
@@ -954,7 +953,7 @@ class XRManager extends EventDispatcher {
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+				renderer._setXRLayerSize( glProjLayer.textureWidth, glProjLayer.textureHeight );
 
 				const depth = this._useMultiview ? 2 : 1;
 				const depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, depth );
