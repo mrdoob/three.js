@@ -2,6 +2,7 @@ import StorageInstancedBufferAttribute from '../../renderers/common/StorageInsta
 import StorageBufferAttribute from '../../renderers/common/StorageBufferAttribute.js';
 import { storage } from './StorageBufferNode.js';
 import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
+import { DataUtils } from '../../extras/DataUtils.js';
 
 /**
  * TSL function for creating a storage buffer node with a configured `StorageBufferAttribute`.
@@ -18,7 +19,7 @@ export const attributeArray = ( count, type = 'float' ) => {
 
 	if ( type.isStruct === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = DataUtils.alignTo4ByteBoundary( type.layout.getLength() );
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
@@ -50,7 +51,7 @@ export const instancedArray = ( count, type = 'float' ) => {
 
 	if ( type.isStruct === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = DataUtils.alignTo4ByteBoundary( type.layout.getLength() );
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
