@@ -19,7 +19,7 @@ export const attributeArray = ( count, type = 'float' ) => {
 
 	if ( type.isStruct === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = DataUtils.alignTo4ByteBoundary( type.layout.getLength() );
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
@@ -29,9 +29,7 @@ export const attributeArray = ( count, type = 'float' ) => {
 
 	}
 
-	const alignmentItemSize = DataUtils.alignTo4ByteBoundary( itemSize );
-
-	const buffer = new StorageBufferAttribute( count, alignmentItemSize, typedArray );
+	const buffer = new StorageBufferAttribute( count, itemSize, typedArray );
 	const node = storage( buffer, type, count );
 
 	return node;
@@ -53,7 +51,7 @@ export const instancedArray = ( count, type = 'float' ) => {
 
 	if ( type.isStruct === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = DataUtils.alignTo4ByteBoundary( type.layout.getLength() );
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
@@ -63,9 +61,7 @@ export const instancedArray = ( count, type = 'float' ) => {
 
 	}
 
-	const alignmentItemSize = DataUtils.alignTo4ByteBoundary( itemSize );
-
-	const buffer = new StorageInstancedBufferAttribute( count, alignmentItemSize, typedArray );
+	const buffer = new StorageInstancedBufferAttribute( count, itemSize, typedArray );
 	const node = storage( buffer, type, count );
 
 	return node;
