@@ -176,6 +176,7 @@ const exceptionList = [
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles',
+	'webgpu_compute_particles_fluid',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_particles_snow',
 	'webgpu_compute_points'
