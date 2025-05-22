@@ -1,6 +1,7 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
+import { DataUtils } from '../../../extras/DataUtils.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -113,7 +114,7 @@ class WebGPUAttributeUtils {
 
 			}
 
-			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+			const size = DataUtils.alignTo4ByteBoundary( array.byteLength );
 
 			buffer = device.createBuffer( {
 				label: bufferAttribute.name,

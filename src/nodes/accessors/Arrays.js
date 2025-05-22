@@ -2,6 +2,7 @@ import StorageInstancedBufferAttribute from '../../renderers/common/StorageInsta
 import StorageBufferAttribute from '../../renderers/common/StorageBufferAttribute.js';
 import { storage } from './StorageBufferNode.js';
 import { getLengthFromType, getTypedArrayFromType } from '../core/NodeUtils.js';
+import { DataUtils } from '../../extras/DataUtils.js';
 
 /**
  * TSL function for creating a storage buffer node with a configured `StorageBufferAttribute`.
@@ -28,7 +29,9 @@ export const attributeArray = ( count, type = 'float' ) => {
 
 	}
 
-	const buffer = new StorageBufferAttribute( count, itemSize, typedArray );
+	const alignmentItemSize = DataUtils.alignTo4ByteBoundary( itemSize );
+
+	const buffer = new StorageBufferAttribute( count, alignmentItemSize, typedArray );
 	const node = storage( buffer, type, count );
 
 	return node;
@@ -60,7 +63,9 @@ export const instancedArray = ( count, type = 'float' ) => {
 
 	}
 
-	const buffer = new StorageInstancedBufferAttribute( count, itemSize, typedArray );
+	const alignmentItemSize = DataUtils.alignTo4ByteBoundary( itemSize );
+
+	const buffer = new StorageInstancedBufferAttribute( count, alignmentItemSize, typedArray );
 	const node = storage( buffer, type, count );
 
 	return node;
