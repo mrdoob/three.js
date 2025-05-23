@@ -1,7 +1,7 @@
 
-import { alignToBoundary } from '../../extras/DataUtils.js';
 import Node from './Node.js';
 import { getLengthFromType } from './NodeUtils.js';
+import { alignToBoundary } from '../../extras/DataUtils.js';
 
 /**
  * Generates a layout for struct members.
