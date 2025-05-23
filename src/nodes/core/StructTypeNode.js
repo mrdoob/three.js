@@ -1,6 +1,6 @@
 
 import Node from './Node.js';
-import { getByteBoundaryFromType, getLengthFromType } from './NodeUtils.js';
+import { getByteBoundaryFromType, getMemoryLengthFromType } from './NodeUtils.js';
 import { GPU_CHUNK_BYTES } from '../../renderers/common/Constants.js';
 
 /**
@@ -93,7 +93,7 @@ class StructTypeNode extends Node {
 
 			const type = member.type;
 
-			const itemSize = getLengthFromType( type );
+			const itemSize = getMemoryLengthFromType( type );
 			const boundary = getByteBoundaryFromType( type );
 
 			// offset within a single chunk in bytes
