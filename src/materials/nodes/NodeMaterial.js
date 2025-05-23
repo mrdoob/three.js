@@ -1,5 +1,5 @@
 import { Material } from '../Material.js';
-import { NoBlending, NormalBlending } from '../../constants.js';
+import { NormalBlending } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../../nodes/core/NodeUtils.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
