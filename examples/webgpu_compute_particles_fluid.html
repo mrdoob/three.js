@@ -156,7 +156,7 @@
 
 		}
 
-		particleBuffer = instancedArray( particleArray, particleStruct ).setPBO( true );
+		particleBuffer = instancedArray( particleArray, particleStruct );
 
 		const cellCount = gridSize.x * gridSize.y * gridSize.z;
 
@@ -167,8 +167,8 @@
 			mass: { type: 'int', atomic: true },
 		} );
 
-		cellBuffer = instancedArray( cellCount, cellStruct ).setPBO( true );
-		cellBufferFloat = instancedArray( cellCount, 'vec4' ).setPBO( true );
+		cellBuffer = instancedArray( cellCount, cellStruct );
+		cellBufferFloat = instancedArray( cellCount, 'vec4' );
 
 	}
 
