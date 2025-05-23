@@ -783,8 +783,6 @@ class NodeMaterial extends Material {
 	 */
 	setupDiffuseColor( { object, geometry } ) {
 
-		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
-
 		// MASK
 
 		if ( this.maskNode !== null ) {
@@ -792,6 +790,10 @@ class NodeMaterial extends Material {
 			bool( this.maskNode ).discard();
 
 		}
+
+		// COLOR
+
+		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
 		// VERTEX COLORS
 
@@ -819,7 +821,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		// COLOR
+		// DIFFUSE COLOR
 
 		diffuseColor.assign( colorNode );
 
@@ -830,19 +832,15 @@ class NodeMaterial extends Material {
 
 		// ALPHA TEST
 
-		let alphaTestNode;
+		let alphaTestNode = null;
 
 		if ( this.alphaTestNode !== null || this.alphaTest > 0 ) {
 
 			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-		} else {
-
-			alphaTestNode = float( 0 );
+			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
 		}
-
-		diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
 		// ALPHA HASH
 
@@ -852,9 +850,17 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
+		// OPAQUE
+
+		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
+
+		if ( isOpaque ) {
 
 			diffuseColor.a.assign( 1.0 );
+
+		} else if ( alphaTestNode === null ) {
+
+			diffuseColor.a.lessThanEqual( 0 ).discard();
 
 		}
 
