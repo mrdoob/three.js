@@ -207,23 +207,6 @@ class DataUtils {
 
 	}
 
-	/**
-	 * Aligns a given byte length to the nearest 4-byte boundary.
-	 *
-	 * This function ensures that the returned byte length is a multiple of 4,
-	 * which is often required for memory alignment in certain systems or formats.
-	 *
-	 * @param {number} byteLength - The original byte length to align.
-	 * @returns {number} The aligned byte length, which is a multiple of 4.
-	 */
-	static alignTo4ByteBoundary( byteLength ) {
-
-		// ensure 4 byte alignment, see #20441
-
-		return byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
-
-	}
-
 }
 
 export {
