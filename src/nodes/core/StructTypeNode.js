@@ -3,8 +3,6 @@ import Node from './Node.js';
 import { getByteBoundaryFromType, getMemoryLengthFromType } from './NodeUtils.js';
 import { GPU_CHUNK_BYTES } from '../../renderers/common/Constants.js';
 
-const alignTo = ( value, alignment ) => Math.ceil( value / alignment ) * alignment;
-
 /**
  * Generates a layout for struct members.
  * This function takes an object representing struct members and returns an array of member layouts.
@@ -89,7 +87,7 @@ class StructTypeNode extends Node {
 	 */
 	getLength() {
 
-		let offset = 0;
+		let offset = 0; // global buffer offset in bytes
 
 		for ( const member of this.membersLayout ) {
 
@@ -98,13 +96,25 @@ class StructTypeNode extends Node {
 			const itemSize = getMemoryLengthFromType( type ) * Float32Array.BYTES_PER_ELEMENT;
 			const boundary = getByteBoundaryFromType( type );
 
-			offset = alignTo( offset, boundary ) + itemSize;
+			const chunkOffset = offset % GPU_CHUNK_BYTES; // offset in the current chunk
+			const chunkPadding = chunkOffset % boundary; // required padding to match boundary
+			const chunkStart = chunkOffset + chunkPadding; // start position in the current chunk for the data
+
+			offset += chunkPadding;
+
+			// Check for chunk overflow
+			if ( chunkStart !== 0 && ( GPU_CHUNK_BYTES - chunkStart ) < itemSize ) {
+
+				// Add padding to the end of the chunk
+				offset += ( GPU_CHUNK_BYTES - chunkStart );
+
+			}
+
+			offset += itemSize;
 
 		}
 
-		const totalAlignedSize = alignTo( offset, GPU_CHUNK_BYTES );
-
-		return totalAlignedSize / Float32Array.BYTES_PER_ELEMENT;
+		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / Float32Array.BYTES_PER_ELEMENT;
 
 	}
 
