@@ -1,4 +1,5 @@
 
+import { alignToBoundary } from '../../extras/DataUtils.js';
 import Node from './Node.js';
 import { getLengthFromType } from './NodeUtils.js';
 
@@ -90,7 +91,9 @@ class StructTypeNode extends Node {
 
 		for ( const member of this.membersLayout ) {
 
-			length += getLengthFromType( member.type );
+			// Align to byte boundary for struct types to ensure proper memory alignment.
+
+			length += alignToBoundary( getLengthFromType( member.type ) );
 
 		}
 

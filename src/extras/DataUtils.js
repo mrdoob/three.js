@@ -160,6 +160,25 @@ function toHalfFloat( val ) {
 }
 
 /**
+ * Aligns a given byte length to the specified boundary alignment.
+ *
+ * Ensures that the resulting byte length is a multiple of the alignment value.
+ * This is useful for maintaining proper memory alignment, which can be critical
+ * for performance and compatibility in certain systems.
+ *
+ * @param {number} byteLength - The original byte length to align.
+ * @param {number} [alignment=4] - The boundary alignment value. Defaults to 4.
+ * @returns {number} The aligned byte length.
+ */
+function alignToBoundary( byteLength, alignment = 4 ) {
+
+	// ensure 4 byte alignment, see #20441
+
+	return byteLength + ( ( alignment - ( byteLength % alignment ) ) % alignment );
+
+}
+
+/**
  * Returns a single precision floating point value (FP32) from the given half
  * precision floating point value (FP16).
  *
@@ -208,19 +227,19 @@ class DataUtils {
 	}
 
 	/**
-	 * Aligns a given byte length to the nearest 4-byte boundary.
+	 * Aligns a given byte length to the specified boundary alignment.
 	 *
-	 * This function ensures that the returned byte length is a multiple of 4,
-	 * which is often required for memory alignment in certain systems or formats.
+	 * Ensures that the resulting byte length is a multiple of the alignment value.
+	 * This is useful for maintaining proper memory alignment, which can be critical
+	 * for performance and compatibility in certain systems.
 	 *
 	 * @param {number} byteLength - The original byte length to align.
-	 * @returns {number} The aligned byte length, which is a multiple of 4.
+	 * @param {number} [alignment=4] - The boundary alignment value. Defaults to 4.
+	 * @returns {number} The aligned byte length.
 	 */
-	static alignTo4ByteBoundary( byteLength ) {
+	static alignToBoundary( byteLength, alignment = 4 ) {
 
-		// ensure 4 byte alignment, see #20441
-
-		return byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
+		return alignToBoundary( byteLength, alignment );
 
 	}
 
@@ -229,5 +248,6 @@ class DataUtils {
 export {
 	toHalfFloat,
 	fromHalfFloat,
+	alignToBoundary,
 	DataUtils
 };
