@@ -160,25 +160,6 @@ function toHalfFloat( val ) {
 }
 
 /**
- * Aligns a given byte length to the specified boundary alignment.
- *
- * Ensures that the resulting byte length is a multiple of the alignment value.
- * This is useful for maintaining proper memory alignment, which can be critical
- * for performance and compatibility in certain systems.
- *
- * @param {number} byteLength - The original byte length to align.
- * @param {number} [alignment=4] - The boundary alignment value.
- * @returns {number} The aligned byte length.
- */
-function alignToBoundary( byteLength, alignment ) {
-
-	// ensure byte alignment, see #20441
-
-	return byteLength + ( ( alignment - ( byteLength % alignment ) ) % alignment );
-
-}
-
-/**
  * Returns a single precision floating point value (FP32) from the given half
  * precision floating point value (FP16).
  *
@@ -226,28 +207,10 @@ class DataUtils {
 
 	}
 
-	/**
-	 * Aligns a given byte length to the specified boundary alignment.
-	 *
-	 * Ensures that the resulting byte length is a multiple of the alignment value.
-	 * This is useful for maintaining proper memory alignment, which can be critical
-	 * for performance and compatibility in certain systems.
-	 *
-	 * @param {number} byteLength - The original byte length to align.
-	 * @param {number} [alignment=4] - The boundary alignment value.
-	 * @returns {number} The aligned byte length.
-	 */
-	static alignToBoundary( byteLength, alignment ) {
-
-		return alignToBoundary( byteLength, alignment );
-
-	}
-
 }
 
 export {
 	toHalfFloat,
 	fromHalfFloat,
-	alignToBoundary,
 	DataUtils
 };
