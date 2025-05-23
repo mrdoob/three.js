@@ -1885,7 +1885,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		this.setMaterials( materials );
+		this.addMaterials( materials );
 
 	}
 
@@ -1907,7 +1907,7 @@ class LDrawLoader extends Loader {
 		fileLoader.load( url, text => {
 
 			// Initializes the materials library with default materials
-			this.setMaterials( [] );
+			this.addDefaultMaterials();
 
 			this.partsCache
 				.parseModel( text )
@@ -1950,13 +1950,35 @@ class LDrawLoader extends Loader {
 
 	setMaterials( materials ) {
 
+		this.clearMaterials();
+		this.addMaterials(materials);
+
+		return this;
+
+	}
+
+	clearMaterials() {
+
 		this.materialLibrary = {};
 		this.materials = [];
+
+		return this;
+
+	}
+
+	addMaterials( materials ) {
+
 		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 			this.addMaterial( materials[ i ] );
 
 		}
+
+		return this;
+
+	}
+
+	addDefaultMaterials() {
 
 		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 		this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ) );
