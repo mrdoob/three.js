@@ -85,7 +85,6 @@
 			import * as THREE from 'three';
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
-			import { TextureHelper } from 'three/addons/helpers/TextureHelper.js';
 
 			let canvas, renderer;
 
@@ -175,7 +174,7 @@
 						element.appendChild( sceneElement );
 
 						const labelElement = document.createElement( 'div' );
-						labelElement.innerText = 'file: ' + path
+						labelElement.innerText = 'file: ' + path;
 						element.appendChild( labelElement );
 
 						// the element that represents the area we want to render the scene
@@ -191,7 +190,7 @@
 							const texture = await loader.loadAsync( supported === false ? 'fail_load.ktx2' : path );
 							const mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({ map: texture }) );
 
-							labelElement.innerText += '\ncolorSpace: ' + texture.colorSpace
+							labelElement.innerText += '\ncolorSpace: ' + texture.colorSpace;
 
 							scene.add( mesh );
 							scenes.push( scene );
