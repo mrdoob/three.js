@@ -852,9 +852,7 @@ class NodeMaterial extends Material {
 
 		// OPAQUE
 
-		const isOpaque =
-			( this.blending === NoBlending ) ||
-			( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false );
+		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
 
 		if ( isOpaque ) {
 
