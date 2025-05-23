@@ -1948,15 +1948,27 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the loader's material library. This method clears existing
+	 * material definitions.
+	 *
+	 * @param {Array<Material>} materials - The materials to set.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	setMaterials( materials ) {
 
 		this.clearMaterials();
-		this.addMaterials(materials);
+		this.addMaterials( materials );
 
 		return this;
 
 	}
 
+	/**
+	 * Clears the loader's material library.
+	 *
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	clearMaterials() {
 
 		this.materialLibrary = {};
@@ -1966,6 +1978,12 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Adds a list of materials to the loader's material library.
+	 *
+	 * @param {Array<Material>} materials - The materials to add.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	addMaterials( materials ) {
 
 		for ( let i = 0, l = materials.length; i < l; i ++ ) {
@@ -1978,6 +1996,11 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Initializes the loader with default materials.
+	 *
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	addDefaultMaterials() {
 
 		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
@@ -2004,6 +2027,12 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Adds a single material to the loader's material library.
+	 *
+	 * @param {Material} material - The material to add.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	addMaterial( material ) {
 
 		// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
