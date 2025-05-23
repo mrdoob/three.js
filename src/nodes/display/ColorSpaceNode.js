@@ -132,7 +132,7 @@ export default ColorSpaceNode;
  * @tsl
  * @function
  * @param {Node} node - Represents the node to convert.
- * @param {string} colorSpace - The target color space.
+ * @param {string} targetColorSpace - The target color space.
  * @returns {ColorSpaceNode}
  */
 export const workingToColorSpace = ( node, targetColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, targetColorSpace ) );
@@ -143,7 +143,7 @@ export const workingToColorSpace = ( node, targetColorSpace ) => nodeObject( new
  * @tsl
  * @function
  * @param {Node} node - Represents the node to convert.
- * @param {string} colorSpace - The source color space.
+ * @param {string} sourceColorSpace - The source color space.
  * @returns {ColorSpaceNode}
  */
 export const colorSpaceToWorking = ( node, sourceColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), sourceColorSpace, WORKING_COLOR_SPACE ) );
