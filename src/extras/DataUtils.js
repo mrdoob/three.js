@@ -167,12 +167,12 @@ function toHalfFloat( val ) {
  * for performance and compatibility in certain systems.
  *
  * @param {number} byteLength - The original byte length to align.
- * @param {number} [alignment=4] - The boundary alignment value. Defaults to 4.
+ * @param {number} [alignment=4] - The boundary alignment value.
  * @returns {number} The aligned byte length.
  */
-function alignToBoundary( byteLength, alignment = 4 ) {
+function alignToBoundary( byteLength, alignment ) {
 
-	// ensure 4 byte alignment, see #20441
+	// ensure byte alignment, see #20441
 
 	return byteLength + ( ( alignment - ( byteLength % alignment ) ) % alignment );
 
@@ -234,10 +234,10 @@ class DataUtils {
 	 * for performance and compatibility in certain systems.
 	 *
 	 * @param {number} byteLength - The original byte length to align.
-	 * @param {number} [alignment=4] - The boundary alignment value. Defaults to 4.
+	 * @param {number} [alignment=4] - The boundary alignment value.
 	 * @returns {number} The aligned byte length.
 	 */
-	static alignToBoundary( byteLength, alignment = 4 ) {
+	static alignToBoundary( byteLength, alignment ) {
 
 		return alignToBoundary( byteLength, alignment );
 

@@ -18,7 +18,7 @@ export const attributeArray = ( count, type = 'float' ) => {
 
 	if ( type.isStruct === true ) {
 
-		itemSize = type.layout.getLength()
+		itemSize = type.layout.getLength();
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
