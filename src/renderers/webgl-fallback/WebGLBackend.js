@@ -472,9 +472,7 @@ class WebGLBackend extends Backend {
 		this._currentContext = renderContext;
 
 		this._setFramebuffer( renderContext );
-
 		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
-
 
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
@@ -546,7 +544,7 @@ class WebGLBackend extends Backend {
 
 			const renderTargetContextData = this.get( renderContext.renderTarget );
 
-			const { samples } = renderContext.renderTarget;
+			const { resolveDepthBuffer, samples } = renderContext.renderTarget;
 
 			if ( samples > 0 && this._useMultisampledExtension( renderContext.renderTarget ) === false ) {
 
@@ -593,8 +591,13 @@ class WebGLBackend extends Backend {
 
 				}
 
-			}
+			} else if ( resolveDepthBuffer === false ) {
 
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				gl.invalidateFramebuffer( gl.DRAW_FRAMEBUFFER, renderTargetContextData.depthInvalidationArray );
+
+			}
 
 		}
 
@@ -2030,6 +2033,7 @@ class WebGLBackend extends Backend {
 				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 				const textures = descriptor.textures;
+				const depthInvalidationArray = [];
 
 				if ( isCube ) {
 
@@ -2089,10 +2093,13 @@ class WebGLBackend extends Backend {
 					const renderbuffer = gl.createRenderbuffer();
 					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0, useMultisampledRTT );
 					renderTargetContextData.xrDepthRenderbuffer = renderbuffer;
+					depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
 				} else {
 
 					if ( descriptor.depthTexture !== null ) {
+
+						depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
 						const textureData = this.get( descriptor.depthTexture );
 						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
@@ -2126,6 +2133,9 @@ class WebGLBackend extends Backend {
 					}
 
 				}
+
+				renderTargetContextData.depthInvalidationArray = depthInvalidationArray;
+
 
 			} else {
 

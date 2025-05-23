@@ -11,6 +11,8 @@ import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat,
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
+import QuadMesh from './QuadMesh.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
@@ -168,6 +170,8 @@ class XRManager extends EventDispatcher {
 		 * @default false
 		 */
 		this._supportsLayers = false;
+
+		this._frameBufferTargets = null;
 
 		/**
 		 * Helper function to create native WebXR Layer.
@@ -788,11 +792,16 @@ class XRManager extends EventDispatcher {
 
 		const translationObject = new Vector3();
 		const quaternionObject = new Quaternion();
+		const renderer = this._renderer;
 
 		const wasPresenting = this.isPresenting;
-		const rendererOutputTarget = this._renderer.getOutputRenderTarget();
-		const rendererFramebufferTarget = this._renderer._frameBufferTarget;
+		const rendererOutputTarget = renderer.getOutputRenderTarget();
+		const rendererFramebufferTarget = renderer._frameBufferTarget;
 		this.isPresenting = false;
+
+		const rendererSize = new Vector2();
+		renderer.getSize( rendererSize );
+		const rendererQuad = renderer._quad;
 
 		for ( const layer of this._layers ) {
 
@@ -804,28 +813,49 @@ class XRManager extends EventDispatcher {
 				layer.xrlayer.transform = new XRRigidTransform( layer.plane.getWorldPosition( translationObject ), layer.plane.getWorldQuaternion( quaternionObject ) );
 
 				const glSubImage = this._glBinding.getSubImage( layer.xrlayer, this._xrFrame );
-				this._renderer.backend.setXRRenderTargetTextures(
+				renderer.backend.setXRRenderTargetTextures(
 					layer.renderTarget,
 					glSubImage.colorTexture,
 					undefined );
 
-				this._renderer.setOutputRenderTarget( layer.renderTarget );
-				this._renderer.setRenderTarget( null );
+				renderer._setXRLayerSize( layer.renderTarget.width, layer.renderTarget.height );
+				renderer.setOutputRenderTarget( layer.renderTarget );
+				renderer.setRenderTarget( null );
+				renderer._frameBufferTarget = null;
+
+				this._frameBufferTargets || ( this._frameBufferTargets = new WeakMap() );
+				const { frameBufferTarget, quad } = this._frameBufferTargets.get( layer.renderTarget ) || { frameBufferTarget: null, quad: null };
+				if ( ! frameBufferTarget ) {
+
+					renderer._quad = new QuadMesh( new NodeMaterial() );
+					this._frameBufferTargets.set( layer.renderTarget, { frameBufferTarget: renderer._getFrameBufferTarget(), quad: renderer._quad } );
+
+				} else {
+
+					renderer._frameBufferTarget = frameBufferTarget;
+					renderer._quad = quad;
+
+				}
+
+				layer.rendercall();
+
+				renderer._frameBufferTarget = null;
 
 			} else {
 
-				this._renderer.setRenderTarget( layer.renderTarget );
+				renderer.setRenderTarget( layer.renderTarget );
+				layer.rendercall();
 
 			}
 
-			layer.rendercall();
-
 		}
 
+		renderer.setRenderTarget( null );
+		renderer.setOutputRenderTarget( rendererOutputTarget );
+		renderer._frameBufferTarget = rendererFramebufferTarget;
+		renderer._setXRLayerSize( rendererSize.x, rendererSize.y );
+		renderer._quad = rendererQuad;
 		this.isPresenting = wasPresenting;
-		this._renderer.setRenderTarget( null );
-		this._renderer.setOutputRenderTarget( rendererOutputTarget );
-		this._renderer._frameBufferTarget = rendererFramebufferTarget;
 
 	}
 
@@ -904,7 +934,8 @@ class XRManager extends EventDispatcher {
 				const projectionlayerInit = {
 					colorFormat: gl.RGBA8,
 					depthFormat: glDepthFormat,
-					scaleFactor: this._framebufferScaleFactor
+					scaleFactor: this._framebufferScaleFactor,
+					clearOnAccess: false
 				};
 
 				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2' ) ) {
@@ -922,7 +953,7 @@ class XRManager extends EventDispatcher {
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+				renderer._setXRLayerSize( glProjLayer.textureWidth, glProjLayer.textureHeight );
 
 				const depth = this._useMultiview ? 2 : 1;
 				const depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, depth );
@@ -1453,7 +1484,8 @@ function createXRLayer( layer ) {
 			height: layer.height / 2,
 			space: this._referenceSpace,
 			viewPixelWidth: layer.pixelwidth,
-			viewPixelHeight: layer.pixelheight
+			viewPixelHeight: layer.pixelheight,
+			clearOnAccess: false
 		} );
 
 	} else {
@@ -1465,7 +1497,8 @@ function createXRLayer( layer ) {
 			aspectRatio: layer.aspectRatio,
 			space: this._referenceSpace,
 			viewPixelWidth: layer.pixelwidth,
-			viewPixelHeight: layer.pixelheight
+			viewPixelHeight: layer.pixelheight,
+			clearOnAccess: false
 		} );
 
 	}
