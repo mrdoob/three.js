@@ -16,6 +16,7 @@ import {
 	RGBA_ASTC_4x4_Format,
 	RGBA_ASTC_6x6_Format,
 	RGBA_BPTC_Format,
+	RGBA_S3TC_DXT3_Format,
 	RGBA_ETC2_EAC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
 	RGBA_S3TC_DXT1_Format,
@@ -73,7 +74,6 @@ import {
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../math/ColorSpaces.js';
-import { RGBA_S3TC_DXT3_Format } from '../../../src/constants.js';
 
 const _taskCache = new WeakMap();
 
