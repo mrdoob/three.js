@@ -96,9 +96,9 @@ class StructTypeNode extends Node {
 			const type = member.type;
 
 			const itemSize = getMemoryLengthFromType( type ) * Float32Array.BYTES_PER_ELEMENT;
-			const alignment = getByteBoundaryFromType( type );
+			const boundary = getByteBoundaryFromType( type );
 
-			offset = alignTo( offset, alignment ) + itemSize;
+			offset = alignTo( offset, boundary ) + itemSize;
 
 		}
 
