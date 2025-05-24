@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - SDF loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			.label {
+				text-shadow: -1px 1px 1px rgb(0,0,0);
+				margin-right: 10px;
+				margin-top: 10px;
+				font-size: 20px;
+				color: #fff;
+				font-family: sans-serif;
+				padding: 2px;
+				background: rgba( 0, 0, 0, .6 );
+				border-radius: 3px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - SDFLoader test
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SDFLoader } from 'three/addons/loaders/SDFLoader.js';
+			import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer, labelRenderer, controls;
+			let molecule;
+
+			const params = {
+				showLabels: true,
+				showBonds: true,
+				metallic: 0.5,
+				roughness: 0.2,
+				exposure: 1.0
+			};
+
+			init();
+
+			function init() {
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 0, 0, 10 );
+
+				// Scene
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+
+				// Lighting
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				scene.add( ambientLight );
+
+				const dirLight1 = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				dirLight1.position.set( 2, 2, 2 );
+				scene.add( dirLight1 );
+
+				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				dirLight2.position.set( - 2, - 2, 2 );
+				scene.add( dirLight2 );
+
+				const pointLight = new THREE.PointLight( 0xffffff, 1.0 );
+				pointLight.position.set( 0, 5, 5 );
+				scene.add( pointLight );
+
+				// Loader
+				const loader = new SDFLoader();
+				loader.load( 'models/sdf/caffeine.sdf', function ( group ) {
+
+					molecule = group;
+					scene.add( group );
+
+					// Center and scale group for better view
+					const box = new THREE.Box3().setFromObject( group );
+					const size = box.getSize( new THREE.Vector3() ).length();
+					const center = box.getCenter( new THREE.Vector3() );
+
+					group.position.sub( center );
+
+					// Add labels to atoms (after centering so labels align)
+					const atoms = group.children[ 0 ]; // atoms mesh
+					for ( let i = 0; i < atoms.count; i ++ ) {
+
+						const matrix = new THREE.Matrix4();
+						atoms.getMatrixAt( i, matrix );
+						const position = new THREE.Vector3();
+						position.setFromMatrixPosition( matrix );
+
+						const color = new THREE.Color();
+						atoms.getColorAt( i, color );
+
+						const labelDiv = document.createElement( 'div' );
+						labelDiv.className = 'label';
+						labelDiv.textContent = getElementFromColor( color );
+						labelDiv.style.color = '#' + color.getHexString();
+
+						const label = new CSS2DObject( labelDiv );
+						label.center.set( 0, 0.5 );
+						label.position.copy( position );
+						group.add( label );
+
+					}
+
+					controls.maxDistance = size * 10;
+					camera.near = size / 100;
+					camera.far = size * 100;
+					camera.updateProjectionMatrix();
+
+					// Update materials for better appearance
+					atoms.material = new THREE.MeshStandardMaterial( {
+						metalness: params.metallic,
+						roughness: params.roughness,
+						envMapIntensity: 1.0
+					} );
+
+					const bonds = group.children[ 1 ]; // bonds mesh
+					bonds.material = new THREE.MeshStandardMaterial( {
+						color: 0xaaaaaa,
+						metalness: 0.1,
+						roughness: 0.3
+					} );
+
+					animate();
+
+				} );
+
+				// WebGL Renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = params.exposure;
+				document.body.appendChild( renderer.domElement );
+
+				// CSS2D Renderer
+				labelRenderer = new CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = '0px';
+				labelRenderer.domElement.style.pointerEvents = 'none';
+				document.body.appendChild( labelRenderer.domElement );
+
+				// Controls
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.05;
+				controls.screenSpacePanning = true;
+				controls.minDistance = 5;
+				controls.maxDistance = 20;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 1.0;
+				controls.addEventListener( 'change', render );
+
+				// GUI
+				const gui = new GUI();
+
+				gui.add( params, 'showLabels' ).name( 'Show Labels' ).onChange( function ( value ) {
+
+					labelRenderer.domElement.style.display = value ? 'block' : 'none';
+
+				} );
+
+				gui.add( params, 'showBonds' ).name( 'Show Bonds' ).onChange( function ( value ) {
+
+					if ( molecule ) molecule.children[ 1 ].visible = value;
+
+				} );
+
+				gui.add( params, 'metallic', 0, 1 ).name( 'Metallic' ).onChange( function ( value ) {
+
+					if ( molecule ) molecule.children[ 0 ].material.metalness = value;
+
+				} );
+
+				gui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( function ( value ) {
+
+					if ( molecule ) molecule.children[ 0 ].material.roughness = value;
+
+				} );
+
+				gui.add( params, 'exposure', 0, 2 ).name( 'Exposure' ).onChange( function ( value ) {
+
+					renderer.toneMappingExposure = value;
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function getElementFromColor( color ) {
+
+				// This is a simplified version - you might want to expand this
+				const hex = color.getHexString();
+				const colorMap = {
+					'ffffff': 'H',
+					'909090': 'C',
+					'3050f8': 'N',
+					'ff0d0d': 'O',
+					'90e050': 'F',
+					'ff8000': 'P',
+					'ffff30': 'S',
+					'1ff01f': 'Cl',
+					'a62929': 'Br',
+					'940094': 'I'
+				};
+
+				return colorMap[ hex ] || '?';
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html> 

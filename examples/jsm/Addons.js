@@ -106,6 +106,7 @@ export * from './loaders/NRRDLoader.js';
 export * from './loaders/OBJLoader.js';
 export * from './loaders/PCDLoader.js';
 export * from './loaders/PDBLoader.js';
+export * from './loaders/SDFLoader.js';
 export * from './loaders/PLYLoader.js';
 export * from './loaders/PVRLoader.js';
 export * from './loaders/RGBELoader.js';
