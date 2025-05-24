@@ -4,6 +4,11 @@ import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
+const _parentBuildStage = {
+	analyze: 'setup',
+	generate: 'analyze'
+};
+
 let _nodeId = 0;
 
 /**
@@ -622,6 +627,30 @@ class Node extends EventDispatcher {
 			return refNode.build( builder, output );
 
 		}
+
+		//
+
+		const nodeData = builder.getDataFromNode( this );
+		nodeData.buildStages = nodeData.buildStages || {};
+		nodeData.buildStages[ builder.buildStage ] = true;
+
+		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
+
+		if ( parentBuildStage && nodeData.buildStages[ parentBuildStage ] !== true ) {
+
+			// force parent build stage (setup or analyze)
+
+			const previousBuildStage = builder.getBuildStage();
+
+			builder.setBuildStage( parentBuildStage );
+
+			this.build( builder );
+
+			builder.setBuildStage( previousBuildStage );
+
+		}
+
+		//
 
 		builder.addNode( this );
 		builder.addChain( this );

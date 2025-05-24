@@ -160,26 +160,31 @@ class MathNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	setup( builder ) {
 
-		let method = this.method;
+		const { aNode, bNode, cNode, method } = this;
 
-		const type = this.getNodeType( builder );
-		const inputType = this.getInputType( builder );
+		let outputNode = null;
 
-		const a = this.aNode;
-		const b = this.bNode;
-		const c = this.cNode;
+		if ( method === MathNode.ONE_MINUS ) {
 
-		const coordinateSystem = builder.renderer.coordinateSystem;
+			outputNode = sub( 1.0, aNode );
 
-		if ( method === MathNode.TRANSFORM_DIRECTION ) {
+		} else if ( method === MathNode.RECIPROCAL ) {
+
+			outputNode = div( 1.0, aNode );
+
+		} else if ( method === MathNode.DIFFERENCE ) {
+
+			outputNode = abs( sub( aNode, bNode ) );
+
+		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal
 
-			let tA = a;
-			let tB = b;
+			let tA = aNode;
+			let tB = bNode;
 
 			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
 
@@ -193,23 +198,46 @@ class MathNode extends TempNode {
 
 			const mulNode = mul( tA, tB ).xyz;
 
-			return normalize( mulNode ).build( builder, output );
+			outputNode = normalize( mulNode );
 
-		} else if ( method === MathNode.NEGATE ) {
+		}
+
+		if ( outputNode !== null ) {
+
+			return outputNode;
+
+		} else {
+
+			return super.setup( builder );
+
+		}
+
+	}
+
+	generate( builder, output ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode ) {
+
+			return super.generate( builder, output );
+
+		}
+
+		let method = this.method;
+
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
+
+		const a = this.aNode;
+		const b = this.bNode;
+		const c = this.cNode;
+
+		const coordinateSystem = builder.renderer.coordinateSystem;
+
+		if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
-
-		} else if ( method === MathNode.ONE_MINUS ) {
-
-			return sub( 1.0, a ).build( builder, output );
-
-		} else if ( method === MathNode.RECIPROCAL ) {
-
-			return div( 1.0, a ).build( builder, output );
-
-		} else if ( method === MathNode.DIFFERENCE ) {
-
-			return abs( sub( a, b ) ).build( builder, output );
 
 		} else {
 
