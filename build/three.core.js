@@ -6387,13 +6387,13 @@ function createColorManagement() {
 
 		},
 
-		fromWorkingColorSpace: function ( color, targetColorSpace ) {
+		workingToColorSpace: function ( color, targetColorSpace ) {
 
 			return this.convert( color, this.workingColorSpace, targetColorSpace );
 
 		},
 
-		toWorkingColorSpace: function ( color, sourceColorSpace ) {
+		colorSpaceToWorking: function ( color, sourceColorSpace ) {
 
 			return this.convert( color, sourceColorSpace, this.workingColorSpace );
 
@@ -6445,7 +6445,25 @@ function createColorManagement() {
 
 			return this.spaces[ colorSpace ].workingColorSpaceConfig.unpackColorSpace;
 
-		}
+		},
+
+		// Deprecated
+
+		fromWorkingColorSpace: function ( color, targetColorSpace ) {
+
+			warnOnce( 'THREE.ColorManagement: .fromWorkingColorSpace() has been renamed to .workingToColorSpace().' ); // @deprecated, r177
+
+			return ColorManagement.workingToColorSpace( color, targetColorSpace );
+
+		},
+
+		toWorkingColorSpace: function ( color, sourceColorSpace ) {
+
+			warnOnce( 'THREE.ColorManagement: .toWorkingColorSpace() has been renamed to .colorSpaceToWorking().' ); // @deprecated, r177
+
+			return ColorManagement.colorSpaceToWorking( color, sourceColorSpace );
+
+		},
 
 	};
 
@@ -15477,7 +15495,7 @@ class Color {
 		this.g = ( hex >> 8 & 255 ) / 255;
 		this.b = ( hex & 255 ) / 255;
 
-		ColorManagement.toWorkingColorSpace( this, colorSpace );
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
 
 		return this;
 
@@ -15498,7 +15516,7 @@ class Color {
 		this.g = g;
 		this.b = b;
 
-		ColorManagement.toWorkingColorSpace( this, colorSpace );
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
 
 		return this;
 
@@ -15535,7 +15553,7 @@ class Color {
 
 		}
 
-		ColorManagement.toWorkingColorSpace( this, colorSpace );
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
 
 		return this;
 
@@ -15806,7 +15824,7 @@ class Color {
 	 */
 	getHex( colorSpace = SRGBColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		return Math.round( clamp( _color.r * 255, 0, 255 ) ) * 65536 + Math.round( clamp( _color.g * 255, 0, 255 ) ) * 256 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
@@ -15836,7 +15854,7 @@ class Color {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		const r = _color.r, g = _color.g, b = _color.b;
 
@@ -15886,7 +15904,7 @@ class Color {
 	 */
 	getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		target.r = _color.r;
 		target.g = _color.g;
@@ -15904,7 +15922,7 @@ class Color {
 	 */
 	getStyle( colorSpace = SRGBColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		const r = _color.r, g = _color.g, b = _color.b;
 
