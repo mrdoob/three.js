@@ -13,8 +13,7 @@ import {
 	RGBAFormat, RGBFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBTransfer, DepthFormat, DepthStencilFormat,
 	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
 	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type, UnsignedInt5999Type,
-	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat,
-	CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping
+	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { DepthTexture } from '../../../textures/DepthTexture.js';
@@ -479,7 +478,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY );
+			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY, texture.premultiplyAlpha );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -489,7 +488,7 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
 
 		}
 
@@ -559,21 +558,6 @@ class WebGPUTextureUtils {
 		const buffer = readBuffer.getMappedRange();
 
 		return new typedArrayType( buffer );
-
-	}
-
-	/**
-	 * Returns `true` if the given texture is an environment map.
-	 *
-	 * @private
-	 * @param {Texture} texture - The texture.
-	 * @return {boolean} Whether the given texture is an environment map or not.
-	 */
-	_isEnvironmentTexture( texture ) {
-
-		const mapping = texture.mapping;
-
-		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
 	}
 
@@ -666,8 +650,9 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
+	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY, premultiplyAlpha ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -681,7 +666,7 @@ class WebGPUTextureUtils {
 
 			} else {
 
-				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY, premultiplyAlpha );
 
 			}
 
@@ -698,8 +683,9 @@ class WebGPUTextureUtils {
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha ) {
 
 		const device = this.backend.device;
 
@@ -710,7 +696,8 @@ class WebGPUTextureUtils {
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
-				origin: { x: 0, y: 0, z: originDepth }
+				origin: { x: 0, y: 0, z: originDepth },
+				premultipliedAlpha: premultiplyAlpha
 			}, {
 				width: image.width,
 				height: image.height,
