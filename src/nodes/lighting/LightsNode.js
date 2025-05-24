@@ -173,13 +173,15 @@ class LightsNode extends Node {
 
 	analyze( builder ) {
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		for ( const node of properties.nodes ) {
 
 			node.build( builder );
 
 		}
+
+		properties.outputNode.build( builder );
 
 	}
 
@@ -329,7 +331,7 @@ class LightsNode extends Node {
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		if ( lightingModel ) {
 

@@ -64,10 +64,9 @@ class Object3DNode extends Node {
 		/**
 		 * Holds the value of the node as a uniform.
 		 *
-		 * @private
 		 * @type {UniformNode}
 		 */
-		this._uniformNode = new UniformNode( null );
+		this.uniformNode = new UniformNode( null );
 
 	}
 
@@ -104,7 +103,7 @@ class Object3DNode extends Node {
 	update( frame ) {
 
 		const object = this.object3d;
-		const uniformNode = this._uniformNode;
+		const uniformNode = this.uniformNode;
 		const scope = this.scope;
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
@@ -165,19 +164,19 @@ class Object3DNode extends Node {
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
-			this._uniformNode.nodeType = 'mat4';
+			this.uniformNode.nodeType = 'mat4';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
-			this._uniformNode.nodeType = 'vec3';
+			this.uniformNode.nodeType = 'vec3';
 
 		} else if ( scope === Object3DNode.RADIUS ) {
 
-			this._uniformNode.nodeType = 'float';
+			this.uniformNode.nodeType = 'float';
 
 		}
 
-		return this._uniformNode.build( builder );
+		return this.uniformNode.build( builder );
 
 	}
 
