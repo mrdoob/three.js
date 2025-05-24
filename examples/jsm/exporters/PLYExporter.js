@@ -320,7 +320,7 @@ class PLYExporter {
 
 							tempColor.fromBufferAttribute( colors, i );
 
-							ColorManagement.fromWorkingColorSpace( tempColor, SRGBColorSpace );
+							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
 							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 							vOffset += 1;
@@ -479,7 +479,7 @@ class PLYExporter {
 
 							tempColor.fromBufferAttribute( colors, i );
 
-							ColorManagement.fromWorkingColorSpace( tempColor, SRGBColorSpace );
+							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
 							line += ' ' +
 								Math.floor( tempColor.r * 255 ) + ' ' +

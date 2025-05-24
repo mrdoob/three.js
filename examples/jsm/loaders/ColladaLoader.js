@@ -1718,9 +1718,9 @@ class ColladaLoader extends Loader {
 
 			}
 
-			ColorManagement.toWorkingColorSpace( material.color, SRGBColorSpace );
-			if ( material.specular ) ColorManagement.toWorkingColorSpace( material.specular, SRGBColorSpace );
-			if ( material.emissive ) ColorManagement.toWorkingColorSpace( material.emissive, SRGBColorSpace );
+			ColorManagement.colorSpaceToWorking( material.color, SRGBColorSpace );
+			if ( material.specular ) ColorManagement.colorSpaceToWorking( material.specular, SRGBColorSpace );
+			if ( material.emissive ) ColorManagement.colorSpaceToWorking( material.emissive, SRGBColorSpace );
 
 			//
 
@@ -2057,7 +2057,7 @@ class ColladaLoader extends Loader {
 					case 'color':
 						const array = parseFloats( child.textContent );
 						data.color = new Color().fromArray( array );
-						ColorManagement.toWorkingColorSpace( data.color, SRGBColorSpace );
+						ColorManagement.colorSpaceToWorking( data.color, SRGBColorSpace );
 						break;
 
 					case 'falloff_angle':
