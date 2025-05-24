@@ -162,7 +162,7 @@ class MathNode extends TempNode {
 
 	setup( builder ) {
 
-		const { aNode, bNode, cNode, method } = this;
+		const { aNode, bNode, method } = this;
 
 		let outputNode = null;
 
