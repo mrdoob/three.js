@@ -2356,8 +2356,6 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
-		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
-
 		if ( renderContextData.currentPass ) {
 
 			const { descriptor } = renderContextData;
