@@ -270,7 +270,7 @@ export function getByteBoundaryFromType( type ) {
 	if ( /vec2/.test( type ) ) return 8;
 	if ( /vec3/.test( type ) ) return 16;
 	if ( /vec4/.test( type ) ) return 16;
-	if ( /mat2/.test( type ) ) return 16;
+	if ( /mat2/.test( type ) ) return 8;
 	if ( /mat3/.test( type ) ) return 48;
 	if ( /mat4/.test( type ) ) return 64;
 
