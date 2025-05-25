@@ -21,7 +21,7 @@ hr {
 	overflow: auto;
 }
 
-.info-item {
+.header {
 	padding: 8px 12px;
 	background: light-dark( #f5f5f5, #333 );
 	border-radius: 4px;
@@ -29,18 +29,27 @@ hr {
 	font-family: monospace;
 	color: light-dark( #666, #aaa );
 }
+	.header a {
+		color: light-dark( #666, #aaa );
+		text-decoration: none;
+	}
+	.header a:hover {
+		color: light-dark( #333, #e0e0e0 );
+	}
+
 .section {
 	margin-bottom: 24px;
 }
-.section h3 {
-	margin: 0 0 8px 0;
-	font-size: 11px;
-	text-transform: uppercase;
-	color: light-dark( #666, #aaa );
-	font-weight: 500;
-	border-bottom: 1px solid light-dark( #eee, #444 );
-	padding-bottom: 4px;
-}
+
+	.section h3 {
+		margin: 0 0 8px 0;
+		font-size: 11px;
+		text-transform: uppercase;
+		color: light-dark( #666, #aaa );
+		font-weight: 500;
+		border-bottom: 1px solid light-dark( #eee, #444 );
+		padding-bottom: 4px;
+	}
 
 .tree-item {
 	padding: 4px;

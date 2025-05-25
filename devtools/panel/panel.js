@@ -419,19 +419,13 @@ function updateUI() {
 	const container = document.getElementById( 'scene-tree' );
 	container.innerHTML = '';
 
-	const versionInfo = document.createElement( 'div' );
-	versionInfo.className = 'info-item';
-	versionInfo.style.display = 'flex'; // Use flexbox
-	versionInfo.style.justifyContent = 'space-between'; // Align items left and right
+	const header = document.createElement( 'div' );
+	header.className = 'header';
+	header.style.display = 'flex'; // Use flexbox
+	header.style.justifyContent = 'space-between'; // Align items left and right
 
-	const threeVersionSpan = document.createElement( 'span' );
-
-	// TODO: Why it's not available?
-	if ( state.revision ) {
-
-		threeVersionSpan.textContent = `Three.js r${state.revision}`;
-
-	}
+	const miscSpan = document.createElement( 'span' );
+	miscSpan.innerHTML = `<a href="https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview" target="_blank">+</a>`;
 
 	const manifest = chrome.runtime.getManifest();
 
@@ -439,10 +433,10 @@ function updateUI() {
 	manifestVersionSpan.textContent = `${manifest.version}`;
 	manifestVersionSpan.style.opacity = '0.5'; // Make it less prominent
 
-	versionInfo.appendChild( threeVersionSpan );
-	versionInfo.appendChild( manifestVersionSpan );
+	header.appendChild( miscSpan );
+	header.appendChild( manifestVersionSpan );
 
-	container.appendChild( versionInfo );
+	container.appendChild( header );
 
 	// Add renderers section
 	if ( state.renderers.size > 0 ) {
