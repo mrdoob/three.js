@@ -2394,6 +2394,12 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		if ( texture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( texture );
+
+		}
+
 	}
 
 }
