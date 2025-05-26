@@ -336,6 +336,14 @@ class PassNode extends TempNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
 	}
 
 	/**
@@ -401,17 +409,6 @@ class PassNode extends TempNode {
 	getMRT() {
 
 		return this._mrt;
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal() {
-
-		return true;
 
 	}
 

@@ -58,23 +58,19 @@ class PropertyNode extends Node {
 		 */
 		this.isPropertyNode = true;
 
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
 	}
 
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal( /*builder*/ ) {
-
-		return true;
 
 	}
 
