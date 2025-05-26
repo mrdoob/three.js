@@ -1863,6 +1863,58 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the current namespace for the node builder.
+	 *
+	 * @return {string} The current namespace.
+	 */
+	get namespace() {
+
+		return this.context.namespace;
+
+	}
+
+	/**
+	 * Returns the output namespace for the node builder, which is used for the current output node.
+	 *
+	 * @return {string} The output namespace.
+	 */
+	getOutputNamespace() {
+
+		return this.getNamespace( 'outputNode' );
+
+	}
+
+	/**
+	 * Returns the namespace for the given property.
+	 *
+	 * If the property name is not set, it returns the namespace only.
+	 * If the namespace is not set, it returns the property name.
+	 * If the namespace is set, it returns the namespace concatenated with the property name.
+	 *
+	 * @param {string} [property=''] - The property name.
+	 * @return {string} The namespace for the property.
+	 */
+	getNamespace( property = '' ) {
+
+		const ns = this.namespace;
+
+		let nsName;
+
+		if ( ns ) {
+
+			nsName = property ? ( ns + '_' + property ) : ns;
+
+		} else {
+
+			nsName = property;
+
+		}
+
+		return nsName;
+
+	}
+
+	/**
 	 * Registers a node declaration in the current shader stage.
 	 *
 	 * @param {Object} node - The node to be registered.
@@ -1885,7 +1937,6 @@ class NodeBuilder {
 
 		}
 
-
 		if ( index > 1 ) {
 
 			node.name = name;
@@ -1893,7 +1944,6 @@ class NodeBuilder {
 			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
-
 
 		declarations[ name ] = node;
 
