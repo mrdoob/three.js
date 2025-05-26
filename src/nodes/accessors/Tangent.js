@@ -30,7 +30,7 @@ export const tangentGeometry = /*@__PURE__*/ Fn( ( builder ) => {
 export const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
 
 /**
- * TSL object that represents the vertex tangent in view space of the current rendered object.
+ * TSL object that represents the transformed vertex tangent in view space of the current rendered object.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -38,25 +38,9 @@ export const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLoc
 export const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
 
 /**
- * TSL object that represents the vertex tangent in world space of the current rendered object.
- *
- * @tsl
- * @type {Node<vec3>}
- */
-export const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).toVarying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
-
-/**
- * TSL object that represents the transformed vertex tangent in view space of the current rendered object.
- *
- * @tsl
- * @type {Node<vec3>}
- */
-export const transformedTangentView = /*@__PURE__*/ tangentView.toVar( 'transformedTangentView' );
-
-/**
  * TSL object that represents the transformed vertex tangent in world space of the current rendered object.
  *
  * @tsl
  * @type {Node<vec3>}
  */
-export const transformedTangentWorld = /*@__PURE__*/ transformedTangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedTangentWorld' );
+export const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).toVarying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );

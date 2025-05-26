@@ -444,7 +444,7 @@ class NodeMaterial extends Material {
 	 */
 	setup( builder ) {
 
-		builder.context.setupNormal = () => this.setupNormal( builder );
+		builder.context.setupNormal = () => namespace( this.setupNormal( builder ), 'NORMAL' );
 		builder.context.setupPositionView = () => this.setupPositionView( builder );
 		builder.context.setupModelViewProjection = () => this.setupModelViewProjection( builder );
 

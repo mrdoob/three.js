@@ -89,7 +89,7 @@ class Background extends DataMap {
 
 				const backgroundMeshNode = context( vec4( backgroundNode ).mul( backgroundIntensity ), {
 					// @TODO: Add Texture2D support using node context
-					getUV: () => backgroundRotation.mul( normalWorld ),
+					getUV: () => backgroundRotation.mul( normalWorld.negate() ),
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
