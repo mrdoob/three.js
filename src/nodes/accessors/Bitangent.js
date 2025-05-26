@@ -1,6 +1,5 @@
 import { varying } from '../core/VaryingNode.js';
 import { Fn } from '../tsl/TSLCore.js';
-import { cameraViewMatrix } from './Camera.js';
 import { normalGeometry, normalLocal, normalView, normalWorld } from './Normal.js';
 import { tangentGeometry, tangentLocal, tangentView, tangentWorld } from './Tangent.js';
 
