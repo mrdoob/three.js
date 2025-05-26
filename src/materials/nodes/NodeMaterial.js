@@ -787,7 +787,9 @@ class NodeMaterial extends Material {
 
 		if ( this.maskNode !== null ) {
 
-			bool( this.maskNode ).discard();
+			// Discard if the mask is `false`
+
+			bool( this.maskNode ).not().discard();
 
 		}
 
