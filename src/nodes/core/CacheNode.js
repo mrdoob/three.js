@@ -97,4 +97,6 @@ export default CacheNode;
  */
 export const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
 
+export const namespace = ( node, namespace ) => node.context( { namespace } );
+
 addMethodChaining( 'cache', cache );
