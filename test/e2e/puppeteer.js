@@ -74,6 +74,7 @@ const exceptionList = [
 	'webgl_interactive_lines',
 	'webgl_loader_collada_kinematics',
 	'webgl_loader_ldraw',
+	'webgl_loader_texture_ktx2',
 	'webgl_loader_pdb',
 	'webgl_modifier_simplifier',
 	'webgl_multiple_canvases_circle',
