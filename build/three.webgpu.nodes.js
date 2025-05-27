@@ -796,7 +796,7 @@ function getByteBoundaryFromType( type ) {
 	if ( /vec2/.test( type ) ) return 8;
 	if ( /vec3/.test( type ) ) return 16;
 	if ( /vec4/.test( type ) ) return 16;
-	if ( /mat2/.test( type ) ) return 16;
+	if ( /mat2/.test( type ) ) return 8;
 	if ( /mat3/.test( type ) ) return 48;
 	if ( /mat4/.test( type ) ) return 64;
 
@@ -1090,6 +1090,11 @@ const defaultBuildStages = [ 'setup', 'analyze', 'generate' ];
 const shaderStages = [ ...defaultShaderStages, 'compute' ];
 const vectorComponents = [ 'x', 'y', 'z', 'w' ];
 
+const _parentBuildStage = {
+	analyze: 'setup',
+	generate: 'analyze'
+};
+
 let _nodeId = 0;
 
 /**
@@ -1342,7 +1347,7 @@ class Node extends EventDispatcher {
 	/**
 	 * By default this method returns the value of the {@link Node#global} flag. This method
 	 * can be overwritten in derived classes if an analytical way is required to determine the
-	 * global status.
+	 * global cache referring to the current shader-stage.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether this node is global or not.
@@ -1708,6 +1713,30 @@ class Node extends EventDispatcher {
 			return refNode.build( builder, output );
 
 		}
+
+		//
+
+		const nodeData = builder.getDataFromNode( this );
+		nodeData.buildStages = nodeData.buildStages || {};
+		nodeData.buildStages[ builder.buildStage ] = true;
+
+		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
+
+		if ( parentBuildStage && nodeData.buildStages[ parentBuildStage ] !== true ) {
+
+			// force parent build stage (setup or analyze)
+
+			const previousBuildStage = builder.getBuildStage();
+
+			builder.setBuildStage( parentBuildStage );
+
+			this.build( builder );
+
+			builder.setBuildStage( previousBuildStage );
+
+		}
+
+		//
 
 		builder.addNode( this );
 		builder.addChain( this );
@@ -3317,7 +3346,13 @@ class ShaderCallNodeInternal extends Node {
 		const { shaderNode, inputNodes } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
-		if ( properties.onceOutput ) return properties.onceOutput;
+		const onceNS = shaderNode.namespace && shaderNode.namespace === builder.namespace ? builder.getNamespace( 'once' ) : 'once';
+
+		if ( properties[ onceNS ] ) {
+
+			return properties[ onceNS ];
+
+		}
 
 		//
 
@@ -3360,31 +3395,11 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.once ) {
 
-			properties.onceOutput = result;
+			properties[ onceNS ] = result;
 
 		}
 
 		return result;
-
-	}
-
-	getOutputNode( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode === null ) {
-
-			properties.outputNode = this.setupOutput( builder );
-
-		}
-
-		return properties.outputNode;
-
-	}
-
-	setup( builder ) {
-
-		return this.getOutputNode( builder );
 
 	}
 
@@ -3398,11 +3413,53 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	generate( builder, output ) {
+	getOutputNode( builder ) {
 
+		const properties = builder.getNodeProperties( this );
+		const outputNamespace = builder.getOutputNamespace();
+
+		properties[ outputNamespace ] = properties[ outputNamespace ] || this.setupOutput( builder );
+
+		return properties[ outputNamespace ];
+
+	}
+
+	build( builder, output = null ) {
+
+		let result = null;
+
+		const buildStage = builder.getBuildStage();
+		const properties = builder.getNodeProperties( this );
+
+		const outputNamespace = builder.getOutputNamespace();
 		const outputNode = this.getOutputNode( builder );
 
-		return outputNode.build( builder, output );
+		if ( buildStage === 'setup' ) {
+
+			const initializedNamespace = builder.getNamespace( 'initialized' );
+
+			if ( properties[ initializedNamespace ] !== true ) {
+
+				properties[ initializedNamespace ] = true;
+
+				properties[ outputNamespace ] = this.getOutputNode( builder );
+				properties[ outputNamespace ].build( builder );
+
+			}
+
+			result = properties[ outputNamespace ];
+
+		} else if ( buildStage === 'analyze' ) {
+
+			outputNode.build( builder, output );
+
+		} else if ( buildStage === 'generate' ) {
+
+			result = outputNode.build( builder, output ) || '';
+
+		}
+
+		return result;
 
 	}
 
@@ -3420,6 +3477,7 @@ class ShaderNodeInternal extends Node {
 		this.global = true;
 
 		this.once = false;
+		this.namespace = null;
 
 	}
 
@@ -3592,7 +3650,9 @@ const Fn = ( jsFunc, layout = null ) => {
 
 		nodeObjects( params );
 
-		if ( params[ 0 ] && params[ 0 ].isNode ) {
+		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+		if ( isArrayAsParameter ) {
 
 			inputs = [ ...params ];
 
@@ -3624,9 +3684,10 @@ const Fn = ( jsFunc, layout = null ) => {
 
 	};
 
-	fn.once = () => {
+	fn.once = ( namespace = null ) => {
 
 		shaderNode.once = true;
+		shaderNode.namespace = namespace;
 
 		return fn;
 
@@ -3664,16 +3725,6 @@ const Fn = ( jsFunc, layout = null ) => {
 	return fn;
 
 };
-
-//
-
-addMethodChaining( 'toGlobal', ( node ) => {
-
-	node.global = true;
-
-	return node;
-
-} );
 
 //
 
@@ -3889,23 +3940,19 @@ class PropertyNode extends Node {
 		 */
 		this.isPropertyNode = true;
 
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
 	}
 
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal( /*builder*/ ) {
-
-		return true;
 
 	}
 
@@ -4711,15 +4758,25 @@ class AssignNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	setup( builder ) {
 
 		const { targetNode, sourceNode } = this;
+
+		const properties = builder.getNodeProperties( this );
+		properties.sourceNode = sourceNode;
+		properties.targetNode = targetNode.context( { assign: true } );
+
+	}
+
+	generate( builder, output ) {
+
+		const { targetNode, sourceNode } = builder.getNodeProperties( this );
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.context( { assign: true } ).build( builder );
+		const target = targetNode.build( builder );
 		const source = sourceNode.build( builder, targetType );
 
 		const sourceType = sourceNode.getNodeType( builder );
@@ -4745,11 +4802,14 @@ class AssignNode extends TempNode {
 
 			builder.addLineFlowCode( `${ sourceProperty } = ${ source }`, this );
 
-			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
+			const splitNode = targetNode.node;
+			const splitTargetNode = splitNode.node.context( { assign: true } );
 
-			for ( let i = 0; i < targetNode.components.length; i ++ ) {
+			const targetRoot = splitTargetNode.build( builder );
 
-				const component = targetNode.components[ i ];
+			for ( let i = 0; i < splitNode.components.length; i ++ ) {
+
+				const component = splitNode.components[ i ];
 
 				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]`, this );
 
@@ -5074,7 +5134,7 @@ class OperatorNode extends TempNode {
 		const bNode = this.bNode;
 
 		const typeA = aNode.getNodeType( builder );
-		const typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
+		const typeB = bNode ? bNode.getNodeType( builder ) : null;
 
 		if ( typeA === 'void' || typeB === 'void' ) {
 
@@ -5152,8 +5212,7 @@ class OperatorNode extends TempNode {
 
 		const op = this.op;
 
-		const aNode = this.aNode;
-		const bNode = this.bNode;
+		const { aNode, bNode } = this;
 
 		const type = this.getNodeType( builder );
 
@@ -5163,7 +5222,7 @@ class OperatorNode extends TempNode {
 		if ( type !== 'void' ) {
 
 			typeA = aNode.getNodeType( builder );
-			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
+			typeB = bNode ? bNode.getNodeType( builder ) : null;
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
@@ -5245,7 +5304,7 @@ class OperatorNode extends TempNode {
 		}
 
 		const a = aNode.build( builder, typeA );
-		const b = typeof bNode !== 'undefined' ? bNode.build( builder, typeB ) : null;
+		const b = bNode ? bNode.build( builder, typeB ) : null;
 
 		const fnOpSnippet = builder.getFunctionOperator( op );
 
@@ -5878,26 +5937,31 @@ class MathNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	setup( builder ) {
 
-		let method = this.method;
+		const { aNode, bNode, method } = this;
 
-		const type = this.getNodeType( builder );
-		const inputType = this.getInputType( builder );
+		let outputNode = null;
 
-		const a = this.aNode;
-		const b = this.bNode;
-		const c = this.cNode;
+		if ( method === MathNode.ONE_MINUS ) {
 
-		const coordinateSystem = builder.renderer.coordinateSystem;
+			outputNode = sub( 1.0, aNode );
 
-		if ( method === MathNode.TRANSFORM_DIRECTION ) {
+		} else if ( method === MathNode.RECIPROCAL ) {
+
+			outputNode = div( 1.0, aNode );
+
+		} else if ( method === MathNode.DIFFERENCE ) {
+
+			outputNode = abs( sub( aNode, bNode ) );
+
+		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal
 
-			let tA = a;
-			let tB = b;
+			let tA = aNode;
+			let tB = bNode;
 
 			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
 
@@ -5911,23 +5975,46 @@ class MathNode extends TempNode {
 
 			const mulNode = mul( tA, tB ).xyz;
 
-			return normalize( mulNode ).build( builder, output );
+			outputNode = normalize( mulNode );
 
-		} else if ( method === MathNode.NEGATE ) {
+		}
+
+		if ( outputNode !== null ) {
+
+			return outputNode;
+
+		} else {
+
+			return super.setup( builder );
+
+		}
+
+	}
+
+	generate( builder, output ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode ) {
+
+			return super.generate( builder, output );
+
+		}
+
+		let method = this.method;
+
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
+
+		const a = this.aNode;
+		const b = this.bNode;
+		const c = this.cNode;
+
+		const coordinateSystem = builder.renderer.coordinateSystem;
+
+		if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
-
-		} else if ( method === MathNode.ONE_MINUS ) {
-
-			return sub( 1.0, a ).build( builder, output );
-
-		} else if ( method === MathNode.RECIPROCAL ) {
-
-			return div( 1.0, a ).build( builder, output );
-
-		} else if ( method === MathNode.DIFFERENCE ) {
-
-			return abs( sub( a, b ) ).build( builder, output );
 
 		} else {
 
@@ -7477,20 +7564,15 @@ class VaryingNode extends Node {
 		 */
 		this.interpolationSampling = null;
 
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal( /*builder*/ ) {
-
-		return true;
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
 
 	}
-
 
 	/**
 	 * Defines the interpolation type of the varying.
@@ -7574,9 +7656,7 @@ class VaryingNode extends Node {
 		const properties = builder.getNodeProperties( this );
 		const varying = this.setupVarying( builder );
 
-		const needsReassign = builder.shaderStage === 'fragment' && properties.reassignPosition === true && builder.context.needsPositionReassign;
-
-		if ( properties.propertyName === undefined || needsReassign ) {
+		if ( properties.propertyName === undefined ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
@@ -7585,17 +7665,6 @@ class VaryingNode extends Node {
 			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node, type, propertyName );
 
 			properties.propertyName = propertyName;
-
-			if ( needsReassign ) {
-
-				// once reassign varying in fragment stage
-				properties.reassignPosition = false;
-
-			} else if ( properties.reassignPosition === undefined && builder.context.isPositionNodeInput ) {
-
-				properties.reassignPosition = true;
-
-			}
 
 		}
 
@@ -9021,6 +9090,20 @@ class CacheNode extends Node {
  * @returns {CacheNode}
  */
 const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
+
+/**
+ * Assigns a namespace to the given node by updating its context.
+ *
+ * Important for TSL functions that use `.once( namespace )` to ensure that the namespace will run twice,
+ * once when the node is build in the specific namespace and once when the node is built in the others namespace.
+ *
+ * This is useful for nodes like `positionWorld` that need to be re-updated if used in `material.positionNode` and outside of it in the same material.
+ *
+ * @param {Object} node - The node to which the namespace will be assigned.
+ * @param {string} namespace - The namespace to be assigned to the node.
+ * @returns {Object} The updated node with the new namespace in its context.
+ */
+const namespace = ( node, namespace ) => node.context( { namespace } );
 
 addMethodChaining( 'cache', cache );
 
@@ -11359,10 +11442,9 @@ class Object3DNode extends Node {
 		/**
 		 * Holds the value of the node as a uniform.
 		 *
-		 * @private
 		 * @type {UniformNode}
 		 */
-		this._uniformNode = new UniformNode( null );
+		this.uniformNode = new UniformNode( null );
 
 	}
 
@@ -11399,7 +11481,7 @@ class Object3DNode extends Node {
 	update( frame ) {
 
 		const object = this.object3d;
-		const uniformNode = this._uniformNode;
+		const uniformNode = this.uniformNode;
 		const scope = this.scope;
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
@@ -11460,19 +11542,19 @@ class Object3DNode extends Node {
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
-			this._uniformNode.nodeType = 'mat4';
+			this.uniformNode.nodeType = 'mat4';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
-			this._uniformNode.nodeType = 'vec3';
+			this.uniformNode.nodeType = 'vec3';
 
 		} else if ( scope === Object3DNode.RADIUS ) {
 
-			this._uniformNode.nodeType = 'float';
+			this.uniformNode.nodeType = 'float';
 
 		}
 
-		return this._uniformNode.build( builder );
+		return this.uniformNode.build( builder );
 
 	}
 
@@ -11767,7 +11849,11 @@ const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'positionPrev
  * @tsl
  * @type {VaryingNode<vec3>}
  */
-const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.toVarying( 'v_positionWorld' ).context( { needsPositionReassign: true } );
+const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getNamespace( 'v_positionWorld' ) );
+
+}, 'vec3' ).once( 'POSITION' ) )();
 
 /**
  * TSL object that represents the position world direction of the current rendered object.
@@ -11775,7 +11861,13 @@ const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.to
  * @tsl
  * @type {Node<vec3>}
  */
-const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).toVarying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' ).context( { needsPositionReassign: true } );
+const positionWorldDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	const vertexPWD = positionLocal.transformDirection( modelWorldMatrix ).toVarying( builder.getNamespace( 'v_positionWorldDirection' ) );
+
+	return vertexPWD.normalize().toVar( 'positionWorldDirection' );
+
+}, 'vec3' ).once( 'POSITION' ) )();
 
 /**
  * TSL object that represents the vertex position in view space of the current rendered object.
@@ -11785,9 +11877,9 @@ const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( m
  */
 const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.context.setupPositionView();
+	return builder.context.setupPositionView().toVarying( builder.getNamespace( 'v_positionView' ) );
 
-}, 'vec3' ).once() )().toVarying( 'v_positionView' ).context( { needsPositionReassign: true } );
+}, 'vec3' ).once( 'POSITION' ) )();
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
@@ -18133,7 +18225,7 @@ class NodeMaterial extends Material {
 
 		if ( this.positionNode !== null ) {
 
-			positionLocal.assign( this.positionNode.context( { isPositionNodeInput: true } ) );
+			positionLocal.assign( namespace( this.positionNode, 'POSITION' ) );
 
 		}
 
@@ -18153,7 +18245,9 @@ class NodeMaterial extends Material {
 
 		if ( this.maskNode !== null ) {
 
-			bool( this.maskNode ).discard();
+			// Discard if the mask is `false`
+
+			bool( this.maskNode ).not().discard();
 
 		}
 
@@ -30159,13 +30253,16 @@ class StructTypeNode extends Node {
 	 */
 	getLength() {
 
+		const GPU_CHUNK_BYTES = 8;
+		const BYTES_PER_ELEMENT = Float32Array.BYTES_PER_ELEMENT;
+
 		let offset = 0; // global buffer offset in bytes
 
 		for ( const member of this.membersLayout ) {
 
 			const type = member.type;
 
-			const itemSize = getMemoryLengthFromType( type ) * Float32Array.BYTES_PER_ELEMENT;
+			const itemSize = getMemoryLengthFromType( type ) * BYTES_PER_ELEMENT;
 			const boundary = getByteBoundaryFromType( type );
 
 			const chunkOffset = offset % GPU_CHUNK_BYTES; // offset in the current chunk
@@ -30186,7 +30283,7 @@ class StructTypeNode extends Node {
 
 		}
 
-		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / Float32Array.BYTES_PER_ELEMENT;
+		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / BYTES_PER_ELEMENT;
 
 	}
 
@@ -34113,6 +34210,14 @@ class PassNode extends TempNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
 	}
 
 	/**
@@ -34178,17 +34283,6 @@ class PassNode extends TempNode {
 	getMRT() {
 
 		return this._mrt;
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal() {
-
-		return true;
 
 	}
 
@@ -34980,6 +35074,14 @@ class CodeNode extends Node {
 		this.isCodeNode = true;
 
 		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
+		/**
 		 * The native code.
 		 *
 		 * @type {string}
@@ -35002,17 +35104,6 @@ class CodeNode extends Node {
 		 * @default ''
 		 */
 		this.language = language;
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal() {
-
-		return true;
 
 	}
 
@@ -37587,13 +37678,15 @@ class LightsNode extends Node {
 
 	analyze( builder ) {
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		for ( const node of properties.nodes ) {
 
 			node.build( builder );
 
 		}
+
+		properties.outputNode.build( builder );
 
 	}
 
@@ -37743,7 +37836,7 @@ class LightsNode extends Node {
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		if ( lightingModel ) {
 
@@ -41766,6 +41859,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mx_worley_noise_float: mx_worley_noise_float,
 	mx_worley_noise_vec2: mx_worley_noise_vec2,
 	mx_worley_noise_vec3: mx_worley_noise_vec3,
+	namespace: namespace,
 	negate: negate,
 	neutralToneMapping: neutralToneMapping,
 	nodeArray: nodeArray,
@@ -43068,7 +43162,7 @@ class Matrix2Uniform extends Uniform {
 		 */
 		this.isMatrix2Uniform = true;
 
-		this.boundary = 16;
+		this.boundary = 8;
 		this.itemSize = 4;
 
 	}
@@ -45382,6 +45476,58 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the current namespace for the node builder.
+	 *
+	 * @return {string} The current namespace.
+	 */
+	get namespace() {
+
+		return this.context.namespace;
+
+	}
+
+	/**
+	 * Returns the output namespace for the node builder, which is used for the current output node.
+	 *
+	 * @return {string} The output namespace.
+	 */
+	getOutputNamespace() {
+
+		return this.getNamespace( 'outputNode' );
+
+	}
+
+	/**
+	 * Returns the namespace for the given property.
+	 *
+	 * If the property name is not set, it returns the namespace only.
+	 * If the namespace is not set, it returns the property name.
+	 * If the namespace is set, it returns the namespace concatenated with the property name.
+	 *
+	 * @param {string} [property=''] - The property name.
+	 * @return {string} The namespace for the property.
+	 */
+	getNamespace( property = '' ) {
+
+		const ns = this.namespace;
+
+		let nsName;
+
+		if ( ns ) {
+
+			nsName = property ? ( ns + '_' + property ) : ns;
+
+		} else {
+
+			nsName = property;
+
+		}
+
+		return nsName;
+
+	}
+
+	/**
 	 * Registers a node declaration in the current shader stage.
 	 *
 	 * @param {Object} node - The node to be registered.
@@ -45404,7 +45550,6 @@ class NodeBuilder {
 
 		}
 
-
 		if ( index > 1 ) {
 
 			node.name = name;
@@ -45412,7 +45557,6 @@ class NodeBuilder {
 			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
-
 
 		declarations[ name ] = node;
 
@@ -49141,6 +49285,8 @@ class XRManager extends EventDispatcher {
 		 */
 		this._supportsLayers = false;
 
+		this._frameBufferTargets = null;
+
 		/**
 		 * Helper function to create native WebXR Layer.
 		 *
@@ -49760,11 +49906,16 @@ class XRManager extends EventDispatcher {
 
 		const translationObject = new Vector3();
 		const quaternionObject = new Quaternion();
+		const renderer = this._renderer;
 
 		const wasPresenting = this.isPresenting;
-		const rendererOutputTarget = this._renderer.getOutputRenderTarget();
-		const rendererFramebufferTarget = this._renderer._frameBufferTarget;
+		const rendererOutputTarget = renderer.getOutputRenderTarget();
+		const rendererFramebufferTarget = renderer._frameBufferTarget;
 		this.isPresenting = false;
+
+		const rendererSize = new Vector2();
+		renderer.getSize( rendererSize );
+		const rendererQuad = renderer._quad;
 
 		for ( const layer of this._layers ) {
 
@@ -49776,28 +49927,49 @@ class XRManager extends EventDispatcher {
 				layer.xrlayer.transform = new XRRigidTransform( layer.plane.getWorldPosition( translationObject ), layer.plane.getWorldQuaternion( quaternionObject ) );
 
 				const glSubImage = this._glBinding.getSubImage( layer.xrlayer, this._xrFrame );
-				this._renderer.backend.setXRRenderTargetTextures(
+				renderer.backend.setXRRenderTargetTextures(
 					layer.renderTarget,
 					glSubImage.colorTexture,
 					undefined );
 
-				this._renderer.setOutputRenderTarget( layer.renderTarget );
-				this._renderer.setRenderTarget( null );
+				renderer._setXRLayerSize( layer.renderTarget.width, layer.renderTarget.height );
+				renderer.setOutputRenderTarget( layer.renderTarget );
+				renderer.setRenderTarget( null );
+				renderer._frameBufferTarget = null;
+
+				this._frameBufferTargets || ( this._frameBufferTargets = new WeakMap() );
+				const { frameBufferTarget, quad } = this._frameBufferTargets.get( layer.renderTarget ) || { frameBufferTarget: null, quad: null };
+				if ( ! frameBufferTarget ) {
+
+					renderer._quad = new QuadMesh( new NodeMaterial() );
+					this._frameBufferTargets.set( layer.renderTarget, { frameBufferTarget: renderer._getFrameBufferTarget(), quad: renderer._quad } );
+
+				} else {
+
+					renderer._frameBufferTarget = frameBufferTarget;
+					renderer._quad = quad;
+
+				}
+
+				layer.rendercall();
+
+				renderer._frameBufferTarget = null;
 
 			} else {
 
-				this._renderer.setRenderTarget( layer.renderTarget );
+				renderer.setRenderTarget( layer.renderTarget );
+				layer.rendercall();
 
 			}
 
-			layer.rendercall();
-
 		}
 
+		renderer.setRenderTarget( null );
+		renderer.setOutputRenderTarget( rendererOutputTarget );
+		renderer._frameBufferTarget = rendererFramebufferTarget;
+		renderer._setXRLayerSize( rendererSize.x, rendererSize.y );
+		renderer._quad = rendererQuad;
 		this.isPresenting = wasPresenting;
-		this._renderer.setRenderTarget( null );
-		this._renderer.setOutputRenderTarget( rendererOutputTarget );
-		this._renderer._frameBufferTarget = rendererFramebufferTarget;
 
 	}
 
@@ -49876,7 +50048,8 @@ class XRManager extends EventDispatcher {
 				const projectionlayerInit = {
 					colorFormat: gl.RGBA8,
 					depthFormat: glDepthFormat,
-					scaleFactor: this._framebufferScaleFactor
+					scaleFactor: this._framebufferScaleFactor,
+					clearOnAccess: false
 				};
 
 				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2' ) ) {
@@ -49894,7 +50067,7 @@ class XRManager extends EventDispatcher {
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+				renderer._setXRLayerSize( glProjLayer.textureWidth, glProjLayer.textureHeight );
 
 				const depth = this._useMultiview ? 2 : 1;
 				const depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, depth );
@@ -50425,7 +50598,8 @@ function createXRLayer( layer ) {
 			height: layer.height / 2,
 			space: this._referenceSpace,
 			viewPixelWidth: layer.pixelwidth,
-			viewPixelHeight: layer.pixelheight
+			viewPixelHeight: layer.pixelheight,
+			clearOnAccess: false
 		} );
 
 	} else {
@@ -50437,7 +50611,8 @@ function createXRLayer( layer ) {
 			aspectRatio: layer.aspectRatio,
 			space: this._referenceSpace,
 			viewPixelWidth: layer.pixelwidth,
-			viewPixelHeight: layer.pixelheight
+			viewPixelHeight: layer.pixelheight,
+			clearOnAccess: false
 		} );
 
 	}
@@ -50855,6 +51030,8 @@ class Renderer {
 		 * @type {Vector4}
 		 */
 		this._scissor = new Vector4( 0, 0, this._width, this._height );
+
+		this._forceViewport = false;
 
 		/**
 		 * Whether the scissor test should be enabled or not.
@@ -51792,6 +51969,7 @@ class Renderer {
 		frameBufferTarget.scissor.multiplyScalar( this._pixelRatio );
 		frameBufferTarget.scissorTest = this._scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 
 		return frameBufferTarget;
 
@@ -51922,7 +52100,7 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false || this._forceViewport;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
@@ -52044,6 +52222,17 @@ class Renderer {
 		//
 
 		return renderContext;
+
+	}
+
+	_setXRLayerSize( width, height ) {
+
+		this._width = width;
+		this._height = height;
+
+		this._forceViewport = true;
+
+		this.setViewport( 0, 0, width, height );
 
 	}
 
@@ -52230,6 +52419,7 @@ class Renderer {
 
 		this.domElement.width = Math.floor( width * pixelRatio );
 		this.domElement.height = Math.floor( height * pixelRatio );
+		this._forceViewport = false;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -52254,6 +52444,8 @@ class Renderer {
 
 		this.domElement.width = Math.floor( width * this._pixelRatio );
 		this.domElement.height = Math.floor( height * this._pixelRatio );
+
+		this._forceViewport = false;
 
 		if ( updateStyle === true ) {
 
@@ -60812,9 +61004,7 @@ class WebGLBackend extends Backend {
 		this._currentContext = renderContext;
 
 		this._setFramebuffer( renderContext );
-
 		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
-
 
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
@@ -60886,7 +61076,7 @@ class WebGLBackend extends Backend {
 
 			const renderTargetContextData = this.get( renderContext.renderTarget );
 
-			const { samples } = renderContext.renderTarget;
+			const { resolveDepthBuffer, samples } = renderContext.renderTarget;
 
 			if ( samples > 0 && this._useMultisampledExtension( renderContext.renderTarget ) === false ) {
 
@@ -60933,8 +61123,13 @@ class WebGLBackend extends Backend {
 
 				}
 
-			}
+			} else if ( resolveDepthBuffer === false ) {
 
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				gl.invalidateFramebuffer( gl.DRAW_FRAMEBUFFER, renderTargetContextData.depthInvalidationArray );
+
+			}
 
 		}
 
@@ -62370,6 +62565,7 @@ class WebGLBackend extends Backend {
 				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 				const textures = descriptor.textures;
+				const depthInvalidationArray = [];
 
 				if ( isCube ) {
 
@@ -62429,10 +62625,13 @@ class WebGLBackend extends Backend {
 					const renderbuffer = gl.createRenderbuffer();
 					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0, useMultisampledRTT );
 					renderTargetContextData.xrDepthRenderbuffer = renderbuffer;
+					depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
 				} else {
 
 					if ( descriptor.depthTexture !== null ) {
+
+						depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
 						const textureData = this.get( descriptor.depthTexture );
 						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
@@ -62466,6 +62665,9 @@ class WebGLBackend extends Backend {
 					}
 
 				}
+
+				renderTargetContextData.depthInvalidationArray = depthInvalidationArray;
+
 
 			} else {
 
@@ -64229,7 +64431,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY );
+			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY, texture.premultiplyAlpha );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -64239,7 +64441,7 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
 
 		}
 
@@ -64309,21 +64511,6 @@ class WebGPUTextureUtils {
 		const buffer = readBuffer.getMappedRange();
 
 		return new typedArrayType( buffer );
-
-	}
-
-	/**
-	 * Returns `true` if the given texture is an environment map.
-	 *
-	 * @private
-	 * @param {Texture} texture - The texture.
-	 * @return {boolean} Whether the given texture is an environment map or not.
-	 */
-	_isEnvironmentTexture( texture ) {
-
-		const mapping = texture.mapping;
-
-		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
 	}
 
@@ -64416,8 +64603,9 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
+	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY, premultiplyAlpha ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -64431,7 +64619,7 @@ class WebGPUTextureUtils {
 
 			} else {
 
-				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY, premultiplyAlpha );
 
 			}
 
@@ -64448,8 +64636,9 @@ class WebGPUTextureUtils {
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
+	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha ) {
 
 		const device = this.backend.device;
 
@@ -64460,7 +64649,8 @@ class WebGPUTextureUtils {
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
-				origin: { x: 0, y: 0, z: originDepth }
+				origin: { x: 0, y: 0, z: originDepth },
+				premultipliedAlpha: premultiplyAlpha
 			}, {
 				width: image.width,
 				height: image.height,
@@ -72114,8 +72304,6 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
-		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
-
 		if ( renderContextData.currentPass ) {
 
 			const { descriptor } = renderContextData;
@@ -72149,6 +72337,12 @@ class WebGPUBackend extends Backend {
 		} else {
 
 			this.device.queue.submit( [ encoder.finish() ] );
+
+		}
+
+		if ( texture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( texture );
 
 		}
 
