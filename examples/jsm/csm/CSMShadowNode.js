@@ -503,6 +503,9 @@ class CSMShadowNode extends ShadowBaseNode {
 		const camera = this.camera;
 		const frustums = this.frustums;
 
+		// make sure the placeholder light objects which represent the
+		// multiple cascade shadow casters are part of the scene graph
+
 		for ( let i = 0; i < this.lights.length; i ++ ) {
 
 			const lwLight = this.lights[ i ];
