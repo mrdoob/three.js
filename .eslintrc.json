@@ -22,6 +22,7 @@
       "WebGL2RenderingContext"
     ]
   },
+  "globalIgnores": ["build/*"],
   "globals": {
     "__THREE_DEVTOOLS__": "readonly",
     "potpack": "readonly",
