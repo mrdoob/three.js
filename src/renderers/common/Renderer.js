@@ -314,8 +314,6 @@ class Renderer {
 		 */
 		this._scissor = new Vector4( 0, 0, this._width, this._height );
 
-		this._forceViewport = false;
-
 		/**
 		 * Whether the scissor test should be enabled or not.
 		 *
@@ -1245,7 +1243,16 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
-		frameBufferTarget.setSize( width, height, outputRenderTarget !== null ? outputRenderTarget.depth : 1 );
+		if ( outputRenderTarget !== null ) {
+
+			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
+
+		} else {
+
+			frameBufferTarget.setSize( width, height, 1 );
+
+		}
+
 		frameBufferTarget.viewport.copy( this._viewport );
 		frameBufferTarget.scissor.copy( this._scissor );
 		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );
@@ -1383,7 +1390,7 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false || this._forceViewport;
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
@@ -1512,8 +1519,6 @@ class Renderer {
 
 		this._width = width;
 		this._height = height;
-
-		this._forceViewport = true;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -1702,7 +1707,6 @@ class Renderer {
 
 		this.domElement.width = Math.floor( width * pixelRatio );
 		this.domElement.height = Math.floor( height * pixelRatio );
-		this._forceViewport = false;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -1727,8 +1731,6 @@ class Renderer {
 
 		this.domElement.width = Math.floor( width * this._pixelRatio );
 		this.domElement.height = Math.floor( height * this._pixelRatio );
-
-		this._forceViewport = false;
 
 		if ( updateStyle === true ) {
 
