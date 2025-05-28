@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, Euler, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, Texture, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, warnOnce, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, DoubleSide, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, warnOnce, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
 
 const refreshUniforms = [
@@ -9951,6 +9951,8 @@ class MaxMipLevelNode extends UniformNode {
  */
 const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode ).setParameterLength( 1 );
 
+const EmptyTexture$1 = /*@__PURE__*/ new Texture();
+
 /**
  * This type of uniform node represents a 2D texture.
  *
@@ -9967,12 +9969,12 @@ class TextureNode extends UniformNode {
 	/**
 	 * Constructs a new texture node.
 	 *
-	 * @param {Texture} value - The texture.
+	 * @param {Texture} [value=EmptyTexture] - The texture.
 	 * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
 	 * @param {?Node<int>} [levelNode=null] - The level node.
 	 * @param {?Node<float>} [biasNode=null] - The bias node.
 	 */
-	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
+	constructor( value = EmptyTexture$1, uvNode = null, levelNode = null, biasNode = null ) {
 
 		super( value );
 
@@ -10677,20 +10679,64 @@ class TextureNode extends UniformNode {
  *
  * @tsl
  * @function
- * @param {Texture} value - The texture.
+ * @param {?Texture} value - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
-const texture = /*@__PURE__*/ nodeProxy( TextureNode ).setParameterLength( 1, 4 );
+const textureBase = /*@__PURE__*/ nodeProxy( TextureNode ).setParameterLength( 1, 4 ).setName( 'texture' );
+
+/**
+ * TSL function for creating a texture node or sample a texture node already existing.
+ *
+ * @tsl
+ * @function
+ * @param {?Texture|TextureNode} [value=EmptyTexture] - The texture.
+ * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
+ * @returns {TextureNode}
+ */
+const texture = ( value = EmptyTexture$1, uvNode = null, levelNode = null, biasNode = null ) => {
+
+	let textureNode;
+
+	if ( value && value.isTextureNode === true ) {
+
+		textureNode = nodeObject( value.clone() );
+		textureNode.referenceNode = value.getSelf(); // Ensure the reference is set to the original node
+
+		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
+		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );
+		if ( biasNode !== null ) textureNode.biasNode = nodeObject( biasNode );
+
+	} else {
+
+		textureNode = textureBase( value, uvNode, levelNode, biasNode );
+
+	}
+
+	return textureNode;
+
+};
+
+/**
+ * TSL function for creating a uniform texture node.
+ *
+ * @tsl
+ * @function
+ * @param {?Texture} value - The texture.
+ * @returns {TextureNode}
+ */
+const uniformTexture = ( value = EmptyTexture$1 ) => texture( value );
 
 /**
  * TSL function for creating a texture node that fetches/loads texels without interpolation.
  *
  * @tsl
  * @function
- * @param {Texture} value - The texture.
+ * @param {?Texture|TextureNode} [value=EmptyTexture] - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
@@ -12215,6 +12261,8 @@ const reflectVector = /*@__PURE__*/ reflectView.transformDirection( cameraViewMa
  */
 const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
 
+const EmptyTexture = /*@__PURE__*/ new CubeTexture();
+
 /**
  * This type of uniform node represents a cube texture.
  *
@@ -12346,7 +12394,51 @@ class CubeTextureNode extends TextureNode {
  * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {CubeTextureNode}
  */
-const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode ).setParameterLength( 1, 4 ).setName( 'cubeTexture' );
+const cubeTextureBase = /*@__PURE__*/ nodeProxy( CubeTextureNode ).setParameterLength( 1, 4 ).setName( 'cubeTexture' );
+
+/**
+ * TSL function for creating a cube texture uniform node.
+ *
+ * @tsl
+ * @function
+ * @param {?CubeTexture|CubeTextureNode} [value=EmptyTexture] - The cube texture.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
+ * @returns {CubeTextureNode}
+ */
+const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = null, biasNode = null ) => {
+
+	let textureNode;
+
+	if ( value && value.isCubeTextureNode === true ) {
+
+		textureNode = nodeObject( value.clone() );
+		textureNode.referenceNode = value.getSelf(); // Ensure the reference is set to the original node
+
+		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
+		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );
+		if ( biasNode !== null ) textureNode.biasNode = nodeObject( biasNode );
+
+	} else {
+
+		textureNode = cubeTextureBase( value, uvNode, levelNode, biasNode );
+
+	}
+
+	return textureNode;
+
+};
+
+/**
+ * TSL function for creating a uniform cube texture node.
+ *
+ * @tsl
+ * @function
+ * @param {?CubeTexture} [value=EmptyTexture] - The cube texture.
+ * @returns {CubeTextureNode}
+ */
+const uniformCubeTexture = ( value = EmptyTexture ) => cubeTextureBase( value );
 
 // TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
 
@@ -38021,17 +38113,6 @@ class ShadowBaseNode extends Node {
 
 	}
 
-	/**
-	 * Can be called when the shadow isn't required anymore. That can happen when
-	 * a lighting node stops casting shadows by setting {@link Object3D#castShadow}
-	 * to `false`.
-	 */
-	dispose() {
-
-		this.updateBeforeType = NodeUpdateType.NONE;
-
-	}
-
 }
 
 /**
@@ -41655,6 +41736,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	cos: cos,
 	cross: cross,
 	cubeTexture: cubeTexture,
+	cubeTextureBase: cubeTextureBase,
 	cubeToUV: cubeToUV,
 	dFdx: dFdx,
 	dFdy: dFdy,
@@ -42038,7 +42120,9 @@ var TSL = /*#__PURE__*/Object.freeze({
 	uint: uint,
 	uniform: uniform,
 	uniformArray: uniformArray,
+	uniformCubeTexture: uniformCubeTexture,
 	uniformGroup: uniformGroup,
+	uniformTexture: uniformTexture,
 	uniforms: uniforms,
 	unpremult: unpremult,
 	userData: userData,
@@ -50749,7 +50833,7 @@ function onAnimationFrame( time, frame ) {
 }
 
 const _scene = /*@__PURE__*/ new Scene();
-const _drawingBufferSize = /*@__PURE__*/ new Vector2();
+const _drawingBufferSize$1 = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _frustumArray = /*@__PURE__*/ new FrustumArray();
@@ -51030,8 +51114,6 @@ class Renderer {
 		 * @type {Vector4}
 		 */
 		this._scissor = new Vector4( 0, 0, this._width, this._height );
-
-		this._forceViewport = false;
 
 		/**
 		 * Whether the scissor test should be enabled or not.
@@ -51933,7 +52015,7 @@ class Renderer {
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
-		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize$1 );
 		const { depth, stencil } = this;
 
 		let frameBufferTarget = this._frameBufferTarget;
@@ -51962,7 +52044,16 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
-		frameBufferTarget.setSize( width, height, outputRenderTarget !== null ? outputRenderTarget.depth : 1 );
+		if ( outputRenderTarget !== null ) {
+
+			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
+
+		} else {
+
+			frameBufferTarget.setSize( width, height, 1 );
+
+		}
+
 		frameBufferTarget.viewport.copy( this._viewport );
 		frameBufferTarget.scissor.copy( this._scissor );
 		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );
@@ -52088,9 +52179,9 @@ class Renderer {
 
 		}
 
-		this.getDrawingBufferSize( _drawingBufferSize );
+		this.getDrawingBufferSize( _drawingBufferSize$1 );
 
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
+		_screen.set( 0, 0, _drawingBufferSize$1.width, _drawingBufferSize$1.height );
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
@@ -52100,7 +52191,7 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false || this._forceViewport;
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
@@ -52229,8 +52320,6 @@ class Renderer {
 
 		this._width = width;
 		this._height = height;
-
-		this._forceViewport = true;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -52419,7 +52508,6 @@ class Renderer {
 
 		this.domElement.width = Math.floor( width * pixelRatio );
 		this.domElement.height = Math.floor( height * pixelRatio );
-		this._forceViewport = false;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -52444,8 +52532,6 @@ class Renderer {
 
 		this.domElement.width = Math.floor( width * this._pixelRatio );
 		this.domElement.height = Math.floor( height * this._pixelRatio );
-
-		this._forceViewport = false;
 
 		if ( updateStyle === true ) {
 
@@ -60547,6 +60633,8 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 }
 
+const _drawingBufferSize = /*@__PURE__*/ new Vector2();
+
 /**
  * A backend implementation targeting WebGL 2.
  *
@@ -60973,7 +61061,7 @@ class WebGLBackend extends Backend {
 	 */
 	beginRender( renderContext ) {
 
-		const { state, gl } = this;
+		const { state } = this;
 		const renderContextData = this.get( renderContext );
 
 		//
@@ -60984,7 +61072,8 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			state.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+			const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+			state.viewport( 0, 0, width, height );
 
 		}
 
@@ -61143,7 +61232,8 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				state.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+				const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+				state.viewport( 0, 0, width, height );
 
 			}
 
@@ -63257,7 +63347,7 @@ const GPUBlendFactor = {
 	SrcAlpha: 'src-alpha',
 	OneMinusSrcAlpha: 'one-minus-src-alpha',
 	Dst: 'dst',
-	OneMinusDstColor: 'one-minus-dst',
+	OneMinusDst: 'one-minus-dst',
 	DstAlpha: 'dst-alpha',
 	OneMinusDstAlpha: 'one-minus-dst-alpha',
 	SrcAlphaSaturated: 'src-alpha-saturated',
@@ -69364,7 +69454,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			case OneMinusDstColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusDstColor;
+				blendFactor = GPUBlendFactor.OneMinusDst;
 				break;
 
 			case DstAlphaFactor:
