@@ -13,7 +13,10 @@ import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
+import { Vector2 } from '../../math/Vector2.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
+
+const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 
 /**
  * A backend implementation targeting WebGL 2.
@@ -441,7 +444,7 @@ class WebGLBackend extends Backend {
 	 */
 	beginRender( renderContext ) {
 
-		const { state, gl } = this;
+		const { state } = this;
 		const renderContextData = this.get( renderContext );
 
 		//
@@ -452,7 +455,8 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			state.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+			const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+			state.viewport( 0, 0, width, height );
 
 		}
 
@@ -611,7 +615,8 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				state.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+				const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+				state.viewport( 0, 0, width, height );
 
 			}
 
