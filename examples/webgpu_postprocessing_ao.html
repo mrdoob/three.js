@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - ambient occlusion (GTAO)</title>
+		<title>three.js webgpu - ambient occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -37,10 +37,9 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, postProcessing, controls, stats;
+			let camera, scene, renderer, postProcessing, controls;
 
 			let aoPass, denoisePass, blendPassAO, blendPassDenoise, scenePassColor;
 
@@ -67,7 +66,7 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -93,9 +92,6 @@
 				controls.minDistance = 2;
 				controls.maxDistance = 8;
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				//
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -113,10 +109,10 @@
 				// ao
 
 				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				aoPass.resolutionScale = 0.5;
+				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
 				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
 
-				// denoise (optional)
+				// denoise (optional, use it if you need best quality but is has a noticeable hit on performance)
 
 				denoisePass = denoise( aoPass.getTextureNode(), scenePassDepth, scenePassNormal, camera );
 				blendPassDenoise = denoisePass.mul( scenePassColor );
@@ -229,7 +225,6 @@
 				controls.update();
 
 				postProcessing.render();
-				stats.update();
 
 			}
 
