@@ -5,6 +5,7 @@
 [![NPM Downloads][npm-downloads]][npmtrends-url]
 [![DeepScan][deepscan]][deepscan-url]
 [![Discord][discord]][discord-url]
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mrdoob/three.js)
 
 #### JavaScript 3D library
 
