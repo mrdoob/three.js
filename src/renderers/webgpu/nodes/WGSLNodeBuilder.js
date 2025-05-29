@@ -1701,7 +1701,7 @@ ${ flowData.code }
 
 					}
 
-				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true && texture.isStorageTexture === false ) {
 
 					textureType = 'texture_2d_array<f32>';
 
@@ -1718,7 +1718,9 @@ ${ flowData.code }
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
-					textureType = `texture_storage_2d<${ format }, ${ access }>`;
+					const isArray = uniform.node.value.isTextureArray ? '_array' : '';
+
+					textureType = `texture_storage_2d${ isArray }<${ format }, ${ access }>`;
 
 				} else {
 

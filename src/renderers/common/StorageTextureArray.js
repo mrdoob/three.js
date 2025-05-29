@@ -51,7 +51,8 @@ class StorageTextureArray extends Texture {
 		 * @readonly
 		 * @default true
 		 */
-		this.isStorageTextureArray = true;
+		this.isStorageTexture = true;
+		this.isTextureArray = true;
 
 	}
 
