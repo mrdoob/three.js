@@ -3,7 +3,7 @@ import { ColorManagement } from '../../../math/ColorManagement.js';
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
-const getImage = ( source ) => {
+function getImage( source ) {
 
 	if ( source.isDataTexture ) {
 
