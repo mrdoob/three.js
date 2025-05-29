@@ -3,25 +3,6 @@ import { ColorManagement } from '../../../math/ColorManagement.js';
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
-function getImage( source ) {
-
-	if ( source.isDataTexture ) {
-
-		return source.image.data;
-
-	} else if ( ( typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement ) ||
-		( typeof HTMLCanvasElement !== 'undefined' && source instanceof HTMLCanvasElement ) ||
-		( typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap ) ||
-		( typeof OffscreenCanvas !== 'undefined' && source instanceof OffscreenCanvas ) ) {
-
-		return source;
-
-	}
-
-	return source.data;
-
-}
-
 /**
  * A WebGL 2 backend utility module for managing textures.
  *
@@ -1151,6 +1132,25 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
 
 	}
+
+}
+
+function getImage( source ) {
+
+	if ( source.isDataTexture ) {
+
+		return source.image.data;
+
+	} else if ( ( typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && source instanceof HTMLCanvasElement ) ||
+		( typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap ) ||
+		( typeof OffscreenCanvas !== 'undefined' && source instanceof OffscreenCanvas ) ) {
+
+		return source;
+
+	}
+
+	return source.data;
 
 }
 
