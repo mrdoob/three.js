@@ -20,7 +20,7 @@ function getImage( source ) {
 
 	return source.data;
 
-};
+}
 
 /**
  * A WebGL 2 backend utility module for managing textures.
