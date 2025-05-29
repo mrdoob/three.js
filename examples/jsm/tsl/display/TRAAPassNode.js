@@ -380,8 +380,8 @@ class TRAAPassNode extends PassNode {
 			const currentWeight = float( 0.05 ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
 
-			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( max( currentColor.r, currentColor.g ), currentColor.b ).add( 1.0 ) ) ) );
-			const compressedHistory = clampedHistoryColor.mul( float( 1 ).div( ( max( max( clampedHistoryColor.r, clampedHistoryColor.g ), clampedHistoryColor.b ).add( 1.0 ) ) ) );
+			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1.0 ) ) ) );
+			const compressedHistory = clampedHistoryColor.mul( float( 1 ).div( ( max( clampedHistoryColor.r, clampedHistoryColor.g, clampedHistoryColor.b ).add( 1.0 ) ) ) );
 
 			const luminanceCurrent = luminance( compressedCurrent.rgb );
 			const luminanceHistory = luminance( compressedHistory.rgb );
