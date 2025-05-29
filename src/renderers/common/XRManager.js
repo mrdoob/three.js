@@ -1021,7 +1021,7 @@ class XRManager extends EventDispatcher {
 				session.updateRenderState( { baseLayer: glBaseLayer } );
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+				renderer._setXRLayerSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight );
 
 				this._xrRenderTarget = new XRRenderTarget(
 					glBaseLayer.framebufferWidth,

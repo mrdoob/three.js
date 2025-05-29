@@ -595,7 +595,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-			} else if ( resolveDepthBuffer === false ) {
+			} else if ( resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
@@ -2075,7 +2075,7 @@ class WebGLBackend extends Backend {
 
 						} else {
 
-							if ( hasExternalTextures && useMultisampledRTT ) {
+							if ( useMultisampledRTT ) {
 
 								multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
@@ -2093,12 +2093,18 @@ class WebGLBackend extends Backend {
 
 				}
 
-				if ( renderTarget.isXRRenderTarget && renderTarget.autoAllocateDepthBuffer === true ) {
+				const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+
+				if ( renderTarget.autoAllocateDepthBuffer === true ) {
 
 					const renderbuffer = gl.createRenderbuffer();
 					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0, useMultisampledRTT );
 					renderTargetContextData.xrDepthRenderbuffer = renderbuffer;
 					depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
+
+					gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
+					gl.framebufferRenderbuffer( gl.FRAMEBUFFER, depthStyle, gl.RENDERBUFFER, renderbuffer );
+
 
 				} else {
 
@@ -2107,7 +2113,6 @@ class WebGLBackend extends Backend {
 						depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
 						const textureData = this.get( descriptor.depthTexture );
-						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 						textureData.renderTarget = descriptor.renderTarget;
 						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
@@ -2166,7 +2171,7 @@ class WebGLBackend extends Backend {
 
 				// rebind external XR textures
 
-				if ( ( isXRRenderTarget && hasExternalTextures ) || renderTarget.multiview ) {
+				if ( isXRRenderTarget || useMultisampledRTT || renderTarget.multiview ) {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
