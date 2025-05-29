@@ -506,7 +506,7 @@ class WebGLTextureUtils {
 			} else if ( ( typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement ) ||
 				( typeof HTMLCanvasElement !== 'undefined' && source instanceof HTMLCanvasElement ) ||
 				( typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap ) ||
-				source instanceof OffscreenCanvas ) {
+				( typeof OffscreenCanvas !== 'undefined' && source instanceof OffscreenCanvas ) ) {
 
 				return source;
 
