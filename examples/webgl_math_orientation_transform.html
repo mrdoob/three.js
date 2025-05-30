@@ -26,13 +26,19 @@
 
 			import * as THREE from 'three';
 
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 			let camera, scene, renderer, mesh, target;
 
 			const spherical = new THREE.Spherical();
 			const rotationMatrix = new THREE.Matrix4();
 			const targetQuaternion = new THREE.Quaternion();
 			const clock = new THREE.Clock();
-			const speed = 2;
+			const speed = Math.PI / 2;
+
+			const params = {
+				useLookAt: false,
+			};
 
 			init();
 
@@ -78,6 +84,13 @@
 
 				//
 
+				const gui = new GUI();
+
+				gui.add( params, 'useLookAt' );
+				gui.open();
+
+				//
+
 				generateTarget();
 
 			}
@@ -95,10 +108,23 @@
 
 				const delta = clock.getDelta();
 
-				if ( ! mesh.quaternion.equals( targetQuaternion ) ) {
+				if ( mesh.quaternion.equals( targetQuaternion ) === false ) {
 
-					const step = speed * delta;
-					mesh.quaternion.rotateTowards( targetQuaternion, step );
+					if ( params.useLookAt === true ) {
+
+						// using lookAt() will make the mesh instantly look at the target
+
+						mesh.lookAt( target.position );
+
+					} else {
+
+						// using rotateTowards() will gradually rotate the mesh towards the target
+						// the "speed" variable represents the rotation speed in radians per seconds
+
+						const step = speed * delta;
+						mesh.quaternion.rotateTowards( targetQuaternion, step );
+
+					}
 
 				}
 

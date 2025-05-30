@@ -321,11 +321,11 @@ class SMAANode extends TempNode {
 			// Calculate left and top deltas:
 			const Cleft = this.textureNode.sample( vOffset0.xy ).rgb.toVar();
 			let t = abs( C.sub( Cleft ) );
-			delta.x = max( max( t.r, t.g ), t.b );
+			delta.x = max( t.r, t.g, t.b );
 
 			const Ctop = this.textureNode.sample( vOffset0.zw ).rgb.toVar();
 			t = abs( C.sub( Ctop ) );
-			delta.y = max( max( t.r, t.g ), t.b );
+			delta.y = max( t.r, t.g, t.b );
 
 			// We do the usual threshold:
 			const edges = step( threshold, delta.xy ).toVar();
@@ -336,26 +336,26 @@ class SMAANode extends TempNode {
 			// Calculate right and bottom deltas:
 			const Cright = this.textureNode.sample( vOffset1.xy ).rgb.toVar();
 			t = abs( C.sub( Cright ) );
-			delta.z = max( max( t.r, t.g ), t.b );
+			delta.z = max( t.r, t.g, t.b );
 
 			const Cbottom = this.textureNode.sample( vOffset1.zw ).rgb.toVar();
 			t = abs( C.sub( Cbottom ) );
-			delta.w = max( max( t.r, t.g ), t.b );
+			delta.w = max( t.r, t.g, t.b );
 
 			// Calculate the maximum delta in the direct neighborhood:
-			let maxDelta = max( max( max( delta.x, delta.y ), delta.z ), delta.w ).toVar();
+			let maxDelta = max( delta.x, delta.y, delta.z, delta.w ).toVar();
 
 			// Calculate left-left and top-top deltas:
 			const Cleftleft = this.textureNode.sample( vOffset2.xy ).rgb.toVar();
 			t = abs( C.sub( Cleftleft ) );
-			delta.z = max( max( t.r, t.g ), t.b );
+			delta.z = max( t.r, t.g, t.b );
 
 			const Ctoptop = this.textureNode.sample( vOffset2.zw ).rgb.toVar();
 			t = abs( C.sub( Ctoptop ) );
-			delta.w = max( max( t.r, t.g ), t.b );
+			delta.w = max( t.r, t.g, t.b );
 
 			// Calculate the final maximum delta:
-			maxDelta = max( max( maxDelta, delta.z ), delta.w );
+			maxDelta = max( maxDelta, delta.z, delta.w );
 
 			// Local contrast adaptation in action:
 			edges.xy.mulAssign( vec2( step( float( 0.5 ).mul( maxDelta ), delta.xy ) ) );

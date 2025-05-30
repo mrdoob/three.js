@@ -40,6 +40,8 @@
 
 			function init() {
 
+				// Renderer
+
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -57,6 +59,8 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 7, 4, 1 );
 
+				// Controls
+
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
@@ -64,8 +68,7 @@
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
-				scene.add( ambient );
+				// Textures
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
 				const filenames = [ 'disturb.jpg', 'colors.png', 'uv_grid_opengl.jpg' ];
@@ -86,13 +89,18 @@
 
 				}
 
+				// Lights
+
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
+				scene.add( ambient );
+
 				spotLight = new THREE.SpotLight( 0xffffff, 100 );
+				spotLight.map = textures[ 'disturb.jpg' ];
 				spotLight.position.set( 2.5, 5, 2.5 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 1;
 				spotLight.decay = 2;
 				spotLight.distance = 0;
-				spotLight.map = textures[ 'disturb.jpg' ];
 
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
@@ -117,7 +125,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				//
+				// Models
 
 				new PLYLoader().load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
@@ -150,7 +158,8 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					shadows: true
+					shadows: true,
+					customAttenuation: false
 				};
 
 				gui.add( params, 'map', textures ).onChange( function ( val ) {
@@ -201,7 +210,6 @@
 					spotLight.shadow.focus = val;
 
 				} );
-
 
 				gui.add( params, 'shadows' ).onChange( function ( val ) {
 
