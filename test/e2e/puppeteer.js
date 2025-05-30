@@ -74,6 +74,7 @@ const exceptionList = [
 	'webgl_interactive_lines',
 	'webgl_loader_collada_kinematics',
 	'webgl_loader_ldraw',
+	'webgl_loader_texture_ktx2',
 	'webgl_loader_pdb',
 	'webgl_modifier_simplifier',
 	'webgl_multiple_canvases_circle',
@@ -168,11 +169,15 @@ const exceptionList = [
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
+	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_xr_native_layers',
+	'webgpu_volume_caustics',
 
 	// WebGPU idleTime and parseTime too low
+	'webgpu_compute_cloth',
 	'webgpu_compute_particles',
+	'webgpu_compute_particles_fluid',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_particles_snow',
 	'webgpu_compute_points'

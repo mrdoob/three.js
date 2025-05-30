@@ -466,12 +466,34 @@ ${ this.tab }} )`;
 		const name = node.initialization.name;
 		const type = node.initialization.type;
 		const condition = node.condition.type;
-		const update = node.afterthought.type;
 
 		const nameParam = name !== 'i' ? `, name: '${ name }'` : '';
 		const typeParam = type !== 'int' ? `, type: '${ type }'` : '';
 		const conditionParam = condition !== '<' ? `, condition: '${ condition }'` : '';
-		const updateParam = update !== '++' ? `, update: '${ update }'` : '';
+
+		let updateParam = '';
+
+		if ( node.afterthought.isUnary ) {
+
+			if ( node.afterthought.type !== '++' ) {
+
+				updateParam = `, update: '${ node.afterthought.type }'`;
+
+			}
+
+		} else if ( node.afterthought.isOperator ) {
+
+			if ( node.afterthought.right.isAccessor || node.afterthought.right.isNumber ) {
+
+				updateParam = `, update: ${ this.emitExpression( node.afterthought.right ) }`;
+
+			} else {
+
+				updateParam = `, update: ( { i } ) => ${ this.emitExpression( node.afterthought ) }`;
+
+			}
+
+		}
 
 		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
 

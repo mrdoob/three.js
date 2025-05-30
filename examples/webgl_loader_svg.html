@@ -142,6 +142,10 @@
 
 				//
 
+				if ( scene ) disposeScene( scene );
+
+				//
+
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xb0b0b0 );
 
@@ -247,6 +251,21 @@
 			function render() {
 
 				renderer.render( scene, camera );
+
+			}
+
+			function disposeScene( scene ) {
+
+				scene.traverse( function ( object ) {
+			
+					if ( object.isMesh || object.isLine ) {
+
+						object.geometry.dispose();
+						object.material.dispose();
+
+					}
+
+				} );
 
 			}
 

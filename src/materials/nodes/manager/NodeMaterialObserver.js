@@ -5,6 +5,7 @@ const refreshUniforms = [
 	'anisotropyMap',
 	'anisotropyRotation',
 	'aoMap',
+	'aoMapIntensity',
 	'attenuationColor',
 	'attenuationDistance',
 	'bumpMap',
@@ -17,8 +18,10 @@ const refreshUniforms = [
 	'dispersion',
 	'displacementMap',
 	'emissive',
+	'emissiveIntensity',
 	'emissiveMap',
 	'envMap',
+	'envMapIntensity',
 	'gradientMap',
 	'ior',
 	'iridescence',
@@ -26,6 +29,7 @@ const refreshUniforms = [
 	'iridescenceMap',
 	'iridescenceThicknessMap',
 	'lightMap',
+	'lightMapIntensity',
 	'map',
 	'matcap',
 	'metalness',
@@ -243,7 +247,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.renderer.nodes.modelViewMatrix !== null || builder.renderer.nodes.modelNormalViewMatrix !== null )
+		if ( builder.renderer.overrideNodes.modelViewMatrix !== null || builder.renderer.overrideNodes.modelNormalViewMatrix !== null )
 			return true;
 
 		return false;

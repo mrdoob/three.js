@@ -118,6 +118,17 @@ class Background extends DataMap {
 
 				};
 
+				function onBackgroundDispose() {
+
+					background.removeEventListener( 'dispose', onBackgroundDispose );
+
+					backgroundMesh.material.dispose();
+					backgroundMesh.geometry.dispose();
+
+				}
+
+				background.addEventListener( 'dispose', onBackgroundDispose );
+
 			}
 
 			const backgroundCacheKey = backgroundNode.getCacheKey();

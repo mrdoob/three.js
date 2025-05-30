@@ -52,7 +52,7 @@ class DebugNode extends TempNode {
 
 		if ( callback !== null ) {
 
-			callback( code );
+			callback( builder, code );
 
 		} else {
 
@@ -68,6 +68,15 @@ class DebugNode extends TempNode {
 
 export default DebugNode;
 
+/**
+ * TSL function for creating a debug node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node to debug.
+ * @param {?Function} [callback=null] - Optional callback function to handle the debug output.
+ * @returns {DebugNode}
+ */
 export const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) );
 
 addMethodChaining( 'debug', debug );

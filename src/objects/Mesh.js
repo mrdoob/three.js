@@ -94,6 +94,15 @@ class Mesh extends Object3D {
 		 */
 		this.morphTargetInfluences = undefined;
 
+		/**
+		 * The number of instances of this mesh.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
 		this.updateMorphTargets();
 
 	}

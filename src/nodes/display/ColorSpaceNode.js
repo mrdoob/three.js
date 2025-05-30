@@ -127,35 +127,15 @@ class ColorSpaceNode extends TempNode {
 export default ColorSpaceNode;
 
 /**
- * TSL function for converting a given color node to the current output color space.
- *
- * @tsl
- * @function
- * @param {Node} node - Represents the node to convert.
- * @returns {ColorSpaceNode}
- */
-export const toOutputColorSpace = ( node ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, OUTPUT_COLOR_SPACE ) );
-
-/**
- * TSL function for converting a given color node to the current working color space.
- *
- * @tsl
- * @function
- * @param {Node} node - Represents the node to convert.
- * @returns {ColorSpaceNode}
- */
-export const toWorkingColorSpace = ( node ) => nodeObject( new ColorSpaceNode( nodeObject( node ), OUTPUT_COLOR_SPACE, WORKING_COLOR_SPACE ) );
-
-/**
  * TSL function for converting a given color node from the current working color space to the given color space.
  *
  * @tsl
  * @function
  * @param {Node} node - Represents the node to convert.
- * @param {string} colorSpace - The target color space.
+ * @param {string} targetColorSpace - The target color space.
  * @returns {ColorSpaceNode}
  */
-export const workingToColorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, colorSpace ) );
+export const workingToColorSpace = ( node, targetColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, targetColorSpace ) );
 
 /**
  * TSL function for converting a given color node from the given color space to the current working color space.
@@ -163,10 +143,10 @@ export const workingToColorSpace = ( node, colorSpace ) => nodeObject( new Color
  * @tsl
  * @function
  * @param {Node} node - Represents the node to convert.
- * @param {string} colorSpace - The source color space.
+ * @param {string} sourceColorSpace - The source color space.
  * @returns {ColorSpaceNode}
  */
-export const colorSpaceToWorking = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, WORKING_COLOR_SPACE ) );
+export const colorSpaceToWorking = ( node, sourceColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), sourceColorSpace, WORKING_COLOR_SPACE ) );
 
 /**
  * TSL function for converting a given color node from one color space to another one.
@@ -179,9 +159,6 @@ export const colorSpaceToWorking = ( node, colorSpace ) => nodeObject( new Color
  * @returns {ColorSpaceNode}
  */
 export const convertColorSpace = ( node, sourceColorSpace, targetColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), sourceColorSpace, targetColorSpace ) );
-
-addMethodChaining( 'toOutputColorSpace', toOutputColorSpace );
-addMethodChaining( 'toWorkingColorSpace', toWorkingColorSpace );
 
 addMethodChaining( 'workingToColorSpace', workingToColorSpace );
 addMethodChaining( 'colorSpaceToWorking', colorSpaceToWorking );

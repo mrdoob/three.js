@@ -80,7 +80,13 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
+
 		this.node.build( builder );
+
+		builder.setContext( previousContext );
 
 	}
 
@@ -90,11 +96,9 @@ class ContextNode extends Node {
 
 		builder.setContext( { ...builder.context, ...this.value } );
 
-		const node = this.node.build( builder );
+		this.node.build( builder );
 
 		builder.setContext( previousContext );
-
-		return node;
 
 	}
 

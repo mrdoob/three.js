@@ -64,18 +64,7 @@ class ShadowBaseNode extends Node {
 
 		// Use assign inside an Fn()
 
-		shadowPositionWorld.assign( material.shadowPositionNode || context.shadowPositionWorld || positionWorld );
-
-	}
-
-	/**
-	 * Can be called when the shadow isn't required anymore. That can happen when
-	 * a lighting node stops casting shadows by setting {@link Object3D#castShadow}
-	 * to `false`.
-	 */
-	dispose() {
-
-		this.updateBeforeType = NodeUpdateType.NONE;
+		shadowPositionWorld.assign( material.receivedShadowPositionNode || context.shadowPositionWorld || positionWorld );
 
 	}
 

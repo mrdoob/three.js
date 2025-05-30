@@ -1,6 +1,8 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
+const _errorMap = new WeakMap();
+
 /**
  * A loader for loading images as an [ImageBitmap]{@link https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap}.
  * An `ImageBitmap` provides an asynchronous and resource efficient pathway to prepare
@@ -11,7 +13,7 @@ import { Loader } from './Loader.js';
  *
  * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
  *
- * Also note that unlike {@link FileLoader}, this loader does not avoid multiple concurrent requests to the same URL.
+ * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
@@ -111,15 +113,27 @@ class ImageBitmapLoader extends Loader {
 
 				cached.then( imageBitmap => {
 
-					if ( onLoad ) onLoad( imageBitmap );
+					// check if there is an error for the cached promise
 
-					scope.manager.itemEnd( url );
+					if ( _errorMap.has( cached ) === true ) {
 
-				} ).catch( e => {
+						if ( onError ) onError( _errorMap.get( cached ) );
 
-					if ( onError ) onError( e );
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if ( onLoad ) onLoad( imageBitmap );
+
+						scope.manager.itemEnd( url );
+
+						return imageBitmap;
+
+					}
 
 				} );
+
 				return;
 
 			}
@@ -162,6 +176,8 @@ class ImageBitmapLoader extends Loader {
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
+
+			_errorMap.set( promise, e );
 
 			Cache.remove( url );
 

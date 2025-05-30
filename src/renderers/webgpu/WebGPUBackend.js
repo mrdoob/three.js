@@ -362,7 +362,7 @@ class WebGPUBackend extends Backend {
 	 */
 	_isRenderCameraDepthArray( renderContext ) {
 
-		return renderContext.depthTexture && renderContext.depthTexture.isDepthArrayTexture && renderContext.camera.isArrayCamera;
+		return renderContext.depthTexture && renderContext.depthTexture.image.depth > 1 && renderContext.camera.isArrayCamera;
 
 	}
 
@@ -444,7 +444,7 @@ class WebGPUBackend extends Backend {
 					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
 					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
 
-				} else if ( renderTarget.isRenderTargetArray ) {
+				} else if ( renderTarget.isRenderTarget && textures[ i ].image.depth > 1 ) {
 
 					if ( isRenderCameraDepthArray === true ) {
 
@@ -509,7 +509,7 @@ class WebGPUBackend extends Backend {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
 				const options = {};
-				if ( renderContext.depthTexture.isDepthArrayTexture ) {
+				if ( renderContext.depthTexture.isArrayTexture ) {
 
 					options.dimension = GPUTextureViewDimension.TwoD;
 					options.arrayLayerCount = 1;
@@ -1326,7 +1326,8 @@ class WebGPUBackend extends Backend {
 		// pipeline
 
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		passEncoderGPU.setPipeline( pipelineGPU );
+
+		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 
 		// bind groups
 
@@ -1422,7 +1423,7 @@ class WebGPUBackend extends Backend {
 		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
 
 			// pipeline
-			passEncoderGPU.setPipeline( pipelineGPU );
+			this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 			currentSets.pipeline = pipelineGPU;
 
 			// bind groups
@@ -1653,8 +1654,8 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-		  // Regular single camera rendering
-		  if ( renderContextData.currentPass ) {
+			// Regular single camera rendering
+			if ( renderContextData.currentPass ) {
 
 				// Handle occlusion queries
 				if ( renderContextData.occlusionQuerySet !== undefined ) {
@@ -2355,8 +2356,6 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
-		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
-
 		if ( renderContextData.currentPass ) {
 
 			const { descriptor } = renderContextData;
@@ -2390,6 +2389,12 @@ class WebGPUBackend extends Backend {
 		} else {
 
 			this.device.queue.submit( [ encoder.finish() ] );
+
+		}
+
+		if ( texture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( texture );
 
 		}
 

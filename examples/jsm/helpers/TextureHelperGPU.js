@@ -51,7 +51,7 @@ class TextureHelper extends Mesh {
 
 			colorNode = texture3D( texture ).sample( uvw );
 
-		} else if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+		} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 			colorNode = textureNode( texture ).sample( uvw.xy ).depth( uvw.z );
 
@@ -100,7 +100,7 @@ function getImageCount( texture ) {
 
 		return 6;
 
-	} else if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+	} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 		return texture.image.depth;
 
@@ -122,7 +122,7 @@ function getAlpha( texture ) {
 
 		return 1;
 
-	} else if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+	} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 		return Math.max( 1 / texture.image.depth, 0.25 );
 
@@ -192,7 +192,7 @@ function createSliceGeometry( texture, width, height, depth ) {
 			const v = texture.flipY ? uv.getY( j ) : 1 - uv.getY( j );
 			const w = sliceCount === 1
 				? 1
-				: texture.isDataArrayTexture || texture.isCompressedArrayTexture
+				: texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture
 					? i
 					: i / ( sliceCount - 1 );
 

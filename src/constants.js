@@ -1,4 +1,4 @@
-export const REVISION = '176dev';
+export const REVISION = '177dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -744,25 +744,6 @@ export const RGBFormat = 1022;
  * @constant
  */
 export const RGBAFormat = 1023;
-
-/**
- * reads each element as a single luminance component. This is then converted to a floating point,
- * clamped to the range `[0,1]`, and then assembled into an RGBA element by placing the luminance value
- * in the red, green and blue channels, and attaching 1.0 to the alpha channel.
- *
- * @type {number}
- * @constant
- */
-export const LuminanceFormat = 1024;
-
-/**
- * Reads each element as a luminance/alpha double. The same process occurs as for the `LuminanceFormat`,
- * except that the alpha channel may have values other than `1.0`.
- *
- * @type {number}
- * @constant
- */
-export const LuminanceAlphaFormat = 1025;
 
 /**
  * Reads each element as a single depth value, converts it to floating point, and clamps to the range `[0,1]`.

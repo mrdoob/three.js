@@ -18,9 +18,9 @@ class VertexColorNode extends AttributeNode {
 	/**
 	 * Constructs a new vertex color node.
 	 *
-	 * @param {number} [index=0] - The attribute index.
+	 * @param {number} index - The attribute index.
 	 */
-	constructor( index = 0 ) {
+	constructor( index ) {
 
 		super( null, 'vec4' );
 
@@ -104,7 +104,7 @@ export default VertexColorNode;
  *
  * @tsl
  * @function
- * @param {number} index - The attribute index.
+ * @param {number} [index=0] - The attribute index.
  * @returns {VertexColorNode}
  */
-export const vertexColor = ( index ) => nodeObject( new VertexColorNode( index ) );
+export const vertexColor = ( index = 0 ) => nodeObject( new VertexColorNode( index ) );

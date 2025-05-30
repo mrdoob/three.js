@@ -351,7 +351,7 @@ class SSAOPass extends Pass {
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 

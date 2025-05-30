@@ -143,8 +143,6 @@
 		THREE.RGBFormat
 		THREE.RGBAFormat 
 		THREE.RGBAIntegerFormat
-		THREE.LuminanceFormat 
-		THREE.LuminanceAlphaFormat 
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -180,16 +178,6 @@
 			الزرقاء والألفا. يتم قراءة `texels` كأعداد صحيحة بدلاً من
 			نقطة عائمة.
 			<br /> <br />
-		 
-			[page:constant LuminanceFormat] يقرأ كل عنصر كمكون إضاءة واحد
-			. يتم تحويله بعد ذلك إلى نقطة عائمة ، ويتم تثبيته في
- 			النطاق [0،1] ، ثم يتم تجميعه في عنصر RGBA عن طريق وضع
- 			قيمة الإضاءة في القنوات الحمراء والخضراء والزرقاء ، وإرفاق `1.0` بـ
- 			قناة الألفا. <br /> <br />
-
- 			[page:constant LuminanceAlphaFormat] يقرأ كل عنصر كـ
- 			مزدوج إضاءة / ألفا. يحدث نفس العملية كما هو الحال في [page:constant LuminanceFormat] ، باستثناء أن قناة الألفا قد تحتوي على قيم غير
- 			`1.0`. <br /> <br />
 
  			[page:constant DepthFormat] يقرأ كل عنصر كقيمة عمق واحدة ،
  			يتحول إلى نقطة عائمة ، ويتم تثبيته في النطاق [0،1]. هذا هو

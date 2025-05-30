@@ -17,6 +17,12 @@ import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
 import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
+
+//
+
+const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
+const _shadowRenderObjectKeys = [];
 
 /**
  * Creates a function to render shadow objects in a scene.
@@ -38,25 +44,44 @@ import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFil
  */
 export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
-	return ( object, scene, _camera, geometry, material, group, ...params ) => {
+	_shadowRenderObjectKeys[ 0 ] = renderer;
+	_shadowRenderObjectKeys[ 1 ] = shadow;
 
-		if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+	let renderObjectFunction = _shadowRenderObjectLibrary.get( _shadowRenderObjectKeys );
 
-			if ( useVelocity ) {
+	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
 
-				getDataFromObject( object ).useVelocity = true;
+		renderObjectFunction = ( object, scene, _camera, geometry, material, group, ...params ) => {
+
+			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( useVelocity ) {
+
+					getDataFromObject( object ).useVelocity = true;
+
+				}
+
+				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
-			object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		};
 
-			renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+		renderObjectFunction.shadowType = shadowType;
+		renderObjectFunction.useVelocity = useVelocity;
 
-			object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		_shadowRenderObjectLibrary.set( _shadowRenderObjectKeys, renderObjectFunction );
 
-		}
+	}
 
-	};
+	_shadowRenderObjectKeys[ 0 ] = null;
+	_shadowRenderObjectKeys[ 1 ] = null;
+
+	return renderObjectFunction;
 
 };
 
@@ -85,7 +110,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
 
-		if ( shadowPass.value.isDepthArrayTexture || shadowPass.value.isDataArrayTexture ) {
+		if ( shadowPass.value.isArrayTexture ) {
 
 			depth = depth.depth( depthLayer );
 
@@ -131,7 +156,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
 
-		if ( shadowPass.value.isDepthArrayTexture || shadowPass.value.isDataArrayTexture ) {
+		if ( shadowPass.value.isArrayTexture ) {
 
 			distribution = distribution.depth( depthLayer );
 
@@ -365,6 +390,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
+		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
@@ -391,15 +417,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		// VSM
 
-		if ( shadowMapType === VSMShadowMap ) {
+		if ( shadowMapType === VSMShadowMap && shadow.isPointLightShadow !== true ) {
 
 			depthTexture.compareFunction = null; // VSM does not use textureSampleCompare()/texture2DCompare()
 
-			if ( shadowMap.isRenderTargetArray ) {
+			if ( shadowMap.depth > 1 ) {
 
 				if ( ! shadowMap._vsmShadowMapVertical ) {
 
-					shadowMap._vsmShadowMapVertical = builder.createRenderTargetArray( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth, { format: RGFormat, type: HalfFloatType, depthBuffer: false } );
+					shadowMap._vsmShadowMapVertical = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType, depth: shadowMap.depth, depthBuffer: false } );
 					shadowMap._vsmShadowMapVertical.texture.name = 'VSMVertical';
 
 				}
@@ -408,7 +434,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				if ( ! shadowMap._vsmShadowMapHorizontal ) {
 
-					shadowMap._vsmShadowMapHorizontal = builder.createRenderTargetArray( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth, { format: RGFormat, type: HalfFloatType, depthBuffer: false } );
+					shadowMap._vsmShadowMapHorizontal = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType, depth: shadowMap.depth, depthBuffer: false } );
 					shadowMap._vsmShadowMapHorizontal.texture.name = 'VSMHorizontal';
 
 				}
@@ -425,7 +451,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			let shadowPassVertical = texture( depthTexture );
 
-			if ( depthTexture.isDepthArrayTexture ) {
+			if ( depthTexture.isArrayTexture ) {
 
 				shadowPassVertical = shadowPassVertical.depth( this.depthLayer );
 
@@ -433,7 +459,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			let shadowPassHorizontal = texture( this.vsmShadowMapVertical.texture );
 
-			if ( depthTexture.isDepthArrayTexture ) {
+			if ( depthTexture.isArrayTexture ) {
 
 				shadowPassHorizontal = shadowPassHorizontal.depth( this.depthLayer );
 
@@ -471,13 +497,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		}
 
-		const shadowDepthTexture = ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
+		const shadowDepthTexture = ( shadowMapType === VSMShadowMap && shadow.isPointLightShadow !== true ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
 
 		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow, depthLayer: this.depthLayer } );
 
 		let shadowColor = texture( shadowMap.texture, shadowCoord );
 
-		if ( depthTexture.isDepthArrayTexture ) {
+		if ( depthTexture.isArrayTexture ) {
 
 			shadowColor = shadowColor.depth( this.depthLayer );
 
@@ -569,7 +595,13 @@ class ShadowNode extends ShadowBaseNode {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 
-		shadow.camera.layers.mask = camera.layers.mask;
+		const _shadowCameraLayer = shadow.camera.layers.mask;
+
+		if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) === 0 ) {
+
+			shadow.camera.layers.mask = camera.layers.mask;
+
+		}
 
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
@@ -582,6 +614,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 
+		renderer.setClearColor( 0x000000, 0 );
+
 		renderer.setRenderTarget( shadowMap );
 
 		this.renderShadow( frame );
@@ -590,11 +624,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		// vsm blur pass
 
-		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {
+		if ( shadowType === VSMShadowMap && shadow.isPointLightShadow !== true ) {
 
 			this.vsmPass( renderer );
 
 		}
+
+		shadow.camera.layers.mask = _shadowCameraLayer;
 
 		restoreRendererAndSceneState( renderer, scene, _rendererState );
 

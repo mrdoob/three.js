@@ -113,7 +113,9 @@ class WebGPUAttributeUtils {
 
 			}
 
-			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+			// ensure 4 byte alignment
+			const byteLength = array.byteLength;
+			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
 			buffer = device.createBuffer( {
 				label: bufferAttribute.name,

@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.175.0",
+  "version": "0.176.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.cjs",
@@ -48,8 +48,10 @@
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "dev-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
+    "dev": "node utils/build/dev.js && servez -p 8080",
+    "dev-ssl": "node utils/build/dev.js && servez -p 8080 --ssl",
+    "preview": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
+    "preview-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
     "lint-examples": "eslint examples --ext .html",
@@ -112,7 +114,7 @@
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
-    "rollup-plugin-visualizer": "^5.9.0",
+    "rollup-plugin-visualizer": "^6.0.0",
     "servez": "^2.2.4"
   },
   "overrides": {

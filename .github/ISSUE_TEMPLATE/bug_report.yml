@@ -74,6 +74,7 @@ body:
         - Firefox
         - Safari
         - Edge
+        - Quest Browser
   - type: dropdown
     id: os
     attributes:

@@ -30,9 +30,9 @@ export function lightShadowMatrix( light ) {
 
 	const data = getLightData( light );
 
-	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => {
+	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( ( frame ) => {
 
-		if ( light.castShadow !== true ) {
+		if ( light.castShadow !== true || frame.renderer.shadowMap.enabled === false ) {
 
 			light.shadow.updateMatrices( light );
 

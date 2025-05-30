@@ -269,7 +269,7 @@ class OutlinePass extends Pass {
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 
@@ -558,7 +558,8 @@ class OutlinePass extends Pass {
 			},
 
 			vertexShader:
-				`#include <morphtarget_pars_vertex>
+				`#include <batching_pars_vertex>
+				#include <morphtarget_pars_vertex>
 				#include <skinning_pars_vertex>
 
 				varying vec4 projTexCoord;
@@ -567,6 +568,7 @@ class OutlinePass extends Pass {
 
 				void main() {
 
+					#include <batching_vertex>
 					#include <skinbase_vertex>
 					#include <begin_vertex>
 					#include <morphtarget_vertex>

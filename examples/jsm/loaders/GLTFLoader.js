@@ -2217,7 +2217,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 }
 
-const _q = new Quaternion();
+const _quaternion = new Quaternion();
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
@@ -2225,7 +2225,7 @@ class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
 		const result = super.interpolate_( i1, t0, t, t1 );
 
-		_q.fromArray( result ).normalize().toArray( result );
+		_quaternion.fromArray( result ).normalize().toArray( result );
 
 		return result;
 
@@ -4450,6 +4450,11 @@ class GLTFParser {
 			if ( ! parser.associations.has( node ) ) {
 
 				parser.associations.set( node, {} );
+
+			} else if ( nodeDef.mesh !== undefined && parser.meshCache.refs[ nodeDef.mesh ] > 1 ) {
+
+				const mapping = parser.associations.get( node );
+				parser.associations.set( node, { ...mapping } );
 
 			}
 

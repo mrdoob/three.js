@@ -237,6 +237,48 @@ export function getLengthFromType( type ) {
 }
 
 /**
+ * Returns the gpu memory length for the given data type.
+ *
+ * @method
+ * @param {string} type - The data type.
+ * @return {number} The length.
+ */
+export function getMemoryLengthFromType( type ) {
+
+	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /vec2/.test( type ) ) return 2;
+	if ( /vec3/.test( type ) ) return 3;
+	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 4;
+	if ( /mat3/.test( type ) ) return 12;
+	if ( /mat4/.test( type ) ) return 16;
+
+	console.error( 'THREE.TSL: Unsupported type:', type );
+
+}
+
+/**
+ * Returns the byte boundary for the given data type.
+ *
+ * @method
+ * @param {string} type - The data type.
+ * @return {number} The byte boundary.
+ */
+export function getByteBoundaryFromType( type ) {
+
+	if ( /float|int|uint/.test( type ) ) return 4;
+	if ( /vec2/.test( type ) ) return 8;
+	if ( /vec3/.test( type ) ) return 16;
+	if ( /vec4/.test( type ) ) return 16;
+	if ( /mat2/.test( type ) ) return 8;
+	if ( /mat3/.test( type ) ) return 48;
+	if ( /mat4/.test( type ) ) return 64;
+
+	console.error( 'THREE.TSL: Unsupported type:', type );
+
+}
+
+/**
  * Returns the data type for the given value.
  *
  * @method

@@ -72,6 +72,15 @@ class VarNode extends Node {
 		 */
 		this.readOnly = readOnly;
 
+		/**
+		 *
+		 * Add this flag to the node system to indicate that this node require parents.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	getMemberType( builder, name ) {
@@ -167,7 +176,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
  * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
-export const Var = ( node, name = null ) => createVar( node, name ).append();
+export const Var = ( node, name = null ) => createVar( node, name ).toStack();
 
 /**
  * TSL function for creating a const node.
@@ -178,7 +187,7 @@ export const Var = ( node, name = null ) => createVar( node, name ).append();
  * @param {?string} name - The name of the constant in the shader.
  * @returns {VarNode}
  */
-export const Const = ( node, name = null ) => createVar( node, name, true ).append();
+export const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
 
 // Method chaining
 

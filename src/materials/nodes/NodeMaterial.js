@@ -2,7 +2,6 @@ import { Material } from '../Material.js';
 import { NormalBlending } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../../nodes/core/NodeUtils.js';
-import { attribute } from '../../nodes/core/AttributeNode.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAO } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
@@ -14,7 +13,7 @@ import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
-import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { namespace, float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
@@ -24,6 +23,7 @@ import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 
 /**
  * Base class for all node materials.
@@ -229,6 +229,15 @@ class NodeMaterial extends Material {
 		 */
 		this.alphaTestNode = null;
 
+
+		/**
+		 * Discards the fragment if the mask value is `false`.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskNode = null;
+
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
 		 * attribute data, morphing or skinning. This node property allows to overwrite
@@ -278,7 +287,16 @@ class NodeMaterial extends Material {
 		 * @type {?Node<float>}
 		 * @default null
 		 */
-		this.shadowPositionNode = null;
+		this.receivedShadowPositionNode = null;
+
+		/**
+		 * Allows to overwrite the geometry position used for shadow map projection which
+		 * is by default {@link positionLocal}, the vertex position in local space.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.castShadowPositionNode = null;
 
 		/**
 		 * This node can be used to influence how an object using this node material
@@ -362,6 +380,26 @@ class NodeMaterial extends Material {
 		 */
 		this.vertexNode = null;
 
+		// Deprecated properties
+
+		Object.defineProperty( this, 'shadowPositionNode', { // @deprecated, r176
+
+			get: () => {
+
+				return this.receivedShadowPositionNode;
+
+			},
+
+			set: ( value ) => {
+
+				console.warn( 'THREE.NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
+
+				this.receivedShadowPositionNode = value;
+
+			}
+
+		} );
+
 	}
 
 	/**
@@ -417,7 +455,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const vertexNode = this.vertexNode || this.setupVertex( builder );
+		const mvp = this.setupVertex( builder );
+
+		const vertexNode = this.vertexNode || mvp;
 
 		builder.stack.outputNode = vertexNode;
 
@@ -632,7 +672,7 @@ class NodeMaterial extends Material {
 
 		if ( depthNode !== null ) {
 
-			depth.assign( depthNode ).append();
+			depth.assign( depthNode ).toStack();
 
 		}
 
@@ -693,13 +733,13 @@ class NodeMaterial extends Material {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			morphReference( object ).append();
+			morphReference( object ).toStack();
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinning( object ).append();
+			skinning( object ).toStack();
 
 		}
 
@@ -715,19 +755,19 @@ class NodeMaterial extends Material {
 
 		if ( object.isBatchedMesh ) {
 
-			batch( object ).append();
+			batch( object ).toStack();
 
 		}
 
 		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
-			instancedMesh( object ).append();
+			instancedMesh( object ).toStack();
 
 		}
 
 		if ( this.positionNode !== null ) {
 
-			positionLocal.assign( this.positionNode.context( { isPositionNodeInput: true } ) );
+			positionLocal.assign( namespace( this.positionNode, 'POSITION' ) );
 
 		}
 
@@ -743,17 +783,29 @@ class NodeMaterial extends Material {
 	 */
 	setupDiffuseColor( { object, geometry } ) {
 
+		// MASK
+
+		if ( this.maskNode !== null ) {
+
+			// Discard if the mask is `false`
+
+			bool( this.maskNode ).not().discard();
+
+		}
+
+		// COLOR
+
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
 		// VERTEX COLORS
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
+			colorNode = colorNode.mul( vertexColor() );
 
 		}
 
-		// Instanced colors
+		// INSTANCED COLORS
 
 		if ( object.instanceColor ) {
 
@@ -771,8 +823,7 @@ class NodeMaterial extends Material {
 
 		}
 
-
-		// COLOR
+		// DIFFUSE COLOR
 
 		diffuseColor.assign( colorNode );
 
@@ -783,9 +834,11 @@ class NodeMaterial extends Material {
 
 		// ALPHA TEST
 
+		let alphaTestNode = null;
+
 		if ( this.alphaTestNode !== null || this.alphaTest > 0 ) {
 
-			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
+			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
@@ -799,9 +852,17 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
+		// OPAQUE
+
+		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
+
+		if ( isOpaque ) {
 
 			diffuseColor.a.assign( 1.0 );
+
+		} else if ( alphaTestNode === null ) {
+
+			diffuseColor.a.lessThanEqual( 0 ).discard();
 
 		}
 
@@ -1160,12 +1221,14 @@ class NodeMaterial extends Material {
 		this.backdropNode = source.backdropNode;
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
+		this.maskNode = source.maskNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;
 
 		this.depthNode = source.depthNode;
-		this.shadowPositionNode = source.shadowPositionNode;
+		this.receivedShadowPositionNode = source.receivedShadowPositionNode;
+		this.castShadowPositionNode = source.castShadowPositionNode;
 		this.receivedShadowNode = source.receivedShadowNode;
 		this.castShadowNode = source.castShadowNode;
 

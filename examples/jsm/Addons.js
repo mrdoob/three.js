@@ -28,7 +28,6 @@ export * from './effects/AnaglyphEffect.js';
 export * from './effects/AsciiEffect.js';
 export * from './effects/OutlineEffect.js';
 export * from './effects/ParallaxBarrierEffect.js';
-export * from './effects/PeppersGhostEffect.js';
 export * from './effects/StereoEffect.js';
 
 export * from './environments/DebugEnvironment.js';

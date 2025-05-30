@@ -11,6 +11,8 @@ import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat,
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
+import QuadMesh from './QuadMesh.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
@@ -32,8 +34,9 @@ class XRManager extends EventDispatcher {
 	 * Constructs a new XR manager.
 	 *
 	 * @param {Renderer} renderer - The renderer.
+	 * @param {boolean} [multiview=false] - Enables multiview if the device supports it.
 	 */
-	constructor( renderer ) {
+	constructor( renderer, multiview = false ) {
 
 		super();
 
@@ -167,6 +170,8 @@ class XRManager extends EventDispatcher {
 		 * @default false
 		 */
 		this._supportsLayers = false;
+
+		this._frameBufferTargets = null;
 
 		/**
 		 * Helper function to create native WebXR Layer.
@@ -353,6 +358,26 @@ class XRManager extends EventDispatcher {
 		 * @readonly
 		 */
 		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
+
+		/**
+		 * Whether the usage of multiview has been requested by the application or not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 * @readonly
+		 */
+		this._useMultiviewIfPossible = multiview;
+
+		/**
+		 * Whether the usage of multiview is actually enabled. This flag only evaluates to `true`
+		 * if multiview has been requested by the application and the `OVR_multiview2` is available.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._useMultiview = false;
 
 	}
 
@@ -564,7 +589,33 @@ class XRManager extends EventDispatcher {
 
 	}
 
-	createQuadLayer( width, height, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = [] ) {
+	/**
+	 * Returns `true` if the engine renders to a multiview target.
+	 *
+	 * @return {boolean} Whether the engine renders to a multiview render target or not.
+	 */
+	useMultiview() {
+
+		return this._useMultiview;
+
+	}
+
+	/**
+	 * This method can be used in XR applications to create a quadratic layer that presents a separate
+	 * rendered scene.
+	 *
+	 * @param {number} width - The width of the layer plane in world units.
+	 * @param {number} height - The height of the layer plane in world units.
+	 * @param {Vector3} translation - The position/translation of the layer plane in world units.
+	 * @param {Quaternion} quaternion - The orientation of the layer plane expressed as a quaternion.
+	 * @param {number} pixelwidth - The width of the layer's render target in pixels.
+	 * @param {number} pixelheight - The height of the layer's render target in pixels.
+	 * @param {Function} rendercall - A callback function that renders the layer. Similar to code in
+	 * the default animation loop, this method can be used to update/transform 3D object in the layer's scene.
+	 * @param {Object} [attributes={}] - Allows to configure the layer's render target.
+	 * @return {Mesh} A mesh representing the quadratic XR layer. This mesh should be added to the XR scene.
+	 */
+	createQuadLayer( width, height, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = {} ) {
 
 		const geometry = new PlaneGeometry( width, height );
 		const renderTarget = new XRRenderTarget(
@@ -589,6 +640,8 @@ class XRManager extends EventDispatcher {
 				resolveDepthBuffer: false,
 				resolveStencilBuffer: false
 			} );
+
+		renderTarget.autoAllocateDepthBuffer = true;
 
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
 		material.map = renderTarget.texture;
@@ -637,7 +690,23 @@ class XRManager extends EventDispatcher {
 
 	}
 
-	createCylinderLayer( radius, centralAngle, aspectratio, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = [] ) {
+	/**
+	 * This method can be used in XR applications to create a cylindrical layer that presents a separate
+	 * rendered scene.
+	 *
+	 * @param {number} radius - The radius of the cylinder in world units.
+	 * @param {number} centralAngle - The central angle of the cylinder in radians.
+	 * @param {number} aspectratio - The aspect ratio.
+	 * @param {Vector3} translation - The position/translation of the layer plane in world units.
+	 * @param {Quaternion} quaternion - The orientation of the layer plane expressed as a quaternion.
+	 * @param {number} pixelwidth - The width of the layer's render target in pixels.
+	 * @param {number} pixelheight - The height of the layer's render target in pixels.
+	 * @param {Function} rendercall - A callback function that renders the layer. Similar to code in
+	 * the default animation loop, this method can be used to update/transform 3D object in the layer's scene.
+	 * @param {Object} [attributes={}] - Allows to configure the layer's render target.
+	 * @return {Mesh} A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.
+	 */
+	createCylinderLayer( radius, centralAngle, aspectratio, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = {} ) {
 
 		const geometry = new CylinderGeometry( radius, radius, radius * centralAngle / aspectratio, 64, 64, true, Math.PI - centralAngle / 2, centralAngle );
 		const renderTarget = new XRRenderTarget(
@@ -662,6 +731,8 @@ class XRManager extends EventDispatcher {
 				resolveDepthBuffer: false,
 				resolveStencilBuffer: false
 			} );
+
+		renderTarget.autoAllocateDepthBuffer = true;
 
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
 		material.map = renderTarget.texture;
@@ -711,39 +782,80 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Renders the XR layers that have been previously added to the scene.
+	 *
+	 * This method is usually called in your animation loop before rendering
+	 * the actual scene via `renderer.render( scene, camera );`.
+	 */
 	renderLayers( ) {
 
 		const translationObject = new Vector3();
 		const quaternionObject = new Quaternion();
+		const renderer = this._renderer;
 
 		const wasPresenting = this.isPresenting;
+		const rendererOutputTarget = renderer.getOutputRenderTarget();
+		const rendererFramebufferTarget = renderer._frameBufferTarget;
 		this.isPresenting = false;
+
+		const rendererSize = new Vector2();
+		renderer.getSize( rendererSize );
+		const rendererQuad = renderer._quad;
 
 		for ( const layer of this._layers ) {
 
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget.hasExternalTextures = layer.renderTarget.isXRRenderTarget;
-			layer.renderTarget.autoAllocateDepthBuffer = ! layer.renderTarget.isXRRenderTarget;
 
 			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
 
 				layer.xrlayer.transform = new XRRigidTransform( layer.plane.getWorldPosition( translationObject ), layer.plane.getWorldQuaternion( quaternionObject ) );
 
 				const glSubImage = this._glBinding.getSubImage( layer.xrlayer, this._xrFrame );
-				this._renderer.backend.setXRRenderTargetTextures(
+				renderer.backend.setXRRenderTargetTextures(
 					layer.renderTarget,
 					glSubImage.colorTexture,
-					glSubImage.depthStencilTexture );
+					undefined );
+
+				renderer._setXRLayerSize( layer.renderTarget.width, layer.renderTarget.height );
+				renderer.setOutputRenderTarget( layer.renderTarget );
+				renderer.setRenderTarget( null );
+				renderer._frameBufferTarget = null;
+
+				this._frameBufferTargets || ( this._frameBufferTargets = new WeakMap() );
+				const { frameBufferTarget, quad } = this._frameBufferTargets.get( layer.renderTarget ) || { frameBufferTarget: null, quad: null };
+				if ( ! frameBufferTarget ) {
+
+					renderer._quad = new QuadMesh( new NodeMaterial() );
+					this._frameBufferTargets.set( layer.renderTarget, { frameBufferTarget: renderer._getFrameBufferTarget(), quad: renderer._quad } );
+
+				} else {
+
+					renderer._frameBufferTarget = frameBufferTarget;
+					renderer._quad = quad;
+
+				}
+
+				layer.rendercall();
+
+				renderer._frameBufferTarget = null;
+
+			} else {
+
+				renderer.setRenderTarget( layer.renderTarget );
+				layer.rendercall();
 
 			}
 
-			this._renderer.setRenderTarget( layer.renderTarget );
-			layer.rendercall();
-
 		}
 
+		renderer.setRenderTarget( null );
+		renderer.setOutputRenderTarget( rendererOutputTarget );
+		renderer._frameBufferTarget = rendererFramebufferTarget;
+		renderer._setXRLayerSize( rendererSize.x, rendererSize.y );
+		renderer._quad = rendererQuad;
 		this.isPresenting = wasPresenting;
-		this._renderer.setRenderTarget( null );
 
 	}
 
@@ -822,8 +934,16 @@ class XRManager extends EventDispatcher {
 				const projectionlayerInit = {
 					colorFormat: gl.RGBA8,
 					depthFormat: glDepthFormat,
-					scaleFactor: this._framebufferScaleFactor
+					scaleFactor: this._framebufferScaleFactor,
+					clearOnAccess: false
 				};
+
+				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2' ) ) {
+
+					projectionlayerInit.textureType = 'texture-array';
+					this._useMultiview = true;
+
+				}
 
 				const glBinding = new XRWebGLBinding( session, gl );
 				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
@@ -833,7 +953,10 @@ class XRManager extends EventDispatcher {
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+				renderer._setXRLayerSize( glProjLayer.textureWidth, glProjLayer.textureHeight );
+
+				const depth = this._useMultiview ? 2 : 1;
+				const depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, depth );
 
 				this._xrRenderTarget = new XRRenderTarget(
 					glProjLayer.textureWidth,
@@ -842,16 +965,21 @@ class XRManager extends EventDispatcher {
 						format: RGBAFormat,
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
-						depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+						depthTexture: depthTexture,
 						stencilBuffer: renderer.stencil,
 						samples: attributes.antialias ? 4 : 0,
 						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
 						resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
+						depth: this._useMultiview ? 2 : 1,
+						multiview: this._useMultiview
 					} );
 
 				this._xrRenderTarget.hasExternalTextures = true;
+				this._xrRenderTarget.depth = this._useMultiview ? 2 : 1;
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
+
+				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
 				if ( this._supportsLayers ) {
 
@@ -893,7 +1021,7 @@ class XRManager extends EventDispatcher {
 				session.updateRenderState( { baseLayer: glBaseLayer } );
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+				renderer._setXRLayerSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight );
 
 				this._xrRenderTarget = new XRRenderTarget(
 					glBaseLayer.framebufferWidth,
@@ -908,13 +1036,13 @@ class XRManager extends EventDispatcher {
 					}
 				);
 
+				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
 			}
 
 			//
 
 			this.setFoveation( this.getFoveation() );
-
-			this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
 			renderer._animation.setAnimationLoop( this._onAnimationFrame );
 			renderer._animation.setContext( session );
@@ -950,6 +1078,7 @@ class XRManager extends EventDispatcher {
 
 		cameraXR.near = cameraR.near = cameraL.near = depthNear;
 		cameraXR.far = cameraR.far = cameraL.far = depthFar;
+		cameraXR.isMultiViewCamera = this._useMultiview;
 
 		if ( this._currentDepthNear !== cameraXR.near || this._currentDepthFar !== cameraXR.far ) {
 
@@ -1212,9 +1341,7 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
-	renderer.backend.setXRTarget( null );
-	renderer.setOutputRenderTarget( null );
-	renderer.setRenderTarget( null );
+	renderer._resetXRState();
 
 	this._session = null;
 	this._xrRenderTarget = null;
@@ -1252,6 +1379,8 @@ function onSessionEnd() {
 
 			layer.plane.material = layer.material;
 			layer.material.map = layer.renderTarget.texture;
+			layer.material.map.offset.y = 1;
+			layer.material.map.repeat.y = - 1;
 			delete layer.xrlayer;
 
 		}
@@ -1261,9 +1390,9 @@ function onSessionEnd() {
 	//
 
 	this.isPresenting = false;
+	this._useMultiview = false;
 
 	renderer._animation.stop();
-
 	renderer._animation.setAnimationLoop( this._currentAnimationLoop );
 	renderer._animation.setContext( this._currentAnimationContext );
 	renderer._animation.start();
@@ -1351,25 +1480,25 @@ function createXRLayer( layer ) {
 
 		return this._glBinding.createQuadLayer( {
 			transform: new XRRigidTransform( layer.translation, layer.quaternion ),
-			depthFormat: this._gl.DEPTH_COMPONENT,
 			width: layer.width / 2,
 			height: layer.height / 2,
 			space: this._referenceSpace,
 			viewPixelWidth: layer.pixelwidth,
-			viewPixelHeight: layer.pixelheight
+			viewPixelHeight: layer.pixelheight,
+			clearOnAccess: false
 		} );
 
 	} else {
 
 		return this._glBinding.createCylinderLayer( {
 			transform: new XRRigidTransform( layer.translation, layer.quaternion ),
-			depthFormat: this._gl.DEPTH_COMPONENT,
 			radius: layer.radius,
 			centralAngle: layer.centralAngle,
 			aspectRatio: layer.aspectRatio,
 			space: this._referenceSpace,
 			viewPixelWidth: layer.pixelwidth,
-			viewPixelHeight: layer.pixelheight
+			viewPixelHeight: layer.pixelheight,
+			clearOnAccess: false
 		} );
 
 	}
@@ -1431,7 +1560,7 @@ function onAnimationFrame( time, frame ) {
 					backend.setXRRenderTargetTextures(
 						this._xrRenderTarget,
 						glSubImage.colorTexture,
-						this._glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture
+						( this._glProjLayer.ignoreDepthValues && ! this._useMultiview ) ? undefined : glSubImage.depthStencilTexture
 					);
 
 				}

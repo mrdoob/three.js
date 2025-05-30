@@ -53,13 +53,13 @@ export const RaymarchingBox = ( steps, callback ) => {
 	bounds.assign( vec2( max( bounds.x, 0.0 ), bounds.y ) );
 
 	const inc = vec3( rayDir.abs().reciprocal() ).toVar();
-	const delta = float( min( inc.x, min( inc.y, inc.z ) ) ).toVar( 'rayDelta' ); // used 'rayDelta' name in loop
+	const delta = float( min( inc.x, min( inc.y, inc.z ) ) ).toVar();
 
 	delta.divAssign( float( steps ) );
 
 	const positionRay = vec3( vOrigin.add( bounds.x.mul( rayDir ) ) ).toVar();
 
-	Loop( { type: 'float', start: bounds.x, end: bounds.y, update: '+= rayDelta' }, () => {
+	Loop( { type: 'float', start: bounds.x, end: bounds.y, update: delta }, () => {
 
 		callback( { positionRay } );
 

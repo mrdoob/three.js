@@ -161,6 +161,17 @@ class ReflectorNode extends TextureNode {
 
 	}
 
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this._reflectorBaseNode.dispose();
+
+	}
+
 }
 
 /**
@@ -269,9 +280,9 @@ class ReflectorBaseNode extends Node {
 		/**
 		 * Weak map for managing render targets.
 		 *
-		 * @type {WeakMap<Camera, RenderTarget>}
+		 * @type {Map<Camera, RenderTarget>}
 		 */
-		this.renderTargets = new WeakMap();
+		this.renderTargets = new Map();
 
 		/**
 		 * Force render even if reflector is facing away from camera.
@@ -280,6 +291,17 @@ class ReflectorBaseNode extends Node {
 		 * @default {false}
 		 */
 		this.forceUpdate = false;
+
+		/**
+		 * Whether the reflector has been rendered or not.
+		 *
+		 * When the reflector is facing away from the camera,
+		 * this flag is set to `false` and the texture will be empty(black).
+		 *
+		 * @type {boolean}
+		 * @default {false}
+		 */
+		this.hasOutput = false;
 
 	}
 
@@ -305,6 +327,21 @@ class ReflectorBaseNode extends Node {
 		this._updateResolution( _defaultRT, builder.renderer );
 
 		return super.setup( builder );
+
+	}
+
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		for ( const renderTarget of this.renderTargets.values() ) {
+
+			renderTarget.dispose();
+
+		}
 
 	}
 
@@ -398,7 +435,21 @@ class ReflectorBaseNode extends Node {
 		// Avoid rendering when reflector is facing away unless forcing an update
 		const isFacingAway = _view.dot( _normal ) > 0;
 
-		if ( isFacingAway === true && this.forceUpdate === false ) return;
+		let needsClear = false;
+
+		if ( isFacingAway === true && this.forceUpdate === false ) {
+
+			if ( this.hasOutput === false ) {
+
+				_inReflector = false;
+
+				return;
+
+			}
+
+			needsClear = true;
+
+		}
 
 		_view.reflect( _normal ).negate();
 		_view.add( _reflectorWorldPosition );
@@ -473,7 +524,19 @@ class ReflectorBaseNode extends Node {
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = true;
 
-		renderer.render( scene, virtualCamera );
+		if ( needsClear ) {
+
+			renderer.clear();
+
+			this.hasOutput = false;
+
+		} else {
+
+			renderer.render( scene, virtualCamera );
+
+			this.hasOutput = true;
+
+		}
 
 		renderer.setMRT( currentMRT );
 		renderer.setRenderTarget( currentRenderTarget );

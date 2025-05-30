@@ -25,6 +25,7 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+const _hashData = [];
 
 /**
  * This node represents the scene's lighting and manages the lighting model's life cycle
@@ -107,23 +108,38 @@ class LightsNode extends Node {
 	}
 
 	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
-	 * light IDs into the cache key.
+	 * Overwrites the default {@link Node#customCacheKey} implementation by including
+	 * light data into the cache key.
 	 *
 	 * @return {number} The custom cache key.
 	 */
 	customCacheKey() {
 
-		const lightIDs = [];
 		const lights = this._lights;
 
 		for ( let i = 0; i < lights.length; i ++ ) {
 
-			lightIDs.push( lights[ i ].id );
+			const light = lights[ i ];
+
+			_hashData.push( light.id );
+			_hashData.push( light.castShadow ? 1 : 0 );
+
+			if ( light.isSpotLight === true ) {
+
+				const hashMap = ( light.map !== null ) ? light.map.id : - 1;
+				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : - 1;
+
+				_hashData.push( hashMap, hashColorNode );
+
+			}
 
 		}
 
-		return hashArray( lightIDs );
+		const cacheKey = hashArray( _hashData );
+
+		_hashData.length = 0;
+
+		return cacheKey;
 
 	}
 
@@ -157,13 +173,15 @@ class LightsNode extends Node {
 
 	analyze( builder ) {
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		for ( const node of properties.nodes ) {
 
 			node.build( builder );
 
 		}
+
+		properties.outputNode.build( builder );
 
 	}
 
@@ -313,7 +331,7 @@ class LightsNode extends Node {
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		if ( lightingModel ) {
 

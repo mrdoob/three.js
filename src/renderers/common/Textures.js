@@ -77,10 +77,13 @@ class Textures extends DataMap {
 		if ( depthTexture === undefined && useDepthTexture ) {
 
 			depthTexture = new DepthTexture();
+
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
 			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
+			depthTexture.image.depth = size.depth;
+			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 
@@ -95,7 +98,7 @@ class Textures extends DataMap {
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = depthTexture.isDepthArrayTexture ? depthTexture.image.depth : 1;
+				depthTexture.image.depth = depthTexture.isArrayTexture ? depthTexture.image.depth : 1;
 
 			}
 
@@ -331,8 +334,6 @@ class Textures extends DataMap {
 
 				this._destroyTexture( texture );
 
-				this.info.memory.textures --;
-
 			};
 
 			texture.addEventListener( 'dispose', onDispose );
@@ -433,10 +434,16 @@ class Textures extends DataMap {
 	 */
 	_destroyTexture( texture ) {
 
-		this.backend.destroySampler( texture );
-		this.backend.destroyTexture( texture );
+		if ( this.has( texture ) === true ) {
 
-		this.delete( texture );
+			this.backend.destroySampler( texture );
+			this.backend.destroyTexture( texture );
+
+			this.delete( texture );
+
+			this.info.memory.textures --;
+
+		}
 
 	}
 

@@ -248,13 +248,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
-		} else if ( this.isFilteredTexture( texture ) ) {
-
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
-
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0' );
+			return this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, '0', depthSnippet );
 
 		}
 
@@ -291,13 +287,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
-	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @param {string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @return {string} The WGSL snippet.
 	 */
-	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
 
-		if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false ) {
+		if ( this.isUnfilterable( texture ) === false ) {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
@@ -453,7 +448,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
 
-			if ( texture.isDataArrayTexture || texture.isDepthArrayTexture || texture.isData3DTexture ) {
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 				textureData.arrayLayerCount = new VarNode(
 					new ExpressionNode(
@@ -536,7 +531,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		let snippet;
 
-		if ( texture.isVideoTexture === true || texture.isStorageTexture === true ) {
+		if ( texture.isVideoTexture === true ) {
 
 			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
 
@@ -566,12 +561,25 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {string} valueSnippet - A WGSL snippet that represent the new texel value.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureStore( texture, textureProperty, uvIndexSnippet, valueSnippet ) {
+	generateTextureStore( texture, textureProperty, uvIndexSnippet, depthSnippet, valueSnippet ) {
 
-		return `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+		let snippet;
+
+		if ( depthSnippet ) {
+
+			snippet = `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, ${ valueSnippet } )`;
+
+		} else {
+
+			snippet = `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+
+		}
+
+		return snippet;
 
 	}
 
@@ -676,7 +684,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'fragment' ) {
 
-			if ( texture.isDepthArrayTexture ) {
+			if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
 
 				return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } )`;
 
@@ -713,7 +721,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			snippet = this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage );
+			snippet = this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
 
 		}
 
@@ -906,7 +914,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.store = node.isStorageTextureNode === true;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( node.value ) === false && texture.store === false ) {
+				if ( this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
 					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -1614,7 +1622,16 @@ ${ flowData.code }
 
 	isCustomStruct( nodeUniform ) {
 
-		return nodeUniform.value.isStorageBufferAttribute && nodeUniform.node.structTypeNode !== null;
+		const attribute = nodeUniform.value;
+		const bufferNode = nodeUniform.node;
+
+		const isAttributeStructType = ( attribute.isBufferAttribute || attribute.isInstancedBufferAttribute ) && bufferNode.structTypeNode !== null;
+
+		const isStructArray =
+			( bufferNode.value && bufferNode.value.array ) &&
+			( typeof bufferNode.value.itemSize === 'number' && bufferNode.value.array.length > bufferNode.value.itemSize );
+
+		return isAttributeStructType && ! isStructArray;
 
 	}
 
@@ -1642,7 +1659,7 @@ ${ flowData.code }
 
 				const texture = uniform.node.value;
 
-				if ( ( shaderStage === 'fragment' || shaderStage === 'compute' ) && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
+				if ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
 
 					if ( this.isSampleCompare( texture ) ) {
 
@@ -1672,10 +1689,6 @@ ${ flowData.code }
 
 					textureType = 'texture_cube<f32>';
 
-				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					textureType = 'texture_2d_array<f32>';
-
 				} else if ( texture.isDepthTexture === true ) {
 
 					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
@@ -1684,9 +1697,13 @@ ${ flowData.code }
 
 					} else {
 
-						textureType = `texture_depth${ multisampled }_2d${ texture.isDepthArrayTexture === true ? '_array' : '' }`;
+						textureType = `texture_depth${ multisampled }_2d${ texture.isArrayTexture === true ? '_array' : '' }`;
 
 					}
+
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+					textureType = 'texture_2d_array<f32>';
 
 				} else if ( texture.isVideoTexture === true ) {
 

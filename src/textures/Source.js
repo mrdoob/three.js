@@ -73,6 +73,28 @@ class Source {
 
 	}
 
+	getSize( target ) {
+
+		const data = this.data;
+
+		if ( data instanceof HTMLVideoElement ) {
+
+			target.set( data.videoWidth, data.videoHeight );
+
+		} else if ( data !== null ) {
+
+			target.set( data.width, data.height, data.depth || 0 );
+
+		} else {
+
+			target.set( 0, 0, 0 );
+
+		}
+
+		return target;
+
+	}
+
 	/**
 	 * When the property is set to `true`, the engine allocates the memory
 	 * for the texture (if necessary) and triggers the actual texture upload

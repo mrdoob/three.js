@@ -81,7 +81,7 @@ class SkeletonHelper extends LineSegments {
 		this.root = object;
 
 		/**
-		 * he list of bones that the helper visualizes.
+		 * The list of bones that the helper visualizes.
 		 *
 		 * @type {Array<Bone>}
 		 */

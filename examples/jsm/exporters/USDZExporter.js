@@ -315,16 +315,16 @@ function buildXform( object, geometry, material ) {
 
 	}
 
-	return `def Xform "${ name }" (
-	prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
-	prepend apiSchemas = ["MaterialBindingAPI"]
-)
-{
-	matrix4d xformOp:transform = ${ transform }
-	uniform token[] xformOpOrder = ["xformOp:transform"]
+	return `			def Xform "${ name }" (
+				prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
+				prepend apiSchemas = ["MaterialBindingAPI"]
+			)
+			{
+				matrix4d xformOp:transform = ${ transform }
+				uniform token[] xformOpOrder = ["xformOp:transform"]
 
-	rel material:binding = </Materials/Material_${ material.id }>
-}
+				rel material:binding = </Materials/Material_${ material.id }>
+			}
 
 `;
 
@@ -827,7 +827,7 @@ function buildCamera( camera ) {
  *
  * @typedef {Object} USDZExporter~Options
  * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
- * @property {boolean} [includeAnchoringProperties=false] - Whether to include anchoring properties or not.
+ * @property {boolean} [includeAnchoringProperties=true] - Whether to include anchoring properties or not.
  * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
  * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
  * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook

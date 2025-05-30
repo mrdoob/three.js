@@ -3,6 +3,7 @@
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
+import { NearestFilter } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Renderers', () => {
 
@@ -16,6 +17,9 @@ export default QUnit.module( 'Renderers', () => {
 				object instanceof EventDispatcher, true,
 				'WebGLRenderTarget extends from EventDispatcher'
 			);
+
+			const options = new WebGLRenderTarget( 1, 1, { magFilter: NearestFilter } );
+			assert.ok( options.width === 1 && options.height === 1 && options.texture.magFilter === NearestFilter, 'Can instantiate a WebGLRenderTarget with texture options.' );
 
 		} );
 

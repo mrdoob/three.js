@@ -1,4 +1,5 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, SRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare } from '../../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, NoColorSpace, LinearTransfer, SRGBTransfer } from '../../../constants.js';
+import { ColorManagement } from '../../../math/ColorManagement.js';
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
@@ -112,7 +113,7 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
-		} else if ( texture.isDepthArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+		} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 			glTextureType = gl.TEXTURE_2D_ARRAY;
 
@@ -205,6 +206,8 @@ class WebGLTextureUtils {
 
 		if ( glFormat === gl.RGB ) {
 
+			const transfer = forceLinearTransfer ? LinearTransfer : ColorManagement.getTransfer( colorSpace );
+
 			if ( glType === gl.FLOAT ) internalFormat = gl.RGB32F;
 			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.RGB16F;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGB8;
@@ -213,7 +216,7 @@ class WebGLTextureUtils {
 			if ( glType === gl.BYTE ) internalFormat = gl.RGB8I;
 			if ( glType === gl.SHORT ) internalFormat = gl.RGB16I;
 			if ( glType === gl.INT ) internalFormat = gl.RGB32I;
-			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( colorSpace === SRGBColorSpace && forceLinearTransfer === false ) ? gl.SRGB8 : gl.RGB8;
+			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( transfer === SRGBTransfer ) ? gl.SRGB8 : gl.RGB8;
 			if ( glType === gl.UNSIGNED_SHORT_5_6_5 ) internalFormat = gl.RGB565;
 			if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = gl.RGB5_A1;
 			if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = gl.RGB4;
@@ -234,6 +237,8 @@ class WebGLTextureUtils {
 
 		if ( glFormat === gl.RGBA ) {
 
+			const transfer = forceLinearTransfer ? LinearTransfer : ColorManagement.getTransfer( colorSpace );
+
 			if ( glType === gl.FLOAT ) internalFormat = gl.RGBA32F;
 			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.RGBA16F;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGBA8;
@@ -242,7 +247,7 @@ class WebGLTextureUtils {
 			if ( glType === gl.BYTE ) internalFormat = gl.RGBA8I;
 			if ( glType === gl.SHORT ) internalFormat = gl.RGBA16I;
 			if ( glType === gl.INT ) internalFormat = gl.RGBA32I;
-			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( colorSpace === SRGBColorSpace && forceLinearTransfer === false ) ? gl.SRGB8_ALPHA8 : gl.RGBA8;
+			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( transfer === SRGBTransfer ) ? gl.SRGB8_ALPHA8 : gl.RGBA8;
 			if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = gl.RGBA4;
 			if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = gl.RGB5_A1;
 
@@ -295,11 +300,14 @@ class WebGLTextureUtils {
 
 		const { gl, extensions, backend } = this;
 
+		const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
+		const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
+		const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? gl.NONE : gl.BROWSER_DEFAULT_WEBGL;
 
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
@@ -307,7 +315,7 @@ class WebGLTextureUtils {
 		if ( textureType === gl.TEXTURE_3D || textureType === gl.TEXTURE_2D_ARRAY ) {
 
 			// WebGL 2 does not support wrapping for depth 2D array textures
-			if ( ! texture.isDepthArrayTexture ) {
+			if ( ! texture.isArrayTexture ) {
 
 				gl.texParameteri( textureType, gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
 
@@ -409,7 +417,7 @@ class WebGLTextureUtils {
 
 		this.setTextureParameters( glTextureType, texture );
 
-		if ( texture.isDepthArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+		if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 
@@ -489,25 +497,6 @@ class WebGLTextureUtils {
 		if ( texture.isRenderTargetTexture || ( textureGPU === undefined /* unsupported texture format */ ) )
 			return;
 
-		const getImage = ( source ) => {
-
-			if ( source.isDataTexture ) {
-
-				return source.image.data;
-
-			} else if ( ( typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement ) ||
-				( typeof HTMLCanvasElement !== 'undefined' && source instanceof HTMLCanvasElement ) ||
-				( typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap ) ||
-				source instanceof OffscreenCanvas ) {
-
-				return source;
-
-			}
-
-			return source.data;
-
-		};
-
 		this.backend.state.bindTexture( glTextureType, textureGPU );
 
 		this.setTextureParameters( glTextureType, texture );
@@ -571,7 +560,7 @@ class WebGLTextureUtils {
 
 			}
 
-		} else if ( texture.isDataArrayTexture || texture.isDepthArrayTexture ) {
+		} else if ( texture.isDataArrayTexture || texture.isArrayTexture ) {
 
 			const image = options.image;
 
@@ -736,7 +725,7 @@ class WebGLTextureUtils {
 			width = Math.floor( image.width * levelScale );
 			height = Math.floor( image.height * levelScale );
 
-			if ( srcTexture.isDataArrayTexture || srcTexture.isDepthArrayTexture ) {
+			if ( srcTexture.isDataArrayTexture || srcTexture.isArrayTexture ) {
 
 				depth = image.depth;
 
@@ -789,7 +778,7 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
-		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture || dstTexture.isDepthArrayTexture;
+		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture || dstTexture.isArrayTexture;
 		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
 			const srcTextureData = backend.get( srcTexture );
@@ -1143,6 +1132,25 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
 
 	}
+
+}
+
+function getImage( source ) {
+
+	if ( source.isDataTexture ) {
+
+		return source.image.data;
+
+	} else if ( ( typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && source instanceof HTMLCanvasElement ) ||
+		( typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap ) ||
+		( typeof OffscreenCanvas !== 'undefined' && source instanceof OffscreenCanvas ) ) {
+
+		return source;
+
+	}
+
+	return source.data;
 
 }
 
