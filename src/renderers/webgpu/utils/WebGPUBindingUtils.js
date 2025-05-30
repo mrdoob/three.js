@@ -208,7 +208,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
-				} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+				} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture || binding.texture.isTextureArray ) {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
@@ -438,7 +438,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
-						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture || ( binding.texture.isStorageTexture && binding.texture.isTextureArray ) ) {
+						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture || binding.texture.isTextureArray ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 

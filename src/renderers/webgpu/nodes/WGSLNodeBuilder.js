@@ -1722,6 +1722,10 @@ ${ flowData.code }
 
 					textureType = `texture_storage_2d${ isArray }<${ format }, ${ access }>`;
 
+				} else if ( uniform.node.value.isTextureArray === true ) {
+
+					textureType = 'texture_2d_array<f32>';
+
 				} else {
 
 					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
