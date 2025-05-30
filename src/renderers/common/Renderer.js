@@ -1260,7 +1260,7 @@ class Renderer {
 		frameBufferTarget.scissorTest = this._scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
-		frameBufferTarget.autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.autoAllocateDepthBuffer : false;
+		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
 		return frameBufferTarget;
 
