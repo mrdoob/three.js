@@ -325,7 +325,13 @@ class ShaderCallNodeInternal extends Node {
 		const { shaderNode, inputNodes } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
-		if ( properties.onceOutput ) return properties.onceOutput;
+		const onceNS = shaderNode.namespace && shaderNode.namespace === builder.namespace ? builder.getNamespace( 'once' ) : 'once';
+
+		if ( properties[ onceNS ] ) {
+
+			return properties[ onceNS ];
+
+		}
 
 		//
 
@@ -368,31 +374,11 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.once ) {
 
-			properties.onceOutput = result;
+			properties[ onceNS ] = result;
 
 		}
 
 		return result;
-
-	}
-
-	getOutputNode( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode === null ) {
-
-			properties.outputNode = this.setupOutput( builder );
-
-		}
-
-		return properties.outputNode;
-
-	}
-
-	setup( builder ) {
-
-		return this.getOutputNode( builder );
 
 	}
 
@@ -406,11 +392,53 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	generate( builder, output ) {
+	getOutputNode( builder ) {
 
+		const properties = builder.getNodeProperties( this );
+		const outputNamespace = builder.getOutputNamespace();
+
+		properties[ outputNamespace ] = properties[ outputNamespace ] || this.setupOutput( builder );
+
+		return properties[ outputNamespace ];
+
+	}
+
+	build( builder, output = null ) {
+
+		let result = null;
+
+		const buildStage = builder.getBuildStage();
+		const properties = builder.getNodeProperties( this );
+
+		const outputNamespace = builder.getOutputNamespace();
 		const outputNode = this.getOutputNode( builder );
 
-		return outputNode.build( builder, output );
+		if ( buildStage === 'setup' ) {
+
+			const initializedNamespace = builder.getNamespace( 'initialized' );
+
+			if ( properties[ initializedNamespace ] !== true ) {
+
+				properties[ initializedNamespace ] = true;
+
+				properties[ outputNamespace ] = this.getOutputNode( builder );
+				properties[ outputNamespace ].build( builder );
+
+			}
+
+			result = properties[ outputNamespace ];
+
+		} else if ( buildStage === 'analyze' ) {
+
+			outputNode.build( builder, output );
+
+		} else if ( buildStage === 'generate' ) {
+
+			result = outputNode.build( builder, output ) || '';
+
+		}
+
+		return result;
 
 	}
 
@@ -428,6 +456,7 @@ class ShaderNodeInternal extends Node {
 		this.global = true;
 
 		this.once = false;
+		this.namespace = null;
 
 	}
 
@@ -600,7 +629,9 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 		nodeObjects( params );
 
-		if ( params[ 0 ] && params[ 0 ].isNode ) {
+		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+		if ( isArrayAsParameter ) {
 
 			inputs = [ ...params ];
 
@@ -621,6 +652,9 @@ export const Fn = ( jsFunc, layout = null ) => {
 	fn.shaderNode = shaderNode;
 	fn.id = shaderNode.id;
 
+	fn.getNodeType = ( ...params ) => shaderNode.getNodeType( ...params );
+	fn.getCacheKey = ( ...params ) => shaderNode.getCacheKey( ...params );
+
 	fn.setLayout = ( layout ) => {
 
 		shaderNode.setLayout( layout );
@@ -629,9 +663,10 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 	};
 
-	fn.once = () => {
+	fn.once = ( namespace = null ) => {
 
 		shaderNode.once = true;
+		shaderNode.namespace = namespace;
 
 		return fn;
 
@@ -669,16 +704,6 @@ export const Fn = ( jsFunc, layout = null ) => {
 	return fn;
 
 };
-
-//
-
-addMethodChaining( 'toGlobal', ( node ) => {
-
-	node.global = true;
-
-	return node;
-
-} );
 
 //
 

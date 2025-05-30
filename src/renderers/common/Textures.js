@@ -83,6 +83,7 @@ class Textures extends DataMap {
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
+			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 

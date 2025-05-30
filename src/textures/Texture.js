@@ -306,6 +306,14 @@ class Texture extends EventDispatcher {
 		this.userData = {};
 
 		/**
+		 * This can be used to only update a subregion or specific rows of the texture (for example, just the
+		 * first 3 rows). Use the `addUpdateRange()` function to add ranges to this array.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.updateRanges = [];
+
+		/**
 		 * This starts at `0` and counts how many times {@link Texture#needsUpdate} is set to `true`.
 		 *
 		 * @type {number}
@@ -416,6 +424,27 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
+	 * Adds a range of data in the data texture to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
+
+	}
+
+	/**
 	 * Returns a new texture with copied values from this instance.
 	 *
 	 * @return {Texture} A clone of this instance.
@@ -481,6 +510,54 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
+	 * Sets this texture's properties based on `values`.
+	 * @param {Object} values - A container with texture parameters.
+	 */
+	setValues( values ) {
+
+		for ( const key in values ) {
+
+			const newValue = values[ key ];
+
+			if ( newValue === undefined ) {
+
+				console.warn( `THREE.Texture.setValues(): parameter '${ key }' has value of undefined.` );
+				continue;
+
+			}
+
+			const currentValue = this[ key ];
+
+			if ( currentValue === undefined ) {
+
+				console.warn( `THREE.Texture.setValues(): property '${ key }' does not exist.` );
+				continue;
+
+			}
+
+			if ( ( currentValue && newValue ) && ( currentValue.isVector2 && newValue.isVector2 ) ) {
+
+				currentValue.copy( newValue );
+
+			} else if ( ( currentValue && newValue ) && ( currentValue.isVector3 && newValue.isVector3 ) ) {
+
+				currentValue.copy( newValue );
+
+			} else if ( ( currentValue && newValue ) && ( currentValue.isMatrix3 && newValue.isMatrix3 ) ) {
+
+				currentValue.copy( newValue );
+
+			} else {
+
+				this[ key ] = newValue;
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Serializes the texture into JSON.
 	 *
 	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
@@ -500,7 +577,7 @@ class Texture extends EventDispatcher {
 		const output = {
 
 			metadata: {
-				version: 4.6,
+				version: 4.7,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},

@@ -292,6 +292,17 @@ class ReflectorBaseNode extends Node {
 		 */
 		this.forceUpdate = false;
 
+		/**
+		 * Whether the reflector has been rendered or not.
+		 *
+		 * When the reflector is facing away from the camera,
+		 * this flag is set to `false` and the texture will be empty(black).
+		 *
+		 * @type {boolean}
+		 * @default {false}
+		 */
+		this.hasOutput = false;
+
 	}
 
 	/**
@@ -424,7 +435,21 @@ class ReflectorBaseNode extends Node {
 		// Avoid rendering when reflector is facing away unless forcing an update
 		const isFacingAway = _view.dot( _normal ) > 0;
 
-		if ( isFacingAway === true && this.forceUpdate === false ) return;
+		let needsClear = false;
+
+		if ( isFacingAway === true && this.forceUpdate === false ) {
+
+			if ( this.hasOutput === false ) {
+
+				_inReflector = false;
+
+				return;
+
+			}
+
+			needsClear = true;
+
+		}
 
 		_view.reflect( _normal ).negate();
 		_view.add( _reflectorWorldPosition );
@@ -499,7 +524,19 @@ class ReflectorBaseNode extends Node {
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = true;
 
-		renderer.render( scene, virtualCamera );
+		if ( needsClear ) {
+
+			renderer.clear();
+
+			this.hasOutput = false;
+
+		} else {
+
+			renderer.render( scene, virtualCamera );
+
+			this.hasOutput = true;
+
+		}
 
 		renderer.setMRT( currentMRT );
 		renderer.setRenderTarget( currentRenderTarget );

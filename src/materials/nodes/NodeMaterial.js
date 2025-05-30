@@ -13,7 +13,7 @@ import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
-import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { namespace, float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
@@ -228,6 +228,15 @@ class NodeMaterial extends Material {
 		 * @default null
 		 */
 		this.alphaTestNode = null;
+
+
+		/**
+		 * Discards the fragment if the mask value is `false`.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskNode = null;
 
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
@@ -446,7 +455,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const vertexNode = this.vertexNode || this.setupVertex( builder );
+		const mvp = this.setupVertex( builder );
+
+		const vertexNode = this.vertexNode || mvp;
 
 		builder.stack.outputNode = vertexNode;
 
@@ -756,7 +767,7 @@ class NodeMaterial extends Material {
 
 		if ( this.positionNode !== null ) {
 
-			positionLocal.assign( this.positionNode.context( { isPositionNodeInput: true } ) );
+			positionLocal.assign( namespace( this.positionNode, 'POSITION' ) );
 
 		}
 
@@ -772,6 +783,18 @@ class NodeMaterial extends Material {
 	 */
 	setupDiffuseColor( { object, geometry } ) {
 
+		// MASK
+
+		if ( this.maskNode !== null ) {
+
+			// Discard if the mask is `false`
+
+			bool( this.maskNode ).not().discard();
+
+		}
+
+		// COLOR
+
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
 		// VERTEX COLORS
@@ -782,7 +805,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		// Instanced colors
+		// INSTANCED COLORS
 
 		if ( object.instanceColor ) {
 
@@ -800,8 +823,7 @@ class NodeMaterial extends Material {
 
 		}
 
-
-		// COLOR
+		// DIFFUSE COLOR
 
 		diffuseColor.assign( colorNode );
 
@@ -812,9 +834,11 @@ class NodeMaterial extends Material {
 
 		// ALPHA TEST
 
+		let alphaTestNode = null;
+
 		if ( this.alphaTestNode !== null || this.alphaTest > 0 ) {
 
-			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
+			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
@@ -828,9 +852,17 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
+		// OPAQUE
+
+		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
+
+		if ( isOpaque ) {
 
 			diffuseColor.a.assign( 1.0 );
+
+		} else if ( alphaTestNode === null ) {
+
+			diffuseColor.a.lessThanEqual( 0 ).discard();
 
 		}
 
@@ -1189,6 +1221,7 @@ class NodeMaterial extends Material {
 		this.backdropNode = source.backdropNode;
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
+		this.maskNode = source.maskNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;

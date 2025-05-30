@@ -14,6 +14,7 @@ export { default as StorageBufferAttribute } from './renderers/common/StorageBuf
 export { default as StorageInstancedBufferAttribute } from './renderers/common/StorageInstancedBufferAttribute.js';
 export { default as IndirectStorageBufferAttribute } from './renderers/common/IndirectStorageBufferAttribute.js';
 export { default as IESSpotLight } from './lights/webgpu/IESSpotLight.js';
+export { default as ProjectorLight } from './lights/webgpu/ProjectorLight.js';
 export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
 export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';
 export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';

@@ -1885,7 +1885,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		this.setMaterials( materials );
+		this.addMaterials( materials );
 
 	}
 
@@ -1907,7 +1907,7 @@ class LDrawLoader extends Loader {
 		fileLoader.load( url, text => {
 
 			// Initializes the materials library with default materials
-			this.setMaterials( [] );
+			this.addDefaultMaterials();
 
 			this.partsCache
 				.parseModel( text )
@@ -1948,15 +1948,60 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the loader's material library. This method clears existing
+	 * material definitions.
+	 *
+	 * @param {Array<Material>} materials - The materials to set.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	setMaterials( materials ) {
+
+		this.clearMaterials();
+		this.addMaterials( materials );
+
+		return this;
+
+	}
+
+	/**
+	 * Clears the loader's material library.
+	 *
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
+	clearMaterials() {
 
 		this.materialLibrary = {};
 		this.materials = [];
+
+		return this;
+
+	}
+
+	/**
+	 * Adds a list of materials to the loader's material library.
+	 *
+	 * @param {Array<Material>} materials - The materials to add.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
+	addMaterials( materials ) {
+
 		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 			this.addMaterial( materials[ i ] );
 
 		}
+
+		return this;
+
+	}
+
+	/**
+	 * Initializes the loader with default materials.
+	 *
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
+	addDefaultMaterials() {
 
 		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 		this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ) );
@@ -1982,6 +2027,12 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Adds a single material to the loader's material library.
+	 *
+	 * @param {Material} material - The material to add.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	addMaterial( material ) {
 
 		// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array

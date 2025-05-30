@@ -37,6 +37,14 @@ class CodeNode extends Node {
 		this.isCodeNode = true;
 
 		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
+		/**
 		 * The native code.
 		 *
 		 * @type {string}
@@ -59,17 +67,6 @@ class CodeNode extends Node {
 		 * @default ''
 		 */
 		this.language = language;
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal() {
-
-		return true;
 
 	}
 

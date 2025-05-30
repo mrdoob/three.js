@@ -36,6 +36,35 @@ class WebGPUPipelineUtils {
 		 */
 		this.backend = backend;
 
+		/**
+		 * A Weak Map that tracks the active pipeline for render or compute passes.
+		 *
+		 * @private
+		 * @type {WeakMap<(GPURenderPassEncoder|GPUComputePassEncoder),(GPURenderPipeline|GPUComputePipeline)>}
+		 */
+		this._activePipelines = new WeakMap();
+
+	}
+
+	/**
+	 * Sets the given pipeline for the given pass. The method makes sure to only set the
+	 * pipeline when necessary.
+	 *
+	 * @param {(GPURenderPassEncoder|GPUComputePassEncoder)} pass - The pass encoder.
+	 * @param {(GPURenderPipeline|GPUComputePipeline)} pipeline - The pipeline.
+	 */
+	setPipeline( pass, pipeline ) {
+
+		const currentPipeline = this._activePipelines.get( pass );
+
+		if ( currentPipeline !== pipeline ) {
+
+			pass.setPipeline( pipeline );
+
+			this._activePipelines.set( pass, pipeline );
+
+		}
+
 	}
 
 	/**
@@ -444,7 +473,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			case OneMinusDstColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusDstColor;
+				blendFactor = GPUBlendFactor.OneMinusDst;
 				break;
 
 			case DstAlphaFactor:

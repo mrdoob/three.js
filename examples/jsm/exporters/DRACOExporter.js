@@ -241,7 +241,7 @@ function createVertexColorSRGBArray( attribute ) {
 
 		_color.fromBufferAttribute( attribute, i );
 
-		ColorManagement.fromWorkingColorSpace( _color, SRGBColorSpace );
+		ColorManagement.workingToColorSpace( _color, SRGBColorSpace );
 
 		array[ i * itemSize ] = _color.r;
 		array[ i * itemSize + 1 ] = _color.g;

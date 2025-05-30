@@ -68,17 +68,6 @@ class ShadowBaseNode extends Node {
 
 	}
 
-	/**
-	 * Can be called when the shadow isn't required anymore. That can happen when
-	 * a lighting node stops casting shadows by setting {@link Object3D#castShadow}
-	 * to `false`.
-	 */
-	dispose() {
-
-		this.updateBeforeType = NodeUpdateType.NONE;
-
-	}
-
 }
 
 /**

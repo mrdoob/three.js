@@ -40,6 +40,15 @@ class AssignNode extends TempNode {
 		 */
 		this.sourceNode = sourceNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isAssignNode = true;
+
 	}
 
 	/**
@@ -84,15 +93,25 @@ class AssignNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	setup( builder ) {
 
 		const { targetNode, sourceNode } = this;
+
+		const properties = builder.getNodeProperties( this );
+		properties.sourceNode = sourceNode;
+		properties.targetNode = targetNode.context( { assign: true } );
+
+	}
+
+	generate( builder, output ) {
+
+		const { targetNode, sourceNode } = builder.getNodeProperties( this );
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.context( { assign: true } ).build( builder );
+		const target = targetNode.build( builder );
 		const source = sourceNode.build( builder, targetType );
 
 		const sourceType = sourceNode.getNodeType( builder );
@@ -118,11 +137,14 @@ class AssignNode extends TempNode {
 
 			builder.addLineFlowCode( `${ sourceProperty } = ${ source }`, this );
 
-			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
+			const splitNode = targetNode.node;
+			const splitTargetNode = splitNode.node.context( { assign: true } );
 
-			for ( let i = 0; i < targetNode.components.length; i ++ ) {
+			const targetRoot = splitTargetNode.build( builder );
 
-				const component = targetNode.components[ i ];
+			for ( let i = 0; i < splitNode.components.length; i ++ ) {
+
+				const component = splitNode.components[ i ];
 
 				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]`, this );
 

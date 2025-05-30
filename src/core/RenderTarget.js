@@ -126,11 +126,7 @@ class RenderTarget extends EventDispatcher {
 
 		const image = { width: width, height: height, depth: options.depth };
 
-		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
-
-		texture.flipY = false;
-		texture.generateMipmaps = options.generateMipmaps;
-		texture.internalFormat = options.internalFormat;
+		const texture = new Texture( image );
 
 		/**
 		 * An array of textures. Each color attachment is represented as a separate texture.
@@ -148,6 +144,8 @@ class RenderTarget extends EventDispatcher {
 			this.textures[ i ].renderTarget = this;
 
 		}
+
+		this._setTextureOptions( options );
 
 		/**
 		 * Whether to allocate a depth buffer or not.
@@ -201,6 +199,38 @@ class RenderTarget extends EventDispatcher {
 		 * @default false
 		 */
 		this.multiview = options.multiview;
+
+	}
+
+	_setTextureOptions( options = {} ) {
+
+		const values = {
+			minFilter: LinearFilter,
+			generateMipmaps: false,
+			flipY: false,
+			internalFormat: null
+		};
+
+		if ( options.mapping !== undefined ) values.mapping = options.mapping;
+		if ( options.wrapS !== undefined ) values.wrapS = options.wrapS;
+		if ( options.wrapT !== undefined ) values.wrapT = options.wrapT;
+		if ( options.wrapR !== undefined ) values.wrapR = options.wrapR;
+		if ( options.magFilter !== undefined ) values.magFilter = options.magFilter;
+		if ( options.minFilter !== undefined ) values.minFilter = options.minFilter;
+		if ( options.format !== undefined ) values.format = options.format;
+		if ( options.type !== undefined ) values.type = options.type;
+		if ( options.anisotropy !== undefined ) values.anisotropy = options.anisotropy;
+		if ( options.colorSpace !== undefined ) values.colorSpace = options.colorSpace;
+		if ( options.flipY !== undefined ) values.flipY = options.flipY;
+		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps;
+		if ( options.internalFormat !== undefined ) values.internalFormat = options.internalFormat;
+
+		for ( let i = 0; i < this.textures.length; i ++ ) {
+
+			const texture = this.textures[ i ];
+			texture.setValues( values );
+
+		}
 
 	}
 
@@ -264,12 +294,7 @@ class RenderTarget extends EventDispatcher {
 				this.textures[ i ].image.width = width;
 				this.textures[ i ].image.height = height;
 				this.textures[ i ].image.depth = depth;
-
-				if ( this.textures[ i ].image.depth > 1 ) {
-
-					this.textures[ i ].isArrayTexture = true;
-
-				}
+				this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
 
 			}
 

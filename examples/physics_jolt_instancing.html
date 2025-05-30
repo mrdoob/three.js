@@ -15,7 +15,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -56,6 +58,7 @@
 				dirLight.position.set( 5, 5, 5 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.zoom = 2;
+				dirLight.shadow.bias = - 0.001;
 				scene.add( dirLight );
 
 				const shadowPlane = new THREE.Mesh(
@@ -124,7 +127,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

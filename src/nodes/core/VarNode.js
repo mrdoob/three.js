@@ -72,6 +72,15 @@ class VarNode extends Node {
 		 */
 		this.readOnly = readOnly;
 
+		/**
+		 *
+		 * Add this flag to the node system to indicate that this node require parents.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	getMemberType( builder, name ) {

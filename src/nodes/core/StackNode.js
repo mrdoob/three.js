@@ -251,9 +251,32 @@ class StackNode extends Node {
 
 		setCurrentStack( this );
 
+		const buildStage = builder.buildStage;
+
 		for ( const node of this.nodes ) {
 
-			node.build( builder, 'void' );
+			if ( buildStage === 'setup' ) {
+
+				node.build( builder );
+
+			} else if ( buildStage === 'analyze' ) {
+
+				node.build( builder, this );
+
+			} else if ( buildStage === 'generate' ) {
+
+				const stages = builder.getDataFromNode( node, 'any' ).stages;
+				const parents = stages && stages[ builder.shaderStage ];
+
+				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
+
+					continue; // skip var nodes that are only used in .toVarying()
+
+				}
+
+				node.build( builder, 'void' );
+
+			}
 
 		}
 

@@ -336,6 +336,25 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	/**
+	 * Returns the type of a member of the struct.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The name of the member.
+	 * @return {string} The type of the member.
+	 */
+	getMemberType( builder, name ) {
+
+		if ( this.structTypeNode !== null ) {
+
+			return this.structTypeNode.getMemberType( builder, name );
+
+		}
+
+		return 'void';
+
+	}
+
+	/**
 	 * Generates the code snippet of the storage buffer node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

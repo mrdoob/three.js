@@ -1,4 +1,4 @@
-import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
+import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4, premult, unpremult } from 'three/tsl';
 
 /**
  * Applies a hash blur effect to the given texture node.
@@ -8,12 +8,35 @@ import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/
  * @function
  * @param {Node<vec4>} textureNode - The texture node that should be blurred.
  * @param {Node<float>} [bluramount=float(0.1)] - This node determines the amount of blur.
- * @param {Node<float>} [repeats=float(45)] - This node determines the quality of the blur. A higher value produces a less grainy result but is also more expensive.
+ * @param {Object} [options={}] - Additional options for the hash blur effect.
+ * @param {Node<float>} [options.repeats=float(45)] - The number of iterations for the blur effect.
+ * @param {Node<vec4>} [options.mask=null] - A mask node to control the alpha blending of the blur.
+ * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
  * @return {Node<vec4>} The blurred texture node.
  */
-export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), repeats = float( 45 ) ] ) => {
+export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), options = {} ] ) => {
 
-	const draw = ( uv ) => textureNode.sample( uv );
+	const {
+		repeats = float( 45 ),
+		mask = null,
+		premultipliedAlpha = false
+	} = options;
+
+	const draw = ( uv ) => {
+
+		let sample = textureNode.sample( uv );
+
+		if ( mask !== null ) {
+
+			const alpha = mask.sample( uv ).x;
+
+			sample = vec4( sample.rgb, sample.a.mul( alpha ) );
+
+		}
+
+		return premultipliedAlpha ? premult( sample ) : sample;
+
+	};
 
 	const targetUV = textureNode.uvNode || uv();
 	const blurred_image = vec4( 0. ).toVar();
@@ -28,6 +51,6 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 
 	blurred_image.divAssign( repeats );
 
-	return blurred_image;
+	return premultipliedAlpha ? unpremult( blurred_image ) : blurred_image;
 
 } );

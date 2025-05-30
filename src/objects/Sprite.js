@@ -108,6 +108,15 @@ class Sprite extends Object3D {
 		 */
 		this.center = new Vector2( 0.5, 0.5 );
 
+		/**
+		 * The number of instances of this sprite.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
 	}
 
 	/**
