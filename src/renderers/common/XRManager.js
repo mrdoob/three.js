@@ -699,7 +699,7 @@ class XRManager extends EventDispatcher {
 
 	}
 
-	 * This method can be used in XR applications to create a quadratic layer that presents a separate
+	 /* This method can be used in XR applications to create a quadratic layer that presents a separate
 	 * rendered scene.
 	 *
 	 * @param {number} width - The width of the layer plane in world units.
