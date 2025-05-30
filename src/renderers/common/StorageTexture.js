@@ -58,7 +58,7 @@ class StorageTexture extends Texture {
 		 * This property is inherited from `Texture` and set here depending on the `depth` value.
 		 *
 		 * @type {boolean}
-		 * 
+		 *
 		 */
 		this.isTextureArray = depth > 0;
 
