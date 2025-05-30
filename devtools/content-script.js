@@ -459,6 +459,7 @@ window.addEventListener('message', handleMainWindowMessage, false);
 window.addEventListener('message', handleIframeMessage, false);
 
 // Use a single listener for messages from the background script
+
 chrome.runtime.onMessage.addListener(handleBackgroundMessage);
 
 // Monkey-patch addEventListener to make scroll-blocking events passive by default
@@ -483,3 +484,5 @@ chrome.runtime.onMessage.addListener(handleBackgroundMessage);
         return origWrite.apply(this, args);
     };
 })();
+
+

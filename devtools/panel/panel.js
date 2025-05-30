@@ -6,6 +6,7 @@
 		return;
 	}
 
+
 	// Ensure extension context is valid before initializing
 	if (!chrome.runtime || !chrome.runtime.connect) {
 		console.warn('Panel: chrome.runtime.connect unavailable, panel context invalid, skipping initialization');
@@ -44,6 +45,7 @@
 				panelTabId = chrome.devtools.inspectedWindow.tabId;
 			} catch (e) {
 				console.warn('Panel: chrome.devtools.inspectedWindow.tabId unavailable', e);
+
 			}
 
 			// Create a connection to the background page (safely)
@@ -354,6 +356,7 @@
 
 			}
 
+
 			// Function to get an object icon based on its type
 			function getObjectIcon(obj) {
 				if (obj.isScene) return '🌍';
@@ -364,6 +367,7 @@
 				if (obj.type === 'Group') return '📁';
 				return '📦';
 			}
+
 
 			// Function to update the UI
 			function updateUI() {
