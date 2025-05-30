@@ -55,7 +55,6 @@ class StorageTexture extends Texture {
 
 		/**
 		 * Indicates whether this texture is a texture array.
-		 * This property is inherited from `Texture` and set here depending on the `depth` value.
 		 *
 		 * @type {boolean}
 		 *
