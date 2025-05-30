@@ -11006,6 +11006,8 @@ class Ray {
 	 */
 	intersectsSphere( sphere ) {
 
+		if ( sphere.radius < 0 ) return false; // handle empty spheres, see #31187
+
 		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
 
 	}
