@@ -1036,6 +1036,7 @@ class XRManager extends EventDispatcher {
 					}
 				);
 
+				this._xrRenderTarget._isOpaqueFramebuffer = true;
 				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
 			}

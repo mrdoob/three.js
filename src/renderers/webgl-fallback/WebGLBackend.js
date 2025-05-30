@@ -2171,7 +2171,7 @@ class WebGLBackend extends Backend {
 
 				// rebind external XR textures
 
-				if ( isXRRenderTarget || useMultisampledRTT || renderTarget.multiview ) {
+				if ( ( isXRRenderTarget || useMultisampledRTT || renderTarget.multiview ) && ( renderTarget._isOpaqueFramebuffer !== true ) ) {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
