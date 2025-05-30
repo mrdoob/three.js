@@ -17,7 +17,7 @@ class StorageTexture extends Texture {
 	 *
 	 * @param {number} [width=1] - The storage texture's width.
 	 * @param {number} [height=1] - The storage texture's height.
-	 * @param {number} [depth=0] - The storage texture's height.
+	 * @param {number} [depth=0] - The storage texture's depth.
 	 */
 	constructor( width = 1, height = 1, depth = 0 ) {
 
