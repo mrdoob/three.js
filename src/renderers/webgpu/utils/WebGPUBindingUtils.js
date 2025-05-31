@@ -138,7 +138,7 @@ class WebGPUBindingUtils {
 
 				}
 
-				if ( binding.texture.isTextureArray ) {
+				if ( binding.texture.isArrayTexture ) {
 
 					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
 

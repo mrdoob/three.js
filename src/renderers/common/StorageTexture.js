@@ -59,7 +59,7 @@ class StorageTexture extends Texture {
 		 * @type {boolean}
 		 *
 		 */
-		this.isTextureArray = depth > 0;
+		this.isArrayTexture = depth > 0;
 
 	}
 
