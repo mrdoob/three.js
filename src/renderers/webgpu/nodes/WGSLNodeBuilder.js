@@ -1701,7 +1701,7 @@ ${ flowData.code }
 
 					}
 
-				} else if ( shaderStage !== "compute" && ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) ) {
+				} else if ( shaderStage !== 'compute' && ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) ) {
 
 					textureType = 'texture_2d_array<f32>';
 
