@@ -34,6 +34,7 @@ class XRRenderTarget extends RenderTarget {
 		 * are defined by external textures. This flag is
 		 * set to `true` when using the WebXR Layers API.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default false
 		 */
@@ -50,11 +51,11 @@ class XRRenderTarget extends RenderTarget {
 		 *
 		 * Reference: {@link https://www.w3.org/TR/webxrlayers-1/#dom-xrprojectionlayer-ignoredepthvalues}.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default true
 		 */
 		this._autoAllocateDepthBuffer = true;
-
 
 		/**
 		 * Whether this render target is associated with a XRWebGLLayer.
@@ -64,6 +65,7 @@ class XRRenderTarget extends RenderTarget {
 		 * stencil and depth buffers. We need to handle this framebuffer
 		 * differently since its textures are always bound.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default false
 		 * */
@@ -77,6 +79,7 @@ class XRRenderTarget extends RenderTarget {
 
 		this._hasExternalTextures = source._hasExternalTextures;
 		this._autoAllocateDepthBuffer = source._autoAllocateDepthBuffer;
+		this._isOpaqueFramebuffer = source._isOpaqueFramebuffer;
 
 		return this;
 
