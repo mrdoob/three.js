@@ -935,6 +935,12 @@ ${ flowData.code }
 
 	}
 
+	getFrag() {
+
+		return 'gl_FragCoord';
+
+	}
+
 	/**
 	 * Returns the frag depth builtin.
 	 *

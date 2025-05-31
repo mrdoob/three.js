@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
+import { Fn, nodeImmutable, vec2, vec4 } from '../tsl/TSLBase.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -26,7 +26,7 @@ class ScreenNode extends Node {
 	/**
 	 * Constructs a new screen node.
 	 *
-	 * @param {('coordinate'|'viewport'|'size'|'uv')} scope - The node's scope.
+	 * @param {('coordinate'|'viewport'|'size'|'uv'|'raw')} scope - The node's scope.
 	 */
 	constructor( scope ) {
 
@@ -62,7 +62,7 @@ class ScreenNode extends Node {
 	 */
 	getNodeType() {
 
-		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
+		if ( this.scope === ScreenNode.VIEWPORT || this.scope === ScreenNode.RAW ) return 'vec4';
 		else return 'vec2';
 
 	}
@@ -143,6 +143,10 @@ class ScreenNode extends Node {
 
 			output = uniform( viewportVec || ( viewportVec = new Vector4() ) );
 
+		} else if ( scope === ScreenNode.RAW ) {
+
+			output = vec4( screenRaw.div( screenSize ) );
+
 		} else {
 
 			output = vec2( screenCoordinate.div( screenSize ) );
@@ -155,7 +159,11 @@ class ScreenNode extends Node {
 
 	generate( builder ) {
 
-		if ( this.scope === ScreenNode.COORDINATE ) {
+		if ( this.scope === ScreenNode.RAW ) {
+
+			return builder.getFrag();
+
+		} else if ( this.scope === ScreenNode.COORDINATE ) {
 
 			let coord = builder.getFragCoord();
 
@@ -183,6 +191,7 @@ ScreenNode.COORDINATE = 'coordinate';
 ScreenNode.VIEWPORT = 'viewport';
 ScreenNode.SIZE = 'size';
 ScreenNode.UV = 'uv';
+ScreenNode.RAW = 'raw';
 
 export default ScreenNode;
 
@@ -229,6 +238,8 @@ export const viewport = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.VIEW
  * @type {ScreenNode<vec2>}
  */
 export const viewportSize = viewport.zw;
+
+export const screenRaw = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.RAW );//.div( vec4( viewport.z, viewport.w, 1, 1 ) );
 
 /**
  * TSL object that represents the current `x`/`y` pixel position on the viewport in physical pixel units.
