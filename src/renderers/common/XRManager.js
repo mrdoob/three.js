@@ -16,6 +16,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
+import { Group } from '../../objects/Group.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -379,6 +380,22 @@ class XRManager extends EventDispatcher {
 		 */
 		this._useMultiview = false;
 
+		/**
+		 * Stores params and video elements for equirect layers.
+		 *
+		 * @private
+		 * @type {Array<Object>}
+		 */
+		this._mediaLayers = [];
+
+		/**
+		 * Stores the created equrect layers for updating render state.
+		 *
+		 * @private
+		 * @type {Array<XREquirectLayer>}
+		 */
+		this._createdMediaLayers = [];
+
 	}
 
 	/**
@@ -601,7 +618,88 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * This method can be used in XR applications to create a quadratic layer that presents a separate
+	 * Sets up params for an equirect native video layer.
+	 * Creates meshes for 2D layers in mono or stereo
+	 *
+	 * @param {VideoTexture} texture The video texture
+	 * @param {('default'|'mono'|'stereo'|'stereo-left-right'|'stereo-top-bottom')} [layout='mono'] The layout to use either mono/stereo-left-right/stereo-top-bottom.
+	 * @param {Object} [quaternion={}] A transform quaternion param for the layer.
+	 * @param {boolean} [is180=false] If it's a 180 video.
+	 * @param {Object} [params={}] Extra params for the layer to add but not needed.
+	 * @returns {Group} Returns a group of a mono or stereo mesh
+	 */
+	createMediaLayer( texture, layout = 'mono', quaternion = {}, is180 = false, params = {} ) {
+
+		const createMaterial = ( texture ) => new MeshBasicMaterial( { map: texture } );
+		const createMesh = ( texture, eyeIndex = 1 ) => {
+
+			const geometry = new PlaneGeometry( 1, 1 ),
+				mesh = new Mesh( geometry, createMaterial( texture ) );
+
+			mesh.layers.set( eyeIndex );
+
+			return mesh;
+
+		};
+
+		const group = new Group();
+
+		switch ( layout ) {
+
+			case 'mono':
+				group.add( createMesh( texture ) );
+				break;
+			default:
+				[ 1, 2 ].forEach( eyeIndex => {
+
+					const mesh = createMesh( texture, eyeIndex );
+					mesh.rotation.y = - Math.PI / 2;
+					group.add( mesh );
+
+				} );
+				break;
+
+		}
+
+		if ( this._useLayers ) {
+
+			const angleFactor = is180 ? 1 : 2;
+
+			const layer = {
+				type: 'equirect',
+				texture: texture,
+				group: group,
+				quaternion: quaternion,
+				params: {
+					layout: layout,
+					centralHorizontalAngle: Math.PI * angleFactor,
+					...params
+				}
+
+			};
+
+			this._mediaLayers.push( layer );
+
+			if ( this._session !== null ) {
+
+				layer.xrlayer = this._createXRLayer( layer );
+
+				this._createdMediaLayers.push( layer.xrlayer );
+
+				const xrlayers = this._session.renderState.layers;
+				xrlayers.unshift( layer.xrlayer );
+
+				this._session.updateRenderState( { layers: xrlayers } );
+
+			}
+
+		}
+
+		return group;
+
+	}
+
+	 /* This method can be used in XR applications to create a quadratic layer that presents a separate
 	 * rendered scene.
 	 *
 	 * @param {number} width - The width of the layer plane in world units.
@@ -678,7 +776,7 @@ class XRManager extends EventDispatcher {
 
 			const xrlayers = this._session.renderState.layers;
 			xrlayers.unshift( layer.xrlayer );
-			this._session.updateRenderState( { layers: xrlayers } );
+			this._session.updateRenderState( { layers: [ ...this._createdMediaLayers, ...xrlayers ] } );
 
 		} else {
 
@@ -770,7 +868,7 @@ class XRManager extends EventDispatcher {
 
 			const xrlayers = this._session.renderState.layers;
 			xrlayers.unshift( layer.xrlayer );
-			this._session.updateRenderState( { layers: xrlayers } );
+			this._session.updateRenderState( { layers: [ ...this._createdMediaLayers, ...xrlayers ] } );
 
 		} else {
 
@@ -999,9 +1097,28 @@ class XRManager extends EventDispatcher {
 
 					}
 
+					//Creates the equirect media layers on session creation
+					if ( this._mediaLayers.length ) {
+
+						this._createdMediaLayers = this._mediaLayers.map( layer => {
+
+							layer.xrlayer = this._createXRLayer( layer );
+							return layer.xrlayer;
+
+						} );
+
+						//disable 2D media mesh layers to be replaced with native media layers
+						for ( const mediaLayer of this._mediaLayers ) {
+
+							mediaLayer.group.children.forEach( mesh => mesh.layers.disableAll() );
+
+						}
+
+					}
+
 				}
 
-				session.updateRenderState( { layers: layersArray } );
+				session.updateRenderState( { layers: [ ...this._createdMediaLayers, ...layersArray ] } );
 
 			} else {
 
@@ -1386,6 +1503,13 @@ function onSessionEnd() {
 
 		}
 
+		//reenable 2D media mesh layers on session end
+		for ( const mediaLayer of this._mediaLayers ) {
+
+			mediaLayer.group.children.forEach( mesh => mesh.layers.enableAll() );
+
+		}
+
 	}
 
 	//
@@ -1488,6 +1612,21 @@ function createXRLayer( layer ) {
 			viewPixelHeight: layer.pixelheight,
 			clearOnAccess: false
 		} );
+
+	} else if ( layer.type === 'equirect' ) {
+
+		const mediaBinding = new XRMediaBinding( this._session );
+
+		return mediaBinding.createEquirectLayer(
+			layer.texture.image,
+			{
+				space: this._referenceSpace,
+				transform: new XRRigidTransform(
+					{},
+					layer.quaternion
+				),
+				...layer.params
+			} );
 
 	} else {
 
