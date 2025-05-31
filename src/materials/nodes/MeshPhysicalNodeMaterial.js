@@ -1,6 +1,6 @@
 import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion } from '../../nodes/core/PropertyNode.js';
 import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion } from '../../nodes/accessors/MaterialNode.js';
-import { float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
+import { namespace, float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
 import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
@@ -478,7 +478,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	setup( builder ) {
 
-		builder.context.setupClearcoatNormal = () => this.setupClearcoatNormal( builder );
+		builder.context.setupClearcoatNormal = () => namespace( this.setupClearcoatNormal( builder ), 'NORMAL' );
 
 		super.setup( builder );
 
