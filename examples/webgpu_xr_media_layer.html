@@ -10,12 +10,15 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo video native media layers<br />
-			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo/mono video native media layers<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.<br />
+			Choose Layout: <select id="layout-select">
+				<option data-layout="stereo-left-right">Stereo</option>
+				<option data-layout="mono">Mono</option>
+			</select>
 		</div>
 
 		<video id="video" muted loop crossOrigin="anonymous" playsinline style="display:none">
-			<source src="textures/MaryOculus.mp4">
 		</video>
 
 		<script type="importmap">
@@ -38,12 +41,44 @@
 
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, controls;
+
+			const sources = {
+				"stereo-left-right": {
+					"src": "textures/MaryOculus.mp4",
+					"transform": { x: 0, y: .28, z: 0, w: .96 },
+					"targetXPos": 0 
+				},
+				"mono": {
+					"src": "textures/pano.mp4",
+					"transform": {},
+					"targetXPos": -(Math.PI / 2)
+				}
+			};
 
 			init();
 
 			function init() {
 
+				//demo code to select media layout from a select menu or from the `layout` query
+				const layoutSelect = document.getElementById('layout-select'),
+				context = (window.parent || window),
+				currentUrl = new URL(context.location.href),
+				urlParams = currentUrl.searchParams,
+				selectedMediaLayout = urlParams.get('layout') || "stereo-left-right",
+				selectedOption = [...layoutSelect.options].filter(option => option.dataset.layout === selectedMediaLayout)[0],
+				selectedSource = sources[selectedMediaLayout].src,
+				selectedMediaTransform = sources[selectedMediaLayout].transform,
+				selectedTargetXPos = sources[selectedMediaLayout].targetXPos;
+
+				if (selectedOption) selectedOption.selected = true;				
+
+				layoutSelect.addEventListener('change', () => {
+					const layout = layoutSelect.options[layoutSelect.selectedIndex].dataset.layout;
+					//have to hardcode a location due to how the examples work and bug with Quest starting a second XR session.
+					const newUrl = `${currentUrl.origin}/examples/webgpu_xr_media_layer.html?layout=${layout}`;
+					context.location.replace(newUrl);
+				});
 
 				const container = document.getElementById( 'container' );
 				container.addEventListener( 'click', function () {
@@ -53,13 +88,11 @@
 				} );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 2000 );
-				
 				camera.layers.enable( 1 );
-				camera.target = new THREE.Vector3(0, 0, 0);
 				camera.rotation.reorder('YXZ');
-                camera.layers.enable(1);
 
 				const video = document.getElementById( 'video' );
+				video.src = selectedSource;
 				video.play();
 
 				const texture = new THREE.VideoTexture( video );
@@ -68,7 +101,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
 			
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true,  colorBufferType: THREE.UnsignedByteType, multiview: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor(0x000, 1);
@@ -82,7 +115,8 @@
 				//SphereGeometry is created internally. To specify radius, width and height segements, they can be configured on the createMediaLayer method.
 				//For 180 degrees video set the is180 param to true. This will create a half sphere geoemtry.
 				//Full usage: renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 }, false, {}, 500, 60, 40);
-				const mediaLayer = renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 });
+				//In this example `selectedMediaLayout` defaults to `stereo-left-right` layout
+				const mediaLayer = renderer.xr.createMediaLayer(texture, selectedMediaLayout, selectedMediaTransform);
 			
 				scene.add(mediaLayer);
 
@@ -92,7 +126,13 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				//positions is needed to get orbit controls working
+				controls.target.x = selectedTargetXPos;
+				controls.target.z = -0.01;
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.05;
+
 				controls.update();
 
 				texture.anisotropy = renderer.backend.capabilities.getMaxAnisotropy();
@@ -180,7 +220,7 @@
 			}
 
 			function animate() {
-
+				controls.update();
 				renderer.render( scene, camera );
 
 			}
