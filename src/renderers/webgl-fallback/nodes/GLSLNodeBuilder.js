@@ -26,13 +26,11 @@ const supports = {
 
 const interpolationTypeMap = {
 	perspective: 'smooth',
-	linear: 'noperspective'
+	linear: 'noperspective',
 };
 
 const interpolationModeMap = {
 	'centroid': 'centroid',
-	'first': 'flat',
-	'either': 'flat'
 };
 
 const defaultPrecisions = `
@@ -795,6 +793,8 @@ ${ flowData.code }
 				if ( varying.needsInterpolation ) {
 
 					if ( varying.interpolationType ) {
+
+						console.log( varying.interpolationType	);
 
 						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
 						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
