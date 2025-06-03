@@ -794,8 +794,6 @@ ${ flowData.code }
 
 					if ( varying.interpolationType ) {
 
-						console.log( varying.interpolationType	);
-
 						const interpolationType = interpolationTypeMap[ varying.interpolationType ] || varying.interpolationType;
 						const sampling = interpolationModeMap[ varying.interpolationSampling ] || '';
 
