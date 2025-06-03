@@ -1,3 +1,5 @@
+/* global chrome */
+
 // Store the state of our inspector
 const state = {
 	revision: null,
@@ -425,7 +427,7 @@ function updateUI() {
 	header.style.justifyContent = 'space-between'; // Align items left and right
 
 	const miscSpan = document.createElement( 'span' );
-	miscSpan.innerHTML = `<a href="https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview" target="_blank">+</a>`;
+	miscSpan.innerHTML = '<a href="https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview" target="_blank">+</a>';
 
 	const manifest = chrome.runtime.getManifest();
 

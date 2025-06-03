@@ -1,3 +1,5 @@
+/* global chrome */
+
 // Map tab IDs to connections
 const connections = new Map();
 
@@ -122,7 +124,7 @@ chrome.webNavigation.onCommitted.addListener( details => {
 } );
 
 // Clear badge when a tab is closed
-chrome.tabs.onRemoved.addListener( ( tabId, removeInfo ) => {
+chrome.tabs.onRemoved.addListener( ( tabId ) => {
 
 	chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => { /* Tab might be gone */ } );
 

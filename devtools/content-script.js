@@ -1,7 +1,9 @@
+/* global chrome */
+
 // This script runs in the context of the web page
 // console.log( 'Three.js DevTools: Content script loaded at document_readyState:', document.readyState ); // Comment out
 
-// Function to inject the bridge script
+// Inject the bridge script into the main document or a target (e.g., iframe)
 function injectBridge( target = document ) {
 
 	const script = document.createElement( 'script' );
@@ -13,27 +15,20 @@ function injectBridge( target = document ) {
 	};
 
 	( target.head || target.documentElement ).appendChild( script );
-
 	return script;
 
 }
 
-// Also inject into any existing iframes
+// Inject bridge into all existing iframes
 function injectIntoIframes() {
 
-	const iframes = document.querySelectorAll( 'iframe' );
-	iframes.forEach( iframe => {
+	document.querySelectorAll( 'iframe' ).forEach( iframe => {
 
 		try {
 
-			injectBridge( iframe.contentDocument );
+			if ( iframe.contentDocument ) injectBridge( iframe.contentDocument );
 
-		} catch ( e ) {
-
-			// Ignore cross-origin iframe errors
-			// console.log( 'DevTools: Could not inject into iframe:', e ); // Comment out
-
-		}
+		} catch ( e ) { /* Ignore cross-origin errors */ }
 
 	} );
 
@@ -44,7 +39,7 @@ injectBridge();
 injectIntoIframes();
 
 // Watch for new iframes being added
-const observer = new MutationObserver( mutations => {
+new MutationObserver( mutations => {
 
 	mutations.forEach( mutation => {
 
@@ -52,19 +47,13 @@ const observer = new MutationObserver( mutations => {
 
 			if ( node.tagName === 'IFRAME' ) {
 
-				// Wait for iframe to load
 				node.addEventListener( 'load', () => {
 
 					try {
 
-						injectBridge( node.contentDocument );
+						if ( node.contentDocument ) injectBridge( node.contentDocument );
 
-					} catch ( e ) {
-
-						// Ignore cross-origin iframe errors
-						// console.log( 'DevTools: Could not inject into iframe:', e ); // Comment out
-
-					}
+					} catch ( e ) { /* Ignore cross-origin errors */ }
 
 				} );
 
@@ -74,19 +63,13 @@ const observer = new MutationObserver( mutations => {
 
 	} );
 
-} );
+} ).observe( document.documentElement, { childList: true, subtree: true } );
 
-observer.observe( document.documentElement, {
-	childList: true,
-	subtree: true
-} );
-
-// Helper function to check if extension context is valid
+// Helper to check if extension context is valid
 function isExtensionContextValid() {
 
 	try {
 
-		// This will throw if context is invalidated
 		chrome.runtime.getURL( '' );
 		return true;
 
@@ -98,24 +81,15 @@ function isExtensionContextValid() {
 
 }
 
-// Handle messages from the main window
-function handleMainWindowMessage( event ) {
+// Unified message handler for window messages
+function handleWindowMessage( event ) {
 
-	// Only accept messages from the same frame
-	if ( event.source !== window ) {
+	// Only accept messages with the correct id
+	if ( ! event.data || event.data.id !== 'three-devtools' ) return;
 
-		return;
+	// Determine source: 'main' for window, 'iframe' otherwise
+	const source = event.source === window ? 'main' : 'iframe';
 
-	}
-
-	const message = event.data;
-	if ( ! message || message.id !== 'three-devtools' ) {
-
-		return;
-
-	}
-
-	// Check extension context before sending message
 	if ( ! isExtensionContextValid() ) {
 
 		console.warn( 'Extension context invalidated, cannot send message' );
@@ -123,95 +97,31 @@ function handleMainWindowMessage( event ) {
 
 	}
 
-	// Add source information
-	const messageWithSource = {
-		...event.data,
-		source: event.source === window ? 'main' : 'iframe'
-	};
-
-	// Forward to background page
+	const messageWithSource = { ...event.data, source };
 	chrome.runtime.sendMessage( messageWithSource );
 
 }
 
-// Handle messages from iframes
-function handleIframeMessage( event ) {
+// Listener for messages from the background script (originating from panel)
+function handleBackgroundMessage( message ) {
 
-	// Skip messages from main window
-	if ( event.source === window ) {
-
-		return;
-
-	}
-
-	const message = event.data;
-	if ( ! message || message.id !== 'three-devtools' ) {
-
-		return;
-
-	}
-
-	// Check extension context before sending message
-	if ( ! isExtensionContextValid() ) {
-
-		console.warn( 'Extension context invalidated, cannot send message' );
-		return;
-
-	}
-
-	// Add source information
-	const messageWithSource = {
-		...event.data,
-		source: 'iframe'
-	};
-
-	// Forward to background page
-	chrome.runtime.sendMessage( messageWithSource );
-
-}
-
-// Listener for messages forwarded from the background script (originating from panel)
-function handleBackgroundMessage( message, sender, sendResponse ) {
-
-	// Check if the message is one we need to forward to the bridge
-	// Only forward request-state now
 	if ( message.name === 'request-state' ) {
 
-		// console.log( 'Content script: Forwarding message to bridge:', message.name );
-		// Ensure the message has the correct ID before forwarding to the page
 		message.id = 'three-devtools';
-		window.postMessage( message, '*' ); // Forward the modified message to the page
-
-		// Optional: Forward to iframes too, if needed (might cause duplicates if bridge is in iframe)
-		/*
-		const iframes = document.querySelectorAll('iframe');
-		iframes.forEach(iframe => {
-			try {
-				iframe.contentWindow.postMessage(message, '*');
-			} catch (e) {}
-		});
-		*/
+		window.postMessage( message, '*' );
 
 	}
-	// Keep channel open? No, this listener is synchronous for now.
-	// return true;
 
 }
 
 // Add event listeners
-window.addEventListener( 'message', handleMainWindowMessage, false );
-window.addEventListener( 'message', handleIframeMessage, false );
-// chrome.runtime.onMessage.addListener( handleDevtoolsMessage ); // This seems redundant/incorrectly placed in original code
-
-// Use a single listener for messages from the background script
+window.addEventListener( 'message', handleWindowMessage, false );
 chrome.runtime.onMessage.addListener( handleBackgroundMessage );
 
 // Icon color scheme
 const isLightTheme = window.matchMedia( '(prefers-color-scheme: light)' ).matches;
-
 chrome.runtime.sendMessage( { scheme: isLightTheme ? 'light' : 'dark' } );
-
-window.matchMedia( '(prefers-color-scheme: light)' ).onchange = ( event ) => {
+window.matchMedia( '(prefers-color-scheme: light)' ).onchange = event => {
 
 	chrome.runtime.sendMessage( { scheme: event.matches ? 'light' : 'dark' } );
 
