@@ -1,6 +1,43 @@
 /* global chrome */
 
-// Store the state of our inspector
+// --- Utility Functions ---
+function getObjectIcon(obj) {
+	if (obj.isScene) return '🌍';
+	if (obj.isCamera) return '📷';
+	if (obj.isLight) return '💡';
+	if (obj.isInstancedMesh) return '🔸';
+	if (obj.isMesh) return '🔷';
+	if (obj.type === 'Group') return '📁';
+	return '📦';
+}
+
+function createPropertyRow(label, value) {
+	const row = document.createElement('div');
+	row.className = 'property-row';
+	row.style.display = 'flex';
+	row.style.justifyContent = 'space-between';
+	row.style.marginBottom = '2px';
+
+	const labelSpan = document.createElement('span');
+	labelSpan.className = 'property-label';
+	labelSpan.textContent = `${label}:`;
+	labelSpan.style.marginRight = '10px';
+	labelSpan.style.whiteSpace = 'nowrap';
+
+	const valueSpan = document.createElement('span');
+	valueSpan.className = 'property-value';
+	const displayValue = (value === undefined || value === null)
+		? '–'
+		: (typeof value === 'number' ? value.toLocaleString() : value);
+	valueSpan.textContent = displayValue;
+	valueSpan.style.textAlign = 'right';
+
+	row.appendChild(labelSpan);
+	row.appendChild(valueSpan);
+	return row;
+}
+
+// --- State ---
 const state = {
 	revision: null,
 	scenes: new Map(),
@@ -82,7 +119,6 @@ function handleThreeEvent( message ) {
 
 		case 'register':
 			state.revision = message.detail.revision;
-			updateUI();
 			break;
 
 		// Handle individual renderer observation
@@ -105,8 +141,6 @@ function handleThreeEvent( message ) {
 			// The DOM update logic previously here is redundant because updateUI()
 			// rebuilds the entire renderer element anyway, using the updated data
 			// from state.renderers and the persisted open/closed state.
-
-			updateUI(); // Call updateUI to rebuild based on the new state
 
 			break;
 
@@ -173,8 +207,6 @@ function handleThreeEvent( message ) {
 
 			} );
 
-			// Update UI once after processing the entire batch
-			updateUI();
 			break;
 
 		case 'committed':
@@ -184,18 +216,7 @@ function handleThreeEvent( message ) {
 
 	}
 
-}
-
-// Function to get an object icon based on its type
-function getObjectIcon( obj ) {
-
-	if ( obj.isScene ) return '🌍';
-	if ( obj.isCamera ) return '📷';
-	if ( obj.isLight ) return '💡';
-	if ( obj.isInstancedMesh ) return '🔸';
-	if ( obj.isMesh ) return '🔷';
-	if ( obj.type === 'Group' ) return '📁';
-	return '📦';
+	updateUI();
 
 }
 
@@ -207,13 +228,7 @@ function renderRenderer( obj, container ) {
 	detailsElement.setAttribute( 'data-uuid', obj.uuid );
 
 	// Set initial state
-	detailsElement.open = false;
-
-	if ( rendererCollapsedState.has( obj.uuid ) ) {
-
-		detailsElement.open = rendererCollapsedState.get( obj.uuid );
-
-	}
+	detailsElement.open = rendererCollapsedState.get( obj.uuid ) || false;
 
 	// Add toggle listener to save state
 	detailsElement.addEventListener( 'toggle', () => {
@@ -479,33 +494,3 @@ function updateUI() {
 // Initial UI update
 clearState();
 updateUI();
-
-// Helper function to create a property row (Label: Value)
-function createPropertyRow( label, value ) {
-
-	const row = document.createElement( 'div' );
-	row.className = 'property-row'; // Add class for potential styling
-	row.style.display = 'flex';
-	row.style.justifyContent = 'space-between'; // Align label left, value right
-	row.style.marginBottom = '2px'; // Small gap between rows
-
-	const labelSpan = document.createElement( 'span' );
-	labelSpan.className = 'property-label';
-	labelSpan.textContent = `${label}:`;
-	labelSpan.style.marginRight = '10px'; // Space between label and value
-	labelSpan.style.whiteSpace = 'nowrap'; // Prevent label wrapping
-
-	const valueSpan = document.createElement( 'span' );
-	valueSpan.className = 'property-value';
-	// Format numbers nicely, handle undefined/null with '–'
-	const displayValue = ( value === undefined || value === null )
-		? '–'
-		: ( typeof value === 'number' ? value.toLocaleString() : value );
-	valueSpan.textContent = displayValue;
-	valueSpan.style.textAlign = 'right'; // Align value text to the right
-
-	row.appendChild( labelSpan );
-	row.appendChild( valueSpan );
-	return row;
-
-}
