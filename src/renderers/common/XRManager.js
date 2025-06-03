@@ -14,12 +14,24 @@ import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
 import QuadMesh from './QuadMesh.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
+import { SphereGeometry } from '../../geometries/SphereGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { Group } from '../../objects/Group.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
+
+const UVMapFactors = {
+	'stereo-top-bottom': [
+		{ yMult: 0.5, yPhase: 0, xMult: 1.0, xPhase: 0 },
+		{ yMult: 0.5, yPhase: 0.5, xMult: 1.0, xPhase: 0 }
+	],
+	'stereo-left-right': [
+		{ yMult: 1.0, yPhase: 0, xMult: 0.5, xPhase: 0 },
+		{ yMult: 1.0, yPhase: 0, xMult: 0.5, xPhase: 0.5 }
+	]
+};
 
 /**
  * The XR manager is built on top of the WebXR Device API to
@@ -626,19 +638,56 @@ class XRManager extends EventDispatcher {
 	 * @param {Object} [quaternion={}] A transform quaternion param for the layer.
 	 * @param {boolean} [is180=false] If it's a 180 video.
 	 * @param {Object} [params={}] Extra params for the layer to add but not needed.
+	 * @param {number} [radius = 500] The SphereGeometry radius.
+	 * @param {number} [widthSegments = 60] The SphereGeometry width segments.
+	 * @param {number} [heightSegments = 40] The SphereGeometry height segments.
 	 * @returns {Group} Returns a group of a mono or stereo mesh
 	 */
-	createMediaLayer( texture, layout = 'mono', quaternion = {}, is180 = false, params = {} ) {
+	createMediaLayer( texture, layout = 'mono', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40 ) {
 
 		const createMaterial = ( texture ) => new MeshBasicMaterial( { map: texture } );
 		const createMesh = ( texture, eyeIndex = 1 ) => {
 
-			const geometry = new PlaneGeometry( 1, 1 ),
-				mesh = new Mesh( geometry, createMaterial( texture ) );
+			let geometry;
+
+			//if 180 video create a half sphere
+			if ( is180 ) {
+
+				geometry = new SphereGeometry( radius, widthSegments, heightSegments, Math.PI / 2, Math.PI, 0, Math.PI );
+
+			} else {
+
+				geometry = new SphereGeometry( radius, widthSegments, heightSegments );
+
+			}
+
+			geometry.scale( - 1, 1, 1 );
+
+			const mesh = new Mesh( geometry, createMaterial( texture ) );
 
 			mesh.layers.set( eyeIndex );
 
 			return mesh;
+
+		};
+
+		//set the uv mapping for each eye in a stereo video.
+		//uv factors for stereo-left-right and stereo-top-bottom layouts is applied.
+		const setUVMapping = ( eyeIndex, uvFactors, geometry ) => {
+
+			const eyeUvfactor = uvFactors[ eyeIndex - 1 ],
+				uvs = geometry.attributes.uv.array;
+
+			for ( let i = 0; i < uvs.length; i += 2 ) {
+
+				//x
+				uvs[ i ] *= eyeUvfactor.xMult;
+				uvs[ i ] += eyeUvfactor.xPhase;
+				//y
+				uvs[ i + 1 ] *= eyeUvfactor.yMult;
+				uvs[ i + 1 ] += eyeUvfactor.yPhase;
+
+			}
 
 		};
 
@@ -650,9 +699,14 @@ class XRManager extends EventDispatcher {
 				group.add( createMesh( texture ) );
 				break;
 			default:
+				//get the uv factors for the layout
+				const uvFactors = UVMapFactors[ layout ];
+
 				[ 1, 2 ].forEach( eyeIndex => {
 
 					const mesh = createMesh( texture, eyeIndex );
+					//set the uv mappingf for each eye index
+					setUVMapping( eyeIndex, uvFactors, mesh.geometry );
 					mesh.rotation.y = - Math.PI / 2;
 					group.add( mesh );
 

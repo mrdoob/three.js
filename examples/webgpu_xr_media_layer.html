@@ -59,8 +59,6 @@
 				camera.rotation.reorder('YXZ');
                 camera.layers.enable(1);
 
-				// video
-
 				const video = document.getElementById( 'video' );
 				video.play();
 
@@ -69,36 +67,6 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
-
-				// left
-
-				const geometry1 = new THREE.SphereGeometry( 500, 60, 40 );
-				// invert the geometry on the x-axis so that all of the faces point inward
-				geometry1.scale( - 1, 1, 1 );
-
-				const uvs1 = geometry1.attributes.uv.array;
-
-
-				for ( let i = 0; i < uvs1.length; i += 2 ) {
-
-					uvs1[ i ] *= 0.5;
-
-				}
-
-				// right
-
-				const geometry2 = new THREE.SphereGeometry( 500, 60, 40 );
-				geometry2.scale( - 1, 1, 1 );
-
-				const uvs2 = geometry2.attributes.uv.array;
-
-		
-				for ( let i = 0; i < uvs2.length; i += 2 ) {
-
-					uvs2[ i ] *= 0.5;
-					uvs2[ i ] += 0.5;
-
-				}
 			
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true,  colorBufferType: THREE.UnsignedByteType, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -108,11 +76,14 @@
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
 
+				//create a native media layer and projection layer / 2D mono/stereo mesh in a group.
+				//media layer position transformation can be applied in a quaternion transformation object.
+				//extra params for the createEquirectLayer method can be applied to the createMediaLayer method.
+				//SphereGeometry is created internally. To specify radius, width and height segements, they can be configured on the createMediaLayer method.
+				//For 180 degrees video set the is180 param to true. This will create a half sphere geoemtry.
+				//Full usage: renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 }, false, {}, 500, 60, 40);
 				const mediaLayer = renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 });
-				//modify geometries for left and right
-				mediaLayer.children[0].geometry = geometry1;
-				mediaLayer.children[1].geometry = geometry2;
-
+			
 				scene.add(mediaLayer);
 
 				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989, 3 ) );
@@ -124,15 +95,11 @@
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.update();
 
-
-				
 				texture.anisotropy = renderer.backend.capabilities.getMaxAnisotropy();
 
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( XRButton.createButton( renderer ) );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
