@@ -175,7 +175,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return Fn( obj );
+		return obj.isFn ? obj : Fn( obj );
 
 	}
 
@@ -651,6 +651,8 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 	fn.shaderNode = shaderNode;
 	fn.id = shaderNode.id;
+
+	fn.isFn = true;
 
 	fn.getNodeType = ( ...params ) => shaderNode.getNodeType( ...params );
 	fn.getCacheKey = ( ...params ) => shaderNode.getCacheKey( ...params );
