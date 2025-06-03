@@ -634,7 +634,7 @@ class XRManager extends EventDispatcher {
 	 * Creates meshes for 2D layers in mono or stereo
 	 *
 	 * @param {VideoTexture} texture The video texture
-	 * @param {('default'|'mono'|'stereo'|'stereo-left-right'|'stereo-top-bottom')} [layout='mono'] The layout to use either mono/steree/stereo-left-right/stereo-top-bottom.
+	 * @param {('default'|'mono'|'stereo'|'stereo-left-right'|'stereo-top-bottom')} [layout='stereo'] The layout to use either mono/steree/stereo-left-right/stereo-top-bottom. The default layout is stereo which creates a stereo-top-bottom layout.
 	 * @param {Object} [quaternion={}] A transform quaternion param for the layer.
 	 * @param {boolean} [is180=false] If it's a 180 video.
 	 * @param {Object} [params={}] Extra params for the layer to add but not needed.
@@ -643,7 +643,7 @@ class XRManager extends EventDispatcher {
 	 * @param {number} [heightSegments = 40] The SphereGeometry height segments.
 	 * @returns {Group} Returns a group of a mono or stereo mesh
 	 */
-	createMediaLayer( texture, layout = 'mono', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40 ) {
+	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40 ) {
 
 		const createMaterial = ( texture ) => new MeshBasicMaterial( { map: texture } );
 		const createMesh = ( texture, eyeIndex = 1 ) => {
