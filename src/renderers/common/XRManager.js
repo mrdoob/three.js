@@ -698,7 +698,11 @@ class XRManager extends EventDispatcher {
 			case 'mono':
 				group.add( createMesh( texture ) );
 				break;
+			case 'stereo':
 			default:
+
+				if ( layout === 'stereo' ) layout = 'stereo-top-bottom';
+
 				//get the uv factors for the layout
 				const uvFactors = UVMapFactors[ layout ];
 
