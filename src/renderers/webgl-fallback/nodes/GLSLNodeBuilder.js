@@ -31,8 +31,8 @@ const interpolationTypeMap = {
 
 const interpolationModeMap = {
 	'centroid': 'centroid',
-	'flat first': 'flat',
-	'flat either': 'flat'
+	'first': 'flat',
+	'either': 'flat'
 };
 
 const defaultPrecisions = `

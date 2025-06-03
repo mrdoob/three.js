@@ -158,8 +158,8 @@
 
 				};
 
-				const withFlatFirstShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.FLAT_FIRST );
-				const withFlatEitherShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.FLAT_EITHER );
+				const withFlatFirstShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.FIRST );
+				const withFlatEitherShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.EITHER );
 
 				const withSampleShader = Fn( () => {
 
@@ -235,16 +235,16 @@
 					THREE.InterpolationSamplingMode.NORMAL,
 					THREE.InterpolationSamplingMode.CENTROID,
 					THREE.InterpolationSamplingMode.SAMPLE,
-					THREE.InterpolationSamplingMode.FLAT_FIRST,
-					THREE.InterpolationSamplingMode.FLAT_EITHER
+					'flat first',
+					'flat either'
 				] ).onChange( () => {
 
 					const interpolationShaderLib = {
 						[ THREE.InterpolationSamplingMode.NORMAL ]: withoutInterpolationShader,
 						[ THREE.InterpolationSamplingMode.CENTROID ]: withInterpolationShader,
 						[ THREE.InterpolationSamplingMode.SAMPLE ]: withSampleShader,
-						[ THREE.InterpolationSamplingMode.FLAT_FIRST ]: withFlatFirstShader,
-						[ THREE.InterpolationSamplingMode.FLAT_EITHER ]: withFlatEitherShader
+						[ 'flat first' ]: withFlatFirstShader,
+						[ 'flat either' ]: withFlatEitherShader
 					};
 
 					const shader = interpolationShaderLib[ effectController.sampling ];
