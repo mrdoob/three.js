@@ -26,11 +26,11 @@ const supports = {
 
 const interpolationTypeMap = {
 	perspective: 'smooth',
-	linear: 'noperspective',
+	linear: 'noperspective'
 };
 
 const interpolationModeMap = {
-	'centroid': 'centroid',
+	'centroid': 'centroid'
 };
 
 const defaultPrecisions = `
