@@ -543,18 +543,24 @@ class WebGLBackend extends Backend {
 		}
 
 		this._currentContext = previousContext;
+		const renderTarget = renderContext.renderTarget;
 
-		if ( renderContext.textures !== null && renderContext.renderTarget ) {
+		if ( renderContext.textures !== null && renderTarget ) {
 
-			const renderTargetContextData = this.get( renderContext.renderTarget );
+			const renderTargetContextData = this.get( renderTarget );
 
-			const { resolveDepthBuffer, samples } = renderContext.renderTarget;
-
-			if ( samples > 0 && this._useMultisampledExtension( renderContext.renderTarget ) === false ) {
+			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 
-				const mask = gl.COLOR_BUFFER_BIT;
+				let mask = gl.COLOR_BUFFER_BIT;
+
+				if ( renderTarget.resolveDepthBuffer ) {
+
+					if ( renderTarget.depthBuffer ) mask |= gl.DEPTH_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= gl.STENCIL_BUFFER_BIT;
+
+				}
 
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
@@ -595,7 +601,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-			} else if ( resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
+			} else if ( renderTarget.resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );

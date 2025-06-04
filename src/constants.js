@@ -1612,8 +1612,8 @@ export const InterpolationSamplingMode = {
 	NORMAL: 'normal',
 	CENTROID: 'centroid',
 	SAMPLE: 'sample',
-	FLAT_FIRST: 'flat first',
-	FLAT_EITHER: 'flat either'
+	FIRST: 'first',
+	EITHER: 'either'
 };
 
 /**
