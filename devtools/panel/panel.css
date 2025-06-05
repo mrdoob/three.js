@@ -1,115 +1,140 @@
 :root {
-	color-scheme: light dark;
+  color-scheme: light dark;
 }
 
 body {
-	background: light-dark( #fff, #333 );
-	color: light-dark( #333, #e0e0e0 );
-	margin: 0;
-	padding: 10px;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-	font-size: 12px;
+  background: light-dark(#fff, #333);
+  color: light-dark(#333, #e0e0e0);
+  margin: 0;
+  padding: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
 }
 
 hr {
-	color: light-dark( #333, #e0e0e0 );
+  color: light-dark(#333, #e0e0e0);
 }
 
 #scene-tree {
-	width: 100%;
-	height: 100%;
-	overflow: auto;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 .header {
-	padding: 8px 12px;
-	background: light-dark( #f5f5f5, #333 );
-	border-radius: 4px;
-	margin-bottom: 16px;
-	font-family: monospace;
-	color: light-dark( #666, #aaa );
+  padding: 8px 12px;
+  background: light-dark(#f5f5f5, #333);
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-family: monospace;
+  color: light-dark(#666, #aaa);
 }
-	.header a {
-		color: light-dark( #666, #aaa );
-		text-decoration: none;
-	}
-	.header a:hover {
-		color: light-dark( #333, #e0e0e0 );
-	}
+.header a {
+  color: light-dark(#666, #aaa);
+  text-decoration: none;
+}
+.header a:hover {
+  color: light-dark(#333, #e0e0e0);
+}
 
 .section {
-	margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
-	.section h3 {
-		margin: 0 0 8px 0;
-		font-size: 11px;
-		text-transform: uppercase;
-		color: light-dark( #666, #aaa );
-		font-weight: 500;
-		border-bottom: 1px solid light-dark( #eee, #444 );
-		padding-bottom: 4px;
-	}
+.section h3 {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: light-dark(#666, #aaa);
+  font-weight: 500;
+  border-bottom: 1px solid light-dark(#eee, #444);
+  padding-bottom: 4px;
+}
+
+button {
+  background: light-dark(#f0f0f0, #454545);
+  border: none;
+  border-radius: 4px;
+  padding: 1px 3px;
+  cursor: pointer;
+  font-size: 11px;
+  color: light-dark(#333, #e0e0e0);
+  border-radius: 4px;
+}
+
+.export-status {
+  margin-left: 8px;
+  opacity: 0.5;
+  font-size: 0.9em;
+
+}
+
+.export-gradient-bar {
+  transition: opacity 0.3s;
+}
 
 .tree-item {
-	padding: 4px;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 .tree-item:hover {
-	background: light-dark( #f0f0f0, #555 );
+  background: light-dark(#f0f0f0, #555);
 }
 .tree-item .icon {
-	margin-right: 4px;
-	opacity: 0.7;
+  margin-right: 4px;
+  opacity: 0.7;
 }
 .tree-item .label {
-	flex: 1;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .tree-item .label .object-details {
-	color: #aaa;
-	margin-left: 4px;
-	font-weight: normal;
+  color: #aaa;
+  margin-left: 4px;
+  font-weight: normal;
 }
 .tree-item .type {
-	margin-left: 8px;
-	opacity: 0.5;
-	font-size: 0.9em;
+  margin-left: 8px;
+  opacity: 0.5;
+  font-size: 0.9em;
 }
 
 .children {
-	margin-left: 0;
+  margin-left: 0;
 }
 
 /* Style for clickable renderer summary */
 .renderer-summary {
-	cursor: pointer;
+  cursor: pointer;
 }
 .renderer-summary:hover {
-	background: light-dark( #f0f0f0, #555 );
+  background: light-dark(#f0f0f0, #555);
 }
 
 /* Hide default details marker when using custom summary */
-details.renderer-container > summary.renderer-summary { /* Target summary */
-	list-style: none; /* Hide default arrow */
-	cursor: pointer; /* Make the summary div look clickable */
+details.renderer-container > summary.renderer-summary {
+  /* Target summary */
+  list-style: none; /* Hide default arrow */
+  cursor: pointer; /* Make the summary div look clickable */
 }
 details.renderer-container > summary.renderer-summary::-webkit-details-marker {
-	display: none; /* Hide default arrow in WebKit */
+  display: none; /* Hide default arrow in WebKit */
 }
 
 /* Style for the toggle icon */
 .toggle-icon::before {
-	content: '▶'; /* Default: collapsed */
-	display: inline-block;
-	width: 1em;
-	margin-right: 2px;
-	opacity: 0.7;
+  content: "▶"; /* Default: collapsed */
+  display: inline-block;
+  width: 1em;
+  margin-right: 2px;
+  opacity: 0.7;
 }
-details.renderer-container[open] > summary.renderer-summary .toggle-icon::before {
-	content: '▼'; /* Expanded */
-} 
+details.renderer-container[open]
+  > summary.renderer-summary
+  .toggle-icon::before {
+  content: "▼"; /* Expanded */
+}

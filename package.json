@@ -68,7 +68,8 @@
     "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 src/nodes/Nodes.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make"
+    "make-screenshot": "node test/e2e/puppeteer.js --make",
+    "devtools": "devtools node utils/devtools/build-devtools.js"
   },
   "keywords": [
     "three",

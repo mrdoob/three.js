@@ -12,18 +12,38 @@
 		"service_worker": "background.js",
 		"type": "module"
 	},
-	"content_scripts": [{
-		"matches": ["<all_urls>"],
-		"js": ["content-script.js"],
-		"all_frames": true,
-		"run_at": "document_start"
-	}],
-	"web_accessible_resources": [{
-		"resources": ["bridge.js"],
-		"matches": ["<all_urls>"]
-	}],
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": [
+				"content-script.js",
+				"export-handler.js"
+			],
+			"all_frames": true,
+			"run_at": "document_start"
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"bridge.js",
+				"export-handler.js",
+				"bridge-patch.js",
+				"panel/exporters/GLTFExporter.js",
+				"panel/exporters/GLTFExporter.umd.js",
+				"panel/build/three.module.js",
+				"panel/build/three.core.js"
+			],
+			"matches": ["<all_urls>"]
+		}
+	],
 	"permissions": [
 		"activeTab",
-		"webNavigation"
+		"webNavigation",
+		"downloads",
+		"scripting"
+	],
+	"host_permissions": [
+		"<all_urls>"
 	]
-} 
+}
