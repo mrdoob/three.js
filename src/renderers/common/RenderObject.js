@@ -172,6 +172,16 @@ class RenderObject {
 		this.attributes = null;
 
 		/**
+		 * An object holding the version of the
+		 * attributes. The keys are the attribute names
+		 * and the values are the attribute versions.
+		 *
+		 * @type {?Object<string, number>}
+		 * @default null
+		 */
+		this.attributesVersion = null;
+
+		/**
 		 * A reference to a render pipeline the render
 		 * object is processed with.
 		 *
@@ -290,17 +300,18 @@ class RenderObject {
 
 		/**
 		 * An event listener which is executed when `dispose()` is called on
-		 * the render object's material.
+		 * the material or geometry of this render object.
 		 *
 		 * @method
 		 */
-		this.onMaterialDispose = () => {
+		this.onObjectDispose = () => {
 
 			this.dispose();
 
 		};
 
-		this.material.addEventListener( 'dispose', this.onMaterialDispose );
+		this.material.addEventListener( 'dispose', this.onObjectDispose );
+		this.geometry.addEventListener( 'dispose', this.onObjectDispose );
 
 	}
 
@@ -439,6 +450,7 @@ class RenderObject {
 
 		this.geometry = geometry;
 		this.attributes = null;
+		this.attributesVersion = null;
 
 	}
 
@@ -458,9 +470,25 @@ class RenderObject {
 		const attributes = [];
 		const vertexBuffers = new Set();
 
+		const attributesVersion = {};
+
 		for ( const nodeAttribute of nodeAttributes ) {
 
-			const attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
+			let attribute;
+
+			if ( nodeAttribute.node && nodeAttribute.node.attribute ) {
+
+				// node attribute
+				attribute = nodeAttribute.node.attribute;
+
+			} else {
+
+				// geometry attribute
+				attribute = geometry.getAttribute( nodeAttribute.name );
+
+				attributesVersion[ nodeAttribute.name ] = attribute.version;
+
+			}
 
 			if ( attribute === undefined ) continue;
 
@@ -472,6 +500,7 @@ class RenderObject {
 		}
 
 		this.attributes = attributes;
+		this.attributesVersion = attributesVersion;
 		this.vertexBuffers = Array.from( vertexBuffers.values() );
 
 		return attributes;
@@ -736,7 +765,27 @@ class RenderObject {
 	 */
 	get needsGeometryUpdate() {
 
-		return this.geometry.id !== this.object.geometry.id;
+		if ( this.geometry.id !== this.object.geometry.id ) return true;
+
+		if ( this.attributes !== null ) {
+
+			const attributesVersion = this.attributesVersion;
+
+			for ( const name in attributesVersion ) {
+
+				const attribute = this.geometry.getAttribute( name );
+
+				if ( attribute === undefined || attributesVersion[ name ] !== attribute.version ) {
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -813,7 +862,8 @@ class RenderObject {
 	 */
 	dispose() {
 
-		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
+		this.material.removeEventListener( 'dispose', this.onObjectDispose );
+		this.geometry.removeEventListener( 'dispose', this.onObjectDispose );
 
 		this.onDispose();
 
