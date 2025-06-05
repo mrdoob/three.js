@@ -686,7 +686,7 @@
 							console.log( 'DevTools: Starting export of scene', sceneUuid, 'as', binary ? 'GLB' : 'GLTF' );
 
 							// Create a deep clone of the scene for export if needed
-							let exportScene = scene;
+							const exportScene = prepareSceneForExport( scene );
 
 							// Pre-process scene to ensure compatibility with other programs
 							function prepareSceneForExport( originalScene ) {
@@ -816,8 +816,7 @@
 
 							}
 
-							// Prepare the scene for export
-							exportScene = prepareSceneForExport( scene );
+
 							// Create TextureUtils if available - needed for proper texture handling
 							let textureUtils = null;
 							if ( window.THREE && window.THREE.WebGLRenderer ) {
