@@ -938,7 +938,7 @@ class WebGLBackend extends Backend {
 
 			const dualAttributeData = transformBuffers[ i ];
 
-			if ( dualAttributeData.pbo ) {
+			if ( dualAttributeData.pbo && this.has( dualAttributeData.pbo ) ) {
 
 				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
 
