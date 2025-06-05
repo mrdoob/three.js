@@ -318,7 +318,10 @@ class RenderObject {
 		 */
 		this.onGeometryDispose = () => {
 
+			// clear geometry cache attributes
+
 			this.attributes = null;
+			this.attributesId = null;
 
 		};
 
