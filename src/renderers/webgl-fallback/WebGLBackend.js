@@ -902,7 +902,7 @@ class WebGLBackend extends Backend {
 
 		if ( vaoGPU === undefined ) {
 
-			this._createVao( attributes );
+			this.vaoCache[ vaoKey ] = this._createVao( attributes );
 
 		} else {
 
@@ -1020,28 +1020,23 @@ class WebGLBackend extends Backend {
 
 		// vertex state
 
-		const renderObjectData = this.get( renderObject );
+		const attributes = renderObject.getAttributes();
+		const attributesData = this.get( attributes );
 
-		let vaoGPU = renderObjectData.staticVao;
+		let vaoGPU = attributesData.vaoGPU;
 
-		if ( vaoGPU === undefined || renderObjectData.geometryId !== renderObject.geometry.id ) {
+		if ( vaoGPU === undefined ) {
 
-			const vaoKey = this._getVaoKey( renderObject.getAttributes() );
+			const vaoKey = this._getVaoKey( attributes );
 
 			vaoGPU = this.vaoCache[ vaoKey ];
 
 			if ( vaoGPU === undefined ) {
 
-				let staticVao;
+				vaoGPU = this._createVao( attributes );
 
-				( { vaoGPU, staticVao } = this._createVao( renderObject.getAttributes() ) );
-
-				if ( staticVao ) {
-
-					renderObjectData.staticVao = vaoGPU;
-					renderObjectData.geometryId = renderObject.geometry.id;
-
-				}
+				this.vaoCache[ vaoKey ] = vaoGPU;
+				attributesData.vaoGPU = vaoGPU;
 
 			}
 
@@ -2339,9 +2334,6 @@ class WebGLBackend extends Backend {
 		const { gl } = this;
 
 		const vaoGPU = gl.createVertexArray();
-		let key = '';
-
-		let staticVao = true;
 
 		gl.bindVertexArray( vaoGPU );
 
@@ -2350,12 +2342,8 @@ class WebGLBackend extends Backend {
 			const attribute = attributes[ i ];
 			const attributeData = this.get( attribute );
 
-			key += ':' + attributeData.id;
-
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
-
-			if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) staticVao = false;
 
 			let stride, offset;
 
@@ -2395,9 +2383,7 @@ class WebGLBackend extends Backend {
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, null );
 
-		this.vaoCache[ key ] = vaoGPU;
-
-		return { vaoGPU, staticVao };
+		return vaoGPU;
 
 	}
 
