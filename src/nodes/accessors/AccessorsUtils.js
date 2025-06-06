@@ -1,5 +1,5 @@
 import { bitangentView } from './Bitangent.js';
-import { normalView, transformedNormalView } from './Normal.js';
+import { normalView } from './Normal.js';
 import { tangentView } from './Tangent.js';
 import { mat3 } from '../tsl/TSLBase.js';
 import { mix } from '../math/MathNode.js';
@@ -40,13 +40,13 @@ export const parallaxUV = ( uv, scale ) => uv.sub( parallaxDirection.mul( scale 
  * @function
  * @returns {Node<vec3>} Bent normals.
  */
-export const transformedBentNormalView = /*@__PURE__*/ ( () => {
+export const bentNormalView = /*@__PURE__*/ ( () => {
 
 	// https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
 
 	let bentNormal = anisotropyB.cross( positionViewDirection );
 	bentNormal = bentNormal.cross( anisotropyB ).normalize();
-	bentNormal = mix( bentNormal, transformedNormalView, anisotropy.mul( roughness.oneMinus() ).oneMinus().pow2().pow2() ).normalize();
+	bentNormal = mix( bentNormal, normalView, anisotropy.mul( roughness.oneMinus() ).oneMinus().pow2().pow2() ).normalize();
 
 	return bentNormal;
 
