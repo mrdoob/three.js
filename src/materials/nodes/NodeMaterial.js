@@ -1078,6 +1078,21 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Setups premultiplied alpha.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node<vec4>} outputNode - The existing output node.
+	 * @return {Node<vec4>} The output node.
+	 */
+	setupPremultipliedAlpha( builder, outputNode ) {
+
+		outputNode = vec4( outputNode.rgb.mul( outputNode.a ), outputNode.a );
+
+		return outputNode;
+
+	}
+
+	/**
 	 * Setups the output node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -1091,6 +1106,14 @@ class NodeMaterial extends Material {
 		if ( this.fog === true ) {
 
 			outputNode = this.setupFog( builder, outputNode );
+
+		}
+
+		// PREMULTIPLIED ALPHA
+
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = this.setupPremultipliedAlpha( builder, outputNode );
 
 		}
 
