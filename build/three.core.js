@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '177';
+const REVISION = '178dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1617,8 +1617,8 @@ const InterpolationSamplingMode = {
 	NORMAL: 'normal',
 	CENTROID: 'centroid',
 	SAMPLE: 'sample',
-	FLAT_FIRST: 'flat first',
-	FLAT_EITHER: 'flat either'
+	FIRST: 'first',
+	EITHER: 'either'
 };
 
 /**

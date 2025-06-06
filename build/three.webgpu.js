@@ -3196,7 +3196,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return Fn( obj );
+		return obj.isFn ? obj : Fn( obj );
 
 	}
 
@@ -3672,6 +3672,8 @@ const Fn = ( jsFunc, layout = null ) => {
 
 	fn.shaderNode = shaderNode;
 	fn.id = shaderNode.id;
+
+	fn.isFn = true;
 
 	fn.getNodeType = ( ...params ) => shaderNode.getNodeType( ...params );
 	fn.getCacheKey = ( ...params ) => shaderNode.getCacheKey( ...params );
@@ -11685,7 +11687,7 @@ const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.V
  * @tsl
  * @function
  * @param {?Object3D} [object3d] - The 3D object.
- * @returns {Object3DNode<vec3>}
+ * @returns {Object3DNode<float>}
  */
 const objectRadius = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.RADIUS ).setParameterLength( 1 );
 
@@ -49178,10 +49180,11 @@ class XRRenderTarget extends RenderTarget {
 		 * are defined by external textures. This flag is
 		 * set to `true` when using the WebXR Layers API.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.hasExternalTextures = false;
+		this._hasExternalTextures = false;
 
 		/**
 		 * Whether a depth buffer should automatically be allocated
@@ -49194,10 +49197,25 @@ class XRRenderTarget extends RenderTarget {
 		 *
 		 * Reference: {@link https://www.w3.org/TR/webxrlayers-1/#dom-xrprojectionlayer-ignoredepthvalues}.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default true
 		 */
-		this.autoAllocateDepthBuffer = true;
+		this._autoAllocateDepthBuffer = true;
+
+		/**
+		 * Whether this render target is associated with a XRWebGLLayer.
+		 *
+		 * A XRWebGLLayer points to an opaque framebuffer. Basically,
+		 * this means that you don't have access to its bound color,
+		 * stencil and depth buffers. We need to handle this framebuffer
+		 * differently since its textures are always bound.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 * */
+		this._isOpaqueFramebuffer = false;
 
 	}
 
@@ -49205,8 +49223,9 @@ class XRRenderTarget extends RenderTarget {
 
 		super.copy( source );
 
-		this.hasExternalTextures = source.hasExternalTextures;
-		this.autoAllocateDepthBuffer = source.autoAllocateDepthBuffer;
+		this._hasExternalTextures = source._hasExternalTextures;
+		this._autoAllocateDepthBuffer = source._autoAllocateDepthBuffer;
+		this._isOpaqueFramebuffer = source._isOpaqueFramebuffer;
 
 		return this;
 
@@ -49839,7 +49858,7 @@ class XRManager extends EventDispatcher {
 				resolveStencilBuffer: false
 			} );
 
-		renderTarget.autoAllocateDepthBuffer = true;
+		renderTarget._autoAllocateDepthBuffer = true;
 
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
 		material.map = renderTarget.texture;
@@ -49930,7 +49949,7 @@ class XRManager extends EventDispatcher {
 				resolveStencilBuffer: false
 			} );
 
-		renderTarget.autoAllocateDepthBuffer = true;
+		renderTarget._autoAllocateDepthBuffer = true;
 
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
 		material.map = renderTarget.texture;
@@ -50004,7 +50023,7 @@ class XRManager extends EventDispatcher {
 		for ( const layer of this._layers ) {
 
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
-			layer.renderTarget.hasExternalTextures = layer.renderTarget.isXRRenderTarget;
+			layer.renderTarget._hasExternalTextures = layer.renderTarget.isXRRenderTarget;
 
 			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
 
@@ -50172,7 +50191,7 @@ class XRManager extends EventDispatcher {
 						multiview: this._useMultiview
 					} );
 
-				this._xrRenderTarget.hasExternalTextures = true;
+				this._xrRenderTarget._hasExternalTextures = true;
 				this._xrRenderTarget.depth = this._useMultiview ? 2 : 1;
 
 				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
@@ -50234,6 +50253,7 @@ class XRManager extends EventDispatcher {
 					}
 				);
 
+				this._xrRenderTarget._isOpaqueFramebuffer = true;
 				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
 			}
@@ -52061,7 +52081,7 @@ class Renderer {
 		frameBufferTarget.scissorTest = this._scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
-		frameBufferTarget.autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.autoAllocateDepthBuffer : false;
+		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
 		return frameBufferTarget;
 
@@ -54913,9 +54933,7 @@ const interpolationTypeMap = {
 };
 
 const interpolationModeMap = {
-	'centroid': 'centroid',
-	'flat first': 'flat',
-	'flat either': 'flat'
+	'centroid': 'centroid'
 };
 
 const defaultPrecisions = `
@@ -60982,13 +61000,13 @@ class WebGLBackend extends Backend {
 
 			// The multisample_render_to_texture extension doesn't work properly if there
 			// are midframe flushes and an external depth texture.
-			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget.autoAllocateDepthBuffer === true && renderTarget.multiview === false ) {
+			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget._autoAllocateDepthBuffer === true && renderTarget.multiview === false ) {
 
 				console.warn( 'THREE.WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
 
 			}
 
-			renderTarget.autoAllocateDepthBuffer = false;
+			renderTarget._autoAllocateDepthBuffer = false;
 
 		}
 
@@ -61161,18 +61179,24 @@ class WebGLBackend extends Backend {
 		}
 
 		this._currentContext = previousContext;
+		const renderTarget = renderContext.renderTarget;
 
-		if ( renderContext.textures !== null && renderContext.renderTarget ) {
+		if ( renderContext.textures !== null && renderTarget ) {
 
-			const renderTargetContextData = this.get( renderContext.renderTarget );
+			const renderTargetContextData = this.get( renderTarget );
 
-			const { resolveDepthBuffer, samples } = renderContext.renderTarget;
-
-			if ( samples > 0 && this._useMultisampledExtension( renderContext.renderTarget ) === false ) {
+			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 
-				const mask = gl.COLOR_BUFFER_BIT;
+				let mask = gl.COLOR_BUFFER_BIT;
+
+				if ( renderTarget.resolveDepthBuffer ) {
+
+					if ( renderTarget.depthBuffer ) mask |= gl.DEPTH_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= gl.STENCIL_BUFFER_BIT;
+
+				}
 
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
@@ -61213,7 +61237,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-			} else if ( resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
+			} else if ( renderTarget.resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
@@ -62620,7 +62644,7 @@ class WebGLBackend extends Backend {
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
-			const hasExternalTextures = ( isXRRenderTarget === true && renderTarget.hasExternalTextures === true );
+			const _hasExternalTextures = ( isXRRenderTarget === true && renderTarget._hasExternalTextures === true );
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
@@ -62637,7 +62661,7 @@ class WebGLBackend extends Backend {
 
 				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
 
-			} else if ( isXRRenderTarget && hasExternalTextures === false ) {
+			} else if ( isXRRenderTarget && _hasExternalTextures === false ) {
 
 				fb = this._xrFramebuffer;
 
@@ -62713,7 +62737,7 @@ class WebGLBackend extends Backend {
 
 				const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-				if ( renderTarget.autoAllocateDepthBuffer === true ) {
+				if ( renderTarget._autoAllocateDepthBuffer === true ) {
 
 					const renderbuffer = gl.createRenderbuffer();
 					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0, useMultisampledRTT );
@@ -62738,7 +62762,7 @@ class WebGLBackend extends Backend {
 
 							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
 
-						} else if ( hasExternalTextures && useMultisampledRTT ) {
+						} else if ( _hasExternalTextures && useMultisampledRTT ) {
 
 							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
@@ -62789,7 +62813,7 @@ class WebGLBackend extends Backend {
 
 				// rebind external XR textures
 
-				if ( isXRRenderTarget || useMultisampledRTT || renderTarget.multiview ) {
+				if ( ( isXRRenderTarget || useMultisampledRTT || renderTarget.multiview ) && ( renderTarget._isOpaqueFramebuffer !== true ) ) {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
@@ -62815,7 +62839,7 @@ class WebGLBackend extends Backend {
 
 					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-					if ( renderTarget.autoAllocateDepthBuffer === true ) {
+					if ( renderTarget._autoAllocateDepthBuffer === true ) {
 
 						const renderbuffer = renderTargetContextData.xrDepthRenderbuffer;
 						gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
@@ -63146,7 +63170,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		return renderTarget.samples > 0 && this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true && renderTarget.autoAllocateDepthBuffer !== false;
+		return renderTarget.samples > 0 && this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true && renderTarget._autoAllocateDepthBuffer !== false;
 
 	}
 
