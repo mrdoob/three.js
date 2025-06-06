@@ -1,40 +1,44 @@
 /* global chrome */
 
 // --- Utility Functions ---
-function getObjectIcon(obj) {
-	if (obj.isScene) return '🌍';
-	if (obj.isCamera) return '📷';
-	if (obj.isLight) return '💡';
-	if (obj.isInstancedMesh) return '🔸';
-	if (obj.isMesh) return '🔷';
-	if (obj.type === 'Group') return '📁';
+function getObjectIcon( obj ) {
+
+	if ( obj.isScene ) return '🌍';
+	if ( obj.isCamera ) return '📷';
+	if ( obj.isLight ) return '💡';
+	if ( obj.isInstancedMesh ) return '🔸';
+	if ( obj.isMesh ) return '🔷';
+	if ( obj.type === 'Group' ) return '📁';
 	return '📦';
+
 }
 
-function createPropertyRow(label, value) {
-	const row = document.createElement('div');
+function createPropertyRow( label, value ) {
+
+	const row = document.createElement( 'div' );
 	row.className = 'property-row';
 	row.style.display = 'flex';
 	row.style.justifyContent = 'space-between';
 	row.style.marginBottom = '2px';
 
-	const labelSpan = document.createElement('span');
+	const labelSpan = document.createElement( 'span' );
 	labelSpan.className = 'property-label';
 	labelSpan.textContent = `${label}:`;
 	labelSpan.style.marginRight = '10px';
 	labelSpan.style.whiteSpace = 'nowrap';
 
-	const valueSpan = document.createElement('span');
+	const valueSpan = document.createElement( 'span' );
 	valueSpan.className = 'property-value';
-	const displayValue = (value === undefined || value === null)
+	const displayValue = ( value === undefined || value === null )
 		? '–'
-		: (typeof value === 'number' ? value.toLocaleString() : value);
+		: ( typeof value === 'number' ? value.toLocaleString() : value );
 	valueSpan.textContent = displayValue;
 	valueSpan.style.textAlign = 'right';
 
-	row.appendChild(labelSpan);
-	row.appendChild(valueSpan);
+	row.appendChild( labelSpan );
+	row.appendChild( valueSpan );
 	return row;
+
 }
 
 // --- State ---
@@ -48,25 +52,92 @@ const state = {
 // console.log('Panel script loaded');
 
 // Create a connection to the background page
-const backgroundPageConnection = chrome.runtime.connect( {
-	name: 'three-devtools'
-} );
+console.log( '[Panel] Attempting to connect to background page...' );
+let backgroundPageConnection = null;
+let reconnectTimeout = null;
+let lostConnectionWarningTimeout = null;
 
-// Initialize the connection with the inspected tab ID
-backgroundPageConnection.postMessage( {
-	name: 'init',
-	tabId: chrome.devtools.inspectedWindow.tabId
-} );
+function connectToBackground() {
 
-// Request the initial state from the bridge script
-backgroundPageConnection.postMessage( {
-	name: 'request-state',
-	tabId: chrome.devtools.inspectedWindow.tabId
-} );
+	if ( backgroundPageConnection ) {
+
+		try {
+
+			backgroundPageConnection.disconnect();
+
+		} catch ( e ) {}
+
+	}
+
+	backgroundPageConnection = chrome.runtime.connect( { name: 'three-devtools' } );
+	console.log( '[Panel] Connected to background page' );
+
+	backgroundPageConnection.onDisconnect.addListener( () => {
+
+		console.warn( '[Panel] Background connection lost. Attempting to reconnect...' );
+		if ( ! reconnectTimeout ) {
+
+			reconnectTimeout = setTimeout( () => {
+
+				connectToBackground();
+				reconnectTimeout = null;
+
+			}, 1000 );
+
+		}
+
+		if ( ! lostConnectionWarningTimeout ) {
+
+			lostConnectionWarningTimeout = setTimeout( () => {
+
+				//alert('Three.js DevTools: Lost connection to background. Please reload the panel if this persists.');
+				lostConnectionWarningTimeout = null;
+
+			}, 5000 );
+
+		}
+
+	} );
+
+	// Re-send init and request-state after reconnect
+	backgroundPageConnection.postMessage( {
+		name: 'init',
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+	backgroundPageConnection.postMessage( {
+		name: 'request-state',
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+
+}
+
+function safePostMessage( msg ) {
+
+	if ( backgroundPageConnection ) {
+
+		try {
+
+			backgroundPageConnection.postMessage( msg );
+
+		} catch ( e ) {
+
+			console.warn( '[Panel] Failed to post message to background:', e );
+
+		}
+
+	} else {
+
+		console.warn( '[Panel] No background connection. Message not sent:', msg );
+
+	}
+
+}
+
+connectToBackground();
 
 const intervalId = setInterval( () => {
 
-	backgroundPageConnection.postMessage( {
+	safePostMessage( {
 		name: 'request-state',
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
@@ -105,11 +176,14 @@ function clearState() {
 // Listen for messages from the background page
 backgroundPageConnection.onMessage.addListener( function ( message ) {
 
+
+
 	if ( message.id === 'three-devtools' ) {
 
 		handleThreeEvent( message );
 
 	}
+
 
 } );
 
@@ -214,6 +288,72 @@ function handleThreeEvent( message ) {
 			clearState();
 			break;
 
+		case 'export-started':
+			console.log( '[Panel] Export started:', message.detail );
+			state.exportStatus.set( getSceneUuidFromMessage( message ), 'Export started...' );
+			break;
+
+		case 'export-file-generated':
+			console.log( '[Panel] Export file generated:', message.detail );
+			state.exportStatus.set( getSceneUuidFromMessage( message ), 'File generated.' );
+			break;
+
+		case 'export-download-initiated':
+			console.log( '[Panel] Export download initiated:', message.detail );
+			state.exportStatus.set( getSceneUuidFromMessage( message ), 'Download initiated.' );
+			break;
+
+		case 'export-complete':
+			console.log( '[Panel] Export complete:', message.detail );
+			state.exportStatus.set( getSceneUuidFromMessage( message ), 'Export complete!' );
+			if ( getSceneUuidFromMessage( message ) ) {
+
+				setTimeout( () => {
+
+					state.exportStatus.set( getSceneUuidFromMessage( message ), '' );
+					updateUI();
+
+				}, 5000 );
+
+			}
+
+			break;
+
+		case 'export-error':
+			console.warn( '[Panel] Export error:', message.detail );
+			state.exportStatus.set( getSceneUuidFromMessage( message ), 'Export error.' );
+			if ( message.detail && message.detail.error ) {
+
+				console.error( 'Panel: Export error:', message.detail.error );
+				// Optionally: alert( 'Export failed: ' + message.detail.error );
+
+			}
+
+			break;
+
+		case 'export-result':
+			// This message is typically used to indicate the export result
+			console.log( '[Panel] Export result:', message.detail );
+			if ( getSceneUuidFromMessage( message ) && getSuccessFromMessage( message ) ) {
+
+				state.exportStatus.set( getSceneUuidFromMessage( message ), 'Export complete!' );
+
+			}
+
+			break;
+
+		case 'export-result-meta':
+			// This message is typically used to provide metadata about the export result
+			// It may not require any specific UI updates, but we can log it if needed
+			console.log( 'Panel: Received export result metadata:', message.detail );
+			// If you want to update the UI with this metadata, you can do so here
+			break;
+
+		default:
+			console.warn( '[Panel] Unhandled message:', message.name, message.detail );
+			// You can handle other messages here if needed
+			break;
+
 	}
 
 	updateUI();
@@ -254,7 +394,7 @@ function renderRenderer( obj, container ) {
 	const displayName = `${obj.type} <span class="object-details">${details.join( ' ・ ' )}</span>`;
 
 	// Use toggle icon instead of paint icon
-	summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
+	summaryElem.innerHTML = `<span class="icon toggle-icon"></span>
 		<span class="label">${displayName}</span>
 		<span class="type">${obj.type}</span>`;
 	detailsElement.appendChild( summaryElem );
@@ -376,11 +516,69 @@ function renderObject( obj, container, level = 0 ) {
 		displayName = `${obj.name || obj.type} <span class="object-details">${objectCount} objects</span>`;
 		labelContent = `<span class="icon">${icon}</span>
 			<span class="label">${displayName}</span>
+			<span class="export-scene-buttons"></span>
 			<span class="type">${obj.type}</span>`;
 
 	}
 
 	elem.innerHTML = labelContent;
+
+	// Add export buttons for scenes
+	if ( obj.isScene ) {
+
+		const btnGltf = document.createElement( 'button' );
+		btnGltf.textContent = '💾 GLTF';
+		btnGltf.onclick = () => {
+
+			btnGltf.disabled = true;
+			btnGlb.disabled = true;
+			backgroundPageConnection.postMessage( { name: 'export-scene', sceneUuid: obj.uuid, binary: false } );
+			console.log( 'Panel: Exporting scene as GLTF:', obj.uuid );
+
+		};
+
+		const btnGlb = document.createElement( 'button' );
+		btnGlb.textContent = '💾 GLB';
+		btnGlb.onclick = () => {
+
+			btnGltf.disabled = true;
+			btnGlb.disabled = true;
+			backgroundPageConnection.postMessage( { name: 'export-scene', sceneUuid: obj.uuid, binary: true } );
+			console.log( 'Panel: Exporting scene as GLB:', obj.uuid );
+
+		};
+
+		if ( ! state.exportSceneBtns ) state.exportSceneBtns = new Map();
+		state.exportSceneBtns.set( obj.uuid, { btnGltf, btnGlb } );
+
+		const exportBtnSpan = elem.querySelector( '.export-scene-buttons' );
+		if ( exportBtnSpan ) {
+
+			exportBtnSpan.style.display = 'inline-flex';
+			exportBtnSpan.style.gap = '6px';
+			exportBtnSpan.appendChild( btnGltf );
+			exportBtnSpan.appendChild( btnGlb );
+
+			// Add status indicator
+			let statusElem = exportBtnSpan.querySelector( '.export-status' );
+
+			if ( ! statusElem ) {
+
+				statusElem = document.createElement( 'span' );
+				statusElem.className = 'export-status';
+				statusElem.style.marginLeft = '8px';
+				exportBtnSpan.appendChild( statusElem );
+
+			}
+
+			const status = state.exportStatus && state.exportStatus.get( obj.uuid );
+
+			statusElem.textContent = status || '';
+
+		}
+
+	}
+
 	container.appendChild( elem );
 
 	// Handle children (excluding children of renderers, as properties are shown in details)
@@ -430,6 +628,8 @@ function renderObject( obj, container, level = 0 ) {
 
 }
 
+
+
 // Function to update the UI
 function updateUI() {
 
@@ -442,7 +642,25 @@ function updateUI() {
 	header.style.justifyContent = 'space-between'; // Align items left and right
 
 	const miscSpan = document.createElement( 'span' );
-	miscSpan.innerHTML = '<a href="https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview" target="_blank">+</a>';
+	miscSpan.className = 'misc-header';
+	miscSpan.style.display = 'flex'; // Use flexbox for the misc section
+	miscSpan.style.width = '100%'; // Ensure it takes full width
+	miscSpan.style.justifyContent = 'space-between'; // Align items within misc section
+	// Add "Update UI" button and feedback link
+	// const updateBtn = document.createElement('button');
+	// updateBtn.textContent = '🖥️';
+	// updateBtn.title = 'Update UI';
+	// updateBtn.onclick = () => updateUI();
+	// updateBtn.style.marginRight = '10px';
+
+	const feedbackLink = document.createElement( 'a' );
+	feedbackLink.href = 'https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview';
+	feedbackLink.target = '_blank';
+	feedbackLink.textContent = '+';
+
+
+	miscSpan.appendChild( feedbackLink );
+	//miscSpan.appendChild(updateBtn);
 
 	const manifest = chrome.runtime.getManifest();
 
@@ -491,6 +709,47 @@ function updateUI() {
 
 }
 
+// Add a map to track export status per scene
+state.exportStatus = new Map();
+
+
+
 // Initial UI update
 clearState();
 updateUI();
+
+// Helper to extract sceneUuid from message
+function getSceneUuidFromMessage( message ) {
+
+	if ( message.sceneUuid ) return message.sceneUuid;
+
+	if ( message.detail && message.detail.sceneUuid ) return message.detail.sceneUuid;
+
+	if ( message.detail && Array.isArray( message.detail.properties ) ) {
+
+		const prop = message.detail.properties.find( p => p.name === 'sceneUuid' );
+
+		if ( prop && prop.value ) return prop.value;
+
+	}
+
+	return undefined;
+
+}
+
+// Helper to extract success from message
+function getSuccessFromMessage( message ) {
+
+	if ( message.detail && typeof message.detail.success === 'boolean' ) return message.detail.success;
+
+	if ( message.detail && Array.isArray( message.detail.properties ) ) {
+
+		const prop = message.detail.properties.find( p => p.name === 'success' );
+		if ( prop ) return prop.value;
+
+	}
+
+	return false;
+
+}
+

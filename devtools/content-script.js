@@ -6,8 +6,18 @@
 // Inject the bridge script into the main document or a target (e.g., iframe)
 function injectBridge( target = document ) {
 
+	if ( target.__threejs_devtools_bridge_injected ) return;
+	target.__threejs_devtools_bridge_injected = true;
+
 	const script = document.createElement( 'script' );
+	// Use UMD/IIFE build for Three.js for global THREE
+	const threeUrl = chrome.runtime.getURL( 'panel/build/three.core.js' );
+	// TODO: Use a UMD/IIFE build for GLTFExporter when available
+	const exporterUrl = chrome.runtime.getURL( 'panel/exporters/GLTFExporter.umd.js' );
+
+	// Only bridge.js is loaded from the extension package
 	script.src = chrome.runtime.getURL( 'bridge.js' );
+
 	script.onload = function () {
 
 		this.remove();
@@ -15,9 +25,14 @@ function injectBridge( target = document ) {
 	};
 
 	( target.head || target.documentElement ).appendChild( script );
+	script.setAttribute( 'data-three-url', threeUrl );
+	script.setAttribute( 'data-exporter-url', exporterUrl );
+
 	return script;
 
 }
+
+
 
 // Inject bridge into all existing iframes
 function injectIntoIframes() {
@@ -102,11 +117,15 @@ function handleWindowMessage( event ) {
 
 }
 
-// Listener for messages from the background script (originating from panel)
+
+// Listener for messages forwarded from the background script (originating from panel)
+// Remove unused parameters 'sender' and 'sendResponse' to fix linter warnings
 function handleBackgroundMessage( message ) {
 
-	if ( message.name === 'request-state' ) {
+	// Forward 'request-state' and 'export-scene' to the bridge
+	if ( message.name === 'request-state' || message.name === 'export-scene' ) {
 
+		//console.log('[Three.js DevTools] Content script received and forwarding:', message.name);
 		message.id = 'three-devtools';
 		window.postMessage( message, '*' );
 
@@ -126,4 +145,16 @@ window.matchMedia( '(prefers-color-scheme: light)' ).onchange = event => {
 	chrome.runtime.sendMessage( { scheme: event.matches ? 'light' : 'dark' } );
 
 };
+
+
+// Handshake: notify background when content script is ready
+try {
+
+	chrome.runtime.sendMessage( { name: 'three-devtools-content-ready' } );
+
+} catch ( e ) {
+
+	console.warn( '[Three.js DevTools] Handshake send failed:', e );
+
+}
 

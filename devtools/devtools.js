@@ -1,3 +1,5 @@
+/* global chrome */
+
 try {
 
 	chrome.devtools.panels.create(
