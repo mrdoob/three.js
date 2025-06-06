@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - html texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #ffffff;
+			}
+			#canvas {
+				display: block;
+			}
+			#drawElement {
+				background-color: #ffffff;
+				color: #000000;
+				font-family: sans-serif;
+				font-size: 30px;
+				line-height: 1.5;
+				text-align: center;
+				padding: 20px;
+				border: 10px solid #cccccc;
+			}
+			img {
+				width: 40px;
+				height: auto;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - html as a texture
+		</div>
+
+		<canvas id="canvas" width="600" height="600" layoutsubtree=true>
+			<div id=drawElement style="width: 500px; height: 500px;">
+				Hello world!<br>I'm multi-line, <b>formatted</b>,
+				rotated text with emoji (&#128512;), RTL text
+				<span dir=rtl>من فارسی صحبت میکنم</span>,
+				vertical text,
+				<p style="writing-mode: vertical-rl;">
+				这是垂直文本
+				</p>
+				an inline image:
+				<img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Gustav_chocolate.jpg">
+				, and:
+				<svg width="50" height="50">
+				<circle cx="25" cy="25" r="20" fill="green" />
+				<text x="25" y="30" font-size="15" text-anchor="middle" fill="white">SVG</text>
+				</svg>
+			</div>
+		</canvas>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let camera, scene, renderer, mesh, material;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaaaaa );
+
+				material = new THREE.MeshBasicMaterial();
+				material.map = new THREE.HTMLTexture( drawElement );
+
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				// document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				mesh.rotation.x += 0.01;
+				mesh.rotation.y += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
