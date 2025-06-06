@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, attributeArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -210,9 +210,9 @@
 				// Labels applied to storage nodes and uniform nodes are reflected within the shader output,
 				// and are useful for debugging purposes.
 
-				const positionStorage = attributeArray( positionArray, 'vec3' ).label( 'positionStorage' );
-				const velocityStorage = attributeArray( velocityArray, 'vec3' ).label( 'velocityStorage' );
-				const phaseStorage = attributeArray( phaseArray, 'float' ).label( 'phaseStorage' );
+				const positionStorage = instancedArray( positionArray, 'vec3' ).label( 'positionStorage' );
+				const velocityStorage = instancedArray( velocityArray, 'vec3' ).label( 'velocityStorage' );
+				const phaseStorage = instancedArray( phaseArray, 'float' ).label( 'phaseStorage' );
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data in the WebGL2 fallback.
 
