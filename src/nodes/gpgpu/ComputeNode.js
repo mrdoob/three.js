@@ -60,6 +60,14 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
+		 * @type {?BufferAttribute}
+		 * @default null
+		 */
+		this.indirect = null;
+
+		/**
+		 * TODO
+		 *
 		 * @type {number}
 		 */
 		this.dispatchCount = 0;
@@ -206,6 +214,31 @@ class ComputeNode extends Node {
 			}
 
 		}
+
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @param {BufferAttribute} indirect - The attribute holding indirect workgroup values.
+	 * @return {ComputeNode} A reference to this node.
+	 */
+	setIndirect( indirect ) {
+
+		this.indirect = indirect;
+
+		return this;
+
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @return {?BufferAttribute} The indirect attribute. Returns `null` if no indirect attribute is defined.
+	 */
+	getIndirect() {
+
+		return this.indirect;
 
 	}
 
