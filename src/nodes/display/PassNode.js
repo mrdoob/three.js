@@ -586,13 +586,6 @@ class PassNode extends TempNode {
 
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
-		// TODO: Disable MSAA for WebGL backend for now
-		if ( renderer.backend.isWebGLBackend === true ) {
-
-			this.renderTarget.samples = 0;
-
-		}
-
 		this.renderTarget.texture.type = renderer.getColorBufferType();
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
