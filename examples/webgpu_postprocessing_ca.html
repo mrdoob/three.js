@@ -22,8 +22,8 @@
 
 		<script type="module">
 			import * as THREE from 'three';
-			import { pass, renderOutput } from 'three/tsl';
-			import { chromaticAberration } from 'three/addons/tsl/display/CANode.js';
+			import { pass, renderOutput,sin, vec2, cos, time } from 'three/tsl';
+			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -34,7 +34,8 @@
 				center: new THREE.Vector2(0.5, 0.5),
 				scale: 1.2,
 				autoRotate: true,
-				cameraDistance: 40
+				cameraDistance: 40,
+				static: false
 			};
 
 			let camera, scene, renderer, clock, mainGroup;
@@ -95,9 +96,16 @@
 				const scenePass = pass( scene, camera );
 				const outputPass = renderOutput( scenePass );
 
-				// chromatic aberration pass
-				const caPass = chromaticAberration( outputPass, params.strength, null, params.scale );
-				postProcessing.outputNode = caPass;
+
+				// With static values
+				const caPassStatic = chromaticAberration( outputPass, 1.5, new THREE.Vector2(0.5, 0.5), 1.2 );
+
+				// With procedural nodes
+				const animatedStrength = sin( time ).mul( 0.5 ).add( 1.0 );
+				const dynamicCenter = vec2( cos( time ).mul( 0.1 ).add( 0.5 ), 0.5 );
+				const caPassProcedural = chromaticAberration( outputPass, animatedStrength, dynamicCenter, 1.0 );
+
+				postProcessing.outputNode = caPassProcedural;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -107,9 +115,18 @@
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 					if ( value === true ) {
-						postProcessing.outputNode = caPass;
+						postProcessing.outputNode = caPassStatic;
 					} else {
 						postProcessing.outputNode = outputPass;
+					}
+					postProcessing.needsUpdate = true;
+				} );
+
+				gui.add( params, 'static' ).onChange( ( value ) => {
+					if ( value === true ) {
+						postProcessing.outputNode = caPassStatic;
+					} else {
+						postProcessing.outputNode = caPassProcedural;
 					}
 					postProcessing.needsUpdate = true;
 				} );

@@ -30,11 +30,11 @@ class ChromaticAberrationNode extends TempNode {
 	 * Constructs a new chromatic aberration node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {number} [strength=1.0] - The strength of the chromatic aberration effect.
-	 * @param {Vector2} [center=null] - The center point of the effect. If null, uses screen center (0.5, 0.5).
-	 * @param {number} [scale=1.0] - The scale factor for stepped scaling from center.
+	 * @param {Node} strengthNode - The strength of the chromatic aberration effect as a node.
+	 * @param {Node} centerNode - The center point of the effect as a node.
+	 * @param {Node} scaleNode - The scale factor for stepped scaling from center as a node.
 	 */
-	constructor( textureNode, strength = 1.0, center = null, scale = 1.0 ) {
+	constructor( textureNode, strengthNode, centerNode, scaleNode ) {
 
 		super( 'vec4' );
 
@@ -55,28 +55,25 @@ class ChromaticAberrationNode extends TempNode {
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
-		 * A uniform node holding the strength of the effect.
+		 * A node holding the strength of the effect.
 		 *
-		 * @private
-		 * @type {UniformNode<float>}
+		 * @type {Node}
 		 */
-		this._strength = uniform( strength );
+		this.strengthNode = strengthNode;
 
 		/**
-		 * A uniform node holding the center point of the effect.
+		 * A node holding the center point of the effect.
 		 *
-		 * @private
-		 * @type {UniformNode<vec2>}
+		 * @type {Node}
 		 */
-		this._center = uniform( center || new Vector2( 0.5, 0.5 ) );
+		this.centerNode = centerNode;
 
 		/**
-		 * A uniform node holding the scale factor for stepped scaling.
+		 * A node holding the scale factor for stepped scaling.
 		 *
-		 * @private
-		 * @type {UniformNode<float>}
+		 * @type {Node}
 		 */
-		this._scale = uniform( scale );
+		this.scaleNode = scaleNode;
 
 		/**
 		 * A uniform node holding the inverse resolution value.
@@ -167,9 +164,9 @@ class ChromaticAberrationNode extends TempNode {
 
 			return ApplyChromaticAberration(
 				uvNode,
-				this._strength,
-				this._center,
-				this._scale,
+				this.strengthNode,
+				this.centerNode,
+				this.scaleNode,
 				this._invSize
 			);
 
@@ -178,111 +175,6 @@ class ChromaticAberrationNode extends TempNode {
 		const outputNode = chromaticAberrationFn();
 
 		return outputNode;
-
-	}
-
-	/**
-	 * Sets the strength of the chromatic aberration effect.
-	 *
-	 * @param {number} value - The strength value.
-	 * @return {ChromaticAberrationNode}
-	 */
-	setStrength( value ) {
-
-		this._strength.value = value;
-		return this;
-
-	}
-
-	/**
-	 * Sets the center point of the chromatic aberration effect.
-	 *
-	 * @param {Vector2} value - The center point.
-	 * @return {ChromaticAberrationNode}
-	 */
-	setCenter( value ) {
-
-		this._center.value.copy( value );
-		return this;
-
-	}
-
-	/**
-	 * Sets the scale factor for the chromatic aberration effect.
-	 *
-	 * @param {number} value - The scale value.
-	 * @return {ChromaticAberrationNode}
-	 */
-	setScale( value ) {
-
-		this._scale.value = value;
-		return this;
-
-	}
-
-	/**
-	 * Gets the strength of the chromatic aberration effect.
-	 *
-	 * @return {number}
-	 */
-	get strength() {
-
-		return this._strength.value;
-
-	}
-
-	/**
-	 * Sets the strength of the chromatic aberration effect.
-	 *
-	 * @param {number} value - The strength value.
-	 */
-	set strength( value ) {
-
-		this._strength.value = value;
-
-	}
-
-	/**
-	 * Gets the center point of the chromatic aberration effect.
-	 *
-	 * @return {Vector2}
-	 */
-	get center() {
-
-		return this._center.value;
-
-	}
-
-	/**
-	 * Sets the center point of the chromatic aberration effect.
-	 *
-	 * @param {Vector2} value - The center point.
-	 */
-	set center( value ) {
-
-		this._center.value.copy( value );
-
-	}
-
-	/**
-	 * Gets the scale factor of the chromatic aberration effect.
-	 *
-	 * @return {number}
-	 */
-	get scale() {
-
-		return this._scale.value;
-
-	}
-
-	/**
-	 * Sets the scale factor of the chromatic aberration effect.
-	 *
-	 * @param {number} value - The scale value.
-	 */
-	set scale( value ) {
-
-		this._scale.value = value;
 
 	}
 
@@ -296,15 +188,24 @@ export default ChromaticAberrationNode;
  * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {number} [strength=1.0] - The strength of the chromatic aberration effect.
- * @param {Vector2} [center=null] - The center point of the effect. If null, uses screen center (0.5, 0.5).
- * @param {number} [scale=1.0] - The scale factor for stepped scaling from center.
+ * @param {Node|number} [strength=1.0] - The strength of the chromatic aberration effect as a node or value.
+ * @param {Node|Vector2} [center=null] - The center point of the effect as a node or value. If null, uses screen center (0.5, 0.5).
+ * @param {Node|number} [scale=1.1] - The scale factor for stepped scaling from center as a node or value.
  * @returns {ChromaticAberrationNode}
  */
-export const chromaticAberration = ( node, strength = 1.0, center = null, scale = 1.1 ) =>
-	nodeObject(
+export const chromaticAberration = ( node, strength = 1.0, center = null, scale = 1.1 ) => {
+
+	// Convert parameters to nodes if they aren't already
+	const strengthNode = strength.isNode ? strength : uniform( strength );
+	const centerNode = center ? ( center.isNode ? center : uniform( center ) ) : uniform( new Vector2( 0.5, 0.5 ) );
+	const scaleNode = scale.isNode ? scale : uniform( scale );
+
+	return nodeObject(
 		new ChromaticAberrationNode(
 			convertToTexture( node ),
-			strength, center, scale
+			strengthNode,
+			centerNode,
+			scaleNode
 		)
 	);
+};
