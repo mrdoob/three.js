@@ -22,7 +22,7 @@
 
 		<script type="module">
 			import * as THREE from 'three';
-			import { pass, renderOutput,sin, vec2, cos, time } from 'three/tsl';
+			import { pass, renderOutput,sin, vec2, cos, time, uniform } from 'three/tsl';
 			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -96,16 +96,25 @@
 				const scenePass = pass( scene, camera );
 				const outputPass = renderOutput( scenePass );
 
+				// Create uniform nodes for the static version that can be updated
+				const staticStrength = uniform( params.strength );
+				const staticCenter = uniform( new THREE.Vector2( params.center.x, params.center.y ) );
+				const staticScale = uniform( params.scale );
 
-				// With static values
-				const caPassStatic = chromaticAberration( outputPass, 1.5, new THREE.Vector2(0.5, 0.5), 1.2 );
+				// With static values (using uniform nodes)
+				const caPassStatic = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
 
 				// With procedural nodes
 				const animatedStrength = sin( time ).mul( 0.5 ).add( 1.0 );
 				const dynamicCenter = vec2( cos( time ).mul( 0.1 ).add( 0.5 ), 0.5 );
 				const caPassProcedural = chromaticAberration( outputPass, animatedStrength, dynamicCenter, 1.0 );
 
-				postProcessing.outputNode = caPassProcedural;
+				// Set initial output based on params
+				if ( params.enabled ) {
+				    postProcessing.outputNode = params.static ? caPassStatic : caPassProcedural;
+				} else {
+				    postProcessing.outputNode = outputPass;
+				}
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -114,47 +123,52 @@
 				gui.title( 'Chromatic Aberration' );
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
-					if ( value === true ) {
-						postProcessing.outputNode = caPassStatic;
-					} else {
-						postProcessing.outputNode = outputPass;
-					}
-					postProcessing.needsUpdate = true;
+				    if ( value === true ) {
+				        postProcessing.outputNode = params.static ? caPassStatic : caPassProcedural;
+				    } else {
+				        postProcessing.outputNode = outputPass;
+				    }
+				    postProcessing.needsUpdate = true;
 				} );
 
 				gui.add( params, 'static' ).onChange( ( value ) => {
-					if ( value === true ) {
-						postProcessing.outputNode = caPassStatic;
-					} else {
-						postProcessing.outputNode = caPassProcedural;
-					}
-					postProcessing.needsUpdate = true;
+				    if ( params.enabled ) {
+				        if ( value === true ) {
+				            postProcessing.outputNode = caPassStatic;
+				        } else {
+				            postProcessing.outputNode = caPassProcedural;
+				        }
+				        postProcessing.needsUpdate = true;
+				    }
 				} );
 
-				gui.add( params, 'strength', 0, 3 ).onChange( ( value ) => {
-					caPass.strength = value;
-					postProcessing.needsUpdate = true;
+				const staticFolder = gui.addFolder( 'Static Parameters' );
+
+				staticFolder.add( params, 'strength', 0, 3 ).onChange( ( value ) => {
+				    staticStrength.value = value;
+				    postProcessing.needsUpdate = true;
 				} );
 
-				gui.add( params.center, 'x', -1, 1 ).name( "Center X").onChange( ( value ) => {
-					caPass.center.x = value;
-					postProcessing.needsUpdate = true;
+				staticFolder.add( params.center, 'x', -1, 1 ).name( "Center X" ).onChange( ( value ) => {
+				    staticCenter.value.x = value;
+				    postProcessing.needsUpdate = true;
 				} );
 
-				gui.add( params.center, 'y', -1, 1).name( "Center Y").onChange( ( value ) => {
-					caPass.center.y = value;
-					postProcessing.needsUpdate = true;
+				staticFolder.add( params.center, 'y', -1, 1 ).name( "Center Y" ).onChange( ( value ) => {
+				    staticCenter.value.y = value;
+				    postProcessing.needsUpdate = true;
 				} );
 
-				gui.add( params, 'scale', 1, 2 ).onChange( ( value ) => {
-					caPass.scale = value;
-					postProcessing.needsUpdate = true;
+				staticFolder.add( params, 'scale', 0.5, 2 ).onChange( ( value ) => {
+				    staticScale.value = value;
+				    postProcessing.needsUpdate = true;
 				} );
 
-				gui.add( params, 'animated' );
-				gui.add( params, 'autoRotate' );
-				gui.add( params, 'cameraDistance', 20, 60 ).onChange( ( value ) => {
-					camera.position.z = value;
+				const animationFolder = gui.addFolder( 'Animation' );
+				animationFolder.add( params, 'animated' );
+				animationFolder.add( params, 'autoRotate' );
+				animationFolder.add( params, 'cameraDistance', 20, 60 ).onChange( ( value ) => {
+				    camera.position.z = value;
 				} );
 			}
 
