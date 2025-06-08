@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul, premult, unpremult } from 'three/tsl';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -250,7 +250,7 @@ class GaussianBlurNode extends TempNode {
 			// https://lisyarus.github.io/blog/posts/blur-coefficients-generator.html
 
 			sampleTexture = ( uv ) => premult( textureNode.sample( uv ) );
-			output = ( color ) => unpremult( color );
+			output = ( color ) => unpremultiplyAlpha( color );
 
 		} else {
 

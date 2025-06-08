@@ -143,7 +143,7 @@ export const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
  * @param {Node<vec4>} color - The input color with non-premultiplied alpha.
  * @return {Node<vec4>} The color with premultiplied alpha.
  */
-export const premult = /*@__PURE__*/ Fn( ( [ color ] ) => {
+export const premultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return vec4( color.rgb.mul( color.a ), color.a );
 
@@ -162,7 +162,7 @@ export const premult = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * @param {Node<vec4>} color - The input color with premultiplied alpha.
  * @return {Node<vec4>} The color with non-premultiplied alpha.
  */
-export const unpremult = /*@__PURE__*/ Fn( ( [ color ] ) => {
+export const unpremultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	If( color.a.equal( 0.0 ), () => vec4( 0.0 ) );
 
