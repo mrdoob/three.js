@@ -145,10 +145,8 @@
 
 					// mask
 
-					const mask = gridUv
-						.sub( 0.5 )
-						.length()
-						.step( orientationStrength.mul( radius ).mul( 0.5 ) )
+					const mask = orientationStrength.mul( radius ).mul( 0.5 )
+						.step( gridUv.sub( 0.5 ).length() )
 						.mul( mix( mixLow, mixHigh, orientationStrength ) );
 
 					return vec4( color, mask );
