@@ -195,17 +195,12 @@ export default ChromaticAberrationNode;
  */
 export const chromaticAberration = ( node, strength = 1.0, center = null, scale = 1.1 ) => {
 
-	// Convert parameters to nodes if they aren't already
-	const strengthNode = strength.isNode ? strength : uniform( strength );
-	const centerNode = center ? ( center.isNode ? center : uniform( center ) ) : uniform( new Vector2( 0.5, 0.5 ) );
-	const scaleNode = scale.isNode ? scale : uniform( scale );
-
 	return nodeObject(
 		new ChromaticAberrationNode(
 			convertToTexture( node ),
-			strengthNode,
-			centerNode,
-			scaleNode
+			nodeObject( strength ),
+			nodeObject( center ),
+			nodeObject( scale )
 		)
 	);
 };
