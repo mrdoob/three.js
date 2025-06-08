@@ -249,7 +249,7 @@ class GaussianBlurNode extends TempNode {
 
 			// https://lisyarus.github.io/blog/posts/blur-coefficients-generator.html
 
-			sampleTexture = ( uv ) => premult( textureNode.sample( uv ) );
+			sampleTexture = ( uv ) => premultiplyAlpha( textureNode.sample( uv ) );
 			output = ( color ) => unpremultiplyAlpha( color );
 
 		} else {
