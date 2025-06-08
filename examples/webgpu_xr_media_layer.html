@@ -13,7 +13,8 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo/mono video native media layers<br />
 			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.<br />
 			Choose Layout: <select id="layout-select">
-				<option data-layout="stereo-left-right">Stereo</option>
+				<option data-layout="stereo-left-right-360">Stereo 360</option>
+				<option data-layout="stereo-top-bottom-180">Stereo 180</option>
 				<option data-layout="mono">Mono</option>
 			</select>
 		</div>
@@ -44,17 +45,28 @@
 			let camera, scene, renderer, controls;
 
 			const sources = {
-				"stereo-left-right": {
+				"stereo-left-right-360": {
 					"src": "textures/MaryOculus.mp4",
 					"transform": { x: 0, y: .28, z: 0, w: .96 },
-					"targetXPos": 0 
+					"targetXPos": 0,
+					"layout": "stereo-left-right"
+				},
+				"stereo-top-bottom-180": {
+					"src": "https://oculus-mp4.s3.amazonaws.com/immersive+video+8K+for+Oculus+Browser/everestvr_6.2k_30s_180_TB_h264_crf27_CREDIT_JON_GRIFFITH-injected.mp4",
+					"transform": { x: 0, y: .28, z: 0, w: .96 },
+					"targetXPos": 0,
+					"layout": "stereo-top-bottom",
+					"is180": true 
 				},
 				"mono": {
 					"src": "textures/pano.mp4",
 					"transform": {},
-					"targetXPos": -(Math.PI / 2)
+					"targetXPos": -(Math.PI / 2),
+					"layout": "mono"
 				}
 			};
+
+		
 
 			init();
 
@@ -65,18 +77,25 @@
 				context = (window.parent || window),
 				currentUrl = new URL(context.location.href),
 				urlParams = currentUrl.searchParams,
-				selectedMediaLayout = urlParams.get('layout') || "stereo-left-right",
-				selectedOption = [...layoutSelect.options].filter(option => option.dataset.layout === selectedMediaLayout)[0],
-				selectedSource = sources[selectedMediaLayout].src,
-				selectedMediaTransform = sources[selectedMediaLayout].transform,
-				selectedTargetXPos = sources[selectedMediaLayout].targetXPos;
+				selectedLayout = urlParams.get('layout') || "stereo-left-right-360",
+				selectedOption = [...layoutSelect.options].filter(option => option.dataset.layout === selectedLayout)[0],
+				selectedMediaLayout = sources[selectedLayout].layout,
+				is180 = sources[selectedLayout].is180,
+				selectedSource = sources[selectedLayout].src,
+				selectedMediaTransform = sources[selectedLayout].transform,
+				selectedTargetXPos = sources[selectedLayout].targetXPos;
+
+				console.log(currentUrl);
 
 				if (selectedOption) selectedOption.selected = true;				
 
 				layoutSelect.addEventListener('change', () => {
 					const layout = layoutSelect.options[layoutSelect.selectedIndex].dataset.layout;
 					//have to hardcode a location due to how the examples work and bug with Quest starting a second XR session.
-					const newUrl = `${currentUrl.origin}/examples/webgpu_xr_media_layer.html?layout=${layout}`;
+					const path = currentUrl.hash ? `${currentUrl.pathname}webgpu_xr_media_layer.html` : currentUrl.pathname;
+
+					const newUrl = `${currentUrl.origin}${path}?layout=${layout}`;
+					console.log(newUrl);
 					context.location.replace(newUrl);
 				});
 
@@ -116,7 +135,7 @@
 				//For 180 degrees video set the is180 param to true. This will create a half sphere geoemtry.
 				//Full usage: renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 }, false, {}, 500, 60, 40);
 				//In this example `selectedMediaLayout` defaults to `stereo-left-right` layout
-				const mediaLayer = renderer.xr.createMediaLayer(texture, selectedMediaLayout, selectedMediaTransform);
+				const mediaLayer = renderer.xr.createMediaLayer(texture, selectedMediaLayout, selectedMediaTransform, is180);
 			
 				scene.add(mediaLayer);
 
