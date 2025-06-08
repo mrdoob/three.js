@@ -15,7 +15,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> batch lod bvh - <a href="https://github.com/agargaro/batched-mesh-extensions" target="_blank" rel="noopener">@three.ez/batched-mesh-extensions</a><br/>
-			BatchedMesh with 10 geometries and 500k instances. Each geometry has 4 LODs generated with meshoptimizer. <br>
+			BatchedMesh with 10 geometries and 500k instances. Each geometry has 5 LODs (4 generated with meshoptimizer). <br>
 			Frustum culling and raycasting are accelerated by using BVHs (TLAS & BLAS). <br>
 			See <a href="https://github.com/agargaro/batched-mesh-extensions" target="_blank" rel="noopener">main project repository</a> for more information and examples on BatchedMesh extensions.
 		</div>
@@ -56,9 +56,10 @@
 			THREE.Mesh.prototype.raycast = acceleratedRaycast;
 			THREE.BatchedMesh.prototype.computeBoundsTree = computeBatchedBoundsTree;
 
-			const instancesCount = 500000;
 			let stats;
 			let camera, scene, renderer;
+
+			const instancesCount = 500000;
 			let batchedMesh;
 			let lastHoveredInstance = null;
 			const lastHoveredColor = new THREE.Color();
@@ -116,7 +117,7 @@
 					new THREE.TorusKnotGeometry( 1, 0.4, 256, 32, 5, 3 )
 				];
 
-				// generate 4 LODs (Levels of Detail) for each geometry
+				// generate 4 LODs (levels of detail) for each geometry
 				const geometriesLODArray = await simplifyGeometriesByErrorLOD( geometries, 4, performanceRangeLOD );
 
 				// create BatchedMesh
@@ -165,15 +166,24 @@
 			
 				// set up gui
 				const config = {
+					freeze: false,
 					useBVH: true,
 					useLOD: true
 				};
 			
 				const bvh = batchedMesh.bvh;
 				const lods = batchedMesh._geometryInfo.map( x => x.LOD );
+				const onBeforeRender = batchedMesh.onBeforeRender;
 			
 				const gui = new GUI();
+
 				gui.add( batchedMesh, 'instanceCount' ).disable();
+			
+				gui.add( config, 'freeze' ).onChange( v => {
+
+					batchedMesh.onBeforeRender = v ? () => {} : onBeforeRender;
+
+				} );
 
 				const frustumCullingFolder = gui.addFolder( 'Frustum culling & raycasting' );
 				frustumCullingFolder.add( config, 'useBVH' ).onChange( v => {
@@ -182,8 +192,8 @@
 
 				} );
 
-				const GeometriesFolder = gui.addFolder( 'Geometries' );
-				GeometriesFolder.add( config, 'useLOD' ).onChange( v => {
+				const geometriesFolder = gui.addFolder( 'Geometries' );
+				geometriesFolder.add( config, 'useLOD' ).onChange( v => {
 
 					const geometryInfo = batchedMesh._geometryInfo;
 					for ( let i = 0; i < geometryInfo.length; i ++ ) {
@@ -194,7 +204,7 @@
 
 				} );
 
-				document.addEventListener( 'mousemove', onMouseMove );
+				document.addEventListener( 'pointermove', onPointerMove );
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 			
@@ -203,7 +213,7 @@
 			}
 
 
-			function onMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				event.preventDefault();
 
@@ -229,28 +239,24 @@
 				raycaster.setFromCamera( mouse, camera );
 				const intersection = raycaster.intersectObject( batchedMesh );
 
-				if ( intersection.length > 0 ) {
-
-					const batchId = intersection[ 0 ].batchId;
-
-					if ( lastHoveredInstance === batchId ) return;
-
-					if ( lastHoveredInstance ) {
-
-						batchedMesh.setColorAt( lastHoveredInstance, lastHoveredColor );
+				const batchId = intersection.length > 0 ? intersection[ 0 ].batchId : null;
 			
-					}
+				if ( lastHoveredInstance === batchId ) return;
 
-					lastHoveredInstance = batchId;
-					batchedMesh.getColorAt( lastHoveredInstance, lastHoveredColor );
-					batchedMesh.setColorAt( lastHoveredInstance, yellow );
+				if ( lastHoveredInstance ) {
 
-				} else if ( lastHoveredInstance ) {
-			
 					batchedMesh.setColorAt( lastHoveredInstance, lastHoveredColor );
-					lastHoveredInstance = null;
-
+			
 				}
+
+				if ( batchId ) {
+
+					batchedMesh.getColorAt( batchId, lastHoveredColor );
+					batchedMesh.setColorAt( batchId, yellow );
+			
+				}
+
+				lastHoveredInstance = batchId;
 
 			}
 
