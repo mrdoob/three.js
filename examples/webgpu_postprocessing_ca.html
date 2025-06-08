@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - Chromatic Aberration</title>
+		<title>three.js webgpu - chromatic aberration</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - chromatic aberration
+		</div>
 
 		<script type="importmap">
 			{
@@ -21,8 +25,10 @@
 		</script>
 
 		<script type="module">
+
 			import * as THREE from 'three';
-			import { pass, renderOutput,sin, vec2, cos, time, uniform } from 'three/tsl';
+			import { pass, renderOutput, sin, vec2, cos, time, uniform } from 'three/tsl';
+
 			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -111,68 +117,101 @@
 
 				// Set initial output based on params
 				if ( params.enabled ) {
+
 				    postProcessing.outputNode = params.static ? caPassStatic : caPassProcedural;
+
 				} else {
+
 				    postProcessing.outputNode = outputPass;
+
 				}
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				// GUI
+
 				const gui = new GUI();
 				gui.title( 'Chromatic Aberration' );
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
+
 				    if ( value === true ) {
+
 				        postProcessing.outputNode = params.static ? caPassStatic : caPassProcedural;
+
 				    } else {
+
 				        postProcessing.outputNode = outputPass;
+
 				    }
+
 				    postProcessing.needsUpdate = true;
+
 				} );
 
 				gui.add( params, 'static' ).onChange( ( value ) => {
+
 				    if ( params.enabled ) {
+
 				        if ( value === true ) {
+
 				            postProcessing.outputNode = caPassStatic;
+
 				        } else {
+
 				            postProcessing.outputNode = caPassProcedural;
+
 				        }
+
 				        postProcessing.needsUpdate = true;
+
 				    }
+
 				} );
 
 				const staticFolder = gui.addFolder( 'Static Parameters' );
 
 				staticFolder.add( params, 'strength', 0, 3 ).onChange( ( value ) => {
+
 				    staticStrength.value = value;
 				    postProcessing.needsUpdate = true;
+
 				} );
 
 				staticFolder.add( params.center, 'x', -1, 1 ).name( "Center X" ).onChange( ( value ) => {
+
 				    staticCenter.value.x = value;
 				    postProcessing.needsUpdate = true;
+
 				} );
 
 				staticFolder.add( params.center, 'y', -1, 1 ).name( "Center Y" ).onChange( ( value ) => {
+
 				    staticCenter.value.y = value;
 				    postProcessing.needsUpdate = true;
+
 				} );
 
 				staticFolder.add( params, 'scale', 0.5, 2 ).onChange( ( value ) => {
+
 				    staticScale.value = value;
 				    postProcessing.needsUpdate = true;
+
 				} );
 
 				const animationFolder = gui.addFolder( 'Animation' );
 				animationFolder.add( params, 'animated' );
 				animationFolder.add( params, 'autoRotate' );
 				animationFolder.add( params, 'cameraDistance', 20, 60 ).onChange( ( value ) => {
+
 				    camera.position.z = value;
+
 				} );
+
 			}
 
 			function createShapes() {
+
 				const shapes = [];
 				const materials = [];
 
@@ -190,11 +229,13 @@
 
 				// Create materials
 				colors.forEach( color => {
-					materials.push( new THREE.MeshStandardMaterial({
+
+					materials.push( new THREE.MeshStandardMaterial( {
 						color: color,
 						roughness: 0.2,
 						metalness: 0.8
-					}));
+					} ) );
+
 				});
 
 				// Create geometries
@@ -215,17 +256,18 @@
 				// Large central torus
 				const centralTorus = new THREE.Mesh(
 					new THREE.TorusGeometry( 5, 1.5, 16, 32 ),
-					new THREE.MeshStandardMaterial({
+					new THREE.MeshStandardMaterial( {
 						color: 0xffffff,
 						roughness: 0.1,
 						metalness: 1,
 						emissive: 0x222222
-					})
+					} )
 				);
 				centralGroup.add( centralTorus );
 
 				// Inner rotating shapes
 				for ( let i = 0; i < 6; i++ ) {
+
 					const angle = ( i / 6 ) * Math.PI * 2;
 					const radius = 3;
 
@@ -243,6 +285,7 @@
 					mesh.scale.setScalar( 0.5 );
 					centralGroup.add( mesh );
 					shapes.push( mesh );
+
 				}
 
 				mainGroup.add( centralGroup );
@@ -253,6 +296,7 @@
 				const outerRadius = 15;
 
 				for ( let i = 0; i < numShapes; i++ ) {
+
 					const angle = ( i / numShapes ) * Math.PI * 2;
 					const shapesGroup = new THREE.Group();
 
@@ -272,6 +316,7 @@
 
 					mainGroup.add( shapesGroup );
 					shapes.push( shapesGroup );
+
 				}
 
 				// Add floating particles
@@ -280,6 +325,7 @@
 				const positions = new Float32Array( particlesCount * 3 );
 
 				for ( let i = 0; i < particlesCount * 3; i += 3 ) {
+
 					const radius = 25 + Math.random() * 10;
 					const theta = Math.random() * Math.PI * 2;
 					const phi = Math.random() * Math.PI;
@@ -287,55 +333,74 @@
 					positions[ i ] = radius * Math.sin( phi ) * Math.cos( theta );
 					positions[ i + 1 ] = radius * Math.cos( phi );
 					positions[ i + 2 ] = radius * Math.sin( phi ) * Math.sin( theta );
+
 				}
 
 				particlesGeometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-				const particlesMaterial = new THREE.PointsMaterial({
+				const particlesMaterial = new THREE.PointsMaterial( {
 					color: 0xffffff,
 					size: 0.5,
 					sizeAttenuation: true
-				});
+				} );
 
 				const particles = new THREE.Points( particlesGeometry, particlesMaterial );
 				mainGroup.add( particles );
+
 			}
 
 			function onWindowResize() {
+
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function animate() {
+
 				const time = clock.getElapsedTime();
 
 				if ( params.animated ) {
+
 					// Animate individual shapes
 					mainGroup.children.forEach( ( child, index ) => {
+
 						if ( child.children.length > 0 ) {
+
 							// Central group
 							child.rotation.y = time * 0.5;
 							child.children.forEach( ( subChild, subIndex ) => {
+
 								if ( subChild.geometry ) {
+
 									subChild.rotation.x = time * ( 1 + subIndex * 0.1 );
 									subChild.rotation.z = time * ( 1 - subIndex * 0.1 );
+
 								}
-							});
+
+							} );
+
 						} else if ( child.type === 'Group' ) {
+
 							// Outer shapes
 							child.rotation.x = time * 0.5 + index;
 							child.rotation.y = time * 0.3 + index;
 							child.position.y = Math.sin( time + index ) * 2;
+
 						}
-					});
+
+					} );
+
 				}
 
 				if ( params.autoRotate ) {
+
 					const radius = params.cameraDistance;
 					camera.position.x = Math.sin( time * 0.1 ) * radius;
 					camera.position.z = Math.cos( time * 0.1 ) * radius;
 					camera.lookAt( 0, 0, 0 );
+
 				}
 
 				postProcessing.render();
