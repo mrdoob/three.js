@@ -40,8 +40,7 @@
 				center: new THREE.Vector2(0.5, 0.5),
 				scale: 1.2,
 				autoRotate: true,
-				cameraDistance: 40,
-				static: false
+				cameraDistance: 40
 			};
 
 			let camera, scene, renderer, clock, mainGroup;
@@ -108,23 +107,10 @@
 				const staticScale = uniform( params.scale );
 
 				// With static values (using uniform nodes)
-				const caPassStatic = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
-
-				// With procedural nodes
-				const animatedStrength = sin( time ).mul( 0.5 ).add( 1.0 );
-				const dynamicCenter = vec2( cos( time ).mul( 0.1 ).add( 0.5 ), 0.5 );
-				const caPassProcedural = chromaticAberration( outputPass, animatedStrength, dynamicCenter, 1.0 );
+				const caPass = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
 
 				// Set initial output based on params
-				if ( params.enabled ) {
-
-				    postProcessing.outputNode = params.static ? caPassStatic : caPassProcedural;
-
-				} else {
-
-				    postProcessing.outputNode = outputPass;
-
-				}
+				postProcessing.outputNode = params.enabled ? caPass : outputPass;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -135,69 +121,17 @@
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 
-				    if ( value === true ) {
-
-				        postProcessing.outputNode = params.static ? caPassStatic : caPassProcedural;
-
-				    } else {
-
-				        postProcessing.outputNode = outputPass;
-
-				    }
-
-				    postProcessing.needsUpdate = true;
-
-				} );
-
-				gui.add( params, 'static' ).onChange( ( value ) => {
-
-				    if ( params.enabled ) {
-
-				        if ( value === true ) {
-
-				            postProcessing.outputNode = caPassStatic;
-
-				        } else {
-
-				            postProcessing.outputNode = caPassProcedural;
-
-				        }
-
-				        postProcessing.needsUpdate = true;
-
-				    }
+					postProcessing.outputNode = value ? caPass : outputPass;
+					postProcessing.needsUpdate = true;
 
 				} );
 
 				const staticFolder = gui.addFolder( 'Static Parameters' );
 
-				staticFolder.add( params, 'strength', 0, 3 ).onChange( ( value ) => {
-
-				    staticStrength.value = value;
-				    postProcessing.needsUpdate = true;
-
-				} );
-
-				staticFolder.add( params.center, 'x', -1, 1 ).name( "Center X" ).onChange( ( value ) => {
-
-				    staticCenter.value.x = value;
-				    postProcessing.needsUpdate = true;
-
-				} );
-
-				staticFolder.add( params.center, 'y', -1, 1 ).name( "Center Y" ).onChange( ( value ) => {
-
-				    staticCenter.value.y = value;
-				    postProcessing.needsUpdate = true;
-
-				} );
-
-				staticFolder.add( params, 'scale', 0.5, 2 ).onChange( ( value ) => {
-
-				    staticScale.value = value;
-				    postProcessing.needsUpdate = true;
-
-				} );
+				staticFolder.add( staticStrength, 'value', 0, 3 ).name( 'Strength' );
+				staticFolder.add( staticCenter.value, 'x', - 1, 1 ).name( 'Center X' );
+				staticFolder.add( staticCenter.value, 'y', - 1, 1 ).name( 'Center Y' );
+				staticFolder.add( staticScale, 'value', 0.5, 2 ).name( 'Scale' );
 
 				const animationFolder = gui.addFolder( 'Animation' );
 				animationFolder.add( params, 'animated' );
