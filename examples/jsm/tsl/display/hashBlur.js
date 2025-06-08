@@ -1,4 +1,4 @@
-import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4, premult, unpremult } from 'three/tsl';
+import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
 
 /**
  * Applies a hash blur effect to the given texture node.
@@ -34,7 +34,7 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 
 		}
 
-		return premultipliedAlpha ? premult( sample ) : sample;
+		return premultipliedAlpha ? premultiplyAlpha( sample ) : sample;
 
 	};
 
@@ -51,6 +51,6 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 
 	blurred_image.divAssign( repeats );
 
-	return premultipliedAlpha ? unpremult( blurred_image ) : blurred_image;
+	return premultipliedAlpha ? unpremultiplyAlpha( blurred_image ) : blurred_image;
 
 } );
