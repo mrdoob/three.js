@@ -281,7 +281,7 @@ class SSAAPassNode extends PassNode {
 		this._quadMesh.material.transparent = true;
 		this._quadMesh.material.depthTest = false;
 		this._quadMesh.material.depthWrite = false;
-		this._quadMesh.material.premultipliedAlpha = true;
+		//this._quadMesh.material.premultipliedAlpha = true;
 		this._quadMesh.material.blending = AdditiveBlending;
 		this._quadMesh.material.name = 'SSAA';
 
