@@ -445,7 +445,7 @@ class FBXTreeParser {
 		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
 
 		let loader = this.manager.getHandler( `.${extension}` );
-		if ( loader === null) loader = this.textureLoader;
+		if ( loader === null ) loader = this.textureLoader;
 
 		const loaderPath = loader.path;
 
@@ -1784,7 +1784,7 @@ class GeometryParser {
 		geoInfo.vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
 		geoInfo.vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
 
-		if ( geoNode.LayerElementColor ) {
+		if ( geoNode.LayerElementColor && geoNode.LayerElementColor.Color ) {
 
 			geoInfo.color = this.parseVertexColors( geoNode.LayerElementColor[ 0 ] );
 
