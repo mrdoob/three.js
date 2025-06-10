@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Billboards</title>
+    <title>Panneaux</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Billboards">
+    <meta name="twitter:title" content="Three.js – Panneaux">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,12 +22,290 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Billboards</h1>
+        <h1>Panneaux</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/billboards.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p>Dans <a href="canvas-textures.html">un article précédent</a> nous avons utilisé une <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>
+pour créer des étiquettes / badges sur les personnages. Parfois, nous aimerions créer des étiquettes ou
+d'autres éléments qui font toujours face à la caméra. Three.js fournit le <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> et le
+<a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> pour y parvenir.</p>
+<p>Modifions l'exemple de badge de <a href="canvas-textures.html">l'article sur les textures de canevas</a>
+pour utiliser <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> et le <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makePerson(x, labelWidth, size, name, color) {
+  const canvas = makeLabelCanvas(labelWidth, size, name);
+  const texture = new THREE.CanvasTexture(canvas);
+  // car notre canevas n'est probablement pas une puissance de 2
+  // dans les deux dimensions, définissez le filtrage de manière appropriée.
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+
+-  const labelMaterial = new THREE.MeshBasicMaterial({
++  const labelMaterial = new THREE.SpriteMaterial({
+    map: texture,
+-    side: THREE.DoubleSide,
+    transparent: true,
+  });
+
+  const root = new THREE.Object3D();
+  root.position.x = x;
+
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  root.add(body);
+  body.position.y = bodyHeight / 2;
+
+  const head = new THREE.Mesh(headGeometry, bodyMaterial);
+  root.add(head);
+  head.position.y = bodyHeight + headRadius * 1.1;
+
+-  const label = new THREE.Mesh(labelGeometry, labelMaterial);
++  const label = new THREE.Sprite(labelMaterial);
+  root.add(label);
+  label.position.y = bodyHeight * 4 / 5;
+  label.position.z = bodyRadiusTop * 1.01;
+</pre>
+<p>et les étiquettes font maintenant toujours face à la caméra</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-labels-w-sprites.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-labels-w-sprites.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Un problème est que, sous certains angles, les étiquettes intersectent maintenant les
+personnages. </p>
+<div class="threejs_center"><img src="../resources/images/billboard-label-z-issue.png" style="width: 455px;"></div>
+
+<p>Nous pouvons déplacer la position des étiquettes pour corriger cela.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+// si les unités sont des mètres, alors 0.01 ici donne une taille
++// de l'étiquette en centimètres.
++const labelBaseScale = 0.01;
+const label = new THREE.Sprite(labelMaterial);
+root.add(label);
+-label.position.y = bodyHeight * 4 / 5;
+-label.position.z = bodyRadiusTop * 1.01;
++label.position.y = head.position.y + headRadius + size * labelBaseScale;
+
+-// si les unités sont des mètres, alors 0.01 ici donne une taille
+-// de l'étiquette en centimètres.
+-const labelBaseScale = 0.01;
+label.scale.x = canvas.width  * labelBaseScale;
+label.scale.y = canvas.height * labelBaseScale;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-labels-w-sprites-adjust-height.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-labels-w-sprites-adjust-height.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Une autre chose que nous pouvons faire avec les panneaux d'affichage est de dessiner des façades.</p>
+<p>Au lieu de dessiner des objets 3D, nous dessinons des plans 2D avec une image
+d'objets 3D. C'est souvent plus rapide que de dessiner des objets 3D.</p>
+<p>Par exemple, créons une scène avec une grille d'arbres. Nous allons créer chaque
+arbre à partir d'un cylindre pour la base et d'un cône pour le sommet.</p>
+<p>Nous créons d'abord la géométrie du cône et du cylindre ainsi que les matériaux que
+tous les arbres partageront</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const trunkRadius = .2;
+const trunkHeight = 1;
+const trunkRadialSegments = 12;
+const trunkGeometry = new THREE.CylinderGeometry(
+    trunkRadius, trunkRadius, trunkHeight, trunkRadialSegments);
+
+const topRadius = trunkRadius * 4;
+const topHeight = trunkHeight * 2;
+const topSegments = 12;
+const topGeometry = new THREE.ConeGeometry(
+    topRadius, topHeight, topSegments);
+
+const trunkMaterial = new THREE.MeshPhongMaterial({color: 'brown'});
+const topMaterial = new THREE.MeshPhongMaterial({color: 'green'});
+</pre>
+<p>Ensuite, nous allons créer une fonction qui crée un <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>
+chacun pour le tronc et le sommet d'un arbre
+et les parentent à un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeTree(x, z) {
+  const root = new THREE.Object3D();
+  const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+  trunk.position.y = trunkHeight / 2;
+  root.add(trunk);
+
+  const top = new THREE.Mesh(topGeometry, topMaterial);
+  top.position.y = trunkHeight + topHeight / 2;
+  root.add(top);
+
+  root.position.set(x, 0, z);
+  scene.add(root);
+
+  return root;
+}
+</pre>
+<p>Ensuite, nous allons créer une boucle pour placer une grille d'arbres.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let z = -50; z &lt;= 50; z += 10) {
+  for (let x = -50; x &lt;= 50; x += 10) {
+    makeTree(x, z);
+  }
+}
+</pre>
+<p>Ajoutons également un plan de sol tant que nous y sommes</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// ajouter le sol
+{
+  const size = 400;
+  const geometry = new THREE.PlaneGeometry(size, size);
+  const material = new THREE.MeshPhongMaterial({color: 'gray'});
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = Math.PI * -0.5;
+  scene.add(mesh);
+}
+</pre>
+<p>et changeons l'arrière-plan en bleu clair</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+-scene.background = new THREE.Color('white');
++scene.background = new THREE.Color('lightblue');
+</pre>
+<p>et nous obtenons une grille d'arbres</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-trees-no-billboards.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-trees-no-billboards.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Il y a 11x11 ou 121 arbres. Chaque arbre est constitué d'un cône de 12 polygones
+et d'un tronc de 48 polygones, donc chaque arbre fait 60 polygones. 121 * 60
+= 7260 polygones. Ce n'est pas énorme, mais bien sûr, un arbre 3D plus détaillé
+pourrait avoir entre 1000 et 3000 polygones. S'ils avaient 3000 polygones chacun,
+alors 121 arbres représenteraient 363000 polygones à dessiner.</p>
+<p>En utilisant des façades, nous pouvons réduire ce nombre.</p>
+<p>Nous pourrions créer manuellement une façade dans un logiciel de dessin, mais écrivons
+du code pour essayer d'en générer une.</p>
+<p>Écrivons du code pour rendre un objet dans une texture
+en utilisant un <code class="notranslate" translate="no">RenderTarget</code>. Nous avons abordé le rendu vers une <code class="notranslate" translate="no">RenderTarget</code>
+dans <a href="rendertargets.html">l'article sur les cibles de rendu</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
+  const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+  const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
+  const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+
+  camera.position.copy(boxCenter);
+  camera.position.z += distance;
+
+  // choisir des valeurs proches et éloignées pour le frustum qui
+  // contiendra la boîte.
+  camera.near = boxSize / 100;
+  camera.far = boxSize * 100;
+
+  camera.updateProjectionMatrix();
+}
+
+function makeSpriteTexture(textureSize, obj) {
+  const rt = new THREE.WebGLRenderTarget(textureSize, textureSize);
+
+  const aspect = 1;  // car la cible de rendu est carrée
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+
+  scene.add(obj);
+
+  // calculer la boîte qui contient obj
+  const box = new THREE.Box3().setFromObject(obj);
+
+  const boxSize = box.getSize(new THREE.Vector3());
+  const boxCenter = box.getCenter(new THREE.Vector3());
+
+  // régler la caméra pour cadrer la boîte
+  const fudge = 1.1;
+  const size = Math.max(...boxSize.toArray()) * fudge;
+  frameArea(size, size, boxCenter, camera);
+
+  renderer.autoClear = false;
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+  renderer.autoClear = true;
+
+  scene.remove(obj);
+
+  return {
+    position: boxCenter.multiplyScalar(fudge),
+    scale: size,
+    texture: rt.texture,
+  };
+}
+</pre>
+<p>Quelques points à noter concernant le code ci-dessus :</p>
+<p>Nous utilisons le champ de vision (<code class="notranslate" translate="no">fov</code>) défini au-dessus de ce code.</p>
+<p>Nous calculons une boîte qui contient l'arbre de la même manière
+que nous l'avons fait dans <a href="load-obj.html">l'article sur le chargement d'un fichier .obj</a>
+avec quelques modifications mineures.</p>
+<p>Nous appelons <code class="notranslate" translate="no">frameArea</code> à nouveau, adapté de <a href="load-obj.html">l'article sur le chargement d'un fichier .obj</a>.
+Dans ce cas, nous calculons à quelle distance la caméra doit se trouver de l'objet,
+compte tenu de son champ de vision, pour contenir l'objet. Nous positionnons ensuite la caméra en -z à cette distance
+du centre de la boîte qui contient l'objet.</p>
+<p>Nous multiplions la taille que nous voulons ajuster par 1,1 (<code class="notranslate" translate="no">fudge</code>) pour nous assurer que l'arbre rentre
+complètement dans la cible de rendu. Le problème ici est que la taille que nous utilisons pour
+calculer si l'objet rentre dans la vue de la caméra ne prend pas en compte
+que les bords mêmes de l'objet finiront par sortir de la zone que nous avons calculée.
+Nous pourrions calculer comment faire rentrer 100% de la boîte, mais cela gaspillerait aussi de l'espace,
+alors au lieu de cela, nous 'truquons' un peu.</p>
+<p>Ensuite, nous rendons sur la cible de rendu et retirons l'objet de
+la scène. </p>
+<p>Il est important de noter que nous avons besoin des lumières dans la scène, mais nous
+devons nous assurer que rien d'autre n'est dans la scène.</p>
+<p>Nous devons également ne pas définir de couleur d'arrière-plan sur la scène</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+-scene.background = new THREE.Color('lightblue');
+</pre>
+<p>Enfin, nous avons créé la texture, nous la renvoyons ainsi que la position et l'échelle
+dont nous avons besoin pour créer la façade afin qu'elle apparaisse au même endroit.</p>
+<p>Nous créons ensuite un arbre et appelons ce code en le lui passant</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// créer la texture du panneau d'affichage
+const tree = makeTree(0, 0);
+const facadeSize = 64;
+const treeSpriteInfo = makeSpriteTexture(facadeSize, tree);
+</pre>
+<p>Nous pouvons ensuite créer une grille de façades au lieu d'une grille de modèles d'arbres</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function makeSprite(spriteInfo, x, z) {
++  const {texture, offset, scale} = spriteInfo;
++  const mat = new THREE.SpriteMaterial({
++    map: texture,
++    transparent: true,
++  });
++  const sprite = new THREE.Sprite(mat);
++  scene.add(sprite);
++  sprite.position.set(
++      offset.x + x,
++      offset.y,
++      offset.z + z);
++  sprite.scale.set(scale, scale, scale);
++}
+
+for (let z = -50; z &lt;= 50; z += 10) {
+  for (let x = -50; x &lt;= 50; x += 10) {
+-    makeTree(x, z);
++    makeSprite(treeSpriteInfo, x, z);
+  }
+}
+</pre>
+<p>Dans le code ci-dessus, nous appliquons le décalage et l'échelle nécessaires pour positionner la façade afin qu'elle
+apparaisse au même endroit où l'arbre d'origine aurait apparu.</p>
+<p>Maintenant que nous avons terminé de créer la texture de la façade de l'arbre, nous pouvons à nouveau définir l'arrière-plan</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">scene.background = new THREE.Color('lightblue');
+</pre>
+<p>et maintenant nous obtenons une scène de façades d'arbres</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-trees-static-billboards.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-trees-static-billboards.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Comparez avec les modèles d'arbres ci-dessus et vous pouvez voir que l'apparence est assez similaire.
+Nous avons utilisé une texture basse résolution, seulement 64x64 pixels, donc les façades sont pixelisées.
+Vous pourriez augmenter la résolution. Souvent, les façades ne sont utilisées qu'à grande distance lorsqu'elles sont assez petites,
+donc une texture basse résolution est suffisante et cela permet d'éviter de dessiner des arbres détaillés qui ne font
+que quelques pixels de taille lorsqu'ils sont loin.</p>
+<p>Un autre problème est que nous ne voyons l'arbre que d'un côté.
+Cela est souvent résolu en rendant plus de façades, par exemple depuis 8 directions autour de l'objet,
+puis en définissant quelle façade afficher en fonction de la direction depuis laquelle la caméra regarde la façade.</p>
+<p>Que vous utilisiez des façades ou non, cela dépend de vous, mais j'espère que cet article
+vous a donné des idées et suggéré des solutions si vous décidez de les utiliser.</p>
 
         </div>
       </div>

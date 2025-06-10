@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Créer une scène</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Créer une scène">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Créer une scène</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+            
+          <p>Le but de cette section est de donner une brève introduction à three.js. Nous commencerons par configurer une scène, avec un cube en rotation. Un exemple fonctionnel est fourni en bas de la page au cas où vous seriez bloqué et auriez besoin d'aide.</p>
+
+		<h2>Avant de commencer</h2>
+
+		<p>
+			Si vous ne l'avez pas encore fait, parcourez le guide `Installation`. Nous supposerons que vous avez déjà configuré la même structure de projet (incluant <i>index.html</i> et <i>main.js</i>), avez installé three.js, et utilisez soit un outil de build, soit un serveur local avec un CDN et des import maps.
+		</p>
+
+		<h2>Créer la scène</h2>
+
+		<p>Pour pouvoir afficher quoi que ce soit avec three.js, nous avons besoin de trois éléments : une scène, une caméra et un moteur de rendu (renderer), afin que nous puissions afficher la scène avec la caméra.</p>
+
+		<p><i>main.js —</i></p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+</pre>
+
+		<p>Prenons un instant pour expliquer ce qui se passe ici. Nous avons maintenant configuré la scène, notre caméra et le moteur de rendu.</p>
+
+		<p>Il existe plusieurs caméras différentes dans three.js. Pour l'instant, utilisons une `PerspectiveCamera`.</p>
+
+		<p>Le premier attribut est le `champ de vision`. Le FOV est l'étendue de la scène visible sur l'écran à un moment donné. La valeur est en degrés.</p>
+
+		<p>Le deuxième est le `rapport d'aspect`. Vous voudrez presque toujours utiliser la largeur de l'élément divisée par la hauteur, sinon vous obtiendrez le même résultat que lorsque vous regardez de vieux films sur une télévision grand écran - l'image semble écrasée.</p>
+
+		<p>Les deux attributs suivants sont les plans de découpe `near` (proche) et `far` (éloigné). Cela signifie que les objets plus éloignés de la caméra que la valeur de `far` ou plus proches que `near` ne seront pas rendus. Vous n'avez pas à vous en soucier maintenant, mais vous pourriez vouloir utiliser d'autres valeurs dans vos applications pour obtenir de meilleures performances.</p>
+
+		<p>Vient ensuite le moteur de rendu (renderer). En plus de créer l'instance du moteur de rendu, nous devons également définir la taille à laquelle nous voulons qu'il affiche notre application. C'est une bonne idée d'utiliser la largeur et la hauteur de la zone que nous voulons remplir avec notre application - dans ce cas, la largeur et la hauteur de la fenêtre du navigateur. Pour les applications gourmandes en performances, vous pouvez également donner des valeurs plus petites à `setSize`, comme `window.innerWidth/2` et `window.innerHeight/2`, ce qui fera afficher l'application à un quart de la taille.</p>
+
+		<p>Si vous souhaitez conserver la taille de votre application mais l'afficher à une résolution inférieure, vous pouvez le faire en appelant `setSize` avec `false` comme argument `updateStyle` (le troisième argument). Par exemple, `setSize(window.innerWidth/2, window.innerHeight/2, false)` affichera votre application à moitié résolution, étant donné que votre &lt;canvas&gt; a une largeur et une hauteur de 100%.</p>
+
+		<p>Enfin, nous ajoutons l'élément `renderer` à notre document HTML. C'est un élément &lt;canvas&gt; que le moteur de rendu utilise pour nous afficher la scène.</p>
+
+		<p><em>"Tout ça c'est bien beau, mais où est ce cube que vous avez promis ?"</em> Ajoutons-le maintenant.</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 5;
+</pre>
+
+		<p>Pour créer un cube, nous avons besoin d'une `BoxGeometry`. C'est un objet qui contient tous les points (`vertices`) et le remplissage (`faces`) du cube. Nous explorerons cela plus en détail à l'avenir.</p>
+
+		<p>En plus de la géométrie, nous avons besoin d'un matériau pour le colorer. Three.js est livré avec plusieurs matériaux, mais nous nous en tiendrons au `MeshBasicMaterial` pour l'instant. Tous les matériaux prennent un objet de propriétés qui leur seront appliquées. Pour simplifier les choses au maximum, nous fournissons seulement un attribut de couleur `0x00ff00`, qui est le vert. Cela fonctionne de la même manière que les couleurs dans CSS ou Photoshop (`couleurs hexadécimales`).</p>
+
+		<p>La troisième chose dont nous avons besoin est un `Mesh`. Un mesh est un objet qui prend une géométrie et lui applique un matériau, que nous pouvons ensuite insérer dans notre scène et déplacer librement.</p>
+
+		<p>Par défaut, lorsque nous appelons `scene.add()`, l'élément que nous ajoutons sera ajouté aux coordonnées `(0,0,0)`. Cela entraînerait la caméra et le cube à être l'un dans l'autre. Pour éviter cela, nous déplaçons simplement un peu la caméra.</p>
+
+		<h2>Afficher la scène</h2>
+
+		<p>Si vous copiez le code ci-dessus dans le fichier main.js que nous avons créé précédemment, vous ne pourrez rien voir. C'est parce que nous n'affichons encore rien. Pour cela, nous avons besoin de ce qu'on appelle une boucle de rendu ou d'animation.</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+function animate() {
+  renderer.render( scene, camera );
+}
+renderer.setAnimationLoop( animate );
+</pre>
+
+		<p>Cela créera une boucle qui fait que le moteur de rendu dessine la scène à chaque rafraîchissement de l'écran (sur un écran typique, cela signifie 60 fois par seconde). Si vous débutez dans l'écriture de jeux dans le navigateur, vous pourriez dire <em>"pourquoi ne pas simplement créer un setInterval ?"</em> Le fait est que - nous pourrions, mais `requestAnimationFrame` qui est utilisé en interne dans `WebGLRenderer` présente un certain nombre d'avantages. Le plus important est peut-être qu'il se met en pause lorsque l'utilisateur navigue vers un autre onglet du navigateur, évitant ainsi de gaspiller sa précieuse puissance de traitement et l'autonomie de sa batterie.</p>
+
+		<h2>Animer le cube</h2>
+
+		<p>Si vous insérez tout le code ci-dessus dans le fichier que vous avez créé avant de commencer, vous devriez voir une boîte verte. Rendons le tout un peu plus intéressant en le faisant pivoter.</p>
+
+		<p>Ajoutez le code suivant juste au-dessus de l'appel `renderer.render` dans votre fonction `animate` :</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+cube.rotation.x += 0.01;
+cube.rotation.y += 0.01;
+</pre>
+
+		<p>Cela sera exécuté à chaque image (normalement 60 fois par seconde) et donnera au cube une belle animation de rotation. En gros, tout ce que vous voulez déplacer ou modifier pendant que l'application est en cours d'exécution doit passer par la boucle d'animation. Vous pouvez bien sûr appeler d'autres fonctions à partir de là, afin de ne pas vous retrouver avec une fonction `animate` de plusieurs centaines de lignes.</p>
+
+		<h2>Le résultat</h2>
+		<p>Félicitations ! Vous avez maintenant terminé votre première application three.js. C'est simple, mais il faut bien commencer quelque part.</p>
+
+		<p>Le code complet est disponible ci-dessous et sous forme d'un [link:https://jsfiddle.net/tswh48fL/ exemple live] modifiable. Jouez avec pour mieux comprendre comment cela fonctionne.</p>
+
+		<p><i>index.html —</i></p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Ma première application three.js&lt;/title&gt;
+    &lt;style&gt;
+      body { margin: 0; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+		<p><i>main.js —</i></p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( animate );
+document.body.appendChild( renderer.domElement );
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 5;
+
+function animate() {
+
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+
+  renderer.render( scene, camera );
+
+}
+</pre>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
