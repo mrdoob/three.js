@@ -68,6 +68,14 @@ class StackNode extends Node {
 		this._expressionNode = null;
 
 		/**
+		 * The namespace of this stack node.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.namespace = null;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -255,6 +263,8 @@ class StackNode extends Node {
 
 		for ( const node of this.nodes ) {
 
+			builder.currentStack = this;
+
 			if ( buildStage === 'setup' ) {
 
 				node.build( builder );
@@ -279,6 +289,8 @@ class StackNode extends Node {
 			}
 
 		}
+
+		builder.currentStack = null;
 
 		setCurrentStack( previousStack );
 

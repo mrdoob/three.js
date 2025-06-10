@@ -48,6 +48,12 @@ class FrontFacingNode extends Node {
 
 		}
 
+		if ( builder.shaderStage !== 'fragment' ) {
+
+			return 'true';
+
+		}
+
 		return builder.getFrontFacing();
 
 	}

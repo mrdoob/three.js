@@ -99,17 +99,16 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	console.log( 'normalView', builder.namespace );
-
 	if ( builder.namespace === 'NORMAL' ) {
 
 		return normalViewGeometry;
 
 	}
+	//console.log( 'normalView', builder.material );
 
 	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-	let normal = builder.context.setupNormal().toVec3().context( { getUV: null } );
+	let normal = builder.context.setupNormal().context( { getUV: null } );
 
 	if ( builder.material.flatShading !== true ) {
 
@@ -121,6 +120,8 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once( 'NORMAL' ) )();
 
+normalView.isNormalTest = true;
+
 /**
  * TSL object that represents the transformed vertex normal in world space of the current rendered object.
  *
@@ -129,13 +130,13 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const normalWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	console.log( 'normaWorld', builder.namespace );
-
 	if ( builder.namespace === 'NORMAL' ) {
 
 		return normalWorldGeometry;
 
 	}
+
+	//console.log( 'normaWorld', builder.material );
 
 	return normalView.transformDirection( cameraViewMatrix ).toVar( 'normalWorld' );
 

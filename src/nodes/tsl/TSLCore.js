@@ -388,6 +388,12 @@ class ShaderCallNodeInternal extends Node {
 
 		builder.stack.outputNode = this.call( builder );
 
+		if ( this.shaderNode.namespace && this.shaderNode.namespace === builder.namespace ) {
+
+			builder.stack.namespace = builder.namespace;
+
+		}
+
 		return builder.removeStack();
 
 	}
@@ -423,6 +429,18 @@ class ShaderCallNodeInternal extends Node {
 
 				properties[ outputNamespace ] = this.getOutputNode( builder );
 				properties[ outputNamespace ].build( builder );
+
+				if ( this.shaderNode.namespace ) {
+
+					for ( const node of builder.chaining ) {
+
+						const nodeData = builder.getDataFromNode( node );
+						nodeData.namespaces = nodeData.namespaces || new Set();
+						nodeData.namespaces.add( this.shaderNode.namespace );
+
+					}
+
+				}
 
 			}
 

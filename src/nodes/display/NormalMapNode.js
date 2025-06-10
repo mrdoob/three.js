@@ -113,6 +113,7 @@ class NormalMapNode extends TempNode {
 
 			if ( tangent === true ) {
 
+				//console.log( '>>>' );
 				outputNode = TBNViewMatrix.mul( normalMap ).normalize();
 
 			} else {

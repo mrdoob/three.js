@@ -419,6 +419,14 @@ class NodeBuilder {
 		 */
 		this.buildStage = null;
 
+		/**
+		 * The current stack of nodes.
+		 *
+		 * @type {?StackNode}
+		 * @default null
+		 */
+		this.currentStack = null;
+
 	}
 
 	/**
@@ -1753,6 +1761,14 @@ class NodeBuilder {
 				name = ( readOnly ? 'nodeConst' : 'nodeVar' ) + id;
 
 				this.vars[ idNS ] ++;
+
+			}
+
+			//
+
+			if ( this.currentStack && this.currentStack.namespace ) {
+console.log( 'NodeBuilder: Using stackNamespace for variable names is deprecated.' );
+				name = this.currentStack.namespace + '_' + name;
 
 			}
 

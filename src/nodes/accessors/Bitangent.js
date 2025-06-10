@@ -18,7 +18,7 @@ const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], bu
 
 	if ( builder.material.flatShading !== true ) {
 
-		bitangent = varying( bitangent, varyingName );
+		//bitangent = varying( bitangent, varyingName );
 
 	}
 
@@ -48,7 +48,11 @@ export const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tan
  * @tsl
  * @type {Node<vec3>}
  */
-export const bitangentView = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize().toVar( 'bitangentView' );
+export const bitangentView = ( Fn( ( builder ) => {
+
+	return getBitangent( normalView.cross( tangentView ), builder.getNamespace( 'v_bitangentView' ) ).normalize().toVar( builder.getNamespace( 'bitangentView' ) );
+
+}, 'vec3' ).once( 'NORMAL' ) )();
 
 /**
  * TSL object that represents the transformed vertex bitangent in world space of the current rendered object.

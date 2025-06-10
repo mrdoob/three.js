@@ -35,7 +35,11 @@ export const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLoc
  * @tsl
  * @type {Node<vec3>}
  */
-export const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
+export const tangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	return modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( builder.getNamespace( 'v_tangentView' ) ).normalize().toVar( builder.getNamespace( 'tangentView' ) );
+
+}, 'vec3' ).once( 'NORMAL' ) )();
 
 /**
  * TSL object that represents the transformed vertex tangent in world space of the current rendered object.

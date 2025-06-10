@@ -719,17 +719,27 @@ class Node extends EventDispatcher {
 				const type = this.getNodeType( builder );
 				const nodeData = builder.getDataFromNode( this );
 
-				result = nodeData.snippet;
+				let snippetKey = 'snippet';
+				let generatedKey = 'generated';
+
+				if ( nodeData.namespaces ) {
+
+					snippetKey = builder.getNamespace( snippetKey );
+					generatedKey = builder.getNamespace( generatedKey );
+
+				}
+
+				result = nodeData[ snippetKey ];
 
 				if ( result === undefined ) {
 
-					if ( nodeData.generated === undefined ) {
+					if ( nodeData[ generatedKey ] === undefined ) {
 
-						nodeData.generated = true;
+						nodeData[ generatedKey ] = true;
 
 						result = this.generate( builder ) || '';
 
-						nodeData.snippet = result;
+						nodeData[ snippetKey ] = result;
 
 					} else {
 

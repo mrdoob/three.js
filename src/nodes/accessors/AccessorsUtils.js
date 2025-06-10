@@ -1,7 +1,7 @@
 import { bitangentView } from './Bitangent.js';
 import { normalView } from './Normal.js';
 import { tangentView } from './Tangent.js';
-import { mat3 } from '../tsl/TSLBase.js';
+import { Fn, mat3 } from '../tsl/TSLBase.js';
 import { mix } from '../math/MathNode.js';
 import { anisotropy, anisotropyB, roughness } from '../core/PropertyNode.js';
 import { positionViewDirection } from './Position.js';
@@ -12,7 +12,12 @@ import { positionViewDirection } from './Position.js';
  * @tsl
  * @type {Node<mat3>}
  */
-export const TBNViewMatrix = /*@__PURE__*/ mat3( tangentView, bitangentView, normalView );
+export const TBNViewMatrix = /*@__PURE__*/ mat3( tangentView, bitangentView, normalView ).toVar( 'TBNViewMatrix' );
+/*export const TBNViewMatrix = ( Fn( ( builder ) => {
+
+	return mat3( tangentView, bitangentView, normalView ).toVar( 'TBNViewMatrix' );
+
+}, 'vec3' ).once( 'NORMAL' ) )();*/
 
 /**
  * TSL object that represents the parallax direction.
