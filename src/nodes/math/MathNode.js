@@ -1043,6 +1043,17 @@ export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
 
 /**
+ * Alias for `step()` with a different parameter order.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The source value for interpolation.
+ * @param {Node | number} edge - The edge value.
+ * @returns {Node}
+ */
+export const stepElement = ( x, edge ) => step( edge, x );
+
+/**
  * Returns the arc-tangent of the quotient of its parameters.
  *
  * @tsl
@@ -1104,7 +1115,7 @@ addMethodChaining( 'fwidth', fwidth );
 addMethodChaining( 'atan2', atan2 );
 addMethodChaining( 'min', min );
 addMethodChaining( 'max', max );
-addMethodChaining( 'step', step );
+addMethodChaining( 'step', stepElement );
 addMethodChaining( 'reflect', reflect );
 addMethodChaining( 'distance', distance );
 addMethodChaining( 'dot', dot );
