@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>How to update Things</title>
+    <title>Comment mettre à jour les éléments</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – How to update Things">
+    <meta name="twitter:title" content="Three.js – Comment mettre à jour les éléments">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,28 +22,28 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>How to update Things</h1>
+        <h1>Comment mettre à jour les éléments</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
           
           <div>
-            <p>All objects by default automatically update their matrices if they have been added to the scene with</p>
+            <p>Par défaut, tous les objets mettent automatiquement à jour leurs matrices s'ils ont été ajoutés à la scène avec</p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const object = new THREE.Object3D();
 scene.add( object );
 </pre>
-            or if they are the child of another object that has been added to the scene:
+            ou s'ils sont l'enfant d'un autre objet qui a été ajouté à la scène :
 <pre class="prettyprint notranslate lang-js" translate="no">
 const object1 = new THREE.Object3D();
 const object2 = new THREE.Object3D();
 
 object1.add( object2 );
-scene.add( object1 ); //object1 and object2 will automatically update their matrices
+scene.add( object1 ); //object1 et object2 mettront automatiquement à jour leurs matrices
 </pre>
           </div>
       
-          <p>However, if you know the object will be static, you can disable this and update the transform matrix manually just when needed.</p>
+          <p>Cependant, si vous savez que l'objet sera statique, vous pouvez désactiver cette mise à jour automatique et mettre à jour la matrice de transformation manuellement uniquement lorsque c'est nécessaire.</p>
       
 <pre class="prettyprint notranslate lang-js" translate="no">
 object.matrixAutoUpdate = false;
@@ -53,26 +53,26 @@ object.updateMatrix();
           <h2>BufferGeometry</h2>
           <div>
             <p>
-              BufferGeometries store information (such as vertex positions, face indices, normals, colors,
-              UVs, and any custom attributes) in attribute buffers - that is,
-              [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays].
-              This makes them generally faster than standard Geometries, at the cost of being somewhat harder to
-              work with.
+              Les BufferGeometries stockent des informations (telles que les positions des sommets, les indices des faces, les normales, les couleurs,
+              les UVs, et tous les attributs personnalisés) dans des buffers d'attributs - c'est-à-dire,
+              [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays tableaux typés].
+              Cela les rend généralement plus rapides que les Geometries standard, au prix d'être un peu plus difficiles à
+              utiliser.
             </p>
             <p>
-              With regards to updating BufferGeometries, the most important thing to understand is that
-              you cannot resize buffers (this is very costly,	basically the equivalent to creating a new geometry).
-              You can however update the content of buffers.
+              En ce qui concerne la mise à jour des BufferGeometries, la chose la plus importante à comprendre est que
+              vous ne pouvez pas redimensionner les buffers (c'est très coûteux,	essentiellement l'équivalent de la création d'une nouvelle géométrie).
+              Vous pouvez cependant mettre à jour le contenu des buffers.
             </p>
             <p>
-              This means that if you know an attribute of your BufferGeometry will grow, say the number of vertices,
-              you must pre-allocate a buffer large enough to hold any new vertices that may be created. Of
-              course, this also means that there will be a maximum size for your BufferGeometry - there is
-              no way to create a BufferGeometry that can efficiently be extended indefinitely.
+              Cela signifie que si vous savez qu'un attribut de votre BufferGeometry va s'agrandir, par exemple le nombre de sommets,
+              vous devez pré-allouer un buffer suffisamment grand pour contenir tous les nouveaux sommets qui pourraient être créés. Bien
+              sûr, cela signifie également qu'il y aura une taille maximale pour votre BufferGeometry - il n'est
+              pas possible de créer un BufferGeometry qui peut être efficacement étendu indéfiniment.
             </p>
             <p>
-              We'll use the example of a line that gets extended at render time. We'll allocate space
-              in the buffer for 500 vertices but draw only two at first, using `BufferGeometry.drawRange`.
+              Nous allons prendre l'exemple d'une ligne qui est étendue au moment du rendu. Nous allons allouer de l'espace
+              dans le buffer pour 500 sommets mais n'en dessiner que deux au début, en utilisant `BufferGeometry.drawRange`.
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const MAX_POINTS = 500;
@@ -81,11 +81,11 @@ const MAX_POINTS = 500;
 const geometry = new THREE.BufferGeometry();
 
 // attributes
-const positions = new Float32Array( MAX_POINTS * 3 ); // 3 floats (x, y and z) per point
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 floats (x, y et z) par point
 geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-const drawCount = 2; // draw the first 2 points, only
+const drawCount = 2; // dessiner uniquement les 2 premiers points
 geometry.setDrawRange( 0, drawCount );
 
 // material
@@ -96,7 +96,7 @@ const line = new THREE.Line( geometry, material );
 scene.add( line );
 </pre>
              <p>
-              Next we'll randomly add points to the line using a pattern like:
+              Ensuite, nous ajouterons aléatoirement des points à la ligne en utilisant un modèle comme :
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const positionAttribute = line.geometry.getAttribute( 'position' );
@@ -114,22 +114,22 @@ for ( let i = 0; i < positionAttribute.count; i ++ ) {
 }
 </pre>
             <p>
-              If you want to change the <em>number of points</em> rendered after the first render, do this:
+              Si vous souhaitez modifier le <em>nombre de points</em> rendus après le premier rendu, faites ceci :
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 line.geometry.setDrawRange( 0, newValue );
 </pre>
             <p>
-              If you want to change the position data values after the first render, you need to
-              set the needsUpdate flag like so:
+              Si vous souhaitez modifier les valeurs des données de position après le premier rendu, vous devez
+              définir le flag needsUpdate comme suit :
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
-positionAttribute.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // requis après le premier rendu
 </pre>
       
             <p>
-              If you change the position data values after the initial render, you may need to recompute
-              bounding volumes so other features of the engine like view frustum culling or helpers properly work.
+              Si vous modifiez les valeurs des données de position après le rendu initial, vous devrez peut-être recalculer
+              les volumes englobants afin que d'autres fonctionnalités du moteur, telles que le culling par frustum de vue ou les helpers, fonctionnent correctement.
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 line.geometry.computeBoundingBox();
@@ -137,57 +137,57 @@ line.geometry.computeBoundingSphere();
 </pre>
       
             <p>
-              [link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle] showing an animated line which you can adapt to your use case.
+              [link:https://jsfiddle.net/t4m85pLr/1/ Voici un fiddle] montrant une ligne animée que vous pouvez adapter à votre cas d'utilisation.
             </p>
       
-            <h3>Examples</h3>
+            <h3>Exemples</h3>
       
             <p>
-              [example:webgl_custom_attributes WebGL / custom / attributes]<br />
-              [example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
+              [example:webgl_custom_attributes WebGL / personnalisé / attributs]<br />
+              [example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / personnalisé / attributs / particules]
             </p>
       
           </div>
       
           <h2>Materials</h2>
           <div>
-            <p>All uniforms values can be changed freely (e.g. colors, textures, opacity, etc), values are sent to the shader every frame.</p>
+            <p>Toutes les valeurs d'uniforms peuvent être modifiées librement (par exemple, couleurs, textures, opacité, etc.), les valeurs sont envoyées au shader à chaque image.</p>
       
-            <p>Also GLstate related parameters can change any time (depthTest, blending, polygonOffset, etc).</p>
+            <p>De plus, les paramètres liés à l'état GL peuvent changer à tout moment (depthTest, blending, polygonOffset, etc).</p>
       
-            <p>The following properties can't be easily changed at runtime (once the material is rendered at least once):</p>
+            <p>Les propriétés suivantes ne peuvent pas être facilement modifiées à l'exécution (une fois le matériau rendu au moins une fois) :</p>
             <ul>
-              <li>numbers and types of uniforms</li>
-              <li>presence or not of
+              <li>nombres et types d'uniforms</li>
+              <li>présence ou non de
                 <ul>
                   <li>texture</li>
-                  <li>fog</li>
-                  <li>vertex colors</li>
+                  <li>brouillard</li>
+                  <li>couleurs des sommets</li>
                   <li>morphing</li>
-                  <li>shadow map</li>
-                  <li>alpha test</li>
+                  <li>carte d'ombres</li>
+                  <li>test alpha</li>
                   <li>transparent</li>
                 </ul>
               </li>
             </ul>
       
-            <p>Changes in these require building of new shader program. You'll need to set</p>
+            <p>Les changements dans ces propriétés nécessitent la construction d'un nouveau programme shader. Vous devrez définir</p>
             <code>material.needsUpdate = true</code>
       
-            <p>Bear in mind this might be quite slow and induce jerkiness in framerate (especially on Windows, as shader compilation is slower in DirectX than OpenGL).</p>
+            <p>Gardez à l'esprit que cela peut être assez lent et provoquer des saccades dans la fréquence d'images (surtout sous Windows, car la compilation des shaders est plus lente en DirectX qu'en OpenGL).</p>
       
-            <p>For smoother experience you can emulate changes in these features to some degree by having "dummy" values like zero intensity lights, white textures, or zero density fog.</p>
+            <p>Pour une expérience plus fluide, vous pouvez imiter dans une certaine mesure les changements dans ces fonctionnalités en utilisant des valeurs "factices" comme des lumières d'intensité nulle, des textures blanches ou un brouillard de densité nulle.</p>
       
-            <p>You can freely change the material used for geometry chunks, however you cannot change how an object is divided into chunks (according to face materials). </p>
+            <p>Vous pouvez librement changer le matériau utilisé pour les portions de géométrie, cependant vous ne pouvez pas changer la manière dont un objet est divisé en portions (selon les matériaux des faces). </p>
       
-            <h3>If you need to have different configurations of materials during runtime:</h3>
-            <p>If the number of materials / chunks is small, you could pre-divide the object beforehand (e.g. hair / face / body / upper clothes / trousers for a human, front / sides / top / glass / tire / interior for a car). </p>
+            <h3>Si vous avez besoin d'avoir différentes configurations de matériaux pendant l'exécution :</h3>
+            <p>Si le nombre de matériaux / portions est faible, vous pourriez pré-diviser l'objet au préalable (par exemple, cheveux / visage / corps / vêtements supérieurs / pantalon pour un humain, avant / côtés / dessus / verre / pneu / intérieur pour une voiture). </p>
       
-            <p>If the number is large (e.g. each face could be potentially different), consider a different solution, such as using attributes / textures to drive different per-face look.</p>
+            <p>Si le nombre est important (par exemple, chaque face pourrait être potentiellement différente), envisagez une solution différente, telle que l'utilisation d'attributs / textures pour piloter un rendu différent par face.</p>
       
-            <h3>Examples</h3>
+            <h3>Exemples</h3>
             <p>
-              [example:webgl_materials_car WebGL / materials / car]<br />
+              [example:webgl_materials_car WebGL / matériaux / voiture]<br />
               [example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
             </p>
           </div>
@@ -195,15 +195,15 @@ line.geometry.computeBoundingSphere();
       
           <h2>Textures</h2>
           <div>
-            <p>Image, canvas, video and data textures need to have the following flag set if they are changed:</p>
+            <p>Les textures d'image, de canvas, de vidéo et de données doivent avoir le flag suivant défini si elles sont modifiées :</p>
             <code>
               texture.needsUpdate = true;
             </code>
-            <p>Render targets update automatically.</p>
+            <p>Les cibles de rendu se mettent à jour automatiquement.</p>
       
-            <h3>Examples</h3>
+            <h3>Exemples</h3>
             <p>
-              [example:webgl_materials_video WebGL / materials / video]<br />
+              [example:webgl_materials_video WebGL / matériaux / vidéo]<br />
               [example:webgl_rtt WebGL / rtt]
             </p>
       
@@ -211,7 +211,7 @@ line.geometry.computeBoundingSphere();
       
           <h2>Cameras</h2>
           <div>
-            <p>A camera's position and target is updated automatically. If you need to change</p>
+            <p>La position et la cible d'une caméra sont mises à jour automatiquement. Si vous devez modifier</p>
             <ul>
               <li>
                 fov
@@ -227,7 +227,7 @@ line.geometry.computeBoundingSphere();
               </li>
             </ul>
             <p>
-              then you'll need to recompute the projection matrix:
+              alors vous devrez recalculer la matrice de projection :
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 camera.aspect = window.innerWidth / window.innerHeight;
@@ -238,13 +238,13 @@ camera.updateProjectionMatrix();
           <h2>InstancedMesh</h2>
           <div>
             <p>
-              `InstancedMesh` is a class for conveniently access instanced rendering in `three.js`. Certain library features like view frustum culling or
-              ray casting rely on up-to-date bounding volumes (bounding sphere and bounding box). Because of the way how `InstancedMesh` works, the class
-              has its own `boundingBox` and `boundingSphere` properties that supersede the bounding volumes on geometry level.
+              `InstancedMesh` est une classe permettant d'accéder facilement au rendu instancié dans `three.js`. Certaines fonctionnalités de la bibliothèque comme le culling par frustum de vue ou
+              le ray casting reposent sur des volumes englobants à jour (sphère englobante et boîte englobante). En raison du fonctionnement de `InstancedMesh`, la classe
+              possède ses propres propriétés `boundingBox` et `boundingSphere` qui remplacent les volumes englobants au niveau de la géométrie.
             </p>
             <p>
-              Similar to geometries you have to recompute the bounding box and sphere whenever you change the underlying data. In context of `InstancedMesh`, that
-              happens when you transform instances via `setMatrixAt()`. You can use the same pattern like with geometries.
+              Similaire aux géométries, vous devez recalculer la boîte englobante et la sphère chaque fois que vous modifiez les données sous-jacentes. Dans le contexte d'`InstancedMesh`, cela
+              se produit lorsque vous transformez des instances via `setMatrixAt()`. Vous pouvez utiliser le même schéma qu'avec les géométries.
             </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 instancedMesh.computeBoundingBox();
@@ -256,10 +256,10 @@ instancedMesh.computeBoundingSphere();
           <h2>SkinnedMesh</h2>
           <div>
             <p>
-              `SkinnedMesh` follows the same principles like `InstancedMesh` in context of bounding volumes. Meaning the class has its own version of
-              `boundingBox` and `boundingSphere` to correctly enclose animated meshes.
-              When calling `computeBoundingBox()` and `computeBoundingSphere()`, the class computes the respective bounding volumes based on the current
-              bone transformation (or in other words the current animation state).
+              `SkinnedMesh` suit les mêmes principes que `InstancedMesh` dans le contexte des volumes englobants. Cela signifie que la classe possède sa propre version de
+              `boundingBox` et `boundingSphere` pour enfermer correctement les maillages animés.
+              Lors de l'appel de `computeBoundingBox()` et `computeBoundingSphere()`, la classe calcule les volumes englobants respectifs en fonction de la transformation osseuse actuelle (ou
+              en d'autres termes l'état d'animation actuel).
             </p>
           </div>
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="utf-8">
-    <title>Three.js and Shadertoy</title>
+    <title>Three.js et Shadertoy</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – and Shadertoy">
+    <meta name="twitter:title" content="Three.js – et Shadertoy">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,91 +22,50 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Three.js and Shadertoy</h1>
+        <h1>Three.js et Shadertoy</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p><a href="https://shadertoy.com">Shadertoy</a> is a famous website hosting amazing shader
-experiments. People often ask how they can use those shaders with Three.js.</p>
-<p>It's important to recognize it's called Shader<strong>TOY</strong> for a reason. In general
-shadertoy shaders are not about best practices. Rather they are a fun challenge
-similar to say <a href="https://dwitter.net">dwitter</a> (write code in 140 characters) or
-<a href="https://js13kgames.com">js13kGames</a> (make a game in 13k or less).</p>
-<p>In the case of Shadertoy the puzzle is, <em>write a function that for a given pixel
-location outputs a color that draws something interesting</em>. It's a fun challenge
-and many of the result are amazing. But, it is not best practice.</p>
-<p>Compare <a href="https://www.shadertoy.com/view/XtsSWs">this amazing shadertoy shader that draws an entire city</a></p>
+          <p><a href="https://shadertoy.com">Shadertoy</a> est un site web célèbre qui héberge d'étonnantes expériences de shaders. Les gens demandent souvent comment ils peuvent utiliser ces shaders avec Three.js.</p>
+<p>Il est important de reconnaître qu'il s'appelle Shader<strong>TOY</strong> pour une raison. En général, les shaders Shadertoy ne suivent pas les meilleures pratiques. Il s'agit plutôt d'un défi amusant similaire à <a href="https://dwitter.net">dwitter</a> (écrire du code en 140 caractères) ou <a href="https://js13kgames.com">js13kGames</a> (créer un jeu en 13k ou moins).</p>
+<p>Dans le cas de Shadertoy, l'énigme est : <em>écrire une fonction qui, pour une position de pixel donnée, produit une couleur qui dessine quelque chose d'intéressant</em>. C'est un défi amusant et beaucoup de résultats sont étonnants. Mais ce n'est pas une bonne pratique.</p>
+<p>Comparez <a href="https://www.shadertoy.com/view/XtsSWs">cet étonnant shader shadertoy qui dessine une ville entière</a></p>
 <div class="threejs_center"><img src="../resources/images/shadertoy-skyline.png"></div>
 
-<p>Fullscreen on my GPU it runs at about 5 frames a second. Contrast that to
-<a href="https://store.steampowered.com/app/255710/Cities_Skylines/">a game like Cities: Skylines</a></p>
+<p>En plein écran sur mon GPU, il tourne à environ 5 images par seconde. Comparez cela à <a href="https://store.steampowered.com/app/255710/Cities_Skylines/">un jeu comme Cities: Skylines</a></p>
 <div class="threejs_center"><img src="../resources/images/cities-skylines.jpg" style="width: 600px;"></div>
 
-<p>This game runs 30-60 frames a second on the same machine because it uses more
-traditional techniques, drawing buildings made from triangles with textures on
-them, etc...</p>
-<p>Still, let's go over using a Shadertoy shader with three.js.</p>
-<p>This is the default shadertoy shader if you <a href="https://www.shadertoy.com/new">pick "New" on shadertoy.com</a>, at least as of January 2019.</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq
-// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+<p>Ce jeu tourne à 30-60 images par seconde sur la même machine car il utilise des techniques plus traditionnelles, dessinant des bâtiments faits de triangles texturés, etc...</p>
+<p>Néanmoins, passons en revue l'utilisation d'un shader Shadertoy avec three.js.</p>
+<p>Voici le shader Shadertoy par défaut si vous <a href="https://www.shadertoy.com/new">choisissez "New" sur shadertoy.com</a>, du moins depuis janvier 2019.</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// Par iq : https://www.shadertoy.com/user/iq
+// licence : Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-    // Normalized pixel coordinates (from 0 to 1)
+    // Coordonnées de pixel normalisées (de 0 à 1)
     vec2 uv = fragCoord/iResolution.xy;
 
-    // Time varying pixel color
+    // Couleur du pixel variant dans le temps
     vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
 
-    // Output to screen
+    // Sortie à l'écran
     fragColor = vec4(col,1.0);
 }
 </pre>
-<p>One thing important to understand about shaders is they are written in a
-language called GLSL (Graphics Library Shading Language) designed for 3D math
-which includes special types. Above we see <code class="notranslate" translate="no">vec4</code>, <code class="notranslate" translate="no">vec2</code>, <code class="notranslate" translate="no">vec3</code> as 3 such
-special types. A <code class="notranslate" translate="no">vec2</code> has 2 values, a <code class="notranslate" translate="no">vec3</code> 3, a <code class="notranslate" translate="no">vec4</code> 4 values. They can be
-addressed in a bunch of ways. The most common ways are with <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code>, <code class="notranslate" translate="no">z</code>, and
-<code class="notranslate" translate="no">w</code> as in</p>
+<p>Une chose importante à comprendre concernant les shaders est qu'ils sont écrits dans un langage appelé GLSL (Graphics Library Shading Language), conçu pour les mathématiques 3D et incluant des types spéciaux. Ci-dessus, nous voyons <code class="notranslate" translate="no">vec4</code>, <code class="notranslate" translate="no">vec2</code>, <code class="notranslate" translate="no">vec3</code> comme 3 de ces types spéciaux. Un <code class="notranslate" translate="no">vec2</code> a 2 valeurs, un <code class="notranslate" translate="no">vec3</code> 3, un <code class="notranslate" translate="no">vec4</code> 4 valeurs. Ils peuvent être adressés de plusieurs façons. Les plus courantes sont avec <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code>, <code class="notranslate" translate="no">z</code> et <code class="notranslate" translate="no">w</code> comme dans</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 v1 = vec4(1.0, 2.0, 3.0, 4.0);
 float v2 = v1.x + v1.y;  // adds 1.0 + 2.0
 </pre>
-<p>Unlike JavaScript, GLSL is more like C/C++ where variables have to have their
-type declared so instead of <code class="notranslate" translate="no">var v = 1.2;</code> it's <code class="notranslate" translate="no">float v = 1.2;</code> declaring <code class="notranslate" translate="no">v</code>
-to be a floating point number.</p>
-<p>Explaining GLSL in detail is more than we can do in this article. For a quick
-overview see <a href="https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html">this article</a>
-and maybe follow that up with <a href="https://thebookofshaders.com/">this series</a>.</p>
-<p>It should be noted that, at least as of January 2019,
-<a href="https://shadertoy.com">shadertoy.com</a> only concerns itself with <em>fragment
-shaders</em>. A fragment shader's responsibility is, given a pixel location output
-a color for that pixel.</p>
-<p>Looking at the function above we can see the shader has an <code class="notranslate" translate="no">out</code> parameter
-called <code class="notranslate" translate="no">fragColor</code>. <code class="notranslate" translate="no">out</code> stands for <code class="notranslate" translate="no">output</code>. It's a parameter the function is
-expected to provide a value for. We need to set this to some color.</p>
-<p>It also has an <code class="notranslate" translate="no">in</code> (for input) parameter called <code class="notranslate" translate="no">fragCoord</code>. This is the pixel
-coordinate that is about to be drawn. We can use that coordinate to decide on a
-color. If the canvas we're drawing to is 400x300 pixels then the function will
-be called 400x300 times or 120,000 times. Each time <code class="notranslate" translate="no">fragCoord</code> will be a
-different pixel coordinate.</p>
-<p>There are 2 more variables being used that are not defined in the code. One is
-<code class="notranslate" translate="no">iResolution</code>. This is set to the resolution of the canvas. If the canvas is
-400x300 then <code class="notranslate" translate="no">iResolution</code> would be 400,300 so as the pixel coordinates change
-that makes <code class="notranslate" translate="no">uv</code> go from 0.0 to 1.0 across and up the texture. Working with
-<em>normalized</em> values often makes things easier and so the majority of shadertoy
-shaders start with something like this.</p>
-<p>The other undefined variable in the shader is <code class="notranslate" translate="no">iTime</code>. This is the time since
-the page loaded in seconds.</p>
-<p>In shader jargon these global variables are called <em>uniform</em> variables. They are
-called <em>uniform</em> because they don't change, they stay uniform from one iteration
-of the shader to the next. It's important to note all of them are specific to
-shadertoy. They not <em>official</em> GLSL variables. They are variables the makers of
-shadertoy made up.</p>
-<p>The <a href="https://www.shadertoy.com/howto">Shadertoy docs define several more</a>. For
-now let's write something that handles the two being used in the shader above.</p>
-<p>The first thing to do is let's make a single plane that fills the canvas. If you
-haven't read it yet we did this in <a href="backgrounds.html">the article on backgrounds</a>
-so let's grab that example but remove the cubes. It's pretty short so here's the
-entire thing</p>
+<p>Contrairement au JavaScript, le GLSL ressemble plus au C/C++ où les variables doivent avoir leur type déclaré, donc au lieu de <code class="notranslate" translate="no">var v = 1.2;</code>, c'est <code class="notranslate" translate="no">float v = 1.2;</code>, déclarant <code class="notranslate" translate="no">v</code> comme un nombre à virgule flottante.</p>
+<p>Expliquer le GLSL en détail dépasse le cadre de cet article. Pour un aperçu rapide, consultez <a href="https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html">cet article</a> et peut-être poursuivez avec <a href="https://thebookofshaders.com/">cette série</a>.</p>
+<p>Il convient de noter qu'au moins depuis janvier 2019, <a href="https://shadertoy.com">shadertoy.com</a> ne traite que des <em>shaders de fragments</em>. La responsabilité d'un shader de fragments est, étant donné une position de pixel, de produire une couleur pour ce pixel.</p>
+<p>En regardant la fonction ci-dessus, nous pouvons voir que le shader a un paramètre <code class="notranslate" translate="no">out</code> appelé <code class="notranslate" translate="no">fragColor</code>. <code class="notranslate" translate="no">out</code> signifie <code class="notranslate" translate="no">output</code> (sortie). C'est un paramètre pour lequel la fonction est censée fournir une valeur. Nous devons définir cela sur une couleur.</p>
+<p>Il a également un paramètre <code class="notranslate" translate="no">in</code> (pour input/entrée) appelé <code class="notranslate" translate="no">fragCoord</code>. C'est la coordonnée du pixel qui est sur le point d'être dessinée. Nous pouvons utiliser cette coordonnée pour décider d'une couleur. Si le canvas sur lequel nous dessinons fait 400x300 pixels, la fonction sera appelée 400x300 fois, soit 120 000 fois. Chaque fois, <code class="notranslate" translate="no">fragCoord</code> sera une coordonnée de pixel différente.</p>
+<p>Il y a 2 variables supplémentaires utilisées qui ne sont pas définies dans le code. L'une est <code class="notranslate" translate="no">iResolution</code>. Celle-ci est définie sur la résolution du canvas. Si le canvas est 400x300, alors <code class="notranslate" translate="no">iResolution</code> serait 400,300, donc à mesure que les coordonnées de pixel changent, cela fait que <code class="notranslate" translate="no">uv</code> va de 0.0 à 1.0 sur et le long de la texture. Travailler avec des valeurs <em>normalisées</em> rend souvent les choses plus faciles et c'est pourquoi la majorité des shaders shadertoy commencent par quelque chose comme ceci.</p>
+<p>L'autre variable indéfinie dans le shader est <code class="notranslate" translate="no">iTime</code>. C'est le temps écoulé depuis le chargement de la page en secondes.</p>
+<p>Dans le jargon des shaders, ces variables globales sont appelées variables <em>uniformes</em>. Elles sont appelées <em>uniformes</em> car elles ne changent pas, elles restent uniformes d'une itération du shader à la suivante. Il est important de noter qu'elles sont toutes spécifiques à shadertoy. Ce ne sont pas des variables GLSL <em>officielles</em>. Ce sont des variables inventées par les créateurs de shadertoy.</p>
+<p>La <a href="https://www.shadertoy.com/howto">documentation de Shadertoy en définit plusieurs autres</a>. Pour l'instant, écrivons quelque chose qui gère les deux utilisées dans le shader ci-dessus.</p>
+<p>La première chose à faire est de créer un simple plan qui remplit le canvas. Si vous ne l'avez pas encore lu, nous l'avons fait dans <a href="backgrounds.html">l'article sur les arrière-plans</a>, alors prenons cet exemple mais retirons les cubes. C'est assez court, voici donc le tout</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
@@ -151,34 +110,31 @@ entire thing</p>
 
 main();
 </pre>
-<p>As <a href="backgrounds.html">explained in the backgrounds article</a> an
-<a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> with these parameters and a 2 unit plane will fill the
-canvas. For now all we'll get is a red canvas as our plane is using a red
-<a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
+<p>Comme <a href="backgrounds.html">expliqué dans l'article sur les arrière-plans</a>, une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> avec ces paramètres et un plan de 2 unités remplira le canvas. Pour l'instant, tout ce que nous obtiendrons est un canvas rouge, car notre plan utilise un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> rouge.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-prep.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/shadertoy-prep.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/shadertoy-prep.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>Now that we have something working let's add the shadertoy shader. </p>
+<p>Maintenant que nous avons quelque chose qui fonctionne, ajoutons le shader shadertoy. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fragmentShader = `
 #include &lt;common&gt;
 
 uniform vec3 iResolution;
 uniform float iTime;
 
-// By iq: https://www.shadertoy.com/user/iq
-// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+// Par iq : https://www.shadertoy.com/user/iq
+// licence : Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-    // Normalized pixel coordinates (from 0 to 1)
+    // Coordonnées de pixel normalisées (de 0 à 1)
     vec2 uv = fragCoord/iResolution.xy;
 
-    // Time varying pixel color
+    // Couleur du pixel variant dans le temps
     vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
 
-    // Output to screen
+    // Sortie à l'écran
     fragColor = vec4(col,1.0);
 }
 
@@ -187,22 +143,15 @@ void main() {
 }
 `;
 </pre>
-<p>Above we declared the 2 uniform variables we talked about. Then we inserted the
-shader GLSL code from shadertoy. Finally we called <code class="notranslate" translate="no">mainImage</code> passing it
-<code class="notranslate" translate="no">gl_FragColor</code> and <code class="notranslate" translate="no">gl_FragCoord.xy</code>.  <code class="notranslate" translate="no">gl_FragColor</code> is an official WebGL
-global variable the shader is responsible for setting to whatever color it wants
-the current pixel to be. <code class="notranslate" translate="no">gl_FragCoord</code> is another official WebGL global
-variable that tells us the coordinate of the pixel we're currently choosing a
-color for.</p>
-<p>We then need to setup three.js uniforms so we can supply values to the shader.</p>
+<p>Ci-dessus, nous avons déclaré les 2 variables uniformes dont nous avons parlé. Ensuite, nous avons inséré le code GLSL du shader depuis shadertoy. Enfin, nous avons appelé <code class="notranslate" translate="no">mainImage</code> en lui passant <code class="notranslate" translate="no">gl_FragColor</code> et <code class="notranslate" translate="no">gl_FragCoord.xy</code>. <code class="notranslate" translate="no">gl_FragColor</code> est une variable globale WebGL officielle que le shader est chargé de définir sur la couleur souhaitée pour le pixel actuel. <code class="notranslate" translate="no">gl_FragCoord</code> est une autre variable globale WebGL officielle qui nous indique la coordonnée du pixel pour lequel nous choisissons actuellement une couleur.</p>
+<p>Nous devons ensuite configurer les uniformes de three.js afin de pouvoir fournir des valeurs au shader.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const uniforms = {
   iTime: { value: 0 },
   iResolution:  { value: new THREE.Vector3() },
 };
 </pre>
-<p>Each uniform in THREE.js has <code class="notranslate" translate="no">value</code> parameter. That value has to match the type
-of the uniform.</p>
-<p>Then we pass both the fragment shader and uniforms to a <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>.</p>
+<p>Chaque uniforme dans THREE.js possède un paramètre <code class="notranslate" translate="no">value</code>. Cette valeur doit correspondre au type de l'uniforme.</p>
+<p>Ensuite, nous passons le shader de fragments et les uniformes à un <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({
 -    color: 'red',
 -});
@@ -211,10 +160,10 @@ of the uniform.</p>
 +  uniforms,
 +});
 </pre>
-<p>and before rendering we need to set the values of the uniforms</p>
+<p>et avant le rendu, nous devons définir les valeurs des uniformes</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render() {
 +function render(time) {
-+  time *= 0.001;  // convert to seconds
++  time *= 0.001;  // convertir en secondes
 
   resizeRendererToDisplaySize(renderer);
 
@@ -228,54 +177,38 @@ of the uniform.</p>
 }
 </pre>
 <blockquote>
-<p>Note: I have no idea why <code class="notranslate" translate="no">iResolution</code> is a <code class="notranslate" translate="no">vec3</code> and what's in the 3rd value
-<a href="https://www.shadertoy.com/howto">is not documented on shadertoy.com</a>. It's
-not used above so just setting it to 1 for now. ¯\_(ツ)_/¯</p>
+<p>Note : Je n'ai aucune idée de pourquoi <code class="notranslate" translate="no">iResolution</code> est un <code class="notranslate" translate="no">vec3</code> et ce qu'il y a dans la 3ème valeur <a href="https://www.shadertoy.com/howto">n'est pas documenté sur shadertoy.com</a>. Elle n'est pas utilisée ci-dessus, donc je la définis simplement à 1 pour l'instant. ¯\_(ツ)_/¯</p>
 </blockquote>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-basic.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/shadertoy-basic.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/shadertoy-basic.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>This <a href="https://www.shadertoy.com/new">matches what we see on Shadertoy for a new shader</a>,
-at least as of January 2019 😉. What's the shader above doing? </p>
+<p>Cela <a href="https://www.shadertoy.com/new">correspond à ce que nous voyons sur Shadertoy pour un nouveau shader</a>, du moins depuis janvier 2019 😉. Que fait le shader ci-dessus ? </p>
 <ul>
-<li><code class="notranslate" translate="no">uv</code> goes from 0 to 1. </li>
-<li><code class="notranslate" translate="no">cos(uv.xyx)</code> gives us 3 cosine values as a <code class="notranslate" translate="no">vec3</code>. One for <code class="notranslate" translate="no">uv.x</code>, another for <code class="notranslate" translate="no">uv.y</code> and another for <code class="notranslate" translate="no">uv.x</code> again.</li>
-<li>Adding in the time, <code class="notranslate" translate="no">cos(iTime+uv.xyx)</code> makes them animate.</li>
-<li>Adding in <code class="notranslate" translate="no">vec3(0,2,4)</code> as in <code class="notranslate" translate="no">cos(iTime+uv.xyx+vec3(0,2,4))</code> offsets the cosine waves</li>
-<li><code class="notranslate" translate="no">cos</code> goes from -1 to 1 so the <code class="notranslate" translate="no">0.5 * 0.5 + cos(...)</code> converts from -1 &lt;-&gt; 1 to 0.0 &lt;-&gt; 1.0</li>
-<li>the results are then used as the RGB color for the current pixel</li>
+<li><code class="notranslate" translate="no">uv</code> va de 0 à 1. </li>
+<li><code class="notranslate" translate="no">cos(uv.xyx)</code> nous donne 3 valeurs de cosinus sous forme de <code class="notranslate" translate="no">vec3</code>. Une pour <code class="notranslate" translate="no">uv.x</code>, une autre pour <code class="notranslate" translate="no">uv.y</code> et encore une pour <code class="notranslate" translate="no">uv.x</code>.</li>
+<li>L'ajout du temps, <code class="notranslate" translate="no">cos(iTime+uv.xyx)</code>, les fait s'animer.</li>
+<li>L'ajout de <code class="notranslate" translate="no">vec3(0,2,4)</code> comme dans <code class="notranslate" translate="no">cos(iTime+uv.xyx+vec3(0,2,4))</code> décale les ondes cosinusoïdales</li>
+<li><code class="notranslate" translate="no">cos</code> va de -1 à 1, donc <code class="notranslate" translate="no">0.5 * 0.5 + cos(...)</code> convertit de -1 &lt;-&gt; 1 à 0.0 &lt;-&gt; 1.0</li>
+<li>les résultats sont ensuite utilisés comme couleur RGB pour le pixel actuel</li>
 </ul>
-<p>A minor change will make it easier to see the cosine waves. Right now <code class="notranslate" translate="no">uv</code> only
-goes from 0 to 1. A cosine repeats at 2π so let's make it go from 0 to 40 by
-multiplying by 40.0. That should make it repeat about 6.3 times.</p>
+<p>Un changement mineur facilitera la visualisation des ondes cosinusoïdales. Actuellement, <code class="notranslate" translate="no">uv</code> ne va que de 0 à 1. Un cosinus se répète à 2π, alors faisons-le aller de 0 à 40 en multipliant par 40.0. Cela devrait le faire se répéter environ 6.3 fois.</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">-vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
 +vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx*40.0+vec3(0,2,4));
 </pre>
-<p>Counting below I see about 6.3 repeats. We can see the blue between the red
-since it's offset by 4 via the <code class="notranslate" translate="no">+vec3(0,2,4)</code>. Without that the blue and red
-would overlap perfectly making purple.</p>
+<p>En comptant ci-dessous, je vois environ 6.3 répétitions. Nous pouvons voir le bleu entre le rouge car il est décalé de 4 via le <code class="notranslate" translate="no">+vec3(0,2,4)</code>. Sans cela, le bleu et le rouge se superposeraient parfaitement, créant du violet.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-basic-x40.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/shadertoy-basic-x40.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/shadertoy-basic-x40.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>Knowing how simple the inputs are and then seeing results like
-<a href="https://www.shadertoy.com/view/MdXGW2">a city canal</a>,
-<a href="https://www.shadertoy.com/view/4ttSWf">a forest</a>,
-<a href="https://www.shadertoy.com/view/ld3Gz2">a snail</a>,
-<a href="https://www.shadertoy.com/view/4tBXR1">a mushroom</a>
-make the challenge all that much more impressive. Hopefully they also make it
-clear why it's not generally the right approach vs the more traditional ways of
-making scenes from triangles. The fact that so much math has to be put into
-computing the color of every pixel means those examples run very slow.</p>
-<p>Some shadertoy shaders take textures as inputs like
-<a href="https://www.shadertoy.com/view/MsXSzM">this one</a>. </p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By Daedelus: https://www.shadertoy.com/user/Daedelus
-// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+<p>Connaître la simplicité des entrées et voir ensuite des résultats comme <a href="https://www.shadertoy.com/view/MdXGW2">un canal urbain</a>, <a href="https://www.shadertoy.com/view/4ttSWf">une forêt</a>, <a href="https://www.shadertoy.com/view/ld3Gz2">un escargot</a>, <a href="https://www.shadertoy.com/view/4tBXR1">un champignon</a> rend le défi d'autant plus impressionnant. Espérons que cela rende également clair pourquoi ce n'est généralement pas la bonne approche par rapport aux méthodes plus traditionnelles de création de scènes à partir de triangles. Le fait qu'il faille mettre autant de mathématiques dans le calcul de la couleur de chaque pixel signifie que ces exemples fonctionnent très lentement.</p>
+<p>Certains shaders shadertoy prennent des textures en entrée comme <a href="https://www.shadertoy.com/view/MsXSzM">celui-ci</a>. </p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// Par Daedelus : https://www.shadertoy.com/user/Daedelus
+// licence : Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 #define TIMESCALE 0.25
 #define TILES 8
 #define COLOR 0.7, 1.6, 2.8
@@ -296,11 +229,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     fragColor = vec4(COLOR, 1.0) * p;
 }
 </pre>
-<p>Passing a texture into a shader is similar to
-<a href="textures.html">passing one into a normal material</a> but we need to set
-up the texture on the uniforms.</p>
-<p>First we'll add the uniform for the texture to the shader. They're referred to
-as <code class="notranslate" translate="no">sampler2D</code> in GLSL.</p>
+<p>Passer une texture dans un shader est similaire à <a href="textures.html">en passer une dans un matériau normal</a>, mais nous devons configurer la texture sur les uniformes.</p>
+<p>Nous allons d'abord ajouter l'uniforme pour la texture au shader. Ils sont appelés <code class="notranslate" translate="no">sampler2D</code> en GLSL.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fragmentShader = `
 #include &lt;common&gt;
 
@@ -310,7 +240,7 @@ uniform float iTime;
 
 ...
 </pre>
-<p>Then we can load a texture like we covered <a href="textures.html">here</a> and assign the uniform's value.</p>
+<p>Ensuite, nous pouvons charger une texture comme nous l'avons <a href="textures.html">vu ici</a> et attribuer la valeur de l'uniforme.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 +const texture = loader.load('resources/images/bayer.png');
 +texture.minFilter = THREE.NearestFilter;
@@ -325,26 +255,13 @@ const uniforms = {
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-bleepy-blocks.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/shadertoy-bleepy-blocks.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/shadertoy-bleepy-blocks.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>So far we've been using Shadertoy shaders as they are used on
-<a href="https://shadertoy.com">Shadertoy.com</a>, namely drawing to cover the canvas.
-There's no reason we need to limit it to just that use case though. The
-important part to remember is the functions people write on shadertoy generally
-just take a <code class="notranslate" translate="no">fragCoord</code> input and a <code class="notranslate" translate="no">iResolution</code>. <code class="notranslate" translate="no">fragCoord</code> does not have to
-come from pixel coordinates, we could use something else like texture
-coordinates instead and could then use them kind of like other textures. This
-technique of using a function to generate textures is often called a
-<a href="https://www.google.com/search?q=procedural+texture"><em>procedural texture</em></a>.</p>
-<p>Let's change the shader above to do this. The simplest thing to do might be to
-take the texture coordinates that three.js normally supplies, multiply them by
-<code class="notranslate" translate="no">iResolution</code> and pass that in for <code class="notranslate" translate="no">fragCoords</code>. </p>
-<p>To do that we add in a <em>varying</em>. A varying is a value passed from the vertex
-shader to the fragment shader that gets interpolated (or varied) between
-vertices. To use it in our fragment shader we declare it. Three.js refers to its
-texture coordinates as <code class="notranslate" translate="no">uv</code> with the <code class="notranslate" translate="no">v</code> in front meaning <em>varying</em>.</p>
+<p>Jusqu'à présent, nous avons utilisé les shaders Shadertoy tels qu'ils sont utilisés sur <a href="https://shadertoy.com">Shadertoy.com</a>, c'est-à-dire en dessinant pour couvrir le canvas. Il n'y a aucune raison de nous limiter à ce seul cas d'utilisation. L'important à retenir est que les fonctions que les gens écrivent sur shadertoy prennent généralement juste une entrée <code class="notranslate" translate="no">fragCoord</code> et un <code class="notranslate" translate="no">iResolution</code>. <code class="notranslate" translate="no">fragCoord</code> ne doit pas nécessairement provenir des coordonnées de pixel ; nous pourrions utiliser autre chose, comme les coordonnées de texture, et les utiliser ensuite un peu comme d'autres textures. Cette technique consistant à utiliser une fonction pour générer des textures est souvent appelée <a href="https://www.google.com/search?q=procedural+texture"><em>texture procédurale</em></a>.</p>
+<p>Modifions le shader ci-dessus pour faire cela. La chose la plus simple à faire serait peut-être de prendre les coordonnées de texture que three.js fournit normalement, de les multiplier par <code class="notranslate" translate="no">iResolution</code> et de les passer pour <code class="notranslate" translate="no">fragCoords</code>.</p>
+<p>Pour ce faire, nous ajoutons un <em>varying</em>. Un varying est une valeur passée du shader de vertex au shader de fragment qui est interpolée (ou varie) entre les sommets. Pour l'utiliser dans notre shader de fragment, nous le déclarons. Three.js désigne ses coordonnées de texture comme <code class="notranslate" translate="no">uv</code> avec le <code class="notranslate" translate="no">v</code> devant signifiant <em>varying</em> (variable/variant).</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">...
 
 +varying vec2 vUv;
@@ -354,9 +271,7 @@ void main() {
 +  mainImage(gl_FragColor, vUv * iResolution.xy);
 }
 </pre>
-<p>Then we need to also provide our own vertex shader. Here is a fairly common
-minimal three.js vertex shader. Three.js declares and will provide values for
-<code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>, <code class="notranslate" translate="no">modelViewMatrix</code>, and <code class="notranslate" translate="no">position</code>.</p>
+<p>Ensuite, nous devons également fournir notre propre shader de vertex. Voici un shader de vertex three.js minimal assez courant. Three.js déclare et fournira des valeurs pour <code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>, <code class="notranslate" translate="no">modelViewMatrix</code> et <code class="notranslate" translate="no">position</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertexShader = `
   varying vec2 vUv;
   void main() {
@@ -365,14 +280,14 @@ minimal three.js vertex shader. Three.js declares and will provide values for
   }
 `;
 </pre>
-<p>We need to pass the vertex shader to the <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a></p>
+<p>Nous devons passer le shader de vertex au <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,
   uniforms,
 });
 </pre>
-<p>We can set the <code class="notranslate" translate="no">iResolution</code> uniform value at init time since it will no longer change.</p>
+<p>Nous pouvons définir la valeur uniforme <code class="notranslate" translate="no">iResolution</code> au moment de l'initialisation puisqu'elle ne changera plus.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const uniforms = {
   iTime: { value: 0 },
 -  iResolution:  { value: new THREE.Vector3() },
@@ -380,24 +295,19 @@ minimal three.js vertex shader. Three.js declares and will provide values for
   iChannel0: { value: texture },
 };
 </pre>
-<p>and we no longer need to set it at render time</p>
+<p>et nous n'avons plus besoin de le définir au moment du rendu</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const canvas = renderer.domElement;
 -uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
 uniforms.iTime.value = time;
 </pre>
-<p>Otherwise I copied back in the original camera and code that sets up 3 rotating
-cubes from <a href="responsive.html">the article on responsiveness</a>. The result:</p>
+<p>Sinon, j'ai recopié la caméra originale et le code qui configure 3 cubes en rotation à partir de <a href="responsive.html">l'article sur la réactivité</a>. Le résultat :</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-as-texture.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/shadertoy-as-texture.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/shadertoy-as-texture.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>I hope this at least gets you started on how to use a shadertoy shader with
-three.js. Again, it's important to remember that most shadertoy shaders are an
-interesting challenge (draw everything with a single function) rather than the
-recommended way to actually display things in a performant way. Still, they are
-amazing, impressive, beautiful, and you can learn a ton by seeing how they work.</p>
+<p>J'espère que cela vous donnera au moins un point de départ sur la façon d'utiliser un shader shadertoy avec three.js. Encore une fois, il est important de se rappeler que la plupart des shaders shadertoy sont un défi intéressant (tout dessiner avec une seule fonction) plutôt que la méthode recommandée pour afficher réellement les choses de manière performante. Néanmoins, ils sont étonnants, impressionnants, magnifiques, et vous pouvez apprendre énormément en voyant comment ils fonctionnent.</p>
 
         </div>
       </div>

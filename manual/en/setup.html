@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Setup</title>
+    <title>Configuration</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Setup">
+    <meta name="twitter:title" content="Three.js – Configuration">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,54 +22,42 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Setup</h1>
+        <h1>Configuration</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>This article is one in a series of articles about three.js.
-The first article was <a href="fundamentals.html">about three.js fundamentals</a>.
-If you haven't read that yet you might want to start there.</p>
-<p>Before we go any further we need to talk about setting up your
-computer as a development environment. In particular, for security reasons,
-WebGL cannot use images from your hard drive directly. That means
-in order to do development you need to use a web server. Fortunately
-development web servers are super easy to setup and use.</p>
-<p>First off if you'd like you can download this entire site from <a href="https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip">this link</a>.
-Once downloaded double click the zip file to unpack the files.</p>
-<p>Next download one of these simple web servers.</p>
-<p>If you'd prefer a web server with a user interface there's
-<a href="https://greggman.github.io/servez">Servez</a></p>
+          <p>Cet article fait partie d'une série d'articles sur three.js. Le premier article était <a href="fundamentals.html">sur les bases de three.js</a>. Si vous ne l'avez pas encore lu, vous pourriez vouloir commencer par là.</p>
+<p>Avant d'aller plus loin, nous devons parler de la configuration de votre ordinateur en tant qu'environnement de développement. En particulier, pour des raisons de sécurité, WebGL ne peut pas utiliser directement les images de votre disque dur. Cela signifie que pour faire du développement, vous devez utiliser un serveur web. Heureusement, les serveurs web de développement sont très faciles à configurer et à utiliser.</p>
+<p>Tout d'abord, si vous le souhaitez, vous pouvez télécharger ce site entier depuis <a href="https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip">ce lien</a>. Une fois téléchargé, double-cliquez sur le fichier zip pour décompresser les fichiers.</p>
+<p>Ensuite, téléchargez l'un de ces serveurs web simples.</p>
+<p>Si vous préférez un serveur web avec une interface utilisateur, il y a <a href="https://greggman.github.io/servez">Servez</a></p>
 <p></p><div class="threejs_image border">
   <img class="" src="../resources/servez.gif">
 </div>
 
 <p></p>
-<p>Just point it at the folder where you unzipped the files, click "Start", then go to
-in your browser <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a> or if you'd
-like to browse the samples go to <a href="http://localhost:8080/threejs"><code class="notranslate" translate="no">http://localhost:8080/threejs</code></a>.</p>
-<p>To stop serving click stop or quit Servez.</p>
-<p>If you prefer the command line (I do), another way is to use <a href="https://nodejs.org">node.js</a>.
-Download it, install it, then open a command prompt / console / terminal window. If you're on Windows the installer will add a special "Node Command Prompt" so use that.</p>
-<p>Then install the <a href="https://github.com/greggman/servez-cli"><code class="notranslate" translate="no">servez</code></a> by typing</p>
+<p>Il suffit de le pointer vers le dossier où vous avez décompressé les fichiers, cliquez sur "Start", puis allez dans votre navigateur à l'adresse <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a> ou si vous souhaitez parcourir les exemples, allez à l'adresse <a href="http://localhost:8080/threejs"><code class="notranslate" translate="no">http://localhost:8080/threejs</code></a>.</p>
+<p>Pour arrêter de servir, cliquez sur stop ou quittez Servez.</p>
+<p>Si vous préférez la ligne de commande (c'est mon cas), une autre façon est d'utiliser <a href="https://nodejs.org">node.js</a>. Téléchargez-le, installez-le, puis ouvrez une invite de commande / console / fenêtre de terminal. Si vous êtes sous Windows, l'installateur ajoutera une invite de commande spéciale "Node Command Prompt", utilisez-la donc.</p>
+<p>Installez ensuite <a href="https://github.com/greggman/servez-cli"><code class="notranslate" translate="no">servez</code></a> en tapant</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">npm -g install servez
-</pre><p>If you're on OSX use</p>
+</pre><p>Si vous êtes sous OSX, utilisez</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">sudo npm -g install servez
-</pre><p>Once you've done that type</p>
+</pre><p>Une fois que vous avez fait cela, tapez</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">servez path/to/folder/where/you/unzipped/files
-</pre><p>Or if you're like me</p>
+</pre><p>Ou si vous êtes comme moi</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">cd path/to/folder/where/you/unzipped/files
 servez
-</pre><p>It should print something like</p>
+</pre><p>Cela devrait afficher quelque chose comme</p>
 <p></p><div class="threejs_image ">
   <img class="" src="../resources/servez-response.png">
 </div>
 
 <p></p>
-<p>Then in your browser go to <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>.</p>
-<p>If you don't specify a path then servez will serve the current folder.</p>
-<p>If either of those options are not to your liking
-<a href="https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver">there are many other simple servers to choose from</a>.</p>
-<p>Now that you have a server setup we can move on to <a href="textures.html">textures</a>.</p>
+<p>Puis, dans votre navigateur, allez à l'adresse <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>.</p>
+<p>Si vous ne spécifiez pas de chemin, servez servira le dossier actuel.</p>
+<p>Si aucune de ces options ne vous convient, <a href="https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver">il existe de nombreux autres serveurs simples parmi lesquels choisir</a>.</p>
+<p>Maintenant que vous avez configuré un serveur, nous pouvons passer aux <a href="textures.html">textures</a>.</p>
 
         </div>
       </div>

@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="utf-8">
-    <title>Transparency</title>
+    <title>Transparence</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Transparency">
+    <meta name="twitter:title" content="Three.js – Transparence">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,18 +22,18 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Transparency</h1>
+        <h1>Transparence</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Transparency in three.js is both easy and hard.</p>
-<p>First we'll go over the easy part. Let's make a
-scene with 8 cubes placed in a 2x2x2 grid.</p>
-<p>We'll start with the example from
-<a href="rendering-on-demand.html">the article on rendering on demand</a>
-which had 3 cubes and modify it to have 8. First
-let's change our <code class="notranslate" translate="no">makeInstance</code> function to take
-an x, y, and z</p>
+          <p>La transparence dans three.js est à la fois facile et difficile.</p>
+<p>Nous allons d'abord aborder la partie facile. Créons une
+scène avec 8 cubes placés dans une grille 2x2x2.</p>
+<p>Nous allons commencer avec l'exemple de
+<a href="rendering-on-demand.html">l'article sur le rendu à la demande</a>
+qui contenait 3 cubes et le modifier pour en avoir 8. D'abord,
+modifions notre fonction <code class="notranslate" translate="no">makeInstance</code> pour qu'elle
+prenne un x, un y et un z</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeInstance(geometry, color) {
 +function makeInstance(geometry, color, x, y, z) {
   const material = new THREE.MeshPhongMaterial({color});
@@ -47,7 +47,7 @@ an x, y, and z</p>
   return cube;
 }
 </pre>
-<p>Then we can create 8 cubes</p>
+<p>Ensuite, nous pouvons créer 8 cubes</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function hsl(h, s, l) {
 +  return (new THREE.Color()).setHSL(h, s, l);
 +}
@@ -68,7 +68,7 @@ an x, y, and z</p>
 +  makeInstance(geometry, hsl(7 / 8, 1, .5),  d,  d,  d);
 +}
 </pre>
-<p>I also adjusted the camera</p>
+<p>J'ai également ajusté la caméra</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
 const near = 0.1;
@@ -78,11 +78,11 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 4;
 +camera.position.z = 2;
 </pre>
-<p>Set the background to white</p>
+<p>Définir le fond en blanc</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color('white');
 </pre>
-<p>And added a second light so all sides of the cubes get some lighting.</p>
+<p>Et ajouté une deuxième lumière pour que tous les côtés des cubes soient éclairés.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-{
 +function addLight(...pos) {
   const color = 0xFFFFFF;
@@ -95,10 +95,10 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +addLight(-1, 2, 4);
 +addLight( 1, -1, -2);
 </pre>
-<p>To make the cubes transparent we just need to set the
-<a href="/docs/#api/en/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> flag and to set an
-<a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> level with 1 being completely opaque
-and 0 being completely transparent.</p>
+<p>Pour rendre les cubes transparents, il suffit de définir le
+drapeau <a href="/docs/#api/en/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> et de définir un
+niveau <a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> où 1 est complètement opaque
+et 0 est complètement transparent.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 -  const material = new THREE.MeshPhongMaterial({color});
 +  const material = new THREE.MeshPhongMaterial({
@@ -115,22 +115,22 @@ and 0 being completely transparent.</p>
   return cube;
 }
 </pre>
-<p>and with that we get 8 transparent cubes</p>
+<p>et avec cela, nous obtenons 8 cubes transparents</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/transparency.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>Drag on the example to rotate the view. </p>
-<p>So it seems easy but ... look closer. The cubes are
-missing their backs.</p>
+<p>Faites glisser sur l'exemple pour faire pivoter la vue. </p>
+<p>Cela semble donc facile mais... regardez de plus près. Les cubes
+n'ont pas leur face arrière.</p>
 <div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
-<div class="threejs_center">no backs</div>
+<div class="threejs_center">pas de faces arrière</div>
 
-<p>We learned about the <a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> material property in
-<a href="materials.html">the article on materials</a>.
-So, let's set it to <code class="notranslate" translate="no">THREE.DoubleSide</code> to get both sides of each cube to be drawn.</p>
+<p>Nous avons appris à propos de la propriété de matériau <a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> dans
+<a href="materials.html">l'article sur les matériaux</a>.
+Donc, réglons-la sur <code class="notranslate" translate="no">THREE.DoubleSide</code> pour que les deux côtés de chaque cube soient dessinés.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
   color,
   map: loader.load(url),
@@ -139,37 +139,37 @@ So, let's set it to <code class="notranslate" translate="no">THREE.DoubleSide</c
 +  side: THREE.DoubleSide,
 });
 </pre>
-<p>And we get</p>
+<p>Et nous obtenons</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-doubleside.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/transparency-doubleside.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>Give it a spin. It kind of looks like it's working as we can see backs
-except on closer inspection sometimes we can't.</p>
+<p>Faites-le tourner. On dirait que ça fonctionne puisque l'on voit les faces arrière
+sauf en y regardant de plus près, parfois on ne les voit pas.</p>
 <div class="threejs_center"><img src="../resources/images/transparency-cubes-some-backs.png" style="width: 368px;"></div>
-<div class="threejs_center">the left back face of each cube is missing</div>
+<div class="threejs_center">la face arrière gauche de chaque cube est manquante</div>
 
-<p>This happens because of the way 3D objects are generally drawn. For each geometry
-each triangle is drawn one at a time. When each pixel of the triangle is drawn
-2 things are recorded. One, the color for that pixel and two, the depth of that pixel.
-When the next triangle is drawn, for each pixel if the depth is deeper than the
-previously recorded depth no pixel is drawn.</p>
-<p>This works great for opaque things but it fails for transparent things.</p>
-<p>The solution is to sort transparent things and draw the stuff in back before
-drawing the stuff in front. THREE.js does this for objects like <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> otherwise
-the very first example would have failed between cubes with some cubes blocking
-out others. Unfortunately for individual triangles shorting would be extremely slow. </p>
-<p>The cube has 12 triangles, 2 for each face, and the order they are drawn is
-<a href="custom-buffergeometry.html">the same order they are built in the geometry</a>
-so depending on which direction we are looking the triangles closer to the camera
-might get drawn first. In that case the triangles in the back aren't drawn.
-This is why sometimes we don't see the backs.</p>
-<p>For a convex object like a sphere or a cube one kind of solution is to add
-every cube to the scene twice. Once with a material that draws
-only the back facing triangles and another with a material that only
-draws the front facing triangles.</p>
+<p>Cela se produit en raison de la manière dont les objets 3D sont généralement dessinés. Pour chaque géométrie,
+chaque triangle est dessiné un par un. Lorsque chaque pixel du triangle est dessiné,
+2 informations sont enregistrées. Premièrement, la couleur de ce pixel et deuxièmement, la profondeur de ce pixel.
+Lorsque le triangle suivant est dessiné, pour chaque pixel, si la profondeur est plus profonde que la
+profondeur précédemment enregistrée, aucun pixel n'est dessiné.</p>
+<p>Cela fonctionne très bien pour les objets opaques mais échoue pour les objets transparents.</p>
+<p>La solution est de trier les objets transparents et de dessiner ce qui est derrière avant
+de dessiner ce qui est devant. THREE.js le fait pour des objets comme <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, sinon
+le tout premier exemple aurait échoué entre les cubes avec certains cubes en bloquant
+d'autres. Malheureusement, pour les triangles individuels, le tri serait extrêmement lent. </p>
+<p>Le cube a 12 triangles, 2 pour chaque face, et l'ordre dans lequel ils sont dessinés est
+<a href="custom-buffergeometry.html">le même ordre dans lequel ils sont construits dans la géométrie</a>
+Donc, selon la direction depuis laquelle nous regardons, les triangles plus proches de la caméra
+pourraient être dessinés en premier. Dans ce cas, les triangles à l'arrière ne sont pas dessinés.
+C'est pourquoi parfois nous ne voyons pas les faces arrière.</p>
+<p>Pour un objet convexe comme une sphère ou un cube, une sorte de solution consiste à ajouter
+chaque cube à la scène deux fois. Une fois avec un matériau qui dessine
+uniquement les triangles orientés vers l'arrière et une autre fois avec un matériau qui
+dessine uniquement les triangles orientés vers l'avant.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 +  [THREE.BackSide, THREE.FrontSide].forEach((side) =&gt; {
     const material = new THREE.MeshPhongMaterial({
@@ -186,18 +186,18 @@ draws the front facing triangles.</p>
 +  });
 }
 </pre>
-<p>Any with that it <em>seems</em> to work.</p>
+<p>Et avec cela, cela <em>semble</em> fonctionner.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside-hack.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-doubleside-hack.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/transparency-doubleside-hack.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>It assumes that the three.js's sorting is stable. Meaning that because we
-added the <code class="notranslate" translate="no">side: THREE.BackSide</code> mesh first and because it's at the exact same
-position that it will be drawn before the <code class="notranslate" translate="no">side: THREE.FrontSide</code> mesh.</p>
-<p>Let's make 2 intersecting planes (after deleting all the code related to cubes).
-We'll <a href="textures.html">add a texture</a> to each plane.</p>
+<p>Cela suppose que le tri de three.js est stable. C'est-à-dire que parce que nous
+avons ajouté le maillage <code class="notranslate" translate="no">side: THREE.BackSide</code> en premier et parce qu'il est exactement à la même
+position, il sera dessiné avant le maillage <code class="notranslate" translate="no">side: THREE.FrontSide</code>.</p>
+<p>Créons 2 plans qui se croisent (après avoir supprimé tout le code relatif aux cubes).
+Nous allons <a href="textures.html">ajouter une texture</a> à chaque plan.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeWidth = 1;
 const planeHeight = 1;
 const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
@@ -223,23 +223,22 @@ function makeInstance(geometry, color, rotY, url) {
 makeInstance(geometry, 'pink',       0,             'resources/images/happyface.png');
 makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.png');
 </pre>
-<p>This time we can use <code class="notranslate" translate="no">side: THREE.DoubleSide</code> since we can only ever see one
-side of a plane at a time. Also note we pass our <code class="notranslate" translate="no">render</code> function to the texture
-loading function so that when the texture finishes loading we re-render the scene.
-This is because this sample is <a href="rendering-on-demand.html">rendering on demand</a>
-instead of rendering continuously.</p>
+<p>Cette fois, nous pouvons utiliser <code class="notranslate" translate="no">side: THREE.DoubleSide</code> car nous ne pouvons
+voir qu'un seul côté d'un plan à la fois. Notez également que nous passons notre fonction <code class="notranslate" translate="no">render</code> à la fonction de chargement de texture afin que, lorsque la texture a fini de se charger, nous redessinions la scène.
+C'est parce que cet exemple effectue un <a href="rendering-on-demand.html">rendu à la demande</a>
+au lieu d'un rendu continu.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>And again we see a similar issue.</p>
+<p>Et encore une fois, nous voyons un problème similaire.</p>
 <div class="threejs_center"><img src="../resources/images/transparency-planes.png" style="width: 408px;"></div>
-<div class="threejs_center">half a face is missing</div>
+<div class="threejs_center">la moitié d'une face est manquante</div>
 
-<p>The solution here is to manually split the each pane into 2 panes
-so that there really is no intersection.</p>
+<p>La solution ici est de diviser manuellement chaque panneau en 2 panneaux
+afin qu'il n'y ait vraiment pas d'intersection.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
 +  const base = new THREE.Object3D();
 +  scene.add(base);
@@ -266,39 +265,39 @@ so that there really is no intersection.</p>
   });
 }
 </pre>
-<p>How you accomplish that is up to you. If I was using modeling package like
-<a href="https://blender.org">Blender</a> I'd probably do this manually by adjusting
-texture coordinates. Here though we're using <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> which by
-default stretches the texture across the plane. Like we <a href="textures.html">covered
-before</a> By setting the <a href="/docs/#api/en/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
-and <a href="/docs/#api/en/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> we can scale and move the texture to get
-the correct half of the face texture on each plane.</p>
-<p>The code above also makes a <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> and parents the 2 planes to it.
-It seemed easier to rotate a parent <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> than to do the math
-required do it without. </p>
+<p>La manière d'y parvenir dépend de vous. Si j'utilisais un logiciel de modélisation comme
+<a href="https://blender.org">Blender</a>, je le ferais probablement manuellement en ajustant
+les coordonnées de texture. Ici cependant, nous utilisons <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> qui, par
+défaut, étire la texture sur tout le plan. Comme nous l'avons <a href="textures.html">déjà vu</a>
+en réglant <a href="/docs/#api/en/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
+et <a href="/docs/#api/en/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a>, nous pouvons mettre à l'échelle et déplacer la texture pour obtenir
+la bonne moitié de la texture de la face sur chaque plan.</p>
+<p>Le code ci-dessus crée également un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> et y attache les 2 plans.
+Il semblait plus facile de faire pivoter un parent <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> que de faire les calculs
+nécessaires sans cela. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-fixed.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-fixed.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>This solution really only works for simple things like 2 planes that
-are not changing their intersection position.</p>
-<p>For textured objects one more solution is to set an alpha test.</p>
-<p>An alpha test is a level of <em>alpha</em> below which three.js will not
-draw the pixel. If we don't draw a pixel at all then the depth
-issues mentioned above disappear. For relatively sharp edged textures
-this works pretty well. Examples include leaf textures on a plant or tree
-or often a patch of grass.</p>
-<p>Let's try on the 2 planes. First let's use different textures.
-The textures above were 100% opaque. These 2 use transparency.</p>
+<p>Cette solution ne fonctionne vraiment que pour des choses simples comme 2 plans dont
+la position d'intersection ne change pas.</p>
+<p>Pour les objets texturés, une autre solution consiste à définir un test alpha.</p>
+<p>Un test alpha est un niveau d'<em>alpha</em> en dessous duquel three.js ne dessinera pas
+le pixel. Si nous ne dessinons pas de pixel du tout, alors les problèmes de profondeur
+mentionnés ci-dessus disparaissent. Pour les textures aux bords relativement nets,
+cela fonctionne assez bien. Les exemples incluent les textures de feuilles sur une plante ou un arbre
+ou souvent une parcelle d'herbe.</p>
+<p>Essayons sur les 2 plans. D'abord, utilisons des textures différentes.
+Les textures ci-dessus étaient 100% opaques. Celles-ci utilisent la transparence.</p>
 <div class="spread">
   <div><img class="checkerboard" src="../examples/resources/images/tree-01.png"></div>
   <div><img class="checkerboard" src="../examples/resources/images/tree-02.png"></div>
 </div>
 
-<p>Going back to the 2 planes that intersect (before we split them) let's
-use these textures and set an <a href="/docs/#api/en/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a>.</p>
+<p>En revenant aux 2 plans qui se croisent (avant que nous les ayons séparés), utilisons
+ces textures et définissons un <a href="/docs/#api/en/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
   const texture = loader.load(url, render);
   const material = new THREE.MeshPhongMaterial({
@@ -321,11 +320,12 @@ use these textures and set an <a href="/docs/#api/en/materials/Material#alphaTes
 +makeInstance(geometry, 'white', 0,             'resources/images/tree-01.png');
 +makeInstance(geometry, 'white', Math.PI * 0.5, 'resources/images/tree-02.png');
 </pre>
-<p>Before we run this let's add a small UI so we can more easily play with the <code class="notranslate" translate="no">alphaTest</code>
-and <code class="notranslate" translate="no">transparent</code> settings. We'll use lil-gui like we introduced
-in the <a href="scenegraph.html">article on three.js's scenegraph</a>.</p>
-<p>First we'll make a helper for lil-gui that sets every material in the scene
-to a value</p>
+<p>Avant d'exécuter cela, ajoutons une petite interface utilisateur pour pouvoir jouer
+plus facilement avec les paramètres <code class="notranslate" translate="no">alphaTest</code>
+et <code class="notranslate" translate="no">transparent</code>. Nous utiliserons lil-gui comme nous l'avons présenté
+dans <a href="scenegraph.html">l'article sur le graphe de scène de three.js</a>.</p>
+<p>D'abord, nous allons créer un assistant pour lil-gui qui définit une valeur
+pour chaque matériau de la scène</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class AllMaterialPropertyGUIHelper {
   constructor(prop, scene) {
     this.prop = prop;
@@ -352,7 +352,7 @@ to a value</p>
   }
 }
 </pre>
-<p>Then we'll add the gui</p>
+<p>Ensuite, nous allons ajouter la GUI</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.add(new AllMaterialPropertyGUIHelper('alphaTest', scene), 'value', 0, 1)
     .name('alphaTest')
@@ -361,33 +361,33 @@ gui.add(new AllMaterialPropertyGUIHelper('transparent', scene), 'value')
     .name('transparent')
     .onChange(requestRenderIfNotRequested);
 </pre>
-<p>and of course we need to include lil-gui</p>
+<p>et bien sûr, nous devons inclure lil-gui</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 +import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
-<p>and here's the results</p>
+<p>et voici les résultats</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-alphatest.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-alphatest.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-alphatest.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>You can see it works but zoom in and you'll see one plane has white lines.</p>
+<p>Vous pouvez voir que cela fonctionne, mais zoomez et vous verrez qu'un plan a des lignes blanches.</p>
 <div class="threejs_center"><img src="../resources/images/transparency-alphatest-issues.png" style="width: 532px;"></div>
 
-<p>This is the same depth issue from before. That plane was drawn first
-so the plane behind is not drawn. There is no perfect solution.
-Adjust the <code class="notranslate" translate="no">alphaTest</code> and/or turn off <code class="notranslate" translate="no">transparent</code> to find a solution
-that fits your use case.</p>
-<p>The take way from this article is perfect transparency is hard.
-There are issues and trade offs and workarounds.</p>
-<p>For example say you have a car.
-Cars usually have windshields on all 4 sides. If you want to avoid the sorting issues
-above you'd have to make each window its own object so that three.js can
-sort the windows and draw them in the correct order.</p>
-<p>If you are making some plants or grass the alpha test solution is common.</p>
-<p>Which solution you pick depends on your needs. </p>
+<p>C'est le même problème de profondeur qu'auparavant. Ce plan a été dessiné en premier,
+donc le plan derrière n'est pas dessiné. Il n'y a pas de solution parfaite.
+Ajustez l'<code class="notranslate" translate="no">alphaTest</code> et/ou désactivez <code class="notranslate" translate="no">transparent</code> pour trouver une solution
+qui correspond à votre cas d'utilisation.</p>
+<p>Ce qu'il faut retenir de cet article, c'est que la transparence parfaite est difficile.
+Il y a des problèmes, des compromis et des solutions de contournement.</p>
+<p>Par exemple, supposons que vous ayez une voiture.
+Les voitures ont généralement des pare-brise sur les 4 côtés. Si vous voulez éviter les problèmes de tri
+mentionnés ci-dessus, vous devrez faire de chaque vitre son propre objet afin que three.js puisse
+trier les vitres et les dessiner dans le bon ordre.</p>
+<p>Si vous créez des plantes ou de l'herbe, la solution du test alpha est courante.</p>
+<p>La solution que vous choisissez dépend de vos besoins. </p>
 
         </div>
       </div>

@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Creating a scene</title>
+    <title>Création d'une scène</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Creating a scene">
+    <meta name="twitter:title" content="Three.js – Création d'une scène">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,22 +22,22 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Creating a scene</h1>
+        <h1>Création d'une scène</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-            
-          <p>The goal of this section is to give a brief introduction to three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page in case you get stuck and need help.</p>
 
-		<h2>Before we start</h2>
+          <p>L'objectif de cette section est de donner une brève introduction à three.js. Nous allons commencer par mettre en place une scène, avec un cube en rotation. Un exemple fonctionnel est fourni en bas de la page au cas où vous seriez bloqué et auriez besoin d'aide.</p>
+
+		<h2>Avant de commencer</h2>
 
 		<p>
-			If you haven't yet, go through the `Installation` guide. We'll assume you've already set up the same project structure (including <i>index.html</i> and <i>main.js</i>), have installed three.js, and are either running a build tool, or using a local server with a CDN and import maps.
+			Si vous ne l'avez pas encore fait, consultez le guide `Installation`. Nous allons supposer que vous avez déjà mis en place la même structure de projet (y compris <i>index.html</i> et <i>main.js</i>), que vous avez installé three.js, et que vous utilisez soit un outil de build, soit un serveur local avec un CDN et des import maps.
 		</p>
 
-		<h2>Creating the scene</h2>
+		<h2>Création de la scène</h2>
 
-		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
+		<p>Pour pouvoir réellement afficher quelque chose avec three.js, nous avons besoin de trois éléments : une scène, une caméra et un renderer, afin de pouvoir rendre la scène avec la caméra.</p>
 
 		<p><i>main.js —</i></p>
 
@@ -52,23 +52,23 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 </pre>
 
-		<p>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer.</p>
+		<p>Prenons un moment pour expliquer ce qui se passe ici. Nous avons maintenant mis en place la scène, notre caméra et le renderer.</p>
 
-		<p>There are a few different cameras in three.js. For now, let's use a `PerspectiveCamera`.</p>
+		<p>Il existe plusieurs caméras différentes dans three.js. Pour l'instant, utilisons une `PerspectiveCamera`.</p>
 
-		<p>The first attribute is the `field of view`. FOV is the extent of the scene that is seen on the display at any given moment. The value is in degrees.</p>
+		<p>Le premier attribut est le `champ de vision`. Le champ de vision est l'étendue de la scène vue sur l'écran à un moment donné. La valeur est en degrés.</p>
 
-		<p>The second one is the `aspect ratio`. You almost always want to use the width of the element divided by the height, or you'll get the same result as when you play old movies on a widescreen TV - the image looks squished.</p>
+		<p>Le second est le `ratio d'aspect`. Vous voudrez presque toujours utiliser la largeur de l'élément divisée par la hauteur, sinon vous obtiendrez le même résultat que lorsque vous regardez de vieux films sur un téléviseur grand écran - l'image semble écrasée.</p>
 
-		<p>The next two attributes are the `near` and `far` clipping plane. What that means, is that objects further away from the camera than the value of `far` or closer than `near` won't be rendered. You don't have to worry about this now, but you may want to use other values in your apps to get better performance.</p>
+		<p>Les deux attributs suivants sont les plans de découpe `near` et `far`. Cela signifie que les objets plus éloignés de la caméra que la valeur de `far` ou plus proches que `near` ne seront pas rendus. Vous n'avez pas à vous en soucier maintenant, mais vous pourriez vouloir utiliser d'autres valeurs dans vos applications pour obtenir de meilleures performances.</p>
 
-		<p>Next up is the renderer. In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give `setSize` smaller values, like `window.innerWidth/2` and `window.innerHeight/2`, which will make the app render at quarter size.</p>
+		<p>Ensuite, il y a le renderer. En plus de créer l'instance du renderer, nous devons également définir la taille à laquelle nous voulons qu'il rende notre application. C'est une bonne idée d'utiliser la largeur et la hauteur de la zone que nous voulons remplir avec notre application - dans ce cas, la largeur et la hauteur de la fenêtre du navigateur. Pour les applications gourmandes en performances, vous pouvez également donner à `setSize` des valeurs plus petites, comme `window.innerWidth/2` et `window.innerHeight/2`, ce qui rendra l'application à un quart de la taille.</p>
 
-		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling `setSize` with false as `updateStyle` (the third argument). For example, `setSize(window.innerWidth/2, window.innerHeight/2, false)` will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
+		<p>Si vous souhaitez conserver la taille de votre application mais la rendre à une résolution inférieure, vous pouvez le faire en appelant `setSize` avec false pour `updateStyle` (le troisième argument). Par exemple, `setSize(window.innerWidth/2, window.innerHeight/2, false)` rendra votre application à la moitié de la résolution, étant donné que votre &lt;canvas&gt; a une largeur et une hauteur de 100%.</p>
 
-		<p>Last but not least, we add the `renderer` element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</p>
+		<p>Enfin et surtout, nous ajoutons l'élément `renderer` à notre document HTML. Il s'agit d'un élément &lt;canvas&gt; que le renderer utilise pour nous afficher la scène.</p>
 
-		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
+		<p><em>"Tout cela est bien beau, mais où est ce cube que vous avez promis ?"</em> Ajoutons-le maintenant.</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
 const geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -79,17 +79,17 @@ scene.add( cube );
 camera.position.z = 5;
 </pre>
 
-		<p>To create a cube, we need a `BoxGeometry`. This is an object that contains all the points (`vertices`) and fill (`faces`) of the cube. We'll explore this more in the future.</p>
+		<p>Pour créer un cube, nous avons besoin d'une `BoxGeometry`. C'est un objet qui contient tous les points (`vertices`) et les faces (`faces`) du cube. Nous explorerons cela plus en détail à l'avenir.</p>
 
-		<p>In addition to the geometry, we need a material to color it. Three.js comes with several materials, but we'll stick to the `MeshBasicMaterial` for now. All materials take an object of properties which will be applied to them. To keep things very simple, we only supply a color attribute of `0x00ff00`, which is green. This works the same way that colors work in CSS or Photoshop (`hex colors`).</p>
+		<p>En plus de la géométrie, nous avons besoin d'un matériau pour le colorer. Three.js est livré avec plusieurs matériaux, mais nous nous en tiendrons au `MeshBasicMaterial` pour l'instant. Tous les matériaux acceptent un objet de propriétés qui leur seront appliquées. Pour rester très simple, nous ne fournissons qu'un attribut de couleur de `0x00ff00`, qui est vert. Cela fonctionne de la même manière que les couleurs fonctionnent en CSS ou dans Photoshop (`couleurs hexadécimales`).</p>
 
-		<p>The third thing we need is a `Mesh`. A mesh is an object that takes a geometry, and applies a material to it, which we then can insert to our scene, and move freely around.</p>
+		<p>La troisième chose dont nous avons besoin est un `Mesh`. Un mesh est un objet qui prend une géométrie et lui applique un matériau, que nous pouvons ensuite insérer dans notre scène et déplacer librement.</p>
 
-		<p>By default, when we call `scene.add()`, the thing we add will be added to the coordinates `(0,0,0)`. This would cause both the camera and the cube to be inside each other. To avoid this, we simply move the camera out a bit.</p>
+		<p>Par défaut, lorsque nous appelons `scene.add()`, l'élément que nous ajoutons sera placé aux coordonnées `(0,0,0)`. Cela entraînerait la caméra et le cube à être l'un dans l'autre. Pour éviter cela, nous déplaçons simplement un peu la caméra.</p>
 
-		<h2>Rendering the scene</h2>
+		<h2>Rendu de la scène</h2>
 
-		<p>If you copied the code from above into the main.js file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a render or animation loop.</p>
+		<p>Si vous copiez le code ci-dessus dans le fichier main.js que nous avons créé précédemment, vous ne verriez rien. C'est parce que nous ne faisons pas encore de rendu. Pour cela, nous avons besoin de ce qu'on appelle une boucle de rendu ou d'animation.</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
 function animate() {
@@ -98,25 +98,25 @@ function animate() {
 renderer.setAnimationLoop( animate );
 </pre>
 
-		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but `requestAnimationFrame` which is internally used in `WebGLRenderer` has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
+		<p>Cela créera une boucle qui force le renderer à dessiner la scène chaque fois que l'écran est rafraîchi (sur un écran typique, cela signifie 60 fois par seconde). Si vous êtes nouveau dans l'écriture de jeux dans le navigateur, vous pourriez vous dire <em>"pourquoi ne pas simplement créer un setInterval ?"</em> Le fait est que nous pourrions, mais `requestAnimationFrame`, qui est utilisé en interne dans `WebGLRenderer`, présente plusieurs avantages. Le plus important est peut-être qu'il se met en pause lorsque l'utilisateur navigue vers un autre onglet du navigateur, ne gaspillant ainsi pas sa précieuse puissance de traitement et sa batterie.</p>
 
-		<h2>Animating the cube</h2>
+		<h2>Animation du cube</h2>
 
-		<p>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</p>
+		<p>Si vous insérez tout le code ci-dessus dans le fichier que vous avez créé avant de commencer, vous devriez voir une boîte verte. Rendons le tout un peu plus intéressant en la faisant tourner.</p>
 
-		<p>Add the following code right above the `renderer.render` call in your `animate` function:</p>
+		<p>Ajoutez le code suivant juste au-dessus de l'appel `renderer.render` dans votre fonction `animate` :</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
 cube.rotation.x += 0.01;
 cube.rotation.y += 0.01;
 </pre>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animation loop. You can of course call other functions from there, so that you don't end up with an `animate` function that's hundreds of lines.</p>
+		<p>Cela sera exécuté à chaque image (normalement 60 fois par seconde), et donnera au cube une belle animation de rotation. En gros, tout ce que vous voulez déplacer ou modifier pendant que l'application est en cours d'exécution doit passer par la boucle d'animation. Vous pouvez bien sûr appeler d'autres fonctions à partir de là, afin de ne pas vous retrouver avec une fonction `animate` qui fait des centaines de lignes.</p>
 
-		<h2>The result</h2>
-		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>
+		<h2>Le résultat</h2>
+		<p>Félicitations ! Vous avez maintenant terminé votre première application three.js. C'est simple, mais il faut bien commencer quelque part.</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/tswh48fL/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>Le code complet est disponible ci-dessous et sous forme d'un [link:https://jsfiddle.net/tswh48fL/ exemple interactif] modifiable. N'hésitez pas à jouer avec pour mieux comprendre son fonctionnement.</p>
 
 		<p><i>index.html —</i></p>
 

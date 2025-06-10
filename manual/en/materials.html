@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="utf-8">
-    <title>Materials</title>
+    <title>Matériaux</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Materials">
+    <meta name="twitter:title" content="Three.js – Matériaux">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,54 +22,52 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Materials</h1>
+        <h1>Matériaux</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>This article is part of a series of articles about three.js. The
-first article is <a href="fundamentals.html">three.js fundamentals</a>. If
-you haven't read that yet and you're new to three.js you might want to
-consider starting there.</p>
-<p>Three.js provides several types of materials.
-They define how objects will appear in the scene.
-Which materials you use really depends on what you're trying to
-accomplish.</p>
-<p>There are 2 ways to set most material properties. One at creation time which
-we've seen before.</p>
+          <p>Cet article fait partie d'une série d'articles sur three.js. Le
+premier article est <a href="fundamentals.html">les fondamentaux de three.js</a>. Si
+vous ne l'avez pas encore lu et que vous débutez avec three.js, vous voudrez peut-être
+considérer de commencer par là.</p>
+<p>Three.js fournit plusieurs types de matériaux.
+Ils définissent l'apparence des objets dans la scène.
+Le choix des matériaux que vous utilisez dépend vraiment de ce que vous essayez d'accomplir.</p>
+<p>Il existe 2 façons de définir la plupart des propriétés des matériaux. L'une au moment de la création, ce que nous avons déjà vu.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
-  color: 0xFF0000,    // red (can also use a CSS color string here)
+  color: 0xFF0000,    // rouge (peut aussi utiliser une chaîne de couleur CSS ici)
   flatShading: true,
 });
 </pre>
-<p>The other is after creation</p>
+<p>L'autre est après la création</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial();
 material.color.setHSL(0, 1, .5);  // red
 material.flatShading = true;
 </pre>
-<p>note that properties of type <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> have multiple ways to be set.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">material.color.set(0x00FFFF);    // same as CSS's #RRGGBB style
-material.color.set(cssString);   // any CSS color, eg 'purple', '#F32',
+<p>notez que les propriétés de type <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> peuvent être définies de plusieurs manières.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">material.color.set(0x00FFFF);    // identique au style #RRGGBB de CSS
+material.color.set(cssString);   // n'importe quelle couleur CSS, par ex. 'purple', '#F32',
                                  // 'rgb(255, 127, 64)',
                                  // 'hsl(180, 50%, 25%)'
-material.color.set(someColor)    // some other THREE.Color
-material.color.setHSL(h, s, l)   // where h, s, and l are 0 to 1
-material.color.setRGB(r, g, b)   // where r, g, and b are 0 to 1
+material.color.set(someColor)    // une autre couleur THREE.Color
+material.color.setHSL(h, s, l)   // où h, s et l sont entre 0 et 1
+material.color.setRGB(r, g, b)   // où r, g et b sont entre 0 et 1
 </pre>
-<p>And at creation time you can pass either a hex number or a CSS string</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const m1 = new THREE.MeshBasicMaterial({color: 0xFF0000});         // red
-const m2 = new THREE.MeshBasicMaterial({color: 'red'});            // red
-const m3 = new THREE.MeshBasicMaterial({color: '#F00'});           // red
-const m4 = new THREE.MeshBasicMaterial({color: 'rgb(255,0,0)'});   // red
-const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'}); // red
+<p>Et au moment de la création, vous pouvez passer soit un nombre hexadécimal, soit une chaîne CSS</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const m1 = new THREE.MeshBasicMaterial({color: 0xFF0000});         // rouge
+const m2 = new THREE.MeshBasicMaterial({color: 'red'});            // rouge
+const m3 = new THREE.MeshBasicMaterial({color: '#F00'});           // rouge
+const m4 = new THREE.MeshBasicMaterial({color: 'rgb(255,0,0)'});   // rouge
+const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'}); // rouge
 </pre>
-<p>So let's go over three.js's set of materials.</p>
-<p>The <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> is not affected by lights.
-The <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> computes lighting only at the vertices vs the <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> which computes lighting at every pixel. The <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>
-also supports specular highlights.</p>
+<p>Passons donc en revue l'ensemble des matériaux de three.js.</p>
+<p>Le <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> n'est pas affecté par les lumières.
+Le <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> calcule l'éclairage uniquement au niveau des sommets, contrairement au <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> qui calcule l'éclairage à chaque pixel. Le <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>
+prend également en charge les reflets spéculaires.</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshBasicMaterial"></div>
-    <div class="code">Basic</div>
+    <div class="code">Basique</div>
   </div>
   <div>
     <div data-diagram="MeshLambertMaterial"></div>
@@ -91,9 +89,9 @@ also supports specular highlights.</p>
     <div data-diagram="MeshPhongMaterialLowPoly"></div>
   </div>
 </div>
-<div class="threejs_center code">low-poly models with same materials</div>
+<div class="threejs_center code">modèles low-poly avec les mêmes matériaux</div>
 
-<p>The <code class="notranslate" translate="no">shininess</code> setting of the <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> determines the <em>shininess</em> of the specular highlight. It defaults to 30.</p>
+<p>Le réglage <code class="notranslate" translate="no">shininess</code> du <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> détermine la <em>brillance</em> du reflet spéculaire. Il est par défaut de 30.</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshPhongMaterialShininess0"></div>
@@ -109,14 +107,14 @@ also supports specular highlights.</p>
   </div>
 </div>
 
-<p>Note that setting the <code class="notranslate" translate="no">emissive</code> property to a color on either a
-<a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> or a <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> and setting the <code class="notranslate" translate="no">color</code> to black
-(and <code class="notranslate" translate="no">shininess</code> to 0 for phong) ends up looking just like the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
+<p>Notez qu'en définissant la propriété <code class="notranslate" translate="no">emissive</code> à une couleur sur un
+<a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ou un <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>, et en définissant la <code class="notranslate" translate="no">color</code> en noir
+(et <code class="notranslate" translate="no">shininess</code> à 0 pour phong), on obtient une apparence similaire au <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshBasicMaterialCompare"></div>
     <div class="code">
-      <div>Basic</div>
+      <div>Basique</div>
       <div>color: 'purple'</div>
     </div>
   </div>
@@ -139,95 +137,96 @@ also supports specular highlights.</p>
   </div>
 </div>
 
-<p>Why have all 3 when <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> can do the same things as <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>
-and <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>? The reason is the more sophisticated material
-takes more GPU power to draw. On a slower GPU like say a mobile phone
-you might want to reduce the GPU power needed to draw your scene by
-using one of the less complex materials. It also follows that if you
-don't need the extra features then use the simplest material. If you don't
-need the lighting and the specular highlight then use the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
-<p>The <a href="/docs/#api/en/materials/MeshToonMaterial"><code class="notranslate" translate="no">MeshToonMaterial</code></a> is similar to the <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>
-with one big difference. Rather than shading smoothly it uses a gradient map
-(an X by 1 texture) to decide how to shade. The default uses a gradient map
-that is 70% brightness for the first 70% and 100% after but you can supply your
-own gradient map. This ends up giving a 2 tone look that looks like a cartoon.</p>
+<p>Pourquoi avoir les 3 alors que le <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> peut faire les mêmes choses que le <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>
+et le <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ? La raison est que le matériau le plus sophistiqué
+nécessite plus de puissance GPU pour être dessiné. Sur un GPU plus lent,
+comme celui d'un téléphone mobile, vous pourriez vouloir réduire la puissance GPU
+nécessaire pour dessiner votre scène en utilisant l'un des matériaux les moins complexes.
+Il s'ensuit également que si vous n'avez pas besoin des fonctionnalités supplémentaires,
+utilisez le matériau le plus simple. Si vous n'avez pas besoin de l'éclairage et
+du reflet spéculaire, utilisez le <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
+<p>Le <a href="/docs/#api/en/materials/MeshToonMaterial"><code class="notranslate" translate="no">MeshToonMaterial</code></a> est similaire au <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>
+avec une grande différence. Plutôt que d'ombrer en douceur, il utilise une carte de dégradé
+(une texture de X par 1) pour décider comment ombrer. La valeur par défaut utilise une carte de dégradé
+qui a une luminosité de 70% pour les 70 premiers % et 100% après, mais vous pouvez fournir votre
+propre carte de dégradé. Cela donne finalement un aspect bicolore qui ressemble à un dessin animé.</p>
 <div class="spread">
   <div data-diagram="MeshToonMaterial"></div>
 </div>
 
-<p>Next up there are 2 <em>physically based rendering</em> materials. Physically Based
-Rendering is often abbreviated PBR.</p>
-<p>The materials above use simple math to make materials that look 3D but they
-aren't what actually happens in real world. The 2 PBR materials use much more
-complex math to come close to what actually happens in the real world.</p>
-<p>The first one is <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>. The biggest difference between
-<a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> and <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> is it uses different parameters.
-<a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> had a <code class="notranslate" translate="no">shininess</code> setting. <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> has 2
-settings <code class="notranslate" translate="no">roughness</code> and <code class="notranslate" translate="no">metalness</code>.</p>
-<p>At a basic level <a href="/docs/#api/en/materials/MeshStandardMaterial#roughness"><code class="notranslate" translate="no">roughness</code></a> is the opposite
-of <code class="notranslate" translate="no">shininess</code>. Something that has a high roughness, like a baseball doesn't
-have hard reflections whereas something that's not rough, like a billiard ball,
-is very shiny. Roughness goes from 0 to 1.</p>
-<p>The other setting, <a href="/docs/#api/en/materials/MeshStandardMaterial#metalness"><code class="notranslate" translate="no">metalness</code></a>, says
-how metal the material is. Metals behave differently than non-metals. 0
-for non-metal and 1 for metal.</p>
-<p>Here's a quick sample of <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> with <code class="notranslate" translate="no">roughness</code> from 0 to 1
-across and <code class="notranslate" translate="no">metalness</code> from 0 to 1 down.</p>
+<p>Ensuite, il y a 2 matériaux basés sur le <em>rendu physique</em>. Le rendu basé sur le physique
+est souvent abrégé PBR (Physically Based Rendering).</p>
+<p>Les matériaux ci-dessus utilisent des calculs simples pour créer des matériaux qui ressemblent à de la 3D, mais ils
+ne correspondent pas à ce qui se passe réellement dans le monde réel. Les 2 matériaux PBR utilisent des calculs beaucoup plus
+complexes pour se rapprocher de ce qui se passe réellement dans le monde réel.</p>
+<p>Le premier est <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>. La plus grande différence entre
+<a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> et <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> est qu'il utilise des paramètres différents.
+<a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> avait un réglage <code class="notranslate" translate="no">shininess</code>. <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> a 2
+réglages : <code class="notranslate" translate="no">roughness</code> et <code class="notranslate" translate="no">metalness</code>.</p>
+<p>À un niveau basique, <a href="/docs/#api/en/materials/MeshStandardMaterial#roughness"><code class="notranslate" translate="no">roughness</code></a> est l'opposé
+de <code class="notranslate" translate="no">shininess</code>. Quelque chose qui a une rugosité élevée, comme une balle de baseball, n'a pas
+de reflets nets, tandis que quelque chose qui n'est pas rugueux, comme une boule de billard,
+est très brillant. La rugosité va de 0 à 1.</p>
+<p>L'autre réglage, <a href="/docs/#api/en/materials/MeshStandardMaterial#metalness"><code class="notranslate" translate="no">metalness</code></a>,
+indique à quel point le matériau est métallique. Les métaux se comportent différemment des non-métaux. 0
+pour non-métal et 1 pour métal.</p>
+<p>Voici un exemple rapide du <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> avec une <code class="notranslate" translate="no">roughness</code> de 0 à 1
+horizontalement et une <code class="notranslate" translate="no">metalness</code> de 0 à 1 verticalement.</p>
 <div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
 
-<p>The <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> is same as the <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> but it
-adds a <code class="notranslate" translate="no">clearcoat</code> parameter that goes from 0 to 1 for how much to
-apply a clearcoat gloss layer and a <code class="notranslate" translate="no">clearCoatRoughness</code> parameter
-that specifies how rough the gloss layer is.</p>
-<p>Here's the same grid of <code class="notranslate" translate="no">roughness</code> by <code class="notranslate" translate="no">metalness</code> as above but with
-<code class="notranslate" translate="no">clearcoat</code> and <code class="notranslate" translate="no">clearCoatRoughness</code> settings.</p>
+<p>Le <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> est identique au <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> mais il
+ajoute un paramètre <code class="notranslate" translate="no">clearcoat</code> qui va de 0 à 1 pour la quantité à
+appliquer une couche de vernis brillant, et un paramètre <code class="notranslate" translate="no">clearCoatRoughness</code>
+qui spécifie la rugosité de la couche brillante.</p>
+<p>Voici la même grille de <code class="notranslate" translate="no">roughness</code> par <code class="notranslate" translate="no">metalness</code> que ci-dessus, mais avec
+les réglages <code class="notranslate" translate="no">clearcoat</code> et <code class="notranslate" translate="no">clearCoatRoughness</code>.</p>
 <div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
 
-<p>The various standard materials progress from fastest to slowest
+<p>Les différents matériaux standard progressent du plus rapide au plus lent :
 <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> ➡
-<a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>. The slower materials
-can make more realistic looking scenes but you might need to design
-your code to use the faster materials on low powered or mobile machines.</p>
-<p>There are 3 materials that have special uses. <a href="/docs/#api/en/materials/ShadowMaterial"><code class="notranslate" translate="no">ShadowMaterial</code></a>
-is used to get the data created from shadows. We haven't
-covered shadows yet. When we do we'll use this material
-to take a peek at what's happening behind the scenes.</p>
-<p>The <a href="/docs/#api/en/materials/MeshDepthMaterial"><code class="notranslate" translate="no">MeshDepthMaterial</code></a> renders the depth of each pixel where
-pixels at negative <a href="/docs/#api/en/cameras/PerspectiveCamera#near"><code class="notranslate" translate="no">near</code></a> of the camera are 0 and negative <a href="/docs/#api/en/cameras/PerspectiveCamera#far"><code class="notranslate" translate="no">far</code></a> are 1. Certain special effects can use this data which we'll
-get into at another time.</p>
+<a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>. Les matériaux plus lents
+peuvent créer des scènes plus réalistes, mais vous pourriez devoir concevoir
+votre code pour utiliser les matériaux plus rapides sur des machines
+moins puissantes ou mobiles.</p>
+<p>Il existe 3 matériaux qui ont des usages spéciaux. Le <a href="/docs/#api/en/materials/ShadowMaterial"><code class="notranslate" translate="no">ShadowMaterial</code></a>
+est utilisé pour obtenir les données créées par les ombres. Nous n'avons pas
+encore abordé les ombres. Lorsque nous le ferons, nous utiliserons ce matériau
+pour jeter un œil à ce qui se passe en coulisses.</p>
+<p>Le <a href="/docs/#api/en/materials/MeshDepthMaterial"><code class="notranslate" translate="no">MeshDepthMaterial</code></a> rend la profondeur de chaque pixel, où
+les pixels à <a href="/docs/#api/en/cameras/PerspectiveCamera#near"><code class="notranslate" translate="no">near</code></a> négatif de la caméra sont à 0 et les pixels à <a href="/docs/#api/en/cameras/PerspectiveCamera#far"><code class="notranslate" translate="no">far</code></a> négatif sont à 1. Certains effets spéciaux peuvent utiliser ces données, que nous aborderons
+ultérieurement.</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshDepthMaterial"></div>
   </div>
 </div>
 
-<p>The <a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> will show you the <em>normals</em> of geometry.
-<em>Normals</em> are the direction a particular triangle or pixel faces.
-<a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> draws the view space normals (the normals relative to the camera).
-<span style="background: red;" class="color">x is red</span>,
-<span style="background: green;" class="dark-color">y is green</span>, and
-<span style="background: blue;" class="dark-color">z is blue</span> so things facing
-to the right will be <span style="background: #FF7F7F;" class="color">pink</span>,
-to the left will be <span style="background: #007F7F;" class="dark-color">aqua</span>,
-up will be <span style="background: #7FFF7F;" class="color">light green</span>,
-down will be <span style="background: #7F007F;" class="dark-color">purple</span>,
-and toward the screen will be <span style="background: #7F7FFF;" class="color">lavender</span>.</p>
+<p>Le <a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> vous montrera les <em>normales</em> de la géométrie.
+Les <em>normales</em> sont la direction vers laquelle un triangle ou un pixel particulier est orienté.
+Le <a href="/docs/#api/en/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a> dessine les normales dans l'espace de vue (les normales relatives à la caméra).
+<span style="background: red;" class="color">x est rouge</span>,
+<span style="background: green;" class="dark-color">y est vert</span>, et
+<span style="background: blue;" class="dark-color">z est bleu</span>, donc les éléments orientés
+vers la droite seront <span style="background: #FF7F7F;" class="color">roses</span>,
+vers la gauche seront <span style="background: #007F7F;" class="dark-color">aigues-marines</span>,
+vers le haut seront <span style="background: #7FFF7F;" class="color">vert clair</span>,
+vers le bas seront <span style="background: #7F007F;" class="dark-color">mauves</span>,
+et vers l'écran seront <span style="background: #7F7FFF;" class="color">lavande</span>.</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshNormalMaterial"></div>
   </div>
 </div>
 
-<p><a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> is for making custom materials using the three.js shader
-system. <a href="/docs/#api/en/materials/RawShaderMaterial"><code class="notranslate" translate="no">RawShaderMaterial</code></a> is for making entirely custom shaders with
-no help from three.js. Both of these topics are large and will be
-covered later.</p>
-<p>Most materials share a bunch of settings all defined by <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>.
-<a href="/docs/#api/en/materials/Material">See the docs</a>
-for all of them but let's go over two of the most commonly used
-properties.</p>
-<p><a href="/docs/#api/en/materials/Material#flatShading"><code class="notranslate" translate="no">flatShading</code></a>:
-whether or not the object looks faceted or smooth. default = <code class="notranslate" translate="no">false</code>.</p>
+<p><a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> sert à créer des matériaux personnalisés en utilisant le système de shaders de three.js.
+Le <a href="/docs/#api/en/materials/RawShaderMaterial"><code class="notranslate" translate="no">RawShaderMaterial</code></a> sert à créer des shaders entièrement personnalisés avec
+aucune aide de three.js. Ces deux sujets sont vastes et seront
+abordés plus tard.</p>
+<p>La plupart des matériaux partagent un ensemble de réglages tous définis par <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>.
+<a href="/docs/#api/en/materials/Material">Voir la documentation</a>
+pour tous les détails, mais passons en revue deux des propriétés les plus couramment utilisées.</p>
+<p><a href="/docs/#api/en/materials/Material#flatShading"><code class="notranslate" translate="no">flatShading</code></a> :
+si l'objet a un aspect facetté ou lisse. par défaut = <code class="notranslate" translate="no">false</code>.</p>
 <div class="spread">
   <div>
     <div data-diagram="smoothShading"></div>
@@ -239,13 +238,13 @@ whether or not the object looks faceted or smooth. default = <code class="notran
   </div>
 </div>
 
-<p><a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a>: which sides of triangles to show. The default is <code class="notranslate" translate="no">THREE.FrontSide</code>.
-Other options are <code class="notranslate" translate="no">THREE.BackSide</code> and <code class="notranslate" translate="no">THREE.DoubleSide</code> (both sides).
-Most 3D objects drawn in three are probably opaque solids so the back sides
-(the sides facing inside the solid) do not need to be drawn. The most common
-reason to set <code class="notranslate" translate="no">side</code> is for planes or other non-solid objects where it is
-common to see the back sides of triangles.</p>
-<p>Here are 6 planes drawn with <code class="notranslate" translate="no">THREE.FrontSide</code> and <code class="notranslate" translate="no">THREE.DoubleSide</code>.</p>
+<p><a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> : quels côtés des triangles afficher. La valeur par défaut est <code class="notranslate" translate="no">THREE.FrontSide</code>.
+Les autres options sont <code class="notranslate" translate="no">THREE.BackSide</code> et <code class="notranslate" translate="no">THREE.DoubleSide</code> (les deux côtés).
+La plupart des objets 3D dessinés dans three.js sont probablement des solides opaques, de sorte que les côtés arrière
+(les côtés faisant face à l'intérieur du solide) n'ont pas besoin d'être dessinés. La raison la plus courante
+de définir <code class="notranslate" translate="no">side</code> est pour les plans ou d'autres objets non solides où il est
+courant de voir les côtés arrière des triangles.</p>
+<p>Voici 6 plans dessinés avec <code class="notranslate" translate="no">THREE.FrontSide</code> et <code class="notranslate" translate="no">THREE.DoubleSide</code>.</p>
 <div class="spread">
   <div>
     <div data-diagram="sideDefault" style="height: 250px;"></div>
@@ -257,39 +256,39 @@ common to see the back sides of triangles.</p>
   </div>
 </div>
 
-<p>There's really a lot to consider with materials and we actually still
-have a bunch more to go. In particular we've mostly ignored textures
-which open up a whole slew of options. Before we cover textures though
-we need to take a break and cover
-<a href="setup.html">setting up your development environment</a></p>
+<p>Il y a vraiment beaucoup de choses à considérer avec les matériaux et nous avons encore
+beaucoup plus à voir. En particulier, nous avons principalement ignoré les textures
+qui ouvrent tout un éventail d'options. Avant de couvrir les textures, cependant,
+nous devons faire une pause et aborder la
+<a href="setup.html">configuration de votre environnement de développement</a></p>
 <div class="threejs_bottombar">
 <h3>material.needsUpdate</h3>
 <p>
-This topic rarely affects most three.js apps but just as an FYI...
-Three.js applies material settings when a material is used where "used"
-means "something is rendered that uses the material". Some material settings are
-only applied once as changing them requires lots of work by three.js.
-In those cases you need to set <code class="notranslate" translate="no">material.needsUpdate = true</code> to tell
-three.js to apply your material changes. The most common settings
-that require you to set <code class="notranslate" translate="no">needsUpdate</code> if you change the settings after
-using the material are:
+Ce sujet affecte rarement la plupart des applications three.js, mais juste pour information...
+Three.js applique les réglages de matériau lorsqu'un matériau est utilisé, où "utilisé"
+signifie "quelque chose est rendu qui utilise le matériau". Certains réglages de matériau sont
+uniquement appliqués une fois car leur modification nécessite beaucoup de travail de la part de three.js.
+Dans ces cas, vous devez définir <code class="notranslate" translate="no">material.needsUpdate = true</code> pour indiquer
+à three.js d'appliquer vos modifications de matériau. Les réglages les plus courants
+qui nécessitent de définir <code class="notranslate" translate="no">needsUpdate</code> si vous modifiez les réglages après
+avoir utilisé le matériau sont :
 </p>
 <ul>
   <li><code class="notranslate" translate="no">flatShading</code></li>
-  <li>adding or removing a texture
+  <li>ajouter ou supprimer une texture
     <p>
-    Changing a texture is ok, but if want to switch from using no texture
-    to using a texture or from using a texture to using no texture
-    then you need to set <code class="notranslate" translate="no">needsUpdate = true</code>.
+    Changer de texture est acceptable, mais si vous voulez passer de l'absence de texture
+    à l'utilisation d'une texture, ou de l'utilisation d'une texture à l'absence de texture,
+    vous devez alors définir <code class="notranslate" translate="no">needsUpdate = true</code>.
     </p>
-    <p>In the case of going from texture to no-texture it is often
-    just better to use a 1x1 pixel white texture.</p>
+    <p>Dans le cas où vous passez d'une texture à l'absence de texture, il est souvent
+    simplement préférable d'utiliser une texture blanche de 1x1 pixel.</p>
   </li>
 </ul>
-<p>As mentioned above most apps never run into these issues. Most apps
-do not switch between flat shaded and non flat shaded. Most apps also
-either use textures or a solid color for a given material, they rarely
-switch from using one to using the other.
+<p>Comme mentionné ci-dessus, la plupart des applications ne rencontrent jamais ces problèmes. La plupart des applications
+ne basculent pas entre l'ombrage plat et l'ombrage non plat. La plupart des applications
+utilisent également soit des textures, soit une couleur unie pour un matériau donné, elles changent rarement
+de l'une à l'autre.
 </p>
 </div>
 
