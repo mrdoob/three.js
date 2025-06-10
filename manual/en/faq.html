@@ -27,59 +27,56 @@
       <div class="lesson">
         <div class="lesson-main">
           
-          <h2>Which 3D model format is best supported?</h2>
+          <h2>Quel format de modèle 3D est le mieux pris en charge ?</h2>
           <div>
             <p>
-              The recommended format for importing and exporting assets is glTF (GL Transmission Format). Because glTF is focused on runtime asset delivery, it is compact to transmit and fast to load.
+              Le format recommandé pour l'importation et l'exportation d'actifs est le glTF (GL Transmission Format). Comme glTF est axé sur la livraison d'actifs au moment de l'exécution, il est compact à transmettre et rapide à charger.
             </p>
             <p>
-              three.js provides loaders for many other popular formats like FBX, Collada or OBJ as well. Nevertheless, you should always try to establish a glTF based workflow in your projects first. 
+              three.js fournit également des chargeurs pour de nombreux autres formats populaires comme FBX, Collada ou OBJ. Néanmoins, vous devriez toujours essayer d'établir un flux de travail basé sur glTF dans vos projets en premier lieu. 
             </p>
           </div>
       
-          <h2>Why are there meta viewport tags in examples?</h2>
+          <h2>Pourquoi y a-t-il des balises meta viewport dans les exemples ?</h2>
           <div>
             <pre class="prettyprint notranslate lang-js" translate="no">&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</pre>
       
-              <p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
+              <p>Ces balises contrôlent la taille et l'échelle de la fenêtre d'affichage (viewport) pour les navigateurs mobiles (où le contenu de la page peut être rendu à une taille différente de la fenêtre d'affichage visible).</p>
       
-              <p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+              <p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari : Utiliser la fenêtre d'affichage]</p>
       
-              <p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+              <p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN : Utiliser la balise meta viewport]</p>
           </div>
       
-          <h2>How can scene scale be preserved on resize?</h2>
+          <h2>Comment la mise à l'échelle de la scène peut-elle être préservée lors du redimensionnement ?</h2>
           <p>
-            We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
+            Nous voulons que tous les objets, quelle que soit leur distance par rapport à la caméra, apparaissent de la même taille, même lorsque la fenêtre est redimensionnée.
       
-            The key equation to solving this is this formula for the visible height at a given distance:
+            L'équation clé pour résoudre ce problème est cette formule pour la hauteur visible à une distance donnée :
       
             <pre class="prettyprint notranslate lang-js" translate="no">visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;</pre>
-            If we increase the window height by a certain percentage, then what we want is the visible height at all distances
-            to increase by the same percentage.
+            Si nous augmentons la hauteur de la fenêtre d'un certain pourcentage, alors ce que nous voulons, c'est que la hauteur visible à toutes les distances augmente du même pourcentage.
       
-            This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
-            [link:http://jsfiddle.net/Q4Jpu/ Example].
+            Cela ne peut pas être fait en changeant la position de la caméra. Au lieu de cela, vous devez changer le champ de vision (field-of-view) de la caméra.
+            [link:http://jsfiddle.net/Q4Jpu/ Exemple].
           </p>
       
-          <h2>Why is part of my object invisible?</h2>
+          <h2>Pourquoi une partie de mon objet est-elle invisible ?</h2>
           <p>
-            This could be because of face culling. Faces have an orientation that decides which side is which. And the culling removes the backside in normal circumstances. 
-            To see if this is your problem, change the material side to THREE.DoubleSide.
+            Cela pourrait être dû au culling des faces. Les faces ont une orientation qui décide quel côté est lequel. Et le culling supprime la face arrière dans des circonstances normales. 
+            Pour voir si c'est votre problème, changez le côté du matériau en THREE.DoubleSide.
             <pre class="prettyprint notranslate lang-js" translate="no">material.side = THREE.DoubleSide</pre>
           </p>
       
-          <h2>Why does three.js sometimes return strange results for invalid inputs?</h2>
+          <h2>Pourquoi three.js renvoie-t-il parfois des résultats étranges pour des entrées invalides ?</h2>
           <p>
-            For performance reasons, three.js doesn't validate inputs in most cases. It's your app's responsibility to make sure that all inputs are valid.
+            Pour des raisons de performance, three.js ne valide pas les entrées dans la plupart des cas. Il est de la responsabilité de votre application de s'assurer que toutes les entrées sont valides.
           </p>
       
-          <h2>Can I use three.js in Node.js?</h2>
+          <h2>Puis-je utiliser three.js dans Node.js ?</h2>
           <p>
-            Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be avoided by using shims like 
-            [link:https://github.com/stackgl/headless-gl headless-gl] and [link:https://github.com/rstacruz/jsdom-global jsdom-global], or by replacing components like `TextureLoader` 
-            with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull 
-            requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
+            Parce que three.js est conçu pour le web, il dépend d'API de navigateur et de DOM qui n'existent pas toujours dans Node.js. Certains de ces problèmes peuvent être évités en utilisant des shims comme 
+            [link:https://github.com/stackgl/headless-gl headless-gl] et [link:https://github.com/rstacruz/jsdom-global jsdom-global], ou en remplaçant des composants comme TextureLoader par des alternatives personnalisées. D'autres API DOM peuvent être profondément liées au code qui les utilise, et seront plus difficiles à contourner. Nous accueillons favorablement les pull requests simples et maintenables pour améliorer le support de Node.js, mais recommandons d'ouvrir un issue pour discuter de vos améliorations au préalable.
           </p>
 
         </div>

@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Types d'uniformes</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Types d'uniformes">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Types d'uniformes</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            Chaque uniforme doit avoir une propriété `value`. Le type de la valeur doit
+            correspondre au type de la variable uniforme dans le code GLSL tel que
+            spécifié pour les types GLSL primitifs dans le tableau ci-dessous. Les structures et
+            tableaux d'uniformes sont également pris en charge. Les tableaux GLSL de type primitif
+            doivent être spécifiés soit comme un tableau des objets THREE correspondants, soit
+            comme un tableau plat contenant les données de tous les objets. En d'autres termes,
+            les primitives GLSL dans les tableaux ne doivent pas être représentées par des tableaux. Cette règle
+            ne s'applique pas de manière transitive. Un tableau de tableaux `vec2`, chacun d'une longueur
+            de cinq vecteurs, doit être un tableau de tableaux, soit de cinq objets `Vector2`,
+            soit de dix `number`s.
+          </p>
+      
+          <table>
+            <thead>
+              <tr>
+                <th>GLSL type</th>
+                <th>JavaScript type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>int</td>
+                <td>Number</td>
+              </tr>
+              <tr>
+                <td>uint</td>
+                <td>Number</td>
+              </tr>
+              <tr>
+                <td>float</td>
+                <td>Number</td>
+              </tr>
+              <tr>
+                <td>bool</td>
+                <td>Boolean</td>
+              </tr>
+              <tr>
+                <td>bool</td>
+                <td>Number</td>
+              </tr>
+              <tr>
+                <td>vec2</td>
+                <td>Vector2</td>
+              </tr>
+              <tr>
+                <td>vec2</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>vec2</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>vec3</td>
+                <td>Vector3</td>
+              </tr>
+              <tr>
+                <td>vec3</td>
+                <td>Color</td>
+              </tr>
+              <tr>
+                <td>vec3</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>vec3</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>vec4</td>
+                <td>Vector4</td>
+              </tr>
+              <tr>
+                <td>vec4</td>
+                <td>Quaternion</td>
+              </tr>
+              <tr>
+                <td>vec4</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>vec4</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>mat2</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>mat2</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>mat3</td>
+                <td>Matrix3</td>
+              </tr>
+              <tr>
+                <td>mat3</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>mat3</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>mat4</td>
+                <td>Matrix4</td>
+              </tr>
+              <tr>
+                <td>mat4</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>mat4</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>ivec2, bvec2</td>
+                <td>Float32Array (*)</td>
+              </tr>
+              <tr>
+                <td>ivec2, bvec2</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>ivec3, bvec3</td>
+                <td>Int32Array (*)</td>
+              </tr>
+              <tr>
+                <td>ivec3, bvec3</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>ivec4, bvec4</td>
+                <td>Int32Array (*)</td>
+              </tr>
+              <tr>
+                <td>ivec4, bvec4</td>
+                <td>Array (*)</td>
+              </tr>
+              <tr>
+                <td>sampler2D</td>
+                <td>Texture</td>
+              </tr>
+              <tr>
+                <td>samplerCube</td>
+                <td>CubeTexture</td>
+              </tr>
+            </tbody>
+          </table>
+      
+          <p>
+            (*) De même pour un tableau (le plus interne) (dimension) du même type GLSL,
+            contenant les composants de tous les vecteurs ou matrices du tableau.
+          </p>
+      
+          <h2>Uniforms structurés</h2>
+      
+          <p>
+            Parfois, vous voulez organiser les uniformes en tant que `structs` dans votre code de shader.
+            Le style suivant doit être utilisé pour que `three.js` puisse traiter
+            les données d'uniformes structurées.
+          </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+uniforms = {
+  data: { 
+    value: {
+      position: new Vector3(), 
+      direction: new Vector3( 0, 0, 1 ) 
+    } 
+  } 
+};
+</pre>
+          Cette définition peut être mappée sur le code GLSL suivant :
+<pre class="prettyprint notranslate lang-js" translate="no">
+struct Data { 
+  vec3 position;
+  vec3 direction;
+};
+uniform Data data;
+</pre>
+      
+          <h2>Uniforms structurés avec tableaux</h2>
+      
+          <p>
+            Il est également possible de gérer des `structs` dans des tableaux. La syntaxe pour ce cas d'utilisation
+            est la suivante :
+          </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const entry1 = {
+  position: new Vector3(),
+  direction: new Vector3( 0, 0, 1 )
+};
+const entry2 = {
+  position: new Vector3( 1, 1, 1 ),
+  direction: new Vector3( 0, 1, 0 )
+};
+
+uniforms = {
+  data: {
+    value: [ entry1, entry2 ]
+  }
+};
+</pre>
+          Cette définition peut être mappée sur le code GLSL suivant :
+<pre class="prettyprint notranslate lang-js" translate="no">
+struct Data { 
+  vec3 position; 
+  vec3 direction; 
+};
+uniform Data data[ 2 ];
+</pre>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

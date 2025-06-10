@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="utf-8">
-    <title>Optimize Lots of Objects</title>
+    <title>Optimiser de nombreux objets</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Optimize Lots of Objects">
+    <meta name="twitter:title" content="Three.js – Optimiser de nombreux objets">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,26 +22,26 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Optimize Lots of Objects</h1>
+        <h1>Optimiser de nombreux objets</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>This article is part of a series of articles about three.js. The first article
-is <a href="fundamentals.html">three.js fundamentals</a>. If you haven't read that
-yet and you're new to three.js you might want to consider starting there. </p>
-<p>There are many ways to optimize things for three.js. One way is often referred
-to as <em>merging geometry</em>. Every <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> you create and three.js represents 1 or
-more requests by the system to draw something. Drawing 2 things has more
-overhead than drawing 1 even if the results are the same so one way to optimize
-is to merge meshes.</p>
-<p>Let's show an example of when this is a good solution for an issue. Let's
-re-create the <a href="https://globe.chromeexperiments.com/">WebGL Globe</a>.</p>
-<p>The first thing we need to do is get some data. The WebGL Globe said the data
-they use comes from <a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>. Checking out
-the site I saw there was <a href="https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10">demographic data in a grid
-format</a>.
-I downloaded the data at 60 minute resolution. Then I took a look at the data</p>
-<p>It looks like this</p>
+          <p>Cet article fait partie d'une série d'articles sur three.js. Le premier article
+est <a href="fundamentals.html">les bases de three.js</a>. Si vous ne l'avez pas encore lu
+et que vous débutez avec three.js, vous pourriez envisager de commencer par là. </p>
+<p>Il existe de nombreuses façons d'optimiser les choses pour three.js. Une méthode est souvent appelée
+<em>fusion de géométrie</em>. Chaque <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> que vous créez
+et three.js représente 1 ou plusieurs requêtes du système pour dessiner quelque chose.
+Dessiner 2 éléments a plus de surcoût que d'en dessiner 1 même si les résultats sont
+identiques, c'est pourquoi une façon d'optimiser est de fusionner les maillages.</p>
+<p>Montrons un exemple où cela constitue une bonne solution à un problème. Recréons le
+<a href="https://globe.chromeexperiments.com/">Globe WebGL</a>.</p>
+<p>La première chose à faire est d'obtenir des données. Le Globe WebGL a indiqué que les données
+qu'ils utilisent proviennent de <a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>.
+En consultant le site, j'ai vu qu'il y avait <a href="https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10">des données démographiques au format
+grille</a>.
+J'ai téléchargé les données à une résolution de 60 minutes. Ensuite, j'ai examiné les données</p>
+<p>Cela ressemble à ceci</p>
 <pre class="prettyprint showlinemods notranslate lang-txt" translate="no"> ncols         360
  nrows         145
  xllcorner     -180
@@ -65,31 +65,31 @@ I downloaded the data at 60 minute resolution. Then I took a look at the data</p
  1.287993 0.4395509 -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999...
  -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999 -9999 ...
 </pre>
-<p>There's a few lines that are like key/value pairs followed by lines with a value
-per grid point, one line for each row of data points.</p>
-<p>To make sure we understand the data let's try to plot it in 2D.</p>
-<p>First some code to load the text file</p>
+<p>Il y a quelques lignes qui ressemblent à des paires clé/valeur, suivies de lignes contenant une valeur
+par point de grille, une ligne pour chaque rangée de points de données.</p>
+<p>Pour nous assurer que nous comprenons les données, essayons de les afficher en 2D.</p>
+<p>D'abord, un peu de code pour charger le fichier texte</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadFile(url) {
   const res = await fetch(url);
   return res.text();
 }
 </pre>
-<p>The code above returns a <code class="notranslate" translate="no">Promise</code> with the contents of the file at <code class="notranslate" translate="no">url</code>;</p>
-<p>Then we need some code to parse the file</p>
+<p>Le code ci-dessus retourne une <code class="notranslate" translate="no">Promise</code> avec le contenu du fichier à l'adresse <code class="notranslate" translate="no">url</code>;</p>
+<p>Ensuite, nous avons besoin de code pour analyser le fichier</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function parseData(text) {
   const data = [];
   const settings = {data};
   let max;
   let min;
-  // split into lines
+  // diviser en lignes
   text.split('\n').forEach((line) =&gt; {
-    // split the line by whitespace
+    // diviser la ligne par les espaces
     const parts = line.trim().split(/\s+/);
     if (parts.length === 2) {
-      // only 2 parts, must be a key/value pair
+      // seulement 2 parties, doit être une paire clé/valeur
       settings[parts[0]] = parseFloat(parts[1]);
     } else if (parts.length &gt; 2) {
-      // more than 2 parts, must be data
+      // plus de 2 parties, doit être des données
       const values = parts.map((v) =&gt; {
         const value = parseFloat(v);
         if (value === settings.NODATA_value) {
@@ -105,24 +105,24 @@ per grid point, one line for each row of data points.</p>
   return Object.assign(settings, {min, max});
 }
 </pre>
-<p>The code above returns an object with all the key/value pairs from the file as
-well as a <code class="notranslate" translate="no">data</code> property with all the data in one large array and the <code class="notranslate" translate="no">min</code> and
-<code class="notranslate" translate="no">max</code> values found in the data.</p>
-<p>Then we need some code to draw that data</p>
+<p>Le code ci-dessus retourne un objet contenant toutes les paires clé/valeur du fichier, ainsi
+qu'une propriété <code class="notranslate" translate="no">data</code> avec toutes les données dans un grand tableau, et les valeurs <code class="notranslate" translate="no">min</code> et
+<code class="notranslate" translate="no">max</code> trouvées dans les données.</p>
+<p>Ensuite, nous avons besoin de code pour dessiner ces données</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function drawData(file) {
   const {min, max, data} = file;
   const range = max - min;
   const ctx = document.querySelector('canvas').getContext('2d');
-  // make the canvas the same size as the data
+  // rendre le canevas de la même taille que les données
   ctx.canvas.width = ncols;
   ctx.canvas.height = nrows;
-  // but display it double size so it's not too small
+  // mais l'afficher en double taille pour qu'il ne soit pas trop petit
   ctx.canvas.style.width = px(ncols * 2);
   ctx.canvas.style.height = px(nrows * 2);
-  // fill the canvas to dark gray
+  // remplir le canevas en gris foncé
   ctx.fillStyle = '#444';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  // draw each data point
+  // dessiner chaque point de donnée
   data.forEach((row, latNdx) =&gt; {
     row.forEach((value, lonNdx) =&gt; {
       if (value === undefined) {
@@ -146,26 +146,26 @@ function hsl(h, s, l) {
   return `hsl(${h * 360 | 0},${s * 100 | 0}%,${l * 100 | 0}%)`;
 }
 </pre>
-<p>And finally gluing it all together</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+<p>Et enfin, assembler le tout</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
   .then(drawData);
 </pre>
-<p>Gives us this result</p>
+<p>Nous donne ce résultat</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/gpw-data-viewer.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/gpw-data-viewer.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/gpw-data-viewer.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
 </div>
 
 <p></p>
-<p>So that seems to work. </p>
-<p>Let's try it in 3D. Starting with the code from <a href="rendering-on-demand.html">rendering on
-demand</a> We'll make one box per data in the
-file.</p>
-<p>First let's make a simple sphere with a texture of the world. Here's the texture</p>
+<p>Donc cela semble fonctionner. </p>
+<p>Essayons en 3D. En partant du code de <a href="rendering-on-demand.html">rendu à la
+demande</a> Nous allons créer une boîte par donnée dans le
+fichier.</p>
+<p>Créons d'abord une simple sphère avec une texture du monde. Voici la texture</p>
 <div class="threejs_center"><img src="../examples/resources/images/world.jpg" style="width: 600px"></div>
 
-<p>And the code to set it up.</p>
+<p>Et le code pour le configurer.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/images/world.jpg', render);
@@ -174,31 +174,30 @@ file.</p>
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>Notice the call to <code class="notranslate" translate="no">render</code> when the texture has finished loading. We need this
-because we're <a href="rendering-on-demand.html">rendering on demand</a> instead of
-continuously so we need to render once when the texture is loaded.</p>
-<p>Then we need to change the code that drew a dot per data point above to instead
-make a box per data point.</p>
+<p>Notez l'appel à <code class="notranslate" translate="no">render</code> lorsque la texture a fini de charger. Nous en avons
+besoin car nous faisons un <a href="rendering-on-demand.html">rendu à la demande</a> au lieu de
+rendre continuellement, nous devons donc rendre une fois que la texture est chargée.</p>
+<p>Ensuite, nous devons modifier le code qui dessinait un point par point de données ci-dessus pour créer à la place une boîte par point de données.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
   const {min, max, data} = file;
   const range = max - min;
 
-  // make one box geometry
+  // créer une géométrie de boîte
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
   const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-  // make it so it scales away from the positive Z axis
+  // faire en sorte qu'elle s'éloigne de l'axe Z positif lors du redimensionnement
   geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
-  // these helpers will make it easy to position the boxes
-  // We can rotate the lon helper on its Y axis to the longitude
+  // ces assistants faciliteront le positionnement des boîtes
+  // Nous pouvons faire pivoter l'assistant lon sur son axe Y pour la longitude
   const lonHelper = new THREE.Object3D();
   scene.add(lonHelper);
-  // We rotate the latHelper on its X axis to the latitude
+  // Nous faisons pivoter le latHelper sur son axe X pour la latitude
   const latHelper = new THREE.Object3D();
   lonHelper.add(latHelper);
-  // The position helper moves the object to the edge of the sphere
+  // L'assistant de position déplace l'objet vers le bord de la sphère
   const positionHelper = new THREE.Object3D();
   positionHelper.position.z = 1;
   latHelper.add(positionHelper);
@@ -219,12 +218,12 @@ make a box per data point.</p>
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
-      // adjust the helpers to point to the latitude and longitude
+      // ajuster les assistants pour pointer vers la latitude et la longitude
       lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
       latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
-      // use the world matrix of the position helper to
-      // position this mesh.
+      // utiliser la matrice monde de l'assistant de position pour
+      // positionner ce maillage.
       positionHelper.updateWorldMatrix(true, false);
       mesh.applyMatrix4(positionHelper.matrixWorld);
 
@@ -233,84 +232,83 @@ make a box per data point.</p>
   });
 }
 </pre>
-<p>The code is mostly straight forward from our test drawing code. </p>
-<p>We make one box and adjust its center so it scales away from positive Z. If we
-didn't do this it would scale from the center but we want them to grow away from the origin.</p>
+<p>Le code est assez simple, dérivé de notre code de dessin de test. </p>
+<p>Nous créons une boîte et ajustons son centre afin qu'elle s'éloigne de l'axe Z positif lors du redimensionnement. Si nous ne faisions pas
+cela, elle se redimensionnerait à partir du centre, mais nous voulons qu'elles s'éloignent de l'origine.</p>
 <div class="spread">
   <div>
     <div data-diagram="scaleCenter" style="height: 250px"></div>
-    <div class="code">default</div>
+    <div class="code">par défaut</div>
   </div>
   <div>
     <div data-diagram="scalePositiveZ" style="height: 250px"></div>
-    <div class="code">adjusted</div>
+    <div class="code">ajusté</div>
   </div>
 </div>
 
-<p>Of course we could also solve that by parenting the box to more <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>
-objects like we covered in <a href="scenegraph.html">scene graphs</a> but the more
-nodes we add to a scene graph the slower it gets.</p>
-<p>We also setup this small hierarchy of nodes of <code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code>, and
-<code class="notranslate" translate="no">positionHelper</code>. We use these objects to compute a position around the sphere
-were to place the box. </p>
+<p>Bien sûr, nous pourrions également résoudre cela en rattachant la boîte à d'autres
+<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>
+objets comme nous l'avons vu dans les <a href="scenegraph.html">graphes de scène</a>, mais plus
+nous ajoutons de nœuds à un graphe de scène, plus il devient lent.</p>
+<p>Nous mettons également en place cette petite hiérarchie de nœuds <code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code>, et
+<code class="notranslate" translate="no">positionHelper</code>. Nous utilisons ces objets pour calculer une position autour de la sphère
+où placer la boîte. </p>
 <div class="spread">
   <div data-diagram="lonLatPos" style="width: 600px; height: 400px;"></div>
 </div>
 
-<p>Above the <span style="color: green;">green bar</span> represents <code class="notranslate" translate="no">lonHelper</code> and
-is used to rotate toward longitude on the equator. The <span style="color: blue;">
-blue bar</span> represents <code class="notranslate" translate="no">latHelper</code> which is used to rotate to a
-latitude above or below the equator. The <span style="color: red;">red
-sphere</span> represents the offset that that <code class="notranslate" translate="no">positionHelper</code> provides.</p>
-<p>We could do all of the math manually to figure out positions on the globe but
-doing it this way leaves most of the math to the library itself so we don't need
-to deal with.</p>
-<p>For each data point we create a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> and a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> and then we ask
-for the world matrix of the <code class="notranslate" translate="no">positionHelper</code> and apply that to the new <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>.
-Finally we scale the mesh at its new position.</p>
-<p>Like above, we could also have created a <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">lonHelper</code>, and
-<code class="notranslate" translate="no">positionHelper</code> for every new box but that would be even slower.</p>
-<p>There are up to 360x145 boxes we're going to create. That's up to 52000 boxes.
-Because some data points are marked as "NO_DATA" the actual number of boxes
-we're going to create is around 19000. If we added 3 extra helper objects per
-box that would be nearly 80000 scene graph nodes that THREE.js would have to
-compute positions for. By instead using one set of helpers to just position the
-meshes we save around 60000 operations.</p>
-<p>A note about <code class="notranslate" translate="no">lonFudge</code> and <code class="notranslate" translate="no">latFudge</code>. <code class="notranslate" translate="no">lonFudge</code> is π/2 which is a quarter of a turn.
-That makes sense. It just means the texture or texture coordinates start at a
-different offset around the globe. <code class="notranslate" translate="no">latFudge</code> on the other hand I have no idea
-why it needs to be π * -0.135, that's just an amount that made the boxes line up
-with the texture.</p>
-<p>The last thing we need to do is call our loader</p>
+<p>Au-dessus, la <span style="color: green;">barre verte</span> représente <code class="notranslate" translate="no">lonHelper</code> et
+est utilisée pour pivoter vers la longitude sur l'équateur. La <span style="color: blue;">
+barre bleue</span> représente <code class="notranslate" translate="no">latHelper</code> qui est utilisée pour pivoter vers une
+latitude au-dessus ou en dessous de l'équateur. La <span style="color: red;">
+sphère rouge</span> représente le décalage que fournit <code class="notranslate" translate="no">positionHelper</code>.</p>
+<p>Nous pourrions faire tous les calculs manuellement pour déterminer les positions sur le globe, mais
+procéder ainsi laisse la majeure partie des calculs à la bibliothèque elle-même, nous n'avons donc pas
+à nous en soucier.</p>
+<p>Pour chaque point de donnée, nous créons un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> et un <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, puis nous demandons
+la matrice monde du <code class="notranslate" translate="no">positionHelper</code> et l'appliquons au nouveau <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>.
+Enfin, nous redimensionnons le maillage à sa nouvelle position.</p>
+<p>Comme ci-dessus, nous aurions également pu créer un <code class="notranslate" translate="no">latHelper</code>, un <code class="notranslate" translate="no">lonHelper</code>, et un
+<code class="notranslate" translate="no">positionHelper</code> pour chaque nouvelle boîte, mais cela serait encore plus lent.</p>
+<p>Il y a jusqu'à 360x145 boîtes que nous allons créer. Cela fait jusqu'à 52000 boîtes.
+Comme certains points de données sont marqués comme "NO_DATA", le nombre réel de boîtes
+que nous allons créer est d'environ 19000. Si nous ajoutions 3 objets assistants supplémentaires par
+boîte, cela ferait près de 80000 nœuds de graphe de scène dont THREE.js devrait
+calculer les positions. En utilisant plutôt un seul ensemble d'assistants pour simplement positionner les
+maillages, nous économisons environ 60000 opérations.</p>
+<p>Une note sur <code class="notranslate" translate="no">lonFudge</code> et <code class="notranslate" translate="no">latFudge</code>. <code class="notranslate" translate="no">lonFudge</code> est π/2, ce qui correspond à un quart de tour.
+Cela a du sens. Cela signifie simplement que la texture ou les coordonnées de texture commencent à un
+décalage différent autour du globe. <code class="notranslate" translate="no">latFudge</code> en revanche, je n'ai aucune idée
+pourquoi il doit être π * -0.135, c'est juste une valeur qui a fait aligner les boîtes
+avec la texture.</p>
+<p>La dernière chose à faire est d'appeler notre chargeur</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
-</pre><p>Once the data has finished loading and parsing then we need to render at least
-once since we're <a href="rendering-on-demand.html">rendering on demand</a>.</p>
+</pre><p>Une fois que les données ont fini de charger et d'être analysées, nous devons faire un rendu au moins
+une fois puisque nous faisons un <a href="rendering-on-demand.html">rendu à la demande</a>.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-slow.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-slow.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-slow.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
 </div>
 
 <p></p>
-<p>If you try to rotate the example above by dragging on the sample you'll likely
-notice it's slow.</p>
-<p>We can check the framerate by <a href="debugging-javascript.html">opening the
-devtools</a> and turning on the browser's frame
-rate meter.</p>
+<p>Si vous essayez de faire pivoter l'exemple ci-dessus en faisant glisser sur l'échantillon, vous remarquerez probablement que c'est lent.</p>
+<p>Nous pouvons vérifier la fréquence d'images en <a href="debugging-javascript.html">ouvrant les
+outils de développement</a> et en activant l'indicateur de fréquence d'images du navigateur.</p>
 <div class="threejs_center"><img src="../resources/images/bring-up-fps-meter.gif"></div>
 
-<p>On my machine I see a framerate under 20fps.</p>
+<p>Sur ma machine, je vois une fréquence d'images inférieure à 20 ips.</p>
 <div class="threejs_center"><img src="../resources/images/fps-meter.gif"></div>
 
-<p>That doesn't feel very good to me and I suspect many people have slower machines
-which would make it even worse. We'd better look into optimizing.</p>
-<p>For this particular problem we can merge all the boxes into a single geometry.
-We're currently drawing around 19000 boxes. By merging them into a single
-geometry we'd remove 18999 operations.</p>
-<p>Here's the new code to merge the boxes into a single geometry.</p>
+<p>Cela ne me semble pas très agréable et je soupçonne que de nombreuses personnes ont des machines plus lentes,
+ce qui rendrait la situation encore pire. Nous ferions mieux de nous pencher sur l'optimisation.</p>
+<p>Pour ce problème particulier, nous pouvons fusionner toutes les boîtes en une seule géométrie.
+Nous dessinons actuellement environ 19000 boîtes. En les fusionnant en une seule
+géométrie, nous supprimerions 18999 opérations.</p>
+<p>Voici le nouveau code pour fusionner les boîtes en une seule géométrie.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
   const {min, max, data} = file;
   const range = max - min;
@@ -334,7 +332,7 @@ geometry we'd remove 18999 operations.</p>
   const positionHelper = new THREE.Object3D();
   positionHelper.position.z = 1;
   latHelper.add(positionHelper);
-+  // Used to move the center of the box so it scales from the position Z axis
++  // Utilisé pour déplacer le centre de la boîte afin qu'elle s'éloigne de l'axe Z lors du redimensionnement
 +  const originHelper = new THREE.Object3D();
 +  originHelper.position.z = 0.5;
 +  positionHelper.add(originHelper);
@@ -373,8 +371,8 @@ geometry we'd remove 18999 operations.</p>
 -
 -      mesh.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
 
-+      // use the world matrix of the origin helper to
-+      // position this geometry
++      // utiliser la matrice monde de l'assistant d'origine pour
++      // positionner cette géométrie
 +      positionHelper.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
 +      originHelper.updateWorldMatrix(true, false);
 +      geometry.applyMatrix4(originHelper.matrixWorld);
@@ -391,29 +389,29 @@ geometry we'd remove 18999 operations.</p>
 
 }
 </pre>
-<p>Above we removed the code that was changing the box geometry's center point and
-are instead doing it by adding an <code class="notranslate" translate="no">originHelper</code>. Before we were using the same
-geometry 19000 times. This time we are creating new geometry for every single
-box and since we are going to use <code class="notranslate" translate="no">applyMatrix</code> to move the vertices of each box
-geometry we might as well do it once instead of twice.</p>
-<p>At the end we pass an array of all the geometries to
-<code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code> which will combined all of
-them into a single mesh.</p>
-<p>We also need to include the <code class="notranslate" translate="no">BufferGeometryUtils</code></p>
+<p>Ci-dessus, nous avons supprimé le code qui modifiait le point central de la géométrie de la boîte et
+le faisons à la place en ajoutant un <code class="notranslate" translate="no">originHelper</code>. Auparavant, nous utilisions la même
+géométrie 19000 fois. Cette fois, nous créons une nouvelle géométrie pour chaque boîte et,
+comme nous allons utiliser <code class="notranslate" translate="no">applyMatrix</code> pour déplacer les sommets de chaque géométrie de boîte,
+autant le faire une fois au lieu de deux.</p>
+<p>À la fin, nous passons un tableau de toutes les géométries à
+<code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, ce qui les combinera toutes
+en un seul maillage.</p>
+<p>Nous devons également inclure les <code class="notranslate" translate="no">BufferGeometryUtils</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
-<p>And now, at least on my machine, I get 60 frames per second</p>
+<p>Et maintenant, du moins sur ma machine, j'obtiens 60 images par seconde</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-merged.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-merged.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-merged.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
 </div>
 
 <p></p>
-<p>So that worked but because it's one mesh we only get one material which means we
-only get one color where as before we had a different color on each box. We can
-fix that by using vertex colors.</p>
-<p>Vertex colors add a color per vertex. By setting all the colors of each vertex
-of each box to specific colors every box will have a different color.</p>
+<p>Cela a donc fonctionné, mais comme il s'agit d'un seul maillage, nous n'obtenons qu'un seul matériau, ce qui signifie que
+nous n'obtenons qu'une seule couleur, alors qu'auparavant, nous avions une couleur différente sur chaque boîte. Nous
+pouvons résoudre ce problème en utilisant les couleurs des sommets.</p>
+<p>Les couleurs de sommet ajoutent une couleur par sommet. En attribuant des couleurs spécifiques à tous les sommets
+de chaque boîte, chaque boîte aura une couleur différente.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const color = new THREE.Color();
 
 const lonFudge = Math.PI * .5;
@@ -441,20 +439,20 @@ data.forEach((row, latNdx) =&gt; {
     originHelper.updateWorldMatrix(true, false);
     geometry.applyMatrix4(originHelper.matrixWorld);
 
-+    // compute a color
++    // calculer une couleur
 +    const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
 +    const saturation = 1;
 +    const lightness = THREE.MathUtils.lerp(0.4, 1.0, amount);
 +    color.setHSL(hue, saturation, lightness);
-+    // get the colors as an array of values from 0 to 255
++    // obtenir les couleurs sous forme de tableau de valeurs de 0 à 255
 +    const rgb = color.toArray().map(v =&gt; v * 255);
 +
-+    // make an array to store colors for each vertex
++    // créer un tableau pour stocker les couleurs de chaque sommet
 +    const numVerts = geometry.getAttribute('position').count;
 +    const itemSize = 3;  // r, g, b
 +    const colors = new Uint8Array(itemSize * numVerts);
 +
-+    // copy the color into the colors array for each vertex
++    // copier la couleur dans le tableau de couleurs pour chaque sommet
 +    colors.forEach((v, ndx) =&gt; {
 +      colors[ndx] = rgb[ndx % 3];
 +    });
@@ -467,10 +465,10 @@ data.forEach((row, latNdx) =&gt; {
   });
 });
 </pre>
-<p>The code above looks up the number or vertices needed by getting the <code class="notranslate" translate="no">position</code>
-attribute from the geometry. We then create a <code class="notranslate" translate="no">Uint8Array</code> to put the colors in.
-It then adds that as an attribute by calling <code class="notranslate" translate="no">geometry.setAttribute</code>.</p>
-<p>Lastly we need to tell three.js to use the vertex colors. </p>
+<p>Le code ci-dessus recherche le nombre ou les sommets nécessaires en obtenant l'attribut <code class="notranslate" translate="no">position</code>
+de la géométrie. Nous créons ensuite un <code class="notranslate" translate="no">Uint8Array</code> pour y placer les couleurs.
+Il ajoute ensuite cela comme un attribut en appelant <code class="notranslate" translate="no">geometry.setAttribute</code>.</p>
+<p>Enfin, nous devons indiquer à three.js d'utiliser les couleurs de sommet. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
@@ -480,23 +478,23 @@ It then adds that as an attribute by calling <code class="notranslate" translate
 const mesh = new THREE.Mesh(mergedGeometry, material);
 scene.add(mesh);
 </pre>
-<p>And with that we get our colors back</p>
+<p>Et avec cela, nous retrouvons nos couleurs</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-merged-vertexcolors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-merged-vertexcolors.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-merged-vertexcolors.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
 </div>
 
 <p></p>
-<p>Merging geometry is a common optimization technique. For example rather than
-100 trees you might merge the trees into 1 geometry, a pile of individual rocks
-into a single geometry of rocks, a picket fence from individual pickets into
-one fence mesh. Another example in Minecraft it doesn't likely draw each cube
-individually but rather creates groups of merged cubes and also selectively removing
-faces that are never visible.</p>
-<p>The problem with making everything one mesh though is it's no longer easy
-to move any part that was previously separate. Depending on our use case
-though there are creative solutions. We'll explore one in
-<a href="optimize-lots-of-objects-animated.html">another article</a>.</p>
+<p>La fusion de géométrie est une technique d'optimisation courante. Par exemple, plutôt que
+100 arbres, vous pourriez fusionner les arbres en une seule géométrie, un tas de roches
+individuelles en une seule géométrie de roches, une clôture en piquets individuels en un seul
+maillage de clôture. Un autre exemple dans Minecraft est qu'il ne dessine probablement pas chaque cube
+individuellement, mais crée plutôt des groupes de cubes fusionnés et supprime également sélectivement les
+faces qui ne sont jamais visibles.</p>
+<p>Le problème de tout regrouper en un seul maillage est qu'il n'est plus facile
+de déplacer une partie qui était auparavant séparée. Cependant, selon notre cas d'utilisation,
+il existe des solutions créatives. Nous en explorerons une dans
+<a href="optimize-lots-of-objects-animated.html">un autre article</a>.</p>
 <p><canvas id="c"></canvas></p>
 <script type="module" src="../resources/threejs-lots-of-objects.js"></script>
         </div>

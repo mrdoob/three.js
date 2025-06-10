@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Aligning HTML Elements to 3D</title>
+    <title>Aligner des éléments HTML en 3D</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Aligning HTML Elements to 3D">
+    <meta name="twitter:title" content="Three.js – Aligner des éléments HTML en 3D">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,36 +22,36 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Aligning HTML Elements to 3D</h1>
+        <h1>Aligner des éléments HTML en 3D</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>This article is part of a series of articles about three.js. The first article
-is <a href="fundamentals.html">three.js fundamentals</a>. If you haven't read that
-yet and you're new to three.js you might want to consider starting there. </p>
-<p>Sometimes you'd like to display some text in your 3D scene. You have many options
-each with pluses and minuses.</p>
+          <p>Cet article fait partie d'une série d'articles sur three.js. Le premier article est
+<a href="fundamentals.html">Les bases de three.js</a>. Si vous ne l'avez pas
+encore lu et que vous êtes nouveau sur three.js, vous pourriez envisager de commencer par là. </p>
+<p>Parfois, vous aimeriez afficher du texte dans votre scène 3D. Vous avez plusieurs options,
+chacune avec ses avantages et ses inconvénients.</p>
 <ul>
-<li><p>Use 3D text</p>
-<p>If you look at the <a href="primitives.html">primitives article</a> you'll see <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> which
-makes 3D text. This might be useful for flying logos but probably not so useful for stats, info,
-or labelling lots of things.</p>
+<li><p>Utiliser du texte 3D</p>
+<p>Si vous regardez <a href="primitives.html">l'article sur les primitives</a>, vous verrez <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> qui
+crée du texte 3D. Cela peut être utile pour des logos volants, mais probablement pas très utile pour des statistiques, des informations,
+ou l'étiquetage de nombreux objets.</p>
 </li>
-<li><p>Use a texture with 2D text drawn into it.</p>
-<p>The article on <a href="canvas-textures.html">using a Canvas as a texture</a> shows using
-a canvas as a texture. You can draw text into a canvas and <a href="billboards.html">display it as a billboard</a>.
-The plus here might be that the text is integrated into the 3D scene. For something like a computer terminal
-shown in a 3D scene this might be perfect.</p>
+<li><p>Utiliser une texture avec du texte 2D dessiné dessus.</p>
+<p>L'article sur <a href="canvas-textures.html">l'utilisation d'un Canvas comme texture</a> montre comment utiliser
+un canvas comme texture. Vous pouvez dessiner du texte dans un canvas et <a href="billboards.html">l'afficher comme un panneau publicitaire</a>.
+L'avantage ici est que le texte est intégré dans la scène 3D. Pour quelque chose comme un terminal d'ordinateur
+montré dans une scène 3D, cela pourrait être parfait.</p>
 </li>
-<li><p>Use HTML Elements and position them to match the 3D</p>
-<p>The benefits to this approach is you can use all of HTML. Your HTML can have multiple elements. It can
-by styled with CSS. It can also be selected by the user as it is actual text. </p>
+<li><p>Utiliser des éléments HTML et les positionner pour qu'ils correspondent à la 3D</p>
+<p>Les avantages de cette approche sont que vous pouvez utiliser tout le HTML. Votre HTML peut avoir plusieurs éléments. Il peut
+être stylisé avec CSS. Il peut également être sélectionné par l'utilisateur car c'est du texte réel. </p>
 </li>
 </ul>
-<p>This article will cover this last approach.</p>
-<p>Let's start simple. We'll make a 3D scene with a few primitives and then add a label to each primitive. We'll start
-with an example from <a href="responsive.html">the article on responsive pages</a> </p>
-<p>We'll add some <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> like we did in <a href="lights.html">the article on lighting</a>.</p>
+<p>Cet article couvrira cette dernière approche.</p>
+<p>Commençons simplement. Nous allons créer une scène 3D avec quelques primitives et ajouter ensuite une étiquette à chaque primitive. Nous commencerons
+avec un exemple tiré de <a href="responsive.html">l'article sur les pages responsives</a> </p>
+<p>Nous allons ajouter des <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> comme nous l'avons fait dans <a href="lights.html">l'article sur l'éclairage</a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
@@ -59,7 +59,7 @@ with an example from <a href="responsive.html">the article on responsive pages</
 controls.target.set(0, 0, 0);
 controls.update();
 </pre>
-<p>We need to provide an HTML element to contain our label elements</p>
+<p>Nous devons fournir un élément HTML pour contenir nos éléments d'étiquette</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
 -  &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="container"&gt;
@@ -68,8 +68,8 @@ controls.update();
 +  &lt;/div&gt;
 &lt;/body&gt;
 </pre>
-<p>By putting both the canvas and the <code class="notranslate" translate="no">&lt;div id="labels"&gt;</code> inside a
-parent container we can make them overlap with this CSS</p>
+<p>En plaçant à la fois le canvas et le <code class="notranslate" translate="no">&lt;div id="labels"&gt;</code> à l'intérieur d'un
+conteneur parent, nous pouvons les superposer avec ce CSS</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
 -    width: 100%;
 -    height: 100%;
@@ -90,7 +90,7 @@ parent container we can make them overlap with this CSS</p>
 +  color: white;
 +}
 </pre>
-<p>let's also add some CSS for the labels themselves</p>
+<p>ajoutons également du CSS pour les étiquettes elles-mêmes</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels&gt;div {
   position: absolute;  /* let us position them inside the container */
   left: 0;             /* make their default position the top left of the container */
@@ -112,9 +112,9 @@ parent container we can make them overlap with this CSS</p>
   color: red;
 }
 </pre>
-<p>Now into our code we don't have to add too much. We had a function
-<code class="notranslate" translate="no">makeInstance</code> that we used to generate cubes. Let's make it
-so it also adds a label element.</p>
+<p>Maintenant, dans notre code, nous n'avons pas grand-chose à ajouter. Nous avions une fonction
+<code class="notranslate" translate="no">makeInstance</code> que nous utilisions pour générer des cubes. Faisons en sorte
+qu'elle ajoute également un élément d'étiquette.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const labelContainerElem = document.querySelector('#labels');
 
 -function makeInstance(geometry, color, x) {
@@ -134,9 +134,9 @@ so it also adds a label element.</p>
 +  return {cube, elem};
 }
 </pre>
-<p>As you can see we're adding a <code class="notranslate" translate="no">&lt;div&gt;</code> to the container, one for each cube. We're
-also returning an object with both the <code class="notranslate" translate="no">cube</code> and the <code class="notranslate" translate="no">elem</code> for the label.</p>
-<p>Calling it we need to provide a name for each</p>
+<p>Comme vous pouvez le voir, nous ajoutons un <code class="notranslate" translate="no">&lt;div&gt;</code> au conteneur, un pour chaque cube. Nous
+retournons également un objet avec le <code class="notranslate" translate="no">cube</code> et l'<code class="notranslate" translate="no">elem</code> pour l'étiquette.</p>
+<p>Lors de l'appel, nous devons fournir un nom pour chaque</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0),
 -  makeInstance(geometry, 0x8844aa, -2),
@@ -146,7 +146,7 @@ also returning an object with both the <code class="notranslate" translate="no">
 +  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
 ];
 </pre>
-<p>What remains is positioning the label elements at render time</p>
+<p>Ce qui reste est de positionner les éléments d'étiquette au moment du rendu</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 
 ...
@@ -159,42 +159,42 @@ also returning an object with both the <code class="notranslate" translate="no">
   cube.rotation.x = rot;
   cube.rotation.y = rot;
 
-+  // get the position of the center of the cube
++  // obtenir la position du centre du cube
 +  cube.updateWorldMatrix(true, false);
 +  cube.getWorldPosition(tempV);
 +
-+  // get the normalized screen coordinate of that position
-+  // x and y will be in the -1 to +1 range with x = -1 being
-+  // on the left and y = -1 being on the bottom
++  // obtenir les coordonnées écran normalisées de cette position
++  // x et y seront dans la plage de -1 à +1, avec x = -1 à gauche
++  // et y = -1 en bas
 +  tempV.project(camera);
 +
-+  // convert the normalized position to CSS coordinates
++  // convertir la position normalisée en coordonnées CSS
 +  const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
 +  const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 +
-+  // move the elem to that position
++  // déplacer l'élément à cette position
 +  elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 });
 </pre>
-<p>And with that we have labels aligned to their corresponding objects.</p>
+<p>Et avec cela, nous avons des étiquettes alignées sur leurs objets correspondants.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/align-html-to-3d.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/align-html-to-3d.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>There are a couple of issues we probably want to deal with.</p>
-<p>One is that if we rotate the objects so they overlap all the labels
-overlap as well.</p>
+<p>Il y a quelques problèmes que nous devrions probablement résoudre.</p>
+<p>L'un est que si nous faisons pivoter les objets de manière à ce qu'ils se chevauchent, toutes les étiquettes
+se chevauchent également.</p>
 <div class="threejs_center"><img src="../resources/images/overlapping-labels.png" style="width: 307px;"></div>
 
-<p>Another is that if we zoom way out so that the objects go outside
-the frustum the labels will still appear.</p>
-<p>A possible solution to the problem of overlapping objects is to use
-the <a href="picking.html">picking code from the article on picking</a>.
-We'll pass in the position of the object on the screen and then
-ask the <code class="notranslate" translate="no">RayCaster</code> to tell us which objects were intersected.
-If our object is not the first one then we are not in the front.</p>
+<p>Un autre est que si nous dézooms très loin de sorte que les objets sortent
+du frustum, les étiquettes apparaîtront toujours.</p>
+<p>Une solution possible au problème des objets qui se chevauchent est d'utiliser
+le <a href="picking.html">code de sélection de l'article sur la sélection</a>.
+Nous passerons la position de l'objet à l'écran et demanderons ensuite
+au <code class="notranslate" translate="no">RayCaster</code> de nous indiquer quels objets ont été intersectés.
+Si notre objet n'est pas le premier, alors nous ne sommes pas à l'avant.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 +const raycaster = new THREE.Raycaster();
 
@@ -207,76 +207,76 @@ cubes.forEach((cubeInfo, ndx) =&gt; {
   cube.rotation.x = rot;
   cube.rotation.y = rot;
 
-  // get the position of the center of the cube
+  // obtenir la position du centre du cube
   cube.updateWorldMatrix(true, false);
   cube.getWorldPosition(tempV);
 
-  // get the normalized screen coordinate of that position
-  // x and y will be in the -1 to +1 range with x = -1 being
-  // on the left and y = -1 being on the bottom
+  // obtenir les coordonnées écran normalisées de cette position
+  // x et y seront dans la plage de -1 à +1, avec x = -1 à gauche
+  // et y = -1 en bas
   tempV.project(camera);
 
-+  // ask the raycaster for all the objects that intersect
-+  // from the eye toward this object's position
++  // demander au raycaster tous les objets qui intersectent
++  // depuis l'œil vers la position de cet objet
 +  raycaster.setFromCamera(tempV, camera);
 +  const intersectedObjects = raycaster.intersectObjects(scene.children);
-+  // We're visible if the first intersection is this object.
++  // Nous sommes visibles si la première intersection est cet objet.
 +  const show = intersectedObjects.length &amp;&amp; cube === intersectedObjects[0].object;
 +
 +  if (!show) {
-+    // hide the label
++    // masquer l'étiquette
 +    elem.style.display = 'none';
 +  } else {
-+    // un-hide the label
++    // rendre l'étiquette visible
 +    elem.style.display = '';
 
-    // convert the normalized position to CSS coordinates
+    // convertir la position normalisée en coordonnées CSS
     const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
     const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 
-    // move the elem to that position
+    // déplacer l'élément à cette position
     elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 +  }
 });
 </pre>
-<p>This handles overlapping.</p>
-<p>To handle going outside the frustum we can add this check if the origin of
-the object is outside the frustum by checking <code class="notranslate" translate="no">tempV.z</code></p>
+<p>Ceci gère les chevauchements.</p>
+<p>Pour gérer la sortie du frustum, nous pouvons ajouter cette vérification si l'origine de
+l'objet est en dehors du frustum en vérifiant <code class="notranslate" translate="no">tempV.z</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  if (!show) {
 +  if (!show || Math.abs(tempV.z) &gt; 1) {
-    // hide the label
+    // masquer l'étiquette
     elem.style.display = 'none';
 </pre>
-<p>This <em>kind of</em> works because the normalized coordinates we computed include a <code class="notranslate" translate="no">z</code>
-value that goes from -1 when at the <code class="notranslate" translate="no">near</code> part of our camera frustum to +1 when
-at the <code class="notranslate" translate="no">far</code> part of our camera frustum.</p>
+<p>Cela fonctionne <em>en quelque sorte</em> car les coordonnées normalisées que nous avons calculées incluent une valeur <code class="notranslate" translate="no">z</code>
+qui va de -1 lorsque la partie <code class="notranslate" translate="no">near</code> de notre frustum de caméra est atteinte, à +1 lorsque
+la partie <code class="notranslate" translate="no">far</code> de notre frustum de caméra est atteinte.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d-w-hiding.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-hiding.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-hiding.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>For the frustum check, the solution above fails as we're only checking the origin of the object. For a large
-object. That origin might go outside the frustum but half of the object might still be in the frustum.</p>
-<p>A more correct solution would be to check if the object itself is in the frustum
-or not. Unfortunate that check is slow. For 3 cubes it will not be a problem
-but for many objects it might be.</p>
-<p>Three.js provides some functions to check if an object's bounding sphere is
-in a frustum</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// at init time
+<p>Pour la vérification du frustum, la solution ci-dessus échoue car nous ne vérifions que l'origine de l'objet. Pour un grand
+objet, cette origine peut se trouver en dehors du frustum, mais la moitié de l'objet peut toujours y être.</p>
+<p>Une solution plus correcte consisterait à vérifier si l'objet lui-même se trouve dans le frustum
+ou non. Malheureusement, cette vérification est lente. Pour 3 cubes, ce ne sera pas un problème,
+mais pour de nombreux objets, cela pourrait l'être.</p>
+<p>Three.js fournit des fonctions pour vérifier si la sphère englobante d'un objet est
+dans un frustum</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// au moment de l'initialisation
 const frustum = new THREE.Frustum();
 const viewProjection = new THREE.Matrix4();
 
 ...
 
-// before checking
+// avant la vérification
 camera.updateMatrix();
 camera.updateMatrixWorld();
 camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
 ...
 
-// then for each mesh
+// puis pour chaque mesh
 someMesh.updateMatrix();
 someMesh.updateMatrixWorld();
 
@@ -285,46 +285,45 @@ viewProjection.multiplyMatrices(
 frustum.setFromProjectionMatrix(viewProjection);
 const inFrustum = frustum.contains(someMesh));
 </pre>
-<p>Our current overlapping solution has similar issues. Picking is slow. We could
-use gpu based picking like we covered in the <a href="picking.html">picking
-article</a> but that is also not free. Which solution you
-chose depends on your needs.</p>
-<p>Another issue is the order the labels appear. If we change the code to have
-longer labels</p>
+<p>Notre solution actuelle pour le chevauchement a des problèmes similaires. Le picking est lent. Nous pourrions
+utiliser le picking basé sur le GPU comme nous l'avons vu dans l'<a href="picking.html">article sur le picking</a>,
+mais ce n'est pas gratuit non plus. La solution que vous
+choisissez dépend de vos besoins.</p>
+<p>Un autre problème est l'ordre d'apparition des étiquettes. Si nous modifions le code pour avoir
+des étiquettes plus longues</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0, 'Aqua'),
 -  makeInstance(geometry, 0x8844aa, -2, 'Purple'),
 -  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
-+  makeInstance(geometry, 0x44aa88,  0, 'Aqua Colored Box'),
-+  makeInstance(geometry, 0x8844aa, -2, 'Purple Colored Box'),
-+  makeInstance(geometry, 0xaa8844,  2, 'Gold Colored Box'),
++  makeInstance(geometry, 0x44aa88,  0, 'Boîte de couleur Aqua'),
++  makeInstance(geometry, 0x8844aa, -2, 'Boîte de couleur Violette'),
++  makeInstance(geometry, 0xaa8844,  2, 'Boîte de couleur Or'),
 ];
 </pre>
-<p>and set the CSS so these don't wrap</p>
+<p>et définissons le CSS pour que celles-ci ne s'enroulent pas</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels&gt;div {
 +  white-space: nowrap;
 </pre>
-<p>Then we can run into this issue</p>
+<p>Alors nous pouvons rencontrer ce problème</p>
 <div class="threejs_center"><img src="../resources/images/label-sorting-issue.png" style="width: 401px;"></div>
 
-<p>You can see above the purple box is in the back but its label is in front of the aqua box.</p>
-<p>We can fix this by setting the <code class="notranslate" translate="no">zIndex</code> of each element. The projected position has a <code class="notranslate" translate="no">z</code> value
-that goes from -1 in front to positive 1 in back. <code class="notranslate" translate="no">zIndex</code> is required to be an integer and goes the
-opposite direction meaning for <code class="notranslate" translate="no">zIndex</code> greater values are in front so the following code should work.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// convert the normalized position to CSS coordinates
+<p>Vous pouvez voir ci-dessus que la boîte violette est à l'arrière, mais son étiquette est devant la boîte aqua.</p>
+<p>Nous pouvons résoudre ce problème en définissant le <code class="notranslate" translate="no">zIndex</code> de chaque élément. La position projetée a une valeur <code class="notranslate" translate="no">z</code>
+qui va de -1 à l'avant à +1 à l'arrière. Le <code class="notranslate" translate="no">zIndex</code> doit être un entier et va dans le sens opposé, ce qui signifie que pour des valeurs de <code class="notranslate" translate="no">zIndex</code> plus grandes sont à l'avant, donc le code suivant devrait fonctionner.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// convertir la position normalisée en coordonnées CSS
 const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
 const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 
-// move the elem to that position
+// déplacer l'élément à cette position
 elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 
-+// set the zIndex for sorting
++// définir le zIndex pour le tri
 +elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
 </pre>
-<p>Because of the way the projected z value works we need to pick a large number to spread out the values
-otherwise many will have the same value. To make sure the labels don't overlap with other parts of
-the page we can tell the browser to create a new <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context">stacking context</a>
-by setting the <code class="notranslate" translate="no">z-index</code> of the container of the labels</p>
+<p>En raison de la façon dont fonctionne la valeur z projetée, nous devons choisir un grand nombre pour étaler les valeurs,
+sinon beaucoup auront la même valeur. Pour s'assurer que les étiquettes ne se chevauchent pas avec d'autres parties de
+la page, nous pouvons demander au navigateur de créer un nouveau <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context">contexte d'empilement</a>
+en définissant le <code class="notranslate" translate="no">z-index</code> du conteneur des étiquettes</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels {
   position: absolute;  /* let us position ourself inside the container */
 +  z-index: 0;          /* make a new stacking context so children don't sort with rest of page */
@@ -334,24 +333,24 @@ by setting the <code class="notranslate" translate="no">z-index</code> of the co
   z-index: 0;
 }
 </pre>
-<p>and now the labels should always be in the correct order.</p>
+<p>et maintenant les étiquettes devraient toujours être dans le bon ordre.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d-w-sorting.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-sorting.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-sorting.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>While we're at it let's do one more example to show one more issue.
-Let's draw a globe like Google Maps and label the countries.</p>
-<p>I found <a href="http://thematicmapping.org/downloads/world_borders.php">this data</a>
-which contains the borders of countries. It's licensed as
+<p>Pendant que nous y sommes, faisons un autre exemple pour montrer un autre problème.
+Dessinons un globe comme Google Maps et étiquetons les pays.</p>
+<p>J'ai trouvé <a href="http://thematicmapping.org/downloads/world_borders.php">ces données</a>
+qui contiennent les frontières des pays. Elles sont sous licence
 <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>.</p>
-<p>I <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">wrote some code</a>
-to load the data, and generate country outlines and some JSON data with the names
-of the countries and their locations.</p>
+<p>J'ai <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">écrit du code</a>
+pour charger les données, générer les contours des pays et des données JSON avec les noms
+des pays et leurs emplacements.</p>
 <div class="threejs_center"><img src="../examples/resources/data/world/country-outlines-4k.png" style="background: black; width: 700px"></div>
 
-<p>The JSON data is an array of entries something like this</p>
+<p>Les données JSON sont un tableau d'entrées ressemblant à ceci</p>
 <pre class="prettyprint showlinemods notranslate lang-json" translate="no">[
   {
     "name": "Algeria",
@@ -372,12 +371,11 @@ of the countries and their locations.</p>
   },
   ...
 </pre>
-<p>where min, max, lat, lon, are all in latitude and longitude degrees.</p>
-<p>Let's load it up. The code is based on the examples from <a href="optimize-lots-of-objects.html">optimizing lots of
-objects</a> though we are not drawing lots
-of objects we'll be using the same solutions for <a href="rendering-on-demand.html">rendering on
-demand</a>.</p>
-<p>The first thing is to make a sphere and use the outline texture.</p>
+<p>où min, max, lat, lon, sont tous en degrés de latitude et longitude.</p>
+<p>Chargeons-les. Le code est basé sur les exemples de <a href="optimize-lots-of-objects.html">l'optimisation de nombreux
+objets</a>, bien que nous ne dessinions pas beaucoup
+d'objets, nous utiliserons les mêmes solutions pour <a href="rendering-on-demand.html">le rendu à la demande</a>.</p>
+<p>La première chose est de créer une sphère et d'utiliser la texture du contour.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
@@ -386,13 +384,13 @@ demand</a>.</p>
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>Then let's load the JSON file by first making a loader</p>
+<p>Puis chargeons le fichier JSON en créant d'abord un chargeur</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadJSON(url) {
   const req = await fetch(url);
   return req.json();
 }
 </pre>
-<p>and then calling it</p>
+<p>et ensuite en l'appelant</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">let countryInfos;
 async function loadCountryData() {
   countryInfos = await loadJSON('resources/data/world/country-info.json');
@@ -402,56 +400,56 @@ async function loadCountryData() {
 }
 loadCountryData();
 </pre>
-<p>Now let's use that data to generate and place the labels.</p>
-<p>In the article on <a href="optimize-lots-of-objects.html">optimizing lots of objects</a>
-we had setup a small scene graph of helper objects to make it easy to
-compute latitude and longitude positions on our globe. See that article
-for an explanation of how they work.</p>
+<p>Maintenant, utilisons ces données pour générer et placer les étiquettes.</p>
+<p>Dans l'article sur <a href="optimize-lots-of-objects.html">l'optimisation de nombreux objets</a>,
+nous avions configuré un petit graphe de scène d'objets helpers pour faciliter
+le calcul des positions de latitude et de longitude sur notre globe. Voir cet article
+pour une explication de leur fonctionnement.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lonFudge = Math.PI * 1.5;
 const latFudge = Math.PI;
-// these helpers will make it easy to position the boxes
-// We can rotate the lon helper on its Y axis to the longitude
+// ces helpers faciliteront le positionnement des boîtes
+// Nous pouvons faire pivoter le lon helper sur son axe Y pour la longitude
 const lonHelper = new THREE.Object3D();
-// We rotate the latHelper on its X axis to the latitude
+// Nous faisons pivoter le latHelper sur son axe X pour la latitude
 const latHelper = new THREE.Object3D();
 lonHelper.add(latHelper);
-// The position helper moves the object to the edge of the sphere
+// Le helper de position déplace l'objet vers le bord de la sphère
 const positionHelper = new THREE.Object3D();
 positionHelper.position.z = 1;
 latHelper.add(positionHelper);
 </pre>
-<p>We'll use that to compute a position for each label</p>
+<p>Nous utiliserons cela pour calculer une position pour chaque étiquette</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
 for (const countryInfo of countryInfos) {
   const {lat, lon, name} = countryInfo;
 
-  // adjust the helpers to point to the latitude and longitude
+  // ajuster les helpers pour pointer vers la latitude et la longitude
   lonHelper.rotation.y = THREE.MathUtils.degToRad(lon) + lonFudge;
   latHelper.rotation.x = THREE.MathUtils.degToRad(lat) + latFudge;
 
-  // get the position of the lat/lon
+  // obtenir la position de la lat/lon
   positionHelper.updateWorldMatrix(true, false);
   const position = new THREE.Vector3();
   positionHelper.getWorldPosition(position);
   countryInfo.position = position;
 
-  // add an element for each country
+  // ajouter un élément pour chaque pays
   const elem = document.createElement('div');
   elem.textContent = name;
   labelParentElem.appendChild(elem);
   countryInfo.elem = elem;
 </pre>
-<p>The code above looks very similar to the code we wrote for making cube labels
-making an element per label. When we're done we have an array, <code class="notranslate" translate="no">countryInfos</code>,
-with one entry for each country to which we've added an <code class="notranslate" translate="no">elem</code> property for
-the label element for that country and a <code class="notranslate" translate="no">position</code> with its position on the
+<p>Le code ci-dessus ressemble beaucoup au code que nous avons écrit pour créer des étiquettes de cube,
+en créant un élément par étiquette. Lorsque nous aurons terminé, nous aurons un tableau, <code class="notranslate" translate="no">countryInfos</code>,
+avec une entrée pour chaque pays à laquelle nous avons ajouté une propriété <code class="notranslate" translate="no">elem</code> pour
+l'élément d'étiquette de ce pays et une <code class="notranslate" translate="no">position</code> avec sa position sur le
 globe.</p>
-<p>Just like we did for the cubes we need to update the position of the
-labels and render time.</p>
+<p>Tout comme nous l'avons fait pour les cubes, nous devons mettre à jour la position des
+étiquettes au moment du rendu.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 
 function updateLabels() {
-  // exit if we have not yet loaded the JSON file
+  // sortir si nous n'avons pas encore chargé le fichier JSON
   if (!countryInfos) {
     return;
   }
@@ -459,28 +457,28 @@ function updateLabels() {
   for (const countryInfo of countryInfos) {
     const {position, elem} = countryInfo;
 
-    // get the normalized screen coordinate of that position
-    // x and y will be in the -1 to +1 range with x = -1 being
-    // on the left and y = -1 being on the bottom
+    // obtenir les coordonnées écran normalisées de cette position
+    // x et y seront dans la plage de -1 à +1, avec x = -1 à gauche
+    // et y = -1 en bas
     tempV.copy(position);
     tempV.project(camera);
 
-    // convert the normalized position to CSS coordinates
+    // convertir la position normalisée en coordonnées CSS
     const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
     const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 
-    // move the elem to that position
+    // déplacer l'élément à cette position
     elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 
-    // set the zIndex for sorting
+    // définir le zIndex pour le tri
     elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
   }
 }
 </pre>
-<p>You can see the code above is substantially similar to the cube example before.
-The only major difference is we pre-computed the label positions at init time.
-We can do this because the globe never moves. Only our camera moves.</p>
-<p>Lastly we need to call <code class="notranslate" translate="no">updateLabels</code> in our render loop</p>
+<p>Vous pouvez voir que le code ci-dessus est sensiblement similaire à l'exemple des cubes précédent.
+La seule différence majeure est que nous avons pré-calculé les positions des étiquettes au moment de l'initialisation.
+Nous pouvons le faire car le globe ne bouge jamais. Seule notre caméra bouge.</p>
+<p>Enfin, nous devons appeler <code class="notranslate" translate="no">updateLabels</code> dans notre boucle de rendu</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
   renderRequested = false;
 
@@ -497,155 +495,155 @@ We can do this because the globe never moves. Only our camera moves.</p>
   renderer.render(scene, camera);
 }
 </pre>
-<p>And this is what we get</p>
+<p>Et voici ce que nous obtenons</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>That is way too many labels!</p>
-<p>We have 2 problems.</p>
+<p>C'est beaucoup trop d'étiquettes !</p>
+<p>Nous avons 2 problèmes.</p>
 <ol>
-<li><p>Labels facing away from us are showing up.</p>
+<li><p>Les étiquettes tournées à l'opposé de nous apparaissent.</p>
 </li>
-<li><p>There are too many labels.</p>
+<li><p>Il y a trop d'étiquettes.</p>
 </li>
 </ol>
-<p>For issue #1 we can't really use the <code class="notranslate" translate="no">RayCaster</code> like we did above as there is
-nothing to intersect except the sphere. Instead what we can do is check if that
-particular country is facing away from us or not. This works because the label
-positions are around a sphere. In fact we're using a unit sphere, a sphere with
-a radius of 1.0. That means the positions are already unit directions making
-the math relatively easy.</p>
+<p>Pour le problème n°1, nous ne pouvons pas vraiment utiliser le <code class="notranslate" translate="no">RayCaster</code> comme nous l'avons fait ci-dessus car il n'y a
+rien à intercepter, sauf la sphère. Au lieu de cela, nous pouvons vérifier si ce
+pays particulier est tourné à l'opposé de nous ou non. Cela fonctionne parce que les positions des étiquettes sont autour d'une sphère. En fait, nous utilisons une sphère unitaire, une sphère avec
+un rayon de 1,0. Cela signifie que les positions sont déjà des directions unitaires, ce qui rend
+les calculs relativement faciles.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 +const cameraToPoint = new THREE.Vector3();
 +const cameraPosition = new THREE.Vector3();
 +const normalMatrix = new THREE.Matrix3();
 
 function updateLabels() {
-  // exit if we have not yet loaded the JSON file
+  // sortir si nous n'avons pas encore chargé le fichier JSON
   if (!countryInfos) {
     return;
   }
 
 +  const minVisibleDot = 0.2;
-+  // get a matrix that represents a relative orientation of the camera
++  // obtenir une matrice qui représente une orientation relative de la caméra
 +  normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
-+  // get the camera's position
++  // obtenir la position de la caméra
 +  camera.getWorldPosition(cameraPosition);
   for (const countryInfo of countryInfos) {
     const {position, elem} = countryInfo;
 
-+    // Orient the position based on the camera's orientation.
-+    // Since the sphere is at the origin and the sphere is a unit sphere
-+    // this gives us a camera relative direction vector for the position.
++    // Orienter la position en fonction de l'orientation de la caméra.
++    // Puisque la sphère est à l'origine et que c'est une sphère unitaire
++    // cela nous donne un vecteur de direction relatif à la caméra pour la position.
 +    tempV.copy(position);
 +    tempV.applyMatrix3(normalMatrix);
 +
-+    // compute the direction to this position from the camera
++    // calculer la direction vers cette position depuis la caméra
 +    cameraToPoint.copy(position);
 +    cameraToPoint.applyMatrix4(camera.matrixWorldInverse).normalize();
 +
-+    // get the dot product of camera relative direction to this position
-+    // on the globe with the direction from the camera to that point.
-+    // 1 = facing directly towards the camera
-+    // 0 = exactly on tangent of the sphere from the camera
-+    // &lt; 0 = facing away
++    // obtenir le produit scalaire de la direction relative à la caméra vers cette position
++    // sur le globe avec la direction de la caméra vers ce point.
++    // 1 = face directement à la caméra
++    // 0 = exactement sur la tangente de la sphère par rapport à la caméra
++    // &lt; 0 = tourné à l'opposé
 +    const dot = tempV.dot(cameraToPoint);
 +
-+    // if the orientation is not facing us hide it.
++    // si l'orientation n'est pas tournée vers nous, masquer l'étiquette.
 +    if (dot &lt; minVisibleDot) {
 +      elem.style.display = 'none';
 +      continue;
 +    }
 +
-+    // restore the element to its default display style
++    // restaurer l'élément à son style d'affichage par défaut
 +    elem.style.display = '';
 
-    // get the normalized screen coordinate of that position
-    // x and y will be in the -1 to +1 range with x = -1 being
-    // on the left and y = -1 being on the bottom
+    // obtenir les coordonnées écran normalisées de cette position
+    // x et y seront dans la plage de -1 à +1, avec x = -1 à gauche
+    // et y = -1 en bas
     tempV.copy(position);
     tempV.project(camera);
 
-    // convert the normalized position to CSS coordinates
+    // convertir la position normalisée en coordonnées CSS
     const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
     const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 
-    // move the elem to that position
+    // déplacer l'élément à cette position
     countryInfo.elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 
-    // set the zIndex for sorting
+    // définir le zIndex pour le tri
     elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
   }
 }
 </pre>
-<p>Above we use the positions as a direction and get that direction relative to the
-camera. Then we get the camera relative direction from the camera to that
-position on the globe and take the <em>dot product</em>. The dot product returns the cosine
-of the angle between the to vectors. This gives us a value from -1
-to +1 where -1 means the label is facing the camera, 0 means the label is directly
-on the edge of the sphere relative to the camera, and anything greater than zero is
-behind. We then use that value to show or hide the element.</p>
+<p>Ci-dessus, nous utilisons les positions comme direction et obtenons cette direction par rapport à la
+caméra. Ensuite, nous obtenons la direction relative à la caméra, de la caméra à cette
+position sur le globe, et prenons le <em>produit scalaire</em>. Le produit scalaire renvoie le cosinus
+de l'angle entre les deux vecteurs. Cela nous donne une valeur de -1
+à +1, où -1 signifie que l'étiquette est face à la caméra, 0 signifie que l'étiquette est directement
+sur le bord de la sphère par rapport à la caméra, ou pour le dire autrement, elle est à 0 lorsque les 2 vecteurs sont
+perpendiculaires l'un à l'autre (90 degrés). Elle est supérieure à zéro lorsque l'étiquette est
+derrière la sphère. Nous utilisons ensuite cette valeur pour afficher ou masquer l'élément.</p>
 <div class="spread">
   <div>
     <div data-diagram="dotProduct" style="height: 400px"></div>
   </div>
 </div>
 
-<p>In the diagram above we can see the dot product of the direction the label is
-facing to direction from the camera to that position. If you rotate the
-direction you'll see the dot product is -1.0 when the direction is directly
-facing the camera, it's 0.0 when exactly on the tangent of the sphere relative
-to the camera or to put it another way it's 0 when the 2 vectors are
-perpendicular to each other, 90 degrees It's greater than zero with the label is
-behind the sphere.</p>
-<p>For issue #2, too many labels we need some way to decide which labels
-to show. One way would be to only show labels for large countries.
-The data we're loading contains min and max values for the area a
-country covers. From that we can compute an area and then use that
-area to decide whether or not to display the country.</p>
-<p>At init time let's compute the area</p>
+<p>Dans le diagramme ci-dessus, nous pouvons voir le produit scalaire de la direction vers laquelle l'étiquette est
+orientée par rapport à la direction de la caméra vers cette position. Si vous faites pivoter la
+direction, vous verrez que le produit scalaire est de -1,0 lorsque la direction est directement
+face à la caméra, il est de 0,0 lorsque l'étiquette est exactement sur la tangente de la sphère par rapport
+à la caméra, ou pour le dire autrement, il est de 0 lorsque les 2 vecteurs sont
+perpendiculaires l'un à l'autre (90 degrés). Il est supérieur à zéro lorsque l'étiquette est
+derrière la sphère.</p>
+<p>Pour le problème n°2 (trop d'étiquettes), nous avons besoin d'un moyen de décider quelles étiquettes
+afficher. Une façon serait de n'afficher que les étiquettes des grands pays.
+Les données que nous chargeons contiennent les valeurs min et max de la surface qu'un
+pays couvre. À partir de cela, nous pouvons calculer une surface, puis utiliser cette
+surface pour décider d'afficher ou non le pays.</p>
+<p>Au moment de l'initialisation, calculons la surface</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
 for (const countryInfo of countryInfos) {
   const {lat, lon, min, max, name} = countryInfo;
 
-  // adjust the helpers to point to the latitude and longitude
+  // ajuster les helpers pour pointer vers la latitude et la longitude
   lonHelper.rotation.y = THREE.MathUtils.degToRad(lon) + lonFudge;
   latHelper.rotation.x = THREE.MathUtils.degToRad(lat) + latFudge;
 
-  // get the position of the lat/lon
+  // obtenir la position de la lat/lon
   positionHelper.updateWorldMatrix(true, false);
   const position = new THREE.Vector3();
   positionHelper.getWorldPosition(position);
   countryInfo.position = position;
 
-+  // compute the area for each country
++  // calculer la surface pour chaque pays
 +  const width = max[0] - min[0];
 +  const height = max[1] - min[1];
 +  const area = width * height;
 +  countryInfo.area = area;
 
-  // add an element for each country
+  // ajouter un élément pour chaque pays
   const elem = document.createElement('div');
   elem.textContent = name;
   labelParentElem.appendChild(elem);
   countryInfo.elem = elem;
 }
 </pre>
-<p>Then at render time let's use the area to decide to display the label
-or not</p>
+<p>Puis, au moment du rendu, utilisons la surface pour décider d'afficher l'étiquette
+ou non</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const large = 20 * 20;
 const maxVisibleDot = 0.2;
-// get a matrix that represents a relative orientation of the camera
+// obtenir une matrice qui représente une orientation relative de la caméra
 normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
-// get the camera's position
+// obtenir la position de la caméra
 camera.getWorldPosition(cameraPosition);
 for (const countryInfo of countryInfos) {
 -  const {position, elem} = countryInfo;
 +  const {position, elem, area} = countryInfo;
-+  // large enough?
++  // assez grand ?
 +  if (area &lt; large) {
 +    elem.style.display = 'none';
 +    continue;
@@ -653,8 +651,8 @@ for (const countryInfo of countryInfos) {
 
   ...
 </pre>
-<p>Finally, since I'm not sure what good values are for these settings lets
-add a GUI so we can play with them</p>
+<p>Enfin, comme je ne suis pas sûr des bonnes valeurs pour ces paramètres, ajoutons
+une GUI pour que nous puissions jouer avec eux</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 +import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
@@ -675,41 +673,39 @@ function updateLabels() {
 -  const large = 20 * 20;
 -  const maxVisibleDot = -0.2;
 +  const large = settings.minArea * settings.minArea;
-  // get a matrix that represents a relative orientation of the camera
+  // obtenir une matrice qui représente une orientation relative de la caméra
   normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
-  // get the camera's position
+  // obtenir la position de la caméra
   camera.getWorldPosition(cameraPosition);
   for (const countryInfo of countryInfos) {
 
     ...
 
-    // if the orientation is not facing us hide it.
+    // si l'orientation n'est pas tournée vers nous, masquer l'étiquette.
 -    if (dot &gt; maxVisibleDot) {
 +    if (dot &gt; settings.maxVisibleDot) {
       elem.style.display = 'none';
       continue;
     }
 </pre>
-<p>and here's the result</p>
+<p>et voici le résultat</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-elements-to-3d-globe.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>You can see as you rotate the earth labels that go behind disappear.
-Adjust the <code class="notranslate" translate="no">minVisibleDot</code> to see the cutoff change.
-You can also adjust the <code class="notranslate" translate="no">minArea</code> value to see larger or smaller countries
-appear.</p>
-<p>The more I worked on this the more I realized just how much
-work is put into Google Maps. They have also have to decide which labels to
-show. I'm pretty sure they use all kinds of criteria. For example your current
-location, your default language setting, your account settings if you have an
-account, they probably use population or popularity, they might give priority
-to the countries in the center of the view, etc ... Lots to think about.</p>
-<p>In any case I hope these examples gave you some idea of how to align HTML
-elements with your 3D. A few things I might change.</p>
-<p>Next up let's make it so you can <a href="indexed-textures.html">pick and highlight a country</a>.</p>
+<p>Vous pouvez voir qu'en faisant pivoter la terre, les étiquettes qui passent derrière disparaissent.
+Ajustez la valeur de <code class="notranslate" translate="no">minVisibleDot</code> pour voir le changement de seuil.
+Vous pouvez également ajuster la valeur de <code class="notranslate" translate="no">minArea</code> pour voir apparaître des pays plus grands ou plus petits.</p>
+<p>Plus je travaillais là-dessus, plus je réalisais à quel point Google Maps a mis
+de travail. Ils doivent également décider quelles étiquettes afficher. Je suis assez sûr qu'ils utilisent
+toutes sortes de critères. Par exemple, votre position actuelle, votre paramètre de langue par défaut, vos paramètres de compte si vous en avez un,
+ils utilisent probablement la population ou la popularité, ils pourraient donner la priorité aux pays au centre
+de la vue, etc. ... Beaucoup de choses à considérer.</p>
+<p>Dans tous les cas, j'espère que ces exemples vous ont donné une idée de la façon d'aligner des éléments HTML
+avec votre scène 3D. Quelques points que je pourrais changer.</p>
+<p>Ensuite, rendons possible de <a href="indexed-textures.html">sélectionner et surligner un pays</a>.</p>
 <p><link rel="stylesheet" href="../resources/threejs-align-html-elements-to-3d.css"></p>
 <script type="module" src="../resources/threejs-align-html-elements-to-3d.js"></script>
 

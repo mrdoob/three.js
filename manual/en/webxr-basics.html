@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
     <title>VR</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -26,59 +26,32 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Making a VR app in three.js is pretty simple. You basically just have to tell
-three.js you want to use WebXR. If you think about it a few things about WebXR
-should be clear. Which way the camera is pointing is supplied by the VR system
-itself since the user turns their head to choose a direction to look. Similarly
-the field of view and aspect will be supplied by the VR system since each system
-has a different field of view and display aspect.</p>
-<p>Let's take an example from the article on <a href="responsive.html">making a responsive webpage</a>
-and make it support VR.</p>
-<p>Before we get started you're going to need a VR capable device like an Android
-smartphone, Google Daydream, Oculus Go, Oculus Rift, Vive, Samsung Gear VR., an
-iPhone with a <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">WebXR browser</a>.</p>
-<p>Next, if you are running locally you need to run a simple web server like is
-covered in <a href="setup.html">the article on setting up</a>. </p>
-<p>If the device you are using to view VR is not the same computer you're running
-on you need to serve your webpage via https or else the browser will not allow using
-the WebXR API. The server mentioned in <a href="setup.html">the article on setting up</a>
-called <a href="https://greggman.github.io/servez">Servez</a> has an option to use https.
-Check it and start the server. </p>
+          <p>Créer une application VR avec three.js est assez simple. Il suffit essentiellement de dire à three.js que vous souhaitez utiliser WebXR. En y réfléchissant, plusieurs points concernant WebXR devraient être clairs. La direction dans laquelle la caméra pointe est fournie par le système VR lui-même, puisque l'utilisateur tourne la tête pour choisir une direction. De même, le champ de vision et l'aspect seront fournis par le système VR, car chaque système a un champ de vision et un aspect d'affichage différents.</p>
+<p>Prenons un exemple tiré de l'article sur <a href="responsive.html">la création d'une page web responsive</a> et rendons-le compatible avec la VR.</p>
+<p>Avant de commencer, vous aurez besoin d'un appareil compatible VR, comme un smartphone Android, Google Daydream, Oculus Go, Oculus Rift, Vive, Samsung Gear VR, ou un iPhone avec un <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">navigateur WebXR</a>.</p>
+<p>Ensuite, si vous exécutez localement, vous devez lancer un simple serveur web, comme expliqué dans <a href="setup.html">l'article sur la configuration</a>. </p>
+<p>Si l'appareil que vous utilisez pour visualiser la VR n'est pas le même ordinateur que celui sur lequel vous travaillez, vous devez servir votre page web via https, sinon le navigateur n'autorisera pas l'utilisation de l'API WebXR. Le serveur mentionné dans <a href="setup.html">l'article sur la configuration</a> appelé <a href="https://greggman.github.io/servez">Servez</a> propose une option pour utiliser https. Cochez-la et démarrez le serveur. </p>
 <div class="threejs_center"><img src="../resources/images/servez-https.png" class="nobg" style="width: 912px;"></div>
 
-<p>The note the URLs. You need the one that is your computer's local ipaddress.
-It will usually start with <code class="notranslate" translate="no">192</code>, <code class="notranslate" translate="no">172</code> or <code class="notranslate" translate="no">10</code>. Type that full address, including the <code class="notranslate" translate="no">https://</code> part
-into your VR device's browser. Note: Your computer and your VR device need to be on the same local network
-or WiFi and you probably need to be on a home network. note: Many cafes are setup to disallow this kind of
-machine to machine connection.</p>
-<p>You'll be greeted with an error something like the one below. Click "advanced" and then click
-<em>proceed</em>.</p>
+<p>Notez les URL. Vous avez besoin de celle qui correspond à l'adresse IP locale de votre ordinateur. Elle commencera généralement par <code class="notranslate" translate="no">192</code>, <code class="notranslate" translate="no">172</code> ou <code class="notranslate" translate="no">10</code>. Saisissez cette adresse complète, y compris la partie <code class="notranslate" translate="no">https://</code>, dans le navigateur de votre appareil VR. Note : Votre ordinateur et votre appareil VR doivent être sur le même réseau local ou WiFi et vous devez probablement être sur un réseau domestique. Note : De nombreux cafés sont configurés pour interdire ce type de connexion entre machines.</p>
+<p>Vous serez accueilli par une erreur similaire à celle ci-dessous. Cliquez sur "advanced" (avancé) puis sur <em>proceed</em> (procéder).</p>
 <div class="threejs_center"><img src="../resources/images/https-warning.gif"></div>
 
-<p>Now you can run your examples.</p>
-<p>If you're really going to do WebXR development another thing you should learn about is
-<a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">remote debugging</a>
-so that you can see console warnings, errors, and of course actually
-<a href="debugging-javascript.html">debug your code</a>.</p>
-<p>If you just want to see the code work below you can just run the code from
-this site.</p>
-<p>The first thing we need to do is include the VR support after
-including three.js</p>
+<p>Vous pouvez maintenant exécuter vos exemples.</p>
+<p>Si vous envisagez sérieusement le développement WebXR, une autre chose que vous devriez apprendre est le <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">débogage à distance</a> afin de pouvoir voir les avertissements et erreurs de la console, et bien sûr réellement <a href="debugging-javascript.html">déboguer votre code</a>.</p>
+<p>Si vous voulez simplement voir le code fonctionner ci-dessous, vous pouvez exécuter le code depuis ce site.</p>
+<p>La première chose à faire est d'inclure le support VR après avoir inclus three.js</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {VRButton} from 'three/addons/webxr/VRButton.js';
 </pre>
-<p>Then we need to enable three.js's WebXR support and add its
-VR button to our page</p>
+<p>Ensuite, nous devons activer le support WebXR de three.js et ajouter son bouton VR à notre page</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  renderer.xr.enabled = true;
 +  document.body.appendChild(VRButton.createButton(renderer));
 </pre>
-<p>We need to let three.js run our render loop. Until now we have used a
-<code class="notranslate" translate="no">requestAnimationFrame</code> loop but to support VR we need to let three.js handle
-our render loop for us. We can do that by calling
-<a href="/docs/#api/en/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a> and passing a function to call for the loop.</p>
+<p>Nous devons laisser three.js gérer notre boucle de rendu. Jusqu'à présent, nous utilisions une boucle <code class="notranslate" translate="no">requestAnimationFrame</code>, mais pour supporter la VR, nous devons laisser three.js gérer notre boucle de rendu pour nous. Nous pouvons le faire en appelant <a href="/docs/#api/en/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a> et en passant une fonction à appeler pour la boucle.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
@@ -103,12 +76,11 @@ our render loop for us. We can do that by calling
 -requestAnimationFrame(render);
 +renderer.setAnimationLoop(render);
 </pre>
-<p>There is one more detail. We should probably set a camera height
-that's kind of average for a standing user.</p>
+<p>Il y a un autre détail. Nous devrions probablement définir une hauteur de caméra qui est à peu près la moyenne pour un utilisateur debout.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 1.6, 0);
 </pre>
-<p>and move the cubes up to be in front of the camera</p>
+<p>et déplacer les cubes vers le haut pour qu'ils soient devant la caméra</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
@@ -116,26 +88,16 @@ cube.position.x = x;
 +cube.position.y = 1.6;
 +cube.position.z = -2;
 </pre>
-<p>We set them to <code class="notranslate" translate="no">z = -2</code> since the camera will now be at <code class="notranslate" translate="no">z = 0</code> and
-camera defaults to looking down the -z axis.</p>
-<p>This brings up an extremely important point. <strong>Units in VR are in meters</strong>.
-In other words <strong>One Unit = One Meter</strong>. This means the camera is 1.6 meters above 0.
-The cube's centers are 2 meters in front of the camera. Each cube
-is 1x1x1 meter large. This is important because VR needs to adjust things to the
-user <em>in the real world</em>. That means we need the units used in three.js to match
-the user's own movements.</p>
-<p>And with that we should get 3 spinning cubes in front
-of the camera with a button to enter VR.</p>
+<p>Nous les avons placés à <code class="notranslate" translate="no">z = -2</code> car la caméra sera maintenant à <code class="notranslate" translate="no">z = 0</code> et la caméra par défaut regarde le long de l'axe -z.</p>
+<p>Cela soulève un point extrêmement important. <strong>Les unités en VR sont en mètres</strong>. En d'autres termes, <strong>Une Unité = Un Mètre</strong>. Cela signifie que la caméra est à 1,6 mètre au-dessus de 0. Les centres des cubes sont à 2 mètres devant la caméra. Chaque cube mesure 1x1x1 mètre. C'est important car la VR doit ajuster les éléments en fonction de l'utilisateur <em>dans le monde réel</em>. Cela signifie que les unités utilisées dans three.js doivent correspondre aux mouvements de l'utilisateur.</p>
+<p>Et avec cela, nous devrions obtenir 3 cubes tournants devant la caméra avec un bouton pour entrer en mode VR.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/webxr-basic.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
-<p>I find that VR works better if we have something surrounding the camera like
-room for reference so let's add a simple grid cubemap like we covered in
-<a href="backgrounds.html">the article on backgrounds</a>. We'll just use the same grid
-texture for each side of the cube which will give as a grid room.</p>
+<p>Je trouve que la VR fonctionne mieux si nous avons quelque chose autour de la caméra pour référence, comme une pièce. Ajoutons donc un simple cubemap en grille comme nous l'avons vu dans <a href="backgrounds.html">l'article sur les arrière-plans</a>. Nous utiliserons simplement la même texture de grille pour chaque côté du cube, ce qui nous donnera une pièce en grille.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +{
 +  const loader = new THREE.CubeTextureLoader();
@@ -150,129 +112,70 @@ texture for each side of the cube which will give as a grid room.</p>
 +  scene.background = texture;
 +}
 </pre>
-<p>That's better.</p>
+<p>C'est mieux.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic-w-background.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/webxr-basic-w-background.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
-<p>Note: To actually see VR you will need a WebXR compatible device.
-I believe most Android Phones can support WebXR using Chrome or Firefox.
-For iOS you might be able to use this <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">WebXR App</a>
-though in general WebXR support on iOS is unsupported as of May 2019.</p>
-<p>To use WebXR on Android or iPhone you'll need a <em>VR Headset</em>
-for phones. You can get them for anywhere from $5 for one made of cardboard
-to $100. Unfortunately I don't know which ones to recommend. I've purchased
-6 of them over the years and they are all of varying quality. I've
-never paid more than about $25.</p>
-<p>Just to mention some of the issues</p>
+<p>Note : Pour réellement voir la VR, vous aurez besoin d'un appareil compatible WebXR. Je pense que la plupart des téléphones Android peuvent supporter WebXR en utilisant Chrome ou Firefox. Pour iOS, vous pourriez être en mesure d'utiliser cette <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">WebXR App</a> bien qu'en général le support de WebXR sur iOS ne soit pas pris en charge depuis mai 2019.</p>
+<p>Pour utiliser WebXR sur Android ou iPhone, vous aurez besoin d'un <em>casque VR</em> pour téléphones. Vous pouvez en trouver pour un prix allant de 5 $ pour un modèle en carton à 100 $. Malheureusement, je ne sais pas lesquels recommander. J'en ai acheté 6 au fil des ans et ils sont tous de qualité variable. Je n'ai jamais payé plus d'environ 25 $.</p>
+<p>Pour mentionner quelques-uns des problèmes</p>
 <ol>
-<li><p>Do they fit your phone</p>
-<p>Phones come in a variety of sizes and so the VR headsets need to match.
-Many headsets claim to match a large variety of sizes. My experience
-is the more sizes they match the worse they actually are since instead
-of being designed for a specific size they have to make compromises
-to match more sizes. Unfortunately multi-size headsets are the most common type.</p>
+<li><p>Correspondent-ils à votre téléphone</p>
+<p>Les téléphones existent dans une variété de tailles et les casques VR doivent donc s'adapter. De nombreux casques prétendent s'adapter à une grande variété de tailles. Mon expérience est que plus ils prétendent s'adapter à de tailles, moins ils sont bons, car au lieu d'être conçus pour une taille spécifique, ils doivent faire des compromis pour s'adapter à plus de tailles. Malheureusement, les casques multi-tailles sont le type le plus courant.</p>
 </li>
-<li><p>Can they focus for your face</p>
-<p>Some devices have more adjustments than others. Generally there
-are at most 2 adjustments. How far the lenses are from your eyes
-and how far apart the lenses are.</p>
+<li><p>Peuvent-ils faire la mise au point pour votre visage</p>
+<p>Certains appareils ont plus d'ajustements que d'autres. Généralement, il y a au maximum 2 ajustements : la distance des lentilles par rapport à vos yeux et l'écart entre les lentilles.</p>
 </li>
-<li><p>Are they too reflective</p>
-<p>Many headsets of a cone of plastic from your eye to the phone.
-If that plastic is shinny or reflective then it will act like
-a mirror reflecting the screen and be very distracting.</p>
-<p>Few if any of the reviews seem to cover this issue.</p>
+<li><p>Sont-ils trop réfléchissants</p>
+<p>De nombreux casques ont un cône en plastique de votre œil au téléphone. Si ce plastique est brillant ou réfléchissant, il agira comme un miroir reflétant l'écran et sera très gênant.</p>
+<p>Peu ou pas de critiques semblent couvrir ce problème.</p>
 </li>
-<li><p>Are the comfortable on your face.</p>
-<p>Most of the devices rest on your nose like a pair of glasses.
-That can hurt after a few minutes. Some have straps that go around
-your head. Others have a 3rd strap that goes over your head. These
-may or may not help keep the device at the right place.</p>
-<p>It turns out for most (all?) devices, you eyes need to be centered
-with the lenses. If the lenses are slightly above or below your
-eyes the image gets out of focus. This can be very frustrating
-as things might start in focus but 45-60 seconds later the device
-has shifted up or down 1 millimeter and you suddenly realize you've
-been struggling to focus on a blurry image.</p>
+<li><p>Sont-ils confortables sur votre visage.</p>
+<p>La plupart des appareils reposent sur votre nez comme une paire de lunettes. Cela peut faire mal après quelques minutes. Certains ont des sangles qui font le tour de votre tête. D'autres ont une 3ème sangle qui passe par-dessus la tête. Celles-ci peuvent aider ou non à maintenir l'appareil au bon endroit.</p>
+<p>Il s'avère que pour la plupart (tous ?) les appareils, vos yeux doivent être centrés avec les lentilles. Si les lentilles sont légèrement au-dessus ou en dessous de vos yeux, l'image devient floue. Cela peut être très frustrant car les choses peuvent commencer nettes, mais 45 à 60 secondes plus tard, l'appareil s'est déplacé de 1 millimètre vers le haut ou vers le bas et vous réalisez soudain que vous avez du mal à faire la mise au point sur une image floue.</p>
 </li>
-<li><p>Can they support your glasses.</p>
-<p>If you wear eye glasses then you'll need to read the reviews to see
-if a particular headset works well with eye glasses.</p>
+<li><p>Peuvent-ils supporter vos lunettes.</p>
+<p>Si vous portez des lunettes, vous devrez lire les critiques pour voir si un casque particulier fonctionne bien avec les lunettes.</p>
 </li>
 </ol>
-<p>I really can't make any recommendations unfortunately. <a href="https://vr.google.com/cardboard/get-cardboard/">Google has some
-cheap recommendations made from cardboard</a>
-some of them as low as $5 so maybe start there and if you enjoy it
-then consider upgrading. $5 is like the price of 1 coffee so seriously, give it try!</p>
-<p>There are also 3 basic types of devices.</p>
+<p>Je ne peux malheureusement vraiment faire aucune recommandation. <a href="https://vr.google.com/cardboard/get-cardboard/">Google propose des recommandations bon marché fabriquées en carton</a>, certaines coûtant aussi peu que 5 $, alors peut-être commencer par là et si vous aimez, envisagez de passer à un modèle supérieur. 5 $ c'est comme le prix d'un café, alors sérieusement, essayez !</p>
+<p>Il existe également 3 types de base d'appareils.</p>
 <ol>
-<li><p>3 degrees of freedom (3dof), no input device</p>
-<p>This is generally the phone style although sometimes you can
-buy a 3rd party input device. The 3 degrees of freedom
-mean you can look up/down (1), left/right(2) and you can tilt
-your head left and right (3).</p>
+<li><p>3 degrés de liberté (3dof), pas de dispositif d'entrée</p>
+<p>C'est généralement le style téléphonique, bien que l'on puisse parfois acheter un dispositif d'entrée tiers. Les 3 degrés de liberté signifient que vous pouvez regarder vers le haut/bas (1), gauche/droite (2) et incliner la tête à gauche et à droite (3).</p>
 </li>
-<li><p>3 degrees of freedom (3dof) with 1 input device (3dof)</p>
-<p>This is basically Google Daydream and Oculus GO</p>
-<p>These also allow 3 degrees of freedom and include a small
-controller that acts like a laser pointer inside VR.
-The laser pointer also only has 3 degrees of freedom. The
-system can tell which way the input device is pointing but
-it can not tell where the device is.</p>
+<li><p>3 degrés de liberté (3dof) avec 1 dispositif d'entrée (3dof)</p>
+<p>Il s'agit essentiellement de Google Daydream et Oculus GO</p>
+<p>Ceux-ci permettent également 3 degrés de liberté et incluent un petit contrôleur qui agit comme un pointeur laser à l'intérieur de la VR. Le pointeur laser n'a également que 3 degrés de liberté. Le système peut savoir dans quelle direction le dispositif d'entrée pointe, mais il ne peut pas savoir où se trouve le dispositif.</p>
 </li>
-<li><p>6 degrees of freedom (6dof) with input devices (6dof)</p>
-<p>These are <em>the real deal</em> haha. 6 degrees of freedom
-means not only do these device know which way you are looking
-but they also know where your head actually is. That means
-if you move from left to right or forward and back or stand up / sit down
-the devices can register this and everything in VR moves accordingly.
-It's spookily and amazingly real feeling. With a good demo
-you'll be blown away or at least I was and still am.</p>
-<p>Further these devices usually include 2 controllers, one
-for each hand and the system can tell exactly where your
-hands are and which way they are oriented and so you can
-manipulate things in VR by just reaching out, touching,
-pushing, twisting, etc...</p>
-<p>6 degree of freedom devices include the Vive and Vive Pro,
-the Oculus Rift and Quest, and I believe all of the Windows MR devices.</p>
+<li><p>6 degrés de liberté (6dof) avec dispositifs d'entrée (6dof)</p>
+<p>C'est <em>la vraie affaire</em> haha. 6 degrés de liberté signifie que ces appareils ne savent pas seulement dans quelle direction vous regardez, mais ils savent aussi où se trouve réellement votre tête. Cela signifie que si vous vous déplacez de gauche à droite, ou d'avant en arrière, ou si vous vous levez/vous asseyez, les appareils peuvent l'enregistrer et tout dans la VR bouge en conséquence. C'est étrangement et incroyablement réaliste. Avec une bonne démo, vous serez époustouflé, ou du moins je l'ai été et je le suis toujours.</p>
+<p>De plus, ces appareils incluent généralement 2 contrôleurs, un pour chaque main, et le système peut savoir exactement où sont vos mains et comment elles sont orientées, de sorte que vous pouvez manipuler des objets en VR en tendant simplement la main, en touchant, poussant, tournant, etc...</p>
+<p>Les appareils à 6 degrés de liberté incluent le Vive et Vive Pro, l'Oculus Rift et Quest, et je crois tous les appareils Windows MR.</p>
 </li>
 </ol>
-<p>With all that covered I don't for sure know which devices will work with WebXR.
-I'm 99% sure that most Android phones will work when running Chrome. You may
-need to turn on WebXR support in <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>. I also know Google
-Daydream will also work and similarly you need to enable WebXR support in
-<a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>. Oculus Rift, Vive, and Vive Pro will work via
-Chrome or Firefox. I'm less sure about Oculus Go and Oculus Quest as both of
-them use custom OSes but according to the internet they both appear to work.</p>
-<p>Okay, after that long detour about VR Devices and WebXR
-there's some things to cover</p>
+<p>Après avoir couvert tout cela, je ne sais pas avec certitude quels appareils fonctionneront avec WebXR. Je suis sûr à 99% que la plupart des téléphones Android fonctionneront avec Chrome. Vous pourriez avoir besoin d'activer le support WebXR dans <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>. Je sais aussi que Google Daydream fonctionnera également et de manière similaire, vous devez activer le support WebXR dans <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>. Oculus Rift, Vive et Vive Pro fonctionneront via Chrome ou Firefox. Je suis moins sûr pour Oculus Go et Oculus Quest car ils utilisent tous deux des OS personnalisés, mais selon internet, ils semblent tous deux fonctionner.</p>
+<p>Ok, après ce long détour sur les appareils VR et WebXR, il y a quelques points à aborder</p>
 <ul>
-<li><p>Supporting both VR and Non-VR</p>
-<p>AFAICT, at least as of r112, there is no easy way to support
-both VR and non-VR modes with three.js. Ideally
-if not in VR mode you'd be able to control the camera using
-whatever means you want, for example the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>,
-and you'd get some kind of event when switching into and
-out of VR mode so that you could turn the controls on/off.</p>
+<li><p>Support de la VR et de la non-VR</p>
+<p>Autant que je sache, au moins à partir de r112, il n'y a pas de moyen simple de supporter à la fois les modes VR et non-VR avec three.js. Idéalement, si vous n'êtes pas en mode VR, vous devriez pouvoir contrôler la caméra par les moyens de votre choix, par exemple les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, et vous recevriez un événement lors du passage en mode VR et de la sortie pour pouvoir activer/désactiver les contrôles.</p>
 </li>
 </ul>
-<p>If three.js adds some support to do both I'll try to update
-this article. Until then you might need 2 versions of your
-site OR pass in a flag in the URL, something like</p>
+<p>Si three.js ajoute un support pour faire les deux, j'essaierai de mettre à jour cet article. D'ici là, vous pourriez avoir besoin de 2 versions de votre site OU passer un indicateur dans l'URL, quelque chose comme</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">https://mysite.com/mycooldemo?allowvr=true
-</pre><p>Then we could add some links in to switch modes</p>
+</pre><p>Ensuite, nous pourrions ajouter quelques liens pour changer de mode</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div class="mode"&gt;
-+    &lt;a href="?allowvr=true" id="vr"&gt;Allow VR&lt;/a&gt;
-+    &lt;a href="?" id="nonvr"&gt;Use Non-VR Mode&lt;/a&gt;
++    &lt;a href="?allowvr=true" id="vr"&gt;Autoriser la VR&lt;/a&gt;
++    &lt;a href="?" id="nonvr"&gt;Utiliser le mode non-VR&lt;/a&gt;
 +  &lt;/div&gt;
 &lt;/body&gt;
 </pre>
-<p>and some CSS to position them</p>
+<p>et du CSS pour les positionner</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
     margin: 0;
 }
@@ -287,7 +190,7 @@ site OR pass in a flag in the URL, something like</p>
 +  top: 1em;
 +}
 </pre>
-<p>in your code you could use that parameter like this</p>
+<p>dans votre code, vous pourriez utiliser ce paramètre comme ceci</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
@@ -315,56 +218,23 @@ site OR pass in a flag in the URL, something like</p>
 +    document.querySelector('#nonvr').style.display = 'none';
 +  }
 </pre>
-<p>Whether that's good or bad I don't know. I have a feeling the differences
-between what's needed for VR and what's needed for non-VR are often
-very different so for all but the most simple things maybe 2 separate pages
-are better? You'll have to decide.</p>
-<p>Note for various reasons this will not work in the live editor
-on this site so if you want to check it out
-<a href="../examples/webxr-basic-vr-optional.html" target="_blank">click here</a>.
-It should start in non-VR mode and you can use the mouse or fingers to move
-the camera. Clicking "Allow VR" should switch to allow VR mode and you should
-be able to click "Enter VR" if you're on a VR device.</p>
+<p>Si c'est bien ou mal, je ne sais pas. J'ai l'impression que les différences entre ce qui est nécessaire pour la VR et ce qui est nécessaire pour la non-VR sont souvent très différentes, donc pour tout sauf les choses les plus simples, peut-être que 2 pages séparées sont mieux ? Vous devrez décider.</p>
+<p>Note : pour diverses raisons, cela ne fonctionnera pas dans l'éditeur en direct sur ce site. Donc, si vous voulez l'essayer, <a href="../examples/webxr-basic-vr-optional.html" target="_blank">cliquez ici</a>. Il devrait démarrer en mode non-VR et vous pouvez utiliser la souris ou les doigts pour déplacer la caméra. Cliquer sur "Allow VR" (Autoriser la VR) devrait basculer en mode VR, et vous devriez pouvoir cliquer sur "Enter VR" (Entrer en mode VR) si vous êtes sur un appareil VR.</p>
 <ul>
-<li><p>Deciding on the level of VR support</p>
-<p>Above we covered 3 types of VR devices. </p>
+<li><p>Décider du niveau de support VR</p>
+<p>Ci-dessus, nous avons couvert 3 types d'appareils VR.</p>
 <ul>
-<li>3DOF no input</li>
-<li>3DOF + 3DOF input</li>
-<li>6DOF + 6DOF input</li>
+<li>3DOF sans entrée</li>
+<li>3DOF + entrée 3DOF</li>
+<li>6DOF + entrée 6DOF</li>
 </ul>
-<p>You need to decide how much effort you're willing to put in
-to support each type of device.</p>
-<p>For example the simplest device has no input. The best you can
-generally do is make it so there are some buttons or objects in the user's view
-and if the user aligns some marker in the center of the display
-on those objects for 1/2 a second or so then that button is clicked.
-A common UX is to display a small timer that will appear over the object indicating
-if you keep the marker there for a moment the object/button will be selected.</p>
-<p>Since there is no other input that's about the best you can do</p>
-<p>The next level up you have one 3DOF input device. Generally it
-can point at things and the user has at least 2 buttons. The Daydream
-also has a touchpad which provides normal touch inputs.</p>
-<p>In any case if a user has this type of device it's far more
-comfortable for the user to by able to point at things with
-their controller than it is to make them do it with their
-head by looking at things.</p>
-<p>A similar level to that might be 3DOF or 6DOF device with a
-game console controller. You'll have to decide what to do here.
-I suspect the most common thing is the user still has to look
-to point and the controller is just used for buttons.</p>
-<p>The last level is a user with a 6DOF headset and 2 6DOF controllers.
-Those users will find an experience that is only 3DOF to often
-be frustrating. Similarly they usually expect to be able to
-virtually manipulate things with their hands in VR so you'll
-have to decide if you want to support that or not.</p>
+<p>Vous devez décider du niveau d'effort que vous êtes prêt à consacrer pour supporter chaque type d'appareil.</p>
+<p>Par exemple, l'appareil le plus simple n'a pas d'entrée. Le mieux que vous puissiez généralement faire est de créer des boutons ou des objets dans la vue de l'utilisateur et si l'utilisateur aligne un marqueur au centre de l'affichage sur ces objets pendant environ une demi-seconde, ce bouton est cliqué. Une UX courante consiste à afficher un petit minuteur qui apparaît au-dessus de l'objet, indiquant que si vous maintenez le marqueur là pendant un instant, l'objet/bouton sera sélectionné.</p>
+<p>Comme il n'y a pas d'autre entrée, c'est à peu près le mieux que vous puissiez faire</p>
 </li>
 </ul>
-<p>As you can see getting started in VR is pretty easy but
-actually making something shippable in VR will require
-lots of decision making and design.</p>
-<p>This was a pretty brief intro into VR with three.js. We'll
-cover some of the input methods in <a href="webxr-look-to-select.html">future articles</a>.</p>
+<p>Comme vous pouvez le voir, démarrer en VR est assez simple, mais créer quelque chose de commercialisable en VR nécessitera beaucoup de décisions et de conception.</p>
+<p>Ceci était une introduction assez brève à la VR avec three.js. Nous couvrirons certaines méthodes d'entrée dans de <a href="webxr-look-to-select.html">futurs articles</a>.</p>
 
         </div>
       </div>

@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Uniform Types</title>
+    <title>Types d'uniformes</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Uniform Types">
+    <meta name="twitter:title" content="Three.js – Types d'uniformes">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,29 +22,30 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Uniform Types</h1>
+        <h1>Types d'uniformes</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
           
           <p>
-            Each uniform must have a `value` property. The type of the value must
-            correspond to the type of the uniform variable in the GLSL code as
-            specified for the primitive GLSL types in the table below. Uniform
-            structures and arrays are also supported. GLSL arrays of primitive type
-            must either be specified as an array of the corresponding THREE objects or
-            as a flat array containing the data of all the objects. In other words;
-            GLSL primitives in arrays must not be represented by arrays. This rule
-            does not apply transitively. An array of `vec2` arrays, each with a length
-            of five vectors, must be an array of arrays, of either five `Vector2`
-            objects or ten `number`s.
+            Chaque uniforme doit avoir une propriété <code>value</code>. Le type de la valeur doit
+            correspondre au type de la variable uniforme dans le code GLSL, tel que
+            spécifié pour les types GLSL primitifs dans le tableau ci-dessous. Les
+            structures et les tableaux d'uniformes sont également pris en charge. Les tableaux
+            GLSL de type primitif doivent être spécifiés soit comme un tableau des objets
+            THREE correspondants, soit comme un tableau plat contenant les données de tous
+            les objets. En d'autres termes ; les primitives GLSL dans les tableaux ne doivent
+            pas être représentées par des tableaux. Cette règle ne s'applique pas de
+            manière transitive. Un tableau de tableaux de <code>vec2</code>, chacun ayant une longueur
+            de cinq vecteurs, doit être un tableau de tableaux, composé soit de cinq
+            objets <code>Vector2</code>, soit de dix <code>number</code>s.
           </p>
       
           <table>
             <thead>
               <tr>
-                <th>GLSL type</th>
-                <th>JavaScript type</th>
+                <th>Type GLSL</th>
+                <th>Type JavaScript</th>
               </tr>
             </thead>
             <tbody>
@@ -180,41 +181,41 @@
           </table>
       
           <p>
-            (*) Same for an (innermost) array (dimension) of the same GLSL type,
-            containing the components of all vectors or matrices in the array.
+            (*) De même pour un tableau (dimension) le plus interne du même type GLSL,
+            contenant les composantes de tous les vecteurs ou matrices dans le tableau.
           </p>
       
-          <h2>Structured Uniforms</h2>
+          <h2>Uniformes structurés</h2>
       
           <p>
-            Sometimes you want to organize uniforms as `structs` in your shader code.
-            The following style must be used so `three.js` is able to process
-            structured uniform data.
+            Parfois, vous souhaitez organiser les uniformes en tant que <code>structs</code> dans votre
+            code de shader. Le style suivant doit être utilisé pour que <code>three.js</code> puisse
+            traiter les données uniformes structurées.
           </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 uniforms = {
-  data: { 
+  data: {
     value: {
-      position: new Vector3(), 
-      direction: new Vector3( 0, 0, 1 ) 
-    } 
-  } 
+      position: new Vector3(),
+      direction: new Vector3( 0, 0, 1 )
+    }
+  }
 };
 </pre>
-          This definition can be mapped on the following GLSL code:
+          Cette définition peut être mappée sur le code GLSL suivant :
 <pre class="prettyprint notranslate lang-js" translate="no">
-struct Data { 
+struct Data {
   vec3 position;
   vec3 direction;
 };
 uniform Data data;
 </pre>
       
-          <h2>Structured Uniforms with Arrays</h2>
+          <h2>Uniformes structurés avec tableaux</h2>
       
           <p>
-            It's also possible to manage `structs` in arrays. The syntax for this use
-            case looks like so:
+            Il est également possible de gérer des <code>structs</code> dans des tableaux. La syntaxe
+            pour ce cas d'utilisation ressemble à ceci :
           </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const entry1 = {
@@ -232,11 +233,11 @@ uniforms = {
   }
 };
 </pre>
-          This definition can be mapped on the following GLSL code:
+          Cette définition peut être mappée sur le code GLSL suivant :
 <pre class="prettyprint notranslate lang-js" translate="no">
-struct Data { 
-  vec3 position; 
-  vec3 direction; 
+struct Data {
+  vec3 position;
+  vec3 direction;
 };
 uniform Data data[ 2 ];
 </pre>
