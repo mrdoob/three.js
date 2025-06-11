@@ -1767,7 +1767,7 @@ class NodeBuilder {
 			//
 
 			if ( this.currentStack && this.currentStack.namespace ) {
-console.log( 'NodeBuilder: Using stackNamespace for variable names is deprecated.' );
+
 				name = this.currentStack.namespace + '_' + name;
 
 			}

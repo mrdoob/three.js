@@ -120,8 +120,6 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once( 'NORMAL' ) )();
 
-normalView.isNormalTest = true;
-
 /**
  * TSL object that represents the transformed vertex normal in world space of the current rendered object.
  *
@@ -135,8 +133,6 @@ export const normalWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 		return normalWorldGeometry;
 
 	}
-
-	//console.log( 'normaWorld', builder.material );
 
 	return normalView.transformDirection( cameraViewMatrix ).toVar( 'normalWorld' );
 

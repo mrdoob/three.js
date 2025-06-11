@@ -256,14 +256,15 @@ class StackNode extends Node {
 	build( builder, ...params ) {
 
 		const previousStack = getCurrentStack();
+		const previousBuilderStack = builder.currentStack;
 
 		setCurrentStack( this );
 
 		const buildStage = builder.buildStage;
 
-		for ( const node of this.nodes ) {
+		builder.currentStack = this;
 
-			builder.currentStack = this;
+		for ( const node of this.nodes ) {
 
 			if ( buildStage === 'setup' ) {
 
@@ -290,7 +291,7 @@ class StackNode extends Node {
 
 		}
 
-		builder.currentStack = null;
+		builder.currentStack = previousBuilderStack;
 
 		setCurrentStack( previousStack );
 
