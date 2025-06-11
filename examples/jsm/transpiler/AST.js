@@ -278,3 +278,26 @@ export class For {
 	}
 
 }
+
+export class Switch {
+
+	constructor( discriminant ) {
+
+		this.discriminant = discriminant;
+		this.cases = [];
+		this.isSwitch = true;
+
+	}
+
+}
+
+export class SwitchCase {
+
+	constructor() {
+
+		this.body = [];
+		this.isSwitchCase = true;
+
+	}
+
+}

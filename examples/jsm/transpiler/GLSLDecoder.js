@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard } from './AST.js';
+import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -801,6 +801,81 @@ class GLSLDecoder {
 
 	}
 
+	parseSwitchCase() {
+
+		const parseCaseExpression = () => {
+
+			this.readToken(); // Skip 'case
+
+			const caseTokens = this.readTokensUntil( ':' );
+
+			return this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
+
+		};
+
+		const parseCaseBlock = ( caseStatement ) => {
+
+			if ( this.getToken().str === '{' ) {
+
+				this.parseBlock( caseStatement );
+
+
+			}
+
+
+		};
+
+
+
+	}
+
+	parseSwitch() {
+
+		const parseSwitchExpression = () => {
+
+			this.readToken(); // Skip 'switch'
+
+			const switchDeterminantTokens = this.readTokensUntil( ')' );
+
+			// Parse expresison between parentheses. Index 1: char after '('. Index -1: char before ')'
+			return this.parseExpressionFromTokens( switchDeterminantTokens.slice( 1, - 1 ) );
+
+
+		};
+
+		const parseSwitchBlock = ( switchStatement ) => {
+
+			if ( this.getToken().str === '{' ) {
+
+				this.readToken(); // Skip '{'
+				if ( this.getToken().str === 'case' ) {
+
+					switchStatement.cases.push( parseSwitchCase() );
+
+				}
+
+			} else {
+
+				switchStatement.body.push( this.parseExpression() );
+
+			}
+
+		};
+
+		const switchStatement = new Switch( parseSwitchExpression() );
+
+		parseSwitchBlock( switchStatement );
+
+
+		// etc
+
+		//etc
+
+		return switchStatement;
+
+
+	}
+
 	parseIf() {
 
 		const parseIfExpression = () => {
@@ -930,6 +1005,14 @@ class GLSLDecoder {
 				} else if ( token.str === 'for' ) {
 
 					statement = this.parseFor();
+
+				} else if ( token.str === 'switch' ) {
+
+					statement = this.parseSwitch();
+
+				} else if ( token.str === 'case' ) {
+
+					statement = this.parseSwitchCase();
 
 				} else {
 
