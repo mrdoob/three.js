@@ -733,22 +733,6 @@ addMethodChaining( 'decrement', decrement );
 /**
  * @tsl
  * @function
- * @deprecated since r168. Use {@link mod} instead.
- *
- * @param {Node} a - The first input.
- * @param {Node} b - The second input.
- * @returns {OperatorNode}
- */
-export const remainder = ( a, b ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: "remainder()" is deprecated. Use "mod( int( ... ) )" instead.' );
-	return mod( a, b );
-
-};
-
-/**
- * @tsl
- * @function
  * @deprecated since r175. Use {@link mod} instead.
  *
  * @param {Node} a - The first input.
@@ -762,5 +746,4 @@ export const modInt = ( a, b ) => { // @deprecated, r175
 
 };
 
-addMethodChaining( 'remainder', remainder );
 addMethodChaining( 'modInt', modInt );

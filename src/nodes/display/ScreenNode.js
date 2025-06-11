@@ -258,29 +258,3 @@ export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r1
 	return screenSize;
 
 }, 'vec2' ).once() )();
-
-/**
- * @tsl
- * @deprecated since r168. Use {@link screenUV} instead.
- * @type {Node<vec2>}
- */
-export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: "viewportTopLeft" is deprecated. Use "screenUV" instead.' );
-
-	return screenUV;
-
-}, 'vec2' ).once() )();
-
-/**
- * @tsl
- * @deprecated since r168. Use `screenUV.flipY()` instead.
- * @type {Node<vec2>}
- */
-export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: "viewportBottomLeft" is deprecated. Use "screenUV.flipY()" instead.' );
-
-	return screenUV.flipY();
-
-}, 'vec2' ).once() )();

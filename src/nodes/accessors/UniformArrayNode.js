@@ -346,19 +346,3 @@ export default UniformArrayNode;
  * @returns {UniformArrayNode}
  */
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
-
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link uniformArray} instead.
- *
- * @param {Array<any>} values - Array-like data.
- * @param {string} nodeType - The data type of the array elements.
- * @returns {UniformArrayNode}
- */
-export const uniforms = ( values, nodeType ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: uniforms() has been renamed to uniformArray().' );
-	return nodeObject( new UniformArrayNode( values, nodeType ) );
-
-};

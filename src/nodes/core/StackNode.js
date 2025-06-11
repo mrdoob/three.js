@@ -286,35 +286,6 @@ class StackNode extends Node {
 
 	}
 
-	// Deprecated
-
-	/**
-	 * @function
-	 * @deprecated since r168. Use {@link StackNode#Else} instead.
-	 *
-	 * @param {...any} params
-	 * @returns {StackNode}
-	 */
-	else( ...params ) { // @deprecated, r168
-
-		console.warn( 'THREE.TSL: .else() has been renamed to .Else().' );
-		return this.Else( ...params );
-
-	}
-
-	/**
-	 * @deprecated since r168. Use {@link StackNode#ElseIf} instead.
-	 *
-	 * @param {...any} params
-	 * @returns {StackNode}
-	 */
-	elseif( ...params ) { // @deprecated, r168
-
-		console.warn( 'THREE.TSL: .elseif() has been renamed to .ElseIf().' );
-		return this.ElseIf( ...params );
-
-	}
-
 }
 
 export default StackNode;
