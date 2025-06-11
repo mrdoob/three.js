@@ -21,7 +21,6 @@
 	"webgl_depth_texture": [ "renderTarget" ],
 	"webgl_framebuffer_texture": [ "renderTarget" ],
 	"webgl_geometries": [ "geometry" ],
-	"webgl_geometries_parametric": [ "geometry" ],
 	"webgl_geometry_colors_lookuptable": [ "vertex" ],
 	"webgl_geometry_csg": [ "external", "csg", "bvh", "constructive", "solid", "geometry", "games", "level" ],
 	"webgl_geometry_nurbs": [ "curve", "surface" ],
