@@ -3,7 +3,7 @@ import { cameraViewMatrix } from './Camera.js';
 import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
 import { mat3, vec3, Fn } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
-import { faceDirection } from '../display/FrontFacingNode.js';
+import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 
 /**
  * TSL object that represents the normal attribute of the current rendered object.
@@ -81,12 +81,6 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	}
 
-	if ( builder.material.flatShading !== true ) {
-
-		normal = normal.mul( faceDirection );
-
-	}
-
 	return normal.normalize().toVar( 'normalWorldGeometry' );
 
 }, 'vec3' ).once() )();
@@ -99,20 +93,23 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	let normal;
+
 	if ( builder.namespace === 'NORMAL' ) {
 
-		return normalViewGeometry;
+		normal = normalViewGeometry;
+
+	} else {
+
+		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
+
+		normal = builder.context.setupNormal().context( { getUV: null } );
 
 	}
-	//console.log( 'normalView', builder.material );
-
-	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
-
-	let normal = builder.context.setupNormal().context( { getUV: null } );
 
 	if ( builder.material.flatShading !== true ) {
 
-		normal = normal.mul( faceDirection );
+		normal = directionToFaceDirection( normal );
 
 	}
 
@@ -146,19 +143,23 @@ export const normalWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const clearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	let normal;
+
 	if ( builder.namespace === 'NORMAL' ) {
 
-		return normalViewGeometry;
+		normal = normalViewGeometry;
+
+	} else {
+
+		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
+
+		normal = builder.context.setupClearcoatNormal().context( { getUV: null } );
 
 	}
 
-	// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
-
-	let normal = builder.context.setupClearcoatNormal().context( { getUV: null } );
-
 	if ( builder.material.flatShading !== true ) {
 
-		normal = normal.mul( faceDirection );
+		normal = directionToFaceDirection( normal );
 
 	}
 

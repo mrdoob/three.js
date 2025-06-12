@@ -745,7 +745,7 @@ class Node extends EventDispatcher {
 
 						console.warn( 'THREE.Node: Recursion detected.', this );
 
-						result = '';
+						result = '/* Recursion detected. */';
 
 					}
 
