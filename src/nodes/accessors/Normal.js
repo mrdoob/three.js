@@ -99,17 +99,17 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		normal = normalViewGeometry;
 
+		if ( builder.material.flatShading !== true ) {
+
+			normal = directionToFaceDirection( normal );
+
+		}
+
 	} else {
 
 		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
 		normal = builder.context.setupNormal().context( { getUV: null } );
-
-	}
-
-	if ( builder.material.flatShading !== true ) {
-
-		normal = directionToFaceDirection( normal );
 
 	}
 
@@ -161,17 +161,18 @@ export const clearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		normal = normalViewGeometry;
 
+		if ( builder.material.flatShading !== true ) {
+
+			normal = directionToFaceDirection( normal );
+
+		}
+
+
 	} else {
 
 		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
 		normal = builder.context.setupClearcoatNormal().context( { getUV: null } );
-
-	}
-
-	if ( builder.material.flatShading !== true ) {
-
-		normal = directionToFaceDirection( normal );
 
 	}
 
