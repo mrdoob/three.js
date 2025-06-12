@@ -72,8 +72,6 @@ class ImageLoader extends Loader {
 
 			removeEventListeners();
 
-			Cache.add( url, this );
-
 			if ( onLoad ) onLoad( this );
 
 			scope.manager.itemEnd( url );
@@ -85,6 +83,8 @@ class ImageLoader extends Loader {
 			removeEventListeners();
 
 			if ( onError ) onError( event );
+
+			Cache.remove( url );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
@@ -107,6 +107,7 @@ class ImageLoader extends Loader {
 
 		}
 
+		Cache.add( url, image );
 		scope.manager.itemStart( url );
 
 		image.src = url;
