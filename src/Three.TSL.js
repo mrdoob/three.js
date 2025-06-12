@@ -341,6 +341,7 @@ export const normalGeometry = TSL.normalGeometry;
 export const normalLocal = TSL.normalLocal;
 export const normalMap = TSL.normalMap;
 export const normalView = TSL.normalView;
+export const normalViewGeometry = TSL.normalViewGeometry;
 export const normalWorld = TSL.normalWorld;
 export const normalWorldGeometry = TSL.normalWorldGeometry;
 export const normalize = TSL.normalize;
