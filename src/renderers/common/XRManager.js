@@ -646,27 +646,56 @@ class XRManager extends EventDispatcher {
 	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40 ) {
 
 		const createMaterial = ( texture ) => new MeshBasicMaterial( { map: texture } );
-		const createMesh = ( texture, eyeIndex = 1 ) => {
 
-			let geometry;
+		//create blend layer material while in immersive-vr XR
+		const createLayerMaterial = ( ) => {
 
-			//if 180 video create a half sphere
-			if ( is180 ) {
+			const material = createMaterial( null );
+			material.side = FrontSide;
+			material.blending = CustomBlending;
+			material.blendEquation = AddEquation;
+			material.blendSrc = ZeroFactor;
+			material.blendDst = ZeroFactor;
+			return material;
 
-				geometry = new SphereGeometry( radius, widthSegments, heightSegments, Math.PI / 2, Math.PI, 0, Math.PI );
+		};
 
-			} else {
+		const createMesh = ( texture, eyeIndex = 1, geometry = null, material = null ) => {
 
-				geometry = new SphereGeometry( radius, widthSegments, heightSegments );
+			//let geometry;
+
+			if ( ! geometry ) {
+
+				//if 180 video create a half sphere
+				if ( is180 ) {
+
+					geometry = new SphereGeometry( radius, widthSegments, heightSegments, Math.PI / 2, Math.PI, 0, Math.PI );
+
+				} else {
+
+					geometry = new SphereGeometry( radius, widthSegments, heightSegments );
+
+				}
+
+				geometry.scale( - 1, 1, 1 );
 
 			}
 
-			geometry.scale( - 1, 1, 1 );
-
-			const mesh = new Mesh( geometry, createMaterial( texture ) );
+			const mesh = new Mesh( geometry, material || createMaterial( texture ) );
 
 			mesh.layers.set( eyeIndex );
 
+			return mesh;
+
+		};
+
+		//creates a layer mesh for sphere geometries to poke through to the native media layers.
+		//this is important for immersive-vr mode or the projection layer blocks the native layer
+		const createLayerMesh = ( geometry, eyeIndex = 1 ) => {
+
+			const mesh = createMesh( null, eyeIndex, geometry, createLayerMaterial() );
+			//mesh.geometry = geometry;
+			mesh.layers.disableAll();
 			return mesh;
 
 		};
@@ -691,12 +720,20 @@ class XRManager extends EventDispatcher {
 
 		};
 
-		const group = new Group();
+		const group = new Group(),
+			layerGroup = new Group();
+
+		layerGroup.name = 'sphere';
+
+		let mesh;
 
 		switch ( layout ) {
 
 			case 'mono':
-				group.add( createMesh( texture ) );
+				mesh = createMesh( texture );
+				group.add( mesh );
+				//add blend sphere layer mesh using the same geometry
+				layerGroup.add( createLayerMesh( mesh.geometry ) );
 				break;
 			case 'stereo':
 			default:
@@ -708,11 +745,17 @@ class XRManager extends EventDispatcher {
 
 				[ 1, 2 ].forEach( eyeIndex => {
 
-					const mesh = createMesh( texture, eyeIndex );
+					mesh = createMesh( texture, eyeIndex );
+
 					//set the uv mappingf for each eye index
 					setUVMapping( eyeIndex, uvFactors, mesh.geometry );
-					mesh.rotation.y = - Math.PI / 2;
+
+					//add blend sphere layer mesh using the same geometry for each eye
+					const layerMesh = createLayerMesh( mesh.geometry, eyeIndex );
+
+					mesh.rotation.y = layerMesh.rotation.y = - Math.PI / 2;
 					group.add( mesh );
+					layerGroup.add( layerMesh );
 
 				} );
 				break;
@@ -727,6 +770,7 @@ class XRManager extends EventDispatcher {
 				type: 'equirect',
 				texture: texture,
 				group: group,
+				layerGroup: layerGroup,
 				quaternion: quaternion,
 				params: {
 					layout: layout,
@@ -738,11 +782,18 @@ class XRManager extends EventDispatcher {
 
 			this._mediaLayers.push( layer );
 
+			group.add( layerGroup );
+
 			if ( this._session !== null ) {
 
 				layer.xrlayer = this._createXRLayer( layer );
 
 				this._createdMediaLayers.push( layer.xrlayer );
+
+				//enable current blend layer group
+				layerGroup.children.forEach( mesh => mesh.layers.enableAll() );
+				//disable current texture group
+				group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.disableAll() );
 
 				const xrlayers = this._session.renderState.layers;
 				xrlayers.unshift( layer.xrlayer );
@@ -1168,7 +1219,10 @@ class XRManager extends EventDispatcher {
 						//disable 2D media mesh layers to be replaced with native media layers
 						for ( const mediaLayer of this._mediaLayers ) {
 
-							mediaLayer.group.children.forEach( mesh => mesh.layers.disableAll() );
+							//enable the blend layer group
+							mediaLayer.layerGroup.children.forEach( mesh => mesh.layers.enableAll() );
+							//disable 2D texture render except the blend layer group
+							mediaLayer.group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.disableAll() );
 
 						}
 
@@ -1564,7 +1618,9 @@ function onSessionEnd() {
 		//reenable 2D media mesh layers on session end
 		for ( const mediaLayer of this._mediaLayers ) {
 
-			mediaLayer.group.children.forEach( mesh => mesh.layers.enableAll() );
+			//disable the blend layer group
+			mediaLayer.layerGroup.children.forEach( mesh => mesh.layers.disableAll() );
+			mediaLayer.group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.enableAll() );
 
 		}
 

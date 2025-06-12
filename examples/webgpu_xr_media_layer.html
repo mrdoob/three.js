@@ -37,7 +37,7 @@
 			
 
 			import * as THREE from 'three';
-			import { XRButton } from 'three/addons/webxr/XRButton.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
@@ -53,7 +53,7 @@
 				},
 				"stereo-top-bottom-180": {
 					"src": "https://oculus-mp4.s3.amazonaws.com/immersive+video+8K+for+Oculus+Browser/everestvr_6.2k_30s_180_TB_h264_crf27_CREDIT_JON_GRIFFITH-injected.mp4",
-					"transform": { x: 0, y: .28, z: 0, w: .96 },
+					"transform": {  },
 					"targetXPos": 0,
 					"layout": "stereo-top-bottom",
 					"is180": true 
@@ -85,8 +85,6 @@
 				selectedMediaTransform = sources[selectedLayout].transform,
 				selectedTargetXPos = sources[selectedLayout].targetXPos;
 
-				console.log(currentUrl);
-
 				if (selectedOption) selectedOption.selected = true;				
 
 				layoutSelect.addEventListener('change', () => {
@@ -95,7 +93,6 @@
 					const path = currentUrl.hash ? `${currentUrl.pathname}webgpu_xr_media_layer.html` : currentUrl.pathname;
 
 					const newUrl = `${currentUrl.origin}${path}?layout=${layout}`;
-					console.log(newUrl);
 					context.location.replace(newUrl);
 				});
 
@@ -158,7 +155,7 @@
 
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( XRButton.createButton( renderer ) );
+				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				window.addEventListener( 'resize', onWindowResize );
 
