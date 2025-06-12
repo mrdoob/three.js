@@ -293,9 +293,9 @@ export class Switch {
 
 export class SwitchCase {
 
-	constructor( condition ) {
+	constructor( caseCondition ) {
 
-		this.condition = condition;
+		this.caseCondition = caseCondition;
 
 		this.body = [];
 		this.isSwitchCase = true;

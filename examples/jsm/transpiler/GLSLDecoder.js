@@ -819,7 +819,7 @@ class GLSLDecoder {
 
 		};
 
-		const switchCase = new SwitchCase( parseCaseExpression );
+		const switchCase = new SwitchCase( parseCaseExpression() );
 
 		parseCaseBlock( switchCase );
 
@@ -846,13 +846,20 @@ class GLSLDecoder {
 			if ( this.getToken().str === '{' ) {
 
 				this.readToken(); // Skip '{'
-				if ( this.getToken().str === 'case' ) {
+
+				while ( this.getToken() && this.getToken().str === 'case' ) {
+
+					console.log( 'parsing case' );
 
 					switchStatement.cases.push( this.parseSwitchCase() );
 
 				}
 
+				console.log( 'unknown behavior' );
+
 			} else {
+
+				console.log( 'parsing expression?' );
 
 				switchStatement.body.push( this.parseExpression() );
 
