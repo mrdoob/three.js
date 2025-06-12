@@ -370,7 +370,7 @@
 				const folder = gui.addFolder( 'THREE.MeshBasicMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' ).onChange( needsUpdate( material, geometry ) );
 
@@ -391,7 +391,7 @@
 
 				const folder = gui.addFolder( 'THREE.MeshDepthMaterial' );
 
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
@@ -402,7 +402,7 @@
 				const folder = gui.addFolder( 'THREE.MeshNormalMaterial' );
 
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 
 			}
 
@@ -438,7 +438,7 @@
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' ).onChange( needsUpdate( material, geometry ) );
 
@@ -488,7 +488,7 @@
 
 				folder.add( material, 'shininess', 0, 100 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -538,7 +538,7 @@
 				folder.add( material, 'roughness', 0, 1 );
 				folder.add( material, 'metalness', 0, 1 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( data, 'envMaps', envMapKeysPBR ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -580,10 +580,10 @@
 				folder.addColor( data, 'sheenColor' ).onChange( handleColorChange( material.sheenColor ) );
 				folder.add( material, 'clearcoat', 0, 1 ).step( 0.01 );
 				folder.add( material, 'clearcoatRoughness', 0, 1 ).step( 0.01 );
-				folder.add( material, 'specularIntensity', 0, 1);
+				folder.add( material, 'specularIntensity', 0, 1 );
 				folder.addColor( data, 'specularColor' ).onChange( handleColorChange( material.specularColor ) );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
-				folder.add( material, 'wireframe' );
+				folder.add( material, 'wireframe' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( data, 'envMaps', envMapKeysPBR ).onChange( updateTexture( material, 'envMap', envMaps ) );

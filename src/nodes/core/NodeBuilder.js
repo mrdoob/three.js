@@ -2776,22 +2776,6 @@ class NodeBuilder {
 	 */
 	*[ Symbol.iterator ]() { }
 
-	// Deprecated
-
-	/**
-	 * @function
-	 * @deprecated since r168. Use `new NodeMaterial()` instead, with targeted node material name.
-	 *
-	 * @param {string} [type='NodeMaterial'] - The node material type.
-	 * @throws {Error}
-	 */
-	createNodeMaterial( type = 'NodeMaterial' ) { // @deprecated, r168
-
-		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );
-
-	}
-
-
 }
 
 export default NodeBuilder;

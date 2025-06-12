@@ -606,21 +606,9 @@ class WebGLBackend extends Backend {
 
 						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
 
-						if ( this._supportsInvalidateFramebuffer === true ) {
-
-							gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, viewY, width, height );
-
-						}
-
 					} else {
 
 						gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
-
-						if ( this._supportsInvalidateFramebuffer === true ) {
-
-							gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
-
-						}
 
 					}
 
@@ -638,6 +626,12 @@ class WebGLBackend extends Backend {
 						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
 
 					}
+
+				}
+
+				if ( this._supportsInvalidateFramebuffer === true ) {
+
+					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
 
 				}
 
@@ -2288,13 +2282,6 @@ class WebGLBackend extends Backend {
 
 						invalidationArray.push( gl.COLOR_ATTACHMENT0 + i );
 
-						if ( depthBuffer ) {
-
-							const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
-							invalidationArray.push( depthStyle );
-
-						}
-
 						const texture = descriptor.textures[ i ];
 						const textureData = this.get( texture );
 
@@ -2309,7 +2296,7 @@ class WebGLBackend extends Backend {
 					renderTargetContextData.msaaFrameBuffer = msaaFb;
 					renderTargetContextData.msaaRenderbuffers = msaaRenderbuffers;
 
-					if ( depthRenderbuffer === undefined ) {
+					if ( depthBuffer && depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
 						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, descriptor, samples );

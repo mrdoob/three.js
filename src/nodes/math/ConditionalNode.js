@@ -226,22 +226,3 @@ export default ConditionalNode;
 export const select = /*@__PURE__*/ nodeProxy( ConditionalNode ).setParameterLength( 2, 3 );
 
 addMethodChaining( 'select', select );
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link select} instead.
- *
- * @param {...any} params
- * @returns {ConditionalNode}
- */
-export const cond = ( ...params ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: cond() has been renamed to select().' );
-	return select( ...params );
-
-};
-
-addMethodChaining( 'cond', cond );

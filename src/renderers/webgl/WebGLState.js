@@ -667,7 +667,7 @@ function WebGLState( gl, extensions ) {
 							break;
 
 						case MultiplyBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+							gl.blendFuncSeparate( gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
 							break;
 
 						default:
@@ -685,15 +685,15 @@ function WebGLState( gl, extensions ) {
 							break;
 
 						case AdditiveBlending:
-							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
+							console.error( 'THREE.WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						case MultiplyBlending:
-							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+							console.error( 'THREE.WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						default:
