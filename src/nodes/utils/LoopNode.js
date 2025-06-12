@@ -351,20 +351,3 @@ export const Continue = () => expression( 'continue' ).toStack();
  * @returns {ExpressionNode}
  */
 export const Break = () => expression( 'break' ).toStack();
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link Loop} instead.
- *
- * @param {...any} params
- * @returns {LoopNode}
- */
-export const loop = ( ...params ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: loop() has been renamed to Loop().' );
-	return Loop( ...params );
-
-};
