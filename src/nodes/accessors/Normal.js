@@ -125,13 +125,25 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const normalWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	let normal;
+
 	if ( builder.namespace === 'NORMAL' ) {
 
-		return normalWorldGeometry;
+		normal = normalWorldGeometry;
+
+		if ( builder.material.flatShading !== true ) {
+
+			normal = directionToFaceDirection( normal );
+
+		}
+
+	} else {
+
+		normal = normalView.transformDirection( cameraViewMatrix );
 
 	}
 
-	return normalView.transformDirection( cameraViewMatrix ).toVar( 'normalWorld' );
+	return normal.toVar( 'normalWorld' );
 
 }, 'vec3' ).once( 'NORMAL' ) )();
 
