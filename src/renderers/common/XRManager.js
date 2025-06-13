@@ -641,9 +641,10 @@ class XRManager extends EventDispatcher {
 	 * @param {number} [radius = 500] The SphereGeometry radius.
 	 * @param {number} [widthSegments = 60] The SphereGeometry width segments.
 	 * @param {number} [heightSegments = 40] The SphereGeometry height segments.
+	 * @param {number} [updateAtIndex = -1] If set update and replace the current layer in an XR session at the specified index.
 	 * @returns {Group} Returns a group of a mono or stereo mesh
 	 */
-	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40 ) {
+	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40, updateAtIndex = - 1 ) {
 
 		const createMaterial = ( texture ) => new MeshBasicMaterial( { map: texture } );
 
@@ -764,6 +765,21 @@ class XRManager extends EventDispatcher {
 
 		if ( this._useLayers ) {
 
+			//update and replace the layer item at the specified index or prepend
+			const updateOrPrepend = ( index, layers, layer ) => {
+
+				if ( index > - 1 ) {
+
+					layers.splice( index, 1, layer );
+
+				} else {
+
+					layers.unshift( layer );
+
+				}
+
+			};
+
 			const angleFactor = is180 ? 1 : 2;
 
 			const layer = {
@@ -780,7 +796,7 @@ class XRManager extends EventDispatcher {
 
 			};
 
-			this._mediaLayers.push( layer );
+			updateOrPrepend( updateAtIndex, this._mediaLayers, layer );
 
 			group.add( layerGroup );
 
@@ -788,15 +804,16 @@ class XRManager extends EventDispatcher {
 
 				layer.xrlayer = this._createXRLayer( layer );
 
-				this._createdMediaLayers.push( layer.xrlayer );
+				updateOrPrepend( updateAtIndex, this._createdMediaLayers, layer.xrlayer );
 
 				//enable current blend layer group
 				layerGroup.children.forEach( mesh => mesh.layers.enableAll() );
 				//disable current texture group
 				group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.disableAll() );
 
-				const xrlayers = this._session.renderState.layers;
-				xrlayers.unshift( layer.xrlayer );
+				const xrlayers = [ ...this._session.renderState.layers ];
+
+				updateOrPrepend( updateAtIndex, xrlayers, layer.xrlayer );
 
 				this._session.updateRenderState( { layers: xrlayers } );
 
