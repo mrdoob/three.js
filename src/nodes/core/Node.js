@@ -451,10 +451,11 @@ class Node extends EventDispatcher {
 	getNodeType( builder ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
+		const outputNodeKey = builder.getNodeProperty( this, 'outputNode' );
 
-		if ( nodeProperties.outputNode ) {
+		if ( nodeProperties[ outputNodeKey ] ) {
 
-			return nodeProperties.outputNode.getNodeType( builder );
+			return nodeProperties[ outputNodeKey ].getNodeType( builder );
 
 		}
 
@@ -502,7 +503,9 @@ class Node extends EventDispatcher {
 
 		// return a outputNode if exists or null
 
-		return nodeProperties.outputNode || null;
+		const outputNodeKey = builder.getNodeProperty( this, 'outputNode' );
+
+		return nodeProperties[ outputNodeKey ] || null;
 
 	}
 
@@ -556,7 +559,9 @@ class Node extends EventDispatcher {
 	 */
 	generate( builder, output ) {
 
-		const { outputNode } = builder.getNodeProperties( this );
+		const properties = builder.getNodeProperties( this );
+		const outputNodeKey = builder.getNodeProperty( this, 'outputNode' );
+		const outputNode = properties[ outputNodeKey ] || null;
 
 		if ( outputNode && outputNode.isNode === true ) {
 
@@ -631,12 +636,20 @@ class Node extends EventDispatcher {
 		//
 
 		const nodeData = builder.getDataFromNode( this );
-		nodeData.buildStages = nodeData.buildStages || {};
-		nodeData.buildStages[ builder.buildStage ] = true;
+		let ns = 'buildStages';
+
+		if ( nodeData.namespaces ) {
+
+			ns = builder.namespace + ns || ns;
+
+		}
+
+		const buildStages = nodeData[ ns ] || ( nodeData[ ns ] = {} );
+		buildStages[ builder.buildStage ] = true;
 
 		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
 
-		if ( parentBuildStage && nodeData.buildStages[ parentBuildStage ] !== true ) {
+		if ( parentBuildStage && buildStages[ parentBuildStage ] !== true ) {
 
 			// force parent build stage (setup or analyze)
 
@@ -670,12 +683,21 @@ class Node extends EventDispatcher {
 
 			const properties = builder.getNodeProperties( this );
 
-			if ( properties.initialized !== true ) {
+			let initializedKey = builder.getNodeProperty( this, 'initialized' );
+			let outputNodeKey = builder.getNodeProperty( this, 'outputNode' );
+
+			if ( properties[ initializedKey ] !== true ) {
 
 				//const stackNodesBeforeSetup = builder.stack.nodes.length;
 
-				properties.initialized = true;
-				properties.outputNode = this.setup( builder ) || properties.outputNode || null;
+				properties[ initializedKey ] = true;
+				const output = this.setup( builder ) || properties[ outputNodeKey ] || null;
+
+				initializedKey = builder.getNodeProperty( this, 'initialized' );
+				outputNodeKey = builder.getNodeProperty( this, 'outputNode' );
+
+				properties[ initializedKey ] = true;
+				properties[ outputNodeKey ] = output;
 
 				/*if ( isNodeOutput && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
@@ -704,7 +726,7 @@ class Node extends EventDispatcher {
 
 			}
 
-			result = properties.outputNode;
+			result = properties[ outputNodeKey ];
 
 		} else if ( buildStage === 'analyze' ) {
 

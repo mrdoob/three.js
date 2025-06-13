@@ -57,9 +57,12 @@ class TempNode extends Node {
 			const type = builder.getVectorType( this.getNodeType( builder, output ) );
 			const nodeData = builder.getDataFromNode( this );
 
-			if ( nodeData.propertyName !== undefined ) {
+			const propertyKey = builder.getNodeProperty( this, 'propertyName' );
+			const snippetKey = builder.getNodeProperty( this, 'snippet' );
 
-				return builder.format( nodeData.propertyName, type, output );
+			if ( nodeData[ propertyKey ] !== undefined ) {
+
+				return builder.format( nodeData[ propertyKey ], type, output );
 
 			} else if ( type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
 
@@ -70,10 +73,10 @@ class TempNode extends Node {
 
 				builder.addLineFlowCode( `${ propertyName } = ${ snippet }`, this );
 
-				nodeData.snippet = snippet;
-				nodeData.propertyName = propertyName;
+				nodeData[ snippetKey ] = snippet;
+				nodeData[ propertyKey ] = propertyName;
 
-				return builder.format( nodeData.propertyName, type, output );
+				return builder.format( propertyName, type, output );
 
 			}
 

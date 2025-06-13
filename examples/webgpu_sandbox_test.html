@@ -52,23 +52,39 @@
 
 				// data texture
 
-				const once = vec3( 0, 0, 1 ).add( vec3( 1, 1, 0 ) ).toVar( 'once' );
+				const once = vec3( 0, 0, 1 ).add( vec3( 1, 1, 0 ) ).toVar( 'NO_FIXED_once' );
 				const onceFn = Fn( () => {
 
-					return vec3( 0, 0, 1 ).add( vec3( 1, 1, 0 ) ).toVar( 'onceFn' );
+					return vec3( 0, 0, 1 ).add( vec3( 1, 1, 0 ) ).toVar( 'NO_onceFn' );
 
 				} ).once()();
 
-				const myNode = Fn( () => {
+				const onceFnPre = Fn( () => {
 
-					const op_var = vec3().toVar( 'op_var' );
+					return vec3( 0, 0, 1 ).add( vec3( 1, 1, 0 ) ).toVar( 'NO_onceFnPre' );
 
-					return onceFn.add( op_var );
+				} ).once()();
+
+				const myNode = Fn( ( builder ) => {
+
+					const op_var = vec3().toVar( 'YES_var' );
+
+					if ( builder.namespace === 'PRE_OPERATION' ) {
+
+						return onceFnPre.div( op_var ).mul( once);
+
+					} else {
+
+						return onceFn.div( op_var ).mul( once );
+
+					}
 
 				} ).once( 'PRE_OPERATION' )();
 
-				const preOperation = namespace( myNode.add( myNode ), 'PRE_OPERATION' );
-				const postOperation = myNode.add( myNode );
+				const flowTEST = myNode.add( myNode ).toVar( 'flowTEST' );
+
+				const preOperation = namespace( flowTEST, 'PRE_OPERATION' );
+				const postOperation = flowTEST;
 
 				const material = new THREE.MeshBasicNodeMaterial();
 				material.colorNode = preOperation.add( postOperation ).debug();

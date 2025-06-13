@@ -1009,9 +1009,11 @@ class NodeBuilder {
 	increaseUsage( node ) {
 
 		const nodeData = this.getDataFromNode( node );
-		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
 
-		return nodeData.usageCount;
+		const property = nodeData.namespaces ? this.namespace + '_usageCount' : 'usageCount';
+		nodeData[ property ] = nodeData[ property ] === undefined ? 1 : nodeData[ property ] + 1;
+
+		return nodeData[ property ];
 
 	}
 
@@ -1604,6 +1606,20 @@ class NodeBuilder {
 
 	}
 
+	getNodeProperty( node, property ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		if ( nodeData.namespaces ) {
+
+			return this.getNamespace( property );
+
+		}
+
+		return property;
+
+	}
+
 	/**
 	 * Returns an instance of {@link NodeAttribute} for the given buffer attribute node.
 	 *
@@ -1746,8 +1762,11 @@ class NodeBuilder {
 	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
+		const variableKey = nodeData.namespaces ? this.namespace + '_var' : 'var';
 
-		let nodeVar = nodeData.variable;
+		let nodeVar = nodeData[ variableKey ];
+
+		//console.log( variableKey, this.namespace, nodeData.namespaces );	
 
 		if ( nodeVar === undefined ) {
 
@@ -1786,7 +1805,7 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVar );
 
-			nodeData.variable = nodeVar;
+			nodeData[ variableKey ] = nodeVar;
 
 		}
 

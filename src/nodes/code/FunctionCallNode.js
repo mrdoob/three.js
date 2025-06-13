@@ -75,6 +75,25 @@ class FunctionCallNode extends TempNode {
 
 	}
 
+	setup( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+		const parameters = this.parameters;
+
+		let flatParameters = Array.isArray( parameters ) ? parameters : Object.values( parameters );
+
+		let count = 0;
+
+		for ( const node of flatParameters ) {
+
+			properties[ 'param' + count ++  ] = node;
+
+		}
+
+		return super.setup( builder );
+
+	}
+
 	generate( builder ) {
 
 		const params = [];

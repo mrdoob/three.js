@@ -111,9 +111,28 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		normal = builder.context.setupNormal().context( { getUV: null } );
 
+		normal.getNodeType2 = normal.getNodeType;
+		normal.getNodeType = ( builder ) => {
+
+			const type = normal.getNodeType2( builder );
+
+			if ( type === null ) {
+
+				console.log( 'type', normal.getNodeType2( builder ) );
+
+			}
+
+			return type;
+
+		};
+
 	}
 
-	return normal.toVar( 'normalView' );
+	const a = normal.toVar( 'normalView' );
+
+	console.log( a.id );
+
+	return a;
 
 }, 'vec3' ).once( 'NORMAL' ) )();
 

@@ -106,6 +106,8 @@ class VarNode extends Node {
 		const { node, name, readOnly } = this;
 		const { renderer } = builder;
 
+		const name = builder.getNodeProperty( this, this.name );
+
 		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
 
 		let isDeterministic = false;
@@ -121,6 +123,14 @@ class VarNode extends Node {
 
 		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
 		const snippet = node.build( builder, vectorType );
+
+		if ( !snippet ) {
+
+			console.warn( 'TSL: VarNode requires a valid node to generate a variable.' );
+			node.build( builder, vectorType );
+			return null;
+
+		}
 
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
 
