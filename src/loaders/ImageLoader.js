@@ -125,7 +125,7 @@ class ImageLoader extends Loader {
 			for ( let i = 0; i < callbacks.length; i ++ ) {
 
 				const callback = callbacks[ i ];
-				if ( callback.onError ) callback.onError( this );
+				if ( callback.onError ) callback.onError( event );
 
 			}
 
