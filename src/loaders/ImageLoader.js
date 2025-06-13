@@ -93,8 +93,6 @@ class ImageLoader extends Loader {
 
 			if ( onLoad ) onLoad( this );
 
-			scope.manager.itemEnd( url );
-
 			//
 
 			const callbacks = _loading.get( this ) || [];
@@ -108,6 +106,8 @@ class ImageLoader extends Loader {
 
 			_loading.delete( this );
 
+			scope.manager.itemEnd( url );
+
 		}
 
 		function onImageError( event ) {
@@ -117,9 +117,6 @@ class ImageLoader extends Loader {
 			if ( onError ) onError( event );
 
 			Cache.remove( url );
-
-			scope.manager.itemError( url );
-			scope.manager.itemEnd( url );
 
 			//
 
@@ -133,6 +130,10 @@ class ImageLoader extends Loader {
 			}
 
 			_loading.delete( this );
+
+
+			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
 		}
 
