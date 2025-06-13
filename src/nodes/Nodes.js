@@ -33,6 +33,7 @@ export { default as StructNode } from './core/StructNode.js';
 export { default as StructTypeNode } from './core/StructTypeNode.js';
 export { default as OutputStructNode } from './core/OutputStructNode.js';
 export { default as MRTNode } from './core/MRTNode.js';
+export { default as SubBuildNode } from './core/SubBuildNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };

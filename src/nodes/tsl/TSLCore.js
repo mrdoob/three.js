@@ -325,15 +325,21 @@ class ShaderCallNodeInternal extends Node {
 		const { shaderNode, inputNodes } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
-		const onceNS = shaderNode.namespace && shaderNode.namespace === builder.namespace ? builder.getNamespace( 'once' ) : 'once';
 
-		if ( properties[ onceNS ] ) {
+		const subBuild = builder.getClosestSubBuild( shaderNode.subBuilds ) || '';
+		const subBuildProperty = subBuild || 'default';
 
-			return properties[ onceNS ];
+		if ( properties[ subBuildProperty ] ) {
+
+			return properties[ subBuildProperty ];
 
 		}
 
 		//
+
+		const previousSubBuildFn = builder.subBuildFn;
+
+		builder.subBuildFn = subBuild;
 
 		let result = null;
 
@@ -372,9 +378,11 @@ class ShaderCallNodeInternal extends Node {
 
 		}
 
+		builder.subBuildFn = previousSubBuildFn;
+
 		if ( shaderNode.once ) {
 
-			properties[ onceNS ] = result;
+			properties[ subBuildProperty ] = result;
 
 		}
 
@@ -395,11 +403,12 @@ class ShaderCallNodeInternal extends Node {
 	getOutputNode( builder ) {
 
 		const properties = builder.getNodeProperties( this );
-		const outputNamespace = builder.getOutputNamespace();
+		const subBuildOutput = builder.getSubBuildOutput( this );
 
-		properties[ outputNamespace ] = properties[ outputNamespace ] || this.setupOutput( builder );
+		properties[ subBuildOutput ] = properties[ subBuildOutput ] || this.setupOutput( builder );
+		properties[ subBuildOutput ].subBuild = builder.getClosestSubBuild( this );
 
-		return properties[ outputNamespace ];
+		return properties[ subBuildOutput ];
 
 	}
 
@@ -410,23 +419,45 @@ class ShaderCallNodeInternal extends Node {
 		const buildStage = builder.getBuildStage();
 		const properties = builder.getNodeProperties( this );
 
-		const outputNamespace = builder.getOutputNamespace();
+		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
 
 		if ( buildStage === 'setup' ) {
 
-			const initializedNamespace = builder.getNamespace( 'initialized' );
+			const subBuildInitialized = builder.getSubBuildProperty( 'initialized', this );
 
-			if ( properties[ initializedNamespace ] !== true ) {
+			if ( properties[ subBuildInitialized ] !== true ) {
 
-				properties[ initializedNamespace ] = true;
+				properties[ subBuildInitialized ] = true;
 
-				properties[ outputNamespace ] = this.getOutputNode( builder );
-				properties[ outputNamespace ].build( builder );
+				properties[ subBuildOutput ] = this.getOutputNode( builder );
+				properties[ subBuildOutput ].build( builder );
+
+				// If the shaderNode has subBuilds, add them to the chaining nodes
+				// so they can be built later in the build process.
+
+				if ( this.shaderNode.subBuilds ) {
+
+					for ( const node of builder.chaining ) {
+
+						const nodeData = builder.getDataFromNode( node, 'any' );
+						nodeData.subBuilds = nodeData.subBuilds || new Set();
+
+						for ( const subBuild of this.shaderNode.subBuilds ) {
+
+							nodeData.subBuilds.add( subBuild );
+
+						}
+
+						//builder.getDataFromNode( node ).subBuilds = nodeData.subBuilds;
+
+					}
+
+				}
 
 			}
 
-			result = properties[ outputNamespace ];
+			result = properties[ subBuildOutput ];
 
 		} else if ( buildStage === 'analyze' ) {
 
@@ -456,7 +487,6 @@ class ShaderNodeInternal extends Node {
 		this.global = true;
 
 		this.once = false;
-		this.namespace = null;
 
 	}
 
@@ -665,10 +695,10 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 	};
 
-	fn.once = ( namespace = null ) => {
+	fn.once = ( subBuilds = null ) => {
 
 		shaderNode.once = true;
-		shaderNode.namespace = namespace;
+		shaderNode.subBuilds = subBuilds;
 
 		return fn;
 
