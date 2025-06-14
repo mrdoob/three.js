@@ -7,6 +7,7 @@
 		"webgl_animation_skinning_morph",
 		"webgl_animation_multiple",
 		"webgl_animation_walk",
+		"webgl_batch_lod_bvh",
 		"webgl_camera",
 		"webgl_camera_array",
 		"webgl_camera_logarithmicdepthbuffer",
