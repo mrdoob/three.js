@@ -108,7 +108,7 @@ class ColladaLoader extends Loader {
 	}
 
 	/**
-	 * Parses the given Collada data and returns a result oject holding the parsed scene,
+	 * Parses the given Collada data and returns a result object holding the parsed scene,
 	 * an array of animation clips and kinematics.
 	 *
 	 * @param {string} text - The raw Collada data as a string.
