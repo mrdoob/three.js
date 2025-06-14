@@ -457,7 +457,7 @@ class ArcballControls extends Controls {
 		this._devPxRatio = window.devicePixelRatio;
 
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
-		this.domElement.addEventListener( 'wheel', this._onWheel, { passive: false } );
+		this.domElement.addEventListener( 'wheel', this._onWheel );
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointercancel', this._onPointerCancel );
 
