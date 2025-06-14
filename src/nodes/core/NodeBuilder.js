@@ -419,6 +419,16 @@ class NodeBuilder {
 		 */
 		this.buildStage = null;
 
+		this.subBuildLayers = [];
+
+		/**
+		 * The current stack of nodes.
+		 *
+		 * @type {?StackNode}
+		 * @default null
+		 */
+		this.currentStack = null;
+
 	}
 
 	/**
@@ -1577,7 +1587,23 @@ class NodeBuilder {
 
 		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
 
-		return nodeData[ shaderStage ];
+		//
+
+		let data = nodeData[ shaderStage ];
+
+		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
+		const subBuild = this.getClosestSubBuild( subBuilds );
+
+		if ( subBuild ) {
+
+			if ( data.subBuildsCache === undefined ) data.subBuildsCache = {};
+
+			data = data.subBuildsCache[ subBuild ] || ( data.subBuildsCache[ subBuild ] = {} );
+			data.subBuilds = subBuilds;
+
+		}
+
+		return data;
 
 	}
 
@@ -1738,8 +1764,9 @@ class NodeBuilder {
 	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
+		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
 
-		let nodeVar = nodeData.variable;
+		let nodeVar = nodeData[ subBuildVariable ];
 
 		if ( nodeVar === undefined ) {
 
@@ -1758,6 +1785,14 @@ class NodeBuilder {
 
 			//
 
+			if ( subBuildVariable !== 'variable' ) {
+
+				name = this.getSubBuildProperty( name, nodeData.subBuilds );
+
+			}
+
+			//
+
 			const count = this.getArrayCount( node );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );
@@ -1770,7 +1805,7 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVar );
 
-			nodeData.variable = nodeVar;
+			nodeData[ subBuildVariable ] = nodeVar;
 
 		}
 
@@ -1838,8 +1873,9 @@ class NodeBuilder {
 	getVaryingFromNode( node, name = null, type = node.getNodeType( this ), interpolationType = null, interpolationSampling = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
+		const subBuildVarying = this.getSubBuildProperty( 'varying', nodeData.subBuilds );
 
-		let nodeVarying = nodeData.varying;
+		let nodeVarying = nodeData[ subBuildVarying ];
 
 		if ( nodeVarying === undefined ) {
 
@@ -1848,69 +1884,27 @@ class NodeBuilder {
 
 			if ( name === null ) name = 'nodeVarying' + index;
 
+			//
+
+			if ( subBuildVarying !== 'varying' ) {
+
+				name = this.getSubBuildProperty( name, nodeData.subBuilds );
+
+			}
+
+			//
+
 			nodeVarying = new NodeVarying( name, type, interpolationType, interpolationSampling );
 
 			varyings.push( nodeVarying );
 
 			this.registerDeclaration( nodeVarying );
 
-			nodeData.varying = nodeVarying;
+			nodeData[ subBuildVarying ] = nodeVarying;
 
 		}
 
 		return nodeVarying;
-
-	}
-
-	/**
-	 * Returns the current namespace for the node builder.
-	 *
-	 * @return {string} The current namespace.
-	 */
-	get namespace() {
-
-		return this.context.namespace;
-
-	}
-
-	/**
-	 * Returns the output namespace for the node builder, which is used for the current output node.
-	 *
-	 * @return {string} The output namespace.
-	 */
-	getOutputNamespace() {
-
-		return this.getNamespace( 'outputNode' );
-
-	}
-
-	/**
-	 * Returns the namespace for the given property.
-	 *
-	 * If the property name is not set, it returns the namespace only.
-	 * If the namespace is not set, it returns the property name.
-	 * If the namespace is set, it returns the namespace concatenated with the property name.
-	 *
-	 * @param {string} [property=''] - The property name.
-	 * @return {string} The namespace for the property.
-	 */
-	getNamespace( property = '' ) {
-
-		const ns = this.namespace;
-
-		let nsName;
-
-		if ( ns ) {
-
-			nsName = property ? ( ns + '_' + property ) : ns;
-
-		} else {
-
-			nsName = property;
-
-		}
-
-		return nsName;
 
 	}
 
@@ -2564,6 +2558,110 @@ class NodeBuilder {
 	buildCode() {
 
 		console.warn( 'Abstract function.' );
+
+	}
+
+	get subBuild() {
+
+		return this.subBuildLayers[ this.subBuildLayers.length - 1 ] || null;
+
+	}
+
+	addSubBuild( subBuild ) {
+
+		this.subBuildLayers.push( subBuild );
+
+	}
+
+	removeSubBuild() {
+
+		return this.subBuildLayers.pop();
+
+	}
+
+	getClosestSubBuild( data ) {
+
+		let subBuilds;
+
+		if ( data && data.isNode ) {
+
+			if ( data.isShaderCallNodeInternal ) {
+
+				subBuilds = data.shaderNode.subBuilds;
+
+			} else if ( data.isStackNode ) {
+
+				subBuilds = [ data.subBuild ];
+
+			} else {
+
+				subBuilds = this.getDataFromNode( data, 'any' ).subBuilds;
+
+			}
+
+		} else if ( data instanceof Set ) {
+
+			subBuilds = [ ...data ];
+
+		} else {
+
+			subBuilds = data;
+
+		}
+
+		if ( ! subBuilds ) return null;
+
+		const subBuildLayers = this.subBuildLayers;
+
+		for ( let i = subBuilds.length - 1; i >= 0; i -- ) {
+
+			const subBuild = subBuilds[ i ];
+
+			if ( subBuildLayers.includes( subBuild ) ) {
+
+				return subBuild;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	getSubBuildOutput( node ) {
+
+		return this.getSubBuildProperty( 'outputNode', node );
+
+	}
+
+	getSubBuildProperty( property = '', node = null ) {
+
+		let subBuild;
+
+		if ( node !== null ) {
+
+			subBuild = this.getClosestSubBuild( node );
+
+		} else {
+
+			subBuild = this.subBuildFn;
+
+		}
+
+		let result;
+
+		if ( subBuild ) {
+
+			result = property ? ( subBuild + '_' + property ) : subBuild;
+
+		} else {
+
+			result = property;
+
+		}
+
+		return result;
 
 	}
 

@@ -35,9 +35,9 @@ export const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'posit
  */
 export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getNamespace( 'v_positionWorld' ) );
+	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
 
-}, 'vec3' ).once( 'POSITION' ) )();
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
 
 /**
  * TSL object that represents the position world direction of the current rendered object.
@@ -45,13 +45,13 @@ export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-export const positionWorldDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
+export const positionWorldDirection = /*@__PURE__*/ ( Fn( () => {
 
-	const vertexPWD = positionLocal.transformDirection( modelWorldMatrix ).toVarying( builder.getNamespace( 'v_positionWorldDirection' ) );
+	const vertexPWD = positionLocal.transformDirection( modelWorldMatrix ).toVarying( 'v_positionWorldDirection' );
 
 	return vertexPWD.normalize().toVar( 'positionWorldDirection' );
 
-}, 'vec3' ).once( 'POSITION' ) )();
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
 
 /**
  * TSL object that represents the vertex position in view space of the current rendered object.
@@ -61,9 +61,9 @@ export const positionWorldDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.context.setupPositionView().toVarying( builder.getNamespace( 'v_positionView' ) );
+	return builder.context.setupPositionView().toVarying( 'v_positionView' );
 
-}, 'vec3' ).once( 'POSITION' ) )();
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
 
 /**
  * TSL object that represents the position view direction of the current rendered object.

@@ -160,10 +160,11 @@ class VaryingNode extends Node {
 
 	generate( builder ) {
 
+		const propertyKey = builder.getSubBuildProperty( 'property', builder.currentStack );
 		const properties = builder.getNodeProperties( this );
 		const varying = this.setupVarying( builder );
 
-		if ( properties.propertyName === undefined ) {
+		if ( properties[ propertyKey ] === undefined ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
@@ -171,7 +172,7 @@ class VaryingNode extends Node {
 			// force node run in vertex stage
 			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node, type, propertyName );
 
-			properties.propertyName = propertyName;
+			properties[ propertyKey ] = propertyName;
 
 		}
 

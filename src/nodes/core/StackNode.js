@@ -247,9 +247,12 @@ class StackNode extends Node {
 
 	build( builder, ...params ) {
 
+		const previousBuildStack = builder.currentStack;
 		const previousStack = getCurrentStack();
 
 		setCurrentStack( this );
+
+		builder.currentStack = this;
 
 		const buildStage = builder.buildStage;
 
@@ -280,9 +283,13 @@ class StackNode extends Node {
 
 		}
 
+		const result = this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+
 		setCurrentStack( previousStack );
 
-		return this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		builder.currentStack = previousBuildStack;
+
+		return result;
 
 	}
 

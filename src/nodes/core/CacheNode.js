@@ -97,18 +97,4 @@ export default CacheNode;
  */
 export const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
 
-/**
- * Assigns a namespace to the given node by updating its context.
- *
- * Important for TSL functions that use `.once( namespace )` to ensure that the namespace will run twice,
- * once when the node is build in the specific namespace and once when the node is built in the others namespace.
- *
- * This is useful for nodes like `positionWorld` that need to be re-updated if used in `material.positionNode` and outside of it in the same material.
- *
- * @param {Object} node - The node to which the namespace will be assigned.
- * @param {string} namespace - The namespace to be assigned to the node.
- * @returns {Object} The updated node with the new namespace in its context.
- */
-export const namespace = ( node, namespace ) => node.context( { namespace } );
-
 addMethodChaining( 'cache', cache );
