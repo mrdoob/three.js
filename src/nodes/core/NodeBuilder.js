@@ -2575,24 +2575,45 @@ class NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the current sub-build layer.
+	 *
+	 * @return {SubBuildNode} The current sub-build layers.
+	 */
 	get subBuild() {
 
 		return this.subBuildLayers[ this.subBuildLayers.length - 1 ] || null;
 
 	}
 
+	/**
+	 * Adds a sub-build layer to the node builder.
+	 *
+	 * @param {SubBuildNode} subBuild - The sub-build layer to add.
+	 */
 	addSubBuild( subBuild ) {
 
 		this.subBuildLayers.push( subBuild );
 
 	}
 
+	/**
+	 * Removes the last sub-build layer from the node builder.
+	 *
+	 * @return {SubBuildNode} The removed sub-build layer.
+	 */
 	removeSubBuild() {
 
 		return this.subBuildLayers.pop();
 
 	}
 
+	/**
+	 * Returns the closest sub-build layer for the given data.
+	 *
+	 * @param {Node|Set|Array} data - The data to get the closest sub-build layer from.
+	 * @return {?string} The closest sub-build name or null if none found.
+	 */
 	getClosestSubBuild( data ) {
 
 		let subBuilds;
@@ -2643,12 +2664,26 @@ class NodeBuilder {
 
 	}
 
+
+	/**
+	 * Returns the output node of a sub-build layer.
+	 *
+	 * @param {Node} node - The node to get the output from.
+	 * @return {string} The output node name.
+	 */
 	getSubBuildOutput( node ) {
 
 		return this.getSubBuildProperty( 'outputNode', node );
 
 	}
 
+	/**
+	 * Returns the sub-build property name for the given property and node.
+	 * 
+	 * @param {string} [property=''] - The property name.
+	 * @param {?Node} [node=null] - The node to get the sub-build from.
+	 * @return {string} The sub-build property name.
+	 */
 	getSubBuildProperty( property = '', node = null ) {
 
 		let subBuild;
