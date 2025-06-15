@@ -173,7 +173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.trailing = [];
 	    }
 	    CommentHandler.prototype.insertInnerComments = function (node, metadata) {
-	        //  innnerComments for properties empty block
+	        //  innerComments for properties empty block
 	        //  `function a() {/** comments **\/}`
 	        if (node.type === syntax_1.Syntax.BlockStatement && node.body.length === 0) {
 	            var innerComments = [];
