@@ -303,7 +303,7 @@ export class SwitchCase {
 		this.nextCase = null;
 
 
-		this.isDefault = false;
+		this.isDefault = caseCondition === null ? true : false;
 		this.isSwitchCase = true;
 
 	}

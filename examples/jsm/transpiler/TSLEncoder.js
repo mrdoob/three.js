@@ -514,8 +514,6 @@ ${ this.tab }} )`;
 
 	emitSwitch( switchNode ) {
 
-		console.log( switchNode );
-
 		const discriminantString = this.emitExpression( switchNode.discriminant );
 
 		let switchString = `Switch(${discriminantString})`;
@@ -525,9 +523,17 @@ ${ this.tab }} )`;
 		while ( caseNode !== null ) {
 
 			const caseBodyString = this.emitBody( caseNode.body );
-			console.log( `Case Node Body: ${caseBodyString}` );
+			if ( ! caseNode.isDefault ) {
 
-			switchString += `.Case(${this.emitExpression( caseNode.caseCondition )}, () => {
+				switchString += `.Case(${this.emitExpression( caseNode.caseCondition )}, `;
+
+			} else {
+
+				switchString += '.Default( ';
+
+			}
+
+			switchString += `() => {
 
 ${caseBodyString}
 

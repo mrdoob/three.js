@@ -821,7 +821,7 @@ class GLSLDecoder {
 
 				this.readToken(); // Skip '{'
 
-				if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken() === 'default' ) ) {
+				if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
 
 					switchStatement.case = this.parseSwitchCase();
 
@@ -854,9 +854,15 @@ class GLSLDecoder {
 		const parseCaseExpression = () => {
 
 			const caseType = this.readToken(); // Skip 'case' or 'default
-			console.log( `caseType: ${caseType}` );
 
 			const caseTokens = this.readTokensUntil( ':' );
+
+			// No case condition on default
+			if ( caseType === 'default' ) {
+
+				return null;
+
+			}
 
 			return this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
 
@@ -865,7 +871,7 @@ class GLSLDecoder {
 		// No '{' so use different approach
 		const parseCaseBlock = ( caseStatement ) => {
 
-			while ( this.getToken() && this.getToken().str !== 'case' ) {
+			while ( this.getToken() && this.getToken().str !== 'case' && this.getToken().str !== 'default' ) {
 
 				if ( this.getToken().str === '}' ) {
 
@@ -877,8 +883,6 @@ class GLSLDecoder {
 
 				caseStatement.body.push( this.parseExpression() );
 
-				console.log( caseStatement.body );
-
 			}
 
 		};
@@ -889,13 +893,11 @@ class GLSLDecoder {
 
 		let currentCase = switchCase;
 
-		while ( this.getToken() && this.getToken().str === 'case' ) {
+		while ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
 
 			const previousCase = currentCase;
 
 			currentCase = new SwitchCase( parseCaseExpression() );
-
-			console.log( `CURRENT CASE: ${currentCase}` );
 
 			previousCase.nextCase = currentCase;
 
