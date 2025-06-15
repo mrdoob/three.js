@@ -283,6 +283,8 @@ export class Switch {
 
 	constructor( discriminant ) {
 
+		this.body = [];
+
 		this.discriminant = discriminant;
 		this.case = null;
 		this.isSwitch = true;

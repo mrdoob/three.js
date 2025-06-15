@@ -63,7 +63,7 @@ function getFunctionName( str ) {
 function getGroupDelta( str ) {
 
 	if ( str === '(' || str === '[' || str === '{' ) return 1;
-	if ( str === ')' || str === ']' || str === '}' ) return - 1;
+	if ( str === ')' || str === ']' || str === '}' || str === 'case' || str === 'default' ) return - 1;
 
 	return 0;
 
@@ -817,15 +817,10 @@ class GLSLDecoder {
 
 		const parseSwitchBlock = ( switchStatement ) => {
 
+			// Validate curly braces
 			if ( this.getToken().str === '{' ) {
 
 				this.readToken(); // Skip '{'
-
-				if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
-
-					switchStatement.case = this.parseSwitchCase();
-
-				}
 
 			} else {
 
@@ -833,16 +828,22 @@ class GLSLDecoder {
 
 			}
 
+			if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
+
+				switchStatement.case = this.parseSwitchCase();
+
+			} else {
+
+				this.parseBlock( switchStatement );
+
+			}
+
+
 		};
 
 		const switchStatement = new Switch( parseSwitchExpression() );
 
 		parseSwitchBlock( switchStatement );
-
-
-		// etc
-
-		//etc
 
 		return switchStatement;
 
@@ -868,10 +869,14 @@ class GLSLDecoder {
 
 		};
 
+		let lastToken = null;
+
 		// No '{' so use different approach
 		const parseCaseBlock = ( caseStatement ) => {
 
-			while ( this.getToken() && this.getToken().str !== 'case' && this.getToken().str !== 'default' ) {
+			lastToken = this.parseBlock( caseStatement );
+
+			/* while ( this.getToken() && this.getToken().str !== 'case' && this.getToken().str !== 'default' ) {
 
 				if ( this.getToken().str === '}' ) {
 
@@ -883,17 +888,20 @@ class GLSLDecoder {
 
 				caseStatement.body.push( this.parseExpression() );
 
-			}
+			} */
 
 		};
 
+		// Parse case condition
 		const switchCase = new SwitchCase( parseCaseExpression() );
 
+		// Get case body
 		parseCaseBlock( switchCase );
 
 		let currentCase = switchCase;
 
-		while ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
+		// If block ended with case, then continue chaining cases, otherwise, ended with '}' and no more case blocks to parse
+		while ( lastToken.str === 'case' || lastToken.str === 'default' ) {
 
 			const previousCase = currentCase;
 
@@ -998,9 +1006,10 @@ class GLSLDecoder {
 
 			if ( groupIndex < 0 ) {
 
-				this.readToken(); // skip '}'
+				this.readToken(); // skip '}', ']', 'case', or other block ending tokens'
 
-				break;
+				// Return skipped token
+				return token;
 
 			}
 
