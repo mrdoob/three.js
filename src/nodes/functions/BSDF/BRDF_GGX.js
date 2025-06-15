@@ -3,17 +3,13 @@ import V_GGX_SmithCorrelated from './V_GGX_SmithCorrelated.js';
 import V_GGX_SmithCorrelated_Anisotropic from './V_GGX_SmithCorrelated_Anisotropic.js';
 import D_GGX from './D_GGX.js';
 import D_GGX_Anisotropic from './D_GGX_Anisotropic.js';
-import { transformedNormalView } from '../../accessors/Normal.js';
+import { normalView as NormalView } from '../../accessors/Normal.js';
 import { positionViewDirection } from '../../accessors/Position.js';
 import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/PropertyNode.js';
 import { Fn, defined } from '../../tsl/TSLBase.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = /*@__PURE__*/ Fn( ( inputs ) => {
-
-	const { lightDirection, f0, f90, roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } = inputs;
-
-	const normalView = inputs.normalView || transformedNormalView;
+const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView = NormalView, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
 
 	const alpha = roughness.pow2(); // UE4's roughness
 
