@@ -442,6 +442,7 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.subBuildFn = null;
+
 	}
 
 	/**
