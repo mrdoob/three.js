@@ -6,6 +6,7 @@ import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
 import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 import { mix, pow2, min } from '../../nodes/math/MathNode.js';
+import { subBuild } from '../../nodes/core/SubBuildNode.js';
 
 import { MeshPhysicalMaterial } from '../MeshPhysicalMaterial.js';
 
@@ -478,7 +479,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	setup( builder ) {
 
-		builder.context.setupClearcoatNormal = () => this.setupClearcoatNormal( builder );
+		builder.context.setupClearcoatNormal = () => subBuild( this.setupClearcoatNormal( builder ), 'NORMAL', 'vec3' );
 
 		super.setup( builder );
 

@@ -44,19 +44,3 @@ export const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal
  * @type {Node<vec3>}
  */
 export const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).toVarying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
-
-/**
- * TSL object that represents the transformed vertex tangent in view space of the current rendered object.
- *
- * @tsl
- * @type {Node<vec3>}
- */
-export const transformedTangentView = /*@__PURE__*/ tangentView.toVar( 'transformedTangentView' );
-
-/**
- * TSL object that represents the transformed vertex tangent in world space of the current rendered object.
- *
- * @tsl
- * @type {Node<vec3>}
- */
-export const transformedTangentWorld = /*@__PURE__*/ transformedTangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedTangentWorld' );
