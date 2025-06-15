@@ -429,6 +429,13 @@ class NodeBuilder {
 		 */
 		this.currentStack = null;
 
+		/**
+		 * The current sub-build TSL function(Fn).
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.subBuildFn = null;
 	}
 
 	/**
