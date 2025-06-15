@@ -20,8 +20,13 @@
       calcolo GPGPU interferisce o addirittura produce i VBO in questione.
 		</p>
 
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_buffergeometry_glbufferattribute Points with custom buffers]<br />
+		</p>
+
 		<h2>Costruttore</h2>
-		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count] )</h3>
+		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count], [param:Boolean normalized] )</h3>
 		<p>
 		`buffer` — Deve essere un [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer].
 		<br />
@@ -41,6 +46,15 @@
 			<li>gl.UNSIGNED_BYTE: 1</li>
 		</ul>
 		`count` — Il numero previsto di vertici in VBO.
+		<br />
+		`normalized` — (optional) Applies to integer data only.
+			Indicates how the underlying data in the buffer maps to the values in the
+			GLSL code. For instance, if [page:WebGLBuffer buffer] contains data of
+			`gl.UNSIGNED_SHORT`, and [page:Boolean normalized] is true, the values `0 -
+			+65535` in the buffer data will be mapped to 0.0f - +1.0f in the GLSL
+			attribute. A `gl.SHORT` (signed) would map from -32768 - +32767 to -1.0f
+			- +1.0f. If [page:Boolean normalized] is false, the values will be
+			converted to floats unmodified, i.e. 32767 becomes 32767.0f.
 		</p>
 
 		<h2>Proprietà</h2>
@@ -55,6 +69,14 @@
       Il numero previsto di vertici in VBO.
 		</p>
 
+		<h3>[property:Integer elementSize]</h3>
+		<p>
+      Memorizza la dimensione corrispondente in byte per il valore della proprietà del `type` corrente.
+		</p>
+		<p>
+      Vedi sopra (costruttore) per un elenco di dimensioni di type conosciute.
+		</p>
+
 		<h3>[property:Boolean isGLBufferAttribute]</h3>
 		<p>
       Solo lettura. Sempre `true`.
@@ -65,17 +87,20 @@
       Quanti valori compongono ogni elemento (vertice).
 		</p>
 
-		<h3>[property:Integer elementSize]</h3>
-		<p>
-      Memorizza la dimensione corrispondente in byte per il valore della proprietà del `type` corrente.
-		</p>
-		<p>
-      Vedi sopra (costruttore) per un elenco di dimensioni di type conosciute.
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>
       Un nome opzionale per questa istanza dell'attributo. Il valore predefinito è una stringa vuota.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+      Il valore predefinito è `false`. Impostando questo metodo a true incrementa la [page:GLBufferAttribute.version versione].
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+			Indicates how the underlying data in the buffer maps to the values in the
+			GLSL shader code. See the constructor above for details.
 		</p>
 
 		<h3>[property:GLenum type]</h3>
@@ -86,6 +111,11 @@
 		<p>
       Imposta questa proprietà insieme a `elementSize`. Il modo consigliato è
       di usare il metodo `setType`.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+      Un numero di versione, incrementato ogni volta che la proprietà needsUpdate è impostata a true.
 		</p>
 
 		<h2>Metodi</h2>
@@ -101,16 +131,6 @@
 
 		<h3>[method:this setCount]( count ) </h3>
 		<p>Imposta la proprietà `count`.</p>
-
-		<h3>[property:Integer version]</h3>
-		<p>
-      Un numero di versione, incrementato ogni volta che la proprietà needsUpdate è impostata a true.
-		</p>
-
-		<h3>[property:Boolean needsUpdate]</h3>
-		<p>
-      Il valore predefinito è `false`. Impostando questo metodo a true incrementa la [page:GLBufferAttribute.version versione].
-		</p>
 
 		<h2>Source</h2>
 		<p>

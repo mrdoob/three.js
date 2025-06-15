@@ -19,8 +19,9 @@ class GLBufferAttribute {
 	 * @param {number} itemSize - The item size.
 	 * @param {number} elementSize - The corresponding size (in bytes) for the given `type` parameter.
 	 * @param {number} count - The expected number of vertices in VBO.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
 	 */
-	constructor( buffer, type, itemSize, elementSize, count ) {
+	constructor( buffer, type, itemSize, elementSize, count, normalized = false ) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -72,6 +73,17 @@ class GLBufferAttribute {
 		 * @type {number}
 		 */
 		this.count = count;
+
+		/**
+		 * Applies to integer data only. Indicates how the underlying data in the buffer maps to
+		 * the values in the GLSL code. For instance, if `buffer` contains data of `gl.UNSIGNED_SHORT`,
+		 * and `normalized` is `true`, the values `0 - +65535` in the buffer data will be mapped to
+		 * `0.0f - +1.0f` in the GLSL attribute. If `normalized` is `false`, the values will be converted
+		 * to floats unmodified, i.e. `65535` becomes `65535.0f`.
+		 *
+		 * @type {boolean}
+		 */
+		this.normalized = normalized;
 
 		/**
 		 * A version number, incremented every time the `needsUpdate` is set to `true`.

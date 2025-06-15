@@ -17,8 +17,13 @@
 			이 클래스의 가장 일반적인 사용 사례는 어떤 종류의 GPGPU 계산이 해당 VBO를 방해하거나 심지어 생성하는 경우입니다.
 		</p>
 
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_buffergeometry_glbufferattribute Points with custom buffers]<br />
+		</p>
+
 		<h2>생성자</h2>
-		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count] )</h3>
+		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count], [param:Boolean normalized] )</h3>
 		<p>
 		*buffer* — 반드시 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]여야 합니다.
 		<br />
@@ -38,6 +43,15 @@
 			<li>gl.UNSIGNED_BYTE: 1</li>
 		</ul>
 		*count* — 예상되는 VBO의 꼭짓점 수.
+		<br />
+		*normalized* — (optional) Applies to integer data only.
+			Indicates how the underlying data in the buffer maps to the values in the
+			GLSL code. For instance, if [page:WebGLBuffer buffer] contains data of
+			`gl.UNSIGNED_SHORT`, and [page:Boolean normalized] is true, the values `0 -
+			+65535` in the buffer data will be mapped to 0.0f - +1.0f in the GLSL
+			attribute. A `gl.SHORT` (signed) would map from -32768 - +32767 to -1.0f
+			- +1.0f. If [page:Boolean normalized] is false, the values will be
+			converted to floats unmodified, i.e. 32767 becomes 32767.0f.
 		</p>
 
 		<h2>프로퍼티</h2>
@@ -52,6 +66,14 @@
 			VBO의 꼭짓점 수.
 		</p>
 
+		<h3>[property:Integer elementSize]</h3>
+		<p>
+			현재의 *type* 속성 값에 맞는 바이트 사이즈를 저장.
+		</p>
+		<p>
+			알려진 타입 크기 리스트는 위의 (생성자)를 참고.
+		</p>
+
 		<h3>[property:Boolean isGLBufferAttribute]</h3>
 		<p>
 			읽기 전용. 언제나 *true*입니다.
@@ -62,17 +84,20 @@
 			각 항목을 구성하는 값의 크기 (꼭짓점).
 		</p>
 
-		<h3>[property:Integer elementSize]</h3>
-		<p>
-			현재의 *type* 속성 값에 맞는 바이트 사이즈를 저장.
-		</p>
-		<p>
-			알려진 타입 크기 리스트는 위의 (생성자)를 참고.
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>
 		이 속성 인스턴스의 임시 이름. 기본값은 빈 문자열입니다.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		기본값은 *false* 입니다. true로 설정하면 [page:GLBufferAttribute.version version]을 증가시킵니다.
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+			Indicates how the underlying data in the buffer maps to the values in the
+			GLSL shader code. See the constructor above for details.
 		</p>
 
 		<h3>[property:GLenum type]</h3>
@@ -82,6 +107,11 @@
 		</p>
 		<p>
 			*elementSize*와 함께 이 속성을 설정합니다. 추천하는 방법은 *setType* 메서드를 사용하는 것입니다.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		버전 넘버이며 needsUpdate 속성이 true가 될 때마다 증가합니다.
 		</p>
 
 		<h2>메서드</h2>
@@ -97,16 +127,6 @@
 
 		<h3>[method:this setCount]( count ) </h3>
 		<p>*count* 속성을 설정합니다.</p>
-
-		<h3>[property:Integer version]</h3>
-		<p>
-		버전 넘버이며 needsUpdate 속성이 true가 될 때마다 증가합니다.
-		</p>
-
-		<h3>[property:Boolean needsUpdate]</h3>
-		<p>
-		기본값은 *false* 입니다. true로 설정하면 [page:GLBufferAttribute.version version]을 증가시킵니다.
-		</p>
 
 		<h2>소스코드</h2>
 		<p>
