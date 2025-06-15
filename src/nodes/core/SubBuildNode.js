@@ -9,9 +9,9 @@ class SubBuildNode extends Node {
 
 	}
 
-	constructor( node, name ) {
+	constructor( node, name, nodeType = null ) {
 
-		super();
+		super( nodeType );
 
 		this.node = node;
 
@@ -29,6 +29,8 @@ class SubBuildNode extends Node {
 	}
 
 	getNodeType( builder ) {
+
+		if ( this.nodeType !== null ) return this.nodeType;
 
 		builder.addSubBuild( this.name );
 
@@ -56,4 +58,4 @@ class SubBuildNode extends Node {
 
 export default SubBuildNode;
 
-export const subBuild = ( node, name ) => nodeObject( new SubBuildNode( nodeObject( node ), name ) );
+export const subBuild = ( node, name, type = null ) => nodeObject( new SubBuildNode( nodeObject( node ), name, type ) );
