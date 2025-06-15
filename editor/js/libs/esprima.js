@@ -5515,7 +5515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                end: this.scanner.index
 	            };
 	        }
-	        // Identifer can not contain backslash (char code 92).
+	        // Identifier can not contain backslash (char code 92).
 	        if (character_1.Character.isIdentifierStart(cp) && (cp !== 92)) {
 	            var start = this.scanner.index;
 	            ++this.scanner.index;
