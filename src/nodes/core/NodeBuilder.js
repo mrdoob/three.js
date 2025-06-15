@@ -2679,7 +2679,7 @@ class NodeBuilder {
 
 	/**
 	 * Returns the sub-build property name for the given property and node.
-	 * 
+	 *
 	 * @param {string} [property=''] - The property name.
 	 * @param {?Node} [node=null] - The node to get the sub-build from.
 	 * @return {string} The sub-build property name.
