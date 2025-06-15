@@ -895,9 +895,8 @@ class TransformControls extends Controls {
 	 * @param {number|Color|string} yAxis - The y-axis color.
 	 * @param {number|Color|string} zAxis - The z-axis color.
 	 * @param {number|Color|string} active - The color for active elements.
-	 * @param {number|Color|string} inactive - The color for inactive elements.
 	 */
-	setColors( xAxis, yAxis, zAxis, active, inactive ) {
+	setColors( xAxis, yAxis, zAxis, active ) {
 
 		const materialLib = this._gizmo.materialLib;
 
@@ -905,7 +904,6 @@ class TransformControls extends Controls {
 		materialLib.yAxis.color.set( yAxis );
 		materialLib.zAxis.color.set( zAxis );
 		materialLib.active.color.set( active );
-		materialLib.inactive.color.set( inactive );
 		materialLib.xAxisTransparent.color.set( xAxis );
 		materialLib.yAxisTransparent.color.set( yAxis );
 		materialLib.zAxisTransparent.color.set( zAxis );
@@ -917,7 +915,6 @@ class TransformControls extends Controls {
 		if ( materialLib.yAxis._color ) materialLib.yAxis._color.set( yAxis );
 		if ( materialLib.zAxis._color ) materialLib.zAxis._color.set( zAxis );
 		if ( materialLib.active._color ) materialLib.active._color.set( active );
-		if ( materialLib.inactive._color ) materialLib.inactive._color.set( inactive );
 		if ( materialLib.xAxisTransparent._color ) materialLib.xAxisTransparent._color.set( xAxis );
 		if ( materialLib.yAxisTransparent._color ) materialLib.yAxisTransparent._color.set( yAxis );
 		if ( materialLib.zAxisTransparent._color ) materialLib.zAxisTransparent._color.set( zAxis );
@@ -1190,7 +1187,6 @@ class TransformControlsGizmo extends Object3D {
 			yAxis: matGreen,
 			zAxis: matBlue,
 			active: matYellow,
-			inactive: matGray,
 			xAxisTransparent: matRedTransparent,
 			yAxisTransparent: matGreenTransparent,
 			zAxisTransparent: matBlueTransparent,
