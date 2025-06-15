@@ -284,7 +284,7 @@ export class Switch {
 	constructor( discriminant ) {
 
 		this.discriminant = discriminant;
-		this.cases = [];
+		this.case = null;
 		this.isSwitch = true;
 
 	}
@@ -295,9 +295,15 @@ export class SwitchCase {
 
 	constructor( caseCondition ) {
 
+		// Condition for the case body to execute
 		this.caseCondition = caseCondition;
-
+		// Body of the case statement
 		this.body = [];
+		// Next case to fall to if current case fails
+		this.nextCase = null;
+
+
+		this.isDefault = false;
 		this.isSwitchCase = true;
 
 	}

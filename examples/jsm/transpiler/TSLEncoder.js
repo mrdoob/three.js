@@ -520,9 +520,9 @@ ${ this.tab }} )`;
 
 		let switchString = `Switch(${discriminantString})`;
 
-		for ( let i = 0; i < switchNode.cases.length; i ++ ) {
+		let caseNode = switchNode.case;
 
-			const caseNode = switchNode.cases[ i ];
+		while ( caseNode !== null ) {
 
 			const caseBodyString = this.emitBody( caseNode.body );
 			console.log( `Case Node Body: ${caseBodyString}` );
@@ -533,22 +533,11 @@ ${caseBodyString}
 
 ${this.tab}} )`;
 
-		}
-
-		if ( switchNode.default !== undefined ) {
-
-			const defaultBodyStr = this.emitBody( switchNode.default.body );
-
-			switchString += `.Default( () => {
-${defaultBodyStr}
-${this.tab}} )`;
+			caseNode = caseNode.nextCase;
 
 		}
-
-		console.log( switchString );
 
 		return switchString;
-
 
 	}
 

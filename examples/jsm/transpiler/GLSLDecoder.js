@@ -801,32 +801,6 @@ class GLSLDecoder {
 
 	}
 
-	parseSwitchCase() {
-
-		const parseCaseExpression = () => {
-
-			this.readToken(); // Skip 'case
-
-			const caseTokens = this.readTokensUntil( ':' );
-
-			return this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
-
-		};
-
-		const parseCaseBlock = ( caseStatement ) => {
-
-			caseStatement.body.push( this.parseExpression() );
-
-		};
-
-		const switchCase = new SwitchCase( parseCaseExpression() );
-
-		parseCaseBlock( switchCase );
-
-		return switchCase;
-
-	}
-
 	parseSwitch() {
 
 		const parseSwitchExpression = () => {
@@ -847,21 +821,15 @@ class GLSLDecoder {
 
 				this.readToken(); // Skip '{'
 
-				while ( this.getToken() && this.getToken().str === 'case' ) {
+				if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken() === 'default' ) ) {
 
-					console.log( 'parsing case' );
-
-					switchStatement.cases.push( this.parseSwitchCase() );
+					switchStatement.case = this.parseSwitchCase();
 
 				}
 
-				console.log( 'unknown behavior' );
-
 			} else {
 
-				console.log( 'parsing expression?' );
-
-				switchStatement.body.push( this.parseExpression() );
+				throw new Error( 'Expected \'{\' after switch(...) ' );
 
 			}
 
@@ -878,6 +846,64 @@ class GLSLDecoder {
 
 		return switchStatement;
 
+
+	}
+
+	parseSwitchCase() {
+
+		const parseCaseExpression = () => {
+
+			const caseType = this.readToken(); // Skip 'case' or 'default
+			console.log( `caseType: ${caseType}` );
+
+			const caseTokens = this.readTokensUntil( ':' );
+
+			return this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
+
+		};
+
+		// No '{' so use different approach
+		const parseCaseBlock = ( caseStatement ) => {
+
+			while ( this.getToken() && this.getToken().str !== 'case' ) {
+
+				if ( this.getToken().str === '}' ) {
+
+					this.readToken( '}' ); // no more cases, skip '}'
+
+					break;
+
+				}
+
+				caseStatement.body.push( this.parseExpression() );
+
+				console.log( caseStatement.body );
+
+			}
+
+		};
+
+		const switchCase = new SwitchCase( parseCaseExpression() );
+
+		parseCaseBlock( switchCase );
+
+		let currentCase = switchCase;
+
+		while ( this.getToken() && this.getToken().str === 'case' ) {
+
+			const previousCase = currentCase;
+
+			currentCase = new SwitchCase( parseCaseExpression() );
+
+			console.log( `CURRENT CASE: ${currentCase}` );
+
+			previousCase.nextCase = currentCase;
+
+			parseCaseBlock( currentCase );
+
+		}
+
+		return switchCase;
 
 	}
 
@@ -921,10 +947,13 @@ class GLSLDecoder {
 
 			this.readToken(); // skip 'else'
 
+			// Assign the current if/else statement as the previous within the chain of conditionals
 			const previous = current;
 
+			// If an 'else if' statement, parse the conditional within the if
 			if ( this.getToken().str === 'if' ) {
 
+				// Current conditional now equal to next conditional in the chain
 				current = new Conditional( parseIfExpression() );
 
 			} else {
@@ -933,8 +962,10 @@ class GLSLDecoder {
 
 			}
 
+			// n - 1 conditional's else statement assigned to new if/else statement
 			previous.elseConditional = current;
 
+			// Parse conditional of latest if statement
 			parseIfBlock( current );
 
 		}
@@ -1014,10 +1045,6 @@ class GLSLDecoder {
 				} else if ( token.str === 'switch' ) {
 
 					statement = this.parseSwitch();
-
-				} else if ( token.str === 'case' ) {
-
-					statement = this.parseSwitchCase();
 
 				} else {
 
