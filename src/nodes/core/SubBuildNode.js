@@ -1,6 +1,14 @@
 import Node from './Node.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
+/**
+ * This node is used to build a sub-build in the node system.
+ *
+ * @augments Node
+ * @param {Node} node - The node to be built in the sub-build.
+ * @param {string} name - The name of the sub-build.
+ * @param {string|null} [nodeType=null] - The type of the node, if known.
+ */
 class SubBuildNode extends Node {
 
 	static get type() {
@@ -13,8 +21,18 @@ class SubBuildNode extends Node {
 
 		super( nodeType );
 
+		/**
+		 * The node to be built in the sub-build.
+		 *
+		 * @type {Node}
+		 */
 		this.node = node;
 
+		/**
+		 * The name of the sub-build.
+		 *
+		 * @type {string}
+		 */
 		this.name = name;
 
 		/**
@@ -58,4 +76,14 @@ class SubBuildNode extends Node {
 
 export default SubBuildNode;
 
+/**
+ * Creates a new sub-build node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node to be built in the sub-build.
+ * @param {string} name - The name of the sub-build.
+ * @param {string|null} [type=null] - The type of the node, if known.
+ * @returns {Node} A node object wrapping the SubBuildNode instance.
+ */
 export const subBuild = ( node, name, type = null ) => nodeObject( new SubBuildNode( nodeObject( node ), name, type ) );

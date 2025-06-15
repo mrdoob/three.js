@@ -419,6 +419,12 @@ class NodeBuilder {
 		 */
 		this.buildStage = null;
 
+		/**
+		 * The sub-build layers.
+		 *
+		 * @type {Array<SubBuildNode>}
+		 * @default []
+		 */
 		this.subBuildLayers = [];
 
 		/**
