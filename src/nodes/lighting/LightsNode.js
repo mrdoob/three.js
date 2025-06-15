@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeObject, vec3 } from '../tsl/TSLBase.js';
+import { nodeObject, property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
 
 const sortLights = ( lights ) => {
@@ -54,21 +54,21 @@ class LightsNode extends Node {
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalDiffuseNode = vec3().toVar();
+		this.totalDiffuseNode = property( 'vec3', 'totalDiffuse' );
 
 		/**
 		 * A node representing the total specular light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalSpecularNode = vec3().toVar();
+		this.totalSpecularNode = property( 'vec3', 'totalSpecular' );
 
 		/**
 		 * A node representing the outgoing light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.outgoingLightNode = vec3().toVar();
+		this.outgoingLightNode = property( 'vec3', 'outgoingLight' );
 
 		/**
 		 * An array representing the lights in the scene.
