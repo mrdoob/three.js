@@ -293,6 +293,10 @@ class TSLEncoder {
 
 			code = this.emitFor( node );
 
+		} else if ( node.isSwitch ) {
+
+			code = this.emitSwitch( node );
+
 		} else if ( node.isVariableDeclaration ) {
 
 			code = this.emitVariables( node );
@@ -504,6 +508,42 @@ ${ this.tab }} )`;
 		this.imports.add( 'Loop' );
 
 		return loopStr;
+
+	}
+
+
+	emitSwitch( switchNode ) {
+
+		const discriminantString = this.emitExpression( switchNode.discriminant );
+
+		let switchString = `Switch(${discriminantString})`;
+
+		let caseNode = switchNode.case;
+
+		while ( caseNode !== null ) {
+
+			const caseBodyString = this.emitBody( caseNode.body );
+			if ( ! caseNode.isDefault ) {
+
+				switchString += `.Case(${this.emitExpression( caseNode.caseCondition )}, `;
+
+			} else {
+
+				switchString += '.Default( ';
+
+			}
+
+			switchString += `() => {
+
+${caseBodyString}
+
+${this.tab}} )`;
+
+			caseNode = caseNode.nextCase;
+
+		}
+
+		return switchString;
 
 	}
 
