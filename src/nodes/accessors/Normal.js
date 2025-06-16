@@ -137,7 +137,7 @@ export const clearcoatNormalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, context }
 
 	if ( subBuildFn === 'NORMAL' || subBuildFn === 'VERTEX' ) {
 
-		return normalView;
+		node = normalView;
 
 	} else {
 
