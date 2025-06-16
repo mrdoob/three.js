@@ -1,6 +1,7 @@
 import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { subBuild } from './SubBuildNode.js';
 
 /**
  * Class for representing shader varyings as nodes. Varyings are create from
@@ -131,7 +132,7 @@ class VaryingNode extends Node {
 			const interpolationSampling = this.interpolationSampling;
 
 			properties.varying = varying = builder.getVaryingFromNode( this, name, type, interpolationType, interpolationSampling );
-			properties.node = this.node;
+			properties.node = subBuild( this.node, 'VERTEX' );
 
 		}
 
@@ -170,7 +171,7 @@ class VaryingNode extends Node {
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
 
 			// force node run in vertex stage
-			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node, type, propertyName );
+			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, properties.node, type, propertyName );
 
 			properties[ propertyKey ] = propertyName;
 
