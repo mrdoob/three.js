@@ -126,6 +126,12 @@ class NormalMapNode extends TempNode {
 
 			}
 
+		} else {
+
+			console.error( `THREE.NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
+
+			outputNode = normalView; // Fallback to default normal view
+
 		}
 
 		return outputNode;
