@@ -1,3 +1,13 @@
+import { EventDispatcher } from '../core/EventDispatcher.js';
+
+/**
+ * Fires when {@link LoadingManager#abort} is called.
+ *
+ * @event LoadingManager#abort
+ * @type {Object}
+ */
+const _abort = { type: 'abort' };
+
 /**
  * Handles and keeps track of loaded and pending data. A default global
  * instance of this class is created and used by loaders if not supplied
@@ -15,7 +25,7 @@
  * const loader2 = new ColladaLoader( manager );
  * ```
  */
-class LoadingManager {
+class LoadingManager extends EventDispatcher {
 
 	/**
 	 * Constructs a new loading manager.
@@ -25,6 +35,8 @@ class LoadingManager {
 	 * @param {Function} [onError] - Executes when an error occurs.
 	 */
 	constructor( onLoad, onProgress, onError ) {
+
+		super();
 
 		const scope = this;
 
@@ -68,6 +80,14 @@ class LoadingManager {
 		 * @default undefined
 		 */
 		this.onError = onError;
+
+		/**
+		 * Whether loading requests can be aborted with {@link LoadingManager#abort} or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.enableAbortManagement = false;
 
 		/**
 		 * This should be called by any loader using the manager when the loader
@@ -266,6 +286,36 @@ class LoadingManager {
 			}
 
 			return null;
+
+		};
+
+		/**
+		 * Can be used to abort ongoing loading requests in loaders using this manager.
+		 * The abort only works if {@link LoadingManager#enableAbortManagement} is set
+		 * to `true` and the loaders implement {@link Loader#abort}.
+		 *
+		 * @fires LoadingManager#abort
+		 * @return {LoadingManager} A reference to this loading manager.
+		 */
+		this.abort = function () {
+
+			this.dispatchEvent( _abort );
+
+			return this;
+
+		};
+
+		/**
+		 * Frees internal resources. Call this method whenever this instance is no
+		 * longer used in your app.
+		 *
+		 * @return {LoadingManager} A reference to this loading manager.
+		 */
+		this.dispose = function () {
+
+			this._listeners = {}; // remove abort handler
+
+			return this;
 
 		};
 
