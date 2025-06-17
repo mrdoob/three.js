@@ -313,7 +313,9 @@ class LoadingManager extends EventDispatcher {
 		 */
 		this.dispose = function () {
 
-			this._listeners = {}; // remove abort handler
+			handlers.length = 0;
+
+			this.removeEventListeners( 'abort' );
 
 			return this;
 
