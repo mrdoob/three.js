@@ -190,11 +190,19 @@ class RTTNode extends TextureNode {
 
 		if ( this.autoSize === true ) {
 
-			this.pixelRatio = renderer.getPixelRatio();
-
+			const pixelRatio = renderer.getPixelRatio();
 			const size = renderer.getSize( _size );
 
-			this.setSize( size.width, size.height );
+			const effectiveWidth = size.width * pixelRatio;
+			const effectiveHeight = size.height * pixelRatio;
+
+			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
+
+				this.renderTarget.setSize( effectiveWidth, effectiveHeight );
+
+				this.textureNeedsUpdate = true;
+
+			}
 
 		}
 
