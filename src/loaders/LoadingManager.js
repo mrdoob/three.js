@@ -305,22 +305,6 @@ class LoadingManager extends EventDispatcher {
 
 		};
 
-		/**
-		 * Frees internal resources. Call this method whenever this instance is no
-		 * longer used in your app.
-		 *
-		 * @return {LoadingManager} A reference to this loading manager.
-		 */
-		this.dispose = function () {
-
-			handlers.length = 0;
-
-			this.removeEventListeners( 'abort' );
-
-			return this;
-
-		};
-
 	}
 
 }

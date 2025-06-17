@@ -94,21 +94,6 @@ class EventDispatcher {
 	}
 
 	/**
-	 * Removes all event listeners for the given event type.
-	 *
-	 * @param {string} type - The type of event.
-	 */
-	removeEventListeners( type ) {
-
-		const listeners = this._listeners;
-
-		if ( listeners === undefined ) return;
-
-		delete this._listeners[ type ];
-
-	}
-
-	/**
 	 * Dispatches an event object.
 	 *
 	 * @param {Object} event - The event that gets fired.
