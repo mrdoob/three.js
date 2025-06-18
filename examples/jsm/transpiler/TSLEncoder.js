@@ -66,6 +66,8 @@ class TSLEncoder {
 		this._currentProperties = {};
 		this._lastStatement = null;
 
+		this.block = null;
+
 	}
 
 	addImport( name ) {
@@ -393,6 +395,12 @@ class TSLEncoder {
 
 		for ( const statement of body ) {
 
+			if ( this.block && this.block.isSwitchCase ) {
+
+				if ( statement.isBreak ) continue; // skip break statements in switch cases
+
+			}
+
 			code += this.emitExtraLine( statement );
 			code += this.tab + this.emitExpression( statement );
 
@@ -533,7 +541,11 @@ ${ this.tab }} )`;
 
 		let caseNode = switchNode.case;
 
+		const previousBlock = this.block;
+
 		while ( caseNode !== null ) {
+
+			this.block = caseNode;
 
 			const caseBodyString = this.emitBody( caseNode.body );
 
@@ -556,6 +568,8 @@ ${ this.tab }} )`;
 			caseNode = caseNode.nextCase;
 
 		}
+
+		this.block = previousBlock;
 
 		this.tab = this.tab.slice( 0, - 1 );
 
