@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard } from './AST.js';
+import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -63,7 +63,7 @@ function getFunctionName( str ) {
 function getGroupDelta( str ) {
 
 	if ( str === '(' || str === '[' || str === '{' ) return 1;
-	if ( str === ')' || str === ']' || str === '}' ) return - 1;
+	if ( str === ')' || str === ']' || str === '}' || str === 'case' || str === 'default' ) return - 1;
 
 	return 0;
 
@@ -492,6 +492,14 @@ class GLSLDecoder {
 
 				return new Discard();
 
+			} else if ( firstToken.str === 'continue' ) {
+
+				return new Continue();
+
+			} else if ( firstToken.str === 'break' ) {
+
+				return new Break();
+
 			}
 
 			const secondToken = tokens[ 1 ];
@@ -801,6 +809,110 @@ class GLSLDecoder {
 
 	}
 
+	parseSwitch() {
+
+		const parseSwitchExpression = () => {
+
+			this.readToken(); // Skip 'switch'
+
+			const switchDeterminantTokens = this.readTokensUntil( ')' );
+
+			// Parse expresison between parentheses. Index 1: char after '('. Index -1: char before ')'
+			return this.parseExpressionFromTokens( switchDeterminantTokens.slice( 1, - 1 ) );
+
+
+		};
+
+		const parseSwitchBlock = ( switchStatement ) => {
+
+			// Validate curly braces
+			if ( this.getToken().str === '{' ) {
+
+				this.readToken(); // Skip '{'
+
+			} else {
+
+				throw new Error( 'Expected \'{\' after switch(...) ' );
+
+			}
+
+			if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
+
+				switchStatement.case = this.parseSwitchCase();
+
+			} else {
+
+				this.parseBlock( switchStatement );
+
+			}
+
+
+		};
+
+		const switchStatement = new Switch( parseSwitchExpression() );
+
+		parseSwitchBlock( switchStatement );
+
+		return switchStatement;
+
+
+	}
+
+	parseSwitchCase() {
+
+		const parseCaseExpression = ( token ) => {
+
+			const caseTypeToken = token ? token : this.readToken(); // Skip 'case' or 'default
+
+			const caseTokens = this.readTokensUntil( ':' );
+
+			// No case condition on default
+			if ( caseTypeToken.str === 'default' ) {
+
+				return null;
+
+			}
+
+			return this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
+
+		};
+
+		let lastReadToken = null;
+
+		// No '{' so use different approach
+		const parseCaseBlock = ( caseStatement ) => {
+
+			lastReadToken = this.parseBlock( caseStatement );
+
+		};
+
+		// Parse case condition
+		const caseCondition = parseCaseExpression();
+		const switchCase = new SwitchCase( caseCondition );
+
+		// Get case body
+		parseCaseBlock( switchCase );
+
+		let currentCase = switchCase;
+
+		// If block ended with case, then continue chaining cases, otherwise, ended with '}' and no more case blocks to parse
+		while ( lastReadToken.str === 'case' || lastReadToken.str === 'default' ) {
+
+			const previousCase = currentCase;
+
+			// case and default already skipped at block end, so need to pass it in as last read token
+			currentCase = new SwitchCase( parseCaseExpression( lastReadToken ) );
+
+			previousCase.nextCase = currentCase;
+
+			parseCaseBlock( currentCase );
+
+		}
+
+		return switchCase;
+
+	}
+
 	parseIf() {
 
 		const parseIfExpression = () => {
@@ -841,10 +953,13 @@ class GLSLDecoder {
 
 			this.readToken(); // skip 'else'
 
+			// Assign the current if/else statement as the previous within the chain of conditionals
 			const previous = current;
 
+			// If an 'else if' statement, parse the conditional within the if
 			if ( this.getToken().str === 'if' ) {
 
+				// Current conditional now equal to next conditional in the chain
 				current = new Conditional( parseIfExpression() );
 
 			} else {
@@ -853,8 +968,10 @@ class GLSLDecoder {
 
 			}
 
+			// n - 1 conditional's else statement assigned to new if/else statement
 			previous.elseConditional = current;
 
+			// Parse conditional of latest if statement
 			parseIfBlock( current );
 
 		}
@@ -885,9 +1002,10 @@ class GLSLDecoder {
 
 			if ( groupIndex < 0 ) {
 
-				this.readToken(); // skip '}'
+				this.readToken(); // skip '}', ']', 'case', or other block ending tokens'
 
-				break;
+				// Return skipped token
+				return token;
 
 			}
 
@@ -930,6 +1048,10 @@ class GLSLDecoder {
 				} else if ( token.str === 'for' ) {
 
 					statement = this.parseFor();
+
+				} else if ( token.str === 'switch' ) {
+
+					statement = this.parseSwitch();
 
 				} else {
 

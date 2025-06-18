@@ -66,6 +66,8 @@ class TSLEncoder {
 		this._currentProperties = {};
 		this._lastStatement = null;
 
+		this.block = null;
+
 	}
 
 	addImport( name ) {
@@ -253,6 +255,17 @@ class TSLEncoder {
 
 			code = 'Discard()';
 
+		} else if ( node.isBreak ) {
+
+			this.addImport( 'Break' );
+
+			code = 'Break()';
+
+		} else if ( node.isContinue ) {
+
+			this.addImport( 'Continue' );
+			code = 'Continue()';
+
 		} else if ( node.isAccessorElements ) {
 
 			code = this.emitExpression( node.object );
@@ -292,6 +305,10 @@ class TSLEncoder {
 		} else if ( node.isFor ) {
 
 			code = this.emitFor( node );
+
+		} else if ( node.isSwitch ) {
+
+			code = this.emitSwitch( node );
 
 		} else if ( node.isVariableDeclaration ) {
 
@@ -377,6 +394,12 @@ class TSLEncoder {
 		this.tab += '\t';
 
 		for ( const statement of body ) {
+
+			if ( this.block && this.block.isSwitchCase ) {
+
+				if ( statement.isBreak ) continue; // skip break statements in switch cases
+
+			}
 
 			code += this.emitExtraLine( statement );
 			code += this.tab + this.emitExpression( statement );
@@ -504,6 +527,69 @@ ${ this.tab }} )`;
 		this.imports.add( 'Loop' );
 
 		return loopStr;
+
+	}
+
+
+	emitSwitch( switchNode ) {
+
+		const discriminantString = this.emitExpression( switchNode.discriminant );
+
+		this.tab += '\t';
+
+		let switchString = `Switch( ${ discriminantString } )\n${ this.tab }`;
+
+		let caseNode = switchNode.case;
+
+		const previousBlock = this.block;
+
+		while ( caseNode !== null ) {
+
+			this.block = caseNode;
+
+			let caseBodyString;
+
+			if ( ! caseNode.isDefault ) {
+
+				const caseConditions = [ this.emitExpression( caseNode.caseCondition ) ];
+
+				while ( caseNode.body.length === 0 && caseNode.nextCase !== null && caseNode.nextCase.isDefault !== true ) {
+
+					caseNode = caseNode.nextCase;
+
+					caseConditions.push( this.emitExpression( caseNode.caseCondition ) );
+
+				}
+
+				caseBodyString = this.emitBody( caseNode.body );
+
+				switchString += `.Case( ${ caseConditions.join( ', ' ) }, `;
+
+			} else {
+
+				caseBodyString = this.emitBody( caseNode.body );
+
+				switchString += '.Default( ';
+
+			}
+
+			switchString += `() => {
+
+${ caseBodyString }
+
+${ this.tab }} )`;
+
+			caseNode = caseNode.nextCase;
+
+		}
+
+		this.block = previousBlock;
+
+		this.tab = this.tab.slice( 0, - 1 );
+
+		this.imports.add( 'Switch' );
+
+		return switchString;
 
 	}
 
@@ -754,7 +840,7 @@ ${ this.tab }} )`;
 
 		if ( statement.isReturn ) return '\n';
 
-		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true;
+		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true && st.isSwitch !== true;
 		const lastExp = isExpression( last );
 		const currExp = isExpression( statement );
 
