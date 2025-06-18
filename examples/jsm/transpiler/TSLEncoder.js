@@ -527,16 +527,19 @@ ${ this.tab }} )`;
 
 		const discriminantString = this.emitExpression( switchNode.discriminant );
 
-		let switchString = `Switch(${discriminantString})`;
+		this.tab += '\t';
+
+		let switchString = `Switch( ${ discriminantString } )\n${ this.tab }`;
 
 		let caseNode = switchNode.case;
 
 		while ( caseNode !== null ) {
 
 			const caseBodyString = this.emitBody( caseNode.body );
+
 			if ( ! caseNode.isDefault ) {
 
-				switchString += `.Case(${this.emitExpression( caseNode.caseCondition )}, `;
+				switchString += `.Case( ${ this.emitExpression( caseNode.caseCondition ) }, `;
 
 			} else {
 
@@ -546,13 +549,17 @@ ${ this.tab }} )`;
 
 			switchString += `() => {
 
-${caseBodyString}
+${ caseBodyString }
 
-${this.tab}} )`;
+${ this.tab }} )`;
 
 			caseNode = caseNode.nextCase;
 
 		}
+
+		this.tab = this.tab.slice( 0, - 1 );
+
+		this.imports.add( 'Switch' );
 
 		return switchString;
 
@@ -805,7 +812,7 @@ ${ this.tab }} )`;
 
 		if ( statement.isReturn ) return '\n';
 
-		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true;
+		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true && st.isSwitch !== true;
 		const lastExp = isExpression( last );
 		const currExp = isExpression( statement );
 

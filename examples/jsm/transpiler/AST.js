@@ -319,11 +319,12 @@ export class SwitchCase {
 
 		// Condition for the case body to execute
 		this.caseCondition = caseCondition;
+
 		// Body of the case statement
 		this.body = [];
+
 		// Next case to fall to if current case fails
 		this.nextCase = null;
-
 
 		this.isDefault = caseCondition === null ? true : false;
 		this.isSwitchCase = true;
