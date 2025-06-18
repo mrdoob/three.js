@@ -547,13 +547,27 @@ ${ this.tab }} )`;
 
 			this.block = caseNode;
 
-			const caseBodyString = this.emitBody( caseNode.body );
+			let caseBodyString;
 
 			if ( ! caseNode.isDefault ) {
 
-				switchString += `.Case( ${ this.emitExpression( caseNode.caseCondition ) }, `;
+				const caseConditions = [ this.emitExpression( caseNode.caseCondition ) ];
+
+				while ( caseNode.body.length === 0 && caseNode.nextCase !== null && caseNode.nextCase.isDefault !== true ) {
+
+					caseNode = caseNode.nextCase;
+
+					caseConditions.push( this.emitExpression( caseNode.caseCondition ) );
+
+				}
+
+				caseBodyString = this.emitBody( caseNode.body );
+
+				switchString += `.Case( ${ caseConditions.join( ', ' ) }, `;
 
 			} else {
+
+				caseBodyString = this.emitBody( caseNode.body );
 
 				switchString += '.Default( ';
 
