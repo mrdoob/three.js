@@ -253,6 +253,17 @@ class TSLEncoder {
 
 			code = 'Discard()';
 
+		} else if ( node.isBreak ) {
+
+			this.addImport( 'Break' );
+
+			code = 'Break()';
+
+		} else if ( node.isContinue ) {
+
+			this.addImport( 'Continue' );
+			code = 'Continue()';
+
 		} else if ( node.isAccessorElements ) {
 
 			code = this.emitExpression( node.object );

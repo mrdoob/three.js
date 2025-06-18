@@ -214,6 +214,26 @@ export class Discard {
 
 }
 
+export class Continue {
+
+	constructor() {
+
+		this.isContinue = true;
+
+	}
+
+}
+
+export class Break {
+
+	constructor() {
+
+		this.isBreak = true;
+
+	}
+
+}
+
 export class Accessor {
 
 	constructor( property ) {

@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase } from './AST.js';
+import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -492,6 +492,14 @@ class GLSLDecoder {
 
 				return new Discard();
 
+			} else if ( firstToken.str === 'continue' ) {
+
+				return new Continue();
+
+			} else if ( firstToken.str === 'break' ) {
+
+				return new Break();
+
 			}
 
 			const secondToken = tokens[ 1 ];
@@ -855,8 +863,6 @@ class GLSLDecoder {
 		const parseCaseExpression = ( token ) => {
 
 			const caseTypeToken = token ? token : this.readToken(); // Skip 'case' or 'default
-			console.log( caseTypeToken );
-			console.log( caseTypeToken.str );
 
 			const caseTokens = this.readTokensUntil( ':' );
 
@@ -882,7 +888,6 @@ class GLSLDecoder {
 
 		// Parse case condition
 		const caseCondition = parseCaseExpression();
-		console.log( caseCondition );
 		const switchCase = new SwitchCase( caseCondition );
 
 		// Get case body
