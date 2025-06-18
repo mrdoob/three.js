@@ -852,14 +852,16 @@ class GLSLDecoder {
 
 	parseSwitchCase() {
 
-		const parseCaseExpression = () => {
+		const parseCaseExpression = ( token ) => {
 
-			const caseType = this.readToken(); // Skip 'case' or 'default
+			const caseTypeToken = token ? token : this.readToken(); // Skip 'case' or 'default
+			console.log( caseTypeToken );
+			console.log( caseTypeToken.str );
 
 			const caseTokens = this.readTokensUntil( ':' );
 
 			// No case condition on default
-			if ( caseType === 'default' ) {
+			if ( caseTypeToken.str === 'default' ) {
 
 				return null;
 
@@ -869,31 +871,19 @@ class GLSLDecoder {
 
 		};
 
-		let lastToken = null;
+		let lastReadToken = null;
 
 		// No '{' so use different approach
 		const parseCaseBlock = ( caseStatement ) => {
 
-			lastToken = this.parseBlock( caseStatement );
-
-			/* while ( this.getToken() && this.getToken().str !== 'case' && this.getToken().str !== 'default' ) {
-
-				if ( this.getToken().str === '}' ) {
-
-					this.readToken( '}' ); // no more cases, skip '}'
-
-					break;
-
-				}
-
-				caseStatement.body.push( this.parseExpression() );
-
-			} */
+			lastReadToken = this.parseBlock( caseStatement );
 
 		};
 
 		// Parse case condition
-		const switchCase = new SwitchCase( parseCaseExpression() );
+		const caseCondition = parseCaseExpression();
+		console.log( caseCondition );
+		const switchCase = new SwitchCase( caseCondition );
 
 		// Get case body
 		parseCaseBlock( switchCase );
@@ -901,11 +891,12 @@ class GLSLDecoder {
 		let currentCase = switchCase;
 
 		// If block ended with case, then continue chaining cases, otherwise, ended with '}' and no more case blocks to parse
-		while ( lastToken.str === 'case' || lastToken.str === 'default' ) {
+		while ( lastReadToken.str === 'case' || lastReadToken.str === 'default' ) {
 
 			const previousCase = currentCase;
 
-			currentCase = new SwitchCase( parseCaseExpression() );
+			// case and default already skipped at block end, so need to pass it in as last read token
+			currentCase = new SwitchCase( parseCaseExpression( lastReadToken ) );
 
 			previousCase.nextCase = currentCase;
 
