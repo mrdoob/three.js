@@ -208,6 +208,7 @@ class ImageBitmapLoader extends Loader {
 	abort() {
 
 		this._abortController.abort();
+		this._abortController = new AbortController();
 
 		return this;
 
