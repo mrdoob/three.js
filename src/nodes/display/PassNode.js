@@ -126,7 +126,16 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		const newNode = new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		newNode.uvNode = this.uvNode;
+		newNode.levelNode = this.levelNode;
+		newNode.biasNode = this.biasNode;
+		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
+
+		return newNode;
 
 	}
 
