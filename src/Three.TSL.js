@@ -477,6 +477,7 @@ export const texture = TSL.texture;
 export const texture3D = TSL.texture3D;
 export const textureBarrier = TSL.textureBarrier;
 export const textureBicubic = TSL.textureBicubic;
+export const textureBicubicLevel = TSL.textureBicubicLevel;
 export const textureCubeUV = TSL.textureCubeUV;
 export const textureLoad = TSL.textureLoad;
 export const textureSize = TSL.textureSize;
