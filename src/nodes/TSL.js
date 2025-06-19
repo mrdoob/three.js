@@ -27,7 +27,7 @@ export * from './math/TriNoise3D.js';
 export * from './utils/EquirectUVNode.js';
 export * from './utils/FunctionOverloadingNode.js';
 export * from './utils/LoopNode.js';
-export * from './utils/MatcapUVNode.js';
+export * from './utils/MatcapUV.js';
 export * from './utils/MaxMipLevelNode.js';
 export * from './utils/Oscillators.js';
 export * from './utils/Packing.js';

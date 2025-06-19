@@ -45,7 +45,6 @@ export { default as EquirectUVNode } from './utils/EquirectUVNode.js';
 export { default as FunctionOverloadingNode } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
 export { default as LoopNode } from './utils/LoopNode.js';
-export { default as MatcapUVNode } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode } from './utils/MaxMipLevelNode.js';
 export { default as RemapNode } from './utils/RemapNode.js';
 export { default as RotateNode } from './utils/RotateNode.js';
