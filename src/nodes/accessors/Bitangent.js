@@ -1,7 +1,7 @@
 import { Fn } from '../tsl/TSLCore.js';
 import { normalGeometry, normalLocal, normalView, normalWorld } from './Normal.js';
 import { tangentGeometry, tangentLocal, tangentView, tangentWorld } from './Tangent.js';
-import { tangentFrame } from './TangentUtils.js';
+import { bitangentViewFrame } from './TangentUtils.js';
 import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 
 /**
@@ -59,7 +59,7 @@ export const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, mater
 
 	} else {
 
-		node = tangentFrame.bitangentView;
+		node = bitangentViewFrame;
 
 	}
 

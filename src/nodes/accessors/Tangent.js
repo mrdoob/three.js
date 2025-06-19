@@ -2,7 +2,7 @@ import { attribute } from '../core/AttributeNode.js';
 import { cameraViewMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
-import { tangentFrame } from './TangentUtils.js';
+import { tangentViewFrame } from './TangentUtils.js';
 import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 
 /**
@@ -47,7 +47,7 @@ export const tangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, materia
 
 	} else {
 
-		node = tangentFrame.tangentView;
+		node = tangentViewFrame;
 
 	}
 
