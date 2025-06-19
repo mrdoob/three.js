@@ -53,7 +53,6 @@ export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode } from './utils/SpriteSheetUVNode.js';
 export { default as StorageArrayElementNode } from './utils/StorageArrayElementNode.js';
-export { default as TriplanarTexturesNode } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
 export { default as MemberNode } from './utils/MemberNode.js';
