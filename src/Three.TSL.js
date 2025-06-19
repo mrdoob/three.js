@@ -420,6 +420,7 @@ export const round = TSL.round;
 export const rtt = TSL.rtt;
 export const sRGBTransferEOTF = TSL.sRGBTransferEOTF;
 export const sRGBTransferOETF = TSL.sRGBTransferOETF;
+export const sample = TSL.sample;
 export const sampler = TSL.sampler;
 export const samplerComparison = TSL.samplerComparison;
 export const saturate = TSL.saturate;

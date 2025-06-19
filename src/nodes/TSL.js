@@ -42,6 +42,7 @@ export * from './utils/TriplanarTexturesNode.js';
 export * from './utils/ReflectorNode.js';
 export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
+export * from './utils/SampleNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';
