@@ -1,4 +1,4 @@
-import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
+import { equirectUV } from '../../nodes/utils/EquirectUV.js';
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
 import { positionWorldDirection } from '../../nodes/accessors/Position.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
