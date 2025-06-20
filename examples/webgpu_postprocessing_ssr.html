@@ -11,11 +11,13 @@
 	</head>
 
 <body>
+
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - screen space reflections<br />
 		<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by 
 		<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
 	</div>
+
 	<script type="importmap">
 		{
 			"imports": {
@@ -28,8 +30,9 @@
 	</script>
 
 	<script type="module">
+
 		import * as THREE from 'three';
-		import { pass, mrt, output, normalView, metalness, blendColor, screenUV, color } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, blendColor, screenUV, color, sample, directionToColor, colorToDirection } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -109,7 +112,7 @@
 			const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: normalView,
+				normal: directionToColor( normalView ),
 				metalness: metalness
 			} ) );
 
@@ -118,7 +121,23 @@
 			const scenePassDepth = scenePass.getTextureNode( 'depth' );
 			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
+			// optimization bandwidth packing the normals and reducing the texture precision if possible
+
+			const metalnessTexture = scenePass.getTexture( 'metalness' );
+			metalnessTexture.type = THREE.UnsignedByteType;
+
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.type = THREE.UnsignedByteType;
+
+			const customNormal = sample( ( uv ) => {
+
+				return colorToDirection( scenePassNormal.sample( uv ) );
+
+			} );
+
+			//
+
+			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, scenePassMetalness, camera );
 			ssrPass.resolutionScale = 1.0;
 
 			// blend SSR over beauty
