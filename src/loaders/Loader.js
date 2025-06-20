@@ -61,14 +61,6 @@ class Loader {
 		 */
 		this.requestHeader = {};
 
-		//
-
-		if ( this.manager.enableAbortManagement === true ) {
-
-			this.manager.addEventListener( 'abort', () => this.abort() );
-
-		}
-
 	}
 
 	/**
