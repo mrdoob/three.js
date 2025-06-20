@@ -102,12 +102,12 @@
 				floorMaterial.colorNode = Fn( () => {
 
 					// blur reflection using textureBicubic()
-					const dityReflection = textureBicubic( reflection, dirty.mul( .9 ) ).rgb;
+					const dirtyReflection = textureBicubic( reflection, dirty.mul( .9 ) ).rgb;
 
 					// falloff opacity by distance like an opacity-fog
 					const opacity = rangeFogFactor( 7, 25 ).oneMinus();
 
-					return vec4( dityReflection.rgb, opacity );
+					return vec4( dirtyReflection.rgb, opacity );
 
 				} )();
 
