@@ -280,7 +280,6 @@ class LoadingManager {
 		 * Can be used to abort ongoing loading requests in loaders using this manager.
 		 * The abort only works if the loaders implement {@link Loader#abort}.
 		 *
-		 * @fires LoadingManager#abort
 		 * @return {LoadingManager} A reference to this loading manager.
 		 */
 		this.abort = function () {
