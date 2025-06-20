@@ -415,6 +415,7 @@
 		"webgpu_postprocessing",
 		"webgpu_procedural_texture",
 		"webgpu_reflection",
+		"webgpu_reflection_dirty",
 		"webgpu_reflection_blurred",
 		"webgpu_refraction",
 		"webgpu_rendertarget_2d-array_3d",
