@@ -210,9 +210,7 @@
 		"webgl_tonemapping",
 		"webgl_video_kinect",
 		"webgl_video_panorama_equirectangular",
-		"webgl_watch",
-		"webgl_water",
-		"webgl_water_flowmap"
+		"webgl_watch"
 	],
 	"webgl / postprocessing": [
 		"webgl_postprocessing",
