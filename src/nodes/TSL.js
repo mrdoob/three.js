@@ -38,7 +38,7 @@ export * from './utils/ViewportUtils.js';
 export * from './utils/RotateNode.js';
 export * from './utils/SpriteSheetUVNode.js';
 export * from './utils/Timer.js';
-export * from './utils/TriplanarTexturesNode.js';
+export * from './utils/TriplanarTextures.js';
 export * from './utils/ReflectorNode.js';
 export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
