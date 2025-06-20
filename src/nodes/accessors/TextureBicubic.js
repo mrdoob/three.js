@@ -1,6 +1,6 @@
 import { add, mul, div } from '../math/OperatorNode.js';
 import { floor, ceil, fract, pow } from '../math/MathNode.js';
-import { Fn, float, vec2, vec4, int } from '../tsl/TSLBase.js';
+import { Fn, vec2, vec4, int } from '../tsl/TSLBase.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
 // Mipped Bicubic Texture Filtering by N8
