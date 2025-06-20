@@ -78,4 +78,4 @@ export default SampleNode;
  * @param {Function} callback - The function to be called when sampling. Should accept a UV node and return a value.
  * @returns {SampleNode} The created SampleNode instance wrapped as a node object.
  */
-export const sample = /*@__PURE__*/ ( callback ) => nodeObject( new SampleNode( callback ) );
+export const sample = ( callback ) => nodeObject( new SampleNode( callback ) );
