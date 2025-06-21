@@ -4,6 +4,10 @@ const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
 ];
 
+const arithmeticOperators = [
+	'*', '/', '%', '+', '-', '<<', '>>'
+];
+
 const precedenceOperators = [
 	'*', '/', '%',
 	'-', '+',
@@ -328,7 +332,11 @@ class GLSLDecoder {
 				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) return;
 
 				// important for negate operator after arithmetic operator: a * -1, a * -( b )
-				if ( ( inverse && tokens[ i - 1 ].isOperator ) || ( ! inverse && tokens[ i + 1 ].isOperator ) ) return;
+				if ( ( inverse && arithmeticOperators.includes( tokens[ i - 1 ].str ) ) || ( ! inverse && arithmeticOperators.includes( tokens[ i + 1 ].str ) ) ) {
+
+					return;
+
+				}
 
 				if ( groupIndex === 0 && token.str === operator ) {
 
