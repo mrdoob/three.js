@@ -343,7 +343,7 @@ async function RapierPhysics() {
 		 * Removes the given mesh from this physics simulation.
 		 *
 		 * @method
-		 * @name RapierPhysics#addMesh
+		 * @name RapierPhysics#removeMesh
 		 * @param {Mesh} mesh The mesh to remove.
 		 */
 		removeMesh: removeMesh,
