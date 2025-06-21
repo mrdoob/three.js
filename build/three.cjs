@@ -49163,7 +49163,7 @@ class Clock {
 	 */
 	start() {
 
-		this.startTime = now();
+		this.startTime = performance.now();
 
 		this.oldTime = this.startTime;
 		this.elapsedTime = 0;
@@ -49212,7 +49212,7 @@ class Clock {
 
 		if ( this.running ) {
 
-			const newTime = now();
+			const newTime = performance.now();
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
@@ -49224,12 +49224,6 @@ class Clock {
 		return diff;
 
 	}
-
-}
-
-function now() {
-
-	return performance.now();
 
 }
 
@@ -65423,6 +65417,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 20 );
 		if ( parameters.batchingColor )
 			_programLayers.enable( 21 );
+		if ( parameters.gradientMap )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();

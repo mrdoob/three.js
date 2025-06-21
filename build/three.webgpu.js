@@ -9842,7 +9842,7 @@ const attribute = ( name, nodeType = null ) => nodeObject( new AttributeNode( na
  * @param {number} [index=0] - The uv index.
  * @return {AttributeNode<vec2>} The uv attribute node.
  */
-const uv = ( index = 0 ) => attribute( 'uv' + ( index > 0 ? index : '' ), 'vec2' );
+const uv$1 = ( index = 0 ) => attribute( 'uv' + ( index > 0 ? index : '' ), 'vec2' );
 
 /**
  * A node that represents the dimensions of a texture. The texture size is
@@ -10235,7 +10235,7 @@ class TextureNode extends UniformNode {
 	 */
 	getDefaultUV() {
 
-		return uv( this.value.channel );
+		return uv$1( this.value.channel );
 
 	}
 
@@ -13064,6 +13064,49 @@ class MaterialReferenceNode extends ReferenceNode {
  */
 const materialReference = ( name, type, material = null ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
 
+// Normal Mapping Without Precomputed Tangents
+// http://www.thetenthplanet.de/archives/1180
+
+const uv = uv$1();
+
+const q0 = positionView.dFdx();
+const q1 = positionView.dFdy();
+const st0 = uv.dFdx();
+const st1 = uv.dFdy();
+
+const N = normalView;
+
+const q1perp = q1.cross( N );
+const q0perp = N.cross( q0 );
+
+const T = q1perp.mul( st0.x ).add( q0perp.mul( st1.x ) );
+const B = q1perp.mul( st0.y ).add( q0perp.mul( st1.y ) );
+
+const det = T.dot( T ).max( B.dot( B ) );
+const scale = det.equal( 0.0 ).select( 0.0, det.inverseSqrt() );
+
+/**
+ * Tangent vector in view space, computed dynamically from geometry and UV derivatives.
+ * Useful for normal mapping without precomputed tangents.
+ *
+ * Reference: http://www.thetenthplanet.de/archives/1180
+ *
+ * @tsl
+ * @type {Node<vec3>}
+ */
+const tangentViewFrame = /*@__PURE__*/ T.mul( scale ).toVar( 'tangentViewFrame' );
+
+/**
+ * Bitangent vector in view space, computed dynamically from geometry and UV derivatives.
+ * Complements the tangentViewFrame for constructing the tangent space basis.
+ *
+ * Reference: http://www.thetenthplanet.de/archives/1180
+ *
+ * @tsl
+ * @type {Node<vec3>}
+ */
+const bitangentViewFrame = /*@__PURE__*/ B.mul( scale ).toVar( 'bitangentViewFrame' );
+
 /**
  * TSL object that represents the tangent attribute of the current rendered object.
  *
@@ -13096,7 +13139,29 @@ const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
  * @tsl
  * @type {Node<vec3>}
  */
-const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
+const tangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+
+	let node;
+
+	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+
+		node = modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize();
+
+	} else {
+
+		node = tangentViewFrame;
+
+	}
+
+	if ( material.flatShading !== true ) {
+
+		node = directionToFaceDirection( node );
+
+	}
+
+	return node;
+
+}, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'tangentView' );
 
 /**
  * TSL object that represents the vertex tangent in world space of the current rendered object.
@@ -13151,7 +13216,29 @@ const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tangentLoc
  * @tsl
  * @type {Node<vec3>}
  */
-const bitangentView = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize().toVar( 'bitangentView' );
+const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+
+	let node;
+
+	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+
+		node = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize();
+
+	} else {
+
+		node = bitangentViewFrame;
+
+	}
+
+	if ( material.flatShading !== true ) {
+
+		node = directionToFaceDirection( node );
+
+	}
+
+	return node;
+
+}, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'bitangentView' );
 
 /**
  * TSL object that represents the vertex bitangent in world space of the current rendered object.
@@ -13207,33 +13294,6 @@ const bentNormalView = /*@__PURE__*/ ( Fn( () => {
 
 } ).once() )();
 
-// Normal Mapping Without Precomputed Tangents
-// http://www.thetenthplanet.de/archives/1180
-
-const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
-
-	const { eye_pos, surf_norm, mapN, uv } = inputs;
-
-	const q0 = eye_pos.dFdx();
-	const q1 = eye_pos.dFdy();
-	const st0 = uv.dFdx();
-	const st1 = uv.dFdy();
-
-	const N = surf_norm; // normalized
-
-	const q1perp = q1.cross( N );
-	const q0perp = N.cross( q0 );
-
-	const T = q1perp.mul( st0.x ).add( q0perp.mul( st1.x ) );
-	const B = q1perp.mul( st0.y ).add( q0perp.mul( st1.y ) );
-
-	const det = T.dot( T ).max( B.dot( B ) );
-	const scale = faceDirection.mul( det.inverseSqrt() );
-
-	return add( T.mul( mapN.x, scale ), B.mul( mapN.y, scale ), N.mul( mapN.z ) ).normalize();
-
-} );
-
 /**
  * This class can be used for applying normals maps to materials.
  *
@@ -13286,7 +13346,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	setup( builder ) {
+	setup( { material } ) {
 
 		const { normalMapType, scaleNode } = this;
 
@@ -13294,44 +13354,37 @@ class NormalMapNode extends TempNode {
 
 		if ( scaleNode !== null ) {
 
-			normalMap = vec3( normalMap.xy.mul( scaleNode ), normalMap.z );
+			let scale = scaleNode;
+
+			if ( material.flatShading === true ) {
+
+				scale = directionToFaceDirection( scale );
+
+			}
+
+			normalMap = vec3( normalMap.xy.mul( scale ), normalMap.z );
 
 		}
 
-		let outputNode = null;
+		let output = null;
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			outputNode = transformNormalToView( normalMap );
+			output = transformNormalToView( normalMap );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			const tangent = builder.hasGeometryAttribute( 'tangent' );
-
-			if ( tangent === true ) {
-
-				outputNode = TBNViewMatrix.mul( normalMap ).normalize();
-
-			} else {
-
-				outputNode = perturbNormal2Arb( {
-					eye_pos: positionView,
-					surf_norm: normalView,
-					mapN: normalMap,
-					uv: uv()
-				} );
-
-			}
+			output = TBNViewMatrix.mul( normalMap ).normalize();
 
 		} else {
 
 			console.error( `THREE.NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
 
-			outputNode = normalView; // Fallback to default normal view
+			output = normalView; // Fallback to default normal view
 
 		}
 
-		return outputNode;
+		return output;
 
 	}
 
@@ -13354,7 +13407,7 @@ const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode ).setParameterLength( 1
 const dHdxy_fwd = Fn( ( { textureNode, bumpScale } ) => {
 
 	// It's used to preserve the same TextureNode instance
-	const sampleTexture = ( callback ) => textureNode.cache().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv() ), forceUVContext: true } );
+	const sampleTexture = ( callback ) => textureNode.cache().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv$1() ), forceUVContext: true } );
 
 	const Hll = float( sampleTexture( ( uvNode ) => uvNode ) );
 
@@ -19676,7 +19729,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		this.colorNode = Fn( () => {
 
-			const vUv = uv();
+			const vUv = uv$1();
 
 			if ( useDash ) {
 
@@ -19950,6 +20003,8 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 }
 
 /**
+ * TSL function for creating an equirect uv node.
+ *
  * Can be used to compute texture coordinates for projecting an
  * equirectangular texture onto a mesh for using it as the scene's
  * background.
@@ -19958,56 +20013,19 @@ class MeshNormalNodeMaterial extends NodeMaterial {
  * scene.backgroundNode = texture( equirectTexture, equirectUV() );
  * ```
  *
- * @augments TempNode
- */
-class EquirectUVNode extends TempNode {
-
-	static get type() {
-
-		return 'EquirectUVNode';
-
-	}
-
-	/**
-	 * Constructs a new equirect uv node.
-	 *
-	 * @param {Node<vec3>} [dirNode=positionWorldDirection] - A direction vector for sampling which is by default `positionWorldDirection`.
-	 */
-	constructor( dirNode = positionWorldDirection ) {
-
-		super( 'vec2' );
-
-		/**
-		 * A direction vector for sampling why is by default `positionWorldDirection`.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.dirNode = dirNode;
-
-	}
-
-	setup() {
-
-		const dir = this.dirNode;
-
-		const u = dir.z.atan( dir.x ).mul( 1 / ( Math.PI * 2 ) ).add( 0.5 );
-		const v = dir.y.clamp( -1, 1.0 ).asin().mul( 1 / Math.PI ).add( 0.5 );
-
-		return vec2( u, v );
-
-	}
-
-}
-
-/**
- * TSL function for creating an equirect uv node.
- *
  * @tsl
  * @function
  * @param {?Node<vec3>} [dirNode=positionWorldDirection] - A direction vector for sampling which is by default `positionWorldDirection`.
- * @returns {EquirectUVNode}
+ * @returns {Node<vec2>}
  */
-const equirectUV = /*@__PURE__*/ nodeProxy( EquirectUVNode ).setParameterLength( 0, 1 );
+const equirectUV = /*@__PURE__*/ Fn( ( [ dir = positionWorldDirection ] ) => {
+
+	const u = dir.z.atan( dir.x ).mul( 1 / ( Math.PI * 2 ) ).add( 0.5 );
+	const v = dir.y.clamp( -1, 1.0 ).asin().mul( 1 / Math.PI ).add( 0.5 );
+
+	return vec2( u, v );
+
+} );
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -21515,10 +21533,10 @@ const bicubic = ( textureNode, texelSize, lod ) => {
  * @tsl
  * @function
  * @param {TextureNode} textureNode - The texture node that should be filtered.
- * @param {Node<float>} [lodNode=float(3)] - Defines the LOD to sample from.
+ * @param {Node<float>} lodNode - Defines the LOD to sample from.
  * @return {Node} The filtered texture sample.
  */
-const textureBicubic = /*@__PURE__*/ Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
+const textureBicubicLevel = /*@__PURE__*/ Fn( ( [ textureNode, lodNode ] ) => {
 
 	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
 	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );
@@ -21528,6 +21546,23 @@ const textureBicubic = /*@__PURE__*/ Fn( ( [ textureNode, lodNode = float( 3 ) ]
 	const cSample = bicubic( textureNode, vec4( cLodSizeInv, cLodSize ), ceil( lodNode ) );
 
 	return fract( lodNode ).mix( fSample, cSample );
+
+} );
+
+/**
+ * Applies mipped bicubic texture filtering to the given texture node.
+ *
+ * @tsl
+ * @function
+ * @param {TextureNode} textureNode - The texture node that should be filtered.
+ * @param {Node<float>} [strength] - Defines the strength of the bicubic filtering.
+ * @return {Node} The filtered texture sample.
+ */
+const textureBicubic = /*@__PURE__*/ Fn( ( [ textureNode, strength ] ) => {
+
+	const lod = strength.mul( maxMipLevel( textureNode ) );
+
+	return textureBicubicLevel( textureNode, lod );
 
 } );
 
@@ -21589,7 +21624,7 @@ const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ],
 
 	const lod = log2( screenSize.x ).mul( applyIorToRoughness( roughness, ior ) );
 
-	return textureBicubic( transmissionSample, lod );
+	return textureBicubicLevel( transmissionSample, lod );
 
 } );
 
@@ -22635,7 +22670,7 @@ const _faceLib = [
 	0, 4, 2
 ];
 
-const _direction = /*@__PURE__*/ getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
+const _direction = /*@__PURE__*/ getDirection( uv$1(), attribute( 'faceIndex' ) ).normalize();
 const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direction.z );
 
 /**
@@ -24991,47 +25026,23 @@ class MeshToonNodeMaterial extends NodeMaterial {
 }
 
 /**
+ * TSL function for creating a matcap uv node.
+ *
  * Can be used to compute texture coordinates for projecting a
  * matcap onto a mesh. Used by {@link MeshMatcapNodeMaterial}.
  *
- * @augments TempNode
- */
-class MatcapUVNode extends TempNode {
-
-	static get type() {
-
-		return 'MatcapUVNode';
-
-	}
-
-	/**
-	 * Constructs a new matcap uv node.
-	 */
-	constructor() {
-
-		super( 'vec2' );
-
-	}
-
-	setup() {
-
-		const x = vec3( positionViewDirection.z, 0, positionViewDirection.x.negate() ).normalize();
-		const y = positionViewDirection.cross( x );
-
-		return vec2( x.dot( normalView ), y.dot( normalView ) ).mul( 0.495 ).add( 0.5 ); // 0.495 to remove artifacts caused by undersized matcap disks
-
-	}
-
-}
-
-/**
- * TSL function for creating a matcap uv node.
- *
  * @tsl
  * @function
- * @returns {MatcapUVNode}
+ * @returns {Node<vec2>} The matcap UV coordinates.
  */
-const matcapUV = /*@__PURE__*/ nodeImmutable( MatcapUVNode );
+const matcapUV = /*@__PURE__*/ Fn( () => {
+
+	const x = vec3( positionViewDirection.z, 0, positionViewDirection.x.negate() ).normalize();
+	const y = positionViewDirection.cross( x );
+
+	return vec2( x.dot( normalView ), y.dot( normalView ) ).mul( 0.495 ).add( 0.5 ); // 0.495 to remove artifacts caused by undersized matcap disks
+
+} ).once( [ 'NORMAL', 'VERTEX' ] )().toVar( 'matcapUV' );
 
 const _defaultValues$3 = /*@__PURE__*/ new MeshMatcapMaterial();
 
@@ -31682,7 +31693,7 @@ class SpriteSheetUVNode extends Node {
 	 * @param {Node<vec2>} [uvNode=uv()] - The uv node.
 	 * @param {Node<float>} [frameNode=float()] - The node that defines the current frame/sprite.
 	 */
-	constructor( countNode, uvNode = uv(), frameNode = float( 0 ) ) {
+	constructor( countNode, uvNode = uv$1(), frameNode = float( 0 ) ) {
 
 		super( 'vec2' );
 
@@ -31742,114 +31753,49 @@ class SpriteSheetUVNode extends Node {
 const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode ).setParameterLength( 3 );
 
 /**
+ * TSL function for creating a triplanar textures node.
+ *
  * Can be used for triplanar texture mapping.
  *
  * ```js
  * material.colorNode = triplanarTexture( texture( diffuseMap ) );
  * ```
  *
- * @augments Node
+ * @tsl
+ * @function
+ * @param {Node} textureXNode - First texture node.
+ * @param {?Node} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.
+ * @param {?Node} [textureZNode=null] - Third texture node. When not set, the shader will sample from `textureXNode` instead.
+ * @param {?Node<float>} [scaleNode=float(1)] - The scale node.
+ * @param {?Node<vec3>} [positionNode=positionLocal] - Vertex positions in local space.
+ * @param {?Node<vec3>} [normalNode=normalLocal] - Normals in local space.
+ * @returns {Node<vec4>}
  */
-class TriplanarTexturesNode extends Node {
+const triplanarTextures = /*@__PURE__*/ Fn( ( [ textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionLocal, normalNode = normalLocal ] ) => {
 
-	static get type() {
+	// Reference: https://github.com/keijiro/StandardTriplanar
 
-		return 'TriplanarTexturesNode';
+	// Blending factor of triplanar mapping
+	let bf = normalNode.abs().normalize();
+	bf = bf.div( bf.dot( vec3( 1.0 ) ) );
 
-	}
+	// Triplanar mapping
+	const tx = positionNode.yz.mul( scaleNode );
+	const ty = positionNode.zx.mul( scaleNode );
+	const tz = positionNode.xy.mul( scaleNode );
 
-	/**
-	 * Constructs a new triplanar textures node.
-	 *
-	 * @param {Node} textureXNode - First texture node.
-	 * @param {?Node} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.
-	 * @param {?Node} [textureZNode=null] - Third texture node. When not set, the shader will sample from `textureXNode` instead.
-	 * @param {?Node<float>} [scaleNode=float(1)] - The scale node.
-	 * @param {?Node<vec3>} [positionNode=positionLocal] - Vertex positions in local space.
-	 * @param {?Node<vec3>} [normalNode=normalLocal] - Normals in local space.
-	 */
-	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionLocal, normalNode = normalLocal ) {
+	// Base color
+	const textureX = textureXNode.value;
+	const textureY = textureYNode !== null ? textureYNode.value : textureX;
+	const textureZ = textureZNode !== null ? textureZNode.value : textureX;
 
-		super( 'vec4' );
+	const cx = texture( textureX, tx ).mul( bf.x );
+	const cy = texture( textureY, ty ).mul( bf.y );
+	const cz = texture( textureZ, tz ).mul( bf.z );
 
-		/**
-		 * First texture node.
-		 *
-		 * @type {Node}
-		 */
-		this.textureXNode = textureXNode;
+	return add( cx, cy, cz );
 
-		/**
-		 * Second texture node. When not set, the shader will sample from `textureXNode` instead.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.textureYNode = textureYNode;
-
-		/**
-		 * Third texture node. When not set, the shader will sample from `textureXNode` instead.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.textureZNode = textureZNode;
-
-		/**
-		 * The scale node.
-		 *
-		 * @type {Node<float>}
-		 * @default float(1)
-		 */
-		this.scaleNode = scaleNode;
-
-		/**
-		 * Vertex positions in local space.
-		 *
-		 * @type {Node<vec3>}
-		 * @default positionLocal
-		 */
-		this.positionNode = positionNode;
-
-		/**
-		 * Normals in local space.
-		 *
-		 * @type {Node<vec3>}
-		 * @default normalLocal
-		 */
-		this.normalNode = normalNode;
-
-	}
-
-	setup() {
-
-		const { textureXNode, textureYNode, textureZNode, scaleNode, positionNode, normalNode } = this;
-
-		// Ref: https://github.com/keijiro/StandardTriplanar
-
-		// Blending factor of triplanar mapping
-		let bf = normalNode.abs().normalize();
-		bf = bf.div( bf.dot( vec3( 1.0 ) ) );
-
-		// Triplanar mapping
-		const tx = positionNode.yz.mul( scaleNode );
-		const ty = positionNode.zx.mul( scaleNode );
-		const tz = positionNode.xy.mul( scaleNode );
-
-		// Base color
-		const textureX = textureXNode.value;
-		const textureY = textureYNode !== null ? textureYNode.value : textureX;
-		const textureZ = textureZNode !== null ? textureZNode.value : textureX;
-
-		const cx = texture( textureX, tx ).mul( bf.x );
-		const cy = texture( textureY, ty ).mul( bf.y );
-		const cz = texture( textureZ, tz ).mul( bf.z );
-
-		return add( cx, cy, cz );
-
-	}
-
-}
+} );
 
 /**
  * TSL function for creating a triplanar textures node.
@@ -31862,22 +31808,7 @@ class TriplanarTexturesNode extends Node {
  * @param {?Node<float>} [scaleNode=float(1)] - The scale node.
  * @param {?Node<vec3>} [positionNode=positionLocal] - Vertex positions in local space.
  * @param {?Node<vec3>} [normalNode=normalLocal] - Normals in local space.
- * @returns {TriplanarTexturesNode}
- */
-const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode ).setParameterLength( 1, 6 );
-
-/**
- * TSL function for creating a triplanar textures node.
- *
- * @tsl
- * @function
- * @param {Node} textureXNode - First texture node.
- * @param {?Node} [textureYNode=null] - Second texture node. When not set, the shader will sample from `textureXNode` instead.
- * @param {?Node} [textureZNode=null] - Third texture node. When not set, the shader will sample from `textureXNode` instead.
- * @param {?Node<float>} [scaleNode=float(1)] - The scale node.
- * @param {?Node<vec3>} [positionNode=positionLocal] - Vertex positions in local space.
- * @param {?Node<vec3>} [normalNode=normalLocal] - Normals in local space.
- * @returns {TriplanarTexturesNode}
+ * @returns {Node<vec4>}
  */
 const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
@@ -32021,10 +31952,17 @@ class ReflectorNode extends TextureNode {
 
 	clone() {
 
-		const texture = new this.constructor( this.reflectorNode );
-		texture._reflectorBaseNode = this._reflectorBaseNode;
+		const newNode = new this.constructor( this.reflectorNode );
+		newNode.uvNode = this.uvNode;
+		newNode.levelNode = this.levelNode;
+		newNode.biasNode = this.biasNode;
+		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
+		newNode._reflectorBaseNode = this._reflectorBaseNode;
 
-		return texture;
+		return newNode;
 
 	}
 
@@ -32566,7 +32504,7 @@ class RTTNode extends TextureNode {
 
 		const renderTarget = new RenderTarget( width, height, options );
 
-		super( renderTarget.texture, uv() );
+		super( renderTarget.texture, uv$1() );
 
 		/**
 		 * The node to render a texture with.
@@ -32884,6 +32822,82 @@ const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projectionMat
 	return normalize( cross( dpdx, dpdy ) );
 
 } );
+
+/**
+ * Class representing a node that samples a value using a provided callback function.
+ *
+ * @extends Node
+ */
+class SampleNode extends Node {
+
+	/**
+	 * Returns the type of the node.
+	 *
+	 * @type {string}
+	 * @readonly
+	 * @static
+	 */
+	static get type() {
+
+		return 'SampleNode';
+
+	}
+
+	/**
+	 * Creates an instance of SampleNode.
+	 *
+	 * @param {Function} callback - The function to be called when sampling. Should accept a UV node and return a value.
+	 */
+	constructor( callback ) {
+
+		super();
+
+		this.callback = callback;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSampleNode = true;
+
+	}
+
+	/**
+	 * Sets up the node by sampling with the default UV accessor.
+	 *
+	 * @returns {Node} The result of the callback function when called with the UV node.
+	 */
+	setup() {
+
+		return this.sample( uv$1() );
+
+	}
+
+	/**
+	 * Calls the callback function with the provided UV node.
+	 *
+	 * @param {Node<vec2>} uv - The UV node or value to be passed to the callback.
+	 * @returns {Node} The result of the callback function.
+	 */
+	sample( uv ) {
+
+		return this.callback( uv );
+
+	}
+
+}
+
+/**
+ * Helper function to create a SampleNode wrapped as a node object.
+ *
+ * @function
+ * @param {Function} callback - The function to be called when sampling. Should accept a UV node and return a value.
+ * @returns {SampleNode} The created SampleNode instance wrapped as a node object.
+ */
+const sample = ( callback ) => nodeObject( new SampleNode( callback ) );
 
 /**
  * This special type of instanced buffer attribute is intended for compute shaders.
@@ -34236,7 +34250,16 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		const newNode = new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		newNode.uvNode = this.uvNode;
+		newNode.levelNode = this.levelNode;
+		newNode.biasNode = this.biasNode;
+		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
+
+		return newNode;
 
 	}
 
@@ -40114,7 +40137,7 @@ class PointLightNode extends AnalyticLightNode {
  * @param {Node<vec2>} coord - The uv coordinates.
  * @return {Node<float>} The result data.
  */
-const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
+const checker = /*@__PURE__*/ Fn( ( [ coord = uv$1() ] ) => {
 
 	const uv = coord.mul( 2.0 );
 
@@ -40134,7 +40157,7 @@ const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
  * @param {Node<vec2>} coord - The uv to generate the circle.
  * @return {Node<float>} The circle shape.
  */
-const shapeCircle = Fn( ( [ coord = uv() ], { renderer, material } ) => {
+const shapeCircle = Fn( ( [ coord = uv$1() ], { renderer, material } ) => {
 
 	const len2 = lengthSq( coord.mul( 2 ).sub( 1 ) );
 
@@ -41636,14 +41659,14 @@ const mx_aastep = ( threshold, value ) => {
 };
 
 const _ramp = ( a, b, uv, p ) => mix( a, b, uv[ p ].clamp() );
-const mx_ramplr = ( valuel, valuer, texcoord = uv() ) => _ramp( valuel, valuer, texcoord, 'x' );
-const mx_ramptb = ( valuet, valueb, texcoord = uv() ) => _ramp( valuet, valueb, texcoord, 'y' );
+const mx_ramplr = ( valuel, valuer, texcoord = uv$1() ) => _ramp( valuel, valuer, texcoord, 'x' );
+const mx_ramptb = ( valuet, valueb, texcoord = uv$1() ) => _ramp( valuet, valueb, texcoord, 'y' );
 
 const _split = ( a, b, center, uv, p ) => mix( a, b, mx_aastep( center, uv[ p ] ) );
-const mx_splitlr = ( valuel, valuer, center, texcoord = uv() ) => _split( valuel, valuer, center, texcoord, 'x' );
-const mx_splittb = ( valuet, valueb, center, texcoord = uv() ) => _split( valuet, valueb, center, texcoord, 'y' );
+const mx_splitlr = ( valuel, valuer, center, texcoord = uv$1() ) => _split( valuel, valuer, center, texcoord, 'x' );
+const mx_splittb = ( valuet, valueb, center, texcoord = uv$1() ) => _split( valuet, valueb, center, texcoord, 'y' );
 
-const mx_transform_uv = ( uv_scale = 1, uv_offset = 0, uv_geo = uv() ) => uv_geo.mul( uv_scale ).add( uv_offset );
+const mx_transform_uv = ( uv_scale = 1, uv_offset = 0, uv_geo = uv$1() ) => uv_geo.mul( uv_scale ).add( uv_offset );
 
 const mx_safepower = ( in1, in2 = 1 ) => {
 
@@ -41655,10 +41678,10 @@ const mx_safepower = ( in1, in2 = 1 ) => {
 
 const mx_contrast = ( input, amount = 1, pivot = .5 ) => float( input ).sub( pivot ).mul( amount ).add( pivot );
 
-const mx_noise_float = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
+const mx_noise_float = ( texcoord = uv$1(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
 //export const mx_noise_vec2 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
-const mx_noise_vec3 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
-const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => {
+const mx_noise_vec3 = ( texcoord = uv$1(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
+const mx_noise_vec4 = ( texcoord = uv$1(), amplitude = 1, pivot = 0 ) => {
 
 	texcoord = texcoord.convert( 'vec2|vec3' ); // overloading type
 
@@ -41668,16 +41691,16 @@ const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => {
 
 };
 
-const mx_worley_noise_float = ( texcoord = uv(), jitter = 1 ) => mx_worley_noise_float$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
-const mx_worley_noise_vec2 = ( texcoord = uv(), jitter = 1 ) => mx_worley_noise_vec2$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
-const mx_worley_noise_vec3 = ( texcoord = uv(), jitter = 1 ) => mx_worley_noise_vec3$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
+const mx_worley_noise_float = ( texcoord = uv$1(), jitter = 1 ) => mx_worley_noise_float$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
+const mx_worley_noise_vec2 = ( texcoord = uv$1(), jitter = 1 ) => mx_worley_noise_vec2$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
+const mx_worley_noise_vec3 = ( texcoord = uv$1(), jitter = 1 ) => mx_worley_noise_vec3$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
 
-const mx_cell_noise_float = ( texcoord = uv() ) => mx_cell_noise_float$1( texcoord.convert( 'vec2|vec3' ) );
+const mx_cell_noise_float = ( texcoord = uv$1() ) => mx_cell_noise_float$1( texcoord.convert( 'vec2|vec3' ) );
 
-const mx_fractal_noise_float = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_float$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
-const mx_fractal_noise_vec2 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec2$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
-const mx_fractal_noise_vec3 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec3$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
-const mx_fractal_noise_vec4 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec4$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
+const mx_fractal_noise_float = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_float$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
+const mx_fractal_noise_vec2 = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec2$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
+const mx_fractal_noise_vec3 = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec3$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
+const mx_fractal_noise_vec4 = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec4$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 
 /**
  * This computes a parallax corrected normal which is used for box-projected cube mapping (BPCEM).
@@ -42170,6 +42193,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	rtt: rtt,
 	sRGBTransferEOTF: sRGBTransferEOTF,
 	sRGBTransferOETF: sRGBTransferOETF,
+	sample: sample,
 	sampler: sampler,
 	samplerComparison: samplerComparison,
 	saturate: saturate,
@@ -42227,6 +42251,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	texture3D: texture3D,
 	textureBarrier: textureBarrier,
 	textureBicubic: textureBicubic,
+	textureBicubicLevel: textureBicubicLevel,
 	textureCubeUV: textureCubeUV,
 	textureLoad: textureLoad,
 	textureSize: textureSize,
@@ -42259,7 +42284,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	uniformTexture: uniformTexture,
 	unpremultiplyAlpha: unpremultiplyAlpha,
 	userData: userData,
-	uv: uv,
+	uv: uv$1,
 	uvec2: uvec2,
 	uvec3: uvec3,
 	uvec4: uvec4,
@@ -73841,4 +73866,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, TriplanarTexturesNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
