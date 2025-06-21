@@ -1,6 +1,6 @@
 import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
 
-const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0';
+const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.17.3';
 
 const frameRate = 60;
 
@@ -144,6 +144,39 @@ async function RapierPhysics() {
 
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
+
+		}
+
+	}
+
+	function removeMesh( mesh ) {
+
+		const index = meshes.indexOf( mesh );
+
+		if ( index !== - 1 ) {
+
+			meshes.splice( index, 1 );
+			meshMap.delete( mesh );
+
+			if ( ! mesh.userData.physics ) return;
+
+			const body = mesh.userData.physics.body;
+
+			if ( ! body ) return;
+
+			if ( Array.isArray( body ) ) {
+
+				for ( let i = 0; i < body.length; i ++ ) {
+
+					world.removeRigidBody( body[ i ] );
+
+				}
+
+			} else {
+
+				world.removeRigidBody( body );
+
+			}
 
 		}
 
@@ -305,6 +338,15 @@ async function RapierPhysics() {
 		 * @param {number} [restitution=0] The restitution/friction of the mesh.
 		 */
 		addMesh: addMesh,
+
+		/**
+		 * Removes the given mesh from this physics simulation.
+		 *
+		 * @method
+		 * @name RapierPhysics#addMesh
+		 * @param {Mesh} mesh The mesh to remove.
+		 */
+		removeMesh: removeMesh,
 
 		/**
 		 * Set the position of the given mesh which is part of the physics simulation. Calling this
