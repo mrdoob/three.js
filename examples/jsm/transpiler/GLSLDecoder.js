@@ -327,7 +327,7 @@ class GLSLDecoder {
 
 				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) return;
 
-				// important for unary operators: a  * -1, a * -( b )
+				// important for unary operators: a * -1, a * -( b )
 				if ( ( inverse && tokens[ i - 1 ].isOperator ) || ( ! inverse && tokens[ i + 1 ].isOperator ) ) return;
 
 				if ( groupIndex === 0 && token.str === operator ) {
