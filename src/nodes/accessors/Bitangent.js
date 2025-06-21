@@ -1,6 +1,8 @@
 import { Fn } from '../tsl/TSLCore.js';
 import { normalGeometry, normalLocal, normalView, normalWorld } from './Normal.js';
 import { tangentGeometry, tangentLocal, tangentView, tangentWorld } from './Tangent.js';
+import { bitangentViewFrame } from './TangentUtils.js';
+import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 
 /**
  * Returns the bitangent node and assigns it to a varying if the material is not flat shaded.
@@ -47,7 +49,29 @@ export const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tan
  * @tsl
  * @type {Node<vec3>}
  */
-export const bitangentView = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize().toVar( 'bitangentView' );
+export const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+
+	let node;
+
+	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+
+		node = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize();
+
+	} else {
+
+		node = bitangentViewFrame;
+
+	}
+
+	if ( material.flatShading !== true ) {
+
+		node = directionToFaceDirection( node );
+
+	}
+
+	return node;
+
+}, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'bitangentView' );
 
 /**
  * TSL object that represents the vertex bitangent in world space of the current rendered object.
