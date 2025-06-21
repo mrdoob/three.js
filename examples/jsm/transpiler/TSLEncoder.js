@@ -58,7 +58,6 @@ class TSLEncoder {
 		this.global = new Set();
 		this.overloadings = new Map();
 		this.iife = false;
-		this.uniqueNames = false;
 		this.reference = false;
 
 		this._currentVariable = null;
@@ -726,8 +725,6 @@ ${ this.tab }} )`;
 
 		for ( const param of node.params ) {
 
-			let str = `{ name: '${ param.name }', type: '${ param.type }'`;
-
 			let name = param.name;
 
 			if ( param.immutable === false && ( param.qualifier !== 'inout' && param.qualifier !== 'out' ) ) {
@@ -746,11 +743,9 @@ ${ this.tab }} )`;
 
 				}
 
-				str += ', qualifier: \'' + param.qualifier + '\'';
-
 			}
 
-			inputs.push( str + ' }' );
+			inputs.push( param.name + ': \'' + param.type + '\'' );
 			params.push( name );
 
 			this._currentProperties[ name ] = param;
@@ -795,23 +790,15 @@ ${ this.tab }} )`;
 
 ${ bodyStr }
 
-${ this.tab }} )`;
-
-		const layoutInput = inputs.length > 0 ? '\n\t\t' + this.tab + inputs.join( ',\n\t\t' + this.tab ) + '\n\t' + this.tab : '';
+${ this.tab }}`;
 
 		if ( node.layout !== false && hasPointer === false ) {
 
-			const uniqueName = this.uniqueNames ? fnName + '_' + Math.random().toString( 36 ).slice( 2 ) : fnName;
-
-			funcStr += `.setLayout( {
-${ this.tab }\tname: '${ uniqueName }',
-${ this.tab }\ttype: '${ type }',
-${ this.tab }\tinputs: [${ layoutInput }]
-${ this.tab }} )`;
+			funcStr += ', { ' + inputs.join( ', ' ) + ', return: \'' + type + '\' }';
 
 		}
 
-		funcStr += ';\n';
+		funcStr += ' );\n';
 
 		this.imports.add( 'Fn' );
 
