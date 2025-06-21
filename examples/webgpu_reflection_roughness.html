@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - dirty reflection</title>
+		<title>three.js webgpu - roughness reflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, vec2, vec4, texture, uv, textureBicubic, rangeFogFactor, reflector, time} from 'three/tsl';
+			import { Fn, vec2, vec4, texture, uv, textureBicubic, rangeFogFactor, reflector, time } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -93,16 +93,16 @@
 				scene.add( reflection.target );
 
 				const animatedUV = uv().mul( 10 ).add( vec2( time.mul( .1 ), 0 ) );
-				const dirty = texture( perlinMap, animatedUV ).r.mul( 2 ).saturate();
+				const roughness = texture( perlinMap, animatedUV ).r.mul( 2 ).saturate();
 
 				const floorMaterial = new THREE.MeshStandardNodeMaterial();
 				floorMaterial.transparent = true;
 				floorMaterial.metalness = 1;
-				floorMaterial.roughnessNode = dirty.mul( .2 );
+				floorMaterial.roughnessNode = roughness.mul( .2 );
 				floorMaterial.colorNode = Fn( () => {
 
 					// blur reflection using textureBicubic()
-					const dirtyReflection = textureBicubic( reflection, dirty.mul( .9 ) ).rgb;
+					const dirtyReflection = textureBicubic( reflection, roughness.mul( .9 ) ).rgb;
 
 					// falloff opacity by distance like an opacity-fog
 					const opacity = rangeFogFactor( 7, 25 ).oneMinus();
