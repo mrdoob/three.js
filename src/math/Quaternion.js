@@ -482,7 +482,7 @@ class Quaternion {
 
 		let r = vFrom.dot( vTo ) + 1;
 
-		if ( r < Number.EPSILON ) {
+		if ( r < 1e-8 ) { // the epsilon value has been discussed in #31286
 
 			// vFrom and vTo point in opposite directions
 
