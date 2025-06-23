@@ -26,7 +26,6 @@ class StorageArrayTexture extends Texture {
 		//inherited from texture
 		this.isArrayTexture = true;
 
-
 		/**
 		 * The image object which just represents the texture's dimension.
 		 *
