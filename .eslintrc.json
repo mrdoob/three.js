@@ -42,7 +42,8 @@
     "esprima": "readonly",
     "jsonlint": "readonly",
     "VideoFrame": "readonly",
-    "VideoDecoder": "readonly"
+    "VideoDecoder": "readonly",
+    "Float16Array": "readonly"
   },
   "rules": {
     "no-throw-literal": [
