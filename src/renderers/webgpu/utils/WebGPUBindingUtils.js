@@ -216,7 +216,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
-				} else if ( binding.texture.is3DTexture || binding.isSampledTexture3D ) {
+				} else if ( binding.texture.is3DTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.ThreeD;
 
@@ -438,7 +438,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-						} else if ( binding.texture.is3DTexture || binding.isSampledTexture3D ) {
+						} else if ( binding.texture.is3DTexture ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
