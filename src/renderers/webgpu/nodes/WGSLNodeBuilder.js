@@ -1705,22 +1705,25 @@ ${ flowData.code }
 
 					textureType = 'texture_2d_array<f32>';
 
+				} else if ( shaderStage !== 'compute' && ( texture.is3DTexture === true || texture.isData3DTexture === true ) ) {
+
+					textureType = 'texture_3d<f32>';
+
 				} else if ( texture.isVideoTexture === true ) {
 
 					textureType = 'texture_external';
-
-				} else if ( texture.isData3DTexture === true ) {
-
-					textureType = 'texture_3d<f32>';
 
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
+					const is3D = uniform.node.value.is3DTexture;
 					const isArray = uniform.node.value.isArrayTexture ? '_array' : '';
 
-					textureType = `texture_storage_2d${ isArray }<${ format }, ${ access }>`;
+					const dimension = is3D ? '3d' : `2d${ isArray ? '_array' : '' }`;
+
+					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
 
 				} else {
 

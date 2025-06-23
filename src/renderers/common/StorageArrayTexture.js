@@ -17,17 +17,18 @@ class StorageTexture extends Texture {
 	 *
 	 * @param {number} [width=1] - The storage texture's width.
 	 * @param {number} [height=1] - The storage texture's height.
+	 * @param {number} [depth=0] - The storage texture's depth.
 	 */
-	constructor( width = 1, height = 1 ) {
+	constructor( width = 1, height = 1, depth = 0 ) {
 
 		super();
 
 		/**
 		 * The image object which just represents the texture's dimension.
 		 *
-		 * @type {{width: number, height: number }}
+		 * @type {{width: number, height: number, depth: number}}
 		 */
-		this.image = { width, height };
+		this.image = { width, height, depth };
 
 		/**
 		 * The default `magFilter` for storage textures is `THREE.LinearFilter`.
@@ -51,6 +52,14 @@ class StorageTexture extends Texture {
 		 * @default true
 		 */
 		this.isStorageTexture = true;
+
+		/**
+		 * Indicates whether this texture is a texture array.
+		 *
+		 * @type {boolean}
+		 *
+		 */
+		this.isArrayTexture = depth > 0;
 
 	}
 

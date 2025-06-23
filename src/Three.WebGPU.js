@@ -10,6 +10,8 @@ export { default as PostProcessing } from './renderers/common/PostProcessing.js'
 import * as RendererUtils from './renderers/common/RendererUtils.js';
 export { RendererUtils };
 export { default as StorageTexture } from './renderers/common/StorageTexture.js';
+export { default as StorageArrayTexture } from './renderers/common/StorageArrayTexture.js';
+export { default as Storage3DTexture } from './renderers/common/Storage3DTexture.js';
 export { default as StorageBufferAttribute } from './renderers/common/StorageBufferAttribute.js';
 export { default as StorageInstancedBufferAttribute } from './renderers/common/StorageInstancedBufferAttribute.js';
 export { default as IndirectStorageBufferAttribute } from './renderers/common/IndirectStorageBufferAttribute.js';
