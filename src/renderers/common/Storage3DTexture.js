@@ -21,7 +21,6 @@ class Storage3DTexture extends Texture {
 	 */
 	constructor( width = 1, height = 1, depth = 1 ) {
 
-
 		super();
 
 		//inherited from texture
