@@ -796,7 +796,7 @@ function getByteBoundaryFromType( type ) {
 	if ( /vec2/.test( type ) ) return 8;
 	if ( /vec3/.test( type ) ) return 16;
 	if ( /vec4/.test( type ) ) return 16;
-	if ( /mat2/.test( type ) ) return 8;
+	if ( /mat2/.test( type ) ) return 16;
 	if ( /mat3/.test( type ) ) return 48;
 	if ( /mat4/.test( type ) ) return 64;
 
@@ -1090,11 +1090,6 @@ const defaultBuildStages = [ 'setup', 'analyze', 'generate' ];
 const shaderStages = [ ...defaultShaderStages, 'compute' ];
 const vectorComponents = [ 'x', 'y', 'z', 'w' ];
 
-const _parentBuildStage = {
-	analyze: 'setup',
-	generate: 'analyze'
-};
-
 let _nodeId = 0;
 
 /**
@@ -1347,7 +1342,7 @@ class Node extends EventDispatcher {
 	/**
 	 * By default this method returns the value of the {@link Node#global} flag. This method
 	 * can be overwritten in derived classes if an analytical way is required to determine the
-	 * global cache referring to the current shader-stage.
+	 * global status.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether this node is global or not.
@@ -1713,30 +1708,6 @@ class Node extends EventDispatcher {
 			return refNode.build( builder, output );
 
 		}
-
-		//
-
-		const nodeData = builder.getDataFromNode( this );
-		nodeData.buildStages = nodeData.buildStages || {};
-		nodeData.buildStages[ builder.buildStage ] = true;
-
-		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
-
-		if ( parentBuildStage && nodeData.buildStages[ parentBuildStage ] !== true ) {
-
-			// force parent build stage (setup or analyze)
-
-			const previousBuildStage = builder.getBuildStage();
-
-			builder.setBuildStage( parentBuildStage );
-
-			this.build( builder );
-
-			builder.setBuildStage( previousBuildStage );
-
-		}
-
-		//
 
 		builder.addNode( this );
 		builder.addChain( this );
@@ -3346,13 +3317,7 @@ class ShaderCallNodeInternal extends Node {
 		const { shaderNode, inputNodes } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
-		const onceNS = shaderNode.namespace && shaderNode.namespace === builder.namespace ? builder.getNamespace( 'once' ) : 'once';
-
-		if ( properties[ onceNS ] ) {
-
-			return properties[ onceNS ];
-
-		}
+		if ( properties.onceOutput ) return properties.onceOutput;
 
 		//
 
@@ -3395,11 +3360,31 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.once ) {
 
-			properties[ onceNS ] = result;
+			properties.onceOutput = result;
 
 		}
 
 		return result;
+
+	}
+
+	getOutputNode( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode === null ) {
+
+			properties.outputNode = this.setupOutput( builder );
+
+		}
+
+		return properties.outputNode;
+
+	}
+
+	setup( builder ) {
+
+		return this.getOutputNode( builder );
 
 	}
 
@@ -3413,53 +3398,11 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	getOutputNode( builder ) {
+	generate( builder, output ) {
 
-		const properties = builder.getNodeProperties( this );
-		const outputNamespace = builder.getOutputNamespace();
-
-		properties[ outputNamespace ] = properties[ outputNamespace ] || this.setupOutput( builder );
-
-		return properties[ outputNamespace ];
-
-	}
-
-	build( builder, output = null ) {
-
-		let result = null;
-
-		const buildStage = builder.getBuildStage();
-		const properties = builder.getNodeProperties( this );
-
-		const outputNamespace = builder.getOutputNamespace();
 		const outputNode = this.getOutputNode( builder );
 
-		if ( buildStage === 'setup' ) {
-
-			const initializedNamespace = builder.getNamespace( 'initialized' );
-
-			if ( properties[ initializedNamespace ] !== true ) {
-
-				properties[ initializedNamespace ] = true;
-
-				properties[ outputNamespace ] = this.getOutputNode( builder );
-				properties[ outputNamespace ].build( builder );
-
-			}
-
-			result = properties[ outputNamespace ];
-
-		} else if ( buildStage === 'analyze' ) {
-
-			outputNode.build( builder, output );
-
-		} else if ( buildStage === 'generate' ) {
-
-			result = outputNode.build( builder, output ) || '';
-
-		}
-
-		return result;
+		return outputNode.build( builder, output );
 
 	}
 
@@ -3477,7 +3420,6 @@ class ShaderNodeInternal extends Node {
 		this.global = true;
 
 		this.once = false;
-		this.namespace = null;
 
 	}
 
@@ -3682,10 +3624,9 @@ const Fn = ( jsFunc, layout = null ) => {
 
 	};
 
-	fn.once = ( namespace = null ) => {
+	fn.once = () => {
 
 		shaderNode.once = true;
-		shaderNode.namespace = namespace;
 
 		return fn;
 
@@ -3723,6 +3664,16 @@ const Fn = ( jsFunc, layout = null ) => {
 	return fn;
 
 };
+
+//
+
+addMethodChaining( 'toGlobal', ( node ) => {
+
+	node.global = true;
+
+	return node;
+
+} );
 
 //
 
@@ -3938,19 +3889,23 @@ class PropertyNode extends Node {
 		 */
 		this.isPropertyNode = true;
 
-		/**
-		 * This flag is used for global cache.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.global = true;
-
 	}
 
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
+
+	}
+
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether this node is global or not.
+	 */
+	isGlobal( /*builder*/ ) {
+
+		return true;
 
 	}
 
@@ -4756,25 +4711,15 @@ class AssignNode extends TempNode {
 
 	}
 
-	setup( builder ) {
-
-		const { targetNode, sourceNode } = this;
-
-		const properties = builder.getNodeProperties( this );
-		properties.sourceNode = sourceNode;
-		properties.targetNode = targetNode.context( { assign: true } );
-
-	}
-
 	generate( builder, output ) {
 
-		const { targetNode, sourceNode } = builder.getNodeProperties( this );
+		const { targetNode, sourceNode } = this;
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
+		const target = targetNode.context( { assign: true } ).build( builder );
 		const source = sourceNode.build( builder, targetType );
 
 		const sourceType = sourceNode.getNodeType( builder );
@@ -4800,14 +4745,11 @@ class AssignNode extends TempNode {
 
 			builder.addLineFlowCode( `${ sourceProperty } = ${ source }`, this );
 
-			const splitNode = targetNode.node;
-			const splitTargetNode = splitNode.node.context( { assign: true } );
+			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
 
-			const targetRoot = splitTargetNode.build( builder );
+			for ( let i = 0; i < targetNode.components.length; i ++ ) {
 
-			for ( let i = 0; i < splitNode.components.length; i ++ ) {
-
-				const component = splitNode.components[ i ];
+				const component = targetNode.components[ i ];
 
 				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]`, this );
 
@@ -5132,7 +5074,7 @@ class OperatorNode extends TempNode {
 		const bNode = this.bNode;
 
 		const typeA = aNode.getNodeType( builder );
-		const typeB = bNode ? bNode.getNodeType( builder ) : null;
+		const typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
 		if ( typeA === 'void' || typeB === 'void' ) {
 
@@ -5210,7 +5152,8 @@ class OperatorNode extends TempNode {
 
 		const op = this.op;
 
-		const { aNode, bNode } = this;
+		const aNode = this.aNode;
+		const bNode = this.bNode;
 
 		const type = this.getNodeType( builder );
 
@@ -5220,7 +5163,7 @@ class OperatorNode extends TempNode {
 		if ( type !== 'void' ) {
 
 			typeA = aNode.getNodeType( builder );
-			typeB = bNode ? bNode.getNodeType( builder ) : null;
+			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
@@ -5302,7 +5245,7 @@ class OperatorNode extends TempNode {
 		}
 
 		const a = aNode.build( builder, typeA );
-		const b = bNode ? bNode.build( builder, typeB ) : null;
+		const b = typeof bNode !== 'undefined' ? bNode.build( builder, typeB ) : null;
 
 		const fnOpSnippet = builder.getFunctionOperator( op );
 
@@ -5935,31 +5878,26 @@ class MathNode extends TempNode {
 
 	}
 
-	setup( builder ) {
+	generate( builder, output ) {
 
-		const { aNode, bNode, method } = this;
+		let method = this.method;
 
-		let outputNode = null;
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
 
-		if ( method === MathNode.ONE_MINUS ) {
+		const a = this.aNode;
+		const b = this.bNode;
+		const c = this.cNode;
 
-			outputNode = sub( 1.0, aNode );
+		const coordinateSystem = builder.renderer.coordinateSystem;
 
-		} else if ( method === MathNode.RECIPROCAL ) {
-
-			outputNode = div( 1.0, aNode );
-
-		} else if ( method === MathNode.DIFFERENCE ) {
-
-			outputNode = abs( sub( aNode, bNode ) );
-
-		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
+		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal
 
-			let tA = aNode;
-			let tB = bNode;
+			let tA = a;
+			let tB = b;
 
 			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
 
@@ -5973,46 +5911,23 @@ class MathNode extends TempNode {
 
 			const mulNode = mul( tA, tB ).xyz;
 
-			outputNode = normalize( mulNode );
+			return normalize( mulNode ).build( builder, output );
 
-		}
-
-		if ( outputNode !== null ) {
-
-			return outputNode;
-
-		} else {
-
-			return super.setup( builder );
-
-		}
-
-	}
-
-	generate( builder, output ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode ) {
-
-			return super.generate( builder, output );
-
-		}
-
-		let method = this.method;
-
-		const type = this.getNodeType( builder );
-		const inputType = this.getInputType( builder );
-
-		const a = this.aNode;
-		const b = this.bNode;
-		const c = this.cNode;
-
-		const coordinateSystem = builder.renderer.coordinateSystem;
-
-		if ( method === MathNode.NEGATE ) {
+		} else if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
+
+		} else if ( method === MathNode.ONE_MINUS ) {
+
+			return sub( 1.0, a ).build( builder, output );
+
+		} else if ( method === MathNode.RECIPROCAL ) {
+
+			return div( 1.0, a ).build( builder, output );
+
+		} else if ( method === MathNode.DIFFERENCE ) {
+
+			return abs( sub( a, b ) ).build( builder, output );
 
 		} else {
 
@@ -7562,15 +7477,20 @@ class VaryingNode extends Node {
 		 */
 		this.interpolationSampling = null;
 
-		/**
-		 * This flag is used for global cache.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.global = true;
+	}
+
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether this node is global or not.
+	 */
+	isGlobal( /*builder*/ ) {
+
+		return true;
 
 	}
+
 
 	/**
 	 * Defines the interpolation type of the varying.
@@ -7654,7 +7574,9 @@ class VaryingNode extends Node {
 		const properties = builder.getNodeProperties( this );
 		const varying = this.setupVarying( builder );
 
-		if ( properties.propertyName === undefined ) {
+		const needsReassign = builder.shaderStage === 'fragment' && properties.reassignPosition === true && builder.context.needsPositionReassign;
+
+		if ( properties.propertyName === undefined || needsReassign ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
@@ -7663,6 +7585,17 @@ class VaryingNode extends Node {
 			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node, type, propertyName );
 
 			properties.propertyName = propertyName;
+
+			if ( needsReassign ) {
+
+				// once reassign varying in fragment stage
+				properties.reassignPosition = false;
+
+			} else if ( properties.reassignPosition === undefined && builder.context.isPositionNodeInput ) {
+
+				properties.reassignPosition = true;
+
+			}
 
 		}
 
@@ -9088,20 +9021,6 @@ class CacheNode extends Node {
  * @returns {CacheNode}
  */
 const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
-
-/**
- * Assigns a namespace to the given node by updating its context.
- *
- * Important for TSL functions that use `.once( namespace )` to ensure that the namespace will run twice,
- * once when the node is build in the specific namespace and once when the node is built in the others namespace.
- *
- * This is useful for nodes like `positionWorld` that need to be re-updated if used in `material.positionNode` and outside of it in the same material.
- *
- * @param {Object} node - The node to which the namespace will be assigned.
- * @param {string} namespace - The namespace to be assigned to the node.
- * @returns {Object} The updated node with the new namespace in its context.
- */
-const namespace = ( node, namespace ) => node.context( { namespace } );
 
 addMethodChaining( 'cache', cache );
 
@@ -11440,9 +11359,10 @@ class Object3DNode extends Node {
 		/**
 		 * Holds the value of the node as a uniform.
 		 *
+		 * @private
 		 * @type {UniformNode}
 		 */
-		this.uniformNode = new UniformNode( null );
+		this._uniformNode = new UniformNode( null );
 
 	}
 
@@ -11479,7 +11399,7 @@ class Object3DNode extends Node {
 	update( frame ) {
 
 		const object = this.object3d;
-		const uniformNode = this.uniformNode;
+		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
@@ -11540,19 +11460,19 @@ class Object3DNode extends Node {
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
-			this.uniformNode.nodeType = 'mat4';
+			this._uniformNode.nodeType = 'mat4';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
-			this.uniformNode.nodeType = 'vec3';
+			this._uniformNode.nodeType = 'vec3';
 
 		} else if ( scope === Object3DNode.RADIUS ) {
 
-			this.uniformNode.nodeType = 'float';
+			this._uniformNode.nodeType = 'float';
 
 		}
 
-		return this.uniformNode.build( builder );
+		return this._uniformNode.build( builder );
 
 	}
 
@@ -11847,11 +11767,7 @@ const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'positionPrev
  * @tsl
  * @type {VaryingNode<vec3>}
  */
-const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
-
-	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getNamespace( 'v_positionWorld' ) );
-
-}, 'vec3' ).once( 'POSITION' ) )();
+const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.toVarying( 'v_positionWorld' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position world direction of the current rendered object.
@@ -11859,13 +11775,7 @@ const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-const positionWorldDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
-
-	const vertexPWD = positionLocal.transformDirection( modelWorldMatrix ).toVarying( builder.getNamespace( 'v_positionWorldDirection' ) );
-
-	return vertexPWD.normalize().toVar( 'positionWorldDirection' );
-
-}, 'vec3' ).once( 'POSITION' ) )();
+const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).toVarying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the vertex position in view space of the current rendered object.
@@ -11875,9 +11785,9 @@ const positionWorldDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.context.setupPositionView().toVarying( builder.getNamespace( 'v_positionView' ) );
+	return builder.context.setupPositionView();
 
-}, 'vec3' ).once( 'POSITION' ) )();
+}, 'vec3' ).once() )().toVarying( 'v_positionView' ).context( { needsPositionReassign: true } );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
@@ -18223,7 +18133,7 @@ class NodeMaterial extends Material {
 
 		if ( this.positionNode !== null ) {
 
-			positionLocal.assign( namespace( this.positionNode, 'POSITION' ) );
+			positionLocal.assign( this.positionNode.context( { isPositionNodeInput: true } ) );
 
 		}
 
@@ -30249,16 +30159,13 @@ class StructTypeNode extends Node {
 	 */
 	getLength() {
 
-		const GPU_CHUNK_BYTES = 8;
-		const BYTES_PER_ELEMENT = Float32Array.BYTES_PER_ELEMENT;
-
 		let offset = 0; // global buffer offset in bytes
 
 		for ( const member of this.membersLayout ) {
 
 			const type = member.type;
 
-			const itemSize = getMemoryLengthFromType( type ) * BYTES_PER_ELEMENT;
+			const itemSize = getMemoryLengthFromType( type ) * Float32Array.BYTES_PER_ELEMENT;
 			const boundary = getByteBoundaryFromType( type );
 
 			const chunkOffset = offset % GPU_CHUNK_BYTES; // offset in the current chunk
@@ -30279,7 +30186,7 @@ class StructTypeNode extends Node {
 
 		}
 
-		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / BYTES_PER_ELEMENT;
+		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / Float32Array.BYTES_PER_ELEMENT;
 
 	}
 
@@ -34206,14 +34113,6 @@ class PassNode extends TempNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		/**
-		 * This flag is used for global cache.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.global = true;
-
 	}
 
 	/**
@@ -34279,6 +34178,17 @@ class PassNode extends TempNode {
 	getMRT() {
 
 		return this._mrt;
+
+	}
+
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @return {boolean} Whether this node is global or not.
+	 */
+	isGlobal() {
+
+		return true;
 
 	}
 
@@ -35070,14 +34980,6 @@ class CodeNode extends Node {
 		this.isCodeNode = true;
 
 		/**
-		 * This flag is used for global cache.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.global = true;
-
-		/**
 		 * The native code.
 		 *
 		 * @type {string}
@@ -35100,6 +35002,17 @@ class CodeNode extends Node {
 		 * @default ''
 		 */
 		this.language = language;
+
+	}
+
+	/**
+	 * The method is overwritten so it always returns `true`.
+	 *
+	 * @return {boolean} Whether this node is global or not.
+	 */
+	isGlobal() {
+
+		return true;
 
 	}
 
@@ -37674,15 +37587,13 @@ class LightsNode extends Node {
 
 	analyze( builder ) {
 
-		const properties = builder.getNodeProperties( this );
+		const properties = builder.getDataFromNode( this );
 
 		for ( const node of properties.nodes ) {
 
 			node.build( builder );
 
 		}
-
-		properties.outputNode.build( builder );
 
 	}
 
@@ -37832,7 +37743,7 @@ class LightsNode extends Node {
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		const properties = builder.getNodeProperties( this );
+		const properties = builder.getDataFromNode( this );
 
 		if ( lightingModel ) {
 
@@ -41855,7 +41766,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mx_worley_noise_float: mx_worley_noise_float,
 	mx_worley_noise_vec2: mx_worley_noise_vec2,
 	mx_worley_noise_vec3: mx_worley_noise_vec3,
-	namespace: namespace,
 	negate: negate,
 	neutralToneMapping: neutralToneMapping,
 	nodeArray: nodeArray,
@@ -43158,7 +43068,7 @@ class Matrix2Uniform extends Uniform {
 		 */
 		this.isMatrix2Uniform = true;
 
-		this.boundary = 8;
+		this.boundary = 16;
 		this.itemSize = 4;
 
 	}
@@ -45472,58 +45382,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the current namespace for the node builder.
-	 *
-	 * @return {string} The current namespace.
-	 */
-	get namespace() {
-
-		return this.context.namespace;
-
-	}
-
-	/**
-	 * Returns the output namespace for the node builder, which is used for the current output node.
-	 *
-	 * @return {string} The output namespace.
-	 */
-	getOutputNamespace() {
-
-		return this.getNamespace( 'outputNode' );
-
-	}
-
-	/**
-	 * Returns the namespace for the given property.
-	 *
-	 * If the property name is not set, it returns the namespace only.
-	 * If the namespace is not set, it returns the property name.
-	 * If the namespace is set, it returns the namespace concatenated with the property name.
-	 *
-	 * @param {string} [property=''] - The property name.
-	 * @return {string} The namespace for the property.
-	 */
-	getNamespace( property = '' ) {
-
-		const ns = this.namespace;
-
-		let nsName;
-
-		if ( ns ) {
-
-			nsName = property ? ( ns + '_' + property ) : ns;
-
-		} else {
-
-			nsName = property;
-
-		}
-
-		return nsName;
-
-	}
-
-	/**
 	 * Registers a node declaration in the current shader stage.
 	 *
 	 * @param {Object} node - The node to be registered.
@@ -45546,6 +45404,7 @@ class NodeBuilder {
 
 		}
 
+
 		if ( index > 1 ) {
 
 			node.name = name;
@@ -45553,6 +45412,7 @@ class NodeBuilder {
 			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
+
 
 		declarations[ name ] = node;
 
@@ -64369,7 +64229,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY, texture.premultiplyAlpha );
+			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -64379,7 +64239,7 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
+			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
 		}
 
@@ -64449,6 +64309,21 @@ class WebGPUTextureUtils {
 		const buffer = readBuffer.getMappedRange();
 
 		return new typedArrayType( buffer );
+
+	}
+
+	/**
+	 * Returns `true` if the given texture is an environment map.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @return {boolean} Whether the given texture is an environment map or not.
+	 */
+	_isEnvironmentTexture( texture ) {
+
+		const mapping = texture.mapping;
+
+		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
 	}
 
@@ -64541,9 +64416,8 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY, premultiplyAlpha ) {
+	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -64557,7 +64431,7 @@ class WebGPUTextureUtils {
 
 			} else {
 
-				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY, premultiplyAlpha );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
 
 			}
 
@@ -64574,9 +64448,8 @@ class WebGPUTextureUtils {
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
 
 		const device = this.backend.device;
 
@@ -64587,8 +64460,7 @@ class WebGPUTextureUtils {
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
-				origin: { x: 0, y: 0, z: originDepth },
-				premultipliedAlpha: premultiplyAlpha
+				origin: { x: 0, y: 0, z: originDepth }
 			}, {
 				width: image.width,
 				height: image.height,
@@ -64969,7 +64841,7 @@ class WebGPUTextureUtils {
 
 		let dimension;
 
-		if ( texture.is3DTexture || texture.isData3DTexture ) {
+		if ( texture.isData3DTexture ) {
 
 			dimension = GPUTextureDimension.ThreeD;
 
@@ -67243,29 +67115,24 @@ ${ flowData.code }
 
 					}
 
-				} else if ( shaderStage !== 'compute' && ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) ) {
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 					textureType = 'texture_2d_array<f32>';
-
-				} else if ( shaderStage !== 'compute' && ( texture.is3DTexture === true || texture.isData3DTexture === true ) ) {
-
-					textureType = 'texture_3d<f32>';
 
 				} else if ( texture.isVideoTexture === true ) {
 
 					textureType = 'texture_external';
+
+				} else if ( texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
 
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
-					const is3D = uniform.node.value.is3DTexture;
-					const isArray = uniform.node.value.isArrayTexture ? '_array' : '';
-
-					const dimension = is3D ? '3d' : `2d${ isArray ? '_array' : '' }`;
-
-					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
+					textureType = `texture_storage_2d<${ format }, ${ access }>`;
 
 				} else {
 
@@ -68521,16 +68388,6 @@ class WebGPUBindingUtils {
 
 				}
 
-				if ( binding.texture.isArrayTexture ) {
-
-					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
-
-				} else if ( binding.texture.is3DTexture ) {
-
-					storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
-
-				}
-
 				bindingGPU.storageTexture = storageTexture;
 
 			} else if ( binding.isSampledTexture ) {
@@ -68599,7 +68456,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
-				} else if ( binding.texture.is3DTexture || binding.isSampledTexture3D ) {
+				} else if ( binding.isSampledTexture3D ) {
 
 					texture.viewDimension = GPUTextureViewDimension.ThreeD;
 
@@ -68821,7 +68678,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-						} else if ( binding.texture.is3DTexture || binding.isSampledTexture3D ) {
+						} else if ( binding.isSampledTexture3D ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
@@ -72257,6 +72114,8 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
+		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
+
 		if ( renderContextData.currentPass ) {
 
 			const { descriptor } = renderContextData;
@@ -72290,12 +72149,6 @@ class WebGPUBackend extends Backend {
 		} else {
 
 			this.device.queue.submit( [ encoder.finish() ] );
-
-		}
-
-		if ( texture.generateMipmaps ) {
-
-			this.textureUtils.generateMipmaps( texture );
 
 		}
 
@@ -72776,7 +72629,7 @@ class StorageTexture extends Texture {
 		/**
 		 * The image object which just represents the texture's dimension.
 		 *
-		 * @type {{width: number, height: number }}
+		 * @type {{width: number, height: number}}
 		 */
 		this.image = { width, height };
 
