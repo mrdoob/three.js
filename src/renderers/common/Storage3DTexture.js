@@ -23,7 +23,7 @@ class Storage3DTexture extends Texture {
 
 		super();
 
-		//inherited from texture
+		//inherited from texture. Must be false for 3DTexture
 		this.isArrayTexture = false;
 
 		/**
