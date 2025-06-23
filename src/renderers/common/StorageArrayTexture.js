@@ -10,18 +10,22 @@ import { LinearFilter } from '../../constants.js';
  *
  * @augments Texture
  */
-class StorageTexture extends Texture {
+class StorageArrayTexture extends Texture {
 
 	/**
 	 * Constructs a new storage texture.
 	 *
 	 * @param {number} [width=1] - The storage texture's width.
 	 * @param {number} [height=1] - The storage texture's height.
-	 * @param {number} [depth=0] - The storage texture's depth.
+	 * @param {number} [depth=1] - The storage texture's depth.
 	 */
-	constructor( width = 1, height = 1, depth = 0 ) {
+	constructor( width = 1, height = 1, depth = 1 ) {
 
 		super();
+
+		//inherited from texture
+		this.isArrayTexture = true;
+
 
 		/**
 		 * The image object which just represents the texture's dimension.
@@ -53,16 +57,8 @@ class StorageTexture extends Texture {
 		 */
 		this.isStorageTexture = true;
 
-		/**
-		 * Indicates whether this texture is a texture array.
-		 *
-		 * @type {boolean}
-		 *
-		 */
-		this.isArrayTexture = depth > 0;
-
 	}
 
 }
 
-export default StorageTexture;
+export default StorageArrayTexture;
