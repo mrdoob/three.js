@@ -1701,18 +1701,6 @@ ${ flowData.code }
 
 					}
 
-				} else if ( shaderStage !== 'compute' && ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) ) {
-
-					textureType = 'texture_2d_array<f32>';
-
-				} else if ( shaderStage !== 'compute' && ( texture.is3DTexture === true || texture.isData3DTexture === true ) ) {
-
-					textureType = 'texture_3d<f32>';
-
-				} else if ( texture.isVideoTexture === true ) {
-
-					textureType = 'texture_external';
-
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
@@ -1724,6 +1712,18 @@ ${ flowData.code }
 					const dimension = is3D ? '3d' : `2d${ isArray ? '_array' : '' }`;
 
 					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
+
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+					textureType = 'texture_2d_array<f32>';
+
+				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
+
+				} else if ( texture.isVideoTexture === true ) {
+
+					textureType = 'texture_external';
 
 				} else {
 
