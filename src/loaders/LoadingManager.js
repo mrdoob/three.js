@@ -278,7 +278,8 @@ class LoadingManager {
 
 		/**
 		 * Can be used to abort ongoing loading requests in loaders using this manager.
-		 * The abort only works if the loaders implement {@link Loader#abort}.
+		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * is supported in the browser.
 		 *
 		 * @return {LoadingManager} A reference to this loading manager.
 		 */
