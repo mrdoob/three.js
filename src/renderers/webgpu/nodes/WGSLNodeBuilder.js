@@ -1707,9 +1707,9 @@ ${ flowData.code }
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
 					const is3D = uniform.node.value.is3DTexture;
-					const isArray = uniform.node.value.isArrayTexture ? '_array' : '';
+					const isArrayTexture = uniform.node.value.isArrayTexture;
 
-					const dimension = is3D ? '3d' : `2d${ isArray ? '_array' : '' }`;
+					const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
 
 					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
 
