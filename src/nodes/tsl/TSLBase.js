@@ -24,6 +24,7 @@ export * from '../code/ExpressionNode.js'; // expression()
 export * from '../utils/Discard.js'; // Discard(), Return()
 export * from '../display/RenderOutputNode.js'; // .renderOutput()
 export * from '../utils/DebugNode.js'; // debug()
+export * from '../core/SubBuildNode.js'; // subBuild()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 

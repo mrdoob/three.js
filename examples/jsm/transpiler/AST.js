@@ -214,6 +214,26 @@ export class Discard {
 
 }
 
+export class Continue {
+
+	constructor() {
+
+		this.isContinue = true;
+
+	}
+
+}
+
+export class Break {
+
+	constructor() {
+
+		this.isBreak = true;
+
+	}
+
+}
+
 export class Accessor {
 
 	constructor( property ) {
@@ -274,6 +294,40 @@ export class For {
 		this.body = [];
 
 		this.isFor = true;
+
+	}
+
+}
+
+export class Switch {
+
+	constructor( discriminant ) {
+
+		this.body = [];
+
+		this.discriminant = discriminant;
+		this.case = null;
+		this.isSwitch = true;
+
+	}
+
+}
+
+export class SwitchCase {
+
+	constructor( caseCondition ) {
+
+		// Condition for the case body to execute
+		this.caseCondition = caseCondition;
+
+		// Body of the case statement
+		this.body = [];
+
+		// Next case to fall to if current case fails
+		this.nextCase = null;
+
+		this.isDefault = caseCondition === null ? true : false;
+		this.isSwitchCase = true;
 
 	}
 

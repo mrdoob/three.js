@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, step, texture, screenUV, mrt, output, transformedNormalWorld, uv, vec2 } from 'three/tsl';
+			import { mix, step, texture, screenUV, mrt, output, normalWorld, uv, vec2 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -85,7 +85,7 @@
 
 				sceneMRT = mrt( {
 					'output': output,
-					'normal': transformedNormalWorld
+					'normal': normalWorld
 				} );
 
 				// Scene

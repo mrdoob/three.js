@@ -24,10 +24,10 @@ export * from './math/MathUtils.js';
 export * from './math/TriNoise3D.js';
 
 // utils
-export * from './utils/EquirectUVNode.js';
+export * from './utils/EquirectUV.js';
 export * from './utils/FunctionOverloadingNode.js';
 export * from './utils/LoopNode.js';
-export * from './utils/MatcapUVNode.js';
+export * from './utils/MatcapUV.js';
 export * from './utils/MaxMipLevelNode.js';
 export * from './utils/Oscillators.js';
 export * from './utils/Packing.js';
@@ -38,10 +38,11 @@ export * from './utils/ViewportUtils.js';
 export * from './utils/RotateNode.js';
 export * from './utils/SpriteSheetUVNode.js';
 export * from './utils/Timer.js';
-export * from './utils/TriplanarTexturesNode.js';
+export * from './utils/TriplanarTextures.js';
 export * from './utils/ReflectorNode.js';
 export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
+export * from './utils/SampleNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';

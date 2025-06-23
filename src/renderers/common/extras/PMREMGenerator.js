@@ -1,6 +1,6 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
-import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
+import { equirectUV } from '../../../nodes/utils/EquirectUV.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';

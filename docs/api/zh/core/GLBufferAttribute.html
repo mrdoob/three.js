@@ -16,7 +16,7 @@
 		</p>
 
 		<h2>构造方法（Constructor）</h2>
-		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count] )</h3>
+		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count], [param:Boolean normalized] )</h3>
 		<p>
 		*buffer* — 必须是 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer].
 		<br />
@@ -35,6 +35,20 @@
 			<li>gl.UNSIGNED_BYTE: 1</li>
 		</ul>
 		*count* — VBO 中预期的顶点数。
+		<br />
+		*normalized* — (optional) Applies to integer data only.
+			Indicates how the underlying data in the buffer maps to the values in the
+			GLSL code. For instance, if [page:WebGLBuffer buffer] contains data of
+			`gl.UNSIGNED_SHORT`, and [page:Boolean normalized] is true, the values `0 -
+			+65535` in the buffer data will be mapped to 0.0f - +1.0f in the GLSL
+			attribute. A `gl.SHORT` (signed) would map from -32768 - +32767 to -1.0f
+			- +1.0f. If [page:Boolean normalized] is false, the values will be
+			converted to floats unmodified, i.e. 32767 becomes 32767.0f.
+		</p>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_buffergeometry_glbufferattribute Points with custom buffers]<br />
 		</p>
 
 		<h2>特性（Properties）</h2>
@@ -49,6 +63,14 @@
 			VBO 中的预期顶点数。
 		</p>
 
+		<h3>[property:Integer elementSize]</h3>
+		<p>
+			存储当前类型属性值的相应大小（以字节为单位）。
+		</p>
+		<p>
+			有关已知类型大小的列表，请参见上面的（构造函数）。
+		</p>
+
 		<h3>[property:Boolean isGLBufferAttribute]</h3>
 		<p>
 			只读。值永远为"true"。
@@ -59,17 +81,20 @@
 			每个项目（顶点）组成多少个值。
 		</p>
 
-		<h3>[property:Integer elementSize]</h3>
-		<p>
-			存储当前类型属性值的相应大小（以字节为单位）。
-		</p>
-		<p>
-			有关已知类型大小的列表，请参见上面的（构造函数）。
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>
 			该attribute实例的别名，默认值为空字符串。
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			默认为假。将此设置为 true 增量[page:GLBufferAttribute.version 版本]
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+			Indicates how the underlying data in the buffer maps to the values in the
+			GLSL shader code. See the constructor above for details.
 		</p>
 
 		<h3>[property:GLenum type]</h3>
@@ -78,6 +103,11 @@
 		</p>
 		<p>
 			将此属性与elementSize一起设置。推荐的方法是使用setType方法。
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		版本号，每次将needsUpdate属性设置为true时递增。
 		</p>
 
 		<h2>方法（Methods）</h2>
@@ -93,16 +123,6 @@
 
 		<h3>[method:this setCount]( count ) </h3>
 		<p>设置计数属性。</p>
-
-		<h3>[property:Integer version]</h3>
-		<p>
-		版本号，每次将needsUpdate属性设置为true时递增。
-		</p>
-
-		<h3>[property:Boolean needsUpdate]</h3>
-		<p>
-			默认为假。将此设置为 true 增量[page:GLBufferAttribute.version 版本]
-		</p>
 
 		<h2>源代码（Source）</h2>
 		<p>

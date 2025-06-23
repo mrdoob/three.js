@@ -7,6 +7,7 @@
 		"webgl_animation_skinning_morph",
 		"webgl_animation_multiple",
 		"webgl_animation_walk",
+		"webgl_batch_lod_bvh",
 		"webgl_camera",
 		"webgl_camera_array",
 		"webgl_camera_logarithmicdepthbuffer",
@@ -209,9 +210,7 @@
 		"webgl_tonemapping",
 		"webgl_video_kinect",
 		"webgl_video_panorama_equirectangular",
-		"webgl_watch",
-		"webgl_water",
-		"webgl_water_flowmap"
+		"webgl_watch"
 	],
 	"webgl / postprocessing": [
 		"webgl_postprocessing",
@@ -417,6 +416,7 @@
 		"webgpu_procedural_texture",
 		"webgpu_reflection",
 		"webgpu_reflection_blurred",
+		"webgpu_reflection_roughness",
 		"webgpu_refraction",
 		"webgpu_rendertarget_2d-array_3d",
 		"webgpu_rtt",
