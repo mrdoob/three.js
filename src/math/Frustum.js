@@ -5,7 +5,7 @@ import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 
 const _sphere = /*@__PURE__*/ new Sphere();
-const _center = /*@__PURE__*/ new Vector2( 0.5, 0.5 );
+const _defaultSpriteCenter = /*@__PURE__*/ new Vector2( 0.5, 0.5 );
 const _vector = /*@__PURE__*/ new Vector3();
 
 /**
@@ -164,7 +164,7 @@ class Frustum {
 
 		_sphere.center.set( 0, 0, 0 );
 
-		const offset = _center.distanceTo( sprite.center );
+		const offset = _defaultSpriteCenter.distanceTo( sprite.center );
 
 		_sphere.radius = 0.7071067811865476 + offset;
 		_sphere.applyMatrix4( sprite.matrixWorld );
