@@ -97,8 +97,8 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			if ( options.UVGenerator !== undefined ) {
 
-				// @deprecated, r178
-				warnOnce( 'THREE.ExtrudeGeometry: The UVGenerator option has been deprecated and will be removed in r188.' );
+				// @deprecated, r179
+				warnOnce( 'THREE.ExtrudeGeometry: The UVGenerator option has been deprecated and will be removed in r189.' );
 
 			}
 
