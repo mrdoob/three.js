@@ -95,14 +95,14 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			const extrudePath = options.extrudePath;
 
-			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
-
 			if ( options.UVGenerator !== undefined ) {
 
 				// @deprecated, r178
-				warnOnce( 'THREE.ExtrudeGeometry: The UVGenerator option is deprecated.' );
+				warnOnce( 'THREE.ExtrudeGeometry: The UVGenerator option has been deprecated and will be removed in r188.' );
 
 			}
+
+			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
 
 			//
 
