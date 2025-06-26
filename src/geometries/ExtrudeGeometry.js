@@ -5,6 +5,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
+import { warnOnce } from '../utils.js';
 
 /**
  * Creates extruded geometry from a path shape.
@@ -95,6 +96,13 @@ class ExtrudeGeometry extends BufferGeometry {
 			const extrudePath = options.extrudePath;
 
 			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+
+			if ( options.UVGenerator !== undefined ) {
+
+				// @deprecated, r178
+				warnOnce( 'THREE.ExtrudeGeometry: The UVGenerator option is deprecated.' );
+
+			}
 
 			//
 
