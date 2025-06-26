@@ -127,7 +127,7 @@ export class VariableDeclaration extends ASTNode {
 
 	}
 
-	isAssignment() {
+	get isAssignment() {
 
 		return this.value !== null;
 

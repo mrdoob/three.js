@@ -340,7 +340,7 @@ class TSLEncoder {
 
 			let type = unaryLib[ node.type ];
 
-			if ( node.isAssignment ) {
+			if ( node.hasAssignment() ) {
 
 				if ( node.after === false ) {
 
