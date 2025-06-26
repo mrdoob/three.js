@@ -680,6 +680,8 @@ ${ this.tab }} )`;
 
 				valueStr = `${ type }( ${ valueStr } )`;
 
+				this.addImport( type );
+
 			}
 
 			if ( node.linker.assignments.length > 0 ) {
@@ -705,8 +707,6 @@ ${ this.tab }} )`;
 			varStr += ', ' + this.emitVariables( next, false );
 
 		}
-
-		this.addImport( type );
 
 		return varStr;
 
