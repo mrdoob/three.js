@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break } from './AST.js';
+import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break, While, Comment } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -45,7 +45,7 @@ const samplers3D = [ 'sampler3D', 'isampler3D', 'usampler3D' ];
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
-const inlineCommentRegExp = /^\/\/.*?(\n|$)/;
+const inlineCommentRegExp = /^\/\/.*?(?=\n|$)/;
 
 const numberRegExp = /^((0x\w+)|(\.?\d+\.?\d*((e-?\d+)|\w)?))/;
 const stringDoubleRegExp = /^(\"((?:[^"\\]|\\.)*)\")/;
@@ -67,7 +67,7 @@ function getFunctionName( str ) {
 function getGroupDelta( str ) {
 
 	if ( str === '(' || str === '[' || str === '{' ) return 1;
-	if ( str === ')' || str === ']' || str === '}' || str === 'case' || str === 'default' ) return - 1;
+	if ( str === ')' || str === ']' || str === '}' ) return - 1;
 
 	return 0;
 
@@ -84,7 +84,9 @@ class Token {
 		this.str = str;
 		this.pos = pos;
 
-		this.tag = null;
+		this.isTag = false;
+
+		this.tags = null;
 
 	}
 
@@ -193,7 +195,7 @@ class Tokenizer {
 
 	}
 
-	readToken() {
+	nextToken() {
 
 		const remainingCode = this.skip( spaceRegExp );
 
@@ -205,28 +207,41 @@ class Tokenizer {
 			if ( result ) {
 
 				const token = new Token( this, parser.type, result[ parser.group || 0 ], this.position );
+				token.isTag = parser.isTag;
 
 				this.position += result[ 0 ].length;
-
-				if ( parser.isTag ) {
-
-					const nextToken = this.readToken();
-
-					if ( nextToken ) {
-
-						nextToken.tag = token;
-
-					}
-
-					return nextToken;
-
-				}
 
 				return token;
 
 			}
 
 		}
+
+	}
+
+	readToken() {
+
+		let token = this.nextToken();
+
+		if ( token && token.isTag ) {
+
+			const tags = [];
+
+			while ( token.isTag ) {
+
+				tags.push( token );
+
+				token = this.nextToken();
+
+				if ( ! token ) return;
+
+			}
+
+			token.tags = tags;
+
+		}
+
+		return token;
 
 	}
 
@@ -241,8 +256,6 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = null;
 		this.keywords = [];
-
-		this._currentFunction = null;
 
 		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( screenCoordinate.x, screenCoordinate.y.oneMinus(), screenCoordinate.z );' );
 
@@ -357,7 +370,7 @@ class GLSLDecoder {
 						const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
 						const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
 
-						return this._evalOperator( new Operator( operator, left, right ) );
+						return new Operator( operator, left, right );
 
 					}
 
@@ -458,7 +471,7 @@ class GLSLDecoder {
 				const rightTokens = tokens.slice( leftTokens.length + 1 );
 				const right = this.parseExpressionFromTokens( rightTokens );
 
-				return this._evalOperator( new Operator( operator.str, left, right ) );
+				return new Operator( operator.str, left, right );
 
 			}
 
@@ -676,14 +689,9 @@ class GLSLDecoder {
 		const paramsTokens = this.readTokensUntil( ')' );
 
 		const params = this.parseFunctionParams( paramsTokens.slice( 1, paramsTokens.length - 1 ) );
+		const body = this.parseBlock();
 
-		const func = new FunctionDeclaration( type, name, params );
-
-		this._currentFunction = func;
-
-		this.parseBlock( func );
-
-		this._currentFunction = null;
+		const func = new FunctionDeclaration( type, name, params, body );
 
 		return func;
 
@@ -779,6 +787,31 @@ class GLSLDecoder {
 
 	}
 
+	parseWhile() {
+
+		this.readToken(); // skip 'while'
+
+		const conditionTokens = this.readTokensUntil( ')' ).slice( 1, - 1 );
+		const condition = this.parseExpressionFromTokens( conditionTokens );
+
+		let body;
+
+		if ( this.getToken().str === '{' ) {
+
+			body = this.parseBlock();
+
+		} else {
+
+			body = [ this.parseExpression() ];
+
+		}
+
+		const statement = new While( condition, body );
+
+		return statement;
+
+	}
+
 	parseFor() {
 
 		this.readToken(); // skip 'for'
@@ -804,17 +837,19 @@ class GLSLDecoder {
 		const condition = this.parseExpressionFromTokens( conditionTokens );
 		const afterthought = this.parseExpressionFromTokens( afterthoughtTokens );
 
-		const statement = new For( initialization, condition, afterthought );
+		let body;
 
 		if ( this.getToken().str === '{' ) {
 
-			this.parseBlock( statement );
+			body = this.parseBlock();
 
 		} else {
 
-			statement.body.push( this.parseExpression() );
+			body = [ this.parseExpression() ];
 
 		}
+
+		const statement = new For( initialization, condition, afterthought, body );
 
 		return statement;
 
@@ -822,105 +857,77 @@ class GLSLDecoder {
 
 	parseSwitch() {
 
-		const parseSwitchExpression = () => {
+		this.readToken(); // Skip 'switch'
 
-			this.readToken(); // Skip 'switch'
+		const switchDeterminantTokens = this.readTokensUntil( ')' );
 
-			const switchDeterminantTokens = this.readTokensUntil( ')' );
+		// Parse expresison between parentheses. Index 1: char after '('. Index -1: char before ')'
+		const discriminant = this.parseExpressionFromTokens( switchDeterminantTokens.slice( 1, - 1 ) );
 
-			// Parse expresison between parentheses. Index 1: char after '('. Index -1: char before ')'
-			return this.parseExpressionFromTokens( switchDeterminantTokens.slice( 1, - 1 ) );
+		// Validate curly braces
+		if ( this.getToken().str !== '{' ) {
 
-
-		};
-
-		const parseSwitchBlock = ( switchStatement ) => {
-
-			// Validate curly braces
-			if ( this.getToken().str === '{' ) {
-
-				this.readToken(); // Skip '{'
-
-			} else {
-
-				throw new Error( 'Expected \'{\' after switch(...) ' );
-
-			}
-
-			if ( this.getToken() && ( this.getToken().str === 'case' || this.getToken().str === 'default' ) ) {
-
-				switchStatement.case = this.parseSwitchCase();
-
-			} else {
-
-				this.parseBlock( switchStatement );
-
-			}
-
-
-		};
-
-		const switchStatement = new Switch( parseSwitchExpression() );
-
-		parseSwitchBlock( switchStatement );
-
-		return switchStatement;
-
-
-	}
-
-	parseSwitchCase() {
-
-		const parseCaseExpression = ( token ) => {
-
-			const caseTypeToken = token ? token : this.readToken(); // Skip 'case' or 'default
-
-			const caseTokens = this.readTokensUntil( ':' );
-
-			// No case condition on default
-			if ( caseTypeToken.str === 'default' ) {
-
-				return null;
-
-			}
-
-			return this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
-
-		};
-
-		let lastReadToken = null;
-
-		// No '{' so use different approach
-		const parseCaseBlock = ( caseStatement ) => {
-
-			lastReadToken = this.parseBlock( caseStatement );
-
-		};
-
-		// Parse case condition
-		const caseCondition = parseCaseExpression();
-		const switchCase = new SwitchCase( caseCondition );
-
-		// Get case body
-		parseCaseBlock( switchCase );
-
-		let currentCase = switchCase;
-
-		// If block ended with case, then continue chaining cases, otherwise, ended with '}' and no more case blocks to parse
-		while ( lastReadToken.str === 'case' || lastReadToken.str === 'default' ) {
-
-			const previousCase = currentCase;
-
-			// case and default already skipped at block end, so need to pass it in as last read token
-			currentCase = new SwitchCase( parseCaseExpression( lastReadToken ) );
-
-			previousCase.nextCase = currentCase;
-
-			parseCaseBlock( currentCase );
+			throw new Error( 'Expected \'{\' after switch(...) ' );
 
 		}
 
-		return switchCase;
+		this.readToken(); // Skip '{'
+
+		const cases = this.parseSwitchCases();
+
+		const switchStatement = new Switch( discriminant, cases );
+
+		return switchStatement;
+
+	}
+
+	parseSwitchCases() {
+
+		const cases = [];
+
+		let token = this.getToken();
+		let conditions = null;
+
+		const isCase = ( token ) => token.str === 'case' || token.str === 'default';
+
+		while ( isCase( token ) ) {
+
+			this.readToken(); // Skip 'case' or 'default'
+
+			if ( token.str === 'case' ) {
+
+				const caseTokens = this.readTokensUntil( ':' );
+				const caseStatement = this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
+
+				conditions = conditions || [];
+				conditions.push( caseStatement );
+
+			} else {
+
+				this.readTokensUntil( ':' ); // Skip 'default:'
+
+				conditions = null;
+
+			}
+
+			token = this.getToken();
+
+			if ( isCase( token ) ) {
+
+				// If the next token is another case/default, continue parsing
+				continue;
+
+			}
+
+			cases.push( new SwitchCase( this.parseBlock(), conditions ) );
+
+			token = this.getToken();
+
+			conditions = null;
+
+		}
+
+		return cases;
 
 	}
 
@@ -936,25 +943,28 @@ class GLSLDecoder {
 
 		};
 
-		const parseIfBlock = ( cond ) => {
+		const parseIfBlock = () => {
+
+			let body;
 
 			if ( this.getToken().str === '{' ) {
 
-				this.parseBlock( cond );
+				body = this.parseBlock();
 
 			} else {
 
-				cond.body.push( this.parseExpression() );
+				body = [ this.parseExpression() ];
 
 			}
+
+			return body;
 
 		};
 
 		//
 
-		const conditional = new Conditional( parseIfExpression() );
-
-		parseIfBlock( conditional );
+		// Parse the first if statement
+		const conditional = new Conditional( parseIfExpression(), parseIfBlock() );
 
 		//
 
@@ -967,23 +977,21 @@ class GLSLDecoder {
 			// Assign the current if/else statement as the previous within the chain of conditionals
 			const previous = current;
 
+			let expression = null;
+
 			// If an 'else if' statement, parse the conditional within the if
 			if ( this.getToken().str === 'if' ) {
 
 				// Current conditional now equal to next conditional in the chain
-				current = new Conditional( parseIfExpression() );
-
-			} else {
-
-				current = new Conditional();
+				expression = parseIfExpression();
 
 			}
 
+			current = new Conditional( expression, parseIfBlock() );
+			current.parent = previous;
+
 			// n - 1 conditional's else statement assigned to new if/else statement
 			previous.elseConditional = current;
-
-			// Parse conditional of latest if statement
-			parseIfBlock( current );
 
 		}
 
@@ -991,7 +999,9 @@ class GLSLDecoder {
 
 	}
 
-	parseBlock( scope ) {
+	parseBlock() {
+
+		const body = [];
 
 		const firstToken = this.getToken();
 
@@ -1011,16 +1021,46 @@ class GLSLDecoder {
 
 			groupIndex += getGroupDelta( token.str );
 
-			if ( groupIndex < 0 ) {
+			if ( groupIndex === 0 && ( token.str === 'case' || token.str === 'default' ) ) {
 
-				this.readToken(); // skip '}', ']', 'case', or other block ending tokens'
+				return body; // switch case or default statement, return body
 
-				// Return skipped token
-				return token;
+			} else if ( groupIndex < 0 ) {
+
+				this.readToken(); // skip '}'
+
+				return body;
 
 			}
 
 			//
+
+			if ( token.tags ) {
+
+				let lastStatement = null;
+
+				for ( const tag of token.tags ) {
+
+					if ( tag.type === Token.COMMENT ) {
+
+						const str = tag.str.replace( /\t/g, '' );
+
+						if ( ! lastStatement || lastStatement.isComment !== true ) {
+
+							lastStatement = new Comment( str );
+							body.push( lastStatement );
+
+						} else {
+
+							lastStatement.comment += '\n' + str;
+
+						}
+
+					}
+
+				}
+
+			}
 
 			if ( token.isLiteral || token.isOperator ) {
 
@@ -1060,6 +1100,10 @@ class GLSLDecoder {
 
 					statement = this.parseFor();
 
+				} else if ( token.str === 'while' ) {
+
+					statement = this.parseWhile();
+
 				} else if ( token.str === 'switch' ) {
 
 					statement = this.parseSwitch();
@@ -1074,7 +1118,7 @@ class GLSLDecoder {
 
 			if ( statement ) {
 
-				scope.body.push( statement );
+				body.push( statement );
 
 			} else {
 
@@ -1084,43 +1128,7 @@ class GLSLDecoder {
 
 		}
 
-	}
-
-	_evalOperator( operator ) {
-
-		if ( operator.type.includes( '=' ) ) {
-
-			const parameter = this._getFunctionParameter( operator.left.property );
-
-			if ( parameter !== undefined ) {
-
-				// Parameters are immutable in WGSL
-
-				parameter.immutable = false;
-
-			}
-
-		}
-
-		return operator;
-
-	}
-
-	_getFunctionParameter( name ) {
-
-		if ( this._currentFunction ) {
-
-			for ( const param of this._currentFunction.params ) {
-
-				if ( param.name === name ) {
-
-					return param;
-
-				}
-
-			}
-
-		}
+		return body;
 
 	}
 
@@ -1147,9 +1155,8 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = new Tokenizer( polyfill + source ).tokenize();
 
-		const program = new Program();
-
-		this.parseBlock( program );
+		const body = this.parseBlock();
+		const program = new Program( body );
 
 		return program;
 

@@ -47,6 +47,7 @@ const unaryLib = {
 
 const textureLookupFunctions = [ 'texture', 'texture2D', 'texture3D', 'textureCube', 'textureLod', 'texelFetch', 'textureGrad' ];
 
+const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true;
 const isPrimitive = ( value ) => /^(true|false|-?(\d|\.\d))/.test( value );
 
 class TSLEncoder {
@@ -60,11 +61,6 @@ class TSLEncoder {
 		this.iife = false;
 		this.reference = false;
 
-		this._currentVariable = null;
-
-		this._currentProperties = {};
-		this._lastStatement = null;
-
 		this.block = null;
 
 	}
@@ -75,7 +71,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( TSL[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
+		if ( TSL[ name ] !== undefined && this.global.has( name ) === false ) {
 
 			this.imports.add( name );
 
@@ -133,19 +129,29 @@ class TSLEncoder {
 
 	}
 
-	emitExpression( node ) {
+	emitExpression( node, outputType = null ) {
 
 		let code;
 
 		if ( node.isAccessor ) {
 
-			this.addImport( node.property );
+			if ( node.linker.accesses.length === 0 ) {
+
+				this.addImport( node.property );
+
+			}
 
 			code = node.property;
 
 		} else if ( node.isNumber ) {
 
-			if ( node.type === 'int' || node.type === 'uint' ) {
+			if ( outputType === null ) {
+
+				outputType = 'float';
+
+			}
+
+			if ( outputType !== node.type === 'int' ) {
 
 				code = node.type + '( ' + node.value + ' )';
 
@@ -165,8 +171,8 @@ class TSLEncoder {
 
 			const opFn = opLib[ node.type ] || node.type;
 
-			const left = this.emitExpression( node.left );
-			const right = this.emitExpression( node.right );
+			const left = this.emitExpression( node.left, outputType );
+			const right = this.emitExpression( node.right, outputType );
 
 			if ( isPrimitive( left ) && isPrimitive( right ) ) {
 
@@ -263,6 +269,7 @@ class TSLEncoder {
 		} else if ( node.isContinue ) {
 
 			this.addImport( 'Continue' );
+
 			code = 'Continue()';
 
 		} else if ( node.isAccessorElements ) {
@@ -305,6 +312,10 @@ class TSLEncoder {
 
 			code = this.emitFor( node );
 
+		} else if ( node.isWhile ) {
+
+			code = this.emitWhile( node );
+
 		} else if ( node.isSwitch ) {
 
 			code = this.emitSwitch( node );
@@ -329,26 +340,23 @@ class TSLEncoder {
 
 			code = this.emitConditional( node );
 
-		} else if ( node.isUnary && node.expression.isNumber ) {
+		} else if ( node.isUnary && node.expression.isNumber && node.type === '-' ) {
 
-			code = node.expression.type + '( ' + node.type + ' ' + node.expression.value + ' )';
+			code = '- ' + node.expression.value;
 
-			this.addImport( node.expression.type );
+			if ( node.expression.type !== 'float' ) {
+
+				code = node.expression.type + '( ' + code + ' )';
+
+				this.addImport( node.expression.type );
+
+			}
 
 		} else if ( node.isUnary ) {
 
 			let type = unaryLib[ node.type ];
 
-			if ( node.type === '++' || node.type === '--' ) {
-
-				if ( this._currentVariable === null ) {
-
-					// optimize increment/decrement operator
-					// to avoid creating a new variable
-
-					node.after = false;
-
-				}
+			if ( node.isAssignment ) {
 
 				if ( node.after === false ) {
 
@@ -386,13 +394,21 @@ class TSLEncoder {
 
 	emitBody( body ) {
 
-		this.setLastStatement( null );
-
 		let code = '';
 
 		this.tab += '\t';
 
 		for ( const statement of body ) {
+
+			code += this.emitExtraLine( statement, body );
+
+			if ( statement.isComment ) {
+
+				code += this.emitComment( statement, body );
+
+				continue;
+
+			}
 
 			if ( this.block && this.block.isSwitchCase ) {
 
@@ -400,14 +416,11 @@ class TSLEncoder {
 
 			}
 
-			code += this.emitExtraLine( statement );
 			code += this.tab + this.emitExpression( statement );
 
 			if ( code.slice( - 1 ) !== '}' ) code += ';';
 
 			code += '\n';
-
-			this.setLastStatement( statement );
 
 		}
 
@@ -538,35 +551,31 @@ ${ this.tab }} )`;
 
 		let switchString = `Switch( ${ discriminantString } )\n${ this.tab }`;
 
-		let caseNode = switchNode.case;
-
 		const previousBlock = this.block;
 
-		while ( caseNode !== null ) {
+		for ( const switchCase of switchNode.cases ) {
 
-			this.block = caseNode;
+			this.block = switchCase;
 
 			let caseBodyString;
 
-			if ( ! caseNode.isDefault ) {
+			if ( ! switchCase.isDefault ) {
 
-				const caseConditions = [ this.emitExpression( caseNode.caseCondition ) ];
+				const caseConditions = [ ];
 
-				while ( caseNode.body.length === 0 && caseNode.nextCase !== null && caseNode.nextCase.isDefault !== true ) {
+				for ( const condition of switchCase.conditions ) {
 
-					caseNode = caseNode.nextCase;
-
-					caseConditions.push( this.emitExpression( caseNode.caseCondition ) );
+					caseConditions.push( this.emitExpression( condition ) );
 
 				}
 
-				caseBodyString = this.emitBody( caseNode.body );
+				caseBodyString = this.emitBody( switchCase.body );
 
 				switchString += `.Case( ${ caseConditions.join( ', ' ) }, `;
 
 			} else {
 
-				caseBodyString = this.emitBody( caseNode.body );
+				caseBodyString = this.emitBody( switchCase.body );
 
 				switchString += '.Default( ';
 
@@ -577,8 +586,6 @@ ${ this.tab }} )`;
 ${ caseBodyString }
 
 ${ this.tab }} )`;
-
-			caseNode = caseNode.nextCase;
 
 		}
 
@@ -639,38 +646,73 @@ ${ this.tab }} )`;
 
 	}
 
+	emitWhile( node ) {
+
+		const condition = this.emitExpression( node.condition );
+
+		let whileStr = `Loop( ${ condition }, () => {\n\n`;
+
+		whileStr += this.emitBody( node.body ) + '\n\n';
+
+		whileStr += this.tab + '} )';
+
+		this.imports.add( 'Loop' );
+
+		return whileStr;
+
+	}
+
+	isNumericExpression( node ) {
+
+		if ( node.isNumber ) {
+
+			return true;
+
+		} else if ( node.isOperator ) {
+
+			return this.isNumericExpression( node.left ) && this.isNumericExpression( node.right );
+
+		}
+
+		return false;
+
+
+	}
+
 	emitVariables( node, isRoot = true ) {
 
 		const { name, type, value, next } = node;
-
-		this._currentVariable = node;
-
-		const valueStr = value ? this.emitExpression( value ) : '';
 
 		let varStr = isRoot ? 'const ' : '';
 		varStr += name;
 
 		if ( value ) {
 
-			if ( value.isFunctionCall && value.name === type ) {
+			let valueStr = this.emitExpression( value );
 
-				varStr += ' = ' + valueStr;
+			if ( this.isNumericExpression( value ) ) {
+
+				// convert JS primitive to node
+
+				valueStr = `${ type }( ${ valueStr } )`;
+
+			}
+
+			if ( node.linker.assignments.length > 0 ) {
+
+				varStr += ' = ' + valueStr + '.toVar()';
 
 			} else {
 
-				varStr += ` = ${ type }( ${ valueStr } )`;
+				varStr += ' = ' + valueStr;
 
 			}
 
 		} else {
 
-			varStr += ` = ${ type }()`;
+			varStr += ` = property( '${ type }' )`;
 
-		}
-
-		if ( node.immutable === false ) {
-
-			varStr += '.toVar()';
+			this.addImport( 'property' );
 
 		}
 
@@ -681,8 +723,6 @@ ${ this.tab }} )`;
 		}
 
 		this.addImport( type );
-
-		this._currentVariable = null;
 
 		return varStr;
 
@@ -715,8 +755,6 @@ ${ this.tab }} )`;
 
 		const { name, type } = node;
 
-		this._currentProperties = { name: node };
-
 		const params = [];
 		const inputs = [];
 		const mutableParams = [];
@@ -727,7 +765,7 @@ ${ this.tab }} )`;
 
 			let name = param.name;
 
-			if ( param.immutable === false && ( param.qualifier !== 'inout' && param.qualifier !== 'out' ) ) {
+			if ( param.linker.assignments.length > 0 ) {
 
 				name = name + '_immutable';
 
@@ -748,13 +786,15 @@ ${ this.tab }} )`;
 			inputs.push( param.name + ': \'' + param.type + '\'' );
 			params.push( name );
 
-			this._currentProperties[ name ] = param;
-
 		}
 
 		for ( const param of mutableParams ) {
 
-			node.body.unshift( new VariableDeclaration( param.type, param.name, new Accessor( param.name + '_immutable' ) ) );
+			const mutableParam = new VariableDeclaration( param.type, param.name, new Accessor( param.name + '_immutable' ), null, true );
+			mutableParam.parent = param.parent; // link to the original node
+			mutableParam.linker.assignments.push( mutableParam );
+
+			node.body.unshift( mutableParam );
 
 		}
 
@@ -814,21 +854,42 @@ ${ this.tab }}`;
 
 	}
 
-	setLastStatement( statement ) {
+	emitComment( statement, body ) {
 
-		this._lastStatement = statement;
+		const index = body.indexOf( statement );
+		const previous = body[ index - 1 ];
+		const next = body[ index + 1 ];
+
+		let output = '';
+
+		if ( previous && isExpression( previous ) ) {
+
+			output += '\n';
+
+		}
+
+		output += this.tab + statement.comment.replace( /\n/g, '\n' + this.tab ) + '\n';
+
+		if ( next && isExpression( next ) ) {
+
+			output += '\n';
+
+		}
+
+		return output;
 
 	}
 
-	emitExtraLine( statement ) {
+	emitExtraLine( statement, body ) {
 
-		const last = this._lastStatement;
-		if ( last === null ) return '';
+		const index = body.indexOf( statement );
+		const previous = body[ index - 1 ];
+
+		if ( previous === undefined ) return '';
 
 		if ( statement.isReturn ) return '\n';
 
-		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true && st.isSwitch !== true;
-		const lastExp = isExpression( last );
+		const lastExp = isExpression( previous );
 		const currExp = isExpression( statement );
 
 		if ( lastExp !== currExp || ( ! lastExp && ! currExp ) ) return '\n';
@@ -863,7 +924,15 @@ ${ this.tab }}`;
 
 		for ( const statement of ast.body ) {
 
-			code += this.emitExtraLine( statement );
+			code += this.emitExtraLine( statement, ast.body );
+
+			if ( statement.isComment ) {
+
+				code += this.emitComment( statement, ast.body );
+
+				continue;
+
+			}
 
 			if ( statement.isFunctionDeclaration ) {
 
@@ -874,8 +943,6 @@ ${ this.tab }}`;
 				code += this.tab + this.emitExpression( statement ) + ';\n';
 
 			}
-
-			this.setLastStatement( statement );
 
 		}
 
