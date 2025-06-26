@@ -50,6 +50,32 @@ const textureLookupFunctions = [ 'texture', 'texture2D', 'texture3D', 'textureCu
 const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true;
 const isPrimitive = ( value ) => /^(true|false|-?(\d|\.\d))/.test( value );
 
+const isNumericExpression = ( node ) => {
+
+	if ( node.isNumber ) {
+
+		return true;
+
+	} else if ( node.isUnary ) {
+
+		if ( node.expression.isNumber ) {
+
+			return true;
+
+		}
+
+	} else if ( node.isOperator ) {
+
+		return isNumericExpression( node.left ) && isNumericExpression( node.right );
+
+	}
+
+	return false;
+
+
+}
+
+
 class TSLEncoder {
 
 	constructor() {
@@ -158,7 +184,7 @@ class TSLEncoder {
 			const left = this.emitExpression( node.left, output );
 			const right = this.emitExpression( node.right, output );
 
-			if ( isPrimitive( left ) && isPrimitive( right ) ) {
+			if ( isNumericExpression( node ) ) {
 
 				return left + ' ' + node.type + ' ' + right;
 
@@ -646,23 +672,6 @@ ${ this.tab }} )`;
 
 	}
 
-	isNumericExpression( node ) {
-
-		if ( node.isNumber ) {
-
-			return true;
-
-		} else if ( node.isOperator ) {
-
-			return this.isNumericExpression( node.left ) && this.isNumericExpression( node.right );
-
-		}
-
-		return false;
-
-
-	}
-
 	emitVariables( node, isRoot = true ) {
 
 		const { name, type, value, next } = node;
@@ -674,7 +683,7 @@ ${ this.tab }} )`;
 
 			let valueStr = this.emitExpression( value );
 
-			if ( this.isNumericExpression( value ) ) {
+			if ( isNumericExpression( value ) ) {
 
 				// convert JS primitive to node
 
