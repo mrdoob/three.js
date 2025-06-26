@@ -345,7 +345,7 @@ class GLSLDecoder {
 				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) return;
 
 				// important for negate operator after arithmetic operator: a * -1, a * -( b )
-				if ( ( inverse && arithmeticOperators.includes( tokens[ i - 1 ].str ) ) || ( ! inverse && arithmeticOperators.includes( tokens[ i + 1 ].str ) ) ) {
+				if ( inverse && arithmeticOperators.includes( tokens[ i - 1 ].str ) ) {
 
 					return;
 
