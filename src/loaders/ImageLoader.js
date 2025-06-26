@@ -50,7 +50,7 @@ class ImageLoader extends Loader {
 
 		const scope = this;
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `image:${url}` );
 
 		if ( cached !== undefined ) {
 
@@ -116,7 +116,7 @@ class ImageLoader extends Loader {
 
 			if ( onError ) onError( event );
 
-			Cache.remove( url );
+			Cache.remove( `image:${url}` );
 
 			//
 
@@ -153,7 +153,7 @@ class ImageLoader extends Loader {
 
 		}
 
-		Cache.add( url, image );
+		Cache.add( `image:${url}`, image );
 		scope.manager.itemStart( url );
 
 		image.src = url;
