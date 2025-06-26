@@ -129,7 +129,7 @@ class TSLEncoder {
 
 	}
 
-	emitExpression( node, outputType = null ) {
+	emitExpression( node, output = null ) {
 
 		let code;
 
@@ -145,23 +145,7 @@ class TSLEncoder {
 
 		} else if ( node.isNumber ) {
 
-			if ( outputType === null ) {
-
-				outputType = 'float';
-
-			}
-
-			if ( outputType !== node.type === 'int' ) {
-
-				code = node.type + '( ' + node.value + ' )';
-
-				this.addImport( node.type );
-
-			} else {
-
-				code = node.value;
-
-			}
+			code = node.value;
 
 		} else if ( node.isString ) {
 
@@ -171,8 +155,8 @@ class TSLEncoder {
 
 			const opFn = opLib[ node.type ] || node.type;
 
-			const left = this.emitExpression( node.left, outputType );
-			const right = this.emitExpression( node.right, outputType );
+			const left = this.emitExpression( node.left, output );
+			const right = this.emitExpression( node.right, output );
 
 			if ( isPrimitive( left ) && isPrimitive( right ) ) {
 
