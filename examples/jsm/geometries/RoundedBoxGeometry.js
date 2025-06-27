@@ -70,7 +70,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 		// ensure radius isn't bigger than shortest side
 		radius = Math.min( width / 2, height / 2, depth / 2, radius );
 
-		super( 1, 1, 1, segments, segments, segments );
+		super( width, height, depth, segments, segments, segments );
 
 		// if we just have one segment we're the same as a regular box
 		if ( segments === 1 ) return;
