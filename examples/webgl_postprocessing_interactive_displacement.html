@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - interactive displacement map</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - interactive displacement map demo.<br />
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { DepthSavePass } from 'three/addons/postprocessing/DepthSavePass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { pickWorldPosition } from 'three/addons/utils/DepthTextureUtils.js';
+
+			let stats, container;
+			let camera, scene, renderer, controls, sphere, material;
+			let composer, renderPass, depthSavePass, outPass, renderTarget;
+
+			const logarithmicDepthBuffer = [ 'linear', 'logarithmic' ];
+
+			const settings = {
+				animate: false,
+				depthBuffer: logarithmicDepthBuffer[ 0 ],
+			};
+
+			const onMouseMouve = ( e ) => {
+
+				mouse.set( e.clientX, e.clientY );
+
+			};
+
+			function initRenderer() {
+
+				if ( renderer ) {
+
+					renderer.setAnimationLoop();
+					renderer.dispose();
+					renderTarget.dispose();
+					composer.dispose();
+					renderPass.dispose();
+					depthSavePass.dispose();
+					outPass.dispose();
+					renderTarget.dispose();
+					controls.dispose();
+
+					renderer.domElement.removeEventListener( 'mousemove', onMouseMouve, false );
+
+					const canvas = renderer.domElement;
+
+					if ( canvas && canvas.parentNode ) {
+
+						canvas.parentNode.removeChild( canvas );
+
+					}
+
+				}
+
+				const animate = () => {
+
+					controls.update();
+
+					stats.begin();
+
+					if ( settings.animate ) {
+
+						r += 0.01;
+
+						material.displacementScale = 4 + 2 * Math.sin( r );
+
+						const m = 0.1 - Math.cos( r ) * 0.1;
+
+						material.displacementMap.offset.set( m, m );
+						material.normalMap.offset.set( m, m );
+
+					}
+
+
+					render();
+
+					stats.end();
+
+				};
+
+				// console.log('settings.logarithmicDepthBuffer', settings.logarithmicDepthBuffer);
+				renderer = new THREE.WebGLRenderer( {
+					logarithmicDepthBuffer: settings.logarithmicDepthBuffer == logarithmicDepthBuffer[ 1 ] } );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enableDamping = true;
+
+				container.appendChild( renderer.domElement );
+
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.VSMShadowMap;
+				renderer.setAnimationLoop( animate );
+
+				renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType } );
+				renderTarget.depthTexture = new THREE.DepthTexture( window.innerWidth, window.innerHeight );
+
+				composer = new EffectComposer( renderer, renderTarget );
+				composer.setPixelRatio( window.devicePixelRatio );
+
+				renderPass = new RenderPass( scene, camera );
+				depthSavePass = new DepthSavePass();
+				outPass = new OutputPass();
+
+				composer.addPass( renderPass );
+				composer.addPass( depthSavePass );
+				composer.addPass( outPass );
+
+				renderer.domElement.addEventListener( 'mousemove', onMouseMouve, false );
+
+			}
+
+			function initGui() {
+
+				const gui = new GUI();
+
+				gui.add( settings, 'animate' );
+
+				gui.add( settings, 'depthBuffer', logarithmicDepthBuffer ).onChange( ( v ) => {
+
+					settings.logarithmicDepthBuffer = v;
+					initRenderer();
+
+				} );
+
+			}
+
+			init();
+			initGui();
+
+			const mouse = new THREE.Vector2();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.set( - 10, 8, 0 );
+				camera.lookAt( 0, 0, 0 );
+
+				scene = new THREE.Scene();
+
+				scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+				scene.fog = new THREE.Fog( scene.background, 1, 5000 );
+
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
+				hemiLight.color.setHSL( 0.6, 1, 0.6 );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.position.set( 0, 50, 0 );
+				scene.add( hemiLight );
+
+				initRenderer();
+
+				scene.add( camera );
+				// lights
+
+				const light = new THREE.DirectionalLight( 0xffffff, 2 );
+				light.position.set( 0, 15, 20 );
+				light.castShadow = true;
+				light.shadow.mapSize.width = 2048;
+				light.shadow.mapSize.height = 2048;
+				light.shadow.camera.far = 50;
+				light.shadow.radius = 4;
+
+				const d = 15;
+				light.shadow.camera.left = - d;
+				light.shadow.camera.right = d;
+				light.shadow.camera.top = d;
+				light.shadow.camera.bottom = - d;
+				light.shadow.bias = - 0.001;
+				scene.add( light );
+
+				// textures
+
+				const textureLoader = new THREE.TextureLoader();
+				const normalTexture = textureLoader.load( 'textures/noises/voronoi/normal-256x256.png' );
+				const displaceTexture = textureLoader.load( 'textures/noises/voronoi/grayscale-256x256.png' );
+
+				normalTexture.wrapS = THREE.RepeatWrapping;
+				normalTexture.wrapT = THREE.RepeatWrapping;
+
+				displaceTexture.wrapS = THREE.RepeatWrapping;
+				displaceTexture.wrapT = THREE.RepeatWrapping;
+
+				material = new THREE.MeshStandardMaterial( {
+
+					color: 0xffffff,
+					roughness: 0.7,
+					metalness: 0.4,
+					normalMap: normalTexture,
+					normalScale: new THREE.Vector2( 1, - 1 ),
+					displacementMap: displaceTexture,
+					displacementScale: 4,
+
+				} );
+
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 30, 40, 256, 256 ), material );
+				plane.rotateX( - Math.PI * 0.5 );
+				plane.castShadow = true;
+				plane.receiveShadow = true;
+				scene.add( plane );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				const tMat = new THREE.MeshStandardMaterial( { color: 0xffff22, depthWrite: false } );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.3, 32, 32 ), tMat );
+				const ring = new THREE.Mesh( new THREE.TorusGeometry( 1.5, 0.3, 32, 32 ), tMat );
+				ring.scale.z = 0.1;
+				ring.castShadow = true;
+				ring.receiveShadow = true;
+				sphere.castShadow = true;
+				sphere.receiveShadow = true;
+				scene.add( sphere );
+				sphere.add( ring );
+
+				//
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			//
+
+			let r = 0;
+
+
+
+			function render() {
+
+				composer.render();
+
+				pickWorldPosition( mouse, renderer, depthSavePass.renderTarget, camera, sphere.position );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

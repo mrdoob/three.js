@@ -218,6 +218,7 @@
 		"webgl_postprocessing_afterimage",
 		"webgl_postprocessing_backgrounds",
 		"webgl_postprocessing_transition",
+		"webgl_postprocessing_interactive_displacement",
 		"webgl_postprocessing_dof",
 		"webgl_postprocessing_dof2",
 		"webgl_postprocessing_fxaa",
