@@ -102,6 +102,7 @@ async function RapierPhysics() {
 	const _vector = new Vector3();
 	const _quaternion = new Quaternion();
 	const _matrix = new Matrix4();
+	const _matrix2 = new Matrix4();
 
 	function addScene( scene ) {
 
@@ -299,6 +300,8 @@ async function RapierPhysics() {
 
 		//
 
+		let needsUpdate = false;
+
 		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
 			const mesh = meshes[ i ];
@@ -315,7 +318,18 @@ async function RapierPhysics() {
 					const position = body.translation();
 					_quaternion.copy( body.rotation() );
 
-					_matrix.compose( position, _quaternion, _scale ).toArray( array, j * 16 );
+					const offset = j * 16;
+
+					_matrix2.fromArray( array, offset );
+					_matrix.compose( position, _quaternion, _scale );
+
+					if ( _matrix2.equals( _matrix ) === false ) {
+
+						needsUpdate = true;
+
+					}
+
+					_matrix.toArray( array, offset );
 
 				}
 
@@ -326,22 +340,51 @@ async function RapierPhysics() {
 
 				const { body } = meshMap.get( mesh );
 
-				mesh.position.copy( body.translation() );
-				mesh.quaternion.copy( body.rotation() );
+				const position = body.translation();
+				_quaternion.copy( body.rotation() );
+
+				if (mesh.position.equals( position ) === false || mesh.quaternion.equals( _quaternion ) === false) {
+
+					needsUpdate = true;
+
+				}
+
+				mesh.position.copy( position );
+				mesh.quaternion.copy( _quaternion );
 
 			}
 
 		}
 
+		return needsUpdate;
+
 	}
 
 	// animate
 
-	setInterval( step, 1000 / frameRate );
+	// @deprecated, r178
+	console.warn( 'THREE.RapierPhysics: The animate has been deprecated and will be removed in r188. Use physics.update() to replace.' );
+	let interval = setInterval( step, 1000 / frameRate );
+
+	function update() {
+
+		if ( interval ) {
+
+			clearInterval( interval );
+			interval = null
+
+		}
+
+		return step();
+
+	}
 
 	return {
 		RAPIER,
 		world,
+
+		update: update,
+
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
 		 * `physics` object in their {@link Object3D#userData} field will be honored.
