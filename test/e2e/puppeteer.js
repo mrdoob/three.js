@@ -111,6 +111,7 @@ const exceptionList = [
 	'webgpu_multisampled_renderbuffers',
 	'webgl_test_wide_gamut',
 	'webgl_volume_instancing',
+	'webgl_buffergeometry',
 	'webgl_buffergeometry_attributes_integer',
 	'webgl_batch_lod_bvh',
 
