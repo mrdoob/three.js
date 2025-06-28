@@ -220,7 +220,11 @@ class WGSLEncoder {
 
 		} else if ( node.isBreak ) {
 
-			code = 'break';
+			if ( node.parent.isSwitchCase !== true ) {
+
+				code = 'break';
+
+			}
 
 		} else if ( node.isContinue ) {
 
