@@ -554,20 +554,6 @@ const getConstNode = ( value, type ) => {
 
 };
 
-const safeGetNodeType = ( node ) => {
-
-	try {
-
-		return node.getNodeType();
-
-	} catch ( _ ) {
-
-		return undefined;
-
-	}
-
-};
-
 const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
@@ -587,7 +573,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( safeGetNodeType( node ) === type ) return nodeObject( node );
+			if ( node.nodeType === type ) return nodeObject( node );
 			return nodeObject( new ConvertNode( node, type ) );
 
 		}
