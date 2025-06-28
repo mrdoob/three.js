@@ -161,9 +161,9 @@ class WGSLEncoder {
 				if ( this.polyfills.has( modFnName ) === false ) {
 
 					this.polyfills.set( modFnName, `fn ${ modFnName }( x: ${ this.getWgslType( types[ 0 ] ) }, y: ${ this.getWgslType( types[ 1 ] ) } ) -> ${ this.getWgslType( types[ 0 ] ) } {
-				
+
 	return x - y * floor( x / y );
-	
+
 }` );
 
 				}
