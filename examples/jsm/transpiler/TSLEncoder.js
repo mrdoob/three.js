@@ -133,7 +133,7 @@ class TSLEncoder {
 
 		if ( node.isAccessor ) {
 
-			if ( node.linker.reference = null ) {
+			if ( node.linker.reference === null ) {
 
 				this.addImport( node.property );
 
