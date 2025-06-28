@@ -81,6 +81,10 @@ function WebGLAttributes( gl ) {
 
 			type = gl.FLOAT;
 
+		} else if ( typeof Float16Array !== 'undefined' && array instanceof Float16Array ) {
+
+			type = gl.HALF_FLOAT;
+
 		} else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
@@ -16615,6 +16619,9 @@ class WebGLRenderer {
 			//
 
 			const currentRenderTarget = _this.getRenderTarget();
+			const currentActiveCubeFace = _this.getActiveCubeFace();
+			const currentActiveMipmapLevel = _this.getActiveMipmapLevel();
+
 			_this.setRenderTarget( transmissionRenderTarget );
 
 			_this.getClearColor( _currentClearColor );
@@ -16684,7 +16691,7 @@ class WebGLRenderer {
 
 			}
 
-			_this.setRenderTarget( currentRenderTarget );
+			_this.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 
 			_this.setClearColor( _currentClearColor, _currentClearAlpha );
 

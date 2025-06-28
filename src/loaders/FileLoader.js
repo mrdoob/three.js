@@ -74,7 +74,7 @@ class FileLoader extends Loader {
 
 		url = this.manager.resolveURL( url );
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `file:${url}` );
 
 		if ( cached !== undefined ) {
 
@@ -263,7 +263,7 @@ class FileLoader extends Loader {
 
 				// Add to cache only on HTTP success, so that we do not cache
 				// error response bodies as proper responses to requests.
-				Cache.add( url, data );
+				Cache.add( `file:${url}`, data );
 
 				const callbacks = loading[ url ];
 				delete loading[ url ];

@@ -103,7 +103,8 @@
 				const geometry1 = new THREE.IcosahedronGeometry( radius, 1 );
 
 				const count = geometry1.attributes.position.count;
-				geometry1.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
+				const arrayType = ( typeof Float16Array !== 'undefined' ) ? Float16Array : Float32Array;
+				geometry1.setAttribute( 'color', new THREE.BufferAttribute( new arrayType( count * 3 ), 3 ) );
 
 				const geometry2 = geometry1.clone();
 				const geometry3 = geometry1.clone();

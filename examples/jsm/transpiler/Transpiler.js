@@ -1,3 +1,5 @@
+import Linker from './Linker.js';
+
 /**
  * A class that transpiles shader code from one language into another.
  *
@@ -32,6 +34,15 @@ class Transpiler {
 		 */
 		this.encoder = encoder;
 
+		/**
+		 * The linker. It processes the AST and resolves
+		 * variable and function references, ensuring that all
+		 * dependencies are properly linked.
+		 *
+		 * @type {Linker}
+		 */
+		this.linker = new Linker();
+
 	}
 
 	/**
@@ -42,7 +53,12 @@ class Transpiler {
 	 */
 	parse( source ) {
 
-		return this.encoder.emit( this.decoder.parse( source ) );
+		const ast = this.decoder.parse( source );
+
+		// Process the AST to resolve variable and function references and optimizations.
+		this.linker.process( ast );
+
+		return this.encoder.emit( ast );
 
 	}
 

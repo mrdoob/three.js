@@ -55190,7 +55190,7 @@ class NodeSampledTexture3D extends NodeSampledTexture {
 		 * @readonly
 		 * @default true
 		 */
-		this.isSampledTexture3D = true;
+		this.is3DTexture = true;
 
 	}
 
@@ -57380,6 +57380,10 @@ class WebGLAttributeUtils {
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
+
+		} else if ( typeof Float16Array !== 'undefined' && array instanceof Float16Array ) {
+
+			type = gl.HALF_FLOAT;
 
 		} else if ( array instanceof Uint16Array ) {
 
@@ -65453,7 +65457,7 @@ class WebGPUTextureUtils {
 
 		let dimension;
 
-		if ( texture.isData3DTexture ) {
+		if ( texture.is3DTexture || texture.isData3DTexture ) {
 
 			dimension = GPUTextureDimension.ThreeD;
 
@@ -67727,24 +67731,29 @@ ${ flowData.code }
 
 					}
 
-				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					textureType = 'texture_2d_array<f32>';
-
-				} else if ( texture.isVideoTexture === true ) {
-
-					textureType = 'texture_external';
-
-				} else if ( texture.isData3DTexture === true ) {
-
-					textureType = 'texture_3d<f32>';
-
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
-					textureType = `texture_storage_2d<${ format }, ${ access }>`;
+					const is3D = uniform.node.value.is3DTexture;
+					const isArrayTexture = uniform.node.value.isArrayTexture;
+
+					const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
+
+					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
+
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+					textureType = 'texture_2d_array<f32>';
+
+				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
+
+				} else if ( texture.isVideoTexture === true ) {
+
+					textureType = 'texture_external';
 
 				} else {
 
@@ -68441,6 +68450,12 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Float32Array, [ 'float32', ]],
 ] );
 
+if ( typeof Float16Array !== 'undefined' ) {
+
+	typedArraysToVertexFormatPrefix.set( Float16Array, [ 'float16' ] );
+
+}
+
 const typedAttributeToVertexFormatPrefix = new Map( [
 	[ Float16BufferAttribute, [ 'float16', ]],
 ] );
@@ -69000,6 +69015,16 @@ class WebGPUBindingUtils {
 
 				}
 
+				if ( binding.texture.isArrayTexture ) {
+
+					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+				} else if ( binding.texture.is3DTexture ) {
+
+					storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
+
+				}
+
 				bindingGPU.storageTexture = storageTexture;
 
 			} else if ( binding.isSampledTexture ) {
@@ -69068,7 +69093,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
-				} else if ( binding.isSampledTexture3D ) {
+				} else if ( binding.texture.is3DTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.ThreeD;
 
@@ -69290,7 +69315,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-						} else if ( binding.isSampledTexture3D ) {
+						} else if ( binding.texture.is3DTexture ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 

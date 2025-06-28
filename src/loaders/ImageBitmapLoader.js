@@ -102,7 +102,7 @@ class ImageBitmapLoader extends Loader {
 
 		const scope = this;
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `image-bitmap:${url}` );
 
 		if ( cached !== undefined ) {
 
@@ -165,7 +165,7 @@ class ImageBitmapLoader extends Loader {
 
 		} ).then( function ( imageBitmap ) {
 
-			Cache.add( url, imageBitmap );
+			Cache.add( `image-bitmap:${url}`, imageBitmap );
 
 			if ( onLoad ) onLoad( imageBitmap );
 
@@ -179,14 +179,14 @@ class ImageBitmapLoader extends Loader {
 
 			_errorMap.set( promise, e );
 
-			Cache.remove( url );
+			Cache.remove( `image-bitmap:${url}` );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
 
 		} );
 
-		Cache.add( url, promise );
+		Cache.add( `image-bitmap:${url}`, promise );
 		scope.manager.itemStart( url );
 
 	}

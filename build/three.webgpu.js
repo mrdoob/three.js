@@ -55190,7 +55190,7 @@ class NodeSampledTexture3D extends NodeSampledTexture {
 		 * @readonly
 		 * @default true
 		 */
-		this.isSampledTexture3D = true;
+		this.is3DTexture = true;
 
 	}
 
@@ -57380,6 +57380,10 @@ class WebGLAttributeUtils {
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
+
+		} else if ( typeof Float16Array !== 'undefined' && array instanceof Float16Array ) {
+
+			type = gl.HALF_FLOAT;
 
 		} else if ( array instanceof Uint16Array ) {
 
@@ -65453,7 +65457,7 @@ class WebGPUTextureUtils {
 
 		let dimension;
 
-		if ( texture.isData3DTexture ) {
+		if ( texture.is3DTexture || texture.isData3DTexture ) {
 
 			dimension = GPUTextureDimension.ThreeD;
 
@@ -67727,24 +67731,29 @@ ${ flowData.code }
 
 					}
 
-				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					textureType = 'texture_2d_array<f32>';
-
-				} else if ( texture.isVideoTexture === true ) {
-
-					textureType = 'texture_external';
-
-				} else if ( texture.isData3DTexture === true ) {
-
-					textureType = 'texture_3d<f32>';
-
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
-					textureType = `texture_storage_2d<${ format }, ${ access }>`;
+					const is3D = uniform.node.value.is3DTexture;
+					const isArrayTexture = uniform.node.value.isArrayTexture;
+
+					const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
+
+					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
+
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+					textureType = 'texture_2d_array<f32>';
+
+				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
+
+				} else if ( texture.isVideoTexture === true ) {
+
+					textureType = 'texture_external';
 
 				} else {
 
@@ -68441,6 +68450,12 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Float32Array, [ 'float32', ]],
 ] );
 
+if ( typeof Float16Array !== 'undefined' ) {
+
+	typedArraysToVertexFormatPrefix.set( Float16Array, [ 'float16' ] );
+
+}
+
 const typedAttributeToVertexFormatPrefix = new Map( [
 	[ Float16BufferAttribute, [ 'float16', ]],
 ] );
@@ -69000,6 +69015,16 @@ class WebGPUBindingUtils {
 
 				}
 
+				if ( binding.texture.isArrayTexture ) {
+
+					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+				} else if ( binding.texture.is3DTexture ) {
+
+					storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
+
+				}
+
 				bindingGPU.storageTexture = storageTexture;
 
 			} else if ( binding.isSampledTexture ) {
@@ -69068,7 +69093,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
-				} else if ( binding.isSampledTexture3D ) {
+				} else if ( binding.texture.is3DTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.ThreeD;
 
@@ -69290,7 +69315,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-						} else if ( binding.isSampledTexture3D ) {
+						} else if ( binding.texture.is3DTexture ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
@@ -73330,6 +73355,140 @@ class StorageTexture extends Texture {
 }
 
 /**
+ * This special type of texture is intended for compute shaders.
+ * It can be used to compute the data of a texture with a compute shader.
+ *
+ * Note: This type of texture can only be used with `WebGPURenderer`
+ * and a WebGPU backend.
+ *
+ * @augments Texture
+ */
+class Storage3DTexture extends Texture {
+
+	/**
+	 * Constructs a new storage texture.
+	 *
+	 * @param {number} [width=1] - The storage texture's width.
+	 * @param {number} [height=1] - The storage texture's height.
+	 * @param {number} [depth=1] - The storage texture's depth.
+	 */
+	constructor( width = 1, height = 1, depth = 1 ) {
+
+		super();
+
+		//inherited from texture. Must be false for 3DTexture
+		this.isArrayTexture = false;
+
+		/**
+		 * The image object which just represents the texture's dimension.
+		 *
+		 * @type {{width: number, height: number, depth: number}}
+		 */
+		this.image = { width, height, depth };
+
+		/**
+		 * The default `magFilter` for storage textures is `THREE.LinearFilter`.
+		 *
+		 * @type {number}
+		 */
+		this.magFilter = LinearFilter;
+
+		/**
+		 * The default `minFilter` for storage textures is `THREE.LinearFilter`.
+		 *
+		 * @type {number}
+		 */
+		this.minFilter = LinearFilter;
+
+		/**
+		 * This defines how the texture is wrapped in the depth direction and corresponds to
+		 * *W* in UVW mapping.
+		 *
+		 * @type {number}
+		 */
+		this.wrapR = ClampToEdgeWrapping;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isStorageTexture = true;
+
+		/**
+		 * Indicates whether this texture is a 3D texture.
+		 *
+		 * @type {boolean}
+		 *
+		 */
+		this.is3DTexture = true;
+
+	}
+
+}
+
+/**
+ * This special type of texture is intended for compute shaders.
+ * It can be used to compute the data of a texture with a compute shader.
+ *
+ * Note: This type of texture can only be used with `WebGPURenderer`
+ * and a WebGPU backend.
+ *
+ * @augments Texture
+ */
+class StorageArrayTexture extends Texture {
+
+	/**
+	 * Constructs a new storage texture.
+	 *
+	 * @param {number} [width=1] - The storage texture's width.
+	 * @param {number} [height=1] - The storage texture's height.
+	 * @param {number} [depth=1] - The storage texture's depth.
+	 */
+	constructor( width = 1, height = 1, depth = 1 ) {
+
+		super();
+
+		//inherited from texture
+		this.isArrayTexture = true;
+
+		/**
+		 * The image object which just represents the texture's dimension.
+		 *
+		 * @type {{width: number, height: number, depth: number}}
+		 */
+		this.image = { width, height, depth };
+
+		/**
+		 * The default `magFilter` for storage textures is `THREE.LinearFilter`.
+		 *
+		 * @type {number}
+		 */
+		this.magFilter = LinearFilter;
+
+		/**
+		 * The default `minFilter` for storage textures is `THREE.LinearFilter`.
+		 *
+		 * @type {number}
+		 */
+		this.minFilter = LinearFilter;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isStorageTexture = true;
+
+	}
+
+}
+
+/**
  * This special type of buffer attribute is intended for compute shaders.
  * It can be used to encode draw parameters for indirect draw calls.
  *
@@ -73866,4 +74025,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };

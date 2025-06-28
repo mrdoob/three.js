@@ -12,6 +12,12 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Float32Array, [ 'float32', ]],
 ] );
 
+if ( typeof Float16Array !== 'undefined' ) {
+
+	typedArraysToVertexFormatPrefix.set( Float16Array, [ 'float16' ] );
+
+}
+
 const typedAttributeToVertexFormatPrefix = new Map( [
 	[ Float16BufferAttribute, [ 'float16', ]],
 ] );
