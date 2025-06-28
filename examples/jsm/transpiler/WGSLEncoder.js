@@ -432,11 +432,11 @@ class WGSLEncoder {
 
 				const elseCondStr = this.emitExpression( current.cond );
 
-				ifStr += ` else if (${elseCondStr}) {\n${elseBodyStr}\n${this.tab}}`;
+				ifStr += ` else if ( ${ elseCondStr } ) {\n\n${ elseBodyStr }\n\n${ this.tab }}`;
 
 			} else { // This is an 'else'
 
-				ifStr += ` else {\n${elseBodyStr}\n${this.tab}}`;
+				ifStr += ` else {\n\n${ elseBodyStr }\n\n${ this.tab }}`;
 
 			}
 
@@ -462,7 +462,7 @@ class WGSLEncoder {
 		const cond = this.emitExpression( node.condition );
 		const body = this.emitBody( node.body );
 
-		return `while (${cond}) {\n${body}\n${this.tab}}`;
+		return `while ( ${ cond } ) {\n\n${ body }\n\n${ this.tab }}`;
 
 	}
 
@@ -470,7 +470,7 @@ class WGSLEncoder {
 
 		const discriminant = this.emitExpression( node.discriminant );
 
-		let switchStr = `switch ${discriminant} {\n`;
+		let switchStr = `switch ( ${ discriminant } ) {\n\n`;
 
 		this.tab += '\t';
 
@@ -480,12 +480,13 @@ class WGSLEncoder {
 
 			if ( switchCase.isDefault ) {
 
-				switchStr += `${this.tab}default: {\n${body}\n${this.tab}}\n`;
+				switchStr += `${ this.tab }default: {\n\n${ body }\n\n${ this.tab }}\n\n`;
 
 			} else {
 
 				const cases = switchCase.conditions.map( c => this.emitExpression( c ) ).join( ', ' );
-				switchStr += `${this.tab}case ${cases}: {\n${body}\n${this.tab}}\n`;
+
+				switchStr += `${ this.tab }case ${ cases }: {\n\n${ body }\n\n${ this.tab }}\n\n`;
 
 			}
 
