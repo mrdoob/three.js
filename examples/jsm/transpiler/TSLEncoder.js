@@ -2,6 +2,7 @@ import { REVISION } from 'three/webgpu';
 import * as TSL from 'three/tsl';
 
 import { VariableDeclaration, Accessor } from './AST.js';
+import { isExpression, isPrimitive } from './TranspilerUtils.js';
 
 const opLib = {
 	'=': 'assign',
@@ -46,35 +47,6 @@ const unaryLib = {
 };
 
 const textureLookupFunctions = [ 'texture', 'texture2D', 'texture3D', 'textureCube', 'textureLod', 'texelFetch', 'textureGrad' ];
-
-const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true;
-const isPrimitive = ( value ) => /^(true|false|-?(\d|\.\d))/.test( value );
-
-const isNumericExpression = ( node ) => {
-
-	if ( node.isNumber ) {
-
-		return true;
-
-	} else if ( node.isUnary ) {
-
-		if ( node.expression.isNumber ) {
-
-			return true;
-
-		}
-
-	} else if ( node.isOperator ) {
-
-		return isNumericExpression( node.left ) && isNumericExpression( node.right );
-
-	}
-
-	return false;
-
-
-}
-
 
 class TSLEncoder {
 
@@ -161,7 +133,7 @@ class TSLEncoder {
 
 		if ( node.isAccessor ) {
 
-			if ( node.linker.accesses.length === 0 ) {
+			if ( node.linker.reference = null ) {
 
 				this.addImport( node.property );
 
@@ -184,7 +156,7 @@ class TSLEncoder {
 			const left = this.emitExpression( node.left, output );
 			const right = this.emitExpression( node.right, output );
 
-			if ( isNumericExpression( node ) ) {
+			if ( node.isNumericExpression ) {
 
 				return left + ' ' + node.type + ' ' + right;
 
@@ -366,7 +338,7 @@ class TSLEncoder {
 
 			let type = unaryLib[ node.type ];
 
-			if ( node.hasAssignment() ) {
+			if ( node.hasAssignment ) {
 
 				if ( node.after === false ) {
 
@@ -683,7 +655,7 @@ ${ this.tab }} )`;
 
 			let valueStr = this.emitExpression( value );
 
-			if ( isNumericExpression( value ) ) {
+			if ( value.isNumericExpression ) {
 
 				// convert JS primitive to node
 
@@ -740,7 +712,7 @@ ${ this.tab }} )`;
 
 		const prefix = this.iife === false ? 'export ' : '';
 
-		return `${ prefix }const ${ name } = /*#__PURE__*/ overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
+		return `${ prefix }const ${ name } = /*@__PURE__*/ overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
 
 	}
 
@@ -819,7 +791,7 @@ ${ this.tab }} )`;
 
 		const prefix = this.iife === false ? 'export ' : '';
 
-		let funcStr = `${ prefix }const ${ fnName } = /*#__PURE__*/ Fn( (${ paramsStr }) => {
+		let funcStr = `${ prefix }const ${ fnName } = /*@__PURE__*/ Fn( (${ paramsStr }) => {
 
 ${ bodyStr }
 

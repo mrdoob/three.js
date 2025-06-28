@@ -1,3 +1,5 @@
+import { toFloatType } from './TranspilerUtils.js';
+
 export class ASTNode {
 
 	constructor() {
@@ -5,6 +7,7 @@ export class ASTNode {
 		this.isASTNode = true;
 
 		this.linker = {
+			reference: null,
 			accesses: [],
 			assignments: []
 		};
@@ -13,7 +16,13 @@ export class ASTNode {
 
 	}
 
-	hasAssignment() {
+	get isNumericExpression() {
+
+		return false;
+
+	}
+
+	get hasAssignment() {
 
 		if ( this.isAssignment === true ) {
 
@@ -27,7 +36,13 @@ export class ASTNode {
 
 		}
 
-		return this.parent.hasAssignment();
+		return this.parent.hasAssignment;
+
+	}
+
+	getType() {
+
+		return this.type || null;
 
 	}
 
@@ -263,6 +278,37 @@ export class Operator extends ASTNode {
 
 	}
 
+	get isNumericExpression() {
+
+		if ( this.left.isNumericExpression && this.right.isNumericExpression ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	getType() {
+
+		const leftType = this.left.getType();
+		const rightType = this.right.getType();
+
+		if ( leftType === rightType ) {
+
+			return leftType;
+
+		} else if ( toFloatType( leftType ) === toFloatType( rightType ) ) {
+
+			return toFloatType( leftType );
+
+		}
+
+		return null;
+
+	}
+
 }
 
 
@@ -288,6 +334,18 @@ export class Unary extends ASTNode {
 
 	}
 
+	get isNumericExpression() {
+
+		if ( this.expression.isNumber ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
 }
 
 export class Number extends ASTNode {
@@ -302,6 +360,12 @@ export class Number extends ASTNode {
 		this.isNumber = true;
 
 		this.initialize();
+
+	}
+
+	get isNumericExpression() {
+
+		return true;
 
 	}
 
@@ -428,6 +492,18 @@ export class Accessor extends ASTNode {
 		this.isAccessor = true;
 
 		this.initialize();
+
+	}
+
+	getType() {
+
+		if ( this.linker.reference ) {
+
+			return this.linker.reference.getType();
+
+		}
+
+		return super.getType();
 
 	}
 

@@ -103,7 +103,9 @@ class Linker {
 
 			if ( property ) {
 
-				node.linker.accesses.push( property );
+				node.linker.reference = property;
+
+				property.linker.accesses.push( node );
 
 			}
 
@@ -194,7 +196,7 @@ class Linker {
 
 			if ( node.isAssignment ) {
 
-				if ( node.parent.hasAssignment() !== true ) {
+				if ( node.parent.hasAssignment !== true ) {
 
 					// optimize increment/decrement operator
 					// to avoid creating a new variable
