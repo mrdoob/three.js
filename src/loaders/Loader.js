@@ -67,6 +67,7 @@ class Loader {
 	 * This method needs to be implemented by all concrete loaders. It holds the
 	 * logic for loading assets from the backend.
 	 *
+	 * @abstract
 	 * @param {string} url - The path/URL of the file to be loaded.
 	 * @param {Function} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
@@ -97,6 +98,7 @@ class Loader {
 	 * This method needs to be implemented by all concrete loaders. It holds the
 	 * logic for parsing the asset into three.js entities.
 	 *
+	 * @abstract
 	 * @param {any} data - The data to parse.
 	 */
 	parse( /* data */ ) {}
@@ -167,6 +169,18 @@ class Loader {
 	setRequestHeader( requestHeader ) {
 
 		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+	/**
+	 * This method can be implemented in loaders for aborting ongoing requests.
+	 *
+	 * @abstract
+	 * @return {Loader} A reference to this instance.
+	 */
+	abort() {
+
 		return this;
 
 	}
