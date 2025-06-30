@@ -28,9 +28,8 @@
 			import * as THREE from 'three';
 			import { Fn, vec2, vec4, texture, uv, textureBicubic, rangeFogFactor, reflector, time } from 'three/tsl';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -43,23 +42,21 @@
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 30 );
-				camera.position.set( - 4, 2, 4 );
-				camera.lookAt( 0, .4, 0 );
+				camera.position.set( - 4, 1, 4 );
 
 				scene = new THREE.Scene();
 
-				//
+				const loader = new UltraHDRLoader();
+				loader.setDataType( THREE.HalfFloatType );
+				loader.load( `textures/equirectangular/spruit_sunrise_2k.hdr.jpg`, function ( texture ) {
 
-				new RGBELoader()
-					.setPath( 'textures/equirectangular/' )
-					.load( 'moonless_golf_1k.hdr', function ( texture ) {
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					texture.needsUpdate = true;
 
-						texture.mapping = THREE.EquirectangularReflectionMapping;
+					scene.background = texture;
+					scene.environment = texture;
 
-						scene.background = texture;
-						scene.environment = texture;
-
-					} );
+				} );
 
 				// textures
 
@@ -73,18 +70,20 @@
 				perlinMap.wrapT = THREE.RepeatWrapping;
 				perlinMap.colorSpace = THREE.SRGBColorSpace;
 
-				// uv map for debugging
-
-				const uvMaterial = new THREE.MeshStandardNodeMaterial( {
-					map: uvMap,
-					emissiveMap: uvMap,
-					emissive: 0xffffff,
-					side: THREE.DoubleSide
-				} );
-
-				const uvMesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), uvMaterial );
-				uvMesh.position.set( 0, 1, 0 );
-				scene.add( uvMesh );
+				// uv box for debugging
+				
+				const mesh = new THREE.Mesh(
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.MeshStandardNodeMaterial( {
+						map: uvMap,
+						roughnessMap: uvMap,
+						emissiveMap: uvMap,
+						emissive: 0xffffff
+					} )
+				);
+				mesh.position.set( 0, 1.25, 0 );
+				mesh.scale.setScalar( 2 );
+				scene.add( mesh );
 
 				// reflection
 
@@ -117,12 +116,12 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
-				renderer.toneMappingExposure = 2;
+				renderer.toneMappingExposure = 1.5;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -134,7 +133,7 @@
 				controls.maxPolarAngle = Math.PI / 2;
 				controls.autoRotate = true;
 				controls.autoRotateSpeed = - .1;
-				controls.target.set( 0, .5, 0 );
+				controls.target.set( 0, .75, 0 );
 				controls.update();
 
 				// events
@@ -152,7 +151,7 @@
 
 			}
 
-			function animate() {
+			function animate( time ) {
 
 				stats.update();
 
