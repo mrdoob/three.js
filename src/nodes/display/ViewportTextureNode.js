@@ -70,7 +70,7 @@ class ViewportTextureNode extends TextureNode {
 		 * @default null
 		 */
 		this.defaultFramebuffer = defaultFramebuffer;
-		
+
 		/**
 		 * This flag can be used for type testing.
 		 *
