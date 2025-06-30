@@ -458,6 +458,30 @@ iframe#viewer {
 	transform: scale(1.08);
 }
 
+#sortControls {
+	display: inline-block;
+	margin-left: 10px;
+	color: #888;
+	margin-right: 10px;
+}
+#sortControls button {
+	background: none;
+	border: 1px solid #ccc;
+	color: #888;
+	cursor: pointer;
+	margin-left: 5px;
+	border-radius: 3px;
+	padding: 2px 6px;
+}
+#sortControls button:hover {
+	background-color: #f0f0f0;
+	border-color: #999;
+}
+.card .date-info {
+	color: #808080;
+	margin-top: 4px;
+	font-style: italic;
+}
 
 
 @media all and ( min-width: 1500px ) {

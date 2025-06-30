@@ -70,7 +70,8 @@
     "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 src/nodes/Nodes.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make"
+    "make-screenshot": "node test/e2e/puppeteer.js --make",
+    "generate-timestamps": "node utils/generate-timestamps.js"
   },
   "keywords": [
     "three",
@@ -106,6 +107,8 @@
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
+    "git-date-extractor": "^4.0.1",
+    "glob": "^11.0.3",
     "jimp": "^1.6.0",
     "jsdoc": "^4.0.4",
     "magic-string": "^0.30.0",
