@@ -64,16 +64,35 @@ class RoundedBoxGeometry extends BoxGeometry {
 	 */
 	constructor( width = 1, height = 1, depth = 1, segments = 2, radius = 0.1 ) {
 
-		// ensure segments is odd so we have a plane connecting the rounded corners
-		segments = segments * 2 + 1;
+		// calculate total segments needed &
+		// ensure it's odd so that we have a plane connecting the rounded corners
+		const totalSegments = segments * 2 + 1;
 
 		// ensure radius isn't bigger than shortest side
 		radius = Math.min( width / 2, height / 2, depth / 2, radius );
 
-		super( width, height, depth, segments, segments, segments );
+		super( width, height, depth, totalSegments, totalSegments, totalSegments );
 
-		// if we just have one segment we're the same as a regular box
-		if ( segments === 1 ) return;
+
+		this.type = 'RoundedBoxGeometry';
+
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
+		this.parameters = {
+			width: width,
+			height: height,
+			depth: depth,
+			segments: segments,
+			radius: radius,
+		};
+
+		// if totalSegments is 1, no rounding is needed - return regular box
+		if ( totalSegments === 1 ) return;
 
 		const geometry2 = this.toNonIndexed();
 
@@ -95,7 +114,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 
 		const faceTris = positions.length / 6;
 		const faceDirVector = new Vector3();
-		const halfSegmentSize = 0.5 / segments;
+		const halfSegmentSize = 0.5 / totalSegments;
 
 		for ( let i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
@@ -171,6 +190,25 @@ class RoundedBoxGeometry extends BoxGeometry {
 		}
 
 	}
+
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @returns {RoundedBoxGeometry} A new instance.
+	 */
+	static fromJSON( data ) {
+
+		return new RoundedBoxGeometry(
+			data.width,
+			data.height,
+			data.depth,
+			data.segments,
+			data.radius
+		);
+
+	}
+
 
 }
 
