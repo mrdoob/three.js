@@ -70,6 +70,13 @@ class LoadingManager {
 		this.onError = onError;
 
 		/**
+		 * Used for aborting ongoing requests in loaders using this manager.
+		 *
+		 * @type {AbortController}
+		 */
+		this.abortController = new AbortController();
+
+		/**
 		 * This should be called by any loader using the manager when the loader
 		 * starts loading an item.
 		 *
@@ -266,6 +273,22 @@ class LoadingManager {
 			}
 
 			return null;
+
+		};
+
+		/**
+		 * Can be used to abort ongoing loading requests in loaders using this manager.
+		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * is supported in the browser.
+		 *
+		 * @return {LoadingManager} A reference to this loading manager.
+		 */
+		this.abort = function () {
+
+			this.abortController.abort();
+			this.abortController = new AbortController();
+
+			return this;
 
 		};
 
