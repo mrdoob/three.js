@@ -1,6 +1,10 @@
-import { DataTexture, FloatType, Mesh, Object3D, PlaneGeometry, Raycaster, RGBAFormat, ShaderMaterial, Vector2, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { DataTexture, FloatType, Mesh, PlaneGeometry, Raycaster, RGBAFormat, ShaderMaterial, Vector2, Vector3, WebGLRenderTarget } from 'three';
 import { FullScreenQuad } from "../Addons.js";
 import { AdvectVelocityShader, ClearShader, CurlShader, DivergenceShader, GradientSubtractShader, PressureShader, SplatShader, VorticityShader } from '../shaders/FluidSimulationShaders.js';
+
+/** @typedef {import('three').Object3D} Object3D */
+/** @typedef {import('three').WebGLRenderer} WebGLRenderer */ 
+
 
 function mix(...configs) {
   return configs.reduce((acc, curr) => ({
@@ -193,7 +197,7 @@ export class FluidSimulator extends Mesh {
 
     /**
      * 
-     * @param {Object3D} obj 
+     * @param {Object3D} object 
      */
     track( object )
     {

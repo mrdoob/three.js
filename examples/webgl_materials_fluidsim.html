@@ -34,7 +34,7 @@
 
 			let container, stats;
 
-			let camera, scene, renderer, effect;  
+			let camera, scene, renderer;  
 			let time = 0;
 			const clock = new THREE.Clock();
 
@@ -43,7 +43,7 @@
 
 			camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.01, 10 );
 			camera.position.set( 1, 1, 1 );
-			camera.lookAt(0,0,0)
+			camera.lookAt(0,0,0);
 
 			//
 
@@ -72,15 +72,11 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			const controls = new OrbitControls( camera, renderer.domElement ); 
+			new OrbitControls( camera, renderer.domElement ); 
 
 			window.addEventListener( 'resize', onWindowResize );
 
 			//---------------------------------------- DEMO SCENE SETUP ------------------------------------------------
-
-			const size = 1024  ;
-			const sizey = size/2;
-			const objectCount = 1; 
 
 			const fluid = new FluidSimulator( renderer, 1024, 512 );
 			scene.add( fluid );
