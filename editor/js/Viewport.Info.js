@@ -60,8 +60,14 @@ function ViewportInfo( editor ) {
 				if ( object.isMesh || object.isPoints ) {
 
 					const geometry = object.geometry;
+					const positionAttr = geometry.attributes.position;
 
-					vertices += geometry.attributes.position.count;
+					// Safely accumulate vertices only if a position attribute exists
+					if ( positionAttr !== undefined ) {
+
+						vertices += positionAttr.count;
+
+					}
 
 					if ( object.isMesh ) {
 
@@ -69,9 +75,9 @@ function ViewportInfo( editor ) {
 
 							triangles += geometry.index.count / 3;
 
-						} else {
+						} else if ( positionAttr !== undefined ) {
 
-							triangles += geometry.attributes.position.count / 3;
+							triangles += positionAttr.count / 3;
 
 						}
 
