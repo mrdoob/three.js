@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Fluid Simulation</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; 
+			import { FluidSimulator } from 'three/addons/objects/FluidSimulator.js';
+			import GUI from "three/addons/libs/lil-gui.module.min.js";
+			
+			const panel = new GUI({ width: 310 });
+
+			let container, stats;
+
+			let camera, scene, renderer, effect;  
+			let time = 0;
+			const clock = new THREE.Clock();
+
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.01, 10 );
+			camera.position.set( 1, 1, 1 );
+			camera.lookAt(0,0,0)
+
+			//
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x444488 );
+			//scene.add( new THREE.AxesHelper())
+			scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+
+			const color = 0xffffff;
+			const intensity = 3;
+			const light = new THREE.DirectionalLight(color, intensity);
+			light.position.set(4, 1, 0);
+			light.castShadow = true;
+			scene.add(light);
+
+			//
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
+			container.appendChild( renderer.domElement );
+
+			// Materials
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			const controls = new OrbitControls( camera, renderer.domElement ); 
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			//---------------------------------------- DEMO SCENE SETUP ------------------------------------------------
+
+			const size = 1024  ;
+			const sizey = size/2;
+			const objectCount = 1; 
+
+			const fluid = new FluidSimulator( renderer, 1024, 512 );
+			scene.add( fluid );
+
+			const myFluidMaterial = new THREE.MeshPhysicalMaterial({
+				roughness:0.2,
+				color: new THREE.Color(0xfefefe),
+				metalness: 0.1,
+				displacementScale:0.01 
+			});
+
+			fluid.fixMaterial(myFluidMaterial);
+
+			fluid.material = myFluidMaterial;
+
+			const ball = new THREE.Mesh( new THREE.SphereGeometry(.01,10,10), new THREE.MeshBasicMaterial({ color:0xff0000 }));
+			scene.add( ball );
+			ball.position.y = .02;
+
+			fluid.track( ball );
+
+			//------------------- DEBUG PANEL 
+			panel.add( fluid, "splatForce", -1000, 1000 );
+			panel.add( fluid, "splatThickness", 0.001, 0.2 );
+			panel.add( fluid, "vorticityInfluence", 0.1, 1 );
+			panel.add( fluid, "swirlIntensity", 1, 100 );
+			panel.add( fluid, "pressure", 0, 1 );
+			panel.add( fluid, "velocityDissipation", 0, 1 );
+			panel.add( fluid, "densityDissipation", 0, 1 );
+			panel.add( myFluidMaterial, "displacementScale", -.1, .1 );
+			panel.add( fluid, "pressureIterations", 1, 100, 1 );
+ 
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+			
+
+			function animate() {
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+				
+				const delta = clock.getDelta();
+
+				time += delta; 
+
+				ball.position.x = Math.cos(time)*.1;
+				ball.position.z = Math.sin(time)*.1;
+
+				fluid.update( delta );
+
+				myFluidMaterial.displacementMap = fluid.elevationTexture;
+
+ 				renderer.render( scene, camera );
+			}
+
+		</script>
+
+	</body>
+</html>
