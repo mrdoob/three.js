@@ -8,7 +8,6 @@ const _scale = new Vector3( 1, 1, 1 );
 const ZERO = new Vector3();
 
 let RAPIER = null;
-let intervalId = null;
 
 function getShape( geometry ) {
 
@@ -103,6 +102,8 @@ async function RapierPhysics() {
 	const _vector = new Vector3();
 	const _quaternion = new Quaternion();
 	const _matrix = new Matrix4();
+
+	let intervalId = null;
 
 	function addScene( scene ) {
 
