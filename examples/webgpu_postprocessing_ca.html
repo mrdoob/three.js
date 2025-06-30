@@ -29,6 +29,8 @@
 			import * as THREE from 'three';
 			import { pass, renderOutput, uniform } from 'three/tsl';
 
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -44,36 +46,36 @@
 			};
 
 			let camera, scene, renderer, clock, mainGroup;
-			let postProcessing;
+			let controls, postProcessing;
 
 			init();
 
 			async function init() {
 
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( 0, 15, params.cameraDistance );
-				camera.lookAt( 0, 0, 0 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.1;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = -0.1;
+				controls.target.set( 0, 0.5, 0 );
+				controls.update();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x0a0a0a );
 
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
 				clock = new THREE.Clock();
-
-				// Lighting
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.3 );
-				scene.add( ambientLight );
-
-				const dirLight1 = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				dirLight1.position.set( 10, 20, 10 );
-				scene.add( dirLight1 );
-
-				const dirLight2 = new THREE.DirectionalLight( 0x4080ff, 0.5 );
-				dirLight2.position.set( -10, 20, -10 );
-				scene.add( dirLight2 );
-
-				const pointLight = new THREE.PointLight( 0xff4080, 1, 50 );
-				pointLight.position.set( 0, 10, 0 );
-				scene.add( pointLight );
 
 				// Create main group
 				mainGroup = new THREE.Group();
@@ -86,12 +88,6 @@
 				const gridHelper = new THREE.GridHelper( 40, 20, 0x444444, 0x222222 );
 				gridHelper.position.y = -10;
 				scene.add( gridHelper );
-
-				renderer = new THREE.WebGPURenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
 
 				// post processing
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -135,10 +131,9 @@
 
 				const animationFolder = gui.addFolder( 'Animation' );
 				animationFolder.add( params, 'animated' );
-				animationFolder.add( params, 'autoRotate' );
-				animationFolder.add( params, 'cameraDistance', 20, 60 ).onChange( ( value ) => {
+				animationFolder.add( params, 'autoRotate' ).onChange( ( value ) => {
 
-				    camera.position.z = value;
+					controls.autoRotate = value;
 
 				} );
 
@@ -295,6 +290,8 @@
 
 				const time = clock.getElapsedTime();
 
+				controls.update();
+
 				if ( params.animated ) {
 
 					// Animate individual shapes
@@ -325,15 +322,6 @@
 						}
 
 					} );
-
-				}
-
-				if ( params.autoRotate ) {
-
-					const radius = params.cameraDistance;
-					camera.position.x = Math.sin( time * 0.1 ) * radius;
-					camera.position.z = Math.cos( time * 0.1 ) * radius;
-					camera.lookAt( 0, 0, 0 );
 
 				}
 
