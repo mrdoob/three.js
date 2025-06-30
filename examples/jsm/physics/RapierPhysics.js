@@ -1,6 +1,6 @@
 import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
 
-const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0';
+const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.17.3';
 
 const frameRate = 60;
 
@@ -132,18 +132,40 @@ async function RapierPhysics() {
 		shape.setMass( mass );
 		shape.setRestitution( restitution );
 
-		const body = mesh.isInstancedMesh
+		const { body, collider } = mesh.isInstancedMesh
 			? createInstancedBody( mesh, mass, shape )
 			: createBody( mesh.position, mesh.quaternion, mass, shape );
 
 		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
 
 		mesh.userData.physics.body = body;
+		mesh.userData.physics.collider = collider;
 
 		if ( mass > 0 ) {
 
 			meshes.push( mesh );
-			meshMap.set( mesh, body );
+			meshMap.set( mesh, { body, collider } );
+
+		}
+
+	}
+
+	function removeMesh( mesh ) {
+
+		const index = meshes.indexOf( mesh );
+
+		if ( index !== - 1 ) {
+
+			meshes.splice( index, 1 );
+			meshMap.delete( mesh );
+
+			if ( ! mesh.userData.physics ) return;
+
+			const body = mesh.userData.physics.body;
+			const collider = mesh.userData.physics.collider;
+
+			if ( body ) removeBody( body );
+			if ( collider ) removeCollider( collider );
 
 		}
 
@@ -154,15 +176,18 @@ async function RapierPhysics() {
 		const array = mesh.instanceMatrix.array;
 
 		const bodies = [];
+		const colliders = [];
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
 			const position = _vector.fromArray( array, i * 16 + 12 );
-			bodies.push( createBody( position, null, mass, shape ) );
+			const { body, collider } = createBody( position, null, mass, shape );
+			bodies.push( body );
+			colliders.push( collider );
 
 		}
 
-		return bodies;
+		return { body: bodies, collider: colliders };
 
 	}
 
@@ -173,15 +198,51 @@ async function RapierPhysics() {
 		if ( quaternion !== null ) desc.setRotation( quaternion );
 
 		const body = world.createRigidBody( desc );
-		world.createCollider( shape, body );
+		const collider = world.createCollider( shape, body );
 
-		return body;
+		return { body, collider };
+
+	}
+
+	function removeBody( body ) {
+
+		if ( Array.isArray( body ) ) {
+
+			for ( let i = 0; i < body.length; i ++ ) {
+
+				world.removeRigidBody( body[ i ] );
+
+			}
+
+		} else {
+
+			world.removeRigidBody( body );
+
+		}
+
+	}
+
+	function removeCollider( collider ) {
+
+		if ( Array.isArray( collider ) ) {
+
+			for ( let i = 0; i < collider.length; i ++ ) {
+
+				world.removeCollider( collider[ i ] );
+
+			}
+
+		} else {
+
+			world.removeCollider( collider );
+
+		}
 
 	}
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
-		let body = meshMap.get( mesh );
+		let { body } = meshMap.get( mesh );
 
 		if ( mesh.isInstancedMesh ) {
 
@@ -197,7 +258,7 @@ async function RapierPhysics() {
 
 	function setMeshVelocity( mesh, velocity, index = 0 ) {
 
-		let body = meshMap.get( mesh );
+		let { body } = meshMap.get( mesh );
 
 		if ( mesh.isInstancedMesh ) {
 
@@ -245,7 +306,7 @@ async function RapierPhysics() {
 			if ( mesh.isInstancedMesh ) {
 
 				const array = mesh.instanceMatrix.array;
-				const bodies = meshMap.get( mesh );
+				const { body: bodies } = meshMap.get( mesh );
 
 				for ( let j = 0; j < bodies.length; j ++ ) {
 
@@ -263,7 +324,7 @@ async function RapierPhysics() {
 
 			} else {
 
-				const body = meshMap.get( mesh );
+				const { body } = meshMap.get( mesh );
 
 				mesh.position.copy( body.translation() );
 				mesh.quaternion.copy( body.rotation() );
@@ -305,6 +366,15 @@ async function RapierPhysics() {
 		 * @param {number} [restitution=0] The restitution/friction of the mesh.
 		 */
 		addMesh: addMesh,
+
+		/**
+		 * Removes the given mesh from this physics simulation.
+		 *
+		 * @method
+		 * @name RapierPhysics#removeMesh
+		 * @param {Mesh} mesh The mesh to remove.
+		 */
+		removeMesh: removeMesh,
 
 		/**
 		 * Set the position of the given mesh which is part of the physics simulation. Calling this

@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Comment utiliser le post-traitement</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Comment utiliser le post-traitement">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Comment utiliser le post-traitement</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <p>
+            De nombreuses applications three.js rendent leurs objets 3D directement à l'écran. Parfois, cependant, vous souhaitez appliquer un ou plusieurs effets graphiques
+            tels que la profondeur de champ, le Bloom, le grain de film ou divers types d'anti-aliasing. Le post-traitement est une approche largement utilisée
+            pour implémenter de tels effets. D'abord, la scène est rendue sur une cible de rendu qui représente un tampon dans la mémoire de la carte graphique.
+            À l'étape suivante, une ou plusieurs passes de post-traitement appliquent des filtres et des effets au tampon d'image avant qu'il ne soit finalement rendu à
+            l'écran.
+          </p>
+          <p>
+            three.js fournit une solution complète de post-traitement via `EffectComposer` pour implémenter un tel flux de travail.
+          </p>
+
+          <h2>Flux de travail</h2>
+
+          <p>
+            La première étape du processus consiste à importer tous les fichiers nécessaires depuis le répertoire d'exemples. Ce guide suppose que vous utilisez le
+            [link:https://www.npmjs.com/package/three package npm] officiel de three.js. Pour notre démo de base dans ce guide, nous avons besoin des fichiers suivants.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+</pre>
+
+          <p>
+            Après l'importation réussie de tous les fichiers, nous pouvons créer notre compositeur en lui passant une instance de `WebGLRenderer`.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+const composer = new EffectComposer( renderer );
+</pre>
+
+          <p>
+            Lorsque vous utilisez un compositeur, il est nécessaire de modifier la boucle d'animation de l'application. Au lieu d'appeler la méthode de rendu de
+            `WebGLRenderer`, nous utilisons maintenant la contrepartie respective de `EffectComposer`.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+function animate() {
+
+  requestAnimationFrame( animate );
+
+  composer.render();
+
+}
+</pre>
+
+          <p>
+            Notre compositeur est maintenant prêt, il est donc possible de configurer la chaîne de passes de post-traitement. Ces passes sont responsables de la création
+            du rendu visuel final de l'application. Elles sont traitées dans l'ordre de leur ajout/insertion. Dans notre exemple, l'instance de `RenderPass`
+            est exécutée en premier, puis l'instance de `GlitchPass` et enfin `OutputPass`. La dernière passe activée dans la chaîne est automatiquement rendue à l'écran.
+            La configuration des passes ressemble à ceci :
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+const renderPass = new RenderPass( scene, camera );
+composer.addPass( renderPass );
+
+const glitchPass = new GlitchPass();
+composer.addPass( glitchPass );
+
+const outputPass = new OutputPass();
+composer.addPass( outputPass );
+</pre>
+
+          <p>
+            `RenderPass` est normalement placée au début de la chaîne afin de fournir la scène rendue comme entrée pour l'étape de post-traitement suivante. Dans notre cas,
+            `GlitchPass` utilisera ces données d'image pour appliquer un effet de glitch sauvage. `OutputPass` est généralement la dernière passe de la chaîne qui effectue la conversion de l'espace colorimétrique sRGB et le mappage tonal.
+            Découvrez cet [link:https://threejs.org/examples/webgl_postprocessing_glitch exemple live] pour le voir en action.
+          </p>
+
+          <h2>Passes intégrées</h2>
+
+          <p>
+            Vous pouvez utiliser une large gamme de passes de post-traitement prédéfinies fournies par le moteur. Elles se trouvent dans le
+            répertoire [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing].
+          </p>
+
+          <h2>Passes personnalisées</h2>
+
+          <p>
+            Parfois, vous souhaitez écrire un shader de post-traitement personnalisé et l'inclure dans la chaîne de passes de post-traitement. Pour ce scénario,
+            vous pouvez utiliser `ShaderPass`. Après avoir importé le fichier et votre shader personnalisé, vous pouvez utiliser le code suivant pour configurer la passe.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
+
+// plus tard dans votre routine d'initialisation
+
+const luminosityPass = new ShaderPass( LuminosityShader );
+composer.addPass( luminosityPass );
+</pre>
+
+          <p>
+            Le dépôt fournit un fichier appelé [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/CopyShader.js CopyShader] qui constitue un
+            bon point de départ pour votre propre shader personnalisé. `CopyShader` copie simplement le contenu de l'image du tampon de lecture (`read buffer`) de l'`EffectComposer`
+            vers son tampon d'écriture (`write buffer`) sans appliquer aucun effet.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
