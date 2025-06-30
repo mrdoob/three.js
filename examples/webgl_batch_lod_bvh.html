@@ -89,7 +89,6 @@
 				//
 
 				scene = new THREE.Scene();
-				// scene.fog = new THREE.Fog( 0x000000, 500, 600 );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
