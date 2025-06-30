@@ -73,7 +73,6 @@ class RoundedBoxGeometry extends BoxGeometry {
 
 		super( width, height, depth, totalSegments, totalSegments, totalSegments );
 
-
 		this.type = 'RoundedBoxGeometry';
 
 		/**
@@ -194,6 +193,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 	/**
 	 * Factory method for creating an instance of this class from the given
 	 * JSON object.
+	 *
 	 * @param {Object} data - A JSON object representing the serialized geometry.
 	 * @returns {RoundedBoxGeometry} A new instance.
 	 */
