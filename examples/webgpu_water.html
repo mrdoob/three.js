@@ -12,7 +12,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - water<br />
 			<a href="https://skfb.ly/6WOOR" target="_blank" rel="noopener">The Night Pool</a> by 
-			<a href="https://sketchfab.com/syntheticplants" target="_blank" rel="noopener">syntheticplants</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
+			<a href="https://sketchfab.com/syntheticplants" target="_blank" rel="noopener">syntheticplants</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a><br />
 		</div>
 
 		<script type="importmap">
@@ -34,7 +34,10 @@
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+
 			import { WaterMesh } from 'three/addons/objects/Water2Mesh.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -42,26 +45,34 @@
 			let scene, camera, renderer, water, postProcessing, controls;
 
 			const params = {
-				color: '#ffffff',
+				color: '#99e0ff',
 				scale: 2,
-				flowX: 0.25,
-				flowY: 0.25
+				flowX: 1,
+				flowY: 1
 			};
 
 			init();
 
 			async function init() {
 
-				// scene
-
 				scene = new THREE.Scene();
-				scene.backgroundNode = screenUV.distance( .5 ).remap( 0, 0.5 ).mix( color( 0x666666 ), color( 0x111111 ) );
+
+				const loader = new UltraHDRLoader();
+				loader.setDataType( THREE.HalfFloatType );
+				loader.load( `textures/equirectangular/moonless_golf_2k.hdr.jpg`, function ( texture ) {
+
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					texture.needsUpdate = true;
+
+					scene.background = texture;
+					scene.environment = texture;
+
+				} );
 
 				// camera
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( - 25, 10, - 25 );
-				camera.lookAt( scene.position );
+				camera.position.set( - 20, 6, - 30 );
 
 				// asset loading
 
@@ -79,6 +90,7 @@
 					textureLoader.loadAsync( 'textures/water/Water_2_M_Normal.jpg' )
 				] );
 
+				gltf.scene.position.z = 2;
 				gltf.scene.scale.setScalar( 0.1 );
 				scene.add( gltf.scene );
 
@@ -102,23 +114,64 @@
 				water.renderOrder = Infinity;
 				scene.add( water );
 
-				// light
+				// floor
 
-				const ambientLight = new THREE.AmbientLight( 0xccccccc, 0.4 );
-				scene.add( ambientLight );
+				const floorGeometry = new THREE.PlaneGeometry( 1, 1 );
+				floorGeometry.rotateX( - Math.PI * 0.5 );
+				const floorMaterial = new THREE.MeshStandardMaterial( {
+					color: 0x444444,
+					roughness: 1,
+					metalness: 0,
+					side: THREE.DoubleSide
+				} );
 
-				const directionalLight = new THREE.DirectionalLight( 0xf435ab, 3 );
-				directionalLight.position.set( - 1, 1, 1 );
-				scene.add( directionalLight );
+				{
+
+					const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+					floor.position.set( 20, 0, 0 );
+					floor.scale.set( 15, 1, 80 );
+					scene.add( floor );
+
+				}
+
+				{
+
+					const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+					floor.position.set( - 20, 0, 0 );
+					floor.scale.set( 15, 1, 80 );
+					scene.add( floor );
+
+				}
+
+				{
+
+					const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+					floor.position.set( 0, 0, 30 );
+					floor.scale.set( 30, 1, 20 );
+					scene.add( floor );
+
+				}
+
+				{
+
+					const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+					floor.position.set( 0, 0, - 30 );
+					floor.scale.set( 30, 1, 20 );
+					scene.add( floor );
+
+				}
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
 				document.body.appendChild( renderer.domElement );
+
+				// postprocessing
 
 				postProcessing = new THREE.PostProcessing( renderer );
 			
@@ -131,7 +184,7 @@
 				const outputPass = scenePass.getTextureNode();
 				const emissivePass = scenePass.getTextureNode( 'emissive' );
 
-				const bloomPass = bloom( emissivePass );
+				const bloomPass = bloom( emissivePass, 2 );
 
 				postProcessing.outputNode = outputPass.add( bloomPass );
 
@@ -168,9 +221,9 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 5;
-				controls.maxDistance = 50;
 				controls.enableDamping = true;
+				controls.target.set( 0, 0, -5 );
+				controls.update();
 
 				//
 
