@@ -1,4 +1,4 @@
-export const REVISION = '178';
+export const REVISION = '179dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
