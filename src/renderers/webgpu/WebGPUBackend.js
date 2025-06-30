@@ -2092,7 +2092,15 @@ class WebGPUBackend extends Backend {
 	 */
 	createIndexAttribute( attribute ) {
 
-		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.INDEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+		let usage = GPUBufferUsage.INDEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+
+		if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) {
+
+			usage |= GPUBufferUsage.STORAGE;
+
+		}
+
+		this.attributeUtils.createAttribute( attribute, usage );
 
 	}
 
