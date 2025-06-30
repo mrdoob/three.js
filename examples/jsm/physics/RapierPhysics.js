@@ -103,8 +103,6 @@ async function RapierPhysics() {
 	const _quaternion = new Quaternion();
 	const _matrix = new Matrix4();
 
-	let intervalId = null;
-
 	function addScene( scene ) {
 
 		scene.traverse( function ( child ) {
@@ -294,7 +292,9 @@ async function RapierPhysics() {
 
 	const clock = new Clock();
 
-	function step() {
+	let autoUpdate = true;
+
+	function update() {
 
 		world.timestep = clock.getDelta();
 		world.step();
@@ -337,53 +337,43 @@ async function RapierPhysics() {
 
 	}
 
-	function start() {
+	function setAutoUpdate( value ) {
 
-		intervalId = setInterval( step, 1000 / frameRate );
-
-	}
-
-	function stop() {
-
-		clearInterval( intervalId );
+		autoUpdate = value;
 
 	}
 
 	// animate
 
-	start();
+	setInterval( function() {
+
+		if ( autoUpdate === true ) update();
+
+	}, 1000 / frameRate );
 
 	return {
 		RAPIER,
 		world,
 
 		/**
-		 * The update method of the pyhsics module. This method is automatically
-		 * called by default by the internal simulation loop. If it has been stopped
-		 * via `stop()`, applications can manually call ` step()` according to their
-		 * requirements.
+		 * Sets the auto update flag. If you want to manually update the physics
+		 * simulation in your app, use `setAutoUpdate( false )` and call `update()`
+		 * as required.
 		 *
 		 * @method
-		 * @name RapierPhysics#step
+		 * @name RapierPhysics#setAutoUpdate
+		 * @param {boolean} autoUpdate Whether the physics should automatically be updated or not.
 		 */
-		step: step,
+		setAutoUpdate: setAutoUpdate,
 
 		/**
-		 * Starts the physics simulation. The simulation is started by default
-		 * so this method is only relevant if `stop()` has been used in advance.
+		 * Updates the physics. This method should be called when `autoUpdate`
+		 * is set to `false`.
 		 *
 		 * @method
-		 * @name RapierPhysics#start
+		 * @name RapierPhysics#update
 		 */
-		start: start,
-
-		/**
-		 * Stops the physics simulation.
-		 *
-		 * @method
-		 * @name RapierPhysics#stop
-		 */
-		stop: stop,
+		update: update,
 
 		/**
 		 * Adds the given scene to this physics simulation. Only meshes with a
