@@ -186,7 +186,7 @@ class StorageTextureNode extends TextureNode {
 		const { uvNode, storeNode, depthNode } = properties;
 
 		const textureProperty = super.generate( builder, 'property' );
-		const uvSnippet = uvNode.build( builder, 'uvec2' );
+		const uvSnippet = uvNode.build( builder, this.value.is3DTexture === true ? 'uvec3' : 'uvec2' );
 		const storeSnippet = storeNode.build( builder, 'vec4' );
 		const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 

@@ -1,0 +1,650 @@
+<html lang="en">
+  <head>
+    <title>three.js - WebGPU - Compute Particles</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="main.css" />
+  </head>
+  <body>
+    <div id="info">
+      <a
+        href="https://threejs.org"
+        target="_blank"
+        rel="noopener"
+        >three.js</a
+      >
+      WebGPU - Compute - Utsubo
+	  <div id="timestamps" style="
+	  position: absolute;
+	  top: 60px;
+	  left: 0;
+	  padding: 10px;
+	  background: rgba( 0, 0, 0, 0.5 );
+	  color: #fff;
+	  font-family: monospace;
+	  font-size: 12px;
+	  line-height: 1.5;
+	  pointer-events: none;
+	  text-align: left;
+  "></div>
+    </div>
+	<video id="video" style="display:none" autoplay playsinline></video>
+
+    <script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.webgpu.js",
+				"three/addons/": "./jsm/",
+			  "stats-gl": "https://www.unpkg.com/statsgl@2.2.7/dist/main.js"
+			}
+		  }
+    </script>
+
+    <script type="module">
+      import * as THREE from 'three';
+
+      import {
+      	positionLocal,
+      	hash,
+      	parabola,
+      	tslFn,
+      	uniform,
+      	texture,
+      	instanceIndex,
+      	float,
+      	vec3,
+		  viewportBottomLeft,
+      	storage,
+      	MeshLambertNodeMaterial,
+      	MeshPhysicalNodeMaterial,
+		  MeshBasicNodeMaterial,
+      	MeshStandardNodeMaterial,
+      	If,
+      	sin,
+      	cos,
+      	mat4,
+      
+      } from 'three/tsl';
+      import * as n from 'three/tsl';
+
+      import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+      import Stats from 'three/addons/libs/stats.module.js';
+
+      import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+      import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+
+      const particleCount = 50000;
+
+      const noisescale = uniform( 1.558 );
+      const noiseFactor = uniform( 15.5 );
+      const noiseTime = uniform( 0.8 );
+      const friction = uniform( 0.99 );
+      const size = uniform( 1 );
+
+      const clickPosition = uniform( new THREE.Vector3() );
+
+      let camera, scene, renderer, video;
+      let controls, stats;
+      let computeParticles;
+
+      // Three.js Transpiler r160
+	  const timestamps = document.getElementById( 'timestamps' );
+
+      import {
+      	normalize,
+      	div,
+      	vec4,
+      	mod,
+      	mul,
+      	sub,
+      	vec2,
+      	dot,
+      	floor,
+      	step,
+      	min,
+      	max,
+      	uv,
+      	abs,
+      } from 'three/tsl';
+
+      const permute = tslFn( ( [ x_immutable ] ) => {
+
+      	const x = vec4( x_immutable ).toVar();
+
+      	return mod( x.mul( 34.0 ).add( 1.0 ).mul( x ), 289.0 );
+
+} );
+
+      const taylorInvSqrt = tslFn( ( [ r_immutable ] ) => {
+
+      	const r = vec4( r_immutable ).toVar();
+
+      	return sub( 1.79284291400159, mul( 0.85373472095314, r ) );
+
+} );
+
+      const utsubo_snoise = tslFn( ( [ v_immutable ] ) => {
+
+      	const v = vec3( v_immutable ).toVar();
+      	const C = vec2( float( 1.0 ).div( 6.0 ), float( 1.0 ).div( 3.0 ) );
+      	const D = vec4( 0.0, 0.5, 1.0, 2.0 );
+      	const i = vec3( floor( v.add( dot( v, C.yyy ) ) ) ).toVar();
+      	const x0 = vec3( v.sub( i ).add( dot( i, C.xxx ) ) ).toVar();
+      	const g = vec3( step( x0.yzx, x0.xyz ) ).toVar();
+      	const l = vec3( sub( 1.0, g ) ).toVar();
+      	const i1 = vec3( min( g.xyz, l.zxy ) ).toVar();
+      	const i2 = vec3( max( g.xyz, l.zxy ) ).toVar();
+      	const x1 = vec3( x0.sub( i1 ).add( mul( 1.0, C.xxx ) ) ).toVar();
+      	const x2 = vec3( x0.sub( i2 ).add( mul( 2.0, C.xxx ) ) ).toVar();
+      	const x3 = vec3( x0.sub( 1 ).add( mul( 3.0, C.xxx ) ) ).toVar();
+      	i.assign( mod( i, 289.0 ) );
+      	const p = vec4(
+      		permute(
+      			permute(
+      				permute( i.z.add( vec4( 0.0, i1.z, i2.z, 1.0 ) ) ).add(
+      					i.y.add( vec4( 0.0, i1.y, i2.y, 1.0 ) )
+      				)
+      			).add( i.x.add( vec4( 0.0, i1.x, i2.x, 1.0 ) ) )
+      		)
+      	).toVar();
+      	const n_ = float( 1.0 ).div( 7.0 ).toVar();
+      	const ns = vec3( n_.mul( D.wyz ).sub( D.xzx ) ).toVar();
+      	const j = vec4( p.sub( mul( 49.0, floor( p.mul( ns.z.mul( ns.z ) ) ) ) ) ).toVar();
+      	const x_ = vec4( floor( j.mul( ns.z ) ) ).toVar();
+      	const y_ = vec4( floor( j.sub( mul( 7.0, x_ ) ) ) ).toVar();
+      	const x = vec4( x_.mul( ns.x ).add( ns.yyyy ) ).toVar();
+      	const y = vec4( y_.mul( ns.x ).add( ns.yyyy ) ).toVar();
+      	const h = vec4( sub( 1.0, abs( x ).sub( abs( y ) ) ) ).toVar();
+      	const b0 = vec4( x.xy, y.xy ).toVar();
+      	const b1 = vec4( x.zw, y.zw ).toVar();
+      	const s0 = vec4( floor( b0 ).mul( 2.0 ).add( 1.0 ) ).toVar();
+      	const s1 = vec4( floor( b1 ).mul( 2.0 ).add( 1.0 ) ).toVar();
+      	const sh = vec4( step( h, vec4( 0.0 ) ).negate() ).toVar();
+      	const a0 = vec4( b0.xzyw.add( s0.xzyw.mul( sh.xxyy ) ) ).toVar();
+      	const a1 = vec4( b1.xzyw.add( s1.xzyw.mul( sh.zzww ) ) ).toVar();
+      	const p0 = vec3( a0.xy, h.x ).toVar();
+      	const p1 = vec3( a0.zw, h.y ).toVar();
+      	const p2 = vec3( a1.xy, h.z ).toVar();
+      	const p3 = vec3( a1.zw, h.w ).toVar();
+      	const norm = vec4(
+      		taylorInvSqrt(
+      			vec4( dot( p0, p0 ), dot( p1, p1 ), dot( p2, p2 ), dot( p3, p3 ) )
+      		)
+      	).toVar();
+      	p0.mulAssign( norm.x );
+      	p1.mulAssign( norm.y );
+      	p2.mulAssign( norm.z );
+      	p3.mulAssign( norm.w );
+      	const m = vec4(
+      		max(
+      			sub( 0.6, vec4( dot( x0, x0 ), dot( x1, x1 ), dot( x2, x2 ), dot( x3, x3 ) ) ),
+      			0.0
+      		)
+      	).toVar();
+      	m.assign( m.mul( m ) );
+
+      	return mul(
+      		42.0,
+      		dot(
+      			m.mul( m ),
+      			vec4( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 ), dot( p3, x3 ) )
+      		)
+      	);
+
+} );
+
+      // layouts
+
+      permute.setLayout( {
+      	name: 'permute',
+      	type: 'vec4',
+      	inputs: [ { name: 'x', type: 'vec4' } ],
+      } );
+
+      taylorInvSqrt.setLayout( {
+      	name: 'taylorInvSqrt',
+      	type: 'vec4',
+      	inputs: [ { name: 'r', type: 'vec4' } ],
+      } );
+
+      utsubo_snoise.setLayout( {
+      	name: 'snoise',
+      	type: 'float',
+      	inputs: [ { name: 'v', type: 'vec3' } ],
+      } );
+
+      export const snoise = ( texcoord = uv() ) =>
+      	utsubo_snoise( texcoord.convert( 'vec2|vec3' ) );
+
+      const snoiseVec3 = tslFn( ( [ x_immutable ] ) => {
+
+      	const x = vec3( x_immutable ).toVar();
+      	const s = float( snoise( vec3( x ) ) ).toVar();
+      	const s1 = float(
+      		snoise( vec3( x.y.sub( 19.1 ), x.z.add( 33.4 ), x.x.add( 47.2 ) ) )
+      	).toVar();
+      	const s2 = float(
+      		snoise( vec3( x.z.add( 74.2 ), x.x.sub( 124.5 ), x.y.add( 99.4 ) ) )
+      	).toVar();
+      	const c = vec3( s, s1, s2 ).toVar();
+
+      	return c;
+
+} );
+
+      const curlNoise = tslFn( ( [ p_immutable ] ) => {
+
+      	const p = vec3( p_immutable ).toVar();
+      	const e = float( 0.1 );
+      	const dx = vec3( e, 0.0, 0.0 ).toVar();
+      	const dy = vec3( 0.0, e, 0.0 ).toVar();
+      	const dz = vec3( 0.0, 0.0, e ).toVar();
+      	const p_x0 = vec3( snoiseVec3( p.sub( dx ) ) ).toVar();
+      	const p_x1 = vec3( snoiseVec3( p.add( dx ) ) ).toVar();
+      	const p_y0 = vec3( snoiseVec3( p.sub( dy ) ) ).toVar();
+      	const p_y1 = vec3( snoiseVec3( p.add( dy ) ) ).toVar();
+      	const p_z0 = vec3( snoiseVec3( p.sub( dz ) ) ).toVar();
+      	const p_z1 = vec3( snoiseVec3( p.add( dz ) ) ).toVar();
+      	const x = float( p_y1.z.sub( p_y0.z.sub( p_z1.y ) ).add( p_z0.y ) ).toVar();
+      	const y = float( p_z1.x.sub( p_z0.x.sub( p_x1.z ) ).add( p_x0.z ) ).toVar();
+      	const z = float( p_x1.y.sub( p_x0.y.sub( p_y1.x ) ).add( p_y0.x ) ).toVar();
+      	const divisor = float( div( 1.0, mul( 2.0, e ) ) );
+
+      	return normalize( vec3( x, y, z ).mul( divisor ) );
+
+} );
+
+      // layouts
+
+      snoiseVec3.setLayout( {
+      	name: 'snoiseVec3',
+      	type: 'vec3',
+      	inputs: [ { name: 'x', type: 'vec3' } ],
+      } );
+
+      curlNoise.setLayout( {
+      	name: 'curlNoise',
+      	type: 'vec3',
+      	inputs: [ { name: 'p', type: 'vec3' } ],
+      } );
+
+      export { snoiseVec3, curlNoise };
+
+      new HDRCubeTextureLoader()
+      	.setPath( 'textures/cube/pisaHDR/' )
+      	.load(
+      		[ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
+      		function ( hdrTexture ) {
+
+      			init( hdrTexture );
+      
+      		}
+      	);
+
+      function init( hdrTexture ) {
+
+      	if ( WebGPU.isAvailable() === false ) {
+
+      		document.body.appendChild( WebGPU.getErrorMessage() );
+
+      		throw new Error( 'No WebGPU support' );
+      
+	}
+
+	video = document.getElementById( 'video' );
+
+
+      	const { innerWidth, innerHeight } = window;
+
+      	// camera = new THREE.OrthographicCamera( - innerWidth / 2, innerWidth / 2, innerHeight / 2, - innerHeight / 2, 1, 3000 );
+      	// camera.position.set( 0, 0, 10 );
+      	camera = new THREE.PerspectiveCamera(
+      		50,
+      		innerWidth / innerHeight,
+      		0.01,
+      		2000
+      	);
+      	camera.position.z = 1000;
+      	scene = new THREE.Scene();
+
+      	// textures
+
+      	const textureLoader = new THREE.TextureLoader();
+      	// const map = textureLoader.load( 'textures/sprite1.png' );
+
+      	//
+      	const delta = n.timerDelta();
+      	const elapsedTime = n.timerLocal();
+
+      	const createBuffer = () =>
+      		storage(
+			    new THREE.StorageInstancedBufferAttribute( particleCount * 3, 3 ),
+      			'vec3',
+      			particleCount
+      		);
+      	const createFloatBuffer = () =>
+      		storage(
+      			new THREE.StorageInstancedBufferAttribute( particleCount, 2 ),
+      			'vec2',
+      			particleCount
+      		);
+
+      	const positionBuffer = createBuffer();
+      	const velocityBuffer = createBuffer();
+      	const lifeBuffer = createFloatBuffer();
+      	const colorBuffer = createBuffer();
+
+      	// compute
+
+      	const computeInit = tslFn( () => {
+
+      		const position = positionBuffer.element( instanceIndex );
+      		const color = colorBuffer.element( instanceIndex );
+      		const life = lifeBuffer.element( instanceIndex );
+      		// init position to simplex 3d noise
+      		const noiseVec3 = vec3( snoiseVec3( vec3( instanceIndex ).mul( 0.1 ) ) ).mul(
+      			200
+      		);
+      		const noiseVec3_2 = vec3(
+      			snoiseVec3( vec3( instanceIndex ).mul( 0.001 ).add( 10 ) )
+      		).mul( 200 );
+      		position.assign( noiseVec3 );
+      		position.addAssign( noiseVec3_2 );
+
+      		color.assign( position.xyz );
+
+      		life.assign( hash( instanceIndex ) );
+      
+	} )().compute( particleCount );
+
+      	//
+
+
+
+	const rotate3d = tslFn( ( [ angle, axis ] ) => {
+
+      		const s = float( sin( angle ) ).toVar();
+      		const c = float( cos( angle ) ).toVar();
+      		const oc = float( c ).sub( 1.0 ).toVar();
+
+      		return mat4(
+      			oc.mul( axis.x.mul( axis.x ) ).add( c ),
+      			oc.mul( axis.x.mul( axis.y ) ).sub( axis.z.mul( s ) ),
+      			oc.mul( axis.z.mul( axis.x ) ).add( axis.y.mul( s ) ),
+      			0.0,
+      			oc.mul( axis.x.mul( axis.y ) ).add( axis.z.mul( s ) ),
+      			oc.mul( axis.y.mul( axis.y ) ).add( c ),
+      			oc.mul( axis.y.mul( axis.z ) ).sub( axis.x.mul( s ) ),
+      			0.0,
+      			oc.mul( axis.z.mul( axis.x ) ).sub( axis.y.mul( s ) ),
+      			oc.mul( axis.y.mul( axis.z ) ).add( axis.x.mul( s ) ),
+      			oc.mul( axis.z.mul( axis.z ) ).add( c ),
+      			0.0,
+      			0.0,
+      			0.0,
+      			0.0,
+      			1.0
+      		);
+
+	} );
+
+      	const computeUpdateNoise = tslFn( () => {
+
+      		const position = positionBuffer.element( instanceIndex );
+      		const velocity = velocityBuffer.element( instanceIndex );
+      		const color = colorBuffer.element( instanceIndex );
+      		const life = lifeBuffer.element( instanceIndex ).x;
+      		const size = lifeBuffer.element( instanceIndex ).y;
+      		life.subAssign( 0.005 );
+
+      		If( life.lessThan( 0 ), () => {
+
+      			life.assign( 1 );
+      			position.assign( color );
+      
+      		} );
+
+      		position.addAssign( velocity );
+
+      		size.assign( parabola( float( 1.0 ).sub( life ), float( 1.0 ) ).mul( 2 ) );
+
+      		const noise = vec3( delta )
+      			.mul( noiseFactor )
+      			.mul(
+      				curlNoise(
+      					position
+      						.mul( 0.001 )
+      						.mul( noisescale )
+      						.add( float( elapsedTime ).mul( noiseTime ).mul( 0.5 ) )
+      				)
+      			);
+      		velocity.addAssign( noise );
+      		velocity.mulAssign( 0.96 );
+
+
+
+      		lifeBuffer.element( instanceIndex ).assign( vec2( life, size ) );
+
+	} );
+
+      	const p = positionBuffer.element( instanceIndex );
+
+      	computeParticles = computeUpdateNoise().compute( particleCount );
+
+
+		  if ( navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
+
+		const constraints = { video: { width: 1280, height: 720, facingMode: 'user' } };
+
+		// navigator.mediaDevices.getUserMedia( constraints ).then( function ( stream ) {
+
+		// 	// apply the stream to the video element used in the texture
+
+		// 	video.srcObject = stream;
+		// 	video.play();
+
+		// } ).catch( function ( error ) {
+
+		// 	console.error( 'Unable to access the camera/webcam.', error );
+
+		// } );
+
+	} else {
+
+		console.error( 'MediaDevices interface not available.' );
+
+	}
+
+	const map = new THREE.VideoTexture( video );
+	map.colorSpace = THREE.SRGBColorSpace;
+
+      	// create nodes
+
+      	const textureNode = texture( map );
+      	// create particles
+
+      	const particleMaterial = new MeshPhysicalNodeMaterial( {
+      		color: 0xffffff,
+      		roughness: .2,
+      		metalness: 0.5,
+      	} );
+
+      	particleMaterial.colorNode = textureNode.uv( viewportBottomLeft ).pow( 2 ).add( n.mx_ramplr( vec3( 0.03 ), vec3( 2., 0.0, 0.0 ), velocityBuffer.toAttribute().mul( 1. ) ).clamp() );
+      	particleMaterial.positionNode = positionLocal
+      		.rotate( velocityBuffer.toAttribute() )
+      	    .mul( lifeBuffer.toAttribute().y )
+      		.add( positionBuffer.toAttribute() );
+
+      	const particles = new THREE.Mesh(
+      		new THREE.BoxGeometry( 30, 10, 10 ),
+      		particleMaterial
+      	);
+      	particles.isInstancedMesh = true;
+      	particles.count = particleCount;
+      	particles.frustumCulled = false;
+      	scene.add( particles );
+
+      	scene.environment = hdrTexture;
+      	// scene.background = new THREE.Color( 0x212121 );
+
+      	scene.add( new THREE.DirectionalLight( 0xffffff, 1 ) );
+
+      	const geometry = new THREE.PlaneGeometry( 1000, 1000 );
+      	geometry.rotateX( - Math.PI / 2 );
+
+      	const plane = new THREE.Mesh(
+      		geometry,
+      		new THREE.MeshBasicMaterial( { visible: false } )
+      	);
+      	scene.add( plane );
+
+      	const raycaster = new THREE.Raycaster();
+      	const pointer = new THREE.Vector2();
+
+      	//
+
+      	renderer = new THREE.WebGPURenderer( { antialias: true, trackTimestamp: true, forceWebGL: false } );
+      	renderer.setPixelRatio( window.devicePixelRatio );
+      	renderer.setSize( window.innerWidth, window.innerHeight );
+      	renderer.setAnimationLoop( animate );
+      	document.body.appendChild( renderer.domElement );
+
+      	stats = new Stats();
+      	document.body.appendChild( stats.dom );
+
+      	//
+
+      	renderer.compute( computeInit );
+
+      	// click event
+
+
+
+
+      	const computeHit = tslFn( () => {
+
+      		const position = positionBuffer.element( instanceIndex );
+      		const velocity = velocityBuffer.element( instanceIndex );
+
+      		const dist = position.distance( clickPosition );
+      		const direction = position.sub( clickPosition ).normalize();
+      		const distArea = float( 6 ).sub( dist ).max( 0 );
+
+      		const power = distArea.mul( 0.01 );
+      		const relativePower = power.mul(
+      			instanceIndex.hash().mul( 0.5 ).add( 0.5 )
+      		);
+
+      		velocity.assign( velocity.add( direction.mul( relativePower ) ) );
+      
+	} )().compute( particleCount );
+
+      	//
+
+      	function onMove( event ) {
+
+      		pointer.set(
+      			( event.clientX / window.innerWidth ) * 2 - 1,
+      			- ( event.clientY / window.innerHeight ) * 2 + 1
+      		);
+
+      		raycaster.setFromCamera( pointer, camera );
+
+      		const intersects = raycaster.intersectObjects( [ plane ], false );
+
+      		if ( intersects.length > 0 ) {
+
+      			const { point } = intersects[ 0 ];
+
+      			// move to uniform
+
+      			clickPosition.value.copy( point );
+      			clickPosition.value.y = - 1;
+
+      			// compute
+
+      			renderer.compute( computeHit );
+      
+      		}
+      
+	}
+
+      	// events
+
+      	renderer.domElement.addEventListener( 'pointermove', onMove );
+
+      	//
+
+      	controls = new OrbitControls( camera, renderer.domElement );
+      	controls.minDistance = 0.1;
+      	controls.maxDistance = 1500;
+      	controls.target.set( 0, 0, 0 );
+      	controls.update();
+
+      	//
+
+      	window.addEventListener( 'resize', onWindowResize );
+
+      	// gui
+
+      	const gui = new GUI();
+
+      	gui.add( noisescale, 'value', - 5, 5, 0.001 ).name( 'noisescale' );
+      	gui.add( noiseFactor, 'value', - 10, 100, 0.01 ).name( 'noiseFactor' );
+      	gui.add( noiseTime, 'value', - 5, 5, 0.001 ).name( 'noiseTime' );
+      	gui.add( friction, 'value', 0.96, 0.99, 0.01 ).name( 'friction' );
+      	gui.add( size, 'value', 0.5, 30, 0.1 ).name( 'size' );
+
+}
+
+      function onWindowResize() {
+
+      	const { innerWidth, innerHeight } = window;
+
+      	camera.aspect = innerWidth / innerHeight;
+      	camera.updateProjectionMatrix();
+
+      	renderer.setSize( innerWidth, innerHeight );
+
+}
+
+      function animate() {
+
+      	stats.update();
+      	renderer.compute( computeParticles );
+
+
+	// throttle the logging
+
+	if ( renderer.hasFeature( 'timestamp-query' ) ) {
+
+		if ( renderer.info.render.calls % 10 === 0 ) {
+
+			timestamps.innerHTML = `
+
+				Compute ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp}ms<br>
+				Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp}ms`;
+
+		}
+
+	} else {
+
+		timestamps.innerHTML = 'Timestamp queries not supported';
+
+	}
+
+      	renderer.render( scene, camera );
+
+}
+    </script>
+  </body>
+</html>
+
