@@ -640,6 +640,11 @@ class TransformControls extends Controls {
 
 			// Apply scale
 
+			// Don't allow negative scales
+			if ( _tempVector2.x < 0 || _tempVector2.y < 0 || _tempVector2.z < 0 ) {
+				return;
+			}
+
 			object.scale.copy( this._scaleStart ).multiply( _tempVector2 );
 
 			if ( this.scaleSnap ) {
