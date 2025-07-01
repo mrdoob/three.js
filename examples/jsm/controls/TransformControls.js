@@ -361,13 +361,13 @@ class TransformControls extends Controls {
 		this._quaternionStart = new Quaternion();
 		this._scaleStart = new Vector3();
 
+		this._bbox = null;
+
 		this._getPointer = getPointer.bind( this );
 		this._onPointerDown = onPointerDown.bind( this );
 		this._onPointerHover = onPointerHover.bind( this );
 		this._onPointerMove = onPointerMove.bind( this );
 		this._onPointerUp = onPointerUp.bind( this );
-
-		this._bbox = null;
 
 		if ( domElement !== null ) {
 
@@ -455,12 +455,12 @@ class TransformControls extends Controls {
 
 				this.pointStart.copy( planeIntersect.point ).sub( this.worldPositionStart );
 
-                if ( this.object.geometry ) {
+				if ( this.object.geometry ) {
 
-				    this.object.geometry.computeBoundingBox();
-				    this._bbox = this.object.geometry.boundingBox.clone();
+					this.object.geometry.computeBoundingBox();
+					this._bbox = this.object.geometry.boundingBox.clone();
 
-                }
+				}
 
 			}
 
@@ -664,6 +664,7 @@ class TransformControls extends Controls {
 			}
 
 			// Scale from pulled side
+
 			if ( this.scaleFromEdge && this._bbox ) {
 
 				if ( this.pointStart.x > 0 ) {
@@ -686,13 +687,13 @@ class TransformControls extends Controls {
 
 				}
 
-				if (this.pointStart.z > 0) {
+				if ( this.pointStart.z > 0 ) {
 
-					this._offset.z = this._bbox.min.z * (this._scaleStart.z - object.scale.z);
+					this._offset.z = this._bbox.min.z * ( this._scaleStart.z - object.scale.z );
 
 				} else {
 
-					this._offset.z = this._bbox.max.z * (this._scaleStart.z - object.scale.z);
+					this._offset.z = this._bbox.max.z * ( this._scaleStart.z - object.scale.z );
 
 				}
 
