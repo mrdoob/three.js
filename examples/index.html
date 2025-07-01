@@ -25,14 +25,11 @@
 				<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off"
 					spellcheck="false" />
 				<div id="sortControls">
-					<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
-						<path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
-					</svg>
 					<select id="sort-by">
 						<option value="added">date created</option>
 						<option value="name">alphabetical</option>
 					</select>
-					<button id="sort-order" title="Sort Descending">▼</button>
+					<button id="sort-order" data-order="desc" title="Sort Descending"></button>
 				</div>
 				<div id="clearSearchButton"></div>
 			</div>
@@ -55,6 +52,8 @@
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 		const sortBySelect = document.getElementById( 'sort-by' );
 		const sortOrderButton = document.getElementById( 'sort-order' );
+		const sortAscSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 26 26" width="24px" fill="currentColor"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg>';
+		const sortDescSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 26 26" width="24px" fill="currentColor"><path d="M3 6v2h6V6H3zm0 5v2h12v-2H3zm0 5v2h18v-2H3z"/></svg>';
 		const links = {};
 		const validRedirects = new Map();
 		const fragment = document.createDocumentFragment();
@@ -63,6 +62,7 @@
 		async function init() {
 
 			viewSrcButton.style.display = 'none';
+			sortOrderButton.innerHTML = sortDescSVG;
 			const files = await ( await fetch( 'files.json' ) ).json();
 			const tags = await ( await fetch( 'tags.json' ) ).json();
 			const timestamps = await ( await fetch( 'timestamps.json' ) ).json();
@@ -168,8 +168,21 @@
 			sortBySelect.onchange = () => sortCards();
 			sortOrderButton.onclick = () => {
 
-				sortOrderButton.textContent = sortOrderButton.textContent === '▲' ? '▼' : '▲';
-				sortOrderButton.title = sortOrderButton.textContent === '▲' ? 'sort ascending' : 'sort descending';
+				const currentOrder = sortOrderButton.dataset.order;
+				if ( currentOrder === 'desc' ) {
+
+					sortOrderButton.dataset.order = 'asc';
+					sortOrderButton.innerHTML = sortAscSVG;
+					sortOrderButton.title = 'Sort Ascending';
+
+				} else {
+
+					sortOrderButton.dataset.order = 'desc';
+					sortOrderButton.innerHTML = sortDescSVG;
+					sortOrderButton.title = 'Sort Descending';
+
+				}
+
 				sortCards();
 
 			};
@@ -349,7 +362,7 @@
 		function sortCards() {
 
 			const sortBy = sortBySelect.value;
-			const direction = sortOrderButton.textContent === '▲' ? 'asc' : 'desc';
+			const direction = sortOrderButton.dataset.order;
 			const headers = content.querySelectorAll( 'h2' );
 			headers.forEach( header => {
 

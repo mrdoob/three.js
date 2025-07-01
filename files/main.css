@@ -466,12 +466,6 @@ iframe#viewer {
 	margin-right: 10px;
 }
 
-#sortControls .sort-label {
-	color: var(--secondary-text-color);
-	white-space: nowrap;
-	font-size: calc(var(--font-size) - 2px);
-}
-
 #sort-by,
 #sort-order {
 	font-family: 'Roboto Mono', monospace;
@@ -505,16 +499,14 @@ iframe#viewer {
 #sort-order {
 	width: 24px;
 	padding: 0;
-	text-align: center;
-	font-size: 0.8em;
-	line-height: 22px;
 }
 
-.sort-icon {
-	color: var(--secondary-text-color);
+#sort-order svg {
+	display: block;
+	margin: auto;
 	width: var(--icon-size);
 	height: var(--icon-size);
-  }
+}
 
 .card .date-info {
 	color: #808080;
