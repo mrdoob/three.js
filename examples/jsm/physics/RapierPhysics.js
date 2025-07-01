@@ -15,7 +15,16 @@ function getShape( geometry ) {
 
 	// TODO change type to is*
 
-	if ( geometry.type === 'BoxGeometry' ) {
+	if ( geometry.type === 'RoundedBoxGeometry' ) {
+
+		const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
+		const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
+		const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
+		const radius = parameters.radius !== undefined ? parameters.radius : 0.1;
+
+		return RAPIER.ColliderDesc.roundCuboid( sx - radius, sy - radius, sz - radius, radius );
+
+	} else if ( geometry.type === 'BoxGeometry' ) {
 
 		const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
 		const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
