@@ -26,42 +26,39 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; 
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FluidSimulator } from 'three/addons/objects/FluidSimulator.js';
-			import GUI from "three/addons/libs/lil-gui.module.min.js";
+			import GUI from 'three/addons/libs/lil-gui.module.min.js';
 			
-			const panel = new GUI({ width: 310 });
+			const panel = new GUI( { width: 310 } );
 
-			let container, stats;
-
-			let camera, scene, renderer;  
 			let time = 0;
 			const clock = new THREE.Clock();
 
-			container = document.createElement( 'div' );
+			const container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.01, 10 );
+			const camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.01, 10 );
 			camera.position.set( 1, 1, 1 );
-			camera.lookAt(0,0,0);
+			camera.lookAt( 0, 0, 0 );
 
 			//
 
-			scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x444488 );
 			//scene.add( new THREE.AxesHelper())
-			scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+			scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
 			const color = 0xffffff;
 			const intensity = 3;
-			const light = new THREE.DirectionalLight(color, intensity);
-			light.position.set(4, 1, 0);
+			const light = new THREE.DirectionalLight( color, intensity );
+			light.position.set( 4, 1, 0 );
 			light.castShadow = true;
-			scene.add(light);
+			scene.add( light );
 
 			//
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
@@ -69,46 +66,61 @@
 
 			// Materials
 
-			stats = new Stats();
+			const stats = new Stats();
 			container.appendChild( stats.dom );
 
-			new OrbitControls( camera, renderer.domElement ); 
+			new OrbitControls( camera, renderer.domElement );
 
 			window.addEventListener( 'resize', onWindowResize );
 
 			//---------------------------------------- DEMO SCENE SETUP ------------------------------------------------
 
-			const fluid = new FluidSimulator( renderer, 1024, 512 );
+const loader = new THREE.TextureLoader();
+loader.load( 'textures/planets/earth_night_4096.jpg', texture => {
+
+	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+	texture.repeat.set( 1, 1 );
+
+	const material = new THREE.MeshStandardMaterial( { map: texture } );
+	const geometry = new THREE.PlaneGeometry( 2, 1 );
+	const mesh = new THREE.Mesh( geometry, material );
+	mesh.rotation.x = - Math.PI / 2;
+	scene.add( mesh );
+
+} );
+
+			const fluid = new FluidSimulator( renderer, 1024, 512, 200 );
 			scene.add( fluid );
 
-			const myFluidMaterial = new THREE.MeshPhysicalMaterial({
-				roughness:0.2,
-				color: new THREE.Color(0xfefefe),
+			const myFluidMaterial = new THREE.MeshPhysicalMaterial( {
+				roughness: 0.2,
+				color: new THREE.Color( 0xfefefe ),
 				metalness: 0.1,
-				displacementScale:0.01 
-			});
+				displacementScale: 0.01,
+	transparent: true
+			} );
 
-			fluid.fixMaterial(myFluidMaterial);
+			fluid.fixMaterial( myFluidMaterial );
 
 			fluid.material = myFluidMaterial;
 
-			const ball = new THREE.Mesh( new THREE.SphereGeometry(.01,10,10), new THREE.MeshBasicMaterial({ color:0xff0000 }));
+			const ball = new THREE.Mesh( new THREE.SphereGeometry( .001, 10, 10 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
 			scene.add( ball );
 			ball.position.y = .02;
 
 			fluid.track( ball );
 
-			//------------------- DEBUG PANEL 
-			panel.add( fluid, "splatForce", -1000, 1000 );
-			panel.add( fluid, "splatThickness", 0.001, 0.2 );
-			panel.add( fluid, "vorticityInfluence", 0.1, 1 );
-			panel.add( fluid, "swirlIntensity", 1, 100 );
-			panel.add( fluid, "pressure", 0, 1 );
-			panel.add( fluid, "velocityDissipation", 0, 1 );
-			panel.add( fluid, "densityDissipation", 0, 1 );
-			panel.add( myFluidMaterial, "displacementScale", -.1, .1 );
-			panel.add( fluid, "pressureIterations", 1, 100, 1 );
- 
+			//------------------- DEBUG PANEL
+			panel.add( fluid, 'splatForce', - 1000, 1000 );
+			panel.add( fluid, 'splatThickness', 0.001, 0.2 );
+			panel.add( fluid, 'vorticityInfluence', 0.1, 1 );
+			panel.add( fluid, 'swirlIntensity', 1, 100 );
+			panel.add( fluid, 'pressure', 0, 1 );
+			panel.add( fluid, 'velocityDissipation', 0, 1 );
+			panel.add( fluid, 'densityDissipation', 0, 1 );
+			panel.add( myFluidMaterial, 'displacementScale', - .1, .1 );
+			panel.add( fluid, 'pressureIterations', 1, 100, 1 );
+
 
 			function onWindowResize() {
 
@@ -131,20 +143,22 @@
 			}
 
 			function render() {
-				
+			
 				const delta = clock.getDelta();
 
-				time += delta; 
+				time += delta;
 
-				ball.position.x = Math.cos(time)*.1;
-				ball.position.z = Math.sin(time)*.1;
+				ball.position.x = Math.cos( time ) * .1;
+				ball.position.z = Math.sin( time ) * .1;
 
 				fluid.update( delta );
 
 				myFluidMaterial.displacementMap = fluid.elevationTexture;
+				myFluidMaterial.map = fluid.elevationTexture;
 
  				renderer.render( scene, camera );
-			}
+
+}
 
 		</script>
 

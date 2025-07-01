@@ -1,4 +1,4 @@
-import {Color} from "three";
+import { Color } from 'three';
 
 // Based on (c) 2017 Pavel Dobryakov : WebGL shader code (https://github.com/PavelDoGreat/WebGL-Fluid-Simulation/tree/master)
 
@@ -33,20 +33,20 @@ const vertexShader = `
  * Introduces either velocity or color into target. Depending on `splatVelocity` flag.
  */
 export const SplatShader = {
-            uniforms: {
-                uTarget: { value: null },
-                splatVelocity: { value:false },
-                color: { value: new Color(0xffffff) },
-                texelSize: { value: null },
-                objectData: { value: null }, // Contains current and previous object positions 
-                count: { value: 1 }, 
-                thickness: { value: 0.035223 }, // in UV units
-                aspectRatio: { value:1 } // in UV units
-                , splatForce: { value: -196 }
-            },
+	uniforms: {
+		uTarget: { value: null },
+		splatVelocity: { value: false },
+		color: { value: new Color( 0xffffff ) },
+		texelSize: { value: null },
+		objectData: { value: null }, // Contains current and previous object positions
+		count: { value: 1 },
+		thickness: { value: 0.035223 }, // in UV units
+		aspectRatio: { value: 1 }, // in UV units
+		splatForce: { value: - 196 }
+	},
 
-            vertexShader,
-            fragmentShader:`
+	vertexShader,
+	fragmentShader: `
                 precision mediump float;
                 precision mediump sampler2D;
 
@@ -119,13 +119,13 @@ export const SplatShader = {
  * sets vorticity inthe alpha channel of uVelocity image
  */
 export const CurlShader = {
-            uniforms: {
-                uVelocity: { value: null },
-                texelSize: { value: null },
-                vorticityInfluence: { value:1 }
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uVelocity: { value: null },
+		texelSize: { value: null },
+		vorticityInfluence: { value: 1 }
+	},
+	vertexShader,
+	fragmentShader: `
                 precision mediump float;
                 precision mediump sampler2D;
 
@@ -151,20 +151,20 @@ export const CurlShader = {
                     gl_FragColor = pixel;
                 }
             `
-        };
+};
 
 /**
  * updates the velocity image
  */
 export const VorticityShader = {
-            uniforms: {
-                uVelocityAndCurl: { value: null },
-                texelSize: { value: null },
-                curl: { value: 1 },
-                dt: { value: 0 },
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uVelocityAndCurl: { value: null },
+		texelSize: { value: null },
+		curl: { value: 1 },
+		dt: { value: 0 },
+	},
+	vertexShader,
+	fragmentShader: `
                 precision highp float;
                 precision highp sampler2D;
 
@@ -198,18 +198,18 @@ export const VorticityShader = {
                     gl_FragColor = vec4( pixel.r, velocity, 0.0 ); 
                 }
             `
-        };
+};
 
 /**
  * Adds divergence in the alpha channel of the velocity image
  */
 export const DivergenceShader = {
-            uniforms: {
-                uVelocity: { value: null },
-                texelSize: { value: null }, 
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uVelocity: { value: null },
+		texelSize: { value: null },
+	},
+	vertexShader,
+	fragmentShader: `
                 precision mediump float;
                 precision mediump sampler2D;
 
@@ -239,19 +239,19 @@ export const DivergenceShader = {
                     gl_FragColor = vec4( pixel.r, C, div );
                 }
             `
-        };
+};
 
 /**
  *  Multiplies the pressure by `value` uniform
  */
 export const ClearShader = {
-            uniforms: {
-                uTexture: { value: null },
-                value: { value: 0.317 }, //PRESSURE
-                texelSize: { value: null }, 
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uTexture: { value: null },
+		value: { value: 0.317 }, //PRESSURE
+		texelSize: { value: null },
+	},
+	vertexShader,
+	fragmentShader: `
                 precision mediump float;
                 precision mediump sampler2D;
 
@@ -267,18 +267,18 @@ export const ClearShader = {
                     gl_FragColor = pixel ;
                 }
             `
-        };
+};
 
 /**
  * updates the pressure of the image
  */
 export const PressureShader = {
-            uniforms: {
-                uPressureWithDivergence: { value: null }, 
-                texelSize: { value: null }, 
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uPressureWithDivergence: { value: null },
+		texelSize: { value: null },
+	},
+	vertexShader,
+	fragmentShader: `
                 precision mediump float;
                 precision mediump sampler2D;
 
@@ -305,16 +305,16 @@ export const PressureShader = {
                     gl_FragColor = pixel;  
                 }
             `
-        };
+};
 
 
 export const GradientSubtractShader = {
-            uniforms: {
-                uPressureWithVelocity: { value: null }, 
-                texelSize: { value: null }, 
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uPressureWithVelocity: { value: null },
+		texelSize: { value: null },
+	},
+	vertexShader,
+	fragmentShader: `
                 precision mediump float;
                 precision mediump sampler2D;
 
@@ -339,24 +339,24 @@ export const GradientSubtractShader = {
                     gl_FragColor = vec4( pixel.r, velocity, 0.0 );
                 }
             `
-        };
+};
 
 
 export const AdvectVelocityShader = {
-            uniforms: {
-                uVelocity: { value: null }, 
-                uSource: { value: null }, 
-                sourceIsVelocity: { value: null },
-                texelSize: { value: null }, 
-                dt: { value: 0 }, 
-                dyeTexelSize: { value: null }, 
-                dissipation: { value: 0.2 }, 
-            },
-            defines: {
-                MANUAL_FILTERING: false
-            },
-            vertexShader,
-            fragmentShader:`
+	uniforms: {
+		uVelocity: { value: null },
+		uSource: { value: null },
+		sourceIsVelocity: { value: null },
+		texelSize: { value: null },
+		dt: { value: 0 },
+		dyeTexelSize: { value: null },
+		dissipation: { value: 0.2 },
+	},
+	defines: {
+		MANUAL_FILTERING: false
+	},
+	vertexShader,
+	fragmentShader: `
                 precision highp float;
                 precision highp sampler2D;
 
@@ -406,4 +406,4 @@ export const AdvectVelocityShader = {
                         }
                 }
             `
-        };
+};
