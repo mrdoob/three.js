@@ -460,10 +460,6 @@ class TransformControls extends Controls {
 					if (!this.object.geometry.boundingBox) this.object.geometry.computeBoundingBox();
 					this._bbox = this.object.geometry.boundingBox.clone();
 
-				} else {
-
-					this._bbox = null;
-
 				}
 
 			}
