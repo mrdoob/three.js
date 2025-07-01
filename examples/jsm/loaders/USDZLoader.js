@@ -604,9 +604,22 @@ class USDZLoader extends Loader {
 
 			if ( data !== undefined ) {
 
+				let surface = undefined;
+
 				const surfaceConnection = data[ 'token outputs:surface.connect' ];
-				const surfaceName = /(\w+).output/.exec( surfaceConnection )[ 1 ];
-				const surface = data[ `def Shader "${surfaceName}"` ];
+
+				if ( surfaceConnection ) {
+
+					const match = /(\w+)\.output/.exec( surfaceConnection );
+
+					if ( match ) {
+
+						const surfaceName = match[ 1 ];
+						surface = data[ `def Shader "${surfaceName}"` ];
+
+					}
+
+				}
 
 				if ( surface !== undefined ) {
 
