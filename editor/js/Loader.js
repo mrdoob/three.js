@@ -622,6 +622,28 @@ function Loader( editor ) {
 
 			}
 
+			case 'usda':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { USDZLoader } = await import( 'three/addons/loaders/USDZLoader.js' );
+
+					const group = new USDZLoader().parse( contents );
+					group.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, group ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			}
+
 			case 'usdz':
 
 			{
