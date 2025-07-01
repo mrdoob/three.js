@@ -457,7 +457,8 @@ class TransformControls extends Controls {
 
 				if ( this.object.geometry ) {
 
-					if (!this.object.geometry.boundingBox) this.object.geometry.computeBoundingBox();
+					if ( ! this.object.geometry.boundingBox ) this.object.geometry.computeBoundingBox();
+
 					this._bbox = this.object.geometry.boundingBox.clone();
 
 				}
