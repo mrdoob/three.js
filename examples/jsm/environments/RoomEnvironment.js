@@ -3,7 +3,7 @@ import {
  	BoxGeometry,
  	InstancedMesh,
  	Mesh,
-	MeshBasicMaterial,
+	MeshLambertMaterial,
  	MeshStandardMaterial,
  	PointLight,
  	Scene,
@@ -168,8 +168,12 @@ class RoomEnvironment extends Scene {
 
 function createAreaLightMaterial( intensity ) {
 
-	const material = new MeshBasicMaterial();
-	material.color.setScalar( intensity );
+	const material = new MeshLambertMaterial( {
+		color: 0x000000,
+		emissive: 0xffffff,
+		emissiveIntensity: intensity
+	} );
+
 	return material;
 
 }
