@@ -1,4 +1,5 @@
 import {
+	Box3,
 	BoxGeometry,
 	BufferGeometry,
 	Controls,
@@ -197,6 +198,16 @@ class TransformControls extends Controls {
 		defineProperty( 'scaleSnap', null );
 
 		/**
+		 * Whether to scale the object from the pulled edge, and not around the center.
+		 * Only applies to simple objects (not groups of objects).
+		 *
+		 * @name TransformControls#scaleFromEdge
+		 * @type {boolean}
+		 * @default false
+		 */
+		defineProperty( 'scaleFromEdge', false );
+
+		/**
 		 * Defines in which coordinate space transformations should be performed.
 		 *
 		 * @name TransformControls#space
@@ -357,6 +368,8 @@ class TransformControls extends Controls {
 		this._onPointerMove = onPointerMove.bind( this );
 		this._onPointerUp = onPointerUp.bind( this );
 
+		this._bbox = null;
+
 		if ( domElement !== null ) {
 
 			this.connect( domElement );
@@ -442,6 +455,13 @@ class TransformControls extends Controls {
 				this.object.matrixWorld.decompose( this.worldPositionStart, this.worldQuaternionStart, this._worldScaleStart );
 
 				this.pointStart.copy( planeIntersect.point ).sub( this.worldPositionStart );
+
+                if ( this.object.geometry ) {
+
+				    this.object.geometry.computeBoundingBox();
+				    this._bbox = this.object.geometry.boundingBox.clone();
+
+                }
 
 			}
 
@@ -644,6 +664,45 @@ class TransformControls extends Controls {
 
 			}
 
+			// Scale from pulled side
+			if ( this.scaleFromEdge && this._bbox ) {
+
+				if ( this.pointStart.x > 0 ) {
+
+					this._offset.x = this._bbox.min.x * ( this._scaleStart.x - object.scale.x );
+
+				} else {
+
+					this._offset.x = this._bbox.max.x * ( this._scaleStart.x - object.scale.x );
+
+				}
+
+				if ( this.pointStart.y > 0 ) {
+
+					this._offset.y = this._bbox.min.y * ( this._scaleStart.y - object.scale.y );
+
+				} else {
+
+					this._offset.y = this._bbox.max.y * ( this._scaleStart.y - object.scale.y );
+
+				}
+
+				if (this.pointStart.z > 0) {
+
+					this._offset.z = this._bbox.min.z * (this._scaleStart.z - object.scale.z);
+
+				} else {
+
+					this._offset.z = this._bbox.max.z * (this._scaleStart.z - object.scale.z);
+
+				}
+
+				this._offset.applyQuaternion( this._quaternionStart );
+
+				object.position.copy( this._offset ).add( this._positionStart );
+
+			}
+
 		} else if ( mode === 'rotate' ) {
 
 			this._offset.copy( this.pointEnd ).sub( this.pointStart );
@@ -735,6 +794,7 @@ class TransformControls extends Controls {
 
 		this.dragging = false;
 		this.axis = null;
+		this._bbox = null;
 
 	}
 
