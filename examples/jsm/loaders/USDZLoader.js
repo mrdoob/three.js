@@ -190,7 +190,7 @@ class USDZLoader extends Loader {
 	/**
 	 * Parses the given USDZ data and returns the resulting group.
 	 *
-	 * @param {ArrayBuffer} buffer - The raw USDZ data as an array buffer.
+	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
 	 * @return {Group} The parsed asset as a group.
 	 */
 	parse( buffer ) {
@@ -280,23 +280,6 @@ class USDZLoader extends Loader {
 			}
 
 		}
-
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) );
-
-		// console.log( zip );
-
-		const assets = parseAssets( zip );
-
-		// console.log( assets )
-
-		const file = findUSD( zip );
-
-		// Parse file
-
-		const text = fflate.strFromU8( file );
-		const root = parser.parse( text );
-
-		// Build scene
 
 		function findMeshGeometry( data ) {
 
@@ -604,9 +587,22 @@ class USDZLoader extends Loader {
 
 			if ( data !== undefined ) {
 
+				let surface = undefined;
+
 				const surfaceConnection = data[ 'token outputs:surface.connect' ];
-				const surfaceName = /(\w+).output/.exec( surfaceConnection )[ 1 ];
-				const surface = data[ `def Shader "${surfaceName}"` ];
+
+				if ( surfaceConnection ) {
+
+					const match = /(\w+)\.output/.exec( surfaceConnection );
+
+					if ( match ) {
+
+						const surfaceName = match[ 1 ];
+						surface = data[ `def Shader "${surfaceName}"` ];
+
+					}
+
+				}
 
 				if ( surface !== undefined ) {
 
@@ -891,11 +887,40 @@ class USDZLoader extends Loader {
 
 		}
 
-		const group = new Group();
+		function buildGroup( data ) {
 
-		buildHierarchy( root, group );
+			const group = new Group();
 
-		return group;
+			buildHierarchy( data, group );
+
+			return group;
+
+		}
+
+		// USDA
+
+		if ( typeof buffer === 'string' ) {
+
+			const root = parser.parse( buffer );
+
+			return buildGroup( root );
+
+		}
+
+		// USDZ
+
+		const zip = fflate.unzipSync( new Uint8Array( buffer ) );
+
+		const assets = parseAssets( zip );
+
+		// console.log( assets )
+
+		const file = findUSD( zip );
+
+		const text = fflate.strFromU8( file );
+		const root = parser.parse( text );
+
+		return buildGroup( root );
 
 	}
 
