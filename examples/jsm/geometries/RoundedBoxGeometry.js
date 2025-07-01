@@ -59,7 +59,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 	 * @param {number} [width=1] - The width. That is, the length of the edges parallel to the X axis.
 	 * @param {number} [height=1] - The height. That is, the length of the edges parallel to the Y axis.
 	 * @param {number} [depth=1] - The depth. That is, the length of the edges parallel to the Z axis.
-	 * @param {number} [segments=2] - Number of segmented that form the rounded corners.
+	 * @param {number} [segments=2] - Number of segments that form the rounded corners.
 	 * @param {number} [radius=0.1] - The radius of the rounded corners.
 	 */
 	constructor( width = 1, height = 1, depth = 1, segments = 2, radius = 0.1 ) {
@@ -71,7 +71,8 @@ class RoundedBoxGeometry extends BoxGeometry {
 		// ensure radius isn't bigger than shortest side
 		radius = Math.min( width / 2, height / 2, depth / 2, radius );
 
-		super( width, height, depth, totalSegments, totalSegments, totalSegments );
+		// start with a unit box geometry, its vertices will be modified to form the rounded box
+		super( 1, 1, 1, totalSegments, totalSegments, totalSegments );
 
 		this.type = 'RoundedBoxGeometry';
 
