@@ -113,6 +113,8 @@ const exceptionList = [
 	'webgl_volume_instancing',
 	'webgl_buffergeometry',
 	'webgl_buffergeometry_attributes_integer',
+	'webgl_buffergeometry_attributes_none',
+	'webgl_buffergeometry_custom_attributes_particles',
 	'webgl_batch_lod_bvh',
 
 	// Intentional z-fighting in this demo makes it non-deterministic
