@@ -168,7 +168,7 @@ class WebGPUUtils {
 	 */
 	getSampleCount( sampleCount ) {
 
-		return sampleCount < 4 ? 1 : 4;
+		return sampleCount >= 4 ? 4 : 1;
 
 	}
 
