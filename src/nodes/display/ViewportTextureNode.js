@@ -35,10 +35,18 @@ class ViewportTextureNode extends TextureNode {
 	 */
 	constructor( uvNode = screenUV, levelNode = null, framebufferTexture = null ) {
 
+		let defaultFramebuffer = null;
+
 		if ( framebufferTexture === null ) {
 
-			framebufferTexture = new FramebufferTexture();
-			framebufferTexture.minFilter = LinearMipmapLinearFilter;
+			defaultFramebuffer = new FramebufferTexture();
+			defaultFramebuffer.minFilter = LinearMipmapLinearFilter;
+
+			framebufferTexture = defaultFramebuffer;
+
+		} else {
+
+			defaultFramebuffer = framebufferTexture;
 
 		}
 
@@ -53,6 +61,16 @@ class ViewportTextureNode extends TextureNode {
 		this.generateMipmaps = false;
 
 		/**
+		 * The reference framebuffer texture. This is used to store the framebuffer texture
+		 * for the current render target. If the render target changes, a new framebuffer texture
+		 * is created automatically.
+		 *
+		 * @type {FramebufferTexture}
+		 * @default null
+		 */
+		this.defaultFramebuffer = defaultFramebuffer;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -62,24 +80,64 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
-		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node renders the
+		 * scene once per render in its {@link ViewportTextureNode#updateBefore} method.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.RENDER;
+
+		/**
+		 * The framebuffer texture for the current renderer context.
+		 *
+		 * @type {WeakMap}
+		 * @private
+		 */
+		this._textures = new WeakMap();
+
+	}
+
+	getFrameBufferTexture( reference = null ) {
+
+		const defaultFramebuffer = this.referenceNode ? this.referenceNode.defaultFramebuffer : this.defaultFramebuffer;
+
+		if ( reference === null ) {
+
+			return defaultFramebuffer;
+
+		}
+
+		if ( this._textures.has( reference ) === false ) {
+
+			const framebufferTexture = defaultFramebuffer.clone();
+
+			this._textures.set( reference, framebufferTexture );
+
+		}
+
+		return this._textures.get( reference );
 
 	}
 
 	updateBefore( frame ) {
 
 		const renderer = frame.renderer;
-		renderer.getDrawingBufferSize( _size );
+		const renderTarget = renderer.getRenderTarget();
+
+		if ( renderTarget === null ) {
+
+			renderer.getDrawingBufferSize( _size );
+
+		} else {
+
+			_size.set( renderTarget.width, renderTarget.height );
+
+		}
 
 		//
 
-		const framebufferTexture = this.value;
+		const framebufferTexture = this.getFrameBufferTexture( renderTarget );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
@@ -97,6 +155,8 @@ class ViewportTextureNode extends TextureNode {
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
 		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
+
+		this.value = framebufferTexture;
 
 	}
 
