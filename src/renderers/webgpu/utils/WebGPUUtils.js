@@ -161,29 +161,14 @@ class WebGPUUtils {
 	/**
 	 * Returns a modified sample count from the given sample count value.
 	 *
-	 * That is required since WebGPU does not support arbitrary sample counts.
+	 * That is required since WebGPU only supports either 1 or 4.
 	 *
 	 * @param {number} sampleCount - The input sample count.
 	 * @return {number} The (potentially updated) output sample count.
 	 */
 	getSampleCount( sampleCount ) {
 
-		let count = 1;
-
-		if ( sampleCount > 1 ) {
-
-			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
-			count = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
-
-			if ( count === 2 ) {
-
-				count = 4;
-
-			}
-
-		}
-
-		return count;
+		return sampleCount >= 4 ? 4 : 1;
 
 	}
 
