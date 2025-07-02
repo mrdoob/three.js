@@ -168,6 +168,7 @@ class RoomEnvironment extends Scene {
 
 function createAreaLightMaterial( intensity ) {
 
+	// create an emissive-only material. see #31348
 	const material = new MeshLambertMaterial( {
 		color: 0x000000,
 		emissive: 0xffffff,

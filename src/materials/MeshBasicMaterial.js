@@ -42,7 +42,7 @@ class MeshBasicMaterial extends Material {
 		 * @type {Color}
 		 * @default (1,1,1)
 		 */
-		this.color = new Color( 0xffffff ); // emissive
+		this.color = new Color( 0xffffff ); // diffuse
 
 		/**
 		 * The color map. May optionally include an alpha channel, typically combined
