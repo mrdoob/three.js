@@ -33405,7 +33405,7 @@ class StorageTextureNode extends TextureNode {
 		const { uvNode, storeNode, depthNode } = properties;
 
 		const textureProperty = super.generate( builder, 'property' );
-		const uvSnippet = uvNode.build( builder, 'uvec2' );
+		const uvSnippet = uvNode.build( builder, this.value.is3DTexture === true ? 'uvec3' : 'uvec2' );
 		const storeSnippet = storeNode.build( builder, 'vec4' );
 		const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 
@@ -33492,9 +33492,9 @@ const normal = Fn( ( { texture, uv } ) => {
 
 		const step = 0.01;
 
-		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+		const x = texture.sample( uv.add( vec3( -0.01, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, -0.01, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, -0.01 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
 
 		ret.assign( vec3( x, y, z ) );
 
@@ -66921,7 +66921,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, access );
+					if ( node.value.is3DTexture === true ) {
+
+						texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, access );
+
+					} else {
+
+						texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, access );
+
+					}
 
 				} else if ( type === 'cubeTexture' ) {
 
@@ -69293,7 +69301,15 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
-					const propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }-${ mipLevelCount }`;
+					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
+
+					if ( textureData.texture.depthOrArrayLayers > 1 ) {
+
+						propertyName += `-${ textureData.texture.depthOrArrayLayers }`;
+
+					}
+
+					propertyName += `-${ mipLevelCount }`;
 
 					resourceGPU = textureData[ propertyName ];
 

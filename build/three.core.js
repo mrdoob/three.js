@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '178';
+const REVISION = '179dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -43307,6 +43307,13 @@ class LoadingManager {
 		this.onError = onError;
 
 		/**
+		 * Used for aborting ongoing requests in loaders using this manager.
+		 *
+		 * @type {AbortController}
+		 */
+		this.abortController = new AbortController();
+
+		/**
 		 * This should be called by any loader using the manager when the loader
 		 * starts loading an item.
 		 *
@@ -43506,6 +43513,22 @@ class LoadingManager {
 
 		};
 
+		/**
+		 * Can be used to abort ongoing loading requests in loaders using this manager.
+		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * is supported in the browser.
+		 *
+		 * @return {LoadingManager} A reference to this loading manager.
+		 */
+		this.abort = function () {
+
+			this.abortController.abort();
+			this.abortController = new AbortController();
+
+			return this;
+
+		};
+
 	}
 
 }
@@ -43585,6 +43608,7 @@ class Loader {
 	 * This method needs to be implemented by all concrete loaders. It holds the
 	 * logic for loading assets from the backend.
 	 *
+	 * @abstract
 	 * @param {string} url - The path/URL of the file to be loaded.
 	 * @param {Function} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
@@ -43615,6 +43639,7 @@ class Loader {
 	 * This method needs to be implemented by all concrete loaders. It holds the
 	 * logic for parsing the asset into three.js entities.
 	 *
+	 * @abstract
 	 * @param {any} data - The data to parse.
 	 */
 	parse( /* data */ ) {}
@@ -43685,6 +43710,18 @@ class Loader {
 	setRequestHeader( requestHeader ) {
 
 		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+	/**
+	 * This method can be implemented in loaders for aborting ongoing requests.
+	 *
+	 * @abstract
+	 * @return {Loader} A reference to this instance.
+	 */
+	abort() {
+
 		return this;
 
 	}
@@ -43771,6 +43808,14 @@ class FileLoader extends Loader {
 		 */
 		this.responseType = '';
 
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
+
 	}
 
 	/**
@@ -43837,7 +43882,7 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
-			// An abort controller could be added within a future PR
+			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
 
 		// record states ( avoid data race )
@@ -44050,6 +44095,20 @@ class FileLoader extends Loader {
 	setMimeType( value ) {
 
 		this.mimeType = value;
+		return this;
+
+	}
+
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {FileLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
 		return this;
 
 	}
@@ -48653,6 +48712,14 @@ class ImageBitmapLoader extends Loader {
 		 */
 		this.options = { premultiplyAlpha: 'none' };
 
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
+
 	}
 
 	/**
@@ -48741,6 +48808,7 @@ class ImageBitmapLoader extends Loader {
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
 		fetchOptions.headers = this.requestHeader;
+		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 
 		const promise = fetch( url, fetchOptions ).then( function ( res ) {
 
@@ -48775,6 +48843,20 @@ class ImageBitmapLoader extends Loader {
 
 		Cache.add( `image-bitmap:${url}`, promise );
 		scope.manager.itemStart( url );
+
+	}
+
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {ImageBitmapLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
+		return this;
 
 	}
 
@@ -56745,34 +56827,34 @@ class CameraHelper extends LineSegments {
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
-		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
-		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
+		setPoint( 'n1', pointMap, geometry, _camera, -1, -1, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, -1, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, -1, h, nearZ );
 		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
-		setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
-		setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
+		setPoint( 'f1', pointMap, geometry, _camera, -1, -1, 1 );
+		setPoint( 'f2', pointMap, geometry, _camera, w, -1, 1 );
+		setPoint( 'f3', pointMap, geometry, _camera, -1, h, 1 );
 		setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
 
 		// up
 
 		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
-		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, -1 * 0.7, h * 1.1, nearZ );
 		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
+		setPoint( 'cf1', pointMap, geometry, _camera, -1, 0, 1 );
 		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, -1, 1 );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
+		setPoint( 'cn1', pointMap, geometry, _camera, -1, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, -1, nearZ );
 		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
