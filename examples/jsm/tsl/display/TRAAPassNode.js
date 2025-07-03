@@ -339,7 +339,7 @@ class TRAAPassNode extends PassNode {
 
 					const index = this._texturesIndex[ name ];
 
-					transferNodes[ name ] = textureLoad( this._sampleRenderTarget.textures[ index ], screenCoordinate )
+					transferNodes[ name ] = textureLoad( this._sampleRenderTarget.textures[ index ], screenCoordinate );
 
 				}
 
