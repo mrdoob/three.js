@@ -175,6 +175,7 @@
 				// postprocessing
 
 				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputColorTransform = false;
 			
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
