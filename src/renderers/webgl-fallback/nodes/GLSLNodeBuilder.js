@@ -1138,6 +1138,22 @@ ${ flowData.code }
 
 	}
 
+
+	/**
+	 * Returns a descriptive shader name.
+	 *
+	 * @private
+	 * @return {string} Shader name.
+	 */
+	getShaderName() {
+
+		const name = this.material?.name;
+		const shaderName = ( name !== '' ) ? name : this.material.constructor.name;
+
+		return shaderName;
+
+	}
+
 	/**
 	 * Returns a GLSL struct based on the given name and variables.
 	 *
@@ -1160,16 +1176,15 @@ ${vars}
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @param {string} shaderName - The shader name.
 	 * @return {string} The vertex shader.
 	 */
-	_getGLSLVertexCode( shaderData, shaderName ) {
+	_getGLSLVertexCode( shaderData ) {
 
 		return `#version 300 es
 
 ${ this.getSignature() }
 
-// ${shaderName}
+// ${shaderData.shaderName}
 
 // extensions
 ${shaderData.extensions}
@@ -1212,16 +1227,15 @@ void main() {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @param {string} shaderName - The shader name.
 	 * @return {string} The vertex shader.
 	 */
-	_getGLSLFragmentCode( shaderData, shaderName ) {
+	_getGLSLFragmentCode( shaderData ) {
 
 		return `#version 300 es
 
 ${ this.getSignature() }
 
-// ${shaderName}
+// ${shaderData.shaderName}
 
 // extensions
 ${shaderData.extensions}
@@ -1312,6 +1326,7 @@ void main() {
 
 			const stageData = shadersData[ shaderStage ];
 
+			stageData.shaderName = this.getShaderName();
 			stageData.extensions = this.getExtensions( shaderStage );
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
@@ -1326,11 +1341,8 @@ void main() {
 
 		if ( this.material !== null ) {
 
-			const name = this.material.name;
-			const shaderName = ( name !== '' ) ? name : this.material.constructor.name;
-
-			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex, shaderName );
-			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment, shaderName );
+			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
+			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
 		} else {
 

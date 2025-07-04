@@ -1798,6 +1798,21 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a descriptive shader name.
+	 *
+	 * @private
+	 * @return {string} Shader name.
+	 */
+	getShaderName() {
+
+		const name = this.material?.name;
+		const shaderName = ( name !== '' ) ? name : this.material.constructor.name;
+
+		return shaderName;
+
+	}
+
+	/**
 	 * Controls the code build of the shader stages.
 	 */
 	buildCode() {
@@ -1811,6 +1826,7 @@ ${ flowData.code }
 			this.shaderStage = shaderStage;
 
 			const stageData = shadersData[ shaderStage ];
+			stageData.shaderName = this.getShaderName();
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
@@ -2025,6 +2041,9 @@ ${ flowData.code }
 	_getWGSLVertexCode( shaderData ) {
 
 		return `${ this.getSignature() }
+
+// ${shaderData.shaderName}
+
 // directives
 ${shaderData.directives}
 
@@ -2067,6 +2086,9 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	_getWGSLFragmentCode( shaderData ) {
 
 		return `${ this.getSignature() }
+
+// ${shaderData.shaderName}
+
 // global
 ${ diagnostics }
 
@@ -2104,6 +2126,9 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
 		return `${ this.getSignature() }
+
+// ${shaderData.shaderName}
+
 // directives
 ${shaderData.directives}
 
