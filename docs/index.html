@@ -97,7 +97,13 @@
 
 					// Redirect to the manual
 
-					window.location.href = hash.replace(/^manual\/([^\/]+)\/([^\/]+)\/(.+)$/, '../manual/#$1/$3').toLowerCase();
+					window.location.href = hash.replace( /^manual\/([^\/]+)\/([^\/]+)\/(.+)$/, '../manual/#$1/$3' ).toLowerCase();
+
+				} else {
+
+					// Redirect to new docs
+
+					window.location.href = hash.replace( /^api\/([^\/]+)\/([^\/]+)\/(.+)$/, '../docs_new/$3' );
 
 				}
 
@@ -112,6 +118,10 @@
 					language = hashLanguage[ 2 ];
 
 				}
+
+			} else {
+
+				window.location.href = '../docs_new/';
 
 			}
 
