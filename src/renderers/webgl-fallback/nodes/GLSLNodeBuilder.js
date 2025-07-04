@@ -1160,13 +1160,16 @@ ${vars}
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
+	 * @param {string} shaderName - The shader name.
 	 * @return {string} The vertex shader.
 	 */
-	_getGLSLVertexCode( shaderData ) {
+	_getGLSLVertexCode( shaderData, shaderName ) {
 
 		return `#version 300 es
 
 ${ this.getSignature() }
+
+// ${shaderName}
 
 // extensions
 ${shaderData.extensions}
@@ -1209,13 +1212,16 @@ void main() {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
+	 * @param {string} shaderName - The shader name.
 	 * @return {string} The vertex shader.
 	 */
-	_getGLSLFragmentCode( shaderData ) {
+	_getGLSLFragmentCode( shaderData, shaderName ) {
 
 		return `#version 300 es
 
 ${ this.getSignature() }
+
+// ${shaderName}
 
 // extensions
 ${shaderData.extensions}
@@ -1320,8 +1326,11 @@ void main() {
 
 		if ( this.material !== null ) {
 
-			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
-			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
+			const name = this.material.name;
+			const shaderName = ( name !== '' ) ? name : this.material.constructor.name;
+
+			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex, shaderName );
+			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment, shaderName );
 
 		} else {
 
