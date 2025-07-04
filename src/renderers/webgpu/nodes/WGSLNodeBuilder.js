@@ -1182,6 +1182,12 @@ ${ flowData.code }
 
 	}
 
+	getFrag() {
+
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' );
+
+	}
+
 	/**
 	 * Returns the frag depth builtin.
 	 *
