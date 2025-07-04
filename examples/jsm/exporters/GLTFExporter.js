@@ -935,6 +935,8 @@ class GLTFWriter {
 	async buildMetalRoughTextureAsync( metalnessMap, roughnessMap ) {
 
 		if ( metalnessMap === roughnessMap ) return metalnessMap;
+		if ( metalnessMap === null ) return roughnessMap;
+		if ( roughnessMap === null ) return metalnessMap;
 
 		function getEncodingConversion( map ) {
 
