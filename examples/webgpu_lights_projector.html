@@ -136,10 +136,15 @@
 
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.rotation.y = - Math.PI / 2;
+					mesh.position.x = - 1;
 					mesh.position.y = 0.8;
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
 					scene.add( mesh );
+
+					const mesh2 = mesh.clone();
+					mesh2.position.x = 1;
+					scene.add( mesh2 );
 
 				} );
 
