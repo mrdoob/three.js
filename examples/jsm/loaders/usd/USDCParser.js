@@ -1,3 +1,7 @@
+import {
+	Group
+} from 'three';
+
 class USDCParser {
 
 	parse( buffer ) {
