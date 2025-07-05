@@ -17,7 +17,8 @@ import {
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
 	UnsignedShort5551Type,
-	WebGLCoordinateSystem
+	WebGLCoordinateSystem,
+	ReversedCoordinateSystem
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
@@ -2382,7 +2383,10 @@ class WebGLRenderer {
 
 				const reverseDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reverseDepthBuffer ) {
+				if ( reverseDepthBuffer && camera.coordinateSystem !== ReversedCoordinateSystem ) {
+
+					// @deprecated, r179
+					warnOnce( 'THREE.WebGLRenderer: reverseDepthBuffer must be used with camera.coordinateSystem = THREE.ReversedCoordinateSystem for correct results. Automatic conversion will be removed in r189.' );
 
 					_currentProjectionMatrix.copy( camera.projectionMatrix );
 

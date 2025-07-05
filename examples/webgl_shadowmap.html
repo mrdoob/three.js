@@ -102,11 +102,18 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, reverseDepthBuffer: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
+
+				if ( renderer.capabilities.reverseDepthBuffer ) {
+
+					camera.coordinateSystem = THREE.ReversedCoordinateSystem;
+					camera.updateProjectionMatrix();
+
+				}
 
 				renderer.autoClear = false;
 
