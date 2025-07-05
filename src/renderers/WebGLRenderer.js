@@ -1068,7 +1068,6 @@ class WebGLRenderer {
 
 		}
 
-
 		function releaseMaterialProgramReferences( material ) {
 
 			const programs = properties.get( material ).programs;
@@ -2176,6 +2175,7 @@ class WebGLRenderer {
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
 			materialProperties.toneMapping = parameters.toneMapping;
+			materialProperties.renderTarget = parameters.renderTarget;
 
 		}
 
@@ -2331,6 +2331,10 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( materialProperties.morphTargetsCount !== morphTargetsCount ) {
+
+					needsProgramChange = true;
+
+				} else if ( materialProperties.renderTarget !== _currentRenderTarget ) {
 
 					needsProgramChange = true;
 
