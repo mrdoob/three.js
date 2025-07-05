@@ -20,18 +20,18 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDAParser {
 
-	parse( text ) {
+	parse( text, assets ) {
 
-		const data = {};
+		const root = {};
 
 		const lines = text.split( '\n' );
 
 		let string = null;
-		let target = data;
+		let target = root;
 
-		const stack = [ data ];
+		const stack = [ root ];
 
-		// debugger;
+		// Parse USDA file
 
 		for ( const line of lines ) {
 
@@ -110,176 +110,7 @@ class USDAParser {
 
 		}
 
-		return data;
-
-	}
-
-}
-
-/**
- * A loader for the USDZ format.
- *
- * USDZ files that use USDC internally are not yet supported, only USDA.
- *
- * ```js
- * const loader = new USDZLoader();
- * const model = await loader.loadAsync( 'saeukkang.usdz' );
- * scene.add( model );
- * ```
- *
- * @augments Loader
- * @three_import import { USDZLoader } from 'three/addons/loaders/USDZLoader.js';
- */
-class USDZLoader extends Loader {
-
-	/**
-	 * Constructs a new USDZ loader.
-	 *
-	 * @param {LoadingManager} [manager] - The loading manager.
-	 */
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
-	/**
-	 * Starts loading from the given URL and passes the loaded USDZ asset
-	 * to the `onLoad()` callback.
-	 *
-	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
-	 */
-	load( url, onLoad, onProgress, onError ) {
-
-		const scope = this;
-
-		const loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( text ) {
-
-			try {
-
-				onLoad( scope.parse( text ) );
-
-			} catch ( e ) {
-
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
-
-			}
-
-		}, onProgress, onError );
-
-	}
-
-	/**
-	 * Parses the given USDZ data and returns the resulting group.
-	 *
-	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
-	 * @return {Group} The parsed asset as a group.
-	 */
-	parse( buffer ) {
-
-		const parser = new USDAParser();
-
-		function parseAssets( zip ) {
-
-			const data = {};
-			const loader = new FileLoader();
-			loader.setResponseType( 'arraybuffer' );
-
-			for ( const filename in zip ) {
-
-				if ( filename.endsWith( 'png' ) ) {
-
-					const blob = new Blob( [ zip[ filename ] ], { type: 'image/png' } );
-					data[ filename ] = URL.createObjectURL( blob );
-
-				}
-
-				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) ) {
-
-					if ( isCrateFile( zip[ filename ] ) ) {
-
-						throw Error( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
-
-					}
-
-					const text = fflate.strFromU8( zip[ filename ] );
-					data[ filename ] = parser.parse( text );
-
-				}
-
-			}
-
-			return data;
-
-		}
-
-		function isCrateFile( buffer ) {
-
-			// Check if this a crate file. First 7 bytes of a crate file are "PXR-USDC".
-			const fileHeader = buffer.slice( 0, 7 );
-			const crateHeader = new Uint8Array( [ 0x50, 0x58, 0x52, 0x2D, 0x55, 0x53, 0x44, 0x43 ] );
-
-			// If this is not a crate file, we assume it is a plain USDA file.
-			return fileHeader.every( ( value, index ) => value === crateHeader[ index ] );
-
-		}
-
-		function findUSD( zip ) {
-
-			if ( zip.length < 1 ) return undefined;
-
-			const firstFileName = Object.keys( zip )[ 0 ];
-			let isCrate = false;
-
-			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
-			// ASCII files can end in either .usda or .usd.
-			// See https://openusd.org/release/spec_usdz.html#layout
-			if ( firstFileName.endsWith( 'usda' ) ) return zip[ firstFileName ];
-
-			if ( firstFileName.endsWith( 'usdc' ) ) {
-
-				isCrate = true;
-
-			} else if ( firstFileName.endsWith( 'usd' ) ) {
-
-				// If this is not a crate file, we assume it is a plain USDA file.
-				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
-
-					return zip[ firstFileName ];
-
-				} else {
-
-					isCrate = true;
-
-				}
-
-			}
-
-			if ( isCrate ) {
-
-				throw Error( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
-
-			}
-
-		}
+		// Build scene graph
 
 		function findMeshGeometry( data ) {
 
@@ -897,13 +728,212 @@ class USDZLoader extends Loader {
 
 		}
 
+		return buildGroup( root );
+
+	}
+
+}
+
+class USDCParser {
+
+	parse( buffer ) {
+
+		// TODO
+
+		return new Group();
+
+	}
+
+}
+
+/**
+ * A loader for the USDZ format.
+ *
+ * USDZ files that use USDC internally are not yet supported, only USDA.
+ *
+ * ```js
+ * const loader = new USDZLoader();
+ * const model = await loader.loadAsync( 'saeukkang.usdz' );
+ * scene.add( model );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { USDZLoader } from 'three/addons/loaders/USDZLoader.js';
+ */
+class USDZLoader extends Loader {
+
+	/**
+	 * Constructs a new USDZ loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
+
+		super( manager );
+
+	}
+
+	/**
+	 * Starts loading from the given URL and passes the loaded USDZ asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
+	load( url, onLoad, onProgress, onError ) {
+
+		const scope = this;
+
+		const loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
+		loader.load( url, function ( text ) {
+
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
+
+		}, onProgress, onError );
+
+	}
+
+	/**
+	 * Parses the given USDZ data and returns the resulting group.
+	 *
+	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
+	 * @return {Group} The parsed asset as a group.
+	 */
+	parse( buffer ) {
+
+		const usda = new USDAParser();
+		const usdc = new USDCParser();
+
+		function parseAssets( zip ) {
+
+			const data = {};
+			const loader = new FileLoader();
+			loader.setResponseType( 'arraybuffer' );
+
+			for ( const filename in zip ) {
+
+				if ( filename.endsWith( 'png' ) ) {
+
+					const blob = new Blob( [ zip[ filename ] ], { type: 'image/png' } );
+					data[ filename ] = URL.createObjectURL( blob );
+
+				}
+
+				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) || filename.endsWith( 'usdc' ) ) {
+
+					if ( isCrateFile( zip[ filename ] ) ) {
+
+						data[ filename ] = usdc.parse( zip[ filename ].buffer, data );
+
+					} else {
+
+						const text = fflate.strFromU8( zip[ filename ] );
+						data[ filename ] = usda.parse( text, data );
+
+					}
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function isCrateFile( buffer ) {
+
+			const crateHeader = new Uint8Array( [ 0x50, 0x58, 0x52, 0x2D, 0x55, 0x53, 0x44, 0x43 ] ); // PXR-USDC
+
+			if ( buffer.byteLength < crateHeader.length ) return false;
+
+			const view = new Uint8Array( buffer, 0, crateHeader.length );
+
+			for ( let i = 0; i < crateHeader.length; i ++ ) {
+
+				if ( view[ i ] !== crateHeader[ i ] ) return false;
+
+			}
+
+			return true;
+
+		}
+
+		function findUSD( zip ) {
+
+			if ( zip.length < 1 ) return undefined;
+
+			const firstFileName = Object.keys( zip )[ 0 ];
+			let isCrate = false;
+
+			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
+			// ASCII files can end in either .usda or .usd.
+			// See https://openusd.org/release/spec_usdz.html#layout
+			if ( firstFileName.endsWith( 'usda' ) ) return zip[ firstFileName ];
+
+			if ( firstFileName.endsWith( 'usdc' ) ) {
+
+				isCrate = true;
+
+			} else if ( firstFileName.endsWith( 'usd' ) ) {
+
+				// If this is not a crate file, we assume it is a plain USDA file.
+				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
+
+					return zip[ firstFileName ];
+
+				} else {
+
+					isCrate = true;
+
+				}
+
+			}
+
+			if ( isCrate ) {
+
+				return zip[ firstFileName ];
+
+			}
+
+		}
+
 		// USDA
 
 		if ( typeof buffer === 'string' ) {
 
-			const root = parser.parse( buffer );
+			return usda.parse( buffer, {} );
 
-			return buildGroup( root );
+		}
+
+		// USDC
+
+		if ( isCrateFile( buffer ) ) {
+
+			return usdc.parse( buffer );
 
 		}
 
@@ -913,14 +943,13 @@ class USDZLoader extends Loader {
 
 		const assets = parseAssets( zip );
 
-		// console.log( assets )
+		// console.log( assets );
 
 		const file = findUSD( zip );
 
 		const text = fflate.strFromU8( file );
-		const root = parser.parse( text );
 
-		return buildGroup( root );
+		return usda.parse( text, assets );
 
 	}
 
