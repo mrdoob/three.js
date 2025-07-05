@@ -1564,7 +1564,7 @@ export const GLSL1 = '100';
 export const GLSL3 = '300 es';
 
 /**
- * WebGL coordinate system.
+ * WebGL coordinate system [-1, 1].
  *
  * @type {number}
  * @constant
@@ -1572,12 +1572,22 @@ export const GLSL3 = '300 es';
 export const WebGLCoordinateSystem = 2000;
 
 /**
- * WebGPU coordinate system.
+ * WebGPU coordinate system [0, 1].
  *
  * @type {number}
  * @constant
  */
 export const WebGPUCoordinateSystem = 2001;
+
+/**
+ * Reversed coordinate system [1, 0].
+ *
+ * Used for reverse depth buffer.
+ *
+ * @type {number}
+ * @constant
+ */
+export const ReversedCoordinateSystem = 2002;
 
 /**
  * Represents the different timestamp query types.
