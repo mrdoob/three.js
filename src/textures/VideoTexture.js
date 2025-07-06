@@ -53,18 +53,26 @@ class VideoTexture extends Texture {
 		 */
 		this.generateMipmaps = false;
 
+		/**
+		 * The video frame request callback identifier, which is initially zero.
+		 * 
+		 * @private
+		 * @type {number}
+		 */
+		this._requestVideoFrameCallbackId = - 1;
+
 		const scope = this;
 
 		function updateVideo() {
 
 			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
+			scope._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
 		if ( 'requestVideoFrameCallback' in video ) {
 
-			video.requestVideoFrameCallback( updateVideo );
+			this._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
@@ -92,6 +100,21 @@ class VideoTexture extends Texture {
 			this.needsUpdate = true;
 
 		}
+
+	}
+
+	/**
+	 * @override
+	 */
+	dispose() {
+
+		if ( this._requestVideoFrameCallbackId !== - 1 ) {
+
+			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
+
+		}
+
+		super.dispose();
 
 	}
 
