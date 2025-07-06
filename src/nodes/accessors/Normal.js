@@ -6,7 +6,7 @@ import { positionView } from './Position.js';
 import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 
 /**
- * TSL object that represents the normal attribute of the current rendered object.
+ * TSL object that represents the normal attribute of the current rendered object in local space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -14,7 +14,7 @@ import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 export const normalGeometry = /*@__PURE__*/ attribute( 'normal', 'vec3' );
 
 /**
- * TSL object that represents the vertex normal in local space of the current rendered object.
+ * TSL object that represents the vertex normal of the current rendered object in local space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -34,7 +34,7 @@ export const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )().toVar( 'normalLocal' );
 
 /**
- * TSL object that represents the flat vertex normal in view space of the current rendered object.
+ * TSL object that represents the flat vertex normal of the current rendered object in view space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -42,7 +42,7 @@ export const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 export const normalFlat = /*@__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize().toVar( 'normalFlat' );
 
 /**
- * TSL object that represents the vertex normal in view space of the current rendered object.
+ * TSL object that represents the vertex normal of the current rendered object in view space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -66,7 +66,7 @@ export const normalViewGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )().toVar( 'normalViewGeometry' );
 
 /**
- * TSL object that represents the vertex normal in world space of the current rendered object.
+ * TSL object that represents the vertex normal of the current rendered object in world space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -86,7 +86,7 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )();
 
 /**
- * TSL object that represents the transformed vertex normal in view space of the current rendered object.
+ * TSL object that represents the vertex normal of the current rendered object in view space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -118,7 +118,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, material, context 
 }, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'normalView' );
 
 /**
- * TSL object that represents the transformed vertex normal in world space of the current rendered object.
+ * TSL object that represents the vertex normal of the current rendered object in world space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -126,7 +126,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, material, context 
 export const normalWorld = /*@__PURE__*/ normalView.transformDirection( cameraViewMatrix ).toVar( 'normalWorld' );
 
 /**
- * TSL object that represents the transformed clearcoat vertex normal in view space of the current rendered object.
+ * TSL object that represents the clearcoat vertex normal of the current rendered object in view space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -200,7 +200,7 @@ export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) =
 // Deprecated
 
 /**
- * TSL object that represents the transformed vertex normal in view space of the current rendered object.
+ * TSL object that represents the transformed vertex normal of the current rendered object in view space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -214,7 +214,7 @@ export const transformedNormalView = ( Fn( () => { // @deprecated, r177
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
 
 /**
- * TSL object that represents the transformed vertex normal in world space of the current rendered object.
+ * TSL object that represents the transformed vertex normal of the current rendered object in world space.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -228,7 +228,7 @@ export const transformedNormalWorld = ( Fn( () => { // @deprecated, r177
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
 
 /**
- * TSL object that represents the transformed clearcoat vertex normal in view space of the current rendered object.
+ * TSL object that represents the transformed clearcoat vertex normal of the current rendered object in view space.
  *
  * @tsl
  * @type {Node<vec3>}
