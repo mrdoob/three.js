@@ -55,7 +55,7 @@ class VideoTexture extends Texture {
 
 		/**
 		 * The video frame request callback identifier, which is initially zero.
-		 * 
+		 *
 		 * @private
 		 * @type {number}
 		 */
