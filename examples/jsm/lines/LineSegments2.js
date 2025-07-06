@@ -70,14 +70,15 @@ function raycastWorldUnits( lineSegments, intersects ) {
 		const point = new Vector3();
 
 		_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
-		const isInside = point.distanceTo( pointOnLine ) < _lineWidth * 0.5;
+		const distance = point.distanceTo( pointOnLine );
+		const isInside = distance < _lineWidth * 0.5;
 
 		if ( isInside ) {
 
 			intersects.push( {
 				point,
 				pointOnLine,
-				distance: _ray.origin.distanceTo( point ),
+				distance: distance,
 				object: lineSegments,
 				face: null,
 				faceIndex: i,
@@ -205,12 +206,12 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 			const pointOnLine = new Vector3();
 			const point = new Vector3();
 
-			_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
+			const distSq = _ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
 
 			intersects.push( {
 				point: point,
 				pointOnLine: pointOnLine,
-				distance: _ray.origin.distanceTo( point ),
+				distance: Math.sqrt( distSq ),
 				object: lineSegments,
 				face: null,
 				faceIndex: i,

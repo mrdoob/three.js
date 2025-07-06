@@ -303,9 +303,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b, i ) {
 
 	if ( distSq > thresholdSq ) return;
 
-	_intersectPointOnRay.applyMatrix4( object.matrixWorld ); // Move back to world space for distance calculation
-
-	const distance = raycaster.ray.origin.distanceTo( _intersectPointOnRay );
+	const distance = Math.sqrt( distSq );
 
 	if ( distance < raycaster.near || distance > raycaster.far ) return;
 
