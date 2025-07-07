@@ -36,6 +36,11 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			const params = {
+				autoRotate: true
+			};
 
 			let camera, scene, renderer;
 			let postProcessing;
@@ -122,6 +127,7 @@
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 				controls.maxPolarAngle = Math.PI / 2;
+				controls.enableDamping = true;
 				controls.autoRotate = true;
 				controls.autoRotateSpeed = 1;
 				controls.target.set( 0, 1, 0 );
@@ -148,6 +154,12 @@
 				//
 
 				startTweens();
+
+				//
+
+				const gui = new GUI();
+
+				gui.add( params, 'autoRotate' ).onChange( value => controls.autoRotate = value );
 
 			}
 
