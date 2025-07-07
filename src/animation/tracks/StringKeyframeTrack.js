@@ -16,7 +16,7 @@ class StringKeyframeTrack extends KeyframeTrack {
 	 *
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
-	 * @param {Array<number>} values - A list of keyframe values.
+	 * @param {Array<string>} values - A list of keyframe values.
 	 */
 	constructor( name, times, values ) {
 
