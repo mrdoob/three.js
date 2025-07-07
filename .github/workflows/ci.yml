@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Lint testing
+  test:
+    name: Lint, Unit, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
@@ -28,39 +28,14 @@ jobs:
       - name: === Lint testing ===
         run: npm run lint
 
-  unit:
-    name: Unit testing
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
       - name: === Unit testing ===
         run: npm run test-unit
 
-  circular:
-    name: Circular dependencies testing
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
       - name: === Circular dependencies testing ===
         run: npm run test-circular-deps
+
+      - name: === Examples ready for release ===
+        run: npm run test-e2e-cov
 
   e2e:
     name: E2E testing
@@ -95,20 +70,3 @@ jobs:
           name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore
-
-  e2e-cov:
-    name: Examples ready for release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
-      - name: === Examples ready for release ===
-        run: npm run test-e2e-cov
