@@ -55,7 +55,7 @@ class VideoTexture extends Texture {
 
 		/**
 		 * The video frame request callback identifier, which is a positive integer.
-		 * 
+		 *
 		 * Value of 0 represents no scheduled rVFC.
 		 *
 		 * @private
