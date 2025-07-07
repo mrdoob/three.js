@@ -1,4 +1,4 @@
-import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem, ReversedCoordinateSystem } from '../constants.js';
 import { Vector3 } from './Vector3.js';
 
 /**
@@ -1126,6 +1126,11 @@ class Matrix4 {
 			c = - far / ( far - near );
 			d = ( - far * near ) / ( far - near );
 
+		} else if ( coordinateSystem === ReversedCoordinateSystem ) {
+
+			c = far / ( far - near ) - 1;
+			d = ( far * near ) / ( far - near );
+
 		} else {
 
 			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
@@ -1175,6 +1180,11 @@ class Matrix4 {
 
 			z = near * p;
 			zInv = - 1 * p;
+
+		} else if ( coordinateSystem === ReversedCoordinateSystem ) {
+
+			z = - near * p - 1;
+			zInv = 1 * p;
 
 		} else {
 

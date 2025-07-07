@@ -1,4 +1,4 @@
-import { FrontSide, BackSide, DoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
+import { FrontSide, BackSide, DoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending, ReversedCoordinateSystem } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
 import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
@@ -149,6 +149,17 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
+
+				// @deprecated, r179
+				if ( capabilities.reverseDepthBuffer === true && camera.coordinateSystem !== ReversedCoordinateSystem ) {
+
+					shadow.camera.coordinateSystem = ReversedCoordinateSystem;
+
+				} else {
+
+					shadow.camera.coordinateSystem = camera.coordinateSystem;
+
+				}
 
 				shadow.camera.updateProjectionMatrix();
 
