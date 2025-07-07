@@ -149,9 +149,9 @@
 					// reflection composite
 
 					const reflectionMask = reflectionBlurred.a.mul( reflectionDepth ).remapClamp( 0, roughnessRange );
-					const reflectionItensity = .1;
+					const reflectionIntensity = .1;
 					const reflectionMixFactor = reflectionMask.mul( roughness.mul( 2 ).min( 1 ) );
-					const reflectionFinal = mix( reflection.rgb, reflectionBlurred.rgb, reflectionMixFactor ).mul( reflectionItensity );
+					const reflectionFinal = mix( reflection.rgb, reflectionBlurred.rgb, reflectionMixFactor ).mul( reflectionIntensity );
 
 					// mix reflection with animated circle
 
