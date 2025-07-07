@@ -54,12 +54,14 @@ class VideoTexture extends Texture {
 		this.generateMipmaps = false;
 
 		/**
-		 * The video frame request callback identifier, which is initially zero.
+		 * The video frame request callback identifier, which is a positive integer.
+		 * 
+		 * Value of 0 represents no scheduled rVFC.
 		 *
 		 * @private
 		 * @type {number}
 		 */
-		this._requestVideoFrameCallbackId = - 1;
+		this._requestVideoFrameCallbackId = 0;
 
 		const scope = this;
 
@@ -108,7 +110,7 @@ class VideoTexture extends Texture {
 	 */
 	dispose() {
 
-		if ( this._requestVideoFrameCallbackId !== - 1 ) {
+		if ( this._requestVideoFrameCallbackId !== 0 ) {
 
 			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
 
