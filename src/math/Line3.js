@@ -193,7 +193,7 @@ class Line3 {
 	 * @param {Vector2} target - The vector that is used to store the method's result. x is parameter for point on this, y is parameter for point on line.
 	 * @return {Vector2} - Point parameters of the shortest segment connecting two lines.
 	 */
-	closestSegmentToLineParameters( line, clampToLine, target ) {
+	shortestSegmentToLineParameters( line, clampToLine, target ) {
 
 		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
 		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
@@ -221,7 +221,7 @@ class Line3 {
 
 		if ( otherLengthSq < EPS_SQR ) {
 
-			target.set( this.closestPointToPoint( line.start, clampToLine ), 0 );
+			target.set( this.closestPointToPointParameter( line.start, clampToLine ), 0 );
 			return target;
 
 		}
@@ -285,9 +285,9 @@ class Line3 {
 	 * @param {Line3} target - The target segment that is used to store the method's result. Start point is on this, end is on line.
 	 * @return {Line3} - The shortest segment connecting two lines.
 	 */
-	closestSegmentToLine( line, clampToLine, target ) {
+	shortestSegmentToLine( line, clampToLine, target ) {
 
-		this.closestSegmentToLineParameters( line, clampToLine, _parameters );
+		this.shortestSegmentToLineParameters( line, clampToLine, _parameters );
 
 		this.delta( target.start ).multiplyScalar( _parameters.x ).add( this.start );
 		line.delta( target.end ).multiplyScalar( _parameters.y ).add( line.start );
@@ -305,7 +305,7 @@ class Line3 {
 	 */
 	closestDistanceToLine( line, clampToLine ) {
 
-		this.closestSegmentToLineParameters( line, clampToLine, _parameters );
+		this.shortestSegmentToLineParameters( line, clampToLine, _parameters );
 
 		const pointA = this.delta( _startEnd ).multiplyScalar( _parameters.x ).add( this.start );
 		const pointB = line.delta( _startEnd2 ).multiplyScalar( _parameters.y ).add( line.start );
