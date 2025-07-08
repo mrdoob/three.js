@@ -1,17 +1,17 @@
 import { Vector3 } from './Vector3.js';
+import { Vector2 } from './Vector2.js';
 import { clamp } from './MathUtils.js';
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
 const _startEnd2 = /*@__PURE__*/ new Vector3();
+const _parameters = /*@__PURE__*/ new Vector2();
 const EPS_SQR = Number.EPSILON * Number.EPSILON;
 
 /**
  * An analytical line segment in 3D space represented by a start and end point.
  */
 class Line3 {
-
-	static _segment = new Line3();
 
 	/**
 	 * Constructs a new line segment.
@@ -186,14 +186,14 @@ class Line3 {
 	}
 
 	/**
-	 * Returns shortest segment connecting two lines.
+	 * Returns point parameters of shortest segment connecting two lines.
 	 *
 	 * @param {Line3} line Line to find distance to
 	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
-	 * @param {Line3} target - The target segment that is used to store the method's result. Start point is on this, end is on line.
-	 * @return {Line3} - The shortest segment connecting two lines.
+	 * @param {Vector2} target - The vector that is used to store the method's result. x is parameter for point on this, y is parameter for point on line.
+	 * @return {Vector2} - Point parameters of the shortest segment connecting two lines.
 	 */
-	closestSegmentToLine( line, clampToLine, target ) {
+	closestSegmentToLineParameters( line, clampToLine, target ) {
 
 		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
 		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
@@ -207,24 +207,21 @@ class Line3 {
 
 		if ( thisLengthSq < EPS_SQR && otherLengthSq < EPS_SQR ) {
 
-			target.start.copy( this.start );
-			target.end.copy( line.start );
+			target.set( 0, 0 );
 			return target;
 
 		}
 
 		if ( thisLengthSq < EPS_SQR ) {
 
-			target.start.copy( this.start );
-			line.closestPointToPoint( this.start, clampToLine, target.end );
+			target.set( 0, line.closestPointToPointParameter( this.start, clampToLine ) );
 			return target;
 
 		}
 
 		if ( otherLengthSq < EPS_SQR ) {
 
-			this.closestPointToPoint( line.start, clampToLine, target.start );
-			target.end.copy( line.start );
+			target.set( this.closestPointToPoint( line.start, clampToLine ), 0 );
 			return target;
 
 		}
@@ -274,8 +271,27 @@ class Line3 {
 
 		}
 
-		target.start.copy( this.start ).addScaledVector( _startEnd, s );
-		target.end.copy( line.start ).addScaledVector( _startEnd2, t );
+		target.set( s, t );
+		return target;
+
+
+	}
+
+	/**
+	 * Returns shortest segment connecting two lines.
+	 *
+	 * @param {Line3} line Line to find distance to
+	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
+	 * @param {Line3} target - The target segment that is used to store the method's result. Start point is on this, end is on line.
+	 * @return {Line3} - The shortest segment connecting two lines.
+	 */
+	closestSegmentToLine( line, clampToLine, target ) {
+
+		this.closestSegmentToLineParameters( line, clampToLine, _parameters );
+
+		this.delta( target.start ).multiplyScalar( _parameters.x ).add( this.start );
+		line.delta( target.end ).multiplyScalar( _parameters.y ).add( line.start );
+
 		return target;
 
 	}
@@ -289,9 +305,12 @@ class Line3 {
 	 */
 	closestDistanceToLine( line, clampToLine ) {
 
-		this.closestSegmentToLine( line, clampToLine, Line3._segment );
+		this.closestSegmentToLineParameters( line, clampToLine, _parameters );
 
-		return Line3._segment.distance();
+		const pointA = this.delta( _startEnd ).multiplyScalar( _parameters.x ).add( this.start );
+		const pointB = line.delta( _startEnd2 ).multiplyScalar( _parameters.y ).add( line.start );
+
+		return pointA.distanceTo( pointB );
 
 	}
 
