@@ -140,6 +140,7 @@ const exceptionList = [
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',
 	'webgpu_compute_sort_bitonic',
+	'webgpu_compute_reduce',
 	'webgpu_struct_drawindirect',
 
 	// WebGPURenderer: Unknown problem
