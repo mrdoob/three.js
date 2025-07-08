@@ -186,9 +186,10 @@ class Line3 {
 	/**
 	 *
 	 * @param {Line3} line Line to find distance to
+	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
 	 * @return {number} Closest distance between lines
 	 */
-	closestDistanceToLine( line ) {
+	closestDistanceToLine( line, clampToLine ) {
 
 		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
 		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
@@ -208,13 +209,13 @@ class Line3 {
 
 		if ( thisLengthSq < EPS_SQR ) {
 
-			return line.distanceToPoint( this.start );
+			return line.distanceToPoint( this.start, clampToLine );
 
 		}
 
 		if ( otherLengthSq < EPS_SQR ) {
 
-			return this.distanceToPoint( line.start );
+			return this.distanceToPoint( line.start, clampToLine );
 
 		}
 
@@ -232,8 +233,11 @@ class Line3 {
 		if ( denom != 0 ) {
 
 			s = ( b * f - c * otherLengthSq ) / denom;
-			// TODO: Clamp only if needed
-			s = Math.min( Math.max( s, 0 ), 1 );
+			if ( clampToLine ) {
+
+				s = clamp( s, 0, 1 );
+
+			}
 
 		}
 
@@ -241,19 +245,22 @@ class Line3 {
 		// t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / otherLengthSq
 		let t = ( b * s + f ) / otherLengthSq;
 
-		// If t in [0,1] done. Else clamp t, recompute s for the new value
-		// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1) = (t*b - c) / thisLengthSq
-		// and clamp s to [0, 1]
-		// TODO: clamp only if needed
-		if ( t < 0.0 ) {
+		if ( clampToLine ) {
 
-			t = 0.0;
-			s = Math.min( Math.max( - c / thisLengthSq, 0 ), 1 );
+			// If t in [0,1] done. Else clamp t, recompute s for the new value
+			// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1) = (t*b - c) / thisLengthSq
+			// and clamp s to [0, 1]
+			if ( t < 0.0 ) {
 
-		} else if ( t > 1 ) {
+				t = 0.0;
+				s = clamp( - c / thisLengthSq, 0, 1 );
 
-			t = 1;
-			s = Math.min( Math.max( ( b - c ) / thisLengthSq, 0 ), 1 );
+			} else if ( t > 1 ) {
+
+				t = 1;
+				s = clamp( ( b - c ) / thisLengthSq, 0, 1 );
+
+			}
 
 		}
 
