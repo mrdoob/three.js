@@ -11,6 +11,8 @@ const EPS_SQR = Number.EPSILON * Number.EPSILON;
  */
 class Line3 {
 
+	static _segment = new Line3();
+
 	/**
 	 * Constructs a new line segment.
 	 *
@@ -184,12 +186,14 @@ class Line3 {
 	}
 
 	/**
+	 * Returns shortest segment connecting two lines.
 	 *
 	 * @param {Line3} line Line to find distance to
 	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
-	 * @return {number} Closest distance between lines
+	 * @param {Line3} target - The target segment that is used to store the method's result. Start point is on this, end is on line.
+	 * @return {Line3} - The shortest segment connecting two lines.
 	 */
-	closestDistanceToLine( line, clampToLine ) {
+	closestSegmentToLine( line, clampToLine, target ) {
 
 		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
 		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
@@ -203,19 +207,25 @@ class Line3 {
 
 		if ( thisLengthSq < EPS_SQR && otherLengthSq < EPS_SQR ) {
 
-			return this.start.distanceTo( line.start );
+			target.start.copy( this.start );
+			target.end.copy( line.start );
+			return target;
 
 		}
 
 		if ( thisLengthSq < EPS_SQR ) {
 
-			return line.distanceToPoint( this.start, clampToLine );
+			target.start.copy( this.start );
+			line.closestPointToPoint( this.start, clampToLine, target.end );
+			return target;
 
 		}
 
 		if ( otherLengthSq < EPS_SQR ) {
 
-			return this.distanceToPoint( line.start, clampToLine );
+			this.closestPointToPoint( line.start, clampToLine, target.start );
+			target.end.copy( line.start );
+			return target;
 
 		}
 
@@ -264,12 +274,27 @@ class Line3 {
 
 		}
 
-		_startEnd.multiplyScalar( s ).add( this.start );
-		_startEnd2.multiplyScalar( t ).add( line.start );
-
-		return _startEnd2.distanceTo( _startEnd );
+		target.start.copy( this.start ).addScaledVector( _startEnd, s );
+		target.end.copy( line.start ).addScaledVector( _startEnd2, t );
+		return target;
 
 	}
+
+	/**
+	 * Return distance between two lines.
+	 *
+	 * @param {Line3} line Line to find distance to
+	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
+	 * @return {number} Closest distance between lines
+	 */
+	closestDistanceToLine( line, clampToLine ) {
+
+		this.closestSegmentToLine( line, clampToLine, Line3._segment );
+
+		return Line3._segment.distance();
+
+	}
+
 
 	/**
 	 * Applies a 4x4 transformation matrix to this line segment.
