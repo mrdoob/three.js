@@ -89,7 +89,7 @@
 				// Number of elements in the grid being displayed
 				gridDisplayWidth: uniform( gridDim ),
 				gridDisplayHeight: uniform( gridDim ),
-				'Display Mode': 'Workgroup 0'
+				'Display Mode': 'Entire Grid'
 			};
 
 			const leftEffectController = {
@@ -483,6 +483,12 @@
 			
 				];
 
+				const createReduce4Fn = ( workgroupSize, dispatch, numElements ) => {
+
+
+			
+				};
+
 				const calls = {
 					'Reduce 0 (N/2)': reduce0Calls,
 					'Reduce 1 (Naive Accumulate)': reduce1Calls,
@@ -646,8 +652,7 @@
 
 						}
 
-						// Debug buffer:
-						// const reductionResult = new Uint32Array( await renderer.getArrayBufferAsync( currentBuffer ) )[0];
+						// DEBUG: const reductionResult = new Uint32Array( await renderer.getArrayBufferAsync( currentBuffer ) )[0];
 
 						let passInfoString = '';
 
@@ -695,8 +700,6 @@
 
 				};
 
-			
-				stepAnimation();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -716,6 +719,8 @@
 					renderer.render( scene, camera );
 
 				}
+
+				setTimeout( stepAnimation, 500 );
 
 			}
 
