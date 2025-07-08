@@ -55,7 +55,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storage, Loop, If, vec3, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray } from 'three/tsl';
+			import { instancedArray, Loop, If, vec3, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -152,8 +152,6 @@
 
 			gui.add( unifiedEffectController, 'Display Mode', displayModes ).onChange( () => {
 
-				console.log( unifiedEffectController[ 'Display Mode' ] );
-
 				switch ( unifiedEffectController[ 'Display Mode' ] ) {
 
 					case 'Entire Grid': {
@@ -166,8 +164,6 @@
 					}
 
 					case 'Workgroup 0': {
-
-						console.log( maxWorkgroupSize );
 
 						unifiedEffectController.gridDisplayWidth.value = Math.sqrt( maxWorkgroupSize );
 						unifiedEffectController.gridDisplayHeight.value = Math.sqrt( maxWorkgroupSize );
@@ -194,8 +190,6 @@
 
 			}
 
-			// Pros: absurdly simple
-			// Cons: Unperformant, especially at higher element counts
 			const serialAlgorithm = ( arr ) => {
 
 				const t0 = performance.now();
@@ -216,7 +210,7 @@
 
 				const t0 = performance.now();
 			
-				const sum = arr.reduce( ( acc, val ) => acc + val, 0 );
+				arr.reduce( ( acc, val ) => acc + val, 0 );
 
 				const t1 = performance.now();
 
@@ -225,12 +219,10 @@
 			
 			};
 
-			// Allow Workgroup Array Swaps
 			init();
 
 			init( false );
 
-			// When forceGlobalSwap is true, force all valid local swaps to be global swaps.
 			async function init( leftSideDisplay = true ) {
 
 				const effectController = leftSideDisplay ? leftEffectController : rightEffectController;
@@ -247,15 +239,12 @@
 
 				} ) );
 
-				const resultArray = new Uint32Array( size );
 
-				//const infoArray = new Uint32Array( [ size / 2 ] );
+				const currentStorage = instancedArray( array, 'uint', size ).setPBO( true ).label( 'Current' );
+				// Result array for future two buffer/ping-pong buffer approach
+				// const resultStorage = instancedArray( new Uint32Array( size ), 'uint' ).setPBO( true ).label( 'Result' );
 
-				// Ping-Pong Buffers
-				const currentBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const resultBuffer = new THREE.StorageInstancedBufferAttribute( resultArray, 1 );
-				const currentStorage = storage( currentBuffer, 'uint', size ).setPBO( true ).label( 'Current' );
-				const resultStorage = storage( resultBuffer, 'uint', size ).setPBO( true ).label( 'Result' );
+			
 
 				const computeResetBufferFn = Fn( () => {
 
@@ -278,6 +267,8 @@
 
 				}
 
+				// Create and store dispatches of reduction of certain size. Map each set of dispatches to algorithm name.
+
 				const computeReduce0Fn = Fn( () => {
 
 					const { numThreadsDispatched } = effectController;
@@ -285,8 +276,6 @@
 					currentStorage.element( instanceIndex ).addAssign( currentStorage.element( instanceIndex.add( numThreadsDispatched ) ) );
 
 				} )();
-
-				// Cache reduce0 calls
 
 				const reduce0Calls = [];
 
@@ -324,25 +313,27 @@
 			
 				};
 
-				// Reduce 1 Explanation:
-				// Example (Assume Workgroup Size 256, numElements: 262144)
-				// 	Initial Buffer Values: | 1, 1, 1, 1, ... |
-				// Kernel 1:
-				//	Executes 256 threads by 256 workgroups. Each thread loops 4 times and accesses elements
-				// 	at the indices below.
-				//         	Thread 1                        Thread 2                         Thread 3
-				// 	| 0, 65536, ..., n * 65536 | 1, 65537, .... (n * 65536) + 1 | 1, 65538, .... (n * 65536) + 2 | etc
-				//	Buffer Values: | 4, 4, 4, 4, ...|
-				// Kernel 2:
-				//	Executes 256 threads by one workgroup. Each thread loops 1024 times
-				//         	Thread 1                        Thread 2                         Thread 3
-				// 	| 0, 256, ...., n * 256    | 1, 257, ... (n * 256) + 1      | 2, 258, ... (n * 256) + 3      | etc
-				// 	Buffer Values: | 1024, 1024, 1024, 1024, ... |
-				// Kernel 3:
-				//	Executes 1 thread by one workgroup. Single thread loops 256 times
-				//         	Thread 1
-				// 	| 0, 1, 2, 3, 4, 5, 6 ... etc|
-				//	Buffer Values: [262144, 1024, 1024]
+				/* Reduce 1 Example (Assume Workgroup Size 256, numElements: 262144) -> Initial currentBuffer State: | 1, 1, 1, 1, ... |
+				 *
+				 * KERNEL 1:
+				 * Executes 256 threads by 256 workgroups. Each thread loops 4 times and accesses elements
+				 * at the indices below.
+				 *          Thread 1                        Thread 2                         Thread 3
+				 * | 0, 65536, ..., n * 65536 | 1, 65537, .... (n * 65536) + 1 | 1, 65538, .... (n * 65536) + 2 | etc
+				 * Buffer Values: | 4, 4, 4, 4, ...|
+				 *
+				 * KERNEL 2:
+				 * Executes 256 threads by one workgroup. Each thread loops 1024 times
+				 *          Thread 1                     Thread 2                     Thread 3
+				 * | 0, 256, ...., n * 256    | 1, 257, ... (n * 256) + 1 | 2, 258, ... (n * 256) + 3 | etc
+				 * Buffer Values: | 1024, 1024, 1024, 1024, ... |
+				 *
+				 * KERNEL 3:
+				 * Executes 1 thread by one workgroup. Single thread loops 256 times
+				 *          Thread 1
+				 * | 0, 1, 2, 3, 4, 5, 6 ... etc|
+				 * Buffer Values: [262144, 1024, 1024]
+				 */
 
 				const reduce1Calls = [
 					// Accumulation
@@ -362,7 +353,7 @@
 						const k = instanceIndex.toVar( 'k' );
 						tSum.element( invocationLocalIndex ).assign( uint( 0 ) );
 
-						// Each workgroup populates its workgroup array with accumulated values from across dispatch blocks
+						// Each workgroup populates its workgroup array with accumulated values from across dispatch blocks.
 						Loop( k.lessThan( uint( numElements ) ), () => {
 
 							tSum.element( invocationLocalIndex ).addAssign( currentStorage.element( k ) );
@@ -371,8 +362,7 @@
 
 						} );
 
-						// Ensure that each thread within a workgroup has finished populating it's share of the
-						// workgroup array
+						// Ensure that each thread within a workgroup has finished populating it's share of the workgroup array.
 						workgroupBarrier();
 
 						// Reset the loop condition
@@ -380,20 +370,18 @@
 
 						Loop( k.greaterThan( 0 ), () => {
 
-							// Reduce power of 2 times
-							// Therefore ensure we only access elements under current power of 2
+							// Only access elements under current power of 2
 							If( invocationLocalIndex.lessThan( k ), () => {
 
-								// Add the element 2^n up to current element (similar to reduce0)
-								// First iteration:
-								//	128 -> 255 added to 0 - 127
-								//  Ensure threads in workgroup completed
-								// Second iteration:
-								// 	64 -> 127 added to 0 -> 63
-								//	Ensure threads completed, etc.
+								/* Add the element 2^n up to current element (similar to reduce0).
+								 * 1st iteration: 128 -> 255 added to 0 - 127.
+								 * 2nd iteration: 64 -> 127 added to 0 -> 63.
+								 */
 								tSum.element( invocationLocalIndex ).addAssign( tSum.element( invocationLocalIndex.add( k ) ) );
 
 							} );
+			
+							// Ensure each iteration's threads complete.
 							workgroupBarrier();
 							k.divAssign( 2 );
 
@@ -449,7 +437,6 @@
 						const k = instanceIndex.toVar( 'k' );
 						tSum.element( invocationLocalIndex ).assign( uint( 0 ) );
 
-						// Each workgroup populates its workgroup array with accumulated values from across dispatch blocks
 						Loop( k.lessThan( uint( numElements ) ), () => {
 
 							tSum.element( invocationLocalIndex ).addAssign( currentStorage.element( k ) );
@@ -465,8 +452,6 @@
 
 						Loop( k.greaterThan( 0 ), () => {
 
-							// Reduce power of 2 times
-							// Therefore ensure we only access elements under current power of 2
 							If( invocationLocalIndex.lessThan( k ).and( invocationLocalIndex.add( k ).lessThan( workgroupSize ) ), () => {
 
 								tSum.element( invocationLocalIndex ).addAssign( tSum.element( invocationLocalIndex.add( k ) ) );
@@ -596,7 +581,6 @@
 
 						}
 
-						//renderer.compute( computeResetBuffer );
 						renderer.render( scene, camera );
 
 					} else if ( state === 'Run Algo' ) {
@@ -649,8 +633,6 @@
 
 								const currentAlgoCalls = calls[ currentAlgorithm ];
 
-								//console.log( currentAlgoCalls.length );
-
 								for ( let i = 0; i < currentAlgoCalls.length; i ++ ) {
 
 									renderer.compute( currentAlgoCalls[ i ] );
@@ -664,7 +646,8 @@
 
 						}
 
-						const reduceArray = new Uint32Array( await renderer.getArrayBufferAsync( currentBuffer ) );
+						// Debug buffer:
+						// const reductionResult = new Uint32Array( await renderer.getArrayBufferAsync( currentBuffer ) )[0];
 
 						let passInfoString = '';
 
