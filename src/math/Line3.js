@@ -3,6 +3,8 @@ import { clamp } from './MathUtils.js';
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
+const _startEnd2 = /*@__PURE__*/ new Vector3();
+const EPS_SQR = Number.EPSILON * Number.EPSILON;
 
 /**
  * An analytical line segment in 3D space represented by a start and end point.
@@ -163,6 +165,102 @@ class Line3 {
 		const t = this.closestPointToPointParameter( point, clampToLine );
 
 		return this.delta( target ).multiplyScalar( t ).add( this.start );
+
+	}
+
+	/**
+	 * Returns distance from a given point to the line.
+	 *
+	 * @param {Vector3} point - The point to compute the closest point on the line for.
+	 * @param {boolean} clampToLine - Whether to clamp the result to the range `[0,1]` or not.
+	 * @return {number} Distance from point to the line.
+	 */
+	distanceToPoint( point, clampToLine ) {
+
+		this.closestPointToPoint( point, clampToLine, _startP );
+
+		return point.distanceTo( _startP );
+
+	}
+
+	/**
+	 *
+	 * @param {Line3} line Line to find distance to
+	 * @return {number} Closest distance between lines
+	 */
+	closestDistanceToLine( line ) {
+
+		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
+		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
+		// under the accompanying license; see chapter 5.1.9 for detailed explanation.
+
+		_startEnd.subVectors( this.end, this.start );
+		_startEnd2.subVectors( line.end, line.start );
+
+		const thisLengthSq = _startEnd.dot( _startEnd );
+		const otherLengthSq = _startEnd2.dot( _startEnd2 );
+
+		if ( thisLengthSq < EPS_SQR && otherLengthSq < EPS_SQR ) {
+
+			return this.start.distanceTo( line.start );
+
+		}
+
+		if ( thisLengthSq < EPS_SQR ) {
+
+			return line.distanceToPoint( this.start );
+
+		}
+
+		if ( otherLengthSq < EPS_SQR ) {
+
+			return this.distanceToPoint( line.start );
+
+		}
+
+		const startDiff = _startP.subVectors( this.start, line.start );
+		const f = _startEnd2.dot( startDiff );
+		const c = _startEnd.dot( startDiff );
+		const b = _startEnd.dot( _startEnd2 );
+
+		const denom = thisLengthSq * otherLengthSq - b * b;
+
+		let s = 0;
+
+		// If segments not parallel, compute closest point on L1 to L2 and
+		// clamp to segment S1. Else pick arbitrary s (here 0)
+		if ( denom != 0 ) {
+
+			s = ( b * f - c * otherLengthSq ) / denom;
+			// TODO: Clamp only if needed
+			s = Math.min( Math.max( s, 0 ), 1 );
+
+		}
+
+		// Compute point on L2 closest to S1(s) using
+		// t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / otherLengthSq
+		let t = ( b * s + f ) / otherLengthSq;
+
+		// If t in [0,1] done. Else clamp t, recompute s for the new value
+		// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1) = (t*b - c) / thisLengthSq
+		// and clamp s to [0, 1]
+		// TODO: clamp only if needed
+		if ( t < 0.0 ) {
+
+			t = 0.0;
+			s = Math.min( Math.max( - c / thisLengthSq, 0 ), 1 );
+
+		} else if ( t > 1 ) {
+
+			t = 1;
+			s = Math.min( Math.max( ( b - c ) / thisLengthSq, 0 ), 1 );
+
+		}
+
+		_startEnd.multiplyScalar( s ).add( this.start );
+		_startEnd2.multiplyScalar( t ).add( line.start );
+
+		return _startEnd2.distanceTo( _startEnd );
 
 	}
 
