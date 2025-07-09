@@ -1,12 +1,14 @@
 import { Vector3 } from './Vector3.js';
-import { Vector2 } from './Vector2.js';
 import { clamp } from './MathUtils.js';
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
-const _startEnd2 = /*@__PURE__*/ new Vector3();
-const _parameters = /*@__PURE__*/ new Vector2();
-const EPS_SQR = Number.EPSILON * Number.EPSILON;
+
+const _d1 = /*@__PURE__*/ new Vector3();
+const _d2 = /*@__PURE__*/ new Vector3();
+const _r = /*@__PURE__*/ new Vector3();
+const _c1 = /*@__PURE__*/ new Vector3();
+const _c2 = /*@__PURE__*/ new Vector3();
 
 /**
  * An analytical line segment in 3D space represented by a start and end point.
@@ -186,134 +188,125 @@ class Line3 {
 	}
 
 	/**
-	 * Returns point parameters of shortest segment connecting two lines.
+	 * Returns the closest squared distance between this line segment and the given one.
 	 *
-	 * @param {Line3} line Line to find distance to
-	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
-	 * @param {Vector2} target - The vector that is used to store the method's result. x is parameter for point on this, y is parameter for point on line.
-	 * @return {Vector2} - Point parameters of the shortest segment connecting two lines.
+	 * @param {Line3} line - The line segment to compute the closest squared distance to.
+	 * @param {?Vector3} c1 - The closest point on this line segment.
+	 * @param {?Vector3} c2 - The closest point on the given line segment.
+	 * @return {number} The squared distance between this line segment and the given one.
 	 */
-	shortestSegmentToLineParameters( line, clampToLine, target ) {
+	distanceSqToLine3( line, c1 = _c1, c2 = _c2 ) {
 
-		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
-		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
-		// under the accompanying license; see chapter 5.1.9 for detailed explanation.
+		// from Real-Time Collision Detection by Christer Ericson, chapter 5.1.9
 
-		_startEnd.subVectors( this.end, this.start );
-		_startEnd2.subVectors( line.end, line.start );
+		// Computes closest points C1 and C2 of S1(s)=P1+s*(Q1-P1) and
+		// S2(t)=P2+t*(Q2-P2), returning s and t. Function result is squared
+		// distance between between S1(s) and S2(t)
 
-		const thisLengthSq = _startEnd.dot( _startEnd );
-		const otherLengthSq = _startEnd2.dot( _startEnd2 );
+		const EPSILON = 1e-8 * 1e-8; // must be squared since we compare squared length
+		let s, t;
 
-		if ( thisLengthSq < EPS_SQR && otherLengthSq < EPS_SQR ) {
+		const p1 = this.start;
+		const p2 = line.start;
+		const q1 = this.end;
+		const q2 = line.end;
 
-			target.set( 0, 0 );
-			return target;
+		_d1.subVectors( q1, p1 ); // Direction vector of segment S1
+		_d2.subVectors( q2, p2 ); // Direction vector of segment S2
+		_r.subVectors( p1, p2 );
+
+		const a = _d1.dot( _d1 ); // Squared length of segment S1, always nonnegative
+		const e = _d2.dot( _d2 ); // Squared length of segment S2, always nonnegative
+		const f = _d2.dot( _r );
+
+		// Check if either or both segments degenerate into points
+
+		if ( a <= EPSILON && e <= EPSILON ) {
+
+			// Both segments degenerate into points
+
+			c1.copy( p1 );
+			c2.copy( p2 );
+
+			c1.sub( c2 );
+
+			return c1.dot( c1 );
 
 		}
 
-		if ( thisLengthSq < EPS_SQR ) {
+		if ( a <= EPSILON ) {
 
-			target.set( 0, line.closestPointToPointParameter( this.start, clampToLine ) );
-			return target;
+			// First segment degenerates into a point
 
-		}
+			s = 0;
+			t = f / e; // s = 0 => t = (b*s + f) / e = f / e
+			t = clamp( t, 0, 1 );
 
-		if ( otherLengthSq < EPS_SQR ) {
 
-			target.set( this.closestPointToPointParameter( line.start, clampToLine ), 0 );
-			return target;
+		} else {
 
-		}
+			const c = _d1.dot( _r );
 
-		const startDiff = _startP.subVectors( this.start, line.start );
-		const f = _startEnd2.dot( startDiff );
-		const c = _startEnd.dot( startDiff );
-		const b = _startEnd.dot( _startEnd2 );
+			if ( e <= EPSILON ) {
 
-		const denom = thisLengthSq * otherLengthSq - b * b;
+				// Second segment degenerates into a point
 
-		let s = 0;
+				t = 0;
+				s = clamp( - c / a, 0, 1 ); // t = 0 => s = (b*t - c) / a = -c / a
 
-		// If segments not parallel, compute closest point on L1 to L2 and
-		// clamp to segment S1. Else pick arbitrary s (here 0)
-		if ( denom != 0 ) {
+			} else {
 
-			s = ( b * f - c * otherLengthSq ) / denom;
-			if ( clampToLine ) {
+				// The general nondegenerate case starts here
 
-				s = clamp( s, 0, 1 );
+				const b = _d1.dot( _d2 );
+				const denom = a * e - b * b; // Always nonnegative
+
+				// If segments not parallel, compute closest point on L1 to L2 and
+				// clamp to segment S1. Else pick arbitrary s (here 0)
+
+				if ( denom !== 0 ) {
+
+					s = clamp( ( b * f - c * e ) / denom, 0, 1 );
+
+				} else {
+
+					s = 0;
+
+				}
+
+				// Compute point on L2 closest to S1(s) using
+				// t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / e
+
+				t = ( b * s + f ) / e;
+
+				// If t in [0,1] done. Else clamp t, recompute s for the new value
+				// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1)= (t*b - c) / a
+				// and clamp s to [0, 1]
+
+				if ( t < 0 ) {
+
+					t = 0.;
+					s = clamp( - c / a, 0, 1 );
+
+				} else if ( t > 1 ) {
+
+					t = 1;
+					s = clamp( ( b - c ) / a, 0, 1 );
+
+				}
 
 			}
 
 		}
 
-		// Compute point on L2 closest to S1(s) using
-		// t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / otherLengthSq
-		let t = ( b * s + f ) / otherLengthSq;
+		c1.copy( p1 ).add( _d1.multiplyScalar( s ) );
+		c2.copy( p2 ).add( _d2.multiplyScalar( t ) );
 
-		if ( clampToLine ) {
+		c1.sub( c2 );
 
-			// If t in [0,1] done. Else clamp t, recompute s for the new value
-			// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1) = (t*b - c) / thisLengthSq
-			// and clamp s to [0, 1]
-			if ( t < 0.0 ) {
-
-				t = 0.0;
-				s = clamp( - c / thisLengthSq, 0, 1 );
-
-			} else if ( t > 1 ) {
-
-				t = 1;
-				s = clamp( ( b - c ) / thisLengthSq, 0, 1 );
-
-			}
-
-		}
-
-		target.set( s, t );
-		return target;
-
+		return c1.dot( c1 );
 
 	}
-
-	/**
-	 * Returns shortest segment connecting two lines.
-	 *
-	 * @param {Line3} line Line to find distance to
-	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
-	 * @param {Line3} target - The target segment that is used to store the method's result. Start point is on this, end is on line.
-	 * @return {Line3} - The shortest segment connecting two lines.
-	 */
-	shortestSegmentToLine( line, clampToLine, target ) {
-
-		this.shortestSegmentToLineParameters( line, clampToLine, _parameters );
-
-		this.delta( target.start ).multiplyScalar( _parameters.x ).add( this.start );
-		line.delta( target.end ).multiplyScalar( _parameters.y ).add( line.start );
-
-		return target;
-
-	}
-
-	/**
-	 * Return distance between two lines.
-	 *
-	 * @param {Line3} line Line to find distance to
-	 * @param {boolean} clampToLine  - Whether to clamp the result to the range `[0,1]` or not.
-	 * @return {number} Closest distance between lines
-	 */
-	closestDistanceToLine( line, clampToLine ) {
-
-		this.shortestSegmentToLineParameters( line, clampToLine, _parameters );
-
-		const pointA = this.delta( _startEnd ).multiplyScalar( _parameters.x ).add( this.start );
-		const pointB = line.delta( _startEnd2 ).multiplyScalar( _parameters.y ).add( line.start );
-
-		return pointA.distanceTo( pointB );
-
-	}
-
 
 	/**
 	 * Applies a 4x4 transformation matrix to this line segment.
