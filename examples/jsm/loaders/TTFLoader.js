@@ -152,13 +152,13 @@ class TTFLoader extends Loader {
 
 					} );
 
-					if( glyph.unicodes !== undefined && glyph.unicodes.length > 0 ) {
+					if ( glyph.unicodes !== undefined && glyph.unicodes.length > 0 ) {
 						
-						glyph.unicodes.forEach( function (unicode) {
+						glyph.unicodes.forEach( function ( unicode ) {
 							
 							glyphs[ String.fromCodePoint( unicode ) ] = token;
 							
-						});
+						} );
 						
 					} else {
 
