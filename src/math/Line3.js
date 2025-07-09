@@ -173,21 +173,6 @@ class Line3 {
 	}
 
 	/**
-	 * Returns distance from a given point to the line.
-	 *
-	 * @param {Vector3} point - The point to compute the closest point on the line for.
-	 * @param {boolean} clampToLine - Whether to clamp the result to the range `[0,1]` or not.
-	 * @return {number} Distance from point to the line.
-	 */
-	distanceToPoint( point, clampToLine ) {
-
-		this.closestPointToPoint( point, clampToLine, _startP );
-
-		return point.distanceTo( _startP );
-
-	}
-
-	/**
 	 * Returns the closest squared distance between this line segment and the given one.
 	 *
 	 * @param {Line3} line - The line segment to compute the closest squared distance to.
