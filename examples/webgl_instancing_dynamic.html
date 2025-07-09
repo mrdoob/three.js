@@ -26,7 +26,6 @@
 
 			import * as THREE from 'three';
 
-			import { Timer } from 'three/addons/misc/Timer.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
 
@@ -70,7 +69,7 @@
 				scene.background = new THREE.Color( 0xadd8e6 );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				timer = new Timer();
+				timer = new THREE.Timer();
 				timer.connect( document );
 
 				const loader = new THREE.TextureLoader();

@@ -27,7 +27,6 @@
 			import * as THREE from 'three';
 			import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
 
-			import { Timer } from 'three/addons/misc/Timer.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -86,7 +85,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				timer = new Timer();
+				timer = new THREE.Timer();
 				timer.connect( document );
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );

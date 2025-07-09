@@ -31,7 +31,6 @@
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Timer } from 'three/addons/misc/Timer.js';
 
 			import { abs, attribute, distance, float, max, modelWorldMatrixInverse, positionLocal, sin, time, uniform } from 'three/tsl';
 
@@ -48,7 +47,7 @@
 
 				scene = new THREE.Scene();
 
-				timer = new Timer();
+				timer = new THREE.Timer();
 				timer.connect( document );
 
 				// model

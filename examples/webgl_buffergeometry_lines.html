@@ -24,7 +24,6 @@
 
 			import * as THREE from 'three';
 
-			import { Timer } from 'three/addons/misc/Timer.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			let container, stats, timer;
@@ -50,7 +49,7 @@
 
 				scene = new THREE.Scene();
 
-				timer = new Timer();
+				timer = new THREE.Timer();
 				timer.connect( document );
 
 				const geometry = new THREE.BufferGeometry();

@@ -11,8 +11,6 @@
  * const timer = new Timer();
  * timer.connect( document ); // use Page Visibility API
  * ```
- *
- * @three_import import { Timer } from 'three/addons/misc/Timer.js';
  */
 class Timer {
 
@@ -23,7 +21,7 @@ class Timer {
 
 		this._previousTime = 0;
 		this._currentTime = 0;
-		this._startTime = now();
+		this._startTime = performance.now();
 
 		this._delta = 0;
 		this._elapsed = 0;
@@ -129,7 +127,7 @@ class Timer {
 	 */
 	reset() {
 
-		this._currentTime = now() - this._startTime;
+		this._currentTime = performance.now() - this._startTime;
 
 		return this;
 
@@ -164,7 +162,7 @@ class Timer {
 		} else {
 
 			this._previousTime = this._currentTime;
-			this._currentTime = ( timestamp !== undefined ? timestamp : now() ) - this._startTime;
+			this._currentTime = ( timestamp !== undefined ? timestamp : performance.now() ) - this._startTime;
 
 			this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
 			this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
@@ -177,46 +175,10 @@ class Timer {
 
 }
 
-/**
- * A special version of a timer with a fixed time delta value.
- * Can be useful for testing and debugging purposes.
- *
- * @augments Timer
- */
-class FixedTimer extends Timer {
-
-	/**
-	 * Constructs a new timer.
-	 *
-	 * @param {number} [fps=60] - The fixed FPS of this timer.
-	 */
-	constructor( fps = 60 ) {
-
-		super();
-		this._delta = ( 1 / fps ) * 1000;
-
-	}
-
-	update() {
-
-		this._elapsed += ( this._delta * this._timescale ); // _elapsed is the accumulation of all previous deltas
-
-		return this;
-
-	}
-
-}
-
-function now() {
-
-	return performance.now();
-
-}
-
 function handleVisibilityChange() {
 
 	if ( this._document.hidden === false ) this.reset();
 
 }
 
-export { Timer, FixedTimer };
+export { Timer };
