@@ -760,7 +760,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._customScissor.multiplyScalar( this._pixelRatio ).floor();
+			this._customScissor.multiplyScalar( this._pixelRatio * this._resolution ).floor();
 
 		}
 
@@ -796,7 +796,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._customViewport.multiplyScalar( this._pixelRatio ).floor();
+			this._customViewport.multiplyScalar( this._pixelRatio * this._resolution ).floor();
 
 		}
 
