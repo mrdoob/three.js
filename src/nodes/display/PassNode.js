@@ -206,24 +206,6 @@ class PassNode extends TempNode {
 		this.options = options;
 
 		/**
-		 * Whether the viewport should automatically kept in sync with the
-		 * pass node's dimension.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.autoViewport = true;
-
-		/**
-		 * Whether the scissor rectangle should automatically kept in sync with the
-		 * pass node's dimension.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.autoScissor = true;
-
-		/**
 		 * The pass's pixel ratio. Will be kept automatically kept in sync with the renderer's pixel ratio.
 		 *
 		 * @private
@@ -365,17 +347,19 @@ class PassNode extends TempNode {
 		 * Custom viewport definition.
 		 *
 		 * @private
-		 * @type {Vector4}
+		 * @type {?Vector4}
+		 * @default null
 		 */
-		this._customViewport = new Vector4();
+		this._customViewport = null;
 
 		/**
 		 * Custom scissor definition.
 		 *
 		 * @private
-		 * @type {Vector4}
+		 * @type {?Vector4}
+		 * @default null
 		 */
-		this._customScissor = new Vector4();
+		this._customScissor = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -740,15 +724,18 @@ class PassNode extends TempNode {
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
-		if ( this.autoScissor === false ) this.renderTarget.scissor.copy( this._customScissor );
-		if ( this.autoViewport === false ) this.renderTarget.viewport.copy( this._customViewport );
+		if ( this._customScissor !== null ) this.renderTarget.scissor.copy( this._customScissor );
+		if ( this._customViewport ) this.renderTarget.viewport.copy( this._customViewport );
 
 	}
 
 	/**
-	 * Defines the scissor rectangle.
+	 * By default, the scissor rectangle is kept in sync with the pass's
+	 * resolution. This method allows to define a custom scissor rectangle.
+	 * To reverse the process and use auto-sizing again, call the method with `null`
+	 * as the single argument.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {?(number | Vector4)} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
 	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
 	 * @param {number} width - The width of the scissor box in logical pixel unit.
@@ -756,22 +743,34 @@ class PassNode extends TempNode {
 	 */
 	setScissor( x, y, width, height ) {
 
-		if ( x.isVector4 ) {
+		if ( x === null ) {
 
-			this._customScissor.copy( x );
+			this._customScissor = null;
 
 		} else {
 
-			this._customScissor.set( x, y, width, height );
+			if ( this._customScissor === null ) this._customScissor = new Vector4();
+
+			if ( x.isVector4 ) {
+
+				this._customScissor.copy( x );
+
+			} else {
+
+				this._customScissor.set( x, y, width, height );
+
+			}
+
+			this._customScissor.multiplyScalar( this._pixelRatio ).floor();
 
 		}
-
-		this._customScissor.multiplyScalar( this._pixelRatio ).floor();
 
 	}
 
 	/**
-	 * Defines the viewport.
+	 * By default, the viewport is kept in sync with the pass's resolution.
+	 * This method allows to define a custom viewport. To reverse the process and use
+	 * auto-sizing again, call the method with `null` as the single argument.
 	 *
 	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
 	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
@@ -780,17 +779,27 @@ class PassNode extends TempNode {
 	 */
 	setViewport( x, y, width, height ) {
 
-		if ( x.isVector4 ) {
+		if ( x === null ) {
 
-			this._customViewport.copy( x );
+			this._customViewport = null;
 
 		} else {
 
-			this._customViewport.set( x, y, width, height );
+			if ( this._customViewport === null ) this._customViewport = new Vector4();
+
+			if ( x.isVector4 ) {
+
+				this._customViewport.copy( x );
+
+			} else {
+
+				this._customViewport.set( x, y, width, height );
+
+			}
+
+			this._customViewport.multiplyScalar( this._pixelRatio ).floor();
 
 		}
-
-		this._customViewport.multiplyScalar( this._pixelRatio ).floor();
 
 	}
 
