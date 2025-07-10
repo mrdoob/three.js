@@ -725,7 +725,7 @@ class PassNode extends TempNode {
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
 		if ( this._customScissor !== null ) this.renderTarget.scissor.copy( this._customScissor );
-		if ( this._customViewport ) this.renderTarget.viewport.copy( this._customViewport );
+		if ( this._customViewport !== null ) this.renderTarget.viewport.copy( this._customViewport );
 
 	}
 
