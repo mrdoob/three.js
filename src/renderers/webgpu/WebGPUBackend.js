@@ -1236,7 +1236,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( supportsDepth && depthStencilAttachment && depthStencilAttachment.depthLoadOp === undefined ) {
+		if ( supportsDepth && depthStencilAttachment ) {
 
 			if ( depth ) {
 
@@ -1255,7 +1255,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( supportsStencil && depthStencilAttachment && depthStencilAttachment.stencilLoadOp === undefined ) {
+		if ( supportsStencil && depthStencilAttachment ) {
 
 			if ( stencil ) {
 
