@@ -152,7 +152,7 @@ class TTFLoader extends Loader {
 
 					} );
 
-					if ( glyph.unicodes !== undefined && glyph.unicodes.length > 0 ) {
+					if ( Array.isArray( glyph.unicodes ) && glyph.unicodes.length > 0 ) {
 						
 						glyph.unicodes.forEach( function ( unicode ) {
 							
