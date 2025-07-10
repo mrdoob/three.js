@@ -176,8 +176,8 @@ class Line3 {
 	 * Returns the closest squared distance between this line segment and the given one.
 	 *
 	 * @param {Line3} line - The line segment to compute the closest squared distance to.
-	 * @param {?Vector3} c1 - The closest point on this line segment.
-	 * @param {?Vector3} c2 - The closest point on the given line segment.
+	 * @param {Vector3} [c1] - The closest point on this line segment.
+	 * @param {Vector3} [c2] - The closest point on the given line segment.
 	 * @return {number} The squared distance between this line segment and the given one.
 	 */
 	distanceSqToLine3( line, c1 = _c1, c2 = _c2 ) {
