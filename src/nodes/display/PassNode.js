@@ -730,10 +730,9 @@ class PassNode extends TempNode {
 	}
 
 	/**
-	 * By default, the scissor rectangle is kept in sync with the pass's
-	 * resolution. This method allows to define a custom scissor rectangle.
-	 * To reverse the process and use auto-sizing again, call the method with `null`
-	 * as the single argument.
+	 * This method allows to define the pass's scissor rectangle. By default, the scissor rectangle is kept
+	 * in sync with the pass's resolution. To reverse the process and use auto-sizing again, call the method
+	 * with `null` as the single argument.
 	 *
 	 * @param {?(number | Vector4)} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
@@ -768,9 +767,9 @@ class PassNode extends TempNode {
 	}
 
 	/**
-	 * By default, the viewport is kept in sync with the pass's resolution.
-	 * This method allows to define a custom viewport. To reverse the process and use
-	 * auto-sizing again, call the method with `null` as the single argument.
+	 * This method allows to define the pass's viewport. By default, the viewport is kept in sync
+	 * with the pass's resolution. To reverse the process and use auto-sizing again, call the method
+	 * with `null` as the single argument.
 	 *
 	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
 	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
