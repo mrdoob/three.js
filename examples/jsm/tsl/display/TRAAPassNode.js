@@ -1,5 +1,5 @@
 import { Color, Vector2, NearestFilter, Matrix4, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, output, mrt, textureLoad, screenCoordinate } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -106,6 +106,15 @@ class TRAAPassNode extends PassNode {
 		this._historyRenderTarget = null;
 
 		/**
+		 * The MRT for the transfer step.
+		 *
+		 * @private
+		 * @type {?MRTNode}
+		 * @default null
+		 */
+		this._transferMRT = null;
+
+		/**
 		 * Material used for the resolve step.
 		 *
 		 * @private
@@ -204,29 +213,21 @@ class TRAAPassNode extends PassNode {
 
 		// configure velocity
 
-		const mrt = this.getMRT();
-		const velocityOutput = mrt.get( 'velocity' );
+		const currentMRT = this.getMRT();
+		const velocityOutput = currentMRT.get( 'velocity' );
 
-		if ( velocityOutput !== undefined ) {
-
-			velocityOutput.setProjectionMatrix( this._originalProjectionMatrix );
-
-		} else {
-
-			throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
-
-		}
+		velocityOutput.setProjectionMatrix( this._originalProjectionMatrix );
 
 		// render sample
 
-		renderer.setMRT( mrt );
+		renderer.setMRT( currentMRT );
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
 		renderer.setRenderTarget( this._sampleRenderTarget );
 		renderer.render( scene, camera );
 
 		renderer.setRenderTarget( null );
-		renderer.setMRT( null );
+		renderer.setMRT( this._transferMRT );
 
 		// every time when the dimensions change we need fresh history data. Copy the sample
 		// into the history and final render target (no AA happens at that point).
@@ -312,19 +313,49 @@ class TRAAPassNode extends PassNode {
 			this._sampleRenderTarget.texture.minFiler = NearestFilter;
 			this._sampleRenderTarget.texture.magFilter = NearestFilter;
 
-			const velocityTarget = this._sampleRenderTarget.texture.clone();
-			velocityTarget.isRenderTargetTexture = true;
-			velocityTarget.name = 'velocity';
+			const currentMRT = this.getMRT();
 
-			this._sampleRenderTarget.textures.push( velocityTarget ); // for MRT
+			if ( currentMRT === null ) {
+
+				throw new Error( 'THREE:TRAAPassNode: Missing MRT configuration.' );
+
+			} else if ( currentMRT.has( 'velocity' ) === false ) {
+
+				throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
+
+			}
+
+			this._texturesIndex = currentMRT.getIndexes( this.renderTarget );
+			
+			const transferNodes = {};
+
+			for ( const name in this._texturesIndex ) {
+
+				if ( name === 'output' ) {
+
+					transferNodes[ name ] = output;
+
+				} else {
+
+					const index = this._texturesIndex[ name ];
+
+					transferNodes[ name ] = textureLoad( this._sampleRenderTarget.textures[ index ], screenCoordinate );
+
+				}
+
+			}
+
+			this._transferMRT = mrt( transferNodes );
 
 		}
 
 		// textures
 
+		const velocityIndex = this._texturesIndex[ 'velocity' ];
+
 		const historyTexture = texture( this._historyRenderTarget.texture );
 		const sampleTexture = texture( this._sampleRenderTarget.textures[ 0 ] );
-		const velocityTexture = texture( this._sampleRenderTarget.textures[ 1 ] );
+		const velocityTexture = texture( this._sampleRenderTarget.textures[ velocityIndex ] );
 		const depthTexture = texture( this._sampleRenderTarget.depthTexture );
 
 		const resolve = Fn( () => {
@@ -395,7 +426,7 @@ class TRAAPassNode extends PassNode {
 
 		// materials
 
-		this._resolveMaterial.fragmentNode = resolve();
+		this._resolveMaterial.colorNode = resolve();
 
 		return super.setup( builder );
 
