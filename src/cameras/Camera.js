@@ -30,7 +30,7 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		/**
-		 * The flag that indicates whether the camera uses a reversed depth buffer - NDC[1, 0].
+		 * The flag that indicates whether the camera uses a reversed depth buffer.
 		 *
 		 * @type {boolean}
 		 * @default false
