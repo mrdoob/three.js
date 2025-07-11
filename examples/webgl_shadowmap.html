@@ -110,7 +110,7 @@
 
 				if ( renderer.capabilities.reverseDepthBuffer ) {
 
-					camera.coordinateSystem = THREE.ReversedCoordinateSystem;
+					camera.reversedDepth = true;
 					camera.updateProjectionMatrix();
 
 				}
