@@ -23,11 +23,6 @@
 			}
 		</script>
 
-		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
-			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
-			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-		</video>
-
 		<script type="module">
 
 			import * as THREE from 'three';
@@ -161,9 +156,9 @@
 					shadows: true,
 				};
 
-				let videoTexture, mapTexture;
+				let mapTexture;
 
-				gui.add( params, 'type', [ 'procedural', 'video', 'texture' ] ).onChange( function ( val ) {
+				gui.add( params, 'type', [ 'procedural', 'texture' ] ).onChange( function ( val ) {
 
 					projectorLight.colorNode = null;
 					projectorLight.map = null;
@@ -173,21 +168,6 @@
 						projectorLight.colorNode = causticEffect;
 
 						focus.setValue( 1 );
-
-					} else if ( val === 'video' ) {
-
-						if ( videoTexture === undefined ) {
-
-							const video = document.getElementById( 'video' );
-							video.play();
-
-							videoTexture = new THREE.VideoTexture( video );
-
-						}
-
-						projectorLight.map = videoTexture;
-
-						focus.setValue( .46 );
 
 					} else if ( val === 'texture' ) {
 

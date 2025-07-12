@@ -338,7 +338,11 @@ class NodeMaterialObserver {
 
 			} else if ( mtlValue.isTexture === true ) {
 
-				if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+				if ( mtlValue.isVideoTexture ) {
+
+					return false;
+
+				} else if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
 
 					value.id = mtlValue.id;
 					value.version = mtlValue.version;

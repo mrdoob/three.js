@@ -109,6 +109,7 @@ class SpotLight extends Light {
 		 * reproduced using pixel values (0, 0, 0, 1-cookie_value).
 		 *
 		 * *Warning*: This property is disabled if {@link Object3D#castShadow} is set to `false`.
+		 * Besides, instances of `VideoTexture` are not supported.
 		 *
 		 * @type {?Texture}
 		 * @default null
