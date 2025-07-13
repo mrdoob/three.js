@@ -20,7 +20,7 @@ function createPropertyRow(label, value) {
 
 	const labelSpan = document.createElement('span');
 	labelSpan.className = 'property-label';
-	labelSpan.textContent = `${label}:`;
+	labelSpan.textContent = `${label}`;
 	labelSpan.style.marginRight = '10px';
 	labelSpan.style.whiteSpace = 'nowrap';
 
@@ -37,13 +37,33 @@ function createPropertyRow(label, value) {
 	return row;
 }
 
+function createVectorRow(label, vector) {
+	const row = document.createElement('div');
+	row.className = 'property-row';
+	row.style.marginBottom = '2px';
+	
+	// Pad label to ensure consistent alignment
+	const paddedLabel = label.padEnd(16, ' '); // Pad to 16 characters
+	const content = `${paddedLabel} ${vector.x.toFixed(3)}\t${vector.y.toFixed(3)}\t${vector.z.toFixed(3)}`;
+	row.textContent = content;
+	row.style.fontFamily = 'monospace';
+	row.style.whiteSpace = 'pre';
+	
+	return row;
+}
+
 // --- State ---
 const state = {
 	revision: null,
 	scenes: new Map(),
 	renderers: new Map(),
-	objects: new Map()
+	objects: new Map(),
+	selectedObject: null
 };
+
+// Floating details panel
+let floatingPanel = null;
+let mousePosition = { x: 0, y: 0 };
 
 
 // Create a connection to the background page
@@ -80,6 +100,15 @@ backgroundPageConnection.onDisconnect.addListener( () => {
 
 } );
 
+// Function to request object details from the bridge
+function requestObjectDetails( uuid ) {
+	backgroundPageConnection.postMessage( {
+		name: 'request-object-details',
+		uuid: uuid,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+}
+
 
 // Store renderer collapse states
 const rendererCollapsedState = new Map();
@@ -95,6 +124,13 @@ function clearState() {
 	if ( container ) {
 
 		container.innerHTML = '';
+
+	}
+
+	// Hide floating panel
+	if ( floatingPanel ) {
+
+		floatingPanel.classList.remove( 'visible' );
 
 	}
 
@@ -137,6 +173,13 @@ function handleThreeEvent( message ) {
 			state.objects.set( detail.uuid, detail );
 
 
+			break;
+
+		// Handle object details response
+		case 'object-details':
+			state.selectedObject = message.detail;
+			console.log( 'Panel: Received object details:', message.detail );
+			showFloatingDetails( message.detail );
 			break;
 
 		// Handle a batch of objects for a specific scene
@@ -376,6 +419,13 @@ function renderObject( obj, container, level = 0 ) {
 	}
 
 	elem.innerHTML = labelContent;
+	
+	// Add mouseover handler to request object details
+	elem.addEventListener( 'mouseover', ( event ) => {
+		event.stopPropagation(); // Prevent bubbling to parent elements
+		requestObjectDetails( obj.uuid );
+	} );
+	
 	container.appendChild( elem );
 
 	// Handle children (excluding children of renderers, as properties are shown in details)
@@ -477,7 +527,97 @@ function updateUI() {
 
 	}
 
+
 }
+
+// Create floating details panel
+function createFloatingPanel() {
+
+	if ( floatingPanel ) return floatingPanel;
+
+	floatingPanel = document.createElement( 'div' );
+	floatingPanel.className = 'floating-details';
+	document.body.appendChild( floatingPanel );
+
+	return floatingPanel;
+
+}
+
+// Show floating details panel
+function showFloatingDetails( objectData ) {
+
+	const panel = createFloatingPanel();
+	
+	// Clear previous content
+	panel.innerHTML = '';
+	
+	if ( objectData.position ) {
+
+		panel.appendChild( createVectorRow( 'Position', objectData.position ) );
+
+	}
+
+	if ( objectData.rotation ) {
+
+		panel.appendChild( createVectorRow( 'Rotation', objectData.rotation ) );
+
+	}
+
+	if ( objectData.scale ) {
+
+		panel.appendChild( createVectorRow( 'Scale', objectData.scale ) );
+
+	}
+
+	// Position panel near mouse
+	updateFloatingPanelPosition();
+	
+	// Show panel
+	panel.classList.add( 'visible' );
+
+}
+
+// Update floating panel position
+function updateFloatingPanelPosition() {
+
+	if ( ! floatingPanel || ! floatingPanel.classList.contains( 'visible' ) ) return;
+
+	const offset = 15; // Offset from cursor
+	let x = mousePosition.x + offset;
+	let y = mousePosition.y + offset;
+
+	// Prevent panel from going off-screen
+	const panelRect = floatingPanel.getBoundingClientRect();
+	const maxX = window.innerWidth - panelRect.width - 10;
+	const maxY = window.innerHeight - panelRect.height - 10;
+
+	if ( x > maxX ) x = mousePosition.x - panelRect.width - offset;
+	if ( y > maxY ) y = mousePosition.y - panelRect.height - offset;
+
+	floatingPanel.style.left = `${Math.max( 10, x )}px`;
+	floatingPanel.style.top = `${Math.max( 10, y )}px`;
+
+}
+
+// Track mouse position
+document.addEventListener( 'mousemove', ( event ) => {
+
+	mousePosition.x = event.clientX;
+	mousePosition.y = event.clientY;
+	updateFloatingPanelPosition();
+
+} );
+
+// Hide panel when mouse leaves the tree area
+document.addEventListener( 'mouseover', ( event ) => {
+
+	if ( floatingPanel && ! event.target.closest( '.tree-item' ) ) {
+
+		floatingPanel.classList.remove( 'visible' );
+
+	}
+
+} );
 
 // Initial UI update
 clearState();

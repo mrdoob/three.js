@@ -372,6 +372,10 @@
 
 				sendState();
 
+			} else if ( message.name === 'request-object-details' ) {
+
+				sendObjectDetails( message.uuid );
+
 			}
 
 		} );
@@ -395,6 +399,57 @@
 			for ( const observedScene of observedScenes ) {
 
 				reloadSceneObjects( observedScene );
+
+			}
+
+		}
+
+		function sendObjectDetails( uuid ) {
+
+			// Find the object with the given UUID
+			const findObjectInScenes = ( targetUuid ) => {
+
+				for ( const scene of observedScenes ) {
+
+					const found = scene.getObjectByProperty( 'uuid', targetUuid );
+					if ( found ) return found;
+
+				}
+
+				return null;
+
+			};
+
+			const object = findObjectInScenes( uuid );
+
+			if ( object ) {
+
+				const details = {
+					uuid: object.uuid,
+					type: object.type,
+					name: object.name,
+					position: {
+						x: object.position.x,
+						y: object.position.y,
+						z: object.position.z
+					},
+					rotation: {
+						x: object.rotation.x,
+						y: object.rotation.y,
+						z: object.rotation.z
+					},
+					scale: {
+						x: object.scale.x,
+						y: object.scale.y,
+						z: object.scale.z
+					}
+				};
+
+				dispatchEvent( 'object-details', details );
+
+			} else {
+
+				console.warn( 'DevTools: Object not found for UUID:', uuid );
 
 			}
 

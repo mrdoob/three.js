@@ -112,4 +112,41 @@ details.renderer-container > summary.renderer-summary::-webkit-details-marker {
 }
 details.renderer-container[open] > summary.renderer-summary .toggle-icon::before {
 	content: '▼'; /* Expanded */
+}
+
+/* Floating object details panel */
+.floating-details {
+	position: fixed;
+	z-index: 1000;
+	background: light-dark( #fff, #2a2a2a );
+	border: 1px solid light-dark( #ccc, #555 );
+	border-radius: 6px;
+	padding: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	max-width: 300px;
+	min-width: 200px;
+	font-size: 11px;
+	pointer-events: none; /* Prevent interfering with mouse interactions */
+	opacity: 0;
+	transform: translateY(10px);
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.floating-details.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.floating-details h4 {
+	margin: 8px 0 4px 0;
+	font-size: 10px;
+	text-transform: uppercase;
+	color: light-dark( #666, #aaa );
+	border-bottom: 1px solid light-dark( #eee, #444 );
+	padding-bottom: 2px;
+}
+
+.floating-details .property-row {
+	margin-bottom: 1px;
+	font-size: 10px;
 } 

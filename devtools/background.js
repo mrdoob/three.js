@@ -20,6 +20,10 @@ chrome.runtime.onConnect.addListener( port => {
 
 			chrome.tabs.sendMessage( tabId, message );
 
+		} else if ( message.name === 'request-object-details' && tabId ) {
+
+			chrome.tabs.sendMessage( tabId, message );
+
 		} else if ( tabId === undefined ) {
 
 			console.warn( 'Background: Message received from panel before init:', message );

@@ -109,6 +109,11 @@ function handleBackgroundMessage( message ) {
 		message.id = 'three-devtools';
 		window.postMessage( message, '*' );
 
+	} else if ( message.name === 'request-object-details' ) {
+
+		message.id = 'three-devtools';
+		window.postMessage( message, '*' );
+
 	}
 
 }
