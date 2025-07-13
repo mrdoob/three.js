@@ -20,9 +20,9 @@ class ComputeNode extends Node {
 	 *
 	 * @param {Node} computeNode - TODO
 	 * @param {number} count - TODO.
-	 * @param {Array<number>} [workgroupSize=[64]] - TODO.
+	 * @param {Array<number>} [workgroupSize = [ 64, 1, 1 ]]
 	 */
-	constructor( computeNode, count, workgroupSize = [ 64 ] ) {
+	constructor( computeNode, count, workgroupSize = [ 64, 1, 1 ] ) {
 
 		super( 'void' );
 
@@ -53,7 +53,7 @@ class ComputeNode extends Node {
 		 * TODO
 		 *
 		 * @type {Array<number>}
-		 * @default [64]
+		 * @default [ 64, 1, 1 ]
 		 */
 		this.workgroupSize = workgroupSize;
 
@@ -220,9 +220,22 @@ export default ComputeNode;
  * @function
  * @param {Node} node - TODO
  * @param {number} count - TODO.
- * @param {Array<number>} [workgroupSize=[64]] - TODO.
+ * @param {Array<number>} [workgroupSize=[ 64, 1, 1 ]]
  * @returns {AtomicFunctionNode}
  */
-export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
+export const compute = ( node, countOrWorkgroupSize, workgroupSize ) => {
+
+	let count = countOrWorkgroupSize;
+
+	if ( Array.isArray( countOrWorkgroupSize ) ) {
+
+		workgroupSize = countOrWorkgroupSize;
+		count = null;
+
+	}
+
+	return nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
+
+};
 
 addMethodChaining( 'compute', compute );

@@ -1898,7 +1898,13 @@ ${ flowData.code }
 
 		} else {
 
-			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+			//this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+
+			const workgroupSize = this.object.workgroupSize || [ 8, 8, 1 ];
+
+			if ( workgroupSize.length !== 3 ) throw new Error( "workgroupSize must have 3 elements" );
+
+			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
 
 		}
 
@@ -2103,6 +2109,8 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
+		const [ workgroupSizeX, workgroupSizeY, workgroupSizeZ ] = workgroupSize;
+
 		return `${ this.getSignature() }
 // directives
 ${shaderData.directives}
@@ -2122,11 +2130,13 @@ ${shaderData.uniforms}
 // codes
 ${shaderData.codes}
 
-@compute @workgroup_size( ${workgroupSize} )
+@compute @workgroup_size( ${workgroupSizeX}, ${workgroupSizeY}, ${workgroupSizeZ} )
 fn main( ${shaderData.attributes} ) {
 
 	// system
-	instanceIndex = globalId.x + globalId.y * numWorkgroups.x * u32(${workgroupSize}) + globalId.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
+	instanceIndex = globalId.x
+    + globalId.y * (${workgroupSizeX} * numWorkgroups.x)
+    + globalId.z * (${workgroupSizeX} * numWorkgroups.x) * (${workgroupSizeY} * numWorkgroups.y);
 
 	// vars
 	${shaderData.vars}

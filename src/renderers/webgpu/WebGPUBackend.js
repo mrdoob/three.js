@@ -1319,9 +1319,13 @@ class WebGPUBackend extends Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline ) {
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize ) {
 
+		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
+		const isValid = dispatchSize[ 0 ] > 0 && dispatchSize[ 1 ] > 0 && dispatchSize[ 2 ] > 0;
+
+		dispatchSize = isValid ? dispatchSize : computeNodeData;
 
 		// pipeline
 
@@ -1340,30 +1344,38 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+		if ( isValid ) {
 
-		const computeNodeData = this.get( computeNode );
-
-		if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
-
-		const { dispatchSize } = computeNodeData;
-
-		if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
-
-			dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
-			dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
+			passEncoderGPU.dispatchWorkgroups(
+				dispatchSize[ 0 ],
+				dispatchSize[ 1 ],
+				dispatchSize[ 2 ]
+			);
 
 		} else {
 
-			dispatchSize.x = computeNode.dispatchCount;
+			const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+
+			if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
+
+			if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+				dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
+				dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
+
+			} else {
+
+				dispatchSize.x = computeNode.dispatchCount;
+
+			}
+
+			passEncoderGPU.dispatchWorkgroups(
+				dispatchSize.x,
+				dispatchSize.y,
+				dispatchSize.z
+			);
 
 		}
-
-		passEncoderGPU.dispatchWorkgroups(
-			dispatchSize.x,
-			dispatchSize.y,
-			dispatchSize.z
-		);
 
 	}
 
