@@ -2383,6 +2383,7 @@ class WebGLRenderer {
 				const reverseDepthBuffer = state.buffers.depth.getReversed();
 
 				if ( reverseDepthBuffer && camera.reversedDepth !== true ) {
+
 					// @deprecated, r179
 					warnOnce( 'THREE.WebGLRenderer: reverseDepthBuffer must be used with "camera.reversedDepth = true;" for correct results. Automatic conversion will be removed in r189.' );
 
