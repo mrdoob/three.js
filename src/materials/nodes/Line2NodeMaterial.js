@@ -67,14 +67,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashOffset = 0;
 
 		/**
-		 * The line width.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.lineWidth = 1;
-
-		/**
 		 * Defines the lines color.
 		 *
 		 * @type {?Node<vec3>}
