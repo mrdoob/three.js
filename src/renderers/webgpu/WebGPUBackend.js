@@ -1318,6 +1318,7 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 * @param {Array<number>} dispatchSize - Array with [x,y,z] values for dispatch.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize ) {
 

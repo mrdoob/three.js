@@ -219,7 +219,7 @@ export default ComputeNode;
  * @tsl
  * @function
  * @param {Node} node - TODO
- * @param {number} count - TODO.
+ * @param {number} countOrWorkgroupSize - TODO.
  * @param {Array<number>} [workgroupSize=[ 64, 1, 1 ]]
  * @returns {AtomicFunctionNode}
  */
