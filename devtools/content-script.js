@@ -1,7 +1,6 @@
 /* global chrome */
 
 // This script runs in the context of the web page
-// console.log( 'Three.js DevTools: Content script loaded at document_readyState:', document.readyState ); // Comment out
 
 // Inject the bridge script into the main document or a target (e.g., iframe)
 function injectBridge( target = document ) {
@@ -97,8 +96,8 @@ function handleWindowMessage( event ) {
 
 	}
 
-	const messageWithSource = { ...event.data, source };
-	chrome.runtime.sendMessage( messageWithSource );
+	event.data.source = source;
+	chrome.runtime.sendMessage( event.data );
 
 }
 

@@ -60,7 +60,6 @@
 
 			reset() {
 
-				// console.log('DevTools: Resetting state');
 
 				// Clear objects map
 				this.objects.clear();
@@ -190,7 +189,6 @@
 		// Listen for Three.js registration
 		devTools.addEventListener( 'register', ( event ) => {
 
-			// console.log('DevTools: Three.js registered with revision:', event.detail.revision);
 			dispatchEvent( 'register', event.detail );
 
 		} );
@@ -313,8 +311,6 @@
 
 		}
 
-		// Start periodic renderer checks
-		// console.log('DevTools: Starting periodic renderer checks');
 
 		// Function to check if bridge is available
 		function checkBridgeAvailability() {
@@ -441,7 +437,6 @@
 
 				if ( ! object || ! object.uuid ) return; // Simplified check
 
-				// console.log('DevTools: Processing object during reload:', object.type || object.constructor.name, object.uuid);
 
 				// Get object data
 				const objectData = getObjectData( object );
@@ -456,7 +451,6 @@
 				// Process children recursively
 				if ( object.children && Array.isArray( object.children ) ) {
 
-					// console.log('DevTools: Processing', object.children.length, 'children of', object.type || object.constructor.name);
 					object.children.forEach( child => observeAndBatchObject( child ) );
 
 				}
@@ -478,8 +472,6 @@
 				// Update the cache
 				sceneObjectCountCache.set( scene.uuid, currentObjectCount );
 
-			} else {
-				// console.log(`DevTools: Scene ${scene.uuid} count unchanged (${currentObjectCount}), skipping dispatch.`);
 			}
 
 		}

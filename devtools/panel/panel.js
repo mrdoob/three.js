@@ -45,7 +45,6 @@ const state = {
 	objects: new Map()
 };
 
-// console.log('Panel script loaded');
 
 // Create a connection to the background page
 const backgroundPageConnection = chrome.runtime.connect( {
@@ -81,7 +80,6 @@ backgroundPageConnection.onDisconnect.addListener( () => {
 
 } );
 
-// console.log('Connected to background page with tab ID:', chrome.devtools.inspectedWindow.tabId);
 
 // Store renderer collapse states
 const rendererCollapsedState = new Map();
@@ -138,9 +136,6 @@ function handleThreeEvent( message ) {
 			// Also update the generic objects map if renderers are stored there too
 			state.objects.set( detail.uuid, detail );
 
-			// The DOM update logic previously here is redundant because updateUI()
-			// rebuilds the entire renderer element anyway, using the updated data
-			// from state.renderers and the persisted open/closed state.
 
 			break;
 
@@ -397,23 +392,16 @@ function renderObject( obj, container, level = 0 ) {
 			.filter( child => child !== undefined )
 			.sort( ( a, b ) => {
 
-				// Sort order: Cameras, Lights, Groups, Meshes, Others
-				const typeOrder = {
-					isCamera: 1,
-					isLight: 2,
-					isGroup: 3,
-					isMesh: 4
-				};
-				// Refactored to avoid optional chaining parser error
-				const findOrder = ( obj ) => {
-
-					const entry = Object.entries( typeOrder ).find( ( [ key ] ) => obj[ key ] );
-					return entry ? entry[ 1 ] : 5; // Check if entry exists, then access index 1 (value)
-
+				const getTypeOrder = ( obj ) => {
+					if ( obj.isCamera ) return 1;
+					if ( obj.isLight ) return 2;
+					if ( obj.isGroup ) return 3;
+					if ( obj.isMesh ) return 4;
+					return 5;
 				};
 
-				const aOrder = findOrder( a );
-				const bOrder = findOrder( b );
+				const aOrder = getTypeOrder( a );
+				const bOrder = getTypeOrder( b );
 
 				return aOrder - bOrder;
 
