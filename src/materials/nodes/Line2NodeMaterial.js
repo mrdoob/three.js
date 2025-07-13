@@ -70,9 +70,9 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * The line width.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
-		this.lineWidth = 1;
+		this.linewidth = 1;
 
 		/**
 		 * Defines the lines color.
