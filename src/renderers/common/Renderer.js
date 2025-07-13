@@ -1241,7 +1241,6 @@ class Renderer {
 
 		const outputRenderTarget = this.getOutputRenderTarget();
 
-
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
 		frameBufferTarget.setSize( width, height, outputRenderTarget !== null ? outputRenderTarget.depth : 1 );
