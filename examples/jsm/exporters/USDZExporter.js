@@ -23,13 +23,13 @@ class USDNode {
 
 	addMetadata( key, value ) {
 
-		this.metadata.push( { [ key ]: value } );
+		this.metadata.push( { key, value } );
 
 	}
 
 	addProperty( property, metadata = [] ) {
 
-		this.properties.push( { property: property, metadata: metadata } );
+		this.properties.push( { property, metadata } );
 
 	}
 
@@ -45,30 +45,26 @@ class USDNode {
 
 		const formattedMetadata = this.metadata.map( ( item ) => {
 
-			if ( typeof item === 'object' && item !== null ) {
+			const key = item.key;
+			const value = item.value;
 
-				const [ key, value ] = Object.entries( item )[ 0 ];
-				if ( Array.isArray( value ) ) {
+			if ( Array.isArray( value ) ) {
 
-					const lines = [];
-					lines.push( `${key} = {` );
-					value.forEach( ( line ) => {
+				const lines = [];
+				lines.push( `${key} = {` );
+				value.forEach( ( line ) => {
 
-						lines.push( `${pad}\t\t${line}` );
+					lines.push( `${pad}\t\t${line}` );
 
-					} );
-					lines.push( `${pad}\t}` );
-					return lines.join( '\n' );
+				} );
+				lines.push( `${pad}\t}` );
+				return lines.join( '\n' );
 
-				} else {
+			} else {
 
-					return `${key} = ${value}`;
-
-				}
+				return `${key} = ${value}`;
 
 			}
-
-			return item;
 
 		} );
 
