@@ -299,9 +299,10 @@ class NodeMaterialObserver {
 	 * Returns `true` if the given render object has not changed its state.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
+	 * @param {NodeFrame} nodeFrame - The current node frame.
 	 * @return {boolean} Whether the given render object has changed its state or not.
 	 */
-	equals( renderObject ) {
+	equals( renderObject, nodeFrame ) {
 
 		const { object, material, geometry } = renderObject;
 
@@ -338,9 +339,9 @@ class NodeMaterialObserver {
 
 			} else if ( mtlValue.isTexture === true ) {
 
-				if ( mtlValue.isVideoTexture ) {
+				if ( mtlValue.isVideoTexture && nodeFrame.renderer.backend.isWebGPUBackend === true ) {
 
-					return false;
+					return false; // video textures in WebGPU always require fresh bindings
 
 				} else if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
 
@@ -520,7 +521,7 @@ class NodeMaterialObserver {
 		if ( isStatic || isBundle )
 			return false;
 
-		const notEqual = this.equals( renderObject ) !== true;
+		const notEqual = this.equals( renderObject, nodeFrame ) !== true;
 
 		return notEqual;
 
