@@ -30,8 +30,6 @@
 			import * as THREE from 'three';
 			
 			import { abs, blendOverlay, color, float, Fn, instancedBufferAttribute, materialColor, normalWorldGeometry, pass, positionGeometry, positionLocal, reflector, screenUV, sin, sub, texture, time, uniform, uv, vec3 } from 'three/tsl';
-			import { ao } from 'three/addons/tsl/display/GTAONode.js';
-			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -155,14 +153,14 @@
 
 				// tweens
 
-				const effectTween = new TWEEN.Tween( uniformEffector1 )
+				new TWEEN.Tween( uniformEffector1 )
 					.to( { value: 1.2 }, 3000 )
 					.delay( 800 )
 					.repeat( Infinity )
 					.easing( TWEEN.Easing.Sinusoidal.InOut )
 					.start();
 
-				const effect2Tween = new TWEEN.Tween( uniformEffector2 )
+				new TWEEN.Tween( uniformEffector2 )
 					.to( { value: 1.2 }, 3000 )
 					.repeat( Infinity )
 					.easing( TWEEN.Easing.Sinusoidal.InOut )
@@ -200,7 +198,6 @@
 			function createTreeMesh() {
 
 				const maxSteps = 5;
-				const angleOffset = Math.PI / 180 * 40;
 				const lengthMult = 0.8;
 
 				const positions = [];
