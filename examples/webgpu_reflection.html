@@ -107,7 +107,6 @@
 				floorMaterial.colorNode = texture( floorColor, floorUV ).add( reflection );
 
 				const floor = new THREE.Mesh( new THREE.BoxGeometry( 50, .001, 50 ), floorMaterial );
-				floor.position.set( 0, 0, 0 );
 				floor.receiveShadow = true;
 				scene.add( floor );
 
@@ -146,14 +145,12 @@
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
 				scenePassColorBlurred.directionNode = scenePassDepth;
 
-				const vignette = screenUV.distance( .5 ).mul( 1.25 ).clamp().oneMinus().sub( 0.2);
+				const vignette = screenUV.distance( .5 ).mul( 1.25 ).clamp().oneMinus().sub( 0.2 );
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = blendOverlay( scenePassColorBlurred, vignette );
 
-				//
-
-				window.addEventListener( 'resize', onWindowResize );
+				// tweens
 
 				const effectTween = new TWEEN.Tween( uniformEffector1 )
 					.to( { value: 1.2 }, 3000 )
@@ -167,6 +164,10 @@
 					.repeat( Infinity )
 					.easing( TWEEN.Easing.Sinusoidal.InOut )
 					.start();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
