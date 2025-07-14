@@ -39,6 +39,13 @@ class WebGPUBindingUtils {
 		 */
 		this.bindGroupLayoutCache = new WeakMap();
 
+		/**
+		 * A cache for external textures.
+		 *
+		 * @type {WeakMap<VideoTexture,Object>}
+		 */
+		this.externalTextureCache = new WeakMap();
+
 	}
 
 	/**
@@ -419,7 +426,29 @@ class WebGPUBindingUtils {
 
 				if ( textureData.externalTexture !== undefined ) {
 
-					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
+					let cache = this.externalTextureCache.get( binding.texture );
+
+					if ( cache === undefined ) {
+
+						// create initial cache object
+
+						cache = { renderId: - 1, resourceGPU: null };
+
+						this.externalTextureCache.set( binding.texture, cache );
+
+					}
+
+					const renderId = this.backend.renderer._nodes.nodeFrame.renderId;
+
+					if ( cache.renderId !== renderId ) {
+
+						cache.renderId = renderId;
+
+						cache.resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
+
+					}
+
+					resourceGPU = cache.resourceGPU;
 
 				} else {
 
