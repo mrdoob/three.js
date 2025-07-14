@@ -1243,13 +1243,24 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
-		frameBufferTarget.setSize( width, height, outputRenderTarget !== null ? outputRenderTarget.depth : 1 );
+		if ( outputRenderTarget !== null ) {
+
+			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
+
+		} else {
+
+			frameBufferTarget.setSize( width, height, 1 );
+
+		}
+
 		frameBufferTarget.viewport.copy( this._viewport );
 		frameBufferTarget.scissor.copy( this._scissor );
 		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );
 		frameBufferTarget.scissor.multiplyScalar( this._pixelRatio );
 		frameBufferTarget.scissorTest = this._scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
+		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
 		return frameBufferTarget;
 
@@ -1502,6 +1513,15 @@ class Renderer {
 		//
 
 		return renderContext;
+
+	}
+
+	_setXRLayerSize( width, height ) {
+
+		this._width = width;
+		this._height = height;
+
+		this.setViewport( 0, 0, width, height );
 
 	}
 
