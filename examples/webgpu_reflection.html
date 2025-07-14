@@ -85,6 +85,7 @@
 				const floorNormal = textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 				floorNormal.wrapS = THREE.RepeatWrapping;
 				floorNormal.wrapT = THREE.RepeatWrapping;
+				floorNormal.repeat.set( 15, 15 );
 
 				// tree
 
@@ -105,6 +106,8 @@
 
 				const floorMaterial = new THREE.MeshPhongNodeMaterial();
 				floorMaterial.colorNode = texture( floorColor, floorUV ).add( reflection );
+				floorMaterial.normalMap = floorNormal;
+				floorMaterial.normalScale.set( 0.2, - 0.2 );
 
 				const floor = new THREE.Mesh( new THREE.BoxGeometry( 50, .001, 50 ), floorMaterial );
 				floor.receiveShadow = true;
@@ -261,7 +264,7 @@
 
 							// color
 
-							color.setHSL( ( count / maxSteps ) * 0.5 + Math.random() * 0.05, 0.75, 0.7 + Math.random() * 0.1 );
+							color.setHSL( ( count / maxSteps ) * 0.5 + Math.random() * 0.05, 0.75, 0.6 + Math.random() * 0.1 );
 							colors.push( color.r, color.g, color.b );
 
 							// to save vertex buffers, we store the size, time and seed in a single attribute
