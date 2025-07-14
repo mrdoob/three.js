@@ -432,17 +432,17 @@ class WebGPUBindingUtils {
 
 						// create initial cache object
 
-						cache = { renderId: - 1, resourceGPU: null };
+						cache = { frameId: - 1, resourceGPU: null };
 
 						this.externalTextureCache.set( binding.texture, cache );
 
 					}
 
-					const renderId = this.backend.renderer._nodes.nodeFrame.renderId;
+					const frameId = this.backend.renderer._nodes.nodeFrame.frameId;
 
-					if ( cache.renderId !== renderId ) {
+					if ( cache.frameId !== frameId ) {
 
-						cache.renderId = renderId;
+						cache.frameId = frameId;
 
 						cache.resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
 
