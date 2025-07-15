@@ -211,6 +211,8 @@ class PostProcessing {
 
 		this._update();
 
+		if ( this._context.onBeforePostProcessing !== null ) this._context.onBeforePostProcessing();
+
 		const renderer = this.renderer;
 
 		const toneMapping = renderer.toneMapping;
@@ -232,6 +234,8 @@ class PostProcessing {
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
+
+		if ( this._context.onAfterPostProcessing !== null ) this._context.onAfterPostProcessing();
 
 	}
 
