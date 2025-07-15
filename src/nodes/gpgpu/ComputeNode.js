@@ -219,18 +219,42 @@ export default ComputeNode;
  * @tsl
  * @function
  * @param {Node} node - TODO
- * @param {number} countOrWorkgroupSize - TODO.
- * @param {Array<number>} [workgroupSize=[ 64, 1, 1 ]]
+ * @param {number} countOrWorkgroupSize - TODO, depends on the future of count
  * @returns {AtomicFunctionNode}
  */
-export const compute = ( node, countOrWorkgroupSize, workgroupSize ) => {
+export const compute = ( node, countOrWorkgroupSize ) => {
 
-	let count = countOrWorkgroupSize;
+	let count = null;
+	let workgroupSize = [ 64, 1, 1 ];	//default
 
 	if ( Array.isArray( countOrWorkgroupSize ) ) {
 
 		workgroupSize = countOrWorkgroupSize;
-		count = null;
+
+		if ( workgroupSize.length === 0 || workgroupSize.length > 3 ) {
+
+			throw new Error( 'workgroupSize must have 1, 2, or 3 elements' );
+
+		}
+
+		for ( let i = 0; i < workgroupSize.length; i ++ ) {
+
+			const val = workgroupSize[ i ];
+
+			if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
+
+				throw new Error( `workgroupSize element at index ${i} must be a positive integer` );
+
+			}
+
+		}
+
+		// Implicit fill-up to [ x, y, z ] with 1s, just like WGSL treats @workgroup_size when fewer dimensions are specified
+		while ( workgroupSize.length < 3 ) workgroupSize.push( 1 );
+
+	} else {
+
+		count = countOrWorkgroupSize;
 
 	}
 

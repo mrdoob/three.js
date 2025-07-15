@@ -1324,9 +1324,9 @@ class WebGPUBackend extends Backend {
 
 		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
-		const isValid = dispatchSize[ 0 ] > 0 && dispatchSize[ 1 ] > 0 && dispatchSize[ 2 ] > 0;
+		const isValid = Array.isArray( dispatchSize );
 
-		dispatchSize = isValid ? dispatchSize : computeNodeData;
+		dispatchSize = isValid ? dispatchSize : computeNodeData;	//Or at some point an initial value if condition is not met and count should be depracticed
 
 		// pipeline
 

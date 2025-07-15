@@ -2311,7 +2311,7 @@ class Renderer {
 	 * @param {Array<number>} dispatchSize - Array with [ x,y,z ] values for dispatch.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
-	compute( computeNodes, dispatchSize = [ 0, 0, 0 ] ) {
+	compute( computeNodes, dispatchSize = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
@@ -2349,6 +2349,38 @@ class Renderer {
 		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
 
 			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
+
+		}
+
+		if ( dispatchSize !== null ) {
+
+			if ( ! Array.isArray( dispatchSize ) ) {
+
+				throw new Error( 'dispatchSize must be an array' );
+
+			}
+
+			if ( dispatchSize.length === 0 || dispatchSize.length > 3 ) {
+
+				throw new Error( 'dispatchSize must have 1, 2, or 3 elements' );
+
+			}
+
+			// Check each element for positive integer
+			for ( let i = 0; i < dispatchSize.length; i ++ ) {
+
+				const val = dispatchSize[ i ];
+
+				if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
+
+					throw new Error( `dispatchSize element at index ${i} must be a positive integer` );
+
+				}
+
+			}
+
+			// Implicit fill-up
+			while ( dispatchSize.length < 3 ) dispatchSize.push( 1 );
 
 		}
 

@@ -1898,9 +1898,7 @@ ${ flowData.code }
 
 		} else {
 
-			const workgroupSize = this.object.workgroupSize || [ 64, 1, 1 ];
-
-			if ( workgroupSize.length !== 3 ) throw new Error( 'workgroupSize must have 3 elements' );
+			const workgroupSize = this.object.workgroupSize;	//early strictly validated in computeNode
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
 
