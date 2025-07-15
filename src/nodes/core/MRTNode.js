@@ -112,33 +112,6 @@ class MRTNode extends OutputStructNode {
 
 	}
 
-	/**
-	 * Returns the indexes of the MRT outputs in the current render target.
-	 *
-	 * @param {RenderTarget} renderTarget - The render target to get the indexes for.
-	 * @return {Array<number>} The indexes of the MRT outputs.
-	 */
-	getIndexes( renderTarget ) {
-
-		const textures = renderTarget.textures;
-		const indexLib = {};
-
-		for ( const name in this.outputNodes ) {
-
-			const index = getTextureIndex( textures, name );
-
-			if ( index !== - 1 ) {
-
-				indexLib[ name ] = index;
-
-			}
-
-		}
-
-		return indexLib;
-
-	}
-
 	setup( builder ) {
 
 		const outputNodes = this.outputNodes;
