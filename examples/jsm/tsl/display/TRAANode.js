@@ -143,6 +143,13 @@ class TRAANode extends TempNode {
 		 */
 		this._originalProjectionMatrix = new Matrix4();
 
+		/**
+		 * Sync the post processing stack with the TRAA node.
+		 * @private
+		 * @type {boolean}
+		 */
+		this._needsPostProcessingSync = false;
+
 	}
 
 	/**
@@ -239,11 +246,21 @@ class TRAANode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+		const size = renderer.getDrawingBufferSize( _size );
 
 		//
 
-		const size = renderer.getDrawingBufferSize( _size );
+		if ( this._needsPostProcessingSync === true ) {
+
+			this.setViewOffset( size.width, size.height );
+
+			this._needsPostProcessingSync = false;
+
+		}
+
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+
+		//
 
 		const needsRestart = this._historyRenderTarget.width !== size.width || this._historyRenderTarget.height !== size.height;
 		this.setSize( size.width, size.height );
@@ -285,7 +302,28 @@ class TRAANode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {PassTextureNode}
 	 */
-	setup( /*builder*/ ) {
+	setup( builder ) {
+
+		const postProcessing = builder.context.postProcessing;
+
+		if ( postProcessing ) {
+
+			this._needsPostProcessingSync = true;
+
+			postProcessing.context.onBeforePostProcessing = () => {
+
+				const size = builder.renderer.getDrawingBufferSize( _size );
+				this.setViewOffset( size.width, size.height );
+
+			};
+
+			postProcessing.context.onAfterPostProcessing = () => {
+
+				this.clearViewOffset();
+
+			};
+
+		}
 
 		const historyTexture = texture( this._historyRenderTarget.texture );
 		const sampleTexture = this.beautyNode;
