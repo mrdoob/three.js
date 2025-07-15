@@ -73,6 +73,12 @@ class Source {
 
 	}
 
+	/**
+	 * Returns the dimensions of the source into the given target vector.
+	 *
+	 * @param {(Vector2|Vector3)} target - The target object the result is written into.
+	 * @return {(Vector2|Vector3)} The dimensions of the source.
+	 */
 	getSize( target ) {
 
 		const data = this.data;
@@ -80,6 +86,10 @@ class Source {
 		if ( data instanceof HTMLVideoElement ) {
 
 			target.set( data.videoWidth, data.videoHeight );
+
+		} else if ( data instanceof VideoFrame ) {
+
+			target.set( data.displayHeight, data.displayWidth );
 
 		} else if ( data !== null ) {
 
