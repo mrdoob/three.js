@@ -159,10 +159,6 @@ class WebGPUTextureUtils {
 
 			textureGPU = this._getDefaultCubeTextureGPU( format );
 
-		} else if ( texture.isVideoTexture ) {
-
-			this.backend.get( texture ).externalTexture = this._getDefaultVideoFrame();
-
 		} else {
 
 			textureGPU = this._getDefaultTextureGPU( format );
@@ -247,38 +243,22 @@ class WebGPUTextureUtils {
 
 		// texture creation
 
-		if ( texture.isVideoTexture ) {
+		if ( format === undefined ) {
 
-			const video = texture.source.data;
-			const videoFrame = new VideoFrame( video );
+			console.warn( 'WebGPURenderer: Texture format not supported.' );
 
-			textureDescriptorGPU.size.width = videoFrame.displayWidth;
-			textureDescriptorGPU.size.height = videoFrame.displayHeight;
-
-			videoFrame.close();
-
-			textureData.externalTexture = video;
-
-		} else {
-
-			if ( format === undefined ) {
-
-				console.warn( 'WebGPURenderer: Texture format not supported.' );
-
-				this.createDefaultTexture( texture );
-				return;
-
-			}
-
-			if ( texture.isCubeTexture ) {
-
-				textureDescriptorGPU.textureBindingViewDimension = GPUTextureViewDimension.Cube;
-
-			}
-
-			textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+			this.createDefaultTexture( texture );
+			return;
 
 		}
+
+		if ( texture.isCubeTexture ) {
+
+			textureDescriptorGPU.textureBindingViewDimension = GPUTextureViewDimension.Cube;
+
+		}
+
+		textureData.texture = backend.device.createTexture( textureDescriptorGPU );
 
 		if ( isMSAA ) {
 
@@ -480,12 +460,6 @@ class WebGPUTextureUtils {
 
 			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY, texture.premultiplyAlpha );
 
-		} else if ( texture.isVideoTexture ) {
-
-			const video = texture.source.data;
-
-			textureData.externalTexture = video;
-
 		} else {
 
 			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
@@ -616,33 +590,6 @@ class WebGPUTextureUtils {
 	}
 
 	/**
-	 * Returns the default video frame used as default data in context of video textures.
-	 *
-	 * @private
-	 * @return {VideoFrame} The video frame.
-	 */
-	_getDefaultVideoFrame() {
-
-		let defaultVideoFrame = this.defaultVideoFrame;
-
-		if ( defaultVideoFrame === null ) {
-
-			const init = {
-				timestamp: 0,
-				codedWidth: 1,
-				codedHeight: 1,
-				format: 'RGBA',
-			};
-
-			this.defaultVideoFrame = defaultVideoFrame = new VideoFrame( new Uint8Array( [ 0, 0, 0, 0xff ] ), init );
-
-		}
-
-		return defaultVideoFrame;
-
-	}
-
-	/**
 	 * Uploads cube texture image data to the GPU memory.
 	 *
 	 * @private
@@ -699,8 +646,8 @@ class WebGPUTextureUtils {
 				origin: { x: 0, y: 0, z: originDepth },
 				premultipliedAlpha: premultiplyAlpha
 			}, {
-				width: image.width,
-				height: image.height,
+				width: textureDescriptorGPU.size.width,
+				height: textureDescriptorGPU.size.height,
 				depthOrArrayLayers: 1
 			}
 		);

@@ -16,7 +16,7 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 
-import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
+import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, SRGBColorSpace } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
@@ -219,7 +219,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	needsToWorkingColorSpace( texture ) {
 
-		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
+		if ( texture.isVideoTexture && texture.colorSpace === SRGBColorSpace ) {
+
+			// Video textures are always in sRGB color space, so no conversion is needed
+			return false;
+
+		}
+
+		return texture.colorSpace !== NoColorSpace;
 
 	}
 
@@ -250,30 +257,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			return this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, '0', depthSnippet );
-
-		}
-
-	}
-
-	/**
-	 * Generates the WGSL snippet when sampling video textures.
-	 *
-	 * @private
-	 * @param {string} textureProperty - The name of the video texture uniform in the shader.
-	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
-	 * @return {string} The WGSL snippet.
-	 */
-	_generateVideoSample( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
-
-		if ( shaderStage === 'fragment' ) {
-
-			return `textureSampleBaseClampToEdge( ${ textureProperty }, ${ textureProperty }_sampler, vec2<f32>( ${ uvSnippet }.x, 1.0 - ${ uvSnippet }.y ) )`;
-
-		} else {
-
-			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
+			return this.generateTextureSampleLevel( texture, textureProperty, uvSnippet, '0', depthSnippet );
 
 		}
 
@@ -290,7 +274,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @return {string} The WGSL snippet.
 	 */
-	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
+	generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
 
 		if ( this.isUnfilterable( texture ) === false ) {
 
@@ -434,7 +418,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			}
 
 			// Build parameters string based on texture type and multisampling
-			if ( isMultisampled || texture.isVideoTexture || texture.isStorageTexture ) {
+			if ( isMultisampled || texture.isStorageTexture ) {
 
 				textureDimensionsParams = textureProperty;
 
@@ -531,11 +515,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		let snippet;
 
-		if ( texture.isVideoTexture === true ) {
-
-			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
-
-		} else if ( depthSnippet ) {
+		if ( depthSnippet ) {
 
 			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
@@ -624,11 +604,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		let snippet = null;
 
-		if ( texture.isVideoTexture === true ) {
-
-			snippet = this._generateVideoSample( textureProperty, uvSnippet, shaderStage );
-
-		} else if ( this.isUnfilterable( texture ) ) {
+		if ( this.isUnfilterable( texture ) ) {
 
 			snippet = this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0', shaderStage );
 
@@ -711,21 +687,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
 
-		let snippet = null;
+		if ( this.isUnfilterable( texture ) === false ) {
 
-		if ( texture.isVideoTexture === true ) {
+			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
-			snippet = this._generateVideoSample( textureProperty, uvSnippet, shaderStage );
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
 
 		} else {
 
-			snippet = this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet );
 
 		}
-
-		return snippet;
 
 	}
 
@@ -1728,10 +1704,6 @@ ${ flowData.code }
 				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
 
 					textureType = 'texture_3d<f32>';
-
-				} else if ( texture.isVideoTexture === true ) {
-
-					textureType = 'texture_external';
 
 				} else {
 
