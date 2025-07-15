@@ -212,25 +212,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
-	 * Checks if the given texture requires a manual conversion to the working color space.
-	 *
-	 * @param {Texture} texture - The texture to check.
-	 * @return {boolean} Whether the given texture requires a conversion to working color space or not.
-	 */
-	needsToWorkingColorSpace( texture ) {
-
-		if ( texture.isVideoTexture && texture.colorSpace === SRGBColorSpace ) {
-
-			// Video textures are always in sRGB color space, so no conversion is needed
-			return false;
-
-		}
-
-		return texture.colorSpace !== NoColorSpace;
-
-	}
-
-	/**
 	 * Generates the WGSL snippet for sampled textures.
 	 *
 	 * @private
