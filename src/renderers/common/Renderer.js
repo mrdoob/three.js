@@ -2308,7 +2308,7 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {Array<number>} dispatchSize - Array with [ x,y,z ] values for dispatch.
+	 * @param {Array<number>} dispatchSize - Array with [ x,y,z ] values for dispatch. Default = null
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSize = null ) {
