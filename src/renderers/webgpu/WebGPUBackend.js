@@ -1324,9 +1324,6 @@ class WebGPUBackend extends Backend {
 
 		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
-		const isValid = Array.isArray( dispatchSize );
-
-		dispatchSize = isValid ? dispatchSize : computeNodeData;	//Or at some point an initial value if condition is not met and count should be depracticed
 
 		// pipeline
 
@@ -1345,7 +1342,33 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( isValid ) {
+		if ( dispatchSize !== null ) {
+
+			if ( ! Array.isArray( dispatchSize ) ) {
+
+				throw new Error( 'dispatchSize must be an array' );
+
+			}
+
+			if ( dispatchSize.length === 0 || dispatchSize.length > 3 ) {
+
+				throw new Error( 'dispatchSize must have 1, 2, or 3 elements' );
+
+			}
+
+			for ( let i = 0; i < dispatchSize.length; i ++ ) {
+
+				const value = dispatchSize[ i ];
+
+				if ( typeof value !== 'number' || value <= 0 || ! Number.isInteger( value ) ) {
+
+					throw new Error( `dispatchSize element at index ${i} must be a positive integer` );
+
+				}
+
+			}
+
+	 		while ( dispatchSize.length < 3 ) dispatchSize.push( 1 );
 
 			passEncoderGPU.dispatchWorkgroups(
 				dispatchSize[ 0 ],
@@ -1354,6 +1377,8 @@ class WebGPUBackend extends Backend {
 			);
 
 		} else {
+
+			dispatchSize = computeNodeData;
 
 			const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
 
