@@ -82,6 +82,15 @@ class PostProcessing {
 		 */
 		this._quadMesh = new QuadMesh( material );
 
+		/**
+		 * The TRAA node of this post processing stack.
+		 *
+		 * @private
+		 * @type {?TRAANode}
+		 * @default null
+		 */
+		this._traaNode = null;
+
 	}
 
 	/**
@@ -90,6 +99,8 @@ class PostProcessing {
 	 * its animation loop (not the one from the renderer).
 	 */
 	render() {
+
+		if ( this._traaNode !== null ) this._traaNode.setViewOffset();
 
 		this._update();
 
@@ -114,6 +125,20 @@ class PostProcessing {
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
+
+		if ( this._traaNode !== null ) this._traaNode.clearViewOffset();
+
+	}
+
+	/**
+	 * Sets the TRAA node so it can be used to modify the camera's
+	 * projection matrix before and after rendering.
+	 *
+	 * @param {?TRAANode} traaNode - The TRAA node to set.
+	 */
+	setTRAANode( traaNode ) {
+
+		this._traaNode = traaNode;
 
 	}
 
