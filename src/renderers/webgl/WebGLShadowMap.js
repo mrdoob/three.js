@@ -151,7 +151,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 				shadow.map.texture.name = light.name + '.shadowMap';
 
 				// @deprecated, r179
-				if ( capabilities.reverseDepthBuffer === true && camera.reversedDepth === false ) {
+				if ( capabilities.reversedDepthBuffer === true && camera.reversedDepth === false ) {
 
 					shadow.camera.reversedDepth = true;
 

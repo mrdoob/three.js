@@ -1119,7 +1119,7 @@ class Matrix4 {
 
 		if ( reversedDepth ) {
 
-			c = far / ( far - near ) - 1;
+			c = near / ( far - near );
 			d = ( far * near ) / ( far - near );
 
 		} else {

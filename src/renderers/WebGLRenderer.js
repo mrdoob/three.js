@@ -80,7 +80,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			reverseDepthBuffer = false,
+			reversedDepthBuffer = false,
 		} = parameters;
 
 		/**
@@ -408,7 +408,7 @@ class WebGLRenderer {
 
 			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+			if ( capabilities.reversedDepthBuffer && reversedDepthBuffer ) {
 
 				state.buffers.depth.setReversed( true );
 
@@ -2379,9 +2379,9 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				const reverseDepthBuffer = state.buffers.depth.getReversed();
+				const reversedDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reverseDepthBuffer && camera.reversedDepth !== true ) {
+				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
 					camera.reversedDepth = true;
 					camera.updateProjectionMatrix();
@@ -3430,7 +3430,7 @@ class WebGLRenderer {
  * @property {boolean} [depth=true] Whether the drawing buffer has a depth buffer of at least 16 bits.
  * @property {boolean} [logarithmicDepthBuffer=false] Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene.
  * Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
- * @property {boolean} [reverseDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
+ * @property {boolean} [reversedDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
  * This is a more faster and accurate version than logarithmic depth buffer.
  **/
 
@@ -3451,7 +3451,7 @@ class WebGLRenderer {
  * @property {number} maxVertexTextures - The number of textures that can be used in a vertex shader.
  * @property {number} maxVertexUniforms - The maximum number of uniforms that can be used in a vertex shader.
  * @property {string} precision - The shader precision currently being used by the renderer.
- * @property {boolean} reverseDepthBuffer - `true` if `reverseDepthBuffer` was set to `true` in the constructor
+ * @property {boolean} reversedDepthBuffer - `true` if `reversedDepthBuffer` was set to `true` in the constructor
  * and the rendering context supports `EXT_clip_control`.
  * @property {boolean} vertexTextures - `true` if vertex textures can be used.
  **/
