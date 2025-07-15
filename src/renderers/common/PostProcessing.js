@@ -2,6 +2,9 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { vec4, renderOutput } from '../../nodes/TSL.js';
 import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import { Vector2 } from '../../math/Vector2.js';
+
+const _size = /*@__PURE__*/ new Vector2();
 
 /**
  * This module is responsible to manage the post processing setups in apps.
@@ -100,11 +103,16 @@ class PostProcessing {
 	 */
 	render() {
 
-		if ( this._traaNode !== null ) this._traaNode.setViewOffset();
+		const renderer = this.renderer;
+
+		if ( this._traaNode !== null ) {
+
+			const size = renderer.getDrawingBufferSize( _size );
+			this._traaNode.setViewOffset( size.width, size.height );
+
+		}
 
 		this._update();
-
-		const renderer = this.renderer;
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;

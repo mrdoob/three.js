@@ -125,7 +125,7 @@ class TRAANode extends TempNode {
 		 * @type {NodeMaterial}
 		 */
 		this._resolveMaterial = new NodeMaterial();
-		this._resolveMaterial.name = 'TRAA.Resolve';
+		this._resolveMaterial.name = 'TRAA.resolve';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
@@ -174,8 +174,11 @@ class TRAANode extends TempNode {
 	/**
 	 * Defines the TRAA's current jitter as a view offset
 	 * to the scene's camera.
+	 *
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
-	setViewOffset() {
+	setViewOffset( width, height ) {
 
 		// save original/unjittered projection matrix for velocity pass
 
@@ -188,12 +191,12 @@ class TRAANode extends TempNode {
 
 		const viewOffset = {
 
-			fullWidth: this._resolveRenderTarget.width,
-			fullHeight: this._resolveRenderTarget.height,
+			fullWidth: width,
+			fullHeight: height,
 			offsetX: 0,
 			offsetY: 0,
-			width: this._resolveRenderTarget.width,
-			height: this._resolveRenderTarget.height
+			width: width,
+			height: height
 
 		};
 
