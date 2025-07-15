@@ -1203,7 +1203,7 @@ function WebGLState( gl, extensions ) {
 		gl.clearColor( 0, 0, 0, 0 );
 
 		gl.depthMask( true );
-		gl.depthFunc( gl.LESS );
+		gl.depthFunc( gl.LEQUAL );
 
 		depthBuffer.setReversed( false );
 
