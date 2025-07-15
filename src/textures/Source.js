@@ -85,11 +85,11 @@ class Source {
 
 		if ( data instanceof HTMLVideoElement ) {
 
-			target.set( data.videoWidth, data.videoHeight );
+			target.set( data.videoWidth, data.videoHeight, 0 );
 
 		} else if ( data instanceof VideoFrame ) {
 
-			target.set( data.displayHeight, data.displayWidth );
+			target.set( data.displayHeight, data.displayWidth, 0 );
 
 		} else if ( data !== null ) {
 
