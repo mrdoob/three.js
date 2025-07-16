@@ -246,13 +246,16 @@ class TRAANode extends TempNode {
 
 		const { renderer } = frame;
 
-		const size = renderer.getDrawingBufferSize( _size );
+		// keep the TRAA in sync with the dimensions of the beauty node
+
+		const width = this.beautyNode.passNode.renderTarget.texture.width;
+		const height = this.beautyNode.passNode.renderTarget.texture.height;
 
 		//
 
 		if ( this._needsPostProcessingSync === true ) {
 
-			this.setViewOffset( size.width, size.height );
+			this.setViewOffset( width, height );
 
 			this._needsPostProcessingSync = false;
 
@@ -262,8 +265,8 @@ class TRAANode extends TempNode {
 
 		//
 
-		const needsRestart = this._historyRenderTarget.width !== size.width || this._historyRenderTarget.height !== size.height;
-		this.setSize( size.width, size.height );
+		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		this.setSize( width, height );
 
 		// every time when the dimensions change we need fresh history data
 
@@ -276,6 +279,11 @@ class TRAANode extends TempNode {
 
 			renderer.setRenderTarget( this._resolveRenderTarget );
 			renderer.clear();
+
+			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
+			// resize will fade from a darker color to the correct one because the history was cleared with black.
+
+			renderer.copyTextureToTexture( this.beautyNode.passNode.renderTarget.texture, this._historyRenderTarget.texture );
 
 		}
 
