@@ -255,7 +255,7 @@ class CameraHelper extends LineSegments {
 
 			} else {
 
-				throw new Error( 'THREE.CameraHelper.update(): Invalid coordinate system: ' + coordinateSystem );
+				throw new Error( 'THREE.CameraHelper.update(): Invalid coordinate system: ' + this.camera.coordinateSystem );
 
 			}
 
