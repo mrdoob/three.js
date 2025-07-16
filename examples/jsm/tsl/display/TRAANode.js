@@ -248,8 +248,10 @@ class TRAANode extends TempNode {
 
 		// keep the TRAA in sync with the dimensions of the beauty node
 
-		const width = this.beautyNode.passNode.renderTarget.texture.width;
-		const height = this.beautyNode.passNode.renderTarget.texture.height;
+		const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
+
+		const width = beautyRenderTarget.texture.width;
+		const height = beautyRenderTarget.texture.height;
 
 		//
 
@@ -283,7 +285,7 @@ class TRAANode extends TempNode {
 			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
 			// resize will fade from a darker color to the correct one because the history was cleared with black.
 
-			renderer.copyTextureToTexture( this.beautyNode.passNode.renderTarget.texture, this._historyRenderTarget.texture );
+			renderer.copyTextureToTexture( beautyRenderTarget.texture, this._historyRenderTarget.texture );
 
 		}
 
