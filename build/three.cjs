@@ -1571,7 +1571,7 @@ const GLSL1 = '100';
 const GLSL3 = '300 es';
 
 /**
- * WebGL coordinate system [-1, 1].
+ * WebGL coordinate system.
  *
  * @type {number}
  * @constant
@@ -1579,22 +1579,12 @@ const GLSL3 = '300 es';
 const WebGLCoordinateSystem = 2000;
 
 /**
- * WebGPU coordinate system [0, 1].
+ * WebGPU coordinate system.
  *
  * @type {number}
  * @constant
  */
 const WebGPUCoordinateSystem = 2001;
-
-/**
- * Reversed coordinate system [1, 0].
- *
- * Used for reverse depth buffer.
- *
- * @type {number}
- * @constant
- */
-const ReversedCoordinateSystem = 2002;
 
 /**
  * Represents the different timestamp query types.
@@ -6292,38 +6282,6 @@ function probeAsync( gl, sync, interval ) {
 
 }
 
-function toNormalizedProjectionMatrix( projectionMatrix ) {
-
-	const m = projectionMatrix.elements;
-
-	// Convert [-1, 1] to [0, 1] projection matrix
-	m[ 2 ] = 0.5 * m[ 2 ] + 0.5 * m[ 3 ];
-	m[ 6 ] = 0.5 * m[ 6 ] + 0.5 * m[ 7 ];
-	m[ 10 ] = 0.5 * m[ 10 ] + 0.5 * m[ 11 ];
-	m[ 14 ] = 0.5 * m[ 14 ] + 0.5 * m[ 15 ];
-
-}
-
-function toReversedProjectionMatrix( projectionMatrix ) {
-
-	const m = projectionMatrix.elements;
-	const isPerspectiveMatrix = m[ 11 ] === -1;
-
-	// Reverse [0, 1] projection matrix
-	if ( isPerspectiveMatrix ) {
-
-		m[ 10 ] = - m[ 10 ] - 1;
-		m[ 14 ] = - m[ 14 ];
-
-	} else {
-
-		m[ 10 ] = - m[ 10 ];
-		m[ 14 ] = - m[ 14 ] + 1;
-
-	}
-
-}
-
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
 	0.4123908, 0.3575843, 0.1804808,
 	0.2126390, 0.7151687, 0.0721923,
@@ -6735,13 +6693,23 @@ class Source {
 
 	}
 
+	/**
+	 * Returns the dimensions of the source into the given target vector.
+	 *
+	 * @param {(Vector2|Vector3)} target - The target object the result is written into.
+	 * @return {(Vector2|Vector3)} The dimensions of the source.
+	 */
 	getSize( target ) {
 
 		const data = this.data;
 
 		if ( data instanceof HTMLVideoElement ) {
 
-			target.set( data.videoWidth, data.videoHeight );
+			target.set( data.videoWidth, data.videoHeight, 0 );
+
+		} else if ( data instanceof VideoFrame ) {
+
+			target.set( data.displayHeight, data.displayWidth, 0 );
 
 		} else if ( data !== null ) {
 
@@ -12424,9 +12392,10 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
 		const x = 2 * near / ( right - left );
@@ -12437,24 +12406,28 @@ class Matrix4 {
 
 		let c, d;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			c = - ( far + near ) / ( far - near );
-			d = ( -2 * far * near ) / ( far - near );
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			c = - far / ( far - near );
-			d = ( - far * near ) / ( far - near );
-
-		} else if ( coordinateSystem === ReversedCoordinateSystem ) {
-
-			c = far / ( far - near ) - 1;
+			c = near / ( far - near );
 			d = ( far * near ) / ( far - near );
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				c = - ( far + near ) / ( far - near );
+				d = ( -2 * far * near ) / ( far - near );
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				c = - far / ( far - near );
+				d = ( - far * near ) / ( far - near );
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -12478,9 +12451,10 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
 		const w = 1.0 / ( right - left );
@@ -12492,24 +12466,28 @@ class Matrix4 {
 
 		let z, zInv;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
-
-			z = ( far + near ) * p;
-			zInv = -2 * p;
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			z = near * p;
-			zInv = -1 * p;
-
-		} else if ( coordinateSystem === ReversedCoordinateSystem ) {
+		if ( reversedDepth ) {
 
 			z = - near * p - 1;
 			zInv = 1 * p;
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				z = ( far + near ) * p;
+				zInv = -2 * p;
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				z = near * p;
+				zInv = -1 * p;
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -21392,6 +21370,14 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		/**
+		 * The flag that indicates whether the camera uses a reversed depth buffer.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.reversedDepth = false;
+
+		/**
 		 * The inverse of the camera's world matrix.
 		 *
 		 * @type {Matrix4}
@@ -21846,7 +21832,7 @@ class PerspectiveCamera extends Camera {
 		const skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem );
+		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem, this.reversedDepth );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -46021,7 +46007,7 @@ class OrthographicCamera extends Camera {
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem );
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -60942,7 +60928,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 	}
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
-	const reverseDepthBuffer = parameters.reverseDepthBuffer === true && extensions.has( 'EXT_clip_control' );
+	const reversedDepthBuffer = parameters.reversedDepthBuffer === true && extensions.has( 'EXT_clip_control' );
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	const maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -60970,7 +60956,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
-		reverseDepthBuffer: reverseDepthBuffer,
+		reversedDepthBuffer: reversedDepthBuffer,
 
 		maxTextures: maxTextures,
 		maxVertexTextures: maxVertexTextures,
@@ -64801,7 +64787,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
+			parameters.reversedDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -64968,7 +64954,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.decodeVideoTextureEmissive ? '#define DECODE_VIDEO_TEXTURE_EMISSIVE' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
+			parameters.reversedDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
@@ -65455,7 +65441,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		}
 
 		const currentRenderTarget = renderer.getRenderTarget();
-		const reverseDepthBuffer = renderer.state.buffers.depth.getReversed();
+		const reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
 
 		const IS_INSTANCEDMESH = object.isInstancedMesh === true;
 		const IS_BATCHEDMESH = object.isBatchedMesh === true;
@@ -65653,7 +65639,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
-			reverseDepthBuffer: reverseDepthBuffer,
+			reversedDepthBuffer: reversedDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
 
@@ -65876,7 +65862,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.logarithmicDepthBuffer )
 			_programLayers.enable( 3 );
-		if ( parameters.reverseDepthBuffer )
+		if ( parameters.reversedDepthBuffer )
 			_programLayers.enable( 4 );
 		if ( parameters.skinning )
 			_programLayers.enable( 5 );
@@ -67110,13 +67096,13 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 				shadow.map.texture.name = light.name + '.shadowMap';
 
 				// @deprecated, r179
-				if ( capabilities.reverseDepthBuffer === true && camera.coordinateSystem !== ReversedCoordinateSystem ) {
+				if ( capabilities.reversedDepthBuffer === true && camera.reversedDepth === false ) {
 
-					shadow.camera.coordinateSystem = ReversedCoordinateSystem;
+					shadow.camera.reversedDepth = true;
 
 				} else {
 
-					shadow.camera.coordinateSystem = camera.coordinateSystem;
+					shadow.camera.reversedDepth = camera.reversedDepth;
 
 				}
 
@@ -73407,7 +73393,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			reverseDepthBuffer = false,
+			reversedDepthBuffer = false,
 		} = parameters;
 
 		/**
@@ -73640,7 +73626,6 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
-		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
 		const _vector3 = new Vector3();
@@ -73736,7 +73721,7 @@ class WebGLRenderer {
 
 			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+			if ( capabilities.reversedDepthBuffer && reversedDepthBuffer ) {
 
 				state.buffers.depth.setReversed( true );
 
@@ -75707,25 +75692,16 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				const reverseDepthBuffer = state.buffers.depth.getReversed();
+				const reversedDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reverseDepthBuffer && camera.coordinateSystem !== ReversedCoordinateSystem ) {
+				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					// @deprecated, r179
-					warnOnce( 'THREE.WebGLRenderer: reverseDepthBuffer must be used with camera.coordinateSystem = THREE.ReversedCoordinateSystem for correct results. Automatic conversion will be removed in r189.' );
-
-					_currentProjectionMatrix.copy( camera.projectionMatrix );
-
-					toNormalizedProjectionMatrix( _currentProjectionMatrix );
-					toReversedProjectionMatrix( _currentProjectionMatrix );
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
-
-				} else {
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+					camera.reversedDepth = true;
+					camera.updateProjectionMatrix();
 
 				}
+
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -77073,7 +77049,6 @@ exports.RenderTarget3D = RenderTarget3D;
 exports.RepeatWrapping = RepeatWrapping;
 exports.ReplaceStencilOp = ReplaceStencilOp;
 exports.ReverseSubtractEquation = ReverseSubtractEquation;
-exports.ReversedCoordinateSystem = ReversedCoordinateSystem;
 exports.RingGeometry = RingGeometry;
 exports.SIGNED_RED_GREEN_RGTC2_Format = SIGNED_RED_GREEN_RGTC2_Format;
 exports.SIGNED_RED_RGTC1_Format = SIGNED_RED_RGTC1_Format;
