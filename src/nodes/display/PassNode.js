@@ -49,7 +49,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
+		this.passNode.build( builder );
 
 		return super.setup( builder );
 
