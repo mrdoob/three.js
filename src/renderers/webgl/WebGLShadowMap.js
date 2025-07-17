@@ -150,6 +150,17 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
 
+				// @deprecated, r179
+				if ( capabilities.reversedDepthBuffer === true && camera.reversedDepth === false ) {
+
+					shadow.camera.reversedDepth = true;
+
+				} else {
+
+					shadow.camera.reversedDepth = camera.reversedDepth;
+
+				}
+
 				shadow.camera.updateProjectionMatrix();
 
 			}

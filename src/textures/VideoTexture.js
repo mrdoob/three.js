@@ -53,18 +53,28 @@ class VideoTexture extends Texture {
 		 */
 		this.generateMipmaps = false;
 
+		/**
+		 * The video frame request callback identifier, which is a positive integer.
+		 *
+		 * Value of 0 represents no scheduled rVFC.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._requestVideoFrameCallbackId = 0;
+
 		const scope = this;
 
 		function updateVideo() {
 
 			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
+			scope._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
 		if ( 'requestVideoFrameCallback' in video ) {
 
-			video.requestVideoFrameCallback( updateVideo );
+			this._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
@@ -92,6 +102,21 @@ class VideoTexture extends Texture {
 			this.needsUpdate = true;
 
 		}
+
+	}
+
+	/**
+	 * @override
+	 */
+	dispose() {
+
+		if ( this._requestVideoFrameCallbackId !== 0 ) {
+
+			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
+
+		}
+
+		super.dispose();
 
 	}
 

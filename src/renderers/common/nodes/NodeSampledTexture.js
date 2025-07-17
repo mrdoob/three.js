@@ -143,7 +143,7 @@ class NodeSampledTexture3D extends NodeSampledTexture {
 		 * @readonly
 		 * @default true
 		 */
-		this.is3DTexture = true;
+		this.isSampledTexture3D = true;
 
 	}
 

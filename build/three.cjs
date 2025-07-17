@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '178dev';
+const REVISION = '179dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -6282,38 +6282,6 @@ function probeAsync( gl, sync, interval ) {
 
 }
 
-function toNormalizedProjectionMatrix( projectionMatrix ) {
-
-	const m = projectionMatrix.elements;
-
-	// Convert [-1, 1] to [0, 1] projection matrix
-	m[ 2 ] = 0.5 * m[ 2 ] + 0.5 * m[ 3 ];
-	m[ 6 ] = 0.5 * m[ 6 ] + 0.5 * m[ 7 ];
-	m[ 10 ] = 0.5 * m[ 10 ] + 0.5 * m[ 11 ];
-	m[ 14 ] = 0.5 * m[ 14 ] + 0.5 * m[ 15 ];
-
-}
-
-function toReversedProjectionMatrix( projectionMatrix ) {
-
-	const m = projectionMatrix.elements;
-	const isPerspectiveMatrix = m[ 11 ] === -1;
-
-	// Reverse [0, 1] projection matrix
-	if ( isPerspectiveMatrix ) {
-
-		m[ 10 ] = - m[ 10 ] - 1;
-		m[ 14 ] = - m[ 14 ];
-
-	} else {
-
-		m[ 10 ] = - m[ 10 ];
-		m[ 14 ] = - m[ 14 ] + 1;
-
-	}
-
-}
-
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
 	0.4123908, 0.3575843, 0.1804808,
 	0.2126390, 0.7151687, 0.0721923,
@@ -6725,13 +6693,23 @@ class Source {
 
 	}
 
+	/**
+	 * Returns the dimensions of the source into the given target vector.
+	 *
+	 * @param {(Vector2|Vector3)} target - The target object the result is written into.
+	 * @return {(Vector2|Vector3)} The dimensions of the source.
+	 */
 	getSize( target ) {
 
 		const data = this.data;
 
 		if ( data instanceof HTMLVideoElement ) {
 
-			target.set( data.videoWidth, data.videoHeight );
+			target.set( data.videoWidth, data.videoHeight, 0 );
+
+		} else if ( data instanceof VideoFrame ) {
+
+			target.set( data.displayHeight, data.displayWidth, 0 );
 
 		} else if ( data !== null ) {
 
@@ -12414,9 +12392,10 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
 		const x = 2 * near / ( right - left );
@@ -12427,19 +12406,28 @@ class Matrix4 {
 
 		let c, d;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			c = - ( far + near ) / ( far - near );
-			d = ( -2 * far * near ) / ( far - near );
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			c = - far / ( far - near );
-			d = ( - far * near ) / ( far - near );
+			c = near / ( far - near );
+			d = ( far * near ) / ( far - near );
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				c = - ( far + near ) / ( far - near );
+				d = ( -2 * far * near ) / ( far - near );
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				c = - far / ( far - near );
+				d = ( - far * near ) / ( far - near );
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -12463,9 +12451,10 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
 		const w = 1.0 / ( right - left );
@@ -12477,19 +12466,28 @@ class Matrix4 {
 
 		let z, zInv;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			z = ( far + near ) * p;
-			zInv = -2 * p;
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			z = near * p;
-			zInv = -1 * p;
+			z = - near * p - 1;
+			zInv = 1 * p;
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				z = ( far + near ) * p;
+				zInv = -2 * p;
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				z = near * p;
+				zInv = -1 * p;
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -17289,7 +17287,7 @@ class MeshBasicMaterial extends Material {
 		 * @type {Color}
 		 * @default (1,1,1)
 		 */
-		this.color = new Color( 0xffffff ); // emissive
+		this.color = new Color( 0xffffff ); // diffuse
 
 		/**
 		 * The color map. May optionally include an alpha channel, typically combined
@@ -21372,6 +21370,14 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		/**
+		 * The flag that indicates whether the camera uses a reversed depth buffer.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.reversedDepth = false;
+
+		/**
 		 * The inverse of the camera's world matrix.
 		 *
 		 * @type {Matrix4}
@@ -21826,7 +21832,7 @@ class PerspectiveCamera extends Camera {
 		const skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem );
+		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem, this.reversedDepth );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -29400,18 +29406,28 @@ class VideoTexture extends Texture {
 		 */
 		this.generateMipmaps = false;
 
+		/**
+		 * The video frame request callback identifier, which is a positive integer.
+		 *
+		 * Value of 0 represents no scheduled rVFC.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._requestVideoFrameCallbackId = 0;
+
 		const scope = this;
 
 		function updateVideo() {
 
 			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
+			scope._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
 		if ( 'requestVideoFrameCallback' in video ) {
 
-			video.requestVideoFrameCallback( updateVideo );
+			this._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
@@ -29439,6 +29455,21 @@ class VideoTexture extends Texture {
 			this.needsUpdate = true;
 
 		}
+
+	}
+
+	/**
+	 * @override
+	 */
+	dispose() {
+
+		if ( this._requestVideoFrameCallbackId !== 0 ) {
+
+			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
+
+		}
+
+		super.dispose();
 
 	}
 
@@ -41694,7 +41725,7 @@ class KeyframeTrack {
 	 *
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
-	 * @param {Array<number>} values - A list of keyframe values.
+	 * @param {Array<number|string|boolean>} values - A list of keyframe values.
 	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
@@ -42282,7 +42313,7 @@ class BooleanKeyframeTrack extends KeyframeTrack {
 	 *
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
-	 * @param {Array<number>} values - A list of keyframe values.
+	 * @param {Array<boolean>} values - A list of keyframe values.
 	 */
 	constructor( name, times, values ) {
 
@@ -42485,7 +42516,7 @@ class StringKeyframeTrack extends KeyframeTrack {
 	 *
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
-	 * @param {Array<number>} values - A list of keyframe values.
+	 * @param {Array<string>} values - A list of keyframe values.
 	 */
 	constructor( name, times, values ) {
 
@@ -43309,6 +43340,13 @@ class LoadingManager {
 		this.onError = onError;
 
 		/**
+		 * Used for aborting ongoing requests in loaders using this manager.
+		 *
+		 * @type {AbortController}
+		 */
+		this.abortController = new AbortController();
+
+		/**
 		 * This should be called by any loader using the manager when the loader
 		 * starts loading an item.
 		 *
@@ -43508,6 +43546,22 @@ class LoadingManager {
 
 		};
 
+		/**
+		 * Can be used to abort ongoing loading requests in loaders using this manager.
+		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * is supported in the browser.
+		 *
+		 * @return {LoadingManager} A reference to this loading manager.
+		 */
+		this.abort = function () {
+
+			this.abortController.abort();
+			this.abortController = new AbortController();
+
+			return this;
+
+		};
+
 	}
 
 }
@@ -43587,6 +43641,7 @@ class Loader {
 	 * This method needs to be implemented by all concrete loaders. It holds the
 	 * logic for loading assets from the backend.
 	 *
+	 * @abstract
 	 * @param {string} url - The path/URL of the file to be loaded.
 	 * @param {Function} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
@@ -43617,6 +43672,7 @@ class Loader {
 	 * This method needs to be implemented by all concrete loaders. It holds the
 	 * logic for parsing the asset into three.js entities.
 	 *
+	 * @abstract
 	 * @param {any} data - The data to parse.
 	 */
 	parse( /* data */ ) {}
@@ -43687,6 +43743,18 @@ class Loader {
 	setRequestHeader( requestHeader ) {
 
 		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+	/**
+	 * This method can be implemented in loaders for aborting ongoing requests.
+	 *
+	 * @abstract
+	 * @return {Loader} A reference to this instance.
+	 */
+	abort() {
+
 		return this;
 
 	}
@@ -43773,6 +43841,14 @@ class FileLoader extends Loader {
 		 */
 		this.responseType = '';
 
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
+
 	}
 
 	/**
@@ -43839,7 +43915,7 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
-			// An abort controller could be added within a future PR
+			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
 
 		// record states ( avoid data race )
@@ -44052,6 +44128,20 @@ class FileLoader extends Loader {
 	setMimeType( value ) {
 
 		this.mimeType = value;
+		return this;
+
+	}
+
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {FileLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
 		return this;
 
 	}
@@ -45917,7 +46007,7 @@ class OrthographicCamera extends Camera {
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem );
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -48655,6 +48745,14 @@ class ImageBitmapLoader extends Loader {
 		 */
 		this.options = { premultiplyAlpha: 'none' };
 
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
+
 	}
 
 	/**
@@ -48743,6 +48841,7 @@ class ImageBitmapLoader extends Loader {
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
 		fetchOptions.headers = this.requestHeader;
+		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 
 		const promise = fetch( url, fetchOptions ).then( function ( res ) {
 
@@ -48777,6 +48876,20 @@ class ImageBitmapLoader extends Loader {
 
 		Cache.add( `image-bitmap:${url}`, promise );
 		scope.manager.itemStart( url );
+
+	}
+
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {ImageBitmapLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
+		return this;
 
 	}
 
@@ -54672,6 +54785,189 @@ function intersect( object, raycaster, intersects, recursive ) {
 }
 
 /**
+ * This class is an alternative to {@link Clock} with a different API design and behavior.
+ * The goal is to avoid the conceptual flaws that became apparent in `Clock` over time.
+ *
+ * - `Timer` has an `update()` method that updates its internal state. That makes it possible to
+ * call `getDelta()` and `getElapsed()` multiple times per simulation step without getting different values.
+ * - The class can make use of the Page Visibility API to avoid large time delta values when the app
+ * is inactive (e.g. tab switched or browser hidden).
+ *
+ * ```js
+ * const timer = new Timer();
+ * timer.connect( document ); // use Page Visibility API
+ * ```
+ */
+class Timer {
+
+	/**
+	 * Constructs a new timer.
+	 */
+	constructor() {
+
+		this._previousTime = 0;
+		this._currentTime = 0;
+		this._startTime = performance.now();
+
+		this._delta = 0;
+		this._elapsed = 0;
+
+		this._timescale = 1;
+
+		this._document = null;
+		this._pageVisibilityHandler = null;
+
+	}
+
+	/**
+	 * Connect the timer to the given document.Calling this method is not mandatory to
+	 * use the timer but enables the usage of the Page Visibility API to avoid large time
+	 * delta values.
+	 *
+	 * @param {Document} document - The document.
+	 */
+	connect( document ) {
+
+		this._document = document;
+
+		// use Page Visibility API to avoid large time delta values
+
+		if ( document.hidden !== undefined ) {
+
+			this._pageVisibilityHandler = handleVisibilityChange.bind( this );
+
+			document.addEventListener( 'visibilitychange', this._pageVisibilityHandler, false );
+
+		}
+
+	}
+
+	/**
+	 * Disconnects the timer from the DOM and also disables the usage of the Page Visibility API.
+	 */
+	disconnect() {
+
+		if ( this._pageVisibilityHandler !== null ) {
+
+			this._document.removeEventListener( 'visibilitychange', this._pageVisibilityHandler );
+			this._pageVisibilityHandler = null;
+
+		}
+
+		this._document = null;
+
+	}
+
+	/**
+	 * Returns the time delta in seconds.
+	 *
+	 * @return {number} The time delta in second.
+	 */
+	getDelta() {
+
+		return this._delta / 1000;
+
+	}
+
+	/**
+	 * Returns the elapsed time in seconds.
+	 *
+	 * @return {number} The elapsed time in second.
+	 */
+	getElapsed() {
+
+		return this._elapsed / 1000;
+
+	}
+
+	/**
+	 * Returns the timescale.
+	 *
+	 * @return {number} The timescale.
+	 */
+	getTimescale() {
+
+		return this._timescale;
+
+	}
+
+	/**
+	 * Sets the given timescale which scale the time delta computation
+	 * in `update()`.
+	 *
+	 * @param {number} timescale - The timescale to set.
+	 * @return {Timer} A reference to this timer.
+	 */
+	setTimescale( timescale ) {
+
+		this._timescale = timescale;
+
+		return this;
+
+	}
+
+	/**
+	 * Resets the time computation for the current simulation step.
+	 *
+	 * @return {Timer} A reference to this timer.
+	 */
+	reset() {
+
+		this._currentTime = performance.now() - this._startTime;
+
+		return this;
+
+	}
+
+	/**
+	 * Can be used to free all internal resources. Usually called when
+	 * the timer instance isn't required anymore.
+	 */
+	dispose() {
+
+		this.disconnect();
+
+	}
+
+	/**
+	 * Updates the internal state of the timer. This method should be called
+	 * once per simulation step and before you perform queries against the timer
+	 * (e.g. via `getDelta()`).
+	 *
+	 * @param {number} timestamp - The current time in milliseconds. Can be obtained
+	 * from the `requestAnimationFrame` callback argument. If not provided, the current
+	 * time will be determined with `performance.now`.
+	 * @return {Timer} A reference to this timer.
+	 */
+	update( timestamp ) {
+
+		if ( this._pageVisibilityHandler !== null && this._document.hidden === true ) {
+
+			this._delta = 0;
+
+		} else {
+
+			this._previousTime = this._currentTime;
+			this._currentTime = ( timestamp !== undefined ? timestamp : performance.now() ) - this._startTime;
+
+			this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
+			this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
+
+		}
+
+		return this;
+
+	}
+
+}
+
+function handleVisibilityChange() {
+
+	if ( this._document.hidden === false ) this.reset();
+
+}
+
+/**
  * This class can be used to represent points in 3D space as
  * [Spherical coordinates]{@link https://en.wikipedia.org/wiki/Spherical_coordinate_system}.
  */
@@ -55440,6 +55736,12 @@ class Box2 {
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
 
+const _d1 = /*@__PURE__*/ new Vector3();
+const _d2 = /*@__PURE__*/ new Vector3();
+const _r = /*@__PURE__*/ new Vector3();
+const _c1 = /*@__PURE__*/ new Vector3();
+const _c2 = /*@__PURE__*/ new Vector3();
+
 /**
  * An analytical line segment in 3D space represented by a start and end point.
  */
@@ -55587,11 +55889,11 @@ class Line3 {
 	}
 
 	/**
-	 * Returns the closets point on the line for a given point.
+	 * Returns the closest point on the line for a given point.
 	 *
 	 * @param {Vector3} point - The point to compute the closest point on the line for.
 	 * @param {boolean} clampToLine - Whether to clamp the result to the range `[0,1]` or not.
-	 * @param {Vector3} target -  The target vector that is used to store the method's result.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
 	 * @return {Vector3} The closest point on the line.
 	 */
 	closestPointToPoint( point, clampToLine, target ) {
@@ -55599,6 +55901,127 @@ class Line3 {
 		const t = this.closestPointToPointParameter( point, clampToLine );
 
 		return this.delta( target ).multiplyScalar( t ).add( this.start );
+
+	}
+
+	/**
+	 * Returns the closest squared distance between this line segment and the given one.
+	 *
+	 * @param {Line3} line - The line segment to compute the closest squared distance to.
+	 * @param {Vector3} [c1] - The closest point on this line segment.
+	 * @param {Vector3} [c2] - The closest point on the given line segment.
+	 * @return {number} The squared distance between this line segment and the given one.
+	 */
+	distanceSqToLine3( line, c1 = _c1, c2 = _c2 ) {
+
+		// from Real-Time Collision Detection by Christer Ericson, chapter 5.1.9
+
+		// Computes closest points C1 and C2 of S1(s)=P1+s*(Q1-P1) and
+		// S2(t)=P2+t*(Q2-P2), returning s and t. Function result is squared
+		// distance between between S1(s) and S2(t)
+
+		const EPSILON = 1e-8 * 1e-8; // must be squared since we compare squared length
+		let s, t;
+
+		const p1 = this.start;
+		const p2 = line.start;
+		const q1 = this.end;
+		const q2 = line.end;
+
+		_d1.subVectors( q1, p1 ); // Direction vector of segment S1
+		_d2.subVectors( q2, p2 ); // Direction vector of segment S2
+		_r.subVectors( p1, p2 );
+
+		const a = _d1.dot( _d1 ); // Squared length of segment S1, always nonnegative
+		const e = _d2.dot( _d2 ); // Squared length of segment S2, always nonnegative
+		const f = _d2.dot( _r );
+
+		// Check if either or both segments degenerate into points
+
+		if ( a <= EPSILON && e <= EPSILON ) {
+
+			// Both segments degenerate into points
+
+			c1.copy( p1 );
+			c2.copy( p2 );
+
+			c1.sub( c2 );
+
+			return c1.dot( c1 );
+
+		}
+
+		if ( a <= EPSILON ) {
+
+			// First segment degenerates into a point
+
+			s = 0;
+			t = f / e; // s = 0 => t = (b*s + f) / e = f / e
+			t = clamp( t, 0, 1 );
+
+
+		} else {
+
+			const c = _d1.dot( _r );
+
+			if ( e <= EPSILON ) {
+
+				// Second segment degenerates into a point
+
+				t = 0;
+				s = clamp( - c / a, 0, 1 ); // t = 0 => s = (b*t - c) / a = -c / a
+
+			} else {
+
+				// The general nondegenerate case starts here
+
+				const b = _d1.dot( _d2 );
+				const denom = a * e - b * b; // Always nonnegative
+
+				// If segments not parallel, compute closest point on L1 to L2 and
+				// clamp to segment S1. Else pick arbitrary s (here 0)
+
+				if ( denom !== 0 ) {
+
+					s = clamp( ( b * f - c * e ) / denom, 0, 1 );
+
+				} else {
+
+					s = 0;
+
+				}
+
+				// Compute point on L2 closest to S1(s) using
+				// t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / e
+
+				t = ( b * s + f ) / e;
+
+				// If t in [0,1] done. Else clamp t, recompute s for the new value
+				// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1)= (t*b - c) / a
+				// and clamp s to [0, 1]
+
+				if ( t < 0 ) {
+
+					t = 0.;
+					s = clamp( - c / a, 0, 1 );
+
+				} else if ( t > 1 ) {
+
+					t = 1;
+					s = clamp( ( b - c ) / a, 0, 1 );
+
+				}
+
+			}
+
+		}
+
+		c1.copy( p1 ).add( _d1.multiplyScalar( s ) );
+		c2.copy( p2 ).add( _d2.multiplyScalar( t ) );
+
+		c1.sub( c2 );
+
+		return c1.dot( c1 );
 
 	}
 
@@ -56747,34 +57170,34 @@ class CameraHelper extends LineSegments {
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, -1, -1, nearZ );
-		setPoint( 'n2', pointMap, geometry, _camera, w, -1, nearZ );
-		setPoint( 'n3', pointMap, geometry, _camera, -1, h, nearZ );
+		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
 		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, -1, -1, 1 );
-		setPoint( 'f2', pointMap, geometry, _camera, w, -1, 1 );
-		setPoint( 'f3', pointMap, geometry, _camera, -1, h, 1 );
+		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
+		setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
+		setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
 		setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
 
 		// up
 
 		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
-		setPoint( 'u2', pointMap, geometry, _camera, -1 * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
 		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, -1, 0, 1 );
+		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
 		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, -1, 1 );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, -1, 0, nearZ );
+		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, -1, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
 		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
@@ -58621,7 +59044,7 @@ var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUG
 
 var roughnessmap_pars_fragment = "#ifdef USE_ROUGHNESSMAP\n\tuniform sampler2D roughnessMap;\n#endif";
 
-var shadowmap_pars_fragment = "#if NUM_SPOT_LIGHT_COORDS > 0\n\tvarying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];\n#endif\n#if NUM_SPOT_LIGHT_MAPS > 0\n\tuniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];\n#endif\n#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n\tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\n\t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\n\t}\n\tvec2 texture2DDistribution( sampler2D shadow, vec2 uv ) {\n\t\treturn unpackRGBATo2Half( texture2D( shadow, uv ) );\n\t}\n\tfloat VSMShadow (sampler2D shadow, vec2 uv, float compare ){\n\t\tfloat occlusion = 1.0;\n\t\tvec2 distribution = texture2DDistribution( shadow, uv );\n\t\tfloat hard_shadow = step( compare , distribution.x );\n\t\tif (hard_shadow != 1.0 ) {\n\t\t\tfloat distance = compare - distribution.x ;\n\t\t\tfloat variance = max( 0.00000, distribution.y * distribution.y );\n\t\t\tfloat softness_probability = variance / (variance + distance * distance );\t\t\tsoftness_probability = clamp( ( softness_probability - 0.3 ) / ( 0.95 - 0.3 ), 0.0, 1.0 );\t\t\tocclusion = clamp( max( hard_shadow, softness_probability ), 0.0, 1.0 );\n\t\t}\n\t\treturn occlusion;\n\t}\n\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\tfloat shadow = 1.0;\n\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\tshadowCoord.z += shadowBias;\n\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\tif ( frustumTest ) {\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx0 = - texelSize.x * shadowRadius;\n\t\t\tfloat dy0 = - texelSize.y * shadowRadius;\n\t\t\tfloat dx1 = + texelSize.x * shadowRadius;\n\t\t\tfloat dy1 = + texelSize.y * shadowRadius;\n\t\t\tfloat dx2 = dx0 / 2.0;\n\t\t\tfloat dy2 = dy0 / 2.0;\n\t\t\tfloat dx3 = dx1 / 2.0;\n\t\t\tfloat dy3 = dy1 / 2.0;\n\t\t\tshadow = (\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\n\t\t\t) * ( 1.0 / 17.0 );\n\t\t#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx = texelSize.x;\n\t\t\tfloat dy = texelSize.y;\n\t\t\tvec2 uv = shadowCoord.xy;\n\t\t\tvec2 f = fract( uv * shadowMapSize + 0.5 );\n\t\t\tuv -= f * texelSize;\n\t\t\tshadow = (\n\t\t\t\ttexture2DCompare( shadowMap, uv, shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, uv + vec2( dx, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, uv + vec2( 0.0, dy ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, uv + texelSize, shadowCoord.z ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( -dx, 0.0 ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 0.0 ), shadowCoord.z ),\n\t\t\t\t\t f.x ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( -dx, dy ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, dy ), shadowCoord.z ),\n\t\t\t\t\t f.x ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( 0.0, -dy ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( 0.0, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t f.y ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( dx, -dy ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( dx, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t f.y ) +\n\t\t\t\tmix( mix( texture2DCompare( shadowMap, uv + vec2( -dx, -dy ), shadowCoord.z ),\n\t\t\t\t\t\t  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, -dy ), shadowCoord.z ),\n\t\t\t\t\t\t  f.x ),\n\t\t\t\t\t mix( texture2DCompare( shadowMap, uv + vec2( -dx, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t\t  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t\t  f.x ),\n\t\t\t\t\t f.y )\n\t\t\t) * ( 1.0 / 9.0 );\n\t\t#elif defined( SHADOWMAP_TYPE_VSM )\n\t\t\tshadow = VSMShadow( shadowMap, shadowCoord.xy, shadowCoord.z );\n\t\t#else\n\t\t\tshadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\n\t\t#endif\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n\tvec2 cubeToUV( vec3 v, float texelSizeY ) {\n\t\tvec3 absV = abs( v );\n\t\tfloat scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\n\t\tabsV *= scaleToCube;\n\t\tv *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\n\t\tvec2 planar = v.xy;\n\t\tfloat almostATexel = 1.5 * texelSizeY;\n\t\tfloat almostOne = 1.0 - almostATexel;\n\t\tif ( absV.z >= almostOne ) {\n\t\t\tif ( v.z > 0.0 )\n\t\t\t\tplanar.x = 4.0 - v.x;\n\t\t} else if ( absV.x >= almostOne ) {\n\t\t\tfloat signX = sign( v.x );\n\t\t\tplanar.x = v.z * signX + 2.0 * signX;\n\t\t} else if ( absV.y >= almostOne ) {\n\t\t\tfloat signY = sign( v.y );\n\t\t\tplanar.x = v.x + 2.0 * signY + 2.0;\n\t\t\tplanar.y = v.z * signY - 2.0;\n\t\t}\n\t\treturn vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );\n\t}\n\tfloat getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tfloat shadow = 1.0;\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\t\n\t\tfloat lightToPositionLength = length( lightToPosition );\n\t\tif ( lightToPositionLength - shadowCameraFar <= 0.0 && lightToPositionLength - shadowCameraNear >= 0.0 ) {\n\t\t\tfloat dp = ( lightToPositionLength - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );\t\t\tdp += shadowBias;\n\t\t\tvec3 bd3D = normalize( lightToPosition );\n\t\t\tvec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\n\t\t\t#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT ) || defined( SHADOWMAP_TYPE_VSM )\n\t\t\t\tvec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\n\t\t\t\tshadow = (\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\n\t\t\t\t) * ( 1.0 / 9.0 );\n\t\t\t#else\n\t\t\t\tshadow = texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\n\t\t\t#endif\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n#endif";
+var shadowmap_pars_fragment = "#if NUM_SPOT_LIGHT_COORDS > 0\n\tvarying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];\n#endif\n#if NUM_SPOT_LIGHT_MAPS > 0\n\tuniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];\n#endif\n#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n\tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\n\t\tfloat depth = unpackRGBAToDepth( texture2D( depths, uv ) );\n\t\t#ifdef USE_REVERSEDEPTHBUF\n\t\t\tif ( depth == 1.0 ) depth = 0.0;\t\t\treturn step( depth, compare );\n\t\t#else\n\t\t\treturn step( compare, depth );\n\t\t#endif\n\t}\n\tvec2 texture2DDistribution( sampler2D shadow, vec2 uv ) {\n\t\treturn unpackRGBATo2Half( texture2D( shadow, uv ) );\n\t}\n\tfloat VSMShadow (sampler2D shadow, vec2 uv, float compare ){\n\t\tfloat occlusion = 1.0;\n\t\tvec2 distribution = texture2DDistribution( shadow, uv );\n\t\t#ifdef USE_REVERSEDEPTHBUF\n\t\t\tfloat hard_shadow = step( distribution.x, compare );\n\t\t#else\n\t\t\tfloat hard_shadow = step( compare , distribution.x );\n\t\t#endif\n\t\tif (hard_shadow != 1.0 ) {\n\t\t\tfloat distance = compare - distribution.x ;\n\t\t\tfloat variance = max( 0.00000, distribution.y * distribution.y );\n\t\t\tfloat softness_probability = variance / (variance + distance * distance );\t\t\tsoftness_probability = clamp( ( softness_probability - 0.3 ) / ( 0.95 - 0.3 ), 0.0, 1.0 );\t\t\tocclusion = clamp( max( hard_shadow, softness_probability ), 0.0, 1.0 );\n\t\t}\n\t\treturn occlusion;\n\t}\n\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\tfloat shadow = 1.0;\n\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\tshadowCoord.z += shadowBias;\n\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\tif ( frustumTest ) {\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx0 = - texelSize.x * shadowRadius;\n\t\t\tfloat dy0 = - texelSize.y * shadowRadius;\n\t\t\tfloat dx1 = + texelSize.x * shadowRadius;\n\t\t\tfloat dy1 = + texelSize.y * shadowRadius;\n\t\t\tfloat dx2 = dx0 / 2.0;\n\t\t\tfloat dy2 = dy0 / 2.0;\n\t\t\tfloat dx3 = dx1 / 2.0;\n\t\t\tfloat dy3 = dy1 / 2.0;\n\t\t\tshadow = (\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\n\t\t\t) * ( 1.0 / 17.0 );\n\t\t#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx = texelSize.x;\n\t\t\tfloat dy = texelSize.y;\n\t\t\tvec2 uv = shadowCoord.xy;\n\t\t\tvec2 f = fract( uv * shadowMapSize + 0.5 );\n\t\t\tuv -= f * texelSize;\n\t\t\tshadow = (\n\t\t\t\ttexture2DCompare( shadowMap, uv, shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, uv + vec2( dx, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, uv + vec2( 0.0, dy ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, uv + texelSize, shadowCoord.z ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( -dx, 0.0 ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 0.0 ), shadowCoord.z ),\n\t\t\t\t\t f.x ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( -dx, dy ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, dy ), shadowCoord.z ),\n\t\t\t\t\t f.x ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( 0.0, -dy ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( 0.0, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t f.y ) +\n\t\t\t\tmix( texture2DCompare( shadowMap, uv + vec2( dx, -dy ), shadowCoord.z ),\n\t\t\t\t\t texture2DCompare( shadowMap, uv + vec2( dx, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t f.y ) +\n\t\t\t\tmix( mix( texture2DCompare( shadowMap, uv + vec2( -dx, -dy ), shadowCoord.z ),\n\t\t\t\t\t\t  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, -dy ), shadowCoord.z ),\n\t\t\t\t\t\t  f.x ),\n\t\t\t\t\t mix( texture2DCompare( shadowMap, uv + vec2( -dx, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t\t  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 2.0 * dy ), shadowCoord.z ),\n\t\t\t\t\t\t  f.x ),\n\t\t\t\t\t f.y )\n\t\t\t) * ( 1.0 / 9.0 );\n\t\t#elif defined( SHADOWMAP_TYPE_VSM )\n\t\t\tshadow = VSMShadow( shadowMap, shadowCoord.xy, shadowCoord.z );\n\t\t#else\n\t\t\tshadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\n\t\t#endif\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n\tvec2 cubeToUV( vec3 v, float texelSizeY ) {\n\t\tvec3 absV = abs( v );\n\t\tfloat scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\n\t\tabsV *= scaleToCube;\n\t\tv *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\n\t\tvec2 planar = v.xy;\n\t\tfloat almostATexel = 1.5 * texelSizeY;\n\t\tfloat almostOne = 1.0 - almostATexel;\n\t\tif ( absV.z >= almostOne ) {\n\t\t\tif ( v.z > 0.0 )\n\t\t\t\tplanar.x = 4.0 - v.x;\n\t\t} else if ( absV.x >= almostOne ) {\n\t\t\tfloat signX = sign( v.x );\n\t\t\tplanar.x = v.z * signX + 2.0 * signX;\n\t\t} else if ( absV.y >= almostOne ) {\n\t\t\tfloat signY = sign( v.y );\n\t\t\tplanar.x = v.x + 2.0 * signY + 2.0;\n\t\t\tplanar.y = v.z * signY - 2.0;\n\t\t}\n\t\treturn vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );\n\t}\n\tfloat getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tfloat shadow = 1.0;\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\t\n\t\tfloat lightToPositionLength = length( lightToPosition );\n\t\tif ( lightToPositionLength - shadowCameraFar <= 0.0 && lightToPositionLength - shadowCameraNear >= 0.0 ) {\n\t\t\tfloat dp = ( lightToPositionLength - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );\t\t\tdp += shadowBias;\n\t\t\tvec3 bd3D = normalize( lightToPosition );\n\t\t\tvec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\n\t\t\t#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT ) || defined( SHADOWMAP_TYPE_VSM )\n\t\t\t\tvec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\n\t\t\t\tshadow = (\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\n\t\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\n\t\t\t\t) * ( 1.0 / 9.0 );\n\t\t\t#else\n\t\t\t\tshadow = texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\n\t\t\t#endif\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n#endif";
 
 var shadowmap_pars_vertex = "#if NUM_SPOT_LIGHT_COORDS > 0\n\tuniform mat4 spotLightMatrix[ NUM_SPOT_LIGHT_COORDS ];\n\tvarying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];\n#endif\n#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\tuniform mat4 pointShadowMatrix[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n#endif";
 
@@ -60505,7 +60928,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 	}
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
-	const reverseDepthBuffer = parameters.reverseDepthBuffer === true && extensions.has( 'EXT_clip_control' );
+	const reversedDepthBuffer = parameters.reversedDepthBuffer === true && extensions.has( 'EXT_clip_control' );
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	const maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -60533,7 +60956,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
-		reverseDepthBuffer: reverseDepthBuffer,
+		reversedDepthBuffer: reversedDepthBuffer,
 
 		maxTextures: maxTextures,
 		maxVertexTextures: maxVertexTextures,
@@ -64364,7 +64787,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
+			parameters.reversedDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -64531,7 +64954,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.decodeVideoTextureEmissive ? '#define DECODE_VIDEO_TEXTURE_EMISSIVE' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
+			parameters.reversedDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
@@ -65018,7 +65441,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		}
 
 		const currentRenderTarget = renderer.getRenderTarget();
-		const reverseDepthBuffer = renderer.state.buffers.depth.getReversed();
+		const reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
 
 		const IS_INSTANCEDMESH = object.isInstancedMesh === true;
 		const IS_BATCHEDMESH = object.isBatchedMesh === true;
@@ -65216,7 +65639,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
-			reverseDepthBuffer: reverseDepthBuffer,
+			reversedDepthBuffer: reversedDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
 
@@ -65439,7 +65862,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.logarithmicDepthBuffer )
 			_programLayers.enable( 3 );
-		if ( parameters.reverseDepthBuffer )
+		if ( parameters.reversedDepthBuffer )
 			_programLayers.enable( 4 );
 		if ( parameters.skinning )
 			_programLayers.enable( 5 );
@@ -66671,6 +67094,17 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
+
+				// @deprecated, r179
+				if ( capabilities.reversedDepthBuffer === true && camera.reversedDepth === false ) {
+
+					shadow.camera.reversedDepth = true;
+
+				} else {
+
+					shadow.camera.reversedDepth = camera.reversedDepth;
+
+				}
 
 				shadow.camera.updateProjectionMatrix();
 
@@ -72959,7 +73393,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			reverseDepthBuffer = false,
+			reversedDepthBuffer = false,
 		} = parameters;
 
 		/**
@@ -73192,7 +73626,6 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
-		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
 		const _vector3 = new Vector3();
@@ -73288,7 +73721,7 @@ class WebGLRenderer {
 
 			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+			if ( capabilities.reversedDepthBuffer && reversedDepthBuffer ) {
 
 				state.buffers.depth.setReversed( true );
 
@@ -75259,22 +75692,16 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				const reverseDepthBuffer = state.buffers.depth.getReversed();
+				const reversedDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reverseDepthBuffer ) {
+				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					_currentProjectionMatrix.copy( camera.projectionMatrix );
-
-					toNormalizedProjectionMatrix( _currentProjectionMatrix );
-					toReversedProjectionMatrix( _currentProjectionMatrix );
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
-
-				} else {
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+					camera.reversedDepth = true;
+					camera.updateProjectionMatrix();
 
 				}
+
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -76669,6 +77096,7 @@ exports.TetrahedronGeometry = TetrahedronGeometry;
 exports.Texture = Texture;
 exports.TextureLoader = TextureLoader;
 exports.TextureUtils = TextureUtils;
+exports.Timer = Timer;
 exports.TimestampQuery = TimestampQuery;
 exports.TorusGeometry = TorusGeometry;
 exports.TorusKnotGeometry = TorusKnotGeometry;

@@ -1,5 +1,7 @@
 import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break, While, Comment } from './AST.js';
 
+import { isType } from './TranspilerUtils.js';
+
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
 ];
@@ -246,8 +248,6 @@ class Tokenizer {
 	}
 
 }
-
-const isType = ( str ) => /void|bool|float|u?int|mat[234]|mat[234]x[234]|(u|i|b)?vec[234]/.test( str );
 
 class GLSLDecoder {
 

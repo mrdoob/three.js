@@ -113,10 +113,6 @@ class WebGPUBindingUtils {
 
 				bindingGPU.sampler = sampler;
 
-			} else if ( binding.isSampledTexture && binding.texture.isVideoTexture ) {
-
-				bindingGPU.externalTexture = {}; // GPUExternalTextureBindingLayout
-
 			} else if ( binding.isSampledTexture && binding.store ) {
 
 				const storageTexture = {}; // GPUStorageTextureBindingLayout
@@ -216,7 +212,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
-				} else if ( binding.texture.is3DTexture ) {
+				} else if ( binding.isSampledTexture3D ) {
 
 					texture.viewDimension = GPUTextureViewDimension.ThreeD;
 
@@ -424,7 +420,15 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
-					const propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }-${ mipLevelCount }`;
+					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
+
+					if ( textureData.texture.depthOrArrayLayers > 1 ) {
+
+						propertyName += `-${ textureData.texture.depthOrArrayLayers }`;
+
+					}
+
+					propertyName += `-${ mipLevelCount }`;
 
 					resourceGPU = textureData[ propertyName ];
 
@@ -438,7 +442,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-						} else if ( binding.texture.is3DTexture ) {
+						} else if ( binding.isSampledTexture3D ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 

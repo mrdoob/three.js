@@ -7,6 +7,7 @@ import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDep
 
 import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
@@ -48,7 +49,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
+		this.passNode.build( builder );
 
 		return super.setup( builder );
 
@@ -323,9 +324,42 @@ class PassNode extends TempNode {
 		 */
 		this._mrt = null;
 
+		/**
+		 * Layer object for configuring the camera that is used
+		 * to produce the pass.
+		 *
+		 * @private
+		 * @type {?Layers}
+		 * @default null
+		 */
 		this._layers = null;
 
+		/**
+		 * Scales the resolution of the internal render target.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 1
+		 */
 		this._resolution = 1;
+
+		/**
+		 * Custom viewport definition.
+		 *
+		 * @private
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this._viewport = null;
+
+		/**
+		 * Custom scissor definition.
+		 *
+		 * @private
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this._scissor = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -374,7 +408,6 @@ class PassNode extends TempNode {
 	 * Gets the current resolution of the pass.
 	 *
 	 * @return {number} The current resolution. A value of `1` means full resolution.
-	 * @default 1
 	 */
 	getResolution() {
 
@@ -382,6 +415,12 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Sets the layer configuration that should be used when rendering the pass.
+	 *
+	 * @param {Layers} layers - The layers object to set.
+	 * @return {PassNode} A reference to this pass.
+	 */
 	setLayers( layers ) {
 
 		this._layers = layers;
@@ -390,6 +429,11 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Gets the current layer configuration of the pass.
+	 *
+	 * @return {?Layers} .
+	 */
 	getLayers() {
 
 		return this._layers;
@@ -679,6 +723,82 @@ class PassNode extends TempNode {
 		const effectiveHeight = this._height * this._pixelRatio * this._resolution;
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
+
+		if ( this._scissor !== null ) this.renderTarget.scissor.copy( this._scissor );
+		if ( this._viewport !== null ) this.renderTarget.viewport.copy( this._viewport );
+
+	}
+
+	/**
+	 * This method allows to define the pass's scissor rectangle. By default, the scissor rectangle is kept
+	 * in sync with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
+	 * with `null` as the single argument.
+	 *
+	 * @param {?(number | Vector4)} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
+	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} width - The width of the scissor box in logical pixel unit.
+	 * @param {number} height - The height of the scissor box in logical pixel unit.
+	 */
+	setScissor( x, y, width, height ) {
+
+		if ( x === null ) {
+
+			this._scissor = null;
+
+		} else {
+
+			if ( this._scissor === null ) this._scissor = new Vector4();
+
+			if ( x.isVector4 ) {
+
+				this._scissor.copy( x );
+
+			} else {
+
+				this._scissor.set( x, y, width, height );
+
+			}
+
+			this._scissor.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+
+		}
+
+	}
+
+	/**
+	 * This method allows to define the pass's viewport. By default, the viewport is kept in sync
+	 * with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
+	 * with `null` as the single argument.
+	 *
+	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number} width - The width of the viewport in logical pixel unit.
+	 * @param {number} height - The height of the viewport in logical pixel unit.
+	 */
+	setViewport( x, y, width, height ) {
+
+		if ( x === null ) {
+
+			this._viewport = null;
+
+		} else {
+
+			if ( this._viewport === null ) this._viewport = new Vector4();
+
+			if ( x.isVector4 ) {
+
+				this._viewport.copy( x );
+
+			} else {
+
+				this._viewport.set( x, y, width, height );
+
+			}
+
+			this._viewport.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+
+		}
 
 	}
 

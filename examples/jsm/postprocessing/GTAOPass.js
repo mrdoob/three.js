@@ -657,7 +657,7 @@ class GTAOPass extends Pass {
 
 			cache.set( object, object.visible );
 
-			if ( object.isPoints || object.isLine ) object.visible = false;
+			if ( object.isPoints || object.isLine || object.isLine2 ) object.visible = false;
 
 		} );
 

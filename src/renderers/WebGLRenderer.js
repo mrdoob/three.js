@@ -52,7 +52,7 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
-import { createCanvasElement, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, warnOnce } from '../utils.js';
+import { createCanvasElement, probeAsync, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 
 /**
@@ -80,7 +80,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			reverseDepthBuffer = false,
+			reversedDepthBuffer = false,
 		} = parameters;
 
 		/**
@@ -313,7 +313,6 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
-		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
 		const _vector3 = new Vector3();
@@ -409,7 +408,7 @@ class WebGLRenderer {
 
 			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+			if ( capabilities.reversedDepthBuffer && reversedDepthBuffer ) {
 
 				state.buffers.depth.setReversed( true );
 
@@ -2380,22 +2379,16 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				const reverseDepthBuffer = state.buffers.depth.getReversed();
+				const reversedDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reverseDepthBuffer ) {
+				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					_currentProjectionMatrix.copy( camera.projectionMatrix );
-
-					toNormalizedProjectionMatrix( _currentProjectionMatrix );
-					toReversedProjectionMatrix( _currentProjectionMatrix );
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
-
-				} else {
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+					camera.reversedDepth = true;
+					camera.updateProjectionMatrix();
 
 				}
+
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -3437,7 +3430,7 @@ class WebGLRenderer {
  * @property {boolean} [depth=true] Whether the drawing buffer has a depth buffer of at least 16 bits.
  * @property {boolean} [logarithmicDepthBuffer=false] Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene.
  * Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
- * @property {boolean} [reverseDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
+ * @property {boolean} [reversedDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
  * This is a more faster and accurate version than logarithmic depth buffer.
  **/
 
@@ -3458,7 +3451,7 @@ class WebGLRenderer {
  * @property {number} maxVertexTextures - The number of textures that can be used in a vertex shader.
  * @property {number} maxVertexUniforms - The maximum number of uniforms that can be used in a vertex shader.
  * @property {string} precision - The shader precision currently being used by the renderer.
- * @property {boolean} reverseDepthBuffer - `true` if `reverseDepthBuffer` was set to `true` in the constructor
+ * @property {boolean} reversedDepthBuffer - `true` if `reversedDepthBuffer` was set to `true` in the constructor
  * and the rendering context supports `EXT_clip_control`.
  * @property {boolean} vertexTextures - `true` if vertex textures can be used.
  **/

@@ -58,7 +58,7 @@ function animate( time ) {
 }
 ```
 
-If everything goes well, you should see [this](https://jsfiddle.net/v98k6oze/).
+If everything goes well, you should see [this](https://jsfiddle.net/w43x5Lgh/).
 
 ### Cloning this repository
 

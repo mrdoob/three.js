@@ -1103,9 +1103,10 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
 		const x = 2 * near / ( right - left );
@@ -1116,19 +1117,28 @@ class Matrix4 {
 
 		let c, d;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			c = - ( far + near ) / ( far - near );
-			d = ( - 2 * far * near ) / ( far - near );
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			c = - far / ( far - near );
-			d = ( - far * near ) / ( far - near );
+			c = near / ( far - near );
+			d = ( far * near ) / ( far - near );
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				c = - ( far + near ) / ( far - near );
+				d = ( - 2 * far * near ) / ( far - near );
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				c = - far / ( far - near );
+				d = ( - far * near ) / ( far - near );
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -1152,9 +1162,10 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
 		const w = 1.0 / ( right - left );
@@ -1166,19 +1177,28 @@ class Matrix4 {
 
 		let z, zInv;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			z = ( far + near ) * p;
-			zInv = - 2 * p;
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			z = near * p;
-			zInv = - 1 * p;
+			z = - near * p - 1;
+			zInv = 1 * p;
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				z = ( far + near ) * p;
+				zInv = - 2 * p;
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				z = near * p;
+				zInv = - 1 * p;
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 

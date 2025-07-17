@@ -11,7 +11,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights<br />
 			Walt Disney head by <a href="http://web.archive.org/web/20120903131400/http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a><br />
-			Displacement effect by <a href="https://web.archive.org/web/20210101053445/http://oos.moxiecode.com/js_webgl/stanford_bunny/" target="_blank" rel="noopener">oosmoxiecode</a>
+			Displacement effect by <a href="https://oosmoxiecode.com/archive/js_webgl/stanford_bunny/" target="_blank" rel="noopener">oosmoxiecode</a>
 		</div>
 
 		<script type="importmap">
@@ -31,7 +31,6 @@
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Timer } from 'three/addons/misc/Timer.js';
 
 			import { abs, attribute, distance, float, max, modelWorldMatrixInverse, positionLocal, sin, time, uniform } from 'three/tsl';
 
@@ -48,7 +47,7 @@
 
 				scene = new THREE.Scene();
 
-				timer = new Timer();
+				timer = new THREE.Timer();
 				timer.connect( document );
 
 				// model
