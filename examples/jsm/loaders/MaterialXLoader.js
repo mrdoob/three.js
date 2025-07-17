@@ -1,7 +1,7 @@
 import { FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
 
 import {
-	float, bool, int, vec2, vec3, vec4, color, texture,
+	float, bool, int, vec2, vec3, vec4, color, texture, mat3,
 	positionLocal, positionWorld, uv, vertexColor,
 	normalLocal, normalWorld, tangentLocal, tangentWorld,
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
@@ -14,7 +14,8 @@ import {
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
 	saturation,
-	timerLocal, frameId
+	timerLocal, frameId,
+	transpose, determinant, inverse, rotate, bumpMap
 } from 'three/tsl';
 
 const colorSpaceLib = {
@@ -46,8 +47,198 @@ const mx_timer = () => timerLocal();
 const mx_frame = () => frameId;
 const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
 
-const separate = ( in1, channel ) => split( in1, channel.at( - 1 ) );
+const mx_ln = ( input ) => input.log();
+const mx_distance = ( in1, in2 ) => in1.sub( in2 ).length();
+const mx_reflect = ( input, normal ) => input.reflect( normal );
+const mx_refract = ( input, normal, ior ) => input.refract( normal, ior );
+const mx_ifgreater = ( value1, value2, in1, in2 ) => value1.greaterThan( value2 ).mix( in1, in2 );
+const mx_ifgreatereq = ( value1, value2, in1, in2 ) => value1.greaterThanEqual( value2 ).mix( in1, in2 );
+const mx_ifequal = ( value1, value2, in1, in2 ) => value1.equal( value2 ).mix( in1, in2 );
+
+const mx_creatematrix = ( in1, in2, in3 ) => mat3( in1, in2, in3 );
+
+// Enhanced separate node to support multi-output referencing (outx, outy, outz, outw)
+const separate = ( in1, channelOrOut = null ) => {
+
+	// If channelOrOut is a string like 'outx', 'outy', 'outz', 'outr', 'outg', 'outb', 'outw', map to index
+	if ( typeof channelOrOut === 'string' ) {
+
+		const map = { x: 0, r: 0, y: 1, g: 1, z: 2, b: 2, w: 3, a: 3 };
+		const c = channelOrOut.replace( /^out/, '' ).toLowerCase();
+		if ( map[ c ] !== undefined ) return in1.element( map[ c ] );
+
+	}
+
+	// If channelOrOut is a number, use as index
+	if ( typeof channelOrOut === 'number' ) {
+
+		return in1.element( channelOrOut );
+
+	}
+
+	// If channelOrOut is a single char (x/y/z/w/r/g/b/a), use as channel
+	if ( typeof channelOrOut === 'string' && channelOrOut.length === 1 ) {
+
+		const map = { x: 0, r: 0, y: 1, g: 1, z: 2, b: 2, w: 3, a: 3 };
+		if ( map[ channelOrOut ] !== undefined ) return in1.element( map[ channelOrOut ] );
+
+	}
+
+	// Default: return input unchanged (for legacy usage)
+	return in1;
+
+};
+
 const extract = ( in1, index ) => in1.element( index );
+
+const mx_place2d = ( texcoord, pivot = vec2( 0.5, 0.5 ), scale = vec2( 1, 1 ), rotate = float( 0 ), offset = vec2( 0, 0 ), operationorder = int( 0 ) ) => {
+
+	// SRT order: Scale, Rotate, Translate (default MaterialX order)
+	let uv = texcoord;
+	if ( pivot ) uv = uv.sub( pivot );
+	if ( scale ) uv = uv.mul( scale );
+	if ( rotate ) {
+
+		const rad = rotate.mul( Math.PI / 180.0 );
+		const cosR = rad.cos();
+		const sinR = rad.sin();
+		uv = vec2(
+			uv.x.mul( cosR ).sub( uv.y.mul( sinR ) ),
+			uv.x.mul( sinR ).add( uv.y.mul( cosR ) )
+		);
+
+	}
+
+	if ( pivot ) uv = uv.add( pivot );
+	if ( offset ) uv = uv.add( offset );
+	return uv;
+
+};
+
+// Type/arity-aware MaterialX node wrappers
+const mx_length = ( input ) => {
+
+	if ( input === undefined ) {
+
+		console.warn( 'MaterialXLoader: mx_length called with undefined input.' );
+		return float( 0 );
+
+	}
+
+	if ( input && ( input.nodeType === 'vec2' || input.nodeType === 'vec3' || input.nodeType === 'vec4' ) ) {
+
+		return input.length();
+
+	} else if ( input && input.nodeType === 'float' ) {
+
+		return input.abs();
+
+	} else {
+
+		console.warn( 'MaterialXLoader: length() called with unsupported type.', input );
+		return float( 0 );
+
+	}
+
+};
+
+const mx_cross = ( a, b ) => {
+
+	if ( a && b && a.nodeType === 'vec3' && b.nodeType === 'vec3' ) {
+
+		return a.cross( b );
+
+	} else if ( a && b && a.nodeType === 'vec2' && b.nodeType === 'vec2' ) {
+
+		// 2D cross product returns a scalar
+		return a.x.mul( b.y ).sub( a.y.mul( b.x ) );
+
+	} else if ( a && b && a.nodeType === 'float' && b.nodeType === 'float' ) {
+
+		// 1D cross product is always zero
+		return float( 0 );
+
+	} else {
+
+		console.warn( 'MaterialXLoader: cross() called with unsupported types.', a, b );
+		return float( 0 );
+
+	}
+
+};
+
+const mx_floor = ( input ) => {
+
+	if ( input && ( input.nodeType === 'vec2' || input.nodeType === 'vec3' || input.nodeType === 'vec4' || input.nodeType === 'float' ) ) {
+
+		return input.floor();
+
+	} else {
+
+		console.warn( 'MaterialXLoader: floor() called with unsupported type.', input );
+		return float( 0 );
+
+	}
+
+};
+
+// Proper implementation for rotate2d
+const mx_rotate2d = ( input, amount ) => {
+
+	if ( ! input || input.nodeType !== 'vec2' ) {
+
+		console.warn( 'MaterialXLoader: rotate2d expects a vec2 input. Returning input unchanged.', input );
+		return input;
+
+	}
+
+	// Convert degrees to radians
+	const radians = amount.mul( Math.PI / 180.0 );
+	// Use the rotate node (2D)
+	return rotate( input, radians );
+
+};
+
+// Proper implementation for rotate3d
+const mx_rotate3d = ( input, amount, axis ) => {
+
+	if ( ! input || input.nodeType !== 'vec3' || ! axis || axis.nodeType !== 'vec3' ) {
+
+		console.warn( 'MaterialXLoader: rotate3d expects vec3 input and axis. Returning input unchanged.', input, axis, amount );
+		return input;
+
+	}
+
+	// Convert degrees to radians
+	const radians = amount.mul( Math.PI / 180.0 );
+	// Normalize axis
+	const nAxis = axis.normalize();
+	const cosA = radians.cos();
+	const sinA = radians.sin();
+	const oneMinusCosA = float( 1 ).sub( cosA );
+	const x = nAxis.x, y = nAxis.y, z = nAxis.z;
+	// Rodrigues' rotation formula
+	const rot =
+		input.mul( cosA )
+			.add( nAxis.cross( input ).mul( sinA ) )
+			.add( nAxis.mul( nAxis.dot( input ) ).mul( oneMinusCosA ) );
+	return rot;
+
+};
+
+const mx_heighttonormal = ( input, scale, texcoord ) => {
+
+	if ( ! input ) {
+
+		console.warn( 'MaterialXLoader: heighttonormal expects a height input. Returning default normal.' );
+		return vec3( 0, 0, 1 );
+
+	}
+
+	// bumpMap expects (height, scale)
+	return bumpMap( input, scale );
+
+};
 
 const MXElements = [
 
@@ -70,7 +261,7 @@ const MXElements = [
 	new MXElement( 'acos', acos, [ 'in' ] ),
 	new MXElement( 'atan2', mx_atan2, [ 'in1', 'in2' ] ),
 	new MXElement( 'sqrt', sqrt, [ 'in' ] ),
-	//new MtlXElement( 'ln', ... ),
+	new MXElement( 'ln', mx_ln, [ 'in' ] ),
 	new MXElement( 'exp', exp, [ 'in' ] ),
 	new MXElement( 'clamp', clamp, [ 'in', 'low', 'high' ] ),
 	new MXElement( 'min', min, [ 'in1', 'in2' ] ),
@@ -79,19 +270,25 @@ const MXElements = [
 	new MXElement( 'magnitude', length, [ 'in1', 'in2' ] ),
 	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
 	new MXElement( 'crossproduct', cross, [ 'in' ] ),
+	new MXElement( 'distance', mx_distance, [ 'in1', 'in2' ] ),
 	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ] ),
 	//new MtlXElement( 'transformpoint', ... ),
 	//new MtlXElement( 'transformvector', ... ),
 	//new MtlXElement( 'transformnormal', ... ),
-	//new MtlXElement( 'transformmatrix', ... ),
+	new MXElement( 'transformmatrix', mul, [ 'in1', 'in2' ] ),
 	new MXElement( 'normalmap', normalMap, [ 'in', 'scale' ] ),
-	//new MtlXElement( 'transpose', ... ),
-	//new MtlXElement( 'determinant', ... ),
-	//new MtlXElement( 'invertmatrix', ... ),
+	new MXElement( 'transpose', transpose, [ 'in' ] ),
+	new MXElement( 'determinant', determinant, [ 'in' ] ),
+	new MXElement( 'invertmatrix', inverse, [ 'in' ] ),
+	new MXElement( 'creatematrix', mx_creatematrix, [ 'in1', 'in2', 'in3' ] ),
 	//new MtlXElement( 'rotate2d', rotateUV, [ 'in', radians( 'amount' )** ] ),
 	//new MtlXElement( 'rotate3d', ... ),
 	//new MtlXElement( 'arrayappend', ... ),
 	//new MtlXElement( 'dot', ... ),
+
+	new MXElement( 'length', mx_length, [ 'in' ] ),
+	new MXElement( 'crossproduct', mx_cross, [ 'in1', 'in2' ] ),
+	new MXElement( 'floor', mx_floor, [ 'in' ] ),
 
 	// << Adjustment >>
 	new MXElement( 'remap', remap, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh' ] ),
@@ -127,7 +324,7 @@ const MXElements = [
 	//new MtlXElement( 'tiledimage', ... ),
 	//new MtlXElement( 'triplanarprojection', triplanarTextures, [ 'filex', 'filey', 'filez' ] ),
 	//new MtlXElement( 'ramp4', ... ),
-	//new MtlXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset' ] ),
+	new MXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset', 'operationorder' ] ),
 	new MXElement( 'safepower', mx_safepower, [ 'in1', 'in2' ] ),
 	new MXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ] ),
 	//new MtlXElement( 'hsvadjust', ... ),
@@ -136,9 +333,19 @@ const MXElements = [
 	new MXElement( 'separate2', separate, [ 'in' ] ),
 	new MXElement( 'separate3', separate, [ 'in' ] ),
 	new MXElement( 'separate4', separate, [ 'in' ] ),
+	new MXElement( 'reflect', mx_reflect, [ 'in', 'normal' ] ),
+	new MXElement( 'refract', mx_refract, [ 'in', 'normal', 'ior' ] ),
 
 	new MXElement( 'time', mx_timer ),
-	new MXElement( 'frame', mx_frame )
+	new MXElement( 'frame', mx_frame ),
+	new MXElement( 'ifgreater', mx_ifgreater, [ 'value1', 'value2', 'in1', 'in2' ] ),
+	new MXElement( 'ifgreatereq', mx_ifgreatereq, [ 'value1', 'value2', 'in1', 'in2' ] ),
+	new MXElement( 'ifequal', mx_ifequal, [ 'value1', 'value2', 'in1', 'in2' ] ),
+
+	// Placeholder implementations for unsupported nodes
+	new MXElement( 'rotate2d', mx_rotate2d, [ 'in', 'amount' ] ),
+	new MXElement( 'rotate3d', mx_rotate3d, [ 'in', 'amount', 'axis' ] ),
+	new MXElement( 'heighttonormal', mx_heighttonormal, [ 'in', 'scale', 'texcoord' ] ),
 
 ];
 
@@ -234,6 +441,12 @@ class MaterialXLoader extends Loader {
 class MaterialXNode {
 
 	constructor( materialX, nodeXML, nodePath = '' ) {
+
+		if ( ! materialX || typeof materialX !== 'object' ) {
+
+			console.warn( 'MaterialXNode: materialX argument is not an object!', { materialX, nodeXML, nodePath } );
+
+		}
 
 		this.materialX = materialX;
 		this.nodeXML = nodeXML;
@@ -418,6 +631,37 @@ class MaterialXNode {
 
 		}
 
+		// Handle <input name="texcoord" type="vector2" ... />
+		if (
+			this.element === 'input' &&
+			this.name === 'texcoord' &&
+			this.type === 'vector2'
+		) {
+
+			// Try to get index from defaultgeomprop (e.g., "UV0" => 0)
+			let index = 0;
+			const defaultGeomProp = this.getAttribute( 'defaultgeomprop' );
+			if ( defaultGeomProp && /^UV(\d+)$/.test( defaultGeomProp ) ) {
+
+				index = parseInt( defaultGeomProp.match( /^UV(\d+)$/ )[ 1 ], 10 );
+
+			}
+
+			node = uv( index );
+
+		}
+
+		// Multi-output support for separate/separate3
+		if (
+			( this.element === 'separate3' || this.element === 'separate2' || this.element === 'separate4' ) &&
+			out && typeof out === 'string' && out.startsWith( 'out' )
+		) {
+
+			const inNode = this.getNodeByName( 'in' );
+			return separate( inNode, out );
+
+		}
+
 		//
 
 		const type = this.type;
@@ -550,6 +794,11 @@ class MaterialXNode {
 		if ( nodeToTypeClass !== null ) {
 
 			node = nodeToTypeClass( node );
+
+		} else {
+
+			console.warn( `THREE.MaterialXLoader: Unexpected node ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+			node = float( 0 );
 
 		}
 

@@ -40,7 +40,7 @@
 			import { MaterialXLoader } from './jsm/loaders/MaterialXLoader.js';
 
 			const SAMPLE_PATH = 'https://raw.githubusercontent.com/materialx/MaterialX/main/resources/Materials/Examples/StandardSurface/';
-
+			const LOCAL_SAMPLE_PATH = 'materialx/';
 			const samples = [
 				'standard_surface_brass_tiled.mtlx',
 				'standard_surface_brick_procedural.mtlx',
@@ -63,6 +63,13 @@
 				//'standard_surface_thin_film.mtlx',
 				'standard_surface_velvet.mtlx',
 				'standard_surface_wood_tiled.mtlx'
+			];
+
+			const localSamples = [
+				'heightnormal.mtlx',
+				'conditional_if_float.mtlx',
+				'image_transform.mtlx',
+				'color3_vec3_cm_test.mtlx',
 			];
 
 			let camera, scene, renderer, prefab;
@@ -108,9 +115,11 @@
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
 
 						for ( const sample of samples ) {
+							addSample( sample, SAMPLE_PATH );
+						}
 
-							addSample( sample );
-
+						for ( const sample of localSamples ) {
+							addSample( sample, LOCAL_SAMPLE_PATH );
 						}
 
 					} );
@@ -141,7 +150,7 @@
 
 			}
 
-			async function addSample( sample ) {
+			async function addSample( sample, path ) {
 
 				const model = prefab.clone();
 
@@ -154,7 +163,7 @@
 				//
 
 				const material = await new MaterialXLoader()
-					.setPath( SAMPLE_PATH )
+					.setPath( path )
 					.loadAsync( sample )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
 
