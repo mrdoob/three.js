@@ -7,7 +7,7 @@ import {
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
 	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
-	mix, split,
+	mix,
 	mx_ramplr, mx_ramptb, mx_splitlr, mx_splittb,
 	mx_fractal_noise_float, mx_noise_float, mx_cell_noise_float, mx_worley_noise_float,
 	mx_transform_uv,
@@ -216,7 +216,6 @@ const mx_rotate3d = ( input, amount, axis ) => {
 	const cosA = radians.cos();
 	const sinA = radians.sin();
 	const oneMinusCosA = float( 1 ).sub( cosA );
-	const x = nAxis.x, y = nAxis.y, z = nAxis.z;
 	// Rodrigues' rotation formula
 	const rot =
 		input.mul( cosA )
