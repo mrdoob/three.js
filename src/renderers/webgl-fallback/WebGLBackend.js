@@ -1574,7 +1574,9 @@ class WebGLBackend extends Backend {
 	_getShaderErrors( gl, shader, type ) {
 
 		const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
-		const errors = gl.getShaderInfoLog( shader ).trim();
+
+		const shaderInfoLog = gl.getShaderInfoLog( shader ) || '';
+		const errors = shaderInfoLog.trim();
 
 		if ( status && errors === '' ) return '';
 
@@ -1606,10 +1608,10 @@ class WebGLBackend extends Backend {
 
 			const gl = this.gl;
 
-			const programLog = gl.getProgramInfoLog( programGPU ).trim();
+			const programInfoLog = gl.getProgramInfoLog( programGPU ) || '';
+			const programLog = programInfoLog.trim();
 
 			if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
-
 
 				if ( typeof this.renderer.debug.onShaderError === 'function' ) {
 
