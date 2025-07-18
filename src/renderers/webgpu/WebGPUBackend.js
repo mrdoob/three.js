@@ -1298,7 +1298,6 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
-
 		const descriptor = {
 			label: 'computeGroup_' + computeGroup.id
 		};
@@ -1318,9 +1317,9 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {Array<number>} dispatchSize - Array with [x,y,z] values for dispatch.
+	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize ) {
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
 
 		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
@@ -1342,66 +1341,65 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( dispatchSize !== null ) {
+		let dispatchSize;
 
-			if ( ! Array.isArray( dispatchSize ) ) {
+		if ( dispatchSizeOrCount === null ) {
 
-				throw new Error( 'dispatchSize must be an array' );
+			dispatchSizeOrCount = computeNode.count;
 
-			}
+		}
 
-			if ( dispatchSize.length === 0 || dispatchSize.length > 3 ) {
+		if ( typeof dispatchSizeOrCount === 'number' ) {
 
-				throw new Error( 'dispatchSize must have 1, 2, or 3 elements' );
+			// If a single number is given, we calculate the dispatch size based on the workgroup size
 
-			}
+			const count = dispatchSizeOrCount;
 
-			for ( let i = 0; i < dispatchSize.length; i ++ ) {
+			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
 
-				const value = dispatchSize[ i ];
+				computeNodeData.dispatchSize = [ 0, 1, 1 ];
+				computeNodeData.count = count;
 
-				if ( typeof value !== 'number' || value <= 0 || ! Number.isInteger( value ) ) {
+				const workgroupSize = computeNode.workgroupSize;
 
-					throw new Error( `dispatchSize element at index ${i} must be a positive integer` );
+				let size = workgroupSize[ 0 ];
+
+				for ( let i = 1; i < workgroupSize.length; i ++ )
+					size *= workgroupSize[ i ];
+
+				const dispatchCount = Math.ceil( count / size );
+
+				//
+
+				const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+
+				dispatchSize = [ dispatchCount, 1, 1 ];
+
+				if ( dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+					dispatchSize[ 0 ] = Math.min( dispatchCount, maxComputeWorkgroupsPerDimension );
+					dispatchSize[ 1 ] = Math.ceil( dispatchCount / maxComputeWorkgroupsPerDimension );
 
 				}
 
+				computeNodeData.dispatchSize = dispatchSize;
+
 			}
 
-	 		while ( dispatchSize.length < 3 ) dispatchSize.push( 1 );
-
-			passEncoderGPU.dispatchWorkgroups(
-				dispatchSize[ 0 ],
-				dispatchSize[ 1 ],
-				dispatchSize[ 2 ]
-			);
+			dispatchSize = computeNodeData.dispatchSize;
 
 		} else {
 
-			dispatchSize = computeNodeData;
-
-			const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
-
-			if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
-
-			if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
-
-				dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
-				dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
-
-			} else {
-
-				dispatchSize.x = computeNode.dispatchCount;
-
-			}
-
-			passEncoderGPU.dispatchWorkgroups(
-				dispatchSize.x,
-				dispatchSize.y,
-				dispatchSize.z
-			);
+			dispatchSize = dispatchSizeOrCount;
 
 		}
+
+
+		passEncoderGPU.dispatchWorkgroups(
+			dispatchSize[ 0 ],
+			dispatchSize[ 1 ],
+			dispatchSize[ 2 ]
+		);
 
 	}
 
