@@ -1357,6 +1357,8 @@ class WebGPUBackend extends Backend {
 
 			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
 
+				// cache dispatch size to avoid recalculating it every time
+
 				computeNodeData.dispatchSize = [ 0, 1, 1 ];
 				computeNodeData.count = count;
 
@@ -1394,6 +1396,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		//
 
 		passEncoderGPU.dispatchWorkgroups(
 			dispatchSize[ 0 ],
