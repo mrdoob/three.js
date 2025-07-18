@@ -118,6 +118,7 @@ export const color = TSL.color;
 export const colorSpaceToWorking = TSL.colorSpaceToWorking;
 export const colorToDirection = TSL.colorToDirection;
 export const compute = TSL.compute;
+export const computeKernel = TSL.computeKernel;
 export const computeSkinning = TSL.computeSkinning;
 export const cond = TSL.cond;
 export const Const = TSL.Const;
