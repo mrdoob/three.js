@@ -434,6 +434,10 @@ class MaterialXLoader extends Loader {
 	 * - specular: Specular reflection intensity
 	 * - specular_color: Specular reflection color
 	 * - ior: Index of refraction
+	 * - specular_anisotropy, specular_rotation: Anisotropic reflection
+	 * - transmission, transmission_color: Transmission properties
+	 * - thin_film_thickness, thin_film_ior: Thin film interference
+	 * - sheen, sheen_color, sheen_roughness: Sheen properties
 	 * - normal: Normal map
 	 * - coat, coat_roughness, coat_color: Clearcoat properties
 	 * - emission, emissionColor: Emission properties
@@ -969,6 +973,40 @@ class MaterialXNode {
 
 		//
 
+		let anisotropyNode = null;
+		let anisotropyRotationNode = null;
+
+		if ( inputs.specular_anisotropy ) anisotropyNode = inputs.specular_anisotropy;
+		if ( inputs.specular_rotation ) anisotropyRotationNode = inputs.specular_rotation;
+
+		//
+
+		let transmissionNode = null;
+		let transmissionColorNode = null;
+
+		if ( inputs.transmission ) transmissionNode = inputs.transmission;
+		if ( inputs.transmission_color ) transmissionColorNode = inputs.transmission_color;
+
+		//
+
+		let thinFilmThicknessNode = null;
+		let thinFilmIorNode = null;
+
+		if ( inputs.thin_film_thickness ) thinFilmThicknessNode = inputs.thin_film_thickness;
+		if ( inputs.thin_film_ior ) thinFilmIorNode = inputs.thin_film_ior;
+
+		//
+
+		let sheenNode = null;
+		let sheenColorNode = null;
+		let sheenRoughnessNode = null;
+
+		if ( inputs.sheen ) sheenNode = inputs.sheen;
+		if ( inputs.sheen_color ) sheenColorNode = inputs.sheen_color;
+		if ( inputs.sheen_roughness ) sheenRoughnessNode = inputs.sheen_roughness;
+
+		//
+
 		let clearcoatNode = null;
 		let clearcoatRoughnessNode = null;
 
@@ -1007,6 +1045,15 @@ class MaterialXNode {
 		material.specularIntensityNode = specularIntensityNode || float( 0.5 );
 		material.specularColorNode = specularColorNode || color( 1.0, 1.0, 1.0 );
 		material.iorNode = iorNode || float( 1.5 );
+		material.anisotropyNode = anisotropyNode || float( 0 );
+		material.anisotropyRotationNode = anisotropyRotationNode || float( 0 );
+		material.transmissionNode = transmissionNode || float( 0 );
+		material.transmissionColorNode = transmissionColorNode || color( 1.0, 1.0, 1.0 );
+		material.thinFilmThicknessNode = thinFilmThicknessNode || float( 0 );
+		material.thinFilmIorNode = thinFilmIorNode || float( 1.5 );
+		material.sheenNode = sheenNode || float( 0 );
+		material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
+		material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );
 		material.clearcoatNode = clearcoatNode || float( 0 );
 		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
 		if ( normalNode ) material.normalNode = normalNode;
