@@ -149,4 +149,29 @@ details.renderer-container[open] > summary.renderer-summary .toggle-icon::before
 .floating-details .property-row {
 	margin-bottom: 1px;
 	font-size: 10px;
+}
+
+/* Scroll to canvas button */
+.scroll-to-canvas-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 12px;
+	margin-left: 8px;
+	padding: 2px 4px;
+	border-radius: 3px;
+	opacity: 0.6;
+	transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.scroll-to-canvas-btn:hover {
+	opacity: 1;
+	background: light-dark( rgba(0,0,0,0.1), rgba(255,255,255,0.1) );
+}
+
+.scroll-to-canvas-placeholder {
+	font-size: 12px;
+	margin-left: 8px;
+	padding: 2px 4px;
+	opacity: 0.3;
 } 

@@ -114,6 +114,11 @@ function handleBackgroundMessage( message ) {
 		message.id = 'three-devtools';
 		window.postMessage( message, '*' );
 
+	} else if ( message.name === 'scroll-to-canvas' ) {
+
+		message.id = 'three-devtools';
+		window.postMessage( message, '*' );
+
 	}
 
 }

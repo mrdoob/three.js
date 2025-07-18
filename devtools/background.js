@@ -24,6 +24,10 @@ chrome.runtime.onConnect.addListener( port => {
 
 			chrome.tabs.sendMessage( tabId, message );
 
+		} else if ( message.name === 'scroll-to-canvas' && tabId ) {
+
+			chrome.tabs.sendMessage( tabId, message );
+
 		} else if ( tabId === undefined ) {
 
 			console.warn( 'Background: Message received from panel before init:', message );

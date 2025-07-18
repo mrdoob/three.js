@@ -83,6 +83,15 @@ backgroundPageConnection.postMessage( {
 	tabId: chrome.devtools.inspectedWindow.tabId
 } );
 
+// Function to scroll to canvas element
+function scrollToCanvas( rendererUuid ) {
+	backgroundPageConnection.postMessage( {
+		name: 'scroll-to-canvas',
+		uuid: rendererUuid,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+}
+
 const intervalId = setInterval( () => {
 
 	backgroundPageConnection.postMessage( {
@@ -292,9 +301,13 @@ function renderRenderer( obj, container ) {
 	const displayName = `${obj.type} <span class="object-details">${details.join( ' ・ ' )}</span>`;
 
 	// Use toggle icon instead of paint icon
+	const scrollButton = obj.canvasInDOM ? 
+		`<button class="scroll-to-canvas-btn" data-canvas-uuid="${obj.uuid}" title="Scroll to canvas">🙂</button>` : 
+		`<span class="scroll-to-canvas-placeholder" title="Canvas not in DOM">󠀠🫥</span>`;
 	summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
 		<span class="label">${displayName}</span>
-		<span class="type">${obj.type}</span>`;
+		<span class="type">${obj.type}</span>
+		${scrollButton}`;
 	detailsElement.appendChild( summaryElem );
 
 	const propsContainer = document.createElement( 'div' );
@@ -369,6 +382,16 @@ function renderRenderer( obj, container ) {
 	}
 
 	detailsElement.appendChild( propsContainer );
+
+	// Add click handler for scroll to canvas button
+	const scrollBtn = detailsElement.querySelector( '.scroll-to-canvas-btn' );
+	if ( scrollBtn ) {
+		scrollBtn.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			scrollToCanvas( obj.uuid );
+		} );
+	}
 
 	container.appendChild( detailsElement ); // Append details to the main container
 

@@ -101,7 +101,8 @@
 					uuid: renderer.uuid || generateUUID(),
 					type: renderer.isWebGLRenderer ? 'WebGLRenderer' : 'WebGPURenderer',
 					name: '',
-					properties: getRendererProperties( renderer )
+					properties: getRendererProperties( renderer ),
+					canvasInDOM: renderer.domElement && document.contains( renderer.domElement )
 				};
 				return data;
 
@@ -376,6 +377,10 @@
 
 				sendObjectDetails( message.uuid );
 
+			} else if ( message.name === 'scroll-to-canvas' ) {
+
+				scrollToCanvas( message.uuid );
+
 			}
 
 		} );
@@ -450,6 +455,36 @@
 			} else {
 
 				console.warn( 'DevTools: Object not found for UUID:', uuid );
+
+			}
+
+		}
+
+		function scrollToCanvas( rendererUuid ) {
+
+			// Find the renderer with the given UUID
+			const renderer = observedRenderers.find( r => r.uuid === rendererUuid );
+			
+			if ( renderer && renderer.domElement ) {
+
+				// Scroll the canvas element into view
+				renderer.domElement.scrollIntoView( {
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'center'
+				} );
+
+				// Optional: Add a brief highlight effect
+				const originalOutline = renderer.domElement.style.outline;
+				renderer.domElement.style.outline = '3px solid #007ACC';
+				
+				setTimeout( () => {
+					renderer.domElement.style.outline = originalOutline;
+				}, 1000 );
+
+			} else {
+
+				console.warn( 'DevTools: Renderer or canvas element not found for UUID:', rendererUuid );
 
 			}
 
