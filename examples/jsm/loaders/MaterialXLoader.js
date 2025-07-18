@@ -428,15 +428,15 @@ class MaterialXLoader extends Loader {
 	 *
 	 * Supported standard_surface inputs:
 	 * - base, base_color: Base color/albedo
-	 * - opacity: Alpha/transparency
+	 * - opacity: Alpha/transparency (auto-enables transparency when < 1.0)
 	 * - specular_roughness: Surface roughness
 	 * - metalness: Metallic property
 	 * - specular: Specular reflection intensity
 	 * - specular_color: Specular reflection color
 	 * - ior: Index of refraction
 	 * - specular_anisotropy, specular_rotation: Anisotropic reflection
-	 * - transmission, transmission_color: Transmission properties
-	 * - thin_film_thickness, thin_film_ior: Thin film interference
+	 * - transmission, transmission_color: Transmission properties (auto-enables transparency when > 0)
+	 * - thin_film_thickness, thin_film_ior: Thin film interference (auto-enables iridescence, IOR clamped to 1.0-2.333)
 	 * - sheen, sheen_color, sheen_roughness: Sheen properties
 	 * - normal: Normal map
 	 * - coat, coat_roughness, coat_color: Clearcoat properties
@@ -993,7 +993,13 @@ class MaterialXNode {
 		let thinFilmIorNode = null;
 
 		if ( inputs.thin_film_thickness ) thinFilmThicknessNode = inputs.thin_film_thickness;
-		if ( inputs.thin_film_ior ) thinFilmIorNode = inputs.thin_film_ior;
+
+		if ( inputs.thin_film_ior ) {
+
+			// Clamp IOR to valid range for Three.js (1.0 to 2.333)
+			thinFilmIorNode = clamp( inputs.thin_film_ior, float( 1.0 ), float( 2.333 ) );
+
+		}
 
 		//
 
@@ -1051,6 +1057,26 @@ class MaterialXNode {
 		material.transmissionColorNode = transmissionColorNode || color( 1.0, 1.0, 1.0 );
 		material.thinFilmThicknessNode = thinFilmThicknessNode || float( 0 );
 		material.thinFilmIorNode = thinFilmIorNode || float( 1.5 );
+
+		// Auto-enable iridescence when thin film parameters are present
+		if ( thinFilmThicknessNode && thinFilmThicknessNode.value !== undefined && thinFilmThicknessNode.value > 0 ) {
+
+			material.iridescence = 1.0;
+
+		}
+
+		// Auto-enable transparency when opacity or transmission is non-default
+		const hasNonDefaultOpacity = opacityNode && opacityNode.value !== undefined && opacityNode.value < 1.0;
+		const hasTransmission = transmissionNode && transmissionNode.value !== undefined && transmissionNode.value > 0;
+
+		if ( hasNonDefaultOpacity || hasTransmission ) {
+
+			material.transparent = true;
+
+		}
+
+		//
+
 		material.sheenNode = sheenNode || float( 0 );
 		material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
 		material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );

@@ -75,12 +75,15 @@
 				'heighttonormal_normal_input.mtlx',
 				'roughness_test.mtlx',
 				'opacity_test.mtlx',
+				'opacity_only_test.mtlx',
 				'specular_test.mtlx',
 				'ior_test.mtlx',
 				'combined_test.mtlx',
 				'texture_opacity_test.mtlx',
 				'transmission_test.mtlx',
+				'transmission_only_test.mtlx',
 				'thin_film_rainbow_test.mtlx',
+				'thin_film_ior_clamp_test.mtlx',
 				'sheen_test.mtlx',
 			];
 
@@ -183,8 +186,6 @@
 					.loadAsync( sample )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
 			
-				material.transparent = true;
-
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );
 				calibrationMesh.material = material;
 
