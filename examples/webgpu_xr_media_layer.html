@@ -7,20 +7,25 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<div id="container"></div>
+		<div id="main-container">
+			<div id="container">
+				<video id="video" muted loop crossOrigin="anonymous" playsinline style="display:none">
+				</video>
+			</div>
+		</div>
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo/mono video native media layers<br />
 			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.<br />
 			Choose Layout: <select id="layout-select">
-				<option data-layout="stereo-left-right-360">Stereo 360</option>
-				<option data-layout="stereo-top-bottom-180">Stereo 180</option>
+				<option data-layout="stereo-top-bottom-360">Stereo TB 360</option>
+				<option data-layout="stereo-left-right-360">Stereo LR 360</option>
+				<option data-layout="stereo-top-bottom-180">Stereo TB 180</option>
 				<option data-layout="mono">Mono</option>
 			</select>
 		</div>
 
-		<video id="video" muted loop crossOrigin="anonymous" playsinline style="display:none">
-		</video>
+		
 
 		<script type="importmap">
 			{
@@ -38,19 +43,27 @@
 
 			import * as THREE from 'three';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, controls, isQuest = (/Quest/i).test(navigator.userAgent), parentNode;
 
 			const sources = {
+				"stereo-top-bottom-360": {
+					"src": "https://oculus-mp4.s3.amazonaws.com/immersive+video+8K+for+Oculus+Browser/everestvr_4.3k_30s_360_h264_crf23_binaural_CREDIT_JON_GRIFFITH_injected.mp4",
+					"transform": {},
+					"targetXPos": 0,
+					"layout": "stereo-top-bottom"
+				},
 				"stereo-left-right-360": {
 					"src": "textures/MaryOculus.mp4",
 					"transform": { x: 0, y: .28, z: 0, w: .96 },
 					"targetXPos": 0,
 					"layout": "stereo-left-right"
 				},
+				
 				"stereo-top-bottom-180": {
 					"src": "https://oculus-mp4.s3.amazonaws.com/immersive+video+8K+for+Oculus+Browser/everestvr_6.2k_30s_180_TB_h264_crf27_CREDIT_JON_GRIFFITH-injected.mp4",
 					"transform": {  },
@@ -77,7 +90,7 @@
 				context = (window.parent || window),
 				currentUrl = new URL(context.location.href),
 				urlParams = currentUrl.searchParams,
-				selectedLayout = urlParams.get('layout') || "stereo-left-right-360",
+				selectedLayout = urlParams.get('layout') || "stereo-top-bottom-360",
 				selectedOption = [...layoutSelect.options].filter(option => option.dataset.layout === selectedLayout)[0],
 				selectedMediaLayout = sources[selectedLayout].layout,
 				is180 = sources[selectedLayout].is180,
@@ -101,7 +114,13 @@
 
 					video.play();
 
+					
+
+					//toggleVideoContainer(container);
+
 				} );
+
+				parentNode = container.parentNode;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 2000 );
 				camera.layers.enable( 1 );
@@ -110,6 +129,11 @@
 				const video = document.getElementById( 'video' );
 				video.src = selectedSource;
 				video.play();
+
+				
+
+				//remove video from DOM for Quest for performance reasons
+				if (isQuest) video.parentNode.removeChild(video);
 
 				const texture = new THREE.VideoTexture( video );
 				texture.colorSpace = THREE.SRGBColorSpace;
@@ -124,6 +148,10 @@
 				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
+
+				renderer.xr.addEventListener("sessionstop", () => {
+					location.reload();
+				});
 
 				//create a native media layer and projection layer / 2D mono/stereo mesh in a group.
 				//media layer position transformation can be applied in a quaternion transformation object.
@@ -155,9 +183,31 @@
 
 				container.appendChild( renderer.domElement );
 
+				//document.body.appendChild( XRButton.createButton( renderer ) );
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				//remove video container from DOM for Quest for performance hit fix with large videos causing crashes
+				if (isQuest) {
+					renderer.xr.addEventListener("sessionstart", () => {
+						
+						//remove canvas from DOM for performance reasons
+						parentNode.removeChild(container);
+
+						video.play();
+					});
+
+					renderer.xr.addEventListener("sessionend", () => {
+						
+						//add canvas back to the DOM
+						parentNode.appendChild(container);
+
+						video.pause();
+
+					});
+				}
+				
 
 				const controller1 = renderer.xr.getController( 0 );
 
@@ -171,6 +221,11 @@
 					this.remove( this.children[ 0 ] );
 
 				} );
+
+				controller1.addEventListener( 'selectstart', () => {
+					renderer.xr.getSession().end();
+				} );
+
 				scene.add( controller1 );
 
 				const controller2 = renderer.xr.getController( 1 );
@@ -185,6 +240,11 @@
 					this.remove( this.children[ 0 ] );
 
 				} );
+
+				controller2.addEventListener( 'selectstart', () => {
+					renderer.xr.getSession().end();
+				} );
+
 				scene.add( controller2 );
 
 
@@ -198,6 +258,11 @@
 				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 				scene.add( controllerGrip2 );
 
+			}
+
+			function toggleVideoContainer(container) {
+				parentNode.contains(container) ? parentNode.removeChild(container) : parentNode.addChild(container);
+				console.log("Toggle Video Container For Quest Performance Hit Fix ", parentNode);
 			}
 
 			function buildController( data ) {
