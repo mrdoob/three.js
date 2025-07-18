@@ -1,4 +1,4 @@
-import { FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
+import { FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, DoubleSide } from 'three/webgpu';
 
 import {
 	float, bool, int, vec2, vec3, vec4, color, texture, mat3,
@@ -428,15 +428,15 @@ class MaterialXLoader extends Loader {
 	 *
 	 * Supported standard_surface inputs:
 	 * - base, base_color: Base color/albedo
-	 * - opacity: Alpha/transparency (auto-enables transparency when < 1.0)
+	 * - opacity: Alpha/transparency
 	 * - specular_roughness: Surface roughness
 	 * - metalness: Metallic property
 	 * - specular: Specular reflection intensity
 	 * - specular_color: Specular reflection color
 	 * - ior: Index of refraction
 	 * - specular_anisotropy, specular_rotation: Anisotropic reflection
-	 * - transmission, transmission_color: Transmission properties (auto-enables transparency when > 0)
-	 * - thin_film_thickness, thin_film_ior: Thin film interference (auto-enables iridescence, IOR clamped to 1.0-2.333)
+	 * - transmission, transmission_color: Transmission properties
+	 * - thin_film_thickness, thin_film_ior: Thin film interference
 	 * - sheen, sheen_color, sheen_roughness: Sheen properties
 	 * - normal: Normal map
 	 * - coat, coat_roughness, coat_color: Clearcoat properties
@@ -1057,6 +1057,13 @@ class MaterialXNode {
 		material.transmissionColorNode = transmissionColorNode || color( 1.0, 1.0, 1.0 );
 		material.thinFilmThicknessNode = thinFilmThicknessNode || float( 0 );
 		material.thinFilmIorNode = thinFilmIorNode || float( 1.5 );
+		material.sheenNode = sheenNode || float( 0 );
+		material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
+		material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );
+		material.clearcoatNode = clearcoatNode || float( 0 );
+		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
+		if ( normalNode ) material.normalNode = normalNode;
+		if ( emissiveNode ) material.emissiveNode = emissiveNode;
 
 		// Auto-enable iridescence when thin film parameters are present
 		if ( thinFilmThicknessNode && thinFilmThicknessNode.value !== undefined && thinFilmThicknessNode.value > 0 ) {
@@ -1069,21 +1076,19 @@ class MaterialXNode {
 		const hasNonDefaultOpacity = opacityNode && opacityNode.value !== undefined && opacityNode.value < 1.0;
 		const hasTransmission = transmissionNode && transmissionNode.value !== undefined && transmissionNode.value > 0;
 
-		if ( hasNonDefaultOpacity || hasTransmission ) {
+		if ( hasNonDefaultOpacity ) {
 
 			material.transparent = true;
 
 		}
 
-		//
+		// Set material properties for transmission
+		if ( hasTransmission ) {
 
-		material.sheenNode = sheenNode || float( 0 );
-		material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
-		material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );
-		material.clearcoatNode = clearcoatNode || float( 0 );
-		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
-		if ( normalNode ) material.normalNode = normalNode;
-		if ( emissiveNode ) material.emissiveNode = emissiveNode;
+			material.transparent = true;
+			material.side = DoubleSide;
+
+		}
 
 	}
 

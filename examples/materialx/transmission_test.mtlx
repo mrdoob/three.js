@@ -8,7 +8,7 @@
     <input name="transmission" type="float" value="0.9" />
     <input name="transmission_color" type="color3" value="0.95, 0.98, 1.0" />
     <input name="ior" type="float" value="1.5" />
-    <input name="specular_roughness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" value="0.1" />
     <input name="metalness" type="float" value="0.0" />
   </standard_surface>
 </materialx> 
