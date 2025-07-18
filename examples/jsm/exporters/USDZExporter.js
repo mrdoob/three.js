@@ -202,6 +202,8 @@ class USDZExporter {
 			options
 		);
 
+		const usedNames = new Set();
+
 		const files = {};
 		const modelFileName = 'model.usda';
 
@@ -265,7 +267,12 @@ class USDZExporter {
 
 					}
 
-					const node = buildXform( object, geometry, materials[ material.uuid ] );
+					const node = buildXform(
+						object,
+						geometry,
+						materials[ material.uuid ],
+						usedNames
+					);
 					sceneNode.addChild( node );
 
 				} else {
@@ -279,7 +286,7 @@ class USDZExporter {
 
 			} else if ( object.isCamera ) {
 
-				const cameraNode = buildCamera( object );
+				const cameraNode = buildCamera( object, usedNames );
 
 				sceneNode.addChild( cameraNode );
 
@@ -371,6 +378,37 @@ class USDZExporter {
 
 }
 
+function getName( object, namesSet ) {
+
+	let name = object.name;
+	name = name.replace( /[^A-Za-z0-9-_]/g, '' );
+
+	if ( name === '' ) {
+
+		if ( object.isCamera ) {
+
+			name = 'Camera';
+
+		} else {
+
+			name = 'Object';
+
+		}
+
+	}
+
+	if ( namesSet.has( name ) ) {
+
+		name = name + '_' + object.id;
+
+	}
+
+	namesSet.add( name );
+
+	return name;
+
+}
+
 function imageToCanvas( image, flipY, maxTextureSize ) {
 
 	if (
@@ -435,9 +473,9 @@ function buildHeader() {
 
 // Xform
 
-function buildXform( object, geometry, material ) {
+function buildXform( object, geometry, material, usedNames ) {
 
-	const name = 'Object_' + object.id;
+	const name = getName( object, usedNames );
 	const transform = buildMatrix( object.matrixWorld );
 
 	if ( object.matrixWorld.determinant() < 0 ) {
@@ -1055,9 +1093,9 @@ function buildVector2( vector ) {
 
 }
 
-function buildCamera( camera ) {
+function buildCamera( camera, usedNames ) {
 
-	const name = camera.name ? camera.name : 'Camera_' + camera.id;
+	const name = getName( camera, usedNames );
 
 	const transform = buildMatrix( camera.matrixWorld );
 
