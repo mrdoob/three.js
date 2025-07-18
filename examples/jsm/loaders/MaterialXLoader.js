@@ -426,6 +426,18 @@ class MaterialXLoader extends Loader {
 	/**
 	 * Parses the given MaterialX data and returns the resulting materials.
 	 *
+	 * Supported standard_surface inputs:
+	 * - base, base_color: Base color/albedo
+	 * - opacity: Alpha/transparency
+	 * - specular_roughness: Surface roughness
+	 * - metalness: Metallic property
+	 * - specular: Specular reflection intensity
+	 * - specular_color: Specular reflection color
+	 * - ior: Index of refraction
+	 * - normal: Normal map
+	 * - coat, coat_roughness, coat_color: Clearcoat properties
+	 * - emission, emissionColor: Emission properties
+	 *
 	 * @param {string} text - The raw MaterialX data as a string.
 	 * @return {Object<string,NodeMaterial>} A dictionary holding the parse node materials.
 	 */
@@ -921,6 +933,12 @@ class MaterialXNode {
 
 		//
 
+		let opacityNode = null;
+
+		if ( inputs.opacity ) opacityNode = inputs.opacity;
+
+		//
+
 		let roughnessNode = null;
 
 		if ( inputs.specular_roughness ) roughnessNode = inputs.specular_roughness;
@@ -930,6 +948,24 @@ class MaterialXNode {
 		let metalnessNode = null;
 
 		if ( inputs.metalness ) metalnessNode = inputs.metalness;
+
+		//
+
+		let specularIntensityNode = null;
+
+		if ( inputs.specular ) specularIntensityNode = inputs.specular;
+
+		//
+
+		let specularColorNode = null;
+
+		if ( inputs.specular_color ) specularColorNode = inputs.specular_color;
+
+		//
+
+		let iorNode = null;
+
+		if ( inputs.ior ) iorNode = inputs.ior;
 
 		//
 
@@ -965,8 +1001,12 @@ class MaterialXNode {
 		//
 
 		material.colorNode = colorNode || color( 0.8, 0.8, 0.8 );
+		material.opacityNode = opacityNode || float( 1.0 );
 		material.roughnessNode = roughnessNode || float( 0.2 );
 		material.metalnessNode = metalnessNode || float( 0 );
+		material.specularIntensityNode = specularIntensityNode || float( 0.5 );
+		material.specularColorNode = specularColorNode || color( 1.0, 1.0, 1.0 );
+		material.iorNode = iorNode || float( 1.5 );
 		material.clearcoatNode = clearcoatNode || float( 0 );
 		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
 		if ( normalNode ) material.normalNode = normalNode;

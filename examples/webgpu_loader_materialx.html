@@ -70,6 +70,15 @@
 				'conditional_if_float.mtlx',
 				'image_transform.mtlx',
 				'color3_vec3_cm_test.mtlx',
+				'rotate2d_test.mtlx',
+				'rotate3d_test.mtlx',
+				'heighttonormal_normal_input.mtlx',
+				'roughness_test.mtlx',
+				'opacity_test.mtlx',
+				'specular_test.mtlx',
+				'ior_test.mtlx',
+				'combined_test.mtlx',
+				'texture_opacity_test.mtlx',
 			];
 
 			let camera, scene, renderer, prefab;
@@ -87,7 +96,7 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.LinearToneMapping;
@@ -115,11 +124,15 @@
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
 
 						for ( const sample of samples ) {
+
 							addSample( sample, SAMPLE_PATH );
+
 						}
 
 						for ( const sample of localSamples ) {
+
 							addSample( sample, LOCAL_SAMPLE_PATH );
+
 						}
 
 					} );
@@ -166,6 +179,8 @@
 					.setPath( path )
 					.loadAsync( sample )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
+			
+				material.transparent = true;
 
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );
 				calibrationMesh.material = material;
