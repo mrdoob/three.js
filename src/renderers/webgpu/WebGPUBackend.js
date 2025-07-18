@@ -1397,8 +1397,8 @@ class WebGPUBackend extends Backend {
 
 		passEncoderGPU.dispatchWorkgroups(
 			dispatchSize[ 0 ],
-			dispatchSize[ 1 ],
-			dispatchSize[ 2 ]
+			dispatchSize[ 1 ] || 1,
+			dispatchSize[ 2 ] || 1
 		);
 
 	}
