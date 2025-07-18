@@ -2086,8 +2086,8 @@ fn main( ${ shaderData.attributes } ) {
 
 	// system
 	instanceIndex = globalId.x
-    	+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
-    	+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
+		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
+		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
 
 	// vars
 	${ shaderData.vars }
