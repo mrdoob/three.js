@@ -47,6 +47,7 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import TWEEN from 'three/addons/libs/tween.module.js';
 
 			let camera, scene, timer, renderer, model, mixer, raycaster, postProcessing;
 
@@ -110,7 +111,7 @@
 
 				const maxBlur = uniform( 2 ); // maximum amount of blur
 				const minDistance = uniform( 1 ); // all positions at or below minDistance will be completely in focus.
-				const maxDistance = uniform( 2 ); // all positions at or beyond maxDistance will be completely out of focus.
+				const maxDistance = uniform( 3 ); // all positions at or beyond maxDistance will be completely out of focus.
 
 				// beauty and blur/out-of-focus pass
 
@@ -145,6 +146,8 @@
 
 			function onPointerDown( event ) {
 
+				TWEEN.removeAll();
+
 				pointerCoords.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,
 					- ( event.clientY / window.innerHeight ) * 2 + 1
@@ -156,10 +159,13 @@
 
 				if ( intersects.length > 0 ) {
 
-					focusPoint.copy( intersects[ 0 ].point );
+					new TWEEN.Tween( focusPoint )
+						.to( intersects[ 0 ].point, 500 )
+						.easing( TWEEN.Easing.Cubic.InOut )
+						.start();
 
 				}
-
+			
 			}
 
 			function onWindowResize() {
@@ -172,6 +178,8 @@
 			}
 
 			function animate() {
+
+				TWEEN.update();
 
 				timer.update();
 
