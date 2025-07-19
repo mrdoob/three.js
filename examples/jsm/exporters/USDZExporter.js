@@ -381,7 +381,12 @@ class USDZExporter {
 function getName( object, namesSet ) {
 
 	let name = object.name;
-	name = name.replace( /[^A-Za-z0-9-_]/g, '' );
+	name = name.replace( /[^A-Za-z0-9_]/g, '' );
+	if ( /^[0-9]/.test( name ) ) {
+
+		name = '_' + name;
+
+	}
 
 	if ( name === '' ) {
 
