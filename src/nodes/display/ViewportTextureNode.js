@@ -91,7 +91,7 @@ class ViewportTextureNode extends TextureNode {
 		/**
 		 * The framebuffer texture for the current renderer context.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
 		 * @private
 		 */
 		this._textures = new WeakMap();
