@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			
+
 			import { abs, color, div, float, Fn, instancedBufferAttribute, materialColor, min, normalWorldGeometry, pass, positionGeometry, positionLocal, reflector, screenUV, sin, sub, texture, time, uniform, uv, varyingProperty } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
@@ -174,7 +174,7 @@
 			}
 
 			function startTweens() {
-			
+
 				const lifeTween = new TWEEN.Tween( uniformLife )
 					.to( { value: 1 }, 5000 )
 					.easing( TWEEN.Easing.Bounce.Out );
@@ -187,7 +187,7 @@
 					.onComplete( function () {
 
 						secondaryTweens();
-			
+
 					} );
 				effectTween.start();
 
@@ -321,13 +321,13 @@
 
 				// TSL
 
-				const vVisbility = varyingProperty( 'float' );
+				const vVisibility = varyingProperty( 'float' );
 
 				const instancePosition = instancedBufferAttribute( attributePosition );
 				const instanceNormal = instancedBufferAttribute( attributeNormal );
 				const instanceColor = instancedBufferAttribute( attributeColor );
 				const instanceData = instancedBufferAttribute( attributeData );
-			
+
 				material.positionNode = Fn( () => {
 
 					const instanceSize = instanceData.x;
@@ -345,7 +345,7 @@
 					// life (controls the visibility and initial scale of the cubes)
 
 					const scale = uniformLife.greaterThan( instanceTime ).select( min( 1, div( uniformLife.sub( instanceTime ), 0 ) ) ).oneMinus();
-					vVisbility.assign( uniformLife.greaterThan( instanceTime ).select( 1, 0 ) );
+					vVisibility.assign( uniformLife.greaterThan( instanceTime ).select( 1, 0 ) );
 
 					// accumulate different vertex animations
 
@@ -363,7 +363,7 @@
 
 				material.colorNode = Fn( () => {
 
-					vVisbility.equal( 0 ).discard();
+					vVisibility.equal( 0 ).discard();
 
 					return materialColor.mul( instanceColor );
 
