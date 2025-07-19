@@ -120,6 +120,8 @@ class KTX2Loader extends Loader {
 		super( manager );
 
 		this.transcoderPath = '';
+		this.transcoderJsUrl = null;
+		this.transcoderWasmUrl = null;
 		this.transcoderBinary = null;
 		this.transcoderPending = null;
 
@@ -152,6 +154,24 @@ class KTX2Loader extends Loader {
 
 		this.transcoderPath = path;
 
+		return this;
+
+	}
+
+	/**
+	 * Sets explicit URLs for the transcoder JS and WASM files.
+	 * This overrides the default behavior of loading files by name from a path.
+	 * Useful for bundler setups (Webpack/Vite/Rollup) where the files are imported directly.
+	 *
+	 * @param {Object} urls - An object with jsUrl and wasmUrl fields
+	 * @param {string} urls.jsUrl - Full URL to the basis_transcoder.js file
+	 * @param {string} urls.wasmUrl - Full URL to the basis_transcoder.wasm file
+	 * @return {this}
+	 */
+	setTranscoderUrls( { jsUrl, wasmUrl } ) {
+
+		this.transcoderJsUrl = jsUrl;
+		this.transcoderWasmUrl = wasmUrl;
 		return this;
 
 	}
@@ -243,16 +263,18 @@ class KTX2Loader extends Loader {
 
 			// Load transcoder wrapper.
 			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
 			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
+			const jsContent = jsLoader.loadAsync(
+				this.transcoderJsUrl || ( this.transcoderPath + 'basis_transcoder.js' )
+			);
 
 			// Load transcoder WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+			const binaryContent = binaryLoader.loadAsync(
+				this.transcoderWasmUrl || ( this.transcoderPath + 'basis_transcoder.wasm' )
+			);
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
