@@ -1755,6 +1755,8 @@ class NodeBuilder {
 	 */
 	getArrayCount( node ) {
 
+		// TODO: Move this to the node itself
+
 		let count = null;
 
 		if ( node.isArrayNode ) count = node.count;
