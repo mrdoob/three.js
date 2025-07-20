@@ -491,7 +491,7 @@ class SSAOPass extends Pass {
 
 		scene.traverse( function ( object ) {
 
-			if ( ( object.isPoints || object.isLine || object.isPoints || object.isLine2 ) && object.visible ) {
+			if ( ( object.isPoints || object.isLine || object.isLine2 ) && object.visible ) {
 
 				object.visible = false;
 				cache.push( object );
