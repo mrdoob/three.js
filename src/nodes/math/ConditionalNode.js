@@ -73,8 +73,6 @@ class ConditionalNode extends Node {
 
 			// fallback setup
 
-			// TODO: use build here
-
 			this.setup( builder );
 
 			return this.getNodeType( builder );

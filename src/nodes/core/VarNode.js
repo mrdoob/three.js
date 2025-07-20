@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { addMethodChaining, getCurrentStack, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -81,16 +81,6 @@ class VarNode extends Node {
 		 */
 		this.parents = true;
 
-		this.intention = false;
-
-	}
-
-	setIntention( value ) {
-
-		this.intention = value;
-
-		return this;
-
 	}
 
 	getMemberType( builder, name ) {
@@ -108,25 +98,6 @@ class VarNode extends Node {
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
-
-	}
-
-	build( ...params ) {
-
-		if ( this.intention === true ) {
-
-			const builder = params[ 0 ];
-			const properties = builder.getNodeProperties( this );
-
-			if ( properties.assign !== true ) {
-
-				return this.node.build( ...params );
-
-			}
-
-		}
-
-		return super.build( ...params );
 
 	}
 
@@ -218,26 +189,10 @@ export const Var = ( node, name = null ) => createVar( node, name ).toStack();
  */
 export const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
 
-//
-//
-
-export const VarIntention = ( node ) => {
-
-	if ( getCurrentStack() === null ) {
-
-		return node;
-
-	}
-
-	return createVar( node ).setIntention( true ).toStack();
-
-};
-
 // Method chaining
 
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
-addMethodChaining( 'toVarIntention', VarIntention );
 
 // Deprecated
 
