@@ -15,12 +15,12 @@ export default QUnit.module( 'Objects', () => {
 			const box = new BoxGeometry( 1, 1, 1 );
 			const material = new MeshBasicMaterial( { color: 0x00ff00 } );
 			
-			// initialize and add geometries into the batched mesh
+			// initialize and add a geometry into the batched mesh
 			const batchedMesh = new BatchedMesh( 4, 5000, 10000, material );
 			const boxGeometryId = batchedMesh.addGeometry( box );
 			
-			// create instances of those geometries
-			let boxInstanceIds = []
+			// create instances of this geometry
+			let boxInstanceIds = [];
 			for (let i = 0; i < 4; i++){
 				boxInstanceIds.push( batchedMesh.addInstance( boxGeometryId ) );
 			}
