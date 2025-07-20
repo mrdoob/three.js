@@ -487,8 +487,6 @@ class SSAOPass extends Pass {
 		const scene = this.scene;
 		const cache = this._visibilityCache;
 
-		cache.length = 0;
-
 		scene.traverse( function ( object ) {
 
 			if ( ( object.isPoints || object.isLine || object.isLine2 ) && object.visible ) {
