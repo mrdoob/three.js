@@ -146,8 +146,6 @@
 
 			function onPointerDown( event ) {
 
-				TWEEN.removeAll();
-
 				pointerCoords.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,
 					- ( event.clientY / window.innerHeight ) * 2 + 1
@@ -158,6 +156,8 @@
 				const intersects = raycaster.intersectObject( model );
 
 				if ( intersects.length > 0 ) {
+
+					TWEEN.removeAll();
 
 					new TWEEN.Tween( focusPoint )
 						.to( intersects[ 0 ].point, 500 )
