@@ -13,10 +13,7 @@ import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
-import { Vector2 } from '../../math/Vector2.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
-
-const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 
 /**
  * A backend implementation targeting WebGL 2.
@@ -183,7 +180,7 @@ class WebGLBackend extends Backend {
 		 * A unique collection of bindings.
 		 *
 		 * @private
-		 * @type {WeakSet}
+		 * @type {WeakSet<Array<BindGroup>>}
 		 */
 		this._knownBindings = new WeakSet();
 
@@ -455,7 +452,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+			const { width, height } = this.getDrawingBufferSize();
 			state.viewport( 0, 0, width, height );
 
 		}
@@ -655,7 +652,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+				const { width, height } = this.getDrawingBufferSize();
 				state.viewport( 0, 0, width, height );
 
 			}

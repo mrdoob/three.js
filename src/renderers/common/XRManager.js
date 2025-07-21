@@ -171,6 +171,15 @@ class XRManager extends EventDispatcher {
 		 */
 		this._supportsLayers = false;
 
+		/**
+		 * Whether the device supports binding gl objects.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
+
 		this._frameBufferTargets = null;
 
 		/**
@@ -357,7 +366,7 @@ class XRManager extends EventDispatcher {
 		 * @type {boolean}
 		 * @readonly
 		 */
-		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
+		this._useLayers = ( this._supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
 		/**
 		 * Whether the usage of multiview has been requested by the application or not.
@@ -915,9 +924,18 @@ class XRManager extends EventDispatcher {
 
 			//
 
+			if ( this._supportsGlBinding ) {
+
+				const glBinding = new XRWebGLBinding( session, gl );
+				this._glBinding = glBinding;
+
+			}
+
+			//
+
 			if ( this._useLayers === true ) {
 
-				// default path using XRWebGLBinding/XRProjectionLayer
+				// default path using XRProjectionLayer
 
 				let depthFormat = null;
 				let depthType = null;
@@ -945,11 +963,9 @@ class XRManager extends EventDispatcher {
 
 				}
 
-				const glBinding = new XRWebGLBinding( session, gl );
-				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+				const glProjLayer = this._glBinding.createProjectionLayer( projectionlayerInit );
 				const layersArray = [ glProjLayer ];
 
-				this._glBinding = glBinding;
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );

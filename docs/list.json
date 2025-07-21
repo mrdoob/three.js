@@ -375,6 +375,7 @@
 				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
+				"KTX2Exporter": "examples/en/exporters/KTX2Exporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
 				"STLExporter": "examples/en/exporters/STLExporter",
