@@ -2217,6 +2217,28 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Executes the node in a specific build stage.
+	 *
+	 * @param {Node} node - The node to execute.
+	 * @param {string} buildStage - The build stage to execute the node in.
+	 * @param {Node|string|null} output - Expected output type. For example 'vec3'.
+	 * @return {Node|string|null} The result of the node build.
+	 */
+	flowBuildStage( node, buildStage, output = null ) {
+
+		const previousBuildStage = this.getBuildStage();
+
+		this.setBuildStage( buildStage );
+
+		const result = node.build( this, output );
+
+		this.setBuildStage( previousBuildStage );
+
+		return result;
+
+	}
+
+	/**
 	 * Runs the node flow through all the steps of creation, 'setup', 'analyze', 'generate'.
 	 *
 	 * @param {Node} node - The node to execute.

@@ -73,9 +73,7 @@ class ConditionalNode extends Node {
 
 			// fallback setup
 
-			// TODO: use build here
-
-			this.setup( builder );
+			builder.flowBuildStage( this, 'setup' );
 
 			return this.getNodeType( builder );
 
