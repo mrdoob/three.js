@@ -142,3 +142,10 @@ export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js'; // @TOD
 // lighting models
 export { default as PhongLightingModel } from './functions/PhongLightingModel.js';
 export { default as PhysicalLightingModel } from './functions/PhysicalLightingModel.js';
+
+// MaterialX TSL node exports
+export {
+	mx_add, mx_subtract, mx_multiply, mx_divide, mx_modulo, mx_power, mx_atan2, mx_timer, mx_frame, mx_invert,
+	mx_ln, mx_distance, mx_reflect, mx_refract, mx_ifgreater, mx_ifgreatereq, mx_ifequal, mx_creatematrix,
+	separate, mx_extract, mx_place2d, mx_length, mx_cross, mx_floor, mx_rotate2d, mx_rotate3d, mx_heighttonormal
+} from './materialx/MaterialXNodes.js';
