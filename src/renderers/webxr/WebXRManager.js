@@ -810,7 +810,7 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the amount of foveation used by the XR compositor for the projection layer.
 		 *
-		 * @return {number} The amount of foveation.
+		 * @return {number|undefined} The amount of foveation.
 		 */
 		this.getFoveation = function () {
 

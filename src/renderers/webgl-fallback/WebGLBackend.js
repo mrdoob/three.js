@@ -183,7 +183,7 @@ class WebGLBackend extends Backend {
 		 * A unique collection of bindings.
 		 *
 		 * @private
-		 * @type {WeakSet}
+		 * @type {WeakSet<Array<BindGroup>>}
 		 */
 		this._knownBindings = new WeakSet();
 
