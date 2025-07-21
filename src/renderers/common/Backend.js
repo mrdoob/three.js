@@ -534,10 +534,9 @@ class Backend {
 	/**
 	 * Returns the drawing buffer size.
 	 *
-	 * @param {Vector2} target - The method writes the result in this target object.
 	 * @return {Vector2} The drawing buffer size.
 	 */
-	getDrawingBufferSize( /* target */ ) {
+	getDrawingBufferSize() {
 
 		_vector2 = _vector2 || new Vector2();
 
