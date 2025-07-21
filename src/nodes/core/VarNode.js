@@ -111,6 +111,12 @@ class VarNode extends Node {
 
 	}
 
+	getArrayCount( builder ) {
+
+		return this.node.getArrayCount( builder );
+
+	}
+
 	build( ...params ) {
 
 		if ( this.intention === true ) {
@@ -167,7 +173,7 @@ class VarNode extends Node {
 
 			} else {
 
-				const count = builder.getArrayCount( node );
+				const count = node.getArrayCount( builder );
 
 				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
 

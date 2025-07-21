@@ -1748,25 +1748,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the array length.
-	 *
-	 * @param {Node} node - The node.
-	 * @return {?number} The array length.
-	 */
-	getArrayCount( node ) {
-
-		// TODO: Move this to the node itself
-
-		let count = null;
-
-		if ( node.isArrayNode ) count = node.count;
-		else if ( node.isVarNode && node.node.isArrayNode ) count = node.node.count;
-
-		return count;
-
-	}
-
-	/**
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
