@@ -30,8 +30,8 @@ class FramebufferTexture extends Texture {
 	/**
 	 * Constructs a new framebuffer texture.
 	 *
-	 * @param {number} width - The width of the texture.
-	 * @param {number} height - The height of the texture.
+	 * @param {number} [width] - The width of the texture.
+	 * @param {number} [height] - The height of the texture.
 	 */
 	constructor( width, height ) {
 

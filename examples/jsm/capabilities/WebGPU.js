@@ -2,7 +2,7 @@ let isAvailable = ( typeof navigator !== 'undefined' && navigator.gpu !== undefi
 
 if ( typeof window !== 'undefined' && isAvailable ) {
 
-	isAvailable = await navigator.gpu.requestAdapter();
+	isAvailable = Boolean( await navigator.gpu.requestAdapter() );
 
 }
 

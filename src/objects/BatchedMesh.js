@@ -1251,7 +1251,7 @@ class BatchedMesh extends Mesh {
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );
-		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length ) {
+		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length - 1 ) {
 
 			instanceInfo.pop();
 			availableInstanceIds.pop();

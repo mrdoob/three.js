@@ -34,8 +34,8 @@ class Color4 extends Color {
 	 * string argument to this method.
 	 *
 	 * @param {number|string|Color} r - The red value.
-	 * @param {number} g - The green value.
-	 * @param {number} b - The blue value.
+	 * @param {number} [g] - The green value.
+	 * @param {number} [b] - The blue value.
 	 * @param {number} [a=1] - The alpha value.
 	 * @return {Color4} A reference to this object.
 	 */
