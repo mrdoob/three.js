@@ -1,6 +1,4 @@
 import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UIText } from './libs/ui.js';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
 
 import { APP } from './libs/app.js';
 
@@ -136,11 +134,12 @@ function SidebarProjectVideo( editor ) {
 
 		//
 
-		const ffmpeg = new FFmpeg();
+		const { createFFmpeg, fetchFile } = FFmpeg; // eslint-disable-line no-undef
+		const ffmpeg = createFFmpeg( { log: true } );
 
 		await ffmpeg.load();
 
-		ffmpeg.on( 'progress', ( { ratio } ) => {
+		ffmpeg.setProgress( ( { ratio } ) => {
 
 			encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
 
@@ -154,7 +153,7 @@ function SidebarProjectVideo( editor ) {
 
 			} else {
 
-				ffmpeg.terminate();
+				ffmpeg.exit();
 
 			}
 
@@ -178,7 +177,7 @@ function SidebarProjectVideo( editor ) {
 
 				if ( output.closed ) return;
 
-				await ffmpeg.writeFile( `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
+				ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 				currentTime += 1 / fps;
 
 				const frame = i + 1;
@@ -190,18 +189,18 @@ function SidebarProjectVideo( editor ) {
 			encodingText.hidden = false;
 			encodingStatus.hidden = false;
 
-			await ffmpeg.exec( [ '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' ] );
+			await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 
-			const videoData = await ffmpeg.readFile( 'out.mp4' );
+			const videoData = ffmpeg.FS( 'readFile', 'out.mp4' );
 
 			for ( let i = 0; i < frames; i ++ ) {
 
 				const num = i.toString().padStart( 5, '0' );
-				await ffmpeg.deleteFile( `tmp.${num}.png` );
+				ffmpeg.FS( 'unlink', `tmp.${num}.png` );
 
 			}
 
-			await ffmpeg.deleteFile( 'out.mp4' );
+			ffmpeg.FS( 'unlink', 'out.mp4' );
 
 			output.document.body.removeChild( canvas );
 
