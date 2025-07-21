@@ -257,16 +257,15 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
 //
 
 /**
- * TSL function for creating a var node with intent.
+ * TSL function for creating a var intent node.
  *
  * @tsl
  * @function
- * @private
  * @param {Node} node - The node for which a variable should be created.
  * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
-const VarIntent = ( node ) => {
+export const VarIntent = ( node ) => {
 
 	if ( getCurrentStack() === null ) {
 

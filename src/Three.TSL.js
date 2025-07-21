@@ -519,6 +519,7 @@ export const uvec2 = TSL.uvec2;
 export const uvec3 = TSL.uvec3;
 export const uvec4 = TSL.uvec4;
 export const Var = TSL.Var;
+export const VarIntent = TSL.VarIntent;
 export const varying = TSL.varying;
 export const varyingProperty = TSL.varyingProperty;
 export const vec2 = TSL.vec2;
