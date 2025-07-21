@@ -61,7 +61,7 @@ const shaderNodeHandler = {
 
 				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
-			} else if ( prop === 'toVarIntention' ) {
+			} else if ( prop === 'toVarIntent' ) {
 
 				return () => nodeObj;
 
@@ -221,9 +221,9 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 			node = nodeObject( Object.assign( node, settings ) );
 
-			if ( settings.intention === true ) {
+			if ( settings.intent === true ) {
 
-				node = node.toVarIntention();
+				node = node.toVarIntent();
 
 			}
 
@@ -591,20 +591,20 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObject( cacheMap.get( params[ 0 ] ) ).toVarIntention();
+			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
 
 		}
 
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObject( node ).toVarIntention();
-			return nodeObject( new ConvertNode( node, type ) ).toVarIntention();
+			if ( node.nodeType === type ) return nodeObjectIntent( node );
+			return nodeObjectIntent( new ConvertNode( node, type ) );
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObject( new JoinNode( nodes, type ) ).toVarIntention();
+		return nodeObjectIntent( new JoinNode( nodes, type ) );
 
 	};
 
@@ -627,11 +627,12 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
 export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
-export const nodeProxyIntention = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intention: true, ...settings } );
+export const nodeProxyIntention = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
 
 let fnId = 0;
 
@@ -687,7 +688,7 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 		if ( nodeType === 'void' ) fnCall.toStack();
 
-		return fnCall.toVarIntention();
+		return fnCall.toVarIntent();
 
 	};
 

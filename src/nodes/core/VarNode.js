@@ -81,15 +81,44 @@ class VarNode extends Node {
 		 */
 		this.parents = true;
 
-		this.intention = false;
+		/**
+		 * This flag is used to indicate that this node is used for intention.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.intent = false;
 
 	}
 
-	setIntention( value ) {
+	/**
+	 * Sets the intention flag for this node.
+	 *
+	 * This flag is used to indicate that this node is used for intention
+	 * and should not be built directly. Instead, it is used to indicate that
+	 * the node should be treated as a variable intention.
+	 *
+	 * It's useful for assigning variables without needing creating a new variable node.
+	 *
+	 * @param {boolean} value - The value to set for the intention flag.
+	 * @returns {VarNode} This node.
+	 */
+	setIntent( value ) {
 
-		this.intention = value;
+		this.intent = value;
 
 		return this;
+
+	}
+
+	/**
+	 * Returns the intention flag of this node.
+	 *
+	 * @return {boolean} The intention flag.
+	 */
+	getIntent() {
+
+		return this.intent;
 
 	}
 
@@ -119,7 +148,7 @@ class VarNode extends Node {
 
 	build( ...params ) {
 
-		if ( this.intention === true ) {
+		if ( this.intent === true ) {
 
 			const builder = params[ 0 ];
 			const properties = builder.getNodeProperties( this );
@@ -227,7 +256,17 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
 //
 //
 
-export const VarIntention = ( node ) => {
+/**
+ * TSL function for creating a var node with intention.
+ *
+ * @tsl
+ * @function
+ * @private
+ * @param {Node} node - The node for which a variable should be created.
+ * @param {?string} name - The name of the variable in the shader.
+ * @returns {VarNode}
+ */
+const VarIntent = ( node ) => {
 
 	if ( getCurrentStack() === null ) {
 
@@ -235,7 +274,7 @@ export const VarIntention = ( node ) => {
 
 	}
 
-	return createVar( node ).setIntention( true ).toStack();
+	return createVar( node ).setIntent( true ).toStack();
 
 };
 
@@ -243,7 +282,7 @@ export const VarIntention = ( node ) => {
 
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
-addMethodChaining( 'toVarIntention', VarIntention );
+addMethodChaining( 'toVarIntent', VarIntent );
 
 // Deprecated
 
