@@ -82,7 +82,7 @@ class VarNode extends Node {
 		this.parents = true;
 
 		/**
-		 * This flag is used to indicate that this node is used for intention.
+		 * This flag is used to indicate that this node is used for intent.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -92,15 +92,15 @@ class VarNode extends Node {
 	}
 
 	/**
-	 * Sets the intention flag for this node.
+	 * Sets the intent flag for this node.
 	 *
-	 * This flag is used to indicate that this node is used for intention
+	 * This flag is used to indicate that this node is used for intent
 	 * and should not be built directly. Instead, it is used to indicate that
-	 * the node should be treated as a variable intention.
+	 * the node should be treated as a variable intent.
 	 *
 	 * It's useful for assigning variables without needing creating a new variable node.
 	 *
-	 * @param {boolean} value - The value to set for the intention flag.
+	 * @param {boolean} value - The value to set for the intent flag.
 	 * @returns {VarNode} This node.
 	 */
 	setIntent( value ) {
@@ -112,9 +112,9 @@ class VarNode extends Node {
 	}
 
 	/**
-	 * Returns the intention flag of this node.
+	 * Returns the intent flag of this node.
 	 *
-	 * @return {boolean} The intention flag.
+	 * @return {boolean} The intent flag.
 	 */
 	getIntent() {
 
@@ -257,7 +257,7 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
 //
 
 /**
- * TSL function for creating a var node with intention.
+ * TSL function for creating a var node with intent.
  *
  * @tsl
  * @function
