@@ -1790,7 +1790,7 @@ class NodeBuilder {
 
 			//
 
-			const count = this.getArrayCount( node );
+			const count = node.getArrayCount( this );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );
 
