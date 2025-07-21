@@ -63,7 +63,7 @@ const shaderNodeHandler = {
 
 			} else if ( prop === 'toVarIntention' ) {
 
-				return () => node;
+				return () => nodeObj;
 
 			} else if ( prop === 'self' ) {
 
