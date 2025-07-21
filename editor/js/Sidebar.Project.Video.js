@@ -140,9 +140,9 @@ function SidebarProjectVideo( editor ) {
 
 		await ffmpeg.load();
 
-		ffmpeg.on( 'progress', ( { ratio } ) => {
+		ffmpeg.on( 'progress', ( { progress } ) => {
 
-			encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
+			encodingStatus.textContent = `( ${ Math.floor( progress * 100 ) }% )`;
 
 		} );
 
