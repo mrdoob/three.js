@@ -28064,7 +28064,7 @@ class BatchedMesh extends Mesh {
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );
-		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length ) {
+		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length - 1 ) {
 
 			instanceInfo.pop();
 			availableInstanceIds.pop();
@@ -29573,8 +29573,8 @@ class FramebufferTexture extends Texture {
 	/**
 	 * Constructs a new framebuffer texture.
 	 *
-	 * @param {number} width - The width of the texture.
-	 * @param {number} height - The height of the texture.
+	 * @param {number} [width] - The width of the texture.
+	 * @param {number} [height] - The height of the texture.
 	 */
 	constructor( width, height ) {
 
@@ -43827,7 +43827,8 @@ class FileLoader extends Loader {
 		super( manager );
 
 		/**
-		 * The expected mime type.
+		 * The expected mime type. Valid values can be found
+		 * [here]{@link hhttps://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype}
 		 *
 		 * @type {string}
 		 */
@@ -57156,17 +57157,44 @@ class CameraHelper extends LineSegments {
 
 		const w = 1, h = 1;
 
+		let nearZ, farZ;
+
 		// we need just camera projection matrix inverse
 		// world matrix must be identity
 
 		_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
 		// Adjust z values based on coordinate system
-		const nearZ = this.camera.coordinateSystem === WebGLCoordinateSystem ? -1 : 0;
+
+		if ( this.camera.reversedDepth === true ) {
+
+			nearZ = 1;
+			farZ = 0;
+
+		} else {
+
+			if ( this.camera.coordinateSystem === WebGLCoordinateSystem ) {
+
+				nearZ = -1;
+				farZ = 1;
+
+			} else if ( this.camera.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				nearZ = 0;
+				farZ = 1;
+
+			} else {
+
+				throw new Error( 'THREE.CameraHelper.update(): Invalid coordinate system: ' + this.camera.coordinateSystem );
+
+			}
+
+		}
+
 
 		// center / target
 		setPoint( 'c', pointMap, geometry, _camera, 0, 0, nearZ );
-		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
+		setPoint( 't', pointMap, geometry, _camera, 0, 0, farZ );
 
 		// near
 
@@ -57177,10 +57205,10 @@ class CameraHelper extends LineSegments {
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
-		setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
-		setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
-		setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
+		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, farZ );
+		setPoint( 'f2', pointMap, geometry, _camera, w, - h, farZ );
+		setPoint( 'f3', pointMap, geometry, _camera, - w, h, farZ );
+		setPoint( 'f4', pointMap, geometry, _camera, w, h, farZ );
 
 		// up
 
@@ -57190,10 +57218,10 @@ class CameraHelper extends LineSegments {
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
-		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
-		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
+		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, farZ );
+		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, farZ );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, farZ );
+		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, farZ );
 
 		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
@@ -64192,7 +64220,9 @@ function getEncodingComponents( colorSpace ) {
 function getShaderErrors( gl, shader, type ) {
 
 	const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
-	const errors = gl.getShaderInfoLog( shader ).trim();
+
+	const shaderInfoLog = gl.getShaderInfoLog( shader ) || '';
+	const errors = shaderInfoLog.trim();
 
 	if ( status && errors === '' ) return '';
 
@@ -65053,9 +65083,13 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		// check for link errors
 		if ( renderer.debug.checkShaderErrors ) {
 
-			const programLog = gl.getProgramInfoLog( program ).trim();
-			const vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-			const fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+			const programInfoLog = gl.getProgramInfoLog( program ) || '';
+			const vertexShaderInfoLog = gl.getShaderInfoLog( glVertexShader ) || '';
+			const fragmentShaderInfoLog = gl.getShaderInfoLog( glFragmentShader ) || '';
+
+			const programLog = programInfoLog.trim();
+			const vertexLog = vertexShaderInfoLog.trim();
+			const fragmentLog = fragmentShaderInfoLog.trim();
 
 			let runnable = true;
 			let haveDiagnostics = true;
@@ -71767,9 +71801,15 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
+				if ( typeof XRWebGLBinding !== 'undefined' ) {
+
+					glBinding = new XRWebGLBinding( session, gl );
+
+				}
+
 				// Check that the browser implements the necessary APIs to use an
 				// XRProjectionLayer rather than an XRWebGLLayer
-				const useLayers = typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype;
+				const useLayers = glBinding !== null && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
 				if ( ! useLayers ) {
 
@@ -71821,8 +71861,6 @@ class WebXRManager extends EventDispatcher {
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
-
-					glBinding = new XRWebGLBinding( session, gl );
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
@@ -72091,9 +72129,10 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			cameraL.layers.mask = camera.layers.mask | 0b010;
-			cameraR.layers.mask = camera.layers.mask | 0b100;
-			cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
+			// inherit camera layers and enable eye layers (1 = left, 2 = right)
+			cameraXR.layers.mask = camera.layers.mask | 0b110;
+			cameraL.layers.mask = cameraXR.layers.mask & 0b011;
+			cameraR.layers.mask = cameraXR.layers.mask & 0b101;
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
@@ -72174,7 +72213,7 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the amount of foveation used by the XR compositor for the projection layer.
 		 *
-		 * @return {number} The amount of foveation.
+		 * @return {number|undefined} The amount of foveation.
 		 */
 		this.getFoveation = function () {
 
@@ -76278,7 +76317,7 @@ class WebGLRenderer {
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
 
-					// when using MRT, select the corect color buffer for the subsequent read command
+					// when using MRT, select the correct color buffer for the subsequent read command
 
 					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
