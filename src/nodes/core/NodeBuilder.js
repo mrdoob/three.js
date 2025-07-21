@@ -196,7 +196,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current fog node.
 		 *
-		 * @type {?FogNode}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.fogNode = null;
