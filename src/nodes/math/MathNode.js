@@ -875,9 +875,9 @@ export const dot = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DOT ).setParamete
  *
  * @tsl
  * @function
- * @param {Node<vec2|vec3|vec4>} x - The first vector.
- * @param {Node<vec2|vec3|vec4>} y - The second vector.
- * @returns {Node<vec2|vec3|vec4>}
+ * @param {Node<vec2|vec3>} x - The first vector.
+ * @param {Node<vec2|vec3>} y - The second vector.
+ * @returns {Node<float|vec3>}
  */
 export const cross = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CROSS ).setParameterLength( 2 );
 
