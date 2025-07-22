@@ -22,7 +22,8 @@ import {
 	mx_timer, mx_frame, mat3, mx_ramp4,
 	reflect, refract, reciprocal,
 	element, mx_ifgreater, mx_ifgreatereq, mx_ifequal, distance,
-	separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal
+	separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal,
+	mx_unifiednoise2d, mx_unifiednoise3d
 } from 'three/tsl';
 
 
@@ -129,7 +130,8 @@ const MXElements = [
 	new MXElement( 'cellnoise3d', mx_cell_noise_float, [ 'texcoord' ] ),
 	new MXElement( 'worleynoise2d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
 	new MXElement( 'worleynoise3d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
-
+	new MXElement( 'unifiednoise2d', mx_unifiednoise2d, [ 'type', 'texcoord', 'freq', 'offset', 'jitter', 'outmin', 'outmax', 'clampoutput', 'octaves', 'lacunarity', 'diminish' ] ),
+	new MXElement( 'unifiednoise3d', mx_unifiednoise3d, [ 'type', 'texcoord', 'freq', 'offset', 'jitter', 'outmin', 'outmax', 'clampoutput', 'octaves', 'lacunarity', 'diminish' ] ),
 	// << Supplemental >>
 	//new MtlXElement( 'tiledimage', ... ),
 	//new MtlXElement( 'triplanarprojection', triplanarTextures, [ 'filex', 'filey', 'filez' ] ),
@@ -588,6 +590,18 @@ class MaterialXNode {
 			} else if ( MtlXLibrary[ element ] !== undefined ) {
 
 				const nodeElement = MtlXLibrary[ element ];
+
+				if ( ! nodeElement ) {
+
+					throw new Error( `THREE.MaterialXLoader: Unexpected node ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+
+				}
+
+				if ( ! nodeElement.nodeFunc ) {
+
+					throw new Error( `THREE.MaterialXLoader: Unexpected node 2 ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+
+				}
 
 				if ( out !== null ) {
 
