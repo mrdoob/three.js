@@ -59,11 +59,12 @@
 				scene.backgroundNode = normalWorldGeometry.y.mix( color( 0x4195a4 ), color( 0x0066ff ) );
 				camera.lookAt( 0, 1, 0 );
 
-				const sunLight = new THREE.DirectionalLight( 0xFFE499, 2 );
+				const sunLight = new THREE.DirectionalLight( 0xFFE499, 1.5 );
 				sunLight.position.set( 7, 5, 7 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.zoom = 1.5;
 				sunLight.shadow.mapSize.set( 1024, 1024 );
+				sunLight.shadow.bias = - 0.0001;
 				scene.add( sunLight );
 
 				const backLight = new THREE.DirectionalLight( 0x0487e2, 0.5 );
