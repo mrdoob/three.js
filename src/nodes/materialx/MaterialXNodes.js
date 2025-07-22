@@ -8,7 +8,7 @@ import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
 import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 import { uv } from '../accessors/UV.js';
-import { float, vec2, vec3, vec4, int, add, sub, mul, div, mod, pow, atan, mat3, Fn } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, vec4, int } from '../tsl/TSLBase.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { rotate } from '../utils/RotateNode.js';
 import { frameId, time } from '../utils/Timer.js';
