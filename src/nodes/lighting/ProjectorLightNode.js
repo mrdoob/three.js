@@ -63,7 +63,7 @@ class ProjectorLightNode extends SpotLightNode {
 	 */
 	getSpotAttenuation( builder ) {
 
-		const attenuation = float( 0 ).toVar();
+		const attenuation = float( 0 );
 		const penumbraCos = this.penumbraCosNode;
 
 		// compute the fragment's position in the light's clip space
