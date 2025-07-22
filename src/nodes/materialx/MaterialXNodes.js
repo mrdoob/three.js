@@ -11,6 +11,7 @@ import { uv } from '../accessors/UV.js';
 import { float, vec2, vec3, vec4, int, add, sub, mul, div, mod, pow, atan, mat3, Fn } from '../tsl/TSLBase.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { rotate } from '../utils/RotateNode.js';
+import { frameId, time } from '../utils/Timer.js';
 
 export const mx_aastep = ( threshold, value ) => {
 
@@ -72,7 +73,7 @@ export { mx_hsvtorgb, mx_rgbtohsv, mx_srgb_texture_to_lin_rec709 };
 // === Moved from MaterialXLoader.js ===
 
 // Math ops
-export const mx_timer = () => timerLocal();
+export const mx_timer = () => time;
 export const mx_frame = () => frameId;
 export const mx_ifgreater = ( value1, value2, in1, in2 ) => value1.greaterThan( value2 ).mix( in1, in2 );
 export const mx_ifgreatereq = ( value1, value2, in1, in2 ) => value1.greaterThanEqual( value2 ).mix( in1, in2 );
