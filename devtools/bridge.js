@@ -409,21 +409,20 @@
 
 		}
 
+		function findObjectInScenes( uuid ) {
+
+			for ( const scene of observedScenes ) {
+
+				const found = scene.getObjectByProperty( 'uuid', uuid );
+				if ( found ) return found;
+
+			}
+
+			return null;
+
+		}
+
 		function sendObjectDetails( uuid ) {
-
-			// Find the object with the given UUID
-			const findObjectInScenes = ( targetUuid ) => {
-
-				for ( const scene of observedScenes ) {
-
-					const found = scene.getObjectByProperty( 'uuid', targetUuid );
-					if ( found ) return found;
-
-				}
-
-				return null;
-
-			};
 
 			const object = findObjectInScenes( uuid );
 
@@ -452,10 +451,6 @@
 
 				dispatchEvent( 'object-details', details );
 
-			} else {
-
-				console.warn( 'DevTools: Object not found for UUID:', uuid );
-
 			}
 
 		}
@@ -481,10 +476,6 @@
 				setTimeout( () => {
 					renderer.domElement.style.outline = originalOutline;
 				}, 1000 );
-
-			} else {
-
-				console.warn( 'DevTools: Renderer or canvas element not found for UUID:', rendererUuid );
 
 			}
 
