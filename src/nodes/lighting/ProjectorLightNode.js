@@ -1,8 +1,10 @@
 import SpotLightNode from './SpotLightNode.js';
 
-import { Fn, vec2 } from '../tsl/TSLCore.js';
+import { float, Fn, If, vec2 } from '../tsl/TSLCore.js';
 import { length, min, max, saturate, acos } from '../math/MathNode.js';
 import { div, sub } from '../math/OperatorNode.js';
+import { lightShadowMatrix } from '../accessors/Lights.js';
+import { positionWorld } from '../accessors/Position.js';
 
 const sdBox = /*@__PURE__*/ Fn( ( [ p, b ] ) => {
 
@@ -61,13 +63,24 @@ class ProjectorLightNode extends SpotLightNode {
 	 */
 	getSpotAttenuation( builder ) {
 
+		const attenuation = float( 0 );
 		const penumbraCos = this.penumbraCosNode;
-		const spotLightCoord = this.getLightCoord( builder );
-		const coord = spotLightCoord.xyz.div( spotLightCoord.w );
 
-		const boxDist = sdBox( coord.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
-		const angleFactor = div( - 1.0, sub( 1.0, acos( penumbraCos ) ).sub( 1.0 ) );
-		const attenuation = saturate( boxDist.mul( - 2.0 ).mul( angleFactor ) );
+		// compute the fragment's position in the light's clip space
+
+		const spotLightCoord = lightShadowMatrix( this.light ).mul( builder.context.positionWorld || positionWorld );
+
+		// the sign of w determines whether the current fragment is in front or behind the light.
+		// to avoid a back-projection, it's important to only compute an attenuation if w is positive
+
+		If( spotLightCoord.w.greaterThan( 0 ), () => {
+
+			const projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
+			const boxDist = sdBox( projectionUV.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
+			const angleFactor = div( - 1.0, sub( 1.0, acos( penumbraCos ) ).sub( 1.0 ) );
+			attenuation.assign( saturate( boxDist.mul( - 2.0 ).mul( angleFactor ) ) );
+
+		} );
 
 		return attenuation;
 

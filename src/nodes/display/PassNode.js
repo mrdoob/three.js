@@ -49,7 +49,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
+		this.passNode.build( builder );
 
 		return super.setup( builder );
 
@@ -335,7 +335,7 @@ class PassNode extends TempNode {
 		this._layers = null;
 
 		/**
-		 * Scales the resolution of the internal render taregt.
+		 * Scales the resolution of the internal render target.
 		 *
 		 * @private
 		 * @type {number}
@@ -350,7 +350,7 @@ class PassNode extends TempNode {
 		 * @type {?Vector4}
 		 * @default null
 		 */
-		this._customViewport = null;
+		this._viewport = null;
 
 		/**
 		 * Custom scissor definition.
@@ -359,7 +359,7 @@ class PassNode extends TempNode {
 		 * @type {?Vector4}
 		 * @default null
 		 */
-		this._customScissor = null;
+		this._scissor = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -724,8 +724,8 @@ class PassNode extends TempNode {
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
-		if ( this._customScissor !== null ) this.renderTarget.scissor.copy( this._customScissor );
-		if ( this._customViewport !== null ) this.renderTarget.viewport.copy( this._customViewport );
+		if ( this._scissor !== null ) this.renderTarget.scissor.copy( this._scissor );
+		if ( this._viewport !== null ) this.renderTarget.viewport.copy( this._viewport );
 
 	}
 
@@ -744,23 +744,23 @@ class PassNode extends TempNode {
 
 		if ( x === null ) {
 
-			this._customScissor = null;
+			this._scissor = null;
 
 		} else {
 
-			if ( this._customScissor === null ) this._customScissor = new Vector4();
+			if ( this._scissor === null ) this._scissor = new Vector4();
 
 			if ( x.isVector4 ) {
 
-				this._customScissor.copy( x );
+				this._scissor.copy( x );
 
 			} else {
 
-				this._customScissor.set( x, y, width, height );
+				this._scissor.set( x, y, width, height );
 
 			}
 
-			this._customScissor.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+			this._scissor.multiplyScalar( this._pixelRatio * this._resolution ).floor();
 
 		}
 
@@ -780,23 +780,23 @@ class PassNode extends TempNode {
 
 		if ( x === null ) {
 
-			this._customViewport = null;
+			this._viewport = null;
 
 		} else {
 
-			if ( this._customViewport === null ) this._customViewport = new Vector4();
+			if ( this._viewport === null ) this._viewport = new Vector4();
 
 			if ( x.isVector4 ) {
 
-				this._customViewport.copy( x );
+				this._viewport.copy( x );
 
 			} else {
 
-				this._customViewport.set( x, y, width, height );
+				this._viewport.set( x, y, width, height );
 
 			}
 
-			this._customViewport.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+			this._viewport.multiplyScalar( this._pixelRatio * this._resolution ).floor();
 
 		}
 

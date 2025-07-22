@@ -127,10 +127,9 @@ class LightsNode extends Node {
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : - 1;
-				const hashMapVersion = ( light.map !== null ) ? light.map.version : - 1;
 				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : - 1;
 
-				_hashData.push( hashMap, hashMapVersion, hashColorNode );
+				_hashData.push( hashMap, hashColorNode );
 
 			}
 

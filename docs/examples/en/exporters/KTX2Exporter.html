@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			An exporter for `KTX2`.
+			<br /><br />
+			[link:https://www.khronos.org/ktx/ KTX2] is an
+			[link:https://github.khronos.org/KTX-Specification/ktxspec.v2.html open
+			format specification] container format that provides efficient storage and
+			transmission of texture data with support for GPU-optimized formats.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly. See
+			[link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { KTX2Exporter } from 'three/addons/exporters/KTX2Exporter.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+			// Instantiate an exporter
+			const exporter = new KTX2Exporter();
+			
+			// Export a data texture
+			const result = await exporter.parse( dataTexture );
+			
+			// Export a render target
+			const result = await exporter.parse( renderer, renderTarget );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_exporter_ktx2]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>Creates a new [name].</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Promise parse]( [param:DataTexture texture] )</h3>
+
+		<p>[page:Object texture] — DataTexture or Data3DTexture to export.<br /></p>
+		<p>
+			Generates a KTX2 file from the input texture. Returns a promise that
+			resolves with the result.
+		</p>
+
+		<h3>
+			[method:Promise parse]( [param:WebGLRenderer renderer],
+			[param:WebGLRenderTarget renderTarget] )
+		</h3>
+
+		<p>
+			[page:Object renderer] — Renderer to use to read pixel data from the render target. Should be a
+			[page:WebGLRenderer] or [page:WebGPURenderer].<br />
+
+			[page:Object renderTarget] — The render target to export. Should be a [page:RenderTarget].<br />
+		</p>
+		<p>
+			Generates a KTX2 file from the render target. Returns a promise that
+			resolves with the result.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/KTX2Exporter.js examples/jsm/exporters/KTX2Exporter.js]
+		</p>
+	</body>
+</html>

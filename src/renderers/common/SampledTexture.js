@@ -78,8 +78,6 @@ class SampledTexture extends Binding {
 	 */
 	needsBindingsUpdate( generation ) {
 
-		const { texture } = this;
-
 		if ( generation !== this.generation ) {
 
 			this.generation = generation;
@@ -88,7 +86,7 @@ class SampledTexture extends Binding {
 
 		}
 
-		return texture.isVideoTexture;
+		return false;
 
 	}
 

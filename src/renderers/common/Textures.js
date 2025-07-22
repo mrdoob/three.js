@@ -366,9 +366,25 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			target.width = image.width || 1;
-			target.height = image.height || 1;
-			target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
+			if ( image instanceof HTMLVideoElement ) {
+
+				target.width = image.videoWidth || 1;
+				target.height = image.videoHeight || 1;
+				target.depth = 1;
+
+			} else if ( image instanceof VideoFrame ) {
+
+				target.width = image.displayWidth || 1;
+				target.height = image.displayHeight || 1;
+				target.depth = 1;
+
+			} else {
+
+				target.width = image.width || 1;
+				target.height = image.height || 1;
+				target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
+
+			}
 
 		} else {
 

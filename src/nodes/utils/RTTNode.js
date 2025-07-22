@@ -42,6 +42,15 @@ class RTTNode extends TextureNode {
 		super( renderTarget.texture, uv() );
 
 		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isRTTNode = true;
+
+		/**
 		 * The node to render a texture with.
 		 *
 		 * @type {Node}
