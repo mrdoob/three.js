@@ -28,6 +28,19 @@ const _ramp = ( a, b, uv, p ) => mix( a, b, uv[ p ].clamp() );
 export const mx_ramplr = ( valuel, valuer, texcoord = uv() ) => _ramp( valuel, valuer, texcoord, 'x' );
 export const mx_ramptb = ( valuet, valueb, texcoord = uv() ) => _ramp( valuet, valueb, texcoord, 'y' );
 
+// Bilinear ramp: interpolate between four corners (tl, tr, bl, br) using texcoord.x and texcoord.y
+export const mx_ramp4 = (
+	valuetl, valuetr, valuebl, valuebr, texcoord = uv()
+) => {
+
+	const u = texcoord.x.clamp();
+	const v = texcoord.y.clamp();
+	const top = mix( valuetl, valuetr, u );
+	const bottom = mix( valuebl, valuebr, u );
+	return mix( top, bottom, v );
+
+};
+
 const _split = ( a, b, center, uv, p ) => mix( a, b, mx_aastep( center, uv[ p ] ) );
 export const mx_splitlr = ( valuel, valuer, center, texcoord = uv() ) => _split( valuel, valuer, center, texcoord, 'x' );
 export const mx_splittb = ( valuet, valueb, center, texcoord = uv() ) => _split( valuet, valueb, center, texcoord, 'y' );

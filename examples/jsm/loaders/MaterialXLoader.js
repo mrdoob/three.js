@@ -19,7 +19,7 @@ import {
 	saturation,
 	transpose, determinant, inverse, pow, atan, log,
 	add, sub, div, mod,
-	mx_timer, mx_frame, mat3,
+	mx_timer, mx_frame, mat3, mx_ramp4,
 	reflect, refract, reciprocal,
 	element, mx_ifgreater, mx_ifgreatereq, mx_ifequal, distance,
 	separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal
@@ -119,6 +119,7 @@ const MXElements = [
 	// << Procedural >>
 	new MXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ] ),
 	new MXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ] ),
+	new MXElement( 'ramp4', mx_ramp4, [ 'valuetl', 'valuetr', 'valuebl', 'valuebr', 'texcoord' ] ),
 	new MXElement( 'splitlr', mx_splitlr, [ 'valuel', 'valuer', 'texcoord' ] ),
 	new MXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'texcoord' ] ),
 	new MXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ] ),

@@ -147,5 +147,5 @@ export { default as PhysicalLightingModel } from './functions/PhysicalLightingMo
 export {
 	mx_timer, mx_frame,
 	separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal,
-	mx_ifgreater, mx_ifgreatereq, mx_ifequal,
+	mx_ifgreater, mx_ifgreatereq, mx_ifequal, mx_ramp4
 } from './materialx/MaterialXNodes.js';

@@ -319,6 +319,7 @@ export const mx_noise_vec3 = TSL.mx_noise_vec3;
 export const mx_noise_vec4 = TSL.mx_noise_vec4;
 export const mx_ramplr = TSL.mx_ramplr;
 export const mx_ramptb = TSL.mx_ramptb;
+export const mx_ramp4 = TSL.mx_ramp4;
 export const mx_rgbtohsv = TSL.mx_rgbtohsv;
 export const mx_safepower = TSL.mx_safepower;
 export const mx_splitlr = TSL.mx_splitlr;
