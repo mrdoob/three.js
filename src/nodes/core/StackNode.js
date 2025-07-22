@@ -255,7 +255,13 @@ class StackNode extends Node {
 
 			if ( childNode.isVarNode && childNode.intent === true ) {
 
-				continue;
+				const properties = builder.getNodeProperties( childNode );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
 
 			}
 
