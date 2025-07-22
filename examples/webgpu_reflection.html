@@ -49,7 +49,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 30 );
 				camera.position.set( 4, 2, 4 );
@@ -59,7 +59,7 @@
 				scene.backgroundNode = normalWorldGeometry.y.mix( color( 0x4195a4 ), color( 0x0066ff ) );
 				camera.lookAt( 0, 1, 0 );
 
-				const sunLight = new THREE.DirectionalLight( 0xFFE499, 1.5 );
+				const sunLight = new THREE.DirectionalLight( 0xFFE499, 2 );
 				sunLight.position.set( 7, 5, 7 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.zoom = 1.5;
@@ -75,19 +75,22 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				const floorColor = textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				const floorColor = await textureLoader.loadAsync( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
 				floorColor.wrapS = THREE.RepeatWrapping;
 				floorColor.wrapT = THREE.RepeatWrapping;
 				floorColor.colorSpace = THREE.SRGBColorSpace;
 
-				const floorNormal = textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
+				const floorNormal = await textureLoader.loadAsync( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 				floorNormal.wrapS = THREE.RepeatWrapping;
 				floorNormal.wrapT = THREE.RepeatWrapping;
 				floorNormal.repeat.set( 15, 15 );
 
+				const boxMap = await textureLoader.loadAsync( 'textures/edge3.jpg' );
+				boxMap.colorSpace = THREE.SRGBColorSpace;
+
 				// tree
 
-				const treeMesh = createTreeMesh();
+				const treeMesh = createTreeMesh( boxMap );
 				treeMesh.castShadow = true;
 				treeMesh.receiveShadow = true;
 				scene.add( treeMesh );
@@ -193,9 +196,15 @@
 
 			}
 
-			function random () { return ( Math.random() - 0.5 ) * 2.0 };
+			function random() {
 
-			function createTreeMesh() {
+				return ( Math.random() - 0.5 ) * 2.0;
+
+			}
+
+
+
+			function createTreeMesh( boxMap ) {
 
 				const maxSteps = 5;
 				const lengthMult = 0.8;
@@ -292,7 +301,7 @@
 				createTreePart( angle, 0, 0, 0, 16, 0 );
 
 				const geometry = new THREE.BoxGeometry();
-				const material = new THREE.MeshStandardNodeMaterial();
+				const material = new THREE.MeshStandardNodeMaterial( { map: boxMap } );
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.setScalar( 0.05 );
 				mesh.count = instanceCount;
