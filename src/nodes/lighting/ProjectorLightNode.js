@@ -63,12 +63,14 @@ class ProjectorLightNode extends SpotLightNode {
 	 */
 	getSpotAttenuation( builder ) {
 
+		const attenuation = float( 0 ).toVar();
 		const penumbraCos = this.penumbraCosNode;
+
+		// compute the fragment's position in the light's clip space
+
 		const spotLightCoord = lightShadowMatrix( this.light ).mul( builder.context.positionWorld || positionWorld );
 
-		const attenuation = float( 0 ).toVar( 'attenuation' );
-
-		// the sign of w determines whether the current fragment is in front or behind the light
+		// the sign of w determines whether the current fragment is in front or behind the light.
 		// to avoid a back-projection, it's important to only compute an attenuation if w is positive
 
 		If( spotLightCoord.w.greaterThan( 0 ), () => {
