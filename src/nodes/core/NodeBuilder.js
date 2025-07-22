@@ -1748,23 +1748,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the array length.
-	 *
-	 * @param {Node} node - The node.
-	 * @return {?number} The array length.
-	 */
-	getArrayCount( node ) {
-
-		let count = null;
-
-		if ( node.isArrayNode ) count = node.count;
-		else if ( node.isVarNode && node.node.isArrayNode ) count = node.node.count;
-
-		return count;
-
-	}
-
-	/**
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
@@ -1807,7 +1790,7 @@ class NodeBuilder {
 
 			//
 
-			const count = this.getArrayCount( node );
+			const count = node.getArrayCount( this );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );
 
@@ -2230,6 +2213,28 @@ class NodeBuilder {
 		shaderNode.layout = layout;
 
 		return flowData;
+
+	}
+
+	/**
+	 * Executes the node in a specific build stage.
+	 *
+	 * @param {Node} node - The node to execute.
+	 * @param {string} buildStage - The build stage to execute the node in.
+	 * @param {Node|string|null} output - Expected output type. For example 'vec3'.
+	 * @return {Node|string|null} The result of the node build.
+	 */
+	flowBuildStage( node, buildStage, output = null ) {
+
+		const previousBuildStage = this.getBuildStage();
+
+		this.setBuildStage( buildStage );
+
+		const result = node.build( this, output );
+
+		this.setBuildStage( previousBuildStage );
+
+		return result;
 
 	}
 

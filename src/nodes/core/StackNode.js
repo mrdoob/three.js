@@ -245,6 +245,36 @@ class StackNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		const nodeProperties = builder.getNodeProperties( this );
+
+		let index = 0;
+
+		for ( const childNode of this.getChildren() ) {
+
+			if ( childNode.isVarNode && childNode.intent === true ) {
+
+				const properties = builder.getNodeProperties( childNode );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
+
+			}
+
+			nodeProperties[ 'node' + index ++ ] = childNode;
+
+		}
+
+		// return a outputNode if exists or null
+
+		return nodeProperties.outputNode || null;
+
+	}
+
 	build( builder, ...params ) {
 
 		const previousBuildStack = builder.currentStack;
@@ -257,6 +287,18 @@ class StackNode extends Node {
 		const buildStage = builder.buildStage;
 
 		for ( const node of this.nodes ) {
+
+			if ( node.isVarNode && node.intent === true ) {
+
+				const properties = builder.getNodeProperties( node );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
+
+			}
 
 			if ( buildStage === 'setup' ) {
 
