@@ -1349,6 +1349,18 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		// When the dispatchSize is set with a StorageBuffer from the GPU.
+
+		if ( dispatchSizeOrCount.isIndirectStorageBufferAttribute ) {
+
+			dispatchSize = this.get( dispatchSizeOrCount ).buffer;
+
+			passEncoderGPU.dispatchWorkgroupsIndirect( dispatchSize, 0 );
+
+			return;
+
+		}
+
 		if ( typeof dispatchSizeOrCount === 'number' ) {
 
 			// If a single number is given, we calculate the dispatch size based on the workgroup size
