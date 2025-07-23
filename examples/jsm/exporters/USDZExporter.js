@@ -196,6 +196,7 @@ class USDZExporter {
 					planeAnchoring: { alignment: 'horizontal' },
 				},
 				includeAnchoringProperties: true,
+				onlyVisible: true,
 				quickLookCompatible: false,
 				maxTextureSize: 1024,
 			},
@@ -240,7 +241,7 @@ class USDZExporter {
 		const materials = {};
 		const textures = {};
 
-		buildHierarchy( scene, sceneNode, materials, usedNames, files );
+		buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
 
 		const materialsNode = buildMaterials(
 			materials,
@@ -426,13 +427,13 @@ function buildHeader() {
 
 // Xform
 
-function buildHierarchy( object, parentNode, materials, usedNames, files ) {
+function buildHierarchy( object, parentNode, materials, usedNames, files, options ) {
 
 	for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
 		const child = object.children[ i ];
 
-		if ( ! child.visible ) continue;
+		if ( child.visible === false && options.onlyVisible === true ) continue;
 
 		let childNode;
 
@@ -489,7 +490,7 @@ function buildHierarchy( object, parentNode, materials, usedNames, files ) {
 		if ( childNode ) {
 
 			parentNode.addChild( childNode );
-			buildHierarchy( child, childNode, materials, usedNames, files );
+			buildHierarchy( child, childNode, materials, usedNames, files, options );
 
 		}
 
@@ -1203,6 +1204,7 @@ function buildCamera( camera, usedNames ) {
  * @typedef {Object} USDZExporter~Options
  * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
  * @property {boolean} [includeAnchoringProperties=true] - Whether to include anchoring properties or not.
+ * @property {boolean} [onlyVisible=true] - Export only visible 3D objects.
  * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
  * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
  * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook
