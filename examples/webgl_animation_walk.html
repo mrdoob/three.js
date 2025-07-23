@@ -76,8 +76,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 2, - 5 );
-				//camera.lookAt( 0, 1, 0 );
-
 
 				clock = new THREE.Clock();
 
@@ -99,8 +97,7 @@
 				cam.bottom = cam.left = - 2;
 				cam.near = 3;
 				cam.far = 8;
-				dirLight.shadow.bias = - 0.005;
-				dirLight.shadow.radius = 4;
+				dirLight.shadow.mapSize.set( 1024, 1024 );
 				followGroup.add( dirLight );
 				followGroup.add( dirLight.target );
 
@@ -113,6 +110,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
 
 				orbitControls = new OrbitControls( camera, renderer.domElement );
@@ -205,7 +203,6 @@
 
 								object.castShadow = true;
 								object.receiveShadow = true;
-								object.material.shadowSide = THREE.DoubleSide;
 								//object.material.envMapIntensity = 0.5;
 								object.material.metalness = 1.0;
 								object.material.roughness = 0.2;
