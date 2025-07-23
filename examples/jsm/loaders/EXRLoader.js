@@ -1044,6 +1044,7 @@ class EXRLoader extends DataTextureLoader {
 			for ( let blocky = 0; blocky < numBlocksY; ++ blocky ) {
 
 				let maxY = 8;
+
 				if ( blocky == numBlocksY - 1 ) maxY = leftoverY;
 
 				for ( let blockx = 0; blockx < numBlocksX; ++ blockx ) {
@@ -1065,11 +1066,13 @@ class EXRLoader extends DataTextureLoader {
 					for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
 
 						const src = blockx * 64 + ( ( y & 0x7 ) * 8 );
+
 						for ( let x = 0; x < 8; ++ x ) {
 
 							dataView.setUint16( offset + x * INT16_SIZE * cd.type, rowBlock[ src + x ], true );
 
 						}
+
 						offset += 8 * INT16_SIZE * cd.type;
 
 					}
@@ -1077,6 +1080,7 @@ class EXRLoader extends DataTextureLoader {
 					if ( numBlocksX != numFullBlocksX ) {
 
 						const src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
+
 						for ( let x = 0; x < leftoverX; ++ x ) {
 
 							dataView.setUint16( offset + x * INT16_SIZE * cd.type, rowBlock[ src + x ], true );
