@@ -1048,9 +1048,6 @@ class EXRLoader extends DataTextureLoader {
 
 				for ( let blockx = 0; blockx < numBlocksX; ++ blockx ) {
 
-					let maxX = 8;
-					if ( blockx == numBlocksX - 1 ) maxX = leftoverX;
-
 					halfZigBlock.fill( 0 );
 					halfZigBlock[ 0 ] = dcBuffer[ currDcComp ++ ];
 					unRleAC( currAcComp, acBuffer, halfZigBlock );
