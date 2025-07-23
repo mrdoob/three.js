@@ -863,7 +863,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function lossyDctDecode( cscSet, rowPtrs, channelData, acBuffer, dcBuffer, outBuffer ) {
 
-			const dataView = new DataView( outBuffer.buffer );
+			let dataView = new DataView( outBuffer.buffer );
 
 			const width = channelData[ cscSet.idx[ 0 ] ].width;
 			const height = channelData[ cscSet.idx[ 0 ] ].height;
