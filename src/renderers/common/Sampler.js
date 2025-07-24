@@ -43,6 +43,28 @@ class Sampler extends Binding {
 
 	}
 
+	/**
+	 * Updates the binding.
+	 *
+	 * @return {boolean} Whether the texture has been updated and must be
+	 * uploaded to the GPU.
+	 */
+	update() {
+
+		const { texture, version } = this;
+
+		if ( version !== texture.version ) {
+
+			this.version = texture.version;
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
 }
 
 export default Sampler;

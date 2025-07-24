@@ -1,4 +1,4 @@
-import Binding from './Binding.js';
+import Sampler from './Sampler.js';
 
 let _id = 0;
 
@@ -8,7 +8,7 @@ let _id = 0;
  * @private
  * @augments Binding
  */
-class SampledTexture extends Binding {
+class SampledTexture extends Sampler {
 
 	/**
 	 * Constructs a new sampled texture.
@@ -18,7 +18,7 @@ class SampledTexture extends Binding {
 	 */
 	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
 
 		/**
 		 * This identifier.
@@ -26,20 +26,6 @@ class SampledTexture extends Binding {
 		 * @type {number}
 		 */
 		this.id = _id ++;
-
-		/**
-		 * The texture this binding is referring to.
-		 *
-		 * @type {?Texture}
-		 */
-		this.texture = texture;
-
-		/**
-		 * The binding's version.
-		 *
-		 * @type {number}
-		 */
-		this.version = texture ? texture.version : 0;
 
 		/**
 		 * Whether the texture is a storage texture or not.
@@ -81,28 +67,6 @@ class SampledTexture extends Binding {
 		if ( generation !== this.generation ) {
 
 			this.generation = generation;
-
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-	/**
-	 * Updates the binding.
-	 *
-	 * @return {boolean} Whether the texture has been updated and must be
-	 * uploaded to the GPU.
-	 */
-	update() {
-
-		const { texture, version } = this;
-
-		if ( version !== texture.version ) {
-
-			this.version = texture.version;
 
 			return true;
 
