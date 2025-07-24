@@ -117,7 +117,7 @@ class WorkgroupInfoNode extends Node {
 		this.scope = scope;
 
 		/**
-		 * The name or label of the uniform.
+		 * The name of the workgroup scoped buffer.
 		 *
 		 * @type {string}
 		 * @default ''
