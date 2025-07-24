@@ -2243,8 +2243,18 @@ class EXRLoader extends DataTextureLoader {
 
 						for ( let x = 0; x < EXRDecoder.columns; x ++ ) {
 
-							const outIndex = outLineOffset + ( x + startX ) * EXRDecoder.outputChannels + cOff;
-							EXRDecoder.byteArray[ outIndex ] = EXRDecoder.getter( viewer, tmpOffset );
+							if ( Array.isArray( cOff ) ) {
+								// Y channel case - copy to R, G, B channels and set A to 1.0
+								const value = EXRDecoder.getter( viewer, tmpOffset );
+								const baseIndex = outLineOffset + ( x + startX ) * EXRDecoder.outputChannels;
+								EXRDecoder.byteArray[ baseIndex + 0 ] = value; // R
+								EXRDecoder.byteArray[ baseIndex + 1 ] = value; // G
+								EXRDecoder.byteArray[ baseIndex + 2 ] = value; // B
+								EXRDecoder.byteArray[ baseIndex + 3 ] = 1.0;   // A
+							} else {
+								const outIndex = outLineOffset + ( x + startX ) * EXRDecoder.outputChannels + cOff;
+								EXRDecoder.byteArray[ outIndex ] = EXRDecoder.getter( viewer, tmpOffset );
+							}
 
 						}
 
@@ -2295,8 +2305,18 @@ class EXRLoader extends DataTextureLoader {
 
 						for ( let x = 0; x < EXRDecoder.columns; x ++ ) {
 
-							const outIndex = outLineOffset + x * EXRDecoder.outputChannels + cOff;
-							EXRDecoder.byteArray[ outIndex ] = EXRDecoder.getter( viewer, tmpOffset );
+							if ( Array.isArray( cOff ) ) {
+								// Y channel case - copy to R, G, B channels and set A to 1.0
+								const value = EXRDecoder.getter( viewer, tmpOffset );
+								const baseIndex = outLineOffset + x * EXRDecoder.outputChannels;
+								EXRDecoder.byteArray[ baseIndex + 0 ] = value; // R
+								EXRDecoder.byteArray[ baseIndex + 1 ] = value; // G
+								EXRDecoder.byteArray[ baseIndex + 2 ] = value; // B
+								EXRDecoder.byteArray[ baseIndex + 3 ] = 1.0;   // A
+							} else {
+								const outIndex = outLineOffset + x * EXRDecoder.outputChannels + cOff;
+								EXRDecoder.byteArray[ outIndex ] = EXRDecoder.getter( viewer, tmpOffset );
+							}
 
 						}
 
@@ -2471,8 +2491,9 @@ class EXRLoader extends DataTextureLoader {
 
 			} else if ( channels.Y ) {
 
-				EXRDecoder.outputChannels = 1;
-				EXRDecoder.decodeChannels = { Y: 0 };
+				fillAlpha = false;
+				EXRDecoder.outputChannels = 4;
+				EXRDecoder.decodeChannels = { Y: [ 0, 1, 2 ] };
 
 			} else {
 
@@ -2569,17 +2590,8 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( EXRDecoder.outputChannels == 4 ) {
-
-				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.colorSpace = LinearSRGBColorSpace;
-
-			} else {
-
-				EXRDecoder.format = RedFormat;
-				EXRDecoder.colorSpace = NoColorSpace;
-
-			}
+			EXRDecoder.format = RGBAFormat;
+			EXRDecoder.colorSpace = LinearSRGBColorSpace;
 
 			if ( EXRHeader.spec.singleTile ) {
 
