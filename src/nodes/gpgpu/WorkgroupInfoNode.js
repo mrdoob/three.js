@@ -116,19 +116,42 @@ class WorkgroupInfoNode extends Node {
 		 */
 		this.scope = scope;
 
+		/**
+		 * The name of the workgroup scoped buffer.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.name = '';
+
+	}
+
+	/**
+	 * Sets the name of this node.
+	 *
+	 * @param {string} name - The name to set.
+	 * @return {WorkgroupInfoNode} A reference to this node.
+	 */
+	setName( name ) {
+
+		this.name = name;
+
+		return this;
+
 	}
 
 	/**
 	 * Sets the name/label of this node.
 	 *
+	 * @deprecated
 	 * @param {string} name - The name to set.
 	 * @return {WorkgroupInfoNode} A reference to this node.
 	 */
 	label( name ) {
 
-		this.name = name;
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
-		return this;
+		return this.setName( name );
 
 	}
 
@@ -185,7 +208,9 @@ class WorkgroupInfoNode extends Node {
 
 	generate( builder ) {
 
-		return builder.getScopedArray( this.name || `${this.scope}Array_${this.id}`, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
+		const name = ( this.name !== '' ) ? this.name : `${this.scope}Array_${this.id}`;
+
+		return builder.getScopedArray( name, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
 
 	}
 
