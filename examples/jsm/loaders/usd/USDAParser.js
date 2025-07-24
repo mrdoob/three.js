@@ -16,7 +16,7 @@ import {
 
 class USDAParser {
 
-	parse( text, assets ) {
+	parseText( text ) {
 
 		const root = {};
 
@@ -105,6 +105,14 @@ class USDAParser {
 			}
 
 		}
+
+		return root;
+
+	}
+
+	parse( text, assets ) {
+
+		const root = this.parseText( text );
 
 		// Build scene graph
 
