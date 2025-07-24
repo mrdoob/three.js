@@ -1709,7 +1709,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			// Handle multi-channel RGB sets
+			// Decode lossy DCT data if we have a valid color space conversion set with the first RGB channel present
 			if ( cscSet.idx[ 0 ] !== undefined && channelData[ cscSet.idx[ 0 ] ] ) {
 
 				lossyDctDecode( cscSet, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer );
