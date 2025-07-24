@@ -244,10 +244,6 @@ class Bindings extends DataMap {
 
 				}
 
-			} else if ( binding.isSampler ) {
-
-				binding.update();
-
 			} else if ( binding.isSampledTexture ) {
 
 				const texturesTextureData = this.textures.get( binding.texture );
@@ -304,6 +300,10 @@ class Bindings extends DataMap {
 					}
 
 				}
+
+			} else if ( binding.isSampler ) {
+
+				binding.update();
 
 			}
 
