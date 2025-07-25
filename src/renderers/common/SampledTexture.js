@@ -36,15 +36,6 @@ class SampledTexture extends Sampler {
 		this.store = false;
 
 		/**
-		 * The binding's generation which is an additional version
-		 * qualifier.
-		 *
-		 * @type {?number}
-		 * @default null
-		 */
-		this.generation = null;
-
-		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -52,27 +43,6 @@ class SampledTexture extends Sampler {
 		 * @default true
 		 */
 		this.isSampledTexture = true;
-
-	}
-
-	/**
-	 * Returns `true` whether this binding requires an update for the
-	 * given generation.
-	 *
-	 * @param {number} generation - The generation.
-	 * @return {boolean} Whether an update is required or not.
-	 */
-	needsBindingsUpdate( generation ) {
-
-		if ( generation !== this.generation ) {
-
-			this.generation = generation;
-
-			return true;
-
-		}
-
-		return false;
 
 	}
 
