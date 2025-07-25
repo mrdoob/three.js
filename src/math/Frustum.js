@@ -108,20 +108,20 @@ class Frustum {
 
 		if ( reversedDepth ) {
 
-			planes[ 4 ].setComponents( me2, me6, me10, me14 ).normalize();
-			planes[ 5 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
+			planes[ 4 ].setComponents( me2, me6, me10, me14 ).normalize(); // far
+			planes[ 5 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // near
 
 		} else {
 
-			planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
+			planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // far
 
 			if ( coordinateSystem === WebGLCoordinateSystem ) {
 
-				planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+				planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize(); // near
 
 			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
 
-				planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
+				planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize(); // near
 
 			} else {
 
