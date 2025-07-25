@@ -309,7 +309,7 @@ class Textures extends DataMap {
 				backend.createDefaultTexture( texture );
 
 				textureData.isDefaultTexture = true;
-				textureData.generation = texture.versions;
+				textureData.generation = texture.version;
 
 			}
 
