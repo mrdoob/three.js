@@ -396,8 +396,36 @@ class ShaderCallNodeInternal extends Node {
 
 		} else {
 
+			let inputs = inputNodes;
+
+			if ( Array.isArray( inputs ) ) {
+
+				// If inputs is an array, we need to convert it to a Proxy
+				// so we can call TSL functions using the syntax `Fn( ( { r, g, b } ) => { ... } )`
+				// and call through `fn( 0, 1, 0 )` or `fn( { r: 0, g: 1, b: 0 } )`
+
+				let index = 0;
+
+				inputs = new Proxy( inputs, {
+					get: ( target, property, receiver ) => {
+
+						if ( target[ property ] === undefined ) {
+
+							return target[ index ++ ];
+
+						} else {
+
+							return Reflect.get( target, property, receiver );
+
+						}
+
+					}
+				} );
+
+			}
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputNodes !== null || jsFunc.length > 1 ? jsFunc( inputNodes || [], builder ) : jsFunc( builder );
+			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], builder ) : jsFunc( builder );
 
 			result = nodeObject( outputNode );
 
