@@ -13,6 +13,24 @@ import { LinearFilter } from '../../constants.js';
 class StorageTexture extends Texture {
 
 	/**
+	 * The width of the storage texture.
+	 */
+	get width() {
+
+		return this.image.width;
+
+	}
+
+	/**
+	 * The height of the storage texture.
+	 */
+	get height() {
+
+		return this.image.height;
+
+	}
+
+	/**
 	 * Constructs a new storage texture.
 	 *
 	 * @param {number} [width=1] - The storage texture's width.
