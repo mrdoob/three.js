@@ -12396,6 +12396,7 @@ class Matrix4 {
 	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
+
 		const x = 2 * near / ( right - left );
 		const y = 2 * near / ( top - bottom );
 
@@ -12455,31 +12456,31 @@ class Matrix4 {
 	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
-		const w = 1.0 / ( right - left );
-		const h = 1.0 / ( top - bottom );
-		const p = 1.0 / ( far - near );
 
-		const x = ( right + left ) * w;
-		const y = ( top + bottom ) * h;
+		const x = 2 / ( right - left );
+		const y = 2 / ( top - bottom );
 
-		let z, zInv;
+		const a = - ( right + left ) / ( right - left );
+		const b = - ( top + bottom ) / ( top - bottom );
+
+		let c, d;
 
 		if ( reversedDepth ) {
 
-			z = - near * p - 1;
-			zInv = 1 * p;
+			c = 1 / ( far - near );
+			d = far / ( far - near );
 
 		} else {
 
 			if ( coordinateSystem === WebGLCoordinateSystem ) {
 
-				z = ( far + near ) * p;
-				zInv = -2 * p;
+				c = -2 / ( far - near );
+				d = - ( far + near ) / ( far - near );
 
 			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
 
-				z = near * p;
-				zInv = -1 * p;
+				c = -1 / ( far - near );
+				d = - near / ( far - near );
 
 			} else {
 
@@ -12489,9 +12490,9 @@ class Matrix4 {
 
 		}
 
-		te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = - x;
-		te[ 1 ] = 0; 		te[ 5 ] = 2 * h;	te[ 9 ] = 0; 		te[ 13 ] = - y;
-		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = zInv;	te[ 14 ] = - z;
+		te[ 0 ] = x;		te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = a;
+		te[ 1 ] = 0; 		te[ 5 ] = y;		te[ 9 ] = 0; 		te[ 13 ] = b;
+		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = c;		te[ 14 ] = d;
 		te[ 3 ] = 0; 		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
 
 		return this;
@@ -26394,9 +26395,10 @@ class Frustum {
 	 *
 	 * @param {Matrix4} m - The projection matrix.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} coordinateSystem - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Frustum} A reference to this frustum.
 	 */
-	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem ) {
+	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const planes = this.planes;
 		const me = m.elements;
@@ -26409,19 +26411,29 @@ class Frustum {
 		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
 		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
 		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
-		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
+			planes[ 4 ].setComponents( me2, me6, me10, me14 ).normalize(); // far
+			planes[ 5 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // near
 
 		} else {
 
-			throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
+			planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // far
+
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize(); // near
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize(); // near
+
+			} else {
+
+				throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -45210,12 +45222,25 @@ class LightShadow {
 		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1 );
 
-		shadowMatrix.set(
-			0.5, 0.0, 0.0, 0.5,
-			0.0, 0.5, 0.0, 0.5,
-			0.0, 0.0, 0.5, 0.5,
-			0.0, 0.0, 0.0, 1.0
-		);
+		if ( shadowCamera.reversedDepth ) {
+
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 1.0, 0.0,
+				0.0, 0.0, 0.0, 1.0
+			);
+
+		} else {
+
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 0.5, 0.5,
+				0.0, 0.0, 0.0, 1.0
+			);
+
+		}
 
 		shadowMatrix.multiply( _projScreenMatrix$1 );
 
@@ -55073,8 +55098,8 @@ class Spherical {
 	 * Sets the spherical components from the given Cartesian coordinates.
 	 *
 	 * @param {number} x - The x value.
-	 * @param {number} y - The x value.
-	 * @param {number} z - The x value.
+	 * @param {number} y - The y value.
+	 * @param {number} z - The z value.
 	 * @return {Spherical} A reference to this spherical.
 	 */
 	setFromCartesianCoords( x, y, z ) {
@@ -56223,7 +56248,7 @@ const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 class SkeletonHelper extends LineSegments {
 
 	/**
-	 * Constructs a new hemisphere light helper.
+	 * Constructs a new skeleton helper.
 	 *
 	 * @param {Object3D} object -  Usually an instance of {@link SkinnedMesh}. However, any 3D object
 	 * can be used if it represents a hierarchy of bones (see {@link Bone}).
@@ -56237,9 +56262,6 @@ class SkeletonHelper extends LineSegments {
 		const vertices = [];
 		const colors = [];
 
-		const color1 = new Color( 0, 0, 1 );
-		const color2 = new Color( 0, 1, 0 );
-
 		for ( let i = 0; i < bones.length; i ++ ) {
 
 			const bone = bones[ i ];
@@ -56248,8 +56270,8 @@ class SkeletonHelper extends LineSegments {
 
 				vertices.push( 0, 0, 0 );
 				vertices.push( 0, 0, 0 );
-				colors.push( color1.r, color1.g, color1.b );
-				colors.push( color2.r, color2.g, color2.b );
+				colors.push( 0, 0, 0 );
+				colors.push( 0, 0, 0 );
 
 			}
 
@@ -56290,6 +56312,13 @@ class SkeletonHelper extends LineSegments {
 		this.matrix = object.matrixWorld;
 		this.matrixAutoUpdate = false;
 
+		// colors
+
+		const color1 = new Color( 0x0000ff );
+		const color2 = new Color( 0x00ff00 );
+
+		this.setColors( color1, color2 );
+
 	}
 
 	updateMatrixWorld( force ) {
@@ -56324,6 +56353,31 @@ class SkeletonHelper extends LineSegments {
 		geometry.getAttribute( 'position' ).needsUpdate = true;
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	/**
+	 * Defines the colors of the helper.
+	 *
+	 * @param {Color} color1 - The first line color for each bone.
+	 * @param {Color} color2 - The second line color for each bone.
+	 * @return {SkeletonHelper} A reference to this helper.
+	 */
+	setColors( color1, color2 ) {
+
+		const geometry = this.geometry;
+		const colorAttribute = geometry.getAttribute( 'color' );
+
+		for ( let i = 0; i < colorAttribute.count; i += 2 ) {
+
+			colorAttribute.setXYZ( i, color1.r, color1.g, color1.b );
+			colorAttribute.setXYZ( i + 1, color2.r, color2.g, color2.b );
+
+		}
+
+		colorAttribute.needsUpdate = true;
+
+		return this;
 
 	}
 
@@ -57087,6 +57141,7 @@ class CameraHelper extends LineSegments {
 	 * @param {Color} up - The up line color.
 	 * @param {Color} target - The target line color.
 	 * @param {Color} cross - The cross line color.
+	 * @return {CameraHelper} A reference to this helper.
 	 */
 	setColors( frustum, cone, up, target, cross ) {
 
@@ -57142,6 +57197,8 @@ class CameraHelper extends LineSegments {
 		colorAttribute.setXYZ( 48, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 49, cross.r, cross.g, cross.b ); // cf3, cf4
 
 		colorAttribute.needsUpdate = true;
+
+		return this;
 
 	}
 
