@@ -79,7 +79,6 @@ export default /* glsl */`
 
 		#ifdef USE_REVERSEDEPTHBUF
 
-			if ( depth == 1.0 ) depth = 0.0; // wrong clear value?
 			return step( depth, compare );
 
 		#else
