@@ -46,18 +46,6 @@ class NodeSampledTexture extends SampledTexture {
 	}
 
 	/**
-	 * Overwrites the default to additionally check if the node value has changed.
-	 *
-	 * @param {number} generation - The generation.
-	 * @return {boolean} Whether an update is required or not.
-	 */
-	needsBindingsUpdate( generation ) {
-
-		return this.textureNode.value !== this.texture || super.needsBindingsUpdate( generation );
-
-	}
-
-	/**
 	 * Updates the binding.
 	 *
 	 * @return {boolean} Whether the texture has been updated and must be

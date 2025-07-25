@@ -203,8 +203,6 @@ class Textures extends DataMap {
 		const isRenderTarget = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
 		const backend = this.backend;
 
-		if ( textureData.generation === undefined ) textureData.generation = 0;
-
 		if ( isRenderTarget && textureData.initialized === true ) {
 
 			// it's an update
@@ -249,7 +247,7 @@ class Textures extends DataMap {
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
 
-			textureData.generation ++;
+			textureData.generation = texture.version;
 
 		} else {
 
@@ -294,7 +292,7 @@ class Textures extends DataMap {
 						backend.createTexture( texture, options );
 
 						textureData.isDefaultTexture = false;
-						textureData.generation ++;
+						textureData.generation = texture.version;
 
 					}
 
@@ -311,7 +309,7 @@ class Textures extends DataMap {
 				backend.createDefaultTexture( texture );
 
 				textureData.isDefaultTexture = true;
-				textureData.generation ++;
+				textureData.generation = texture.versions;
 
 			}
 
@@ -322,7 +320,7 @@ class Textures extends DataMap {
 		if ( textureData.initialized !== true ) {
 
 			textureData.initialized = true;
-			textureData.generation ++;
+			textureData.generation = texture.version;
 
 			//
 
