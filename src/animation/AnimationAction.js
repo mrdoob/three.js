@@ -1,13 +1,31 @@
 import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, NormalAnimationBlendMode, AdditiveAnimationBlendMode } from '../constants.js';
 
-
+/**
+ * An instance of `AnimationAction` schedules the playback of an animation which is
+ * stored in {@link AnimationClip}.
+ */
 class AnimationAction {
 
+	/**
+	 * Constructs a new animation action.
+	 *
+	 * @param {AnimationMixer} mixer - The mixer that is controlled by this action.
+	 * @param {AnimationClip} clip - The animation clip that holds the actual keyframes.
+	 * @param {?Object3D} [localRoot=null] - The root object on which this action is performed.
+	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode] - The blend mode.
+	 */
 	constructor( mixer, clip, localRoot = null, blendMode = clip.blendMode ) {
 
 		this._mixer = mixer;
 		this._clip = clip;
 		this._localRoot = localRoot;
+
+		/**
+		 * Defines how the animation is blended/combined when two or more animations
+		 * are simultaneously played.
+		 *
+		 * @type {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)}
+		 */
 		this.blendMode = blendMode;
 
 		const tracks = clip.tracks,
@@ -40,6 +58,12 @@ class AnimationAction {
 		this._timeScaleInterpolant = null;
 		this._weightInterpolant = null;
 
+		/**
+		 * The loop mode, set via {@link AnimationAction#setLoop}.
+		 *
+		 * @type {(LoopRepeat|LoopOnce|LoopPingPong)}
+		 * @default LoopRepeat
+		 */
 		this.loop = LoopRepeat;
 		this._loopCount = - 1;
 
@@ -47,30 +71,107 @@ class AnimationAction {
 		// it's set back to 'null' upon start of the action
 		this._startTime = null;
 
-		// scaled local time of the action
-		// gets clamped or wrapped to 0..clip.duration according to loop
+		/**
+		 * The local time of this action (in seconds, starting with `0`).
+		 *
+		 * The value gets clamped or wrapped to `[0,clip.duration]` (according to the
+		 * loop state).
+		 *
+		 * @type {number}
+		 * @default Infinity
+		 */
 		this.time = 0;
 
+		/**
+		 * Scaling factor for the {@link AnimationAction#time}. A value of `0` causes the
+		 * animation to pause. Negative values cause the animation to play backwards.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.timeScale = 1;
 		this._effectiveTimeScale = 1;
 
+		/**
+		 * The degree of influence of this action (in the interval `[0, 1]`). Values
+		 * between `0` (no impact) and `1` (full impact) can be used to blend between
+		 * several actions.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.weight = 1;
 		this._effectiveWeight = 1;
 
-		this.repetitions = Infinity; // no. of repetitions when looping
+		/**
+		 * The number of repetitions of the performed clip over the course of this action.
+		 * Can be set via {@link AnimationAction#setLoop}.
+		 *
+		 * Setting this number has no effect if {@link AnimationAction#loop} is set to
+		 * `THREE:LoopOnce`.
+		 *
+		 * @type {number}
+		 * @default Infinity
+		 */
+		this.repetitions = Infinity;
 
-		this.paused = false; // true -> zero effective time scale
-		this.enabled = true; // false -> zero effective weight
+		/**
+		 * If set to `true`, the playback of the action is paused.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.paused = false;
 
-		this.clampWhenFinished = false;// keep feeding the last frame?
+		/**
+		 * If set to `false`, the action is disabled so it has no impact.
+		 *
+		 * When the action is re-enabled, the animation continues from its current
+		 * time (setting `enabled` to `false` doesn't reset the action).
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
 
-		this.zeroSlopeAtStart = true;// for smooth interpolation w/o separate
-		this.zeroSlopeAtEnd = true;// clips for start, loop and end
+		/**
+		 * If set to true the animation will automatically be paused on its last frame.
+		 *
+		 * If set to false, {@link AnimationAction#enabled} will automatically be switched
+		 * to `false` when the last loop of the action has finished, so that this action has
+		 * no further impact.
+		 *
+		 * Note: This member has no impact if the action is interrupted (it
+		 * has only an effect if its last loop has really finished).
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.clampWhenFinished = false;
+
+		/**
+		 * Enables smooth interpolation without separate clips for start, loop and end.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.zeroSlopeAtStart = true;
+
+		/**
+		 * Enables smooth interpolation without separate clips for start, loop and end.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.zeroSlopeAtEnd = true;
 
 	}
 
-	// State & Scheduling
-
+	/**
+	 * Starts the playback of the animation.
+	 *
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	play() {
 
 		this._mixer._activateAction( this );
@@ -79,6 +180,11 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Stops the playback of the animation.
+	 *
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	stop() {
 
 		this._mixer._deactivateAction( this );
@@ -87,6 +193,11 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Resets the playback of the animation.
+	 *
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	reset() {
 
 		this.paused = false;
@@ -100,6 +211,11 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Returns `true` if the animation is running.
+	 *
+	 * @return {boolean} Whether the animation is running or not.
+	 */
 	isRunning() {
 
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
@@ -107,13 +223,23 @@ class AnimationAction {
 
 	}
 
-	// return true when play has been called
+	/**
+	 * Returns `true` when {@link AnimationAction#play} has been called.
+	 *
+	 * @return {boolean} Whether the animation is scheduled or not.
+	 */
 	isScheduled() {
 
 		return this._mixer._isActiveAction( this );
 
 	}
 
+	/**
+	 * Defines the time when the animation should start.
+	 *
+	 * @param {number} time - The start time in seconds.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	startAt( time ) {
 
 		this._startTime = time;
@@ -122,6 +248,13 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Configures the loop settings for this action.
+	 *
+	 * @param {(LoopRepeat|LoopOnce|LoopPingPong)} mode - The loop mode.
+	 * @param {number} repetitions - The number of repetitions.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	setLoop( mode, repetitions ) {
 
 		this.loop = mode;
@@ -131,11 +264,15 @@ class AnimationAction {
 
 	}
 
-	// Weight
-
-	// set the weight stopping any scheduled fading
-	// although .enabled = false yields an effective weight of zero, this
-	// method does *not* change .enabled, because it would be confusing
+	/**
+	 * Sets the effective weight of this action.
+	 *
+	 * An action has no effect and thus an effective weight of zero when the
+	 * action is disabled.
+	 *
+	 * @param {number} weight - The weight to set.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	setEffectiveWeight( weight ) {
 
 		this.weight = weight;
@@ -147,31 +284,58 @@ class AnimationAction {
 
 	}
 
-	// return the weight considering fading and .enabled
+	/**
+	 * Returns the effective weight of this action.
+	 *
+	 * @return {number} The effective weight.
+	 */
 	getEffectiveWeight() {
 
 		return this._effectiveWeight;
 
 	}
 
+	/**
+	 * Fades the animation in by increasing its weight gradually from `0` to `1`,
+	 * within the passed time interval.
+	 *
+	 * @param {number} duration - The duration of the fade.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	fadeIn( duration ) {
 
 		return this._scheduleFading( duration, 0, 1 );
 
 	}
 
+	/**
+	 * Fades the animation out by decreasing its weight gradually from `1` to `0`,
+	 * within the passed time interval.
+	 *
+	 * @param {number} duration - The duration of the fade.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	fadeOut( duration ) {
 
 		return this._scheduleFading( duration, 1, 0 );
 
 	}
 
-	crossFadeFrom( fadeOutAction, duration, warp ) {
+	/**
+	 * Causes this action to fade in and the given action to fade out,
+	 * within the passed time interval.
+	 *
+	 * @param {AnimationAction} fadeOutAction - The animation action to fade out.
+	 * @param {number} duration - The duration of the fade.
+	 * @param {boolean} [warp=false] - Whether warping should be used or not.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
+	crossFadeFrom( fadeOutAction, duration, warp = false ) {
 
 		fadeOutAction.fadeOut( duration );
 		this.fadeIn( duration );
 
-		if ( warp ) {
+		if ( warp === true ) {
 
 			const fadeInDuration = this._clip.duration,
 				fadeOutDuration = fadeOutAction._clip.duration,
@@ -188,12 +352,26 @@ class AnimationAction {
 
 	}
 
-	crossFadeTo( fadeInAction, duration, warp ) {
+	/**
+	 * Causes this action to fade out and the given action to fade in,
+	 * within the passed time interval.
+	 *
+	 * @param {AnimationAction} fadeInAction - The animation action to fade in.
+	 * @param {number} duration - The duration of the fade.
+	 * @param {boolean} [warp=false] - Whether warping should be used or not.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
+	crossFadeTo( fadeInAction, duration, warp = false ) {
 
 		return fadeInAction.crossFadeFrom( this, duration, warp );
 
 	}
 
+	/**
+	 * Stops any fading which is applied to this action.
+	 *
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	stopFading() {
 
 		const weightInterpolant = this._weightInterpolant;
@@ -209,11 +387,15 @@ class AnimationAction {
 
 	}
 
-	// Time Scale Control
-
-	// set the time scale stopping any scheduled warping
-	// although .paused = true yields an effective time scale of zero, this
-	// method does *not* change .paused, because it would be confusing
+	/**
+	 * Sets the effective time scale of this action.
+	 *
+	 * An action has no effect and thus an effective time scale of zero when the
+	 * action is paused.
+	 *
+	 * @param {number} timeScale - The time scale to set.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	setEffectiveTimeScale( timeScale ) {
 
 		this.timeScale = timeScale;
@@ -223,13 +405,23 @@ class AnimationAction {
 
 	}
 
-	// return the time scale considering warping and .paused
+	/**
+	 * Returns the effective time scale of this action.
+	 *
+	 * @return {number} The effective time scale.
+	 */
 	getEffectiveTimeScale() {
 
 		return this._effectiveTimeScale;
 
 	}
 
+	/**
+	 * Sets the duration for a single loop of this action.
+	 *
+	 * @param {number} duration - The duration to set.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	setDuration( duration ) {
 
 		this.timeScale = this._clip.duration / duration;
@@ -238,6 +430,12 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Synchronizes this action with the passed other action.
+	 *
+	 * @param {AnimationAction} action - The action to sync with.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	syncWith( action ) {
 
 		this.time = action.time;
@@ -247,12 +445,28 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Decelerates this animation's speed to `0` within the passed time interval.
+	 *
+	 * @param {number} duration - The duration.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	halt( duration ) {
 
 		return this.warp( this._effectiveTimeScale, 0, duration );
 
 	}
 
+	/**
+	 * Changes the playback speed, within the passed time interval, by modifying
+	 * {@link AnimationAction#timeScale} gradually from `startTimeScale` to
+	 * `endTimeScale`.
+	 *
+	 * @param {number} startTimeScale - The start time scale.
+	 * @param {number} endTimeScale - The end time scale.
+	 * @param {number} duration - The duration.
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	warp( startTimeScale, endTimeScale, duration ) {
 
 		const mixer = this._mixer,
@@ -281,6 +495,11 @@ class AnimationAction {
 
 	}
 
+	/**
+	 * Stops any scheduled warping which is applied to this action.
+	 *
+	 * @return {AnimationAction} A reference to this animation action.
+	 */
 	stopWarping() {
 
 		const timeScaleInterpolant = this._timeScaleInterpolant;
@@ -296,20 +515,33 @@ class AnimationAction {
 
 	}
 
-	// Object Accessors
-
+	/**
+	 * Returns the animation mixer of this animation action.
+	 *
+	 * @return {AnimationMixer} The animation mixer.
+	 */
 	getMixer() {
 
 		return this._mixer;
 
 	}
 
+	/**
+	 * Returns the animation clip of this animation action.
+	 *
+	 * @return {AnimationClip} The animation clip.
+	 */
 	getClip() {
 
 		return this._clip;
 
 	}
 
+	/**
+	 * Returns the root object of this animation action.
+	 *
+	 * @return {Object3D} The root object.
+	 */
 	getRoot() {
 
 		return this._localRoot || this._mixer._root;

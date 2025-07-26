@@ -28,9 +28,21 @@ const getGradientIrradiance = /*@__PURE__*/ Fn( ( { normal, lightDirection, buil
 
 } );
 
+/**
+ * Represents the lighting model for a toon material. Used in {@link MeshToonNodeMaterial}.
+ *
+ * @augments LightingModel
+ */
 class ToonLightingModel extends LightingModel {
 
-	direct( { lightDirection, lightColor, reflectedLight }, stack, builder ) {
+	/**
+	 * Implements the direct lighting. Instead of using a conventional smooth irradiance, the irradiance is
+	 * reduced to a small number of discrete shades to create a comic-like, flat look.
+	 *
+	 * @param {Object} lightData - The light data.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	direct( { lightDirection, lightColor, reflectedLight }, builder ) {
 
 		const irradiance = getGradientIrradiance( { normal: normalGeometry, lightDirection, builder } ).mul( lightColor );
 
@@ -38,7 +50,14 @@ class ToonLightingModel extends LightingModel {
 
 	}
 
-	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
+	/**
+	 * Implements the indirect lighting.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirect( builder ) {
+
+		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 

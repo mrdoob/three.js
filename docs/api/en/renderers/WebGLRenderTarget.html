@@ -133,7 +133,11 @@
 		<p>Creates a copy of this render target.</p>
 
 		<h3>[method:this copy]( [param:WebGLRenderTarget source] )</h3>
-		<p>Adopts the settings of the given render target.</p>
+		<p>
+			Adopts the settings of the given render target. This is a structural copy so 
+			no resources are shared between render targets after the copy. That includes
+			all MRT textures and the depth texture.
+		</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>

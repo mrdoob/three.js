@@ -4,6 +4,11 @@ import {
 } from 'three';
 
 /**
+ * @module GodRaysShader
+ * @three_import import * as GodRaysShader from 'three/addons/shaders/GodRaysShader.js';
+ */
+
+/**
  * God-rays (crepuscular rays)
  *
  * Similar implementation to the one used by Crytek for CryEngine 2 [Sousa2008].
@@ -12,15 +17,16 @@ import {
  * sample count to produce a blur filter with large support.
  *
  * My implementation performs 3 passes, similar to the implementation from Sousa. I found
- * just 6 samples per pass produced acceptible results. The blur is applied three times,
+ * just 6 samples per pass produced acceptable results. The blur is applied three times,
  * with decreasing filter support. The result is equivalent to a single pass with
  * 6*6*6 = 216 samples.
  *
  * References:
+ * - [Sousa2008, Crysis Next Gen Effects, GDC2008]{@link http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt}.
  *
- * Sousa2008 - Crysis Next Gen Effects, GDC2008, http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const GodRaysDepthMaskShader = {
 
 	name: 'GodRaysDepthMaskShader',
@@ -72,8 +78,10 @@ const GodRaysDepthMaskShader = {
  *
  * The results of the previous pass are re-blurred, each time with a
  * decreased distance between samples.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const GodRaysGenerateShader = {
 
 	name: 'GodRaysGenerateShader',
@@ -136,12 +144,12 @@ const GodRaysGenerateShader = {
 		//	- see http://code.google.com/p/chromium/issues/detail?id=153105
 
 		/*
-		// Unrolling didnt do much on my hardware (ATI Mobility Radeon 3450),
+		// Unrolling didn't do much on my hardware (ATI Mobility Radeon 3450),
 		// so i've just left the loop
 
 		"for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {",
 
-		// Accumulate samples, making sure we dont walk past the light source.
+		// Accumulate samples, making sure we don't walk past the light source.
 
 		// The check for uv.y < 1 would not be necessary with "border" UV wrap
 		// mode, with a black border color. I don't think this is currently
@@ -194,8 +202,10 @@ const GodRaysGenerateShader = {
 /**
  * Additively applies god rays from texture tGodRays to a background (tColors).
  * fGodRayIntensity attenuates the god rays.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const GodRaysCombineShader = {
 
 	name: 'GodRaysCombineShader',
@@ -253,8 +263,10 @@ const GodRaysCombineShader = {
 /**
  * A dodgy sun/sky shader. Makes a bright spot at the sun location. Would be
  * cheaper/faster/simpler to implement this as a simple sun sprite.
+ *
+ * @constant
+ * @type {Object}
  */
-
 const GodRaysFakeSunShader = {
 
 	name: 'GodRaysFakeSunShader',

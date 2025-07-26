@@ -5,3 +5,5 @@ paths-ignore:
   - "examples/jsm/loaders/ifc/**/*.*"
   - "build/*.*"
   - "manual/3rdparty/**/*.*"
+  - "utils/docs/template/static/scripts/fuse/**/*.*"
+  - "utils/docs/template/static/scripts/prettify/**/*.*"

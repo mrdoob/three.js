@@ -12,7 +12,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -21,7 +22,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { normalWorld, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
+			import { normalWorldGeometry, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -71,7 +72,7 @@
 						const pmremRoughness = uniform( .5 );
 						const pmremNode = pmremTexture( map, reflectVec, pmremRoughness );
 
-						scene.backgroundNode = pmremTexture( map, normalWorld, pmremRoughness );
+						scene.backgroundNode = pmremTexture( map, normalWorldGeometry, pmremRoughness );
 
 						scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
 

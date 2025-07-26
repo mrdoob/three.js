@@ -1,17 +1,35 @@
-/**
- * https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts
- */
-
 import {
  	BackSide,
  	BoxGeometry,
+ 	InstancedMesh,
  	Mesh,
-	MeshBasicMaterial,
+	MeshLambertMaterial,
  	MeshStandardMaterial,
  	PointLight,
  	Scene,
+ 	Object3D,
 } from 'three';
 
+/**
+ * This class represents a scene with a basic room setup that can be used as
+ * input for {@link PMREMGenerator#fromScene}. The resulting PMREM represents the room's
+ * lighting and can be used for Image Based Lighting by assigning it to {@link Scene#environment}
+ * or directly as an environment map to PBR materials.
+ *
+ * The implementation is based on the [EnvironmentScene](https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts)
+ * component from the `model-viewer` project.
+ *
+ * ```js
+ * const environment = new RoomEnvironment();
+ * const pmremGenerator = new THREE.PMREMGenerator( renderer );
+ *
+ * const envMap = pmremGenerator.fromScene( environment ).texture;
+ * scene.environment = envMap;
+ * ```
+ *
+ * @augments Scene
+ * @three_import import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+ */
 class RoomEnvironment extends Scene {
 
 	constructor() {
@@ -33,41 +51,52 @@ class RoomEnvironment extends Scene {
 		room.scale.set( 31.713, 28.305, 28.591 );
 		this.add( room );
 
-		const box1 = new Mesh( geometry, boxMaterial );
-		box1.position.set( - 10.906, 2.009, 1.846 );
-		box1.rotation.set( 0, - 0.195, 0 );
-		box1.scale.set( 2.328, 7.905, 4.651 );
-		this.add( box1 );
+		const boxes = new InstancedMesh( geometry, boxMaterial, 6 );
+		const transform = new Object3D();
 
-		const box2 = new Mesh( geometry, boxMaterial );
-		box2.position.set( - 5.607, - 0.754, - 0.758 );
-		box2.rotation.set( 0, 0.994, 0 );
-		box2.scale.set( 1.970, 1.534, 3.955 );
-		this.add( box2 );
+		// box1
+		transform.position.set( - 10.906, 2.009, 1.846 );
+		transform.rotation.set( 0, - 0.195, 0 );
+		transform.scale.set( 2.328, 7.905, 4.651 );
+		transform.updateMatrix();
+		boxes.setMatrixAt( 0, transform.matrix );
 
-		const box3 = new Mesh( geometry, boxMaterial );
-		box3.position.set( 6.167, 0.857, 7.803 );
-		box3.rotation.set( 0, 0.561, 0 );
-		box3.scale.set( 3.927, 6.285, 3.687 );
-		this.add( box3 );
+		// box2
+		transform.position.set( - 5.607, - 0.754, - 0.758 );
+		transform.rotation.set( 0, 0.994, 0 );
+		transform.scale.set( 1.970, 1.534, 3.955 );
+		transform.updateMatrix();
+		boxes.setMatrixAt( 1, transform.matrix );
 
-		const box4 = new Mesh( geometry, boxMaterial );
-		box4.position.set( - 2.017, 0.018, 6.124 );
-		box4.rotation.set( 0, 0.333, 0 );
-		box4.scale.set( 2.002, 4.566, 2.064 );
-		this.add( box4 );
+		// box3
+		transform.position.set( 6.167, 0.857, 7.803 );
+		transform.rotation.set( 0, 0.561, 0 );
+		transform.scale.set( 3.927, 6.285, 3.687 );
+		transform.updateMatrix();
+		boxes.setMatrixAt( 2, transform.matrix );
 
-		const box5 = new Mesh( geometry, boxMaterial );
-		box5.position.set( 2.291, - 0.756, - 2.621 );
-		box5.rotation.set( 0, - 0.286, 0 );
-		box5.scale.set( 1.546, 1.552, 1.496 );
-		this.add( box5 );
+		// box4
+		transform.position.set( - 2.017, 0.018, 6.124 );
+		transform.rotation.set( 0, 0.333, 0 );
+		transform.scale.set( 2.002, 4.566, 2.064 );
+		transform.updateMatrix();
+		boxes.setMatrixAt( 3, transform.matrix );
 
-		const box6 = new Mesh( geometry, boxMaterial );
-		box6.position.set( - 2.193, - 0.369, - 5.547 );
-		box6.rotation.set( 0, 0.516, 0 );
-		box6.scale.set( 3.875, 3.487, 2.986 );
-		this.add( box6 );
+		// box5
+		transform.position.set( 2.291, - 0.756, - 2.621 );
+		transform.rotation.set( 0, - 0.286, 0 );
+		transform.scale.set( 1.546, 1.552, 1.496 );
+		transform.updateMatrix();
+		boxes.setMatrixAt( 4, transform.matrix );
+
+		// box6
+		transform.position.set( - 2.193, - 0.369, - 5.547 );
+		transform.rotation.set( 0, 0.516, 0 );
+		transform.scale.set( 3.875, 3.487, 2.986 );
+		transform.updateMatrix();
+		boxes.setMatrixAt( 5, transform.matrix );
+
+		this.add( boxes );
 
 
 		// -x right
@@ -108,6 +137,10 @@ class RoomEnvironment extends Scene {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the environment is no longer required.
+	 */
 	dispose() {
 
 		const resources = new Set();
@@ -135,8 +168,13 @@ class RoomEnvironment extends Scene {
 
 function createAreaLightMaterial( intensity ) {
 
-	const material = new MeshBasicMaterial();
-	material.color.setScalar( intensity );
+	// create an emissive-only material. see #31348
+	const material = new MeshLambertMaterial( {
+		color: 0x000000,
+		emissive: 0xffffff,
+		emissiveIntensity: intensity
+	} );
+
 	return material;
 
 }

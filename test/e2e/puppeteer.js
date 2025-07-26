@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
-import jimp from 'jimp';
+import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
 class PromiseQueue {
@@ -37,20 +37,24 @@ class PromiseQueue {
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 9; // 9 seconds - for how long there should be no network requests
+const idleTime = 12; // 9 seconds - for how long there should be no network requests
 const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
+
+	// tiles not loaded in time for screenshot
+	'webgl_loader_3dtiles',
 
 	// video tag isn't deterministic enough?
 	'css3d_youtube',
 	'webgl_materials_video',
 	'webgl_video_kinect',
 	'webgl_video_panorama_equirectangular',
+	'webgpu_video_frame',
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 
-	// WebXR also isn't determinstic enough?
+	// WebXR also isn't deterministic enough?
 	'webxr_ar_lighting',
 	'webxr_vr_sandbox',
 	'webxr_vr_video',
@@ -70,6 +74,7 @@ const exceptionList = [
 	'webgl_interactive_lines',
 	'webgl_loader_collada_kinematics',
 	'webgl_loader_ldraw',
+	'webgl_loader_texture_ktx2',
 	'webgl_loader_pdb',
 	'webgl_modifier_simplifier',
 	'webgl_multiple_canvases_circle',
@@ -77,6 +82,7 @@ const exceptionList = [
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'physics_rapier_basic',
 	'webgl_animation_skinning_blending',
 	'webgl_animation_skinning_additive_blending',
 	'webgl_buffergeometry_glbufferattribute',
@@ -89,21 +95,30 @@ const exceptionList = [
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_materials_alphahash',
+	'webgpu_materials_alphahash',
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
 	'webgl_postprocessing_transition',
 	'webgl_postprocessing_glitch',
 	'webgl_postprocessing_dof2',
-	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap',
 	'webgl_shadowmap_progressive',
+	'webgpu_shadowmap_progressive',
 	'webgl_test_memory2',
-	'webgl_tiled_forward',
 	'webgl_points_dynamic',
 	'webgpu_multisampled_renderbuffers',
 	'webgl_test_wide_gamut',
+	'webgl_volume_instancing',
+	'webgl_buffergeometry',
+	'webgl_buffergeometry_attributes_integer',
+	'webgl_buffergeometry_attributes_none',
+	'webgl_buffergeometry_custom_attributes_particles',
+	'webgl_batch_lod_bvh',
+
+	// Intentional z-fighting in this demo makes it non-deterministic
+	'webgl_reverse_depth_buffer',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -111,24 +126,26 @@ const exceptionList = [
 	'physics_jolt_instancing',
 
 	// Awaiting for WebGL backend support
-	'webgpu_clearcoat',
 	'webgpu_compute_audio',
 	'webgpu_compute_texture',
+	'webgpu_compute_texture_3d',
 	'webgpu_compute_texture_pingpong',
-	"webgpu_compute_water",
+	'webgpu_compute_water',
 	'webgpu_materials',
-	'webgpu_sandbox',
-	'webgpu_sprites',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_bloom_emissive',
+	'webgpu_lights_tiled',
+	'webgpu_postprocessing_traa',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',
 	'webgpu_compute_sort_bitonic',
+	'webgpu_struct_drawindirect',
 
 	// WebGPURenderer: Unknown problem
+	'webgpu_backdrop_water',
+	"webgpu_centroid_sampling",
 	'webgpu_camera_logarithmicdepthbuffer',
-	'webgpu_clipping',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
@@ -138,6 +155,7 @@ const exceptionList = [
 	'webgpu_particles',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
+	'webgpu_shadowmap_array',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
 	'webgpu_tsl_interoperability',
@@ -147,16 +165,26 @@ const exceptionList = [
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
 	'webgpu_lights_rectarealight',
-	'webgpu_tsl_coffee_smoke',
 	'webgpu_tsl_vfx_flames',
 	'webgpu_tsl_halftone',
 	'webgpu_tsl_vfx_linkedparticles',
-	'webgpu_tsl_vfx_tornado',
 	'webgpu_textures_anisotropy',
-	'webgpu_backdrop_water',
+	'webgpu_textures_2d-array_compressed',
+	'webgpu_rendertarget_2d-array_3d',
+	'webgpu_materials_envmaps_bpcem',
+	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_sobel',
+	'webgpu_postprocessing_3dlut',
+	'webgpu_postprocessing_fxaa',
+	'webgpu_postprocessing_afterimage',
+	'webgpu_postprocessing_ca',
+	'webgpu_xr_native_layers',
+	'webgpu_volume_caustics',
 
 	// WebGPU idleTime and parseTime too low
+	'webgpu_compute_cloth',
 	'webgpu_compute_particles',
+	'webgpu_compute_particles_fluid',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_particles_snow',
 	'webgpu_compute_points'
@@ -292,6 +320,7 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
+		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
 		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
@@ -322,11 +351,11 @@ async function main() {
 
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
-		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated succesfully.` );
+		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated successfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
 
-		console.green( `${ files.length } screenshots succesfully generated.` );
+		console.green( `${ files.length } screenshots successfully generated.` );
 
 	} else if ( failedScreenshots.length ) {
 
@@ -558,7 +587,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-		const screenshot = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality );
+		const screenshot = ( await Jimp.read( await page.screenshot(), { quality: jpgQuality } ) ).scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
 
@@ -566,7 +595,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			/* Make screenshots */
 
-			await screenshot.writeAsync( `examples/screenshots/${ file }.jpg` );
+			await screenshot.write( `examples/screenshots/${ file }.jpg` );
 
 			console.green( `Screenshot generated for file ${ file }` );
 
@@ -578,11 +607,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			try {
 
-				expected = ( await jimp.read( `examples/screenshots/${ file }.jpg` ) ).quality( jpgQuality );
+				expected = ( await Jimp.read( `examples/screenshots/${ file }.jpg`, { quality: jpgQuality } ) );
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -601,8 +630,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -617,9 +646,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
-				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}

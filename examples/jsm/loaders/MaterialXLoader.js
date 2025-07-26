@@ -1,4 +1,4 @@
-import { FileLoader, Loader, TextureLoader, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, RepeatWrapping } from 'three';
+import { FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
 
 import {
 	float, bool, int, vec2, vec3, vec4, color, texture,
@@ -145,14 +145,42 @@ const MXElements = [
 const MtlXLibrary = {};
 MXElements.forEach( element => MtlXLibrary[ element.name ] = element );
 
+/**
+ * A loader for the MaterialX format.
+ *
+ * The node materials loaded with this loader can only be used with {@link WebGPURenderer}.
+ *
+ * ```js
+ * const loader = new MaterialXLoader().setPath( SAMPLE_PATH );
+ * const materials = await loader.loadAsync( 'standard_surface_brass_tiled.mtlx' );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { MaterialXLoader } from 'three/addons/loaders/MaterialXLoader.js';
+ */
 class MaterialXLoader extends Loader {
 
+	/**
+	 * Constructs a new MaterialX loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded MaterialX asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Object<string,NodeMaterial>)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @return {MaterialXLoader} A reference to this loader.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const _onError = function ( e ) {
@@ -189,6 +217,12 @@ class MaterialXLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given MaterialX data and returns the resulting materials.
+	 *
+	 * @param {string} text - The raw MaterialX data as a string.
+	 * @return {Object<string,NodeMaterial>} A dictionary holding the parse node materials.
+	 */
 	parse( text ) {
 
 		return new MaterialX( this.manager, this.path ).parse( text );
@@ -396,7 +430,7 @@ class MaterialXNode {
 
 		} else if ( this.hasReference ) {
 
-			if ( this.element === 'output' && this.output && out === null  ) {
+			if ( this.element === 'output' && this.output && out === null ) {
 
 				out = this.output;
 

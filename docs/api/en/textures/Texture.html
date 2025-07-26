@@ -292,6 +292,12 @@
 			transformations.
 		</p>
 
+		<h3>[property:Array updateRanges]</h3>
+		<p>
+			This can be used to only update a subregion or specific rows of the texture (for example, just 
+			the first 3 rows). Use the [page:Texture.addUpdateRange .addUpdateRange] function to add ranges to this array.
+		</p>
+
 		<h2>Methods</h2>
 
 		<p>
@@ -309,10 +315,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			Make copy of the texture. Note this is not a "deep copy", the image is
-			shared. Besides, cloning a texture does not automatically mark it for a
-			texture upload. You have to set [page:Texture.needsUpdate .needsUpdate] to
-			true as soon as its image property (the data source) is fully loaded or
-			ready.
+			shared. Cloning the texture automatically marks it for texture upload.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -333,6 +336,16 @@
 			Transform the uv based on the value of this texture's [page:Texture.offset .offset], 
 			[page:Texture.repeat .repeat], [page:Texture.wrapS .wrapS],
 			[page:Texture.wrapT .wrapT] and [page:Texture.flipY .flipY] properties.
+		</p>
+
+		<h3>[method:undefined addUpdateRange]( [param:number start], [param:number count] )</h3>
+		<p>
+			Adds a range of data in the data texture to be updated on the GPU.
+		</p>
+
+		<h3>[method:undefined clearUpdateRanges]()</h3>
+		<p>
+			Clears the update ranges.
 		</p>
 
 		<h2>Source</h2>

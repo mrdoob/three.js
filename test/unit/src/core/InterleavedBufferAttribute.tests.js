@@ -117,7 +117,7 @@ export default QUnit.module( 'Core', () => {
 			instance.setX( 0, 123 );
 			instance.setX( 1, 321 );
 
-			// the offset was defined as 1, so go one step futher in the array
+			// the offset was defined as 1, so go one step further in the array
 			assert.ok( instance.data.array[ 1 ] === 123 &&
 				instance.data.array[ 4 ] === 321, 'x was calculated correct based on index and default offset' );
 

@@ -1,5 +1,14 @@
-import { AlphaFormat, LuminanceFormat, LuminanceAlphaFormat, RedFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBAFormat, RGBAIntegerFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, UnsignedByteType, ByteType, UnsignedShortType, ShortType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedIntType, IntType, FloatType, UnsignedInt5999Type } from '../constants.js';
+import { AlphaFormat, RedFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBAFormat, RGBAIntegerFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, UnsignedByteType, ByteType, UnsignedShortType, ShortType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedIntType, IntType, FloatType, UnsignedInt5999Type } from '../constants.js';
 
+/**
+ * Scales the texture as large as possible within its surface without cropping
+ * or stretching the texture. The method preserves the original aspect ratio of
+ * the texture. Akin to CSS `object-fit: contain`
+ *
+ * @param {Texture} texture - The texture.
+ * @param {number} aspect - The texture's aspect ratio.
+ * @return {Texture} The updated texture.
+ */
 function contain( texture, aspect ) {
 
 	const imageAspect = ( texture.image && texture.image.width ) ? texture.image.width / texture.image.height : 1;
@@ -26,6 +35,15 @@ function contain( texture, aspect ) {
 
 }
 
+/**
+ * Scales the texture to the smallest possible size to fill the surface, leaving
+ * no empty space. The method preserves the original aspect ratio of the texture.
+ * Akin to CSS `object-fit: cover`.
+ *
+ * @param {Texture} texture - The texture.
+ * @param {number} aspect - The texture's aspect ratio.
+ * @return {Texture} The updated texture.
+ */
 function cover( texture, aspect ) {
 
 	const imageAspect = ( texture.image && texture.image.width ) ? texture.image.width / texture.image.height : 1;
@@ -52,6 +70,12 @@ function cover( texture, aspect ) {
 
 }
 
+/**
+ * Configures the texture to the default transformation. Akin to CSS `object-fit: fill`.
+ *
+ * @param {Texture} texture - The texture.
+ * @return {Texture} The updated texture.
+ */
 function fill( texture ) {
 
 	texture.repeat.x = 1;
@@ -64,11 +88,14 @@ function fill( texture ) {
 
 }
 
-
-
 /**
- * Given the width, height, format, and type of a texture. Determines how many
- * bytes must be used to represent the texture.
+ * Determines how many bytes must be used to represent the texture.
+ *
+ * @param {number} width - The width of the texture.
+ * @param {number} height - The height of the texture.
+ * @param {number} format - The texture's format.
+ * @param {number} type - The texture's type.
+ * @return {number} The byte length.
  */
 function getByteLength( width, height, format, type ) {
 
@@ -79,10 +106,6 @@ function getByteLength( width, height, format, type ) {
 		// https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
 		case AlphaFormat:
 			return width * height;
-		case LuminanceFormat:
-			return width * height;
-		case LuminanceAlphaFormat:
-			return width * height * 2;
 		case RedFormat:
 			return ( ( width * height ) / typeByteLength.components ) * typeByteLength.byteLength;
 		case RedIntegerFormat:
@@ -200,11 +223,70 @@ function getTextureTypeByteLength( type ) {
 
 }
 
-const TextureUtils = {
-	contain,
-	cover,
-	fill,
-	getByteLength
-};
+/**
+ * A class containing utility functions for textures.
+ *
+ * @hideconstructor
+ */
+class TextureUtils {
+
+	/**
+	 * Scales the texture as large as possible within its surface without cropping
+	 * or stretching the texture. The method preserves the original aspect ratio of
+	 * the texture. Akin to CSS `object-fit: contain`
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {number} aspect - The texture's aspect ratio.
+	 * @return {Texture} The updated texture.
+	 */
+	static contain( texture, aspect ) {
+
+		return contain( texture, aspect );
+
+	}
+
+	/**
+	 * Scales the texture to the smallest possible size to fill the surface, leaving
+	 * no empty space. The method preserves the original aspect ratio of the texture.
+	 * Akin to CSS `object-fit: cover`.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {number} aspect - The texture's aspect ratio.
+	 * @return {Texture} The updated texture.
+	 */
+	static cover( texture, aspect ) {
+
+		return cover( texture, aspect );
+
+	}
+
+	/**
+	 * Configures the texture to the default transformation. Akin to CSS `object-fit: fill`.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Texture} The updated texture.
+	 */
+	static fill( texture ) {
+
+		return fill( texture );
+
+	}
+
+	/**
+	 * Determines how many bytes must be used to represent the texture.
+	 *
+	 * @param {number} width - The width of the texture.
+	 * @param {number} height - The height of the texture.
+	 * @param {number} format - The texture's format.
+	 * @param {number} type - The texture's type.
+	 * @return {number} The byte length.
+	 */
+	static getByteLength( width, height, format, type ) {
+
+		return getByteLength( width, height, format, type );
+
+	}
+
+}
 
 export { contain, cover, fill, getByteLength, TextureUtils };

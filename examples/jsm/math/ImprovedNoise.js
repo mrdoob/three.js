@@ -1,4 +1,6 @@
-// https://cs.nyu.edu/~perlin/noise/
+import { MathUtils } from 'three';
+
+const { lerp } = MathUtils;
 
 const _p = [ 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10,
 	 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87,
@@ -23,12 +25,6 @@ function fade( t ) {
 
 }
 
-function lerp( t, a, b ) {
-
-	return a + t * ( b - a );
-
-}
-
 function grad( hash, x, y, z ) {
 
 	const h = hash & 15;
@@ -37,8 +33,24 @@ function grad( hash, x, y, z ) {
 
 }
 
+/**
+ * A utility class providing a 3D noise function.
+ *
+ * The code is based on [IMPROVED NOISE]{@link https://cs.nyu.edu/~perlin/noise/}
+ * by Ken Perlin, 2002.
+ *
+ * @three_import import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+ */
 class ImprovedNoise {
 
+	/**
+	 * Returns a noise value for the given parameters.
+	 *
+	 * @param {number} x - The x coordinate.
+	 * @param {number} y - The y coordinate.
+	 * @param {number} z - The z coordinate.
+	 * @return {number} The noise value.
+	 */
 	noise( x, y, z ) {
 
 		const floorX = Math.floor( x ), floorY = Math.floor( y ), floorZ = Math.floor( z );
@@ -55,14 +67,19 @@ class ImprovedNoise {
 
 		const A = _p[ X ] + Y, AA = _p[ A ] + Z, AB = _p[ A + 1 ] + Z, B = _p[ X + 1 ] + Y, BA = _p[ B ] + Z, BB = _p[ B + 1 ] + Z;
 
-		return lerp( w, lerp( v, lerp( u, grad( _p[ AA ], x, y, z ),
-			grad( _p[ BA ], xMinus1, y, z ) ),
-		lerp( u, grad( _p[ AB ], x, yMinus1, z ),
-			grad( _p[ BB ], xMinus1, yMinus1, z ) ) ),
-		lerp( v, lerp( u, grad( _p[ AA + 1 ], x, y, zMinus1 ),
-			grad( _p[ BA + 1 ], xMinus1, y, zMinus1 ) ),
-		lerp( u, grad( _p[ AB + 1 ], x, yMinus1, zMinus1 ),
-			grad( _p[ BB + 1 ], xMinus1, yMinus1, zMinus1 ) ) ) );
+		return lerp(
+			lerp(
+				lerp( grad( _p[ AA ], x, y, z ), grad( _p[ BA ], xMinus1, y, z ), u ),
+				lerp( grad( _p[ AB ], x, yMinus1, z ), grad( _p[ BB ], xMinus1, yMinus1, z ), u ),
+				v
+			),
+			lerp(
+				lerp( grad( _p[ AA + 1 ], x, y, zMinus1 ), grad( _p[ BA + 1 ], xMinus1, y, zMinus1 ), u ),
+				lerp( grad( _p[ AB + 1 ], x, yMinus1, zMinus1 ), grad( _p[ BB + 1 ], xMinus1, yMinus1, zMinus1 ), u ),
+				v
+			),
+			w
+		);
 
 	}
 

@@ -1,8 +1,12 @@
 import AttributeNode from '../core/AttributeNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
-
 import { Vector4 } from '../../math/Vector4.js';
 
+/**
+ * An attribute node for representing vertex colors.
+ *
+ * @augments AttributeNode
+ */
 class VertexColorNode extends AttributeNode {
 
 	static get type() {
@@ -11,16 +15,40 @@ class VertexColorNode extends AttributeNode {
 
 	}
 
-	constructor( index = 0 ) {
+	/**
+	 * Constructs a new vertex color node.
+	 *
+	 * @param {number} index - The attribute index.
+	 */
+	constructor( index ) {
 
 		super( null, 'vec4' );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isVertexColorNode = true;
 
+		/**
+		 * The attribute index to enable more than one sets of vertex colors.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.index = index;
 
 	}
 
+	/**
+	 * Overwrites the default implementation by honoring the attribute index.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The attribute name.
+	 */
 	getAttributeName( /*builder*/ ) {
 
 		const index = this.index;
@@ -71,4 +99,12 @@ class VertexColorNode extends AttributeNode {
 
 export default VertexColorNode;
 
-export const vertexColor = ( ...params ) => nodeObject( new VertexColorNode( ...params ) );
+/**
+ * TSL function for creating a reference node.
+ *
+ * @tsl
+ * @function
+ * @param {number} [index=0] - The attribute index.
+ * @returns {VertexColorNode}
+ */
+export const vertexColor = ( index = 0 ) => nodeObject( new VertexColorNode( index ) );

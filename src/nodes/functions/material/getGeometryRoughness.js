@@ -1,9 +1,15 @@
-import { normalView } from '../../accessors/Normal.js';
-import { Fn } from '../../tsl/TSLBase.js';
+import { normalViewGeometry } from '../../accessors/Normal.js';
+import { float, Fn } from '../../tsl/TSLBase.js';
 
-const getGeometryRoughness = /*@__PURE__*/ Fn( () => {
+const getGeometryRoughness = /*@__PURE__*/ Fn( ( builder ) => {
 
-	const dxy = normalView.dFdx().abs().max( normalView.dFdy().abs() );
+	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
+
+		return float( 0 );
+
+	}
+
+	const dxy = normalViewGeometry.dFdx().abs().max( normalViewGeometry.dFdy().abs() );
 	const geometryRoughness = dxy.x.max( dxy.y ).max( dxy.z );
 
 	return geometryRoughness;

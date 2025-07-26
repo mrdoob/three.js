@@ -15,8 +15,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
-					"three/debug": "../src/Three.WebGPU.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -67,7 +67,7 @@
 					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupportAsync( renderer );
 
-				const ktxTexture = await ktxLoader.loadAsync( './textures/compressed/sample_uastc_zstd.ktx2' );
+				const ktxTexture = await ktxLoader.loadAsync( './textures/ktx2/2d_uastc.ktx2' );
 
 				// box mesh
 
@@ -75,6 +75,7 @@
 				const materialBox = new THREE.MeshBasicNodeMaterial();
 
 				// birection speed
+
 				const timerScaleNode = time.mul( vec2( - 0.5, 0.1 ) );
 				const animateUV = uv().add( timerScaleNode );
 
@@ -226,7 +227,9 @@
 
 			}
 
-			/** Correct UVs to be compatible with `flipY=false` textures. */
+			/*
+			 * Correct UVs to be compatible with `flipY=false` textures.
+			 */
 			function flipY( geometry ) {
 
 				const uv = geometry.attributes.uv;

@@ -7,16 +7,48 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 
+/**
+ * This displays a cone shaped helper object for a {@link SpotLight}.
+ *
+ * ```js
+ * const spotLight = new THREE.SpotLight( 0xffffff );
+ * spotLight.position.set( 10, 10, 10 );
+ * scene.add( spotLight );
+ *
+ * const spotLightHelper = new THREE.SpotLightHelper( spotLight );
+ * scene.add( spotLightHelper );
+ * ```
+ *
+ * @augments Object3D
+ */
 class SpotLightHelper extends Object3D {
 
+	/**
+	 * Constructs a new spot light helper.
+	 *
+	 * @param {HemisphereLight} light - The light to be visualized.
+	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
+	 * the color of the light.
+	 */
 	constructor( light, color ) {
 
 		super();
 
+		/**
+		 * The light being visualized.
+		 *
+		 * @type {SpotLight}
+		 */
 		this.light = light;
 
 		this.matrixAutoUpdate = false;
 
+		/**
+		 * The color parameter passed in the constructor.
+		 * If not set, the helper will take the color of the light.
+		 *
+		 * @type {number|Color|string}
+		 */
 		this.color = color;
 
 		this.type = 'SpotLightHelper';
@@ -54,6 +86,10 @@ class SpotLightHelper extends Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.cone.geometry.dispose();
@@ -61,6 +97,10 @@ class SpotLightHelper extends Object3D {
 
 	}
 
+	/**
+	 * Updates the helper to match the position and direction of the
+	 * light being visualized.
+	 */
 	update() {
 
 		this.light.updateWorldMatrix( true, false );

@@ -315,17 +315,15 @@ const GouraudShader = {
 
 class MeshGouraudMaterial extends ShaderMaterial {
 
-	static get type() {
-
-		return 'MeshGouraudMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
+		console.warn( 'THREE.MeshGouraudMaterial: MeshGouraudMaterial has been deprecated and will be removed with r183. Use THREE.MeshLambertMaterial instead.' ); // @deprecated r173
+
 		this.isMeshGouraudMaterial = true;
+
+		this.type = 'MeshGouraudMaterial';
 
 		//this.color = new THREE.Color( 0xffffff ); // diffuse
 

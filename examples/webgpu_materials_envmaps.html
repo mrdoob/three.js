@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -103,7 +104,11 @@
 						sphereMaterial.needsUpdate = true;
 
 					},
-					Refraction: false
+					Refraction: false,
+					backgroundRotationX: false,
+					backgroundRotationY: false,
+					backgroundRotationZ: false,
+					syncMaterial: false
 				};
 
 				const gui = new GUI( { width: 300 } );
@@ -126,6 +131,10 @@
 					sphereMaterial.needsUpdate = true;
 
 				} );
+				gui.add( params, 'backgroundRotationX' );
+				gui.add( params, 'backgroundRotationY' );
+				gui.add( params, 'backgroundRotationZ' );
+				gui.add( params, 'syncMaterial' );
 				gui.open();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -144,6 +153,30 @@
 			//
 
 			function animate() {
+
+				if ( params.backgroundRotationX ) {
+
+					scene.backgroundRotation.x += 0.001;
+
+				}
+
+				if ( params.backgroundRotationY ) {
+
+					scene.backgroundRotation.y += 0.001;
+
+				}
+
+				if ( params.backgroundRotationZ ) {
+
+					scene.backgroundRotation.z += 0.001;
+
+				}
+
+				if ( params.syncMaterial ) {
+
+					sphereMesh.material.envMapRotation.copy( scene.backgroundRotation );
+
+				}
 
 				camera.lookAt( scene.position );
 				renderer.render( scene, camera );

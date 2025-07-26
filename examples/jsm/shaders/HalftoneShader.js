@@ -1,10 +1,19 @@
 /**
- * RGB Halftone shader for three.js.
- *	NOTE:
- * 		Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
- *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
+ * @module HalftoneShader
+ * @three_import import { HalftoneShader } from 'three/addons/shaders/HalftoneShader.js';
  */
 
+/**
+ * RGB Halftone shader.
+ *
+ * Used by {@link HalftonePass}.
+ *
+ * Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
+ * Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const HalftoneShader = {
 
 	name: 'HalftoneShader',

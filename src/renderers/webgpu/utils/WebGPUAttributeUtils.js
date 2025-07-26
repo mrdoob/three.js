@@ -12,6 +12,12 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Float32Array, [ 'float32', ]],
 ] );
 
+if ( typeof Float16Array !== 'undefined' ) {
+
+	typedArraysToVertexFormatPrefix.set( Float16Array, [ 'float16' ] );
+
+}
+
 const typedAttributeToVertexFormatPrefix = new Map( [
 	[ Float16BufferAttribute, [ 'float16', ]],
 ] );
@@ -24,14 +30,35 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
+/**
+ * A WebGPU backend utility module for managing shader attributes.
+ *
+ * @private
+ */
 class WebGPUAttributeUtils {
 
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
 	constructor( backend ) {
 
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
 		this.backend = backend;
 
 	}
 
+	/**
+	 * Creates the GPU buffer for the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @param {GPUBufferUsage} usage - A flag that indicates how the buffer may be used after its creation.
+	 */
 	createAttribute( attribute, usage ) {
 
 		const bufferAttribute = this._getBufferAttribute( attribute );
@@ -48,16 +75,27 @@ class WebGPUAttributeUtils {
 			let array = bufferAttribute.array;
 
 			// patch for INT16 and UINT16
-			if ( attribute.normalized === false && ( array.constructor === Int16Array || array.constructor === Uint16Array ) ) {
+			if ( attribute.normalized === false ) {
 
-				const tempArray = new Uint32Array( array.length );
-				for ( let i = 0; i < array.length; i ++ ) {
+				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
 
-					tempArray[ i ] = array[ i ];
+					array = new Int32Array( array );
+
+				} else if ( array.constructor === Uint16Array || array.constructor === Uint8Array ) {
+
+					array = new Uint32Array( array );
+
+					if ( usage & GPUBufferUsage.INDEX ) {
+
+						for ( let i = 0; i < array.length; i ++ ) {
+
+							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff; // use correct primitive restart index
+
+						}
+
+					}
 
 				}
-
-				array = tempArray;
 
 			}
 
@@ -77,9 +115,13 @@ class WebGPUAttributeUtils {
 				bufferAttribute.itemSize = 4;
 				bufferAttribute.array = array;
 
+				bufferData._force3to4BytesAlignment = true;
+
 			}
 
-			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+			// ensure 4 byte alignment
+			const byteLength = array.byteLength;
+			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
 			buffer = device.createBuffer( {
 				label: bufferAttribute.name,
@@ -98,6 +140,11 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Updates the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	updateAttribute( attribute ) {
 
 		const bufferAttribute = this._getBufferAttribute( attribute );
@@ -105,9 +152,28 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
+		const bufferData = backend.get( bufferAttribute );
 		const buffer = backend.get( bufferAttribute ).buffer;
 
-		const array = bufferAttribute.array;
+		let array = bufferAttribute.array;
+
+		//  if storage buffer ensure 4 byte alignment
+		if ( bufferData._force3to4BytesAlignment === true ) {
+
+			array = new array.constructor( bufferAttribute.count * 4 );
+
+			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+
+				array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+
+			}
+
+			bufferAttribute.array = array;
+
+		}
+
+
+		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
 		if ( updateRanges.length === 0 ) {
@@ -123,15 +189,35 @@ class WebGPUAttributeUtils {
 
 		} else {
 
+			const byteOffsetFactor = isTypedArray ? 1 : array.BYTES_PER_ELEMENT;
+
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
+				let dataOffset, size;
+
+				if ( bufferData._force3to4BytesAlignment === true ) {
+
+					const vertexStart = Math.floor( range.start / 3 );
+					const vertexCount = Math.ceil( range.count / 3 );
+					dataOffset = vertexStart * 4 * byteOffsetFactor;
+					size = vertexCount * 4 * byteOffsetFactor;
+
+				} else {
+
+					dataOffset = range.start * byteOffsetFactor;
+					size = range.count * byteOffsetFactor;
+
+				}
+
+				const bufferOffset = dataOffset * ( isTypedArray ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
 				device.queue.writeBuffer(
 					buffer,
-					0,
+					bufferOffset,
 					array,
-					range.start * array.BYTES_PER_ELEMENT,
-					range.count * array.BYTES_PER_ELEMENT
+					dataOffset,
+					size
 				);
 
 			}
@@ -142,6 +228,13 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * This method creates the vertex buffer layout data which are
+	 * require when creating a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Array<Object>} An array holding objects which describe the vertex buffer layout.
+	 */
 	createShaderVertexBuffers( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
@@ -203,6 +296,11 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Destroys the GPU buffer of the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
@@ -214,24 +312,32 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * This method performs a readback operation by moving buffer data from
+	 * a storage buffer attribute from the GPU to the CPU.
+	 *
+	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 */
 	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;
 		const device = backend.device;
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
-
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;
 
 		const readBufferGPU = device.createBuffer( {
-			label: attribute.name,
+			label: `${ attribute.name }_readback`,
 			size,
 			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 		} );
 
-
-		const cmdEncoder = device.createCommandEncoder( {} );
+		const cmdEncoder = device.createCommandEncoder( {
+			label: `readback_encoder_${ attribute.name }`
+		} );
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,
@@ -241,8 +347,6 @@ class WebGPUAttributeUtils {
 			size
 		);
 
-		readBufferGPU.unmap();
-
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
 
@@ -250,10 +354,21 @@ class WebGPUAttributeUtils {
 
 		const arrayBuffer = readBufferGPU.getMappedRange();
 
-		return arrayBuffer;
+		const dstBuffer = new attribute.array.constructor( arrayBuffer.slice( 0 ) );
+
+		readBufferGPU.unmap();
+
+		return dstBuffer.buffer;
 
 	}
 
+	/**
+	 * Returns the vertex format of the given buffer attribute.
+	 *
+	 * @private
+	 * @param {BufferAttribute} geometryAttribute - The buffer attribute.
+	 * @return {string|undefined} The vertex format (e.g. 'float32x3').
+	 */
 	_getVertexFormat( geometryAttribute ) {
 
 		const { itemSize, normalized } = geometryAttribute;
@@ -262,7 +377,7 @@ class WebGPUAttributeUtils {
 
 		let format;
 
-		if ( itemSize == 1 ) {
+		if ( itemSize === 1 ) {
 
 			format = typeArraysToVertexFormatPrefixForItemSize1.get( ArrayType );
 
@@ -299,6 +414,27 @@ class WebGPUAttributeUtils {
 
 	}
 
+	/**
+	 * Returns `true` if the given array is a typed array.
+	 *
+	 * @private
+	 * @param {any} array - The array.
+	 * @return {boolean} Whether the given array is a typed array or not.
+	 */
+	_isTypedArray( array ) {
+
+		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
+
+	}
+
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @private
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
 	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;

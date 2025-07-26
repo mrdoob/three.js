@@ -15,7 +15,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -27,6 +28,7 @@
 			import { range, texture, mix, uv, color, rotateUV, positionLocal, time, uniform } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -37,13 +39,20 @@
 
 			function init() {
 
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
 				const { innerWidth, innerHeight } = window;
 
 				camera = new THREE.PerspectiveCamera( 60, innerWidth / innerHeight, 1, 5000 );
 				camera.position.set( 1300, 500, 0 );
 
 				scene = new THREE.Scene();
-				//scene.fogNode = rangeFog( color( 0x0000ff ), 1500, 2100 );
 
 				// textures
 
@@ -80,7 +89,6 @@
 				smokeNodeMaterial.positionNode = offsetRange.mul( lifeTime );
 				smokeNodeMaterial.scaleNode = scaleRange.mul( lifeTime.max( 0.3 ) );
 				smokeNodeMaterial.depthWrite = false;
-				smokeNodeMaterial.transparent = true;
 
 				const smokeInstancedSprite = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), smokeNodeMaterial );
 				smokeInstancedSprite.scale.setScalar( 400 );
@@ -89,21 +97,39 @@
 
 				//
 
+				const fireGeometry = new THREE.PlaneGeometry( 1, 1 );
+				const fireCount = 1000;
+
 				const fireNodeMaterial = new THREE.SpriteNodeMaterial();
 				fireNodeMaterial.colorNode = mix( color( 0xb72f17 ), color( 0xb72f17 ), life );
 				fireNodeMaterial.positionNode = range( new THREE.Vector3( - 1, 1, - 1 ), new THREE.Vector3( 1, 2, 1 ) ).mul( lifeTime );
 				fireNodeMaterial.scaleNode = smokeNodeMaterial.scaleNode;
-				fireNodeMaterial.opacityNode = opacityNode;
+				fireNodeMaterial.opacityNode = opacityNode.mul( .5 );
 				fireNodeMaterial.blending = THREE.AdditiveBlending;
 				fireNodeMaterial.transparent = true;
 				fireNodeMaterial.depthWrite = false;
 
-				const fireInstancedSprite = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), fireNodeMaterial );
+				const fireInstancedSprite = new THREE.Mesh( fireGeometry, fireNodeMaterial );
 				fireInstancedSprite.scale.setScalar( 400 );
-				fireInstancedSprite.count = 100;
+				fireInstancedSprite.count = fireCount;
 				fireInstancedSprite.position.y = - 100;
 				fireInstancedSprite.renderOrder = 1;
 				scene.add( fireInstancedSprite );
+
+				// indirect draw ( optional )
+				// each indirect draw call is 5 uint32 values for indexes ( different structure for non-indexed draw calls using 4 uint32 values )
+
+				const indexCount = fireGeometry.index.array.length;
+
+				const uint32 = new Uint32Array( 5 );
+				uint32[ 0 ] = indexCount;	// indexCount
+				uint32[ 1 ] = fireCount; 	// instanceCount
+				uint32[ 2 ] = 0;			// firstIndex
+				uint32[ 3 ] = 0;			// baseVertex
+				uint32[ 4 ] = 0;			// firstInstance
+
+				const indirectAttribute = new THREE.IndirectStorageBufferAttribute( uint32, 5 );
+				fireGeometry.setIndirect( indirectAttribute );
 
 				//
 

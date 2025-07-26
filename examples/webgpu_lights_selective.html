@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -26,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { rangeFog, color, lights, texture, normalMap } from 'three/tsl';
+			import { fog, rangeFogFactor, color, lights, texture, normalMap } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -47,7 +48,7 @@
 				camera.position.z = 7;
 
 				scene = new THREE.Scene();
-				scene.fogNode = rangeFog( color( 0xFF00FF ), 12, 30 );
+				scene.fogNode = fog( color( 0xFF00FF ), rangeFogFactor( 12, 30 ) );
 
 				const sphereGeometry = new THREE.SphereGeometry( 0.1, 16, 8 );
 

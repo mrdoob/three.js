@@ -120,10 +120,18 @@ class RenderableSprite {
 
 }
 
-//
-
+/**
+ * This class can project a given scene in 3D space into a 2D representation
+ * used for rendering with a 2D API. `Projector` is currently used by {@link SVGRenderer}
+ * and was previously used by the legacy `CanvasRenderer`.
+ *
+ * @three_import import { Projector } from 'three/addons/renderers/Projector.js';
+ */
 class Projector {
 
+	/**
+	 * Constructs a new projector.
+	 */
 	constructor() {
 
 		let _object, _objectCount, _objectPoolLength = 0,
@@ -403,6 +411,16 @@ class Projector {
 
 		}
 
+		/**
+		 * Projects the given scene in 3D space into a 2D representation. The result
+		 * is an object with renderable items.
+		 *
+		 * @param {Object3D} scene - A scene or any other type of 3D object.
+		 * @param {Camera} camera - The camera.
+		 * @param {boolean} sortObjects - Whether to sort objects or not.
+		 * @param {boolean} sortElements - Whether to sort elements (faces, lines and sprites) or not.
+		 * @return {{objects:Array<Objects>,lights:Array<Objects>,elements:Array<Objects>}} The projected scene as renderable objects.
+		 */
 		this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
 			_faceCount = 0;

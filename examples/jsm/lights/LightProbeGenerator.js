@@ -8,13 +8,28 @@ import {
 	NoColorSpace,
 	HalfFloatType,
 	DataUtils,
-	WebGLCoordinateSystem
+	WebGLCoordinateSystem,
+	FloatType
 } from 'three';
 
+/**
+ * Utility class for creating instances of {@link LightProbe}.
+ *
+ * @hideconstructor
+ * @three_import import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';
+ */
 class LightProbeGenerator {
 
-	// https://www.ppsloan.org/publications/StupidSH36.pdf
+	/**
+	 * Creates a light probe from the given (radiance) environment map.
+	 * The method expects that the environment map is represented as a cube texture.
+	 *
+	 * @param {CubeTexture} cubeTexture - The environment map.
+	 * @return {LightProbe} The created light probe.
+	 */
 	static fromCubeTexture( cubeTexture ) {
+
+		// https://www.ppsloan.org/publications/StupidSH36.pdf
 
 		let totalWeight = 0;
 
@@ -99,7 +114,7 @@ class LightProbeGenerator {
 				// evaluate SH basis functions in direction dir
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
-				// accummuulate
+				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;
@@ -127,9 +142,21 @@ class LightProbeGenerator {
 
 	}
 
+	/**
+	 * Creates a light probe from the given (radiance) environment map.
+	 * The method expects that the environment map is represented as a cube render target.
+	 *
+	 * The cube render target must be in RGBA so `cubeRenderTarget.texture.format` must be
+	 * set to {@link RGBAFormat}.
+	 *
+	 * @async
+	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
+	 * @param {CubeRenderTarget|WebGLCubeRenderTarget} cubeRenderTarget - The environment map.
+	 * @return {Promise<LightProbe>} A Promise that resolves with the created light probe.
+	 */
 	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
-		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? -1 : 1;
+		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? - 1 : 1;
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
@@ -152,7 +179,11 @@ class LightProbeGenerator {
 
 		if ( renderer.isWebGLRenderer ) {
 
-			if ( dataType === HalfFloatType ) {
+			if ( dataType === FloatType ) {
+
+				data = new Float32Array( imageWidth * imageWidth * 4 );
+
+			} else if ( dataType === HalfFloatType ) {
 
 				data = new Uint16Array( imageWidth * imageWidth * 4 );
 
@@ -184,7 +215,13 @@ class LightProbeGenerator {
 
 				let r, g, b;
 
-				if ( dataType === HalfFloatType ) {
+				if ( dataType === FloatType ) {
+
+					r = data[ i ];
+					g = data[ i + 1 ];
+					b = data[ i + 2 ];
+
+				} else if ( dataType === HalfFloatType ) {
 
 					r = DataUtils.fromHalfFloat( data[ i ] );
 					g = DataUtils.fromHalfFloat( data[ i + 1 ] );
@@ -242,7 +279,7 @@ class LightProbeGenerator {
 				// evaluate SH basis functions in direction dir
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
-				// accummuulate
+				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;

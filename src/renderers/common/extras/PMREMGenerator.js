@@ -1,6 +1,6 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
-import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
+import { equirectUV } from '../../../nodes/utils/EquirectUV.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
@@ -69,7 +69,11 @@ const _axisDirections = [
 	/*@__PURE__*/ new Vector3( 1, 1, 1 )
 ];
 
-//
+const _origin = /*@__PURE__*/ new Vector3();
+
+// maps blur materials to their uniforms dictionary
+
+const _uniformsMap = new WeakMap();
 
 // WebGPU Face indices
 const _faceLib = [
@@ -77,8 +81,8 @@ const _faceLib = [
 	0, 4, 2
 ];
 
-const direction = getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
-const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
+const _direction = /*@__PURE__*/ getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
+const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direction.z );
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
@@ -91,12 +95,16 @@ const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting
- * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+ * Paper: Fast, Accurate Image-Based Lighting:
+ * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
 */
-
 class PMREMGenerator {
 
+	/**
+	 * Constructs a new PMREM generator.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( renderer ) {
 
 		this._renderer = renderer;
@@ -116,25 +124,63 @@ class PMREMGenerator {
 
 	}
 
+	get _hasInitialized() {
+
+		return this._renderer.hasInitialized();
+
+	}
+
 	/**
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
 	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
 	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
-	 * is placed at the origin).
+	 * and far planes ensure the scene is rendered in its entirety.
+	 *
+	 * @param {Scene} scene - The scene to be captured.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {RenderTarget} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromSceneAsync}
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
+
+		const {
+			size = 256,
+			position = _origin,
+			renderTarget = null,
+		} = options;
+
+		this._setSize( size );
+
+		if ( this._hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+
+			options.renderTarget = cubeUVRenderTarget;
+
+			this.fromSceneAsync( scene, sigma, near, far, options );
+
+			return cubeUVRenderTarget;
+
+		}
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		this._setSize( 256 );
-
-		const cubeUVRenderTarget = this._allocateTargets();
+		const cubeUVRenderTarget = renderTarget || this._allocateTarget();
 		cubeUVRenderTarget.depthBuffer = true;
 
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+		this._init( cubeUVRenderTarget );
+
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position );
 
 		if ( sigma > 0 ) {
 
@@ -151,11 +197,74 @@ class PMREMGenerator {
 	}
 
 	/**
+	 * Generates a PMREM from a supplied Scene, which can be faster than using an
+	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
+	 * in radians to be applied to the scene before PMREM generation. Optional near
+	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
+	 * is placed at the origin).
+	 *
+	 * @param {Scene} scene - The scene to be captured.
+	 * @param {number} [sigma=0] - The blur radius in radians.
+	 * @param {number} [near=0.1] - The near plane distance.
+	 * @param {number} [far=100] - The far plane distance.
+	 * @param {Object} [options={}] - The configuration options.
+	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
+	 * @see {@link PMREMGenerator#fromScene}
+	 */
+	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
+
+		if ( this._hasInitialized === false ) await this._renderer.init();
+
+		return this.fromScene( scene, sigma, near, far, options );
+
+	}
+
+	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {RenderTarget} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromEquirectangularAsync}
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
+
+			this._setSizeFromTexture( equirectangular );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+
+			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
+
+			return cubeUVRenderTarget;
+
+		}
+
+		return this._fromTexture( equirectangular, renderTarget );
+
+	}
+
+	/**
+	 * Generates a PMREM from an equirectangular texture, which can be either LDR
+	 * or HDR. The ideal input image size is 1k (1024 x 512),
+	 * as this matches best with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromEquirectangular}
+	 */
+	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( equirectangular, renderTarget );
 
@@ -165,8 +274,45 @@ class PMREMGenerator {
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} cubemap - The cubemap texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {RenderTarget} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromCubemapAsync}
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) {
+
+			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
+
+			this._setSizeFromTexture( cubemap );
+
+			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+
+			this.fromCubemapAsync( cubemap, renderTarget );
+
+			return cubeUVRenderTarget;
+
+		}
+
+		return this._fromTexture( cubemap, renderTarget );
+
+	}
+
+	/**
+	 * Generates a PMREM from an cubemap texture, which can be either LDR
+	 * or HDR. The ideal input cube size is 256 x 256,
+	 * with the 256 x 256 cubemap output.
+	 *
+	 * @param {Texture} cubemap - The cubemap texture to be converted.
+	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @see {@link PMREMGenerator#fromCubemap}
+	 */
+	async fromCubemapAsync( cubemap, renderTarget = null ) {
+
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( cubemap, renderTarget );
 
@@ -175,6 +321,8 @@ class PMREMGenerator {
 	/**
 	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
+	 *
+	 * @returns {Promise}
 	 */
 	async compileCubemapShader() {
 
@@ -190,6 +338,8 @@ class PMREMGenerator {
 	/**
 	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
+	 *
+	 * @returns {Promise}
 	 */
 	async compileEquirectangularShader() {
 
@@ -224,6 +374,20 @@ class PMREMGenerator {
 
 	// private interface
 
+	_setSizeFromTexture( texture ) {
+
+		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
+
+			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+
+		} else { // Equirectangular
+
+			this._setSize( texture.image.width / 4 );
+
+		}
+
+	}
+
 	_setSize( cubeSize ) {
 
 		this._lodMax = Math.floor( Math.log2( cubeSize ) );
@@ -255,21 +419,14 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
-
-			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
-
-		} else { // Equirectangular
-
-			this._setSize( texture.image.width / 4 );
-
-		}
+		this._setSizeFromTexture( texture );
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+		const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+		this._init( cubeUVRenderTarget );
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -278,24 +435,20 @@ class PMREMGenerator {
 
 	}
 
-	_allocateTargets() {
+	_allocateTarget() {
 
 		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
 		const height = 4 * this._cubeSize;
 
-		const params = {
-			magFilter: LinearFilter,
-			minFilter: LinearFilter,
-			generateMipmaps: false,
-			type: HalfFloatType,
-			format: RGBAFormat,
-			colorSpace: LinearSRGBColorSpace,
-			//depthBuffer: false
-		};
+		const cubeUVRenderTarget = _createRenderTarget( width, height );
 
-		const cubeUVRenderTarget = _createRenderTarget( width, height, params );
+		return cubeUVRenderTarget;
 
-		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width || this._pingPongRenderTarget.height !== height ) {
+	}
+
+	_init( renderTarget ) {
+
+		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== renderTarget.width || this._pingPongRenderTarget.height !== renderTarget.height ) {
 
 			if ( this._pingPongRenderTarget !== null ) {
 
@@ -303,16 +456,14 @@ class PMREMGenerator {
 
 			}
 
-			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
+			this._pingPongRenderTarget = _createRenderTarget( renderTarget.width, renderTarget.height );
 
 			const { _lodMax } = this;
 			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas, lodMeshes: this._lodMeshes } = _createPlanes( _lodMax ) );
 
-			this._blurMaterial = _getBlurShader( _lodMax, width, height );
+			this._blurMaterial = _getBlurShader( _lodMax, renderTarget.width, renderTarget.height );
 
 		}
-
-		return cubeUVRenderTarget;
 
 	}
 
@@ -323,15 +474,15 @@ class PMREMGenerator {
 
 	}
 
-	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position ) {
 
 		const cubeCamera = _cubeCamera;
 		cubeCamera.near = near;
 		cubeCamera.far = far;
 
 		// px, py, pz, nx, ny, nz
-		const upSign = [ - 1, 1, - 1, - 1, - 1, - 1 ];
-		const forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
+		const upSign = [ 1, 1, 1, 1, - 1, 1 ];
+		const forwardSign = [ 1, - 1, 1, - 1, 1, - 1 ];
 
 		const renderer = this._renderer;
 
@@ -393,17 +544,22 @@ class PMREMGenerator {
 			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
 
 			} else if ( col === 1 ) {
 
 				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
+
 
 			} else {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
+
 
 			}
 
@@ -486,6 +642,13 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
+	 *
+	 * @private
+	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
+	 * @param {number} lodIn - The input level-of-detail.
+	 * @param {number} lodOut - The output level-of-detail.
+	 * @param {number} sigma - The blur radius in radians.
+	 * @param {Vector3} [poleAxis] - The pole axis.
 	 */
 	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
@@ -528,7 +691,7 @@ class PMREMGenerator {
 		const blurMesh = this._lodMeshes[ lodOut ];
 		blurMesh.material = blurMaterial;
 
-		const blurUniforms = blurMaterial.uniforms;
+		const blurUniforms = _uniformsMap.get( blurMaterial );
 
 		const pixels = this._sizeLods[ lodIn ] - 1;
 		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
@@ -683,7 +846,17 @@ function _createPlanes( lodMax ) {
 
 }
 
-function _createRenderTarget( width, height, params ) {
+function _createRenderTarget( width, height ) {
+
+	const params = {
+		magFilter: LinearFilter,
+		minFilter: LinearFilter,
+		generateMipmaps: false,
+		type: HalfFloatType,
+		format: RGBAFormat,
+		colorSpace: LinearSRGBColorSpace,
+		//depthBuffer: false
+	};
 
 	const cubeUVRenderTarget = new RenderTarget( width, height, params );
 	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
@@ -732,7 +905,7 @@ function _getBlurShader( lodMax, width, height ) {
 		latitudinal,
 		weights,
 		poleAxis,
-		outputDirection,
+		outputDirection: _outputDirection,
 		dTheta,
 		samples,
 		envMap,
@@ -743,8 +916,9 @@ function _getBlurShader( lodMax, width, height ) {
 	};
 
 	const material = _getMaterial( 'blur' );
-	material.uniforms = materialUniforms; // TODO: Move to outside of the material
 	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+
+	_uniformsMap.set( material, materialUniforms );
 
 	return material;
 
@@ -753,7 +927,7 @@ function _getBlurShader( lodMax, width, height ) {
 function _getCubemapMaterial( envTexture ) {
 
 	const material = _getMaterial( 'cubemap' );
-	material.fragmentNode = cubeTexture( envTexture, outputDirection );
+	material.fragmentNode = cubeTexture( envTexture, _outputDirection );
 
 	return material;
 
@@ -762,7 +936,7 @@ function _getCubemapMaterial( envTexture ) {
 function _getEquirectMaterial( envTexture ) {
 
 	const material = _getMaterial( 'equirect' );
-	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0 );
+	material.fragmentNode = texture( envTexture, equirectUV( _outputDirection ), 0 );
 
 	return material;
 

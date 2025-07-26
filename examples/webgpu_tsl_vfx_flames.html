@@ -18,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -92,7 +93,7 @@
 
 				// flame 1 material
 
-				const flame1Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame1Material = new THREE.SpriteNodeMaterial( { side: THREE.DoubleSide } );
 
 				flame1Material.colorNode = Fn( () => {
 
@@ -120,7 +121,7 @@
 					const gradientColor = texture( gradient.texture, vec2( shape.remap( 0, 1, 0, 1 ), 0 ) );
 
 					// output
-					const color = mix( gradientColor, vec3( 1 ), shape.step( 0.8 ).oneMinus() );
+					const color = mix( gradientColor, vec3( 1 ), shape.step( 0.8 ) );
 					const alpha = shape.smoothstep( 0, 0.3 );
 					return vec4( color.rgb, alpha );
 
@@ -128,7 +129,7 @@
 
 				// flame 2 material
 
-				const flame2Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame2Material = new THREE.SpriteNodeMaterial( { side: THREE.DoubleSide } );
 
 				flame2Material.colorNode = Fn( () => {
 
@@ -161,7 +162,7 @@
 					const cellularNoise = texture( cellularTexture, cellularUv, 0 ).r.oneMinus().smoothstep( 0.25, 1 );
 
 					// shape
-					const shape = mainUv.sub( 0.5 ).mul( vec2( 6, 1 ) ).length().step( 0.5 );
+					const shape = step( mainUv.sub( 0.5 ).mul( vec2( 6, 1 ) ).length(), 0.5 );
 					shape.assign( shape.mul( cellularNoise ) );
 					shape.mulAssign( gradient3 );
 					shape.assign( step( 0.01, shape ) );

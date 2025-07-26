@@ -1,6 +1,14 @@
-import { Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
+import { Vector2, TempNode, NodeUpdateType } from 'three/webgpu';
+import { nodeObject, Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
 
+/**
+ * Post processing node for detecting edges with a sobel filter.
+ * A sobel filter should be applied after tone mapping and output color
+ * space conversion.
+ *
+ * @augments TempNode
+ * @three_import import { sobel } from 'three/addons/tsl/display/SobelOperatorNode.js';
+ */
 class SobelOperatorNode extends TempNode {
 
 	static get type() {
@@ -9,19 +17,47 @@ class SobelOperatorNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new sobel operator node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
+	 */
 	constructor( textureNode ) {
 
-		super();
+		super( 'vec4' );
 
+		/**
+		 * The texture node that represents the input of the effect.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNode = textureNode;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * its internal uniforms once per frame in `updateBefore()`.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * A uniform node holding the inverse resolution value.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
 		this._invSize = uniform( new Vector2() );
 
 	}
 
-	updateBefore() {
+	/**
+	 * This method is used to update the effect's uniforms once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
+	updateBefore( /* frame */ ) {
 
 		const map = this.textureNode.value;
 
@@ -29,13 +65,19 @@ class SobelOperatorNode extends TempNode {
 
 	}
 
-	setup() {
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ShaderCallNodeInternal}
+	 */
+	setup( /* builder */ ) {
 
 		const { textureNode } = this;
 
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.sample( uv );
 
 		const sobel = Fn( () => {
 
@@ -97,7 +139,7 @@ class SobelOperatorNode extends TempNode {
 				Gy[ 2 ][ 2 ].mul( tx2y2 )
 			);
 
-			// magnitute of the total gradient
+			// magnitude of the total gradient
 
 			const G = valueGx.mul( valueGx ).add( valueGy.mul( valueGy ) ).sqrt();
 
@@ -115,4 +157,12 @@ class SobelOperatorNode extends TempNode {
 
 export default SobelOperatorNode;
 
+/**
+ * TSL function for creating a sobel operator node which performs edge detection with a sobel filter.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @returns {SobelOperatorNode}
+ */
 export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );

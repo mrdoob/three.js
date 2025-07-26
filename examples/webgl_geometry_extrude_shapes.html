@@ -43,7 +43,6 @@
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.style.color = '#fff';
-				info.style.link = '#f80';
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
 				document.body.appendChild( info );
 
@@ -177,6 +176,19 @@
 				mesh3.position.set( 50, 100, 50 );
 
 				scene.add( mesh3 );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

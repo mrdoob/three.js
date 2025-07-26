@@ -11,14 +11,15 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - parallax uv<br />
 			Textures by <a href="https://ambientcg.com/view?id=Ice002" target="_blank" rel="noopener">ambientCG</a><br />
-			
+
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -27,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, parallaxUV, overlay, uv } from 'three/tsl';
+			import { texture, parallaxUV, blendOverlay, uv } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -81,7 +82,7 @@
 				bottomTexture.wrapS = THREE.RepeatWrapping;
 				bottomTexture.wrapT = THREE.RepeatWrapping;
 
-				// paralax effect
+				// parallax effect
 
 				const parallaxScale = .3;
 				const offsetUV = texture( displaceTexture ).mul( parallaxScale );
@@ -89,7 +90,7 @@
 				const parallaxUVOffset = parallaxUV( uv(), offsetUV );
 				const parallaxResult = texture( bottomTexture, parallaxUVOffset );
 
-				const iceNode = overlay( texture( topTexture ), parallaxResult );
+				const iceNode = blendOverlay( texture( topTexture ), parallaxResult );
 
 				// material
 

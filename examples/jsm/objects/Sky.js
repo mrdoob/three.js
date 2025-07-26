@@ -8,21 +8,32 @@ import {
 } from 'three';
 
 /**
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
+ * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight]{@link https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight}
+ * aka The Preetham Model, the de facto standard for analytical skydomes.
  *
- * First implemented by Simon Wallner
- * http://simonwallner.at/project/atmospheric-scattering/
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link SkyMesh}.
  *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ * More references:
  *
- * Three.js integration by zz85 http://twitter.com/blurspline
-*/
-
+ * - {@link http://simonwallner.at/project/atmospheric-scattering/}
+ * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
+ *
+ *
+ * ```js
+ * const sky = new Sky();
+ * sky.scale.setScalar( 10000 );
+ * scene.add( sky );
+ * ```
+ *
+ * @augments Mesh
+ * @three_import import { Sky } from 'three/addons/objects/Sky.js';
+ */
 class Sky extends Mesh {
 
+	/**
+	 * Constructs a new skydome.
+	 */
 	constructor() {
 
 		const shader = Sky.SkyShader;
@@ -38,6 +49,13 @@ class Sky extends Mesh {
 
 		super( new BoxGeometry( 1, 1, 1 ), material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSky = true;
 
 	}
@@ -77,7 +95,7 @@ Sky.SkyShader = {
 
 		// wavelength of used primaries, according to preetham
 		const vec3 lambda = vec3( 680E-9, 550E-9, 450E-9 );
-		// this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function:
+		// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 		// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
 		const vec3 totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
 
@@ -120,7 +138,7 @@ Sky.SkyShader = {
 
 			float rayleighCoefficient = rayleigh - ( 1.0 * ( 1.0 - vSunfade ) );
 
-			// extinction (absorbtion + out scattering)
+			// extinction (absorption + out scattering)
 			// rayleigh coefficients
 			vBetaR = totalRayleigh * rayleighCoefficient;
 

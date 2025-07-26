@@ -138,7 +138,7 @@ lil-guiで色を調整するにはヘルパーが必要です。
 <p>lil-guiの設定は以下の通りです。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 </pre>
 <p>これで以下のような結果になります。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -171,7 +171,7 @@ scene.add(light);
 -gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 +gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
 +gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 </pre>
 <p>これが結果です。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -199,7 +199,7 @@ three.jsの <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notrans
 <p>GUIに追加してlight.targetを動かせるようにしてみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 gui.add(light.target.position, 'x', -10, 10);
 gui.add(light.target.position, 'z', -10, 10);
 gui.add(light.target.position, 'y', 0, 10);
@@ -238,7 +238,7 @@ scene.add(helper);
 
 const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 5, 0.01);
 
 +makeXYZGUI(gui, light.position, 'position', updateLight);
 +makeXYZGUI(gui, light.target.position, 'target', updateLight);
@@ -287,7 +287,7 @@ scene.add(helper);
 <p>distanceを調整できるようにGUIを設定してみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light, 'intensity', 0, 250, 1);
 +gui.add(light, 'distance', 0, 40).onChange(updateLight);
 
 makeXYZGUI(gui, light.position, 'position', updateLight);

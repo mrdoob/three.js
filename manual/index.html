@@ -20,6 +20,7 @@
 				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
+					<a href="../docs/">docs</a>
 					<span class="selected">manual</span>
 				</div>
 
@@ -230,6 +231,14 @@
 			for ( const category in categories ) {
 
 				// Create categories
+
+				if ( category === '---' ) {
+
+					const separator = document.createElement( 'hr' );
+					navigation.appendChild( separator );
+					continue;
+
+				}
 
 				const pages = categories[ category ];
 

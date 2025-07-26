@@ -3,12 +3,12 @@
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
 [![NPM Downloads][npm-downloads]][npmtrends-url]
-[![DeepScan][deepscan]][deepscan-url]
 [![Discord][discord]][discord-url]
+[![DeepWiki][deepwiki]][deepwiki-url]
 
 #### JavaScript 3D library
 
-The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
+The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include WebGL and WebGPU renderers but SVG and CSS3D renderers are also available as addons.
 
 [Examples](https://threejs.org/examples/) &mdash;
 [Docs](https://threejs.org/docs/) &mdash;
@@ -58,7 +58,7 @@ function animate( time ) {
 }
 ```
 
-If everything goes well, you should see [this](https://jsfiddle.net/v98k6oze/).
+If everything goes well, you should see [this](https://jsfiddle.net/w43x5Lgh/).
 
 ### Cloning this repository
 
@@ -79,8 +79,8 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [build-size-url]: https://bundlephobia.com/result?p=three
 [npm-downloads]: https://img.shields.io/npm/dw/three
 [npmtrends-url]: https://www.npmtrends.com/three
-[deepscan]: https://deepscan.io/api/teams/16600/projects/19901/branches/525701/badge/grade.svg
-[deepscan-url]: https://deepscan.io/dashboard#view=project&tid=16600&pid=19901&bid=525701
 [discord]: https://img.shields.io/discord/685241246557667386
 [discord-url]: https://discord.gg/56GBJwAnUS
+[deepwiki]: https://deepwiki.com/badge.svg
+[deepwiki-url]: https://deepwiki.com/mrdoob/three.js
 

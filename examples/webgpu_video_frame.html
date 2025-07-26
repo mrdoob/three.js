@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - video frames</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video - frames<br/>
+			Decodes all frames from a MP4 file and renders them onto a plane as fast as possible.<br/>
+			<a href="https://github.com/gpac/mp4box.js/" target="_blank" rel="noopener">mp4box.js</a> used for MP4 parsing.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { MP4Demuxer } from 'three/addons/libs/demuxer_mp4.js';
+
+			let camera, scene, renderer;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, .25, 10 );
+				camera.position.set( 0, 0, 1 );
+
+				scene = new THREE.Scene();
+
+				const geometry = new THREE.PlaneGeometry();
+
+				const videoTexture = new THREE.VideoFrameTexture();
+				videoTexture.colorSpace = THREE.SRGBColorSpace;
+
+				// eslint-disable-next-line compat/compat
+				const decoder = new VideoDecoder( {
+					output( frame ) {
+
+						// To avoid video decoder stalls, we should close the VideoFrame which is no longer needed. https://w3c.github.io/webcodecs/#dom-videodecoder-decode
+						if ( videoTexture.image instanceof VideoFrame ) videoTexture.image.close();
+
+						videoTexture.setFrame( frame );
+			
+					},
+					error( e ) {
+
+						console.error( 'VideoDecoder:', e );
+
+					}
+				} );
+
+				new MP4Demuxer( './textures/sintel.mp4', {
+					onConfig( config ) {
+
+						decoder.configure( config );
+
+					},
+					onChunk( chunk ) {
+
+						decoder.decode( chunk );
+
+					},
+					setStatus( kind, status ) {
+
+						console.info( 'MP4Demuxer:', kind );
+
+						if ( kind === 'fetch' && status === 'Done' ) {
+
+							decoder.flush().then( () => {
+
+								decoder.close();
+
+								// In case our VideoFrameTexture is no longer needed, we should close its backed VideoFrame, see issue #30379:
+								if ( videoTexture.image instanceof VideoFrame ) videoTexture.image.close();
+
+								videoTexture.image = null;
+
+								scene.remove( mesh );
+
+							} );
+
+						}
+
+					}
+				} );
+			
+				const material = new THREE.MeshBasicMaterial( { map: videoTexture } );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+	</body>
+</html>

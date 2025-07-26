@@ -36,7 +36,7 @@
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
-		Toute propriété du matériau (y compris toute proprioété héritée de [page:Material]) peut être passée dans l'objet.
+		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être passée dans l'objet.
 		</p>
 
 
@@ -64,23 +64,22 @@
 		<h3>[property:Float displacementScale]</h3>
 		<p>
 			Dans quelle mesure la carte de déplacement affecte le maillage (où le noir n'est pas un déplacement,
-			et le blanc est le déplacement maximal). Sans ensemble de cartes de déplacement, cette valeur n'est pas appliquée.
-			La valeur par défaut est 1.
+			et le blanc est le déplacement maximal). Sans carte de déplacement, cette valeur n'est pas appliquée.
+			La valeur par défaut est `1`.
 		</p>
 
 		<h3>[property:Float displacementBias]</h3>
 		<p>
 			Le décalage des valeurs de la carte de déplacement sur les sommets du maillage.
-			Sans ensemble de cartes de déplacement, cette valeur n'est pas appliquée. La valeur par défaut est 0.
+			Le décalage est ajouté après la mise à l'échelle de la carte de déplacement.
+			Sans carte de déplacement, cette valeur n'est pas appliquée. La valeur par défaut
+			est `0`.
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>
 		<p>
 			Définit si le matériau est rendu avec un ombrage plat. La valeur par défaut est false.
 		</p>
-
-		<h3>[property:Boolean fog]</h3>
-		<p>Si le matériau est affecté par le brouillard (fog) La valeur par défaut est `false`.</p>
 
 		<h3>[property:Texture normalMap]</h3>
 		<p>
@@ -112,7 +111,7 @@
 		<p>Contrôle l'épaisseur du filaire. La valeur par défaut est 1.<br /><br />
 
 		A cause des limitations de [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
-			avec le moteur de rendu [page:WebGLRenderer WebGL] sur la plupârt des plateformes, l'épaisseur de ligne (linewidth) sera toujours 
+			avec le moteur de rendu [page:WebGLRenderer WebGL] sur la plupart des plateformes, l'épaisseur de ligne (linewidth) sera toujours
 			à 1, indépendamment de la valeur définie.
 		</p>
 

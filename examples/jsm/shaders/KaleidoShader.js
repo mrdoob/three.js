@@ -1,13 +1,20 @@
 /**
- * Kaleidoscope Shader
+ * @module KaleidoShader
+ * @three_import import { KaleidoShader } from 'three/addons/shaders/KaleidoShader.js';
+ */
+
+/**
+ * Kaleidoscope Shader.
  * Radial reflection around center point
- * Ported from: http://pixelshaders.com/editor/
- * by Toby Schachman / http://tobyschachman.com/
+ * Ported from: {@link http://pixelshaders.com/editor/}
+ * by [Toby Schachman]{@link http://tobyschachman.com/}
  *
  * sides: number of reflections
  * angle: initial angle in radians
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const KaleidoShader = {
 
 	name: 'KaleidoShader',

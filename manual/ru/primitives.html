@@ -217,7 +217,7 @@ function addObject(x, y, obj) {
 как то, что справа.</p>
 <p>Другие исключения - это 2-строчные примеры для <a href="/docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>
 и <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>. Вместо того, чтобы вызвать <code class="notranslate" translate="no">addSolidGeometry</code>
-они вызвают <code class="notranslate" translate="no">addLineGeomtry</code> который выглядит так</p>
+они вызвают <code class="notranslate" translate="no">addLineGeometry</code> который выглядит так</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">function addLineGeometry(x, y, geometry) {
   const material = new THREE.LineBasicMaterial({color: 0x000000});
   const mesh = new THREE.LineSegments(geometry, material);

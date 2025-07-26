@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js physics - rapier3d basic</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #333;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> basic
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+			import { RapierHelper } from 'three/addons/helpers/RapierHelper.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			let camera, scene, renderer, stats, controls;
+			let physics, physicsHelper;
+
+			init();
+
+			async function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 3, 10 );
+
+				const ambient = new THREE.HemisphereLight( 0x555555, 0xFFFFFF );
+
+				scene.add( ambient );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 4 );
+
+				light.position.set( 0, 12.5, 12.5 );
+				light.castShadow = true;
+				light.shadow.radius = 3;
+				light.shadow.blurSamples = 8;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+
+				const size = 10;
+				light.shadow.camera.left = - size;
+				light.shadow.camera.bottom = - size;
+				light.shadow.camera.right = size;
+				light.shadow.camera.top = size;
+				light.shadow.camera.near = 1;
+				light.shadow.camera.far = 50;
+
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+				renderer.setAnimationLoop( animate );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target = new THREE.Vector3( 0, 2, 0 );
+				controls.update();
+
+				const geometry = new THREE.BoxGeometry( 10, 0.5, 10 );
+				const material = new THREE.MeshStandardMaterial( { color: 0xFFFFFF } );
+
+				const floor = new THREE.Mesh( geometry, material );
+				floor.receiveShadow = true;
+
+				floor.position.y = - 0.25;
+				floor.userData.physics = { mass: 0 };
+
+				scene.add( floor );
+
+				new THREE.TextureLoader().load( 'textures/grid.png', function ( texture ) {
+
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.repeat.set( 20, 20 );
+					floor.material.map = texture;
+					floor.material.needsUpdate = true;
+
+				} );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				initPhysics();
+
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			async function initPhysics() {
+
+				//Initialize physics engine using the script in the jsm/physics folder
+				physics = await RapierPhysics();
+
+				physics.addScene( scene );
+
+				addBody( );
+
+				//Optionally display collider outlines
+				physicsHelper = new RapierHelper( physics.world );
+				scene.add( physicsHelper );
+
+				setInterval( addBody, 1000 );
+
+			}
+
+			const geometries = [
+				new THREE.BoxGeometry( 1, 1, 1 ),
+				new THREE.SphereGeometry( 0.5 ),
+				new RoundedBoxGeometry( 1, 1, 1, 2, 0.25 )
+			];
+
+			function addBody( ) {
+
+				const geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+				const material = new THREE.MeshStandardMaterial( { color: Math.floor( Math.random() * 0xFFFFFF ) } );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.castShadow = true;
+
+				mesh.position.set( Math.random() * 2 - 1, Math.random() * 3 + 6, Math.random() * 2 - 1 );
+
+				scene.add( mesh );
+
+				//parameter 2 - mass, parameter 3 - restitution ( how bouncy )
+				physics.addMesh( mesh, 1, 0.5 );
+
+			}
+
+			function onWindowResize( ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				for ( const object of scene.children ) {
+
+					if ( object.isMesh ) {
+
+						if ( object.position.y < - 10 ) {
+
+							scene.remove( object );
+							physics.removeMesh( object );
+
+						}
+			
+					}
+
+				}
+
+				if ( physicsHelper ) physicsHelper.update();
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>

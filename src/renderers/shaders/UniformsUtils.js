@@ -1,8 +1,6 @@
 import { ColorManagement } from '../../math/ColorManagement.js';
 
-/**
- * Uniform Utilities
- */
+// Uniform Utilities
 
 export function cloneUniforms( src ) {
 

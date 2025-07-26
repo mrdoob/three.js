@@ -14,8 +14,8 @@
 		<p class="desc">
 			A special version of [page:Mesh] with multi draw batch rendering support. Use
 			[name] if you have to render a large number of objects with the same
-			material but with different world transformations. The usage of [name] will
-			help you to reduce the number of draw calls and thus improve the overall
+			material but with different geometries or world transformations. The usage of
+			[name] will help you to reduce the number of draw calls and thus improve the overall
 			rendering performance in your application.
 
 			<br/>
@@ -167,7 +167,7 @@
 		<p>
 			[page:Integer instanceId]: The id of an instance to get the visibility state of.
 		</p>
-		<p>Get whether the given instance is marked as "visible" or not.</p>		
+		<p>Get whether the given instance is marked as "visible" or not.</p>
 
 		<h3>
 			[method:Object getGeometryRangeAt]( [param:Integer geometryId], [param:Object target] )
@@ -181,7 +181,7 @@
 		<p>Get the range representing the subset of triangles related to the attached geometry, indicating the starting offset and count, or `null` if invalid.</p>
 		<p>Return an object of the form:</p>
 		<code>{ start: Integer, count: Integer }</code>
-	
+
 		<h3>
 			[method:Integer getGeometryIdAt]( [param:Integer instanceId] )
 		</h3>
@@ -213,6 +213,9 @@
 		</p>
 		<p>
 			Sets the given local transformation matrix to the defined instance.
+		</p>
+		<p>
+			Negatively scaled matrices are not supported.
 		</p>
 
 		<h3>
@@ -301,12 +304,34 @@
 			Calling this will change all instances that are rendering that geometry.
 		</p>
 
-
 		<h3>
 			[method:this optimize]()
 		</h3>
 		<p>
 			Repacks the sub geometries in [name] to remove any unused space remaining from previously deleted geometry, freeing up space to add new geometry.
+		</p>
+
+		<h3>
+			[method:this setGeometrySize]( maxVertexCount, maxIndexCount )
+		</h3>
+		<p>
+			Resizes the available space in [name]'s vertex and index buffer attributes to the provided sizes. If the provided arguments shrink the geometry buffers
+			but there is not enough unused space at the end of the geometry attributes then an error is thrown.
+		</p>
+		<p>
+			[page:Integer maxVertexCount] - the max number of vertices to be used by all unique geometries to resize to.<br />
+			[page:Integer maxIndexCount] - the max number of indices to be used by all unique geometries to resize to.<br />
+		</p>
+
+		<h3>
+			[method:this setInstanceCount]( maxInstanceCount )
+		</h3>
+		<p>
+			Resizes the necessary buffers to support the provided number of instances. If the provided arguments shrink the number of instances but there are not enough
+			unused ids at the end of the list then an error is thrown.
+		</p>
+		<p>
+			[page:Integer maxInstanceCount] - the max number of individual instances that can be added and rendered by the [name].<br />
 		</p>
 
 		<!--

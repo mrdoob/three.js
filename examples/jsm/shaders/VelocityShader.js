@@ -5,9 +5,16 @@ import {
 } from 'three';
 
 /**
- * Mesh Velocity Shader @bhouston
+ * @module VelocityShader
+ * @three_import import { VelocityShader } from 'three/addons/shaders/VelocityShader.js';
  */
 
+/**
+ * Mesh velocity shader by @bhouston.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const VelocityShader = {
 
 	name: 'VelocityShader',

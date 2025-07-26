@@ -1,3 +1,17 @@
+/**
+ * @module OutputShader
+ * @three_import import { OutputShader } from 'three/addons/shaders/OutputShader.js';
+ */
+
+/**
+ * Performs tone mapping and color space conversion for
+ * FX workflows.
+ *
+ * Used by {@link OutputPass}.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const OutputShader = {
 
 	name: 'OutputShader',
@@ -28,7 +42,7 @@ const OutputShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-	
+
 		precision highp float;
 
 		uniform sampler2D tDiffuse;
@@ -67,6 +81,10 @@ const OutputShader = {
 			#elif defined( NEUTRAL_TONE_MAPPING )
 
 				gl_FragColor.rgb = NeutralToneMapping( gl_FragColor.rgb );
+
+			#elif defined( CUSTOM_TONE_MAPPING )
+
+				gl_FragColor.rgb = CustomToneMapping( gl_FragColor.rgb );
 
 			#endif
 

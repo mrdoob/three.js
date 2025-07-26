@@ -92,13 +92,14 @@
 	</head>
 	<body>
 
-		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs/loader.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "../examples/jsm/",
 					"flow": "./libs/flow.module.js"
 				}

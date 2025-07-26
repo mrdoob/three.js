@@ -5,10 +5,6 @@ import {
 	Quaternion,
 } from 'three';
 
-/**
- * This is a class to check whether objects are in a selection area in 3D space
- */
-
 const _frustum = new Frustum();
 const _center = new Vector3();
 
@@ -33,34 +29,105 @@ const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
 const _scale = new Vector3();
 
+/**
+ * This class can be used to select 3D objects in a scene with a selection box.
+ * It is recommended to visualize the selected area with the help of {@link SelectionHelper}.
+ *
+ * ```js
+ * const selectionBox = new SelectionBox( camera, scene );
+ * const selectedObjects = selectionBox.select( startPoint, endPoint );
+ * ```
+ *
+ * @three_import import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';
+ */
 class SelectionBox {
 
+	/**
+	 * Constructs a new selection box.
+	 *
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {Scene} scene - The scene.
+	 * @param {number} [deep=Number.MAX_VALUE] - How deep the selection frustum of perspective cameras should extend.
+	 */
 	constructor( camera, scene, deep = Number.MAX_VALUE ) {
 
+		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
+
+		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The start point of the selection.
+		 *
+		 * @type {Vector3}
+		 */
 		this.startPoint = new Vector3();
+
+		/**
+		 * The end point of the selection.
+		 *
+		 * @type {Vector3}
+		 */
 		this.endPoint = new Vector3();
+
+		/**
+		 * The selected 3D objects.
+		 *
+		 * @type {Array<Object3D>}
+		 */
 		this.collection = [];
+
+		/**
+		 * The selected instance IDs of instanced meshes.
+		 *
+		 * @type {Object}
+		 */
 		this.instances = {};
+
+		/**
+		 * How deep the selection frustum of perspective cameras should extend.
+		 *
+		 * @type {number}
+		 * @default Number.MAX_VALUE
+		 */
 		this.deep = deep;
 
 	}
 
+	/**
+	 * This method selects 3D objects in the scene based on the given start
+	 * and end point. If no parameters are provided, the method uses the start
+	 * and end values of the respective members.
+	 *
+	 * @param {Vector3} [startPoint] - The start point.
+	 * @param {Vector3} [endPoint] - The end point.
+	 * @return {Array<Object3D>} The selected 3D objects.
+	 */
 	select( startPoint, endPoint ) {
 
 		this.startPoint = startPoint || this.startPoint;
 		this.endPoint = endPoint || this.endPoint;
 		this.collection = [];
 
-		this.updateFrustum( this.startPoint, this.endPoint );
-		this.searchChildInFrustum( _frustum, this.scene );
+		this._updateFrustum( this.startPoint, this.endPoint );
+		this._searchChildInFrustum( _frustum, this.scene );
 
 		return this.collection;
 
 	}
 
-	updateFrustum( startPoint, endPoint ) {
+	// private
+
+	_updateFrustum( startPoint, endPoint ) {
 
 		startPoint = startPoint || this.startPoint;
 		endPoint = endPoint || this.endPoint;
@@ -170,7 +237,7 @@ class SelectionBox {
 
 	}
 
-	searchChildInFrustum( frustum, object ) {
+	_searchChildInFrustum( frustum, object ) {
 
 		if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -214,7 +281,7 @@ class SelectionBox {
 
 			for ( let x = 0; x < object.children.length; x ++ ) {
 
-				this.searchChildInFrustum( frustum, object.children[ x ] );
+				this._searchChildInFrustum( frustum, object.children[ x ] );
 
 			}
 

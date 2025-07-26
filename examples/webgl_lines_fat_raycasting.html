@@ -18,7 +18,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.8/dist/main.js"
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 				}
 			}
 		</script>
@@ -194,7 +194,7 @@
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
-				stats = new Stats( { horizontal: false } );
+				stats = new Stats( { horizontal: false, trackGPU: true } );
 				stats.init( renderer );
 				document.body.appendChild( stats.dom );
 			

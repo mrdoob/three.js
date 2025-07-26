@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Comment se débarrasser des objets</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Comment se débarrasser des objets">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Comment se débarrasser des objets</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <p>
+            Un aspect important pour améliorer les performances et éviter les fuites de mémoire dans votre application est la libération des entités de la librairie inutilisées.
+            Chaque fois que vous créez une instance d'un type *three.js*, vous allouez une certaine quantité de mémoire. Cependant, *three.js* crée pour des objets spécifiques
+            comme les géométries ou les matériaux des entités liées à WebGL comme des tampons (buffers) ou des programmes de shaders qui sont nécessaires au rendu. Il est important de
+            souligner que ces objets ne sont pas libérés automatiquement. Au lieu de cela, l'application doit utiliser une API spéciale afin de libérer de telles ressources.
+            Ce guide donne un bref aperçu de la manière dont cette API est utilisée et des objets pertinents dans ce contexte.
+          </p>
+
+          <h2>Géométries</h2>
+
+          <p>
+            Une géométrie représente généralement les informations de vertex définies comme une collection d'attributs. *three.js* crée en interne un objet de type [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]
+            pour chaque attribut. Ces entités ne sont supprimées que si vous appelez `BufferGeometry.dispose()`. Si une géométrie devient obsolète dans votre application,
+            exécutez la méthode pour libérer toutes les ressources associées.
+          </p>
+
+          <h2>Matériaux</h2>
+
+          <p>
+            Un matériau définit la manière dont les objets sont rendus. *three.js* utilise les informations d'une définition de matériau afin de construire un programme de shader pour le rendu.
+            Les programmes de shader ne peuvent être supprimés que si le matériau respectif est libéré. Pour des raisons de performance, *three.js* essaie de réutiliser les
+            programmes de shader existants si possible. Ainsi, un programme de shader n'est supprimé que si tous les matériaux associés sont libérés. Vous pouvez indiquer la libération d'un matériau en
+            exécutant `Material.dispose()`.
+          </p>
+
+          <h2>Textures</h2>
+
+          <p>
+            La libération d'un matériau n'a aucun effet sur les textures. Elles sont gérées séparément car une seule texture peut être utilisée par plusieurs matériaux en même temps.
+            Chaque fois que vous créez une instance de `Texture`, three.js crée en interne une instance de [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture].
+            Comme pour les tampons (buffers), cet objet ne peut être supprimé qu'en appelant `Texture.dispose()`.
+          </p>
+
+          <p>
+            Si vous utilisez un `ImageBitmap` comme source de données de la texture, vous devez appeler [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() au niveau de l'application pour libérer toutes les ressources côté CPU.
+            Un appel automatique de `ImageBitmap.close()` dans `Texture.dispose()` n'est pas possible, car l'image bitmap devient inutilisable, et le moteur n'a aucun moyen de savoir si l'image bitmap est utilisée ailleurs.
+          </p>
+
+          <h2>Cibles de rendu</h2>
+
+          <p>
+            Les objets de type `WebGLRenderTarget` allouent non seulement une instance de [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture] mais aussi
+            des [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer] et des [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer]
+            pour réaliser des destinations de rendu personnalisées. Ces objets ne sont désalloués qu'en exécutant `WebGLRenderTarget.dispose()`.
+          </p>
+
+          <h2>Mesh skinné</h2>
+
+          <p>
+            Les meshes skinnés représentent leur hiérarchie d'os comme des squelettes. Si vous n'avez plus besoin d'un mesh skinné, envisagez d'appeler `Skeleton.dispose()` sur le squelette pour libérer les ressources internes.
+            Gardez à l'esprit que les squelettes peuvent être partagés entre plusieurs meshes skinnés, n'appelez donc `dispose()` que si le squelette n'est pas utilisé par d'autres meshes skinnés actifs.
+          </p>
+
+          <h2>Divers</h2>
+
+          <p>
+            Il existe d'autres classes dans le répertoire d'exemples, comme les contrôles ou les passes de post-traitement, qui fournissent des méthodes `dispose()` afin de supprimer les écouteurs d'événements internes
+            ou les cibles de rendu. En général, il est recommandé de vérifier l'API ou la documentation d'une classe et de rechercher `dispose()`. Si présent, vous devriez l'utiliser lors du nettoyage.
+          </p>
+
+          <h2>FAQ</h2>
+
+          <h3>Pourquoi *three.js* ne peut-il pas libérer les objets automatiquement ?</h3>
+
+          <p>
+            Cette question a été posée de nombreuses fois par la communauté, il est donc important de clarifier ce point. Le fait est que *three.js* ne connaît pas la durée de vie ou la portée
+            des entités créées par l'utilisateur, comme les géométries ou les matériaux. C'est la responsabilité de l'application. Par exemple, même si un matériau n'est actuellement pas utilisé pour le rendu,
+            il pourrait être nécessaire pour la prochaine image. Donc, si l'application décide qu'un certain objet peut être supprimé, elle doit en informer le moteur en appelant la méthode
+            `dispose()` respective.
+          </p>
+
+          <h3>La suppression d'un mesh de la scène libère-t-elle également sa géométrie et son matériau ?</h3>
+
+          <p>
+            Non, vous devez explicitement libérer la géométrie et le matériau via *dispose()*. Gardez à l'esprit que les géométries et les matériaux peuvent être partagés entre des objets 3D comme les meshes.
+          </p>
+
+          <h3>*three.js* fournit-il des informations sur la quantité d'objets mis en cache ?</h3>
+
+          <p>
+            Oui. Il est possible d'évaluer `renderer.info`, une propriété spéciale du renderer avec une série d'informations statistiques sur la mémoire de la carte graphique
+            et le processus de rendu. Entre autres choses, elle vous indique combien de textures, de géométries et de programmes de shader sont stockés en interne. Si vous remarquez des problèmes de performance
+            dans votre application, c'est une bonne idée de déboguer cette propriété afin d'identifier facilement une fuite de mémoire.
+          </p>
+
+          <h3>Que se passe-t-il lorsque vous appelez `dispose()` sur une texture mais que l'image n'est pas encore chargée ?</h3>
+
+          <p>
+            Les ressources internes d'une texture ne sont allouées que si l'image est entièrement chargée. Si vous libérez une texture avant que l'image ne soit chargée,
+            rien ne se passe. Aucune ressource n'a été allouée, il n'y a donc pas besoin de nettoyage.
+          </p>
+
+          <h3>Que se passe-t-il si j'appelle `dispose()` puis utilise l'objet respectif ultérieurement ?</h3>
+
+          <p>
+            Cela dépend. Pour les géométries, les matériaux, les textures, les cibles de rendu et les passes de post-traitement, les ressources internes supprimées peuvent être recréées par le moteur.
+            Aucune erreur d'exécution ne se produira donc, mais vous pourriez remarquer un impact négatif sur les performances pour l'image actuelle, surtout lorsque les programmes de shader doivent être compilés.
+
+            Les contrôles et les renderers sont une exception. Les instances de ces classes ne peuvent pas être utilisées après que `dispose()` a été appelée. Vous devez créer de nouvelles instances dans ce cas.
+          </p>
+
+          <h3>Comment gérer les objets *three.js* dans mon application ? Quand savoir comment libérer les choses ?</h3>
+
+          <p>
+            En général, il n'y a pas de recommandation définitive pour cela. Cela dépend fortement du cas d'utilisation spécifique pour savoir quand appeler `dispose()` est approprié. Il est important de souligner que
+            il n'est pas toujours nécessaire de libérer les objets en permanence. Un bon exemple est un jeu composé de plusieurs niveaux. Un bon moment pour la libération des objets est lors du changement de niveau.
+            L'application pourrait parcourir l'ancienne scène et libérer tous les matériaux, géométries et textures obsolètes. Comme mentionné dans la section précédente, cela ne produit pas
+            d'erreur d'exécution si vous libérez un objet qui est en fait toujours utilisé. Le pire qui puisse arriver est une chute de performance pour une seule image.
+          </p>
+
+          <h3>Pourquoi `renderer.info.memory` rapporte toujours des géométries et des textures après avoir parcouru la scène et libéré toutes les textures et géométries accessibles ?</h3>
+
+          <p>
+            Dans certains cas, certaines textures et géométries utilisées en interne par Three.js
+            ne sont pas accessibles lors de la traversée du graphe de scène afin d'être libérées.
+            Il est prévu que `renderer.info.memory` les signale toujours même après un nettoyage complet de la scène.
+            Cependant, elles ne fuient pas, mais sont réutilisées lors des cycles consécutifs de nettoyage/repopulation de la scène.
+
+            Ces cas peuvent être liés à l'utilisation de `material.envMap`, `scene.background`, `scene.environment`,
+            ou d'autres contextes qui nécessitent que le moteur crée des textures ou des géométries pour un usage interne.
+          </p>
+
+          <h2>Exemples illustrant l'utilisation de dispose()</h2>
+
+          <p>
+            [example:webgl_test_memory WebGL / test / mémoire]<br />
+            [example:webgl_test_memory2 WebGL / test / mémoire2]<br />
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

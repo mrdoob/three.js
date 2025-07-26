@@ -47,34 +47,56 @@ import {
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
-/**
- * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
- * Versions lower than this may load but will probably have errors
- *
- * Needs Support:
- *  Morph normals / blend shape normals
- *
- * FBX format references:
- * 	https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
- *
- * Binary format specification:
- *	https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- */
-
-
 let fbxTree;
 let connections;
 let sceneGraph;
 
+/**
+ * A loader for the FBX format.
+ *
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format.
+ * Versions lower than this may load but will probably have errors.
+ *
+ * Needs Support:
+ * - Morph normals / blend shape normals
+ *
+ * FBX format references:
+ * - [C++ SDK reference]{@link https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html}
+ *
+ * Binary format specification:
+ * - [FBX binary file format specification]{@link https://code.blender.org/2013/08/fbx-binary-file-format-specification/}
+ *
+ * ```js
+ * const loader = new FBXLoader();
+ * const object = await loader.loadAsync( 'models/fbx/stanford-bunny.fbx' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+ */
 class FBXLoader extends Loader {
 
+	/**
+	 * Constructs a new FBX loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded FBX asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -113,6 +135,13 @@ class FBXLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given FBX data and returns the resulting group.
+	 *
+	 * @param {ArrayBuffer} FBXBuffer - The raw FBX data as an array buffer.
+	 * @param {string} path - The URL base path.
+	 * @return {Group} An object representing the parsed asset.
+	 */
 	parse( FBXBuffer, path ) {
 
 		if ( isFbxFormatBinary( FBXBuffer ) ) {
@@ -319,6 +348,11 @@ class FBXTreeParser {
 				type = 'image/tga';
 				break;
 
+			case 'webp':
+
+				type = 'image/webp';
+				break;
+
 			default:
 
 				console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
@@ -408,21 +442,10 @@ class FBXTreeParser {
 	// load a texture specified as a blob or data URI, or via an external URL using TextureLoader
 	loadTexture( textureNode, images ) {
 
-		const nonNativeExtensions = new Set( [ 'tga', 'tif', 'tiff', 'exr', 'dds', 'hdr', 'ktx2' ] );
-
 		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
 
-		const loader = nonNativeExtensions.has( extension ) ? this.manager.getHandler( `.${extension}` ) : this.textureLoader;
-
-		if ( ! loader ) {
-
-			console.warn(
-				`FBXLoader: ${extension.toUpperCase()} loader not found, creating placeholder texture for`,
-				textureNode.RelativeFilename
-			);
-			return new Texture();
-
-		}
+		let loader = this.manager.getHandler( `.${extension}` );
+		if ( loader === null ) loader = this.textureLoader;
 
 		const loaderPath = loader.path;
 
@@ -445,6 +468,13 @@ class FBXTreeParser {
 				loader.setPath( undefined );
 
 			}
+
+		}
+
+		if ( fileName === undefined ) {
+
+			console.warn( 'FBXLoader: Undefined filename, creating placeholder texture.' );
+			return new Texture();
 
 		}
 
@@ -539,12 +569,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Diffuse ) {
 
-			parameters.color = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.Diffuse.value ), SRGBColorSpace );
+			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Diffuse.value ), SRGBColorSpace );
 
 		} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports diffuse here instead of in materialNode.Diffuse
-			parameters.color = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.DiffuseColor.value ), SRGBColorSpace );
+			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.DiffuseColor.value ), SRGBColorSpace );
 
 		}
 
@@ -556,12 +586,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Emissive ) {
 
-			parameters.emissive = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.Emissive.value ), SRGBColorSpace );
+			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Emissive.value ), SRGBColorSpace );
 
 		} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports emissive color here instead of in materialNode.Emissive
-			parameters.emissive = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.EmissiveColor.value ), SRGBColorSpace );
+			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.EmissiveColor.value ), SRGBColorSpace );
 
 		}
 
@@ -607,12 +637,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Specular ) {
 
-			parameters.specular = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.Specular.value ), SRGBColorSpace );
+			parameters.specular = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Specular.value ), SRGBColorSpace );
 
 		} else if ( materialNode.SpecularColor && materialNode.SpecularColor.type === 'Color' ) {
 
 			// The blender exporter exports specular color here instead of in materialNode.Specular
-			parameters.specular = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.SpecularColor.value ), SRGBColorSpace );
+			parameters.specular = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.SpecularColor.value ), SRGBColorSpace );
 
 		}
 
@@ -1011,7 +1041,7 @@ class FBXTreeParser {
 						skeleton.bones[ i ] = bone;
 
 						// In cases where a bone is shared between multiple meshes
-						// duplicate the bone here and and it as a child of the first bone
+						// duplicate the bone here and add it as a child of the first bone
 						if ( subBone !== null ) {
 
 							bone.add( subBone );
@@ -1163,7 +1193,7 @@ class FBXTreeParser {
 
 			if ( lightAttribute.Color !== undefined ) {
 
-				color = ColorManagement.toWorkingColorSpace( new Color().fromArray( lightAttribute.Color.value ), SRGBColorSpace );
+				color = ColorManagement.colorSpaceToWorking( new Color().fromArray( lightAttribute.Color.value ), SRGBColorSpace );
 
 			}
 
@@ -1295,6 +1325,35 @@ class FBXTreeParser {
 				material.vertexColors = true;
 
 			} );
+
+		}
+
+		// Sanitization: If geometry has groups, then it must match the provided material array.
+		// If not, we need to clean up the `group.materialIndex` properties inside the groups and point at a (new) default material.
+		// This isn't well defined; Unity creates default material, while Blender implicitly uses the previous material in the list.
+		if ( geometry.groups.length > 0 ) {
+
+			let needsDefaultMaterial = false;
+
+			for ( let i = 0, il = geometry.groups.length; i < il; i ++ ) {
+
+				const group = geometry.groups[ i ];
+
+				if ( group.materialIndex < 0 || group.materialIndex >= materials.length ) {
+
+					group.materialIndex = materials.length;
+					needsDefaultMaterial = true;
+
+				}
+
+			}
+
+			if ( needsDefaultMaterial ) {
+
+				const defaultMaterial = new MeshPhongMaterial();
+				materials.push( defaultMaterial );
+
+			}
 
 		}
 
@@ -1725,7 +1784,7 @@ class GeometryParser {
 		geoInfo.vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
 		geoInfo.vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
 
-		if ( geoNode.LayerElementColor ) {
+		if ( geoNode.LayerElementColor && geoNode.LayerElementColor[ 0 ].Colors ) {
 
 			geoInfo.color = this.parseVertexColors( geoNode.LayerElementColor[ 0 ] );
 
@@ -2332,7 +2391,7 @@ class GeometryParser {
 		for ( let i = 0, c = new Color(); i < buffer.length; i += 4 ) {
 
 			c.fromArray( buffer, i );
-			ColorManagement.toWorkingColorSpace( c, SRGBColorSpace );
+			ColorManagement.colorSpaceToWorking( c, SRGBColorSpace );
 			c.toArray( buffer, i );
 
 		}
@@ -2706,7 +2765,7 @@ class AnimationParser {
 	}
 
 	// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
-	// hierarchy. Each Stack node will be used to create a AnimationClip
+	// hierarchy. Each Stack node will be used to create an AnimationClip
 	parseAnimStacks( layersMap ) {
 
 		const rawStacks = fbxTree.Objects.AnimationStack;

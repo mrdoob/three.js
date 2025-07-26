@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -219,7 +220,7 @@
 
 				gui.add( param, 'dash scale', 0.5, 1, 0.1 ).onChange( function ( val ) {
 
-					matLine.dashScale = val;
+					matLine.scale = val;
 					matLineDashed.scale = val;
 
 				} );

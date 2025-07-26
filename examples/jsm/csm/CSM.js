@@ -11,7 +11,7 @@ import { CSMFrustum } from './CSMFrustum.js';
 import { CSMShader } from './CSMShader.js';
 
 const _cameraToLightMatrix = new Matrix4();
-const _lightSpaceFrustum = new CSMFrustum();
+const _lightSpaceFrustum = new CSMFrustum( { webGL: true } );
 const _center = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
@@ -20,38 +20,181 @@ const _lightOrientationMatrix = new Matrix4();
 const _lightOrientationMatrixInverse = new Matrix4();
 const _up = new Vector3( 0, 1, 0 );
 
+/**
+ * An implementation of Cascade Shadow Maps (CSM).
+ *
+ * This module can only be used with {@link WebGLRenderer}. When using {@link WebGPURenderer},
+ * use {@link CSMShadowNode} instead.
+ *
+ * @three_import import { CSM } from 'three/addons/csm/CSM.js';
+ */
 export class CSM {
 
+	/**
+	 * Constructs a new CSM instance.
+	 *
+	 * @param {CSM~Data} data - The CSM data.
+	 */
 	constructor( data ) {
 
+		/**
+		 * The scene's camera.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = data.camera;
+
+		/**
+		 * The parent object, usually the scene.
+		 *
+		 * @type {Object3D}
+		 */
 		this.parent = data.parent;
+
+		/**
+		 * The number of cascades.
+		 *
+		 * @type {number}
+		 * @default 3
+		 */
 		this.cascades = data.cascades || 3;
+
+		/**
+		 * The maximum far value.
+		 *
+		 * @type {number}
+		 * @default 100000
+		 */
 		this.maxFar = data.maxFar || 100000;
+
+		/**
+		 * The frustum split mode.
+		 *
+		 * @type {('practical'|'uniform'|'logarithmic'|'custom')}
+		 * @default 'practical'
+		 */
 		this.mode = data.mode || 'practical';
+
+		/**
+		 * The shadow map size.
+		 *
+		 * @type {number}
+		 * @default 2048
+		 */
 		this.shadowMapSize = data.shadowMapSize || 2048;
+
+		/**
+		 * The shadow bias.
+		 *
+		 * @type {number}
+		 * @default 0.000001
+		 */
 		this.shadowBias = data.shadowBias || 0.000001;
+
+		/**
+		 * The light direction.
+		 *
+		 * @type {Vector3}
+		 */
 		this.lightDirection = data.lightDirection || new Vector3( 1, - 1, 1 ).normalize();
+
+		/**
+		 * The light intensity.
+		 *
+		 * @type {number}
+		 * @default 3
+		 */
 		this.lightIntensity = data.lightIntensity || 3;
+
+		/**
+		 * The light near value.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.lightNear = data.lightNear || 1;
+
+		/**
+		 * The light far value.
+		 *
+		 * @type {number}
+		 * @default 2000
+		 */
 		this.lightFar = data.lightFar || 2000;
+
+		/**
+		 * The light margin.
+		 *
+		 * @type {number}
+		 * @default 200
+		 */
 		this.lightMargin = data.lightMargin || 200;
+
+		/**
+		 * Custom split callback when using `mode='custom'`.
+		 *
+		 * @type {Function}
+		 */
 		this.customSplitsCallback = data.customSplitsCallback;
+
+		/**
+		 * Whether to fade between cascades or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.fade = false;
-		this.mainFrustum = new CSMFrustum();
+
+		/**
+		 * The main frustum.
+		 *
+		 * @type {CSMFrustum}
+		 */
+		this.mainFrustum = new CSMFrustum( { webGL: true } );
+
+		/**
+		 * An array of frustums representing the cascades.
+		 *
+		 * @type {Array<CSMFrustum>}
+		 */
 		this.frustums = [];
+
+		/**
+		 * An array of numbers in the range `[0,1]` the defines how the
+		 * mainCSM frustum should be split up.
+		 *
+		 * @type {Array<number>}
+		 */
 		this.breaks = [];
 
+		/**
+		 * An array of directional lights which cast the shadows for
+		 * the different cascades. There is one directional light for each
+		 * cascade.
+		 *
+		 * @type {Array<DirectionalLight>}
+		 */
 		this.lights = [];
+
+		/**
+		 * A Map holding enhanced material shaders.
+		 *
+		 * @type {Map<Material,Object>}
+		 */
 		this.shaders = new Map();
 
-		this.createLights();
+		this._createLights();
 		this.updateFrustums();
-		this.injectInclude();
+		this._injectInclude();
 
 	}
 
-	createLights() {
+	/**
+	 * Creates the directional lights of this CSM instance.
+	 *
+	 * @private
+	 */
+	_createLights() {
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
@@ -72,7 +215,12 @@ export class CSM {
 
 	}
 
-	initCascades() {
+	/**
+	 * Inits the cascades according to the scene's camera and breaks configuration.
+	 *
+	 * @private
+	 */
+	_initCascades() {
 
 		const camera = this.camera;
 		camera.updateProjectionMatrix();
@@ -81,7 +229,12 @@ export class CSM {
 
 	}
 
-	updateShadowBounds() {
+	/**
+	 * Updates the shadow bounds of this CSM instance.
+	 *
+	 * @private
+	 */
+	_updateShadowBounds() {
 
 		const frustums = this.frustums;
 		for ( let i = 0; i < frustums.length; i ++ ) {
@@ -130,7 +283,13 @@ export class CSM {
 
 	}
 
-	getBreaks() {
+	/**
+	 * Computes the breaks of this CSM instance based on the scene's camera, number of cascades
+	 * and the selected split mode.
+	 *
+	 * @private
+	 */
+	_getBreaks() {
 
 		const camera = this.camera;
 		const far = Math.min( camera.far, this.maxFar );
@@ -197,6 +356,10 @@ export class CSM {
 
 	}
 
+	/**
+	 * Updates the CSM. This method must be called in your animation loop before
+	 * calling `renderer.render()`.
+	 */
 	update() {
 
 		const camera = this.camera;
@@ -243,13 +406,23 @@ export class CSM {
 
 	}
 
-	injectInclude() {
+	/**
+	 * Injects the CSM shader enhancements into the built-in materials.
+	 *
+	 * @private
+	 */
+	_injectInclude() {
 
 		ShaderChunk.lights_fragment_begin = CSMShader.lights_fragment_begin;
 		ShaderChunk.lights_pars_begin = CSMShader.lights_pars_begin;
 
 	}
 
+	/**
+	 * Applications must call this method for all materials that should be affected by CSM.
+	 *
+	 * @param {Material} material - The material to setup for CSM support.
+	 */
 	setupMaterial( material ) {
 
 		material.defines = material.defines || {};
@@ -269,7 +442,7 @@ export class CSM {
 		material.onBeforeCompile = function ( shader ) {
 
 			const far = Math.min( scope.camera.far, scope.maxFar );
-			scope.getExtendedBreaks( breaksVec2 );
+			scope._getExtendedBreaks( breaksVec2 );
 
 			shader.uniforms.CSM_cascades = { value: breaksVec2 };
 			shader.uniforms.cameraNear = { value: scope.camera.near };
@@ -283,7 +456,12 @@ export class CSM {
 
 	}
 
-	updateUniforms() {
+	/**
+	 * Updates the CSM uniforms.
+	 *
+	 * @private
+	 */
+	_updateUniforms() {
 
 		const far = Math.min( this.camera.far, this.maxFar );
 		const shaders = this.shaders;
@@ -293,7 +471,7 @@ export class CSM {
 			if ( shader !== null ) {
 
 				const uniforms = shader.uniforms;
-				this.getExtendedBreaks( uniforms.CSM_cascades.value );
+				this._getExtendedBreaks( uniforms.CSM_cascades.value );
 				uniforms.cameraNear.value = this.camera.near;
 				uniforms.shadowFar.value = far;
 
@@ -315,7 +493,13 @@ export class CSM {
 
 	}
 
-	getExtendedBreaks( target ) {
+	/**
+	 * Computes the extended breaks for the CSM uniforms.
+	 *
+	 * @private
+	 * @param {Array<Vector2>} target - The target array that holds the extended breaks.
+	 */
+	_getExtendedBreaks( target ) {
 
 		while ( target.length < this.breaks.length ) {
 
@@ -336,15 +520,21 @@ export class CSM {
 
 	}
 
+	/**
+	 * Applications must call this method every time they change camera or CSM settings.
+	 */
 	updateFrustums() {
 
-		this.getBreaks();
-		this.initCascades();
-		this.updateShadowBounds();
-		this.updateUniforms();
+		this._getBreaks();
+		this._initCascades();
+		this._updateShadowBounds();
+		this._updateUniforms();
 
 	}
 
+	/**
+	 * Applications must call this method when they remove the CSM usage from their scene.
+	 */
 	remove() {
 
 		for ( let i = 0; i < this.lights.length; i ++ ) {
@@ -356,6 +546,10 @@ export class CSM {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		const shaders = this.shaders;
@@ -382,3 +576,22 @@ export class CSM {
 	}
 
 }
+
+/**
+ * Constructor data of `CSM`.
+ *
+ * @typedef {Object} CSM~Data
+ * @property {Camera} camera - The scene's camera.
+ * @property {Object3D} parent - The parent object, usually the scene.
+ * @property {number} [cascades=3] - The number of cascades.
+ * @property {number} [maxFar=100000] - The maximum far value.
+ * @property {('practical'|'uniform'|'logarithmic'|'custom')} [mode='practical'] - The frustum split mode.
+ * @property {Function} [customSplitsCallback] - Custom split callback when using `mode='custom'`.
+ * @property {number} [shadowMapSize=2048] - The shadow map size.
+ * @property {number} [shadowBias=0.000001] - The shadow bias.
+ * @property {Vector3} [lightDirection] - The light direction.
+ * @property {number} [lightIntensity=3] - The light intensity.
+ * @property {number} [lightNear=1] - The light near value.
+ * @property {number} [lightNear=2000] - The light far value.
+ * @property {number} [lightMargin=200] - The light margin.
+ **/

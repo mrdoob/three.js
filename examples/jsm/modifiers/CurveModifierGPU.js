@@ -19,9 +19,11 @@ import { modelWorldMatrix, normalLocal, vec2, vec3, vec4, mat3, varyingProperty,
 /**
  * Make a new DataTexture to store the descriptions of the curves.
  *
- * @param { number } numberOfCurves the number of curves needed to be described by this texture.
+ * @private
+ * @param {number} [numberOfCurves=1] - The number of curves needed to be described by this texture.
+ * @returns  {DataTexture} The new data texture.
  */
-export function initSplineTexture( numberOfCurves = 1 ) {
+function initSplineTexture( numberOfCurves = 1 ) {
 
 	const dataArray = new Uint16Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS );
 	const dataTexture = new DataTexture(
@@ -43,13 +45,14 @@ export function initSplineTexture( numberOfCurves = 1 ) {
 }
 
 /**
- * Write the curve description to the data texture
+ * Write the curve description to the data texture.
  *
- * @param { DataTexture } texture The DataTexture to write to
- * @param { Curve } splineCurve The curve to describe
- * @param { number } offset Which curve slot to write to
+ * @private
+ * @param {DataTexture} texture - The data texture to write to.
+ * @param {Curve} splineCurve - The curve to describe.
+ * @param {number} [offset=0] - Which curve slot to write to.
  */
-export function updateSplineTexture( texture, splineCurve, offset = 0 ) {
+function updateSplineTexture( texture, splineCurve, offset = 0 ) {
 
 	const numberOfPoints = Math.floor( TEXTURE_WIDTH * ( TEXTURE_HEIGHT / 4 ) );
 	splineCurve.arcLengthDivisions = numberOfPoints / 2;
@@ -92,11 +95,13 @@ function setTextureValue( texture, index, x, y, z, o ) {
 }
 
 /**
- * Create a new set of uniforms for describing the curve modifier
+ * Create a new set of uniforms for describing the curve modifier.
  *
- * @param { DataTexture } Texture which holds the curve description
+ * @private
+ * @param {DataTexture} splineTexture - Which holds the curve description.
+ * @returns {Object} The uniforms object.
  */
-export function getUniforms( splineTexture ) {
+function getUniforms( splineTexture ) {
 
 	return {
 		spineTexture: splineTexture,
@@ -109,7 +114,7 @@ export function getUniforms( splineTexture ) {
 
 }
 
-export function modifyShader( material, uniforms, numberOfCurves ) {
+function modifyShader( material, uniforms, numberOfCurves ) {
 
 	const spineTexture = uniforms.spineTexture;
 
@@ -155,19 +160,26 @@ export function modifyShader( material, uniforms, numberOfCurves ) {
 }
 
 /**
- * A helper class for making meshes bend aroudn curves
+ * A modifier for making meshes bend around curves.
+ *
+ * This module can only be used with {@link WebGPURenderer}. When using {@link WebGLRenderer},
+ * import the class from `CurveModifier.js`.
+ *
+ * @three_import import { Flow } from 'three/addons/modifiers/CurveModifierGPU.js';
  */
 export class Flow {
 
 	/**
-	 * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
-	 * @param {number} numberOfCurves The amount of space that should preallocated for additional curves
+	 * Constructs a new Flow instance.
+	 *
+	 * @param {Mesh} mesh - The mesh to clone and modify to bend around the curve.
+	 * @param {number} numberOfCurves - The amount of space that should preallocated for additional curves.
 	 */
 	constructor( mesh, numberOfCurves = 1 ) {
 
 		const obj3D = mesh.clone();
-		const splineTexure = initSplineTexture( numberOfCurves );
-		const uniforms = getUniforms( splineTexure );
+		const splineTexture = initSplineTexture( numberOfCurves );
+		const uniforms = getUniforms( splineTexture );
 
 		obj3D.traverse( function ( child ) {
 
@@ -205,14 +217,20 @@ export class Flow {
 		this.curveLengthArray = new Array( numberOfCurves );
 
 		this.object3D = obj3D;
-		this.splineTexure = splineTexure;
+		this.splineTexture = splineTexture;
 		this.uniforms = uniforms;
 
 	}
 
+	/**
+	 * Updates the curve for the given curve index.
+	 *
+	 * @param {number} index - The curve index.
+	 * @param {Curve} curve - The curve that should be used to bend the mesh.
+	 */
 	updateCurve( index, curve ) {
 
-		if ( index >= this.curveArray.length ) throw Error( 'Index out of range for Flow' );
+		if ( index >= this.curveArray.length ) throw Error( 'Flow: Index out of range.' );
 
 		const curveLength = curve.getLength();
 
@@ -220,10 +238,15 @@ export class Flow {
 		this.curveLengthArray[ index ] = curveLength;
 		this.curveArray[ index ] = curve;
 
-		updateSplineTexture( this.splineTexure, curve, index );
+		updateSplineTexture( this.splineTexture, curve, index );
 
 	}
 
+	/**
+	 * Moves the mesh along the curve.
+	 *
+	 * @param {number} amount - The offset.
+	 */
 	moveAlongCurve( amount ) {
 
 		this.uniforms.pathOffset += amount;

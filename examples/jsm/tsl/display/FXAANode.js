@@ -1,6 +1,13 @@
-import { Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
+import { Vector2, TempNode } from 'three/webgpu';
+import { nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
 
+/**
+ * Post processing node for applying FXAA. This node requires sRGB input
+ * so tone mapping and color space conversion must happen before the anti-aliasing.
+ *
+ * @augments TempNode
+ * @three_import import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+ */
 class FXAANode extends TempNode {
 
 	static get type() {
@@ -9,19 +16,47 @@ class FXAANode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new FXAA node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
+	 */
 	constructor( textureNode ) {
 
-		super();
+		super( 'vec4' );
 
+		/**
+		 * The texture node that represents the input of the effect.
+		 *
+		 * @type {TextureNode}
+		 */
 		this.textureNode = textureNode;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * its internal uniforms once per frame in `updateBefore()`.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * A uniform node holding the inverse resolution value.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
 		this._invSize = uniform( new Vector2() );
 
 	}
 
-	updateBefore() {
+	/**
+	 * This method is used to update the effect's uniforms once per frame.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
+	updateBefore( /* frame */ ) {
 
 		const map = this.textureNode.value;
 
@@ -29,7 +64,13 @@ class FXAANode extends TempNode {
 
 	}
 
-	setup() {
+	/**
+	 * This method is used to setup the effect's TSL code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {ShaderCallNodeInternal}
+	 */
+	setup( /* builder */ ) {
 
 		const textureNode = this.textureNode.bias( - 100 );
 		const uvNode = textureNode.uvNode || uv();
@@ -44,7 +85,7 @@ class FXAANode extends TempNode {
 
 		const Sample = Fn( ( [ uv ] ) => {
 
-			return textureNode.uv( uv );
+			return textureNode.sample( uv );
 
 		} );
 
@@ -82,8 +123,8 @@ class FXAANode extends TempNode {
 			const se = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
 			const sw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
 
-			const highest = max( max( max( max( s, e ), n ), w ), m );
-			const lowest = min( min( min( min( s, e ), n ), w ), m );
+			const highest = max( s, e, n, w, m );
+			const lowest = min( s, e, n, w, m );
 			const contrast = highest.sub( lowest );
 
 			return { m, n, e, s, w, ne, nw, se, sw, highest, lowest, contrast };
@@ -313,4 +354,12 @@ class FXAANode extends TempNode {
 
 export default FXAANode;
 
+/**
+ * TSL function for creating a FXAA node for anti-aliasing via post processing.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} node - The node that represents the input of the effect.
+ * @returns {FXAANode}
+ */
 export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );

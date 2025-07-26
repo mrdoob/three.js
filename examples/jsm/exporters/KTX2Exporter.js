@@ -120,15 +120,37 @@ const KHR_DF_CHANNEL_SAMPLE_LOWER_UPPER = {
 	[ HalfFloatType ]: [ 0xbf800000, 0x3f800000 ],
 	[ UnsignedByteType ]: [ 0, 255 ],
 
-}
+};
 
 const ERROR_INPUT = 'THREE.KTX2Exporter: Supported inputs are DataTexture, Data3DTexture, or WebGLRenderer and WebGLRenderTarget.';
 const ERROR_FORMAT = 'THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFormat, or RedFormat.';
 const ERROR_TYPE = 'THREE.KTX2Exporter: Supported types are FloatType, HalfFloatType, or UnsignedByteType."';
 const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBColorSpace (UnsignedByteType only), LinearSRGBColorSpace, or NoColorSpace.';
 
+/**
+ * An exporter for KTX2.
+ *
+ * ```js
+ * const exporter = new KTX2Exporter();
+ * const result = await exporter.parse( dataTexture );
+ * ```
+ *
+ * @three_import import { KTX2Exporter } from 'three/addons/exporters/KTX2Exporter.js';
+ */
 export class KTX2Exporter {
 
+	/**
+	 * This method has two variants.
+	 *
+	 * - When exporting a data texture, it receives one parameter. The data or 3D data texture.
+	 * - When exporting a render target (e.g. a PMREM), it receives two parameters. The renderer and the
+	 * render target.
+	 *
+	 * @async
+	 * @param {(DataTexture|Data3DTexture|WebGPURenderer|WebGLRenderer)} arg1 - The data texture to export or a renderer.
+	 * @param {RenderTarget} [arg2] - The render target that should be exported
+	 * @return {Promise<Uint8Array>} A Promise that resolves with the exported KTX2.
+	 */
 	async parse( arg1, arg2 ) {
 
 		let texture;

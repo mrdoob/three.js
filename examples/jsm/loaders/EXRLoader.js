@@ -11,13 +11,8 @@ import {
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
-/**
- * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
- * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
- *
- * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
- * implementation, so I have preserved their copyright notices.
- */
+// Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
+// implementation, so I have preserved their copyright notices.
 
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
@@ -84,16 +79,48 @@ import * as fflate from '../libs/fflate.module.js';
 
 // // End of OpenEXR license -------------------------------------------------
 
+
+/**
+ * A loader for the OpenEXR texture format.
+ *
+ * `EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
+ *
+ * ```js
+ * const loader = new EXRLoader();
+ * const texture = await loader.loadAsync( 'textures/memorial.exr' );
+ * ```
+ *
+ * @augments DataTextureLoader
+ * @three_import import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+ */
 class EXRLoader extends DataTextureLoader {
 
+	/**
+	 * Constructs a new EXR loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * The texture type.
+		 *
+		 * @type {(HalfFloatType|FloatType)}
+		 * @default HalfFloatType
+		 */
 		this.type = HalfFloatType;
 
 	}
 
+	/**
+	 * Parses the given EXR texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @return {DataTextureLoader~TexData} An object representing the parsed texture data.
+	 */
 	parse( buffer ) {
 
 		const USHORT_RANGE = ( 1 << 16 );
@@ -995,6 +1022,81 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
+		function lossyDctChannelDecode( channelIndex, rowPtrs, channelData, acBuffer, dcBuffer, outBuffer ) {
+
+			const dataView = new DataView( outBuffer.buffer );
+			const cd = channelData[ channelIndex ];
+			const width = cd.width;
+			const height = cd.height;
+
+			const numBlocksX = Math.ceil( width / 8.0 );
+			const numBlocksY = Math.ceil( height / 8.0 );
+			const numFullBlocksX = Math.floor( width / 8.0 );
+			const leftoverX = width - ( numBlocksX - 1 ) * 8;
+			const leftoverY = height - ( numBlocksY - 1 ) * 8;
+
+			const currAcComp = { value: 0 };
+			let currDcComp = 0;
+			const dctData = new Float32Array( 64 );
+			const halfZigBlock = new Uint16Array( 64 );
+			const rowBlock = new Uint16Array( numBlocksX * 64 );
+
+			for ( let blocky = 0; blocky < numBlocksY; ++ blocky ) {
+
+				let maxY = 8;
+
+				if ( blocky == numBlocksY - 1 ) maxY = leftoverY;
+
+				for ( let blockx = 0; blockx < numBlocksX; ++ blockx ) {
+
+					halfZigBlock.fill( 0 );
+					halfZigBlock[ 0 ] = dcBuffer[ currDcComp ++ ];
+					unRleAC( currAcComp, acBuffer, halfZigBlock );
+					unZigZag( halfZigBlock, dctData );
+					dctInverse( dctData );
+					convertToHalf( dctData, rowBlock, blockx * 64 );
+
+				}
+
+				// Write decoded data to output buffer
+				for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
+
+					let offset = rowPtrs[ channelIndex ][ y ];
+
+					for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
+
+						const src = blockx * 64 + ( ( y & 0x7 ) * 8 );
+
+						for ( let x = 0; x < 8; ++ x ) {
+
+							dataView.setUint16( offset + x * INT16_SIZE * cd.type, rowBlock[ src + x ], true );
+
+						}
+
+						offset += 8 * INT16_SIZE * cd.type;
+
+					}
+
+					if ( numBlocksX != numFullBlocksX ) {
+
+						const src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
+
+						for ( let x = 0; x < leftoverX; ++ x ) {
+
+							dataView.setUint16( offset + x * INT16_SIZE * cd.type, rowBlock[ src + x ], true );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			cd.decoded = true;
+
+		}
+
 		function unRleAC( currAcComp, acBuffer, halfZigBlock ) {
 
 			let acValue;
@@ -1607,8 +1709,12 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			// Lossy DCT decode RGB channels
-			lossyDctDecode( cscSet, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer );
+			// Decode lossy DCT data if we have a valid color space conversion set with the first RGB channel present
+			if ( cscSet.idx[ 0 ] !== undefined && channelData[ cscSet.idx[ 0 ] ] ) {
+
+				lossyDctDecode( cscSet, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer );
+
+			}
 
 			// Decode other channels
 			for ( let i = 0; i < channelData.length; ++ i ) {
@@ -1646,7 +1752,11 @@ class EXRLoader extends DataTextureLoader {
 
 						break;
 
-					case LOSSY_DCT: // skip
+					case LOSSY_DCT:
+
+						lossyDctChannelDecode( i, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer );
+
+						break;
 
 					default:
 						throw new Error( 'EXRLoader.parse: unsupported channel compression' );
@@ -2229,7 +2339,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const attributeName = parseNullTerminatedString( buffer, offset );
 
-				if ( attributeName == 0 ) {
+				if ( attributeName === '' ) {
 
 					keepReading = false;
 
@@ -2533,6 +2643,12 @@ class EXRLoader extends DataTextureLoader {
 
 	}
 
+	/**
+	 * Sets the texture type.
+	 *
+	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+	 * @return {RGBMLoader} A reference to this loader.
+	 */
 	setDataType( value ) {
 
 		this.type = value;
