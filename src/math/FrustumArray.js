@@ -54,7 +54,7 @@ class FrustumArray {
 
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				this.coordinateSystem,
+				camera.coordinateSystem,
 				camera.reversedDepth
 			);
 
@@ -97,7 +97,7 @@ class FrustumArray {
 
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				this.coordinateSystem,
+				camera.coordinateSystem,
 				camera.reversedDepth
 			);
 
@@ -140,7 +140,7 @@ class FrustumArray {
 
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				this.coordinateSystem,
+				camera.coordinateSystem,
 				camera.reversedDepth
 			);
 
@@ -183,7 +183,7 @@ class FrustumArray {
 
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				this.coordinateSystem,
+				camera.coordinateSystem,
 				camera.reversedDepth
 			);
 
@@ -226,7 +226,7 @@ class FrustumArray {
 
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				this.coordinateSystem,
+				camera.coordinateSystem,
 				camera.reversedDepth
 			);
 
