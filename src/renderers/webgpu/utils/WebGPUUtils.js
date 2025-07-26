@@ -1,4 +1,5 @@
 import { HalfFloatType, UnsignedByteType } from '../../../constants.js';
+import { ColorManagement } from '../../../math/ColorManagement.js';
 import { GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
 
 /**
@@ -201,19 +202,18 @@ class WebGPUUtils {
 	getPreferredCanvasFormat() {
 
 		const outputType = this.backend.parameters.outputType;
+		const toneMappingMode = ColorManagement.getToneMappingMode( this.backend.renderer.outputColorSpace );
 
-		if ( outputType === undefined ) {
+		if ( toneMappingMode === 'extended' ) {
+
+			return GPUTextureFormat.RGBA16Float;
+
+		} else if ( outputType === undefined ) {
 
 			return navigator.gpu.getPreferredCanvasFormat();
 
 		} else if ( outputType === UnsignedByteType ) {
 
-			return GPUTextureFormat.RGBA16Float;
-
-		} else if ( navigator.userAgent.includes( 'Quest' ) ) {
-
-			// TODO: Remove this check when Quest 34.5 is out
-			// https://github.com/mrdoob/three.js/pull/29221/files#r1731833949
 			return GPUTextureFormat.BGRA8Unorm;
 
 		} else if ( outputType === HalfFloatType ) {

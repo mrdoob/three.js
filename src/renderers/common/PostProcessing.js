@@ -2,6 +2,9 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { vec4, renderOutput } from '../../nodes/TSL.js';
 import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
+
+const ExtendedLinearSRGBColorSpace = 'extended-linear-srgb';
 
 /**
  * This module is responsible to manage the post processing setups in apps.
@@ -110,7 +113,7 @@ class PostProcessing {
 		const outputColorSpace = renderer.outputColorSpace;
 
 		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
+		renderer.outputColorSpace = ColorManagement.getToneMappingMode( outputColorSpace ) === 'extended' ? ExtendedLinearSRGBColorSpace : LinearSRGBColorSpace;
 
 		//
 
@@ -219,7 +222,8 @@ class PostProcessing {
 		const outputColorSpace = renderer.outputColorSpace;
 
 		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
+
+		renderer.outputColorSpace = ColorManagement.getToneMappingMode( renderer.outputColorSpace ) === 'extended' ? ExtendedLinearSRGBColorSpace : LinearSRGBColorSpace;
 
 		//
 

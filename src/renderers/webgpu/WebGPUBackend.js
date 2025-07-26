@@ -16,6 +16,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce } from '../../utils.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
  * A backend implementation targeting WebGPU.
@@ -67,7 +68,6 @@ class WebGPUBackend extends Backend {
 		this.parameters.compatibilityMode = ( parameters.compatibilityMode === undefined ) ? false : parameters.compatibilityMode;
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
-		this.parameters.hdr = ( parameters.hdr === true );
 
 		/**
 		 * Indicates whether the backend is in compatibility mode or not.
@@ -238,9 +238,8 @@ class WebGPUBackend extends Backend {
 		this.context = context;
 
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
-		const hdr = parameters.hdr ? 'extended' : 'standard';
 
-		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
+		const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
 
 		this.context.configure( {
 			device: this.device,
@@ -248,9 +247,11 @@ class WebGPUBackend extends Backend {
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 			alphaMode: alphaMode,
 			toneMapping: {
-				mode: hdr
+				mode: toneMappingMode
 			}
 		} );
+
+		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
 

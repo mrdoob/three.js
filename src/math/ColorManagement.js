@@ -34,7 +34,7 @@ function createColorManagement() {
 		 *	- luminanceCoefficients: RGB luminance coefficients
 		 *
 		 * Optional:
-		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace }
+		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace, toneMappingMode: 'extended' | 'standard' }
 		 *  - workingColorSpaceConfig: { unpackColorSpace: ColorSpace }
 		 *
 		 * Reference:
@@ -100,6 +100,12 @@ function createColorManagement() {
 			if ( colorSpace === NoColorSpace ) return LinearTransfer;
 
 			return this.spaces[ colorSpace ].transfer;
+
+		},
+
+		getToneMappingMode: function ( colorSpace ) {
+
+			return this.spaces[ colorSpace ].outputColorSpaceConfig.toneMappingMode || 'standard';
 
 		},
 
