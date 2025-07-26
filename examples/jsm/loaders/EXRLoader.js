@@ -113,6 +113,14 @@ class EXRLoader extends DataTextureLoader {
 		 */
 		this.type = HalfFloatType;
 
+		/**
+		 * Whether to expand format or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.shouldExpand = true;
+
 	}
 
 	/**
@@ -2374,7 +2382,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function setupDecoder( EXRHeader, dataView, uInt8Array, offset, outputType ) {
+		function setupDecoder( EXRHeader, dataView, uInt8Array, offset, outputType, shouldExpand ) {
 
 			const EXRDecoder = {
 				size: 0,
@@ -2385,6 +2393,7 @@ class EXRLoader extends DataTextureLoader {
 				height: EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1,
 				inputChannels: EXRHeader.channels,
 				channelByteOffsets: {},
+				shouldExpand: false,
 				scanOrder: null,
 				totalBytes: null,
 				columns: null,
@@ -2471,7 +2480,18 @@ class EXRLoader extends DataTextureLoader {
 
 			} else if ( channels.Y ) {
 
-				EXRDecoder.outputChannels = 1;
+				if ( shouldExpand ) {
+
+					fillAlpha = true;
+					EXRDecoder.shouldExpand = true;
+					EXRDecoder.outputChannels = 4;
+
+				} else {
+
+					EXRDecoder.outputChannels = 1;
+
+				}
+
 				EXRDecoder.decodeChannels = { Y: 0 };
 
 			} else {
@@ -2626,10 +2646,21 @@ class EXRLoader extends DataTextureLoader {
 		const EXRHeader = parseHeader( bufferDataView, buffer, offset );
 
 		// get input compression information and prepare decoding.
-		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type );
+		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type, this.shouldExpand );
 
 		// parse input data
 		EXRDecoder.decode();
+
+		// output texture post-processing
+		if ( EXRDecoder.shouldExpand && EXRDecoder.outputChannels == 4 ) {
+
+			const byteArray = EXRDecoder.byteArray;
+
+			// should be updated accordingly if input texture support changes
+			for ( let i = 0; i < byteArray.length; i += 4 )
+				byteArray [i + 2 ] = ( byteArray [ i + 1 ] = byteArray[ i ] );
+
+		}
 
 		return {
 			header: EXRHeader,
@@ -2647,11 +2678,24 @@ class EXRLoader extends DataTextureLoader {
 	 * Sets the texture type.
 	 *
 	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
-	 * @return {RGBMLoader} A reference to this loader.
+	 * @return {EXRLoader} A reference to this loader.
 	 */
 	setDataType( value ) {
 
 		this.type = value;
+		return this;
+
+	}
+
+	/**
+	 * Controls whether the loader should expand output format to `RGBAFormat`. Defaults to `true`.
+	 *
+	 * @param {boolean} value - Whether to expand format or not.
+	 * @return {EXRLoader} A reference to this loader.
+	 */
+	setExpandedFormat( value ) {
+
+		this.shouldExpand = value;
 		return this;
 
 	}
