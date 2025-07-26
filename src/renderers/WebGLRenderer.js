@@ -1556,7 +1556,7 @@ class WebGLRenderer {
 			renderStateStack.push( currentRenderState );
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera._reversedDepth );
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
@@ -2381,9 +2381,9 @@ class WebGLRenderer {
 
 				const reversedDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
+				if ( reversedDepthBuffer && camera._reversedDepth !== true ) {
 
-					camera.reversedDepth = true;
+					camera._reversedDepth = true;
 					camera.updateProjectionMatrix();
 
 				}

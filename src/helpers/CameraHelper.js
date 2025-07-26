@@ -239,7 +239,7 @@ class CameraHelper extends LineSegments {
 
 		// Adjust z values based on coordinate system
 
-		if ( this.camera.reversedDepth === true ) {
+		if ( this.camera._reversedDepth === true ) {
 
 			nearZ = 1;
 			farZ = 0;

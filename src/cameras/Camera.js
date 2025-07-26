@@ -35,7 +35,7 @@ class Camera extends Object3D {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.reversedDepth = false;
+		this._reversedDepth = false;
 
 		/**
 		 * The inverse of the camera's world matrix.
