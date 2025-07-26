@@ -1354,10 +1354,9 @@ class WebGPUBackend extends Backend {
 
 		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
 
-			passEncoderGPU.dispatchWorkgroupsIndirect(
-				this.get( dispatchSize ).buffer,
-				0
-			);
+			const dispatchBuffer = this.get( dispatchSize ).buffer;
+
+			passEncoderGPU.dispatchWorkgroupsIndirect( dispatchBuffer, 0 );
 
 			return;
 
