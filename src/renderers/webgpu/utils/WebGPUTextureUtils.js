@@ -344,10 +344,9 @@ class WebGPUTextureUtils {
 	 * Returns the color buffer representing the color
 	 * attachment of the default framebuffer.
 	 *
-	 * @param {string} toneMappingMode - The tone mapping mode.
 	 * @return {GPUTexture} The color buffer.
 	 */
-	getColorBuffer( toneMappingMode ) {
+	getColorBuffer() {
 
 		if ( this.colorBuffer ) this.colorBuffer.destroy();
 
@@ -362,7 +361,7 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: 1
 			},
 			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
-			format: backend.utils.getPreferredCanvasFormat( toneMappingMode ),
+			format: backend.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
