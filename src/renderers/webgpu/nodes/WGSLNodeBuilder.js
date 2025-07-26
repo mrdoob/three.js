@@ -801,8 +801,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	getNodeAccess( node, shaderStage ) {
 
-		if ( shaderStage !== 'compute' )
+		if ( shaderStage !== 'compute' ) {
+
+			if ( node.isAtomic === true ) {
+
+				console.warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+
+				return NodeAccess.READ_WRITE;
+
+			}
+
 			return NodeAccess.READ_ONLY;
+
+		}
 
 		return node.access;
 
