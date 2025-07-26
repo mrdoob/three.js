@@ -555,6 +555,18 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * TSL function for creating a texture node that fetches/loads texels without interpolation.
+	 *
+	 * @param {Node<uvec2>} uvNode - The uv node.
+	 * @returns {TextureNode} A texture node representing the texture load.
+	 */
+	load( uvNode ) {
+
+		return this.sample( uvNode ).setSampler( false );
+
+	}
+
+	/**
 	 * Samples a blurred version of the texture by defining an internal bias.
 	 *
 	 * @param {Node<float>} amountNode - How blurred the texture should be.
