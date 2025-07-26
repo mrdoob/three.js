@@ -196,7 +196,7 @@ class UniformNode extends InputNode {
 
 				nodeData.propertyName = propertyName;
 
-				snippet = builder.format( uniformName, sharedNodeType, output );
+				snippet = builder.format( uniformName, sharedNodeType, type );
 
 				builder.addLineFlowCode( `${ propertyName } = ${ snippet }`, this );
 
