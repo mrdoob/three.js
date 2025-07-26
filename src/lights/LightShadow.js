@@ -204,7 +204,7 @@ class LightShadow {
 		shadowCamera.updateMatrixWorld();
 
 		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix, undefined, shadowCamera.reversedDepth ); // todo: coord system
 
 		if ( shadowCamera.reversedDepth ) {
 

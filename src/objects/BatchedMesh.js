@@ -1529,10 +1529,12 @@ class BatchedMesh extends Mesh {
 			_matrix
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
+
 			_frustum.setFromProjectionMatrix(
 				_matrix,
-				renderer.coordinateSystem
-			);
+				renderer.coordinateSystem,
+				camera.reversedDepth
+			); // todo: check if camera.reversedDepth has been properly set
 
 		}
 
