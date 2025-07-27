@@ -244,23 +244,30 @@ class Bindings extends DataMap {
 
 				}
 
-			} else if ( binding.isSampler ) {
-
-				binding.update();
-
 			} else if ( binding.isSampledTexture ) {
-
-				const texturesTextureData = this.textures.get( binding.texture );
-
-				if ( binding.needsBindingsUpdate( texturesTextureData.generation ) ) needsBindingsUpdate = true;
 
 				const updated = binding.update();
 
+				// get the texture data after the update, to sync the texture reference from node
+
 				const texture = binding.texture;
+				const texturesTextureData = this.textures.get( texture );
 
 				if ( updated ) {
 
+					// version: update the texture data or create a new one
+
 					this.textures.updateTexture( texture );
+
+					// generation: update the bindings if a new texture has been created
+
+					if ( binding.generation !== texturesTextureData.generation ) {
+
+						binding.generation = texturesTextureData.generation;
+
+						needsBindingsUpdate = true;
+
+					}
 
 				}
 
@@ -274,16 +281,6 @@ class Bindings extends DataMap {
 
 					cacheIndex = cacheIndex * 10 + texture.id;
 					version += texture.version;
-
-				}
-
-				if ( backend.isWebGPUBackend === true && textureData.texture === undefined && textureData.externalTexture === undefined ) {
-
-					// TODO: Remove this once we found why updated === false isn't bound to a texture in the WebGPU backend
-					console.error( 'Bindings._update: binding should be available:', binding, updated, texture, binding.textureNode.value, needsBindingsUpdate );
-
-					this.textures.updateTexture( texture );
-					needsBindingsUpdate = true;
 
 				}
 
@@ -304,6 +301,10 @@ class Bindings extends DataMap {
 					}
 
 				}
+
+			} else if ( binding.isSampler ) {
+
+				binding.update();
 
 			}
 

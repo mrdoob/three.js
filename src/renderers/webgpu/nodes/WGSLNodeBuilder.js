@@ -801,8 +801,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	getNodeAccess( node, shaderStage ) {
 
-		if ( shaderStage !== 'compute' )
+		if ( shaderStage !== 'compute' ) {
+
+			if ( node.isAtomic === true ) {
+
+				console.warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+
+				return NodeAccess.READ_WRITE;
+
+			}
+
 			return NodeAccess.READ_ONLY;
+
+		}
 
 		return node.access;
 
@@ -1851,7 +1862,11 @@ ${ flowData.code }
 
 		} else {
 
-			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+			// Early strictly validated in computeNode
+
+			const workgroupSize = this.object.workgroupSize;
+
+			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
 
 		}
 
@@ -2056,36 +2071,40 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
+		const [ workgroupSizeX, workgroupSizeY, workgroupSizeZ ] = workgroupSize;
+
 		return `${ this.getSignature() }
 // directives
-${shaderData.directives}
+${ shaderData.directives }
 
 // system
 var<private> instanceIndex : u32;
 
 // locals
-${shaderData.scopedArrays}
+${ shaderData.scopedArrays }
 
 // structs
-${shaderData.structs}
+${ shaderData.structs }
 
 // uniforms
-${shaderData.uniforms}
+${ shaderData.uniforms }
 
 // codes
-${shaderData.codes}
+${ shaderData.codes }
 
-@compute @workgroup_size( ${workgroupSize} )
-fn main( ${shaderData.attributes} ) {
+@compute @workgroup_size( ${ workgroupSizeX }, ${ workgroupSizeY }, ${ workgroupSizeZ } )
+fn main( ${ shaderData.attributes } ) {
 
 	// system
-	instanceIndex = globalId.x + globalId.y * numWorkgroups.x * u32(${workgroupSize}) + globalId.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
+	instanceIndex = globalId.x
+		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
+		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
 
 	// vars
-	${shaderData.vars}
+	${ shaderData.vars }
 
 	// flow
-	${shaderData.flow}
+	${ shaderData.flow }
 
 }
 `;

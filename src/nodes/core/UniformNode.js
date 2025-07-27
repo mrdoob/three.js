@@ -59,11 +59,26 @@ class UniformNode extends InputNode {
 	 * @param {string} name - The name of the uniform.
 	 * @return {UniformNode} A reference to this node.
 	 */
-	label( name ) {
+	setName( name ) {
 
 		this.name = name;
 
 		return this;
+
+	}
+
+	/**
+	 * Sets the {@link UniformNode#name} property.
+	 *
+	 * @deprecated
+	 * @param {string} name - The name of the uniform.
+	 * @return {UniformNode} A reference to this node.
+	 */
+	label( name ) {
+
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+
+		return this.setName( name );
 
 	}
 
@@ -125,6 +140,20 @@ class UniformNode extends InputNode {
 
 	}
 
+	getInputType( builder ) {
+
+		let type = super.getInputType( builder );
+
+		if ( type === 'bool' ) {
+
+			type = 'uint';
+
+		}
+
+		return type;
+
+	}
+
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
@@ -144,11 +173,40 @@ class UniformNode extends InputNode {
 		const sharedNodeType = sharedNode.getInputType( builder );
 
 		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.label );
-		const propertyName = builder.getPropertyName( nodeUniform );
+		const uniformName = builder.getPropertyName( nodeUniform );
 
 		if ( builder.context.label !== undefined ) delete builder.context.label;
 
-		return builder.format( propertyName, type, output );
+		//
+
+		let snippet = uniformName;
+
+		if ( type === 'bool' ) {
+
+			// cache to variable
+
+			const nodeData = builder.getDataFromNode( this );
+
+			let propertyName = nodeData.propertyName;
+
+			if ( propertyName === undefined ) {
+
+				const nodeVar = builder.getVarFromNode( this, null, 'bool' );
+				propertyName = builder.getPropertyName( nodeVar );
+
+				nodeData.propertyName = propertyName;
+
+				snippet = builder.format( uniformName, sharedNodeType, type );
+
+				builder.addLineFlowCode( `${ propertyName } = ${ snippet }`, this );
+
+			}
+
+			snippet = propertyName;
+
+		}
+
+		return builder.format( snippet, type, output );
 
 	}
 

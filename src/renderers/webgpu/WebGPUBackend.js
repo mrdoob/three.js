@@ -1298,7 +1298,6 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
-
 		const descriptor = {
 			label: 'computeGroup_' + computeGroup.id
 		};
@@ -1318,9 +1317,11 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline ) {
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
 
+		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
 
 		// pipeline
@@ -1340,29 +1341,67 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+		let dispatchSize;
 
-		const computeNodeData = this.get( computeNode );
+		if ( dispatchSizeOrCount === null ) {
 
-		if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
-
-		const { dispatchSize } = computeNodeData;
-
-		if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
-
-			dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
-			dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
-
-		} else {
-
-			dispatchSize.x = computeNode.dispatchCount;
+			dispatchSizeOrCount = computeNode.count;
 
 		}
 
+		if ( typeof dispatchSizeOrCount === 'number' ) {
+
+			// If a single number is given, we calculate the dispatch size based on the workgroup size
+
+			const count = dispatchSizeOrCount;
+
+			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
+
+				// cache dispatch size to avoid recalculating it every time
+
+				computeNodeData.dispatchSize = [ 0, 1, 1 ];
+				computeNodeData.count = count;
+
+				const workgroupSize = computeNode.workgroupSize;
+
+				let size = workgroupSize[ 0 ];
+
+				for ( let i = 1; i < workgroupSize.length; i ++ )
+					size *= workgroupSize[ i ];
+
+				const dispatchCount = Math.ceil( count / size );
+
+				//
+
+				const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+
+				dispatchSize = [ dispatchCount, 1, 1 ];
+
+				if ( dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+					dispatchSize[ 0 ] = Math.min( dispatchCount, maxComputeWorkgroupsPerDimension );
+					dispatchSize[ 1 ] = Math.ceil( dispatchCount / maxComputeWorkgroupsPerDimension );
+
+				}
+
+				computeNodeData.dispatchSize = dispatchSize;
+
+			}
+
+			dispatchSize = computeNodeData.dispatchSize;
+
+		} else {
+
+			dispatchSize = dispatchSizeOrCount;
+
+		}
+
+		//
+
 		passEncoderGPU.dispatchWorkgroups(
-			dispatchSize.x,
-			dispatchSize.y,
-			dispatchSize.z
+			dispatchSize[ 0 ],
+			dispatchSize[ 1 ] || 1,
+			dispatchSize[ 2 ] || 1
 		);
 
 	}

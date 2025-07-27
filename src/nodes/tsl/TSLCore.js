@@ -61,6 +61,10 @@ const shaderNodeHandler = {
 
 				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
+			} else if ( prop === 'toVarIntent' ) {
+
+				return () => nodeObj;
+
 			} else if ( prop === 'self' ) {
 
 				return node;
@@ -211,7 +215,28 @@ const ShaderNodeArray = function ( array, altType = null ) {
 
 const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
 
-	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
+	function assignNode( node ) {
+
+		if ( settings !== null ) {
+
+			node = nodeObject( Object.assign( node, settings ) );
+
+			if ( settings.intent === true ) {
+
+				node = node.toVarIntent();
+
+			}
+
+		} else {
+
+			node = nodeObject( node );
+
+		}
+
+		return node;
+
+
+	}
 
 	let fn, name = scope, minParams, maxParams;
 
@@ -371,8 +396,36 @@ class ShaderCallNodeInternal extends Node {
 
 		} else {
 
+			let inputs = inputNodes;
+
+			if ( Array.isArray( inputs ) ) {
+
+				// If inputs is an array, we need to convert it to a Proxy
+				// so we can call TSL functions using the syntax `Fn( ( { r, g, b } ) => { ... } )`
+				// and call through `fn( 0, 1, 0 )` or `fn( { r: 0, g: 1, b: 0 } )`
+
+				let index = 0;
+
+				inputs = new Proxy( inputs, {
+					get: ( target, property, receiver ) => {
+
+						if ( target[ property ] === undefined ) {
+
+							return target[ index ++ ];
+
+						} else {
+
+							return Reflect.get( target, property, receiver );
+
+						}
+
+					}
+				} );
+
+			}
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputNodes !== null || jsFunc.length > 1 ? jsFunc( inputNodes || [], builder ) : jsFunc( builder );
+			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], builder ) : jsFunc( builder );
 
 			result = nodeObject( outputNode );
 
@@ -566,20 +619,20 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObject( cacheMap.get( params[ 0 ] ) );
+			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
 
 		}
 
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObject( node );
-			return nodeObject( new ConvertNode( node, type ) );
+			if ( node.nodeType === type ) return nodeObjectIntent( node );
+			return nodeObjectIntent( new ConvertNode( node, type ) );
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObject( new JoinNode( nodes, type ) );
+		return nodeObjectIntent( new JoinNode( nodes, type ) );
 
 	};
 
@@ -602,10 +655,12 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
-export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
-export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
+export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
+export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
+export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
 
 let fnId = 0;
 
@@ -661,7 +716,7 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 		if ( nodeType === 'void' ) fnCall.toStack();
 
-		return fnCall;
+		return fnCall.toVarIntent();
 
 	};
 

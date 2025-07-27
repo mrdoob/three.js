@@ -63,6 +63,16 @@ const refreshUniforms = [
 	'transmissionMap'
 ];
 
+
+/**
+ * A WeakMap to cache lights data for node materials.
+ * Cache lights data by render ID to avoid unnecessary recalculations.
+ *
+ * @private
+ * @type {WeakMap<LightsNode,Object>}
+ */
+const _lightsCache = new WeakMap();
+
 /**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
@@ -204,6 +214,8 @@ class NodeMaterialObserver {
 
 			}
 
+			data.lights = this.getLightsData( renderObject.lightsNode.getLights() );
+
 			this.renderObjects.set( renderObject, data );
 
 		}
@@ -307,9 +319,10 @@ class NodeMaterialObserver {
 	 * Returns `true` if the given render object has not changed its state.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Light>} lightsData - The current material lights.
 	 * @return {boolean} Whether the given render object has changed its state or not.
 	 */
-	equals( renderObject ) {
+	equals( renderObject, lightsData ) {
 
 		const { object, material, geometry } = renderObject;
 
@@ -470,6 +483,22 @@ class NodeMaterialObserver {
 
 		}
 
+		// lights
+
+		if ( renderObjectData.lights ) {
+
+			for ( let i = 0; i < lightsData.length; i ++ ) {
+
+				if ( renderObjectData.lights[ i ].map !== lightsData[ i ].map ) {
+
+					return false;
+
+				}
+
+			}
+
+		}
+
 		// center
 
 		if ( renderObjectData.center ) {
@@ -493,6 +522,61 @@ class NodeMaterialObserver {
 		}
 
 		return true;
+
+	}
+
+	/**
+	 * Returns the lights data for the given material lights.
+	 *
+	 * @param {Array<Light>} materialLights - The material lights.
+	 * @return {Array<Object>} The lights data for the given material lights.
+	 */
+	getLightsData( materialLights ) {
+
+		const lights = [];
+
+		for ( const light of materialLights ) {
+
+			if ( light.isSpotLight === true && light.map !== null ) {
+
+				// only add lights that have a map
+
+				lights.push( { map: light.map.version } );
+
+			}
+
+		}
+
+		return lights;
+
+	}
+
+	/**
+	 * Returns the lights for the given lights node and render ID.
+	 *
+	 * @param {LightsNode} lightsNode - The lights node.
+	 * @param {number} renderId - The render ID.
+	 * @return {Array} The lights for the given lights node and render ID.
+	 */
+	getLights( lightsNode, renderId ) {
+
+		if ( _lightsCache.has( lightsNode ) ) {
+
+			const cached = _lightsCache.get( lightsNode );
+
+			if ( cached.renderId === renderId ) {
+
+				return cached.lightsData;
+
+			}
+
+		}
+
+		const lightsData = this.getLightsData( lightsNode.getLights() );
+
+		_lightsCache.set( lightsNode, { renderId, lightsData } );
+
+		return lightsData;
 
 	}
 
@@ -524,7 +608,8 @@ class NodeMaterialObserver {
 		if ( isStatic || isBundle )
 			return false;
 
-		const notEqual = this.equals( renderObject ) !== true;
+		const lightsData = this.getLights( renderObject.lightsNode, renderId );
+		const notEqual = this.equals( renderObject, lightsData ) !== true;
 
 		return notEqual;
 
@@ -1563,6 +1648,18 @@ class Node extends EventDispatcher {
 		const nodeFromHash = builder.getNodeFromHash( hash );
 
 		return nodeFromHash || this;
+
+	}
+
+	/**
+	 * Returns the number of elements in the node array.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {?number} The number of elements in the node array.
+	 */
+	getArrayCount( /*builder*/ ) {
+
+		return null;
 
 	}
 
@@ -3082,6 +3179,10 @@ const shaderNodeHandler = {
 
 				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
+			} else if ( prop === 'toVarIntent' ) {
+
+				return () => nodeObj;
+
 			} else if ( prop === 'self' ) {
 
 				return node;
@@ -3232,7 +3333,28 @@ const ShaderNodeArray = function ( array, altType = null ) {
 
 const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
 
-	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
+	function assignNode( node ) {
+
+		if ( settings !== null ) {
+
+			node = nodeObject( Object.assign( node, settings ) );
+
+			if ( settings.intent === true ) {
+
+				node = node.toVarIntent();
+
+			}
+
+		} else {
+
+			node = nodeObject( node );
+
+		}
+
+		return node;
+
+
+	}
 
 	let fn, name = scope, minParams, maxParams;
 
@@ -3587,20 +3709,20 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObject( cacheMap.get( params[ 0 ] ) );
+			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
 
 		}
 
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObject( node );
-			return nodeObject( new ConvertNode( node, type ) );
+			if ( node.nodeType === type ) return nodeObjectIntent( node );
+			return nodeObjectIntent( new ConvertNode( node, type ) );
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObject( new JoinNode( nodes, type ) );
+		return nodeObjectIntent( new JoinNode( nodes, type ) );
 
 	};
 
@@ -3623,10 +3745,12 @@ function ShaderNode( jsFunc, nodeType ) {
 }
 
 const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
 const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
-const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
-const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
+const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
+const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
+const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
 
 let fnId = 0;
 
@@ -3682,7 +3806,7 @@ const Fn = ( jsFunc, layout = null ) => {
 
 		if ( nodeType === 'void' ) fnCall.toStack();
 
-		return fnCall;
+		return fnCall.toVarIntent();
 
 	};
 
@@ -4417,11 +4541,26 @@ class UniformNode extends InputNode {
 	 * @param {string} name - The name of the uniform.
 	 * @return {UniformNode} A reference to this node.
 	 */
-	label( name ) {
+	setName( name ) {
 
 		this.name = name;
 
 		return this;
+
+	}
+
+	/**
+	 * Sets the {@link UniformNode#name} property.
+	 *
+	 * @deprecated
+	 * @param {string} name - The name of the uniform.
+	 * @return {UniformNode} A reference to this node.
+	 */
+	label( name ) {
+
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+
+		return this.setName( name );
 
 	}
 
@@ -4586,6 +4725,18 @@ class ArrayNode extends TempNode {
 		 * @default true
 		 */
 		this.isArrayNode = true;
+
+	}
+
+	/**
+	 * Returns the number of elements in the node array.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {number} The number of elements in the node array.
+	 */
+	getArrayCount( /*builder*/ ) {
+
+		return this.count;
 
 	}
 
@@ -4764,6 +4915,9 @@ class AssignNode extends TempNode {
 	setup( builder ) {
 
 		const { targetNode, sourceNode } = this;
+
+		const targetProperties = builder.getNodeProperties( targetNode );
+		targetProperties.assign = true;
 
 		const properties = builder.getNodeProperties( this );
 		properties.sourceNode = sourceNode;
@@ -5437,7 +5591,7 @@ class OperatorNode extends TempNode {
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
+const add = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
 
 /**
  * Returns the subtraction of two or more value.
@@ -5449,7 +5603,7 @@ const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' ).setParameterLength( 2, 
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
+const sub = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
 
 /**
  * Returns the multiplication of two or more value.
@@ -5461,7 +5615,7 @@ const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' ).setParameterLength( 2, 
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
+const mul = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
 
 /**
  * Returns the division of two or more value.
@@ -5473,7 +5627,7 @@ const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' ).setParameterLength( 2, 
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
+const div = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
 
 /**
  * Computes the remainder of dividing the first node by the second one.
@@ -5484,7 +5638,7 @@ const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' ).setParameterLength( 2, 
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const mod = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
+const mod = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
 
 /**
  * Checks if two nodes are equal.
@@ -5495,7 +5649,7 @@ const mod = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLength( 2 )
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
+const equal = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
 
 /**
  * Checks if two nodes are not equal.
@@ -5506,7 +5660,7 @@ const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterLength( 
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
+const notEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
 
 /**
  * Checks if the first node is less than the second.
@@ -5517,7 +5671,7 @@ const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParameterLengt
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
+const lessThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
 
 /**
  * Checks if the first node is greater than the second.
@@ -5528,7 +5682,7 @@ const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParameterLength
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
+const greaterThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
 
 /**
  * Checks if the first node is less than or equal to the second.
@@ -5539,7 +5693,7 @@ const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParameterLen
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
+const lessThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
 
 /**
  * Checks if the first node is greater than or equal to the second.
@@ -5550,7 +5704,7 @@ const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setParameter
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
+const greaterThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
 
 /**
  * Performs a logical AND operation on multiple nodes.
@@ -5560,7 +5714,7 @@ const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' ).setParame
  * @param {...Node} nodes - The input nodes to be combined using AND.
  * @returns {OperatorNode}
  */
-const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
+const and = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
 
 /**
  * Performs a logical OR operation on multiple nodes.
@@ -5570,7 +5724,7 @@ const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' ).setParameterLength( 2,
  * @param {...Node} nodes - The input nodes to be combined using OR.
  * @returns {OperatorNode}
  */
-const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
+const or = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
 
 /**
  * Performs logical NOT on a node.
@@ -5580,7 +5734,7 @@ const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' ).setParameterLength( 2, 
  * @param {Node} value - The value.
  * @returns {OperatorNode}
  */
-const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
+const not = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
 
 /**
  * Performs logical XOR on two nodes.
@@ -5591,7 +5745,7 @@ const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' ).setParameterLength( 1 )
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
+const xor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
 
 /**
  * Performs bitwise AND on two nodes.
@@ -5602,7 +5756,7 @@ const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLength( 2 
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
+const bitAnd = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
 
 /**
  * Performs bitwise NOT on a node.
@@ -5613,7 +5767,7 @@ const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterLength( 
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
+const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
 
 /**
  * Performs bitwise OR on two nodes.
@@ -5624,7 +5778,7 @@ const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterLength( 
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
+const bitOr = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
 
 /**
  * Performs bitwise XOR on two nodes.
@@ -5635,7 +5789,7 @@ const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLength( 2
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
+const bitXor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
 
 /**
  * Shifts a node to the left.
@@ -5646,7 +5800,7 @@ const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterLength( 
  * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
-const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
+const shiftLeft = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
 
 /**
  * Shifts a node to the right.
@@ -5657,7 +5811,7 @@ const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParameterLeng
  * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
-const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
+const shiftRight = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
 
 /**
  * Increments a node by 1.
@@ -6190,7 +6344,7 @@ const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
  * @param {Node | number} x - The parameter.
  * @returns {Node<bool>}
  */
-const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL ).setParameterLength( 1 );
+const all = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ALL ).setParameterLength( 1 );
 
 /**
  * Returns `true` if any components of `x` are `true`.
@@ -6200,7 +6354,7 @@ const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node<bool>}
  */
-const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY ).setParameterLength( 1 );
+const any = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ANY ).setParameterLength( 1 );
 
 /**
  * Converts a quantity in degrees to radians.
@@ -6210,7 +6364,7 @@ const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY ).setParameterLength
  * @param {Node | number} x - The input in degrees.
  * @returns {Node}
  */
-const radians = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RADIANS ).setParameterLength( 1 );
+const radians = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.RADIANS ).setParameterLength( 1 );
 
 /**
  * Convert a quantity in radians to degrees.
@@ -6220,7 +6374,7 @@ const radians = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RADIANS ).setParamet
  * @param {Node | number} x - The input in radians.
  * @returns {Node}
  */
-const degrees = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DEGREES ).setParameterLength( 1 );
+const degrees = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DEGREES ).setParameterLength( 1 );
 
 /**
  * Returns the natural exponentiation of the parameter.
@@ -6230,7 +6384,7 @@ const degrees = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DEGREES ).setParamet
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const exp = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP ).setParameterLength( 1 );
+const exp = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.EXP ).setParameterLength( 1 );
 
 /**
  * Returns 2 raised to the power of the parameter.
@@ -6240,7 +6394,7 @@ const exp = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const exp2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP2 ).setParameterLength( 1 );
+const exp2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.EXP2 ).setParameterLength( 1 );
 
 /**
  * Returns the natural logarithm of the parameter.
@@ -6250,7 +6404,7 @@ const exp2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP2 ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const log = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG ).setParameterLength( 1 );
+const log = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LOG ).setParameterLength( 1 );
 
 /**
  * Returns the base 2 logarithm of the parameter.
@@ -6260,7 +6414,7 @@ const log = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const log2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG2 ).setParameterLength( 1 );
+const log2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LOG2 ).setParameterLength( 1 );
 
 /**
  * Returns the square root of the parameter.
@@ -6270,7 +6424,7 @@ const log2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG2 ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const sqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SQRT ).setParameterLength( 1 );
+const sqrt = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SQRT ).setParameterLength( 1 );
 
 /**
  * Returns the inverse of the square root of the parameter.
@@ -6280,7 +6434,7 @@ const sqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SQRT ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const inverseSqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE_SQRT ).setParameterLength( 1 );
+const inverseSqrt = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE_SQRT ).setParameterLength( 1 );
 
 /**
  * Finds the nearest integer less than or equal to the parameter.
@@ -6290,7 +6444,7 @@ const inverseSqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE_SQRT ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const floor = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FLOOR ).setParameterLength( 1 );
+const floor = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FLOOR ).setParameterLength( 1 );
 
 /**
  * Finds the nearest integer that is greater than or equal to the parameter.
@@ -6300,7 +6454,7 @@ const floor = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FLOOR ).setParameterLe
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const ceil = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CEIL ).setParameterLength( 1 );
+const ceil = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CEIL ).setParameterLength( 1 );
 
 /**
  * Calculates the unit vector in the same direction as the original vector.
@@ -6310,7 +6464,7 @@ const ceil = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CEIL ).setParameterLeng
  * @param {Node} x - The input vector.
  * @returns {Node}
  */
-const normalize = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NORMALIZE ).setParameterLength( 1 );
+const normalize = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NORMALIZE ).setParameterLength( 1 );
 
 /**
  * Computes the fractional part of the parameter.
@@ -6320,7 +6474,7 @@ const normalize = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NORMALIZE ).setPar
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const fract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FRACT ).setParameterLength( 1 );
+const fract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FRACT ).setParameterLength( 1 );
 
 /**
  * Returns the sine of the parameter.
@@ -6330,7 +6484,7 @@ const fract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FRACT ).setParameterLe
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const sin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIN ).setParameterLength( 1 );
+const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setParameterLength( 1 );
 
 /**
  * Returns the cosine of the parameter.
@@ -6340,7 +6494,7 @@ const sin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIN ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const cos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.COS ).setParameterLength( 1 );
+const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setParameterLength( 1 );
 
 /**
  * Returns the tangent of the parameter.
@@ -6350,7 +6504,7 @@ const cos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.COS ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const tan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TAN ).setParameterLength( 1 );
+const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setParameterLength( 1 );
 
 /**
  * Returns the arcsine of the parameter.
@@ -6360,7 +6514,7 @@ const tan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TAN ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const asin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ASIN ).setParameterLength( 1 );
+const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).setParameterLength( 1 );
 
 /**
  * Returns the arccosine of the parameter.
@@ -6370,7 +6524,7 @@ const asin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ASIN ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS ).setParameterLength( 1 );
+const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).setParameterLength( 1 );
 
 /**
  * Returns the arc-tangent of the parameter.
@@ -6382,7 +6536,7 @@ const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS ).setParameterLeng
  * @param {?(Node | number)} x - The x parameter.
  * @returns {Node}
  */
-const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
+const atan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
 
 /**
  * Returns the absolute value of the parameter.
@@ -6392,7 +6546,7 @@ const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const abs = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ABS ).setParameterLength( 1 );
+const abs = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ABS ).setParameterLength( 1 );
 
 /**
  * Extracts the sign of the parameter.
@@ -6402,7 +6556,7 @@ const abs = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ABS ).setParameterLength
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const sign = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIGN ).setParameterLength( 1 );
+const sign = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIGN ).setParameterLength( 1 );
 
 /**
  * Calculates the length of a vector.
@@ -6412,7 +6566,7 @@ const sign = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIGN ).setParameterLeng
  * @param {Node} x - The parameter.
  * @returns {Node<float>}
  */
-const length = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LENGTH ).setParameterLength( 1 );
+const length = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LENGTH ).setParameterLength( 1 );
 
 /**
  * Negates the value of the parameter (-x).
@@ -6422,7 +6576,7 @@ const length = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LENGTH ).setParameter
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const negate = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NEGATE ).setParameterLength( 1 );
+const negate = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NEGATE ).setParameterLength( 1 );
 
 /**
  * Return `1` minus the parameter.
@@ -6432,7 +6586,7 @@ const negate = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NEGATE ).setParameter
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const oneMinus = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ONE_MINUS ).setParameterLength( 1 );
+const oneMinus = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ONE_MINUS ).setParameterLength( 1 );
 
 /**
  * Returns the partial derivative of the parameter with respect to x.
@@ -6442,7 +6596,7 @@ const oneMinus = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ONE_MINUS ).setPara
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const dFdx = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDX ).setParameterLength( 1 );
+const dFdx = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DFDX ).setParameterLength( 1 );
 
 /**
  * Returns the partial derivative of the parameter with respect to y.
@@ -6452,7 +6606,7 @@ const dFdx = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDX ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const dFdy = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDY ).setParameterLength( 1 );
+const dFdy = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DFDY ).setParameterLength( 1 );
 
 /**
  * Rounds the parameter to the nearest integer.
@@ -6462,7 +6616,7 @@ const dFdy = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDY ).setParameterLeng
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const round = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ROUND ).setParameterLength( 1 );
+const round = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ROUND ).setParameterLength( 1 );
 
 /**
  * Returns the reciprocal of the parameter `(1/x)`.
@@ -6472,7 +6626,7 @@ const round = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ROUND ).setParameterLe
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const reciprocal = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RECIPROCAL ).setParameterLength( 1 );
+const reciprocal = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.RECIPROCAL ).setParameterLength( 1 );
 
 /**
  * Truncates the parameter, removing the fractional part.
@@ -6482,7 +6636,7 @@ const reciprocal = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RECIPROCAL ).setP
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const trunc = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRUNC ).setParameterLength( 1 );
+const trunc = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRUNC ).setParameterLength( 1 );
 
 /**
  * Returns the sum of the absolute derivatives in x and y.
@@ -6492,7 +6646,7 @@ const trunc = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRUNC ).setParameterLe
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-const fwidth = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FWIDTH ).setParameterLength( 1 );
+const fwidth = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FWIDTH ).setParameterLength( 1 );
 
 /**
  * Returns the transpose of a matrix.
@@ -6502,7 +6656,7 @@ const fwidth = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FWIDTH ).setParameter
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node}
  */
-const transpose = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSPOSE ).setParameterLength( 1 );
+const transpose = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSPOSE ).setParameterLength( 1 );
 
 // 2 inputs
 
@@ -6515,7 +6669,7 @@ const transpose = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSPOSE ).setPar
  * @param {string} y - The new type.
  * @returns {Node}
  */
-const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST ).setParameterLength( 2 );
+const bitcast = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.BITCAST ).setParameterLength( 2 );
 
 /**
  * Returns `true` if `x` equals `y`.
@@ -6542,7 +6696,7 @@ const equals = ( x, y ) => { // @deprecated, r172
  * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
-const min$1 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN ).setParameterLength( 2, Infinity );
+const min$1 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIN ).setParameterLength( 2, Infinity );
 
 /**
  * Returns the greatest of the given values.
@@ -6552,7 +6706,7 @@ const min$1 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN ).setParameterLeng
  * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
-const max$1 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX ).setParameterLength( 2, Infinity );
+const max$1 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MAX ).setParameterLength( 2, Infinity );
 
 /**
  * Generate a step function by comparing two values.
@@ -6563,7 +6717,7 @@ const max$1 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX ).setParameterLeng
  * @param {Node | number} y - The x parameter.
  * @returns {Node}
  */
-const step = /*@__PURE__*/ nodeProxy( MathNode, MathNode.STEP ).setParameterLength( 2 );
+const step = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.STEP ).setParameterLength( 2 );
 
 /**
  * Calculates the reflection direction for an incident vector.
@@ -6574,7 +6728,7 @@ const step = /*@__PURE__*/ nodeProxy( MathNode, MathNode.STEP ).setParameterLeng
  * @param {Node<vec2|vec3|vec4>} N - The normal vector.
  * @returns {Node<vec2|vec3|vec4>}
  */
-const reflect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFLECT ).setParameterLength( 2 );
+const reflect = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.REFLECT ).setParameterLength( 2 );
 
 /**
  * Calculates the distance between two points.
@@ -6585,7 +6739,7 @@ const reflect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFLECT ).setParamet
  * @param {Node<vec2|vec3|vec4>} y - The second point.
  * @returns {Node<float>}
  */
-const distance = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DISTANCE ).setParameterLength( 2 );
+const distance = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DISTANCE ).setParameterLength( 2 );
 
 /**
  * Calculates the absolute difference between two values.
@@ -6596,7 +6750,7 @@ const distance = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DISTANCE ).setParam
  * @param {Node | number} y - The second parameter.
  * @returns {Node}
  */
-const difference = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DIFFERENCE ).setParameterLength( 2 );
+const difference = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DIFFERENCE ).setParameterLength( 2 );
 
 /**
  * Calculates the dot product of two vectors.
@@ -6607,7 +6761,7 @@ const difference = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DIFFERENCE ).setP
  * @param {Node<vec2|vec3|vec4>} y - The second vector.
  * @returns {Node<float>}
  */
-const dot = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DOT ).setParameterLength( 2 );
+const dot = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DOT ).setParameterLength( 2 );
 
 /**
  * Calculates the cross product of two vectors.
@@ -6618,7 +6772,7 @@ const dot = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DOT ).setParameterLength
  * @param {Node<vec2|vec3|vec4>} y - The second vector.
  * @returns {Node<vec2|vec3|vec4>}
  */
-const cross = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CROSS ).setParameterLength( 2 );
+const cross = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CROSS ).setParameterLength( 2 );
 
 /**
  * Return the value of the first parameter raised to the power of the second one.
@@ -6629,7 +6783,7 @@ const cross = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CROSS ).setParameterLe
  * @param {Node | number} y - The second parameter.
  * @returns {Node}
  */
-const pow = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW ).setParameterLength( 2 );
+const pow = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW ).setParameterLength( 2 );
 
 /**
  * Returns the square of the parameter.
@@ -6639,7 +6793,7 @@ const pow = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW ).setParameterLength
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-const pow2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 2 ).setParameterLength( 1 );
+const pow2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 2 ).setParameterLength( 1 );
 
 /**
  * Returns the cube of the parameter.
@@ -6649,7 +6803,7 @@ const pow2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 2 ).setParameterLe
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-const pow3 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 3 ).setParameterLength( 1 );
+const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).setParameterLength( 1 );
 
 /**
  * Returns the fourth power of the parameter.
@@ -6659,7 +6813,7 @@ const pow3 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 3 ).setParameterLe
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-const pow4 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
+const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
 
 /**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
@@ -6670,7 +6824,7 @@ const pow4 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 4 ).setParameterLe
  * @param {Node<mat2|mat3|mat4>} matrix - The transformation matrix.
  * @returns {Node}
  */
-const transformDirection = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION ).setParameterLength( 2 );
+const transformDirection = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSFORM_DIRECTION ).setParameterLength( 2 );
 
 /**
  * Returns the cube root of a number.
@@ -6702,7 +6856,7 @@ const lengthSq = ( a ) => dot( a, a );
  * @param {Node | number} t - The interpolation value.
  * @returns {Node}
  */
-const mix = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIX ).setParameterLength( 3 );
+const mix = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIX ).setParameterLength( 3 );
 
 /**
  * Constrains a value to lie between two further values.
@@ -6736,7 +6890,7 @@ const saturate = ( value ) => clamp( value );
  * @param {Node<float>} eta - The ratio of indices of refraction.
  * @returns {Node<vec2|vec3|vec4>}
  */
-const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT ).setParameterLength( 3 );
+const refract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.REFRACT ).setParameterLength( 3 );
 
 /**
  * Performs a Hermite interpolation between two values.
@@ -6748,7 +6902,7 @@ const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT ).setParamet
  * @param {Node | number} x - The source value for interpolation.
  * @returns {Node}
  */
-const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP ).setParameterLength( 3 );
+const smoothstep = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SMOOTHSTEP ).setParameterLength( 3 );
 
 /**
  * Returns a vector pointing in the same direction as another.
@@ -6760,7 +6914,7 @@ const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP ).setP
  * @param {Node<vec2|vec3|vec4>} Nref - The reference vector.
  * @returns {Node<vec2|vec3|vec4>}
  */
-const faceForward = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FACEFORWARD ).setParameterLength( 3 );
+const faceForward = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FACEFORWARD ).setParameterLength( 3 );
 
 /**
  * Returns a random value for the given uv.
@@ -6968,7 +7122,7 @@ class ConditionalNode extends Node {
 
 			// fallback setup
 
-			this.setup( builder );
+			builder.flowBuildStage( this, 'setup' );
 
 			return this.getNodeType( builder );
 
@@ -7342,6 +7496,45 @@ class VarNode extends Node {
 		 */
 		this.parents = true;
 
+		/**
+		 * This flag is used to indicate that this node is used for intent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.intent = false;
+
+	}
+
+	/**
+	 * Sets the intent flag for this node.
+	 *
+	 * This flag is used to indicate that this node is used for intent
+	 * and should not be built directly. Instead, it is used to indicate that
+	 * the node should be treated as a variable intent.
+	 *
+	 * It's useful for assigning variables without needing creating a new variable node.
+	 *
+	 * @param {boolean} value - The value to set for the intent flag.
+	 * @returns {VarNode} This node.
+	 */
+	setIntent( value ) {
+
+		this.intent = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the intent flag of this node.
+	 *
+	 * @return {boolean} The intent flag.
+	 */
+	getIntent() {
+
+		return this.intent;
+
 	}
 
 	getMemberType( builder, name ) {
@@ -7359,6 +7552,31 @@ class VarNode extends Node {
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
+
+	}
+
+	getArrayCount( builder ) {
+
+		return this.node.getArrayCount( builder );
+
+	}
+
+	build( ...params ) {
+
+		if ( this.intent === true ) {
+
+			const builder = params[ 0 ];
+			const properties = builder.getNodeProperties( this );
+
+			if ( properties.assign !== true ) {
+
+				return this.node.build( ...params );
+
+			}
+
+		}
+
+		return super.build( ...params );
 
 	}
 
@@ -7399,7 +7617,7 @@ class VarNode extends Node {
 
 			} else {
 
-				const count = builder.getArrayCount( node );
+				const count = node.getArrayCount( builder );
 
 				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
 
@@ -7448,10 +7666,35 @@ const Var = ( node, name = null ) => createVar( node, name ).toStack();
  */
 const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
 
+//
+//
+
+/**
+ * TSL function for creating a var intent node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node for which a variable should be created.
+ * @param {?string} name - The name of the variable in the shader.
+ * @returns {VarNode}
+ */
+const VarIntent = ( node ) => {
+
+	if ( getCurrentStack() === null ) {
+
+		return node;
+
+	}
+
+	return createVar( node ).setIntent( true ).toStack();
+
+};
+
 // Method chaining
 
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
+addMethodChaining( 'toVarIntent', VarIntent );
 
 // Deprecated
 
@@ -8855,10 +9098,9 @@ class ComputeNode extends Node {
 	 * Constructs a new compute node.
 	 *
 	 * @param {Node} computeNode - TODO
-	 * @param {number} count - TODO.
-	 * @param {Array<number>} [workgroupSize=[64]] - TODO.
+	 * @param {Array<number>} workgroupSize - TODO.
 	 */
-	constructor( computeNode, count, workgroupSize = [ 64 ] ) {
+	constructor( computeNode, workgroupSize ) {
 
 		super( 'void' );
 
@@ -8878,18 +9120,12 @@ class ComputeNode extends Node {
 		 */
 		this.computeNode = computeNode;
 
-		/**
-		 * TODO
-		 *
-		 * @type {number}
-		 */
-		this.count = count;
 
 		/**
 		 * TODO
 		 *
 		 * @type {Array<number>}
-		 * @default [64]
+		 * @default [ 64 ]
 		 */
 		this.workgroupSize = workgroupSize;
 
@@ -8898,7 +9134,7 @@ class ComputeNode extends Node {
 		 *
 		 * @type {number}
 		 */
-		this.dispatchCount = 0;
+		this.count = null;
 
 		/**
 		 * TODO
@@ -8931,7 +9167,19 @@ class ComputeNode extends Node {
 		 */
 		this.onInitFunction = null;
 
-		this.updateDispatchCount();
+	}
+
+	setCount( count ) {
+
+		this.count = count;
+
+		return this;
+
+	}
+
+	getCount() {
+
+		return this.count;
 
 	}
 
@@ -8950,7 +9198,7 @@ class ComputeNode extends Node {
 	 * @param {string} name - The name of the uniform.
 	 * @return {ComputeNode} A reference to this node.
 	 */
-	label( name ) {
+	setName( name ) {
 
 		this.name = name;
 
@@ -8959,18 +9207,17 @@ class ComputeNode extends Node {
 	}
 
 	/**
-	 * TODO
+	 * Sets the {@link ComputeNode#name} property.
+	 *
+	 * @deprecated
+	 * @param {string} name - The name of the uniform.
+	 * @return {ComputeNode} A reference to this node.
 	 */
-	updateDispatchCount() {
+	label( name ) {
 
-		const { count, workgroupSize } = this;
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
-		let size = workgroupSize[ 0 ];
-
-		for ( let i = 1; i < workgroupSize.length; i ++ )
-			size *= workgroupSize[ i ];
-
-		this.dispatchCount = Math.ceil( count / size );
+		return this.setName( name );
 
 	}
 
@@ -9048,6 +9295,45 @@ class ComputeNode extends Node {
 }
 
 /**
+ * TSL function for creating a compute kernel node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - TODO
+ * @param {Array<number>} [workgroupSize=[64]] - TODO.
+ * @returns {AtomicFunctionNode}
+ */
+const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
+
+	if ( workgroupSize.length === 0 || workgroupSize.length > 3 ) {
+
+		console.error( 'THREE.TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
+
+	}
+
+	for ( let i = 0; i < workgroupSize.length; i ++ ) {
+
+		const val = workgroupSize[ i ];
+
+		if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
+
+			console.error( `THREE.TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
+
+		}
+
+	}
+
+	// Implicit fill-up to [ x, y, z ] with 1s, just like WGSL treats @workgroup_size when fewer dimensions are specified
+
+	while ( workgroupSize.length < 3 ) workgroupSize.push( 1 );
+
+	//
+
+	return nodeObject( new ComputeNode( nodeObject( node ), workgroupSize ) );
+
+};
+
+/**
  * TSL function for creating a compute node.
  *
  * @tsl
@@ -9057,9 +9343,10 @@ class ComputeNode extends Node {
  * @param {Array<number>} [workgroupSize=[64]] - TODO.
  * @returns {AtomicFunctionNode}
  */
-const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
+const compute = ( node, count, workgroupSize ) => computeKernel( node, workgroupSize ).setCount( count );
 
 addMethodChaining( 'compute', compute );
+addMethodChaining( 'computeKernel', computeKernel );
 
 /**
  * This node can be used as a cache management component for another node.
@@ -9643,7 +9930,7 @@ class DebugNode extends TempNode {
  * @param {?Function} [callback=null] - Optional callback function to handle the debug output.
  * @returns {DebugNode}
  */
-const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) );
+const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) ).toStack();
 
 addMethodChaining( 'debug', debug );
 
@@ -11319,7 +11606,7 @@ const builtin = nodeProxy( BuiltinNode ).setParameterLength( 1 );
  * @tsl
  * @type {UniformNode<uint>}
  */
-const cameraIndex = /*@__PURE__*/ uniform( 0, 'uint' ).label( 'u_cameraIndex' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).toVarying( 'v_cameraIndex' );
+const cameraIndex = /*@__PURE__*/ uniform( 0, 'uint' ).setName( 'u_cameraIndex' ).setGroup( sharedUniformGroup( 'cameraIndex' ) ).toVarying( 'v_cameraIndex' );
 
 /**
  * TSL object that represents the `near` value of the camera used for the current render.
@@ -11327,7 +11614,7 @@ const cameraIndex = /*@__PURE__*/ uniform( 0, 'uint' ).label( 'u_cameraIndex' ).
  * @tsl
  * @type {UniformNode<float>}
  */
-const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.near );
+const cameraNear = /*@__PURE__*/ uniform( 'float' ).setName( 'cameraNear' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.near );
 
 /**
  * TSL object that represents the `far` value of the camera used for the current render.
@@ -11335,7 +11622,7 @@ const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' ).setGro
  * @tsl
  * @type {UniformNode<float>}
  */
-const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.far );
+const cameraFar = /*@__PURE__*/ uniform( 'float' ).setName( 'cameraFar' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.far );
 
 /**
  * TSL object that represents the projection matrix of the camera used for the current render.
@@ -11357,13 +11644,13 @@ const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 		}
 
-		const cameraProjectionMatrices = uniformArray( matrices ).setGroup( renderGroup ).label( 'cameraProjectionMatrices' );
+		const cameraProjectionMatrices = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' );
 
 		cameraProjectionMatrix = cameraProjectionMatrices.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex ).toVar( 'cameraProjectionMatrix' );
 
 	} else {
 
-		cameraProjectionMatrix = uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
+		cameraProjectionMatrix = uniform( 'mat4' ).setName( 'cameraProjectionMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
 
 	}
 
@@ -11391,13 +11678,13 @@ const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 		}
 
-		const cameraProjectionMatricesInverse = uniformArray( matrices ).setGroup( renderGroup ).label( 'cameraProjectionMatricesInverse' );
+		const cameraProjectionMatricesInverse = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' );
 
 		cameraProjectionMatrixInverse = cameraProjectionMatricesInverse.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex ).toVar( 'cameraProjectionMatrixInverse' );
 
 	} else {
 
-		cameraProjectionMatrixInverse = uniform( 'mat4' ).label( 'cameraProjectionMatrixInverse' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrixInverse );
+		cameraProjectionMatrixInverse = uniform( 'mat4' ).setName( 'cameraProjectionMatrixInverse' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrixInverse );
 
 	}
 
@@ -11425,13 +11712,13 @@ const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 		}
 
-		const cameraViewMatrices = uniformArray( matrices ).setGroup( renderGroup ).label( 'cameraViewMatrices' );
+		const cameraViewMatrices = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraViewMatrices' );
 
 		cameraViewMatrix = cameraViewMatrices.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex ).toVar( 'cameraViewMatrix' );
 
 	} else {
 
-		cameraViewMatrix = uniform( 'mat4' ).label( 'cameraViewMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorldInverse );
+		cameraViewMatrix = uniform( 'mat4' ).setName( 'cameraViewMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorldInverse );
 
 	}
 
@@ -11445,7 +11732,7 @@ const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraWorldMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraWorldMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorld );
+const cameraWorldMatrix = /*@__PURE__*/ uniform( 'mat4' ).setName( 'cameraWorldMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorld );
 
 /**
  * TSL object that represents the normal matrix of the camera used for the current render.
@@ -11453,7 +11740,7 @@ const cameraWorldMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraWorldMat
  * @tsl
  * @type {UniformNode<mat3>}
  */
-const cameraNormalMatrix = /*@__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
+const cameraNormalMatrix = /*@__PURE__*/ uniform( 'mat3' ).setName( 'cameraNormalMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
 
 /**
  * TSL object that represents the position in world space of the camera used for the current render.
@@ -11461,7 +11748,7 @@ const cameraNormalMatrix = /*@__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalM
  * @tsl
  * @type {UniformNode<vec3>}
  */
-const cameraPosition = /*@__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( renderGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
+const cameraPosition = /*@__PURE__*/ uniform( new Vector3() ).setName( 'cameraPosition' ).setGroup( renderGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
 
 const _sphere = /*@__PURE__*/ new Sphere();
 
@@ -12780,16 +13067,31 @@ class ReferenceNode extends Node {
 	}
 
 	/**
+	 * Sets the name for the internal uniform.
+	 *
+	 * @param {string} name - The label to set.
+	 * @return {ReferenceNode} A reference to this node.
+	 */
+	setName( name ) {
+
+		this.name = name;
+
+		return this;
+
+	}
+
+	/**
 	 * Sets the label for the internal uniform.
 	 *
+	 * @deprecated
 	 * @param {string} name - The label to set.
 	 * @return {ReferenceNode} A reference to this node.
 	 */
 	label( name ) {
 
-		this.name = name;
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
-		return this;
+		return this.setName( name );
 
 	}
 
@@ -16898,7 +17200,7 @@ class ViewportTextureNode extends TextureNode {
 		/**
 		 * The framebuffer texture for the current renderer context.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
 		 * @private
 		 */
 		this._textures = new WeakMap();
@@ -19026,7 +19328,7 @@ class NodeMaterial extends Material {
 
 			output.assign( outputNode );
 
-			outputNode = vec4( fogNode );
+			outputNode = vec4( fogNode.toVar() );
 
 		}
 
@@ -22157,7 +22459,7 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {Object} lightData - The light data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	direct( { lightDirection, lightColor, reflectedLight } ) {
+	direct( { lightDirection, lightColor, reflectedLight }, /* builder */ ) {
 
 		const dotNL = normalView.dot( lightDirection ).clamp();
 		const irradiance = dotNL.mul( lightColor );
@@ -22190,7 +22492,7 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {Object} input - The input data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 } ) {
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 }, /* builder */ ) {
 
 		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
 		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
@@ -28881,10 +29183,6 @@ class Bindings extends DataMap {
 
 				}
 
-			} else if ( binding.isSampler ) {
-
-				binding.update();
-
 			} else if ( binding.isSampledTexture ) {
 
 				const texturesTextureData = this.textures.get( binding.texture );
@@ -28941,6 +29239,10 @@ class Bindings extends DataMap {
 					}
 
 				}
+
+			} else if ( binding.isSampler ) {
+
+				binding.update();
 
 			}
 
@@ -30292,8 +30594,8 @@ class Color4 extends Color {
 	 * string argument to this method.
 	 *
 	 * @param {number|string|Color} r - The red value.
-	 * @param {number} g - The green value.
-	 * @param {number} b - The blue value.
+	 * @param {number} [g] - The green value.
+	 * @param {number} [b] - The blue value.
 	 * @param {number} [a=1] - The alpha value.
 	 * @return {Color4} A reference to this object.
 	 */
@@ -30634,6 +30936,36 @@ class StackNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		const nodeProperties = builder.getNodeProperties( this );
+
+		let index = 0;
+
+		for ( const childNode of this.getChildren() ) {
+
+			if ( childNode.isVarNode && childNode.intent === true ) {
+
+				const properties = builder.getNodeProperties( childNode );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
+
+			}
+
+			nodeProperties[ 'node' + index ++ ] = childNode;
+
+		}
+
+		// return a outputNode if exists or null
+
+		return nodeProperties.outputNode || null;
+
+	}
+
 	build( builder, ...params ) {
 
 		const previousBuildStack = builder.currentStack;
@@ -30646,6 +30978,18 @@ class StackNode extends Node {
 		const buildStage = builder.buildStage;
 
 		for ( const node of this.nodes ) {
+
+			if ( node.isVarNode && node.intent === true ) {
+
+				const properties = builder.getNodeProperties( node );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
+
+			}
 
 			if ( buildStage === 'setup' ) {
 
@@ -33235,7 +33579,7 @@ class SceneNode extends Node {
 
 		} else if ( scope === SceneNode.BACKGROUND_ROTATION ) {
 
-			output = uniform( 'mat4' ).label( 'backgroundRotation' ).setGroup( renderGroup ).onRenderUpdate( () => {
+			output = uniform( 'mat4' ).setName( 'backgroundRotation' ).setGroup( renderGroup ).onRenderUpdate( () => {
 
 				const background = scene.background;
 
@@ -34235,7 +34579,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
+		this.passNode.build( builder );
 
 		return super.setup( builder );
 
@@ -37461,19 +37805,42 @@ class WorkgroupInfoNode extends Node {
 		 */
 		this.scope = scope;
 
+		/**
+		 * The name of the workgroup scoped buffer.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.name = '';
+
+	}
+
+	/**
+	 * Sets the name of this node.
+	 *
+	 * @param {string} name - The name to set.
+	 * @return {WorkgroupInfoNode} A reference to this node.
+	 */
+	setName( name ) {
+
+		this.name = name;
+
+		return this;
+
 	}
 
 	/**
 	 * Sets the name/label of this node.
 	 *
+	 * @deprecated
 	 * @param {string} name - The name to set.
 	 * @return {WorkgroupInfoNode} A reference to this node.
 	 */
 	label( name ) {
 
-		this.name = name;
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
-		return this;
+		return this.setName( name );
 
 	}
 
@@ -37530,7 +37897,9 @@ class WorkgroupInfoNode extends Node {
 
 	generate( builder ) {
 
-		return builder.getScopedArray( this.name || `${this.scope}Array_${this.id}`, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
+		const name = ( this.name !== '' ) ? this.name : `${this.scope}Array_${this.id}`;
+
+		return builder.getScopedArray( name, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
 
 	}
 
@@ -38066,10 +38435,9 @@ class LightsNode extends Node {
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : -1;
-				const hashMapVersion = ( light.map !== null ) ? light.map.version : -1;
 				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : -1;
 
-				_hashData.push( hashMap, hashMapVersion, hashColorNode );
+				_hashData.push( hashMap, hashColorNode );
 
 			}
 
@@ -38683,7 +39051,7 @@ const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
  */
 const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	let basic = texture( depthTexture, shadowCoord.xy ).label( 't_basic' );
+	let basic = texture( depthTexture, shadowCoord.xy ).setName( 't_basic' );
 
 	if ( depthTexture.isArrayTexture ) {
 
@@ -41982,6 +42350,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	VSMShadowFilter: VSMShadowFilter,
 	V_GGX_SmithCorrelated: V_GGX_SmithCorrelated,
 	Var: Var,
+	VarIntent: VarIntent,
 	abs: abs,
 	acesFilmicToneMapping: acesFilmicToneMapping,
 	acos: acos,
@@ -42072,6 +42441,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	colorSpaceToWorking: colorSpaceToWorking,
 	colorToDirection: colorToDirection,
 	compute: compute,
+	computeKernel: computeKernel,
 	computeSkinning: computeSkinning,
 	context: context,
 	convert: convert,
@@ -42290,8 +42660,10 @@ var TSL = /*#__PURE__*/Object.freeze({
 	nodeArray: nodeArray,
 	nodeImmutable: nodeImmutable,
 	nodeObject: nodeObject,
+	nodeObjectIntent: nodeObjectIntent,
 	nodeObjects: nodeObjects,
 	nodeProxy: nodeProxy,
+	nodeProxyIntent: nodeProxyIntent,
 	normalFlat: normalFlat,
 	normalGeometry: normalGeometry,
 	normalLocal: normalLocal,
@@ -44234,7 +44606,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current fog node.
 		 *
-		 * @type {?FogNode}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.fogNode = null;
@@ -45784,23 +46156,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the array length.
-	 *
-	 * @param {Node} node - The node.
-	 * @return {?number} The array length.
-	 */
-	getArrayCount( node ) {
-
-		let count = null;
-
-		if ( node.isArrayNode ) count = node.count;
-		else if ( node.isVarNode && node.node.isArrayNode ) count = node.node.count;
-
-		return count;
-
-	}
-
-	/**
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
@@ -45843,7 +46198,7 @@ class NodeBuilder {
 
 			//
 
-			const count = this.getArrayCount( node );
+			const count = node.getArrayCount( this );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );
 
@@ -46266,6 +46621,28 @@ class NodeBuilder {
 		shaderNode.layout = layout;
 
 		return flowData;
+
+	}
+
+	/**
+	 * Executes the node in a specific build stage.
+	 *
+	 * @param {Node} node - The node to execute.
+	 * @param {string} buildStage - The build stage to execute the node in.
+	 * @param {Node|string|null} output - Expected output type. For example 'vec3'.
+	 * @return {Node|string|null} The result of the node build.
+	 */
+	flowBuildStage( node, buildStage, output = null ) {
+
+		const previousBuildStage = this.getBuildStage();
+
+		this.setBuildStage( buildStage );
+
+		const result = node.build( this, output );
+
+		this.setBuildStage( previousBuildStage );
+
+		return result;
 
 	}
 
@@ -47741,13 +48118,24 @@ class ProjectorLightNode extends SpotLightNode {
 	 */
 	getSpotAttenuation( builder ) {
 
+		const attenuation = float( 0 );
 		const penumbraCos = this.penumbraCosNode;
-		const spotLightCoord = this.getLightCoord( builder );
-		const coord = spotLightCoord.xyz.div( spotLightCoord.w );
 
-		const boxDist = sdBox( coord.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
-		const angleFactor = div( -1, sub( 1.0, acos( penumbraCos ) ).sub( 1.0 ) );
-		const attenuation = saturate( boxDist.mul( -2 ).mul( angleFactor ) );
+		// compute the fragment's position in the light's clip space
+
+		const spotLightCoord = lightShadowMatrix( this.light ).mul( builder.context.positionWorld || positionWorld );
+
+		// the sign of w determines whether the current fragment is in front or behind the light.
+		// to avoid a back-projection, it's important to only compute an attenuation if w is positive
+
+		If( spotLightCoord.w.greaterThan( 0 ), () => {
+
+			const projectionUV = spotLightCoord.xyz.div( spotLightCoord.w );
+			const boxDist = sdBox( projectionUV.xy.sub( vec2( 0.5 ) ), vec2( 0.5 ) );
+			const angleFactor = div( -1, sub( 1.0, acos( penumbraCos ) ).sub( 1.0 ) );
+			attenuation.assign( saturate( boxDist.mul( -2 ).mul( angleFactor ) ) );
+
+		} );
 
 		return attenuation;
 
@@ -49856,6 +50244,15 @@ class XRManager extends EventDispatcher {
 		 */
 		this._supportsLayers = false;
 
+		/**
+		 * Whether the device supports binding gl objects.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
+
 		this._frameBufferTargets = null;
 
 		/**
@@ -50042,7 +50439,7 @@ class XRManager extends EventDispatcher {
 		 * @type {boolean}
 		 * @readonly
 		 */
-		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
+		this._useLayers = ( this._supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
 		/**
 		 * Whether the usage of multiview has been requested by the application or not.
@@ -50600,9 +50997,18 @@ class XRManager extends EventDispatcher {
 
 			//
 
+			if ( this._supportsGlBinding ) {
+
+				const glBinding = new XRWebGLBinding( session, gl );
+				this._glBinding = glBinding;
+
+			}
+
+			//
+
 			if ( this._useLayers === true ) {
 
-				// default path using XRWebGLBinding/XRProjectionLayer
+				// default path using XRProjectionLayer
 
 				let depthFormat = null;
 				let depthType = null;
@@ -50630,11 +51036,9 @@ class XRManager extends EventDispatcher {
 
 				}
 
-				const glBinding = new XRWebGLBinding( session, gl );
-				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+				const glProjLayer = this._glBinding.createProjectionLayer( projectionlayerInit );
 				const layersArray = [ glProjLayer ];
 
-				this._glBinding = glBinding;
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );
@@ -51321,7 +51725,7 @@ function onAnimationFrame( time, frame ) {
 }
 
 const _scene = /*@__PURE__*/ new Scene();
-const _drawingBufferSize$1 = /*@__PURE__*/ new Vector2();
+const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _frustumArray = /*@__PURE__*/ new FrustumArray();
@@ -52503,7 +52907,7 @@ class Renderer {
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
-		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize$1 );
+		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
 		let frameBufferTarget = this._frameBufferTarget;
@@ -52668,9 +53072,9 @@ class Renderer {
 
 		}
 
-		this.getDrawingBufferSize( _drawingBufferSize$1 );
+		this.getDrawingBufferSize( _drawingBufferSize );
 
-		_screen.set( 0, 0, _drawingBufferSize$1.width, _drawingBufferSize$1.height );
+		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
@@ -53597,9 +54001,10 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
+	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
-	compute( computeNodes ) {
+	compute( computeNodes, dispatchSizeOrCount = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
@@ -53678,7 +54083,7 @@ class Renderer {
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
-			backend.compute( computeNodes, computeNode, computeBindings, computePipeline );
+			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSizeOrCount );
 
 		}
 
@@ -53695,13 +54100,14 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
+	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
-	async computeAsync( computeNodes ) {
+	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
 
 		if ( this._initialized === false ) await this.init();
 
-		this.compute( computeNodes );
+		this.compute( computeNodes, dispatchSizeOrCount );
 
 	}
 
@@ -54250,7 +54656,7 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 */
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
@@ -54305,7 +54711,7 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
@@ -55114,20 +55520,18 @@ class NodeUniformsGroup extends UniformsGroup {
 
 }
 
-let _id$2 = 0;
-
 /**
- * Represents a sampled texture binding type.
+ * Represents a sampler binding type.
  *
  * @private
  * @augments Binding
  */
-class SampledTexture extends Binding {
+class Sampler extends Binding {
 
 	/**
-	 * Constructs a new sampled texture.
+	 * Constructs a new sampler.
 	 *
-	 * @param {string} name - The sampled texture's name.
+	 * @param {string} name - The samplers's name.
 	 * @param {?Texture} texture - The texture this binding is referring to.
 	 */
 	constructor( name, texture ) {
@@ -55135,14 +55539,7 @@ class SampledTexture extends Binding {
 		super( name );
 
 		/**
-		 * This identifier.
-		 *
-		 * @type {number}
-		 */
-		this.id = _id$2 ++;
-
-		/**
-		 * The texture this binding is referring to.
+		 * The texture the sampler is referring to.
 		 *
 		 * @type {?Texture}
 		 */
@@ -55154,6 +55551,68 @@ class SampledTexture extends Binding {
 		 * @type {number}
 		 */
 		this.version = texture ? texture.version : 0;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSampler = true;
+
+	}
+
+	/**
+	 * Updates the binding.
+	 *
+	 * @return {boolean} Whether the texture has been updated and must be
+	 * uploaded to the GPU.
+	 */
+	update() {
+
+		const { texture, version } = this;
+
+		if ( version !== texture.version ) {
+
+			this.version = texture.version;
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+}
+
+let _id$2 = 0;
+
+/**
+ * Represents a sampled texture binding type.
+ *
+ * @private
+ * @augments Binding
+ */
+class SampledTexture extends Sampler {
+
+	/**
+	 * Constructs a new sampled texture.
+	 *
+	 * @param {string} name - The sampled texture's name.
+	 * @param {?Texture} texture - The texture this binding is referring to.
+	 */
+	constructor( name, texture ) {
+
+		super( name, texture );
+
+		/**
+		 * This identifier.
+		 *
+		 * @type {number}
+		 */
+		this.id = _id$2 ++;
 
 		/**
 		 * Whether the texture is a storage texture or not.
@@ -55195,28 +55654,6 @@ class SampledTexture extends Binding {
 		if ( generation !== this.generation ) {
 
 			this.generation = generation;
-
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-	/**
-	 * Updates the binding.
-	 *
-	 * @return {boolean} Whether the texture has been updated and must be
-	 * uploaded to the GPU.
-	 */
-	update() {
-
-		const { texture, version } = this;
-
-		if ( version !== texture.version ) {
-
-			this.version = texture.version;
 
 			return true;
 
@@ -61124,8 +61561,6 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 }
 
-const _drawingBufferSize = /*@__PURE__*/ new Vector2();
-
 /**
  * A backend implementation targeting WebGL 2.
  *
@@ -61291,7 +61726,7 @@ class WebGLBackend extends Backend {
 		 * A unique collection of bindings.
 		 *
 		 * @private
-		 * @type {WeakSet}
+		 * @type {WeakSet<Array<BindGroup>>}
 		 */
 		this._knownBindings = new WeakSet();
 
@@ -61563,7 +61998,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+			const { width, height } = this.getDrawingBufferSize();
 			state.viewport( 0, 0, width, height );
 
 		}
@@ -61763,7 +62198,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+				const { width, height } = this.getDrawingBufferSize();
 				state.viewport( 0, 0, width, height );
 
 			}
@@ -62023,8 +62458,9 @@ class WebGLBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 * @param {number|null} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline ) {
+	compute( computeGroup, computeNode, bindings, pipeline, count = null ) {
 
 		const { state, gl } = this;
 
@@ -62061,13 +62497,23 @@ class WebGLBackend extends Backend {
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
 		gl.beginTransformFeedback( gl.POINTS );
 
+		count = ( count !== null ) ? count : computeNode.count;
+
+		if ( Array.isArray( count ) ) {
+
+			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not an array.' );
+
+			count = count[ 0 ];
+
+		}
+
 		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {
 
-			gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+			gl.drawArraysInstanced( gl.POINTS, 0, 1, count );
 
 		} else {
 
-			gl.drawArrays( gl.POINTS, 0, computeNode.count );
+			gl.drawArrays( gl.POINTS, 0, count );
 
 		}
 
@@ -62682,7 +63128,9 @@ class WebGLBackend extends Backend {
 	_getShaderErrors( gl, shader, type ) {
 
 		const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
-		const errors = gl.getShaderInfoLog( shader ).trim();
+
+		const shaderInfoLog = gl.getShaderInfoLog( shader ) || '';
+		const errors = shaderInfoLog.trim();
 
 		if ( status && errors === '' ) return '';
 
@@ -62714,10 +63162,10 @@ class WebGLBackend extends Backend {
 
 			const gl = this.gl;
 
-			const programLog = gl.getProgramInfoLog( programGPU ).trim();
+			const programInfoLog = gl.getProgramInfoLog( programGPU ) || '';
+			const programLog = programInfoLog.trim();
 
 			if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
-
 
 				if ( typeof this.renderer.debug.onShaderError === 'function' ) {
 
@@ -63962,51 +64410,6 @@ const GPUFeatureName = {
 	TextureFormatsTier1: 'texture-formats-tier1',
 	TextureFormatsTier2: 'texture-formats-tier2'
 };
-
-/**
- * Represents a sampler binding type.
- *
- * @private
- * @augments Binding
- */
-class Sampler extends Binding {
-
-	/**
-	 * Constructs a new sampler.
-	 *
-	 * @param {string} name - The samplers's name.
-	 * @param {?Texture} texture - The texture this binding is referring to.
-	 */
-	constructor( name, texture ) {
-
-		super( name );
-
-		/**
-		 * The texture the sampler is referring to.
-		 *
-		 * @type {?Texture}
-		 */
-		this.texture = texture;
-
-		/**
-		 * The binding's version.
-		 *
-		 * @type {number}
-		 */
-		this.version = texture ? texture.version : 0;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isSampler = true;
-
-	}
-
-}
 
 /**
  * A special form of sampler binding type.
@@ -68015,7 +68418,11 @@ ${ flowData.code }
 
 		} else {
 
-			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+			// Early strictly validated in computeNode
+
+			const workgroupSize = this.object.workgroupSize;
+
+			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
 
 		}
 
@@ -68220,36 +68627,40 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
+		const [ workgroupSizeX, workgroupSizeY, workgroupSizeZ ] = workgroupSize;
+
 		return `${ this.getSignature() }
 // directives
-${shaderData.directives}
+${ shaderData.directives }
 
 // system
 var<private> instanceIndex : u32;
 
 // locals
-${shaderData.scopedArrays}
+${ shaderData.scopedArrays }
 
 // structs
-${shaderData.structs}
+${ shaderData.structs }
 
 // uniforms
-${shaderData.uniforms}
+${ shaderData.uniforms }
 
 // codes
-${shaderData.codes}
+${ shaderData.codes }
 
-@compute @workgroup_size( ${workgroupSize} )
-fn main( ${shaderData.attributes} ) {
+@compute @workgroup_size( ${ workgroupSizeX }, ${ workgroupSizeY }, ${ workgroupSizeZ } )
+fn main( ${ shaderData.attributes } ) {
 
 	// system
-	instanceIndex = globalId.x + globalId.y * numWorkgroups.x * u32(${workgroupSize}) + globalId.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
+	instanceIndex = globalId.x
+		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
+		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
 
 	// vars
-	${shaderData.vars}
+	${ shaderData.vars }
 
 	// flow
-	${shaderData.flow}
+	${ shaderData.flow }
 
 }
 `;
@@ -69050,26 +69461,6 @@ class WebGPUBindingUtils {
 
 				bindingGPU.buffer = buffer;
 
-			} else if ( binding.isSampler ) {
-
-				const sampler = {}; // GPUSamplerBindingLayout
-
-				if ( binding.texture.isDepthTexture ) {
-
-					if ( binding.texture.compareFunction !== null ) {
-
-						sampler.type = GPUSamplerBindingType.Comparison;
-
-					} else if ( backend.compatibilityMode ) {
-
-						sampler.type = GPUSamplerBindingType.NonFiltering;
-
-					}
-
-				}
-
-				bindingGPU.sampler = sampler;
-
 			} else if ( binding.isSampledTexture && binding.store ) {
 
 				const storageTexture = {}; // GPUStorageTextureBindingLayout
@@ -69176,6 +69567,26 @@ class WebGPUBindingUtils {
 				}
 
 				bindingGPU.texture = texture;
+
+			} else if ( binding.isSampler ) {
+
+				const sampler = {}; // GPUSamplerBindingLayout
+
+				if ( binding.texture.isDepthTexture ) {
+
+					if ( binding.texture.compareFunction !== null ) {
+
+						sampler.type = GPUSamplerBindingType.Comparison;
+
+					} else if ( backend.compatibilityMode ) {
+
+						sampler.type = GPUSamplerBindingType.NonFiltering;
+
+					}
+
+				}
+
+				bindingGPU.sampler = sampler;
 
 			} else {
 
@@ -69358,12 +69769,6 @@ class WebGPUBindingUtils {
 
 				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
 
-			} else if ( binding.isSampler ) {
-
-				const textureGPU = backend.get( binding.texture );
-
-				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
-
 			} else if ( binding.isSampledTexture ) {
 
 				const textureData = backend.get( binding.texture );
@@ -69420,6 +69825,12 @@ class WebGPUBindingUtils {
 				}
 
 				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+
+			} else if ( binding.isSampler ) {
+
+				const textureGPU = backend.get( binding.texture );
+
+				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
 
 			}
 
@@ -70134,7 +70545,7 @@ class WebGPUPipelineUtils {
 	 *
 	 * @private
 	 * @param {Material} material - The material.
-	 * @return {string} The GPU color write mask.
+	 * @return {number} The GPU color write mask.
 	 */
 	_getColorWriteMask( material ) {
 
@@ -71777,7 +72188,6 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
-
 		const descriptor = {
 			label: 'computeGroup_' + computeGroup.id
 		};
@@ -71797,9 +72207,11 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
+	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline ) {
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
 
+		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
 
 		// pipeline
@@ -71819,29 +72231,67 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+		let dispatchSize;
 
-		const computeNodeData = this.get( computeNode );
+		if ( dispatchSizeOrCount === null ) {
 
-		if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
-
-		const { dispatchSize } = computeNodeData;
-
-		if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
-
-			dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
-			dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
-
-		} else {
-
-			dispatchSize.x = computeNode.dispatchCount;
+			dispatchSizeOrCount = computeNode.count;
 
 		}
 
+		if ( typeof dispatchSizeOrCount === 'number' ) {
+
+			// If a single number is given, we calculate the dispatch size based on the workgroup size
+
+			const count = dispatchSizeOrCount;
+
+			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
+
+				// cache dispatch size to avoid recalculating it every time
+
+				computeNodeData.dispatchSize = [ 0, 1, 1 ];
+				computeNodeData.count = count;
+
+				const workgroupSize = computeNode.workgroupSize;
+
+				let size = workgroupSize[ 0 ];
+
+				for ( let i = 1; i < workgroupSize.length; i ++ )
+					size *= workgroupSize[ i ];
+
+				const dispatchCount = Math.ceil( count / size );
+
+				//
+
+				const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+
+				dispatchSize = [ dispatchCount, 1, 1 ];
+
+				if ( dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+					dispatchSize[ 0 ] = Math.min( dispatchCount, maxComputeWorkgroupsPerDimension );
+					dispatchSize[ 1 ] = Math.ceil( dispatchCount / maxComputeWorkgroupsPerDimension );
+
+				}
+
+				computeNodeData.dispatchSize = dispatchSize;
+
+			}
+
+			dispatchSize = computeNodeData.dispatchSize;
+
+		} else {
+
+			dispatchSize = dispatchSizeOrCount;
+
+		}
+
+		//
+
 		passEncoderGPU.dispatchWorkgroups(
-			dispatchSize.x,
-			dispatchSize.y,
-			dispatchSize.z
+			dispatchSize[ 0 ],
+			dispatchSize[ 1 ] || 1,
+			dispatchSize[ 2 ] || 1
 		);
 
 	}

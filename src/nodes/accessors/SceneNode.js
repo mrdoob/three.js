@@ -78,7 +78,7 @@ class SceneNode extends Node {
 
 		} else if ( scope === SceneNode.BACKGROUND_ROTATION ) {
 
-			output = uniform( 'mat4' ).label( 'backgroundRotation' ).setGroup( renderGroup ).onRenderUpdate( () => {
+			output = uniform( 'mat4' ).setName( 'backgroundRotation' ).setGroup( renderGroup ).onRenderUpdate( () => {
 
 				const background = scene.background;
 
