@@ -63,7 +63,7 @@ export default EventNode;
 const createEvent = ( type, callback ) => nodeObject( new EventNode( type, callback ) ).toStack();
 
 /**
- * Creates an event for every time an object (Mesh|Sprite) is rendered the function is called when this code is included.
+ * Creates an event that triggers a function every time an object (Mesh|Sprite) is rendered.
  *
  * @param {Function} callback - The callback function.
  * @returns {EventNode}
@@ -71,7 +71,7 @@ const createEvent = ( type, callback ) => nodeObject( new EventNode( type, callb
 export const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback );
 
 /**
- * Creates an event that triggers a function each time a object (Mesh|Sprite) is rendered when this code is included.
+ * Creates an event that triggers a function when the first object that uses this material is rendered.
  *
  * @param {Function} callback - The callback function.
  * @returns {EventNode}
