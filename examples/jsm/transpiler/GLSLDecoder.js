@@ -11,7 +11,7 @@ const arithmeticOperators = [
 ];
 
 const precedenceOperators = [
-	'*', '/', '%',
+	'/', '*', '%',
 	'-', '+',
 	'<<', '>>',
 	'<', '>', '<=', '>=',
