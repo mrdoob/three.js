@@ -361,6 +361,8 @@ MathNode.RECIPROCAL = 'reciprocal';
 MathNode.TRUNC = 'trunc';
 MathNode.FWIDTH = 'fwidth';
 MathNode.TRANSPOSE = 'transpose';
+MathNode.DETERMINANT = 'determinant';
+MathNode.INVERSE = 'inverse';
 
 // 2 inputs
 
@@ -743,6 +745,26 @@ export const fwidth = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FWIDTH )
  */
 export const transpose = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSPOSE ).setParameterLength( 1 );
 
+/**
+ * Returns the determinant of a matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<mat2|mat3|mat4>} x - The parameter.
+ * @returns {Node<float>}
+ */
+export const determinant = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DETERMINANT ).setParameterLength( 1 );
+
+/**
+ * Returns the inverse of a matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<mat2|mat3|mat4>} x - The parameter.
+ * @returns {Node<mat2|mat3|mat4>}
+ */
+export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
+
 // 2 inputs
 
 /**
@@ -853,9 +875,9 @@ export const dot = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DOT ).setPa
  *
  * @tsl
  * @function
- * @param {Node<vec2|vec3|vec4>} x - The first vector.
- * @param {Node<vec2|vec3|vec4>} y - The second vector.
- * @returns {Node<vec2|vec3|vec4>}
+ * @param {Node<vec2|vec3>} x - The first vector.
+ * @param {Node<vec2|vec3>} y - The second vector.
+ * @returns {Node<float|vec3>}
  */
 export const cross = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CROSS ).setParameterLength( 2 );
 
@@ -1134,4 +1156,6 @@ addMethodChaining( 'difference', difference );
 addMethodChaining( 'saturate', saturate );
 addMethodChaining( 'cbrt', cbrt );
 addMethodChaining( 'transpose', transpose );
+addMethodChaining( 'determinant', determinant );
+addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );
