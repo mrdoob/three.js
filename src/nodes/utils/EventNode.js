@@ -2,6 +2,11 @@ import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
+/**
+ * EventNode is a node that executes a callback during specific update phases.
+ *
+ * @augments Node
+ */
 class EventNode extends Node {
 
 	static get type() {
@@ -10,6 +15,12 @@ class EventNode extends Node {
 
 	}
 
+	/**
+	 * Creates an EventNode.
+	 *
+	 * @param {string} eventType - The type of event
+	 * @param {Function} callback - The callback to execute on update.
+	 */
 	constructor( eventType, callback ) {
 
 		super( 'void' );
@@ -42,7 +53,27 @@ EventNode.MATERIAL = 'material';
 
 export default EventNode;
 
+/**
+ * Helper to create an EventNode and add it to the stack.
+ *
+ * @param {string} type - The event type.
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
 const createEvent = ( type, callback ) => nodeObject( new EventNode( type, callback ) ).toStack();
 
+/**
+ * Creates an event for every time an object (Mesh|Sprite) is rendered the function is called when this code is included.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
 export const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback );
+
+/**
+ * Creates an event that triggers a function each time a object (Mesh|Sprite) is rendered when this code is included.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
 export const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
