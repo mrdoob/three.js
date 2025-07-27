@@ -1111,9 +1111,11 @@ class XRManager extends EventDispatcher {
 
 		}
 
-		cameraL.layers.mask = camera.layers.mask | 0b010;
-		cameraR.layers.mask = camera.layers.mask | 0b100;
-		cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
+		// inherit camera layers and enable eye layers (1 = left, 2 = right)
+		cameraXR.layers.mask = camera.layers.mask | 0b110;
+		cameraL.layers.mask = cameraXR.layers.mask & 0b011;
+		cameraR.layers.mask = cameraXR.layers.mask & 0b101;
+
 
 		const parent = camera.parent;
 		const cameras = cameraXR.cameras;
