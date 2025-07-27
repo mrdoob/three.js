@@ -65,7 +65,7 @@ const createEvent = ( type, callback ) => nodeObject( new EventNode( type, callb
 /**
  * Creates an event that triggers a function every time an object (Mesh|Sprite) is rendered.
  *
- * The event will be bound to the declared TSL function (`Fn()`); it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
  *
  * @param {Function} callback - The callback function.
  * @returns {EventNode}
@@ -75,7 +75,7 @@ export const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, cal
 /**
  * Creates an event that triggers a function when the first object that uses the material is rendered.
  *
- * The event will be bound to the declared TSL function (`Fn()`); it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
  *
  * @param {Function} callback - The callback function.
  * @returns {EventNode}
