@@ -753,7 +753,7 @@ export const transpose = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANS
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node<float>}
  */
-export const determinant = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DETERMINANT ).setParameterLength( 1 );
+export const determinant = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DETERMINANT ).setParameterLength( 1 );
 
 /**
  * Returns the inverse of a matrix.
@@ -763,7 +763,7 @@ export const determinant = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DETERMINA
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node<mat2|mat3|mat4>}
  */
-export const inverse = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
+export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
 
 // 2 inputs
 
