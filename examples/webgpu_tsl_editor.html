@@ -173,7 +173,7 @@ output = vec4( finalColor, opacity );
 							const AsyncFunction = async function () {}.constructor;
 
 							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
-							const nodes = await ( new AsyncFunction( 'THREE', tslCode )( THREE ) );
+							const nodes = await ( new AsyncFunction( 'three/webgpu', tslCode )( THREE ) );
 
 							mesh.material.fragmentNode = nodes.output;
 							mesh.material.needsUpdate = true;
