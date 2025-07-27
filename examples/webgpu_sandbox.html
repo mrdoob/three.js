@@ -35,6 +35,18 @@
 
 			init();
 
+			console.log( Object.keys( THREE.TSL ) );
+
+			let code = '';
+
+			for ( const key of Object.keys( THREE.TSL ) ) {
+
+				code += `export const ${ key } = TSL.${ key };\n`;
+
+			}
+
+			console.log( code );
+
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );

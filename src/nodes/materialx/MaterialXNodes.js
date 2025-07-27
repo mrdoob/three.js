@@ -7,9 +7,9 @@ import {
 } from './lib/mx_noise.js';
 import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
 import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
-import { mix, smoothstep } from '../math/MathNode.js';
+
+import { float, vec2, vec3, vec4, int, add, sub, mul, div, mod, atan, mix, pow, smoothstep } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
-import { float, vec2, vec3, vec4, int } from '../tsl/TSLBase.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { rotate } from '../utils/RotateNode.js';
 import { frameId, time } from '../utils/Timer.js';
@@ -90,14 +90,22 @@ export { mx_hsvtorgb, mx_rgbtohsv, mx_srgb_texture_to_lin_rec709 };
 // === Moved from MaterialXLoader.js ===
 
 // Math ops
+export const mx_add = ( in1, in2 = float( 0 ) ) => add( in1, in2 );
+export const mx_subtract = ( in1, in2 = float( 0 ) ) => sub( in1, in2 );
+export const mx_multiply = ( in1, in2 = float( 1 ) ) => mul( in1, in2 );
+export const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
+export const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
+export const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
+export const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan( in1, in2 );
 export const mx_timer = () => time;
 export const mx_frame = () => frameId;
+export const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
 export const mx_ifgreater = ( value1, value2, in1, in2 ) => value1.greaterThan( value2 ).mix( in1, in2 );
 export const mx_ifgreatereq = ( value1, value2, in1, in2 ) => value1.greaterThanEqual( value2 ).mix( in1, in2 );
 export const mx_ifequal = ( value1, value2, in1, in2 ) => value1.equal( value2 ).mix( in1, in2 );
 
 // Enhanced separate node to support multi-output referencing (outx, outy, outz, outw)
-export const separate = ( in1, channelOrOut = null ) => {
+export const mx_separate = ( in1, channelOrOut = null ) => {
 
 	if ( typeof channelOrOut === 'string' ) {
 

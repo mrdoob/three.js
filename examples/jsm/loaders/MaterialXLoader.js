@@ -10,22 +10,18 @@ import {
 	mul, abs, sign, floor, ceil, round, sin, cos, tan,
 	asin, acos, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
-	mix,
+	mix, saturation, transpose, determinant, inverse, log, reflect, refract, element,
 	mx_ramplr, mx_ramptb, mx_splitlr, mx_splittb,
 	mx_fractal_noise_float, mx_noise_float, mx_cell_noise_float, mx_worley_noise_float,
 	mx_transform_uv,
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
-	saturation,
-	transpose, determinant, inverse, pow, atan, log,
-	add, sub, div, mod,
+	mx_add, mx_atan2, mx_divide, mx_modulo, mx_multiply, mx_power, mx_subtract,
 	mx_timer, mx_frame, mat3, mx_ramp4,
-	reflect, refract, reciprocal,
-	element, mx_ifgreater, mx_ifgreatereq, mx_ifequal, distance,
-	separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal,
+	mx_invert, mx_ifgreater, mx_ifgreatereq, mx_ifequal, distance,
+	mx_separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal,
 	mx_unifiednoise2d, mx_unifiednoise3d
 } from 'three/tsl';
-
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709
@@ -52,23 +48,23 @@ class MXElement {
 const MXElements = [
 
 	// << Math >>
-	new MXElement( 'add', add, [ 'in1', 'in2' ] ),
-	new MXElement( 'subtract', sub, [ 'in1', 'in2' ] ),
-	new MXElement( 'multiply', mul, [ 'in1', 'in2' ] ),
-	new MXElement( 'divide', div, [ 'in1', 'in2' ] ),
-	new MXElement( 'modulo', mod, [ 'in1', 'in2' ] ),
+	new MXElement( 'add', mx_add, [ 'in1', 'in2' ] ),
+	new MXElement( 'subtract', mx_subtract, [ 'in1', 'in2' ] ),
+	new MXElement( 'multiply', mx_multiply, [ 'in1', 'in2' ] ),
+	new MXElement( 'divide', mx_divide, [ 'in1', 'in2' ] ),
+	new MXElement( 'modulo', mx_modulo, [ 'in1', 'in2' ] ),
 	new MXElement( 'absval', abs, [ 'in1', 'in2' ] ),
 	new MXElement( 'sign', sign, [ 'in1', 'in2' ] ),
 	new MXElement( 'floor', floor, [ 'in1', 'in2' ] ),
 	new MXElement( 'ceil', ceil, [ 'in1', 'in2' ] ),
 	new MXElement( 'round', round, [ 'in1', 'in2' ] ),
-	new MXElement( 'power', pow, [ 'in1', 'in2' ] ),
+	new MXElement( 'power', mx_power, [ 'in1', 'in2' ] ),
 	new MXElement( 'sin', sin, [ 'in' ] ),
 	new MXElement( 'cos', cos, [ 'in' ] ),
 	new MXElement( 'tan', tan, [ 'in' ] ),
 	new MXElement( 'asin', asin, [ 'in' ] ),
 	new MXElement( 'acos', acos, [ 'in' ] ),
-	new MXElement( 'atan2', atan, [ 'in1', 'in2' ] ),
+	new MXElement( 'atan2', mx_atan2, [ 'in1', 'in2' ] ),
 	new MXElement( 'sqrt', sqrt, [ 'in' ] ),
 	new MXElement( 'ln', log, [ 'in' ] ),
 	new MXElement( 'exp', exp, [ 'in' ] ),
@@ -80,7 +76,7 @@ const MXElements = [
 	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
 	new MXElement( 'crossproduct', cross, [ 'in' ] ),
 	new MXElement( 'distance', distance, [ 'in1', 'in2' ] ),
-	new MXElement( 'invert', reciprocal, [ 'in' ] ),
+	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ] ),
 	//new MtlXElement( 'transformpoint', ... ),
 	//new MtlXElement( 'transformvector', ... ),
 	//new MtlXElement( 'transformnormal', ... ),
@@ -142,9 +138,9 @@ const MXElements = [
 	//new MtlXElement( 'hsvadjust', ... ),
 	new MXElement( 'saturate', saturation, [ 'in', 'amount' ] ),
 	new MXElement( 'extract', element, [ 'in', 'index' ] ),
-	new MXElement( 'separate2', separate, [ 'in' ] ),
-	new MXElement( 'separate3', separate, [ 'in' ] ),
-	new MXElement( 'separate4', separate, [ 'in' ] ),
+	new MXElement( 'separate2', mx_separate, [ 'in' ] ),
+	new MXElement( 'separate3', mx_separate, [ 'in' ] ),
+	new MXElement( 'separate4', mx_separate, [ 'in' ] ),
 	new MXElement( 'reflect', reflect, [ 'in', 'normal' ] ),
 	new MXElement( 'refract', refract, [ 'in', 'normal', 'ior' ] ),
 
@@ -486,7 +482,7 @@ class MaterialXNode {
 		) {
 
 			const inNode = this.getNodeByName( 'in' );
-			return separate( inNode, out );
+			return mx_separate( inNode, out );
 
 		}
 
