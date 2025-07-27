@@ -32,6 +32,7 @@ class Camera extends Object3D {
 		/**
 		 * The flag that indicates whether the camera uses a reversed depth buffer.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default false
 		 */
