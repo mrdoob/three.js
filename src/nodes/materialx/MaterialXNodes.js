@@ -125,7 +125,7 @@ export const separate = ( in1, channelOrOut = null ) => {
 };
 
 export const mx_place2d = (
-	texcoord, pivot = vec2( 0.5, 0.5 ), scale = vec2( 1, 1 ), rotate = float( 0 ), offset = vec2( 0, 0 ), operationorder = int( 0 )
+	texcoord, pivot = vec2( 0.5, 0.5 ), scale = vec2( 1, 1 ), rotate = float( 0 ), offset = vec2( 0, 0 )/*, operationorder = int( 0 )*/
 ) => {
 
 	let uv = texcoord;
@@ -179,7 +179,7 @@ export const mx_rotate3d = ( input, amount, axis ) => {
 
 };
 
-export const mx_heighttonormal = ( input, scale, texcoord ) => {
+export const mx_heighttonormal = ( input, scale/*, texcoord*/ ) => {
 
 	input = vec3( input );
 	scale = float( scale );
