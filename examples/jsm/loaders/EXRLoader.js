@@ -7,6 +7,7 @@ import {
 	LinearFilter,
 	LinearSRGBColorSpace,
 	RedFormat,
+	RGFormat,
 	RGBAFormat
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
@@ -114,12 +115,12 @@ class EXRLoader extends DataTextureLoader {
 		this.type = HalfFloatType;
 
 		/**
-		 * Whether to expand format or not.
+		 * Texture output format.
 		 *
-		 * @type {boolean}
-		 * @default true
+		 * @type {(RGBAFormat|RGFormat|RedFormat)}
+		 * @default RGBAFormat
 		 */
-		this.shouldExpand = true;
+		this.outputFormat = RGBAFormat;
 
 	}
 
@@ -2382,7 +2383,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function setupDecoder( EXRHeader, dataView, uInt8Array, offset, outputType, shouldExpand ) {
+		function setupDecoder( EXRHeader, dataView, uInt8Array, offset, outputType, outputFormat ) {
 
 			const EXRDecoder = {
 				size: 0,
@@ -2471,34 +2472,99 @@ class EXRLoader extends DataTextureLoader {
 
 			// RGB images will be converted to RGBA format, preventing software emulation in select devices.
 			let fillAlpha = false;
+			let invalidOutput = false;
 
+			// Validate if input texture contain supported channels
 			if ( channels.R && channels.G && channels.B ) {
 
-				fillAlpha = ! channels.A;
 				EXRDecoder.outputChannels = 4;
-				EXRDecoder.decodeChannels = { R: 0, G: 1, B: 2, A: 3 };
 
 			} else if ( channels.Y ) {
 
-				if ( shouldExpand ) {
-
-					fillAlpha = true;
-					EXRDecoder.shouldExpand = true;
-					EXRDecoder.outputChannels = 4;
-
-				} else {
-
-					EXRDecoder.outputChannels = 1;
-
-				}
-
-				EXRDecoder.decodeChannels = { Y: 0 };
+				EXRDecoder.outputChannels = 1;
 
 			} else {
 
 				throw new Error( 'EXRLoader.parse: file contains unsupported data channels.' );
 
 			}
+
+			// Setup output texture configuration
+			switch ( EXRDecoder.outputChannels ) {
+
+				case 4:
+
+					if ( outputFormat == RGBAFormat ) {
+
+						fillAlpha = ! channels.A;
+						EXRDecoder.format = RGBAFormat;
+						EXRDecoder.colorSpace = LinearSRGBColorSpace;
+						EXRDecoder.outputChannels = 4;
+						EXRDecoder.decodeChannels = { R: 0, G: 1, B: 2, A: 3 };
+
+					} else if ( outputFormat == RGFormat ) {
+
+						EXRDecoder.format = RGFormat;
+						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.outputChannels = 2;
+						EXRDecoder.decodeChannels = { R: 0, G: 1 };
+
+					} else if ( outputFormat == RedFormat ) {
+
+						EXRDecoder.format = RedFormat;
+						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.outputChannels = 1;
+						EXRDecoder.decodeChannels = { R: 0 };
+
+					} else  {
+
+						invalidOutput = true;
+
+					}
+
+					break;
+
+				case 1:
+
+					if ( outputFormat == RGBAFormat ) {
+
+						fillAlpha = true;
+						EXRDecoder.format = RGBAFormat;
+						EXRDecoder.colorSpace = LinearSRGBColorSpace;
+						EXRDecoder.outputChannels = 4;
+						EXRDecoder.shouldExpand = true;
+						EXRDecoder.decodeChannels = { Y: 0 };
+
+					} else if ( outputFormat == RGFormat ) {
+
+						EXRDecoder.format = RGFormat;
+						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.outputChannels = 2;
+						EXRDecoder.shouldExpand = true;
+						EXRDecoder.decodeChannels = { Y: 0 };
+
+					} else if ( outputFormat == RedFormat ) {
+
+						EXRDecoder.format = RedFormat;
+						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.outputChannels = 1;
+						EXRDecoder.decodeChannels = { Y: 0 };
+
+					} else  {
+
+						invalidOutput = true;
+
+					}
+
+					break;
+
+				default:
+
+					invalidOutput = true;
+
+			}
+
+			if (invalidOutput) throw new Error( 'EXRLoader.parse: invalid output format for specified file.' );
 
 			if ( EXRDecoder.type == 1 ) {
 
@@ -2589,18 +2655,6 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( EXRDecoder.outputChannels == 4 ) {
-
-				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.colorSpace = LinearSRGBColorSpace;
-
-			} else {
-
-				EXRDecoder.format = RedFormat;
-				EXRDecoder.colorSpace = NoColorSpace;
-
-			}
-
 			if ( EXRHeader.spec.singleTile ) {
 
 				EXRDecoder.blockHeight = EXRHeader.tiles.ySize;
@@ -2646,19 +2700,27 @@ class EXRLoader extends DataTextureLoader {
 		const EXRHeader = parseHeader( bufferDataView, buffer, offset );
 
 		// get input compression information and prepare decoding.
-		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type, this.shouldExpand );
+		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type, this.outputFormat );
 
 		// parse input data
 		EXRDecoder.decode();
 
 		// output texture post-processing
-		if ( EXRDecoder.shouldExpand && EXRDecoder.outputChannels == 4 ) {
+		if ( EXRDecoder.shouldExpand ) {
 
 			const byteArray = EXRDecoder.byteArray;
 
-			// should be updated accordingly if input texture support changes
-			for ( let i = 0; i < byteArray.length; i += 4 )
-				byteArray [i + 2 ] = ( byteArray [ i + 1 ] = byteArray[ i ] );
+			if ( this.outputFormat == RGBAFormat ) {
+
+				for ( let i = 0; i < byteArray.length; i += 4 )
+					byteArray [i + 2 ] = ( byteArray [ i + 1 ] = byteArray[ i ] );
+
+			} else if ( this.outputFormat == RGFormat ) {
+
+				for ( let i = 0; i < byteArray.length; i += 2 )
+					byteArray [ i + 1 ] = byteArray[ i ] ;
+
+			}
 
 		}
 
@@ -2688,14 +2750,14 @@ class EXRLoader extends DataTextureLoader {
 	}
 
 	/**
-	 * Controls whether the loader should expand output format to `RGBAFormat`. Defaults to `true`.
+	 * Sets texture output format. Defaults to `RGBAFormat`.
 	 *
-	 * @param {boolean} value - Whether to expand format or not.
+	 * @param {(RGBAFormat|RGFormat|RedFormat)} value - Texture output format.
 	 * @return {EXRLoader} A reference to this loader.
 	 */
-	setExpandedFormat( value ) {
+	setOutputFormat( value ) {
 
-		this.shouldExpand = value;
+		this.outputFormat = value;
 		return this;
 
 	}
