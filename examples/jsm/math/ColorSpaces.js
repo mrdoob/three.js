@@ -122,11 +122,6 @@ export const LinearRec2020ColorSpaceImpl = {
  */
 export const ExtendedSRGBColorSpace = 'extended-srgb';
 
-/******************************************************************************
- * Extended Linear sRGB definitions
- */
-export const ExtendedLinearSRGBColorSpace = 'extended-linear-srgb';
-
 /**
  * Implementation object for the Extended-sRGB color space.
  *
@@ -135,17 +130,6 @@ export const ExtendedLinearSRGBColorSpace = 'extended-linear-srgb';
  */
 export const ExtendedSRGBColorSpaceImpl = {
 	...ColorManagement.spaces[ SRGBColorSpace ],
-	outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace, toneMappingMode: 'extended' }
-};
-
-/**
- * Implementation object for the Extended-Linear-sRGB color space.
- *
- * @type {module:ColorSpaces~ColorSpaceImpl}
- * @constant
- */
-export const ExtendedLinearSRGBColorSpaceImpl = {
-	...ColorManagement.spaces[ LinearSRGBColorSpace ],
 	outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace, toneMappingMode: 'extended' }
 };
 

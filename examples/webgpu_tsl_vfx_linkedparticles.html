@@ -35,10 +35,9 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			import { ExtendedSRGBColorSpace, ExtendedSRGBColorSpaceImpl, ExtendedLinearSRGBColorSpace, ExtendedLinearSRGBColorSpaceImpl } from 'three/addons/math/ColorSpaces.js';
+			import { ExtendedSRGBColorSpace, ExtendedSRGBColorSpaceImpl } from 'three/addons/math/ColorSpaces.js';
 
 			THREE.ColorManagement.define( { [ ExtendedSRGBColorSpace ]: ExtendedSRGBColorSpaceImpl } );
-			THREE.ColorManagement.define( { [ ExtendedLinearSRGBColorSpace ]: ExtendedLinearSRGBColorSpaceImpl } );
 
 			let camera, scene, renderer, postProcessing, controls, timer, light;
 
@@ -95,13 +94,12 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, outputType: THREE.HalfFloatType } );
 				renderer.setClearColor( 0x14171a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 
-				renderer.outputColorSpace = ExtendedSRGBColorSpace;
 				// TODO: Add support for tone mapping #29573
 				// renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );

@@ -1,5 +1,4 @@
 import { HalfFloatType, UnsignedByteType } from '../../../constants.js';
-import { ColorManagement } from '../../../math/ColorManagement.js';
 import { GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
 
 /**
@@ -202,13 +201,8 @@ class WebGPUUtils {
 	getPreferredCanvasFormat() {
 
 		const outputType = this.backend.parameters.outputType;
-		const toneMappingMode = ColorManagement.getToneMappingMode( this.backend.renderer.outputColorSpace );
 
-		if ( toneMappingMode === 'extended' ) {
-
-			return GPUTextureFormat.RGBA16Float;
-
-		} else if ( outputType === undefined ) {
+		if ( outputType === undefined ) {
 
 			return navigator.gpu.getPreferredCanvasFormat();
 
