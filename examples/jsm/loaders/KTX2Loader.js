@@ -100,7 +100,10 @@ let _zstd;
  *
  * ```js
  * const loader = new KTX2Loader();
- * loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
+ * loader.setTranscoderPath( {
+ *   js: 'examples/jsm/libs/basis/basis_transcoder.js',
+ *   wasm: 'examples/jsm/libs/basis/basis_transcoder.wasm'
+ * } );
  * loader.detectSupport( renderer );
  * const texture = loader.loadAsync( 'diffuse.ktx2' );
  * ```
@@ -119,9 +122,8 @@ class KTX2Loader extends Loader {
 
 		super( manager );
 
-		this.transcoderPath = '';
-		this.transcoderJsUrl = null;
-		this.transcoderWasmUrl = null;
+		this.transcoderJsPath = null;
+		this.transcoderWasmPath = null;
 		this.transcoderBinary = null;
 		this.transcoderPending = null;
 
@@ -143,35 +145,20 @@ class KTX2Loader extends Loader {
 	}
 
 	/**
-	 * Sets the transcoder path.
+	 * Sets the transcoder paths.
 	 *
 	 * The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
 	 *
-	 * @param {string} path - The transcoder path to set.
+	 * @param {Object} paths - An object with js and wasm fields
+	 * @param {string} paths.js - Full URL to the basis_transcoder.js file
+	 * @param {string} paths.wasm - Full URL to the basis_transcoder.wasm file
 	 * @return {KTX2Loader} A reference to this loader.
 	 */
-	setTranscoderPath( path ) {
+	setTranscoderPath( { js, wasm } ) {
 
-		this.transcoderPath = path;
+		this.transcoderJsPath = js;
+		this.transcoderWasmPath = wasm;
 
-		return this;
-
-	}
-
-	/**
-	 * Sets explicit URLs for the transcoder JS and WASM files.
-	 * This overrides the default behavior of loading files by name from a path.
-	 * Useful for bundler setups (Webpack/Vite/Rollup) where the files are imported directly.
-	 *
-	 * @param {Object} urls - An object with jsUrl and wasmUrl fields
-	 * @param {string} urls.jsUrl - Full URL to the basis_transcoder.js file
-	 * @param {string} urls.wasmUrl - Full URL to the basis_transcoder.wasm file
-	 * @return {this}
-	 */
-	setTranscoderUrls( { jsUrl, wasmUrl } ) {
-
-		this.transcoderJsUrl = jsUrl;
-		this.transcoderWasmUrl = wasmUrl;
 		return this;
 
 	}
@@ -261,20 +248,22 @@ class KTX2Loader extends Loader {
 
 		if ( ! this.transcoderPending ) {
 
+			if ( ! this.transcoderJsPath || ! this.transcoderWasmPath ) {
+
+				throw new Error( 'THREE.KTX2Loader: Missing transcoder paths. Use .setTranscoderPath() to set the paths.' );
+
+			}
+
 			// Load transcoder wrapper.
 			const jsLoader = new FileLoader( this.manager );
 			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync(
-				this.transcoderJsUrl || ( this.transcoderPath + 'basis_transcoder.js' )
-			);
+			const jsContent = jsLoader.loadAsync( this.transcoderJsPath );
 
 			// Load transcoder WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync(
-				this.transcoderWasmUrl || ( this.transcoderPath + 'basis_transcoder.wasm' )
-			);
+			const binaryContent = binaryLoader.loadAsync( this.transcoderWasmPath );
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
