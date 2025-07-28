@@ -2383,7 +2383,7 @@ class WebGLRenderer {
 
 				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					camera.reversedDepth = true;
+					camera._reversedDepth = true;
 					camera.updateProjectionMatrix();
 
 				}
