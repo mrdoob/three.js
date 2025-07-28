@@ -100,6 +100,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 
+				renderer.outputColorSpace = ExtendedSRGBColorSpace;
 				// TODO: Add support for tone mapping #29573
 				// renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
