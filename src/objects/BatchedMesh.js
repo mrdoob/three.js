@@ -1533,7 +1533,7 @@ class BatchedMesh extends Mesh {
 			_frustum.setFromProjectionMatrix(
 				_matrix,
 				camera.coordinateSystem,
-				camera._reversedDepth
+				camera.reversedDepth
 			);
 
 		}

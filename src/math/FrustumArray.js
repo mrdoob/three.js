@@ -55,7 +55,7 @@ class FrustumArray {
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
 				camera.coordinateSystem,
-				camera._reversedDepth
+				camera.reversedDepth
 			);
 
 			if ( _frustum.intersectsObject( object ) ) {
@@ -98,7 +98,7 @@ class FrustumArray {
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
 				camera.coordinateSystem,
-				camera._reversedDepth
+				camera.reversedDepth
 			);
 
 			if ( _frustum.intersectsSprite( sprite ) ) {
@@ -141,7 +141,7 @@ class FrustumArray {
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
 				camera.coordinateSystem,
-				camera._reversedDepth
+				camera.reversedDepth
 			);
 
 			if ( _frustum.intersectsSphere( sphere ) ) {
@@ -184,7 +184,7 @@ class FrustumArray {
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
 				camera.coordinateSystem,
-				camera._reversedDepth
+				camera.reversedDepth
 			);
 
 			if ( _frustum.intersectsBox( box ) ) {
@@ -227,7 +227,7 @@ class FrustumArray {
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
 				camera.coordinateSystem,
-				camera._reversedDepth
+				camera.reversedDepth
 			);
 
 			if ( _frustum.containsPoint( point ) ) {
