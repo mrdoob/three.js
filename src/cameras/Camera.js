@@ -30,15 +30,6 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		/**
-		 * The flag that indicates whether the camera uses a reversed depth buffer.
-		 *
-		 * @private
-		 * @type {boolean}
-		 * @default false
-		 */
-		this._reversedDepth = false;
-
-		/**
 		 * The inverse of the camera's world matrix.
 		 *
 		 * @type {Matrix4}
@@ -65,6 +56,20 @@ class Camera extends Object3D {
 		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
 		 */
 		this.coordinateSystem = WebGLCoordinateSystem;
+
+		this._reversedDepth = false;
+
+	}
+
+	/**
+	 * The flag that indicates whether the camera uses a reversed depth buffer.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get reversedDepth() {
+
+		return this._reversedDepth;
 
 	}
 
