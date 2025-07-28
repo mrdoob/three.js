@@ -142,6 +142,9 @@ export function* getNodeChildren( node, toJSON = false ) {
 
 			for ( const subProperty in object ) {
 
+				// Ignore private properties.
+				if ( subProperty.startsWith( '_' ) === true ) continue;
+
 				const child = object[ subProperty ];
 
 				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
