@@ -138,7 +138,7 @@ export function* getNodeChildren( node, toJSON = false ) {
 
 			yield { property, childNode: object };
 
-		} else if ( typeof object === 'object' ) {
+		} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
 
 			for ( const subProperty in object ) {
 
