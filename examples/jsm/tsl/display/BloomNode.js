@@ -449,10 +449,11 @@ class BloomNode extends TempNode {
 	_getSeparableBlurMaterial( builder, kernelRadius ) {
 
 		const coefficients = [];
+		const sigma = kernelRadius / 3;
 
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
 
 		}
 

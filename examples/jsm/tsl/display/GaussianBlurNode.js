@@ -281,11 +281,9 @@ class GaussianBlurNode extends TempNode {
 				const sample2 = sampleTexture( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
-				weightSum.addAssign( mul( 2.0, w ) );
-
 			}
 
-			return output( diffuseSum.div( weightSum ) );
+			return output( diffuseSum );
 
 		} );
 
@@ -328,10 +326,11 @@ class GaussianBlurNode extends TempNode {
 	_getCoefficients( kernelRadius ) {
 
 		const coefficients = [];
+		const sigma = kernelRadius / 3;
 
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
 
 		}
 
