@@ -104,7 +104,7 @@ class MathNode extends TempNode {
 		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
 		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
-		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
+		const aLen = ( builder.isMatrix( aType ) || this.method === MathNode.NATIVE_SELECT ) ? 0 : builder.getTypeLength( aType );
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
@@ -283,9 +283,9 @@ class MathNode extends TempNode {
 			} else if ( method === MathNode.NATIVE_SELECT ) {
 
 				params.push(
-					a.build( builder, inputType ),
+					c.build( builder, inputType ),
 					b.build( builder, inputType ),
-					c.build( builder, 'bool' )
+					a.build( builder, 'bool' )
 				);
 
 			} else {
@@ -1108,9 +1108,9 @@ export const atan2 = ( y, x ) => { // @deprecated, r172
  *
  * @tsl
  * @function
- * @param {Node | number} elseNode - The node that is evaluate when the condition ends up `false`.
- * @param {Node | number} ifNode - The node that is evaluate when the condition ends up `true`.
  * @param {Node} condNode - The node that defines the condition.
+ * @param {Node | number} ifNode - The node that is evaluate when the condition ends up `true`.
+ * @param {Node | number} elseNode - The node that is evaluate when the condition ends up `false`. Defaults to 0.
  * @returns {MathNode}
  */
 export const nativeSelect = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NATIVE_SELECT ).setParameterLength( 3 );
