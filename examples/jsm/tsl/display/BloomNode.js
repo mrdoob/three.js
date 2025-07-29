@@ -469,8 +469,7 @@ class BloomNode extends TempNode {
 
 		const separableBlurPass = Fn( () => {
 
-			const weightSum = gaussianCoefficients.element( 0 ).toVar();
-			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
+			const diffuseSum = sampleTexel(uvNode).rgb.mul( gaussianCoefficients.element(0) ).toVar();
 
 			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -479,12 +478,11 @@ class BloomNode extends TempNode {
 				const uvOffset = direction.mul( invSize ).mul( x );
 				const sample1 = sampleTexel( uvNode.add( uvOffset ) ).rgb;
 				const sample2 = sampleTexel( uvNode.sub( uvOffset ) ).rgb;
-				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
-				weightSum.addAssign( float( 2.0 ).mul( w ) );
+				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );		
 
 			} );
 
-			return vec4( diffuseSum.div( weightSum ), 1.0 );
+			return vec4( diffuseSum, 1.0 );
 
 		} );
 
