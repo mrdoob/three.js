@@ -1,9 +1,5 @@
 import * as THREE from 'three';
 
-import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
-import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 import { UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
@@ -50,7 +46,7 @@ class UITexture extends UISpan {
 		} );
 		this.dom.appendChild( canvas );
 
-		function loadFile( file ) {
+		async function loadFile( file ) {
 
 			const extension = file.name.split( '.' ).pop().toLowerCase();
 			const reader = new FileReader();
@@ -67,9 +63,11 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'hdr' || extension === 'pic' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
 
 					// assuming RGBE/Radiance HDR image format
+
+					const { RGBELoader } = await import( 'three/addons/loaders/RGBELoader.js' );
 
 					const loader = new RGBELoader();
 					loader.load( event.target.result, function ( hdrTexture ) {
@@ -90,7 +88,9 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'tga' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { TGALoader } = await import( 'three/addons/loaders/TGALoader.js' );
 
 					const loader = new TGALoader();
 					loader.load( event.target.result, function ( texture ) {
@@ -113,7 +113,9 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'ktx2' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { KTX2Loader } = await import( 'three/addons/loaders/KTX2Loader.js' );
 
 					const arrayBuffer = event.target.result;
 					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
@@ -142,7 +144,9 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'exr' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { EXRLoader } = await import( 'three/addons/loaders/EXRLoader.js' );
 
 					const arrayBuffer = event.target.result;
 					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
