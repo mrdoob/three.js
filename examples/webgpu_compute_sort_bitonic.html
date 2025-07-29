@@ -55,7 +55,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { storage, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
+			import { storage, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId, nativeSelect } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -383,7 +383,11 @@
 
 						} else {
 
-							nextAlgo.assign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).select( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ) );
+							nextAlgo.assign( nativeSelect(
+								StepType.DISPERSE_LOCAL,
+								StepType.DISPERSE_GLOBAL,
+								nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 )
+							) );
 
 						}
 

@@ -280,6 +280,14 @@ class MathNode extends TempNode {
 					c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
 				);
 
+			} else if ( method === MathNode.NATIVE_SELECT ) {
+
+				params.push(
+					a.build( builder, inputType ),
+					b.build( builder, inputType ),
+					c.build( builder, 'bool' )
+				);
+
 			} else {
 
 				if ( coordinateSystem === WebGPUCoordinateSystem && method === MathNode.ATAN && b !== null ) {
@@ -386,6 +394,7 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+MathNode.NATIVE_SELECT = 'select';
 
 export default MathNode;
 
@@ -1093,6 +1102,19 @@ export const atan2 = ( y, x ) => { // @deprecated, r172
 
 };
 
+/**
+ * TSL function for executing the WGSL native select function.
+ * This node can only be used with a WebGPU backend.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} elseNode - The node that is evaluate when the condition ends up `false`.
+ * @param {Node | number} ifNode - The node that is evaluate when the condition ends up `true`.
+ * @param {Node} condNode - The node that defines the condition.
+ * @returns {MathNode}
+ */
+export const nativeSelect = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NATIVE_SELECT ).setParameterLength( 3 );
+
 // GLSL alias function
 
 export const faceforward = faceForward;
@@ -1159,3 +1181,4 @@ addMethodChaining( 'transpose', transpose );
 addMethodChaining( 'determinant', determinant );
 addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );
+addMethodChaining( 'nativeSelect', nativeSelect );
