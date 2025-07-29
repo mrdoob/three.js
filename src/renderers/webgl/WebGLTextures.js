@@ -366,13 +366,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function deleteTexture( texture ) {
 
-		if ( texture.isRawTexture && texture.opaque ) {
-
-			console.warn( 'THREE.WebGLRenderer: Trying to delete an opaque RawTexture, this texture is externally managed and should not be deleted' );
-			return;
-
-		}
-
 		const textureProperties = properties.get( texture );
 		_gl.deleteTexture( textureProperties.__webglTexture );
 
