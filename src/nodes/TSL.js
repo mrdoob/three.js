@@ -51,6 +51,7 @@ export * from './tsl/TSLBase.js';
 // accessors
 export * from './accessors/AccessorsUtils.js';
 export * from './accessors/Arrays.js';
+export * from './accessors/ArrayBuiltinNode.js';
 export * from './accessors/UniformArrayNode.js';
 export * from './accessors/Bitangent.js';
 export * from './accessors/BufferAttributeNode.js';
@@ -129,6 +130,7 @@ export * from './gpgpu/ComputeBuiltinNode.js';
 export * from './gpgpu/BarrierNode.js';
 export * from './gpgpu/WorkgroupInfoNode.js';
 export * from './gpgpu/AtomicFunctionNode.js';
+export * from './gpgpu/SubgroupFunctionNode.js';
 
 // lighting
 export * from './accessors/Lights.js';

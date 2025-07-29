@@ -13,32 +13,8 @@
 			<br /> Reference implementations are translated from the CUDA code present in the following books/repos:
 			<br /> <a href="https://www.cambridge.org/core/books/programming-in-parallel-with-cuda/C43652A69033C25AD6933368CDBE084C"><i>Programming in Parallel with CUDA</i></a> by <a href="https://people.bss.phy.cam.ac.uk/~rea1/">Richard Ansorge</a>
 			<br />
-			<div id="left_side_display" style="
-				position: absolute;
-				top: 150px;
-				left: 0;
-				padding: 10px;
-				background: rgba( 0, 0, 0, 0.5 );
-				color: #fff;
-				font-family: monospace;
-				font-size: 12px;
-				line-height: 1.5;
-				pointer-events: none;
-				text-align: left;
-			"></div>
-			<div id="right_side_display" style="
-			position: absolute;
-			top: 150px;
-			right: 0;
-			padding: 10px;
-			background: rgba( 0, 0, 0, 0.5 );
-			color: #fff;
-			font-family: monospace;
-			font-size: 12px;
-			line-height: 1.5;
-			pointer-events: none;
-			text-align: left;
-		"></div>
+			<div id="left_side_display" style="position: absolute;top: 150px;left: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
+			<div id="right_side_display" style="position: absolute;top: 150px;right: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 		</div>
 
 		<script type="importmap">
@@ -54,8 +30,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { instancedArray, Loop, If, vec3, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { instancedArray, Loop, If, vec3, nativeSelect, arrayLength, int, atomicStore, subgroupAdd, select, uvec4, atomicAdd, dot, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupIndex, subgroupShuffleDown, subgroupSize, countTrailingZeros } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -73,14 +49,14 @@
 
 			// Algorithm speed increase as you iterate through algorithms array
 			const algorithms = [
-				'CPU (Serial)',
-				'CPU (Reduce)',
 				'Reduce 0 (N/2)',
 				'Reduce 1 (Naive Accumulate)',
 				'Reduce 2 (Workgroup Reduction)',
-				'Reduce 2x (NumWorkgroups % 2 != 0)'
+				'Reduce 3 (Simple Shuffle)',
+				'Incorrect Baseline',
 			];
-			const displayModes = [ 'Entire Grid', 'Workgroup 0' ];
+
+			const displayModes = [ 'Entire Grid', 'Logarithmic' ];
 
 			const unifiedEffectController = {
 				// Number of elements in the grid
@@ -89,65 +65,47 @@
 				// Number of elements in the grid being displayed
 				gridDisplayWidth: uniform( gridDim ),
 				gridDisplayHeight: uniform( gridDim ),
-				'Display Mode': 'Entire Grid'
+				'Display Mode': 'Logarithmic',
+				loggedBuffer: 'Data Buffer',
 			};
+			
 
 			const leftEffectController = {
 				algo: 'Reduce 0 (N/2)',
 				highlight: uniform( 0 ),
+				currentAlgo: uniform( 0 ),
 				state: 'Run Algo',
 				numThreadsDispatched: uniform( size / 2 ),
 			};
 
+			const leftMaterial = null;
+
 			const rightEffectController = {
-				algo: 'Reduce 2 (Workgroup Reduction)',
+				algo: 'Reduce 0 (N/2)',
+				currentAlgo: uniform( 0 ),
 				highlight: uniform( 0 ),
 				state: 'Run Algo',
 				numThreadsDispatched: uniform( size / 2 )
 			};
+
+			const rightMaterial = null;
 			
 			// https://medium.com/@rimikadhara/7-step-optimization-of-parallel-reduction-with-cuda-33a3b2feafd8
 			// https://superjomn.github.io/posts/reduce-cuda/
 
 			const gui = new GUI();
 
-			let lastValidLeftValue = leftEffectController.algo;
-			let lastValidRightValue = rightEffectController.algo;
-			let isSyncingAlgos = false;
+			gui.add( leftEffectController, 'algo', algorithms ).onChange( () => {
 
-			const leftSideAlgoController = gui.add( leftEffectController, 'algo', algorithms ).onChange( () => {
-
-				if ( isSyncingAlgos ) return;
-
-				if ( leftEffectController.algo === rightEffectController.algo ) {
-
-					isSyncingAlgos = true;
-					leftSideAlgoController.setValue( lastValidLeftValue );
-					isSyncingAlgos = false;
-
-				} else {
-
-					lastValidLeftValue = leftEffectController.algo;
-
-				}
+				leftEffectController.currentAlgo.value = algorithms.findIndex( val => val === leftEffectController.algo );
+			
 
 			} );
 
-			const rightSideAlgoController = gui.add( rightEffectController, 'algo', algorithms ).onChange( () => {
+			gui.add( rightEffectController, 'algo', algorithms ).onChange( () => {
 
-				if ( isSyncingAlgos ) return;
+				rightEffectController.currentAlgo.value = algorithms.findIndex( val => val === rightEffectController.algo );
 
-				if ( rightEffectController.algo === leftEffectController.algo ) {
-
-					isSyncingAlgos = true;
-					rightSideAlgoController.setValue( lastValidRightValue );
-
-				} else {
-
-					lastValidRightValue = rightEffectController.algo;
-
-				}
-			
 			} );
 
 			gui.add( unifiedEffectController, 'Display Mode', displayModes ).onChange( () => {
@@ -181,6 +139,11 @@
 			stateLeftController.domElement.style.pointerEvents = 'none';
 			const stateRightController = gui.add( rightEffectController, 'state' ).name( 'Right Display State' );
 			stateRightController.domElement.style.pointerEvents = 'none';
+			const leftCPUArray = null;
+			const rightCPUArray = null;
+
+			const debugFolder = gui.addFolder( 'Debug' );
+			debugFolder.add( unifiedEffectController, 'loggedBuffer', [ 'Data Buffer', 'Workgroup Sums Buffer', 'Accumulation Buffer' ] ).name( 'Logged Buffer' );
 
 			if ( WebGPU.isAvailable() === false ) {
 
@@ -239,12 +202,31 @@
 
 				} ) );
 
+			
 
-				const currentStorage = instancedArray( array, 'uint', size ).setPBO( true ).label( 'Current' );
+
+				const currentStorage = instancedArray( array, 'uint', size ).setPBO( true ).label( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const workgroupSums = instancedArray( new Uint32Array( 256 ), 'uint', 256 ).setPBO( true ).label( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const atomicAccumulator = instancedArray( new Uint32Array( 1 ), 'uint' ).setPBO( true ).toAtomic();
+
+				const buffers = {
+					'Data Buffer': currentStorage,
+					'Workgroup Sums Buffer': workgroupSums,
+					'Accumulation Buffer': atomicAccumulator,
+				};
 				// Result array for future two buffer/ping-pong buffer approach
 				// const resultStorage = instancedArray( new Uint32Array( size ), 'uint' ).setPBO( true ).label( 'Result' );
 
-			
+				const logFunctionName = `Log ${leftSideDisplay ? 'Left' : 'Right'} Side`;
+				const functionObj = {};
+				functionObj[ logFunctionName ] = async() => {
+
+					const selectedBuffer = buffers[ unifiedEffectController.loggedBuffer ];
+					console.log( new Uint32Array( await renderer.getArrayBufferAsync( selectedBuffer.value ) ) );
+
+				};
+
+				debugFolder.add( functionObj, `Log ${leftSideDisplay ? 'Left' : 'Right'} Side` );
 
 				const computeResetBufferFn = Fn( () => {
 
@@ -252,8 +234,16 @@
 			
 				} );
 
+				const computeResetWorkgroupSumsFn = Fn( () => {
+
+					workgroupSums.element( instanceIndex ).assign( 0 );
+					atomicStore( atomicAccumulator.element( 0 ), 0 );
+
+				} );
+
 				// Re-initialize compute buffer
 				const computeResetBuffer = computeResetBufferFn().compute( size );
+				const computeResetWorkgroupSums = computeResetWorkgroupSumsFn().compute( 256 );
 
 				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -344,72 +334,7 @@
 					createReduce1Fn( 1, maxWorkgroupSize ).compute( 1, [ 1 ] ),
 				];
 
-				const createReduce2Fn = ( workgroupSize, dispatch, numElements ) => {
-
-					const fnDef = Fn( () => {
-
-						const tSum = workgroupArray( 'uint', workgroupSize );
-
-						const k = instanceIndex.toVar( 'k' );
-						tSum.element( invocationLocalIndex ).assign( uint( 0 ) );
-
-						// Each workgroup populates its workgroup array with accumulated values from across dispatch blocks.
-						Loop( k.lessThan( uint( numElements ) ), () => {
-
-							tSum.element( invocationLocalIndex ).addAssign( currentStorage.element( k ) );
-
-							k.addAssign( uint( dispatch ) );
-
-						} );
-
-						// Ensure that each thread within a workgroup has finished populating it's share of the workgroup array.
-						workgroupBarrier();
-
-						// Reset the loop condition
-						k.assign( uint( workgroupSize / 2 ) );
-
-						Loop( k.greaterThan( 0 ), () => {
-
-							// Only access elements under current power of 2
-							If( invocationLocalIndex.lessThan( k ), () => {
-
-								/* Add the element 2^n up to current element (similar to reduce0).
-								 * 1st iteration: 128 -> 255 added to 0 - 127.
-								 * 2nd iteration: 64 -> 127 added to 0 -> 63.
-								 */
-								tSum.element( invocationLocalIndex ).addAssign( tSum.element( invocationLocalIndex.add( k ) ) );
-
-							} );
-			
-							// Ensure each iteration's threads complete.
-							workgroupBarrier();
-							k.divAssign( 2 );
-
-						} );
-
-						// Each workgroup has completed its own individual reduction, which lies in
-						// element 0. Each workgroup now passed on its reduction value to currentStorage
-						// for the next pass
-						If( invocationLocalIndex.equal( uint( 0 ) ), () => {
-			
-							currentStorage.element( workgroupId.x ).assign( tSum.element( uint( 0 ) ) );
-			
-						} );
-			
-					} )();
-
-					return fnDef;
-			
-				};
-
-				const reduce2Calls = [
-					// Accumulate within workgroups
-					createReduce2Fn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
-					// 1 Block accumulation
-					createReduce2Fn( maxWorkgroupSize, maxWorkgroupSize, maxWorkgroupSize ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
-				];
-
-				const pow2Ceil = ( x ) => {
+				const pow2Ceil = Fn( ( [ x ] ) => {
 
 					If( x.equal( uint( 0 ) ), () => {
 
@@ -425,10 +350,16 @@
 					val.assign( val.bitOr( val.shiftRight( 16 ) ) );
 					return val.add( 1 );
 
-				};
+				} ).setLayout( {
+					name: 'pow2Ceil',
+					type: 'uint',
+					inputs: [
+						{ name: 'x', type: 'uint' }
+					]
+				} );
 
 				// For non power of 2 # of workgroups
-				const createReduce2xFn = ( workgroupSize, dispatch, numElements ) => {
+				const createReduce2Fn = ( workgroupSize, dispatch, numElements ) => {
 
 					const fnDef = Fn( () => {
 
@@ -463,56 +394,269 @@
 						} );
 
 						If( invocationLocalIndex.equal( uint( 0 ) ), () => {
-			
+
 							currentStorage.element( workgroupId.x ).assign( tSum.element( uint( 0 ) ) );
+
+						} );
+
+					} )();
+
+					return fnDef;
+
+				};
+
+				const reduce2Calls = [
+
+					// Accumulate within workgroups
+					createReduce2Fn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
+					// 1 Block accumulation
+					createReduce2Fn( maxWorkgroupSize, maxWorkgroupSize, maxWorkgroupSize ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
+
+				];
+
+
+				const createWorkgroupSyncBlock = ( workgroupSize, blockSize, tSum ) => {
+
+					If(
+						workgroupSize.greaterThan( blockSize ).and(
+							invocationLocalIndex.lessThan( blockSize )
+						).and(
+							invocationLocalIndex.add( blockSize ).lessThan( workgroupSize )
+						),
+						() => {
+
+							tSum.element( invocationLocalIndex ).addAssign( tSum.element( invocationLocalIndex.add( blockSize ) ) );
+			
+						}
+					);
+
+					workgroupBarrier();
+			
+				};
+
+				const createReduce3Fn = ( workgroupSize, dispatch, numElements ) => {
+
+					const fnDef = Fn( () => {
+
+						const WORKGROUP_SIZE = uint( workgroupSize );
+						const DISPATCH = uint( dispatch );
+						const DISPATCHED_WORKGROUPS = uint( 256 ); // # of elements in maxworkgroupSize * maxWorkgroupSize so 256 workgroups dispatched
+						const NUM_ELEMENTS = uint( numElements );
+
+						const tSum = workgroupArray( 'uint', workgroupSize );
+
+						const k = instanceIndex.toVar( 'k' );
+						tSum.element( invocationLocalIndex ).assign( uint( 0 ) );
+
+						Loop( k.lessThan( NUM_ELEMENTS ), () => {
+
+							tSum.element( invocationLocalIndex ).addAssign( currentStorage.element( k ) );
+
+							k.addAssign( DISPATCH );
+
+						} );
+
+						workgroupBarrier();
+
+						// Reset the loop condition (account for numWorkgroups % 2 != 0)
+						k.assign( pow2Ceil( WORKGROUP_SIZE ).div( 2 ) );
+
+						createWorkgroupSyncBlock( WORKGROUP_SIZE, 128, tSum );
+						createWorkgroupSyncBlock( WORKGROUP_SIZE, 64, tSum );
+						createWorkgroupSyncBlock( WORKGROUP_SIZE, 32, tSum );
+
+						// Icd Dmagine a tiled partition of 32 threads/invocations whose parent is a 256 invocation block/workgroup
+						// Each workgroup contains 8 subgroups/warps
+						// In this case, we only want to operate within the first warp
+						// of each workgroup
+
+						// Equivalent to CUDA function meta_group_rank
+						const subgroupMetaRank = ( invocationLocalIndex.mod( WORKGROUP_SIZE ) ).div( subgroupSize );
+
+						const isFirstSubgroup = subgroupMetaRank.equal( 0 ).toVar( 'isFirstSubgroup' );
+
+						// No need to sync within warp as warp operations inherently execute in parallel
+						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
+							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
+							16
+						) );
+						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
+							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
+							8
+						) );
+						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
+							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
+							4
+						) );
+						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
+							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
+							2
+						) );
+						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
+							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
+							1
+						) );
+
+						If( invocationLocalIndex.equal( uint( 0 ) ), () => {
+
+							workgroupSums.element( workgroupId.x ).assign( tSum.element( uint( 0 ) ) );
 			
 						} );
+
+					} )();
+
+					return fnDef;
+
+				};
+
+				const accumulateFn = Fn( () => {
+
+					atomicAdd( atomicAccumulator.element( 0 ), workgroupSums.element( instanceIndex ) );
+
+				} );
+
+				const reduce3Calls = [
+					createReduce3Fn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
+					accumulateFn().compute( 256, [ maxWorkgroupSize ] )
+				];
+
+
+				// Work Per Thread
+				// numRows: 4 * 32 = 128
+				// workgroupSize2ndPass = 32
+
+				const workPerThread = 4;
+				const numRows = workPerThread * 32;
+				console.log( numRows );
+				const rowSize = divRoundUp( size, numRows );
+				console.log( rowSize );
+
+				const intermediateArray = new Uint32Array( numRows );
+				const intermediateBuffer = instancedArray( intermediateArray, 'uint', numRows );
+
+				// Run with workgroupSize of 256 in the first pass
+				// workgroups size of workgroupSize2ndPass in the second pass
+				// For some reason the number of workgroups is dispatched in the y dimension, rather than the x.
+
+				// 2041 row Size
+
+				// 2041 / 256
+
+				const RowReduce = ( currentStorage ) => {
+
+
+				};
+
+
+				const reduce4Fn = Fn( () => {
+
+					const ROW_SIZE = uint( rowSize );
+					const WORKGROUP_SIZE = uint( maxWorkgroupSize );
+					const WORK_PER_THREAD = uint( 4 );
+
+					const inputSize = arrayLength( currentStorage );
+					const row = workgroupId.x.mul( ROW_SIZE );
+
+
+					// If the current rows elements exceed the bounds of the input
+					// Select either 0 or number of elements left,
+					// otherwise, select existing ROW_SIZE
+					const currentRowSize = nativeSelect(
+						ROW_SIZE,
+						nativeSelect( 0, inputSize.sub( row ), inputSize.greaterThan( row ) ),
+						( row.add( ROW_SIZE ) ).greaterThan( inputSize )
+					);
+
+					const total = uint( 0 ).toVar( 'total' );
+
+					const blockSize = WORKGROUP_SIZE.mul( workPerThread );
+					const block = uint( 0 ).toVar( 'block' );
+					const blockLimiter = ROW_SIZE.DIV( blockSize ).toVar( 'blockLimiter' );
+					Loop( block.lessThan( blockLimiter ), () => {
+
+						const idx = block.mul( blockSize ).add( invocationLocalIndex.mul( workPerThread ) );
+						const i = uint( 0 ).toVar( 'readOffset' );
+						Loop( i.lessThan( WORK_PER_THREAD ), () => {
+
 			
+						} );
+
+
+			
+					} );
+
+
+					total.assign( subgroupAdd( total ) );
+
+					const delta = WORKGROUP_SIZE.div( subgroupSize ).toVar( 'delta' );
+
+					const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
+
+
+					Loop( float( delta ).greaterThan( 1.0 ), () => {
+
+						If( invocationSubgroupIndex.assign( 0 ), () => {
+			
+							workgroupSums.element( subgroupMetaRank ).assign( total );
+
+						} );
+
+						workgroupBarrier();
+
+						total.assign( nativeSelect( 0, workgroupSums.element( invocationLocalIndex ), invocationLocalIndex.lessThan( delta ) ) );
+						total.assign( subgroupAdd( total ) );
+
+						delta.divAssign( subgroupSize );
+
+					} );
+
+				} );
+
+
+				const divRoundUp = ( size, part_size ) => {
+
+					Math.floor( ( size + part_size - 1 ) / part_size );
+
+				};
+
+				const createIncorrectBaselineFn = () => {
+
+					const fnDef = Fn( () => {
+
+						currentStorage.element( instanceIndex ).assign( 99999 );
+
 					} )();
 
 					return fnDef;
 			
 				};
 
-				const reduce2xCalls = [
-
-					// Accumulate within workgroups
-					createReduce2xFn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
-					// 1 Block accumulation
-					createReduce2xFn( maxWorkgroupSize, maxWorkgroupSize, maxWorkgroupSize ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
-			
+				const incorrectBaselineCalls = [
+					createIncorrectBaselineFn().compute( size ),
 				];
 
 				const calls = {
 					'Reduce 0 (N/2)': reduce0Calls,
 					'Reduce 1 (Naive Accumulate)': reduce1Calls,
 					'Reduce 2 (Workgroup Reduction)': reduce2Calls,
-					'Reduce 2x (NumWorkgroups % 2 != 0)': reduce2xCalls
+					'Reduce 3 (Simple Shuffle)': reduce3Calls,
+					'Incorrect Baseline': incorrectBaselineCalls
 				};
 
 				const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
 
-				const display = Fn( () => {
+				const getColor = ( bufferToCheck, colorChanger, width, height ) => {
 
-					const { gridElementWidth, gridElementHeight, gridDisplayWidth, gridDisplayHeight } = unifiedEffectController;
-					const { highlight } = effectController;
-
-					const newUV = uv().mul( vec2( gridDisplayWidth, gridDisplayHeight ) );
-
-					const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
-
-					const elementIndex = uint( gridDisplayWidth ).mul( pixel.y ).add( pixel.x );
-
-					const colorChanger = currentStorage.element( elementIndex );
-
-					const subtracter = float( colorChanger ).div( gridElementWidth.mul( gridElementHeight ) );
+					const subtracter = float( colorChanger ).div( width.mul( height ) );
 
 					const color = vec3( subtracter.oneMinus() ).toVar();
+
+					const { highlight } = effectController;
 
 					// Validate that element 0 is equal to expected result of reduction
 					If( highlight.equal( 1 ), () => {
 
-						If( ( currentStorage.element( 0 ) ).equal( size ), () => {
+						If( ( bufferToCheck.element( 0 ) ).equal( size ), () => {
 
 							color.assign( vec3( 0.0, subtracter.oneMinus(), 0.0 ) );
 
@@ -526,9 +670,73 @@
 
 					return color;
 
-				} );
+				};
 
-				material.colorNode = display();
+				const displayColorNodes = {
+
+					'Entire Grid': Fn( () => {
+
+						const { gridElementWidth, gridElementHeight, gridDisplayWidth, gridDisplayHeight } = unifiedEffectController;
+						const { currentAlgo } = effectController;
+
+						const newUV = uv().mul( vec2( gridDisplayWidth, gridDisplayHeight ) );
+
+						const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
+
+						const elementIndex = uint( gridDisplayWidth ).mul( pixel.y ).add( pixel.x );
+
+						const colorChanger = uint( 0 ).toVar();
+						const color = vec3( 0 ).toVar( 'color' );
+
+						If( currentAlgo.equal( 3 ), () => {
+
+							// Workgroup Sums condition
+
+							colorChanger.assign( workgroupSums.element( 0 ) );
+							color.assign( getColor( workgroupSums, colorChanger, gridElementWidth, gridElementHeight ) );
+
+						} ).Else( () => {
+
+							colorChanger.assign( currentStorage.element( elementIndex ) );
+							color.assign( getColor( currentStorage, colorChanger, gridElementWidth, gridElementHeight ) );
+
+						} );
+
+						return color;
+
+					} )(),
+
+					'Logarithmic': Fn( () => {
+
+						const { gridElementWidth, gridElementHeight } = unifiedEffectController;
+						const { currentAlgo } = effectController;
+
+						const newUV = uv().mul( vec2( Math.log2( size ) ), 1 );
+
+						const colorChanger = uint( 0 ).toVar();
+						const color = vec3( 0 ).toVar( 'color' );
+
+						If( currentAlgo.equal( 3 ), () => {
+
+							// Workgroup Sums condition
+
+							colorChanger.assign( workgroupSums.element( 0 ) );
+							color.assign( getColor( workgroupSums, colorChanger, gridElementWidth, gridElementHeight ) );
+
+						} ).Else( () => {
+
+							colorChanger.assign( currentStorage.element( uint( 1 ).shiftLeft( newUV.x ) ) );
+							color.assign( getColor( currentStorage, colorChanger, gridElementWidth, gridElementHeight ) );
+
+						} );
+
+						return color;
+
+					} )(),
+
+				};
+
+				material.colorNode = displayColorNodes[ unifiedEffectController[ 'Display Mode' ] ];
 				material.needsUpdate = true;
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
@@ -571,17 +779,8 @@
 
 					if ( state === 'Reset' ) {
 
-						if ( currentAlgorithm.substring( 0, 3 ) === 'CPU' ) {
-
-							array.fill( 1 );
-			
-						} else {
-
-							renderer.compute( computeResetBuffer );
-
-						}
-
-						renderer.render( scene, camera );
+						renderer.computeAsync( computeResetBuffer );
+						renderer.computeAsync( computeResetWorkgroupSums );
 
 					} else if ( state === 'Run Algo' ) {
 
@@ -617,7 +816,7 @@
 
 									const reduce0 = reduce0Calls[ i ];
 									// Do a reduction step
-									renderer.compute( reduce0 );
+									renderer.computeAsync( reduce0 );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 									m /= 2;
@@ -635,7 +834,7 @@
 
 								for ( let i = 0; i < currentAlgoCalls.length; i ++ ) {
 
-									renderer.compute( currentAlgoCalls[ i ] );
+									renderer.computeAsync( currentAlgoCalls[ i ] );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 								}

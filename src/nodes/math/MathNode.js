@@ -280,6 +280,14 @@ class MathNode extends TempNode {
 					c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
 				);
 
+			} else if ( method === MathNode.NATIVE_SELECT ) {
+
+				params.push(
+					a.build( builder, inputType ),
+					b.build( builder, inputType ),
+					c.build( builder, 'bool' )
+				);
+
 			} else {
 
 				if ( coordinateSystem === WebGPUCoordinateSystem && method === MathNode.ATAN && b !== null ) {
@@ -378,6 +386,7 @@ MathNode.DOT = 'dot';
 MathNode.CROSS = 'cross';
 MathNode.POW = 'pow';
 MathNode.TRANSFORM_DIRECTION = 'transformDirection';
+MathNode.NATIVE_SELECT = 'select';
 
 // 3 inputs
 
@@ -923,6 +932,18 @@ export const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).s
 export const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
 
 /**
+ * TSL function for using the WGSL native select function.
+ *
+ * @tsl
+ * @function
+ * @param {Node} elseNode - The node that is evaluate when the condition ends up `false`.
+ * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
+ * @param {Node} condNode - The node that defines the condition.
+ * @returns {MathNode}
+ */
+export const nativeSelect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NATIVE_SELECT ).setParameterLength( 3 );
+
+/**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
  *
  * @tsl
@@ -1074,6 +1095,18 @@ export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
  * @returns {Node}
  */
 export const stepElement = ( x, edge ) => step( edge, x );
+
+
+/**
+ * A built-in function that returns the length of a storage array in WGSL.
+ * Can only be used in the WebGPURenderer.
+ *
+ * @tsl
+ * @function
+ * @param {StorageBufferNode} x - A node representing a GPU buffer array.
+ * @returns {Node}
+ */
+export const arrayLength = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ARRAY_LENGTH, 1 ).setParameterLength( 1 );
 
 /**
  * Returns the arc-tangent of the quotient of its parameters.
