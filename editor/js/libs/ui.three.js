@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
@@ -132,6 +133,31 @@ class UITexture extends UISpan {
 
 						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 						ktx2Loader.dispose();
+
+					} );
+
+				} );
+
+				reader.readAsArrayBuffer( file );
+
+			} else if ( extension === 'exr' ) {
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					const arrayBuffer = event.target.result;
+					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
+					const exrLoader = new EXRLoader();
+
+					exrLoader.load( blobURL, function ( texture ) {
+
+						texture.sourceFile = file.name;
+						texture.needsUpdate = true;
+
+						cache.set( hash, texture );
+
+						scope.setValue( texture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 					} );
 
