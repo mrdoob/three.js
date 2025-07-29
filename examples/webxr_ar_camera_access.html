@@ -87,7 +87,18 @@
 
 			function setCameraTexture() {
 
-				if ( ! renderer.xr.getSession() ) return;
+				if ( ! renderer.xr.getSession() ) {
+
+					if ( cube.material.map ) {
+
+						cube.material.map = null;
+						cube.material.needsUpdate = true;
+
+					}
+
+					return;
+
+				}
 
 				const frame = renderer.xr.getFrame();
 				const referenceSpace = renderer.xr.getReferenceSpace();
@@ -102,6 +113,8 @@
 				
 				const cameraTexture = renderer.xr.getCameraTexture( view.camera );
 
+				if ( cube.material.map === cameraTexture ) return;
+
 				cube.material.map = cameraTexture;
 				cube.material.needsUpdate = true;
 				
@@ -111,11 +124,7 @@
 
 				const delta = clock.getDelta();
 
-				if ( !cube.material.map ) {
-
-					setCameraTexture();
-
-				}
+				setCameraTexture();
 
 				cube.rotation.x += delta;
 				cube.rotation.y += delta;
