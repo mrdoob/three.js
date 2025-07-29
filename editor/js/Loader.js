@@ -992,7 +992,10 @@ function Loader( editor ) {
 		dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 		const ktx2Loader = new KTX2Loader( manager );
-		ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
+		ktx2Loader.setTranscoderPath( {
+			js: 'jsm/libs/basis/basis_transcoder.js',
+			wasm: 'jsm/libs/basis/basis_transcoder.wasm'
+		} );
 
 		editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
