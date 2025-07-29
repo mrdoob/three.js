@@ -3,7 +3,6 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	NoColorSpace,
 	LinearFilter,
 	LinearSRGBColorSpace,
 	RedFormat,
@@ -2505,14 +2504,14 @@ class EXRLoader extends DataTextureLoader {
 					} else if ( outputFormat == RGFormat ) {
 
 						EXRDecoder.format = RGFormat;
-						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.colorSpace = LinearSRGBColorSpace;
 						EXRDecoder.outputChannels = 2;
 						EXRDecoder.decodeChannels = { R: 0, G: 1 };
 
 					} else if ( outputFormat == RedFormat ) {
 
 						EXRDecoder.format = RedFormat;
-						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.colorSpace = LinearSRGBColorSpace;
 						EXRDecoder.outputChannels = 1;
 						EXRDecoder.decodeChannels = { R: 0 };
 
@@ -2538,7 +2537,7 @@ class EXRLoader extends DataTextureLoader {
 					} else if ( outputFormat == RGFormat ) {
 
 						EXRDecoder.format = RGFormat;
-						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.colorSpace = LinearSRGBColorSpace;
 						EXRDecoder.outputChannels = 2;
 						EXRDecoder.shouldExpand = true;
 						EXRDecoder.decodeChannels = { Y: 0 };
@@ -2546,7 +2545,7 @@ class EXRLoader extends DataTextureLoader {
 					} else if ( outputFormat == RedFormat ) {
 
 						EXRDecoder.format = RedFormat;
-						EXRDecoder.colorSpace = NoColorSpace;
+						EXRDecoder.colorSpace = LinearSRGBColorSpace;
 						EXRDecoder.outputChannels = 1;
 						EXRDecoder.decodeChannels = { Y: 0 };
 
