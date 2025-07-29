@@ -9,7 +9,7 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { Texture } from '../../textures/Texture.js';
+import { RawTexture } from '../../textures/RawTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 import { WebXRDepthSensing } from './WebXRDepthSensing.js';
 
@@ -234,6 +234,11 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthFar = null;
 
 			depthSensing.reset();
+			for ( const key in cameraAccessTextures ) {
+
+				delete cameraAccessTextures[ key ];
+
+			}
 
 			// restore framebuffer/rendering state
 
@@ -993,7 +998,7 @@ class WebXRManager extends EventDispatcher {
 
 					if ( depthData && depthData.isValid && depthData.texture ) {
 
-						depthSensing.init( renderer, depthData, session.renderState );
+						depthSensing.init( depthData, session.renderState );
 
 					}
 
@@ -1018,14 +1023,13 @@ class WebXRManager extends EventDispatcher {
 
 								if ( ! cameraTex ) {
 
-									cameraTex = new Texture();
+									cameraTex = new RawTexture( null, true );
 									cameraAccessTextures[ camera ] = cameraTex;
 
 								}
 
 								const glTexture = glBinding.getCameraImage( camera );
-								const texProps = renderer.properties.get( cameraTex );
-								texProps.__webglTexture = glTexture;
+								cameraTex.sourceTexture = glTexture;
 
 							}
 

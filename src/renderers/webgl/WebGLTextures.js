@@ -366,6 +366,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function deleteTexture( texture ) {
 
+		if ( texture.isRawTexture && texture.opaque ) {
+
+			console.warn( 'THREE.WebGLRenderer: Trying to delete an opaque RawTexture, this texture is externally managed and should not be deleted' );
+			return;
+
+		}
+
 		const textureProperties = properties.get( texture );
 		_gl.deleteTexture( textureProperties.__webglTexture );
 
@@ -515,7 +522,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
-		if ( texture.isRenderTargetTexture === false && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isRenderTargetTexture === false && texture.isRawTexture === false && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			const image = texture.image;
 
@@ -533,6 +540,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				return;
 
 			}
+
+		} else if ( texture.isRawTexture ) {
+
+			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
 
 		}
 
