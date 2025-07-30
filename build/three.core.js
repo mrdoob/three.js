@@ -21369,14 +21369,6 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		/**
-		 * The flag that indicates whether the camera uses a reversed depth buffer.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.reversedDepth = false;
-
-		/**
 		 * The inverse of the camera's world matrix.
 		 *
 		 * @type {Matrix4}
@@ -21403,6 +21395,20 @@ class Camera extends Object3D {
 		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
 		 */
 		this.coordinateSystem = WebGLCoordinateSystem;
+
+		this._reversedDepth = false;
+
+	}
+
+	/**
+	 * The flag that indicates whether the camera uses a reversed depth buffer.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get reversedDepth() {
+
+		return this._reversedDepth;
 
 	}
 
@@ -26639,7 +26645,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsObject( object ) ) {
@@ -26681,7 +26688,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsSprite( sprite ) ) {
@@ -26723,7 +26731,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsSphere( sphere ) ) {
@@ -26765,7 +26774,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsBox( box ) ) {
@@ -26807,7 +26817,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.containsPoint( point ) ) {
@@ -28352,9 +28363,11 @@ class BatchedMesh extends Mesh {
 			_matrix$1
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
+
 			_frustum.setFromProjectionMatrix(
 				_matrix$1,
-				renderer.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 		}
@@ -45220,7 +45233,7 @@ class LightShadow {
 		shadowCamera.updateMatrixWorld();
 
 		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1 );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
 		if ( shadowCamera.reversedDepth ) {
 
@@ -45697,7 +45710,7 @@ class PointLightShadow extends LightShadow {
 		shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 	}
 
@@ -57253,34 +57266,34 @@ class CameraHelper extends LineSegments {
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
-		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
-		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
+		setPoint( 'n1', pointMap, geometry, _camera, -1, -1, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, -1, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, -1, h, nearZ );
 		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, farZ );
-		setPoint( 'f2', pointMap, geometry, _camera, w, - h, farZ );
-		setPoint( 'f3', pointMap, geometry, _camera, - w, h, farZ );
+		setPoint( 'f1', pointMap, geometry, _camera, -1, -1, farZ );
+		setPoint( 'f2', pointMap, geometry, _camera, w, -1, farZ );
+		setPoint( 'f3', pointMap, geometry, _camera, -1, h, farZ );
 		setPoint( 'f4', pointMap, geometry, _camera, w, h, farZ );
 
 		// up
 
 		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
-		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, -1 * 0.7, h * 1.1, nearZ );
 		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, farZ );
+		setPoint( 'cf1', pointMap, geometry, _camera, -1, 0, farZ );
 		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, farZ );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, farZ );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, -1, farZ );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, farZ );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
+		setPoint( 'cn1', pointMap, geometry, _camera, -1, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, -1, nearZ );
 		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
