@@ -81,7 +81,7 @@ class WebXRDepthSensing {
 
 		if ( this.texture === null ) {
 
-			const texture = new RawTexture( depthData.depthTexture, true );
+			const texture = new RawTexture( depthData.depthTexture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
