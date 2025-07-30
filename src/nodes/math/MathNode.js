@@ -1,6 +1,10 @@
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div, mod, equal } from './OperatorNode.js';
+<<<<<<< HEAD
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
+=======
+import { addMethodChaining, nodeObject, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
+>>>>>>> e0caebba49 (change native select approach)
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
 /**
@@ -104,7 +108,7 @@ class MathNode extends TempNode {
 		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
 		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
-		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
+		const aLen = ( builder.isMatrix( aType ) || this.method === MathNode.NATIVE_SELECT ) ? 0 : builder.getTypeLength( aType );
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
@@ -283,9 +287,9 @@ class MathNode extends TempNode {
 			} else if ( method === MathNode.NATIVE_SELECT ) {
 
 				params.push(
-					a.build( builder, inputType ),
+					c.build( builder, inputType ),
 					b.build( builder, inputType ),
-					c.build( builder, 'bool' )
+					a.build( builder, 'bool' )
 				);
 
 			} else {
@@ -386,7 +390,6 @@ MathNode.DOT = 'dot';
 MathNode.CROSS = 'cross';
 MathNode.POW = 'pow';
 MathNode.TRANSFORM_DIRECTION = 'transformDirection';
-MathNode.NATIVE_SELECT = 'select';
 
 // 3 inputs
 
@@ -395,6 +398,7 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+MathNode.NATIVE_SELECT = 'select';
 
 export default MathNode;
 
@@ -930,6 +934,7 @@ export const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).s
  * @returns {Node}
  */
 export const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
+<<<<<<< HEAD
 
 /**
  * TSL function for using the WGSL native select function.
@@ -942,6 +947,8 @@ export const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).s
  * @returns {MathNode}
  */
 export const nativeSelect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NATIVE_SELECT ).setParameterLength( 3 );
+=======
+>>>>>>> e0caebba49 (change native select approach)
 
 /**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
@@ -1114,6 +1121,19 @@ export const atan2 = ( y, x ) => { // @deprecated, r172
 
 };
 
+/**
+ * TSL function for executing the WGSL native select function.
+ * This node can only be used with a WebGPU backend.
+ *
+ * @tsl
+ * @function
+ * @param {Node} condNode - The node that defines the condition.
+ * @param {Node | number} ifNode - The node that is evaluate when the condition ends up `true`.
+ * @param {Node | number} elseNode - The node that is evaluate when the condition ends up `false`. Defaults to 0.
+ * @returns {MathNode}
+ */
+export const nativeSelect = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NATIVE_SELECT ).setParameterLength( 3 );
+
 // GLSL alias function
 
 export const faceforward = faceForward;
@@ -1180,3 +1200,4 @@ addMethodChaining( 'transpose', transpose );
 addMethodChaining( 'determinant', determinant );
 addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );
+addMethodChaining( 'nativeSelect', nativeSelect );
