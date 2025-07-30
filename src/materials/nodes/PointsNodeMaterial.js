@@ -37,8 +37,8 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 		 *
 		 * Note that WebGPU only supports point primitives with 1 pixel size. Consequently,
 		 * this node has no effect when the material is used with {@link Points} and
-		 * a WebGPU backend. If want to render points with a size larger than 1 pixel,
-		 * use the material with {@link Sprite} and instancing.
+		 * a WebGPU backend. If an application wants to render points with a size larger than 1 pixel,
+		 * the material should be used with {@link Sprite} and instancing.
 		 *
 		 * @type {?Node<vec2>}
 		 * @default null
