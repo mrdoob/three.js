@@ -17,7 +17,7 @@ class RawTexture extends Texture {
 	 *
 	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
 	 */
-	constructor( sourceTexture = null, opaque = false ) {
+	constructor( sourceTexture = null ) {
 
 		super();
 
