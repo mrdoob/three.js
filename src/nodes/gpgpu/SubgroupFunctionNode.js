@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeProxy, nodeProxyIntent } from '../tsl/TSLCore.js';
+import { nodeProxyIntent } from '../tsl/TSLCore.js';
 
 
 /**
