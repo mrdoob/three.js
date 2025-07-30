@@ -187,8 +187,8 @@
 
 				} ) );
 
-				const inputStorage = instancedArray( array, 'uint', size ).setPBO( true ).label( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
-				const inputVectorizedStorage = instancedArray( array, 'uvec4', size / 4 ).setPBO( true ).label( `Current_Vectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputStorage = instancedArray( array, 'uint', size ).setPBO( true ).setName( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputVectorizedStorage = instancedArray( array, 'uvec4', size / 4 ).setPBO( true ).setName( `Current_Vectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
 				const atomicAccumulator = instancedArray( new Uint32Array( 1 ), 'uint' ).setPBO( true ).toAtomic();
 			
 				// Reduce 3 Calculations
@@ -197,15 +197,13 @@
 				const rowSize = divRoundUp( size, numRows );
 
 				const workgroupSumsArray = new Uint32Array( numRows );
-				const workgroupSumsStorage = instancedArray( workgroupSumsArray, 'uint', numRows ).setPBO( true ).label( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const workgroupSumsStorage = instancedArray( workgroupSumsArray, 'uint', numRows ).setPBO( true ).setName( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
 
 				const buffers = {
 					'Data Buffer': inputStorage,
 					'Workgroup Sums Buffer': workgroupSumsStorage,
 					'Accumulation Buffer': atomicAccumulator,
 				};
-				// Result array for future two buffer/ping-pong buffer approach
-				// const resultStorage = instancedArray( new Uint32Array( size ), 'uint' ).setPBO( true ).label( 'Result' );
 
 				const logFunctionName = `Log ${leftSideDisplay ? 'Left' : 'Right'} Side`;
 				const functionObj = {};
