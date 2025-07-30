@@ -519,7 +519,7 @@
 						workgroupBarrier();
 
 						// Thread 0 - subgroupsInWorkgroup will assign a value to total
-						total.assign( nativeSelect( 0, subgroupSums.element( invocationLocalIndex ), invocationLocalIndex.lessThan( delta ) ) );
+						total.assign( nativeSelect( invocationLocalIndex.lessThan( delta ), subgroupSums.element( invocationLocalIndex ), 0 ) );
 						// # of subgroups in workgroup is invariably less than # of threads in subgroup, so subgroupAdd will still sync here
 						total.assign( subgroupAdd( total ) );
 
@@ -544,9 +544,9 @@
 						// Select either 0 or number of elements left,
 						// otherwise, select existing ROW_SIZE
 						const currentRowSize = nativeSelect(
+							( rowOffset.add( ROW_SIZE ) ).greaterThan( inputSize ),
+							nativeSelect( inputSize.greaterThan( rowOffset ), inputSize.sub( rowOffset ), 0 ),
 							ROW_SIZE,
-							nativeSelect( 0, inputSize.sub( rowOffset ), inputSize.greaterThan( rowOffset ) ),
-							( rowOffset.add( ROW_SIZE ) ).greaterThan( inputSize )
 						);
 
 						const total = uint( 0 ).toVar( 'total' );
