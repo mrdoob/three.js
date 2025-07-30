@@ -364,7 +364,7 @@ class BloomNode extends TempNode {
 
 		// gaussian blur materials
 
-		const kernelSizeArray = [ 3, 5, 7, 9, 11 ];
+		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
