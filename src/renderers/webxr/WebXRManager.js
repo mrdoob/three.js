@@ -1023,7 +1023,7 @@ class WebXRManager extends EventDispatcher {
 
 								if ( ! cameraTex ) {
 
-									cameraTex = new RawTexture( null, true );
+									cameraTex = new RawTexture();
 									cameraAccessTextures[ camera ] = cameraTex;
 
 								}
