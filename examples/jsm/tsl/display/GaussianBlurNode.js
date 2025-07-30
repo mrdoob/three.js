@@ -26,7 +26,7 @@ class GaussianBlurNode extends TempNode {
 	 * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 	 */
-	constructor( textureNode, directionNode = null, sigma = 2 ) {
+	constructor( textureNode, directionNode = null, sigma = 4 ) {
 
 		super( 'vec4' );
 
