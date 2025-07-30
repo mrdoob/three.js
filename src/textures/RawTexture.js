@@ -1,31 +1,39 @@
 import { Texture } from './Texture.js';
 
 /**
- * A texture created externally from the renderer context.
+ * Represents a texture created externally from the renderer context.
  *
  * This may be a texture from a protected media stream, device camera feed,
  * or other data feeds like a depth sensor.
+ *
+ * Note that this class is only supported in {@link WebGLRenderer} right now.
  *
  * @augments Texture
  */
 class RawTexture extends Texture {
 
 	/**
+	 * Creates a new raw texture.
 	 *
-	 * @param {*} sourceTexture The external texture. in WebGL, this is a WebGLTexture object.
-	 * @param {boolean} opaque Whether the texture should be treated as read-only.
+	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
+	 * @param {boolean} [opaque=false] - Whether the texture should be treated as read-only.
 	 */
 	constructor( sourceTexture = null, opaque = false ) {
 
 		super();
 
 		/**
-		 * The external source texture
+		 * The external source texture.
+		 *
+		 * @type {?WebGLTexture}
+		 * @default null
 		 */
 		this.sourceTexture = sourceTexture;
 
 		/**
 		 * Whether the texture should be treated as read-only.
+		 *
+		 * @type {boolean}
 		 * @default false
 		 */
 		this.opaque = opaque;
