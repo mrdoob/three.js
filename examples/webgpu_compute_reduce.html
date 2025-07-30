@@ -91,7 +91,7 @@
 
 			const rightEffectController = {
 				algo: 'Reduce 3 (Subgroup Reduce)',
-				currentAlgo: uniform( 0 ),
+				currentAlgo: uniform( 3 ),
 				highlight: uniform( 0 ),
 				displayMode: 'Input Element 0',
 				state: 'Run Algo',
@@ -179,6 +179,7 @@
 				} ) );
 
 				const inputStorage = instancedArray( array, 'uint', size ).setPBO( true ).setName( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputVectorizedStorage = instancedArray( array, 'vec4' ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
 				const atomicAccumulator = instancedArray( new Uint32Array( 1 ), 'uint' ).setPBO( true ).toAtomic();
 			
 				// Reduce 3 Calculations
@@ -574,6 +575,116 @@
 						workPerThread: 4,
 					} ).compute( 32, [ 32 ] )
 				];
+
+				const createReduce4Fn = ( createReduce4FnProps ) => {
+
+					const { workgroupSize, workPerThread, numElements, minSubgroupSize } = createReduce4FnProps;
+					const partitionSize = uint(workgroupSize * workPerThread);
+					const numThreadBlocks = 
+
+					const MAX_REDUCE_SIZE = uint(workgroupSize).div(minSubgroupSize);
+
+					vecSize = numElements / 4;
+
+					const fnDef = Fn( () => {
+
+						const workgroupReductionArray = createSubgroupArray('uint', maxWorkgroupSize, minSubgroupSize);
+
+						// Get the index of the subgroup within the workgroup
+						const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
+						// Offset by 4 subgroups from current subgroup since each thread will scan in values from across 4 subgroups
+						const subgroupOffset = subgroupMetaRank.mul( subgroupSize ).mul( workPerThread );
+						subgroupOffset.addAssign( invocationSubgroupIndex );
+
+						// Per workgroup, offset by number of elements scanned per workgroup
+						const workgroupOffset = workgroupId.x.mul( partitionSize );
+
+						const startThread = subgroupOffset.add( workgroupOffset );
+
+						const subgroupReduction = uint(0);
+
+						If(workgroupId.x.lessThan(info.thread_blocks - 1u), () => {
+
+							const currentSubgroupInBlock = uint(0).toVar();
+
+							Loop( currentSubgroupInBlock.lessThan(workPerThread), () => {
+
+								// Get vectorized element from input array
+								const val = inputVectorizedStorage.element(startThread);
+
+								// Sum values within vec4 together by using result of dot product
+								subgroupReduction.addAssign(dot(val, vec4(1)));
+
+								// Increment so thread will scan value in next subgroup
+								startThread.addAssign(subgroupSize);
+
+								// Increment to continue loop
+								currentSubgroupInBlock.addAssign(1);
+								
+							})
+						})
+
+						If(workgroupId.x.equal(info.thread_blocks - 1u), () => {
+
+							const currentSubgroupInBlock = uint(0).toVar();
+
+							Loop( currentSubgroupInBlock.lessThan(workPerThread), () => {
+
+								const inputValue = inputVectorizedStorage.element(startThread);
+
+								const val = select(startThread.lessThan(vecSize), inputValue, vec4(0));
+
+								// Sum values within vec4 together by using result of dot product
+								subgroupReduction.addAssign(dot(val, vec4(1)));
+
+								// Increment so thread will scan value in next subgroup
+								startThread.addAssign(subgroupSize);
+
+								// Increment to continue loop
+								currentSubgroupInBlock.addAssign(1);
+								
+							})
+						})
+
+						subgroupReduction.assign(subgroupAdd(subgroupReduction));
+
+						// Delegate one thread per subgroup to assign to the workgroupArray storing elements per subgroup
+						If(invocationSubgroupIndex.equal(0), () => {
+
+							workgroupArray.element(subgroupMetaRank).assign()
+
+						})
+
+						// Ensure that each workgroup has populated wg_reduce with data
+						// from each subgroup before we begin reducing down its values
+
+						
+							
+							{
+        for(var k = 0u; k < VEC4_SPT; k += 1u){
+            let t = scan_in[i];
+            s_red += dot(t, vec4(1u, 1u, 1u, 1u));
+            i += lane_count;
+        }
+    }
+
+    if(wgid.x == info.thread_blocks - 1u){
+        for(var k = 0u; k < VEC4_SPT; k += 1u){
+            let t = select(vec4<u32>(0u, 0u, 0u, 0u), scan_in[i], i < info.vec_size);
+            s_red += dot(t, vec4(1u, 1u, 1u, 1u));
+            i += lane_count;
+        }
+    }
+
+
+
+
+			
+					} );
+
+
+			
+				};
 
 				const incorrectBaselineCalls = [
 					createIncorrectBaselineFn().compute( size ),
