@@ -1096,18 +1096,6 @@ export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
  */
 export const stepElement = ( x, edge ) => step( edge, x );
 
-
-/**
- * A built-in function that returns the length of a storage array in WGSL.
- * Can only be used in the WebGPURenderer.
- *
- * @tsl
- * @function
- * @param {StorageBufferNode} x - A node representing a GPU buffer array.
- * @returns {Node}
- */
-export const arrayLength = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ARRAY_LENGTH, 1 ).setParameterLength( 1 );
-
 /**
  * Returns the arc-tangent of the quotient of its parameters.
  *

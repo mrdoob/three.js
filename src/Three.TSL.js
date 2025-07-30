@@ -53,7 +53,6 @@ export const any = TSL.any;
 export const append = TSL.append;
 export const array = TSL.array;
 export const arrayBuffer = TSL.arrayBuffer;
-export const arrayLength = TSL.arrayLength;
 export const asin = TSL.asin;
 export const assign = TSL.assign;
 export const atan = TSL.atan;

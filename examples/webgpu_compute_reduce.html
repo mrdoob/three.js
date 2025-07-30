@@ -10,9 +10,9 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<br /> This example demonstrates the performance of various simple parallel reduction kernels.
-			<br /> Reference implementations are translated from the CUDA code present in the following books/repos:
-			<br /> <a href="https://www.cambridge.org/core/books/programming-in-parallel-with-cuda/C43652A69033C25AD6933368CDBE084C"><i>Programming in Parallel with CUDA</i></a> by <a href="https://people.bss.phy.cam.ac.uk/~rea1/">Richard Ansorge</a>
-			<br />
+			<br /> Reference implementations are translated from the CUDA/WGSL code present in the following books/repos:
+			<br /> Impl. 0 - 2: <a href="https://www.cambridge.org/core/books/programming-in-parallel-with-cuda/C43652A69033C25AD6933368CDBE084C"><i>Programming in Parallel with CUDA</i></a> by <a href="https://people.bss.phy.cam.ac.uk/~rea1/">Richard Ansorge</a>
+			<br /> Impl. 3: <a href="https://github.com/frost-beta/betann/blob/main/betann/wgsl/reduce_all.wgsl"><i>betann reduce_all kernel</i></a> by <a href="https://github.com/zcbenz">zcbenz</a>
 			<div id="left_side_display" style="position: absolute;top: 150px;left: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 			<div id="right_side_display" style="position: absolute;top: 150px;right: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 		</div>
@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedArray, Loop, If, vec3, nativeSelect, arrayLength, int, atomicStore, subgroupAdd, select, uvec4, atomicAdd, dot, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupIndex, subgroupShuffleDown, subgroupSize, countTrailingZeros } from 'three/tsl';
+			import { instancedArray, Loop, If, vec3, nativeSelect, atomicStore, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -46,18 +46,22 @@
 			const size = 262144;
 			const gridDim = Math.sqrt( size );
 			let maxWorkgroupSize = 64;
+			let minSubgroupSize = 4;
 
 			// Algorithm speed increase as you iterate through algorithms array
 			const algorithms = [
 				'Reduce 0 (N/2)',
 				'Reduce 1 (Naive Accumulate)',
 				'Reduce 2 (Workgroup Reduction)',
-				'Reduce 3 (Simple Shuffle)',
+				'Reduce 3 (Subgroup Reduce)',
 				'Incorrect Baseline',
 			];
 
-			const displayModes = [ 'Entire Grid', 'Logarithmic' ];
+			// Data Grid: Displays input data in a grid format
+			// Logarithmic: Displays input grid data's logarithmic indices horizontally (1, 2, 4, 8, 16, ..., size)
+			const displayModes = [ 'Data Grid', 'Logarithmic' ];
 
+			// Holds uniforms for both displays as well as debug information
 			const unifiedEffectController = {
 				// Number of elements in the grid
 				gridElementWidth: uniform( gridDim ),
@@ -65,30 +69,33 @@
 				// Number of elements in the grid being displayed
 				gridDisplayWidth: uniform( gridDim ),
 				gridDisplayHeight: uniform( gridDim ),
+				// How to display end result of reduction.
+				// Ideally this is unique to the reduction method being deployed
 				'Display Mode': 'Logarithmic',
 				loggedBuffer: 'Data Buffer',
+				elementsReduced: size,
 			};
 			
 
 			const leftEffectController = {
 				algo: 'Reduce 0 (N/2)',
 				highlight: uniform( 0 ),
+				// Uniform that corresponds to the index of the current algorithm within the algorithms array
 				currentAlgo: uniform( 0 ),
+				// Current state of reduction (Running, validating, reseting)
 				state: 'Run Algo',
+				// Reduce 0 specfic uniform
 				numThreadsDispatched: uniform( size / 2 ),
 			};
 
-			const leftMaterial = null;
-
 			const rightEffectController = {
-				algo: 'Reduce 0 (N/2)',
+				algo: 'Reduce 3 (Subgroup Reduce)',
 				currentAlgo: uniform( 0 ),
 				highlight: uniform( 0 ),
 				state: 'Run Algo',
 				numThreadsDispatched: uniform( size / 2 )
 			};
 
-			const rightMaterial = null;
 			
 			// https://medium.com/@rimikadhara/7-step-optimization-of-parallel-reduction-with-cuda-33a3b2feafd8
 			// https://superjomn.github.io/posts/reduce-cuda/
@@ -112,7 +119,7 @@
 
 				switch ( unifiedEffectController[ 'Display Mode' ] ) {
 
-					case 'Entire Grid': {
+					case 'Data Grid': {
 
 						unifiedEffectController.gridDisplayWidth.value = gridDim;
 						unifiedEffectController.gridDisplayHeight.value = gridDim;
@@ -135,15 +142,16 @@
 			
 			} );
 
-			const stateLeftController = gui.add( leftEffectController, 'state' ).name( 'Left Display State' );
-			stateLeftController.domElement.style.pointerEvents = 'none';
-			const stateRightController = gui.add( rightEffectController, 'state' ).name( 'Right Display State' );
-			stateRightController.domElement.style.pointerEvents = 'none';
-			const leftCPUArray = null;
-			const rightCPUArray = null;
 
 			const debugFolder = gui.addFolder( 'Debug' );
-			debugFolder.add( unifiedEffectController, 'loggedBuffer', [ 'Data Buffer', 'Workgroup Sums Buffer', 'Accumulation Buffer' ] ).name( 'Logged Buffer' );
+			const elementsReducedController = debugFolder.add( unifiedEffectController, 'elementsReduced' ).name( 'Elements Reduced' );
+			elementsReducedController.disable();
+			const stateLeftController = debugFolder.add( leftEffectController, 'state' ).name( 'Left Display State' );
+			stateLeftController.disable();
+			const stateRightController = debugFolder.add( rightEffectController, 'state' ).name( 'Right Display State' );
+			stateRightController.disable();
+			debugFolder.add( unifiedEffectController, 'loggedBuffer', [ 'Data Buffer', 'Workgroup Sums Buffer', 'Accumulation Buffer' ] ).name( 'Buffer to Log' );
+			debugFolder.close();
 
 			if ( WebGPU.isAvailable() === false ) {
 
@@ -153,33 +161,10 @@
 
 			}
 
-			const serialAlgorithm = ( arr ) => {
+			const divRoundUp = ( size, part_size ) => {
 
-				const t0 = performance.now();
-			
-				for ( let i = 0; i < size - 1; i ++ ) {
+				return Math.floor( ( size + part_size - 1 ) / part_size );
 
-					arr[ i + 1 ] += i;
-
-				}
-
-				const t1 = performance.now();
-
-				return ( t1 - t0 ).toFixed( 2 );
-
-			};
-
-			const serialAlgorithmNativeReduce = ( arr ) => {
-
-				const t0 = performance.now();
-			
-				arr.reduce( ( acc, val ) => acc + val, 0 );
-
-				const t1 = performance.now();
-
-				return ( t1 - t0 ).toFixed( 2 );
-
-			
 			};
 
 			init();
@@ -202,16 +187,21 @@
 
 				} ) );
 
-			
-
-
-				const currentStorage = instancedArray( array, 'uint', size ).setPBO( true ).label( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
-				const workgroupSums = instancedArray( new Uint32Array( 256 ), 'uint', 256 ).setPBO( true ).label( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputStorage = instancedArray( array, 'uint', size ).setPBO( true ).label( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputVectorizedStorage = instancedArray( array, 'uvec4', size / 4 ).setPBO( true ).label( `Current_Vectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
 				const atomicAccumulator = instancedArray( new Uint32Array( 1 ), 'uint' ).setPBO( true ).toAtomic();
+			
+				// Reduce 3 Calculations
+				const workPerThread = 4;
+				const numRows = workPerThread * 32;
+				const rowSize = divRoundUp( size, numRows );
+
+				const workgroupSumsArray = new Uint32Array( numRows );
+				const workgroupSumsStorage = instancedArray( workgroupSumsArray, 'uint', numRows ).setPBO( true ).label( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
 
 				const buffers = {
-					'Data Buffer': currentStorage,
-					'Workgroup Sums Buffer': workgroupSums,
+					'Data Buffer': inputStorage,
+					'Workgroup Sums Buffer': workgroupSumsStorage,
 					'Accumulation Buffer': atomicAccumulator,
 				};
 				// Result array for future two buffer/ping-pong buffer approach
@@ -230,13 +220,13 @@
 
 				const computeResetBufferFn = Fn( () => {
 
-					currentStorage.element( instanceIndex ).assign( 1 );
+					inputStorage.element( instanceIndex ).assign( 1 );
 			
 				} );
 
 				const computeResetWorkgroupSumsFn = Fn( () => {
 
-					workgroupSums.element( instanceIndex ).assign( 0 );
+					workgroupSumsStorage.element( instanceIndex ).assign( 0 );
 					atomicStore( atomicAccumulator.element( 0 ), 0 );
 
 				} );
@@ -249,11 +239,13 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
+				// Unfortunately, need to arbitrarily run compute shader to get access to device limits
 				await renderer.computeAsync( computeResetBuffer );
 
 				if ( renderer.backend.device !== null ) {
 
 					maxWorkgroupSize = renderer.backend.device.limits.maxComputeWorkgroupSizeX;
+					minSubgroupSize = renderer.backend.device.adapterInfo.subgroupMinSize;
 
 				}
 
@@ -263,7 +255,7 @@
 
 					const { numThreadsDispatched } = effectController;
 
-					currentStorage.element( instanceIndex ).addAssign( currentStorage.element( instanceIndex.add( numThreadsDispatched ) ) );
+					inputStorage.element( instanceIndex ).addAssign( inputStorage.element( instanceIndex.add( numThreadsDispatched ) ) );
 
 				} )();
 
@@ -279,7 +271,9 @@
 				// Thanks to Sam0oneau of Graphics Programming Discord for the explanation.
 				// (Graphics Programming Discord Message Link): https://discord.com/channels/318590007881236480/374061825454768129/1391248956171882597
 
-				const createReduce1Fn = ( dispatch, numElements ) => {
+				const createReduce1Fn = ( createReduce1FnProps ) => {
+
+					const { dispatchSize, numElements } = createReduce1FnProps;
 
 					const fnDef = Fn( () => {
 
@@ -289,12 +283,12 @@
 
 						Loop( k.lessThan( uint( numElements ) ), ( ) => {
 
-							tSum.addAssign( currentStorage.element( k ) );
-							k.addAssign( uint( dispatch ) );
+							tSum.addAssign( inputStorage.element( k ) );
+							k.addAssign( uint( dispatchSize ) );
 
 						} );
 
-						currentStorage.element( instanceIndex ).assign( tSum );
+						inputStorage.element( instanceIndex ).assign( tSum );
 
 
 					} )();
@@ -327,11 +321,20 @@
 
 				const reduce1Calls = [
 					// Accumulation
-					createReduce1Fn( maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
+					createReduce1Fn( {
+						dispatchSize: maxWorkgroupSize * maxWorkgroupSize,
+						numElements: size
+					} ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
 					// 1 Block accumulation
-					createReduce1Fn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
+					createReduce1Fn( {
+						dispatchSize: maxWorkgroupSize,
+						numElements: maxWorkgroupSize * maxWorkgroupSize
+					} ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
 					// Final result
-					createReduce1Fn( 1, maxWorkgroupSize ).compute( 1, [ 1 ] ),
+					createReduce1Fn( {
+						dispatchSize: 1,
+						numElements: maxWorkgroupSize
+					} ).compute( 1, [ 1 ] ),
 				];
 
 				const pow2Ceil = Fn( ( [ x ] ) => {
@@ -359,7 +362,9 @@
 				} );
 
 				// For non power of 2 # of workgroups
-				const createReduce2Fn = ( workgroupSize, dispatch, numElements ) => {
+				const createReduce2Fn = ( createReduce2FnProps ) => {
+
+					const { workgroupSize, dispatchSize, numElements } = createReduce2FnProps;
 
 					const fnDef = Fn( () => {
 
@@ -370,9 +375,9 @@
 
 						Loop( k.lessThan( uint( numElements ) ), () => {
 
-							tSum.element( invocationLocalIndex ).addAssign( currentStorage.element( k ) );
+							tSum.element( invocationLocalIndex ).addAssign( inputStorage.element( k ) );
 
-							k.addAssign( uint( dispatch ) );
+							k.addAssign( uint( dispatchSize ) );
 
 						} );
 
@@ -395,7 +400,7 @@
 
 						If( invocationLocalIndex.equal( uint( 0 ) ), () => {
 
-							currentStorage.element( workgroupId.x ).assign( tSum.element( uint( 0 ) ) );
+							inputStorage.element( workgroupId.x ).assign( tSum.element( uint( 0 ) ) );
 
 						} );
 
@@ -406,12 +411,18 @@
 				};
 
 				const reduce2Calls = [
-
 					// Accumulate within workgroups
-					createReduce2Fn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
+					createReduce2Fn( {
+						workgroupSize: maxWorkgroupSize,
+						dispatchSize: maxWorkgroupSize * maxWorkgroupSize,
+						numElements: size
+					} ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
 					// 1 Block accumulation
-					createReduce2Fn( maxWorkgroupSize, maxWorkgroupSize, maxWorkgroupSize ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
-
+					createReduce2Fn( {
+						workgroupSize: maxWorkgroupSize,
+						dispatchSize: maxWorkgroupSize,
+						numElements: maxWorkgroupSize
+					} ).compute( maxWorkgroupSize, [ maxWorkgroupSize ] ),
 				];
 
 
@@ -434,196 +445,146 @@
 			
 				};
 
-				const createReduce3Fn = ( workgroupSize, dispatch, numElements ) => {
+				/* Create array with enough indices for worst-case subgroup size */
+				const createSubgroupArray = ( type, workgroupSize, minSubgroupSize = 4 ) => {
 
-					const fnDef = Fn( () => {
-
-						const WORKGROUP_SIZE = uint( workgroupSize );
-						const DISPATCH = uint( dispatch );
-						const DISPATCHED_WORKGROUPS = uint( 256 ); // # of elements in maxworkgroupSize * maxWorkgroupSize so 256 workgroups dispatched
-						const NUM_ELEMENTS = uint( numElements );
-
-						const tSum = workgroupArray( 'uint', workgroupSize );
-
-						const k = instanceIndex.toVar( 'k' );
-						tSum.element( invocationLocalIndex ).assign( uint( 0 ) );
-
-						Loop( k.lessThan( NUM_ELEMENTS ), () => {
-
-							tSum.element( invocationLocalIndex ).addAssign( currentStorage.element( k ) );
-
-							k.addAssign( DISPATCH );
-
-						} );
-
-						workgroupBarrier();
-
-						// Reset the loop condition (account for numWorkgroups % 2 != 0)
-						k.assign( pow2Ceil( WORKGROUP_SIZE ).div( 2 ) );
-
-						createWorkgroupSyncBlock( WORKGROUP_SIZE, 128, tSum );
-						createWorkgroupSyncBlock( WORKGROUP_SIZE, 64, tSum );
-						createWorkgroupSyncBlock( WORKGROUP_SIZE, 32, tSum );
-
-						// Icd Dmagine a tiled partition of 32 threads/invocations whose parent is a 256 invocation block/workgroup
-						// Each workgroup contains 8 subgroups/warps
-						// In this case, we only want to operate within the first warp
-						// of each workgroup
-
-						// Equivalent to CUDA function meta_group_rank
-						const subgroupMetaRank = ( invocationLocalIndex.mod( WORKGROUP_SIZE ) ).div( subgroupSize );
-
-						const isFirstSubgroup = subgroupMetaRank.equal( 0 ).toVar( 'isFirstSubgroup' );
-
-						// No need to sync within warp as warp operations inherently execute in parallel
-						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
-							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
-							16
-						) );
-						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
-							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
-							8
-						) );
-						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
-							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
-							4
-						) );
-						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
-							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
-							2
-						) );
-						tSum.element( invocationLocalIndex ).addAssign( subgroupShuffleDown(
-							nativeSelect( uint( 0 ), tSum.element( invocationLocalIndex ), isFirstSubgroup ),
-							1
-						) );
-
-						If( invocationLocalIndex.equal( uint( 0 ) ), () => {
-
-							workgroupSums.element( workgroupId.x ).assign( tSum.element( uint( 0 ) ) );
-			
-						} );
-
-					} )();
-
-					return fnDef;
-
-				};
-
-				const accumulateFn = Fn( () => {
-
-					atomicAdd( atomicAccumulator.element( 0 ), workgroupSums.element( instanceIndex ) );
-
-				} );
-
-				const reduce3Calls = [
-					createReduce3Fn( maxWorkgroupSize, maxWorkgroupSize * maxWorkgroupSize, size ).compute( maxWorkgroupSize * maxWorkgroupSize, [ maxWorkgroupSize ] ),
-					accumulateFn().compute( 256, [ maxWorkgroupSize ] )
-				];
-
-
-				// Work Per Thread
-				// numRows: 4 * 32 = 128
-				// workgroupSize2ndPass = 32
-
-				const workPerThread = 4;
-				const numRows = workPerThread * 32;
-				console.log( numRows );
-				const rowSize = divRoundUp( size, numRows );
-				console.log( rowSize );
-
-				const intermediateArray = new Uint32Array( numRows );
-				const intermediateBuffer = instancedArray( intermediateArray, 'uint', numRows );
-
-				// Run with workgroupSize of 256 in the first pass
-				// workgroups size of workgroupSize2ndPass in the second pass
-				// For some reason the number of workgroups is dispatched in the y dimension, rather than the x.
-
-				// 2041 row Size
-
-				// 2041 / 256
-
-				const RowReduce = ( currentStorage ) => {
-
+					return workgroupArray( 'uint', workgroupSize / minSubgroupSize );
 
 				};
 
 
-				const reduce4Fn = Fn( () => {
-
-					const ROW_SIZE = uint( rowSize );
-					const WORKGROUP_SIZE = uint( maxWorkgroupSize );
-					const WORK_PER_THREAD = uint( 4 );
-
-					const inputSize = arrayLength( currentStorage );
-					const row = workgroupId.x.mul( ROW_SIZE );
+				const ROW_SIZE = uint( rowSize );
 
 
-					// If the current rows elements exceed the bounds of the input
-					// Select either 0 or number of elements left,
-					// otherwise, select existing ROW_SIZE
-					const currentRowSize = nativeSelect(
-						ROW_SIZE,
-						nativeSelect( 0, inputSize.sub( row ), inputSize.greaterThan( row ) ),
-						( row.add( ROW_SIZE ) ).greaterThan( inputSize )
-					);
+				// zcbenz implementation
+				// https://github.com/frost-beta/betann/blob/8aa2701caf63fb29bd4cd2454e656973342c1588/betann/wgsl/reduce_ops.wgsl#L71
+				const RowReduce = ( rowReduceProps ) => {
 
-					const total = uint( 0 ).toVar( 'total' );
+					const { workgroupSize, inputBuffer, total, rowOffset, currentRowSize, workPerThread } = rowReduceProps;
 
-					const blockSize = WORKGROUP_SIZE.mul( workPerThread );
+					// Number of unvectorized elements each workgroup can ingest
+					// At workgroupSize of 256, blockSize will be 1024
+					const blockSize = uint( workgroupSize ).mul( workPerThread );
 					const block = uint( 0 ).toVar( 'block' );
-					const blockLimiter = ROW_SIZE.DIV( blockSize ).toVar( 'blockLimiter' );
+
+					// At rowSize of 2048, there will be two blocks
+					const blockLimiter = currentRowSize.div( blockSize ).toVar( 'blockLimiter' );
 					Loop( block.lessThan( blockLimiter ), () => {
 
-						const idx = block.mul( blockSize ).add( invocationLocalIndex.mul( workPerThread ) );
-						const i = uint( 0 ).toVar( 'readOffset' );
-						Loop( i.lessThan( WORK_PER_THREAD ), () => {
+						const blockOffset = block.mul( blockSize );
+						const startThread = blockOffset.add( invocationLocalIndex.mul( workPerThread ) );
+						const localThreadOffset = uint( 0 ).toVar( 'localThreadOffset' );
+						Loop( localThreadOffset.lessThan( workPerThread ), () => {
 
+							const inputElement = inputBuffer.element( rowOffset.add( startThread ).add( localThreadOffset ) );
+							total.addAssign( inputElement );
 			
+							// Increment up a thread
+							localThreadOffset.addAssign( 1 );
+
 						} );
 
+						// Increment up a block
+						block.addAssign( 1 );
 
-			
 					} );
 
+					// Ignoring left over check for this example, since we know ahead of time the value of leftover (2048 % 1024 === 0)
+			
+				};
 
+				const WorkgroupReduce = ( workgroupReduceProps ) => {
+
+					const { total, workgroupSize, minSubgroupSize } = workgroupReduceProps;
+			
+					const subgroupSums = createSubgroupArray( 'uint', workgroupSize, minSubgroupSize );
+
+					// Assign sum of all values in subgroup to total
 					total.assign( subgroupAdd( total ) );
 
-					const delta = WORKGROUP_SIZE.div( subgroupSize ).toVar( 'delta' );
+					const delta = uint( workgroupSize ).div( subgroupSize ).toVar( 'delta' );
 
 					const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
 
-
 					Loop( float( delta ).greaterThan( 1.0 ), () => {
 
-						If( invocationSubgroupIndex.assign( 0 ), () => {
+						If( invocationSubgroupIndex.equal( 0 ), () => {
 			
-							workgroupSums.element( subgroupMetaRank ).assign( total );
+							// Each subgroup will populate the subgroupSums array
+							subgroupSums.element( subgroupMetaRank ).assign( total );
 
 						} );
 
+						// Ensure that all subgroups in the workgroup have populated the workgroup memory array
 						workgroupBarrier();
 
-						total.assign( nativeSelect( 0, workgroupSums.element( invocationLocalIndex ), invocationLocalIndex.lessThan( delta ) ) );
+						// Thread 0 - subgroupsInWorkgroup will assign a value to total
+						total.assign( nativeSelect( 0, subgroupSums.element( invocationLocalIndex ), invocationLocalIndex.lessThan( delta ) ) );
+						// # of subgroups in workgroup is invariably less than # of threads in subgroup, so subgroupAdd will still sync here
 						total.assign( subgroupAdd( total ) );
 
 						delta.divAssign( subgroupSize );
 
 					} );
 
-				} );
+				};
 
+				// b0nes164 inspired implementation with vec4
 
-				const divRoundUp = ( size, part_size ) => {
+				const createReduce3Fn = ( createReduce4FnProps ) => {
 
-					Math.floor( ( size + part_size - 1 ) / part_size );
+					const { workgroupSize, workPerThread, inputBuffer, intermediateBuffer, minSubgroupSize } = createReduce4FnProps;
+
+					const fnDef = Fn( () => {
+
+						const inputSize = uint( inputBuffer.bufferCount.length );
+						const rowOffset = workgroupId.x.mul( ROW_SIZE );
+			
+						// If the current rows elements exceed the bounds of the input
+						// Select either 0 or number of elements left,
+						// otherwise, select existing ROW_SIZE
+						const currentRowSize = nativeSelect(
+							ROW_SIZE,
+							nativeSelect( 0, inputSize.sub( rowOffset ), inputSize.greaterThan( rowOffset ) ),
+							( rowOffset.add( ROW_SIZE ) ).greaterThan( inputSize )
+						);
+
+						const total = uint( 0 ).toVar( 'total' );
+
+						RowReduce( {
+							inputBuffer: inputBuffer,
+							total: total,
+							rowOffset: rowOffset,
+							currentRowSize: currentRowSize,
+							workPerThread: workPerThread,
+							workgroupSize: workgroupSize,
+						} );
+
+						WorkgroupReduce( {
+							total: total,
+							workgroupSize: workgroupSize,
+							minSubgroupSize: minSubgroupSize
+						} );
+
+						// Populate each workgroup with its reduction
+						If( invocationLocalIndex.equal( 0 ), () => {
+
+							intermediateBuffer.element( workgroupId.x ).assign( total );
+			
+						} );
+
+					} )();
+
+					return fnDef;
 
 				};
+
 
 				const createIncorrectBaselineFn = () => {
 
 					const fnDef = Fn( () => {
 
-						currentStorage.element( instanceIndex ).assign( 99999 );
+						inputStorage.element( instanceIndex ).assign( 99999 );
 
 					} )();
 
@@ -631,15 +592,32 @@
 			
 				};
 
+				const reduce3Calls = [
+					createReduce3Fn( {
+						inputBuffer: inputStorage,
+						intermediateBuffer: workgroupSumsStorage,
+						workgroupSize: maxWorkgroupSize,
+						minSubgroupSize: minSubgroupSize,
+						workPerThread: 4,
+					} ).compute( maxWorkgroupSize * numRows, [ maxWorkgroupSize ] ),
+					createReduce3Fn( {
+						inputBuffer: workgroupSumsStorage,
+						intermediateBuffer: inputStorage,
+						workgroupSize: 32,
+						minSubgroupSize: minSubgroupSize,
+						workPerThread: 4,
+					} ).compute( 32, [ 32 ] )
+				];
+
 				const incorrectBaselineCalls = [
 					createIncorrectBaselineFn().compute( size ),
 				];
-
+			
 				const calls = {
 					'Reduce 0 (N/2)': reduce0Calls,
 					'Reduce 1 (Naive Accumulate)': reduce1Calls,
 					'Reduce 2 (Workgroup Reduction)': reduce2Calls,
-					'Reduce 3 (Simple Shuffle)': reduce3Calls,
+					'Reduce 3 (Subgroup Reduce)': reduce3Calls,
 					'Incorrect Baseline': incorrectBaselineCalls
 				};
 
@@ -674,10 +652,9 @@
 
 				const displayColorNodes = {
 
-					'Entire Grid': Fn( () => {
+					'Data Grid': Fn( () => {
 
 						const { gridElementWidth, gridElementHeight, gridDisplayWidth, gridDisplayHeight } = unifiedEffectController;
-						const { currentAlgo } = effectController;
 
 						const newUV = uv().mul( vec2( gridDisplayWidth, gridDisplayHeight ) );
 
@@ -688,19 +665,9 @@
 						const colorChanger = uint( 0 ).toVar();
 						const color = vec3( 0 ).toVar( 'color' );
 
-						If( currentAlgo.equal( 3 ), () => {
+						colorChanger.assign( inputStorage.element( elementIndex ) );
+						color.assign( getColor( inputStorage, colorChanger, gridElementWidth, gridElementHeight ) );
 
-							// Workgroup Sums condition
-
-							colorChanger.assign( workgroupSums.element( 0 ) );
-							color.assign( getColor( workgroupSums, colorChanger, gridElementWidth, gridElementHeight ) );
-
-						} ).Else( () => {
-
-							colorChanger.assign( currentStorage.element( elementIndex ) );
-							color.assign( getColor( currentStorage, colorChanger, gridElementWidth, gridElementHeight ) );
-
-						} );
 
 						return color;
 
@@ -709,26 +676,14 @@
 					'Logarithmic': Fn( () => {
 
 						const { gridElementWidth, gridElementHeight } = unifiedEffectController;
-						const { currentAlgo } = effectController;
 
 						const newUV = uv().mul( vec2( Math.log2( size ) ), 1 );
 
 						const colorChanger = uint( 0 ).toVar();
 						const color = vec3( 0 ).toVar( 'color' );
-
-						If( currentAlgo.equal( 3 ), () => {
-
-							// Workgroup Sums condition
-
-							colorChanger.assign( workgroupSums.element( 0 ) );
-							color.assign( getColor( workgroupSums, colorChanger, gridElementWidth, gridElementHeight ) );
-
-						} ).Else( () => {
-
-							colorChanger.assign( currentStorage.element( uint( 1 ).shiftLeft( newUV.x ) ) );
-							color.assign( getColor( currentStorage, colorChanger, gridElementWidth, gridElementHeight ) );
-
-						} );
+			
+						colorChanger.assign( inputStorage.element( uint( 1 ).shiftLeft( newUV.x ) ) );
+						color.assign( getColor( inputStorage, colorChanger, gridElementWidth, gridElementHeight ) );
 
 						return color;
 
@@ -786,25 +741,9 @@
 
 						renderer.info.reset();
 
-						let cpuTime = 0;
+						const cpuTime = 0;
 
 						switch ( currentAlgorithm ) {
-
-							case 'CPU (Serial)': {
-
-								cpuTime = serialAlgorithm( array );
-
-								break;
-
-							}
-
-							case 'CPU (Reduce)': {
-
-								cpuTime = serialAlgorithmNativeReduce( array );
-
-								break;
-
-							}
 			
 							case 'Reduce 0 (N/2)': {
 
