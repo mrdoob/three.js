@@ -10,6 +10,12 @@ import { Texture } from './Texture.js';
  * const texture = new THREE.VideoTexture( video );
  * ```
  *
+ * Note: Due to inherent design constraints in WebGPURenderer, .colorSpace must be explicitly set
+ * to SRGBColorSpace. Assigning alternative values may result in perceptible color inaccuracies,
+ * including luminance shifts and hue distortion. This outcome is a direct consequence of the
+ * renderer's internal texture handling mechanisms and is entirely independent of the color space
+ * employed by the browser during video decoding.
+ *
  * Note: After the initial use of a texture, its dimensions, format, and type
  * cannot be changed. Instead, call {@link Texture#dispose} on the texture and instantiate a new one.
  *
