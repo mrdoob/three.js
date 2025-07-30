@@ -1,10 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div, mod, equal } from './OperatorNode.js';
-<<<<<<< HEAD
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
-=======
-import { addMethodChaining, nodeObject, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
->>>>>>> e0caebba49 (change native select approach)
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 
 /**
@@ -934,21 +930,6 @@ export const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).s
  * @returns {Node}
  */
 export const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
-<<<<<<< HEAD
-
-/**
- * TSL function for using the WGSL native select function.
- *
- * @tsl
- * @function
- * @param {Node} elseNode - The node that is evaluate when the condition ends up `false`.
- * @param {Node} ifNode - The node that is evaluate when the condition ends up `true`.
- * @param {Node} condNode - The node that defines the condition.
- * @returns {MathNode}
- */
-export const nativeSelect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NATIVE_SELECT ).setParameterLength( 3 );
-=======
->>>>>>> e0caebba49 (change native select approach)
 
 /**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
