@@ -16,7 +16,6 @@ class RawTexture extends Texture {
 	 * Creates a new raw texture.
 	 *
 	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
-	 * @param {boolean} [opaque=false] - Whether the texture should be treated as read-only.
 	 */
 	constructor( sourceTexture = null, opaque = false ) {
 
@@ -29,14 +28,6 @@ class RawTexture extends Texture {
 		 * @default null
 		 */
 		this.sourceTexture = sourceTexture;
-
-		/**
-		 * Whether the texture should be treated as read-only.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.opaque = opaque;
 
 		/**
 		 * This flag can be used for type testing.
