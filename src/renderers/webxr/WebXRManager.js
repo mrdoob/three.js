@@ -884,8 +884,8 @@ class WebXRManager extends EventDispatcher {
 		 * Retrieves an opaque texture from the view-aligned {@link XRCamera}.
 		 * Only available during the current animation loop.
 		 *
-		 * @param {XRCamera} xrCamera the camera to query.
-		 * @return {?Texture} an opaque texture representing the current raw camera frame.
+		 * @param {XRCamera} xrCamera - The camera to query.
+		 * @return {?Texture} An opaque texture representing the current raw camera frame.
 		 */
 		this.getCameraTexture = function ( xrCamera ) {
 
