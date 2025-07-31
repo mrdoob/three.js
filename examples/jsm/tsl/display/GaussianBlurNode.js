@@ -267,7 +267,7 @@ class GaussianBlurNode extends TempNode {
 			const invSize = this._invSize;
 			const direction = directionNode.mul( this._passDirection );
 
-			const diffuseSum = vec4(sampleTexture(uvNode).mul( gaussianCoefficients[0] ) ).toVar();
+			const diffuseSum = vec4( sampleTexture( uvNode ).mul( gaussianCoefficients[ 0 ] ) ).toVar();
 
 			for ( let i = 1; i < kernelSize; i ++ ) {
 
