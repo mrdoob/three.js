@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedArray, Loop, If, vec3, nativeSelect, clamp, atomicStore, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize } from 'three/tsl';
+			import { instancedArray, Loop, If, vec3, nativeSelect, clamp, atomicStore, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, vec4 } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -578,17 +578,18 @@
 
 				const createReduce4Fn = ( createReduce4FnProps ) => {
 
-					const { workgroupSize, workPerThread, numElements, minSubgroupSize } = createReduce4FnProps;
-					const partitionSize = uint(workgroupSize * workPerThread);
-					const numThreadBlocks = 
+					const { workgroupSize, workPerThread, numElements, minSubgroupSize, inputBuffer } = createReduce4FnProps;
+					// Number of elements handled by each thread is equal to the workgroupSize * the number of
+					// elements scanned per thread * the number of elements packed into a vec4
+					const partitionSize = uint( workgroupSize * workPerThread * 4 );
+					const vecSize = numElements / 4;
+					const NUM_WORKGROUPS = uint( divRoundUp( numElements, partitionSize ) );
 
-					const MAX_REDUCE_SIZE = uint(workgroupSize).div(minSubgroupSize);
-
-					vecSize = numElements / 4;
+					const MAX_REDUCE_SIZE = uint( workgroupSize ).div( minSubgroupSize );
 
 					const fnDef = Fn( () => {
 
-						const workgroupReductionArray = createSubgroupArray('uint', maxWorkgroupSize, minSubgroupSize);
+						const workgroupReductionArray = createSubgroupArray( 'uint', maxWorkgroupSize, minSubgroupSize );
 
 						// Get the index of the subgroup within the workgroup
 						const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
@@ -601,89 +602,117 @@
 
 						const startThread = subgroupOffset.add( workgroupOffset );
 
-						const subgroupReduction = uint(0);
+						const subgroupReduction = uint( 0 );
 
-						If(workgroupId.x.lessThan(info.thread_blocks - 1u), () => {
+						If( workgroupId.x.lessThan( NUM_WORKGROUPS.sub( 1 ) ), () => {
 
-							const currentSubgroupInBlock = uint(0).toVar();
+							const currentSubgroupInBlock = uint( 0 ).toVar();
 
-							Loop( currentSubgroupInBlock.lessThan(workPerThread), () => {
+							Loop( currentSubgroupInBlock.lessThan( workPerThread ), () => {
 
 								// Get vectorized element from input array
-								const val = inputVectorizedStorage.element(startThread);
+								const val = inputVectorizedStorage.element( startThread );
 
 								// Sum values within vec4 together by using result of dot product
-								subgroupReduction.addAssign(dot(val, vec4(1)));
+								subgroupReduction.addAssign( dot( val, vec4( 1 ) ) );
 
 								// Increment so thread will scan value in next subgroup
-								startThread.addAssign(subgroupSize);
+								startThread.addAssign( subgroupSize );
 
 								// Increment to continue loop
-								currentSubgroupInBlock.addAssign(1);
-								
-							})
-						})
+								currentSubgroupInBlock.addAssign( 1 );
+			
+							} );
+			
+						} );
 
-						If(workgroupId.x.equal(info.thread_blocks - 1u), () => {
+						If( workgroupId.x.equal( NUM_WORKGROUPS.sub( 1 ) ), () => {
 
-							const currentSubgroupInBlock = uint(0).toVar();
+							const currentSubgroupInBlock = uint( 0 ).toVar();
 
-							Loop( currentSubgroupInBlock.lessThan(workPerThread), () => {
+							Loop( currentSubgroupInBlock.lessThan( workPerThread ), () => {
 
-								const inputValue = inputVectorizedStorage.element(startThread);
+								const inputValue = inputVectorizedStorage.element( startThread );
 
-								const val = select(startThread.lessThan(vecSize), inputValue, vec4(0));
+								const val = nativeSelect( startThread.lessThan( vecSize ), inputValue, vec4( 0 ) );
 
 								// Sum values within vec4 together by using result of dot product
-								subgroupReduction.addAssign(dot(val, vec4(1)));
+								subgroupReduction.addAssign( dot( val, vec4( 1 ) ) );
 
 								// Increment so thread will scan value in next subgroup
-								startThread.addAssign(subgroupSize);
+								startThread.addAssign( subgroupSize );
 
 								// Increment to continue loop
-								currentSubgroupInBlock.addAssign(1);
-								
-							})
-						})
+								currentSubgroupInBlock.addAssign( 1 );
+			
+							} );
+			
+			} );
 
-						subgroupReduction.assign(subgroupAdd(subgroupReduction));
+						subgroupReduction.assign( subgroupAdd( subgroupReduction ) );
 
-						// Delegate one thread per subgroup to assign to the workgroupArray storing elements per subgroup
-						If(invocationSubgroupIndex.equal(0), () => {
+						// Delegate one thread per subgroup to assign each subgroup's reduction to the workgroup array
+						If( invocationSubgroupIndex.equal( 0 ), () => {
 
-							workgroupArray.element(subgroupMetaRank).assign()
+							workgroupReductionArray.element( subgroupMetaRank ).assign( subgroupReduction );
 
-						})
+						} );
 
 						// Ensure that each workgroup has populated wg_reduce with data
 						// from each subgroup before we begin reducing down its values
+						workgroupBarrier();
 
-						
-							
-							{
-        for(var k = 0u; k < VEC4_SPT; k += 1u){
-            let t = scan_in[i];
-            s_red += dot(t, vec4(1u, 1u, 1u, 1u));
-            i += lane_count;
-        }
-    }
+						// WORKGROUP LEVEL REDUCE
 
-    if(wgid.x == info.thread_blocks - 1u){
-        for(var k = 0u; k < VEC4_SPT; k += 1u){
-            let t = select(vec4<u32>(0u, 0u, 0u, 0u), scan_in[i], i < info.vec_size);
-            s_red += dot(t, vec4(1u, 1u, 1u, 1u));
-            i += lane_count;
-        }
-    }
+						const subgroupSizeLog = log2( subgroupSize );
+						// Effectively equal to number of subgroups in the workgroup
+						// also 'spine_size'
+						const numSubgroupsInWorkgroup = uint( workgroupSize ).shiftRight( subgroupSizeLog );
+						const spineLog = log2( spineSize );
+
+						const alignedSize = ( spineLog.add( subgroupSizeLog ).sub( 1 ) ).div( laneLog );
+						alignedSize.assign( uint( 1 ).shiftLeft( alignedSize ) );
+
+						const offset = uint( 0 );
+
+						const j = subgroupSize.toVar();
+
+						Loop( j.lessThanEqual( alignedSize ), () => {
+
+							const subgroupIndex = ( ( invocationLocalIndex.add( 1 ) ).shiftLeft( offset ) ).sub( 1 );
+
+							const isValidSubgroupIndex = subgroupIndex.lessThan( numSubgroupsInWorkgroup );
+
+							// Reduce values within the local workgroup memory
+							const t = subgroupAdd( select(
+								isValidSubgroupIndex,
+								workgroupReductionArray.element( subgroupIndex ),
+								0
+							) );
+
+							// Can assign back to workgroupArray since all
+							// subgroup threads work in lockstop for subgroupAdd
+							If( isValidSubgroupIndex, () => {
+
+								workgroupReductionArray.element( subgroupIndex ).assign( t );
+
+							} );
+
+							// Ensure all threads have completed work
+
+							workgroupBarrier();
+
+							offset.addAssign( subgroupSizeLog );
+							j.shiftLeftAssign( subgroupSizeLog );
 
 
+						} );
 
 
+			
 			
 					} );
 
-
-			
 				};
 
 				const incorrectBaselineCalls = [

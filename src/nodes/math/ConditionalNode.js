@@ -135,6 +135,33 @@ class ConditionalNode extends Node {
 
 		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
+		const isUniformControlFlow = builder.context.uniformFlow;
+
+		// Build node using ternary operator or select
+		if ( isUniformControlFlow ) {
+
+			const condSnippet = condNode.build( builder, 'bool' );
+			const ifSnippet = ifNode.build( builder, type );
+			const elseSnippet = elseNode.build( builder, type );
+
+			let codeSnippet = '';
+
+			if ( builder.renderer.backend.isWebGLBackend ) {
+
+				codeSnippet = `${condSnippet} ? ${ifSnippet} : ${elseSnippet}`;
+
+			} else {
+
+				codeSnippet = `select(${elseSnippet}, ${ifSnippet}, )`;
+
+			}
+
+			builder.addFlowCode( codeSnippet );
+
+			return builder.format( nodeProperty, type, output );
+
+		}
+
 		const functionNode = builder.currentFunctionNode;
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
