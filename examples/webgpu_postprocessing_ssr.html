@@ -141,7 +141,7 @@
 
 			} );
 
-			const customMetal = sample( ( uv ) => {
+			const customMetalness = sample( ( uv ) => {
 
 				return scenePassMetalRough.sample( uv ).r;
 
@@ -149,7 +149,7 @@
 
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, customMetal, camera );
+			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, customMetalness, camera );
 			ssrPass.resolutionScale = 1.0;
 
 			// blend SSR over beauty
