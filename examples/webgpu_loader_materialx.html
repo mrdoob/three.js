@@ -248,6 +248,13 @@
 				const previewMesh = model.getObjectByName( 'Preview_Mesh' );
 				previewMesh.material = material;
 
+				if ( material.transparent ) {
+
+					calibrationMesh.renderOrder = 1;
+					previewMesh.renderOrder = 2;
+
+				}
+
 			}
 
 			function addGUI() {
