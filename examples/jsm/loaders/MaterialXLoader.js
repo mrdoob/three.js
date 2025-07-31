@@ -893,24 +893,16 @@ class MaterialXNode {
 
 		}
 
-		// Auto-enable transparency when opacity or transmission is non-default
-		const hasNonDefaultOpacity = opacityNode && opacityNode.value !== undefined && opacityNode.value < 1.0;
-		const hasOpacityNode = opacityNode !== null;
-
-		const hasTransmission = transmissionNode && transmissionNode.value !== undefined && transmissionNode.value > 0;
-		const hasTransmissionNode = transmissionNode !== null;
-
-		if ( hasNonDefaultOpacity || hasOpacityNode ) {
+		if ( opacityNode !== null ) {
 
 			material.transparent = true;
 
 		}
 
-		// Set material properties for transmission
-		if ( hasTransmission || hasTransmissionNode ) {
+		if ( transmissionNode !== null ) {
 
-			material.transparent = true;
 			material.side = DoubleSide;
+			material.transparent = true;
 
 		}
 
