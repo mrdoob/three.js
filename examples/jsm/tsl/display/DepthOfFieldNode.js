@@ -1,5 +1,5 @@
 import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, Vector3, Vector4, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, passTexture, uniformArray, mrt, outputStruct, property } from 'three/tsl';
+import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, passTexture, uniformArray, outputStruct, property, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 let _rendererState;
@@ -101,7 +101,7 @@ class DepthOfFieldNode extends TempNode {
 		 * @private
 		 * @type {PassTextureNode}
 		 */
-		this._textureNode = passTexture( this, this._CoCRT.texture );
+		this._textureNode = passTexture( this, this._CoCRT.textures[ 1 ] );
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
@@ -181,25 +181,33 @@ class DepthOfFieldNode extends TempNode {
 
 		const kernels = this._generateKernels();
 
-		const bokeh64 = uniformArray( kernels.points64 );
-		const bokeh16 = uniformArray( kernels.points16 );
+		// CoC, near and far fields
+
+		const nearField = property( 'float' );
+		const farField = property( 'float' );
+
+		const outputNode = outputStruct( nearField, farField );
 
 		const CoC = Fn( () => {
 
 			const signedDist = this.viewZNode.negate().sub( this.focusDistanceNode );
 			const CoC = smoothstep( 0, this.focalLengthNode, signedDist.abs() );
 
-			const nearField = step( signedDist, 0 ).mul( CoC );
-			const farField = step( 0, signedDist ).mul( CoC );
+			nearField.assign( step( signedDist, 0 ).mul( CoC ) );
+			farField.assign( step( 0, signedDist ).mul( CoC ) );
 
-			return outputStruct( nearField, farField );
+			return vec4( 0 );
 
 		} );
 
-		//
-
-		this._CoCMaterial.fragmentNode = CoC().context( builder.getSharedContext() );
+		this._CoCMaterial.colorNode = CoC().context( builder.getSharedContext() );
+		this._CoCMaterial.outputNode = outputNode;
 		this._CoCMaterial.needsUpdate = true;
+
+		// bokeh
+
+		const bokeh64 = uniformArray( kernels.points64 );
+		const bokeh16 = uniformArray( kernels.points16 );
 
 		return this._textureNode;
 
