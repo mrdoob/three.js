@@ -105,7 +105,9 @@
 				document.body.appendChild( renderer.domElement );
 
 				const effectController = {
-					focus: uniform( 500.0 )
+					focusDistance: uniform( 500 ),
+					focalLength: uniform( 200 ),
+					bokehScale: uniform( 10 )
 				};
 
 				// post processing
@@ -117,7 +119,7 @@
 				const scenePassColor = scenePass.getTextureNode();
 				const scenePassViewZ = scenePass.getViewZNode();
 
-				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focus, 100 );
+				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focusDistance, effectController.focalLength, effectController.bokehScale );
 
 				postProcessing.outputNode = dofPass;
 
@@ -136,7 +138,9 @@
 				// gui
 
 				const gui = new GUI();
-				gui.add( effectController.focus, 'value', 10.0, 3000.0, 10 ).name( 'focus' );
+				gui.add( effectController.focusDistance, 'value', 10.0, 3000.0 ).name( 'focus distance' );
+				gui.add( effectController.focalLength, 'value', 50, 750 ).name( 'focal length' );
+				gui.add( effectController.bokehScale, 'value', 1, 10 ).name( 'bokeh scale' );
 
 			}
 
