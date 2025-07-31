@@ -1,4 +1,4 @@
-import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, Vector3, Vector4, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
+import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, Vector3, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
