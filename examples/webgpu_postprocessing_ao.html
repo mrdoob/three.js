@@ -28,10 +28,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, metalness, normalView, roughness, blendColor } from 'three/tsl';
+			import { pass, mrt, output, metalness, normalView, roughness, velocity, blendColor, sample, vec2 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -67,7 +67,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGPURenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
+				// renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
@@ -102,21 +102,18 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					normal: normalView,
-					metalness: metalness,
-					roughness: roughness
+					metalrough: vec2( metalness, roughness ),
+					velocity: velocity
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
-				const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
-				const scenePassRoughness = scenePass.getTextureNode( 'roughness' );
+				const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
-				const metalnessTexture = scenePass.getTexture( 'metalness' );
-				metalnessTexture.type = THREE.UnsignedByteType;
-
-				const roughnessTexture = scenePass.getTexture( 'roughness' );
-				roughnessTexture.type = THREE.UnsignedByteType;
+				const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+				metalRoughTexture.type = THREE.UnsignedByteType;
 
 				// ao
 
@@ -125,14 +122,19 @@
 			
 				// ssr
 
-				ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
+				const customMetalness = sample( ( uv ) => {
+
+					const metalRough = scenePassMetalRough.sample( uv );
+					return metalRough.r.mul( metalRough.g.add( 0.25 ) );
+
+				} );
+
+				ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, customMetalness, camera );
 				ssrPass.resolutionScale = 1.0;
 
-				postProcessing.outputNode = smaa(
-					blendColor(
-						scenePassColor.mul( aoPass ),
-						ssrPass.mul( scenePassRoughness.add( 0.25 ) )
-					)
+				postProcessing.outputNode = traa(
+					blendColor( scenePassColor.mul( aoPass ), ssrPass ),
+					scenePassDepth, scenePassVelocity, camera
 				);
 
 				//
@@ -166,8 +168,8 @@
 
 					if ( o.material ) {
 
-						if ( o.material.map ) o.material.map.anisotropy = 16;
-						if ( o.material.roughnessMap ) o.material.roughnessMap.anisotropy = 16;
+						if ( o.material.map ) o.material.map.anisotropy = 8;
+						if ( o.material.roughnessMap ) o.material.roughnessMap.anisotropy = 8;
 
 						// Remove emissive from all materials
 
