@@ -32,7 +32,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, blendColor, screenUV, color, sample, directionToColor, colorToDirection } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, blendColor, screenUV, color, sample, directionToColor, colorToDirection, vec2 } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -119,26 +119,21 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: directionToColor( normalView ),
-				metalness: metalness,
-				roughness: roughness,
+				metalrough: vec2( metalness, roughness )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' );
 			const scenePassDepth = scenePass.getTextureNode( 'depth' );
-			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
-			const scenePassRoughness = scenePass.getTextureNode( 'roughness' );
+			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' );
 
 			// optimization bandwidth packing the normals and reducing the texture precision if possible
 
-			const metalnessTexture = scenePass.getTexture( 'metalness' );
-			metalnessTexture.type = THREE.UnsignedByteType;
-
-			const roughnessTexture = scenePass.getTexture( 'roughness' );
-			roughnessTexture.type = THREE.UnsignedByteType;
-
 			const normalTexture = scenePass.getTexture( 'normal' );
 			normalTexture.type = THREE.UnsignedByteType;
+
+			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+			metalRoughTexture.type = THREE.UnsignedByteType;
 
 			const customNormal = sample( ( uv ) => {
 
@@ -146,15 +141,21 @@
 
 			} );
 
+			const customMetal = sample( ( uv ) => {
+
+				return scenePassMetalRough.sample( uv ).r;
+
+			} );
+
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, scenePassMetalness, camera );
+			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, customMetal, camera );
 			ssrPass.resolutionScale = 1.0;
 
 			// blend SSR over beauty
-		
-			const outputNode = smaa( blendColor( scenePassColor, ssrPass.mul( scenePassRoughness.oneMinus() ) ) );
-			
+
+			const outputNode = smaa( blendColor( scenePassColor, ssrPass.mul( scenePassMetalRough.g.oneMinus() ) ) );
+
 			postProcessing.outputNode = outputNode;
 
 			//
