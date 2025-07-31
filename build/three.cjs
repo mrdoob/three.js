@@ -69328,7 +69328,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
-		if ( texture.isRenderTargetTexture === false && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isRenderTargetTexture === false && texture.isRawTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			const image = texture.image;
 
@@ -69346,6 +69346,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				return;
 
 			}
+
+		} else if ( texture.isRawTexture ) {
+
+			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
 
 		}
 
@@ -71350,6 +71354,48 @@ function WebGLUtils( gl, extensions ) {
 
 }
 
+/**
+ * Represents a texture created externally from the renderer context.
+ *
+ * This may be a texture from a protected media stream, device camera feed,
+ * or other data feeds like a depth sensor.
+ *
+ * Note that this class is only supported in {@link WebGLRenderer} right now.
+ *
+ * @augments Texture
+ */
+class RawTexture extends Texture {
+
+	/**
+	 * Creates a new raw texture.
+	 *
+	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
+	 */
+	constructor( sourceTexture = null ) {
+
+		super();
+
+		/**
+		 * The external source texture.
+		 *
+		 * @type {?WebGLTexture}
+		 * @default null
+		 */
+		this.sourceTexture = sourceTexture;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isRawTexture = true;
+
+	}
+
+}
+
 const _occlusion_vertex = `
 void main() {
 
@@ -71389,9 +71435,9 @@ class WebXRDepthSensing {
 	constructor() {
 
 		/**
-		 * A texture representing the depth of the user's environment.
+		 * An opaque texture representing the depth of the user's environment.
 		 *
-		 * @type {?Texture}
+		 * @type {?RawTexture}
 		 */
 		this.texture = null;
 
@@ -71421,18 +71467,14 @@ class WebXRDepthSensing {
 	/**
 	 * Inits the depth sensing module
 	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {XRWebGLDepthInformation} depthData - The XR depth data.
 	 * @param {XRRenderState} renderState - The XR render state.
 	 */
-	init( renderer, depthData, renderState ) {
+	init( depthData, renderState ) {
 
 		if ( this.texture === null ) {
 
-			const texture = new Texture();
-
-			const texProps = renderer.properties.get( texture );
-			texProps.__webglTexture = depthData.texture;
+			const texture = new RawTexture( depthData.texture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
@@ -71493,7 +71535,7 @@ class WebXRDepthSensing {
 	/**
 	 * Returns a texture representing the depth of the user's environment.
 	 *
-	 * @return {?Texture} The depth texture.
+	 * @return {?RawTexture} The depth texture.
 	 */
 	getDepthTexture() {
 
@@ -71543,6 +71585,7 @@ class WebXRManager extends EventDispatcher {
 		let xrFrame = null;
 
 		const depthSensing = new WebXRDepthSensing();
+		const cameraAccessTextures = {};
 		const attributes = gl.getContextAttributes();
 
 		let initialRenderTarget = null;
@@ -71723,6 +71766,11 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthFar = null;
 
 			depthSensing.reset();
+			for ( const key in cameraAccessTextures ) {
+
+				delete cameraAccessTextures[ key ];
+
+			}
 
 			// restore framebuffer/rendering state
 
@@ -72364,6 +72412,19 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Retrieves an opaque texture from the view-aligned {@link XRCamera}.
+		 * Only available during the current animation loop.
+		 *
+		 * @param {XRCamera} xrCamera - The camera to query.
+		 * @return {?Texture} An opaque texture representing the current raw camera frame.
+		 */
+		this.getCameraTexture = function ( xrCamera ) {
+
+			return cameraAccessTextures[ xrCamera ];
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -72469,7 +72530,42 @@ class WebXRManager extends EventDispatcher {
 
 					if ( depthData && depthData.isValid && depthData.texture ) {
 
-						depthSensing.init( renderer, depthData, session.renderState );
+						depthSensing.init( depthData, session.renderState );
+
+					}
+
+				}
+
+				const cameraAccessEnabled = enabledFeatures &&
+				    enabledFeatures.includes( 'camera-access' );
+
+				if ( cameraAccessEnabled ) {
+
+					renderer.state.unbindTexture();
+
+					if ( glBinding ) {
+
+						for ( let i = 0; i < views.length; i ++ ) {
+
+							const camera = views[ i ].camera;
+
+							if ( camera ) {
+
+								let cameraTex = cameraAccessTextures[ camera ];
+
+								if ( ! cameraTex ) {
+
+									cameraTex = new RawTexture();
+									cameraAccessTextures[ camera ] = cameraTex;
+
+								}
+
+								const glTexture = glBinding.getCameraImage( camera );
+								cameraTex.sourceTexture = glTexture;
+
+							}
+
+						}
 
 					}
 
