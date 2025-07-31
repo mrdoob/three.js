@@ -9,7 +9,7 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { RawTexture } from '../../textures/RawTexture.js';
+import { ExternalTexture } from '../../textures/ExternalTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 import { WebXRDepthSensing } from './WebXRDepthSensing.js';
 
@@ -1023,7 +1023,7 @@ class WebXRManager extends EventDispatcher {
 
 								if ( ! cameraTex ) {
 
-									cameraTex = new RawTexture();
+									cameraTex = new ExternalTexture();
 									cameraAccessTextures[ camera ] = cameraTex;
 
 								}

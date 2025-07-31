@@ -10,7 +10,7 @@ import { Texture } from './Texture.js';
  *
  * @augments Texture
  */
-class RawTexture extends Texture {
+class ExternalTexture extends Texture {
 
 	/**
 	 * Creates a new raw texture.
@@ -36,10 +36,10 @@ class RawTexture extends Texture {
 		 * @readonly
 		 * @default true
 		 */
-		this.isRawTexture = true;
+		this.isExternalTexture = true;
 
 	}
 
 }
 
-export { RawTexture };
+export { ExternalTexture };

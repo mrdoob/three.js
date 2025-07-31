@@ -515,7 +515,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
-		if ( texture.isRenderTargetTexture === false && texture.isRawTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isRenderTargetTexture === false && texture.isExternalTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			const image = texture.image;
 
@@ -534,7 +534,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-		} else if ( texture.isRawTexture ) {
+		} else if ( texture.isExternalTexture ) {
 
 			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
 
