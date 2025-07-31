@@ -105,9 +105,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				const effectController = {
-					focus: uniform( 500.0 ),
-					aperture: uniform( 5 ),
-					maxblur: uniform( 0.01 )
+					focus: uniform( 500.0 )
 				};
 
 				// post processing
@@ -119,7 +117,7 @@
 				const scenePassColor = scenePass.getTextureNode();
 				const scenePassViewZ = scenePass.getViewZNode();
 
-				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
+				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focus, 100 );
 
 				postProcessing.outputNode = dofPass;
 
@@ -139,8 +137,6 @@
 
 				const gui = new GUI();
 				gui.add( effectController.focus, 'value', 10.0, 3000.0, 10 ).name( 'focus' );
-				gui.add( effectController.aperture, 'value', 0, 10, 0.1 ).name( 'aperture' );
-				gui.add( effectController.maxblur, 'value', 0.0, 0.01, 0.001 ).name( 'maxblur' );
 
 			}
 

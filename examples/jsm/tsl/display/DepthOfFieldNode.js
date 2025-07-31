@@ -1,5 +1,8 @@
-import { TempNode, NodeUpdateType } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
+import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, Vector3, Vector4, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
+import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, passTexture, uniformArray, mrt, outputStruct, property } from 'three/tsl';
+
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
+let _rendererState;
 
 /**
  * Post processing node for creating depth of field (DOF) effect.
@@ -20,11 +23,11 @@ class DepthOfFieldNode extends TempNode {
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
 	 * @param {Node<float>} viewZNode - Represents the viewZ depth values of the scene.
-	 * @param {Node<float>} focusNode - Defines the effect's focus which is the distance along the camera's look direction in world units.
-	 * @param {Node<float>} apertureNode - Defines the effect's aperture.
-	 * @param {Node<float>} maxblurNode - Defines the effect's maximum blur.
+	 * @param {Node<float>} focusDistanceNode - Defines the effect's focus which is the distance along the camera's look direction in world units.
+	 * @param {Node<float>} focalLengthNode - .
+	 * @param {Node<float>} bokehScaleNode - .
 	 */
-	constructor( textureNode, viewZNode, focusNode, apertureNode, maxblurNode ) {
+	constructor( textureNode, viewZNode, focusDistanceNode, focalLengthNode, bokehScaleNode ) {
 
 		super( 'vec4' );
 
@@ -47,29 +50,58 @@ class DepthOfFieldNode extends TempNode {
 		 *
 		 * @type {Node<float>}
 		 */
-		this.focusNode = focusNode;
+		this.focusDistanceNode = focusDistanceNode;
 
 		/**
-		 * Defines the effect's aperture.
+		 *
 		 *
 		 * @type {Node<float>}
 		 */
-		this.apertureNode = apertureNode;
+		this.focalLengthNode = focalLengthNode;
 
 		/**
-		 * Defines the effect's maximum blur.
+		 *
 		 *
 		 * @type {Node<float>}
 		 */
-		this.maxblurNode = maxblurNode;
+		this.bokehScaleNode = bokehScaleNode;
 
 		/**
-		 * Represents the input's aspect ratio.
+		 *
 		 *
 		 * @private
-		 * @type {UniformNode<float>}
+		 * @type {UniformNode<vec3>}
 		 */
-		this._aspect = uniform( 0 );
+		this._focusPointView = uniform( new Vector3() );
+
+		/**
+		 *
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._invSize = uniform( new Vector2() );
+
+		/**
+		 * The render target used for the near and far field.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._CoCRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, format: RedFormat, count: 2 } );
+		this._CoCRT.textures[ 0 ].name = 'DepthOfField.NearField';
+		this._CoCRT.textures[ 1 ].name = 'DepthOfField.FarField';
+
+
+		this._CoCMaterial = new NodeMaterial();
+
+		/**
+		 * The result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
+		this._textureNode = passTexture( this, this._CoCRT.texture );
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
@@ -83,15 +115,59 @@ class DepthOfFieldNode extends TempNode {
 	}
 
 	/**
+	 * Sets the size of the effect.
+	 *
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
+	 */
+	setSize( width, height ) {
+
+		this._invSize.value.set( 1 / width, 1 / height );
+
+		this._CoCRT.setSize( width, height );
+
+	}
+
+	/**
+	 * Returns the result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 */
+	getTextureNode() {
+
+		return this._textureNode;
+
+	}
+
+	/**
 	 * This method is used to update the effect's uniforms once per frame.
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
 	 */
-	updateBefore() {
+	updateBefore( frame ) {
+
+		const { renderer } = frame;
+
+		// resize
 
 		const map = this.textureNode.value;
+		this.setSize( map.image.width, map.image.height );
 
-		this._aspect.value = map.image.width / map.image.height;
+		// save state
+
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+
+		// coc
+
+		_quadMesh.material = this._CoCMaterial;
+		renderer.setClearColor( 0x000000, 0 );
+
+		renderer.setRenderTarget( this._CoCRT );
+		_quadMesh.render( renderer );
+
+		// restore
+
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
@@ -101,81 +177,78 @@ class DepthOfFieldNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {ShaderCallNodeInternal}
 	 */
-	setup() {
+	setup( builder ) {
 
-		const textureNode = this.textureNode;
-		const uvNode = textureNode.uvNode || uv();
+		const kernels = this._generateKernels();
 
-		const sampleTexture = ( uv ) => textureNode.sample( uv );
+		const bokeh64 = uniformArray( kernels.points64 );
+		const bokeh16 = uniformArray( kernels.points16 );
 
-		const dof = Fn( () => {
+		const CoC = Fn( () => {
 
-			const aspectcorrect = vec2( 1.0, this._aspect );
+			const signedDist = this.viewZNode.negate().sub( this.focusDistanceNode );
+			const CoC = smoothstep( 0, this.focalLengthNode, signedDist.abs() );
 
-			const factor = this.focusNode.add( this.viewZNode );
+			const nearField = step( signedDist, 0 ).mul( CoC );
+			const farField = step( 0, signedDist ).mul( CoC );
 
-			const dofblur = vec2( clamp( factor.mul( this.apertureNode ), this.maxblurNode.negate(), this.maxblurNode ) );
-
-			const dofblur9 = dofblur.mul( 0.9 );
-			const dofblur7 = dofblur.mul( 0.7 );
-			const dofblur4 = dofblur.mul( 0.4 );
-
-			let col = vec4( 0.0 );
-
-			col = col.add( sampleTexture( uvNode ) );
-
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.0, 0.4 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.15, 0.37 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.29, 0.29 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.37, 0.15 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.40, 0.0 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.37, - 0.15 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.29, - 0.29 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.15, - 0.37 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.0, - 0.4 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.15, 0.37 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.29, 0.29 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.37, 0.15 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.4, 0.0 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.37, - 0.15 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.29, - 0.29 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.15, - 0.37 ).mul( aspectcorrect ).mul( dofblur ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.15, 0.37 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.37, 0.15 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.37, - 0.15 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.15, - 0.37 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.15, 0.37 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.37, 0.15 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.37, - 0.15 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.15, - 0.37 ).mul( aspectcorrect ).mul( dofblur9 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.29, 0.29 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.40, 0.0 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.29, - 0.29 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.0, - 0.4 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.29, 0.29 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.4, 0.0 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.29, - 0.29 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.0, 0.4 ).mul( aspectcorrect ).mul( dofblur7 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.29, 0.29 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.4, 0.0 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.29, - 0.29 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.0, - 0.4 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.29, 0.29 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.4, 0.0 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( - 0.29, - 0.29 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-			col = col.add( sampleTexture( uvNode.add( vec2( 0.0, 0.4 ).mul( aspectcorrect ).mul( dofblur4 ) ) ) );
-
-			col = col.div( 41 );
-			col.a = 1;
-
-			return vec4( col );
-
+			return outputStruct( nearField, farField );
 
 		} );
 
-		const outputNode = dof();
+		//
 
-		return outputNode;
+		this._CoCMaterial.fragmentNode = CoC().context( builder.getSharedContext() );
+		this._CoCMaterial.needsUpdate = true;
+
+		return this._textureNode;
+
+	}
+
+	_generateKernels() {
+
+		const GOLDEN_ANGLE = 2.39996323;
+
+		const points64 = [];
+		const points16 = [];
+
+		let idx64 = 0;
+		let idx16 = 0;
+
+		for ( let i = 0; i < 80; i ++ ) {
+
+			const theta = i * GOLDEN_ANGLE;
+			const r = Math.sqrt( i ) / Math.sqrt( 80 );
+
+			const p = new Vector4( r * Math.cos( theta ), r * Math.sin( theta ), 0, 0 );
+
+			if ( i % 5 === 0 ) {
+
+				points16[ idx16 ] = p;
+				idx16 ++;
+
+			} else {
+
+				points64[ idx64 ] = p;
+				idx64 ++;
+
+			}
+
+		}
+
+		return { points16, points64 };
+
+	}
+
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		this._CoCRT.dispose();
+
+		this._CoCMaterial.dispose();
 
 	}
 
@@ -190,9 +263,9 @@ export default DepthOfFieldNode;
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<float>} viewZNode - Represents the viewZ depth values of the scene.
- * @param {Node<float> | number} focus - Defines the effect's focus which is the distance along the camera's look direction in world units.
- * @param {Node<float> | number} aperture - Defines the effect's aperture.
- * @param {Node<float> | number} maxblur - Defines the effect's maximum blur.
+ * @param {Node<float> | number} focusDistance - Defines the effect's focus which is the distance along the camera's look direction in world units.
+ * @param {Node<float> | number} focalLength - .
+ * @param {Node<float> | number} bokehScale - .
  * @returns {DepthOfFieldNode}
  */
-export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
+export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) ) );
