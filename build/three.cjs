@@ -57268,34 +57268,34 @@ class CameraHelper extends LineSegments {
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, -1, -1, nearZ );
-		setPoint( 'n2', pointMap, geometry, _camera, w, -1, nearZ );
-		setPoint( 'n3', pointMap, geometry, _camera, -1, h, nearZ );
+		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
 		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, -1, -1, farZ );
-		setPoint( 'f2', pointMap, geometry, _camera, w, -1, farZ );
-		setPoint( 'f3', pointMap, geometry, _camera, -1, h, farZ );
+		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, farZ );
+		setPoint( 'f2', pointMap, geometry, _camera, w, - h, farZ );
+		setPoint( 'f3', pointMap, geometry, _camera, - w, h, farZ );
 		setPoint( 'f4', pointMap, geometry, _camera, w, h, farZ );
 
 		// up
 
 		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
-		setPoint( 'u2', pointMap, geometry, _camera, -1 * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
 		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, -1, 0, farZ );
+		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, farZ );
 		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, farZ );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, -1, farZ );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, farZ );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, farZ );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, -1, 0, nearZ );
+		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, -1, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
 		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
@@ -69328,7 +69328,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
-		if ( texture.isRenderTargetTexture === false && texture.isRawTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isRenderTargetTexture === false && texture.isExternalTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			const image = texture.image;
 
@@ -69347,7 +69347,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-		} else if ( texture.isRawTexture ) {
+		} else if ( texture.isExternalTexture ) {
 
 			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
 
@@ -71364,7 +71364,7 @@ function WebGLUtils( gl, extensions ) {
  *
  * @augments Texture
  */
-class RawTexture extends Texture {
+class ExternalTexture extends Texture {
 
 	/**
 	 * Creates a new raw texture.
@@ -71390,7 +71390,7 @@ class RawTexture extends Texture {
 		 * @readonly
 		 * @default true
 		 */
-		this.isRawTexture = true;
+		this.isExternalTexture = true;
 
 	}
 
@@ -71437,7 +71437,7 @@ class WebXRDepthSensing {
 		/**
 		 * An opaque texture representing the depth of the user's environment.
 		 *
-		 * @type {?RawTexture}
+		 * @type {?ExternalTexture}
 		 */
 		this.texture = null;
 
@@ -71474,7 +71474,7 @@ class WebXRDepthSensing {
 
 		if ( this.texture === null ) {
 
-			const texture = new RawTexture( depthData.texture );
+			const texture = new ExternalTexture( depthData.texture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
@@ -71535,7 +71535,7 @@ class WebXRDepthSensing {
 	/**
 	 * Returns a texture representing the depth of the user's environment.
 	 *
-	 * @return {?RawTexture} The depth texture.
+	 * @return {?ExternalTexture} The depth texture.
 	 */
 	getDepthTexture() {
 
@@ -72555,7 +72555,7 @@ class WebXRManager extends EventDispatcher {
 
 								if ( ! cameraTex ) {
 
-									cameraTex = new RawTexture();
+									cameraTex = new ExternalTexture();
 									cameraAccessTextures[ camera ] = cameraTex;
 
 								}

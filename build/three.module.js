@@ -10657,7 +10657,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
-		if ( texture.isRenderTargetTexture === false && texture.isRawTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isRenderTargetTexture === false && texture.isExternalTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			const image = texture.image;
 
@@ -10676,7 +10676,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-		} else if ( texture.isRawTexture ) {
+		} else if ( texture.isExternalTexture ) {
 
 			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
 
@@ -12693,7 +12693,7 @@ function WebGLUtils( gl, extensions ) {
  *
  * @augments Texture
  */
-class RawTexture extends Texture {
+class ExternalTexture extends Texture {
 
 	/**
 	 * Creates a new raw texture.
@@ -12719,7 +12719,7 @@ class RawTexture extends Texture {
 		 * @readonly
 		 * @default true
 		 */
-		this.isRawTexture = true;
+		this.isExternalTexture = true;
 
 	}
 
@@ -12766,7 +12766,7 @@ class WebXRDepthSensing {
 		/**
 		 * An opaque texture representing the depth of the user's environment.
 		 *
-		 * @type {?RawTexture}
+		 * @type {?ExternalTexture}
 		 */
 		this.texture = null;
 
@@ -12803,7 +12803,7 @@ class WebXRDepthSensing {
 
 		if ( this.texture === null ) {
 
-			const texture = new RawTexture( depthData.texture );
+			const texture = new ExternalTexture( depthData.texture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
@@ -12864,7 +12864,7 @@ class WebXRDepthSensing {
 	/**
 	 * Returns a texture representing the depth of the user's environment.
 	 *
-	 * @return {?RawTexture} The depth texture.
+	 * @return {?ExternalTexture} The depth texture.
 	 */
 	getDepthTexture() {
 
@@ -13884,7 +13884,7 @@ class WebXRManager extends EventDispatcher {
 
 								if ( ! cameraTex ) {
 
-									cameraTex = new RawTexture();
+									cameraTex = new ExternalTexture();
 									cameraAccessTextures[ camera ] = cameraTex;
 
 								}
