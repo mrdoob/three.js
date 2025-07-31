@@ -32,7 +32,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, blendColor, screenUV, color, sample, directionToColor, colorToDirection } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, blendColor, screenUV, color, sample, directionToColor, colorToDirection } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -75,6 +75,12 @@
 
 					if ( object.material ) {
 
+						if ( object.material.name === 'Lense_Casing' ) {
+
+							object.material.transparent = true;
+
+						}
+
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
 		
@@ -113,18 +119,23 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: directionToColor( normalView ),
-				metalness: metalness
+				metalness: metalness,
+				roughness: roughness,
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' );
 			const scenePassDepth = scenePass.getTextureNode( 'depth' );
 			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
+			const scenePassRoughness = scenePass.getTextureNode( 'roughness' );
 
 			// optimization bandwidth packing the normals and reducing the texture precision if possible
 
 			const metalnessTexture = scenePass.getTexture( 'metalness' );
 			metalnessTexture.type = THREE.UnsignedByteType;
+
+			const roughnessTexture = scenePass.getTexture( 'roughness' );
+			roughnessTexture.type = THREE.UnsignedByteType;
 
 			const normalTexture = scenePass.getTexture( 'normal' );
 			normalTexture.type = THREE.UnsignedByteType;
@@ -142,8 +153,8 @@
 
 			// blend SSR over beauty
 		
-			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
-
+			const outputNode = smaa( blendColor( scenePassColor, ssrPass.mul( scenePassRoughness.oneMinus() ) ) );
+			
 			postProcessing.outputNode = outputNode;
 
 			//
