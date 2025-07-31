@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, metalness, normalView, blendColor } from 'three/tsl';
+			import { pass, mrt, output, metalness, normalView, roughness, blendColor } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
@@ -43,7 +43,7 @@
 
 			let camera, scene, renderer, postProcessing, controls, stats;
 
-			let aoPass, ssrPass, blendPassAO;
+			let aoPass, ssrPass;
 
 			const params = {
 				distanceExponent: 1,
@@ -102,25 +102,38 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					normal: normalView,
-					metalness: metalness
+					metalness: metalness,
+					roughness: roughness
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
+				const scenePassRoughness = scenePass.getTextureNode( 'roughness' );
+
+				const metalnessTexture = scenePass.getTexture( 'metalness' );
+				metalnessTexture.type = THREE.UnsignedByteType;
+
+				const roughnessTexture = scenePass.getTexture( 'roughness' );
+				roughnessTexture.type = THREE.UnsignedByteType;
 
 				// ao
 
 				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
+				aoPass.resolutionScale = 0.5;
 			
 				// ssr
 
 				ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
 				ssrPass.resolutionScale = 1.0;
 
-				postProcessing.outputNode = smaa( blendColor( blendPassAO, ssrPass ) );
+				postProcessing.outputNode = smaa(
+					blendColor(
+						scenePassColor.mul( aoPass ),
+						ssrPass.mul( scenePassRoughness.add( 0.25 ) )
+					)
+				);
 
 				//
 
