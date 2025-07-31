@@ -383,9 +383,9 @@ class DepthOfFieldNode extends TempNode {
 
 			const uvNode = uv();
 
-			const col = this._blur64TextureNode.sample( uvNode );
-			const maxVal = col.rgb.toVar();
-			const CoC = col.a.toVar();
+			const col = this._blur64TextureNode.sample( uvNode ).toVar();
+			const maxVal = col.rgb;
+			const CoC = col.a;
 			const sampleStep = this._invSize.mul( this.bokehScaleNode ).mul( CoC );
 
 			Loop( 16, ( { i } ) => {
@@ -447,7 +447,7 @@ class DepthOfFieldNode extends TempNode {
 			const theta = i * GOLDEN_ANGLE;
 			const r = Math.sqrt( i ) / Math.sqrt( 80 );
 
-			const p = new Vector4( r * Math.cos( theta ), r * Math.sin( theta ), 0, 0 );
+			const p = new Vector2( r * Math.cos( theta ), r * Math.sin( theta ) );
 
 			if ( i % 5 === 0 ) {
 
