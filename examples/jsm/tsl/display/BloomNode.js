@@ -367,6 +367,7 @@ class BloomNode extends TempNode {
 		// These sizes have been changed to account for the altered coefficents-calculation to avoid blockiness,
 		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
 		const kernelSizeArray = [ 6, 10, 14, 18, 22 ]; 
+
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
 			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( builder, kernelSizeArray[ i ] ) );
@@ -470,7 +471,7 @@ class BloomNode extends TempNode {
 
 		const separableBlurPass = Fn( () => {
 
-			const diffuseSum = sampleTexel(uvNode).rgb.mul( gaussianCoefficients.element(0) ).toVar();
+			const diffuseSum = sampleTexel( uvNode ).rgb.mul( gaussianCoefficients.element( 0 ) ).toVar();
 
 			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
 
