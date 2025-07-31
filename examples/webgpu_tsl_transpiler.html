@@ -8,11 +8,14 @@
 	<body>
 
 		<style>
+			* {
+				box-sizing: border-box;
+			}
 			#source {
 				position: absolute;
 				top: 50px;
 				left: 0;
-				width: 50%;
+				width: calc(50% - 1px);
 				height: calc(100% - 50px);
 			}
 			#result {
@@ -24,15 +27,22 @@
 			}
 			#source-dropdown {
 				position: absolute;
-				top: 10px;
-				left: 10px;
+				top: 0;
+				width: calc(50% - 1px);
 				z-index: 100;
+				padding: 10px;
+				background: #222;
+				text-align: center;
 			}
 			#result-dropdown {
 				position: absolute;
-				top: 10px;
-				left: calc(50% + 10px);
+				top: 0;
+				left: calc(50%);
+				width: 50%;
+				padding: 10px;
 				z-index: 100;
+				background: #222;
+				text-align: center;
 			}
 			select {
 				background: #333;
@@ -48,13 +58,13 @@
 		</style>
 
 		<div id="source-dropdown">
-			<label for="decoder-select">Encoder:</label>
+			<label for="decoder-select">Encoder</label>
 			<select id="decoder-select">
 				<option value="GLSL">GLSL</option>
 			</select>
 		</div>
 		<div id="result-dropdown">
-			<label for="encoder-select">Decoder:</label>
+			<label for="encoder-select">Decoder</label>
 			<select id="encoder-select">
 				<option value="TSL">TSL</option>
 				<option value="WGSL">WGSL</option>
