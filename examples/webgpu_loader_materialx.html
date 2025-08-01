@@ -32,7 +32,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { Fn, length, fract, vec4, positionWorld, smoothstep, max, abs, float, cameraPosition, clamp } from 'three/tsl';
+			import { Fn, length, fract, vec4, positionWorld, smoothstep, max, abs, float, fwidth } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -119,22 +119,23 @@
 
 				// Ground plane
 
-				const material = new THREE.MeshStandardNodeMaterial();
+				const material = new THREE.MeshBasicNodeMaterial();
 
 				const gridXZ = Fn( ( [ gridSize = float( 1.0 ), dotWidth = float( 0.1 ), lineWidth = float( 0.02 ) ] ) => {
 
 					const worldPos = positionWorld;
-					const grid = fract( worldPos.xz.div( gridSize ) );
+					const coord = worldPos.xz.div( gridSize );
+					const grid = fract( coord );
 					
-					// Distance-based antialiasing
-					const distToCamera = length( worldPos.sub( cameraPosition ) );
-					const smoothing = clamp( distToCamera.div( 100.0 ), 0.01, 0.02 );
+					// Screen-space derivative for automatic antialiasing
+					const fw = fwidth( coord );
+					const smoothing = max( fw.x, fw.y ).mul( 0.5 );
 					
-					// Create dots at cell centers
-					const dotDist = length( grid.sub( 0.5 ) );
-					const dots = smoothstep( dotWidth.add( smoothing ), dotWidth.sub( smoothing ), dotDist );
+					// Create squares at cell centers
+					const squareDist = max( abs( grid.x.sub( 0.5 ) ), abs( grid.y.sub( 0.5 ) ) );
+					const dots = smoothstep( dotWidth.add( smoothing ), dotWidth.sub( smoothing ), squareDist );
 					
-					// Create grid lines
+					// Create grid lines with derivative-based antialiasing
 					const lineX = smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), abs( grid.x.sub( 0.5 ) ) );
 					const lineZ = smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), abs( grid.y.sub( 0.5 ) ) );
 					const lines = max( lineX, lineZ );
@@ -150,15 +151,15 @@
 				} );
 				
 				// Create grid pattern
-				const gridPattern = gridXZ( 1.0, 0.04, 0.01 );
+				const gridPattern = gridXZ( 1.0, 0.03, 0.005 );
 				const baseColor = vec4( 1.0, 1.0, 1.0, 0.0 );
-				const gridColor = vec4( 0.2, 0.2, 0.2, 1.0 );
+				const gridColor = vec4( 0.5, 0.5, 0.5, 1.0 );
 				
 				// Mix base color with grid lines
 				material.colorNode = gridPattern.mix( baseColor, gridColor ).mul( radialGradient( 30.0, 20.0 ) );
 				material.transparent = true;
 
-				const plane = new THREE.Mesh( new THREE.CircleGeometry( 50 ), material );
+				const plane = new THREE.Mesh( new THREE.CircleGeometry( 40 ), material );
 				plane.rotation.x = - Math.PI / 2;
 				plane.renderOrder = - 1;
 				scene.add( plane );
