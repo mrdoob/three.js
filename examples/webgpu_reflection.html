@@ -29,7 +29,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { abs, blendOverlay, color, float, Fn, instancedBufferAttribute, materialColor, normalWorldGeometry, pass, positionGeometry, positionLocal, reflector, screenUV, sin, sub, texture, time, uniform, uv, vec3 } from 'three/tsl';
+			import { abs, blendOverlay, color, float, Fn, instancedBufferAttribute, materialColor, max, normalWorldGeometry, pass, positionGeometry, positionLocal, pow2, reflector, screenUV, sin, sub, texture, time, uniform, uv, vec2, vec3 } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -55,7 +55,7 @@
 				camera.position.set( 4, 2, 4 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x4195a4, 1, 25 );
+				scene.fog = new THREE.Fog( 0x4195a4, 1, 20 );
 				scene.backgroundNode = normalWorldGeometry.y.mix( color( 0x4195a4 ), color( 0x0066ff ) );
 				camera.lookAt( 0, 1, 0 );
 
@@ -79,18 +79,16 @@
 				floorColor.wrapS = THREE.RepeatWrapping;
 				floorColor.wrapT = THREE.RepeatWrapping;
 				floorColor.colorSpace = THREE.SRGBColorSpace;
+				floorColor.repeat.set( 15, 15 );
 
 				const floorNormal = await textureLoader.loadAsync( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 				floorNormal.wrapS = THREE.RepeatWrapping;
 				floorNormal.wrapT = THREE.RepeatWrapping;
 				floorNormal.repeat.set( 15, 15 );
 
-				const boxMap = await textureLoader.loadAsync( 'textures/edge3.jpg' );
-				boxMap.colorSpace = THREE.SRGBColorSpace;
-
 				// tree
 
-				const treeMesh = createTreeMesh( boxMap );
+				const treeMesh = createTreeMesh();
 				treeMesh.castShadow = true;
 				treeMesh.receiveShadow = true;
 				scene.add( treeMesh );
@@ -100,13 +98,14 @@
 				const floorUV = uv().mul( 15 );
 				const floorNormalOffset = texture( floorNormal, floorUV ).xy.mul( 2 ).sub( 1 ).mul( .02 );
 
-				const reflection = reflector( { resolution: 0.5 } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolution: 0.2 } );
 				reflection.target.rotateX( - Math.PI / 2 );
 				reflection.uvNode = reflection.uvNode.add( floorNormalOffset );
 				scene.add( reflection.target );
 
 				const floorMaterial = new THREE.MeshPhongNodeMaterial();
-				floorMaterial.colorNode = texture( floorColor, floorUV ).add( reflection );
+				floorMaterial.colorNode = texture( floorColor, floorUV );
+				floorMaterial.emissiveNode = reflection.mul( 0.25 );
 				floorMaterial.normalMap = floorNormal;
 				floorMaterial.normalScale.set( 0.2, - 0.2 );
 
@@ -202,9 +201,7 @@
 
 			}
 
-
-
-			function createTreeMesh( boxMap ) {
+			function createTreeMesh() {
 
 				const maxSteps = 5;
 				const lengthMult = 0.8;
@@ -239,7 +236,7 @@
 
 						size = size / 100;
 
-						const subSteps = 200;
+						const subSteps = 50;
 
 						// below loop generates the instanced data for a tree part
 
@@ -255,13 +252,13 @@
 							newPosition.set( x, y, z ).lerp( new THREE.Vector3( newX, newY, newZ ), percent );
 							position.copy( newPosition );
 
-							position.x += Math.random() * ( size * 3 ) - ( size * 1.5 );
-							position.y += Math.random() * ( size * 3 ) - ( size * 1.5 );
-							position.z += Math.random() * ( size * 3 ) - ( size * 1.5 );
+							position.x += random() * size * 3;
+							position.y += random() * size * 3;
+							position.z += random() * size * 3;
 
 							positions.push( position.x, position.y, position.z );
 
-							const scale = Math.random();
+							const scale = Math.random() + 5;
 
 							// normal
 
@@ -301,7 +298,7 @@
 				createTreePart( angle, 0, 0, 0, 16, 0 );
 
 				const geometry = new THREE.BoxGeometry();
-				const material = new THREE.MeshStandardNodeMaterial( { map: boxMap } );
+				const material = new THREE.MeshStandardNodeMaterial();
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.setScalar( 0.05 );
 				mesh.count = instanceCount;
@@ -349,9 +346,17 @@
 
 				} )();
 
+				const squareEdge = Fn( () => {
+
+					const pos = uv().sub( vec2( 0.5, 0.5 ) );
+					const squareDistance = max( abs( pos.x ), abs( pos.y ) );
+					return squareDistance.div( 0.5 ).clamp( 0.85, 1 ).sub( 0.5 ).mul( 2.0 );
+
+				} )();
+
 				material.colorNode = Fn( () => {
 
-					return materialColor.mul( instanceColor );
+					return squareEdge.sub( instanceColor );
 
 				} )();
 
@@ -365,7 +370,7 @@
 					const dif2 = abs( instanceTime.sub( uniformEffector2 ) ).toConst();
 					const effect2 = dif2.lessThanEqual( 0.15 ).select( sub( 0.15, dif2 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), effect1 );
 
-					return vec3( effect1, 0, effect2 ).mul( instanceColor );
+					return pow2( vec3( effect1, 0, effect2 ) ).mul( instanceColor );
 
 				} )();
 
