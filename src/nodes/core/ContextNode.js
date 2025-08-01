@@ -152,7 +152,7 @@ export const setName = ( node, name ) => context( node, { preferredName: name } 
  * @param {string} name - The name/label to set.
  * @returns {ContextNode}
  */
-export const label = ( node, name ) => {
+export function label( node, name ) {
 
 	console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
