@@ -445,10 +445,11 @@ class DepthOfFieldNode extends TempNode {
 
 			// TODO: applying the bokeh scale to the near field CoC value introduces blending
 			// issues around edges of blurred foreground objects when their are rendered above
-			// the background. for now, just apply the bokeh scale to the far field CoC
+			// the background. for now, don't apply the bokeh scale to the blend factors. that
+			// will cause less blur for objects which are partly out-of-focus (CoC between 0 and 1).
 
 			const blendNear = min( near.a, 0.5 ).mul( 2 );
-			const blendFar = min( this.bokehScaleNode.mul( far.a ), 0.5 ).mul( 2 );
+			const blendFar = min( far.a, 0.5 ).mul( 2 );
 
 			const result = vec4( 0, 0, 0, 1 ).toVar();
 			result.rgb = mix( beauty.rgb, far.rgb, blendFar );
