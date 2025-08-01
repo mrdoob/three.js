@@ -30,8 +30,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { Fn, color, mx_worley_noise_float, time } from 'three/tsl';
+
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -42,9 +44,16 @@
 
 			let projectorLight, lightHelper;
 
+			let stats;
+
 			init();
 
 			function init() {
+
+				// Stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				// Renderer
 
@@ -182,6 +191,7 @@
 							video.play();
 
 							videoTexture = new THREE.VideoTexture( video );
+							videoTexture.colorSpace = THREE.SRGBColorSpace;
 
 						}
 
@@ -280,6 +290,8 @@
 			function animate() {
 
 				const time = performance.now() / 3000;
+
+				stats.update();
 
 				projectorLight.position.x = Math.cos( time ) * 2.5;
 				projectorLight.position.z = Math.sin( time ) * 2.5;

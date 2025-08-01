@@ -11,7 +11,7 @@ const arithmeticOperators = [
 ];
 
 const precedenceOperators = [
-	'*', '/', '%',
+	'/', '*', '%',
 	'-', '+',
 	'<<', '>>',
 	'<', '>', '<=', '>=',
@@ -861,7 +861,7 @@ class GLSLDecoder {
 
 		const switchDeterminantTokens = this.readTokensUntil( ')' );
 
-		// Parse expresison between parentheses. Index 1: char after '('. Index -1: char before ')'
+		// Parse expression between parentheses. Index 1: char after '('. Index -1: char before ')'
 		const discriminant = this.parseExpressionFromTokens( switchDeterminantTokens.slice( 1, - 1 ) );
 
 		// Validate curly braces

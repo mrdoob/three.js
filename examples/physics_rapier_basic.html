@@ -32,6 +32,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 			import { RapierHelper } from 'three/addons/helpers/RapierHelper.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			let camera, scene, renderer, stats, controls;
@@ -131,9 +132,15 @@
 
 			}
 
+			const geometries = [
+				new THREE.BoxGeometry( 1, 1, 1 ),
+				new THREE.SphereGeometry( 0.5 ),
+				new RoundedBoxGeometry( 1, 1, 1, 2, 0.25 )
+			];
+
 			function addBody( ) {
 
-				const geometry = ( Math.random() > 0.5 ) ? new THREE.SphereGeometry( 0.5 ) : new THREE.BoxGeometry( 1, 1, 1 );
+				const geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
 				const material = new THREE.MeshStandardMaterial( { color: Math.floor( Math.random() * 0xFFFFFF ) } );
 
 				const mesh = new THREE.Mesh( geometry, material );

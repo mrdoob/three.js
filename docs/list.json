@@ -65,6 +65,7 @@
 				"Layers": "api/en/core/Layers",
 				"Object3D": "api/en/core/Object3D",
 				"Raycaster": "api/en/core/Raycaster",
+				"Timer": "api/en/core/Timer",
 				"Uniform": "api/en/core/Uniform"
 			},
 
@@ -374,19 +375,17 @@
 				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
+				"KTX2Exporter": "examples/en/exporters/KTX2Exporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
-				"STLExporter": "examples/en/exporters/STLExporter"
+				"STLExporter": "examples/en/exporters/STLExporter",
+				"USDZExporter": "examples/en/exporters/USDZExporter"
 			},
 
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
 				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 				"OBB": "examples/en/math/OBB"
-			},
-
-			"Misc": {
-				"Timer": "examples/en/misc/Timer"
 			},
 
 			"Modifiers": {
@@ -775,6 +774,7 @@
 				"Layers": "api/zh/core/Layers",
 				"Object3D": "api/zh/core/Object3D",
 				"Raycaster": "api/zh/core/Raycaster",
+				"Timer": "api/zh/core/Timer",
 				"Uniform": "api/zh/core/Uniform"
 			},
 
@@ -1086,10 +1086,6 @@
 
 			"修改器":{
 				"EdgeSplitModifier": "examples/zh/modifiers/EdgeSplitModifier"
-			},
-
-			"杂项": {
-				"Timer": "examples/zh/misc/Timer"
 			},
 
 			"凸包": {

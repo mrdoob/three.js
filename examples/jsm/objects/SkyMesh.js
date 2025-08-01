@@ -165,7 +165,7 @@ class SkyMesh extends Mesh {
 
 		} )();
 
-		const fragmentNode = /*@__PURE__*/ Fn( () => {
+		const colorNode = /*@__PURE__*/ Fn( () => {
 
 			// constants for atmospheric scattering
 			const pi = float( 3.141592653589793238462643383279502884197169 );
@@ -234,7 +234,7 @@ class SkyMesh extends Mesh {
 		material.depthWrite = false;
 
 		material.vertexNode = vertexNode;
-		material.fragmentNode = fragmentNode;
+		material.colorNode = colorNode;
 
 	}
 

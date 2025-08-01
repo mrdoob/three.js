@@ -26,7 +26,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { pass, renderOutput, uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -39,7 +39,7 @@
 				enabled: true,
 				animated: true,
 				strength: 1.5,
-				center: new THREE.Vector2(0.5, 0.5),
+				center: new THREE.Vector2( 0.5, 0.5 ),
 				scale: 1.2,
 				autoRotate: true,
 				cameraDistance: 40
@@ -58,6 +58,8 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( 0, 15, params.cameraDistance );
 
@@ -65,7 +67,7 @@
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.1;
 				controls.autoRotate = true;
-				controls.autoRotateSpeed = -0.1;
+				controls.autoRotateSpeed = - 0.1;
 				controls.target.set( 0, 0.5, 0 );
 				controls.update();
 
@@ -86,7 +88,7 @@
 
 				// Add a grid for reference
 				const gridHelper = new THREE.GridHelper( 40, 20, 0x444444, 0x222222 );
-				gridHelper.position.y = -10;
+				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
 				// post processing
@@ -153,7 +155,7 @@
 					0xff00ff, // Magenta
 					0x00ffff, // Cyan
 					0xffffff, // White
-					0xff8800  // Orange
+					0xff8800 // Orange
 				];
 
 				// Create materials
@@ -165,7 +167,7 @@
 						metalness: 0.8
 					} ) );
 
-				});
+				} );
 
 				// Create geometries
 				const geometries = [
@@ -195,7 +197,7 @@
 				centralGroup.add( centralTorus );
 
 				// Inner rotating shapes
-				for ( let i = 0; i < 6; i++ ) {
+				for ( let i = 0; i < 6; i ++ ) {
 
 					const angle = ( i / 6 ) * Math.PI * 2;
 					const radius = 3;
@@ -224,7 +226,7 @@
 				const numShapes = 12;
 				const outerRadius = 15;
 
-				for ( let i = 0; i < numShapes; i++ ) {
+				for ( let i = 0; i < numShapes; i ++ ) {
 
 					const angle = ( i / numShapes ) * Math.PI * 2;
 					const shapesGroup = new THREE.Group();
@@ -326,6 +328,7 @@
 				}
 
 				postProcessing.render();
+			
 			}
 
 		</script>

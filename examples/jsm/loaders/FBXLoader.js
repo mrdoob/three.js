@@ -1784,7 +1784,7 @@ class GeometryParser {
 		geoInfo.vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
 		geoInfo.vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
 
-		if ( geoNode.LayerElementColor && geoNode.LayerElementColor.Color ) {
+		if ( geoNode.LayerElementColor && geoNode.LayerElementColor[ 0 ].Colors ) {
 
 			geoInfo.color = this.parseVertexColors( geoNode.LayerElementColor[ 0 ] );
 

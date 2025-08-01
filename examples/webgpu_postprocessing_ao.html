@@ -27,10 +27,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { pass, mrt, output, normalView } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, normalView, velocity } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
-			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -38,10 +38,11 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, scene, renderer, postProcessing, controls;
+			let camera, scene, renderer, postProcessing, controls, stats;
 
-			let aoPass, denoisePass, blendPassAO, blendPassDenoise, scenePassColor;
+			let aoPass, traaPass, blendPassAO, scenePassColor;
 
 			const params = {
 				distanceExponent: 1,
@@ -66,11 +67,14 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.domElement );
 
 				await renderer.init();
 
@@ -99,12 +103,14 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: normalView
+					normal: normalView,
+					velocity: velocity
 				} ) );
 
 				scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
 				// ao
 
@@ -112,12 +118,11 @@
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
 				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
 
-				// denoise (optional, use it if you need best quality but is has a noticeable hit on performance)
+				// traa
 
-				denoisePass = denoise( aoPass.getTextureNode(), scenePassDepth, scenePassNormal, camera );
-				blendPassDenoise = denoisePass.mul( scenePassColor );
+				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
 
-				postProcessing.outputNode = blendPassAO;
+				postProcessing.outputNode = traaPass;
 
 				//
 
@@ -158,38 +163,6 @@
 				gui.add( params, 'radius' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
 				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
 				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-				gui.add( params, 'enabled' ).onChange( updatePassChain );
-				const folder = gui.addFolder( 'Denoise settings' );
-				folder.add( params, 'denoiseRadius' ).min( 0.01 ).max( 10 ).name( 'radius' ).onChange( updateParameters );
-				folder.add( params, 'lumaPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
-				folder.add( params, 'depthPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
-				folder.add( params, 'normalPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
-				folder.add( params, 'denoised' ).name( 'enabled' ).onChange( updatePassChain );
-
-			}
-
-			function updatePassChain() {
-
-				if ( params.enabled === true ) {
-
-					if ( params.denoised === true ) {
-
-						postProcessing.outputNode = blendPassDenoise;
-
-					} else {
-
-						postProcessing.outputNode = blendPassAO;
-
-					}
-
-				} else {
-
-					postProcessing.outputNode = scenePassColor;
-
-				}
-
-				postProcessing.needsUpdate = true;
-
 
 			}
 
@@ -200,11 +173,6 @@
 				aoPass.radius.value = params.radius;
 				aoPass.scale.value = params.scale;
 				aoPass.thickness.value = params.thickness;
-
-				denoisePass.radius.value = params.denoiseRadius;
-				denoisePass.lumaPhi.value = params.lumaPhi;
-				denoisePass.depthPhi.value = params.depthPhi;
-				denoisePass.normalPhi.value = params.normalPhi;
 
 			}
 
@@ -223,6 +191,8 @@
 			function animate() {
 
 				controls.update();
+
+				stats.update();
 
 				postProcessing.render();
 

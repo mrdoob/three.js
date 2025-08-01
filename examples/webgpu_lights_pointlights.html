@@ -11,7 +11,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights<br />
 			Walt Disney head by <a href="http://web.archive.org/web/20120903131400/http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a><br />
-			Displacement effect by <a href="https://web.archive.org/web/20210101053445/http://oos.moxiecode.com/js_webgl/stanford_bunny/" target="_blank" rel="noopener">oosmoxiecode</a>
+			Displacement effect by <a href="https://oosmoxiecode.com/archive/js_webgl/stanford_bunny/" target="_blank" rel="noopener">oosmoxiecode</a>
 		</div>
 
 		<script type="importmap">
@@ -27,16 +27,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Timer } from 'three/addons/misc/Timer.js';
 
 			import { abs, attribute, distance, float, max, modelWorldMatrixInverse, positionLocal, sin, time, uniform } from 'three/tsl';
 
 			let camera, scene, timer, renderer, controls;
-			
+
 			let light1, light2;
 
 			init();
@@ -48,7 +47,7 @@
 
 				scene = new THREE.Scene();
 
-				timer = new Timer();
+				timer = new THREE.Timer();
 				timer.connect( document );
 
 				// model
@@ -79,7 +78,7 @@
 				scene.add( light2 );
 
 				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.1 ) );
-			
+
 				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
@@ -129,7 +128,7 @@
 			function createMaterial() {
 
 				const material = new THREE.MeshPhongNodeMaterial();
-			
+
 				const seedAttribute = attribute( 'seed' );
 				const displaceNormalAttribute = attribute( 'displaceNormal' );
 
@@ -153,7 +152,7 @@
 			}
 
 			function createGeometry( geometry ) {
-			
+
 				const positionAttribute = geometry.getAttribute( 'position' );
 
 				const v0 = new THREE.Vector3();
@@ -180,7 +179,7 @@
 					v3.copy( v0 ).add( v1 ).add( v2 ).divideScalar( 3 ); // compute center
 					v3.add( n.copy( plane.normal ).multiplyScalar( - 1 ) ); // displace center inwards
 
-					// generate tetraeder for each triangle
+					// generate tetrahedron for each triangle
 
 					vertices.push( v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z );
 					vertices.push( v3.x, v3.y, v3.z, v1.x, v1.y, v1.z, v0.x, v0.y, v0.z );

@@ -315,6 +315,7 @@
 		"webgpu_compute_points",
 		"webgpu_compute_sort_bitonic",
 		"webgpu_compute_texture",
+		"webgpu_compute_texture_3d",
 		"webgpu_compute_texture_pingpong",
 		"webgpu_compute_water",
 		"webgpu_cubemap_adjustments",
@@ -399,6 +400,7 @@
 		"webgpu_postprocessing_bloom_selective",
 		"webgpu_postprocessing_difference",
 		"webgpu_postprocessing_dof",
+		"webgpu_postprocessing_dof_basic",
 		"webgpu_postprocessing_pixel",
 		"webgpu_postprocessing_fxaa",
 		"webgpu_postprocessing_lensflare",
@@ -473,6 +475,7 @@
 		"webaudio_visualizer"
 	],
 	"webxr": [
+		"webxr_ar_camera_access",
 		"webxr_ar_cones",
 		"webxr_ar_hittest",
 		"webxr_ar_lighting",
