@@ -1,4 +1,4 @@
-import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, Vector3, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
+import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
@@ -54,29 +54,21 @@ class DepthOfFieldNode extends TempNode {
 		this.focusDistanceNode = focusDistanceNode;
 
 		/**
-		 *
+		 * How far an object can be from the focal plane before it goes completely out-of-focus in world units.
 		 *
 		 * @type {Node<float>}
 		 */
 		this.focalLengthNode = focalLengthNode;
 
 		/**
-		 *
+		 * A unitless value for artistic purposes to adjust the size of the bokeh.
 		 *
 		 * @type {Node<float>}
 		 */
 		this.bokehScaleNode = bokehScaleNode;
 
 		/**
-		 *
-		 *
-		 * @private
-		 * @type {UniformNode<vec3>}
-		 */
-		this._focusPointView = uniform( new Vector3() );
-
-		/**
-		 *
+		 * The inverse size of the resolution.
 		 *
 		 * @private
 		 * @type {UniformNode<vec2>}
@@ -507,12 +499,14 @@ class DepthOfFieldNode extends TempNode {
 	dispose() {
 
 		this._CoCRT.dispose();
+		this._CoCBlurredRT.dispose();
 		this._blur64RT.dispose();
 		this._blur16NearRT.dispose();
 		this._blur16FarRT.dispose();
 		this._compositeRT.dispose();
 
 		this._CoCMaterial.dispose();
+		this._CoCBlurredMaterial.dispose();
 		this._blur64Material.dispose();
 		this._blur16Material.dispose();
 		this._compositeMaterial.dispose();
