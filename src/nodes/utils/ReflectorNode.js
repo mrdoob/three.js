@@ -399,7 +399,7 @@ class ReflectorBaseNode extends Node {
 
 		if ( renderTarget === undefined ) {
 
-			renderTarget = new RenderTarget( 0, 0, { type: HalfFloatType, ...( this.generateMipmaps ? {} : { samples: this.samples } ) } );
+			renderTarget = new RenderTarget( 0, 0, { type: HalfFloatType, samples: this.samples } );
 
 			if ( this.generateMipmaps === true ) {
 
