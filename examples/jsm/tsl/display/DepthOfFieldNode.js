@@ -443,8 +443,8 @@ class DepthOfFieldNode extends TempNode {
 			const far = this._blur16FarTextureNode.sample( uvNode );
 			const beauty = this.textureNode.sample( uvNode );
 
-			// TODO: applying the bokeh scale to the near field CoC value introduces blending issues
-			// around edges of fully blurred foreground objects when their are rendered towards
+			// TODO: applying the bokeh scale to the near field CoC value introduces blending
+			// issues around edges of blurred foreground objects when their are rendered above
 			// the background. for now, just apply the bokeh scale to the far field CoC
 
 			const blendNear = min( near.a, 0.5 ).mul( 2 );
