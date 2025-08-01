@@ -123,8 +123,7 @@
 
 				const gridXZ = Fn( ( [ gridSize = float( 1.0 ), dotWidth = float( 0.1 ), lineWidth = float( 0.02 ) ] ) => {
 
-					const worldPos = positionWorld;
-					const coord = worldPos.xz.div( gridSize );
+					const coord = positionWorld.xz.div( gridSize );
 					const grid = fract( coord );
 					
 					// Screen-space derivative for automatic antialiasing
@@ -135,7 +134,7 @@
 					const squareDist = max( abs( grid.x.sub( 0.5 ) ), abs( grid.y.sub( 0.5 ) ) );
 					const dots = smoothstep( dotWidth.add( smoothing ), dotWidth.sub( smoothing ), squareDist );
 					
-					// Create grid lines with derivative-based antialiasing
+					// Create grid lines
 					const lineX = smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), abs( grid.x.sub( 0.5 ) ) );
 					const lineZ = smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), abs( grid.y.sub( 0.5 ) ) );
 					const lines = max( lineX, lineZ );
