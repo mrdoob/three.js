@@ -46,7 +46,7 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 3500 );
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
@@ -98,7 +98,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -140,7 +140,7 @@
 				const gui = new GUI();
 				gui.add( effectController.focusDistance, 'value', 10.0, 3000.0 ).name( 'focus distance' );
 				gui.add( effectController.focalLength, 'value', 50, 750 ).name( 'focal length' );
-				gui.add( effectController.bokehScale, 'value', 1, 10 ).name( 'bokeh scale' );
+				gui.add( effectController.bokehScale, 'value', 1, 20 ).name( 'bokeh scale' );
 
 			}
 

@@ -243,7 +243,7 @@ class DepthOfFieldNode extends TempNode {
 		const halfResX = Math.round( width / 2 );
 		const halfResY = Math.round( height / 2 );
 
-		this._CoCBlurredRT.setSize( width, height );
+		this._CoCBlurredRT.setSize( halfResX, halfResY );
 		this._blur64RT.setSize( halfResX, halfResY );
 		this._blur16NearRT.setSize( halfResX, halfResY );
 		this._blur16FarRT.setSize( halfResX, halfResY );
@@ -443,7 +443,11 @@ class DepthOfFieldNode extends TempNode {
 			const far = this._blur16FarTextureNode.sample( uvNode );
 			const beauty = this.textureNode.sample( uvNode );
 
-			const blendNear = min( this.bokehScaleNode.mul( near.a ), 0.5 ).mul( 2 );
+			// TODO: applying the bokeh scale to the near field CoC value introduces blending issues
+			// around edges of fully blurred foreground objects when their are rendered towards
+			// the background. for now, just apply the bokeh scale to the far field CoC
+
+			const blendNear = min( near.a, 0.5 ).mul( 2 );
 			const blendFar = min( this.bokehScaleNode.mul( far.a ), 0.5 ).mul( 2 );
 
 			const result = vec4( 0, 0, 0, 1 ).toVar();
@@ -465,7 +469,8 @@ class DepthOfFieldNode extends TempNode {
 
 		// Vogel's method, see https://www.shadertoy.com/view/4fBXRG
 		// this approach allows to generate uniformly distributed sample
-		// points in a disc-shaped pattern
+		// points in a disc-shaped pattern. Blurring with these samples
+		// produces a typical optical lens blur
 
 		const GOLDEN_ANGLE = 2.39996323;
 		const SAMPLES = 80;
