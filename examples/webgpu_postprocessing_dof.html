@@ -23,6 +23,7 @@
 			import * as THREE from 'three/webgpu';
 			import { cubeTexture, positionWorld, oscSine, time, pass, uniform } from 'three/tsl';
 			import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -30,12 +31,7 @@
 
 			//
 
-			let camera, scene, renderer, mesh, stats;
-
-			let mouseX = 0, mouseY = 0;
-
-			let windowHalfX = window.innerWidth / 2;
-			let windowHalfY = window.innerHeight / 2;
+			let camera, scene, renderer, mesh, controls, stats;
 
 			let width = window.innerWidth;
 			let height = window.innerHeight;
@@ -125,8 +121,8 @@
 
 				// controls
 
-				renderer.domElement.style.touchAction = 'none';
-				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -144,19 +140,7 @@
 
 			}
 
-			function onPointerMove( event ) {
-
-				if ( event.isPrimary === false ) return;
-
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
-
-			}
-
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				width = window.innerWidth;
 				height = window.innerHeight;
@@ -170,20 +154,11 @@
 
 			function animate() {
 
-				render();
-
-				stats.update();
-
-			}
-
-			function render() {
-
-				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
-
-				camera.lookAt( scene.position );
+				controls.update();
 
 				postProcessing.render();
+
+				stats.update();
 
 			}
 
