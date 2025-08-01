@@ -266,6 +266,7 @@ class WebGPUTextureUtils {
 
 			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
 			msaaTextureDescriptorGPU.sampleCount = samples;
+			msaaTextureDescriptorGPU.mipLevelCount = 1; // See https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/createTexture
 
 			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
 
