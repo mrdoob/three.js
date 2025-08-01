@@ -16,6 +16,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce } from '../../utils.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
  * A backend implementation targeting WebGPU.
@@ -238,14 +239,19 @@ class WebGPUBackend extends Backend {
 
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
-		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
+		const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
 
 		this.context.configure( {
 			device: this.device,
 			format: this.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-			alphaMode: alphaMode
+			alphaMode: alphaMode,
+			toneMapping: {
+				mode: toneMappingMode
+			}
 		} );
+
+		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
 

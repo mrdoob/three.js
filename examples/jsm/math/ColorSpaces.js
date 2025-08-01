@@ -1,4 +1,4 @@
-import { LinearTransfer, Matrix3, SRGBTransfer } from 'three';
+import { LinearTransfer, Matrix3, SRGBTransfer, SRGBColorSpace, ColorManagement } from 'three';
 
 /** @module ColorSpaces */
 
@@ -114,6 +114,24 @@ export const LinearRec2020ColorSpaceImpl = {
 	luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
 };
 
+/**
+ * Extended-sRGB color space.
+ *
+ * @type {string}
+ * @constant
+ */
+export const ExtendedSRGBColorSpace = 'extended-srgb';
+
+/**
+ * Implementation object for the Extended-sRGB color space.
+ *
+ * @type {module:ColorSpaces~ColorSpaceImpl}
+ * @constant
+ */
+export const ExtendedSRGBColorSpaceImpl = {
+	...ColorManagement.spaces[ SRGBColorSpace ],
+	outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace, toneMappingMode: 'extended' }
+};
 
 /**
  * An object holding the color space implementation.
