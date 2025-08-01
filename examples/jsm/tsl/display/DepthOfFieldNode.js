@@ -1,5 +1,6 @@
 import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, Vector3, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix } from 'three/tsl';
+import { gaussianBlur } from './GaussianBlurNode.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 let _rendererState;
@@ -93,6 +94,15 @@ class DepthOfFieldNode extends TempNode {
 		this._CoCRT.textures[ 1 ].name = 'DepthOfField.FarField';
 
 		/**
+		 * The render target used for blurring the near field.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._CoCBlurredRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, format: RedFormat } );
+		this._CoCBlurredRT.texture.name = 'DepthOfField.NearFieldBlurred';
+
+		/**
 		 * The render target used for the first blur pass.
 		 *
 		 * @private
@@ -135,6 +145,14 @@ class DepthOfFieldNode extends TempNode {
 		 * @type {NodeMaterial}
 		 */
 		this._CoCMaterial = new NodeMaterial();
+
+		/**
+		 * The material used for blurring the near field.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._CoCBlurredMaterial = new NodeMaterial();
 
 		/**
 		 * The material used for the 64 tap blur.
@@ -229,6 +247,7 @@ class DepthOfFieldNode extends TempNode {
 		const halfResX = Math.round( width / 2 );
 		const halfResY = Math.round( height / 2 );
 
+		this._CoCBlurredRT.setSize( width, height );
 		this._blur64RT.setSize( halfResX, halfResY );
 		this._blur16NearRT.setSize( halfResX, halfResY );
 		this._blur16FarRT.setSize( halfResX, halfResY );
@@ -272,9 +291,18 @@ class DepthOfFieldNode extends TempNode {
 		renderer.setRenderTarget( this._CoCRT );
 		_quadMesh.render( renderer );
 
-		// blur64 near
+		// blur near field to avoid visible aliased edges when the near field
+		// is blended with the background
 
 		this._CoCTextureNode.value = this._CoCRT.textures[ 0 ];
+
+		_quadMesh.material = this._CoCBlurredMaterial;
+		renderer.setRenderTarget( this._CoCBlurredRT );
+		_quadMesh.render( renderer );
+
+		// blur64 near
+
+		this._CoCTextureNode.value = this._CoCBlurredRT.texture;
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
@@ -344,6 +372,11 @@ class DepthOfFieldNode extends TempNode {
 		this._CoCMaterial.colorNode = CoC().context( builder.getSharedContext() );
 		this._CoCMaterial.outputNode = outputNode;
 		this._CoCMaterial.needsUpdate = true;
+
+		// blurred CoC for near field
+
+		this._CoCBlurredMaterial.colorNode = gaussianBlur( this._CoCTextureNode, 1, 1 );
+		this._CoCBlurredMaterial.needsUpdate = true;
 
 		// bokeh 64 blur pass
 
