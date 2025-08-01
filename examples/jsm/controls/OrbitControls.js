@@ -683,7 +683,7 @@ class OrbitControls extends Controls {
 
 			const prevRadius = this._spherical.radius;
 			this._spherical.radius = this._clampDistance( this._spherical.radius * this._scale );
-			zoomChanged = Math.abs(prevRadius - this._spherical.radius) > _EPS;
+			zoomChanged = Math.abs( prevRadius - this._spherical.radius ) > _EPS;
 
 		}
 
