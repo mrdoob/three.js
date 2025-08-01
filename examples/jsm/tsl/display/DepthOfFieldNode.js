@@ -8,6 +8,10 @@ let _rendererState;
 /**
  * Post processing node for creating depth of field (DOF) effect.
  *
+ * References:
+ * - {@link https://pixelmischiefblog.wordpress.com/2016/11/25/bokeh-depth-of-field/}
+ * - {@link https://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/}
+ *
  * @augments TempNode
  * @three_import import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
  */
@@ -459,7 +463,12 @@ class DepthOfFieldNode extends TempNode {
 
 	_generateKernels() {
 
+		// Vogel's method, see https://www.shadertoy.com/view/4fBXRG
+		// this approach allows to generate uniformly distributed sample
+		// points in a disc-shaped pattern
+
 		const GOLDEN_ANGLE = 2.39996323;
+		const SAMPLES = 80;
 
 		const points64 = [];
 		const points16 = [];
@@ -467,10 +476,10 @@ class DepthOfFieldNode extends TempNode {
 		let idx64 = 0;
 		let idx16 = 0;
 
-		for ( let i = 0; i < 80; i ++ ) {
+		for ( let i = 0; i < SAMPLES; i ++ ) {
 
 			const theta = i * GOLDEN_ANGLE;
-			const r = Math.sqrt( i ) / Math.sqrt( 80 );
+			const r = Math.sqrt( i ) / Math.sqrt( SAMPLES );
 
 			const p = new Vector2( r * Math.cos( theta ), r * Math.sin( theta ) );
 
