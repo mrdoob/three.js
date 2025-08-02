@@ -132,7 +132,7 @@ export default ContextNode;
 export const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength( 1, 2 );
 
 /**
- * TSL function for defining a preferred name for the context value for a given node.
+ * TSL function for defining a name for the context value for a given node.
  *
  * @tsl
  * @function
@@ -140,7 +140,7 @@ export const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength
  * @param {string} name - The name to set.
  * @returns {ContextNode}
  */
-export const setName = ( node, name ) => context( node, { preferredName: name } );
+export const setName = ( node, name ) => context( node, { nodeName: name } );
 
 /**
  * TSL function for defining a label context value for a given node.

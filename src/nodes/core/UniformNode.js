@@ -172,10 +172,10 @@ class UniformNode extends InputNode {
 
 		const sharedNodeType = sharedNode.getInputType( builder );
 
-		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.preferredName );
+		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.nodeName );
 		const uniformName = builder.getPropertyName( nodeUniform );
 
-		if ( builder.context.preferredName !== undefined ) delete builder.context.preferredName;
+		if ( builder.context.nodeName !== undefined ) delete builder.context.nodeName;
 
 		//
 
