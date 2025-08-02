@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '179dev';
+const REVISION = '179';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -21371,14 +21371,6 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		/**
-		 * The flag that indicates whether the camera uses a reversed depth buffer.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.reversedDepth = false;
-
-		/**
 		 * The inverse of the camera's world matrix.
 		 *
 		 * @type {Matrix4}
@@ -21405,6 +21397,20 @@ class Camera extends Object3D {
 		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
 		 */
 		this.coordinateSystem = WebGLCoordinateSystem;
+
+		this._reversedDepth = false;
+
+	}
+
+	/**
+	 * The flag that indicates whether the camera uses a reversed depth buffer.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get reversedDepth() {
+
+		return this._reversedDepth;
 
 	}
 
@@ -26641,7 +26647,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsObject( object ) ) {
@@ -26683,7 +26690,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsSprite( sprite ) ) {
@@ -26725,7 +26733,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsSphere( sphere ) ) {
@@ -26767,7 +26776,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.intersectsBox( box ) ) {
@@ -26809,7 +26819,8 @@ class FrustumArray {
 
 			_frustum$1.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				this.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 			if ( _frustum$1.containsPoint( point ) ) {
@@ -28354,9 +28365,11 @@ class BatchedMesh extends Mesh {
 			_matrix$1
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
+
 			_frustum.setFromProjectionMatrix(
 				_matrix$1,
-				renderer.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 		}
@@ -29374,6 +29387,9 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
  * const video = document.getElementById( 'video' );
  * const texture = new THREE.VideoTexture( video );
  * ```
+ *
+ * Note: When using video textures with {@link WebGPURenderer}, {@link Texture#colorSpace} must be
+ * set to THREE.SRGBColorSpace.
  *
  * Note: After the initial use of a texture, its dimensions, format, and type
  * cannot be changed. Instead, call {@link Texture#dispose} on the texture and instantiate a new one.
@@ -45222,7 +45238,7 @@ class LightShadow {
 		shadowCamera.updateMatrixWorld();
 
 		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1 );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
 		if ( shadowCamera.reversedDepth ) {
 
@@ -45699,7 +45715,7 @@ class PointLightShadow extends LightShadow {
 		shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 	}
 
@@ -69315,7 +69331,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
-		if ( texture.isRenderTargetTexture === false && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isRenderTargetTexture === false && texture.isExternalTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			const image = texture.image;
 
@@ -69333,6 +69349,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				return;
 
 			}
+
+		} else if ( texture.isExternalTexture ) {
+
+			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
 
 		}
 
@@ -71337,6 +71357,48 @@ function WebGLUtils( gl, extensions ) {
 
 }
 
+/**
+ * Represents a texture created externally from the renderer context.
+ *
+ * This may be a texture from a protected media stream, device camera feed,
+ * or other data feeds like a depth sensor.
+ *
+ * Note that this class is only supported in {@link WebGLRenderer} right now.
+ *
+ * @augments Texture
+ */
+class ExternalTexture extends Texture {
+
+	/**
+	 * Creates a new raw texture.
+	 *
+	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
+	 */
+	constructor( sourceTexture = null ) {
+
+		super();
+
+		/**
+		 * The external source texture.
+		 *
+		 * @type {?WebGLTexture}
+		 * @default null
+		 */
+		this.sourceTexture = sourceTexture;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isExternalTexture = true;
+
+	}
+
+}
+
 const _occlusion_vertex = `
 void main() {
 
@@ -71376,9 +71438,9 @@ class WebXRDepthSensing {
 	constructor() {
 
 		/**
-		 * A texture representing the depth of the user's environment.
+		 * An opaque texture representing the depth of the user's environment.
 		 *
-		 * @type {?Texture}
+		 * @type {?ExternalTexture}
 		 */
 		this.texture = null;
 
@@ -71408,18 +71470,14 @@ class WebXRDepthSensing {
 	/**
 	 * Inits the depth sensing module
 	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {XRWebGLDepthInformation} depthData - The XR depth data.
 	 * @param {XRRenderState} renderState - The XR render state.
 	 */
-	init( renderer, depthData, renderState ) {
+	init( depthData, renderState ) {
 
 		if ( this.texture === null ) {
 
-			const texture = new Texture();
-
-			const texProps = renderer.properties.get( texture );
-			texProps.__webglTexture = depthData.texture;
+			const texture = new ExternalTexture( depthData.texture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
@@ -71480,7 +71538,7 @@ class WebXRDepthSensing {
 	/**
 	 * Returns a texture representing the depth of the user's environment.
 	 *
-	 * @return {?Texture} The depth texture.
+	 * @return {?ExternalTexture} The depth texture.
 	 */
 	getDepthTexture() {
 
@@ -71530,6 +71588,7 @@ class WebXRManager extends EventDispatcher {
 		let xrFrame = null;
 
 		const depthSensing = new WebXRDepthSensing();
+		const cameraAccessTextures = {};
 		const attributes = gl.getContextAttributes();
 
 		let initialRenderTarget = null;
@@ -71710,6 +71769,11 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthFar = null;
 
 			depthSensing.reset();
+			for ( const key in cameraAccessTextures ) {
+
+				delete cameraAccessTextures[ key ];
+
+			}
 
 			// restore framebuffer/rendering state
 
@@ -72351,6 +72415,19 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Retrieves an opaque texture from the view-aligned {@link XRCamera}.
+		 * Only available during the current animation loop.
+		 *
+		 * @param {XRCamera} xrCamera - The camera to query.
+		 * @return {?Texture} An opaque texture representing the current raw camera frame.
+		 */
+		this.getCameraTexture = function ( xrCamera ) {
+
+			return cameraAccessTextures[ xrCamera ];
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -72456,7 +72533,42 @@ class WebXRManager extends EventDispatcher {
 
 					if ( depthData && depthData.isValid && depthData.texture ) {
 
-						depthSensing.init( renderer, depthData, session.renderState );
+						depthSensing.init( depthData, session.renderState );
+
+					}
+
+				}
+
+				const cameraAccessEnabled = enabledFeatures &&
+				    enabledFeatures.includes( 'camera-access' );
+
+				if ( cameraAccessEnabled ) {
+
+					renderer.state.unbindTexture();
+
+					if ( glBinding ) {
+
+						for ( let i = 0; i < views.length; i ++ ) {
+
+							const camera = views[ i ].camera;
+
+							if ( camera ) {
+
+								let cameraTex = cameraAccessTextures[ camera ];
+
+								if ( ! cameraTex ) {
+
+									cameraTex = new ExternalTexture();
+									cameraAccessTextures[ camera ] = cameraTex;
+
+								}
+
+								const glTexture = glBinding.getCameraImage( camera );
+								cameraTex.sourceTexture = glTexture;
+
+							}
+
+						}
 
 					}
 
@@ -74983,7 +75095,7 @@ class WebGLRenderer {
 			renderStateStack.push( currentRenderState );
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_frustum.setFromProjectionMatrix( _projScreenMatrix );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
@@ -75810,7 +75922,7 @@ class WebGLRenderer {
 
 				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					camera.reversedDepth = true;
+					camera._reversedDepth = true;
 					camera.updateProjectionMatrix();
 
 				}

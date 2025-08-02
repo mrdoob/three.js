@@ -132,7 +132,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputColorTransform = false;
-				postProcessing.outputNode = colorPass.add( gaussianBlur( maskPass, 1, 10 ).mul( .3 ) ).renderOutput();
+				postProcessing.outputNode = colorPass.add( gaussianBlur( maskPass, 1, 20 ).mul( .3 ) ).renderOutput();
 
 				// controls
 

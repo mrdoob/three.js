@@ -128,7 +128,7 @@ const scaledTime = time.mul( .5 ); // .5 is speed
 const uv0 = uv();
 const animateUv = vec2( uv0.x.add( oscSine( scaledTime ) ), uv0.y );
 
-// label is optional
+// .setName() is optional
 const myMap = texture( samplerTexture, animateUv ).rgb.setName( 'myTexture' );
 const myColor = uniform( new THREE.Color( 0x0066ff ) ).setName( 'myColor' );
 const opacity = .7;
@@ -173,7 +173,7 @@ output = vec4( finalColor, opacity );
 							const AsyncFunction = async function () {}.constructor;
 
 							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
-							const nodes = await ( new AsyncFunction( 'three/webgpu', tslCode )( THREE ) );
+							const nodes = await ( new AsyncFunction( 'THREE', tslCode )( THREE ) );
 
 							mesh.material.fragmentNode = nodes.output;
 							mesh.material.needsUpdate = true;

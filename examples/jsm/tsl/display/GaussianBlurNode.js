@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -26,7 +26,7 @@ class GaussianBlurNode extends TempNode {
 	 * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 	 */
-	constructor( textureNode, directionNode = null, sigma = 2 ) {
+	constructor( textureNode, directionNode = null, sigma = 4 ) {
 
 		super( 'vec4' );
 
@@ -267,8 +267,7 @@ class GaussianBlurNode extends TempNode {
 			const invSize = this._invSize;
 			const direction = directionNode.mul( this._passDirection );
 
-			const weightSum = float( gaussianCoefficients[ 0 ] ).toVar();
-			const diffuseSum = vec4( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
+			const diffuseSum = vec4( sampleTexture( uvNode ).mul( gaussianCoefficients[ 0 ] ) ).toVar();
 
 			for ( let i = 1; i < kernelSize; i ++ ) {
 
@@ -281,11 +280,9 @@ class GaussianBlurNode extends TempNode {
 				const sample2 = sampleTexture( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
-				weightSum.addAssign( mul( 2.0, w ) );
-
 			}
 
-			return output( diffuseSum.div( weightSum ) );
+			return output( diffuseSum );
 
 		} );
 
@@ -328,10 +325,11 @@ class GaussianBlurNode extends TempNode {
 	_getCoefficients( kernelRadius ) {
 
 		const coefficients = [];
+		const sigma = kernelRadius / 3;
 
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
 
 		}
 
