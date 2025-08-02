@@ -463,7 +463,7 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true, forceWebGL: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
