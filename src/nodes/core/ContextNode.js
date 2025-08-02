@@ -132,15 +132,34 @@ export default ContextNode;
 export const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength( 1, 2 );
 
 /**
- * TSL function for defining a label context value for a given node.
+ * TSL function for defining a name for the context value for a given node.
  *
  * @tsl
  * @function
  * @param {Node} node - The node whose context should be modified.
+ * @param {string} name - The name to set.
+ * @returns {ContextNode}
+ */
+export const setName = ( node, name ) => context( node, { nodeName: name } );
+
+/**
+ * TSL function for defining a label context value for a given node.
+ *
+ * @tsl
+ * @function
+ * @deprecated
+ * @param {Node} node - The node whose context should be modified.
  * @param {string} name - The name/label to set.
  * @returns {ContextNode}
  */
-export const label = ( node, name ) => context( node, { label: name } );
+export function label( node, name ) {
+
+	console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+
+	return setName( node, name );
+
+}
 
 addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
+addMethodChaining( 'setName', setName );
