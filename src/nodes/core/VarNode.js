@@ -282,24 +282,3 @@ export const VarIntent = ( node ) => {
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
 addMethodChaining( 'toVarIntent', VarIntent );
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r170. Use `Var( node )` or `node.toVar()` instead.
- *
- * @param {any} node
- * @returns {VarNode}
- */
-export const temp = ( node ) => { // @deprecated, r170
-
-	console.warn( 'TSL: "temp( node )" is deprecated. Use "Var( node )" or "node.toVar()" instead.' );
-
-	return createVar( node );
-
-};
-
-addMethodChaining( 'temp', temp );
-
