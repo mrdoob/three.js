@@ -1,4 +1,4 @@
-import { Fn, vec2, uv, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, max, int, textureSize, nodeObject } from 'three/tsl';
+import { Fn, vec2, uv, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, max, int, textureSize, nodeObject, convertToTexture } from 'three/tsl';
 
 /**
  * Applies a box blur effect to the given texture node.
@@ -24,6 +24,7 @@ import { Fn, vec2, uv, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, max, in
  */
 export const boxBlur = /*#__PURE__*/ Fn( ( [ textureNode, options = {} ] ) => {
 
+	textureNode = convertToTexture( textureNode );
 	const size = nodeObject( options.size ) || int( 1 );
 	const separation = nodeObject( options.separation ) || int( 1 );
 	const premultipliedAlpha = options.premultipliedAlpha || false;
