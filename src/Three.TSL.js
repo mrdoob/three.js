@@ -363,6 +363,7 @@ export const mx_unifiednoise3d = TSL.mx_unifiednoise3d;
 export const mx_worley_noise_float = TSL.mx_worley_noise_float;
 export const mx_worley_noise_vec2 = TSL.mx_worley_noise_vec2;
 export const mx_worley_noise_vec3 = TSL.mx_worley_noise_vec3;
+export const nativeSelect = TSL.nativeSelect;
 export const negate = TSL.negate;
 export const neutralToneMapping = TSL.neutralToneMapping;
 export const nodeArray = TSL.nodeArray;
