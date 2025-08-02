@@ -128,7 +128,7 @@ const scaledTime = time.mul( .5 ); // .5 is speed
 const uv0 = uv();
 const animateUv = vec2( uv0.x.add( oscSine( scaledTime ) ), uv0.y );
 
-// label is optional
+// .setName() is optional
 const myMap = texture( samplerTexture, animateUv ).rgb.setName( 'myTexture' );
 const myColor = uniform( new THREE.Color( 0x0066ff ) ).setName( 'myColor' );
 const opacity = .7;
