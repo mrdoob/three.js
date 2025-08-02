@@ -383,7 +383,7 @@
 
 						} else {
 
-							nextAlgo.assign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).nativeSelect( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ) );
+							nextAlgo.assign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).select( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ).uniformFlow() );
 
 						}
 
@@ -463,7 +463,7 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true, forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 

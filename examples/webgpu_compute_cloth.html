@@ -71,7 +71,7 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.NeutralToneMapping;
@@ -106,11 +106,19 @@
 				gui.add( params, 'wind', 0, 5, 0.1 );
 
 				const materialFolder = gui.addFolder( 'material' );
-				materialFolder.addColor( API, 'color' ).onChange( function ( color ) { clothMaterial.color.setHex( color ); } );
+				materialFolder.addColor( API, 'color' ).onChange( function ( color ) {
+
+		clothMaterial.color.setHex( color );
+
+	} );
 				materialFolder.add( clothMaterial, 'roughness', 0.0, 1, 0.01 );
 				materialFolder.add( clothMaterial, 'sheen', 0.0, 1, 0.01 );
 				materialFolder.add( clothMaterial, 'sheenRoughness', 0.0, 1, 0.01 );
-				materialFolder.addColor( API, 'sheenColor' ).onChange( function ( color ) { clothMaterial.sheenColor.setHex( color ); } );
+				materialFolder.addColor( API, 'sheenColor' ).onChange( function ( color ) {
+
+		clothMaterial.sheenColor.setHex( color );
+
+	} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -340,7 +348,7 @@
 						const springId = springListBuffer.element( i ).toVar( 'springId' );
 						const springForce = springForceBuffer.element( springId );
 						const springVertexIds = springVertexIdBuffer.element( springId );
-						const factor = select( springVertexIds.x.equal( instanceIndex ), 1.0, - 1.0 );
+						const factor = select( springVertexIds.x.equal( instanceIndex ), 1.0, - 1.0 ).uniformFlow();
 						force.addAssign( springForce.mul( factor ) );
 
 					} );
@@ -386,7 +394,7 @@
 				springWireframeMaterial.positionNode = Fn( () => {
 
 					const vertexIds = springVertexIdBuffer.element( instanceIndex );
-					const vertexId = select( attribute( 'vertexIndex' ).equal( 0 ), vertexIds.x, vertexIds.y );
+					const vertexId = select( attribute( 'vertexIndex' ).equal( 0 ), vertexIds.x, vertexIds.y ).uniformFlow();
 					return vertexPositionBuffer.element( vertexId );
 
 				} )();

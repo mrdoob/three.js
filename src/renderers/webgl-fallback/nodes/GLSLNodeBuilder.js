@@ -135,6 +135,20 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a ternary operation.
+	 *
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( condSnippet, ifSnippet, elseSnippet ) {
+
+		return `${condSnippet} ? ${ifSnippet} : ${elseSnippet}`;
+
+	}
+
+	/**
 	 * Returns the output struct name. Not relevant for GLSL.
 	 *
 	 * @return {string}

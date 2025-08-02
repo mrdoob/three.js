@@ -30,7 +30,7 @@
 			import Stats from 'stats-gl';
 
 
-			import { Fn, uniform, instancedArray, float, vec2, vec3, color, instanceIndex } from 'three/tsl';
+			import { Fn, uniform, instancedArray, float, vec2, color, instanceIndex } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -68,15 +68,15 @@
 
 					const position = particle.add( velocity ).toVar();
 
-					velocity.x = position.x.abs().greaterThanEqual( limit.x ).select( velocity.x.negate(), velocity.x );
-					velocity.y = position.y.abs().greaterThanEqual( limit.y ).select( velocity.y.negate(), velocity.y );
+					velocity.x = position.x.abs().greaterThanEqual( limit.x ).select( velocity.x.negate(), velocity.x ).uniformFlow();
+					velocity.y = position.y.abs().greaterThanEqual( limit.y ).select( velocity.y.negate(), velocity.y ).uniformFlow();
 
 					position.assign( position.min( limit ).max( limit.negate() ) );
 
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec3(), position ) );
+					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec2(), position ).uniformFlow() );
 
 				} );
 
