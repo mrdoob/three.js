@@ -4685,10 +4685,10 @@ class UniformNode extends InputNode {
 
 		const sharedNodeType = sharedNode.getInputType( builder );
 
-		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.label );
+		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.nodeName );
 		const uniformName = builder.getPropertyName( nodeUniform );
 
-		if ( builder.context.label !== undefined ) delete builder.context.label;
+		if ( builder.context.nodeName !== undefined ) delete builder.context.nodeName;
 
 		//
 
@@ -7501,18 +7501,37 @@ class ContextNode extends Node {
 const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength( 1, 2 );
 
 /**
- * TSL function for defining a label context value for a given node.
+ * TSL function for defining a name for the context value for a given node.
  *
  * @tsl
  * @function
  * @param {Node} node - The node whose context should be modified.
+ * @param {string} name - The name to set.
+ * @returns {ContextNode}
+ */
+const setName = ( node, name ) => context( node, { nodeName: name } );
+
+/**
+ * TSL function for defining a label context value for a given node.
+ *
+ * @tsl
+ * @function
+ * @deprecated
+ * @param {Node} node - The node whose context should be modified.
  * @param {string} name - The name/label to set.
  * @returns {ContextNode}
  */
-const label = ( node, name ) => context( node, { label: name } );
+function label( node, name ) {
+
+	console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+
+	return setName( node, name );
+
+}
 
 addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
+addMethodChaining( 'setName', setName );
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -13243,7 +13262,7 @@ class ReferenceNode extends Node {
 
 		}
 
-		if ( this.name !== null ) node.label( this.name );
+		if ( this.name !== null ) node.setName( this.name );
 
 		this.node = node.getSelf();
 
@@ -43295,6 +43314,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	scriptableValue: scriptableValue,
 	select: select,
 	setCurrentStack: setCurrentStack,
+	setName: setName,
 	shaderStages: shaderStages,
 	shadow: shadow,
 	shadowPositionWorld: shadowPositionWorld,
@@ -56606,7 +56626,7 @@ ${ flowData.code }
 			attribute.pboNode = pbo;
 			attribute.pbo = pbo.value;
 
-			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.nodeName );
 
 		}
 
@@ -56650,7 +56670,7 @@ ${ flowData.code }
 
 		}
 
-		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.nodeName );
 		const textureName = this.getPropertyName( nodeUniform );
 
 		this.increaseUsage( indexNode ); // force cache generate to be used as index in x,y
