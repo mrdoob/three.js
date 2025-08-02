@@ -371,7 +371,7 @@ class DepthOfFieldNode extends TempNode {
 
 		// blurred CoC for near field
 
-		this._CoCBlurredMaterial.colorNode = gaussianBlur( this._CoCTextureNode, 1, 1 );
+		this._CoCBlurredMaterial.colorNode = gaussianBlur( this._CoCTextureNode, 1, 2 );
 		this._CoCBlurredMaterial.needsUpdate = true;
 
 		// bokeh 64 blur pass
