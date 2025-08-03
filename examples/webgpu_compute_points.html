@@ -68,15 +68,15 @@
 
 					const position = particle.add( velocity ).toVar();
 
-					velocity.x = position.x.abs().greaterThanEqual( limit.x ).select( velocity.x.negate(), velocity.x ).uniformFlow();
-					velocity.y = position.y.abs().greaterThanEqual( limit.y ).select( velocity.y.negate(), velocity.y ).uniformFlow();
+					velocity.x = position.x.abs().greaterThanEqual( limit.x ).select( velocity.x.negate(), velocity.x );
+					velocity.y = position.y.abs().greaterThanEqual( limit.y ).select( velocity.y.negate(), velocity.y );
 
 					position.assign( position.min( limit ).max( limit.negate() ) );
 
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec2(), position ).uniformFlow() );
+					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec2(), position ) );
 
 				} );
 

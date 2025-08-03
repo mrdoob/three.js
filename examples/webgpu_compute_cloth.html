@@ -348,7 +348,7 @@
 						const springId = springListBuffer.element( i ).toVar( 'springId' );
 						const springForce = springForceBuffer.element( springId );
 						const springVertexIds = springVertexIdBuffer.element( springId );
-						const factor = select( springVertexIds.x.equal( instanceIndex ), 1.0, - 1.0 ).uniformFlow();
+						const factor = select( springVertexIds.x.equal( instanceIndex ), 1.0, - 1.0 );
 						force.addAssign( springForce.mul( factor ) );
 
 					} );
@@ -394,7 +394,7 @@
 				springWireframeMaterial.positionNode = Fn( () => {
 
 					const vertexIds = springVertexIdBuffer.element( instanceIndex );
-					const vertexId = select( attribute( 'vertexIndex' ).equal( 0 ), vertexIds.x, vertexIds.y ).uniformFlow();
+					const vertexId = select( attribute( 'vertexIndex' ).equal( 0 ), vertexIds.x, vertexIds.y );
 					return vertexPositionBuffer.element( vertexId );
 
 				} )();
