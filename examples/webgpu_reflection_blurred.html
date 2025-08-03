@@ -138,7 +138,7 @@
 					const radiusRange = mix( 0.01, 0.1, radius ); // range [ 0.01, 0.1 ]
 					const roughnessRange = mix( 0.3, 0.03, roughness ); // range [ 0.03, 0.3 ]
 
-					// blur the reflection
+					// mask the sample
 
 					const maskReflection = sample( ( uv ) => {
 
@@ -148,6 +148,8 @@
 						return vec4( sample.rgb, sample.a.mul( mask.r ) );
 
 					}, reflection.uvNode );
+
+					// blur the reflection
 
 					const reflectionBlurred = hashBlur( maskReflection, radiusRange, {
 						repeats: 40,
