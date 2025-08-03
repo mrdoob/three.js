@@ -25,8 +25,10 @@ class GaussianBlurNode extends TempNode {
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
 	 * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+	 * @param {Object} [options={}] - Additional options for the gaussian blur effect.
+	 * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
 	 */
-	constructor( textureNode, directionNode = null, sigma = 4 ) {
+	constructor( textureNode, directionNode = null, sigma = 4, options = {} ) {
 
 		super( 'vec4' );
 
@@ -119,32 +121,7 @@ class GaussianBlurNode extends TempNode {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.premultipliedAlpha = false;
-
-	}
-
-	/**
-	 * Sets the given premultiplied alpha value.
-	 *
-	 * @param {boolean} value - Whether the effect should use premultiplied alpha or not.
-	 * @return {GaussianBlurNode} height - A reference to this node.
-	 */
-	setPremultipliedAlpha( value ) {
-
-		this.premultipliedAlpha = value;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the premultiplied alpha value.
-	 *
-	 * @return {boolean} Whether the effect should use premultiplied alpha or not.
-	 */
-	getPremultipliedAlpha() {
-
-		return this.premultipliedAlpha;
+		this.premultipliedAlpha = options.premultipliedAlpha || false;
 
 	}
 
@@ -280,6 +257,7 @@ class GaussianBlurNode extends TempNode {
 				const sample2 = sampleTexture( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
+
 			}
 
 			return output( diffuseSum );
@@ -349,18 +327,27 @@ export default GaussianBlurNode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+ * @param {Object} [options={}] - Additional options for the gaussian blur effect.
+ * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
  * @returns {GaussianBlurNode}
  */
-export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
+export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options ) );
 
 /**
  * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.
  *
  * @tsl
  * @function
+ * @deprecated  since r180. Use `gaussianBlur()` with `premultipliedAlpha: true` option instead.
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @returns {GaussianBlurNode}
  */
-export const premultipliedGaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ).setPremultipliedAlpha( true ) );
+export function premultipliedGaussianBlur( node, directionNode, sigma ) {
+
+	console.warn( 'THREE.TSL: "premultipliedGaussianBlur()" is deprecated. Use "gaussianBlur()" with "premultipliedAlpha: true" option instead.' ); // deprecated, r180
+
+	return gaussianBlur( node, directionNode, sigma, { premultipliedAlpha: true } );
+
+}
