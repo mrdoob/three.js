@@ -17,7 +17,7 @@ import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4, premultiplyAl
 export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), options = {} ] ) => {
 
 	textureNode = convertToTexture( textureNode );
-	bluramount = nodeObject( bluramount );
+
 	const repeats = nodeObject( options.size ) || float( 45 );
 	const mask = options.mask || null;
 	const premultipliedAlpha = options.premultipliedAlpha || false;
