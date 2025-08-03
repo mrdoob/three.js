@@ -26,9 +26,10 @@ import { Fn, vec2, uv, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, max, in
 export const boxBlur = /*#__PURE__*/ Fn( ( [ textureNode, options = {} ] ) => {
 
 	textureNode = convertToTexture( textureNode );
+
 	const size = nodeObject( options.size ) || int( 1 );
 	const separation = nodeObject( options.separation ) || int( 1 );
-	const mask = options.mask || null;
+	const mask = options.mask ? convertToTexture( options.mask ) : null;
 	const premultipliedAlpha = options.premultipliedAlpha || false;
 
 	const tap = ( uv ) => {

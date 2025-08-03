@@ -19,7 +19,7 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 	textureNode = convertToTexture( textureNode );
 
 	const repeats = nodeObject( options.size ) || float( 45 );
-	const mask = options.mask || null;
+	const mask = options.mask ? convertToTexture( options.mask ) : null;
 	const premultipliedAlpha = options.premultipliedAlpha || false;
 
 	const draw = ( uv ) => {
