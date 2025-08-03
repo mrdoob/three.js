@@ -407,25 +407,57 @@ class ShaderCallNodeInternal extends Node {
 				let index = 0;
 
 				inputs = new Proxy( inputs, {
+
 					get: ( target, property, receiver ) => {
+
+						let value;
 
 						if ( target[ property ] === undefined ) {
 
-							return target[ index ++ ];
+							value = target[ index ++ ];
 
 						} else {
 
-							return Reflect.get( target, property, receiver );
+							value = Reflect.get( target, property, receiver );
 
 						}
 
+						return value;
+
 					}
+
 				} );
 
 			}
 
+			const secureNodeBuilder = new Proxy( builder, {
+
+				get: ( target, property, receiver ) => {
+
+					let value;
+
+					if ( Symbol.iterator === property ) {
+
+						value = function* () {
+
+							yield undefined;
+
+						};
+
+					} else {
+
+						value = Reflect.get( target, property, receiver );
+
+					}
+
+					return value;
+
+				}
+
+			} );
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], builder ) : jsFunc( builder );
+			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], secureNodeBuilder ) : jsFunc( secureNodeBuilder );
 
 			result = nodeObject( outputNode );
 
@@ -611,6 +643,18 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
+		for ( const param of params ) {
+
+			if ( param === undefined ) {
+
+				console.error( `THREE.TSL: Invalid parameter "${ param }" for type "${ type }".` );
+
+				return nodeObject( new ConstNode( 0, type ) );
+
+			}
+
+		}
+
 		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
 
 			const paramType = typeof param;
@@ -792,7 +836,7 @@ class FnNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		console.warn( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+		console.error( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
 
 		return builder.generateConst( type );
 

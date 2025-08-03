@@ -765,6 +765,16 @@ class Node extends EventDispatcher {
 
 			}
 
+			if ( result === '' && output !== null && output !== 'void' ) {
+
+				// if no snippet is generated, return a default value
+
+				console.error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
+
+				result = builder.generateConst( output );
+
+			}
+
 		}
 
 		builder.removeChain( this );

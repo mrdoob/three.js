@@ -1144,7 +1144,6 @@ class NodeBuilder {
 
 	}
 
-
 	/**
 	 * Generates the shader string for the given type and value.
 	 *
@@ -2922,11 +2921,6 @@ class NodeBuilder {
 		return `// Three.js r${ REVISION } - Node System\n`;
 
 	}
-
-	/**
-	 * Prevents the node builder from being used as an iterable in TSL.Fn(), avoiding potential runtime errors.
-	 */
-	*[ Symbol.iterator ]() { }
 
 }
 
