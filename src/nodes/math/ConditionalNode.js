@@ -112,7 +112,7 @@ class ConditionalNode extends Node {
 
 		//
 
-		const isUniformFlow = builder.context.UniformFlow;
+		const isUniformFlow = builder.context.uniformFlow;
 
 		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
