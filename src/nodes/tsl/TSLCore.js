@@ -647,7 +647,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( param === undefined ) {
 
-				console.error( `THREE.TSL: Invalid parameter "${ param }" for type "${ type }".` );
+				console.error( `THREE.TSL: Invalid parameter for the type "${ type }".` );
 
 				return nodeObject( new ConstNode( 0, type ) );
 
