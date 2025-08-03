@@ -112,19 +112,10 @@ class AssignNode extends TempNode {
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
-		const targetType = targetNode.getNodeType( builder );
 		const target = targetNode.build( builder );
+		const targetType = targetNode.getNodeType( builder );
 
-		let source = sourceNode.build( builder, targetType );
-
-		if ( source === '' ) {
-
-			console.error( `THREE.TSL: Invalid node using in "${ target }" assignment.` );
-
-			source = builder.generateConst( targetType );
-
-		}
-
+		const source = sourceNode.build( builder, targetType );
 		const sourceType = sourceNode.getNodeType( builder );
 
 		const nodeData = builder.getDataFromNode( this );
