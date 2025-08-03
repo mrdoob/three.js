@@ -3732,7 +3732,13 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
+
+			const paramType = typeof param;
+
+			return paramType !== 'object' && paramType !== 'function';
+
+		} ) ) ) {
 
 			params = [ getValueFromType( type, ...params ) ];
 
@@ -3785,88 +3791,53 @@ const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} 
 
 let fnId = 0;
 
-const Fn = ( jsFunc, layout = null ) => {
+class FnNode extends Node {
 
-	let nodeType = null;
+	constructor( jsFunc, layout = null ) {
 
-	if ( layout !== null ) {
+		super();
 
-		if ( typeof layout === 'object' ) {
+		let nodeType = null;
 
-			nodeType = layout.return;
+		if ( layout !== null ) {
 
-		} else {
+			if ( typeof layout === 'object' ) {
 
-			if ( typeof layout === 'string' ) {
-
-				nodeType = layout;
+				nodeType = layout.return;
 
 			} else {
 
-				console.error( 'THREE.TSL: Invalid layout type.' );
+				if ( typeof layout === 'string' ) {
+
+					nodeType = layout;
+
+				} else {
+
+					console.error( 'THREE.TSL: Invalid layout type.' );
+
+				}
+
+				layout = null;
 
 			}
 
-			layout = null;
+		}
+
+		this.shaderNode = new ShaderNode( jsFunc, nodeType );
+
+		if ( layout !== null ) {
+
+			this.setLayout( layout );
 
 		}
+
+		this.isFn = true;
 
 	}
 
-	const shaderNode = new ShaderNode( jsFunc, nodeType );
+	setLayout( layout ) {
 
-	const fn = ( ...params ) => {
-
-		let inputs;
-
-		nodeObjects( params );
-
-		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-		if ( isArrayAsParameter ) {
-
-			inputs = [ ...params ];
-
-		} else {
-
-			inputs = params[ 0 ];
-
-		}
-
-		const fnCall = shaderNode.call( inputs );
-
-		if ( nodeType === 'void' ) fnCall.toStack();
-
-		return fnCall.toVarIntent();
-
-	};
-
-	fn.shaderNode = shaderNode;
-	fn.id = shaderNode.id;
-
-	fn.isFn = true;
-
-	fn.getNodeType = ( ...params ) => shaderNode.getNodeType( ...params );
-	fn.getCacheKey = ( ...params ) => shaderNode.getCacheKey( ...params );
-
-	fn.setLayout = ( layout ) => {
-
-		shaderNode.setLayout( layout );
-
-		return fn;
-
-	};
-
-	fn.once = ( subBuilds = null ) => {
-
-		shaderNode.once = true;
-		shaderNode.subBuilds = subBuilds;
-
-		return fn;
-
-	};
-
-	if ( layout !== null ) {
+		const nodeType = this.shaderNode.nodeType;
 
 		if ( typeof layout.inputs !== 'object' ) {
 
@@ -3891,13 +3862,92 @@ const Fn = ( jsFunc, layout = null ) => {
 
 		}
 
-		fn.setLayout( layout );
+		this.shaderNode.setLayout( layout );
+
+		return this;
 
 	}
 
-	return fn;
+	getNodeType( builder ) {
 
-};
+		return this.shaderNode.getNodeType( builder ) || 'float';
+
+	}
+
+	call( ...params ) {
+
+		let inputs;
+
+		nodeObjects( params );
+
+		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+		if ( isArrayAsParameter ) {
+
+			inputs = [ ...params ];
+
+		} else {
+
+			inputs = params[ 0 ];
+
+		}
+
+		const fnCall = this.shaderNode.call( inputs );
+
+		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
+
+		return fnCall.toVarIntent();
+
+	}
+
+	once( subBuilds = null ) {
+
+		this.shaderNode.once = true;
+		this.shaderNode.subBuilds = subBuilds;
+
+		return this;
+
+	}
+
+	generate( builder ) {
+
+		const type = this.getNodeType( builder );
+
+		console.warn( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+
+		return builder.generateConst( type );
+
+	}
+
+}
+
+function Fn( jsFunc, layout = null ) {
+
+	const instance = new FnNode( jsFunc, layout );
+
+	return new Proxy( () => {}, {
+
+		apply( target, thisArg, params ) {
+
+			return instance.call( ...params );
+
+		},
+
+		get( target, prop, receiver ) {
+
+			return Reflect.get( instance, prop, receiver );
+
+		},
+
+		set( target, prop, value, receiver ) {
+
+			return Reflect.set( instance, prop, value, receiver );
+
+		}
+
+	} );
+
+}
 
 //
 
@@ -7812,26 +7862,6 @@ const VarIntent = ( node ) => {
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
 addMethodChaining( 'toVarIntent', VarIntent );
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r170. Use `Var( node )` or `node.toVar()` instead.
- *
- * @param {any} node
- * @returns {VarNode}
- */
-const temp = ( node ) => { // @deprecated, r170
-
-	console.warn( 'TSL: "temp( node )" is deprecated. Use "Var( node )" or "node.toVar()" instead.' );
-
-	return createVar( node );
-
-};
-
-addMethodChaining( 'temp', temp );
 
 /**
  * This node is used to build a sub-build in the node system.
@@ -31995,53 +32025,6 @@ const deltaTime = /*@__PURE__*/ uniform( 0 ).setGroup( renderGroup ).onRenderUpd
  */
 const frameId = /*@__PURE__*/ uniform( 0, 'uint' ).setGroup( renderGroup ).onRenderUpdate( ( frame ) => frame.frameId );
 
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r170. Use {@link time} instead.
- *
- * @param {number} [timeScale=1] - The time scale.
- * @returns {UniformNode<float>}
- */
-const timerLocal = ( timeScale = 1 ) => { // @deprecated, r170
-
-	console.warn( 'TSL: timerLocal() is deprecated. Use "time" instead.' );
-	return time.mul( timeScale );
-
-};
-
-/**
- * @tsl
- * @function
- * @deprecated since r170. Use {@link time} instead.
- *
- * @param {number} [timeScale=1] - The time scale.
- * @returns {UniformNode<float>}
- */
-const timerGlobal = ( timeScale = 1 ) => { // @deprecated, r170
-
-	console.warn( 'TSL: timerGlobal() is deprecated. Use "time" instead.' );
-	return time.mul( timeScale );
-
-};
-
-/**
- * @tsl
- * @function
- * @deprecated since r170. Use {@link deltaTime} instead.
- *
- * @param {number} [timeScale=1] - The time scale.
- * @returns {UniformNode<float>}
- */
-const timerDelta = ( timeScale = 1 ) => { // @deprecated, r170
-
-	console.warn( 'TSL: timerDelta() is deprecated. Use "deltaTime" instead.' );
-	return deltaTime.mul( timeScale );
-
-};
-
 /**
  * Generates a sine wave oscillation based on a timer.
  *
@@ -32396,6 +32379,7 @@ class ReflectorNode extends TextureNode {
 	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
 	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
 	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
 	 * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
 	 * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
 	 */
@@ -32539,6 +32523,7 @@ class ReflectorBaseNode extends Node {
 	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
 	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
 	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+	 * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
 	 */
 	constructor( textureNode, parameters = {} ) {
 
@@ -32549,7 +32534,8 @@ class ReflectorBaseNode extends Node {
 			resolution = 1,
 			generateMipmaps = false,
 			bounces = true,
-			depth = false
+			depth = false,
+			samples = 0
 		} = parameters;
 
 		/**
@@ -32598,6 +32584,14 @@ class ReflectorBaseNode extends Node {
 		 * @default {false}
 		 */
 		this.depth = depth;
+
+		/**
+		 * The number of anti-aliasing samples for the render-target
+		 *
+		 * @type {number}
+		 * @default {0}
+		 */
+		this.samples = samples;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` when {@link ReflectorBaseNode#bounces}
@@ -32719,7 +32713,7 @@ class ReflectorBaseNode extends Node {
 
 		if ( renderTarget === undefined ) {
 
-			renderTarget = new RenderTarget( 0, 0, { type: HalfFloatType } );
+			renderTarget = new RenderTarget( 0, 0, { type: HalfFloatType, samples: this.samples } );
 
 			if ( this.generateMipmaps === true ) {
 
@@ -32901,6 +32895,7 @@ class ReflectorBaseNode extends Node {
  * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
  * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
  * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
+ * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
  * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
  * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
  * @returns {ReflectorNode}
@@ -43355,7 +43350,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	tangentLocal: tangentLocal,
 	tangentView: tangentView,
 	tangentWorld: tangentWorld,
-	temp: temp,
 	texture: texture,
 	texture3D: texture3D,
 	textureBarrier: textureBarrier,
@@ -43367,9 +43361,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	textureStore: textureStore,
 	thickness: thickness,
 	time: time,
-	timerDelta: timerDelta,
-	timerGlobal: timerGlobal,
-	timerLocal: timerLocal,
 	toneMapping: toneMapping,
 	toneMappingExposure: toneMappingExposure,
 	toonOutlinePass: toonOutlinePass,
@@ -65806,6 +65797,7 @@ class WebGPUTextureUtils {
 
 			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
 			msaaTextureDescriptorGPU.sampleCount = samples;
+			msaaTextureDescriptorGPU.mipLevelCount = 1; // See https://www.w3.org/TR/webgpu/#texture-creation
 
 			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
 

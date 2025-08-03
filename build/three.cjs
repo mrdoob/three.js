@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '179';
+const REVISION = '180dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -76834,15 +76834,6 @@ class WebGLRenderer {
 			}
 
 			state.unbindTexture();
-
-		};
-
-		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
-
-			// @deprecated, r170
-			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
-
-			return this.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 		};
 
