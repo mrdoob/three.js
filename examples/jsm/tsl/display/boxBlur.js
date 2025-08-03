@@ -19,6 +19,7 @@ import { Fn, vec2, uv, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, max, in
  * @param {Object} [options={}] - Additional options for the hash blur effect.
  * @param {Node<int>} [options.size=int(1)] - Controls the blur's kernel. For performant results, the range should within [1, 3].
  * @param {Node<int>} [options.separation=int(1)] - Spreads out the blur without having to sample additional fragments. Ranges from [1, Infinity].
+ * @param {Node<vec4>} [options.mask=null] - A mask node to control the alpha blending of the blur.
  * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
  * @return {Node<vec4>} The blurred texture node.
  */
@@ -27,11 +28,21 @@ export const boxBlur = /*#__PURE__*/ Fn( ( [ textureNode, options = {} ] ) => {
 	textureNode = convertToTexture( textureNode );
 	const size = nodeObject( options.size ) || int( 1 );
 	const separation = nodeObject( options.separation ) || int( 1 );
+	const mask = options.mask || null;
 	const premultipliedAlpha = options.premultipliedAlpha || false;
 
 	const tap = ( uv ) => {
 
-		const sample = textureNode.sample( uv );
+		let sample = textureNode.sample( uv );
+
+		if ( mask !== null ) {
+
+			const alpha = mask.sample( uv ).x;
+
+			sample = vec4( sample.rgb, sample.a.mul( alpha ) );
+
+		}
+
 		return premultipliedAlpha ? premultiplyAlpha( sample ) : sample;
 
 	};
