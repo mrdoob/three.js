@@ -27,6 +27,7 @@ class GaussianBlurNode extends TempNode {
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 	 * @param {Object} [options={}] - Additional options for the gaussian blur effect.
 	 * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
+	 * @param {Vector2} [options.resolution=new Vector2(1, 1)] - The resolution of the effect. 0.5 means half the resolution of the texture node.
 	 */
 	constructor( textureNode, directionNode = null, sigma = 4, options = {} ) {
 
@@ -112,7 +113,7 @@ class GaussianBlurNode extends TempNode {
 		 * @type {Vector2}
 		 * @default (1,1)
 		 */
-		this.resolution = new Vector2( 1, 1 );
+		this.resolution = options.resolution || new Vector2( 1, 1 );
 
 		/**
 		 * Whether the effect should use premultiplied alpha or not. Set this to `true`
@@ -329,6 +330,7 @@ export default GaussianBlurNode;
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @param {Object} [options={}] - Additional options for the gaussian blur effect.
  * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
+ * @param {Vector2} [options.resolution=new Vector2(1, 1)] - The resolution of the effect. 0.5 means half the resolution of the texture node.
  * @returns {GaussianBlurNode}
  */
 export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options ) );
