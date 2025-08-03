@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, vec4, fract, abs, uniform, pow, color, max, length, rangeFogFactor, sub, reflector, normalWorld, hue, time, mix, positionWorld } from 'three/tsl';
+			import { Fn, vec4, fract, sample, abs, uniform, pow, color, max, length, rangeFogFactor, sub, reflector, normalWorld, hue, time, mix, positionWorld } from 'three/tsl';
 
 			import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
 
@@ -140,9 +140,17 @@
 
 					// blur the reflection
 
-					const reflectionBlurred = hashBlur( reflection, radiusRange, {
+					const maskReflection = sample( ( uv ) => {
+
+						const sample = reflection.sample( uv );
+						const mask = reflectionDepth.sample( uv );
+
+						return vec4( sample.rgb, sample.a.mul( mask.r ) );
+
+					}, reflection.uvNode );
+
+					const reflectionBlurred = hashBlur( maskReflection, radiusRange, {
 						repeats: 40,
-						mask: reflectionDepth,
 						premultipliedAlpha: true
 					} );
 
