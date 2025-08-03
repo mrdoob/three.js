@@ -3,6 +3,13 @@ import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4, premultiplyAl
 /**
  * Applies a hash blur effect to the given texture node.
  *
+ * The approach of this blur is different compared to Gaussian and box blur since
+ * it does not rely on a kernel to apply a convolution. Instead, it reads the base
+ * texture multiple times in a random pattern and then averages the samples. A
+ * typical artifact of this technique is a slightly noisy appearance of the blur which
+ * can be mitigated by increasing the number of iterations (see `repeats` parameter).
+ * Compared to Gaussian blur, hash blur requires just a single pass.
+ *
  * Reference: {@link https://www.shadertoy.com/view/4lXXWn}.
  *
  * @function
