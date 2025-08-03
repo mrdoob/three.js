@@ -765,7 +765,7 @@ class Node extends EventDispatcher {
 
 			}
 
-			if ( result === '' && output !== null && output !== 'void' ) {
+			if ( result === '' && output !== null && output !== 'void' && output !== 'OutputType' ) {
 
 				// if no snippet is generated, return a default value
 
