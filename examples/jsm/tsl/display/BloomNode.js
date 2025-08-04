@@ -366,7 +366,7 @@ class BloomNode extends TempNode {
 
 		// These sizes have been changed to account for the altered coefficents-calculation to avoid blockiness,
 		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
-		const kernelSizeArray = [ 6, 10, 14, 18, 22 ]; 
+		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
@@ -480,7 +480,7 @@ class BloomNode extends TempNode {
 				const uvOffset = direction.mul( invSize ).mul( x );
 				const sample1 = sampleTexel( uvNode.add( uvOffset ) ).rgb;
 				const sample2 = sampleTexel( uvNode.sub( uvOffset ) ).rgb;
-				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );		
+				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
 
 			} );
 
