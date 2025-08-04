@@ -1909,7 +1909,7 @@ ${ flowData.code }
 	 */
 	getTernary( condSnippet, ifSnippet, elseSnippet ) {
 
-		return `select(${elseSnippet}, ${ifSnippet}, ${condSnippet})`;
+		return `select( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
 
 	}
 
