@@ -30,7 +30,7 @@
 			import Stats from 'stats-gl';
 
 
-			import { Fn, uniform, instancedArray, float, vec2, vec3, color, instanceIndex } from 'three/tsl';
+			import { Fn, uniform, instancedArray, float, vec2, color, instanceIndex } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -76,7 +76,7 @@
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec3(), position ) );
+					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec2(), position ) );
 
 				} );
 

@@ -547,6 +547,7 @@ export const uniform = TSL.uniform;
 export const uniformArray = TSL.uniformArray;
 export const uniformCubeTexture = TSL.uniformCubeTexture;
 export const uniformGroup = TSL.uniformGroup;
+export const uniformFlow = TSL.uniformFlow;
 export const uniformTexture = TSL.uniformTexture;
 export const unpremultiplyAlpha = TSL.unpremultiplyAlpha;
 export const userData = TSL.userData;
