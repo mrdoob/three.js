@@ -183,8 +183,7 @@ class ConditionalNode extends Node {
 
 		}
 
-		builder.addLineFlowCode( ifSnippet, ifNode );
-		builder.removeFlowTab().addFlowCode( '\n\n' + builder.tab + '}' );
+		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
 
 		if ( elseNode !== null ) {
 
@@ -214,8 +213,7 @@ class ConditionalNode extends Node {
 
 			}
 
-			builder.addLineFlowCode( elseSnippet, elseNode );
-			builder.removeFlowTab().addFlowCode( '\n\n' + builder.tab + '}\n\n' );
+			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}\n\n' );
 
 		} else {
 
