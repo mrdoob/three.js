@@ -1246,7 +1246,7 @@ class ThreeMFLoader extends Loader {
 						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) );
 						break;
 
-					case 'default':
+					case 'default' || undefined:
 						meshes.push( buildDefaultMesh( meshData ) );
 						break;
 
