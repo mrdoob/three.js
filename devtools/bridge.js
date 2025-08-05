@@ -455,12 +455,19 @@
 
 		}
 
-		function scrollToCanvas( rendererUuid ) {
+		function scrollToCanvas( uuid ) {
 
-			// Find the renderer with the given UUID
-			const renderer = observedRenderers.find( r => r.uuid === rendererUuid );
+			let renderer = null;
 			
-			if ( renderer && renderer.domElement ) {
+			if ( uuid ) {
+				// Find the renderer with the given UUID
+				renderer = observedRenderers.find( r => r.uuid === uuid );
+			} else {
+				// If no UUID provided, find the first available renderer whose canvas is in the DOM
+				renderer = observedRenderers.find( r => r.domElement && document.body.contains( r.domElement ) );
+			}
+			
+			if ( renderer ) {
 
 				// Scroll the canvas element into view
 				renderer.domElement.scrollIntoView( {

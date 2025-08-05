@@ -3,6 +3,20 @@
 // Map tab IDs to connections
 const connections = new Map();
 
+// Handle extension icon clicks in the toolbar
+chrome.action.onClicked.addListener( ( tab ) => {
+
+	// Send scroll-to-canvas message to the content script (no UUID = scroll to first canvas)
+	chrome.tabs.sendMessage( tab.id, {
+		name: 'scroll-to-canvas',
+		tabId: tab.id
+	} ).catch( () => {
+		// Tab might not have the content script injected
+		console.log( 'Could not send scroll-to-canvas message to tab', tab.id );
+	} );
+
+} );
+
 // Listen for connections from the devtools panel
 chrome.runtime.onConnect.addListener( port => {
 
