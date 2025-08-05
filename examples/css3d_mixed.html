@@ -45,7 +45,7 @@
 				rendererWebGL.setPixelRatio( window.devicePixelRatio );
 				rendererWebGL.setSize( window.innerWidth, window.innerHeight );
 				rendererWebGL.toneMapping = THREE.NeutralToneMapping;
-				rendererWebGL.setAnimationLoop( animate )
+				rendererWebGL.setAnimationLoop( animate );
 				document.body.appendChild( rendererWebGL.domElement );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
