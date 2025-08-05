@@ -8474,7 +8474,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		// Set GL state for depth map.
 		_state.setBlending( NoBlending );
 
-		if ( _state.buffers.depth.getReversed() ) {
+		if ( _state.buffers.depth.getReversed() === true ) {
 
 			_state.buffers.color.setClear( 0, 0, 0, 0 );
 

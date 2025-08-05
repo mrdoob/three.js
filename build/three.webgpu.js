@@ -1939,6 +1939,16 @@ class Node extends EventDispatcher {
 
 			}
 
+			if ( result === '' && output !== null && output !== 'void' && output !== 'OutputType' ) {
+
+				// if no snippet is generated, return a default value
+
+				console.error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
+
+				result = builder.generateConst( output );
+
+			}
+
 		}
 
 		builder.removeChain( this );
@@ -3528,25 +3538,57 @@ class ShaderCallNodeInternal extends Node {
 				let index = 0;
 
 				inputs = new Proxy( inputs, {
+
 					get: ( target, property, receiver ) => {
+
+						let value;
 
 						if ( target[ property ] === undefined ) {
 
-							return target[ index ++ ];
+							value = target[ index ++ ];
 
 						} else {
 
-							return Reflect.get( target, property, receiver );
+							value = Reflect.get( target, property, receiver );
 
 						}
 
+						return value;
+
 					}
+
 				} );
 
 			}
 
+			const secureNodeBuilder = new Proxy( builder, {
+
+				get: ( target, property, receiver ) => {
+
+					let value;
+
+					if ( Symbol.iterator === property ) {
+
+						value = function* () {
+
+							yield undefined;
+
+						};
+
+					} else {
+
+						value = Reflect.get( target, property, receiver );
+
+					}
+
+					return value;
+
+				}
+
+			} );
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], builder ) : jsFunc( builder );
+			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], secureNodeBuilder ) : jsFunc( secureNodeBuilder );
 
 			result = nodeObject( outputNode );
 
@@ -3732,6 +3774,18 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
+		for ( const param of params ) {
+
+			if ( param === undefined ) {
+
+				console.error( `THREE.TSL: Invalid parameter for the type "${ type }".` );
+
+				return nodeObject( new ConstNode( 0, type ) );
+
+			}
+
+		}
+
 		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
 
 			const paramType = typeof param;
@@ -3913,7 +3967,7 @@ class FnNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		console.warn( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+		console.error( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
 
 		return builder.generateConst( type );
 
@@ -4780,16 +4834,24 @@ class UniformNode extends InputNode {
  *
  * @tsl
  * @function
- * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {string} [arg2] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @param {any|string} value - The value of this uniform or your type. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+ * @param {string} [type] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
  * @returns {UniformNode}
  */
-const uniform = ( arg1, arg2 ) => {
+const uniform = ( value, type ) => {
 
-	const nodeType = getConstNodeType( arg2 || arg1 );
+	const nodeType = getConstNodeType( type || value );
+
+	if ( nodeType === value ) {
+
+		// if the value is a type but no having a value
+
+		value = getValueFromType( nodeType );
+
+	}
 
 	// @TODO: get ConstNode from .traverse() in the future
-	const value = ( arg1 && arg1.isNode === true ) ? ( arg1.node && arg1.node.value ) || arg1.value : arg1;
+	value = ( value && value.isNode === true ) ? ( value.node && value.node.value ) || value.value : value;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 
@@ -5055,11 +5117,10 @@ class AssignNode extends TempNode {
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
+		const target = targetNode.build( builder );
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
 		const source = sourceNode.build( builder, targetType );
-
 		const sourceType = sourceNode.getNodeType( builder );
 
 		const nodeData = builder.getDataFromNode( this );
@@ -7309,10 +7370,12 @@ class ConditionalNode extends Node {
 
 		//
 
+		const isUniformFlow = builder.context.uniformFlow;
+
 		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
-		properties.ifNode = ifNode.context( { nodeBlock: ifNode } );
-		properties.elseNode = elseNode ? elseNode.context( { nodeBlock: elseNode } ) : null;
+		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: ifNode } );
+		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: elseNode } ) ) : null;
 
 	}
 
@@ -7337,6 +7400,20 @@ class ConditionalNode extends Node {
 		nodeData.nodeProperty = nodeProperty;
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
+		const isUniformFlow = builder.context.uniformFlow;
+
+		if ( isUniformFlow && elseNode !== null ) {
+
+			const ifSnippet = ifNode.build( builder, type );
+			const elseSnippet = elseNode.build( builder, type );
+
+			const mathSnippet = builder.getTernary( nodeSnippet, ifSnippet, elseSnippet );
+
+			// TODO: If node property already exists return something else
+
+			return builder.format( mathSnippet, type, output );
+
+		}
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
@@ -7551,6 +7628,16 @@ class ContextNode extends Node {
 const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength( 1, 2 );
 
 /**
+ * TSL function for defining a uniformFlow context value for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node whose dependencies should all execute within a uniform control-flow path.
+ * @returns {ContextNode}
+ */
+const uniformFlow = ( node ) => context( node, { uniformFlow: true } );
+
+/**
  * TSL function for defining a name for the context value for a given node.
  *
  * @tsl
@@ -7581,6 +7668,7 @@ function label( node, name ) {
 
 addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
+addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
 
 /**
@@ -30936,13 +31024,13 @@ class StackNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.outputNode ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.outputNode ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.hasOutput ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -30953,6 +31041,13 @@ class StackNode extends Node {
 	 * @return {StackNode} A reference to this stack node.
 	 */
 	add( node ) {
+
+		if ( node.isNode !== true ) {
+
+			console.error( 'THREE.TSL: Invalid node added to stack.' );
+			return this;
+
+		}
 
 		this.nodes.push( node );
 
@@ -31047,7 +31142,7 @@ class StackNode extends Node {
 
 		} else {
 
-			throw new Error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			console.error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 
@@ -31131,6 +31226,12 @@ class StackNode extends Node {
 
 	}
 
+	get hasOutput() {
+
+		return this.outputNode && this.outputNode.isNode;
+
+	}
+
 	build( builder, ...params ) {
 
 		const previousBuildStack = builder.currentStack;
@@ -31181,7 +31282,19 @@ class StackNode extends Node {
 
 		}
 
-		const result = this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		//
+
+		let result;
+
+		if ( this.hasOutput ) {
+
+			result = this.outputNode.build( builder, ...params );
+
+		} else {
+
+			result = super.build( builder, ...params );
+
+		}
 
 		setCurrentStack( previousStack );
 
@@ -43380,6 +43493,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	uniform: uniform,
 	uniformArray: uniformArray,
 	uniformCubeTexture: uniformCubeTexture,
+	uniformFlow: uniformFlow,
 	uniformGroup: uniformGroup,
 	uniformTexture: uniformTexture,
 	unpremultiplyAlpha: unpremultiplyAlpha,
@@ -45782,6 +45896,22 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a ternary operation. E.g. GLSL would output
+	 * a ternary op as `cond ? x : y` whereas WGSL would output it as `select(y, x, cond)`
+	 *
+	 * @abstract
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( /* condSnippet, ifSnippet, elseSnippet*/ ) {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
 	 * @param {number} hash - The hash of the node.
@@ -46096,7 +46226,6 @@ class NodeBuilder {
 		return type + '( ' + snippets.join( ', ' ) + ' )';
 
 	}
-
 
 	/**
 	 * Generates the shader string for the given type and value.
@@ -47875,11 +48004,6 @@ class NodeBuilder {
 		return `// Three.js r${ REVISION } - Node System\n`;
 
 	}
-
-	/**
-	 * Prevents the node builder from being used as an iterable in TSL.Fn(), avoiding potential runtime errors.
-	 */
-	*[ Symbol.iterator ]() { }
 
 }
 
@@ -56499,6 +56623,20 @@ class GLSLNodeBuilder extends NodeBuilder {
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
+
+	}
+
+	/**
+	 * Returns the native snippet for a ternary operation.
+	 *
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( condSnippet, ifSnippet, elseSnippet ) {
+
+		return `${condSnippet} ? ${ifSnippet} : ${elseSnippet}`;
 
 	}
 
@@ -69028,6 +69166,21 @@ ${ flowData.code }
 		return wgslMethod || method;
 
 	}
+
+	/**
+	 * Returns the native snippet for a ternary operation.
+	 *
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( condSnippet, ifSnippet, elseSnippet ) {
+
+		return `select( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+	}
+
 
 	/**
 	 * Returns the WGSL type of the given node data type.
