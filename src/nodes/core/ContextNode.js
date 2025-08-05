@@ -142,11 +142,7 @@ export const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength
 export const uniformFlow = ( node ) => context( node, { uniformFlow: true } );
 
 /**
-<<<<<<< HEAD
  * TSL function for defining a name for the context value for a given node.
-=======
- * TSL function for defining a label context value for a given node.
->>>>>>> d15ca48302 (work)
  *
  * @tsl
  * @function
