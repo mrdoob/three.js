@@ -79,7 +79,7 @@ class TRAANode extends TempNode {
 		/**
 		 *  The camera the scene is rendered with.
 		 *
-		 * @type {TextureNode}
+		 * @type {Camera}
 		 */
 		this.camera = camera;
 
