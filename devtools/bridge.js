@@ -476,13 +476,33 @@
 					inline: 'center'
 				} );
 
-				// Optional: Add a brief highlight effect
-				const originalOutline = renderer.domElement.style.outline;
-				renderer.domElement.style.outline = '3px solid #007ACC';
+				// Add a brief blue overlay flash effect
+				const overlay = document.createElement('div');
+				overlay.style.cssText = `
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-color: rgba(0, 122, 204, 0.3);
+					pointer-events: none;
+					z-index: 999999;
+				`;
 				
-				setTimeout( () => {
-					renderer.domElement.style.outline = originalOutline;
-				}, 1000 );
+				// Position the overlay relative to the canvas
+				const canvasParent = renderer.domElement.parentElement || document.body;
+				
+				if (getComputedStyle(canvasParent).position === 'static') {
+					canvasParent.style.position = 'relative';
+				}
+				
+				canvasParent.appendChild(overlay);
+				
+				setTimeout(() => {
+					if (overlay.parentElement) {
+						overlay.parentElement.removeChild(overlay);
+					}
+				}, 1000);
 
 			}
 
