@@ -114,7 +114,6 @@
 		"webgl_loader_texture_ktx2",
 		"webgl_loader_texture_lottie",
 		"webgl_loader_texture_pvrtc",
-		"webgl_loader_texture_rgbm",
 		"webgl_loader_texture_tga",
 		"webgl_loader_texture_tiff",
 		"webgl_loader_ttf",

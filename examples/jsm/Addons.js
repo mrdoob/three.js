@@ -110,7 +110,6 @@ export * from './loaders/PLYLoader.js';
 export * from './loaders/PVRLoader.js';
 export * from './loaders/RGBELoader.js';
 export * from './loaders/UltraHDRLoader.js';
-export * from './loaders/RGBMLoader.js';
 export * from './loaders/STLLoader.js';
 export * from './loaders/SVGLoader.js';
 export * from './loaders/TDSLoader.js';
