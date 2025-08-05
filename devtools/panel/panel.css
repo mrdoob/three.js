@@ -174,4 +174,27 @@ details.renderer-container[open] > summary.renderer-summary .toggle-icon::before
 	margin-left: 8px;
 	padding: 2px 4px;
 	opacity: 0.3;
-} 
+}
+
+/* Two-column layout for wide panel */
+@media (min-width: 1000px) {
+	.sections-container {
+		display: flex;
+		gap: 20px;
+		align-items: flex-start;
+	}
+	
+	.sections-container .section {
+		flex: 1;
+		margin-bottom: 0;
+	}
+	
+	/* Ensure sections have equal width */
+	.sections-container .section:first-child {
+		min-width: 0; /* Allow flexbox to shrink */
+	}
+	
+	.sections-container .section:last-child {
+		min-width: 0; /* Allow flexbox to shrink */
+	}
+}

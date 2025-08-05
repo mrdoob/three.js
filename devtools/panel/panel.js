@@ -516,8 +516,21 @@ function updateUI() {
 
 	container.appendChild( header );
 
+	const hasRenderers = state.renderers.size > 0;
+	const hasScenes = state.scenes.size > 0;
+
+	// Create sections container if both renderers and scenes exist (for responsive layout)
+	let sectionsContainer = container;
+	if ( hasRenderers && hasScenes ) {
+
+		sectionsContainer = document.createElement( 'div' );
+		sectionsContainer.className = 'sections-container';
+		container.appendChild( sectionsContainer );
+
+	}
+
 	// Add renderers section
-	if ( state.renderers.size > 0 ) {
+	if ( hasRenderers ) {
 
 		const renderersSection = document.createElement( 'div' );
 		renderersSection.className = 'section';
@@ -529,12 +542,12 @@ function updateUI() {
 
 		} );
 
-		container.appendChild( renderersSection );
+		sectionsContainer.appendChild( renderersSection );
 
 	}
 
 	// Add scenes section
-	if ( state.scenes.size > 0 ) {
+	if ( hasScenes ) {
 
 		const scenesSection = document.createElement( 'div' );
 		scenesSection.className = 'section';
@@ -546,7 +559,7 @@ function updateUI() {
 
 		} );
 
-		container.appendChild( scenesSection );
+		sectionsContainer.appendChild( scenesSection );
 
 	}
 
