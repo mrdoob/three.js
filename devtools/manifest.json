@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Three.js DevTools",
-	"version": "1.10",
+	"version": "1.11",
 	"description": "Developer tools extension for Three.js",
 	"icons": {
 		"128": "icons/128-light.png"
