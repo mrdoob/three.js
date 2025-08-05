@@ -11,29 +11,43 @@ import {
 import * as fflate from '../libs/fflate.module.js';
 
 /**
- * Description: Early release of an AMF Loader following the pattern of the
- * example loaders in the three.js project.
+ * A loader for the AMF format.
  *
- * Usage:
- *	const loader = new AMFLoader();
- *	loader.load('/path/to/project.amf', function(objecttree) {
- *		scene.add(objecttree);
- *	});
+ * The loader supports materials, color and ZIP compressed files.
+ * No constellation support (yet).
  *
- * Materials now supported, material colors supported
- * Zip support, requires fflate
- * No constellation support (yet)!
+ * ```js
+ * const loader = new AMFLoader();
  *
+ * const object = await loader.loadAsync( './models/amf/rook.amf' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
  */
-
 class AMFLoader extends Loader {
 
+	/**
+	 * Constructs a new AMF loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded AMF asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -69,6 +83,12 @@ class AMFLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given AMF data and returns the resulting group.
+	 *
+	 * @param {ArrayBuffer} data - The raw AMF asset data as an array buffer.
+	 * @return {Group} A group representing the parsed asset.
+	 */
 	parse( data ) {
 
 		function loadDocument( data ) {
@@ -236,7 +256,7 @@ class AMFLoader extends Loader {
 
 		function loadMeshVolume( node ) {
 
-			const volume = { name: '', triangles: [], materialid: null };
+			const volume = { name: '', triangles: [], materialId: null };
 
 			let currVolumeNode = node.firstElementChild;
 

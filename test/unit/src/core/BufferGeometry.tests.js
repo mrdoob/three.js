@@ -463,14 +463,20 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		const toHalfFloatArray = ( f32Array ) => {
+
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
+
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
+
 			}
+
 			return f16Array;
+
 		};
 
 		QUnit.test( 'computeBoundingBox - Float16', ( assert ) => {
+
 			const vertices = [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ];
 			const geometry = new BufferGeometry();
 
@@ -490,6 +496,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		QUnit.test( 'computeBoundingSphere - Float16', ( assert ) => {
+
 			const vertices = [ - 10, 0, 0, 10, 0, 0 ];
 			const geometry = new BufferGeometry();
 
@@ -521,25 +528,25 @@ export default QUnit.module( 'Core', () => {
 			let normals = getNormalsForVertices( [ - 1, 0, 0, 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === 1,
-				'first normal is pointing to screen since the the triangle was created counter clockwise' );
+				'first normal is pointing to screen since the triangle was created counter clockwise' );
 
 			assert.ok( normals[ 3 ] === 0 && normals[ 4 ] === 0 && normals[ 5 ] === 1,
-				'second normal is pointing to screen since the the triangle was created counter clockwise' );
+				'second normal is pointing to screen since the triangle was created counter clockwise' );
 
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === 1,
-				'third normal is pointing to screen since the the triangle was created counter clockwise' );
+				'third normal is pointing to screen since the triangle was created counter clockwise' );
 
 			// get normals for a clockwise created triangle
 			normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === - 1,
-				'first normal is pointing to screen since the the triangle was created clockwise' );
+				'first normal is pointing to screen since the triangle was created clockwise' );
 
 			assert.ok( normals[ 3 ] === 0 && normals[ 4 ] === 0 && normals[ 5 ] === - 1,
-				'second normal is pointing to screen since the the triangle was created clockwise' );
+				'second normal is pointing to screen since the triangle was created clockwise' );
 
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === - 1,
-				'third normal is pointing to screen since the the triangle was created clockwise' );
+				'third normal is pointing to screen since the triangle was created clockwise' );
 
 			normals = getNormalsForVertices( [ 0, 0, 1, 0, 0, - 1, 1, 1, 0 ], assert );
 
@@ -647,7 +654,7 @@ export default QUnit.module( 'Core', () => {
 			let j = a.toJSON();
 			const gold = {
 				'metadata': {
-					'version': 4.6,
+					'version': 4.7,
 					'type': 'BufferGeometry',
 					'generator': 'BufferGeometry.toJSON'
 				},

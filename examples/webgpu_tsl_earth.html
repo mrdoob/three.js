@@ -29,8 +29,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { step, normalWorld, output, texture, vec3, vec4, normalize, positionWorld, bumpMap, cameraPosition, color, uniform, mix, uv, max } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { step, normalWorldGeometry, output, texture, vec3, vec4, normalize, positionWorld, bumpMap, cameraPosition, color, uniform, mix, uv, max } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -79,11 +79,11 @@
 				// fresnel
 
 				const viewDirection = positionWorld.sub( cameraPosition ).normalize();
-				const fresnel = viewDirection.dot( normalWorld ).abs().oneMinus().toVar();
+				const fresnel = viewDirection.dot( normalWorldGeometry ).abs().oneMinus().toVar();
 
 				// sun orientation
 
-				const sunOrientation = normalWorld.dot( normalize( sun.position ) ).toVar();
+				const sunOrientation = normalWorldGeometry.dot( normalize( sun.position ) ).toVar();
 
 				// atmosphere color
 

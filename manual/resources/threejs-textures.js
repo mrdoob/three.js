@@ -196,7 +196,7 @@ import { threejsLessonUtils } from './threejs-lesson-utils.js';
 				// but no checks for mipmaps I'm guessing. It seems like
 				// they shouldn't be checking for same image, the should be
 				// checking for same WebGLTexture. Given there is more than
-				// WebGL to support maybe they need to abtract WebGLTexture to
+				// WebGL to support maybe they need to abstract WebGLTexture to
 				// PlatformTexture or something?
 
 				const meshInfos = [

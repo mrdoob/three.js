@@ -323,6 +323,9 @@ document.body.appendChild( renderer.domElement );
 		<h3>[property:Number toneMappingExposure]</h3>
 		<p>Exposure level of tone mapping. Default is `1`.</p>
 
+		<h3>[property:Number transmissionResolutionScale]</h3>
+		<p>The normalized resolution scale for the transmission render target, measured in percentage of viewport dimensions. Lowering this value can result in significant improvements to [page:MeshPhysicalMaterial MeshPhysicalMaterial] transmission performance. Default is `1`.</p>
+
 		<h3>[property:WebXRManager xr]</h3>
 		<p>
 			Provides access to the WebXR related [page:WebXRManager interface] of the

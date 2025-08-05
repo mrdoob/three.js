@@ -11,11 +11,13 @@
 	</head>
 
 <body>
+
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - screen space reflections<br />
 		<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by 
 		<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
 	</div>
+
 	<script type="importmap">
 		{
 			"imports": {
@@ -28,9 +30,11 @@
 	</script>
 
 	<script type="module">
-		import * as THREE from 'three';
-		import { pass, mrt, output, transformedNormalView, metalness, blendColor, screenUV, color } from 'three/tsl';
+
+		import * as THREE from 'three/webgpu';
+		import { pass, mrt, output, normalView, metalness, roughness, blendColor, screenUV, color, sample, directionToColor, colorToDirection, vec2 } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -40,7 +44,7 @@
 		import Stats from 'three/addons/libs/stats.module.js';
 
 		const params = {
-			maxDistance: 0.2,
+			maxDistance: 0.5,
 			opacity: 1,
 			thickness: 0.015,
 			enabled: true
@@ -54,10 +58,10 @@
 		async function init() {
 
 			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 50 );
-			camera.position.set( 2.5, 2, 2.5 );
+			camera.position.set( 3, 2, 3 );
 
 			scene = new THREE.Scene();
-			scene.backgroundNode = screenUV.distance( .5 ).remap( 0, 0.5 ).mix( color( 0x666666 ), color( 0x393939 ) );
+			scene.backgroundNode = screenUV.distance( .5 ).remap( 0, 0.5 ).mix( color( 0x888877 ), color( 0x776666 ) );
 
 			const dracoLoader = new DRACOLoader();
 			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
@@ -67,6 +71,24 @@
 			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/steampunk_camera.glb', function ( gltf ) {
 
+				gltf.scene.traverse( function ( object ) {
+
+					if ( object.material ) {
+
+						if ( object.material.name === 'Lense_Casing' ) {
+
+							object.material.transparent = true;
+
+						}
+
+						// Avoid overdrawing
+						object.material.side = THREE.FrontSide;
+		
+					}
+		
+				} );
+		
+				gltf.scene.position.y = 0.1;
 				scene.add( gltf.scene );
 
 			} );
@@ -74,9 +96,10 @@
 			//
 
 			renderer = new THREE.WebGPURenderer();
-			renderer.setPixelRatio( window.devicePixelRatio );
+			// renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			document.body.appendChild( renderer.domElement );
 
 			await renderer.init();
@@ -85,7 +108,7 @@
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			scene.environment = pmremGenerator.fromScene( environment ).texture;
-			scene.environmentIntensity = 0.75;
+			scene.environmentIntensity = 1.25;
 			pmremGenerator.dispose();
 
 			//
@@ -95,23 +118,45 @@
 			const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: transformedNormalView,
-				metalness: metalness
+				normal: directionToColor( normalView ),
+				metalrough: vec2( metalness, roughness )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' );
 			const scenePassDepth = scenePass.getTextureNode( 'depth' );
-			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
+			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' );
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
+			// optimization bandwidth packing the normals and reducing the texture precision if possible
+
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.type = THREE.UnsignedByteType;
+
+			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+			metalRoughTexture.type = THREE.UnsignedByteType;
+
+			const customNormal = sample( ( uv ) => {
+
+				return colorToDirection( scenePassNormal.sample( uv ) );
+
+			} );
+
+			const customMetalness = sample( ( uv ) => {
+
+				return scenePassMetalRough.sample( uv ).r;
+
+			} );
+
+			//
+
+			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, customMetalness, camera );
+			ssrPass.resolutionScale = 1.0;
 
 			// blend SSR over beauty
-		
-			const outputNode = blendColor( scenePassColor, ssrPass );
+
+			const outputNode = smaa( blendColor( scenePassColor, ssrPass.mul( scenePassMetalRough.g.oneMinus() ) ) );
 
 			postProcessing.outputNode = outputNode;
-
 
 			//
 

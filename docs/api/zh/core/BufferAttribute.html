@@ -58,9 +58,9 @@
 
 		<h3>[property:Number gpuType]</h3>
 		<p>
-			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+			配置着色器中使用的绑定 GPU 类型。[page:BufferAttribute THREE.FloatType] 或 [page:BufferAttribute THREE.IntType]，默认为 [page:BufferAttribute THREE.FloatType]。
 
-			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
+			注意：这仅对整数数组有效，对于浮点数组不可配置。对于精度较低的浮点类型，请参阅 [page:BufferAttributeTypes THREE.Float16BufferAttribute]。
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
@@ -123,6 +123,16 @@
 
 		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
 		<p>将矩阵[page:Matrix4 m]应用到此BufferAttribute的每一个Vector3元素中，并将所有元素解释为方向向量。</p>
+		
+		<h3>[method:this addUpdateRange]( [param:Integer start], [param:Integer count] )</h3>
+		<p>
+			在数据数组中添加要在 GPU 上更新的数据范围。将描述范围的对象添加到 [page:BufferAttribute.updateRanges updateRanges] 数组。
+		</p>
+
+		<h3>[method:this clearUpdateRanges]()</h3>
+		<p>
+			清除 [page:BufferAttribute.updateRanges updateRanges] 数组。
+		</p>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>返回该 BufferAttribute 的拷贝。</p>
@@ -136,7 +146,7 @@
 		<p>将一个矢量从 bufferAttribute[index2] 拷贝到 [page:BufferAttribute.array array][index1] 中。</p>
 
 		<h3>[method:Number getComponent]( [param:Integer index], [param:Integer component] ) </h3>
-		<p>Returns the given component of the vector at the given index.</p>
+		<p>返回给定索引处的向量的给定分量。</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
 		<p>获取给定索引的矢量的第一维元素 （即 X 值）。</p>
@@ -167,10 +177,10 @@
 		</p>
 
 		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.</p>
+		<p>设置 [page:BufferAttribute.usage usage] 值。查看所有可能的输入值的 usage [page:BufferAttributeUsage constants]。</p>
 
 		<h3>[method:Number setComponent]( [param:Integer index], [param:Integer component], [param:Float value] ) </h3>
-		<p>Sets the given component of the vector at the given index.</p>
+		<p>在给定索引处设置向量的给定分量。</p>
 
 		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>设置给定索引的矢量的第一维数据（设置 X 值）。</p>

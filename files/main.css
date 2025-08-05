@@ -11,7 +11,8 @@
 	--font-size: 16px;
 	--line-height: 26px;
 
-	--border-style: 1px solid #E8E8E8;
+	--border-color: #E8E8E8;
+	--border-style: 1px solid var(--border-color);
 	--header-height: 48px;
 	--panel-width: 300px;
 	--panel-padding: 16px;
@@ -27,7 +28,8 @@
 		--text-color: #bbb;
 		--secondary-text-color: #666;
 
-		--border-style: 1px solid #444;
+		--border-color: #444;
+		--border-style: 1px solid var(--border-color);
 	}
 
 	#previewsToggler {
@@ -101,6 +103,13 @@ h3 {
 
 h1 a {
 	color: var(--color-blue);
+}
+
+hr {
+	border: 0;
+	height: 1px;
+	background-color: var(--border-color);
+	margin: 16px 0;
 }
 
 #header {

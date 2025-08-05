@@ -2,7 +2,7 @@ import { DoubleSide, FloatType, HalfFloatType, Mesh, MeshBasicMaterial, MeshPhon
 import { potpack } from '../libs/potpack.module.js';
 
 /**
- * Progressive Light Map Accumulator, by [zalo](https://github.com/zalo/)
+ * Progressive Light Map Accumulator, by [zalo]{@link https://github.com/zalo/}.
  *
  * To use, simply construct a `ProgressiveLightMap` object,
  * `plmap.addObjectsToLightMap(object)` an array of semi-static
@@ -14,15 +14,38 @@ import { potpack } from '../libs/potpack.module.js';
  * your objects, so you can start jittering lighting to achieve
  * the texture-space effect you're looking for.
  *
- * @param {WebGLRenderer} renderer An instance of WebGLRenderer.
- * @param {number} res The side-long dimension of you total lightmap.
+ * This class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, import from `ProgressiveLightMapGPU.js`.
+ *
+ * @three_import import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMap.js';
  */
 class ProgressiveLightMap {
 
+	/**
+	 * Constructs a new progressive light map.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+ 	 * @param {number} [res=1024] - The side-long dimension of the total lightmap.
+	 */
 	constructor( renderer, res = 1024 ) {
 
+		/**
+		 * The renderer.
+		 *
+		 * @type {WebGLRenderer}
+		 */
 		this.renderer = renderer;
+
+		/**
+		 * The side-long dimension of the total lightmap.
+		 *
+		 * @type {number}
+		 * @default 1024
+		 */
 		this.res = res;
+
+		// internals
+
 		this.lightMapContainers = [];
 		this.scene = new Scene();
 		this.buffer1Active = false;
@@ -75,7 +98,8 @@ class ProgressiveLightMap {
 
 	/**
 	 * Sets these objects' materials' lightmaps and modifies their uv1's.
-	 * @param {Object3D} objects An array of objects and lights to set up your lightmap.
+	 *
+	 * @param {Array<Object3D>} objects - An array of objects and lights to set up your lightmap.
 	 */
 	addObjectsToLightMap( objects ) {
 
@@ -141,10 +165,11 @@ class ProgressiveLightMap {
 	}
 
 	/**
-	 * This function renders each mesh one at a time into their respective surface maps
-	 * @param {Camera} camera Standard Rendering Camera
-	 * @param {number} blendWindow When >1, samples will accumulate over time.
-	 * @param {boolean} blurEdges  Whether to fix UV Edges via blurring
+	 * This function renders each mesh one at a time into their respective surface maps.
+	 *
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {number} [blendWindow=100] - When >1, samples will accumulate over time.
+	 * @param {boolean} [blurEdges=true] - Whether to fix UV Edges via blurring.
 	 */
 	update( camera, blendWindow = 100, blurEdges = true ) {
 
@@ -214,10 +239,11 @@ class ProgressiveLightMap {
 
 	}
 
-	/** DEBUG
-	 * Draw the lightmap in the main scene.  Call this after adding the objects to it.
-	 * @param {boolean} visible Whether the debug plane should be visible
-	 * @param {Vector3} position Where the debug plane should be drawn
+	/**
+	 * Draws the lightmap in the main scene. Call this after adding the objects to it.
+	 *
+	 * @param {boolean} visible - Whether the debug plane should be visible
+	 * @param {Vector3} [position] - Where the debug plane should be drawn
 	*/
 	showDebugLightmap( visible, position = undefined ) {
 
@@ -250,9 +276,11 @@ class ProgressiveLightMap {
 	}
 
 	/**
-	 * INTERNAL Creates the Blurring Plane
-	 * @param {number} res The square resolution of this object's lightMap.
-	 * @param {WebGLRenderTexture} lightMap The lightmap to initialize the plane with.
+	 * Creates the Blurring Plane.
+	 *
+	 * @private
+	 * @param {number} res - The square resolution of this object's lightMap.
+	 * @param {WebGLRenderTarget} [lightMap] - The lightmap to initialize the plane with.
 	 */
 	_initializeBlurPlane( res, lightMap = null ) {
 

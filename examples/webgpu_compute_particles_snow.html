@@ -18,14 +18,14 @@
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.8/dist/main.js"
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { Fn, texture, vec3, pass, color, uint, screenUV, instancedArray, positionWorld, positionLocal, time, vec2, hash, instanceIndex, If } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
@@ -273,7 +273,9 @@
 
 				stats = new Stats( {
 					precision: 3,
-					horizontal: false
+					horizontal: false,
+					trackGPU: true,
+					trackCPT: true
 				} );
 				stats.init( renderer );
 				document.body.appendChild( stats.dom );
@@ -294,10 +296,10 @@
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
-				const vignet = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
+				const vignette = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				const teapotTreePass = pass( teapotTree, camera ).getTextureNode();
-				const teapotTreePassBlurred = gaussianBlur( teapotTreePass, vec2( 1 ), 3 );
+				const teapotTreePassBlurred = gaussianBlur( teapotTreePass, vec2( 1 ), 6 );
 				teapotTreePassBlurred.resolution = new THREE.Vector2( .2, .2 );
 
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
@@ -308,7 +310,7 @@
 
 				let totalPass = scenePass;
 				totalPass = totalPass.add( scenePassColorBlurred.mul( .1 ) );
-				totalPass = totalPass.mul( vignet );
+				totalPass = totalPass.mul( vignette );
 				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ) );
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -343,11 +345,12 @@
 
 				scene.overrideMaterial = collisionPosMaterial;
 				renderer.setRenderTarget( collisionPosRT );
-				await renderer.renderAsync( scene, collisionCamera );
+				renderer.render( scene, collisionCamera );
 
 				// compute
 
-				await renderer.computeAsync( computeParticles );
+				renderer.compute( computeParticles );
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 				// result
 
@@ -355,7 +358,8 @@
 				renderer.setRenderTarget( null );
 
 				await postProcessing.renderAsync();
-			
+
+				renderer.resolveTimestampsAsync();
 				stats.update();
 
 			}

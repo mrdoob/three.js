@@ -41,7 +41,9 @@
     "CodeMirror": "readonly",
     "esprima": "readonly",
     "jsonlint": "readonly",
-    "VideoFrame": "readonly"
+    "VideoFrame": "readonly",
+    "VideoDecoder": "readonly",
+    "Float16Array": "readonly"
   },
   "rules": {
     "no-throw-literal": [
@@ -60,6 +62,27 @@
     ],
     "no-irregular-whitespace": [
       "error"
+    ],
+    "no-duplicate-imports": [
+      "error"
+    ],
+    "prefer-spread": "error",
+    "valid-jsdoc": [
+      "error",
+      {
+        "requireReturn": false,
+        "requireReturnType": true,
+        "requireParamDescription": false,
+        "requireReturnDescription": false,
+        "requireParamType": true,
+        "preferType": {
+          "Any": "any",
+          "Boolean": "boolean",
+          "Number": "number",
+          "object": "Object",
+          "String": "string"
+        }
+      }
     ]
   }
 }

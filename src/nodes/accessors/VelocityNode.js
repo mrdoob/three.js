@@ -11,6 +11,16 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 
 const _objectData = new WeakMap();
 
+/**
+ * A node for representing motion or velocity vectors. Foundation
+ * for advanced post processing effects like motion blur or TRAA.
+ *
+ * The node keeps track of the model, view and projection matrices
+ * of the previous frame and uses them to compute offsets in NDC space.
+ * These offsets represent the final velocity.
+ *
+ * @augments TempNode
+ */
 class VelocityNode extends TempNode {
 
 	static get type() {
@@ -19,27 +29,79 @@ class VelocityNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new vertex color node.
+	 */
 	constructor() {
 
 		super( 'vec2' );
 
+		/**
+		 * The current projection matrix.
+		 *
+		 * @type {?Matrix4}
+		 * @default null
+		 */
 		this.projectionMatrix = null;
 
+		/**
+		 * Overwritten since velocity nodes are updated per object.
+		 *
+		 * @type {string}
+		 * @default 'object'
+		 */
 		this.updateType = NodeUpdateType.OBJECT;
+
+		/**
+		 * Overwritten since velocity nodes save data after the update.
+		 *
+		 * @type {string}
+		 * @default 'object'
+		 */
 		this.updateAfterType = NodeUpdateType.OBJECT;
 
+		/**
+		 * Uniform node representing the previous model matrix in world space.
+		 *
+		 * @type {UniformNode<mat4>}
+		 * @default null
+		 */
 		this.previousModelWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * Uniform node representing the previous projection matrix.
+		 *
+		 * @type {UniformNode<mat4>}
+		 * @default null
+		 */
 		this.previousProjectionMatrix = uniform( new Matrix4() ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the previous view matrix.
+		 *
+		 * @type {UniformNode<mat4>}
+		 * @default null
+		 */
 		this.previousCameraViewMatrix = uniform( new Matrix4() );
 
 	}
 
+	/**
+	 * Sets the given projection matrix.
+	 *
+	 * @param {Matrix4} projectionMatrix - The projection matrix to set.
+	 */
 	setProjectionMatrix( projectionMatrix ) {
 
 		this.projectionMatrix = projectionMatrix;
 
 	}
 
+	/**
+	 * Updates velocity specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( { frameId, camera, object } ) {
 
 		const previousModelMatrix = getPreviousMatrix( object );
@@ -82,12 +144,23 @@ class VelocityNode extends TempNode {
 
 	}
 
+	/**
+	 * Overwritten to updated velocity specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	updateAfter( { object } ) {
 
 		getPreviousMatrix( object ).copy( object.matrixWorld );
 
 	}
 
+	/**
+	 * Implements the velocity computation based on the previous and current vertex data.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Node<vec2>} The motion vector.
+	 */
 	setup( /*builder*/ ) {
 
 		const projectionMatrix = ( this.projectionMatrix === null ) ? cameraProjectionMatrix : uniform( this.projectionMatrix );
@@ -132,6 +205,7 @@ function getPreviousMatrix( object, index = 0 ) {
 	if ( matrix === undefined ) {
 
 		objectData[ index ] = matrix = new Matrix4();
+		objectData[ index ].copy( object.matrixWorld );
 
 	}
 
@@ -141,4 +215,10 @@ function getPreviousMatrix( object, index = 0 ) {
 
 export default VelocityNode;
 
+/**
+ * TSL object that represents the velocity of a render pass.
+ *
+ * @tsl
+ * @type {VelocityNode}
+ */
 export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );

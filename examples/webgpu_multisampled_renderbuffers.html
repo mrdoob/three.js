@@ -24,7 +24,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { texture } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -71,7 +71,7 @@
 
 				const gui = new GUI();
 				gui.add( params, 'samples', 0, 4 ).step( 1 );
-				gui.add( params, 'animated', true );
+				gui.add( params, 'animated' );
 
 			}
 

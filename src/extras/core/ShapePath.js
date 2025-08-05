@@ -3,19 +3,51 @@ import { Path } from './Path.js';
 import { Shape } from './Shape.js';
 import { ShapeUtils } from '../ShapeUtils.js';
 
+/**
+ * This class is used to convert a series of paths to an array of
+ * shapes. It is specifically used in context of fonts and SVG.
+ */
 class ShapePath {
 
+	/**
+	 * Constructs a new shape path.
+	 */
 	constructor() {
 
 		this.type = 'ShapePath';
 
+		/**
+		 * The color of the shape.
+		 *
+		 * @type {Color}
+		 */
 		this.color = new Color();
 
+		/**
+		 * The paths that have been generated for this shape.
+		 *
+		 * @type {Array<Path>}
+		 * @default null
+		 */
 		this.subPaths = [];
+
+		/**
+		 * The current path that is being generated.
+		 *
+		 * @type {?Path}
+		 * @default null
+		 */
 		this.currentPath = null;
 
 	}
 
+	/**
+	 * Creates a new path and moves it current point to the given one.
+	 *
+	 * @param {number} x - The x coordinate.
+	 * @param {number} y - The y coordinate.
+	 * @return {ShapePath} A reference to this shape path.
+	 */
 	moveTo( x, y ) {
 
 		this.currentPath = new Path();
@@ -26,6 +58,14 @@ class ShapePath {
 
 	}
 
+	/**
+	 * Adds an instance of {@link LineCurve} to the path by connecting
+	 * the current point with the given one.
+	 *
+	 * @param {number} x - The x coordinate of the end point.
+	 * @param {number} y - The y coordinate of the end point.
+	 * @return {ShapePath} A reference to this shape path.
+	 */
 	lineTo( x, y ) {
 
 		this.currentPath.lineTo( x, y );
@@ -34,6 +74,16 @@ class ShapePath {
 
 	}
 
+	/**
+	 * Adds an instance of {@link QuadraticBezierCurve} to the path by connecting
+	 * the current point with the given one.
+	 *
+	 * @param {number} aCPx - The x coordinate of the control point.
+	 * @param {number} aCPy - The y coordinate of the control point.
+	 * @param {number} aX - The x coordinate of the end point.
+	 * @param {number} aY - The y coordinate of the end point.
+	 * @return {ShapePath} A reference to this shape path.
+	 */
 	quadraticCurveTo( aCPx, aCPy, aX, aY ) {
 
 		this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
@@ -42,6 +92,18 @@ class ShapePath {
 
 	}
 
+	/**
+	 * Adds an instance of {@link CubicBezierCurve} to the path by connecting
+	 * the current point with the given one.
+	 *
+	 * @param {number} aCP1x - The x coordinate of the first control point.
+	 * @param {number} aCP1y - The y coordinate of the first control point.
+	 * @param {number} aCP2x - The x coordinate of the second control point.
+	 * @param {number} aCP2y - The y coordinate of the second control point.
+	 * @param {number} aX - The x coordinate of the end point.
+	 * @param {number} aY - The y coordinate of the end point.
+	 * @return {ShapePath} A reference to this shape path.
+	 */
 	bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 		this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
@@ -50,6 +112,13 @@ class ShapePath {
 
 	}
 
+	/**
+	 * Adds an instance of {@link SplineCurve} to the path by connecting
+	 * the current point with the given list of points.
+	 *
+	 * @param {Array<Vector2>} pts - An array of points in 2D space.
+	 * @return {ShapePath} A reference to this shape path.
+	 */
 	splineThru( pts ) {
 
 		this.currentPath.splineThru( pts );
@@ -58,6 +127,13 @@ class ShapePath {
 
 	}
 
+	/**
+	 * Converts the paths into an array of shapes.
+	 *
+	 * @param {boolean} isCCW - By default solid shapes are  defined clockwise (CW) and holes are defined counterclockwise (CCW).
+	 * If this flag is set to `true`, then those are flipped.
+	 * @return {Array<Shape>} An array of shapes.
+	 */
 	toShapes( isCCW ) {
 
 		function toShapesNoHoles( inSubpaths ) {

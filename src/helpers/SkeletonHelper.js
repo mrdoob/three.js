@@ -10,9 +10,24 @@ const _vector = /*@__PURE__*/ new Vector3();
 const _boneMatrix = /*@__PURE__*/ new Matrix4();
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
-
+/**
+ * A helper object to assist with visualizing a {@link Skeleton}.
+ *
+ * ```js
+ * const helper = new THREE.SkeletonHelper( skinnedMesh );
+ * scene.add( helper );
+ * ```
+ *
+ * @augments LineSegments
+ */
 class SkeletonHelper extends LineSegments {
 
+	/**
+	 * Constructs a new skeleton helper.
+	 *
+	 * @param {Object3D} object -  Usually an instance of {@link SkinnedMesh}. However, any 3D object
+	 * can be used if it represents a hierarchy of bones (see {@link Bone}).
+	 */
 	constructor( object ) {
 
 		const bones = getBoneList( object );
@@ -22,9 +37,6 @@ class SkeletonHelper extends LineSegments {
 		const vertices = [];
 		const colors = [];
 
-		const color1 = new Color( 0, 0, 1 );
-		const color2 = new Color( 0, 1, 0 );
-
 		for ( let i = 0; i < bones.length; i ++ ) {
 
 			const bone = bones[ i ];
@@ -33,8 +45,8 @@ class SkeletonHelper extends LineSegments {
 
 				vertices.push( 0, 0, 0 );
 				vertices.push( 0, 0, 0 );
-				colors.push( color1.r, color1.g, color1.b );
-				colors.push( color2.r, color2.g, color2.b );
+				colors.push( 0, 0, 0 );
+				colors.push( 0, 0, 0 );
 
 			}
 
@@ -47,15 +59,40 @@ class SkeletonHelper extends LineSegments {
 
 		super( geometry, material );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSkeletonHelper = true;
 
 		this.type = 'SkeletonHelper';
 
+		/**
+		 * The object being visualized.
+		 *
+		 * @type {Object3D}
+		 */
 		this.root = object;
+
+		/**
+		 * The list of bones that the helper visualizes.
+		 *
+		 * @type {Array<Bone>}
+		 */
 		this.bones = bones;
 
 		this.matrix = object.matrixWorld;
 		this.matrixAutoUpdate = false;
+
+		// colors
+
+		const color1 = new Color( 0x0000ff );
+		const color2 = new Color( 0x00ff00 );
+
+		this.setColors( color1, color2 );
 
 	}
 
@@ -94,6 +131,35 @@ class SkeletonHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Defines the colors of the helper.
+	 *
+	 * @param {Color} color1 - The first line color for each bone.
+	 * @param {Color} color2 - The second line color for each bone.
+	 * @return {SkeletonHelper} A reference to this helper.
+	 */
+	setColors( color1, color2 ) {
+
+		const geometry = this.geometry;
+		const colorAttribute = geometry.getAttribute( 'color' );
+
+		for ( let i = 0; i < colorAttribute.count; i += 2 ) {
+
+			colorAttribute.setXYZ( i, color1.r, color1.g, color1.b );
+			colorAttribute.setXYZ( i + 1, color2.r, color2.g, color2.b );
+
+		}
+
+		colorAttribute.needsUpdate = true;
+
+		return this;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.geometry.dispose();
@@ -116,7 +182,7 @@ function getBoneList( object ) {
 
 	for ( let i = 0; i < object.children.length; i ++ ) {
 
-		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+		boneList.push( ...getBoneList( object.children[ i ] ) );
 
 	}
 

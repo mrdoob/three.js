@@ -5,19 +5,34 @@ import { materialSpecularStrength, materialReflectivity } from '../accessors/Mat
 import { mix } from '../math/MathNode.js';
 import { vec4 } from '../tsl/TSLBase.js';
 
+/**
+ * Represents the lighting model for unlit materials. The only light contribution
+ * is baked indirect lighting modulated with ambient occlusion and the material's
+ * diffuse color. Environment mapping is supported. Used in {@link MeshBasicNodeMaterial}.
+ *
+ * @augments LightingModel
+ */
 class BasicLightingModel extends LightingModel {
 
+	/**
+	 * Constructs a new basic lighting model.
+	 */
 	constructor() {
 
 		super();
 
 	}
 
-	indirect( context, stack, builder ) {
+	/**
+	 * Implements the baked indirect lighting with its modulation.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirect( { context } ) {
 
 		const ambientOcclusion = context.ambientOcclusion;
 		const reflectedLight = context.reflectedLight;
-		const irradianceLightMap = builder.context.irradianceLightMap;
+		const irradianceLightMap = context.irradianceLightMap;
 
 		reflectedLight.indirectDiffuse.assign( vec4( 0.0 ) );
 
@@ -41,9 +56,15 @@ class BasicLightingModel extends LightingModel {
 
 	}
 
-	finish( context, stack, builder ) {
+	/**
+	 * Implements the environment mapping.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	finish( builder ) {
 
-		const material = builder.material;
+		const { material, context } = builder;
+
 		const outgoingLight = context.outgoingLight;
 		const envNode = builder.context.environment;
 

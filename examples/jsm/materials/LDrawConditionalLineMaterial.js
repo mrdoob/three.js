@@ -5,6 +5,15 @@ import {
 	UniformsUtils,
 } from 'three';
 
+/**
+ * A special line material for meshes loaded via {@link LDrawLoader}.
+ *
+ * This module can only be used with {@link WebGLRenderer}. When using {@link WebGPURenderer},
+ * import the class from `LDrawConditionalLineNodeMaterial.js`.
+ *
+ * @augments ShaderMaterial
+ * @three_import import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';
+ */
 class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 	static get type() {
@@ -13,6 +22,15 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 	}
 
+	/**
+	 * Constructs a new conditional line material.
+	 *
+	 * @param {Object} [parameters] - An object with one or more properties
+	 * defining the material's appearance. Any property of the material
+	 * (including any property from inherited materials) can be passed
+	 * in here. Color values can be passed any type of value accepted
+	 * by {@link Color#set}.
+	 */
 	constructor( parameters ) {
 
 		super( {
@@ -109,6 +127,13 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 		Object.defineProperties( this, {
 
+			/**
+			 * The material's opacity.
+			 *
+			 * @name LDrawConditionalLineMaterial#opacity
+			 * @type {number}
+			 * @default 1
+			 */
 			opacity: {
 				get: function () {
 
@@ -123,6 +148,13 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 				}
 			},
 
+			/**
+			 * The material's color.
+			 *
+			 * @name LDrawConditionalLineMaterial#color
+			 * @type {Color}
+			 * @default (1,1,1)
+			 */
 			color: {
 				get: function () {
 
@@ -134,6 +166,14 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 		} );
 
 		this.setValues( parameters );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isLDrawConditionalLineMaterial = true;
 
 	}

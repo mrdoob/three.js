@@ -9,11 +9,27 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
+import { ExternalTexture } from '../../textures/ExternalTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 import { WebXRDepthSensing } from './WebXRDepthSensing.js';
 
+/**
+ * This class represents an abstraction of the WebXR Device API and is
+ * internally used by {@link WebGLRenderer}. `WebXRManager` also provides a public
+ * interface that allows users to enable/disable XR and perform XR related
+ * tasks like for instance retrieving controllers.
+ *
+ * @augments EventDispatcher
+ * @hideconstructor
+ */
 class WebXRManager extends EventDispatcher {
 
+	/**
+	 * Constructs a new WebGL renderer.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGL2RenderingContext} gl - The rendering context.
+	 */
 	constructor( renderer, gl ) {
 
 		super();
@@ -37,6 +53,7 @@ class WebXRManager extends EventDispatcher {
 		let xrFrame = null;
 
 		const depthSensing = new WebXRDepthSensing();
+		const cameraAccessTextures = {};
 		const attributes = gl.getContextAttributes();
 
 		let initialRenderTarget = null;
@@ -65,11 +82,40 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		/**
+		 * Whether the manager's XR camera should be automatically updated or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.cameraAutoUpdate = true;
+
+		/**
+		 * This flag notifies the renderer to be ready for XR rendering. Set it to `true`
+		 * if you are going to use XR in your app.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.enabled = false;
 
+		/**
+		 * Whether XR presentation is active or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.isPresenting = false;
 
+		/**
+		 * Returns a group representing the `target ray` space of the XR controller.
+		 * Use this space for visualizing 3D objects that support the user in pointing
+		 * tasks like UI interaction.
+		 *
+		 * @param {number} index - The index of the controller.
+		 * @return {Group} A group representing the `target ray` space.
+		 */
 		this.getController = function ( index ) {
 
 			let controller = controllers[ index ];
@@ -85,6 +131,21 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns a group representing the `grip` space of the XR controller.
+		 * Use this space for visualizing 3D objects that support the user in pointing
+		 * tasks like UI interaction.
+		 *
+		 * Note: If you want to show something in the user's hand AND offer a
+		 * pointing ray at the same time, you'll want to attached the handheld object
+		 * to the group returned by `getControllerGrip()` and the ray to the
+		 * group returned by `getController()`. The idea is to have two
+		 * different groups in two different coordinate spaces for the same WebXR
+		 * controller.
+		 *
+		 * @param {number} index - The index of the controller.
+		 * @return {Group} A group representing the `grip` space.
+		 */
 		this.getControllerGrip = function ( index ) {
 
 			let controller = controllers[ index ];
@@ -100,6 +161,14 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns a group representing the `hand` space of the XR controller.
+		 * Use this space for visualizing 3D objects that support the user in pointing
+		 * tasks like UI interaction.
+		 *
+		 * @param {number} index - The index of the controller.
+		 * @return {Group} A group representing the `hand` space.
+		 */
 		this.getHand = function ( index ) {
 
 			let controller = controllers[ index ];
@@ -165,6 +234,11 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthFar = null;
 
 			depthSensing.reset();
+			for ( const key in cameraAccessTextures ) {
+
+				delete cameraAccessTextures[ key ];
+
+			}
 
 			// restore framebuffer/rendering state
 
@@ -189,6 +263,13 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		/**
+		 * Sets the framebuffer scale factor.
+		 *
+		 * This method can not be used during a XR session.
+		 *
+		 * @param {number} value - The framebuffer scale factor.
+		 */
 		this.setFramebufferScaleFactor = function ( value ) {
 
 			framebufferScaleFactor = value;
@@ -201,6 +282,16 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Sets the reference space type. Can be used to configure a spatial relationship with the user's physical
+		 * environment. Depending on how the user moves in 3D space, setting an appropriate reference space can
+		 * improve tracking. Default is `local-floor`. Valid values can be found here
+		 * https://developer.mozilla.org/en-US/docs/Web/API/XRReferenceSpace#reference_space_types.
+		 *
+		 * This method can not be used during a XR session.
+		 *
+		 * @param {string} value - The reference space type.
+		 */
 		this.setReferenceSpaceType = function ( value ) {
 
 			referenceSpaceType = value;
@@ -213,42 +304,81 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns the XR reference space.
+		 *
+		 * @return {XRReferenceSpace} The XR reference space.
+		 */
 		this.getReferenceSpace = function () {
 
 			return customReferenceSpace || referenceSpace;
 
 		};
 
+		/**
+		 * Sets a custom XR reference space.
+		 *
+		 * @param {XRReferenceSpace} space - The XR reference space.
+		 */
 		this.setReferenceSpace = function ( space ) {
 
 			customReferenceSpace = space;
 
 		};
 
+		/**
+		 * Returns the current base layer.
+		 *
+		 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
+		 */
 		this.getBaseLayer = function () {
 
 			return glProjLayer !== null ? glProjLayer : glBaseLayer;
 
 		};
 
+		/**
+		 * Returns the current XR binding.
+		 *
+		 * @return {?XRWebGLBinding} The XR binding.
+		 */
 		this.getBinding = function () {
 
 			return glBinding;
 
 		};
 
+		/**
+		 * Returns the current XR frame.
+		 *
+		 * @return {?XRFrame} The XR frame. Returns `null` when used outside a XR session.
+		 */
 		this.getFrame = function () {
 
 			return xrFrame;
 
 		};
 
+		/**
+		 * Returns the current XR session.
+		 *
+		 * @return {?XRSession} The XR session. Returns `null` when used outside a XR session.
+		 */
 		this.getSession = function () {
 
 			return session;
 
 		};
 
+		/**
+		 * After a XR session has been requested usually with one of the `*Button` modules, it
+		 * is injected into the renderer with this method. This method triggers the start of
+		 * the actual XR rendering.
+		 *
+		 * @async
+		 * @param {XRSession} value - The XR session to set.
+		 * @return {Promise} A Promise that resolves when the session has been set.
+		 */
 		this.setSession = async function ( value ) {
 
 			session = value;
@@ -275,7 +405,17 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
-				if ( session.renderState.layers === undefined ) {
+				if ( typeof XRWebGLBinding !== 'undefined' ) {
+
+					glBinding = new XRWebGLBinding( session, gl );
+
+				}
+
+				// Check that the browser implements the necessary APIs to use an
+				// XRProjectionLayer rather than an XRWebGLLayer
+				const useLayers = glBinding !== null && 'createProjectionLayer' in XRWebGLBinding.prototype;
+
+				if ( ! useLayers ) {
 
 					const layerInit = {
 						antialias: attributes.antialias,
@@ -299,7 +439,10 @@ class WebXRManager extends EventDispatcher {
 							format: RGBAFormat,
 							type: UnsignedByteType,
 							colorSpace: renderer.outputColorSpace,
-							stencilBuffer: attributes.stencil
+							stencilBuffer: attributes.stencil,
+							resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+							resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false )
+
 						}
 					);
 
@@ -323,8 +466,6 @@ class WebXRManager extends EventDispatcher {
 						scaleFactor: framebufferScaleFactor
 					};
 
-					glBinding = new XRWebGLBinding( session, gl );
-
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
@@ -342,7 +483,8 @@ class WebXRManager extends EventDispatcher {
 							stencilBuffer: attributes.stencil,
 							colorSpace: renderer.outputColorSpace,
 							samples: attributes.antialias ? 4 : 0,
-							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false )
+							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
+							resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false )
 						} );
 
 				}
@@ -365,6 +507,11 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns the environment blend mode from the current XR session.
+		 *
+		 * @return {'opaque'|'additive'|'alpha-blend'|undefined} The environment blend mode. Returns `undefined` when used outside of a XR session.
+		 */
 		this.getEnvironmentBlendMode = function () {
 
 			if ( session !== null ) {
@@ -375,6 +522,11 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns the current depth texture computed via depth sensing.
+		 *
+		 * @return {?Texture} The depth texture.
+		 */
 		this.getDepthTexture = function () {
 
 			return depthSensing.getDepthTexture();
@@ -457,6 +609,10 @@ class WebXRManager extends EventDispatcher {
 		 * the cameras' projection and world matrices have already been set.
 		 * And that near and far planes are identical for both cameras.
 		 * Visualization of this technique: https://computergraphics.stackexchange.com/a/4765
+		 *
+		 * @param {ArrayCamera} camera - The camera to update.
+		 * @param {PerspectiveCamera} cameraL - The left camera.
+		 * @param {PerspectiveCamera} cameraR - The right camera.
 		 */
 		function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
@@ -537,6 +693,15 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		/**
+		 * Updates the state of the XR camera. Use this method on app level if you
+		 * set cameraAutoUpdate` to `false`. The method requires the non-XR
+		 * camera of the scene as a parameter. The passed in camera's transformation
+		 * is automatically adjusted to the position of the XR camera when calling
+		 * this method.
+		 *
+		 * @param {Camera} camera - The camera.
+		 */
 		this.updateCamera = function ( camera ) {
 
 			if ( session === null ) return;
@@ -568,9 +733,10 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			cameraL.layers.mask = camera.layers.mask | 0b010;
-			cameraR.layers.mask = camera.layers.mask | 0b100;
-			cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
+			// inherit camera layers and enable eye layers (1 = left, 2 = right)
+			cameraXR.layers.mask = camera.layers.mask | 0b110;
+			cameraL.layers.mask = cameraXR.layers.mask & 0b011;
+			cameraR.layers.mask = cameraXR.layers.mask & 0b101;
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
@@ -632,12 +798,27 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		/**
+		 * Returns an instance of {@link ArrayCamera} which represents the XR camera
+		 * of the active XR session. For each view it holds a separate camera object.
+		 *
+		 * The camera's `fov` is currently not used and does not reflect the fov of
+		 * the XR camera. If you need the fov on app level, you have to compute in
+		 * manually from the XR camera's projection matrices.
+		 *
+		 * @return {ArrayCamera} The XR camera.
+		 */
 		this.getCamera = function () {
 
 			return cameraXR;
 
 		};
 
+		/**
+		 * Returns the amount of foveation used by the XR compositor for the projection layer.
+		 *
+		 * @return {number|undefined} The amount of foveation.
+		 */
 		this.getFoveation = function () {
 
 			if ( glProjLayer === null && glBaseLayer === null ) {
@@ -650,6 +831,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Sets the foveation value.
+		 *
+		 * @param {number} value - A number in the range `[0,1]` where `0` means no foveation (full resolution)
+		 * and `1` means maximum foveation (the edges render at lower resolution).
+		 */
 		this.setFoveation = function ( value ) {
 
 			// 0 = no foveation = full resolution
@@ -671,15 +858,38 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		/**
+		 * Returns `true` if depth sensing is supported.
+		 *
+		 * @return {boolean} Whether depth sensing is supported or not.
+		 */
 		this.hasDepthSensing = function () {
 
 			return depthSensing.texture !== null;
 
 		};
 
+		/**
+		 * Returns the depth sensing mesh.
+		 *
+		 * @return {Mesh} The depth sensing mesh.
+		 */
 		this.getDepthSensingMesh = function () {
 
 			return depthSensing.getMesh( cameraXR );
+
+		};
+
+		/**
+		 * Retrieves an opaque texture from the view-aligned {@link XRCamera}.
+		 * Only available during the current animation loop.
+		 *
+		 * @param {XRCamera} xrCamera - The camera to query.
+		 * @return {?Texture} An opaque texture representing the current raw camera frame.
+		 */
+		this.getCameraTexture = function ( xrCamera ) {
+
+			return cameraAccessTextures[ xrCamera ];
 
 		};
 
@@ -735,7 +945,7 @@ class WebXRManager extends EventDispatcher {
 							renderer.setRenderTargetTextures(
 								newRenderTarget,
 								glSubImage.colorTexture,
-								glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture );
+								glSubImage.depthStencilTexture );
 
 							renderer.setRenderTarget( newRenderTarget );
 
@@ -778,14 +988,52 @@ class WebXRManager extends EventDispatcher {
 				//
 
 				const enabledFeatures = session.enabledFeatures;
+				const gpuDepthSensingEnabled = enabledFeatures &&
+					enabledFeatures.includes( 'depth-sensing' ) &&
+					session.depthUsage == 'gpu-optimized';
 
-				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
+				if ( gpuDepthSensingEnabled && glBinding ) {
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
 					if ( depthData && depthData.isValid && depthData.texture ) {
 
-						depthSensing.init( renderer, depthData, session.renderState );
+						depthSensing.init( depthData, session.renderState );
+
+					}
+
+				}
+
+				const cameraAccessEnabled = enabledFeatures &&
+				    enabledFeatures.includes( 'camera-access' );
+
+				if ( cameraAccessEnabled ) {
+
+					renderer.state.unbindTexture();
+
+					if ( glBinding ) {
+
+						for ( let i = 0; i < views.length; i ++ ) {
+
+							const camera = views[ i ].camera;
+
+							if ( camera ) {
+
+								let cameraTex = cameraAccessTextures[ camera ];
+
+								if ( ! cameraTex ) {
+
+									cameraTex = new ExternalTexture();
+									cameraAccessTextures[ camera ] = cameraTex;
+
+								}
+
+								const glTexture = glBinding.getCameraImage( camera );
+								cameraTex.sourceTexture = glTexture;
+
+							}
+
+						}
 
 					}
 

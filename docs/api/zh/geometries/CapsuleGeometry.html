@@ -47,13 +47,14 @@ const capsule = new THREE.Mesh( geometry, material ); scene.add( capsule );
 		<h2>构造函数</h2>
 
 		<h3>
-			[name]([param:Float radius], [param:Float length], [param:Integer capSegments], [param:Integer radialSegments])
+			[name]([param:Float radius], [param:Float height], [param:Integer capSegments], [param:Integer radialSegments], [param:Integer heightSegments])
 		</h3>
 		<p>
 			radius — 胶囊半径。可选的; 默认值为1。<br />
-			length — 中间区域的长度。可选的; 默认值为1。<br />
+			height — 中间区域的高度。可选的; 默认值为1。<br />
 			capSegments — 构造盖子的曲线部分的个数。可选的; 默认值为4。<br />
 			radialSegments — 覆盖胶囊圆周的分离的面的个数。可选的; 默认值为8。<br />
+			heightSegments — 胶囊侧面沿其高度的段数，默认值为 1。<br />
 		</p>
 
 		<h2>属性</h2>

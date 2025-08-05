@@ -1,7 +1,7 @@
  <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - compute - water</title>
+		<title>three.js webgpu - compute water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgpu compute water<br/>
-			Move mouse to disturb water.
+			Click and move mouse to disturb water.
 		</div>
 
 		<script type="importmap">
@@ -26,10 +26,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
+			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView } from 'three/tsl';
 
-			import { color, instanceIndex, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView } from 'three/tsl';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+ 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -37,22 +42,42 @@
 			const WIDTH = 128;
 
 			// Water size in system units.
-			const BOUNDS = 512;
+			const BOUNDS = 6;
 			const BOUNDS_HALF = BOUNDS * 0.5;
+			const limit = BOUNDS_HALF - 0.2;
 
-			const waterMaxHeight = 10;
+			const waterMaxHeight = 0.1;
 
 			let container, stats;
-			let camera, scene, renderer;
-			let mouseMoved = false;
+			let camera, scene, renderer, controls;
+
+			let mouseDown = false;
+			let firstClick = true;
+			let updateOriginMouseDown = false;
+
 			const mouseCoords = new THREE.Vector2();
 			const raycaster = new THREE.Raycaster();
-			let effectController;
+			let frame = 0;
 
-			let waterMesh, meshRay;
-			let computeHeight, computeSmooth, computeSphere;
+			const effectController = {
+				mousePos: uniform( new THREE.Vector2() ).setName( 'mousePos' ),
+				mouseSpeed: uniform( new THREE.Vector2() ).setName( 'mouseSpeed' ),
+				mouseDeep: uniform( .5 ).setName( 'mouseDeep' ),
+				mouseSize: uniform( 0.12 ).setName( 'mouseSize' ),
+				viscosity: uniform( 0.96 ).setName( 'viscosity' ),
+				ducksEnabled: true,
+				wireframe: false,
+				speed: 5,
+			};
 
-			const NUM_SPHERES = 100;
+			let sun;
+			let waterMesh;
+			let poolBorder;
+			let meshRay;
+			let computeHeight, computeDucks;
+			let duckModel = null;
+
+			const NUM_DUCKS = 100;
 
 			const simplex = new SimplexNoise();
 
@@ -75,34 +100,22 @@
 
 			}
 
-			function init() {
+			async function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
-				camera.position.set( 0, 200, 350 );
+				camera.position.set( 0, 2.00, 4 );
 				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
-				const sun = new THREE.DirectionalLight( 0xFFFFFF, 3.0 );
-				sun.position.set( 300, 400, 175 );
+				sun = new THREE.DirectionalLight( 0xFFFFFF, 4.0 );
+ 				sun.position.set( - 1, 2.6, 1.4 );
 				scene.add( sun );
 
-				const sun2 = new THREE.DirectionalLight( 0x40A040, 2.0 );
-				sun2.position.set( - 100, 350, - 200 );
-				scene.add( sun2 );
-
 				//
-
-				effectController = {
-					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
-					mouseSize: uniform( 30.0 ).label( 'mouseSize' ),
-					viscosity: uniform( 0.95 ).label( 'viscosity' ),
-					spheresEnabled: true,
-					wireframe: false
-				};
 
 				// Initialize height storage buffers
 				const heightArray = new Float32Array( WIDTH * WIDTH );
@@ -127,8 +140,8 @@
 
 				}
 
-				const heightStorage = instancedArray( heightArray ).label( 'Height' );
-				const prevHeightStorage = instancedArray( prevHeightArray ).label( 'PrevHeight' );
+				const heightStorage = instancedArray( heightArray ).setName( 'Height' );
+				const prevHeightStorage = instancedArray( prevHeightArray ).setName( 'PrevHeight' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
 				const getNeighborIndicesTSL = ( index ) => {
@@ -138,9 +151,9 @@
 					// Get 2-D compute coordinate from one-dimensional instanceIndex. The calculation will
 					// still work even if you dispatch your compute shader 2-dimensionally, since within a compute
 					// context, instanceIndex is a 1-dimensional value derived from the workgroup dimensions.
-			
+
 					// Cast to int to prevent unintended index overflow upon subtraction.
-					const x = int( index.modInt( WIDTH ) );
+					const x = int( index.mod( WIDTH ) );
 					const y = int( index.div( WIDTH ) );
 
 					// The original shader accesses height via texture uvs. However, unlike with textures, we can't
@@ -155,7 +168,7 @@
 
 					const westIndex = y.mul( width ).add( leftX );
 					const eastIndex = y.mul( width ).add( rightX );
-			
+
 					const southIndex = bottomY.mul( width ).add( x );
 					const northIndex = topY.mul( width ).add( x );
 
@@ -191,7 +204,7 @@
 
 				computeHeight = Fn( () => {
 
-					const { viscosity, mousePos, mouseSize } = effectController;
+					const { viscosity, mousePos, mouseSize, mouseDeep, mouseSpeed } = effectController;
 
 					const height = heightStorage.element( instanceIndex ).toVar();
 					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
@@ -205,66 +218,63 @@
 					const newHeight = neighborHeight.mul( viscosity );
 
 					// Get 2-D compute coordinate from one-dimensional instanceIndex.
-					const x = float( instanceIndex.modInt( WIDTH ) ).mul( 1 / WIDTH );
+					const x = float( instanceIndex.mod( WIDTH ) ).mul( 1 / WIDTH );
 					const y = float( instanceIndex.div( WIDTH ) ).mul( 1 / WIDTH );
 
 					// Mouse influence
 					const centerVec = vec2( 0.5 );
+
 					// Get length of position in range [ -BOUNDS / 2, BOUNDS / 2 ], offset by mousePos, then scale.
 					const mousePhase = clamp( length( ( vec2( x, y ).sub( centerVec ) ).mul( BOUNDS ).sub( mousePos ) ).mul( Math.PI ).div( mouseSize ), 0.0, Math.PI );
 
-					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( 0.28 ) );
+					// "Indent" water down by scaled distance from center of mouse impact
+					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( mouseDeep ).mul( mouseSpeed.length() ) );
 
 					prevHeightStorage.element( instanceIndex ).assign( height );
 					heightStorage.element( instanceIndex ).assign( newHeight );
 
 				} )().compute( WIDTH * WIDTH );
 
-				computeSmooth = Fn( () => {
-
-					const height = heightStorage.element( instanceIndex ).toVar();
-					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
-
-					// Get neighboring height values.
-					const { north: northH, south: southH, east: eastH, west: westH } = getNeighborValuesTSL( instanceIndex, heightStorage );
-			
-					// Get neighboring prev height values.
-					const { north: northP, south: southP, east: eastP, west: westP } = getNeighborValuesTSL( instanceIndex, prevHeightStorage );
-
-					height.addAssign( northH.add( southH ).add( eastH ).add( westH ) );
-					prevHeight.addAssign( northP.add( southP ).add( eastP ).add( westP ) );
-
-					heightStorage.element( instanceIndex ).assign( height.div( 5 ) );
-					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
-
-				} )().compute( WIDTH * WIDTH/*, [ 8, 8 ]*/ );
-
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
-				// material: make a THREE.ShaderMaterial clone of THREE.MeshPhongMaterial, with customized position shader.
-				const waterMaterial = new THREE.MeshPhongNodeMaterial();
 
-				waterMaterial.lights = true;
-				waterMaterial.colorNode = color( 0x0040C0 );
-				waterMaterial.specularNode = color( 0x111111 );
-				waterMaterial.shininess = Math.max( 50, 1e-4 );
-				waterMaterial.positionNode = Fn( () => {
+				const waterMaterial = new THREE.MeshStandardNodeMaterial( {
+					color: 0x9bd2ec,
+ 					metalness: 0.9,
+ 					roughness: 0,
+ 					transparent: true,
+ 					opacity: 0.8,
+ 					side: THREE.DoubleSide
+				} );
 
-					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
+				waterMaterial.normalNode = Fn( () => {
+
+					// To correct the lighting as our mesh undulates, we have to reassign the normals in the normal shader.
 					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightStorage );
 
-					varyingProperty( 'vec3', 'v_normalView' ).assign( transformNormalToView( vec3( normalX, negate( normalY ), 1.0 ) ) );
+					return transformNormalToView( vec3( normalX, normalY.negate(), 1.0 ) ).toVertexStage();
+
+				} )();
+
+				waterMaterial.positionNode = Fn( () => {
 
 					return vec3( positionLocal.x, positionLocal.y, heightStorage.element( vertexIndex ) );
 
 				} )();
 
 				waterMesh = new THREE.Mesh( waterGeometry, waterMaterial );
-				waterMesh.rotation.x = - Math.PI / 2;
+				waterMesh.rotation.x = - Math.PI * 0.5;
 				waterMesh.matrixAutoUpdate = false;
 				waterMesh.updateMatrix();
 
 				scene.add( waterMesh );
+
+				// Pool border
+				const borderGeom = new THREE.TorusGeometry( 4.2, 0.1, 12, 4 );
+ 				borderGeom.rotateX( Math.PI * 0.5 );
+ 				borderGeom.rotateY( Math.PI * 0.25 );
+ 				poolBorder = new THREE.Mesh( borderGeom, new THREE.MeshStandardMaterial( { color: 0x908877, roughness: 0.2 } ) );
+ 				scene.add( poolBorder );
 
 				// THREE.Mesh just for mouse raycasting
 				const geometryRay = new THREE.PlaneGeometry( BOUNDS, BOUNDS, 1, 1 );
@@ -274,150 +284,182 @@
 				meshRay.updateMatrix();
 				scene.add( meshRay );
 
-				// Create sphere THREE.InstancedMesh
-				const sphereGeometry = new THREE.SphereGeometry( 4, 24, 12 );
-				const sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFF00 } );
-			
 				// Initialize sphere mesh instance position and velocity.
-				const spherePositionArray = new Float32Array( NUM_SPHERES * 3 );
-			
+				// position<vec3> + velocity<vec2> + unused<vec3> = 8 floats per sphere.
+				// for structs arrays must be enclosed in multiple of 4
+
+				const duckStride = 8;
+				const duckInstanceDataArray = new Float32Array( NUM_DUCKS * duckStride );
+
 				// Only hold velocity in x and z directions.
 				// The sphere is wedded to the surface of the water, and will only move vertically with the water.
-				const sphereVelocityArray = new Float32Array( NUM_SPHERES * 2 );
 
-				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
+				for ( let i = 0; i < NUM_DUCKS; i ++ ) {
 
-					spherePositionArray[ i * 3 + 0 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
-					spherePositionArray[ i * 3 + 1 ] = 0;
-					spherePositionArray[ i * 3 + 2 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					duckInstanceDataArray[ i * duckStride + 0 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					duckInstanceDataArray[ i * duckStride + 1 ] = 0;
+					duckInstanceDataArray[ i * duckStride + 2 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
 
 				}
 
-				sphereVelocityArray.fill( 0.0 );
+				const DuckStruct = struct( {
+					position: 'vec3',
+					velocity: 'vec2'
+				} );
 
-				// Sphere Instance Storage
-				const sphereInstancePositionStorage = instancedArray( spherePositionArray, 'vec3' ).label( 'SpherePosition' );
-				const sphereVelocityStorage = instancedArray( sphereVelocityArray, 'vec2' ).label( 'SphereVelocity' );
+				// Duck instance data storage
 
-				computeSphere = Fn( () => {
+				const duckInstanceDataStorage = instancedArray( duckInstanceDataArray, DuckStruct ).setName( 'DuckInstanceData' );
 
-					const instancePosition = sphereInstancePositionStorage.element( instanceIndex );
-					const velocity = sphereVelocityStorage.element( instanceIndex );
+				computeDucks = Fn( () => {
 
-					// Bring position from range of [ -BOUNDS/2, BOUNDS/2 ] to [ 0, BOUNDS ]
-					const tempX = instancePosition.x.add( BOUNDS_HALF );
-					const tempZ = instancePosition.z.add( BOUNDS_HALF );
+					const yOffset = float( - 0.04 );
+					const verticalResponseFactor = float( 0.98 );
+					const waterPushFactor = float( 0.015 );
+					const linearDamping = float( 0.92 );
+					const bounceDamping = float( - 0.4 );
 
-					// Bring position from range [ 0, BOUNDS ] to [ 0, WIDTH ]
-					// ( i.e bring geometry range into 'heightmap' range )
-					// WIDTH = 128, BOUNDS = 512... same as dividing by 4
-					tempX.mulAssign( WIDTH / BOUNDS );
-					tempZ.mulAssign( WIDTH / BOUNDS );
+					// Get 2-D compute coordinate from one-dimensional instanceIndex. The calculation will
+					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' ).toVar();
+					const velocity = duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' ).toVar();
 
-					// Can only access storage buffers with uints
-					const xCoord = uint( floor( tempX ) );
-					const zCoord = uint( floor( tempZ ) );
+					const gridCoordX = instancePosition.x.div( BOUNDS ).add( 0.5 ).mul( WIDTH );
+					const gridCoordZ = instancePosition.z.div( BOUNDS ).add( 0.5 ).mul( WIDTH );
 
-					// Get one dimensional index
+					// Cast to int to prevent unintended index overflow upon subtraction.
+					const xCoord = uint( clamp( floor( gridCoordX ), 0, WIDTH - 1 ) );
+					const zCoord = uint( clamp( floor( gridCoordZ ), 0, WIDTH - 1 ) );
 					const heightInstanceIndex = zCoord.mul( WIDTH ).add( xCoord );
 
-					// Set to read-only to be safe, even if it's not strictly necessary for compute access.
-					const height = heightStorage.element( heightInstanceIndex );
-
-					// Assign height to sphere position
-					instancePosition.y.assign( height );
-
-					// Calculate normal of the water mesh at this location.
+					// Get height of water at the duck's position
+					const waterHeight = heightStorage.element( heightInstanceIndex );
 					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightStorage );
 
-					normalX.mulAssign( 0.1 );
-					normalY.mulAssign( 0.1 );
+					// Calculate the target Y position based on the water height and the duck's vertical offset
+					const targetY = waterHeight.add( yOffset );
 
-					const waterNormal = vec3( normalX, 0.0, negate( normalY ) );
+					const deltaY = targetY.sub( instancePosition.y );
+					instancePosition.y.addAssign( deltaY.mul( verticalResponseFactor ) ); // Gradually update position
 
-					const newVelocity = vec3( velocity.x, 0.0, velocity.y ).add( waterNormal );
-					newVelocity.mulAssign( 0.998 );
+					// Get the normal of the water surface at the duck's position
+					const pushX = normalX.mul( waterPushFactor );
+					const pushZ = normalY.mul( waterPushFactor );
 
-					const newPosition = instancePosition.add( newVelocity ).toVar();
+					// Apply the water push to the duck's velocity
+					velocity.x.mulAssign( linearDamping );
+					velocity.y.mulAssign( linearDamping );
 
-					// Reverse velocity and reset position when exceeding bounds.
-					If( newPosition.x.lessThan( - BOUNDS_HALF ), () => {
+					velocity.x.addAssign( pushX );
+					velocity.y.addAssign( pushZ );
 
-						newPosition.x = float( - BOUNDS_HALF ).add( 0.001 );
-						newVelocity.x.mulAssign( - 0.3 );
-			
-					} ).ElseIf( newPosition.x.greaterThan( BOUNDS_HALF ), () => {
+					// update position based on velocity
+					instancePosition.x.addAssign( velocity.x );
+					instancePosition.z.addAssign( velocity.y );
 
-						newPosition.x = float( BOUNDS_HALF ).sub( 0.001 );
-						newVelocity.x.mulAssign( - 0.3 );
-			
+					// Clamp position to the pool bounds
+
+					If( instancePosition.x.lessThan( - limit ), () => {
+
+						instancePosition.x = - limit;
+						velocity.x.mulAssign( bounceDamping );
+
+					} ).ElseIf( instancePosition.x.greaterThan( limit ), () => {
+
+						instancePosition.x = limit;
+						velocity.x.mulAssign( bounceDamping );
+
 					} );
 
-					If( newPosition.z.lessThan( - BOUNDS_HALF ), () => {
+					If( instancePosition.z.lessThan( - limit ), () => {
 
-						newPosition.z = float( - BOUNDS_HALF ).add( 0.001 );
-						newVelocity.z.mulAssign( - 0.3 );
-			
-					} ).ElseIf( newPosition.z.greaterThan( BOUNDS_HALF ), () => {
+						instancePosition.z = - limit;
+						velocity.y.mulAssign( bounceDamping ); // Invert and damp vz (velocity.y)
 
-						newPosition.z = float( BOUNDS_HALF ).sub( 0.001 );
-						newVelocity.z.mulAssign( - 0.3 );
-			
+					} ).ElseIf( instancePosition.z.greaterThan( limit ), () => {
+
+						instancePosition.z = limit;
+						velocity.y.mulAssign( bounceDamping );
+
 					} );
 
-					instancePosition.assign( newPosition );
-					velocity.assign( vec2( newVelocity.x, newVelocity.z ) );
+					// assignment of new values to the instance data storage
 
-				} )().compute( NUM_SPHERES );
+					duckInstanceDataStorage.element( instanceIndex ).get( 'position' ).assign( instancePosition );
+					duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' ).assign( velocity );
 
-				sphereMaterial.positionNode = Fn( () => {
+				} )().compute( NUM_DUCKS );
 
-					const instancePosition = sphereInstancePositionStorage.element( instanceIndex );
+				// Models / Textures
+
+				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
+ 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
+ 				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
+
+ 				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
+ 				env.mapping = THREE.EquirectangularReflectionMapping;
+ 				scene.environment = env;
+ 				scene.background = env;
+ 				scene.backgroundBlurriness = 0.3;
+ 				scene.environmentIntensity = 1.25;
+
+				duckModel = model.scene.children[ 0 ];
+				duckModel.material.positionNode = Fn( () => {
+
+					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' );
 
 					const newPosition = positionLocal.add( instancePosition );
 
 					return newPosition;
-			
+
 				} )();
 
-				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
-				scene.add( sphereMesh );
+				const duckMesh = new THREE.InstancedMesh( duckModel.geometry, duckModel.material, NUM_DUCKS );
+				scene.add( duckMesh );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, container );
+
+				container.style.touchAction = 'none';
+
+				// Stats
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
+				container.addEventListener( 'pointerdown', onPointerDown );
+				container.addEventListener( 'pointerup', onPointerUp );
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				// GUI
+
 				const gui = new GUI();
-				gui.add( effectController.mouseSize, 'value', 1.0, 100.0, 1.0 ).name( 'Mouse Size' );
-				gui.add( effectController.viscosity, 'value', 0.9, 0.999, 0.001 ).name( 'viscosity' );
-				const buttonCompute = {
-					smoothWater: function () {
+				gui.add( effectController.mouseSize, 'value', 0.1, .3 ).name( 'Mouse Size' );
+				gui.add( effectController.mouseDeep, 'value', 0.1, 1 ).name( 'Mouse Deep' );
+				gui.add( effectController.viscosity, 'value', 0.9, 0.96, 0.001 ).name( 'viscosity' );
+				gui.add( effectController, 'speed', 1, 6, 1 );
+				gui.add( effectController, 'ducksEnabled' ).onChange( () => {
 
-						renderer.computeAsync( computeSmooth );
+					duckMesh.visible = effectController.ducksEnabled;
 
-					}
-				};
-				gui.add( buttonCompute, 'smoothWater' );
-				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
-			
-					sphereMesh.visible = effectController.spheresEnabled;
-			
 				} );
 				gui.add( effectController, 'wireframe' ).onChange( () => {
-			
+
 					waterMesh.material.wireframe = ! waterMesh.material.wireframe;
+					poolBorder.material.wireframe = ! poolBorder.material.wireframe;
+					duckModel.material.wireframe = ! duckModel.material.wireframe;
 					waterMesh.material.needsUpdate = true;
-			
+					poolBorder.material.needsUpdate = true;
+
 				} );
 
 			}
@@ -434,7 +476,24 @@
 			function setMouseCoords( x, y ) {
 
 				mouseCoords.set( ( x / renderer.domElement.clientWidth ) * 2 - 1, - ( y / renderer.domElement.clientHeight ) * 2 + 1 );
-				mouseMoved = true;
+
+			}
+
+			function onPointerDown() {
+
+				mouseDown = true;
+				firstClick = true;
+				updateOriginMouseDown = true;
+
+			}
+
+			function onPointerUp() {
+
+				mouseDown = false;
+				firstClick = false;
+				updateOriginMouseDown = false;
+
+				controls.enabled = true;
 
 			}
 
@@ -453,9 +512,9 @@
 
 			}
 
-			function render() {
+			function raycast() {
 
-				if ( mouseMoved ) {
+				if ( mouseDown && ( firstClick || ! controls.enabled ) ) {
 
 					raycaster.setFromCamera( mouseCoords, camera );
 
@@ -464,27 +523,65 @@
 					if ( intersects.length > 0 ) {
 
 						const point = intersects[ 0 ].point;
+
+						if ( updateOriginMouseDown ) {
+
+							effectController.mousePos.value.set( point.x, point.z );
+
+							updateOriginMouseDown = false;
+
+						}
+
+						effectController.mouseSpeed.value.set(
+							( point.x - effectController.mousePos.value.x ),
+							( point.z - effectController.mousePos.value.y )
+						);
+
 						effectController.mousePos.value.set( point.x, point.z );
+
+						if ( firstClick ) {
+
+							controls.enabled = false;
+
+						}
 
 					} else {
 
-						effectController.mousePos.value.set( 10000, 10000 );
+						updateOriginMouseDown = true;
+
+						effectController.mouseSpeed.value.set( 0, 0 );
 
 					}
 
-					mouseMoved = false;
+					firstClick = false;
 
 				} else {
 
-					effectController.mousePos.value.set( 10000, 10000 );
+					updateOriginMouseDown = true;
+
+					effectController.mouseSpeed.value.set( 0, 0 );
 
 				}
-			
-				renderer.computeAsync( computeHeight );
 
-				if ( effectController.spheresEnabled ) {
+			}
 
-					renderer.computeAsync( computeSphere );
+			function render() {
+
+				raycast();
+
+				frame ++;
+
+				if ( frame >= 7 - effectController.speed ) {
+
+					renderer.computeAsync( computeHeight );
+
+					if ( effectController.ducksEnabled ) {
+
+						renderer.computeAsync( computeDucks );
+
+					}
+
+					frame = 0;
 
 				}
 

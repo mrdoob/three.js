@@ -6,39 +6,35 @@ import {
 } from 'three';
 import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
 
+const _v1 = new Vector3();
+
 /**
- * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
- *
- * Usage:
+ * This class can be used to subdivide a convex Geometry object into pieces.
  *
  * Use the function prepareBreakableObject to prepare a Mesh object to be broken.
- *
- * Then, call the various functions to subdivide the object (subdivideByImpact, cutByPlane)
- *
+ * Then, call the various functions to subdivide the object (subdivideByImpact, cutByPlane).
  * Sub-objects that are product of subdivision don't need prepareBreakableObject to be called on them.
  *
  * Requisites for the object:
- *
- *  - Mesh object must have a buffer geometry and a material
- *
- *  - Vertex normals must be planar (not smoothed)
- *
- *  - The geometry must be convex (this is not checked in the library). You can create convex
- *  geometries with ConvexGeometry. The BoxGeometry, SphereGeometry and other convex primitives
- *  can also be used.
+ * - Mesh object must have a buffer geometry and a material.
+ * - Vertex normals must be planar (not smoothed).
+ * - The geometry must be convex (this is not checked in the library). You can create convex
+ * geometries with {@link ConvexGeometry}. The {@link BoxGeometry}, {@link SphereGeometry} and other
+ * convex primitives can also be used.
  *
  * Note: This lib adds member variables to object's userData member (see prepareBreakableObject function)
  * Use with caution and read the code when using with other libs.
  *
- * @param {double} minSizeForBreak Min size a debris can have to break.
- * @param {double} smallDelta Max distance to consider that a point belongs to a plane.
- *
-*/
-
-const _v1 = new Vector3();
-
+ * @three_import import { ConvexObjectBreaker } from 'three/addons/misc/ConvexObjectBreaker.js';
+ */
 class ConvexObjectBreaker {
 
+	/**
+	 * Constructs a new convex object breaker.
+	 *
+	 * @param {number} [minSizeForBreak=1.4] - Min size a debris can have to break.
+ 	 * @param {number} [smallDelta=0.0001] - Max distance to consider that a point belongs to a plane.
+	 */
 	constructor( minSizeForBreak = 1.4, smallDelta = 0.0001 ) {
 
 		this.minSizeForBreak = minSizeForBreak;
@@ -68,6 +64,15 @@ class ConvexObjectBreaker {
 
 	}
 
+	/**
+	 * Must be called for all 3D objects that should be breakable.
+	 *
+	 * @param {Object3D} object - The 3D object. It must have a convex geometry.
+	 * @param {number} mass - The 3D object's mass in kg. Must be greater than `0`.
+	 * @param {Vector3} velocity - The 3D object's velocity.
+	 * @param {Vector3} angularVelocity - The 3D object's angular velocity.
+	 * @param {boolean} breakable - Whether the 3D object is breakable or not.
+	 */
 	prepareBreakableObject( object, mass, velocity, angularVelocity, breakable ) {
 
 		// object is a Object3d (normally a Mesh), must have a buffer geometry, and it must be convex.
@@ -82,11 +87,16 @@ class ConvexObjectBreaker {
 
 	}
 
-	/*
-	 * @param {int} maxRadialIterations Iterations for radial cuts.
-	 * @param {int} maxRandomIterations Max random iterations for not-radial cuts
+	/**
+	 * Subdivides the given 3D object into pieces by an impact (meaning another object hits
+	 * the given 3D object at a certain surface point).
 	 *
-	 * Returns the array of pieces
+	 * @param {Object3D} object - The 3D object to subdivide.
+	 * @param {Vector3} pointOfImpact - The point of impact.
+	 * @param {Vector3} normal - The impact normal.
+	 * @param {number} maxRadialIterations - Iterations for radial cuts.
+	 * @param {number} maxRandomIterations - Max random iterations for not-radial cuts.
+	 * @return {Array<Object3D>} The array of pieces.
 	 */
 	subdivideByImpact( object, pointOfImpact, normal, maxRadialIterations, maxRandomIterations ) {
 
@@ -168,6 +178,14 @@ class ConvexObjectBreaker {
 
 	}
 
+	/**
+	 * Subdivides the given 3D object into pieces by a plane.
+	 *
+	 * @param {Object3D} object - The 3D object to subdivide.
+	 * @param {Plane} plane - The plane to cut the 3D object.
+	 * @param {{object1:?Mesh,object2:?Mesh}} output - An object that stores the pieces.
+	 * @return {number} The number of pieces.
+	 */
 	cutByPlane( object, plane, output ) {
 
 		// Returns breakable objects in output.object1 and output.object2 members, the resulting 2 pieces of the cut.
@@ -448,6 +466,8 @@ class ConvexObjectBreaker {
 		return numObjects;
 
 	}
+
+	// internal helpers
 
 	static transformFreeVector( v, m ) {
 

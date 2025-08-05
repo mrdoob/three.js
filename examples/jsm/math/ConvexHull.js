@@ -5,10 +5,6 @@ import {
 	Vector3
 } from 'three';
 
-/**
- * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
- */
-
 const Visible = 0;
 const Deleted = 1;
 
@@ -18,8 +14,20 @@ const _plane = new Plane();
 const _closestPoint = new Vector3();
 const _triangle = new Triangle();
 
+/**
+ * Can be used to compute the convex hull in 3D space for a given set of points. It
+ * is primarily intended for {@link ConvexGeometry}.
+ *
+ * This Quickhull 3D implementation is a port of [quickhull3d]{@link https://github.com/maurizzzio/quickhull3d/}
+ * by Mauricio Poppe.
+ *
+ * @three_import import { ConvexHull } from 'three/addons/math/ConvexHull.js';
+ */
 class ConvexHull {
 
+	/**
+	 * Constructs a new convex hull.
+	 */
 	constructor() {
 
 		this.tolerance = - 1;
@@ -40,10 +48,16 @@ class ConvexHull {
 		this.assigned = new VertexList();
 		this.unassigned = new VertexList();
 
-		this.vertices = []; 	// vertices of the hull (internal representation of given geometry data)
+		this.vertices = []; // vertices of the hull (internal representation of given geometry data)
 
 	}
 
+	/**
+	 * Computes to convex hull for the given array of points.
+	 *
+	 * @param {Array<Vector3>} points - The array of points in 3D space.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
 	setFromPoints( points ) {
 
 		// The algorithm needs at least four points.
@@ -58,7 +72,7 @@ class ConvexHull {
 
 			}
 
-			this.compute();
+			this._compute();
 
 		}
 
@@ -66,6 +80,13 @@ class ConvexHull {
 
 	}
 
+	/**
+	 * Computes the convex hull of the given 3D object (including its descendants),
+	 * accounting for the world transforms of both the 3D object and its descendants.
+	 *
+	 * @param {Object3D} object - The 3D object to compute the convex hull for.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
 	setFromObject( object ) {
 
 		const points = [];
@@ -102,6 +123,12 @@ class ConvexHull {
 
 	}
 
+	/**
+	 * Returns `true` if the given point lies in the convex hull.
+	 *
+	 * @param {Vector3} point - The point to test.
+	 * @return {boolean} Whether the given point lies in the convex hull or not.
+	 */
 	containsPoint( point ) {
 
 		const faces = this.faces;
@@ -120,6 +147,13 @@ class ConvexHull {
 
 	}
 
+	/**
+	 * Computes the intersections point of the given ray and this convex hull.
+	 *
+	 * @param {Ray} ray - The ray to test.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3|null} The intersection point. Returns `null` if not intersection was detected.
+	 */
 	intersectRay( ray, target ) {
 
 		// based on "Fast Ray-Convex Polyhedron Intersection" by Eric Haines, GRAPHICS GEMS II
@@ -196,12 +230,23 @@ class ConvexHull {
 
 	}
 
+	/**
+	 * Returns `true` if the given ray intersects with this convex hull.
+	 *
+	 * @param {Ray} ray - The ray to test.
+	 * @return {boolean} Whether the given ray intersects with this convex hull or not.
+	 */
 	intersectsRay( ray ) {
 
 		return this.intersectRay( ray, _v1 ) !== null;
 
 	}
 
+	/**
+	 * Makes the convex hull empty.
+	 *
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
 	makeEmpty() {
 
 		this.faces = [];
@@ -211,9 +256,17 @@ class ConvexHull {
 
 	}
 
-	// Adds a vertex to the 'assigned' list of vertices and assigns it to the given face
+	// private
 
-	addVertexToFace( vertex, face ) {
+	/**
+	 * Adds a vertex to the 'assigned' list of vertices and assigns it to the given face.
+	 *
+	 * @private
+	 * @param {VertexNode} vertex - The vertex to add.
+	 * @param {Face} face - The target face.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_addVertexToFace( vertex, face ) {
 
 		vertex.face = face;
 
@@ -233,9 +286,17 @@ class ConvexHull {
 
 	}
 
-	// Removes a vertex from the 'assigned' list of vertices and from the given face
-
-	removeVertexFromFace( vertex, face ) {
+	/**
+	 * Removes a vertex from the 'assigned' list of vertices and from the given face.
+	 * It also makes sure that the link from 'face' to the first vertex it sees in 'assigned'
+	 * is linked correctly after the removal.
+	 *
+	 * @private
+	 * @param {VertexNode} vertex - The vertex to remove.
+	 * @param {Face} face - The target face.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_removeVertexFromFace( vertex, face ) {
 
 		if ( vertex === face.outside ) {
 
@@ -263,9 +324,15 @@ class ConvexHull {
 
 	}
 
-	// Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertex list
-
-	removeAllVerticesFromFace( face ) {
+	/**
+	 * Removes all the visible vertices that a given face is able to see which are stored in
+	 * the 'assigned' vertex list.
+	 *
+	 * @private
+	 * @param {Face} face - The target face.
+	 * @return {VertexNode|undefined} A reference to this convex hull.
+	 */
+	_removeAllVerticesFromFace( face ) {
 
 		if ( face.outside !== null ) {
 
@@ -293,11 +360,21 @@ class ConvexHull {
 
 	}
 
-	// Removes all the visible vertices that 'face' is able to see
+	/**
+	 * Removes all the visible vertices that `face` is able to see.
+	 *
+	 * - If `absorbingFace` doesn't exist, then all the removed vertices will be added to the 'unassigned' vertex list.
+	 * - If `absorbingFace` exists, then this method will assign all the vertices of 'face' that can see 'absorbingFace'.
+	 * - If a vertex cannot see `absorbingFace`, it's added to the 'unassigned' vertex list.
+	 *
+	 * @private
+	 * @param {Face} face - The given face.
+	 * @param {Face} [absorbingFace] - An optional face that tries to absorb the vertices of the first face.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_deleteFaceVertices( face, absorbingFace ) {
 
-	deleteFaceVertices( face, absorbingFace ) {
-
-		const faceVertices = this.removeAllVerticesFromFace( face );
+		const faceVertices = this._removeAllVerticesFromFace( face );
 
 		if ( faceVertices !== undefined ) {
 
@@ -327,7 +404,7 @@ class ConvexHull {
 
 					if ( distance > this.tolerance ) {
 
-						this.addVertexToFace( vertex, absorbingFace );
+						this._addVertexToFace( vertex, absorbingFace );
 
 					} else {
 
@@ -349,9 +426,14 @@ class ConvexHull {
 
 	}
 
-	// Reassigns as many vertices as possible from the unassigned list to the new faces
-
-	resolveUnassignedPoints( newFaces ) {
+	/**
+	 * Reassigns as many vertices as possible from the unassigned list to the new faces.
+	 *
+	 * @private
+	 * @param {Array<Face>} newFaces - The new faces.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_resolveUnassignedPoints( newFaces ) {
 
 		if ( this.unassigned.isEmpty() === false ) {
 
@@ -359,7 +441,7 @@ class ConvexHull {
 
 			do {
 
-				// buffer 'next' reference, see .deleteFaceVertices()
+				// buffer 'next' reference, see ._deleteFaceVertices()
 
 				const nextVertex = vertex.next;
 
@@ -392,7 +474,7 @@ class ConvexHull {
 
 				if ( maxFace !== null ) {
 
-					this.addVertexToFace( vertex, maxFace );
+					this._addVertexToFace( vertex, maxFace );
 
 				}
 
@@ -406,9 +488,14 @@ class ConvexHull {
 
 	}
 
-	// Computes the extremes of a simplex which will be the initial hull
-
-	computeExtremes() {
+	/**
+	 * Computes the extremes values (min/max vectors) which will be used to
+	 * compute the initial hull.
+	 *
+	 * @private
+	 * @return {Object} The extremes.
+	 */
+	_computeExtremes() {
 
 		const min = new Vector3();
 		const max = new Vector3();
@@ -474,13 +561,17 @@ class ConvexHull {
 
 	}
 
-	// Computes the initial simplex assigning to its faces all the points
-	// that are candidates to form part of the hull
-
-	computeInitialHull() {
+	/**
+	 * Computes the initial simplex assigning to its faces all the points that are
+	 * candidates to form part of the hull.
+	 *
+	 * @private
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_computeInitialHull() {
 
 		const vertices = this.vertices;
-		const extremes = this.computeExtremes();
+		const extremes = this._computeExtremes();
 		const min = extremes.min;
 		const max = extremes.max;
 
@@ -652,7 +743,7 @@ class ConvexHull {
 
 				if ( maxFace !== null ) {
 
-					this.addVertexToFace( vertex, maxFace );
+					this._addVertexToFace( vertex, maxFace );
 
 				}
 
@@ -664,9 +755,13 @@ class ConvexHull {
 
 	}
 
-	// Removes inactive faces
-
-	reindexFaces() {
+	/**
+	 * Removes inactive (e.g. deleted) faces from the internal face list.
+	 *
+	 * @private
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_reindexFaces() {
 
 		const activeFaces = [];
 
@@ -688,9 +783,17 @@ class ConvexHull {
 
 	}
 
-	// Finds the next vertex to create faces with the current hull
-
-	nextVertexToAdd() {
+	/**
+	 * Finds the next vertex to create faces with the current hull.
+	 *
+	 * - Let the initial face be the first face existing in the 'assigned' vertex list.
+	 * - If a face doesn't exist then return since there're no vertices left.
+	 * - Otherwise for each vertex that face sees find the one furthest away from it.
+	 *
+	 * @private
+	 * @return {?VertexNode} The next vertex to add.
+	 */
+	_nextVertexToAdd() {
 
 		// if the 'assigned' list of vertices is empty, no vertices are left. return with 'undefined'
 
@@ -698,7 +801,7 @@ class ConvexHull {
 
 			let eyeVertex, maxDistance = 0;
 
-			// grap the first available face and start with the first visible vertex of that face
+			// grab the first available face and start with the first visible vertex of that face
 
 			const eyeFace = this.assigned.first().face;
 			let vertex = eyeFace.outside;
@@ -726,15 +829,23 @@ class ConvexHull {
 
 	}
 
-	// Computes a chain of half edges in CCW order called the 'horizon'.
-	// For an edge to be part of the horizon it must join a face that can see
-	// 'eyePoint' and a face that cannot see 'eyePoint'.
-
-	computeHorizon( eyePoint, crossEdge, face, horizon ) {
+	/**
+	 * Computes a chain of half edges in CCW order called the 'horizon'. For an edge
+	 * to be part of the horizon it must join a face that can see 'eyePoint' and a face
+	 * that cannot see 'eyePoint'.
+	 *
+	 * @private
+	 * @param {Vector3} eyePoint - The 3D-coordinates of a point.
+	 * @param {HalfEdge} crossEdge - The edge used to jump to the current face.
+	 * @param {Face} face - The current face being tested.
+	 * @param {Array<HalfEdge>} horizon - The edges that form part of the horizon in CCW order.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_computeHorizon( eyePoint, crossEdge, face, horizon ) {
 
 		// moves face's vertices to the 'unassigned' vertex list
 
-		this.deleteFaceVertices( face );
+		this._deleteFaceVertices( face );
 
 		face.mark = Deleted;
 
@@ -764,7 +875,7 @@ class ConvexHull {
 
 					// the opposite face can see the vertex, so proceed with next edge
 
-					this.computeHorizon( eyePoint, twinEdge, oppositeFace, horizon );
+					this._computeHorizon( eyePoint, twinEdge, oppositeFace, horizon );
 
 				} else {
 
@@ -784,9 +895,17 @@ class ConvexHull {
 
 	}
 
-	// Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in CCW order
-
-	addAdjoiningFace( eyeVertex, horizonEdge ) {
+	/**
+	 * Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head'
+	 * in CCW order. All the half edges are created in CCW order thus the face is always pointing
+	 * outside the hull.
+	 *
+	 * @private
+	 * @param {VertexNode} eyeVertex - The vertex that is added to the hull.
+	 * @param {HalfEdge} horizonEdge - A single edge of the horizon.
+	 * @return {HalfEdge} The half edge whose vertex is the eyeVertex.
+	 */
+	_addAdjoiningFace( eyeVertex, horizonEdge ) {
 
 		// all the half edges are created in ccw order thus the face is always pointing outside the hull
 
@@ -803,10 +922,16 @@ class ConvexHull {
 
 	}
 
-	//  Adds 'horizon.length' faces to the hull, each face will be linked with the
-	//  horizon opposite face and the face on the left/right
-
-	addNewFaces( eyeVertex, horizon ) {
+	/**
+	 * Adds 'horizon.length' faces to the hull, each face will be linked with the horizon
+	 * opposite face and the face on the left/right.
+	 *
+	 * @private
+	 * @param {VertexNode} eyeVertex - The vertex that is added to the hull.
+	 * @param {Array<HalfEdge>} horizon - The horizon.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_addNewFaces( eyeVertex, horizon ) {
 
 		this.newFaces = [];
 
@@ -819,7 +944,7 @@ class ConvexHull {
 
 			// returns the right side edge
 
-			const sideEdge = this.addAdjoiningFace( eyeVertex, horizonEdge );
+			const sideEdge = this._addAdjoiningFace( eyeVertex, horizonEdge );
 
 			if ( firstSideEdge === null ) {
 
@@ -846,9 +971,21 @@ class ConvexHull {
 
 	}
 
-	// Adds a vertex to the hull
-
-	addVertexToHull( eyeVertex ) {
+	/**
+	 * Adds a vertex to the hull with the following algorithm:
+	 *
+	 * - Compute the 'horizon' which is a chain of half edges. For an edge to belong to this group
+	 * it must be the edge connecting a face that can see 'eyeVertex' and a face which cannot see 'eyeVertex'.
+	 * - All the faces that can see 'eyeVertex' have its visible vertices removed from the assigned vertex list.
+	 * - A new set of faces is created with each edge of the 'horizon' and 'eyeVertex'. Each face is connected
+	 * with the opposite horizon face and the face on the left/right.
+	 * - The vertices removed from all the visible faces are assigned to the new faces if possible.
+	 *
+	 * @private
+	 * @param {VertexNode} eyeVertex - The vertex to add.
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_addVertexToHull( eyeVertex ) {
 
 		const horizon = [];
 
@@ -856,21 +993,27 @@ class ConvexHull {
 
 		// remove 'eyeVertex' from 'eyeVertex.face' so that it can't be added to the 'unassigned' vertex list
 
-		this.removeVertexFromFace( eyeVertex, eyeVertex.face );
+		this._removeVertexFromFace( eyeVertex, eyeVertex.face );
 
-		this.computeHorizon( eyeVertex.point, null, eyeVertex.face, horizon );
+		this._computeHorizon( eyeVertex.point, null, eyeVertex.face, horizon );
 
-		this.addNewFaces( eyeVertex, horizon );
+		this._addNewFaces( eyeVertex, horizon );
 
 		// reassign 'unassigned' vertices to the new faces
 
-		this.resolveUnassignedPoints( this.newFaces );
+		this._resolveUnassignedPoints( this.newFaces );
 
 		return	this;
 
 	}
 
-	cleanup() {
+	/**
+	 * Cleans up internal properties after computing the convex hull.
+	 *
+	 * @private
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_cleanup() {
 
 		this.assigned.clear();
 		this.unassigned.clear();
@@ -880,23 +1023,29 @@ class ConvexHull {
 
 	}
 
-	compute() {
+	/**
+	 * Starts the execution of the quick hull algorithm.
+	 *
+	 * @private
+	 * @return {ConvexHull} A reference to this convex hull.
+	 */
+	_compute() {
 
 		let vertex;
 
-		this.computeInitialHull();
+		this._computeInitialHull();
 
 		// add all available vertices gradually to the hull
 
-		while ( ( vertex = this.nextVertexToAdd() ) !== undefined ) {
+		while ( ( vertex = this._nextVertexToAdd() ) !== undefined ) {
 
-			this.addVertexToHull( vertex );
+			this._addVertexToHull( vertex );
 
 		}
 
-		this.reindexFaces();
+		this._reindexFaces();
 
-		this.cleanup();
+		this._cleanup();
 
 		return this;
 
@@ -904,23 +1053,84 @@ class ConvexHull {
 
 }
 
-//
-
+/**
+ * Represents a section bounded by a specific amount of half-edges.
+ * The current implementation assumes that a face always consist of three edges.
+ *
+ * @private
+ */
 class Face {
 
+	/**
+	 * Constructs a new face.
+	 */
 	constructor() {
 
+		/**
+		 * The normal vector of the face.
+		 *
+		 * @private
+		 * @type {Vector3}
+		 */
 		this.normal = new Vector3();
+
+		/**
+		 * The midpoint or centroid of the face.
+		 *
+		 * @private
+		 * @type {Vector3}
+		 */
 		this.midpoint = new Vector3();
+
+		/**
+		 * The area of the face.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
 		this.area = 0;
 
-		this.constant = 0; // signed distance from face to the origin
+		/**
+		 * Signed distance from face to the origin.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this.constant = 0;
+
+		/**
+		 * Reference to a vertex in a vertex list this face can see.
+		 *
+		 * @private
+		 * @type {?VertexNode}
+		 * @default null
+		 */
 		this.outside = null; // reference to a vertex in a vertex list this face can see
 		this.mark = Visible;
+
+		/**
+		 * Reference to the base edge of a face. To retrieve all edges, you can use the
+		 * `next` reference of the current edge.
+		 *
+		 * @private
+		 * @type {?HalfEdge}
+		 * @default null
+		 */
 		this.edge = null;
 
 	}
 
+	/**
+	 * Creates a face from the given vertex nodes.
+	 *
+	 * @private
+	 * @param {VertexNode} a - The first vertex node.
+	 * @param {VertexNode} b - The second vertex node.
+	 * @param {VertexNode} c - The third vertex node.
+	 * @return {Face} The created face.
+	 */
 	static create( a, b, c ) {
 
 		const face = new Face();
@@ -943,6 +1153,13 @@ class Face {
 
 	}
 
+	/**
+	 * Returns an edge by the given index.
+	 *
+	 * @private
+	 * @param {number} i - The edge index.
+	 * @return {HalfEdge} The edge.
+	 */
 	getEdge( i ) {
 
 		let edge = this.edge;
@@ -965,6 +1182,12 @@ class Face {
 
 	}
 
+	/**
+	 * Computes all properties of the face.
+	 *
+	 * @private
+	 * @return {Face} A reference to this face.
+	 */
 	compute() {
 
 		const a = this.edge.tail();
@@ -983,6 +1206,13 @@ class Face {
 
 	}
 
+	/**
+	 * Returns the signed distance from a given point to the plane representation of this face.
+	 *
+	 * @private
+	 * @param {Vector3} point - The point to compute the distance to.
+	 * @return {number} The distance.
+	 */
 	distanceToPoint( point ) {
 
 		return this.normal.dot( point ) - this.constant;
@@ -991,33 +1221,97 @@ class Face {
 
 }
 
-// Entity for a Doubly-Connected Edge List (DCEL).
-
+/**
+ * The basis for a half-edge data structure, also known as doubly
+ * connected edge list (DCEL).
+ *
+ * @private
+ */
 class HalfEdge {
 
-
+	/**
+	 * Constructs a new half edge.
+	 *
+	 * @param {VertexNode} vertex - A reference to its destination vertex.
+	 * @param {Face} face - A reference to its face.
+	 */
 	constructor( vertex, face ) {
 
+		/**
+		 * A reference to its destination vertex.
+		 *
+		 * @private
+		 * @type {VertexNode}
+		 */
 		this.vertex = vertex;
+
+		/**
+		 * Reference to the previous half-edge of the same face.
+		 *
+		 * @private
+		 * @type {?HalfEdge}
+		 * @default null
+		 */
 		this.prev = null;
+
+		/**
+		 * Reference to the next half-edge of the same face.
+		 *
+		 * @private
+		 * @type {?HalfEdge}
+		 * @default null
+		 */
 		this.next = null;
+
+		/**
+		 * Reference to the twin half-edge to reach the opposite face.
+		 *
+		 * @private
+		 * @type {?HalfEdge}
+		 * @default null
+		 */
 		this.twin = null;
+
+		/**
+		 * A reference to its face.
+		 *
+		 * @private
+		 * @type {Face}
+		 */
 		this.face = face;
 
 	}
 
+	/**
+	 * Returns the destination vertex.
+	 *
+	 * @private
+	 * @return {VertexNode} The destination vertex.
+	 */
 	head() {
 
 		return this.vertex;
 
 	}
 
+	/**
+	 * Returns the origin vertex.
+	 *
+	 * @private
+	 * @return {VertexNode} The destination vertex.
+	 */
 	tail() {
 
 		return this.prev ? this.prev.vertex : null;
 
 	}
 
+	/**
+	 * Returns the Euclidean length (straight-line length) of the edge.
+	 *
+	 * @private
+	 * @return {number} The edge's length.
+	 */
 	length() {
 
 		const head = this.head();
@@ -1033,6 +1327,12 @@ class HalfEdge {
 
 	}
 
+	/**
+	 * Returns the square of the Euclidean length (straight-line length) of the edge.
+	 *
+	 * @private
+	 * @return {number} The square of the edge's length.
+	 */
 	lengthSquared() {
 
 		const head = this.head();
@@ -1048,6 +1348,14 @@ class HalfEdge {
 
 	}
 
+	/**
+	 * Sets the twin edge of this half-edge. It also ensures that the twin reference
+	 * of the given half-edge is correctly set.
+	 *
+	 * @private
+	 * @param {HalfEdge} edge - The twin edge to set.
+	 * @return {HalfEdge} A reference to this edge.
+	 */
 	setTwin( edge ) {
 
 		this.twin = edge;
@@ -1059,44 +1367,121 @@ class HalfEdge {
 
 }
 
-// A vertex as a double linked list node.
-
+/**
+ * A vertex as a double linked list node.
+ *
+ * @private
+ */
 class VertexNode {
 
+	/**
+	 * Constructs a new vertex node.
+	 *
+	 * @param {Vector3} point - A point in 3D space.
+	 */
 	constructor( point ) {
 
+		/**
+		 * A point in 3D space.
+		 *
+		 * @private
+		 * @type {Vector3}
+		 */
 		this.point = point;
+
+		/**
+		 * Reference to the previous vertex in the double linked list.
+		 *
+		 * @private
+		 * @type {?VertexNode}
+		 * @default null
+		 */
 		this.prev = null;
+
+		/**
+		 * Reference to the next vertex in the double linked list.
+		 *
+		 * @private
+		 * @type {?VertexNode}
+		 * @default null
+		 */
 		this.next = null;
-		this.face = null; // the face that is able to see this vertex
+
+		/**
+		 * Reference to the face that is able to see this vertex.
+		 *
+		 * @private
+		 * @type {?Face}
+		 * @default null
+		 */
+		this.face = null;
 
 	}
 
 }
 
-// A double linked list that contains vertex nodes.
-
+/**
+ * A doubly linked list of vertices.
+ *
+ * @private
+ */
 class VertexList {
 
+	/**
+	 * Constructs a new vertex list.
+	 */
 	constructor() {
 
+		/**
+		 * Reference to the first vertex of the linked list.
+		 *
+		 * @private
+		 * @type {?VertexNode}
+		 * @default null
+		 */
 		this.head = null;
+
+		/**
+		 * Reference to the last vertex of the linked list.
+		 *
+		 * @private
+		 * @type {?VertexNode}
+		 * @default null
+		 */
 		this.tail = null;
 
 	}
 
+	/**
+	 * Returns the head reference.
+	 *
+	 * @private
+	 * @return {VertexNode} The head reference.
+	 */
 	first() {
 
 		return this.head;
 
 	}
 
+	/**
+	 * Returns the tail reference.
+	 *
+	 * @private
+	 * @return {VertexNode} The tail reference.
+	 */
 	last() {
 
 		return this.tail;
 
 	}
 
+	/**
+	 * Clears the linked list.
+	 *
+	 * @private
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	clear() {
 
 		this.head = this.tail = null;
@@ -1105,8 +1490,14 @@ class VertexList {
 
 	}
 
-	// Inserts a vertex before the target vertex
-
+	/**
+	 * Inserts a vertex before a target vertex.
+	 *
+	 * @private
+	 * @param {VertexNode} target - The target.
+	 * @param {VertexNode} vertex - The vertex to insert.
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	insertBefore( target, vertex ) {
 
 		vertex.prev = target.prev;
@@ -1128,8 +1519,14 @@ class VertexList {
 
 	}
 
-	// Inserts a vertex after the target vertex
-
+	/**
+	 * Inserts a vertex after a target vertex.
+	 *
+	 * @private
+	 * @param {VertexNode} target - The target.
+	 * @param {VertexNode} vertex - The vertex to insert.
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	insertAfter( target, vertex ) {
 
 		vertex.prev = target;
@@ -1151,8 +1548,13 @@ class VertexList {
 
 	}
 
-	// Appends a vertex to the end of the linked list
-
+	/**
+	 * Appends a vertex to this vertex list.
+	 *
+	 * @private
+	 * @param {VertexNode} vertex - The vertex to append.
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	append( vertex ) {
 
 		if ( this.head === null ) {
@@ -1174,8 +1576,13 @@ class VertexList {
 
 	}
 
-	// Appends a chain of vertices where 'vertex' is the head.
-
+	/**
+	 * Appends a chain of vertices where the given vertex is the head.
+	 *
+	 * @private
+	 * @param {VertexNode} vertex - The head vertex of a chain of vertices.
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	appendChain( vertex ) {
 
 		if ( this.head === null ) {
@@ -1204,8 +1611,13 @@ class VertexList {
 
 	}
 
-	// Removes a vertex from the linked list
-
+	/**
+	 * Removes a vertex from the linked list.
+	 *
+	 * @private
+	 * @param {VertexNode} vertex - The vertex to remove.
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	remove( vertex ) {
 
 		if ( vertex.prev === null ) {
@@ -1232,8 +1644,14 @@ class VertexList {
 
 	}
 
-	// Removes a list of vertices whose 'head' is 'a' and whose 'tail' is b
-
+	/**
+	 * Removes a sublist of vertices from the linked list.
+	 *
+	 * @private
+	 * @param {VertexNode} a - The head of the sublist.
+	 * @param {VertexNode} b - The tail of the sublist.
+	 * @return {VertexList} A reference to this vertex list.
+	 */
 	removeSubList( a, b ) {
 
 		if ( a.prev === null ) {
@@ -1260,6 +1678,12 @@ class VertexList {
 
 	}
 
+	/**
+	 * Returns `true` if the linked list is empty.
+	 *
+	 * @private
+	 * @return {boolean} Whether the linked list is empty or not.
+	 */
 	isEmpty() {
 
 		return this.head === null;

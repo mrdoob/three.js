@@ -49,7 +49,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'has (with aliasses)', ( assert ) => {
+			QUnit.test( 'has (with aliases)', ( assert ) => {
 
 				const gl = new WebglContextMock( [ 'WEBKIT_WEBGL_depth_texture' ] );
 				const extensions = new WebGLExtensions( gl );
@@ -68,7 +68,7 @@ export default QUnit.module( 'Renderers', () => {
 				assert.ok( extensions.get( 'Extension2' ) );
 				assert.ok( extensions.get( 'Extension1' ) );
 
-				// surpress the following console message when testing
+				// suppress the following console message when testing
 				// THREE.WebGLRenderer: NonExistingExtension extension not supported.
 
 				console.level = CONSOLE_LEVEL.OFF;
@@ -77,14 +77,14 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'get (with aliasses)', ( assert ) => {
+			QUnit.test( 'get (with aliases)', ( assert ) => {
 
 				const gl = new WebglContextMock( [ 'WEBKIT_WEBGL_depth_texture' ] );
 				const extensions = new WebGLExtensions( gl );
 				assert.ok( extensions.get( 'WEBGL_depth_texture' ) );
 				assert.ok( extensions.get( 'WEBKIT_WEBGL_depth_texture' ) );
 
-				// surpress the following console message when testing
+				// suppress the following console message when testing
 				// THREE.WebGLRenderer: EXT_texture_filter_anisotropic extension not supported.
 				// THREE.WebGLRenderer: NonExistingExtension extension not supported.
 

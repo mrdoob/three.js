@@ -6,42 +6,63 @@ import {
 import { VolumeSlice } from '../misc/VolumeSlice.js';
 
 /**
- * This class had been written to handle the output of the NRRD loader.
- * It contains a volume of data and informations about it.
- * For now it only handles 3 dimensional data.
- * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
- * @class
- * @param   {number}        xLength         Width of the volume
- * @param   {number}        yLength         Length of the volume
- * @param   {number}        zLength         Depth of the volume
- * @param   {string}        type            The type of data (uint8, uint16, ...)
- * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
+ * This class had been written to handle the output of the {@link NRRDLoader}.
+ * It contains a volume of data and information about it. For now it only handles 3 dimensional data.
+ *
+ * @three_import import { Volume } from 'three/addons/misc/Volume.js';
  */
 class Volume {
 
+	/**
+	 * Constructs a new volume.
+	 *
+	 * @param {number} [xLength] - Width of the volume.
+	 * @param {number} [yLength] - Length of the volume.
+	 * @param {number} [zLength] - Depth of the volume.
+	 * @param {string} [type] - The type of data (uint8, uint16, ...).
+	 * @param {ArrayBuffer} [arrayBuffer] - The buffer with volume data.
+	 */
 	constructor( xLength, yLength, zLength, type, arrayBuffer ) {
 
 		if ( xLength !== undefined ) {
 
 			/**
-			 * @member {number} xLength Width of the volume in the IJK coordinate system
+			 * Width of the volume in the IJK coordinate system.
+			 *
+			 * @type {number}
+			 * @default 1
 			 */
 			this.xLength = Number( xLength ) || 1;
+
 			/**
-			 * @member {number} yLength Height of the volume in the IJK coordinate system
+			 * Height of the volume in the IJK coordinate system.
+			 *
+			 * @type {number}
+			 * @default 1
 			 */
 			this.yLength = Number( yLength ) || 1;
+
 			/**
-			 * @member {number} zLength Depth of the volume in the IJK coordinate system
+			 * Depth of the volume in the IJK coordinate system.
+			 *
+			 * @type {number}
+			 * @default 1
 			 */
 			this.zLength = Number( zLength ) || 1;
+
 			/**
-			 * @member {Array<string>} The order of the Axis dictated by the NRRD header
+			 * The order of the Axis dictated by the NRRD header
+			 *
+			 * @type {Array<string>}
 			 */
 			this.axisOrder = [ 'x', 'y', 'z' ];
+
 			/**
-			 * @member {TypedArray} data Data of the volume
+			 * The data of the volume.
+			 *
+			 * @type {TypedArray}
 			 */
+			this.data;
 
 			switch ( type ) {
 
@@ -127,25 +148,34 @@ class Volume {
 		}
 
 		/**
-		 * @member {Array}  spacing Spacing to apply to the volume from IJK to RAS coordinate system
+		 * Spacing to apply to the volume from IJK to RAS coordinate system
+		 *
+		 * @type {Array<number>}
 		 */
 		this.spacing = [ 1, 1, 1 ];
+
 		/**
-		 * @member {Array}  offset Offset of the volume in the RAS coordinate system
+		 * Offset of the volume in the RAS coordinate system
+		 *
+		 * @type {Array<number>}
 		 */
 		this.offset = [ 0, 0, 0 ];
+
 		/**
-		 * @member {Martrix3} matrix The IJK to RAS matrix
+		 * The IJK to RAS matrix.
+		 *
+		 * @type {Martrix3}
 		 */
 		this.matrix = new Matrix3();
 		this.matrix.identity();
+
 		/**
-		 * @member {Martrix3} inverseMatrix The RAS to IJK matrix
+		 * The RAS to IJK matrix.
+		 *
+		 * @type {Martrix3}
 		 */
-		/**
-		 * @member {number} lowerThreshold The voxels with values under this threshold won't appear in the slices.
-		 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
-		 */
+		this.inverseMatrix = new Matrix3();
+
 		let lowerThreshold = - Infinity;
 		Object.defineProperty( this, 'lowerThreshold', {
 			get: function () {
@@ -153,6 +183,14 @@ class Volume {
 				return lowerThreshold;
 
 			},
+			/**
+			 * The voxels with values under this threshold won't appear in the slices.
+			 * If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume.
+			 *
+			 * @name Volume#lowerThreshold
+			 * @type {number}
+			 * @param {number} value
+			 */
 			set: function ( value ) {
 
 				lowerThreshold = value;
@@ -164,10 +202,7 @@ class Volume {
 
 			}
 		} );
-		/**
-		 * @member {number} upperThreshold The voxels with values over this threshold won't appear in the slices.
-		 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
-		 */
+
 		let upperThreshold = Infinity;
 		Object.defineProperty( this, 'upperThreshold', {
 			get: function () {
@@ -175,6 +210,14 @@ class Volume {
 				return upperThreshold;
 
 			},
+			/**
+			 * The voxels with values over this threshold won't appear in the slices.
+			 * If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+			 *
+			 * @name Volume#upperThreshold
+			 * @type {number}
+			 * @param {number} value
+			 */
 			set: function ( value ) {
 
 				upperThreshold = value;
@@ -189,32 +232,38 @@ class Volume {
 
 
 		/**
-		 * @member {Array} sliceList The list of all the slices associated to this volume
+		 * The list of all the slices associated to this volume
+		 *
+		 * @type {Array}
 		 */
 		this.sliceList = [];
 
-
 		/**
-		 * @member {boolean} segmentation in segmentation mode, it can load 16-bits nrrds correctly
+		 * Whether to use segmentation mode or not.
+		 * It can load 16-bits nrrds correctly.
+		 *
+		 * @type {boolean}
+		 * @default false
 		 */
 		this.segmentation = false;
 
 
 		/**
-		 * @member {Array} RASDimensions This array holds the dimensions of the volume in the RAS space
+		 * This array holds the dimensions of the volume in the RAS space
+		 *
+		 * @type {Array<number>}
 		 */
-
-
+		this.RASDimensions = [];
 
 	}
 
 	/**
-	 * @member {Function} getData Shortcut for data[access(i,j,k)]
-	 * @memberof Volume
-	 * @param {number} i    First coordinate
-	 * @param {number} j    Second coordinate
-	 * @param {number} k    Third coordinate
-	 * @returns {number}  value in the data array
+	 * Shortcut for data[access(i,j,k)].
+	 *
+	 * @param {number} i - First coordinate.
+	 * @param {number} j - Second coordinate.
+	 * @param {number} k - Third coordinate.
+	 * @returns {number} The value in the data array.
 	 */
 	getData( i, j, k ) {
 
@@ -223,12 +272,12 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} access compute the index in the data array corresponding to the given coordinates in IJK system
-	 * @memberof Volume
-	 * @param {number} i    First coordinate
-	 * @param {number} j    Second coordinate
-	 * @param {number} k    Third coordinate
-	 * @returns {number}  index
+	 * Compute the index in the data array corresponding to the given coordinates in IJK system.
+	 *
+	 * @param {number} i - First coordinate.
+	 * @param {number} j - Second coordinate.
+	 * @param {number} k - Third coordinate.
+	 * @returns {number} The index.
 	 */
 	access( i, j, k ) {
 
@@ -237,10 +286,10 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} reverseAccess Retrieve the IJK coordinates of the voxel corresponding of the given index in the data
-	 * @memberof Volume
-	 * @param {number} index index of the voxel
-	 * @returns {Array}  [x,y,z]
+	 * Retrieve the IJK coordinates of the voxel corresponding of the given index in the data.
+	 *
+	 * @param {number} index - Index of the voxel.
+	 * @returns {Array<number>} The IJK coordinates as `[x,y,z]`.
 	 */
 	reverseAccess( index ) {
 
@@ -252,14 +301,12 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} map Apply a function to all the voxels, be careful, the value will be replaced
-	 * @memberof Volume
-	 * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters :
-	 *                                 value of the voxel
-	 *                                 index of the voxel
-	 *                                 the data (TypedArray)
-	 * @param {Object}   context    You can specify a context in which call the function, default if this Volume
-	 * @returns {Volume}   this
+	 * Apply a function to all the voxels, be careful, the value will be replaced.
+	 *
+	 * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters:
+	 * value of the voxel, index of the voxel, the data (TypedArray).
+	 * @param {Object} context - You can specify a context in which call the function, default if this Volume.
+	 * @returns {Volume} A reference to this instance.
 	 */
 	map( functionToMap, context ) {
 
@@ -277,11 +324,12 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} extractPerpendicularPlane Compute the orientation of the slice and returns all the information relative to the geometry such as sliceAccess, the plane matrix (orientation and position in RAS coordinate) and the dimensions of the plane in both coordinate system.
-	 * @memberof Volume
-	 * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
-	 * @param {number}            index the index of the slice
-	 * @returns {Object} an object containing all the usefull information on the geometry of the slice
+	 * Compute the orientation of the slice and returns all the information relative to the geometry such as sliceAccess,
+	 * the plane matrix (orientation and position in RAS coordinate) and the dimensions of the plane in both coordinate system.
+	 *
+	 * @param {('x'|'y'|'z')} axis - The normal axis to the slice.
+	 * @param {number} RASIndex - The index of the slice.
+	 * @returns {Object} An object containing all the useful information on the geometry of the slice.
 	 */
 	extractPerpendicularPlane( axis, RASIndex ) {
 
@@ -401,12 +449,12 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} extractSlice Returns a slice corresponding to the given axis and index
-	 *                        The coordinate are given in the Right Anterior Superior coordinate format
-	 * @memberof Volume
-	 * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
-	 * @param {number}            index the index of the slice
-	 * @returns {VolumeSlice} the extracted slice
+	 * Returns a slice corresponding to the given axis and index.
+	 * The coordinate are given in the Right Anterior Superior coordinate format.
+	 *
+	 * @param {('x'|'y'|'z')} axis - The normal axis to the slice.
+	 * @param {number} index - The index of the slice.
+	 * @returns {VolumeSlice} The extracted slice.
 	 */
 	extractSlice( axis, index ) {
 
@@ -417,10 +465,10 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} repaintAllSlices Call repaint on all the slices extracted from this volume
-	 * @see VolumeSlice.repaint
-	 * @memberof Volume
-	 * @returns {Volume} this
+	 * Call repaint on all the slices extracted from this volume.
+	 *
+	 * @see {@link VolumeSlice#repaint}
+	 * @returns {Volume} A reference to this volume.
 	 */
 	repaintAllSlices() {
 
@@ -435,9 +483,9 @@ class Volume {
 	}
 
 	/**
-	 * @member {Function} computeMinMax Compute the minimum and the maximum of the data in the volume
-	 * @memberof Volume
-	 * @returns {Array} [min,max]
+	 * Compute the minimum and the maximum of the data in the volume.
+	 *
+	 * @returns {Array<number>} The min/max data as `[min,max]`.
 	 */
 	computeMinMax() {
 

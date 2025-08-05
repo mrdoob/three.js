@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>VR - 3DOF Point to Select</title>
+    <title>VR - Sélection par Pointage 3DOF</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – VR - 3DOF Point to Select">
+    <meta name="twitter:title" content="Three.js – VR - Sélection par Pointage 3DOF">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,12 +22,317 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>VR - 3DOF Point to Select</h1>
+        <h1>VR - Sélection par Pointage 3DOF</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/webxr-point-to-select.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p><strong>NOTE : Les exemples sur cette page nécessitent un appareil compatible VR avec un dispositif de pointage. Sans cela, ils ne fonctionneront pas. Voir <a href="webxr.html">cet article</a> pour comprendre pourquoi.</strong></p>
+<p>Dans l'<a href="webxr-look-to-select.html">article précédent</a>, nous avons examiné un exemple VR très simple où l'utilisateur pouvait choisir des éléments en pointant via le regard. Dans cet article, nous irons un peu plus loin et laisserons l'utilisateur choisir avec un dispositif de pointage. </p>
+<p>Three.js rend les choses relativement faciles en fournissant 2 objets contrôleurs en VR et essaie de gérer les deux cas : un seul contrôleur 3DOF et deux contrôleurs 6DOF. Chacun des contrôleurs est un objet <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> qui donne l'orientation et la position de ce contrôleur. Ils fournissent également les événements <code class="notranslate" translate="no">selectstart</code>, <code class="notranslate" translate="no">select</code> et <code class="notranslate" translate="no">selectend</code> lorsque l'utilisateur commence à appuyer, appuie, et cesse d'appuyer (termine) sur le bouton "principal" du contrôleur.</p>
+<p>En partant du dernier exemple de l'<a href="webxr-look-to-select.html">article précédent</a>, changeons le <code class="notranslate" translate="no">PickHelper</code> en un <code class="notranslate" translate="no">ControllerPickHelper</code>.</p>
+<p>Notre nouvelle implémentation émettra un événement <code class="notranslate" translate="no">select</code> qui nous donnera l'objet qui a été sélectionné, donc pour l'utiliser, nous aurons juste besoin de faire ceci.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new ControllerPickHelper(scene);
+pickHelper.addEventListener('select', (event) =&gt; {
+  event.selectedObject.visible = false;
+  const partnerObject = meshToMeshMap.get(event.selectedObject);
+  partnerObject.visible = true;
+});
+</pre>
+<p>Rappelez-vous de notre code précédent : <code class="notranslate" translate="no">meshToMeshMap</code> mappe nos boîtes et sphères les unes aux autres, donc si nous en avons une, nous pouvons trouver son partenaire via <code class="notranslate" translate="no">meshToMeshMap</code>. Ici, nous cachons simplement l'objet sélectionné et rendons son partenaire visible.</p>
+<p>Quant à l'implémentation réelle de <code class="notranslate" translate="no">ControllerPickHelper</code>, nous devons d'abord ajouter les objets contrôleurs VR à la scène et y ajouter des lignes 3D que nous pouvons utiliser pour afficher où l'utilisateur pointe. Nous sauvegardons à la fois les contrôleurs et leurs lignes.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+  constructor(scene) {
+    const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+
+    this.controllers = [];
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      scene.add(controller);
+
+      const line = new THREE.Line(pointerGeometry);
+      line.scale.z = 5;
+      controller.add(line);
+      this.controllers.push({controller, line});
+    }
+  }
+}
+</pre>
+<p>Sans rien faire d'autre, cela seul nous donnerait 1 ou 2 lignes dans la scène montrant où se trouvent les dispositifs de pointage de l'utilisateur et dans quelle direction ils pointent.</p>
+<p>Cependant, nous avons un problème : nous ne voulons pas que notre <code class="notranslate" translate="no">RayCaster</code> sélectionne la ligne elle-même. Une solution facile est de séparer les objets que nous voulions pouvoir sélectionner des objets que nous ne voulons pas en les plaçant sous un autre <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++// objet pour placer les objets sélectionnables afin de pouvoir les
++// séparer facilement des objets non sélectionnables
++const pickRoot = new THREE.Object3D();
++scene.add(pickRoot);
+
+...
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+-  scene.add(cube);
++  pickRoot.add(cube);
+
+...
+</pre>
+<p>Ajoutons ensuite du code pour sélectionner à partir des contrôleurs. C'est la première fois que nous sélectionnons avec autre chose que la caméra. Dans notre <a href="picking.html">article sur la sélection</a>, l'utilisateur utilise la souris ou le doigt pour sélectionner, ce qui signifie que la sélection provient de la caméra vers l'écran. Dans <a href="webxr-look-to-select.html">l'article précédent</a>, nous sélectionnions en fonction de la direction dans laquelle l'utilisateur regardait, donc cela venait aussi de la caméra. Cette fois, cependant, nous sélectionnons à partir de la position des contrôleurs, donc nous n'utilisons pas la caméra.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+  constructor(scene) {
++    this.raycaster = new THREE.Raycaster();
++    this.objectToColorMap = new Map();
++    this.controllerToObjectMap = new Map();
++    this.tempMatrix = new THREE.Matrix4();
+
+    const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+
+    this.controllers = [];
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      scene.add(controller);
+
+      const line = new THREE.Line(pointerGeometry);
+      line.scale.z = 5;
+      controller.add(line);
+      this.controllers.push({controller, line});
+    }
++  update(pickablesParent, time) {
++    this.reset();
++    for (const {controller, line} of this.controllers) {
++      // lancer un rayon depuis le contrôleur
++      this.tempMatrix.identity().extractRotation(controller.matrixWorld);
++      this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
++      this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
++      // obtenir la liste des objets intersectés par le rayon
++      const intersections = this.raycaster.intersectObjects(pickablesParent.children);
++      if (intersections.length) {
++        const intersection = intersections[0];
++        // faire en sorte que la ligne touche l'objet
++        line.scale.z = intersection.distance;
++        // sélectionner le premier objet. C'est le plus proche
++        const pickedObject = intersection.object;
++        // sauvegarder quel objet ce contrôleur a sélectionné
++        this.controllerToObjectMap.set(controller, pickedObject);
++        // mettre en évidence l'objet si ce n'est pas déjà fait
++        if (this.objectToColorMap.get(pickedObject) === undefined) {
++          // sauvegarder sa couleur
++          this.objectToColorMap.set(pickedObject, pickedObject.material.emissive.getHex());
++          // définir sa couleur émissive en rouge/jaune clignotant
++          pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFF2000 : 0xFF0000);
++        }
++      } else {
++        line.scale.z = 5;
++      }
++    }
++  }
+}
+</pre>
+<p>Comme précédemment, nous utilisons un <a href="/docs/#api/en/core/Raycaster"><code class="notranslate" translate="no">Raycaster</code></a>, mais cette fois, nous prenons le rayon depuis le contrôleur. Dans notre précédent <code class="notranslate" translate="no">PickHelper</code>, il n'y avait qu'une seule chose pour la sélection, mais ici nous avons jusqu'à 2 contrôleurs, un pour chaque main. Nous sauvegardons l'objet que chaque contrôleur regarde dans <code class="notranslate" translate="no">controllerToObjectMap</code>. Nous sauvegardons également la couleur émissive d'origine dans <code class="notranslate" translate="no">objectToColorMap</code> et nous faisons en sorte que la ligne soit assez longue pour toucher ce vers quoi elle pointe.</p>
+<p>Nous devons ajouter du code pour réinitialiser ces paramètres à chaque image.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+
+  ...
+
++  _reset() {
++    // restaurer les couleurs
++    this.objectToColorMap.forEach((color, object) =&gt; {
++      object.material.emissive.setHex(color);
++    });
++    this.objectToColorMap.clear();
++    this.controllerToObjectMap.clear();
++  }
+  update(pickablesParent, time) {
++    this._reset();
+
+    ...
+
+}
+</pre>
+<p>Ensuite, nous voulons émettre un événement <code class="notranslate" translate="no">select</code> lorsque l'utilisateur clique sur le contrôleur. Pour ce faire, nous pouvons étendre l'<a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> de three.js, puis nous vérifierons quand nous recevons un événement <code class="notranslate" translate="no">select</code> du contrôleur. Si ce contrôleur pointe vers quelque chose, nous émettrons ce vers quoi le contrôleur pointe comme notre propre événement <code class="notranslate" translate="no">select</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class ControllerPickHelper {
++class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
++    super();
+    this.raycaster = new THREE.Raycaster();
+-    this.objectToColorMap = new Map();  // object to save color and picked object
++    this.objectToColorMap = new Map();  // objet pour sauvegarder la couleur et l'objet sélectionné
+    this.controllerToObjectMap = new Map();
+    this.tempMatrix = new THREE.Matrix4();
+
+    const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+
+    this.controllers = [];
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
++      controller.addEventListener('select', (event) =&gt; {
++        const controller = event.target;
++        const selectedObject = this.controllerToObjectMap.get(controller);
++        if (selectedObject) {
++          this.dispatchEvent({type: 'select', controller, selectedObject});
++        }
++      });
+      scene.add(controller);
+
+      const line = new THREE.Line(pointerGeometry);
+      line.scale.z = 5;
+      controller.add(line);
+      this.controllers.push({controller, line});
+    }
+  }
+}
+</pre>
+<p>Il ne reste plus qu'à appeler <code class="notranslate" translate="no">update</code> dans notre boucle de rendu.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+  ...
+
++  pickHelper.update(pickablesParent, time);
+
+  renderer.render(scene, camera);
+}
+</pre>
+<p>et en supposant que vous ayez un appareil VR avec un contrôleur, vous devriez pouvoir utiliser les contrôleurs pour sélectionner des éléments.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-point-to-select.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Et si nous voulions pouvoir déplacer les objets ?</p>
+<p>C'est relativement facile. Déplaçons notre code d'écouteur 'select' du contrôleur dans une fonction afin de pouvoir l'utiliser pour plus d'une chose.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
+    super();
+
+    ...
+
+    this.controllers = [];
+
++    const selectListener = (event) =&gt; {
++      const controller = event.target;
++      const selectedObject = this.controllerToObjectMap.get(event.target);
++      if (selectedObject) {
++        this.dispatchEvent({type: 'select', controller, selectedObject});
++      }
++    };
+
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+-      controller.addEventListener('select', (event) =&gt; {
+-        const controller = event.target;
+-        const selectedObject = this.controllerToObjectMap.get(event.target);
+-        if (selectedObject) {
+-          this.dispatchEvent({type: 'select', controller, selectedObject});
+-        }
+-      });
++      controller.addEventListener('select', selectListener);
+
+       ...
+</pre>
+<p>Utilisons-le ensuite pour <code class="notranslate" translate="no">selectstart</code> et <code class="notranslate" translate="no">select</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
+    super();
+
+    ...
+
+    this.controllers = [];
+
+    const selectListener = (event) =&gt; {
+      const controller = event.target;
+      const selectedObject = this.controllerToObjectMap.get(event.target);
+      if (selectedObject) {
+-        this.dispatchEvent({type: 'select', controller, selectedObject});
++        this.dispatchEvent({type: event.type, controller, selectedObject});
+      }
+    };
+
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      controller.addEventListener('select', selectListener);
+      controller.addEventListener('selectstart', selectListener);
+
+       ...
+</pre>
+<p>et transmettons également l'événement <code class="notranslate" translate="no">selectend</code> que three.js envoie lorsque l'utilisateur relâche le bouton du contrôleur.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
+    super();
+
+    ...
+
+    this.controllers = [];
+
+    const selectListener = (event) =&gt; {
+      const controller = event.target;
+      const selectedObject = this.controllerToObjectMap.get(event.target);
+      if (selectedObject) {
+        this.dispatchEvent({type: event.type, controller, selectedObject});
+      }
+    };
+
++    const endListener = (event) =&gt; {
++      const controller = event.target;
++      this.dispatchEvent({type: event.type, controller});
++    };
+
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      controller.addEventListener('select', selectListener);
+      controller.addEventListener('selectstart', selectListener);
++      controller.addEventListener('selectend', endListener);
+
+       ...
+</pre>
+<p>Maintenant, modifions le code de manière à ce que, lorsque nous recevons un événement <code class="notranslate" translate="no">selectstart</code>, nous retirions l'objet sélectionné de la scène et en fassions un enfant du contrôleur. Cela signifie qu'il se déplacera avec le contrôleur. Lorsque nous recevrons un événement <code class="notranslate" translate="no">selectend</code>, nous le remettrons dans la scène.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new ControllerPickHelper(scene);
+-pickHelper.addEventListener('select', (event) =&gt; {
+-  event.selectedObject.visible = false;
+-  const partnerObject = meshToMeshMap.get(event.selectedObject);
+-  partnerObject.visible = true;
+-});
+
++const controllerToSelection = new Map();
++pickHelper.addEventListener('selectstart', (event) =&gt; {
++  const {controller, selectedObject} = event;
++  const existingSelection = controllerToSelection.get(controller);
++  if (!existingSelection) {
++    controllerToSelection.set(controller, {
++      object: selectedObject,
++      parent: selectedObject.parent,
++    });
++    controller.attach(selectedObject);
++  }
++});
++
++pickHelper.addEventListener('selectend', (event) =&gt; {
++  const {controller} = event;
++  const selection = controllerToSelection.get(controller);
++  if (selection) {
++    controllerToSelection.delete(controller);
++    selection.parent.attach(selection.object);
++  }
++});
+</pre>
+<p>Lorsqu'un objet est sélectionné, nous sauvegardons cet objet et son parent d'origine. Lorsque l'utilisateur a terminé, nous pouvons remettre l'objet en place.</p>
+<p>Nous utilisons <a href="/docs/#api/en/core/Object3D.attach"><code class="notranslate" translate="no">Object3D.attach</code></a> pour changer le parent des objets sélectionnés. Ces fonctions nous permettent de modifier le parent d'un objet sans modifier son orientation et sa position dans la scène. </p>
+<p>Et avec cela, nous devrions pouvoir déplacer les objets avec un contrôleur 6DOF ou au moins changer leur orientation avec un contrôleur 3DOF.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select-w-move.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-point-to-select-w-move.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Pour être honnête, je ne suis pas sûr à 100 % que ce <code class="notranslate" translate="no">ControllerPickHelper</code> soit la meilleure façon d'organiser le code, mais il est utile pour démontrer les différentes parties nécessaires pour faire fonctionner quelque chose de simple en VR avec three.js.</p>
 
         </div>
       </div>

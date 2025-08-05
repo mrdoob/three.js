@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { screenUV, color, vec2, vec4, reflector, positionWorld } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -137,7 +137,7 @@
 
 			function getSource( sourceModel ) {
 
-				const clip = sourceModel.animations[ 0 ]
+				const clip = sourceModel.animations[ 0 ];
 
 				const helper = new THREE.SkeletonHelper( sourceModel );
 				const skeleton = new THREE.Skeleton( helper.bones );

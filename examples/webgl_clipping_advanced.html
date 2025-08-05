@@ -208,18 +208,20 @@
 					clipShadows: true
 				} );
 
-				object = new THREE.Group();
-
+				const count = 5 * 5 * 5;
 				const geometry = new THREE.BoxGeometry( 0.18, 0.18, 0.18 );
+				object = new THREE.InstancedMesh( geometry, clipMaterial, count );
+				object.castShadow = true;
+
+				let i = 0;
+				const matrix = new THREE.Matrix4();
 
 				for ( let z = - 2; z <= 2; ++ z )
 					for ( let y = - 2; y <= 2; ++ y )
 						for ( let x = - 2; x <= 2; ++ x ) {
 
-							const mesh = new THREE.Mesh( geometry, clipMaterial );
-							mesh.position.set( x / 5, y / 5, z / 5 );
-							mesh.castShadow = true;
-							object.add( mesh );
+							matrix.setPosition( x / 5, y / 5, z / 5 );
+							object.setMatrixAt( i ++, matrix );
 
 						}
 

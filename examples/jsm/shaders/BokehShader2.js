@@ -3,11 +3,18 @@ import {
 } from 'three';
 
 /**
- * Depth-of-field shader with bokeh
- * ported from GLSL shader by Martins Upitis
- * http://blenderartists.org/forum/showthread.php?237488-GLSL-depth-of-field-with-bokeh-v2-4-(update)
+ * @module BokehShader2
+ * @three_import import { BokehShader, BokehDepthShader } from 'three/addons/shaders/BokehShader2.js';
+ */
+
+/**
+ * Depth-of-field shader with bokeh ported from
+ * [GLSL shader by Martins Upitis]{@link http://blenderartists.org/forum/showthread.php?237488-GLSL-depth-of-field-with-bokeh-v2-4-(update)}.
  *
  * Requires #define RINGS and SAMPLES integers
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
 const BokehShader = {
 
@@ -104,7 +111,7 @@ const BokehShader = {
 
 		float vignout = 1.3; // vignetting outer border
 		float vignin = 0.0; // vignetting inner border
-		float vignfade = 22.0; // f-stops till vignete fades
+		float vignfade = 22.0; // f-stops till vignette fades
 
 		uniform bool shaderFocus;
 		// disable if you use external focalDepth value

@@ -3,12 +3,18 @@ import {
 } from 'three';
 
 /**
- * Sobel Edge Detection (see https://youtu.be/uihBwtPIBxM)
+ * @module SobelOperatorShader
+ * @three_import import { SobelOperatorShader } from 'three/addons/shaders/SobelOperatorShader.js';
+ */
+
+/**
+ * Sobel Edge Detection (see {@link https://youtu.be/uihBwtPIBxM}).
  *
  * As mentioned in the video the Sobel operator expects a grayscale image as input.
  *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
-
 const SobelOperatorShader = {
 
 	name: 'SobelOperatorShader',
@@ -79,7 +85,7 @@ const SobelOperatorShader = {
 				Gy[0][1] * tx0y1 + Gy[1][1] * tx1y1 + Gy[2][1] * tx2y1 +
 				Gy[0][2] * tx0y2 + Gy[1][2] * tx1y2 + Gy[2][2] * tx2y2;
 
-		// magnitute of the total gradient
+		// magnitude of the total gradient
 
 			float G = sqrt( ( valueGx * valueGx ) + ( valueGy * valueGy ) );
 

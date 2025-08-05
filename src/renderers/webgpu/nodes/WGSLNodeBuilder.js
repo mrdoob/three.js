@@ -16,7 +16,7 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 
-import { NoColorSpace, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
+import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
@@ -157,30 +157,71 @@ if ( ( typeof navigator !== 'undefined' && /Firefox|Deno/g.test( navigator.userA
 
 }
 
-//
-
+/**
+ * A node builder targeting WGSL.
+ *
+ * This module generates WGSL shader code from node materials and also
+ * generates the respective bindings and vertex buffer definitions. These
+ * data are later used by the renderer to create render and compute pipelines
+ * for render objects.
+ *
+ * @augments NodeBuilder
+ */
 class WGSLNodeBuilder extends NodeBuilder {
 
+	/**
+	 * Constructs a new WGSL node builder renderer.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Renderer} renderer - The renderer.
+	 */
 	constructor( object, renderer ) {
 
 		super( object, renderer, new WGSLNodeParser() );
 
+		/**
+		 * A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
+		 * another dictionary which manages UBOs per group ('render','frame','object').
+		 *
+		 * @type {Object<string,Object<string,NodeUniformsGroup>>}
+		 */
 		this.uniformGroups = {};
 
+		/**
+		 * A dictionary that holds for each shader stage a Map of builtins.
+		 *
+		 * @type {Object<string,Map<string,Object>>}
+		 */
 		this.builtins = {};
 
+		/**
+		 * A dictionary that holds for each shader stage a Set of directives.
+		 *
+		 * @type {Object<string,Set<string>>}
+		 */
 		this.directives = {};
 
+		/**
+		 * A map for managing scope arrays. Only relevant for when using
+		 * {@link WorkgroupInfoNode} in context of compute shaders.
+		 *
+		 * @type {Map<string,Object>}
+		 */
 		this.scopedArrays = new Map();
 
 	}
 
-	needsToWorkingColorSpace( texture ) {
-
-		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
-
-	}
-
+	/**
+	 * Generates the WGSL snippet for sampled textures.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
+	 */
 	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -195,35 +236,28 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
-		} else if ( this.isFilteredTexture( texture ) ) {
-
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
-
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0' );
+			return this.generateTextureSampleLevel( texture, textureProperty, uvSnippet, '0', depthSnippet );
 
 		}
 
 	}
 
-	_generateVideoSample( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	/**
+	 * Generates the WGSL snippet when sampling textures with explicit mip level.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
 
-		if ( shaderStage === 'fragment' ) {
-
-			return `textureSampleBaseClampToEdge( ${ textureProperty }, ${ textureProperty }_sampler, vec2<f32>( ${ uvSnippet }.x, 1.0 - ${ uvSnippet }.y ) )`;
-
-		} else {
-
-			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
-
-		}
-
-	}
-
-	_generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
-
-		if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false ) {
+		if ( this.isUnfilterable( texture ) === false ) {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
@@ -239,9 +273,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates a wrap function used in context of textures.
+	 *
+	 * @param {Texture} texture - The texture to generate the function for.
+	 * @return {string} The name of the generated function.
+	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.isData3DTexture ? '3d' : '2d' }T`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -249,7 +289,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const includes = [];
 
-			let code = `fn ${ functionName }( coord : vec2f ) -> vec2f {\n\n\treturn vec2f(\n`;
+			// For 3D textures, use vec3f; for texture arrays, keep vec2f since array index is separate
+			const coordType = texture.isData3DTexture ? 'vec3f' : 'vec2f';
+			let code = `fn ${ functionName }( coord : ${ coordType } ) -> ${ coordType } {\n\n\treturn ${ coordType }(\n`;
 
 			const addWrapSnippet = ( wrap, axis ) => {
 
@@ -287,6 +329,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			addWrapSnippet( texture.wrapT, 'y' );
 
+			if ( texture.isData3DTexture ) {
+
+				code += ',\n';
+				addWrapSnippet( texture.wrapR, 'z' );
+
+			}
+
 			code += '\n\t);\n\n}\n';
 
 			wgslCodeCache[ functionName ] = nodeCode = new CodeNode( code, includes );
@@ -299,6 +348,29 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the array declaration string.
+	 *
+	 * @param {string} type - The type.
+	 * @param {?number} [count] - The count.
+	 * @return {string} The generated value as a shader string.
+	 */
+	generateArrayDeclaration( type, count ) {
+
+		return `array< ${ this.getType( type ) }, ${ count } >`;
+
+	}
+
+	/**
+	 * Generates a WGSL variable that holds the texture dimension of the given texture.
+	 * It also returns information about the number of layers (elements) of an arrayed
+	 * texture as well as the cube face count of cube textures.
+	 *
+	 * @param {Texture} texture - The texture to generate the function for.
+	 * @param {string} textureProperty - The name of the video texture uniform in the shader.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The name of the dimension variable.
+	 */
 	generateTextureDimension( texture, textureProperty, levelSnippet ) {
 
 		const textureData = this.getDataFromNode( texture, this.shaderStage, this.globalCache );
@@ -310,20 +382,56 @@ class WGSLNodeBuilder extends NodeBuilder {
 		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
 
 			let textureDimensionsParams;
+			let dimensionType;
 
-			if ( texture.isMultisampleRenderTargetTexture === true ) {
+			const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+			const isMultisampled = primarySamples > 1;
+
+			if ( texture.isData3DTexture ) {
+
+				dimensionType = 'vec3<u32>';
+
+			} else {
+
+				// Regular 2D textures, depth textures, etc.
+				dimensionType = 'vec2<u32>';
+
+			}
+
+			// Build parameters string based on texture type and multisampling
+			if ( isMultisampled || texture.isStorageTexture ) {
 
 				textureDimensionsParams = textureProperty;
 
 			} else {
 
-				textureDimensionsParams = `${ textureProperty }, u32( ${ levelSnippet } )`;
+				textureDimensionsParams = `${textureProperty}${levelSnippet ? `, u32( ${ levelSnippet } )` : ''}`;
 
 			}
 
-			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, 'uvec2' ) );
+			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, dimensionType ) );
 
 			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
+
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
+
+				textureData.arrayLayerCount = new VarNode(
+					new ExpressionNode(
+						`textureNumLayers(${textureProperty})`,
+						'u32'
+					)
+				);
+
+			}
+
+			// For cube textures, we know it's always 6 faces
+			if ( texture.isTextureCube ) {
+
+				textureData.cubeFaceCount = new VarNode(
+					new ExpressionNode( '6u', 'u32' )
+				);
+
+			}
 
 		}
 
@@ -331,6 +439,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for a manual filtered texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0u' ) {
 
 		this._include( 'biquadraticTexture' );
@@ -342,61 +459,133 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for a texture lookup with explicit level-of-detail.
+	 * Since it's a lookup, no sampling or filtering is applied.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet = '0u' ) {
 
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
-		const coordSnippet = `vec2u( ${ wrapFunction }( ${ uvSnippet } ) * vec2f( ${ textureDimension } ) )`;
+		const vecType = texture.isData3DTexture ? 'vec3' : 'vec2';
+		const coordSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
 
 		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, levelSnippet );
 
 	}
 
+	/**
+	 * Generates the WGSL snippet that reads a single texel from a texture without sampling or filtering.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
+
+		let snippet;
 
 		if ( depthSnippet ) {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
 		} else {
 
-			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+
+			if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
+
+				snippet += '.x';
+
+			}
 
 		}
 
-	}
-
-	generateTextureStore( texture, textureProperty, uvIndexSnippet, valueSnippet ) {
-
-		return `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+		return snippet;
 
 	}
 
+	/**
+	 * Generates the WGSL snippet that writes a single texel to a texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} valueSnippet - A WGSL snippet that represent the new texel value.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureStore( texture, textureProperty, uvIndexSnippet, depthSnippet, valueSnippet ) {
+
+		let snippet;
+
+		if ( depthSnippet ) {
+
+			snippet = `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, ${ valueSnippet } )`;
+
+		} else {
+
+			snippet = `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+
+		}
+
+		return snippet;
+
+	}
+
+	/**
+	 * Returns `true` if the sampled values of the given texture should be compared against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {boolean} Whether the sampled values of the given texture should be compared against a reference value or not.
+	 */
 	isSampleCompare( texture ) {
 
 		return texture.isDepthTexture === true && texture.compareFunction !== null;
 
 	}
 
+	/**
+	 * Returns `true` if the given texture is unfilterable.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {boolean} Whether the given texture is unfilterable or not.
+	 */
 	isUnfilterable( texture ) {
 
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) ||
 			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
-			texture.isMultisampleRenderTargetTexture === true;
+			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampling/loading the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		let snippet = null;
 
-		if ( texture.isVideoTexture === true ) {
-
-			snippet = this._generateVideoSample( textureProperty, uvSnippet, shaderStage );
-
-		} else if ( this.isUnfilterable( texture ) ) {
+		if ( this.isUnfilterable( texture ) ) {
 
 			snippet = this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0', shaderStage );
 
@@ -410,6 +599,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampling/loading the given texture using explicit gradients.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {Array<string>} gradSnippet - An array holding both gradient WGSL snippets.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -425,9 +625,27 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Generates the WGSL snippet for sampling a depth texture and comparing the sampled depth values
+	 * against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet -  A WGSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
+
+			if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
+
+				return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } )`;
+
+			}
 
 			return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet } )`;
 
@@ -439,24 +657,46 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	/**
+	 * Generates the WGSL snippet when sampling textures with explicit mip level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
 
-		let snippet = null;
+		if ( this.isUnfilterable( texture ) === false ) {
 
-		if ( texture.isVideoTexture === true ) {
+			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
-			snippet = this._generateVideoSample( textureProperty, uvSnippet, shaderStage );
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
 
 		} else {
 
-			snippet = this._generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, shaderStage );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet );
 
 		}
 
-		return snippet;
-
 	}
 
+	/**
+	 * Generates the WGSL snippet when sampling textures with a bias to the mip level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} biasSnippet - A WGSL snippet that represents the bias to apply to the mip level before sampling.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The WGSL snippet.
+	 */
 	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -471,6 +711,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns a WGSL snippet that represents the property name of the given node.
+	 *
+	 * @param {Node} node - The node.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The property name.
+	 */
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
 		if ( node.isNodeVarying === true && node.needsInterpolation === true ) {
@@ -492,7 +739,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				return `NodeBuffer_${ node.id }.${name}`;
+				if ( this.isCustomStruct( node ) ) {
+
+					return name;
+
+				}
+
+				return name + '.value';
 
 			} else {
 
@@ -506,18 +759,23 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the output struct name.
+	 *
+	 * @return {string} The name of the output struct.
+	 */
 	getOutputStructName() {
 
 		return 'output';
 
 	}
 
-	_getUniformGroupCount( shaderStage ) {
-
-		return Object.keys( this.uniforms[ shaderStage ] ).length;
-
-	}
-
+	/**
+	 * Returns the native shader operator name for a given generic name.
+	 *
+	 * @param {string} op - The operator name to resolve.
+	 * @return {?string} The resolved operator name.
+	 */
 	getFunctionOperator( op ) {
 
 		const fnOp = wgslFnOpLib[ op ];
@@ -534,21 +792,59 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns the node access for the given node and shader stage.
+	 *
+	 * @param {StorageTextureNode|StorageBufferNode} node - The storage node.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The node access.
+	 */
 	getNodeAccess( node, shaderStage ) {
 
-		if ( shaderStage !== 'compute' )
+		if ( shaderStage !== 'compute' ) {
+
+			if ( node.isAtomic === true ) {
+
+				console.warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+
+				return NodeAccess.READ_WRITE;
+
+			}
+
 			return NodeAccess.READ_ONLY;
+
+		}
 
 		return node.access;
 
 	}
 
+	/**
+	 * Returns A WGSL snippet representing the storage access.
+	 *
+	 * @param {StorageTextureNode|StorageBufferNode} node - The storage node.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet representing the storage access.
+	 */
 	getStorageAccess( node, shaderStage ) {
 
 		return accessNames[ this.getNodeAccess( node, shaderStage ) ];
 
 	}
 
+	/**
+	 * This method is one of the more important ones since it's responsible
+	 * for generating a matching binding instance for the given uniform node.
+	 *
+	 * These bindings are later used in the renderer to create bind groups
+	 * and layouts.
+	 *
+	 * @param {UniformNode} node - The uniform node.
+	 * @param {string} type - The node data type.
+	 * @param {string} shaderStage - The shader stage.
+	 * @param {?string} [name=null] - An optional uniform name.
+	 * @return {NodeUniform} The node uniform object.
+	 */
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
@@ -571,7 +867,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, access );
+					if ( node.value.is3DTexture === true ) {
+
+						texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, access );
+
+					} else {
+
+						texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, access );
+
+					}
 
 				} else if ( type === 'cubeTexture' ) {
 
@@ -586,9 +890,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.store = node.isStorageTextureNode === true;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
+				if ( this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
-					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, group );
+					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.push( sampler, texture );
@@ -613,6 +917,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				bindings.push( buffer );
 
 				uniformGPU = buffer;
+
+				uniformNode.name = name ? name : 'NodeBuffer_' + uniformNode.id;
 
 			} else {
 
@@ -645,6 +951,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * This method should be used whenever builtins are required in nodes.
+	 * The internal builtins data structure will make sure builtins are
+	 * defined in the WGSL source.
+	 *
+	 * @param {string} name - The builtin name.
+	 * @param {string} property - The property name.
+	 * @param {string} type - The node data type.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {string} The property name.
+	 */
 	getBuiltin( name, property, type, shaderStage = this.shaderStage ) {
 
 		const map = this.builtins[ shaderStage ] || ( this.builtins[ shaderStage ] = new Map() );
@@ -663,12 +980,24 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Returns `true` if the given builtin is defined in the given shader stage.
+	 *
+	 * @param {string} name - The builtin name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
+	 * @return {boolean} Whether the given builtin is defined in the given shader stage or not.
+	 */
 	hasBuiltin( name, shaderStage = this.shaderStage ) {
 
 		return ( this.builtins[ shaderStage ] !== undefined && this.builtins[ shaderStage ].has( name ) );
 
 	}
 
+	/**
+	 * Returns the vertex index builtin.
+	 *
+	 * @return {string} The vertex index.
+	 */
 	getVertexIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {
@@ -681,6 +1010,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Builds the given shader node.
+	 *
+	 * @param {ShaderNodeInternal} shaderNode - The shader node.
+	 * @return {string} The WGSL function code.
+	 */
 	buildFunctionCode( shaderNode ) {
 
 		const layout = shaderNode.layout;
@@ -715,6 +1050,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the instance index builtin.
+	 *
+	 * @return {string} The instance index.
+	 */
 	getInstanceIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {
@@ -727,12 +1067,22 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the invocation local index builtin.
+	 *
+	 * @return {string} The invocation local index.
+	 */
 	getInvocationLocalIndex() {
 
 		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
 
 	}
 
+	/**
+	 * Returns the subgroup size builtin.
+	 *
+	 * @return {string} The subgroup size.
+	 */
 	getSubgroupSize() {
 
 		this.enableSubGroups();
@@ -741,6 +1091,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the invocation subgroup index builtin.
+	 *
+	 * @return {string} The invocation subgroup index.
+	 */
 	getInvocationSubgroupIndex() {
 
 		this.enableSubGroups();
@@ -749,6 +1104,11 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the subgroup index builtin.
+	 *
+	 * @return {string} The subgroup index.
+	 */
 	getSubgroupIndex() {
 
 		this.enableSubGroups();
@@ -757,42 +1117,78 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Overwritten as a NOP since this method is intended for the WebGL 2 backend.
+	 *
+	 * @return {null} Null.
+	 */
 	getDrawIndex() {
 
 		return null;
 
 	}
 
+	/**
+	 * Returns the front facing builtin.
+	 *
+	 * @return {string} The front facing builtin.
+	 */
 	getFrontFacing() {
 
 		return this.getBuiltin( 'front_facing', 'isFront', 'bool' );
 
 	}
 
+	/**
+	 * Returns the frag coord builtin.
+	 *
+	 * @return {string} The frag coord builtin.
+	 */
 	getFragCoord() {
 
 		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
 
 	}
 
+	/**
+	 * Returns the frag depth builtin.
+	 *
+	 * @return {string} The frag depth builtin.
+	 */
 	getFragDepth() {
 
 		return 'output.' + this.getBuiltin( 'frag_depth', 'depth', 'f32', 'output' );
 
 	}
 
+	/**
+	 * Returns the clip distances builtin.
+	 *
+	 * @return {string} The clip distances builtin.
+	 */
 	getClipDistance() {
 
 		return 'varyings.hw_clip_distances';
 
 	}
 
+	/**
+	 * Whether to flip texture data along its vertical axis or not.
+	 *
+	 * @return {boolean} Returns always `false` in context of WGSL.
+	 */
 	isFlipY() {
 
 		return false;
 
 	}
 
+	/**
+	 * Enables the given directive for the given shader stage.
+	 *
+	 * @param {string} name - The directive name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage to enable the directive for.
+	 */
 	enableDirective( name, shaderStage = this.shaderStage ) {
 
 		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = new Set() );
@@ -800,6 +1196,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the directives of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} A WGSL snippet that enables the directives of the given stage.
+	 */
 	getDirectives( shaderStage ) {
 
 		const snippets = [];
@@ -819,36 +1221,56 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Enables the 'subgroups' directive.
+	 */
 	enableSubGroups() {
 
 		this.enableDirective( 'subgroups' );
 
 	}
 
+	/**
+	 * Enables the 'subgroups-f16' directive.
+	 */
 	enableSubgroupsF16() {
 
 		this.enableDirective( 'subgroups-f16' );
 
 	}
 
+	/**
+	 * Enables the 'clip_distances' directive.
+	 */
 	enableClipDistances() {
 
 		this.enableDirective( 'clip_distances' );
 
 	}
 
+	/**
+	 * Enables the 'f16' directive.
+	 */
 	enableShaderF16() {
 
 		this.enableDirective( 'f16' );
 
 	}
 
+	/**
+	 * Enables the 'dual_source_blending' directive.
+	 */
 	enableDualSourceBlending() {
 
 		this.enableDirective( 'dual_source_blending' );
 
 	}
 
+	/**
+	 * Enables hardware clipping.
+	 *
+	 * @param {string} planeCount - The clipping plane count.
+	 */
 	enableHardwareClipping( planeCount ) {
 
 		this.enableClipDistances();
@@ -856,6 +1278,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the builtins of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} A WGSL snippet that represents the builtins of the given stage.
+	 */
 	getBuiltins( shaderStage ) {
 
 		const snippets = [];
@@ -875,6 +1303,17 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * This method should be used when a new scoped buffer is used in context of
+	 * compute shaders. It adds the array to the internal data structure which is
+	 * later used to generate the respective WGSL.
+	 *
+	 * @param {string} name - The array name.
+	 * @param {string} scope - The scope.
+	 * @param {string} bufferType - The buffer type.
+	 * @param {string} bufferCount - The buffer count.
+	 * @return {string} The array name.
+	 */
 	getScopedArray( name, scope, bufferType, bufferCount ) {
 
 		if ( this.scopedArrays.has( name ) === false ) {
@@ -892,6 +1331,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the scoped arrays of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string|undefined} The WGSL snippet that defines the scoped arrays.
+	 * Returns `undefined` when used in the vertex or fragment stage.
+	 */
 	getScopedArrays( shaderStage ) {
 
 		if ( shaderStage !== 'compute' ) {
@@ -914,13 +1360,19 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the shader attributes of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the shader attributes.
+	 */
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
 
 		if ( shaderStage === 'compute' ) {
 
-			this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
+			this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'local_invocation_id', 'localId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
@@ -958,57 +1410,108 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the members of the given struct type node as a WGSL string.
+	 *
+	 * @param {StructTypeNode} struct - The struct type node.
+	 * @return {string} The WGSL snippet that defines the struct members.
+	 */
 	getStructMembers( struct ) {
 
 		const snippets = [];
-		const members = struct.getMemberTypes();
 
-		for ( let i = 0; i < members.length; i ++ ) {
+		for ( const member of struct.members ) {
 
-			const member = members[ i ];
-			snippets.push( `\t@location( ${i} ) m${i} : ${ member }<f32>` );
+			const prefix = struct.output ? '@location( ' + member.index + ' ) ' : '';
+
+			let type = this.getType( member.type );
+
+			if ( member.atomic ) {
+
+				type = 'atomic< ' + type + ' >';
+
+			}
+
+			snippets.push( `\t${ prefix + member.name } : ${ type }` );
 
 		}
 
-		const builtins = this.getBuiltins( 'output' );
+		if ( struct.output ) {
 
-		if ( builtins ) snippets.push( '\t' + builtins );
+			snippets.push( `\t${ this.getBuiltins( 'output' ) }` );
+
+		}
 
 		return snippets.join( ',\n' );
 
 	}
 
+	/**
+	 * Returns the structs of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the structs.
+	 */
 	getStructs( shaderStage ) {
 
-		const snippets = [];
+		let result = '';
+
 		const structs = this.structs[ shaderStage ];
 
-		for ( let index = 0, length = structs.length; index < length; index ++ ) {
+		if ( structs.length > 0 ) {
 
-			const struct = structs[ index ];
-			const name = struct.name;
+			const snippets = [];
 
-			let snippet = `\struct ${ name } {\n`;
-			snippet += this.getStructMembers( struct );
-			snippet += '\n}';
+			for ( const struct of structs ) {
 
+				let snippet = `struct ${ struct.name } {\n`;
+				snippet += this.getStructMembers( struct );
+				snippet += '\n};';
 
-			snippets.push( snippet );
+				snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n` );
+			}
+
+			result = '\n' + snippets.join( '\n\n' ) + '\n';
 
 		}
 
-		return snippets.join( '\n\n' );
+		return result;
 
 	}
 
-	getVar( type, name ) {
+	/**
+	 * Returns a WGSL string representing a variable.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a variable.
+	 */
+	getVar( type, name, count = null ) {
 
-		return `var ${ name } : ${ this.getType( type ) }`;
+		let snippet = `var ${ name } : `;
+
+		if ( count !== null ) {
+
+			snippet += this.generateArrayDeclaration( type, count );
+
+		} else {
+
+			snippet += this.getType( type );
+
+		}
+
+		return snippet;
 
 	}
 
+	/**
+	 * Returns the variables of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the variables.
+	 */
 	getVars( shaderStage ) {
 
 		const snippets = [];
@@ -1018,7 +1521,7 @@ ${ flowData.code }
 
 			for ( const variable of vars ) {
 
-				snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
+				snippets.push( `\t${ this.getVar( variable.type, variable.name, variable.count ) };` );
 
 			}
 
@@ -1028,6 +1531,12 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the varyings of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the varyings.
+	 */
 	getVaryings( shaderStage ) {
 
 		const snippets = [];
@@ -1051,10 +1560,17 @@ ${ flowData.code }
 
 					let attributesSnippet = `@location( ${index} )`;
 
-					if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
+					if ( varying.interpolationType ) {
 
-						attributesSnippet += ' @interpolate( flat )';
+						const samplingSnippet = varying.interpolationSampling !== null ? `, ${ varying.interpolationSampling } )` : ' )';
 
+						attributesSnippet += ` @interpolate( ${ varying.interpolationType }${ samplingSnippet }`;
+
+						// Otherwise, optimize interpolation when sensible
+
+					} else if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
+
+						attributesSnippet += ` @interpolate( ${ this.renderer.backend.compatibilityMode ? 'flat, either' : 'flat' } )`;
 
 					}
 
@@ -1080,6 +1596,27 @@ ${ flowData.code }
 
 	}
 
+	isCustomStruct( nodeUniform ) {
+
+		const attribute = nodeUniform.value;
+		const bufferNode = nodeUniform.node;
+
+		const isAttributeStructType = ( attribute.isBufferAttribute || attribute.isInstancedBufferAttribute ) && bufferNode.structTypeNode !== null;
+
+		const isStructArray =
+			( bufferNode.value && bufferNode.value.array ) &&
+			( typeof bufferNode.value.itemSize === 'number' && bufferNode.value.array.length > bufferNode.value.itemSize );
+
+		return isAttributeStructType && ! isStructArray;
+
+	}
+
+	/**
+	 * Returns the uniforms of the given shader stage as a WGSL string.
+	 *
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {string} The WGSL snippet that defines the uniforms.
+	 */
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
@@ -1098,7 +1635,7 @@ ${ flowData.code }
 
 				const texture = uniform.node.value;
 
-				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
+				if ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
 
 					if ( this.isSampleCompare( texture ) ) {
 
@@ -1116,7 +1653,9 @@ ${ flowData.code }
 
 				let multisampled = '';
 
-				if ( texture.isMultisampleRenderTargetTexture === true ) {
+				const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+				if ( primarySamples > 1 ) {
 
 					multisampled = '_multisampled';
 
@@ -1126,34 +1665,43 @@ ${ flowData.code }
 
 					textureType = 'texture_cube<f32>';
 
-				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					textureType = 'texture_2d_array<f32>';
-
 				} else if ( texture.isDepthTexture === true ) {
 
-					textureType = `texture_depth${multisampled}_2d`;
+					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
 
-				} else if ( texture.isVideoTexture === true ) {
+						textureType = `texture${ multisampled }_2d<f32>`;
 
-					textureType = 'texture_external';
+					} else {
 
-				} else if ( texture.isData3DTexture === true ) {
+						textureType = `texture_depth${ multisampled }_2d${ texture.isArrayTexture === true ? '_array' : '' }`;
 
-					textureType = 'texture_3d<f32>';
+					}
 
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
-					textureType = `texture_storage_2d<${ format }, ${ access }>`;
+					const is3D = uniform.node.value.is3DTexture;
+					const isArrayTexture = uniform.node.value.isArrayTexture;
+
+					const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
+
+					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
+
+				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+					textureType = 'texture_2d_array<f32>';
+
+				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
 
 				} else {
 
 					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
 
-					textureType = `texture${multisampled}_2d<${ componentPrefix }32>`;
+					textureType = `texture${ multisampled }_2d<${ componentPrefix }32>`;
 
 				}
 
@@ -1162,15 +1710,23 @@ ${ flowData.code }
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'indirectStorageBuffer' ) {
 
 				const bufferNode = uniform.node;
-				const bufferType = this.getType( bufferNode.bufferType );
+				const bufferType = this.getType( bufferNode.getNodeType( this ) );
 				const bufferCount = bufferNode.bufferCount;
-
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
-				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${bufferType}>` : `${bufferType}`;
-				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode, shaderStage ) }` : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+				if ( this.isCustomStruct( uniform ) ) {
+
+					bufferSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var<${ bufferAccessMode }> ${ uniform.name } : ${ bufferType };` );
+
+				} else {
+
+					const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${ bufferType }>` : `${ bufferType }`;
+					const bufferSnippet = `\tvalue : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >`;
+
+					bufferSnippets.push( this._getWGSLStructBinding( uniform.name, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+
+				}
 
 			} else {
 
@@ -1205,6 +1761,9 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Controls the code build of the shader stages.
+	 */
 	buildCode() {
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
@@ -1212,6 +1771,8 @@ ${ flowData.code }
 		this.sortBindingGroups();
 
 		for ( const shaderStage in shadersData ) {
+
+			this.shaderStage = shaderStage;
 
 			const stageData = shadersData[ shaderStage ];
 			stageData.uniforms = this.getUniforms( shaderStage );
@@ -1243,7 +1804,7 @@ ${ flowData.code }
 
 					if ( flow.length > 0 ) flow += '\n';
 
-					flow += `\t// flow -> ${ slotName }\n\t`;
+					flow += `\t// flow -> ${ slotName }\n`;
 
 				}
 
@@ -1261,7 +1822,8 @@ ${ flowData.code }
 
 						if ( isOutputStruct ) {
 
-							stageData.returnType = outputNode.nodeType;
+							stageData.returnType = outputNode.getNodeType( this );
+							stageData.structs += 'var<private> output : ' + stageData.returnType + ';';
 
 							flow += `return ${ flowSlotData.result };`;
 
@@ -1275,7 +1837,7 @@ ${ flowData.code }
 
 							stageData.returnType = 'OutputStruct';
 							stageData.structs += this._getWGSLStruct( 'OutputStruct', structSnippet );
-							stageData.structs += '\nvar<private> output : OutputStruct;\n\n';
+							stageData.structs += '\nvar<private> output : OutputStruct;';
 
 							flow += `output.color = ${ flowSlotData.result };\n\n\treturn output;`;
 
@@ -1289,8 +1851,9 @@ ${ flowData.code }
 
 			stageData.flow = flow;
 
-
 		}
+
+		this.shaderStage = null;
 
 		if ( this.material !== null ) {
 
@@ -1299,12 +1862,23 @@ ${ flowData.code }
 
 		} else {
 
-			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+			// Early strictly validated in computeNode
+
+			const workgroupSize = this.object.workgroupSize;
+
+			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
 
 		}
 
 	}
 
+	/**
+	 * Returns the native shader method name for a given generic name.
+	 *
+	 * @param {string} method - The method name to resolve.
+	 * @param {?string} [output=null] - An optional output.
+	 * @return {string} The resolved WGSL method name.
+	 */
 	getMethod( method, output = null ) {
 
 		let wgslMethod;
@@ -1325,12 +1899,39 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the native snippet for a ternary operation.
+	 *
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( condSnippet, ifSnippet, elseSnippet ) {
+
+		return `select( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+	}
+
+
+	/**
+	 * Returns the WGSL type of the given node data type.
+	 *
+	 * @param {string} type - The node data type.
+	 * @return {string} The WGSL type.
+	 */
 	getType( type ) {
 
 		return wgslTypeLib[ type ] || type;
 
 	}
 
+	/**
+	 * Whether the requested feature is available or not.
+	 *
+	 * @param {string} name - The requested feature.
+	 * @return {boolean} Whether the requested feature is supported or not.
+	 */
 	isAvailable( name ) {
 
 		let result = supports[ name ];
@@ -1355,6 +1956,13 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns the native shader method name for a given generic name.
+	 *
+	 * @private
+	 * @param {string} method - The method name to resolve.
+	 * @return {string} The resolved WGSL method name.
+	 */
 	_getWGSLMethod( method ) {
 
 		if ( wgslPolyfill[ method ] !== undefined ) {
@@ -1367,6 +1975,14 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Includes the given method name into the current
+	 * function node.
+	 *
+	 * @private
+	 * @param {string} name - The method name to include.
+	 * @return {CodeNode} The respective code node.
+	 */
 	_include( name ) {
 
 		const codeNode = wgslPolyfill[ name ];
@@ -1382,11 +1998,21 @@ ${ flowData.code }
 
 	}
 
+	/**
+	 * Returns a WGSL vertex shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @return {string} The vertex shader.
+	 */
 	_getWGSLVertexCode( shaderData ) {
 
 		return `${ this.getSignature() }
 // directives
 ${shaderData.directives}
+
+// structs
+${shaderData.structs}
 
 // uniforms
 ${shaderData.uniforms}
@@ -1414,17 +2040,24 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 
 	}
 
+	/**
+	 * Returns a WGSL fragment shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @return {string} The vertex shader.
+	 */
 	_getWGSLFragmentCode( shaderData ) {
 
 		return `${ this.getSignature() }
 // global
 ${ diagnostics }
 
-// uniforms
-${shaderData.uniforms}
-
 // structs
 ${shaderData.structs}
+
+// uniforms
+${shaderData.uniforms}
 
 // codes
 ${shaderData.codes}
@@ -1443,41 +2076,64 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 
 	}
 
+	/**
+	 * Returns a WGSL compute shader based on the given shader data.
+	 *
+	 * @private
+	 * @param {Object} shaderData - The shader data.
+	 * @param {string} workgroupSize - The workgroup size.
+	 * @return {string} The vertex shader.
+	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
+
+		const [ workgroupSizeX, workgroupSizeY, workgroupSizeZ ] = workgroupSize;
 
 		return `${ this.getSignature() }
 // directives
-${shaderData.directives}
+${ shaderData.directives }
 
 // system
 var<private> instanceIndex : u32;
 
 // locals
-${shaderData.scopedArrays}
+${ shaderData.scopedArrays }
+
+// structs
+${ shaderData.structs }
 
 // uniforms
-${shaderData.uniforms}
+${ shaderData.uniforms }
 
 // codes
-${shaderData.codes}
+${ shaderData.codes }
 
-@compute @workgroup_size( ${workgroupSize} )
-fn main( ${shaderData.attributes} ) {
+@compute @workgroup_size( ${ workgroupSizeX }, ${ workgroupSizeY }, ${ workgroupSizeZ } )
+fn main( ${ shaderData.attributes } ) {
 
 	// system
-	instanceIndex = id.x + id.y * numWorkgroups.x * u32(${workgroupSize}) + id.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
+	instanceIndex = globalId.x
+		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
+		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
 
 	// vars
-	${shaderData.vars}
+	${ shaderData.vars }
 
 	// flow
-	${shaderData.flow}
+	${ shaderData.flow }
 
 }
 `;
 
 	}
 
+	/**
+	 * Returns a WGSL struct based on the given name and variables.
+	 *
+	 * @private
+	 * @param {string} name - The struct name.
+	 * @param {string} vars - The struct variables.
+	 * @return {string} The WGSL snippet representing a struct.
+	 */
 	_getWGSLStruct( name, vars ) {
 
 		return `
@@ -1487,14 +2143,25 @@ ${vars}
 
 	}
 
+	/**
+	 * Returns a WGSL struct binding.
+	 *
+	 * @private
+	 * @param {string} name - The struct name.
+	 * @param {string} vars - The struct variables.
+	 * @param {string} access - The access.
+	 * @param {number} [binding=0] - The binding index.
+	 * @param {number} [group=0] - The group index.
+	 * @return {string} The WGSL snippet representing a struct binding.
+	 */
 	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
 
 		const structName = name + 'Struct';
 		const structSnippet = this._getWGSLStruct( structName, vars );
 
 		return `${structSnippet}
-@binding( ${binding} ) @group( ${group} )
-var<${access}> ${name} : ${structName};`;
+@binding( ${ binding } ) @group( ${ group } )
+var<${access}> ${ name } : ${ structName };`;
 
 	}
 

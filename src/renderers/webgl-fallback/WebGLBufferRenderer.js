@@ -26,7 +26,7 @@ class WebGLBufferRenderer {
 
 		}
 
-		info.update( object, count, mode, 1 );
+		info.update( object, count, 1 );
 
 	}
 
@@ -46,7 +46,7 @@ class WebGLBufferRenderer {
 
 		}
 
-		info.update( object, count, mode, primcount );
+		info.update( object, count, primcount );
 
 	}
 
@@ -85,7 +85,7 @@ class WebGLBufferRenderer {
 
 			}
 
-			info.update( object, elementCount, mode, 1 );
+			info.update( object, elementCount, 1 );
 
 		}
 
@@ -126,7 +126,7 @@ class WebGLBufferRenderer {
 
 			}
 
-			info.update( object, elementCount, mode, 1 );
+			info.update( object, elementCount, 1 );
 
 		}
 

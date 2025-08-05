@@ -2,11 +2,24 @@ import {
 	Matrix4,
 	Vector2
 } from 'three';
+
+
 /**
+ * A collection of shaders used for SSR.
+ *
  * References:
- * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
+ * - [3D Game Shaders For Beginners, Screen Space Reflection (SSR)]{@link https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html}.
+ *
+ * @module SSRShader
+ * @three_import import * as SSRShader from 'three/addons/shaders/SSRShader.js';
  */
 
+/**
+ * SSR shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSRShader = {
 
 	name: 'SSRShader',
@@ -233,6 +246,12 @@ const SSRShader = {
 
 };
 
+/**
+ * SSR Depth shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSRDepthShader = {
 
 	name: 'SSRDepthShader',
@@ -302,6 +321,12 @@ const SSRDepthShader = {
 
 };
 
+/**
+ * SSR Blur shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSRBlurShader = {
 
 	name: 'SSRBlurShader',

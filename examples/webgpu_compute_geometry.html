@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { vec4, storage, Fn, If, uniform, instanceIndex, objectWorldMatrix, color, screenUV, attribute } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -40,6 +40,8 @@
 			let raycaster, pointer;
 			let stats;
 
+			let mesh;
+
 			const pointerPosition = uniform( vec4( 0 ) );
 			const elasticity = uniform( .4 ); // elasticity ( how "strong" the spring is )
 			const damping = uniform( .94 ); // damping factor ( energy loss )
@@ -52,7 +54,7 @@
 
 				const count = geometry.attributes.position.count;
 
-				// replace geometry attributes for storage buffer attributes
+				// Create storage buffer attribute for modified position.
 
 				const positionBaseAttribute = geometry.attributes.position;
 				const positionStorageBufferAttribute = new THREE.StorageBufferAttribute( count, 3 );
@@ -60,24 +62,27 @@
 
 				geometry.setAttribute( 'storagePosition', positionStorageBufferAttribute );
 
-				// attributes
+				// Attributes
 
 				const positionAttribute = storage( positionBaseAttribute, 'vec3', count );
 				const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec3', count );
 
 				const speedAttribute = storage( speedBufferAttribute, 'vec3', count );
 
-				// vectors
+				// Vectors
 
+				// Base vec3 position of the mesh vertices.
 				const basePosition = positionAttribute.element( instanceIndex );
+				// Mesh vertices after compute modification.
 				const currentPosition = positionStorageAttribute.element( instanceIndex );
+				// Speed of each mesh vertex.
 				const currentSpeed = speedAttribute.element( instanceIndex );
 
 				//
 
 				const computeInit = Fn( () => {
 
-					// copy position to storage
+					// Modified storage position starts out the same as the base position.
 
 					currentPosition.assign( basePosition );
 
@@ -137,10 +142,10 @@
 				// background
 
 				const bgColor = screenUV.y.mix( color( 0x9f87f7 ), color( 0xf2cdcd ) );
-				const bgVignet = screenUV.distance( .5 ).remapClamp( 0.3, .8 ).oneMinus();
+				const bgVignette = screenUV.distance( .5 ).remapClamp( 0.3, .8 ).oneMinus();
 				const bgIntensity = 4;
 
-				scene.backgroundNode = bgColor.mul( bgVignet.mul( color( 0xa78ff6 ).mul( bgIntensity ) ) );
+				scene.backgroundNode = bgColor.mul( bgVignette.mul( color( 0xa78ff6 ).mul( bgIntensity ) ) );
 
 				// model
 
@@ -154,7 +159,7 @@
 
 					// apply the material to the mesh
 
-					const mesh = gltf.scene.children[ 0 ];
+					mesh = gltf.scene.children[ 0 ];
 					mesh.scale.setScalar( .1 );
 					mesh.material = material;
 					scene.add( mesh );

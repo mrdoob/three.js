@@ -3,7 +3,6 @@
 export { default as NodeMaterialObserver } from './manager/NodeMaterialObserver.js';
 
 export { default as NodeMaterial } from './NodeMaterial.js';
-export { default as InstancedPointsNodeMaterial } from './InstancedPointsNodeMaterial.js';
 export { default as LineBasicNodeMaterial } from './LineBasicNodeMaterial.js';
 export { default as LineDashedNodeMaterial } from './LineDashedNodeMaterial.js';
 export { default as Line2NodeMaterial } from './Line2NodeMaterial.js';

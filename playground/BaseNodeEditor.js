@@ -19,7 +19,7 @@ export class BaseNodeEditor extends Node {
 		const title = new TitleElement( name )
 			.setObjectCallback( getObjectCallback )
 			.setSerializable( false );
-		
+
 		setOutputAestheticsFromNode( title, value );
 
 		const contextButton = new ButtonInput().onClick( () => {
@@ -79,6 +79,7 @@ export class BaseNodeEditor extends Node {
 		this.onValidElement = onValidNode;
 
 		this.outputLength = getLengthFromNode( value );
+
 	}
 
 	getColor() {

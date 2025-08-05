@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Foire aux questions</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Foire aux questions">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Foire aux questions</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <h2>Quel format de modèle 3D est le mieux supporté ?</h2>
+          <div>
+            <p>
+              Le format recommandé pour l'importation et l'exportation d'assets est glTF (GL Transmission Format). Comme glTF est axé sur la livraison d'assets au moment de l'exécution, il est compact à transmettre et rapide à charger.
+            </p>
+            <p>
+              three.js fournit également des chargeurs pour de nombreux autres formats populaires comme FBX, Collada ou OBJ. Néanmoins, vous devriez toujours essayer d'établir d'abord un workflow basé sur glTF dans vos projets.
+            </p>
+          </div>
+
+          <h2>Pourquoi y a-t-il des balises meta viewport dans les exemples ?</h2>
+          <div>
+            <pre class="prettyprint notranslate lang-js" translate="no">&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</pre>
+
+              <p>Ces balises contrôlent la taille et l'échelle de la fenêtre d'affichage (viewport) pour les navigateurs mobiles (où le contenu de la page peut être rendu à une taille différente de la fenêtre d'affichage visible).</p>
+
+              <p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari : Utiliser la fenêtre d'affichage]</p>
+
+              <p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN : Utiliser la balise meta viewport]</p>
+          </div>
+
+          <h2>Comment l'échelle de la scène peut-elle être préservée lors du redimensionnement ?</h2>
+          <p>
+            Nous voulons que tous les objets, quelle que soit leur distance par rapport à la caméra, apparaissent de la même taille, même lorsque la fenêtre est redimensionnée.
+
+            L'équation clé pour résoudre cela est cette formule pour la hauteur visible à une distance donnée :
+
+            <pre class="prettyprint notranslate lang-js" translate="no">visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;</pre>
+            Si nous augmentons la hauteur de la fenêtre d'un certain pourcentage, alors ce que nous voulons, c'est que la hauteur visible à toutes les distances augmente du même pourcentage.
+
+            Cela ne peut pas être fait en changeant la position de la caméra. Au lieu de cela, vous devez changer le champ de vision de la caméra.
+            [link:http://jsfiddle.net/Q4Jpu/ Exemple].
+          </p>
+
+          <h2>Pourquoi une partie de mon objet est-elle invisible ?</h2>
+          <p>
+            Cela pourrait être dû au culling des faces (face culling). Les faces ont une orientation qui décide quel côté est lequel. Et le culling supprime le côté arrière dans des circonstances normales.
+            Pour voir si c'est votre problème, changez le côté du matériau en THREE.DoubleSide.
+            <pre class="prettyprint notranslate lang-js" translate="no">material.side = THREE.DoubleSide</pre>
+          </p>
+
+          <h2>Pourquoi three.js renvoie-t-il parfois des résultats étranges pour des entrées invalides ?</h2>
+          <p>
+            Pour des raisons de performance, three.js ne valide pas les entrées dans la plupart des cas. Il est de la responsabilité de votre application de s'assurer que toutes les entrées sont valides.
+          </p>
+
+          <h2>Puis-je utiliser three.js dans Node.js ?</h2>
+          <p>
+            Parce que three.js est conçu pour le web, il dépend d'APIs de navigateur et du DOM qui n'existent pas toujours dans Node.js. Certains de ces problèmes peuvent être évités en utilisant des shims comme
+            [link:https://github.com/stackgl/headless-gl headless-gl] et [link:https://github.com/rstacruz/jsdom-global jsdom-global], ou en remplaçant des composants comme `TextureLoader`
+            par des alternatives personnalisées. D'autres APIs du DOM peuvent être profondément liées au code qui les utilise, et seront plus difficiles à contourner. Nous accueillons favorablement les pull requests simples et maintenables pour améliorer le support de Node.js, mais recommandons d'ouvrir d'abord un issue pour discuter de vos améliorations.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

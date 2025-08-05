@@ -1,0 +1,306 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Installation</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Installation">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Installation</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <h2>Structure du projet</h2>
+
+          <p>
+            Tout projet three.js nécessite au moins un fichier HTML pour définir la page web, et un fichier JavaScript pour exécuter votre code three.js. La structure et les choix de noms ci-dessous ne sont pas obligatoires, mais seront utilisés tout au long de ce guide par souci de cohérence.
+          </p>
+
+          <ul>
+            <li>
+              <i>index.html</i>
+    <pre class="prettyprint notranslate lang-js" translate="no">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Ma première application three.js&lt;/title&gt;
+    &lt;style&gt;
+      body { margin: 0; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+    </pre>
+  </li>
+  <li>
+    <i>main.js</i>
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+
+...
+</pre>
+            </li>
+            <li>
+              <i>public/</i>
+              <ul>
+                <li>
+                  Le dossier <i>public/</i> est parfois aussi appelé dossier "static", car les fichiers qu'il contient sont poussés vers le site web sans modification. Généralement, les textures, l'audio et les modèles 3D s'y trouvent.
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <p>
+            Maintenant que nous avons mis en place la structure de base du projet, nous avons besoin d'un moyen pour exécuter le projet localement et y accéder via un navigateur web. L'installation et le développement local peuvent être accomplis avec npm et un outil de build, ou en important three.js depuis un CDN. Les deux options sont expliquées dans les sections ci-dessous.
+          </p>
+
+          <h2>Option 1 : Installation avec NPM et un outil de build</h2>
+
+          <h3>Développement</h3>
+
+          <p>
+            L'installation depuis le [link:https://www.npmjs.com/ registre de packages npm] et l'utilisation d'un [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC outil de build] est l'approche recommandée pour la plupart des utilisateurs — plus votre projet a de dépendances, plus vous êtes susceptible de rencontrer des problèmes que l'hébergement statique ne peut pas facilement résoudre. Avec un outil de build, l'importation de fichiers JavaScript locaux et de packages npm devrait fonctionner directement, sans cartes d'importation.
+          </p>
+
+
+          <ol>
+            <li>
+              Installez [link:https://nodejs.org/ Node.js]. Nous en aurons besoin pour gérer les dépendances et exécuter notre outil de build.
+            </li>
+            <li>
+              <p>
+                Installez three.js et un outil de build, [link:https://vitejs.dev/ Vite], en utilisant un [link:https://www.joshwcomeau.com/javascript/terminal-for-js-devs/ terminal] dans le dossier de votre projet. Vite sera utilisé pendant le développement, mais ne fait pas partie de la page web finale. Si vous préférez utiliser un autre outil de build, c'est bien — nous supportons les outils de build modernes qui peuvent importer les [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC Modules ES].
+              </p>
+<pre class="prettyprint notranslate" translate="no">
+# three.js
+npm install --save three
+
+# vite
+npm install --save-dev vite
+</pre>
+              <aside>
+                <details>
+                  <summary>L'installation a ajouté les dossiers <i>node_modules/</i> et <i>package.json</i> à mon projet. De quoi s'agit-il ?</summary>
+                  <p>
+                    npm utilise <i>package.json</i> pour décrire quelles versions de chaque dépendance vous avez installées. Si vous travaillez sur le projet avec d'autres personnes, elles peuvent installer les versions originales de chaque dépendance simplement en exécutant <i>npm install</i>. Si vous utilisez l'historique des versions, commitez <i>package.json</i>.
+                  </p>
+                  <p>
+                    npm installe le code de chaque dépendance dans un nouveau dossier <i>node_modules/</i>. Lorsque Vite construit votre application, il voit les importations pour 'three' et extrait automatiquement les fichiers three.js de ce dossier. Le dossier <i>node_modules/</i> est utilisé uniquement pendant le développement, et ne doit pas être téléversé chez votre hébergeur web ou commité dans l'historique des versions.
+                  </p>
+                </details>
+                <details>
+                  <summary>Améliorez l'auto-complétion de votre éditeur avec <i>jsconfig</i> ou <i>tsconfig</i></summary>
+                  <p>
+                    Placez un fichier <i>jsconfig.json</i> (ou <i>tsconfig.json</i> pour les projets TypeScript) à la racine de votre projet. L'ajout de la configuration ci-dessous aide votre éditeur à localiser les fichiers three.js pour une auto-complétion améliorée.
+                  </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+{
+  "compilerOptions": {
+    // other options...
+    "paths": {
+      "three/webgpu": ["node_modules/three/build/three.webgpu.js"],
+      "three/tsl": ["node_modules/three/build/three.tsl.js"],
+    },
+  }
+}
+</pre>
+                </details>
+              </aside>
+            </li>
+            <li>
+              Depuis votre terminal, exécutez :
+              <pre class="prettyprint notranslate" translate="no">npx vite </pre>
+              <aside>
+                <details>
+                  <summary>Qu'est-ce que <i>npx</i> ?</summary>
+                  <p>
+                    npx est installé avec Node.js, et exécute des programmes en ligne de commande comme Vite afin que vous n'ayez pas à chercher vous-même le bon fichier dans <i>node_modules/</i>. Si vous préférez, vous pouvez mettre les [link:https://vitejs.dev/guide/#command-line-interface commandes courantes de Vite] dans la liste [link:https://docs.npmjs.com/cli/v9/using-npm/scripts package.json:scripts], et utiliser <i>npm run dev</i> à la place.
+                  </p>
+                </details>
+              </aside>
+            </li>
+            <li>
+              Si tout s'est bien passé, vous verrez une URL comme <i>http://localhost:5173</i> apparaître dans votre terminal, et vous pourrez ouvrir cette URL pour voir votre application web.
+            </li>
+          </ol>
+
+          <p>
+            La page sera vide — vous êtes prêt à <a href="creating-a-scene.html">créer une scène</a>.
+          </p>
+
+          <p>
+            Si vous voulez en savoir plus sur ces outils avant de continuer, consultez :
+          </p>
+
+          <ul>
+            <li>
+              [link:https://threejs-journey.com/lessons/local-server three.js journey : Serveur local]
+            </li>
+            <li>
+              [link:https://vitejs.dev/guide/cli.html Vite : Interface en ligne de commande]
+            </li>
+            <li>
+              [link:https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management MDN : Principes de base de la gestion des packages]
+            </li>
+          </ul>
+
+          <h3>Production</h3>
+
+          <p>
+            Plus tard, lorsque vous serez prêt à déployer votre application web, il vous suffira d'indiquer à Vite d'exécuter une build de production — <i>npx vite build</i>. Tout ce qui est utilisé par l'application sera compilé, optimisé et copié dans le dossier <i>dist/</i>. Le contenu de ce dossier est prêt à être hébergé sur votre site web.
+          </p>
+
+          <h2>Option 2 : Importation depuis un CDN</h2>
+
+          <h3>Développement</h3>
+
+          <p>L'installation sans outils de build nécessitera quelques modifications de la structure du projet donnée ci-dessus.</p>
+
+          <ol>
+            <li>
+              <p>
+                Nous avons importé du code depuis 'three' (un package npm) dans <i>main.js</i>, et les navigateurs web ne savent pas ce que cela signifie. Dans <i>index.html</i>, nous devrons ajouter une [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap carte d'importation] définissant où obtenir le package. Placez le code ci-dessous à l'intérieur de la balise <i>&lt;head>&lt/head></i>, après les styles.
+              </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+&lt;script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/examples/jsm/"
+  }
+}
+&lt;/script>
+</pre>
+              <p>
+                N'oubliez pas de remplacer <i>&lt;version&gt;</i> par une version réelle de three.js, comme <i>"v0.149.0"</i>. La version la plus récente peut être trouvée sur la [link:https://www.npmjs.com/package/three?activeTab=versions liste des versions npm].
+              </p>
+            </li>
+            <li>
+              <p>
+                Nous aurons également besoin d'exécuter un <i>serveur local</i> pour héberger ces fichiers à une URL accessible par le navigateur web. Bien qu'il soit techniquement possible de double-cliquer sur un fichier HTML et de l'ouvrir dans votre navigateur, des fonctionnalités importantes que nous implémenterons plus tard ne fonctionnent pas lorsque la page est ouverte de cette manière, pour des raisons de sécurité.
+              </p>
+              <p>
+                Installez [link:https://nodejs.org/ Node.js], puis exécutez [link:https://www.npmjs.com/package/serve serve] pour démarrer un serveur local dans le répertoire du projet :
+              </p>
+              <pre class="prettyprint notranslate" translate="no">npx serve .</pre>
+            </li>
+            <li>
+              Si tout s'est bien passé, vous verrez une URL comme http://localhost:3000 apparaître dans votre terminal, et vous pourrez ouvrir cette URL pour voir votre application web.
+            </li>
+          </ol>
+
+          <p>
+            La page sera vide — vous êtes prêt à [link:#manual/introduction/Creating-a-scene créer une scène].
+          </p>
+
+          <p>
+            De nombreux autres serveurs statiques locaux sont disponibles — certains utilisent des langages différents au lieu de Node.js, et d'autres sont des applications de bureau. Ils fonctionnent tous fondamentalement de la même manière, et nous avons fourni quelques alternatives ci-dessous.
+          </p>
+
+          <details>
+            <summary>Plus de serveurs locaux</summary>
+
+            <h3>Ligne de commande</h3>
+
+            <p>Les serveurs locaux en ligne de commande s'exécutent depuis une fenêtre de terminal. Le langage de programmation associé peut devoir être installé au préalable.</p>
+
+            <ul>
+              <li><i>npx http-server</i> (Node.js)</li>
+              <li><i>npx five-server</i> (Node.js)</li>
+              <li><i>python -m SimpleHTTPServer</i> (Python 2.x)</li>
+              <li><i>python -m http.server</i> (Python 3.x)</li>
+              <li><i>php -S localhost:8000</i> (PHP 5.4+)</li>
+            </ul>
+
+
+            <h3>GUI</h3>
+
+            <p>Les serveurs locaux GUI s'exécutent sous forme de fenêtre d'application sur votre ordinateur, et peuvent avoir une interface utilisateur.</p>
+
+            <ul>
+              <li>[link:https://greggman.github.io/servez Servez]</li>
+            </ul>
+
+            <h3>Plugins d'éditeur de code</h3>
+
+            <p>Certains éditeurs de code disposent de plugins qui lancent un simple serveur à la demande.</p>
+
+            <ul>
+              <li>[link:https://marketplace.visualstudio.com/items?itemName=yandeu.five-server Five Server] pour Visual Studio Code</li>
+              <li>[link:https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server] pour Visual Studio Code</li>
+              <li>[link:https://atom.io/packages/atom-live-server Live Server] pour Atom</li>
+            </ul>
+
+
+          </details>
+
+          <h3>Production</h3>
+
+          <p>
+            Lorsque vous êtes prêt à déployer votre application web, poussez les fichiers source chez votre hébergeur web — pas besoin de build ou de compiler quoi que ce soit. L'inconvénient de ce compromis est que vous devrez veiller à maintenir la carte d'importation à jour avec toutes les dépendances (et les dépendances des dépendances !) dont votre application a besoin. Si le CDN hébergeant vos dépendances tombe temporairement, votre site web cessera également de fonctionner.
+          </p>
+
+          <p>
+            <i><b>IMPORTANT :</b> Importez toutes les dépendances depuis la même version de three.js et depuis le même CDN. Mélanger des fichiers de différentes sources peut entraîner l'inclusion de code dupliqué, ou même casser l'application de manière inattendue.</i>
+          </p>
+
+          <h2>Addons</h2>
+
+          <p>
+            Par défaut, three.js inclut les fondamentaux d'un moteur 3D. Les autres composants de three.js — tels que les contrôles, les chargeurs et les effets de post-traitement — font partie du répertoire [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm addons/]. Les Addons n'ont pas besoin d'être <i>installés</i> séparément, mais doivent être <i>importés</i> séparément.
+          </p>
+
+          <p>
+            L'exemple ci-dessous montre comment importer three.js avec les addons `OrbitControls` et `GLTFLoader`. Si nécessaire, cela sera également mentionné dans la documentation ou les exemples de chaque addon.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const controls = new OrbitControls( camera, renderer.domElement );
+const loader = new GLTFLoader();
+</pre>
+
+          <p>
+            D'excellents projets tiers sont également disponibles pour three.js. Ceux-ci doivent être installés séparément — voir <a href="libraries-and-plugins">Bibliothèques et Plugins</a>.
+          </p>
+
+          <h2>Étapes suivantes</h2>
+
+          <p>
+            Vous êtes maintenant prêt à <a href="creating-a-scene.html">créer une scène</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

@@ -9,7 +9,7 @@
 	<script id="vs" type="x-shader/x-vertex">
 	uniform vec2 size;
 	attribute uint instancedIndex;
-	flat out uint diffuseIndex; 
+	flat out uint diffuseIndex;
 	out vec2 vUv;
 
 	void main() {
@@ -125,6 +125,7 @@
 					srcLayer: 0,
 					destLayer: 0,
 					transfer() {
+
 						const layerElementLength = layerByteLength / spiritedaway.mipmaps[ 0 ].data.BYTES_PER_ELEMENT;
 						textureArray.mipmaps[ 0 ].data.set(
 							spiritedaway.mipmaps[ 0 ].data.subarray(
@@ -137,6 +138,7 @@
 						textureArray.needsUpdate = true;
 
 						renderer.render( scene, camera );
+
 					},
 				};
 

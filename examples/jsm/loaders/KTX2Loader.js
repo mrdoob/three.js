@@ -1,74 +1,76 @@
-/**
- * Loader for KTX 2.0 GPU Texture containers.
- *
- * KTX 2.0 is a container format for various GPU texture formats. The loader
- * supports Basis Universal GPU textures, which can be quickly transcoded to
- * a wide variety of GPU texture compression formats, as well as some
- * uncompressed DataTexture and Data3DTexture formats.
- *
- * References:
- * - KTX: http://github.khronos.org/KTX-Specification/
- * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
- * - BasisU HDR: https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0
- */
-
 import {
-	CompressedTexture,
 	CompressedArrayTexture,
 	CompressedCubeTexture,
+	CompressedTexture,
 	Data3DTexture,
 	DataTexture,
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearSRGBColorSpace,
 	Loader,
-	RedFormat,
+	NoColorSpace,
+	RGBAFormat,
+	RGBA_ASTC_4x4_Format,
+	RGBA_ASTC_6x6_Format,
+	RGBA_BPTC_Format,
+	RGBA_S3TC_DXT3_Format,
+	RGBA_ETC2_EAC_Format,
+	RGBA_PVRTC_4BPPV1_Format,
+	RGBA_S3TC_DXT1_Format,
+	RGBA_S3TC_DXT5_Format,
 	RGB_BPTC_UNSIGNED_Format,
 	RGB_ETC1_Format,
 	RGB_ETC2_Format,
 	RGB_PVRTC_4BPPV1_Format,
-	RGBA_ASTC_4x4_Format,
-	RGBA_ASTC_6x6_Format,
-	RGBA_BPTC_Format,
-	RGBA_ETC2_EAC_Format,
-	RGBA_PVRTC_4BPPV1_Format,
-	RGBA_S3TC_DXT5_Format,
-	RGBA_S3TC_DXT1_Format,
-	RGBAFormat,
+	RGB_S3TC_DXT1_Format,
 	RGFormat,
+	RedFormat,
 	SRGBColorSpace,
-	UnsignedByteType,
+	UnsignedByteType
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
 	read,
 	KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
+	KHR_DF_PRIMARIES_BT709,
+	KHR_DF_PRIMARIES_DISPLAYP3,
+	KHR_DF_PRIMARIES_UNSPECIFIED,
 	KHR_DF_TRANSFER_SRGB,
 	KHR_SUPERCOMPRESSION_NONE,
 	KHR_SUPERCOMPRESSION_ZSTD,
-	VK_FORMAT_UNDEFINED,
-	VK_FORMAT_R16_SFLOAT,
-	VK_FORMAT_R16G16_SFLOAT,
-	VK_FORMAT_R16G16B16A16_SFLOAT,
-	VK_FORMAT_R32_SFLOAT,
-	VK_FORMAT_R32G32_SFLOAT,
-	VK_FORMAT_R32G32B32A32_SFLOAT,
-	VK_FORMAT_R8_SRGB,
-	VK_FORMAT_R8_UNORM,
-	VK_FORMAT_R8G8_SRGB,
-	VK_FORMAT_R8G8_UNORM,
-	VK_FORMAT_R8G8B8A8_SRGB,
-	VK_FORMAT_R8G8B8A8_UNORM,
 	VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT,
+	VK_FORMAT_ASTC_4x4_SRGB_BLOCK,
+	VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
 	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
 	VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
-	KHR_DF_PRIMARIES_UNSPECIFIED,
-	KHR_DF_PRIMARIES_BT709,
-	KHR_DF_PRIMARIES_DISPLAYP3
+	VK_FORMAT_BC1_RGBA_SRGB_BLOCK,
+	VK_FORMAT_BC1_RGBA_UNORM_BLOCK,
+	VK_FORMAT_BC1_RGB_SRGB_BLOCK,
+	VK_FORMAT_BC1_RGB_UNORM_BLOCK,
+	VK_FORMAT_BC3_SRGB_BLOCK,
+	VK_FORMAT_BC3_UNORM_BLOCK,
+	VK_FORMAT_BC5_SNORM_BLOCK,
+	VK_FORMAT_BC5_UNORM_BLOCK,
+	VK_FORMAT_BC7_SRGB_BLOCK,
+	VK_FORMAT_BC7_UNORM_BLOCK,
+	VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK,
+	VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK,
+	VK_FORMAT_R16G16B16A16_SFLOAT,
+	VK_FORMAT_R16G16_SFLOAT,
+	VK_FORMAT_R16_SFLOAT,
+	VK_FORMAT_R32G32B32A32_SFLOAT,
+	VK_FORMAT_R32G32_SFLOAT,
+	VK_FORMAT_R32_SFLOAT,
+	VK_FORMAT_R8G8B8A8_SRGB,
+	VK_FORMAT_R8G8B8A8_UNORM,
+	VK_FORMAT_R8G8_SRGB,
+	VK_FORMAT_R8G8_UNORM,
+	VK_FORMAT_R8_SRGB,
+	VK_FORMAT_R8_UNORM,
+	VK_FORMAT_UNDEFINED
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../math/ColorSpaces.js';
@@ -79,8 +81,40 @@ let _activeLoaders = 0;
 
 let _zstd;
 
+/**
+ * A loader for KTX 2.0 GPU Texture containers.
+ *
+ * KTX 2.0 is a container format for various GPU texture formats. The loader supports Basis Universal GPU textures,
+ * which can be quickly transcoded to a wide variety of GPU texture compression formats. While KTX 2.0 also allows
+ * other hardware-specific formats, this loader does not yet parse them.
+ *
+ * This loader parses the KTX 2.0 container and transcodes to a supported GPU compressed texture format.
+ * The required WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+ *
+ * This loader relies on Web Assembly which is not supported in older browsers.
+ *
+ * References:
+ * - [KTX specification]{@link http://github.khronos.org/KTX-Specification/}
+ * - [DFD]{@link https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor}
+ * - [BasisU HDR]{@link https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0}
+ *
+ * ```js
+ * const loader = new KTX2Loader();
+ * loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
+ * loader.detectSupport( renderer );
+ * const texture = loader.loadAsync( 'diffuse.ktx2' );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+ */
 class KTX2Loader extends Loader {
 
+	/**
+	 * Constructs a new KTX2 loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
@@ -106,6 +140,14 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Sets the transcoder path.
+	 *
+	 * The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+	 *
+	 * @param {string} path - The transcoder path to set.
+	 * @return {KTX2Loader} A reference to this loader.
+	 */
 	setTranscoderPath( path ) {
 
 		this.transcoderPath = path;
@@ -114,14 +156,28 @@ class KTX2Loader extends Loader {
 
 	}
 
-	setWorkerLimit( num ) {
+	/**
+	 * Sets the maximum number of Web Workers to be allocated by this instance.
+	 *
+	 * @param {number} workerLimit - The worker limit.
+	 * @return {KTX2Loader} A reference to this loader.
+	 */
+	setWorkerLimit( workerLimit ) {
 
-		this.workerPool.setWorkerLimit( num );
+		this.workerPool.setWorkerLimit( workerLimit );
 
 		return this;
 
 	}
 
+
+	/**
+	 * Async version of {@link KTX2Loader#detectSupport}.
+	 *
+	 * @async
+	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the support has been detected.
+	 */
 	async detectSupportAsync( renderer ) {
 
 		this.workerConfig = {
@@ -138,6 +194,13 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Detects hardware support for available compressed texture formats, to determine
+	 * the output format for the transcoder. Must be called before loading a texture.
+	 *
+	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
+	 * @return {KTX2Loader} A reference to this loader.
+	 */
 	detectSupport( renderer ) {
 
 		if ( renderer.isWebGPURenderer === true ) {
@@ -171,6 +234,8 @@ class KTX2Loader extends Loader {
 		return this;
 
 	}
+
+	// TODO: Make this method private
 
 	init() {
 
@@ -243,6 +308,15 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded KTX2 texture
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(CompressedTexture)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.workerConfig === null ) {
@@ -253,8 +327,10 @@ class KTX2Loader extends Loader {
 
 		const loader = new FileLoader( this.manager );
 
-		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
+		loader.setCrossOrigin( this.crossOrigin );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, ( buffer ) => {
 
@@ -264,6 +340,14 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given KTX2 data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw KTX2 data as an array buffer.
+	 * @param {function(CompressedTexture)} onLoad - Executed when the loading/parsing process has been finished.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @returns {Promise} A Promise that resolves when the parsing has been finished.
+	 */
 	parse( buffer, onLoad, onError ) {
 
 		if ( this.workerConfig === null ) {
@@ -323,8 +407,9 @@ class KTX2Loader extends Loader {
 	}
 
 	/**
+	 * @private
 	 * @param {ArrayBuffer} buffer
-	 * @param {object?} config
+	 * @param {?Object} config
 	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
 	 */
 	async _createTexture( buffer, config = {} ) {
@@ -364,14 +449,16 @@ class KTX2Loader extends Loader {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the loader is no longer required.
+	 */
 	dispose() {
 
 		this.workerPool.dispose();
 		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
 
 		_activeLoaders --;
-
-		return this;
 
 	}
 
@@ -790,7 +877,12 @@ KTX2Loader.BasisWorker = function () {
 
 	}
 
-	/** Concatenates N byte arrays. */
+	/**
+	 * Concatenates N byte arrays.
+	 *
+	 * @param {Uint8Array[]} arrays
+	 * @return {Uint8Array}
+	 */
 	function concat( arrays ) {
 
 		if ( arrays.length === 1 ) return arrays[ 0 ];
@@ -845,9 +937,28 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R8_SRGB ]: RedFormat,
 	[ VK_FORMAT_R8_UNORM ]: RedFormat,
 
+	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: RGB_ETC2_Format,
+	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: RGBA_ETC2_EAC_Format,
+
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: RGBA_ASTC_4x4_Format,
+	[ VK_FORMAT_ASTC_4x4_SRGB_BLOCK ]: RGBA_ASTC_4x4_Format,
+	[ VK_FORMAT_ASTC_4x4_UNORM_BLOCK ]: RGBA_ASTC_4x4_Format,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: RGBA_ASTC_6x6_Format,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: RGBA_ASTC_6x6_Format,
+
+	[ VK_FORMAT_BC1_RGBA_UNORM_BLOCK ]: RGBA_S3TC_DXT1_Format,
+	[ VK_FORMAT_BC1_RGBA_SRGB_BLOCK ]: RGBA_S3TC_DXT1_Format,
+	[ VK_FORMAT_BC1_RGB_UNORM_BLOCK ]: RGB_S3TC_DXT1_Format,
+	[ VK_FORMAT_BC1_RGB_SRGB_BLOCK ]: RGB_S3TC_DXT1_Format,
+
+	[ VK_FORMAT_BC3_SRGB_BLOCK ]: RGBA_S3TC_DXT3_Format,
+	[ VK_FORMAT_BC3_UNORM_BLOCK ]: RGBA_S3TC_DXT3_Format,
+
+	[ VK_FORMAT_BC5_SNORM_BLOCK ]: RGBA_S3TC_DXT5_Format,
+	[ VK_FORMAT_BC5_UNORM_BLOCK ]: RGBA_S3TC_DXT5_Format,
+
+	[ VK_FORMAT_BC7_SRGB_BLOCK ]: RGBA_BPTC_Format,
+	[ VK_FORMAT_BC7_UNORM_BLOCK ]: RGBA_BPTC_Format,
 
 };
 
@@ -867,6 +978,9 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
+
+	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: UnsignedByteType,
 
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: HalfFloatType,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: UnsignedByteType,

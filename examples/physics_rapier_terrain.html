@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Rapier.js terrain heightfield demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #333;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">Rapier.js physics terrain heightfield demo</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+
+			// Heightfield parameters
+			const terrainWidthExtents = 100;
+			const terrainDepthExtents = 100;
+			const terrainWidth = 128;
+			const terrainDepth = 128;
+			const terrainHalfWidth = terrainWidth / 2;
+			const terrainHalfDepth = terrainDepth / 2;
+			const terrainMaxHeight = 8;
+			const terrainMinHeight = - 2;
+
+			// Graphics variables
+			let container, stats;
+			let camera, scene, renderer;
+			let terrainMesh;
+			const clock = new THREE.Clock();
+
+			// Physics variables
+			let physics;
+			const dynamicObjects = [];
+			let heightData = null;
+
+			let time = 0;
+			const objectTimePeriod = 3;
+			let timeNextSpawn = time + objectTimePeriod;
+			const maxNumObjects = 30;
+
+			init();
+
+			async function init() {
+
+				heightData = generateHeight( terrainWidth, terrainDepth, terrainMinHeight, terrainMaxHeight );
+				initGraphics();
+				await initPhysics();
+				// Start animation loop only after physics is initialized
+				renderer.setAnimationLoop( animate );
+			
+			}
+
+			function initGraphics() {
+
+				container = document.getElementById( 'container' );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				// Remove setAnimationLoop from here since we'll start it after physics init
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
+
+				camera.position.y = heightData[ terrainHalfWidth + terrainHalfDepth * terrainWidth ] * ( terrainMaxHeight - terrainMinHeight ) + 5;
+				camera.position.z = terrainDepthExtents / 2;
+				camera.lookAt( 0, 0, 0 );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+
+				const geometry = new THREE.PlaneGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
+				geometry.rotateX( - Math.PI / 2 );
+
+				const vertices = geometry.attributes.position.array;
+
+				for ( let i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+
+					vertices[ j + 1 ] = heightData[ i ];
+			
+				}
+
+				geometry.computeVertexNormals();
+
+				const groundMaterial = new THREE.MeshPhongMaterial( { color: 0xC7C7C7 } );
+				terrainMesh = new THREE.Mesh( geometry, groundMaterial );
+				terrainMesh.receiveShadow = true;
+				terrainMesh.castShadow = true;
+				scene.add( terrainMesh );
+
+				const textureLoader = new THREE.TextureLoader();
+				textureLoader.load( 'textures/grid.png', function ( texture ) {
+
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.repeat.set( terrainWidth - 1, terrainDepth - 1 );
+					groundMaterial.map = texture;
+					groundMaterial.needsUpdate = true;
+			
+				} );
+
+				const ambientLight = new THREE.AmbientLight( 0xbbbbbb );
+				scene.add( ambientLight );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				light.position.set( 100, 100, 50 );
+				light.castShadow = true;
+				const dLight = 200;
+				const sLight = dLight * 0.25;
+				light.shadow.camera.left = - sLight;
+				light.shadow.camera.right = sLight;
+				light.shadow.camera.top = sLight;
+				light.shadow.camera.bottom = - sLight;
+				light.shadow.camera.near = dLight / 30;
+				light.shadow.camera.far = dLight;
+				light.shadow.mapSize.x = 1024 * 2;
+				light.shadow.mapSize.y = 1024 * 2;
+				scene.add( light );
+
+				window.addEventListener( 'resize', onWindowResize );
+			
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			async function initPhysics() {
+
+				physics = await RapierPhysics();
+
+				// Create the terrain body using RapierPhysics module
+				physics.addHeightfield( terrainMesh, terrainWidth - 1, terrainDepth - 1, heightData, { x: terrainWidthExtents, y: 1.0, z: terrainDepthExtents } );
+
+				// Continue with adding other dynamic objects as needed
+			
+			}
+
+			function generateHeight( width, depth, minHeight, maxHeight ) {
+
+				const size = width * depth;
+				const data = new Float32Array( size );
+				const hRange = maxHeight - minHeight;
+				const w2 = width / 2;
+				const d2 = depth / 2;
+				const phaseMult = 12;
+				let p = 0;
+			
+				for ( let j = 0; j < depth; j ++ ) {
+
+					for ( let i = 0; i < width; i ++ ) {
+
+						const radius = Math.sqrt( Math.pow( ( i - w2 ) / w2, 2.0 ) + Math.pow( ( j - d2 ) / d2, 2.0 ) );
+						const height = ( Math.sin( radius * phaseMult ) + 1 ) * 0.5 * hRange + minHeight;
+						data[ p ] = height;
+						p ++;
+			
+					}
+			
+				}
+
+				return data;
+			
+			}
+
+			function generateObject() {
+
+				const numTypes = 3; // cones not working
+				const objectType = Math.ceil( Math.random() * numTypes );
+				let threeObject = null;
+				const objectSize = 3;
+				let radius, height;
+
+				switch ( objectType ) {
+
+					case 1: // Sphere
+						radius = 1 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh( new THREE.SphereGeometry( radius, 20, 20 ), createObjectMaterial() );
+						break;
+					case 2: // Box
+						const sx = 1 + Math.random() * objectSize;
+						const sy = 1 + Math.random() * objectSize;
+						const sz = 1 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
+						break;
+					case 3: // Cylinder
+						radius = 1 + Math.random() * objectSize;
+						height = 1 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh( new THREE.CylinderGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
+						break;
+					default: // Cone
+						radius = 1 + Math.random() * objectSize;
+						height = 2 + Math.random() * objectSize;
+						threeObject = new THREE.Mesh( new THREE.ConeGeometry( radius, height, 20, 2 ), createObjectMaterial() );
+						break;
+			
+				}
+
+				// Position objects higher and with more randomization to prevent clustering
+				threeObject.position.set(
+					( Math.random() - 0.5 ) * terrainWidth * 0.6,
+					terrainMaxHeight + objectSize + 15 + Math.random() * 5, // Even higher with randomization
+					( Math.random() - 0.5 ) * terrainDepth * 0.6
+				);
+
+				const mass = objectSize * 5;
+				const restitution = 0.3; // Add some bounciness
+
+				// Add to scene first
+				scene.add( threeObject );
+
+				// Add physics to the object
+				physics.addMesh( threeObject, mass, restitution );
+
+				// Store the object for later reference
+				dynamicObjects.push( threeObject );
+
+				// Force a small delay before adding the next object
+				timeNextSpawn = time + 0.5;
+
+				threeObject.receiveShadow = true;
+				threeObject.castShadow = true;
+
+			}
+
+			function createObjectMaterial() {
+
+				const c = Math.floor( Math.random() * ( 1 << 24 ) );
+				return new THREE.MeshPhongMaterial( { color: c } );
+
+			}
+
+			function animate() {
+
+				render();
+				stats.update();
+			
+			}
+
+			function render() {
+
+				const deltaTime = clock.getDelta();
+
+				// Generate new objects with a delay between them
+				if ( dynamicObjects.length < maxNumObjects && time > timeNextSpawn ) {
+
+					// Generate object directly in this frame
+					generateObject();
+					// timeNextSpawn is now set in generateObject()
+			
+				}
+
+				// Clean up objects that have fallen off the terrain
+				for ( let i = dynamicObjects.length - 1; i >= 0; i -- ) {
+
+					const obj = dynamicObjects[ i ];
+					if ( obj.position.y < terrainMinHeight - 10 ) {
+
+						// Remove from scene and physics world
+						scene.remove( obj );
+						dynamicObjects.splice( i, 1 );
+			
+					}
+			
+				}
+
+				updatePhysics();
+				renderer.render( scene, camera );
+				time += deltaTime;
+			
+			}
+
+			function updatePhysics() {
+
+				// Check for objects that might need help with physics
+				for ( let i = 0, il = dynamicObjects.length; i < il; i ++ ) {
+
+					const objThree = dynamicObjects[ i ];
+
+					// If object is not moving but should be (based on height), try to fix it
+					if ( objThree.position.y > 1.0 ) {
+
+						// Check if physics body exists
+						if ( objThree.userData && objThree.userData.physics && objThree.userData.physics.body ) {
+
+							const body = objThree.userData.physics.body;
+
+							// Make sure body is awake
+							if ( typeof body.wakeUp === 'function' ) {
+
+								body.wakeUp();
+			
+							}
+
+							// Check velocity and apply impulse if needed
+							if ( typeof body.linvel === 'function' ) {
+
+								const velocity = body.linvel();
+								const speed = Math.sqrt( velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z );
+
+								// If object is very slow, give it a stronger impulse
+								if ( speed < 0.5 ) {
+
+									body.applyImpulse( { x: 0, y: - 2.0, z: 0 }, true );
+			
+								}
+			
+							}
+			
+						} else {
+
+							// If the object doesn't have a physics body but should, recreate it
+							const mass = 5; // Default mass
+							const restitution = 0.3; // Default restitution
+
+							// Recreate physics for the object
+							physics.addMesh( objThree, mass, restitution );
+			
+						}
+			
+					}
+			
+				}
+			
+			}
+
+		</script>
+	</body>
+</html>

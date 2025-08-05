@@ -12,7 +12,7 @@
 			<br /> This example demonstrates a bitonic sort running step by step in a compute shader.
 			<br /> The left canvas swaps values within workgroup local arrays. The right swaps values within storage buffers.
 			<br /> Reference implementation by <a href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">Tim Gfrerer</a>
-			<br /> 
+			<br />
 			<div id="local_swap" style="
 				position: absolute;
 				top: 150px;
@@ -54,8 +54,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { storage, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -110,15 +112,23 @@
 
 					effectController.highlight.value = 0;
 
-			
+
 				} else {
 
 					effectController.highlight.value = 1;
-			
+
 				}
 
-			
+
 			} );
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
 
 			// Allow Workgroup Array Swaps
 			init();
@@ -141,17 +151,17 @@
 
 				const nextAlgoBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL ), 1 );
 
-				const nextAlgoStorage = storageObject( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).label( 'NextAlgo' );
+				const nextAlgoStorage = storage( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).setPBO( true ).setName( 'NextAlgo' );
 
 				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const nextBlockHeightStorage = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' );
-				const nextBlockHeightRead = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' ).toReadOnly();
+				const nextBlockHeightStorage = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).setName( 'NextBlockHeight' );
+				const nextBlockHeightRead = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).setName( 'NextBlockHeight' ).toReadOnly();
 
 				const highestBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const highestBlockHeightStorage = storageObject( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).label( 'HighestBlockHeight' );
+				const highestBlockHeightStorage = storage( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).setPBO( true ).setName( 'HighestBlockHeight' );
 
 				const counterBuffer = new THREE.StorageBufferAttribute( 1, 1 );
-				const counterStorage = storageObject( counterBuffer, 'uint', counterBuffer.count ).toAtomic().label( 'Counter' );
+				const counterStorage = storage( counterBuffer, 'uint', counterBuffer.count ).setPBO( true ).toAtomic().setName( 'Counter' );
 
 				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
 
@@ -179,19 +189,19 @@
 				randomizeDataArray();
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storageObject( currentElementsBuffer, 'uint', size ).label( 'Elements' );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint', size ).setPBO( true ).setName( 'Elements' );
 				const tempBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const tempStorage = storageObject( tempBuffer, 'uint', size ).label( 'Temp' );
+				const tempStorage = storage( tempBuffer, 'uint', size ).setPBO( true ).setName( 'Temp' );
 				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
-				const randomizedElementsStorage = storageObject( randomizedElementsBuffer, 'uint', size ).label( 'RandomizedElements' );
+				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint', size ).setPBO( true ).setName( 'RandomizedElements' );
 
 				const getFlipIndices = ( index, blockHeight ) => {
 
 					const blockOffset = ( index.mul( 2 ).div( blockHeight ) ).mul( blockHeight );
 					const halfHeight = blockHeight.div( 2 );
 					const idx = uvec2(
-						index.modInt( halfHeight ),
-						blockHeight.sub( index.modInt( halfHeight ) ).sub( 1 )
+						index.mod( halfHeight ),
+						blockHeight.sub( index.mod( halfHeight ) ).sub( 1 )
 					);
 					idx.x.addAssign( blockOffset );
 					idx.y.addAssign( blockOffset );
@@ -205,8 +215,8 @@
 					const blockOffset = ( ( index.mul( 2 ) ).div( blockHeight ) ).mul( blockHeight );
 					const halfHeight = blockHeight.div( 2 );
 					const idx = uvec2(
-						index.modInt( halfHeight ),
-						( index.modInt( halfHeight ) ).add( halfHeight )
+						index.mod( halfHeight ),
+						( index.mod( halfHeight ) ).add( halfHeight )
 					);
 
 					idx.x.addAssign( blockOffset );
@@ -266,7 +276,7 @@
 					// Get ids of indices needed to populate workgroup local buffer.
 					// Use .toVar() to prevent these values from being recalculated multiple times.
 					const localOffset = uint( WORKGROUP_SIZE[ 0 ] ).mul( 2 ).mul( workgroupId.x ).toVar();
-			
+
 					const localID1 = invocationLocalIndex.mul( 2 );
 					const localID2 = invocationLocalIndex.mul( 2 ).add( 1 );
 
@@ -333,7 +343,7 @@
 						if ( forceGlobalSwap ) {
 
 							If( highestBlockHeight.equal( size * 2 ), () => {
-			
+
 								nextAlgo.assign( StepType.NONE );
 								nextBlockHeight.assign( 0 );
 
@@ -347,7 +357,7 @@
 						} else {
 
 							If( highestBlockHeight.equal( size * 2 ), () => {
-			
+
 								nextAlgo.assign( StepType.NONE );
 								nextBlockHeight.assign( 0 );
 
@@ -373,7 +383,7 @@
 
 						} else {
 
-							nextAlgo.assign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).select( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ) );
+							nextAlgo.assign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).select( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ).uniformFlow() );
 
 						}
 
@@ -393,7 +403,7 @@
 				const computeResetBuffersFn = Fn( () => {
 
 					currentElementsStorage.element( instanceIndex ).assign( randomizedElementsStorage.element( instanceIndex ) );
-			
+
 				} );
 
 				const computeResetAlgoFn = Fn( () => {
@@ -437,7 +447,7 @@
 
 					If( highlight.equal( 1 ).and( not( nextAlgoStorage.element( 0 ).equal( StepType.NONE ) ) ), () => {
 
-						const boolCheck = int( elementIndex.modInt( nextBlockHeightRead.element( 0 ) ).lessThan( nextBlockHeightRead.element( 0 ).div( 2 ) ) );
+						const boolCheck = int( elementIndex.mod( nextBlockHeightRead.element( 0 ) ).lessThan( nextBlockHeightRead.element( 0 ).div( 2 ) ) );
 						color.z.assign( nextAlgoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
 						color.x.mulAssign( boolCheck );
 						color.y.mulAssign( abs( boolCheck.sub( 1 ) ) );
@@ -477,7 +487,7 @@
 					renderer.domElement.style.left = '50%';
 
 					scene.background = new THREE.Color( 0x212121 );
-			
+
 				} else {
 
 					scene.background = new THREE.Color( 0x313131 );
@@ -499,9 +509,9 @@
 						if ( nextStepGlobal ) {
 
 							renderer.compute( computeAlignCurrent );
-			
+
 						}
-			
+
 						renderer.compute( computeSetAlgo );
 
 						currentStep ++;
@@ -512,14 +522,18 @@
 						renderer.compute( computeResetAlgo );
 
 						currentStep = 0;
-			
+
 					}
 
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+
+
 					const algo = new Uint32Array( await renderer.getArrayBufferAsync( nextAlgoBuffer ) );
-					algo > StepType.DISPERSE_LOCAL ? ( nextStepGlobal = true ) : ( nextStepGlobal = false );
+					nextStepGlobal = algo[ 0 ] > StepType.DISPERSE_LOCAL;
 					const totalSwaps = new Uint32Array( await renderer.getArrayBufferAsync( counterBuffer ) );
-			
+
 					renderer.render( scene, camera );
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
 
 					timestamps[ forceGlobalSwap ? 'global_swap' : 'local_swap' ].innerHTML = `
 
@@ -531,17 +545,17 @@
 									&nbsp;to Region&nbsp;
 									<div style="background-color: ${ forceGlobalSwap ? globalColors[ 1 ] : localColors[ 1 ]}; width:12.5px; height: 1em; border-radius: 20%;"></div>
 								</div>`;
-			
+
 
 					if ( currentStep === MAX_STEPS ) {
 
 						setTimeout( stepAnimation, 1000 );
 
-			
+
 					} else {
 
 						setTimeout( stepAnimation, 50 );
-			
+
 					}
 
 				};

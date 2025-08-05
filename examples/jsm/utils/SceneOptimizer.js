@@ -1,7 +1,20 @@
 import * as THREE from 'three';
 
+/**
+ * This class can be used to optimized scenes by converting
+ * individual meshes into {@link BatchedMesh}. This component
+ * is an experimental attempt to implement auto-batching in three.js.
+ *
+ * @three_import import { SceneOptimizer } from 'three/addons/utils/SceneOptimizer.js';
+ */
 class SceneOptimizer {
 
+	/**
+	 * Constructs a new scene optimizer.
+	 *
+	 * @param {Scene} scene - The scene to optimize.
+	 * @param {SceneOptimizer~Options} options - The configuration options.
+	 */
 	constructor( scene, options = {} ) {
 
 		this.scene = scene;
@@ -9,7 +22,7 @@ class SceneOptimizer {
 
 	}
 
-	bufferToHash( buffer ) {
+	_bufferToHash( buffer ) {
 
 		let hash = 0;
 		if ( buffer.byteLength !== 0 ) {
@@ -43,7 +56,7 @@ class SceneOptimizer {
 
 	}
 
-	getMaterialPropertiesHash( material ) {
+	_getMaterialPropertiesHash( material ) {
 
 		const mapProps = [
 			'map',
@@ -128,7 +141,7 @@ class SceneOptimizer {
 
 	}
 
-	getAttributesSignature( geometry ) {
+	_getAttributesSignature( geometry ) {
 
 		return Object.keys( geometry.attributes )
 			.sort()
@@ -142,24 +155,24 @@ class SceneOptimizer {
 
 	}
 
-	getGeometryHash( geometry ) {
+	_getGeometryHash( geometry ) {
 
 		const indexHash = geometry.index
-			? this.bufferToHash( geometry.index.array )
+			? this._bufferToHash( geometry.index.array )
 			: 'noIndex';
-		const positionHash = this.bufferToHash( geometry.attributes.position.array );
-		const attributesSignature = this.getAttributesSignature( geometry );
+		const positionHash = this._bufferToHash( geometry.attributes.position.array );
+		const attributesSignature = this._getAttributesSignature( geometry );
 		return `${indexHash}_${positionHash}_${attributesSignature}`;
 
 	}
 
-	getBatchKey( materialProps, attributesSignature ) {
+	_getBatchKey( materialProps, attributesSignature ) {
 
 		return `${materialProps}_${attributesSignature}`;
 
 	}
 
-	analyzeModel() {
+	_analyzeModel() {
 
 		const batchGroups = new Map();
 		const singleGroups = new Map();
@@ -170,10 +183,10 @@ class SceneOptimizer {
 
 			if ( ! node.isMesh ) return;
 
-			const materialProps = this.getMaterialPropertiesHash( node.material );
-			const attributesSignature = this.getAttributesSignature( node.geometry );
-			const batchKey = this.getBatchKey( materialProps, attributesSignature );
-			const geometryHash = this.getGeometryHash( node.geometry );
+			const materialProps = this._getMaterialPropertiesHash( node.material );
+			const attributesSignature = this._getAttributesSignature( node.geometry );
+			const batchKey = this._getBatchKey( materialProps, attributesSignature );
+			const geometryHash = this._getGeometryHash( node.geometry );
 			uniqueGeometries.add( geometryHash );
 
 			if ( ! batchGroups.has( batchKey ) ) {
@@ -222,7 +235,7 @@ class SceneOptimizer {
 
 	}
 
-	createBatchedMeshes( batchGroups ) {
+	_createBatchedMeshes( batchGroups ) {
 
 		const meshesToRemove = new Set();
 
@@ -269,7 +282,7 @@ class SceneOptimizer {
 
 			for ( const mesh of group.meshes ) {
 
-				const geometryHash = this.getGeometryHash( mesh.geometry );
+				const geometryHash = this._getGeometryHash( mesh.geometry );
 
 				if ( ! geometryIds.has( geometryHash ) ) {
 
@@ -308,6 +321,11 @@ class SceneOptimizer {
 
 	}
 
+	/**
+	 * Removes empty nodes from all descendants of the given 3D object.
+	 *
+	 * @param {Object3D} object - The 3D object to process.
+	 */
 	removeEmptyNodes( object ) {
 
 		const children = [ ...object.children ];
@@ -327,6 +345,11 @@ class SceneOptimizer {
 
 	}
 
+	/**
+	 * Removes the given array of meshes from the scene.
+	 *
+	 * @param {Set<Mesh>} meshesToRemove - The meshes to remove.
+	 */
 	disposeMeshes( meshesToRemove ) {
 
 		meshesToRemove.forEach( ( mesh ) => {
@@ -356,7 +379,7 @@ class SceneOptimizer {
 
 	}
 
-	logDebugInfo( stats ) {
+	_logDebugInfo( stats ) {
 
 		console.group( 'Scene Optimization Results' );
 		console.log( `Original meshes: ${stats.originalMeshes}` );
@@ -368,10 +391,18 @@ class SceneOptimizer {
 
 	}
 
+	/**
+	 * Performs the auto-baching by identifying groups of meshes in the scene
+	 * that can be represented as a single {@link BatchedMesh}. The method modifies
+	 * the scene by adding instances of `BatchedMesh` and removing the now redundant
+	 * individual meshes.
+	 *
+	 * @return {Scene} The optimized scene.
+	 */
 	toBatchedMesh() {
 
-		const { batchGroups, singleGroups, uniqueGeometries } = this.analyzeModel();
-		const meshesToRemove = this.createBatchedMeshes( batchGroups );
+		const { batchGroups, singleGroups, uniqueGeometries } = this._analyzeModel();
+		const meshesToRemove = this._createBatchedMeshes( batchGroups );
 
 		this.disposeMeshes( meshesToRemove );
 		this.removeEmptyNodes( this.scene );
@@ -390,7 +421,7 @@ class SceneOptimizer {
 				reductionRatio: ( ( 1 - totalFinalMeshes / totalOriginalMeshes ) * 100 ).toFixed( 1 ),
 			};
 
-			this.logDebugInfo( stats );
+			this._logDebugInfo( stats );
 
 		}
 
@@ -398,7 +429,17 @@ class SceneOptimizer {
 
 	}
 
-	// Placeholder for future implementation
+	/**
+	 * Performs the auto-instancing by identifying groups of meshes in the scene
+	 * that can be represented as a single {@link InstancedMesh}. The method modifies
+	 * the scene by adding instances of `InstancedMesh` and removing the now redundant
+	 * individual meshes.
+	 *
+	 * This method is not yet implemented.
+	 *
+	 * @abstract
+	 * @return {Scene} The optimized scene.
+	 */
 	toInstancingMesh() {
 
 		throw new Error( 'InstancedMesh optimization not implemented yet' );
@@ -406,5 +447,12 @@ class SceneOptimizer {
 	}
 
 }
+
+/**
+ * Constructor options of `SceneOptimizer`.
+ *
+ * @typedef {Object} SceneOptimizer~Options
+ * @property {boolean} [debug=false] - Whether to enable debug mode or not.
+ **/
 
 export { SceneOptimizer };

@@ -27,8 +27,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { luminance, cos, float, min, time, atan2, uniform, pass, PI, PI2, color, positionLocal, oneMinus, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { luminance, cos, min, time, atan, uniform, pass, PI, PI2, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -58,7 +58,7 @@
 
 					const centeredUv = uv.sub( 0.5 ).toVar();
 					const distanceToCenter = centeredUv.length();
-					const angle = atan2( centeredUv.y, centeredUv.x );
+					const angle = atan( centeredUv.y, centeredUv.x );
 					const radialUv = vec2( angle.add( PI ).div( PI2 ), distanceToCenter ).toVar();
 					radialUv.mulAssign( multiplier );
 					radialUv.x.addAssign( rotation );
@@ -79,7 +79,7 @@
 
 				const twistedCylinder = Fn( ( [ position, parabolStrength, parabolOffset, parabolAmplitude, time ] ) => {
 
-					const angle = atan2( position.z, position.x ).toVar();
+					const angle = atan( position.z, position.x ).toVar();
 					const elevation = position.y;
 
 					// parabol
@@ -145,7 +145,7 @@
 					// outer fade
 					const distanceToCenter = uv().sub( 0.5 ).toVar();
 					const outerFade = min(
-						oneMinus( distanceToCenter.length() ).smoothstep( 0.5, 0.9 ),
+						distanceToCenter.length().oneMinus().smoothstep( 0.5, 0.9 ),
 						distanceToCenter.length().smoothstep( 0, 0.2 )
 					);
 
@@ -154,7 +154,7 @@
 
 					// output
 					return vec4(
-						emissiveColor.mul( float( 0.2 ).step( effect ) ).mul( 3 ), // Emissive
+						emissiveColor.mul( effect.step( 0.2 ) ).mul( 3 ), // Emissive
 						effect.smoothstep( 0, 0.01 ) // Alpha
 					);
 
@@ -200,7 +200,7 @@
 					// outer fade
 					const outerFade = min(
 						uv().y.smoothstep( 0, 0.1 ),
-						oneMinus( uv().y ).smoothstep( 0, 0.4 )
+						uv().y.oneMinus().smoothstep( 0, 0.4 )
 					);
 
 					// effect
@@ -251,7 +251,7 @@
 					// outer fade
 					const outerFade = min(
 						uv().y.smoothstep( 0, 0.2 ),
-						oneMinus( uv().y ).smoothstep( 0, 0.4 )
+						uv().y.oneMinus().smoothstep( 0, 0.4 )
 					);
 
 					// effect
@@ -275,6 +275,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
 				// post processing

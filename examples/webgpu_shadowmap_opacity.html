@@ -25,8 +25,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { Fn, vec4 } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { Fn, mix } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -100,9 +100,10 @@
 
 				// shadow node
 
-				const customShadow = Fn( ( [ color, opacity = .8 ] ) => {
+				const customShadow = Fn( ( [ color, opacity = 1 ] ) => {
 
-					return vec4( color, opacity );
+					//return vec4( color, opacity ); // opacity by blending
+					return mix( 1, color, opacity ); // opacity by color
 
 				} );
 

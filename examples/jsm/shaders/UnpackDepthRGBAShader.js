@@ -1,8 +1,14 @@
 /**
- * Unpack RGBA depth shader
- * - show RGBA encoded depth as monochrome color
+ * @module UnpackDepthRGBAShader
+ * @three_import import { UnpackDepthRGBAShader } from 'three/addons/shaders/UnpackDepthRGBAShader.js';
  */
 
+/**
+ * Unpack RGBA depth shader that shows RGBA encoded depth as monochrome color.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const UnpackDepthRGBAShader = {
 
 	name: 'UnpackDepthRGBAShader',
@@ -37,8 +43,17 @@ const UnpackDepthRGBAShader = {
 
 		void main() {
 
-			float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );
-			gl_FragColor = vec4( vec3( depth ), opacity );
+			float depth = unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );
+
+			#ifdef USE_REVERSEDEPTHBUF
+
+				gl_FragColor = vec4( vec3( depth ), opacity );
+
+			#else
+
+				gl_FragColor = vec4( vec3( 1.0 - depth ), opacity );
+
+			#endif
 
 		}`
 

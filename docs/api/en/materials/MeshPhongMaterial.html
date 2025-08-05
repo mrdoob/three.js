@@ -139,6 +139,7 @@
 		<h3>[property:Float displacementBias]</h3>
 		<p>
 			The offset of the displacement map's values on the mesh's vertices.
+			The bias is added to the scaled sample of the displacement map.
 			Without a displacement map set, this value is not applied. Default is `0`.
 		</p>
 
@@ -190,7 +191,7 @@
 		<h3>[property:Texture map]</h3>
 		<p>
 			The color map. May optionally include an alpha channel, typically combined
-			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest]. 
+			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest].
 			Default is null. The texture map color is modulated by the
 			diffuse [page:.color].
 		</p>
@@ -230,7 +231,7 @@
 		<p>
 			The index of refraction (IOR) of air (approximately 1) divided by the
 			index of refraction of the material. It is used with environment mapping
-			modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping]. 
+			modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
 			The refraction ratio should not exceed `1`. Default is `0.98`.
 		</p>
 
@@ -267,7 +268,7 @@
 			"square". Default is 'round'.<br /><br />
 
 			This corresponds to the
-			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap] 
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
@@ -277,7 +278,7 @@
 			"miter". Default is 'round'.<br /><br />
 
 			This corresponds to the
-			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin] 
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
@@ -286,7 +287,7 @@
 			Controls wireframe thickness. Default is `1`.<br /><br />
 
 			Due to limitations of the
-			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
 			with the [page:WebGLRenderer WebGL] renderer on most
 			platforms linewidth will always be `1` regardless of the set value.
 		</p>

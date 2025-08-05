@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color, mix, normalWorld, output, Fn, uniform, vec4, rotate, screenCoordinate, screenSize } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -145,14 +145,12 @@
 
 					// mask
 
-					const mask = gridUv
-						.sub( 0.5 )
-						.length()
-						.step( orientationStrength.mul( radius ).mul( 0.5 ) )
+					const mask = orientationStrength.mul( radius ).mul( 0.5 )
+						.step( gridUv.sub( 0.5 ).length() )
 						.mul( mix( mixLow, mixHigh, orientationStrength ) );
 
 					return vec4( color, mask );
-			
+
 				} );
 
 				const halftones = Fn( ( [ input ] ) => {
@@ -202,7 +200,7 @@
 
 						const model = gltf.scene;
 						model.position.y = - 2;
-						model.scale.setScalar( 2.5, 2.5, 2.5 );
+						model.scale.setScalar( 2.5 );
 						model.traverse( ( child ) => {
 
 							if ( child.isMesh )
@@ -211,7 +209,7 @@
 						} );
 
 						scene.add( model );
-			
+
 					}
 				);
 
@@ -243,7 +241,7 @@
 			}
 
 			async function animate() {
-			
+
 				controls.update();
 
 				const time = clock.getElapsedTime();

@@ -144,8 +144,6 @@
 		THREE.RGBFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
-		THREE.LuminanceFormat
-		THREE.LuminanceAlphaFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -172,14 +170,6 @@
 
 		[page:constant RGBAIntegerFormat]는 기본값이며 red, green, blue 및 alpha 요소를 읽어들입니다.
 		texel은 부동 소수점 대신 정수로 읽어들입니다.
-		<br /><br />
-
-		[page:constant LuminanceFormat]은 각 요소(element)를 단일 휘도 요소(component)로 읽어들입니다.
-		그 다음에 부동 소수점으로 변환되어 [0,1] 범위에 고정한 다음
-		휘도 값을 적색, 녹색 및 청색 채널에 배치하고 1.0을 알파 채널에 할당하여 RGBA 요소로 조립합니다.<br /><br />
-
-		[page:constant LuminanceAlphaFormat]은 각 요소(element)를 휘도/알파 소수로 읽어들입니다.
-		The same process occurs as for the [page:constant LuminanceFormat]와 같은 절차가 이루어지며, 알파 채널에 *1.0* 이외의 값이 들어갈 수 있다는 점만 다릅니다.
 		<br /><br />
 
 		[page:constant DepthFormat]은 각 요소를 단일 깊이 값으로 일거들이며 부동 소수점으로 변환하고, [0,1]범위에 고정합니다.

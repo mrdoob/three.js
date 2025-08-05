@@ -33,7 +33,7 @@
 			-1.0, -1.0,  1.0
 		] );
 
-		// itemSize = 3 parce qu'il y a 3 valeurs (comoosants) par sommet
+		// itemSize = 3 parce qu'il y a 3 valeurs (composants) par sommet
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		const mesh = new THREE.Mesh( geometry, material );
@@ -267,7 +267,7 @@
 
 		<h3>[method:this scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		Mettre à l'échelle les données géométriques. Cela se fait généralement en une seule opération et non pendant une boucle.	
+		Mettre à l'échelle les données géométriques. Cela se fait généralement en une seule opération et non pendant une boucle.
 	Utilisez [page:Object3D.scale] pour une utilisation typique du maillage en temps réel.
 		</p>
 

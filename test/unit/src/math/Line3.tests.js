@@ -211,6 +211,62 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'distanceSqToLine3', ( assert ) => {
+
+			const line1 = new Line3();
+			line1.start.set( 0, 0, 0 );
+			line1.end.set( 2, 0, 0 );
+
+			const line2 = new Line3();
+			line2.start.set( 1, 10, 0 );
+			line2.end.set( 1, - 2, 0 );
+
+			assert.numEqual( line1.distanceSqToLine3( line2 ), 0 );
+
+			// Parallel lines case
+			line2.start.set( - 2, 0, 2 );
+			line2.end.set( 20, 0, 2 );
+
+			assert.numEqual( line1.distanceSqToLine3( line2 ), 4 );
+
+			// Closest point on lines from one side is out of segment
+			line1.start.set( 0, 4, 0 );
+			line1.end.set( 2, 2, 0 );
+
+			line2.start.set( 0, 0, 0 );
+			line2.end.set( 4, 0, 0 );
+
+			assert.numEqual( line1.distanceSqToLine3( line2 ), 4 );
+
+			// Closest point on lines from another side is out of segment
+			line1.start.set( 0, 4, 0 );
+			line1.end.set( 3, 1, 0 );
+
+			line2.start.set( 0, 0, 0 );
+			line2.end.set( 1, 0, 0 );
+
+			assert.numEqual( line1.distanceSqToLine3( line2 ), 4.5 );
+
+			// Closest point on lines from both sides is out of the segment
+			line1.start.set( 0, 4, 0 );
+			line1.end.set( 2, 2, 0 );
+
+			line2.start.set( 0, 0, 0 );
+			line2.end.set( 1, 0, 0 );
+
+			assert.numEqual( line1.distanceSqToLine3( line2 ), 5 );
+
+			// General case with skew lines
+			line1.start.set( 4, 0, 0 );
+			line1.end.set( - 4, 0, 0 );
+
+			line2.start.set( 0, 4, 0 );
+			line2.end.set( 0, 0, 4 );
+
+			assert.numEqual( line1.distanceSqToLine3( line2 ), 8 );
+
+		} );
+
 	} );
 
 } );

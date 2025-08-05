@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Tips</title>
+    <title>Conseils</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
@@ -22,12 +22,314 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Tips</h1>
+        <h1>Conseils</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/tips.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p>Cet article est une collection de petits problèmes que vous pourriez rencontrer
+en utilisant three.js, qui semblaient trop mineurs pour avoir leur propre article.</p>
+<hr>
+<p><a id="screenshot" data-toc="Faire une capture d'écran"></a></p>
+<h1 id="taking-a-screenshot-of-the-canvas">Faire une capture d'écran du Canvas</h1>
+<p>Dans le navigateur, il y a effectivement 2 fonctions qui permettent de prendre une capture d'écran.
+L'ancienne
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>
+et la nouvelle, meilleure,
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a></p>
+<p>On pourrait donc penser qu'il serait facile de prendre une capture d'écran en ajoutant simplement du code comme</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;button id="screenshot" type="button"&gt;Enregistrer...&lt;/button&gt;
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+
+const saveBlob = (function() {
+  const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style.display = 'none';
+  return function saveData(blob, fileName) {
+     const url = window.URL.createObjectURL(blob);
+     a.href = url;
+     a.download = fileName;
+     a.click();
+  };
+}());
+</pre>
+<p>Voici l'exemple de <a href="responsive.html">l'article sur la réactivité</a>
+avec le code ci-dessus ajouté et un peu de CSS pour positionner le bouton</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-bad.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-bad.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Lorsque je l'ai essayé, j'ai obtenu cette capture d'écran</p>
+<div class="threejs_center"><img src="../resources/images/screencapture-413x313.png"></div>
+
+<p>Oui, c'est juste une image noire.</p>
+<p>Il est possible que cela ait fonctionné pour vous selon votre navigateur/OS mais en général,
+il est peu probable que cela fonctionne.</p>
+<p>Le problème est que, pour des raisons de performance et de compatibilité, par défaut, le navigateur
+efface le buffer de dessin d'un canvas WebGL après y avoir dessiné.</p>
+<p>La solution est d'appeler votre code de rendu juste avant la capture.</p>
+<p>Dans notre code, nous devons ajuster quelques éléments. D'abord, séparons
+le code de rendu.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const state = {
++  time: 0,
++};
+
+-function render(time) {
+-  time *= 0.001;
++function render() {
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = state.time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
++function animate(time) {
++  state.time = time * 0.001;
++
++  render();
++
++  requestAnimationFrame(animate);
++}
++requestAnimationFrame(animate);
+</pre>
+<p>Maintenant que <code class="notranslate" translate="no">render</code> ne s'occupe que du rendu effectif,
+nous pouvons l'appeler juste avant de capturer le canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
++  render();
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x-${canvas.height}.png`);
+  });
+});
+</pre>
+<p>Et maintenant, ça devrait marcher.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-good.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-good.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Pour une solution différente, voir l'élément suivant.</p>
+<hr>
+<p><a id="preservedrawingbuffer" data-toc="Empêcher l'effacement du Canvas"></a></p>
+<h1 id="preventing-the-canvas-being-cleared">Empêcher l'effacement du canvas</h1>
+<p>Supposons que vous vouliez permettre à l'utilisateur de peindre avec un objet
+animé. Vous devez passer <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> lorsque
+vous créez le <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Cela empêche le navigateur d'effacer
+le canvas. Vous devez également dire à three.js de ne pas effacer
+le canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  preserveDrawingBuffer: true,
++  alpha: true,
++});
++renderer.autoClearColor = false;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-preservedrawingbuffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-preservedrawingbuffer.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Notez que si vous étiez sérieux au sujet de la création d'un programme de dessin, ce ne serait pas une
+solution car le navigateur effacera toujours le canvas chaque fois que sa
+résolution change. Nous modifions sa résolution en fonction de sa taille d'affichage. Sa taille d'affichage
+change lorsque la fenêtre change de taille. Cela inclut lorsque l'utilisateur télécharge
+un fichier, même dans un autre onglet, et que le navigateur ajoute une barre d'état. Cela inclut également lorsque
+l'utilisateur tourne son téléphone et que le navigateur passe du mode portrait au mode paysage.</p>
+<p>Si vous vouliez vraiment créer un programme de dessin, vous devriez
+<a href="rendertargets.html">faire le rendu sur une texture en utilisant une cible de rendu</a>.</p>
+<hr>
+<p><a id="tabindex" data-toc="Obtenir la saisie clavier d'un Canvas"></a></p>
+<h1 id="getting-keyboard-input">Obtenir la saisie clavier</h1>
+<p>Tout au long de ces tutoriels, nous avons souvent attaché des écouteurs d'événements au <code class="notranslate" translate="no">canvas</code>.
+Bien que de nombreux événements fonctionnent, un qui ne fonctionne pas par défaut est l'événement
+clavier.</p>
+<p>Pour obtenir les événements clavier, définissez le <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex"><code class="notranslate" translate="no">tabindex</code></a>
+du canvas à 0 ou plus. Par exemple :</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas tabindex="0"&gt;&lt;/canvas&gt;
+</pre>
+<p>Cela finit cependant par causer un nouveau problème. Tout élément ayant un <code class="notranslate" translate="no">tabindex</code> défini
+sera mis en évidence lorsqu'il aura le focus. Pour résoudre ce problème, définissez son contour de focus CSS
+à none (aucun)</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">canvas:focus {
+  outline:none;
+}
+</pre>
+<p>Pour démontrer, voici 3 canvas</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c1"&gt;&lt;/canvas&gt;
+&lt;canvas id="c2" tabindex="0"&gt;&lt;/canvas&gt;
+&lt;canvas id="c3" tabindex="1"&gt;&lt;/canvas&gt;
+</pre>
+<p>et un peu de css juste pour le dernier canvas</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c3:focus {
+    outline: none;
+}
+</pre>
+<p>Notez que vous ne pouvez pas faire en sorte que le premier canvas accepte les saisies clavier.
+Le deuxième canvas le peut, mais il est mis en évidence. Le 3ème
+canvas a les deux solutions appliquées.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-tabindex.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-tabindex.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="transparent-canvas" data-toc="Rendre le Canvas Transparent"></a></p>
+<h1 id="making-the-canvas-transparent">Rendre le Canvas Transparent</h1>
+<p>Par défaut, THREE.js rend le canvas opaque. Si vous voulez que le
+canvas soit transparent, passez <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> lorsque vous créez
+le <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  alpha: true,
++});
+</pre>
+<p>Vous voudrez probablement aussi lui dire que vos résultats <strong>n'utilisent pas</strong> l'alpha prémultiplié</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
++  premultipliedAlpha: false,
+});
+</pre>
+<p>Three.js utilise par défaut <a href="/docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> pour le canvas,
+mais par défaut, les matériaux génèrent <a href="/docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
+<p>Si vous souhaitez mieux comprendre quand utiliser ou non l'alpha prémultiplié,
+voici <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">un bon article à ce sujet</a>.</p>
+<p>En tout cas, configurons un exemple simple avec un canvas transparent.</p>
+<p>Nous avons appliqué les paramètres ci-dessus à l'exemple de <a href="responsive.html">l'article sur la réactivité</a>.
+Rendons également les matériaux plus transparents.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+-  const material = new THREE.MeshPhongMaterial({color});
++  const material = new THREE.MeshPhongMaterial({
++    color,
++    opacity: 0.5,
++  });
+
+...
+</pre>
+<p>Et ajoutons un peu de contenu HTML</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="content"&gt;
++    &lt;div&gt;
++      &lt;h1&gt;Cubes-R-Us !&lt;/h1&gt;
++      &lt;p&gt;Nous fabriquons les meilleurs cubes !&lt;/p&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>ainsi qu'un peu de CSS pour placer le canvas devant</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    position: fixed;
++    left: 0;
++    top: 0;
++    z-index: 2;
++    pointer-events: none;
+}
++#content {
++  font-size: 7vw;
++  font-family: sans-serif;
++  text-align: center;
++  width: 100%;
++  height: 100%;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++}
+</pre>
+<p>Notez que <code class="notranslate" translate="no">pointer-events: none</code> rend le canvas invisible aux événements de souris
+et tactiles afin que vous puissiez sélectionner le texte en dessous.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-transparent-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-transparent-canvas.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="html-background" data-toc="Utiliser three.js comme fond en HTML"></a></p>
+<h1 id="making-your-background-a-three-js-animation">Faire de votre arrière-plan une animation three.js</h1>
+<p>Une question courante est de savoir comment faire en sorte qu'une animation three.js serve d'arrière-plan à
+une page web.</p>
+<p>Il y a 2 façons évidentes.</p>
+<ul>
+<li>Définir la propriété CSS <code>position</code> du canvas sur <code>fixed</code> comme dans</li>
+</ul>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+ position: fixed;
+ left: 0;
+ top: 0;
+ ...
+}
+</pre>
+<p>Vous pouvez voir cette solution exacte dans l'exemple précédent. Il suffit de définir <code>z-index</code> à -1
+et les cubes apparaîtront derrière le texte.</p>
+<p>Un petit inconvénient de cette solution est que votre JavaScript doit s'intégrer à la page
+et si vous avez une page complexe, vous devez vous assurer qu'aucun des scripts JavaScript de votre
+visualisation three.js n'entre en conflit avec le JavaScript effectuant d'autres tâches dans la page.</p>
+<ul>
+<li>Utiliser une <code>iframe</code></li>
+</ul>
+<p>C'est la solution utilisée sur <a href="/">la page d'accueil de ce site</a>.</p>
+<p>Dans votre page web, insérez simplement une iframe, par exemple :</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;iframe id="background" src="responsive.html"&gt;
+&lt;div&gt;
+  Votre contenu ici.
+&lt;/div&gt;
+</pre>
+<p>Ensuite, stylisez l'iframe pour qu'elle remplisse la fenêtre et soit en arrière-plan,
+ce qui est essentiellement le même code que nous avons utilisé ci-dessus pour le canvas,
+sauf que nous devons également définir <code>border</code> à <code>none</code> car les iframes ont
+une bordure par défaut.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">#background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    border: none;
+    pointer-events: none;
+}
+</pre><p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-html-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-html-background.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
 
         </div>
       </div>

@@ -45,7 +45,7 @@ function header() {
 
 			code.prepend( `/**
  * @license
- * Copyright 2010-2024 Three.js Authors
+ * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */\n` );
 
@@ -66,7 +66,7 @@ function header() {
 const builds = [
 	{
 		input: {
-			'three.core.js': 'src/Three.core.js',
+			'three.core.js': 'src/Three.Core.js',
 			'three.webgpu.nodes.js': 'src/Three.WebGPU.Nodes.js',
 		},
 		plugins: [
@@ -85,7 +85,7 @@ const builds = [
 	},
 	{
 		input: {
-			'three.core.js': 'src/Three.core.js',
+			'three.core.js': 'src/Three.Core.js',
 			'three.module.js': 'src/Three.WebGPU.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
 		},
@@ -123,7 +123,7 @@ const builds = [
 	},
 	{
 		input: {
-			'three.core.min.js': 'src/Three.core.js',
+			'three.core.min.js': 'src/Three.Core.js',
 			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.Nodes.js',
 		},
 		plugins: [
@@ -143,7 +143,7 @@ const builds = [
 	},
 	{
 		input: {
-			'three.core.min.js': 'src/Three.core.js',
+			'three.core.min.js': 'src/Three.Core.js',
 			'three.module.min.js': 'src/Three.WebGPU.js',
 			'three.webgpu.min.js': 'src/Three.WebGPU.js',
 		},

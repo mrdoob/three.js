@@ -44,6 +44,15 @@ const perturbNormalArb = Fn( ( inputs ) => {
 
 } );
 
+/**
+ * This class can be used for applying bump maps to materials.
+ *
+ * ```js
+ * material.normalNode = bumpMap( texture( bumpTex ) );
+ * ```
+ *
+ * @augments TempNode
+ */
 class BumpMapNode extends TempNode {
 
 	static get type() {
@@ -52,11 +61,29 @@ class BumpMapNode extends TempNode {
 
 	}
 
+	/**
+	 * Constructs a new bump map node.
+	 *
+	 * @param {Node<float>} textureNode - Represents the bump map data.
+	 * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
+	 */
 	constructor( textureNode, scaleNode = null ) {
 
 		super( 'vec3' );
 
+		/**
+		 * Represents the bump map data.
+		 *
+		 * @type {Node<float>}
+		 */
 		this.textureNode = textureNode;
+
+		/**
+		 * Controls the intensity of the bump effect.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
 		this.scaleNode = scaleNode;
 
 	}
@@ -78,4 +105,13 @@ class BumpMapNode extends TempNode {
 
 export default BumpMapNode;
 
-export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode );
+/**
+ * TSL function for creating a bump map node.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} textureNode - Represents the bump map data.
+ * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
+ * @returns {BumpMapNode}
+ */
+export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode ).setParameterLength( 1, 2 );

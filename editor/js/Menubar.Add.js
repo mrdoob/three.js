@@ -81,7 +81,7 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/capsule' ) );
 	option.onClick( function () {
 
-		const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
+		const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8, 1 );
 		const material = new THREE.MeshStandardMaterial();
 		const mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Capsule';

@@ -6,20 +6,61 @@ const _eyeRight = /*@__PURE__*/ new Matrix4();
 const _eyeLeft = /*@__PURE__*/ new Matrix4();
 const _projectionMatrix = /*@__PURE__*/ new Matrix4();
 
+/**
+ * A special type of camera that uses two perspective cameras with
+ * stereoscopic projection. Can be used for rendering stereo effects
+ * like [3D Anaglyph]{@link https://en.wikipedia.org/wiki/Anaglyph_3D} or
+ * [Parallax Barrier]{@link https://en.wikipedia.org/wiki/parallax_barrier}.
+ */
 class StereoCamera {
 
+	/**
+	 * Constructs a new stereo camera.
+	 */
 	constructor() {
 
+		/**
+		 * The type property is used for detecting the object type
+		 * in context of serialization/deserialization.
+		 *
+		 * @type {string}
+		 * @readonly
+		 */
 		this.type = 'StereoCamera';
 
+		/**
+		 * The aspect.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.aspect = 1;
 
+		/**
+		 * The eye separation which represents the distance
+		 * between the left and right camera.
+		 *
+		 * @type {number}
+		 * @default 0.064
+		 */
 		this.eyeSep = 0.064;
 
+		/**
+		 * The camera representing the left eye. This is added to layer `1` so objects to be
+		 * rendered by the left camera must also be added to this layer.
+		 *
+		 * @type {PerspectiveCamera}
+		 */
 		this.cameraL = new PerspectiveCamera();
 		this.cameraL.layers.enable( 1 );
 		this.cameraL.matrixAutoUpdate = false;
 
+		/**
+		 * The camera representing the right eye. This is added to layer `2` so objects to be
+		 * rendered by the right camera must also be added to this layer.
+		 *
+		 * @type {PerspectiveCamera}
+		 */
 		this.cameraR = new PerspectiveCamera();
 		this.cameraR.layers.enable( 2 );
 		this.cameraR.matrixAutoUpdate = false;
@@ -36,6 +77,11 @@ class StereoCamera {
 
 	}
 
+	/**
+	 * Updates the stereo camera based on the given perspective camera.
+	 *
+	 * @param {PerspectiveCamera} camera - The perspective camera.
+	 */
 	update( camera ) {
 
 		const cache = this._cache;

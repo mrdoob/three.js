@@ -1,10 +1,31 @@
 import { Quaternion } from '../math/Quaternion.js';
 
+/**
+ * Buffered scene graph property that allows weighted accumulation; used internally.
+ */
 class PropertyMixer {
 
+	/**
+	 * Constructs a new property mixer.
+	 *
+	 * @param {PropertyBinding} binding - The property binding.
+	 * @param {string} typeName - The keyframe track type name.
+	 * @param {number} valueSize - The keyframe track value size.
+	 */
 	constructor( binding, typeName, valueSize ) {
 
+		/**
+		 * The property binding.
+		 *
+		 * @type {PropertyBinding}
+		 */
 		this.binding = binding;
+
+		/**
+		 * The keyframe track value size.
+		 *
+		 * @type {number}
+		 */
 		this.valueSize = valueSize;
 
 		let mixFunction,
@@ -66,15 +87,46 @@ class PropertyMixer {
 		this._origIndex = 3;
 		this._addIndex = 4;
 
+		/**
+		 * TODO
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.cumulativeWeight = 0;
+
+		/**
+		 * TODO
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.cumulativeWeightAdditive = 0;
 
+		/**
+		 * TODO
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.useCount = 0;
+
+		/**
+		 * TODO
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.referenceCount = 0;
 
 	}
 
-	// accumulate data in the 'incoming' region into 'accu<i>'
+	/**
+	 * Accumulates data in the `incoming` region into `accu<i>`.
+	 *
+	 * @param {number} accuIndex - The accumulation index.
+	 * @param {number} weight - The weight.
+	 */
 	accumulate( accuIndex, weight ) {
 
 		// note: happily accumulating nothing when weight = 0, the caller knows
@@ -112,7 +164,11 @@ class PropertyMixer {
 
 	}
 
-	// accumulate data in the 'incoming' region into 'add'
+	/**
+	 * Accumulates data in the `incoming` region into `add`.
+	 *
+	 * @param {number} weight - The weight.
+	 */
 	accumulateAdditive( weight ) {
 
 		const buffer = this.buffer,
@@ -134,7 +190,11 @@ class PropertyMixer {
 
 	}
 
-	// apply the state of 'accu<i>' to the binding when accus differ
+	/**
+	 * Applies the state of `accu<i>` to the binding when accus differ.
+	 *
+	 * @param {number} accuIndex - The accumulation index.
+	 */
 	apply( accuIndex ) {
 
 		const stride = this.valueSize,
@@ -183,7 +243,10 @@ class PropertyMixer {
 
 	}
 
-	// remember the state of the bound property and copy it to both accus
+
+	/**
+	 * Remembers the state of the bound property and copy it to both accus.
+	 */
 	saveOriginalState() {
 
 		const binding = this.binding;
@@ -210,13 +273,17 @@ class PropertyMixer {
 
 	}
 
-	// apply the state previously taken via 'saveOriginalState' to the binding
+	/**
+	 * Applies the state previously taken via {@link PropertyMixer#saveOriginalState} to the binding.
+	 */
 	restoreOriginalState() {
 
 		const originalValueOffset = this.valueSize * 3;
 		this.binding.setValue( this.buffer, originalValueOffset );
 
 	}
+
+	// internals
 
 	_setAdditiveIdentityNumeric() {
 

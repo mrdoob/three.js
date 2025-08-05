@@ -32,7 +32,7 @@
 			being somewhat more computationally expensive. [name] uses per-fragment
 			shading.<br /><br />
 
-			Note that for best results you should always specify an [page:.envMap environment map] 
+			Note that for best results you should always specify an [page:.envMap environment map]
 			when using this material.<br /><br />
 
 			For a non-technical introduction to the concept of PBR and how to set up a
@@ -50,7 +50,7 @@
 		<p>
 			Technical details of the approach used in three.js (and most other PBR
 			systems) can be found is this
-			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney] 
+			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney]
 			(pdf), by Brent Burley.
 		</p>
 
@@ -165,9 +165,9 @@
 		<h3>[property:Float displacementBias]</h3>
 		<p>
 			The offset of the displacement map's values on the mesh's vertices.
+			The bias is added to the scaled sample of the displacement map.
 			Without a displacement map set, this value is not applied. Default is `0`.
 		</p>
-
 		<h3>[property:Color emissive]</h3>
 		<p>
 			Emissive (light) color of the material, essentially a solid color
@@ -226,7 +226,7 @@
 		<h3>[property:Texture map]</h3>
 		<p>
 			The color map. May optionally include an alpha channel, typically combined
-			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest]. 
+			with [page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest].
 			Default is null. The texture map color is modulated by the diffuse [page:.color].
 		</p>
 
@@ -293,7 +293,7 @@
 			"square". Default is 'round'.<br /><br />
 
 			This corresponds to the
-			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap] 
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
@@ -303,7 +303,7 @@
 			"miter". Default is 'round'.<br /><br />
 
 			This corresponds to the
-			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin] 
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
@@ -312,7 +312,7 @@
 			Controls wireframe thickness. Default is `1`.<br /><br />
 
 			Due to limitations of the
-			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
 			with the [page:WebGLRenderer WebGL] renderer on most
 			platforms linewidth will always be `1` regardless of the set value.
 		</p>

@@ -61,16 +61,15 @@
 					uniform mat4 projectionMatrix;
 					uniform vec3 cameraPos;
 
-					out vec3 vOrigin;
-					out vec3 vDirection;
+					out vec4 vScreenPosition;
+					out mat4 vInstanceToViewMatrix;
 
 					void main() {
 						vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4( position, 1.0 );
 
-						vOrigin = vec3( inverse( instanceMatrix * modelMatrix ) * vec4( cameraPos, 1.0 ) ).xyz;
-						vDirection = position - vOrigin;
-
 						gl_Position = projectionMatrix * mvPosition;
+						vScreenPosition = vec4( gl_Position.xy, 0.0, gl_Position.w );
+						vInstanceToViewMatrix = modelViewMatrix * instanceMatrix;
 					}
 				`;
 
@@ -78,11 +77,12 @@
 					precision highp float;
 					precision highp sampler3D;
 
+					uniform mat4 viewMatrix;
 					uniform mat4 modelViewMatrix;
 					uniform mat4 projectionMatrix;
 
-					in vec3 vOrigin;
-					in vec3 vDirection;
+					in vec4 vScreenPosition;
+					in mat4 vInstanceToViewMatrix;
 
 					out vec4 color;
 
@@ -126,20 +126,41 @@
 						return normalize( vec3( x, y, z ) );
 					}
 
-					void main(){
+					void main() {
 
-						vec3 rayDir = normalize( vDirection );
-						vec2 bounds = hitBox( vOrigin, rayDir );
+						// perform w divide in the fragment shader to avoid interpolation artifacts
+						vec2 screenUv = vScreenPosition.xy / vScreenPosition.w;
+						mat4 invProjectionMatrix = inverse( projectionMatrix );
+						mat4 invInstanceToViewMatrix = inverse( vInstanceToViewMatrix );
+						
+						// get camera ray
+						vec4 temp;
+						vec3 camRayOrigin, camRayEnd;
+						temp = invProjectionMatrix * vec4( screenUv, - 1.0, 1.0 );
+						camRayOrigin = temp.xyz / temp.w;
+
+						temp = invProjectionMatrix * vec4( screenUv, 1.0, 1.0 );
+						camRayEnd = temp.xyz / temp.w;
+						
+						// get local ray
+						vec3 instRayOrigin, instRayDirection, instRayEnd;
+						instRayOrigin = ( invInstanceToViewMatrix * vec4( camRayOrigin, 1.0 ) ).xyz;
+						instRayEnd = ( invInstanceToViewMatrix * vec4( camRayEnd, 1.0 ) ).xyz;
+						instRayDirection = normalize( instRayEnd - instRayOrigin );
+
+						// calculate the start of the ray at the box edge
+						vec2 bounds = hitBox( instRayOrigin, instRayDirection );
 
 						if ( bounds.x > bounds.y ) discard;
 
 						bounds.x = max( bounds.x, 0.0 );
 
-						vec3 p = vOrigin + bounds.x * rayDir;
-						vec3 inc = 1.0 / abs( rayDir );
+						vec3 p = instRayOrigin + bounds.x * instRayDirection;
+						vec3 inc = 1.0 / abs( instRayDirection );
 						float delta = min( inc.x, min( inc.y, inc.z ) );
 						delta /= 50.0;
 
+						// march through the volume
 						for ( float t = bounds.x; t < bounds.y; t += delta ) {
 
 							float d = sample1( p + 0.5 );
@@ -152,11 +173,21 @@
 
 							}
 
-							p += rayDir * delta;
+							p += instRayDirection * delta;
 
 						}
 
 						if ( color.a == 0.0 ) discard;
+
+						// calculate the final point in the ndc coords
+						vec4 ndc = projectionMatrix * vInstanceToViewMatrix * vec4( p, 1.0 );
+						ndc /= ndc.w;
+
+						// map the ndc coordinate to depth
+						// https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth
+						float far = gl_DepthRange.far;
+						float near = gl_DepthRange.near;
+						gl_FragDepth = ( ( ( far - near ) * ndc.z ) + near + far ) / 2.0;
 
 					}
 				`;

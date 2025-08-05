@@ -27,15 +27,46 @@ import {
 	Material,
 } from '../materials/Materials.js';
 
+/**
+ * Class for loading geometries. The files are internally
+ * loaded via {@link FileLoader}.
+ *
+ * ```js
+ * const loader = new THREE.MaterialLoader();
+ * const material = await loader.loadAsync( 'material.json' );
+ * ```
+ * This loader does not support node materials. Use {@link NodeMaterialLoader} instead.
+ *
+ * @augments Loader
+ */
 class MaterialLoader extends Loader {
 
+	/**
+	 * Constructs a new material loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
+
+		/**
+		 * A dictionary holding textures used by the material.
+		 *
+		 * @type {Object<string,Texture>}
+		 */
 		this.textures = {};
 
 	}
 
+	/**
+	 * Starts loading from the given URL and pass the loaded material to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Material)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -70,6 +101,12 @@ class MaterialLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given JSON object and returns a material.
+	 *
+	 * @param {Object} json - The serialized material.
+	 * @return {Material} The parsed material.
+	 */
 	parse( json ) {
 
 		const textures = this.textures;
@@ -335,6 +372,13 @@ class MaterialLoader extends Loader {
 
 	}
 
+	/**
+	 * Textures are not embedded in the material JSON so they have
+	 * to be injected before the loading process starts.
+	 *
+	 * @param {Object} value - A dictionary holding textures for material properties.
+	 * @return {MaterialLoader} A reference to this material loader.
+	 */
 	setTextures( value ) {
 
 		this.textures = value;
@@ -342,12 +386,25 @@ class MaterialLoader extends Loader {
 
 	}
 
+	/**
+	 * Creates a material for the given type.
+	 *
+	 * @param {string} type - The material type.
+	 * @return {Material} The new material.
+	 */
 	createMaterialFromType( type ) {
 
 		return MaterialLoader.createMaterialFromType( type );
 
 	}
 
+	/**
+	 * Creates a material for the given type.
+	 *
+	 * @static
+	 * @param {string} type - The material type.
+	 * @return {Material} The new material.
+	 */
 	static createMaterialFromType( type ) {
 
 		const materialLib = {

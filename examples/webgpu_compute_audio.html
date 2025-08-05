@@ -29,7 +29,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { Fn, uniform, instanceIndex, instancedArray, float, texture, screenUV, color } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -42,7 +42,8 @@
 			const analyserBuffer = new Uint8Array( 1024 );
 			let analyserTexture;
 
-			init();
+			const startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
 
 			async function playAudioBuffer() {
 
@@ -79,6 +80,9 @@
 
 			async function init() {
 
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
+
 				// audio buffer
 
 				const soundBuffer = await fetch( 'sounds/webgpu-audio-processing.mp3' ).then( res => res.arrayBuffer() );
@@ -99,12 +103,13 @@
 
 				// read-only buffer
 
-				const waveNode = instancedArray( waveBuffer );
+				const originalWave = instancedArray( waveBuffer ).toReadOnly();
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
 				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
 
-				waveNode.setPBO( true );
+				originalWave.setPBO( true );
+				waveArray.setPBO( true );
 
 				// params
 
@@ -123,14 +128,14 @@
 
 					const time = index.mul( pitch );
 
-					let wave = waveNode.element( time );
+					let wave = originalWave.element( time );
 
 
 					// delay
 
 					for ( let i = 1; i < 7; i ++ ) {
 
-						const waveOffset = waveNode.element( index.sub( delayOffset.mul( sampleRate ).mul( i ) ).mul( pitch ) );
+						const waveOffset = originalWave.element( index.sub( delayOffset.mul( sampleRate ).mul( i ) ).mul( pitch ) );
 						const waveOffsetVolume = waveOffset.mul( delayVolume.div( i * i ) );
 
 						wave = wave.add( waveOffsetVolume );
@@ -191,16 +196,9 @@
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'click', playAudioBuffer );
 
-
-				document.onclick = () => {
-
-					const overlay = document.getElementById( 'overlay' );
-					if ( overlay !== null ) overlay.remove();
-
-					playAudioBuffer();
-
-				};
+				playAudioBuffer();
 
 			}
 

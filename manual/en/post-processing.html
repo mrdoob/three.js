@@ -154,10 +154,10 @@ that effect.</p>
 <p>Looking inside
 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
 I found this line:</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.combineUniforms[ 'strength' ].value = strength;
 </pre>
 <p>So we can set the strength by setting</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.combineUniforms.strength.value = someValue;
 </pre>
 <p>Similarly looking in
 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
@@ -173,7 +173,7 @@ this.uniforms.grayscale.value = grayscale;
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 {
   const folder = gui.addFolder('BloomPass');
-  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
+  folder.add(bloomPass.combineUniforms.strength, 'value', 0, 2).name('strength');
   folder.open();
 }
 {

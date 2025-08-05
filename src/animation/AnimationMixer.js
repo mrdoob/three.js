@@ -6,12 +6,20 @@ import { PropertyMixer } from './PropertyMixer.js';
 import { AnimationClip } from './AnimationClip.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
-
 const _controlInterpolantsResultBuffer = new Float32Array( 1 );
 
-
+/**
+ * `AnimationMixer` is a player for animations on a particular object in
+ * the scene. When multiple objects in the scene are animated independently,
+ * one `AnimationMixer` may be used for each object.
+ */
 class AnimationMixer extends EventDispatcher {
 
+	/**
+	 * Constructs a new animation mixer.
+	 *
+	 * @param {Object3D} root - The object whose animations shall be played by this mixer.
+	 */
 	constructor( root ) {
 
 		super();
@@ -19,7 +27,25 @@ class AnimationMixer extends EventDispatcher {
 		this._root = root;
 		this._initMemoryManager();
 		this._accuIndex = 0;
+
+		/**
+		 * The global mixer time (in seconds; starting with `0` on the mixer's creation).
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.time = 0;
+
+		/**
+		 * A scaling factor for the global time.
+		 *
+		 * Note: Setting this member to `0` and later back to `1` is a
+		 * possibility to pause/unpause all actions that are controlled by this
+		 * mixer.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.timeScale = 1.0;
 
 	}
@@ -510,9 +536,18 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// return an action for a clip optionally using a custom root target
-	// object (this method allocates a lot of dynamic memory in case a
-	// previously unknown clip/root combination is specified)
+	/**
+	 * Returns an instance of {@link AnimationAction} for the passed clip.
+	 *
+	 * If an action fitting the clip and root parameters doesn't yet exist, it
+	 * will be created by this method. Calling this method several times with the
+	 * same clip and root parameters always returns the same action.
+	 *
+	 * @param {AnimationClip|string} clip - An animation clip or alternatively the name of the animation clip.
+	 * @param {Object3D} [optionalRoot] - An alternative root object.
+	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode] - The blend mode.
+	 * @return {?AnimationAction} The animation action.
+	 */
 	clipAction( clip, optionalRoot, blendMode ) {
 
 		const root = optionalRoot || this._root,
@@ -574,7 +609,13 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// get an existing action
+	/**
+	 * Returns an existing animation action for the passed clip.
+	 *
+	 * @param {AnimationClip|string} clip - An animation clip or alternatively the name of the animation clip.
+	 * @param {Object3D} [optionalRoot] - An alternative root object.
+	 * @return {?AnimationAction} The animation action. Returns `null` if no action was found.
+	 */
 	existingAction( clip, optionalRoot ) {
 
 		const root = optionalRoot || this._root,
@@ -597,7 +638,11 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// deactivates all previously scheduled actions
+	/**
+	 * Deactivates all previously scheduled actions on this mixer.
+	 *
+	 * @return {AnimationMixer} A reference to thi animation mixer.
+	 */
 	stopAllAction() {
 
 		const actions = this._actions,
@@ -613,7 +658,15 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// advance the time and update apply the animation
+	/**
+	 * Advances the global mixer time and updates the animation.
+	 *
+	 * This is usually done in the render loop by passing the delta
+	 * time from {@link Clock} or {@link Timer}.
+	 *
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @return {AnimationMixer} A reference to thi animation mixer.
+	 */
 	update( deltaTime ) {
 
 		deltaTime *= this.timeScale;
@@ -651,8 +704,16 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// Allows you to seek to a specific time in an animation.
-	setTime( timeInSeconds ) {
+	/**
+	 * Sets the global mixer to a specific time and updates the animation accordingly.
+	 *
+	 * This is useful when you need to jump to an exact time in an animation. The
+	 * input parameter will be scaled by {@link AnimationMixer#timeScale}
+	 *
+	 * @param {number} time - The time to set in seconds.
+	 * @return {AnimationMixer} A reference to thi animation mixer.
+	 */
+	setTime( time ) {
 
 		this.time = 0; // Zero out time attribute for AnimationMixer object;
 		for ( let i = 0; i < this._actions.length; i ++ ) {
@@ -661,18 +722,27 @@ class AnimationMixer extends EventDispatcher {
 
 		}
 
-		return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
+		return this.update( time ); // Update used to set exact time. Returns "this" AnimationMixer object.
 
 	}
 
-	// return this mixer's root target object
+	/**
+	 * Returns this mixer's root object.
+	 *
+	 * @return {Object3D} The mixer's root object.
+	 */
 	getRoot() {
 
 		return this._root;
 
 	}
 
-	// free all resources specific to a particular clip
+	/**
+	 * Deallocates all memory resources for a clip. Before using this method make
+	 * sure to call {@link AnimationAction#stop} for all related actions.
+	 *
+	 * @param {AnimationClip} clip - The clip to uncache.
+	 */
 	uncacheClip( clip ) {
 
 		const actions = this._actions,
@@ -714,7 +784,14 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// free all resources specific to a particular root target object
+	/**
+	 * Deallocates all memory resources for a root object. Before using this
+	 * method make sure to call {@link AnimationAction#stop} for all related
+	 * actions or alternatively {@link AnimationMixer#stopAllAction} when the
+	 * mixer operates on a single root.
+	 *
+	 * @param {Object3D} root - The root object to uncache.
+	 */
 	uncacheRoot( root ) {
 
 		const rootUuid = root.uuid,
@@ -751,7 +828,14 @@ class AnimationMixer extends EventDispatcher {
 
 	}
 
-	// remove a targeted clip from the cache
+	/**
+	 * Deallocates all memory resources for an action. The action is identified by the
+	 * given clip and an optional root object. Before using this method make
+	 * sure to call {@link AnimationAction#stop} to deactivate the action.
+	 *
+	 * @param {AnimationClip|string} clip - An animation clip or alternatively the name of the animation clip.
+	 * @param {Object3D} [optionalRoot] - An alternative root object.
+	 */
 	uncacheAction( clip, optionalRoot ) {
 
 		const action = this.existingAction( clip, optionalRoot );

@@ -1,4 +1,5 @@
 import { Color } from '../../math/Color.js';
+import { Matrix2 } from '../../math/Matrix2.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -45,10 +46,41 @@ function cyrb53( value, seed = 0 ) {
 
 }
 
+/**
+ * Computes a hash for the given string.
+ *
+ * @method
+ * @param {string} str - The string to be hashed.
+ * @return {number} The hash.
+ */
 export const hashString = ( str ) => cyrb53( str );
+
+/**
+ * Computes a hash for the given array.
+ *
+ * @method
+ * @param {Array<number>} array - The array to be hashed.
+ * @return {number} The hash.
+ */
 export const hashArray = ( array ) => cyrb53( array );
+
+/**
+ * Computes a hash for the given list of parameters.
+ *
+ * @method
+ * @param {...number} params - A list of parameters.
+ * @return {number} The hash.
+ */
 export const hash = ( ...params ) => cyrb53( params );
 
+/**
+ * Computes a cache key for the given node.
+ *
+ * @method
+ * @param {Object|Node} object - The object to be hashed.
+ * @param {boolean} [force=false] - Whether to force a cache key computation or not.
+ * @return {number} The hash.
+ */
 export function getCacheKey( object, force = false ) {
 
 	const values = [];
@@ -62,7 +94,7 @@ export function getCacheKey( object, force = false ) {
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		values.push( values, cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
+		values.push( cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
 
 	}
 
@@ -70,6 +102,15 @@ export function getCacheKey( object, force = false ) {
 
 }
 
+/**
+ * This generator function can be used to iterate over the node children
+ * of the given object.
+ *
+ * @generator
+ * @param {Object} node - The object to be hashed.
+ * @param {boolean} [toJSON=false] - Whether to return JSON or not.
+ * @yields {Object} A result node holding the property, index (if available) and the child node.
+ */
 export function* getNodeChildren( node, toJSON = false ) {
 
 	for ( const property in node ) {
@@ -97,9 +138,12 @@ export function* getNodeChildren( node, toJSON = false ) {
 
 			yield { property, childNode: object };
 
-		} else if ( typeof object === 'object' ) {
+		} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
 
 			for ( const subProperty in object ) {
+
+				// Ignore private properties.
+				if ( subProperty.startsWith( '_' ) === true ) continue;
 
 				const child = object[ subProperty ];
 
@@ -126,18 +170,68 @@ const typeFromLength = /*@__PURE__*/ new Map( [
 	[ 16, 'mat4' ]
 ] );
 
+const dataFromObject = /*@__PURE__*/ new WeakMap();
+
+/**
+ * Returns the data type for the given the length.
+ *
+ * @method
+ * @param {number} length - The length.
+ * @return {string} The data type.
+ */
 export function getTypeFromLength( length ) {
 
 	return typeFromLength.get( length );
 
 }
 
+/**
+ * Returns the typed array for the given data type.
+ *
+ * @method
+ * @param {string} type - The data type.
+ * @return {TypedArray} The typed array.
+ */
+export function getTypedArrayFromType( type ) {
+
+	// Handle component type for vectors and matrices
+	if ( /[iu]?vec\d/.test( type ) ) {
+
+		// Handle int vectors
+		if ( type.startsWith( 'ivec' ) ) return Int32Array;
+		// Handle uint vectors
+		if ( type.startsWith( 'uvec' ) ) return Uint32Array;
+		// Default to float vectors
+		return Float32Array;
+
+	}
+
+	// Handle matrices (always float)
+	if ( /mat\d/.test( type ) ) return Float32Array;
+
+	// Basic types
+	if ( /float/.test( type ) ) return Float32Array;
+	if ( /uint/.test( type ) ) return Uint32Array;
+	if ( /int/.test( type ) ) return Int32Array;
+
+	throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
+
+}
+
+/**
+ * Returns the length for the given data type.
+ *
+ * @method
+ * @param {string} type - The data type.
+ * @return {number} The length.
+ */
 export function getLengthFromType( type ) {
 
 	if ( /float|int|uint/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 4;
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
@@ -145,6 +239,55 @@ export function getLengthFromType( type ) {
 
 }
 
+/**
+ * Returns the gpu memory length for the given data type.
+ *
+ * @method
+ * @param {string} type - The data type.
+ * @return {number} The length.
+ */
+export function getMemoryLengthFromType( type ) {
+
+	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /vec2/.test( type ) ) return 2;
+	if ( /vec3/.test( type ) ) return 3;
+	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 4;
+	if ( /mat3/.test( type ) ) return 12;
+	if ( /mat4/.test( type ) ) return 16;
+
+	console.error( 'THREE.TSL: Unsupported type:', type );
+
+}
+
+/**
+ * Returns the byte boundary for the given data type.
+ *
+ * @method
+ * @param {string} type - The data type.
+ * @return {number} The byte boundary.
+ */
+export function getByteBoundaryFromType( type ) {
+
+	if ( /float|int|uint/.test( type ) ) return 4;
+	if ( /vec2/.test( type ) ) return 8;
+	if ( /vec3/.test( type ) ) return 16;
+	if ( /vec4/.test( type ) ) return 16;
+	if ( /mat2/.test( type ) ) return 8;
+	if ( /mat3/.test( type ) ) return 48;
+	if ( /mat4/.test( type ) ) return 64;
+
+	console.error( 'THREE.TSL: Unsupported type:', type );
+
+}
+
+/**
+ * Returns the data type for the given value.
+ *
+ * @method
+ * @param {any} value - The value.
+ * @return {?string} The data type.
+ */
 export function getValueType( value ) {
 
 	if ( value === undefined || value === null ) return null;
@@ -183,6 +326,10 @@ export function getValueType( value ) {
 
 		return 'vec4';
 
+	} else if ( value.isMatrix2 === true ) {
+
+		return 'mat2';
+
 	} else if ( value.isMatrix3 === true ) {
 
 		return 'mat3';
@@ -205,6 +352,14 @@ export function getValueType( value ) {
 
 }
 
+/**
+ * Returns the value/object for the given data type and parameters.
+ *
+ * @method
+ * @param {string} type - The given type.
+ * @param {...any} params - A parameter list.
+ * @return {any} The value/object.
+ */
 export function getValueFromType( type, ...params ) {
 
 	const last4 = type ? type.slice( - 4 ) : undefined;
@@ -232,6 +387,10 @@ export function getValueFromType( type, ...params ) {
 	} else if ( last4 === 'vec4' ) {
 
 		return new Vector4( ...params );
+
+	} else if ( last4 === 'mat2' ) {
+
+		return new Matrix2( ...params );
 
 	} else if ( last4 === 'mat3' ) {
 
@@ -263,6 +422,34 @@ export function getValueFromType( type, ...params ) {
 
 }
 
+/**
+ * Gets the object data that can be shared between different rendering steps.
+ *
+ * @param {Object} object - The object to get the data for.
+ * @return {Object} The object data.
+ */
+export function getDataFromObject( object ) {
+
+	let data = dataFromObject.get( object );
+
+	if ( data === undefined ) {
+
+		data = {};
+		dataFromObject.set( object, data );
+
+	}
+
+	return data;
+
+}
+
+/**
+ * Converts the given array buffer to a Base64 string.
+ *
+ * @method
+ * @param {ArrayBuffer} arrayBuffer - The array buffer.
+ * @return {string} The Base64 string.
+ */
 export function arrayBufferToBase64( arrayBuffer ) {
 
 	let chars = '';
@@ -279,6 +466,13 @@ export function arrayBufferToBase64( arrayBuffer ) {
 
 }
 
+/**
+ * Converts the given Base64 string to an array buffer.
+ *
+ * @method
+ * @param {string} base64 - The Base64 string.
+ * @return {ArrayBuffer} The array buffer.
+ */
 export function base64ToArrayBuffer( base64 ) {
 
 	return Uint8Array.from( atob( base64 ), c => c.charCodeAt( 0 ) ).buffer;

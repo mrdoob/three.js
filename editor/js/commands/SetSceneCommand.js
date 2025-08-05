@@ -3,13 +3,13 @@ import { SetUuidCommand } from './SetUuidCommand.js';
 import { SetValueCommand } from './SetValueCommand.js';
 import { AddObjectCommand } from './AddObjectCommand.js';
 
-/**
- * @param editor Editor
- * @param scene containing children to import
- * @constructor
- */
 class SetSceneCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Scene|null} [scene=null]
+	 * @constructor
+	 */
 	constructor( editor, scene = null ) {
 
 		super( editor );

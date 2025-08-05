@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Comment créer du contenu VR</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Comment créer du contenu VR">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Comment créer du contenu VR</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <p>
+            Ce guide fournit un bref aperçu des composants de base d'une application VR basée sur le web réalisée avec three.js.
+          </p>
+
+          <h2>Flux de travail</h2>
+
+          <p>
+            Tout d'abord, vous devez inclure [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
+            dans votre projet.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+</pre>
+
+          <p>
+            *VRButton.createButton()* fait deux choses importantes : il crée un bouton qui indique la compatibilité VR. De plus, il initialise une session VR si l'utilisateur active le bouton. La seule chose que vous avez à faire est d'ajouter la ligne de code suivante à votre application.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+document.body.appendChild( VRButton.createButton( renderer ) );
+</pre>
+
+          <p>
+            Ensuite, vous devez indiquer à votre instance de `WebGLRenderer` d'activer le rendu XR.
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+renderer.xr.enabled = true;
+</pre>
+
+          <p>
+            Enfin, vous devez ajuster votre boucle d'animation car nous ne pouvons pas utiliser notre fonction bien connue *window.requestAnimationFrame()*. Pour les projets VR, nous utilisons `renderer.setAnimationLoop()`. Le code minimal ressemble à ceci :
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+renderer.setAnimationLoop( function () {
+
+  renderer.render( scene, camera );
+
+} );
+</pre>
+
+          <h2>Étapes suivantes</h2>
+
+          <p>
+            Jetez un œil à l'un des exemples officiels de WebVR pour voir ce flux de travail en action.<br /><br />
+
+            [example:webxr_xr_ballshooter WebXR / XR / tireur de balles]<br />
+            [example:webxr_xr_cubes WebXR / XR / cubes]<br />
+            [example:webxr_xr_dragging WebXR / XR / glisser-déposer]<br />
+            [example:webxr_xr_paint WebXR / XR / peinture]<br />
+            [example:webxr_xr_sculpt WebXR / XR / sculpture]<br />
+            [example:webxr_vr_panorama_depth WebXR / VR / panorama-profondeur]<br />
+            [example:webxr_vr_panorama WebXR / VR / panorama]<br />
+            [example:webxr_vr_rollercoaster WebXR / VR / montagnes russes]<br />
+            [example:webxr_vr_sandbox WebXR / VR / bac à sable]<br />
+            [example:webxr_vr_video WebXR / VR / vidéo]
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

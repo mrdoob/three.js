@@ -16,7 +16,7 @@ async function main() {
 
 	// screenshots
 	const S = ( await fs.readdir( 'examples/screenshots' ) )
-		.filter( s => s.indexOf( '.' ) !== -1 )
+		.filter( s => s.indexOf( '.' ) !== - 1 )
 		.map( s => s.slice( 0, s.indexOf( '.' ) ) );
 
 	// files.js

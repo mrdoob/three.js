@@ -145,7 +145,7 @@
 
 				const geometry = new THREE.PlaneGeometry();
 				const material = new THREE.MeshBasicMaterial( {
-					map: shadowTexture, blending: THREE.MultiplyBlending, toneMapped: false
+					map: shadowTexture, blending: THREE.MultiplyBlending, toneMapped: false, premultipliedAlpha: true
 				} );
 
 				const mesh = new THREE.Mesh( geometry, material );

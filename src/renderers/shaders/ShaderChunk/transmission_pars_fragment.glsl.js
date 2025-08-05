@@ -123,7 +123,7 @@ export default /* glsl */`
 		// Direction of refracted light.
 		vec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );
 
-		// Compute rotation-independant scaling of the model matrix.
+		// Compute rotation-independent scaling of the model matrix.
 		vec3 modelScale;
 		modelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );
 		modelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );
@@ -184,13 +184,13 @@ export default /* glsl */`
 
 				vec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, iors[ i ], modelMatrix );
 				vec3 refractedRayExit = position + transmissionRay;
-		
+
 				// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
 				vec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );
 				vec2 refractionCoords = ndcPos.xy / ndcPos.w;
 				refractionCoords += 1.0;
 				refractionCoords /= 2.0;
-		
+
 				// Sample framebuffer to get pixel the refracted ray hits.
 				vec4 transmissionSample = getTransmissionSample( refractionCoords, roughness, iors[ i ] );
 				transmittedLight[ i ] = transmissionSample[ i ];
@@ -201,9 +201,9 @@ export default /* glsl */`
 			}
 
 			transmittedLight.a /= 3.0;
-		
+
 		#else
-		
+
 			vec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
 			vec3 refractedRayExit = position + transmissionRay;
 
@@ -216,7 +216,7 @@ export default /* glsl */`
 			// Sample framebuffer to get pixel the refracted ray hits.
 			transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
 			transmittance = diffuseColor * volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance );
-		
+
 		#endif
 
 		vec3 attenuatedColor = transmittance * transmittedLight.rgb;
@@ -224,7 +224,7 @@ export default /* glsl */`
 		// Get the specular component.
 		vec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );
 
-		// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job 
+		// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job
 		// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
 		float transmittanceFactor = ( transmittance.r + transmittance.g + transmittance.b ) / 3.0;
 

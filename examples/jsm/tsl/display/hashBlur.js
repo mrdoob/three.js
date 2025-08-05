@@ -1,10 +1,42 @@
-import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
+import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, convertToTexture, nodeObject } from 'three/tsl';
 
-// https://www.shadertoy.com/view/4lXXWn
+/**
+ * Applies a hash blur effect to the given texture node.
+ *
+ * Reference: {@link https://www.shadertoy.com/view/4lXXWn}.
+ *
+ * @function
+ * @param {Node<vec4>} textureNode - The texture node that should be blurred.
+ * @param {Node<float>} [bluramount=float(0.1)] - This node determines the amount of blur.
+ * @param {Object} [options={}] - Additional options for the hash blur effect.
+ * @param {Node<float>} [options.repeats=float(45)] - The number of iterations for the blur effect.
+ * @param {Node<vec4>} [options.mask=null] - A mask node to control the alpha blending of the blur.
+ * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
+ * @return {Node<vec4>} The blurred texture node.
+ */
+export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), options = {} ] ) => {
 
-export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0.1 ), repeats = float( 45 ) ] ) => {
+	textureNode = convertToTexture( textureNode );
+	bluramount = nodeObject( bluramount );
+	const repeats = nodeObject( options.size ) || float( 45 );
+	const mask = options.mask || null;
+	const premultipliedAlpha = options.premultipliedAlpha || false;
 
-	const draw = ( uv ) => textureNode.uv( uv );
+	const draw = ( uv ) => {
+
+		let sample = textureNode.sample( uv );
+
+		if ( mask !== null ) {
+
+			const alpha = mask.sample( uv ).x;
+
+			sample = vec4( sample.rgb, sample.a.mul( alpha ) );
+
+		}
+
+		return premultipliedAlpha ? premultiplyAlpha( sample ) : sample;
+
+	};
 
 	const targetUV = textureNode.uvNode || uv();
 	const blurred_image = vec4( 0. ).toVar();
@@ -19,6 +51,6 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 
 	blurred_image.divAssign( repeats );
 
-	return blurred_image;
+	return premultipliedAlpha ? unpremultiplyAlpha( blurred_image ) : blurred_image;
 
 } );

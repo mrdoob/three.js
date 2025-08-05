@@ -75,7 +75,17 @@ export default /* glsl */`
 
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
-		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
+		float depth = unpackRGBAToDepth( texture2D( depths, uv ) );
+
+		#ifdef USE_REVERSEDEPTHBUF
+
+			return step( depth, compare );
+
+		#else
+
+			return step( compare, depth );
+
+		#endif
 
 	}
 
@@ -91,7 +101,15 @@ export default /* glsl */`
 
 		vec2 distribution = texture2DDistribution( shadow, uv );
 
-		float hard_shadow = step( compare , distribution.x ); // Hard Shadow
+		#ifdef USE_REVERSEDEPTHBUF
+
+			float hard_shadow = step( distribution.x, compare ); // Hard Shadow
+
+		#else
+
+			float hard_shadow = step( compare , distribution.x ); // Hard Shadow
+
+		#endif
 
 		if (hard_shadow != 1.0 ) {
 

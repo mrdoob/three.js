@@ -205,6 +205,7 @@ function onDocumentLoad() {
 		for ( let i = 0; i < elements.length; i ++ ) {
 
 			const e = elements[ i ];
+			e.currentStyle = { 'whiteSpace': 'pre-wrap' }; // Workaround for Firefox, see #30008
 			e.className += ' prettyprint';
 			e.setAttribute( 'translate', 'no' );
 

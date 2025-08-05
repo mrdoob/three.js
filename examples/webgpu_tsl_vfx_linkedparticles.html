@@ -27,15 +27,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { atan2, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { atan, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform, step } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			let camera, scene, renderer, postProcessing, controls, clock, light;
+			let camera, scene, renderer, postProcessing, controls, timer, light;
 
 			let updateParticles, spawnParticles; // TSL compute nodes
 			let getInstanceColor; // TSL function
@@ -85,7 +85,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// renderer
 
@@ -94,6 +95,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
 				// TSL function
@@ -122,12 +124,11 @@
 				const particleGeom = new THREE.PlaneGeometry( particleQuadSize, particleQuadSize );
 
 				const particleMaterial = new THREE.SpriteNodeMaterial();
-				particleMaterial.transparent = true;
 				particleMaterial.blending = THREE.AdditiveBlending;
 				particleMaterial.depthWrite = false;
 				particleMaterial.positionNode = particlePositions.toAttribute();
 				particleMaterial.scaleNode = vec2( particleSize );
-				particleMaterial.rotationNode = atan2( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
+				particleMaterial.rotationNode = atan( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
 
 				particleMaterial.colorNode = /*#__PURE__*/ Fn( () => {
 
@@ -145,7 +146,7 @@
 
 				particleMaterial.opacityNode = /*#__PURE__*/ Fn( () => {
 
-					const circle = uv().xy.sub( 0.5 ).length().step( 0.5 );
+					const circle = step( uv().xy.sub( 0.5 ).length(), 0.5 );
 					const life = particlePositions.toAttribute().w;
 
 					return circle.mul( life );
@@ -370,7 +371,7 @@
 				const gui = new GUI();
 
 				gui.add( controls, 'autoRotate' ).name( 'Auto Rotate' );
-				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );				
+				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );
 
 				const partFolder = gui.addFolder( 'Particles' );
 				partFolder.add( timeScale, 'value', 0.0, 4.0, 0.01 ).name( 'timeScale' );
@@ -396,7 +397,7 @@
 
 			}
 
-			function onWindowResize( e ) {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -419,11 +420,13 @@
 
 			}
 
-			async function animate() {
+			function animate() {
+
+				timer.update();
 
 				// compute particles
-				await renderer.computeAsync( updateParticles );
-				await renderer.computeAsync( spawnParticles );
+				renderer.compute( updateParticles );
+				renderer.compute( spawnParticles );
 
 				// update particle index for next spawn
 				spawnIndex.value = ( spawnIndex.value + nbToSpawn.value ) % nbParticles;
@@ -437,9 +440,9 @@
 				spawnPosition.value.lerp( scenePointer, 0.1 );
 
 				// rotating colors
-				colorOffset.value += clock.getDelta() * colorRotationSpeed.value * timeScale.value;
+				colorOffset.value += timer.getDelta() * colorRotationSpeed.value * timeScale.value;
 
-				const elapsedTime = clock.getElapsedTime();
+				const elapsedTime = timer.getElapsed();
 				light.position.set(
 					Math.sin( elapsedTime * 0.5 ) * 30,
 					Math.cos( elapsedTime * 0.3 ) * 30,
@@ -448,7 +451,7 @@
 
 				controls.update();
 
-				postProcessing.renderAsync();
+				postProcessing.render();
 
 			}
 

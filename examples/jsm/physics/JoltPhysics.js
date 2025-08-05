@@ -39,7 +39,7 @@ const NUM_OBJECT_LAYERS = 2;
 
 function setupCollisionFiltering( settings ) {
 
-	let objectFilter = new Jolt.ObjectLayerPairFilterTable( NUM_OBJECT_LAYERS );
+	const objectFilter = new Jolt.ObjectLayerPairFilterTable( NUM_OBJECT_LAYERS );
 	objectFilter.EnableCollision( LAYER_NON_MOVING, LAYER_MOVING );
 	objectFilter.EnableCollision( LAYER_MOVING, LAYER_MOVING );
 
@@ -47,7 +47,7 @@ function setupCollisionFiltering( settings ) {
 	const BP_LAYER_MOVING = new Jolt.BroadPhaseLayer( 1 );
 	const NUM_BROAD_PHASE_LAYERS = 2;
 
-	let bpInterface = new Jolt.BroadPhaseLayerInterfaceTable( NUM_OBJECT_LAYERS, NUM_BROAD_PHASE_LAYERS );
+	const bpInterface = new Jolt.BroadPhaseLayerInterfaceTable( NUM_OBJECT_LAYERS, NUM_BROAD_PHASE_LAYERS );
 	bpInterface.MapObjectToBroadPhaseLayer( LAYER_NON_MOVING, BP_LAYER_NON_MOVING );
 	bpInterface.MapObjectToBroadPhaseLayer( LAYER_MOVING, BP_LAYER_MOVING );
 
@@ -55,8 +55,22 @@ function setupCollisionFiltering( settings ) {
 	settings.mBroadPhaseLayerInterface = bpInterface;
 	settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterTable( settings.mBroadPhaseLayerInterface, NUM_BROAD_PHASE_LAYERS, settings.mObjectLayerPairFilter, NUM_OBJECT_LAYERS );
 
-};
+}
 
+/**
+ * @classdesc Can be used to include Jolt as a Physics engine into
+ * `three.js` apps. The API can be initialized via:
+ * ```js
+ * const physics = await JoltPhysics();
+ * ```
+ * The component automatically imports Jolt from a CDN so make sure
+ * to use the component with an active Internet connection.
+ *
+ * @name JoltPhysics
+ * @class
+ * @hideconstructor
+ * @three_import import { JoltPhysics } from 'three/addons/physics/JoltPhysics.js';
+ */
 async function JoltPhysics() {
 
 	if ( Jolt === null ) {
@@ -111,8 +125,8 @@ async function JoltPhysics() {
 		if ( shape === null ) return;
 
 		const body = mesh.isInstancedMesh
-							? createInstancedBody( mesh, mass, restitution, shape )
-							: createBody( mesh.position, mesh.quaternion, mass, restitution, shape );
+			? createInstancedBody( mesh, mass, restitution, shape )
+			: createBody( mesh.position, mesh.quaternion, mass, restitution, shape );
 
 		if ( mass > 0 ) {
 
@@ -175,8 +189,8 @@ async function JoltPhysics() {
 
 			const physics = mesh.userData.physics;
 
-			let shape = body.GetShape();
-			let body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
+			const shape = body.GetShape();
+			const body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
 
 			bodies[ index ] = body2;
 
@@ -270,9 +284,44 @@ async function JoltPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		/**
+		 * Adds the given scene to this physics simulation. Only meshes with a
+		 * `physics` object in their {@link Object3D#userData} field will be honored.
+		 * The object can be used to store the mass and restitution of the mesh. E.g.:
+		 * ```js
+		 * box.userData.physics = { mass: 1, restitution: 0 };
+		 * ```
+		 *
+		 * @method
+		 * @name JoltPhysics#addScene
+		 * @param {Object3D} scene The scene or any type of 3D object to add.
+		 */
 		addScene: addScene,
+
+		/**
+		 * Adds the given mesh to this physics simulation.
+		 *
+		 * @method
+		 * @name JoltPhysics#addMesh
+		 * @param {Mesh} mesh The mesh to add.
+		 * @param {number} [mass=0] The mass in kg of the mesh.
+		 * @param {number} [restitution=0] The restitution/friction of the mesh.
+		 */
 		addMesh: addMesh,
+
+		/**
+		 * Set the position of the given mesh which is part of the physics simulation. Calling this
+		 * method will reset the current simulated velocity of the mesh.
+		 *
+		 * @method
+		 * @name JoltPhysics#setMeshPosition
+		 * @param {Mesh} mesh The mesh to update the position for.
+		 * @param {Vector3} position - The new position.
+		 * @param {number} [index=0] - If the mesh is instanced, the index represents the instanced ID.
+		 */
 		setMeshPosition: setMeshPosition,
+
+		// NOOP
 		setMeshVelocity: setMeshVelocity
 	};
 

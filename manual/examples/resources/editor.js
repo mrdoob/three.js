@@ -1713,7 +1713,7 @@ async function openInStackBlitz() {
 		const url = getSourceBlobFromEditor();
 		// g.iframe.src = url;
 		// work around firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1828286
-		g.iframe.contentWindow.location.replace(url);
+		g.iframe.contentWindow.location.replace( url );
 
 	}
 
@@ -1961,7 +1961,7 @@ async function openInStackBlitz() {
 		} else {
 
 			applySubstitutions();
-			require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs' } } );
+			require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } } );
 			require( [ 'vs/editor/editor.main' ], main );
 
 		}

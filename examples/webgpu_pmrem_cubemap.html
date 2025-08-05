@@ -21,10 +21,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { normalWorld, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { normalWorldGeometry, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
 
-			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -61,16 +61,16 @@
 				controls.maxDistance = 10;
 				controls.update();
 
-				new RGBMLoader()
-					.setPath( './textures/cube/pisaRGBM16/' )
-					.loadCubemap( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( map ) {
+				new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ], function ( map ) {
 
 						const reflectVec = positionViewDirection.negate().reflect( normalView ).transformDirection( cameraViewMatrix );
 
 						const pmremRoughness = uniform( .5 );
 						const pmremNode = pmremTexture( map, reflectVec, pmremRoughness );
 
-						scene.backgroundNode = pmremTexture( map, normalWorld, pmremRoughness );
+						scene.backgroundNode = pmremTexture( map, normalWorldGeometry, pmremRoughness );
 
 						scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
 

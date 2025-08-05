@@ -25,12 +25,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import * as TSL from 'three/tsl';
 
 			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, screenUV, js, string, Loop, cameraProjectionMatrix, ScriptableNodeResources } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -43,6 +44,14 @@
 			init();
 
 			function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -241,7 +250,6 @@
 
 				// Scriptable
 
-				ScriptableNodeResources.set( 'THREE', THREE );
 				ScriptableNodeResources.set( 'TSL', TSL );
 
 				const asyncNode = scriptable( js( `
@@ -420,21 +428,23 @@
 			function testSerialization( mesh ) {
 
 				const json = mesh.toJSON();
-				const loader = new THREE.NodeObjectLoader().setNodes( moduleToLib( TSL ) ).setNodeMaterials( moduleToLib( THREE ) );
-				const serializedMesh = loader.parse( json );
+				const loader = new THREE.NodeObjectLoader().setNodes( moduleToLib( THREE ) ).setNodeMaterials( moduleToLib( THREE ) );
+				const serializedMesh = loader.parse( json, () => {
 
-				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
-				serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+					serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
+					serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
 
-				const scriptableNode = serializedMesh.material.colorNode;
+					const scriptableNode = serializedMesh.material.colorNode;
 
-				// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
-				scriptableNode.setLocal( 'material', serializedMesh.material );
-				scriptableNode.setParameter( 'execFrom', 'serialized' );
+					// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
+					scriptableNode.setLocal( 'material', serializedMesh.material );
+					scriptableNode.setParameter( 'execFrom', 'serialized' );
 
-				objects.push( serializedMesh );
+					objects.push( serializedMesh );
 
-				scene.add( serializedMesh );
+					scene.add( serializedMesh );
+
+				} );
 
 			}
 

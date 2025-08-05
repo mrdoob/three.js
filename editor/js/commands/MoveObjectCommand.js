@@ -1,14 +1,14 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newParent THREE.Object3D
- * @param newBefore THREE.Object3D
- * @constructor
- */
 class MoveObjectCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {THREE.Object3D|null} [newParent=null]
+	 * @param {THREE.Object3D|null} [newBefore=null]
+	 * @constructor
+	 */
 	constructor( editor, object = null, newParent = null, newBefore = null ) {
 
 		super( editor );
@@ -50,6 +50,9 @@ class MoveObjectCommand extends Command {
 		this.object.parent = this.newParent;
 
 		this.object.dispatchEvent( { type: 'added' } );
+		this.editor.signals.objectChanged.dispatch( this.object );
+		this.editor.signals.objectChanged.dispatch( this.newParent );
+		this.editor.signals.objectChanged.dispatch( this.oldParent );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
 	}
@@ -63,6 +66,9 @@ class MoveObjectCommand extends Command {
 		this.object.parent = this.oldParent;
 
 		this.object.dispatchEvent( { type: 'added' } );
+		this.editor.signals.objectChanged.dispatch( this.object );
+		this.editor.signals.objectChanged.dispatch( this.newParent );
+		this.editor.signals.objectChanged.dispatch( this.oldParent );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
 	}

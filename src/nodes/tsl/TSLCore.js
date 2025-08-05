@@ -6,9 +6,8 @@ import SplitNode from '../utils/SplitNode.js';
 import SetNode from '../utils/SetNode.js';
 import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
+import MemberNode from '../utils/MemberNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
-
-//
 
 let currentStack = null;
 
@@ -18,12 +17,12 @@ export function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		console.warn( `Redefinition of method chaining ${ name }` );
+		console.warn( `THREE.TSL: Redefinition of method chaining '${ name }'.` );
 		return;
 
 	}
 
-	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
+	if ( typeof nodeElement !== 'function' ) throw new Error( `THREE.TSL: Node element ${ name } is not a function` );
 
 	NodeElements.set( name, nodeElement );
 
@@ -62,6 +61,10 @@ const shaderNodeHandler = {
 
 				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
+			} else if ( prop === 'toVarIntent' ) {
+
+				return () => nodeObj;
+
 			} else if ( prop === 'self' ) {
 
 				return node;
@@ -86,7 +89,7 @@ const shaderNodeHandler = {
 
 				prop = parseSwizzleAndSort( prop.slice( 3 ).toLowerCase() );
 
-				return ( value ) => nodeObject( new SetNode( node, prop, value ) );
+				return ( value ) => nodeObject( new SetNode( node, prop, nodeObject( value ) ) );
 
 			} else if ( /^flip[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
 
@@ -111,6 +114,12 @@ const shaderNodeHandler = {
 				// accessing array
 
 				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
+
+			} else if ( /^get$/.test( prop ) === true ) {
+
+				// accessing properties
+
+				return ( value ) => nodeObject( new MemberNode( nodeObj, value ) );
 
 			}
 
@@ -170,7 +179,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return Fn( obj );
+		return obj.isFn ? obj : Fn( obj );
 
 	}
 
@@ -206,13 +215,61 @@ const ShaderNodeArray = function ( array, altType = null ) {
 
 const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
 
-	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
+	function assignNode( node ) {
+
+		if ( settings !== null ) {
+
+			node = nodeObject( Object.assign( node, settings ) );
+
+			if ( settings.intent === true ) {
+
+				node = node.toVarIntent();
+
+			}
+
+		} else {
+
+			node = nodeObject( node );
+
+		}
+
+		return node;
+
+
+	}
+
+	let fn, name = scope, minParams, maxParams;
+
+	function verifyParamsLimit( params ) {
+
+		let tslName;
+
+		if ( name ) tslName = /[a-z]/i.test( name ) ? name + '()' : name;
+		else tslName = NodeClass.type;
+
+		if ( minParams !== undefined && params.length < minParams ) {
+
+			console.error( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+
+			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
+
+		} else if ( maxParams !== undefined && params.length > maxParams ) {
+
+			console.error( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+
+			return params.slice( 0, maxParams );
+
+		}
+
+		return params;
+
+	}
 
 	if ( scope === null ) {
 
-		return ( ...params ) => {
+		fn = ( ...params ) => {
 
-			return assignNode( new NodeClass( ...nodeArray( params ) ) );
+			return assignNode( new NodeClass( ...nodeArray( verifyParamsLimit( params ) ) ) );
 
 		};
 
@@ -220,21 +277,40 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		factor = nodeObject( factor );
 
-		return ( ...params ) => {
+		fn = ( ...params ) => {
 
-			return assignNode( new NodeClass( scope, ...nodeArray( params ), factor ) );
+			return assignNode( new NodeClass( scope, ...nodeArray( verifyParamsLimit( params ) ), factor ) );
 
 		};
 
 	} else {
 
-		return ( ...params ) => {
+		fn = ( ...params ) => {
 
-			return assignNode( new NodeClass( scope, ...nodeArray( params ) ) );
+			return assignNode( new NodeClass( scope, ...nodeArray( verifyParamsLimit( params ) ) ) );
 
 		};
 
 	}
+
+	fn.setParameterLength = ( ...params ) => {
+
+		if ( params.length === 1 ) minParams = maxParams = params[ 0 ];
+		else if ( params.length === 2 ) [ minParams, maxParams ] = params;
+
+		return fn;
+
+	};
+
+	fn.setName = ( value ) => {
+
+		name = value;
+
+		return fn;
+
+	};
+
+	return fn;
 
 };
 
@@ -253,6 +329,8 @@ class ShaderCallNodeInternal extends Node {
 		this.shaderNode = shaderNode;
 		this.inputNodes = inputNodes;
 
+		this.isShaderCallNodeInternal = true;
+
 	}
 
 	getNodeType( builder ) {
@@ -261,14 +339,32 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	getMemberType( builder, name ) {
+
+		return this.getOutputNode( builder ).getMemberType( builder, name );
+
+	}
+
 	call( builder ) {
 
 		const { shaderNode, inputNodes } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
-		if ( properties.onceOutput ) return properties.onceOutput;
+
+		const subBuild = builder.getClosestSubBuild( shaderNode.subBuilds ) || '';
+		const subBuildProperty = subBuild || 'default';
+
+		if ( properties[ subBuildProperty ] ) {
+
+			return properties[ subBuildProperty ];
+
+		}
 
 		//
+
+		const previousSubBuildFn = builder.subBuildFn;
+
+		builder.subBuildFn = subBuild;
 
 		let result = null;
 
@@ -294,50 +390,88 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
-			if ( builder.currentFunctionNode !== null ) {
-
-				builder.currentFunctionNode.includes.push( functionNode );
-
-			}
+			builder.addInclude( functionNode );
 
 			result = nodeObject( functionNode.call( inputNodes ) );
 
 		} else {
 
+			let inputs = inputNodes;
+
+			if ( Array.isArray( inputs ) ) {
+
+				// If inputs is an array, we need to convert it to a Proxy
+				// so we can call TSL functions using the syntax `Fn( ( { r, g, b } ) => { ... } )`
+				// and call through `fn( 0, 1, 0 )` or `fn( { r: 0, g: 1, b: 0 } )`
+
+				let index = 0;
+
+				inputs = new Proxy( inputs, {
+
+					get: ( target, property, receiver ) => {
+
+						let value;
+
+						if ( target[ property ] === undefined ) {
+
+							value = target[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( target, property, receiver );
+
+						}
+
+						return value;
+
+					}
+
+				} );
+
+			}
+
+			const secureNodeBuilder = new Proxy( builder, {
+
+				get: ( target, property, receiver ) => {
+
+					let value;
+
+					if ( Symbol.iterator === property ) {
+
+						value = function* () {
+
+							yield undefined;
+
+						};
+
+					} else {
+
+						value = Reflect.get( target, property, receiver );
+
+					}
+
+					return value;
+
+				}
+
+			} );
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
+			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], secureNodeBuilder ) : jsFunc( secureNodeBuilder );
 
 			result = nodeObject( outputNode );
 
 		}
 
+		builder.subBuildFn = previousSubBuildFn;
+
 		if ( shaderNode.once ) {
 
-			properties.onceOutput = result;
+			properties[ subBuildProperty ] = result;
 
 		}
 
 		return result;
-
-	}
-
-	getOutputNode( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode === null ) {
-
-			properties.outputNode = this.setupOutput( builder );
-
-		}
-
-		return properties.outputNode;
-
-	}
-
-	setup( builder ) {
-
-		return this.getOutputNode( builder );
 
 	}
 
@@ -351,11 +485,76 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	generate( builder, output ) {
+	getOutputNode( builder ) {
 
+		const properties = builder.getNodeProperties( this );
+		const subBuildOutput = builder.getSubBuildOutput( this );
+
+		properties[ subBuildOutput ] = properties[ subBuildOutput ] || this.setupOutput( builder );
+		properties[ subBuildOutput ].subBuild = builder.getClosestSubBuild( this );
+
+		return properties[ subBuildOutput ];
+
+	}
+
+	build( builder, output = null ) {
+
+		let result = null;
+
+		const buildStage = builder.getBuildStage();
+		const properties = builder.getNodeProperties( this );
+
+		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
 
-		return outputNode.build( builder, output );
+		if ( buildStage === 'setup' ) {
+
+			const subBuildInitialized = builder.getSubBuildProperty( 'initialized', this );
+
+			if ( properties[ subBuildInitialized ] !== true ) {
+
+				properties[ subBuildInitialized ] = true;
+
+				properties[ subBuildOutput ] = this.getOutputNode( builder );
+				properties[ subBuildOutput ].build( builder );
+
+				// If the shaderNode has subBuilds, add them to the chaining nodes
+				// so they can be built later in the build process.
+
+				if ( this.shaderNode.subBuilds ) {
+
+					for ( const node of builder.chaining ) {
+
+						const nodeData = builder.getDataFromNode( node, 'any' );
+						nodeData.subBuilds = nodeData.subBuilds || new Set();
+
+						for ( const subBuild of this.shaderNode.subBuilds ) {
+
+							nodeData.subBuilds.add( subBuild );
+
+						}
+
+						//builder.getDataFromNode( node ).subBuilds = nodeData.subBuilds;
+
+					}
+
+				}
+
+			}
+
+			result = properties[ subBuildOutput ];
+
+		} else if ( buildStage === 'analyze' ) {
+
+			outputNode.build( builder, output );
+
+		} else if ( buildStage === 'generate' ) {
+
+			result = outputNode.build( builder, output ) || '';
+
+		}
+
+		return result;
 
 	}
 
@@ -440,25 +639,29 @@ const getConstNode = ( value, type ) => {
 
 };
 
-const safeGetNodeType = ( node ) => {
-
-	try {
-
-		return node.getNodeType();
-
-	} catch ( _ ) {
-
-		return undefined;
-
-	}
-
-};
-
 const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
+		for ( const param of params ) {
+
+			if ( param === undefined ) {
+
+				console.error( `THREE.TSL: Invalid parameter for the type "${ type }".` );
+
+				return nodeObject( new ConstNode( 0, type ) );
+
+			}
+
+		}
+
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
+
+			const paramType = typeof param;
+
+			return paramType !== 'object' && paramType !== 'function';
+
+		} ) ) ) {
 
 			params = [ getValueFromType( type, ...params ) ];
 
@@ -466,20 +669,20 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObject( cacheMap.get( params[ 0 ] ) );
+			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
 
 		}
 
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( safeGetNodeType( node ) === type ) return nodeObject( node );
-			return nodeObject( new ConvertNode( node, type ) );
+			if ( node.nodeType === type ) return nodeObjectIntent( node );
+			return nodeObjectIntent( new ConvertNode( node, type ) );
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObject( new JoinNode( nodes, type ) );
+		return nodeObjectIntent( new JoinNode( nodes, type ) );
 
 	};
 
@@ -502,22 +705,107 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
-export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
-export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
+export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
+export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
+export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
 
-export const Fn = ( jsFunc, nodeType ) => {
+let fnId = 0;
 
-	const shaderNode = new ShaderNode( jsFunc, nodeType );
+class FnNode extends Node {
 
-	const fn = ( ...params ) => {
+	constructor( jsFunc, layout = null ) {
+
+		super();
+
+		let nodeType = null;
+
+		if ( layout !== null ) {
+
+			if ( typeof layout === 'object' ) {
+
+				nodeType = layout.return;
+
+			} else {
+
+				if ( typeof layout === 'string' ) {
+
+					nodeType = layout;
+
+				} else {
+
+					console.error( 'THREE.TSL: Invalid layout type.' );
+
+				}
+
+				layout = null;
+
+			}
+
+		}
+
+		this.shaderNode = new ShaderNode( jsFunc, nodeType );
+
+		if ( layout !== null ) {
+
+			this.setLayout( layout );
+
+		}
+
+		this.isFn = true;
+
+	}
+
+	setLayout( layout ) {
+
+		const nodeType = this.shaderNode.nodeType;
+
+		if ( typeof layout.inputs !== 'object' ) {
+
+			const fullLayout = {
+				name: 'fn' + fnId ++,
+				type: nodeType,
+				inputs: []
+			};
+
+			for ( const name in layout ) {
+
+				if ( name === 'return' ) continue;
+
+				fullLayout.inputs.push( {
+					name: name,
+					type: layout[ name ]
+				} );
+
+			}
+
+			layout = fullLayout;
+
+		}
+
+		this.shaderNode.setLayout( layout );
+
+		return this;
+
+	}
+
+	getNodeType( builder ) {
+
+		return this.shaderNode.getNodeType( builder ) || 'float';
+
+	}
+
+	call( ...params ) {
 
 		let inputs;
 
 		nodeObjects( params );
 
-		if ( params[ 0 ] && params[ 0 ].isNode ) {
+		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+		if ( isArrayAsParameter ) {
 
 			inputs = [ ...params ];
 
@@ -527,48 +815,62 @@ export const Fn = ( jsFunc, nodeType ) => {
 
 		}
 
-		return shaderNode.call( inputs );
+		const fnCall = this.shaderNode.call( inputs );
 
-	};
+		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
 
-	fn.shaderNode = shaderNode;
+		return fnCall.toVarIntent();
 
-	fn.setLayout = ( layout ) => {
+	}
 
-		shaderNode.setLayout( layout );
+	once( subBuilds = null ) {
 
-		return fn;
+		this.shaderNode.once = true;
+		this.shaderNode.subBuilds = subBuilds;
 
-	};
+		return this;
 
-	fn.once = () => {
+	}
 
-		shaderNode.once = true;
+	generate( builder ) {
 
-		return fn;
+		const type = this.getNodeType( builder );
 
-	};
+		console.error( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
 
-	return fn;
+		return builder.generateConst( type );
 
-};
+	}
 
-export const tslFn = ( ...params ) => { // @deprecated, r168
+}
 
-	console.warn( 'TSL.ShaderNode: tslFn() has been renamed to Fn().' );
-	return Fn( ...params );
+export function Fn( jsFunc, layout = null ) {
 
-};
+	const instance = new FnNode( jsFunc, layout );
 
-//
+	return new Proxy( () => {}, {
 
-addMethodChaining( 'toGlobal', ( node ) => {
+		apply( target, thisArg, params ) {
 
-	node.global = true;
+			return instance.call( ...params );
 
-	return node;
+		},
 
-} );
+		get( target, prop, receiver ) {
+
+			return Reflect.get( instance, prop, receiver );
+
+		},
+
+		set( target, prop, value, receiver ) {
+
+			return Reflect.set( instance, prop, value, receiver );
+
+		}
+
+	} );
+
+}
 
 //
 
@@ -586,9 +888,44 @@ export const setCurrentStack = ( stack ) => {
 
 export const getCurrentStack = () => currentStack;
 
+/**
+ * Represent a conditional node using if/else statements.
+ *
+ * ```js
+ * If( condition, function )
+ * 	.ElseIf( condition, function )
+ * 	.Else( function )
+ * ```
+ * @tsl
+ * @function
+ * @param {...any} params - The parameters for the conditional node.
+ * @returns {StackNode} The conditional node.
+ */
 export const If = ( ...params ) => currentStack.If( ...params );
 
-export function append( node ) {
+/**
+ * Represent a conditional node using switch/case statements.
+ *
+ * ```js
+ * Switch( value )
+ * 	.Case( 1, function )
+ * 	.Case( 2, 3, 4, function )
+ * 	.Default( function )
+ * ```
+ * @tsl
+ * @function
+ * @param {...any} params - The parameters for the conditional node.
+ * @returns {StackNode} The conditional node.
+ */
+export const Switch = ( ...params ) => currentStack.Switch( ...params );
+
+/**
+ * Add the given node to the current stack.
+ *
+ * @param {Node} node - The node to add.
+ * @returns {Node} The node that was added to the stack.
+ */
+export function Stack( node ) {
 
 	if ( currentStack ) currentStack.add( node );
 
@@ -596,7 +933,7 @@ export function append( node ) {
 
 }
 
-addMethodChaining( 'append', append );
+addMethodChaining( 'toStack', Stack );
 
 // types
 
@@ -652,9 +989,34 @@ addMethodChaining( 'toMat4', mat4 );
 
 // basic nodes
 
-export const element = /*@__PURE__*/ nodeProxy( ArrayElementNode );
+export const element = /*@__PURE__*/ nodeProxy( ArrayElementNode ).setParameterLength( 2 );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
+
+// deprecated
+
+/**
+ * @tsl
+ * @function
+ * @deprecated since r176. Use {@link Stack} instead.
+ *
+ * @param {Node} node - The node to add.
+ * @returns {Function}
+ */
+export const append = ( node ) => { // @deprecated, r176
+
+	console.warn( 'THREE.TSL: append() has been renamed to Stack().' );
+	return Stack( node );
+
+};
+
+addMethodChaining( 'append', ( node ) => { // @deprecated, r176
+
+	console.warn( 'THREE.TSL: .append() has been renamed to .toStack().' );
+	return Stack( node );
+
+} );
+

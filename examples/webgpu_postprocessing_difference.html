@@ -26,11 +26,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { pass, luminance, saturation } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Timer } from 'three/addons/misc/Timer.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -61,7 +60,8 @@
 				scene.fog = new THREE.Fog( 0x0487e2, 7, 25 );
 				scene.background = new THREE.Color( 0x0487e2 );
 
-				timer = new Timer();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 				texture.colorSpace = THREE.SRGBColorSpace;

@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Système d'Animation</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Système d'Animation">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Système d'Animation</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+ 
+          <h2>Vue d'ensemble</h2>
+
+		<p class="desc">
+			Au sein du système d'animation de three.js, vous pouvez animer diverses propriétés de vos modèles :
+			les os d'un modèle skinné et riggé, les morph targets, différentes propriétés de matériaux
+			(couleurs, opacité, booléens), la visibilité et les transformations. Les propriétés animées peuvent être introduites en fondu,
+			dissoutes en fondu, fondues enchaînées et déformées. L'influence (weight) et l'échelle temporelle (time scales) de différentes animations simultanées
+			sur le même objet ainsi que sur différents objets peuvent être modifiées
+			indépendamment. Diverses animations sur le même objet et sur différents objets peuvent être
+			synchronisées.<br /><br />
+
+			Pour atteindre tout cela dans un seul système homogène, le système d'animation de three.js
+			[link:https://github.com/mrdoob/three.js/issues/6881 a complètement changé en 2015]
+			(méfiez-vous des informations obsolètes !), et il a maintenant une architecture similaire à
+			Unity/Unreal Engine 4. Cette page donne un bref aperçu des principaux composants du
+			système et de leur fonctionnement ensemble.
+
+		</p>
+
+		<h3>Clips d'Animation</h3>
+
+		<p class="desc">
+
+			Si vous avez importé avec succès un objet 3D animé (peu importe qu'il ait des
+			os, des morph targets, ou les deux) — par exemple en l'exportant depuis Blender avec l'
+			[link:https://github.com/KhronosGroup/glTF-Blender-IO exportateur glTF pour Blender] et
+			en le chargeant dans une scène three.js à l'aide de `GLTFLoader` — l'un des champs de réponse
+			devrait être un tableau nommé "animations", contenant les clips d'animation
+			pour ce modèle (voir une liste des chargeurs possibles ci-dessous).<br /><br />
+
+			Chaque `AnimationClip` contient généralement les données pour une certaine activité de l'objet. Si le
+			mesh est un personnage, par exemple, il peut y avoir un AnimationClip pour un cycle de marche, un second
+			pour un saut, un troisième pour un pas de côté, et ainsi de suite.
+
+		</p>
+
+		<h3>Pistes d'Images Clés</h3>
+
+		<p class="desc">
+
+			À l'intérieur d'un tel `AnimationClip`, les données pour chaque propriété animée sont stockées dans une
+			`KeyframeTrack` séparée. En supposant qu'un objet personnage a un squelette,
+			une piste d'images clés pourrait stocker les données des changements de position de l'os de l'avant-bras
+			au fil du temps, une piste différente les données des changements de rotation du même os, une troisième
+			la position, la rotation ou l'échelle d'un autre os, et ainsi de suite. Il devrait être clair
+			qu'un AnimationClip peut être composé de nombreuses pistes de ce type.<br /><br />
+
+			En supposant que le modèle a des morph targets (par exemple un morph
+			target montrant un visage amical et un autre montrant un visage en colère), chaque piste contient les
+			informations sur la manière dont l'influence d'un certain morph target change pendant la performance
+			du clip.
+
+		</p>
+
+		<h3>Mixeur d'Animation</h3>
+
+		<p class="desc">
+
+			Les données stockées ne forment que la base des animations - la lecture réelle est contrôlée par le
+			`AnimationMixer`. Vous pouvez l'imaginer non seulement comme un lecteur d'animations, mais
+			comme une simulation d'un matériel comme une véritable console de mixage, qui peut contrôler plusieurs animations
+			simultanément, en les mélangeant et en les fusionnant.
+
+		</p>
+
+		<h3>Actions d'Animation</h3>
+
+		<p class="desc">
+
+			Le `AnimationMixer` lui-même n'a que très peu de propriétés et de méthodes (générales), car il
+			peut être contrôlé par les actions d'animation. En configurant une
+			`AnimationAction`, vous pouvez déterminer quand un certain `AnimationClip` doit être lu, mis en pause
+			ou arrêté sur l'un des mixeurs, si et combien de fois le clip doit être répété, s'il
+			doit être exécuté avec un fondu ou une échelle temporelle, et quelques éléments supplémentaires, tels que le fondu enchaîné
+			ou la synchronisation.
+
+		</p>
+
+		<h3>Groupes d'Objets d'Animation</h3>
+
+		<p class="desc">
+
+			Si vous souhaitez qu'un groupe d'objets reçoive un état d'animation partagé, vous pouvez utiliser un
+			`AnimationObjectGroup`.
+
+		</p>
+
+		<h3>Formats et Chargeurs Pris en Charge</h3>
+
+		<p class="desc">
+			Notez que tous les formats de modèle n'incluent pas l'animation (OBJ notamment ne le fait pas), et que seuls certains
+			chargeurs three.js supportent les séquences `AnimationClip`. Plusieurs qui <i>supportent</i>
+			ce type d'animation :
+		</p>
+
+			<ul>
+				<li>THREE.ObjectLoader</li>
+				<li>THREE.BVHLoader</li>
+				<li>THREE.ColladaLoader</li>
+				<li>THREE.FBXLoader</li>
+				<li>THREE.GLTFLoader</li>
+			</ul>
+
+		<p class="desc">
+			Notez que 3ds max et Maya ne peuvent actuellement pas exporter plusieurs animations (c'est-à-dire des animations qui ne sont pas
+			sur la même ligne de temps) directement dans un seul fichier.
+		</p>
+
+		<h2>Exemple</h2>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+let mesh;
+
+// Créer un AnimationMixer, et obtenir la liste des instances de AnimationClip
+const mixer = new THREE.AnimationMixer( mesh );
+const clips = mesh.animations;
+
+// Mettre à jour le mixeur à chaque image
+function update () {
+  mixer.update( deltaSeconds );
+}
+
+// Jouer une animation spécifique
+const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+const action = mixer.clipAction( clip );
+action.play();
+
+// Jouer toutes les animations
+clips.forEach( function ( clip ) {
+  mixer.clipAction( clip ).play();
+} );
+</pre>
+         
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

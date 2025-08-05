@@ -36,7 +36,7 @@
 		<div id="source"></div>
 		<div id="result"></div>
 		<div id="renderer"></div>
-		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs/loader.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 
 		<script type="importmap">
 			{
@@ -60,7 +60,7 @@
 
 			function init() {
 
-				// add the depedencies
+				// add the dependencies
 
 				const width = 200;
 				const height = 200;
@@ -99,7 +99,7 @@
 
 				// editor
 
-				window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs' } } );
+				window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } } );
 
 				require( [ 'vs/editor/editor.main' ], () => {
 
@@ -128,9 +128,9 @@ const scaledTime = time.mul( .5 ); // .5 is speed
 const uv0 = uv();
 const animateUv = vec2( uv0.x.add( oscSine( scaledTime ) ), uv0.y );
 
-// label is optional
-const myMap = texture( samplerTexture, animateUv ).rgb.label( 'myTexture' );
-const myColor = uniform( new THREE.Color( 0x0066ff ) ).label( 'myColor' );
+// .setName() is optional
+const myMap = texture( samplerTexture, animateUv ).rgb.setName( 'myTexture' );
+const myColor = uniform( new THREE.Color( 0x0066ff ) ).setName( 'myColor' );
 const opacity = .7;
 
 const desaturatedMap = grayscale( myMap.rgb );

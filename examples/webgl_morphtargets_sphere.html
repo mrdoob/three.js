@@ -28,7 +28,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { Timer } from 'three/addons/misc/Timer.js';
 
 			let camera, scene, renderer, timer;
 
@@ -48,7 +47,8 @@
 
 				scene = new THREE.Scene();
 
-				timer = new Timer();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const light1 = new THREE.PointLight( 0xff2200, 50000 );
 				light1.position.set( 100, 100, 100 );

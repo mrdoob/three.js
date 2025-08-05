@@ -29,11 +29,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'euclideanModulo', ( assert ) => {
 
 			assert.ok( isNaN( MathUtils.euclideanModulo( 6, 0 ) ), 'Division by zero returns NaN' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 1 ), 0, 'Divison by trivial divisor' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 2 ), 0, 'Divison by non-trivial divisor' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 5 ), 1, 'Divison by itself - 1' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 6 ), 0, 'Divison by itself' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 7 ), 6, 'Divison by itself + 1' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 1 ), 0, 'Division by trivial divisor' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 2 ), 0, 'Division by non-trivial divisor' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 5 ), 1, 'Division by itself - 1' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 6 ), 0, 'Division by itself' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 7 ), 6, 'Division by itself + 1' );
 
 		} );
 
@@ -85,7 +85,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.smoothstep( 1, 0, 2 ), 0.5, 'Value within limits' );
 			assert.strictEqual( MathUtils.smoothstep( 1.5, 0, 2 ), 0.84375, 'Value within limits' );
 			assert.strictEqual( MathUtils.smoothstep( 2, 0, 2 ), 1, 'Value equal to maximum' );
-			assert.strictEqual( MathUtils.smoothstep( 3, 0, 2 ), 1, 'Value highter than maximum' );
+			assert.strictEqual( MathUtils.smoothstep( 3, 0, 2 ), 1, 'Value higher than maximum' );
 
 		} );
 
@@ -97,7 +97,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.smootherstep( 1, 0, 2 ), 0.5, 'Value within limits' );
 			assert.strictEqual( MathUtils.smootherstep( 1.5, 0, 2 ), 0.896484375, 'Value within limits' );
 			assert.strictEqual( MathUtils.smootherstep( 2, 0, 2 ), 1, 'Value equal to maximum' );
-			assert.strictEqual( MathUtils.smootherstep( 3, 0, 2 ), 1, 'Value highter than maximum' );
+			assert.strictEqual( MathUtils.smootherstep( 3, 0, 2 ), 1, 'Value higher than maximum' );
 
 		} );
 

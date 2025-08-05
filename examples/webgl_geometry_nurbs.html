@@ -170,9 +170,9 @@
 					object.position.set( - 400, 100, 0 );
 					object.scale.multiplyScalar( 1 );
 					group.add( object );
-			
+
 				}
-			
+
 				// NURBS volume
 				{
 
@@ -313,9 +313,9 @@
 					objectSide.position.set( 400, 100, 0 );
 					objectSide.scale.multiplyScalar( 0.5 );
 					group.add( objectSide );
-			
+
 				}
-			
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -371,7 +371,7 @@
 
 			}
 
-			function onPointerUp() {
+			function onPointerUp( event ) {
 
 				if ( event.isPrimary === false ) return;
 

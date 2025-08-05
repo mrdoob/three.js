@@ -25,13 +25,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
 			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
 			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Timer } from 'three/addons/misc/Timer.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, postProcessing;
@@ -61,7 +60,8 @@
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				timer = new Timer();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const geometry = new THREE.SphereGeometry( 0.1, 32, 16 );
 

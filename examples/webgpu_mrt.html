@@ -26,8 +26,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { output, transformedNormalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { output, normalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -85,7 +85,7 @@
 				const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: directionToColor( transformedNormalView ),
+					normal: directionToColor( normalView ),
 					diffuse: diffuseColor,
 					emissive: emissive
 				} ) );

@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { float, If, PI, color, cos, instanceIndex, Loop, mix, mod, sin, instancedArray, Fn, uint, uniform, uniformArray, hash, vec3, vec4 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -82,7 +82,7 @@
 					new THREE.Vector3( 0, 1, 0 ),
 					new THREE.Vector3( 1, 0, - 0.5 ).normalize()
 				] );
-				const attractorsLength = uniform( attractorsPositions.array.length );
+				const attractorsLength = uniform( attractorsPositions.array.length, 'uint' );
 				const attractors = [];
 				const helpersRingGeometry = new THREE.RingGeometry( 1, 1.02, 32, 1, 0, Math.PI * 1.5 );
 				const helpersArrowGeometry = new THREE.ConeGeometry( 0.1, 0.4, 12, 1, false );
@@ -120,28 +120,28 @@
 					attractor.controls.visible = true;
 					attractor.controls.enabled = attractor.controls.visible;
 					scene.add( attractor.controls.getHelper() );
-			
+
 					attractor.controls.addEventListener( 'dragging-changed', ( event ) => {
 
 						controls.enabled = ! event.value;
-			
+
 					} );
-			
+
 					attractor.controls.addEventListener( 'change', () => {
 
 						attractor.position.copy( attractor.reference.position );
 						attractor.orientation.copy( new THREE.Vector3( 0, 1, 0 ).applyQuaternion( attractor.reference.quaternion ) );
-			
+
 					} );
 
 					attractors.push( attractor );
-			
+
 				}
 
 				// particles
 
 				const count = Math.pow( 2, 18 );
-				const material = new THREE.SpriteNodeMaterial( { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false } );
+				const material = new THREE.SpriteNodeMaterial( { blending: THREE.AdditiveBlending, depthWrite: false } );
 
 				const attractorMass = uniform( Number( `1e${7}` ) );
 				const particleGlobalMass = uniform( Number( `1e${4}` ) );
@@ -167,7 +167,7 @@
 						cos( phi ),
 						sinPhiRadius.mul( cos( theta ) )
 					);
-			
+
 				} );
 
 				// init compute
@@ -188,7 +188,7 @@
 					const theta = hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) ).mul( PI );
 					const baseVelocity = sphericalToVec3( phi, theta ).mul( 0.05 );
 					velocity.assign( baseVelocity );
-			
+
 				} );
 
 				const initCompute = init().compute( count );
@@ -196,7 +196,7 @@
 				const reset = () => {
 
 					renderer.computeAsync( initCompute );
-			
+
 				};
 
 				reset();
@@ -209,7 +209,7 @@
 				const update = Fn( () => {
 
 					// const delta = timerDelta().mul( timeScale ).min( 1 / 30 ).toVar();
-					const delta = float( 1 / 60 ).mul( timeScale ).toVar(); // uses fixed delta to consistant result
+					const delta = float( 1 / 60 ).mul( timeScale ).toVar(); // uses fixed delta to consistent result
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
 
@@ -234,7 +234,7 @@
 						const spinningForce = attractorRotationAxis.mul( gravityStrength ).mul( spinningStrength );
 						const spinningVelocity = spinningForce.cross( toAttractor );
 						force.addAssign( spinningVelocity );
-			
+
 					} );
 
 					// velocity
@@ -244,7 +244,7 @@
 					If( speed.greaterThan( maxSpeed ), () => {
 
 						velocity.assign( velocity.normalize().mul( maxSpeed ) );
-			
+
 					} );
 					velocity.mulAssign( velocityDamping.oneMinus() );
 
@@ -256,7 +256,7 @@
 
 					const halfHalfExtent = boundHalfExtent.div( 2 ).toVar();
 					position.assign( mod( position.add( halfHalfExtent ), boundHalfExtent ).sub( halfHalfExtent ) );
-			
+
 				} );
 				updateCompute = update().compute( count );
 
@@ -272,7 +272,7 @@
 					const finalColor = mix( colorA, colorB, colorMix );
 
 					return vec4( finalColor, 1 );
-			
+
 				} )();
 
 				material.scaleNode = particleMassMultiplier.mul( scale );
@@ -307,17 +307,17 @@
 
 								attractor.controls.visible = false;
 								attractor.controls.enabled = false;
-			
+
 							} else {
 
 								attractor.controls.visible = true;
 								attractor.controls.enabled = true;
 								attractor.controls.mode = value;
-			
+
 							}
-			
+
 						}
-			
+
 					} );
 
 				gui
@@ -326,7 +326,7 @@
 
 						for ( const attractor of attractors )
 							attractor.helper.visible = value;
-			
+
 					} );
 
 				gui.add( { reset }, 'reset' );
@@ -343,7 +343,7 @@
 			}
 
 			async function animate() {
-			
+
 				controls.update();
 
     			renderer.compute( updateCompute );

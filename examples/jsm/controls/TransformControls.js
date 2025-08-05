@@ -32,13 +32,56 @@ const _unit = {
 	Z: new Vector3( 0, 0, 1 )
 };
 
+/**
+ * Fires if any type of change (object or property change) is performed. Property changes
+ * are separate events you can add event listeners to. The event type is "propertyname-changed".
+ *
+ * @event TransformControls#change
+ * @type {Object}
+ */
 const _changeEvent = { type: 'change' };
+
+/**
+ * Fires if a pointer (mouse/touch) becomes active.
+ *
+ * @event TransformControls#mouseDown
+ * @type {Object}
+ */
 const _mouseDownEvent = { type: 'mouseDown', mode: null };
+
+/**
+ * Fires if a pointer (mouse/touch) is no longer active.
+ *
+ * @event TransformControls#mouseUp
+ * @type {Object}
+ */
 const _mouseUpEvent = { type: 'mouseUp', mode: null };
+
+/**
+ * Fires if the controlled 3D object is changed.
+ *
+ * @event TransformControls#objectChange
+ * @type {Object}
+ */
 const _objectChangeEvent = { type: 'objectChange' };
 
+/**
+ * This class can be used to transform objects in 3D space by adapting a similar interaction model
+ * of DCC tools like Blender. Unlike other controls, it is not intended to transform the scene's camera.
+ *
+ * `TransformControls` expects that its attached 3D object is part of the scene graph.
+ *
+ * @augments Controls
+ * @three_import import { TransformControls } from 'three/addons/controls/TransformControls.js';
+ */
 class TransformControls extends Controls {
 
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Camera} camera - The camera of the rendered scene.
+	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 */
 	constructor( camera, domElement = null ) {
 
 		super( undefined, domElement );
@@ -96,25 +139,170 @@ class TransformControls extends Controls {
 		// Setting the defined property will automatically trigger change event
 		// Defined properties are passed down to gizmo and plane
 
+		/**
+		 * The camera of the rendered scene.
+		 *
+		 * @name TransformControls#camera
+		 * @type {Camera}
+		 */
 		defineProperty( 'camera', camera );
 		defineProperty( 'object', undefined );
 		defineProperty( 'enabled', true );
+
+		/**
+		 * The current transformation axis.
+		 *
+		 * @name TransformControls#axis
+		 * @type {string}
+		 */
 		defineProperty( 'axis', null );
+
+		/**
+		 * The current transformation axis.
+		 *
+		 * @name TransformControls#mode
+		 * @type {('translate'|'rotate'|'scale')}
+		 * @default 'translate'
+		 */
 		defineProperty( 'mode', 'translate' );
+
+		/**
+		 * By default, 3D objects are continuously translated. If you set this property to a numeric
+		 * value (world units), you can define in which steps the 3D object should be translated.
+		 *
+		 * @name TransformControls#translationSnap
+		 * @type {?number}
+		 * @default null
+		 */
 		defineProperty( 'translationSnap', null );
+
+		/**
+		 * By default, 3D objects are continuously rotated. If you set this property to a numeric
+		 * value (radians), you can define in which steps the 3D object should be rotated.
+		 *
+		 * @name TransformControls#rotationSnap
+		 * @type {?number}
+		 * @default null
+		 */
 		defineProperty( 'rotationSnap', null );
+
+		/**
+		 * By default, 3D objects are continuously scaled. If you set this property to a numeric
+		 * value, you can define in which steps the 3D object should be scaled.
+		 *
+		 * @name TransformControls#scaleSnap
+		 * @type {?number}
+		 * @default null
+		 */
 		defineProperty( 'scaleSnap', null );
+
+		/**
+		 * Defines in which coordinate space transformations should be performed.
+		 *
+		 * @name TransformControls#space
+		 * @type {('world'|'local')}
+		 * @default 'world'
+		 */
 		defineProperty( 'space', 'world' );
+
+		/**
+		 * The size of the helper UI (axes/planes).
+		 *
+		 * @name TransformControls#size
+		 * @type {number}
+		 * @default 1
+		 */
 		defineProperty( 'size', 1 );
+
+		/**
+		 * Whether dragging is currently performed or not.
+		 *
+		 * @name TransformControls#dragging
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		defineProperty( 'dragging', false );
+
+		/**
+		 * Whether the x-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showX
+		 * @type {boolean}
+		 * @default true
+		 */
 		defineProperty( 'showX', true );
+
+		/**
+		 * Whether the y-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showY
+		 * @type {boolean}
+		 * @default true
+		 */
 		defineProperty( 'showY', true );
+
+		/**
+		 * Whether the z-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showZ
+		 * @type {boolean}
+		 * @default true
+		 */
 		defineProperty( 'showZ', true );
+
+		/**
+		 * The minimum allowed X position during translation.
+		 *
+		 * @name TransformControls#minX
+		 * @type {number}
+		 * @default -Infinity
+		 */
 		defineProperty( 'minX', - Infinity );
+
+		/**
+		 * The maximum allowed X position during translation.
+		 *
+		 * @name TransformControls#maxX
+		 * @type {number}
+		 * @default Infinity
+		 */
 		defineProperty( 'maxX', Infinity );
+
+		/**
+		 * The minimum allowed y position during translation.
+		 *
+		 * @name TransformControls#minY
+		 * @type {number}
+		 * @default -Infinity
+		 */
 		defineProperty( 'minY', - Infinity );
+
+		/**
+		 * The maximum allowed Y position during translation.
+		 *
+		 * @name TransformControls#maxY
+		 * @type {number}
+		 * @default Infinity
+		 */
 		defineProperty( 'maxY', Infinity );
+
+		/**
+		 * The minimum allowed z position during translation.
+		 *
+		 * @name TransformControls#minZ
+		 * @type {number}
+		 * @default -Infinity
+		 */
 		defineProperty( 'minZ', - Infinity );
+
+		/**
+		 * The maximum allowed Z position during translation.
+		 *
+		 * @name TransformControls#maxZ
+		 * @type {number}
+		 * @default Infinity
+		 */
 		defineProperty( 'maxZ', Infinity );
 
 		// Reusable utility variables
@@ -171,13 +359,15 @@ class TransformControls extends Controls {
 
 		if ( domElement !== null ) {
 
-			this.connect();
+			this.connect( domElement );
 
 		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
@@ -198,6 +388,12 @@ class TransformControls extends Controls {
 
 	}
 
+	/**
+	 * Returns the visual representation of the controls. Add the helper to your scene to
+	 * visually transform the attached  3D object.
+	 *
+	 * @return {TransformControlsRoot} The helper.
+	 */
 	getHelper() {
 
 		return this._root;
@@ -550,7 +746,12 @@ class TransformControls extends Controls {
 
 	}
 
-	// Set current object
+	/**
+	 * Sets the 3D object that should be transformed and ensures the controls UI is visible.
+	 *
+	 * @param {Object3D} object -  The 3D object that should be transformed.
+	 * @return {TransformControls} A reference to this controls.
+	 */
 	attach( object ) {
 
 		this.object = object;
@@ -560,7 +761,11 @@ class TransformControls extends Controls {
 
 	}
 
-	// Detach from object
+	/**
+	 * Removes the current 3D object from the controls and makes the helper UI invisible.
+	 *
+	 * @return {TransformControls} A reference to this controls.
+	 */
 	detach() {
 
 		this.object = undefined;
@@ -572,6 +777,9 @@ class TransformControls extends Controls {
 
 	}
 
+	/**
+	 * Resets the object's position, rotation and scale to when the current transform began.
+	 */
 	reset() {
 
 		if ( ! this.enabled ) return;
@@ -591,53 +799,126 @@ class TransformControls extends Controls {
 
 	}
 
+	/**
+	 * Returns the raycaster that is used for user interaction. This object is shared between all
+	 * instances of `TransformControls`.
+	 *
+	 * @returns {Raycaster} The internal raycaster.
+	 */
 	getRaycaster() {
 
 		return _raycaster;
 
 	}
 
-	// TODO: deprecate
-
+	/**
+	 * Returns the transformation mode.
+	 *
+	 * @returns {'translate'|'rotate'|'scale'} The transformation mode.
+	 */
 	getMode() {
 
 		return this.mode;
 
 	}
 
+	/**
+	 * Sets the given transformation mode.
+	 *
+	 * @param {'translate'|'rotate'|'scale'} mode - The transformation mode to set.
+	 */
 	setMode( mode ) {
 
 		this.mode = mode;
 
 	}
 
+	/**
+	 * Sets the translation snap.
+	 *
+	 * @param {?number} translationSnap - The translation snap to set.
+	 */
 	setTranslationSnap( translationSnap ) {
 
 		this.translationSnap = translationSnap;
 
 	}
 
+	/**
+	 * Sets the rotation snap.
+	 *
+	 * @param {?number} rotationSnap - The rotation snap to set.
+	 */
 	setRotationSnap( rotationSnap ) {
 
 		this.rotationSnap = rotationSnap;
 
 	}
 
+	/**
+	 * Sets the scale snap.
+	 *
+	 * @param {?number} scaleSnap - The scale snap to set.
+	 */
 	setScaleSnap( scaleSnap ) {
 
 		this.scaleSnap = scaleSnap;
 
 	}
 
+	/**
+	 * Sets the size of the helper UI.
+	 *
+	 * @param {number} size - The size to set.
+	 */
 	setSize( size ) {
 
 		this.size = size;
 
 	}
 
+	/**
+	 * Sets the coordinate space in which transformations are applied.
+	 *
+	 * @param {'world'|'local'} space - The space to set.
+	 */
 	setSpace( space ) {
 
 		this.space = space;
+
+	}
+
+	/**
+	 * Sets the colors of the control's gizmo.
+	 *
+	 * @param {number|Color|string} xAxis - The x-axis color.
+	 * @param {number|Color|string} yAxis - The y-axis color.
+	 * @param {number|Color|string} zAxis - The z-axis color.
+	 * @param {number|Color|string} active - The color for active elements.
+	 */
+	setColors( xAxis, yAxis, zAxis, active ) {
+
+		const materialLib = this._gizmo.materialLib;
+
+		materialLib.xAxis.color.set( xAxis );
+		materialLib.yAxis.color.set( yAxis );
+		materialLib.zAxis.color.set( zAxis );
+		materialLib.active.color.set( active );
+		materialLib.xAxisTransparent.color.set( xAxis );
+		materialLib.yAxisTransparent.color.set( yAxis );
+		materialLib.zAxisTransparent.color.set( zAxis );
+		materialLib.activeTransparent.color.set( active );
+
+		// update color caches
+
+		if ( materialLib.xAxis._color ) materialLib.xAxis._color.set( xAxis );
+		if ( materialLib.yAxis._color ) materialLib.yAxis._color.set( yAxis );
+		if ( materialLib.zAxis._color ) materialLib.zAxis._color.set( zAxis );
+		if ( materialLib.active._color ) materialLib.active._color.set( active );
+		if ( materialLib.xAxisTransparent._color ) materialLib.xAxisTransparent._color.set( xAxis );
+		if ( materialLib.yAxisTransparent._color ) materialLib.yAxisTransparent._color.set( yAxis );
+		if ( materialLib.zAxisTransparent._color ) materialLib.zAxisTransparent._color.set( zAxis );
+		if ( materialLib.activeTransparent._color ) materialLib.activeTransparent._color.set( active );
 
 	}
 
@@ -899,6 +1180,19 @@ class TransformControlsGizmo extends Object3D {
 		const matGray = gizmoMaterial.clone();
 		matGray.color.setHex( 0x787878 );
 
+		// materials in the below property are configurable via setColors()
+
+		this.materialLib = {
+			xAxis: matRed,
+			yAxis: matGreen,
+			zAxis: matBlue,
+			active: matYellow,
+			xAxisTransparent: matRedTransparent,
+			yAxisTransparent: matGreenTransparent,
+			zAxisTransparent: matBlueTransparent,
+			activeTransparent: matYellowTransparent
+		};
+
 		// reusable geometry
 
 		const arrowGeometry = new CylinderGeometry( 0, 0.04, 0.1, 12 );
@@ -953,16 +1247,16 @@ class TransformControlsGizmo extends Object3D {
 				[ new Mesh( lineGeometry2, matBlue ), null, [ Math.PI / 2, 0, 0 ]]
 			],
 			XYZ: [
-				[ new Mesh( new OctahedronGeometry( 0.1, 0 ), matWhiteTransparent.clone() ), [ 0, 0, 0 ]]
+				[ new Mesh( new OctahedronGeometry( 0.1, 0 ), matWhiteTransparent ), [ 0, 0, 0 ]]
 			],
 			XY: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matBlueTransparent.clone() ), [ 0.15, 0.15, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matBlueTransparent ), [ 0.15, 0.15, 0 ]]
 			],
 			YZ: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matRedTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matRedTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]]
 			],
 			XZ: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matGreenTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matGreenTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
 			]
 		};
 
@@ -1004,13 +1298,13 @@ class TransformControlsGizmo extends Object3D {
 				[ new Line( TranslateHelperGeometry(), matHelper ), null, null, null, 'helper' ]
 			],
 			X: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
 			],
 			Y: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
 			],
 			Z: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
 			]
 		};
 
@@ -1034,7 +1328,7 @@ class TransformControlsGizmo extends Object3D {
 
 		const helperRotate = {
 			AXIS: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
 			]
 		};
 
@@ -1082,7 +1376,7 @@ class TransformControlsGizmo extends Object3D {
 				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matGreenTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
 			],
 			XYZ: [
-				[ new Mesh( new BoxGeometry( 0.1, 0.1, 0.1 ), matWhiteTransparent.clone() ) ],
+				[ new Mesh( new BoxGeometry( 0.1, 0.1, 0.1 ), matWhiteTransparent ) ],
 			]
 		};
 
@@ -1115,13 +1409,13 @@ class TransformControlsGizmo extends Object3D {
 
 		const helperScale = {
 			X: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
 			],
 			Y: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
 			],
 			Z: [
-				[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
+				[ new Line( lineGeometry, matHelper ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
 			]
 		};
 
@@ -1502,7 +1796,7 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === this.axis ) {
 
-					handle.material.color.setHex( 0xffff00 );
+					handle.material.color.copy( this.materialLib.active.color );
 					handle.material.opacity = 1.0;
 
 				} else if ( this.axis.split( '' ).some( function ( a ) {
@@ -1511,7 +1805,7 @@ class TransformControlsGizmo extends Object3D {
 
 				} ) ) {
 
-					handle.material.color.setHex( 0xffff00 );
+					handle.material.color.copy( this.materialLib.active.color );
 					handle.material.opacity = 1.0;
 
 				}

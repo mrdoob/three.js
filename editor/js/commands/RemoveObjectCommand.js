@@ -2,13 +2,13 @@ import { Command } from '../Command.js';
 
 import { ObjectLoader } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @constructor
- */
 class RemoveObjectCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @constructor
+	 */
 	constructor( editor, object = null ) {
 
 		super( editor );

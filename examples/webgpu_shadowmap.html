@@ -24,7 +24,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { mx_fractal_noise_vec3, positionWorld, vec4, Fn, color, vertexIndex, hash } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -139,20 +139,19 @@
 				scene.add( pillar4 );
 
 				const planeGeometry = new THREE.PlaneGeometry( 200, 200 );
-				const planeMaterial = new THREE.MeshPhongMaterial( {
-					color: 0x999999,
-					shininess: 0,
-					specular: 0x111111
-				} );
 
-				planeMaterial.shadowPositionNode = Fn( () => {
+				const planeMaterial = new THREE.MeshPhongNodeMaterial();
+				planeMaterial.color.setHex( 0x999999 );
+				planeMaterial.shininess = 0;
+				planeMaterial.specular.setHex( 0x111111 );
+
+				planeMaterial.receivedShadowPositionNode = Fn( () => {
 
 					const pos = positionWorld.toVar();
 					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );
 					return pos;
 
 				} )();
-
 
 				planeMaterial.colorNode = Fn( () => {
 

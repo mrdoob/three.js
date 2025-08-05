@@ -3,21 +3,42 @@ import {
 } from 'three';
 
 /**
- * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
- * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
+ * A loader for the KTX texture compression format.
  *
- * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts
+ * References:
+ * - [The KTX File Format and Tools]{@link https://www.khronos.org/opengles/sdk/tools/KTX/}
+ * - [Babylon.JS khronosTextureContainer.ts]{@link https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts}
+ *
+ * ```js
+ * const loader = new KTXLoader();
+ *
+ * const map = loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' )
+ * map.colorSpace = THREE.SRGBColorSpace; // only for color textures
+ * ```
+ *
+ * @augments CompressedTextureLoader
+ * @three_import import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';
  */
-
-
 class KTXLoader extends CompressedTextureLoader {
 
+	/**
+	 * Constructs a new KTX loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
+	/**
+	 * Parses the given KTX texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @param {boolean} loadMipmaps - Whether to load mipmaps or not.
+	 * @return {CompressedTextureLoader~TexData} An object representing the parsed texture data.
+	 */
 	parse( buffer, loadMipmaps ) {
 
 		const ktx = new KhronosTextureContainer( buffer, 1 );
@@ -35,7 +56,6 @@ class KTXLoader extends CompressedTextureLoader {
 
 }
 
-
 const HEADER_LEN = 12 + ( 13 * 4 ); // identifier + header elements (not including key value meta-data pairs)
 // load types
 const COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
@@ -46,10 +66,11 @@ const COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
 class KhronosTextureContainer {
 
 	/**
-	 * @param {ArrayBuffer} arrayBuffer- contents of the KTX container file
-	 * @param {number} facesExpected- should be either 1 or 6, based whether a cube texture or or
-	 * @param {boolean} threeDExpected- provision for indicating that data should be a 3D texture, not implemented
-	 * @param {boolean} textureArrayExpected- provision for indicating that data should be a texture array, not implemented
+	 * @private
+	 * @param {ArrayBuffer} arrayBuffer - contents of the KTX container file
+	 * @param {number} facesExpected - should be either 1 or 6, based whether a cube texture or or
+	 * @param {boolean} threeDExpected - provision for indicating that data should be a 3D texture, not implemented
+	 * @param {boolean} textureArrayExpected - provision for indicating that data should be a texture array, not implemented
 	 */
 	constructor( arrayBuffer, facesExpected /*, threeDExpected, textureArrayExpected */ ) {
 

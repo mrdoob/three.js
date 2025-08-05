@@ -1,7 +1,20 @@
 import { Interpolant } from '../Interpolant.js';
 
+/**
+ * A basic linear interpolant.
+ *
+ * @augments Interpolant
+ */
 class LinearInterpolant extends Interpolant {
 
+	/**
+	 * Constructs a new linear interpolant.
+	 *
+	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} sampleValues - The sample values.
+	 * @param {number} sampleSize - The sample size
+	 * @param {TypedArray} [resultBuffer] - The result buffer.
+	 */
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 		super( parameterPositions, sampleValues, sampleSize, resultBuffer );

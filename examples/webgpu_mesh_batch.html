@@ -30,7 +30,7 @@
 
 	<script type="module">
 
-		import * as THREE from 'three';
+		import * as THREE from 'three/webgpu';
 
 		import Stats from 'three/addons/libs/stats.module.js';
 
@@ -39,7 +39,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
 
-		import { transformedNormalView, directionToColor, diffuseColor } from 'three/tsl';
+		import { normalView, directionToColor, diffuseColor } from 'three/tsl';
 
 		let camera, scene, renderer;
 		let controls, stats;
@@ -127,7 +127,7 @@
 			if ( ! material ) {
 
 				material = new THREE.MeshBasicNodeMaterial();
-				material.outputNode = diffuseColor.mul( directionToColor( transformedNormalView ).y.add( 0.5 ) );
+				material.outputNode = diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) );
 		
 	}
 

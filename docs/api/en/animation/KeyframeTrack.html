@@ -126,10 +126,13 @@
 		</p>
 
 		<p>
-			Note: The track's name does not necessarily have to be unique. Multiple
-			tracks can drive the same property. The result should be based on a
-			weighted blend between the multiple tracks according to the weights of
-			their respective actions.
+			Note: The track’s name does not necessarily have to be unique. Multiple tracks
+			can drive the same property, resulting in a weighted blend between the tracks 
+			according to the weights of their respective actions. However, if object names
+			used for targeting are not unique within the subtree, tracks referencing
+			those objects by name will only animate the first object encountered, even if
+			the path is unique. To reliably target distinct objects use UUIDs, or ensure
+			object names remain unique.
 		</p>
 
 		<h3>[property:Float32Array times]</h3>

@@ -2,32 +2,6 @@
 
 	"en": {
 
-		"Manual": {
-
-			"Getting Started": {
-				"Installation": "manual/en/introduction/Installation",
-				"Creating a scene": "manual/en/introduction/Creating-a-scene",
-				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
-				"Drawing lines": "manual/en/introduction/Drawing-lines",
-				"Creating text": "manual/en/introduction/Creating-text",
-				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
-				"Libraries and Plugins": "manual/en/introduction/Libraries-and-Plugins",
-				"FAQ": "manual/en/introduction/FAQ",
-				"Useful links": "manual/en/introduction/Useful-links"
-			},
-
-			"Next Steps": {
-				"Updating resources": "manual/en/introduction/How-to-update-things",
-				"Disposing resources": "manual/en/introduction/How-to-dispose-of-objects",
-				"Creating VR content": "manual/en/introduction/How-to-create-VR-content",
-				"Post-processing": "manual/en/introduction/How-to-use-post-processing",
-				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
-				"Animation system": "manual/en/introduction/Animation-system",
-				"Color management": "manual/en/introduction/Color-management"
-			}
-
-		},
-
 		"Reference": {
 
 			"Animation": {
@@ -91,6 +65,7 @@
 				"Layers": "api/en/core/Layers",
 				"Object3D": "api/en/core/Object3D",
 				"Raycaster": "api/en/core/Raycaster",
+				"Timer": "api/en/core/Timer",
 				"Uniform": "api/en/core/Uniform"
 			},
 
@@ -318,6 +293,7 @@
 				"FramebufferTexture": "api/en/textures/FramebufferTexture",
 				"Source": "api/en/textures/Source",
 				"Texture": "api/en/textures/Texture",
+				"VideoFrameTexture": "api/en/textures/VideoFrameTexture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
 
@@ -326,9 +302,7 @@
 		"Addons": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/en/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver"
 			},
 
 			"Controls": {
@@ -380,7 +354,6 @@
 				"LDrawLoader": "examples/en/loaders/LDrawLoader",
 				"LUT3dlLoader": "examples/en/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/en/loaders/LUTCubeLoader",
-				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
@@ -402,19 +375,17 @@
 				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
+				"KTX2Exporter": "examples/en/exporters/KTX2Exporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
-				"STLExporter": "examples/en/exporters/STLExporter"
+				"STLExporter": "examples/en/exporters/STLExporter",
+				"USDZExporter": "examples/en/exporters/USDZExporter"
 			},
 
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
 				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 				"OBB": "examples/en/math/OBB"
-			},
-
-			"Misc": {
-				"Timer": "examples/en/misc/Timer"
 			},
 
 			"Modifiers": {
@@ -460,31 +431,6 @@
 	},
 
 	"ar": {
-
-		"الكتيب": {
-
-			"البدء": {
-				"التثبيت": "manual/ar/introduction/Installation",
-				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
-				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
-				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
-				"إنشاء نص": "manual/ar/introduction/Creating-text",
-				"تحميل نماذج ثلاثية الأبعاد": "manual/ar/introduction/Loading-3D-models",
-				"المكتبات والإضافات": "manual/ar/introduction/Libraries-and-Plugins",
-				"الأسئلة الشائعة": "manual/ar/introduction/FAQ",
-				"روابط مفيدة": "manual/ar/introduction/Useful-links"
-			},
-
-			"الخطوات التالية": {
-				"كيفية تحديث الأشياء": "manual/ar/introduction/How-to-update-things",
-				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects",
-				"كيفية إنشاء محتوى VR": "manual/ar/introduction/How-to-create-VR-content",
-				"كيفية استخدام المعالجة اللاحقة (post-processing)": "manual/ar/introduction/How-to-use-post-processing",
-				"تحولات المصفوفة (Matrix transformations)": "manual/ar/introduction/Matrix-transformations",
-				"نظام الحركات": "manual/ar/introduction/Animation-system"
-			}
-
-		},
 
 		"المرجع": {
 
@@ -765,32 +711,6 @@
 
 	"zh": {
 
-		"手册": {
-
-			"起步": {
-				"安装": "manual/zh/introduction/Installation",
-				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
-				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
-				"画线": "manual/zh/introduction/Drawing-lines",
-				"创建文字": "manual/zh/introduction/Creating-text",
-				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
-				"库和插件": "manual/zh/introduction/Libraries-and-Plugins",
-				"常见问题": "manual/zh/introduction/FAQ",
-				"一些有用的链接": "manual/zh/introduction/Useful-links"
-			},
-
-			"进阶": {
-				"如何更新场景": "manual/zh/introduction/How-to-update-things",
-				"如何废置对象": "manual/zh/introduction/How-to-dispose-of-objects",
-				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
-				"如何使用后期处理": "manual/zh/introduction/How-to-use-post-processing",
-				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
-				"动画系统": "manual/zh/introduction/Animation-system",
-				"色彩管理": "manual/zh/introduction/Color-management"
-			}
-
-		},
-
 		"参考": {
 
 			"动画": {
@@ -854,6 +774,7 @@
 				"Layers": "api/zh/core/Layers",
 				"Object3D": "api/zh/core/Object3D",
 				"Raycaster": "api/zh/core/Raycaster",
+				"Timer": "api/zh/core/Timer",
 				"Uniform": "api/zh/core/Uniform"
 			},
 
@@ -1087,9 +1008,7 @@
 		"附加": {
 
 			"动画": {
-				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/zh/animations/MMDPhysics"
+				"CCDIKSolver": "examples/zh/animations/CCDIKSolver"
 			},
 
 			"控制": {
@@ -1133,7 +1052,6 @@
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
 				"LUT3dlLoader": "examples/zh/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
-				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
@@ -1168,10 +1086,6 @@
 
 			"修改器":{
 				"EdgeSplitModifier": "examples/zh/modifiers/EdgeSplitModifier"
-			},
-
-			"杂项": {
-				"Timer": "examples/zh/misc/Timer"
 			},
 
 			"凸包": {
@@ -1212,32 +1126,6 @@
 	},
 
 	"ko": {
-
-		"매뉴얼": {
-
-			"시작하기": {
-				"설치": "manual/ko/introduction/Installation",
-				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
-				"WebGL 호환성 검사": "manual/ko/introduction/WebGL-compatibility-check",
-				"선 그리기": "manual/ko/introduction/Drawing-lines",
-				"텍스트 만들기": "manual/ko/introduction/Creating-text",
-				"3D 모델 불러오기": "manual/ko/introduction/Loading-3D-models",
-				"라이브러리 및 플러그인": "manual/en/introduction/Libraries-and-Plugins",
-				"FAQ": "manual/ko/introduction/FAQ",
-				"참고 링크": "manual/ko/introduction/Useful-links"
-			},
-
-			"심화 과정": {
-				"오브젝트를 업데이트하는 방법": "manual/ko/introduction/How-to-update-things",
-				"오브젝트를 폐기하는 방법": "manual/ko/introduction/How-to-dispose-of-objects",
-				"VR 컨텐츠를 만드는 방법": "manual/ko/introduction/How-to-create-VR-content",
-				"후처리 사용 방법": "manual/ko/introduction/How-to-use-post-processing",
-				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
-				"애니메이션 시스템": "manual/ko/introduction/Animation-system",
-				"색상 관리": "manual/ko/introduction/Color-management"
-			}
-
-		},
 
 		"레퍼런스": {
 
@@ -1386,62 +1274,7 @@
 
 	},
 
-	"ja": {
-
-		"マニュアル": {
-
-			"はじめてみましょう": {
-				"インストールの方法": "manual/ja/introduction/Installation",
-				"シーンの作成": "manual/ja/introduction/Creating-a-scene",
-				"WebGLの互換性の確認": "manual/ja/introduction/WebGL-compatibility-check",
-				"線を引く": "manual/ja/introduction/Drawing-lines",
-				"テキストを作成する": "manual/ja/introduction/Creating-text",
-				"3Dモデルをロードする": "manual/ja/introduction/Loading-3D-models",
-				"ライブラリとプラグイン": "manual/ja/introduction/Libraries-and-Plugins",
-				"FAQ": "manual/ja/introduction/FAQ",
-				"役にたつリンク集": "manual/ja/introduction/Useful-links"
-			},
-
-			"次の段階": {
-				"更新の仕方": "manual/ja/introduction/How-to-update-things",
-				"オブジェクトを廃棄する方法": "manual/ja/introduction/How-to-dispose-of-objects",
-				"VRコンテンツの作り方": "manual/ja/introduction/How-to-create-VR-content",
-				"post-processingの使い方": "manual/ja/introduction/How-to-use-post-processing",
-				"行列の変換": "manual/ja/introduction/Matrix-transformations",
-				"アニメーションシステム": "manual/ja/introduction/Animation-system"
-			}
-
-		}
-
-	},
-
 	"it": {
-
-		"Manuale": {
-
-			"Per iniziare": {
-				"Installazione": "manual/it/introduction/Installation",
-				"Creare una scena": "manual/it/introduction/Creating-a-scene",
-				"Controllo compatibilità WebGL": "manual/it/introduction/WebGL-compatibility-check",
-				"Disegnare linee": "manual/it/introduction/Drawing-lines",
-				"Creare testo": "manual/it/introduction/Creating-text",
-				"Caricare modelli 3D": "manual/it/introduction/Loading-3D-models",
-				"Librerie e Plugins": "manual/it/introduction/Libraries-and-Plugins",
-				"FAQ": "manual/it/introduction/FAQ",
-				"Link utili": "manual/it/introduction/Useful-links"
-			},
-
-			"Prossimi passi": {
-				"Come aggiornare le cose": "manual/it/introduction/How-to-update-things",
-				"Come liberare le risorse": "manual/it/introduction/How-to-dispose-of-objects",
-				"Come creare contenuti VR": "manual/it/introduction/How-to-create-VR-content",
-				"Come utilizzare il post-processing": "manual/it/introduction/How-to-use-post-processing",
-				"Trasformazioni di matrici": "manual/it/introduction/Matrix-transformations",
-				"Sistema di animazione": "manual/it/introduction/Animation-system",
-				"Gestione del colore": "manual/it/introduction/Color-management"
-			}
-
-		},
 
 		"Riferimenti": {
 
@@ -1734,32 +1567,6 @@
 	},
 	"pt-br": {
 
-		"Manual": {
-
-			"Comece a usar": {
-				"Instalação": "manual/pt-br/introduction/Installation",
-				"Criando uma cena": "manual/pt-br/introduction/Creating-a-scene",
-				"Compatibilidade WebGL": "manual/pt-br/introduction/WebGL-compatibility-check",
-				"Desenhando linhas": "manual/pt-br/introduction/Drawing-lines",
-				"Criando texto": "manual/pt-br/introduction/Creating-text",
-				"Carregando modelos 3D": "manual/pt-br/introduction/Loading-3D-models",
-				"Bibliotecas e Plugins": "manual/pt-br/introduction/Libraries-and-Plugins",
-				"FAQ": "manual/pt-br/introduction/FAQ",
-				"Links úteis": "manual/pt-br/introduction/Useful-links"
-			},
-
-			"Próximos Passos": {
-				"Como atualizar as coisas": "manual/pt-br/introduction/How-to-update-things",
-				"Como descartar objetos": "manual/pt-br/introduction/How-to-dispose-of-objects",
-				"Como criar conteúdo de VR": "manual/pt-br/introduction/How-to-create-VR-content",
-				"Como usar o pós-processamento": "manual/pt-br/introduction/How-to-use-post-processing",
-				"Transformações de matriz": "manual/pt-br/introduction/Matrix-transformations",
-				"Sistema de animação": "manual/pt-br/introduction/Animation-system",
-				"Gerenciamento de cor": "manual/pt-br/introduction/Color-management"
-			}
-
-		},
-
 		"Referência": {
 
 			"Animation": {
@@ -1814,32 +1621,6 @@
 	},
 
 	"fr": {
-
-		"Manuel": {
-
-			"Débuter": {
-				"Installation": "manual/fr/introduction/Installation",
-				"Créer une scène": "manual/fr/introduction/Creating-a-scene",
-				"Compatibilité WebGL": "manual/fr/introduction/WebGL-compatibility-check",
-				"Dessiner des lignes": "manual/fr/introduction/Drawing-lines",
-				"Créer un texte": "manual/fr/introduction/Creating-text",
-				"Importer des modèles 3D": "manual/fr/introduction/Loading-3D-models",
-				"Librairies et Plugins": "manual/fr/introduction/Libraries-and-Plugins",
-				"FAQ": "manual/fr/introduction/FAQ",
-				"Liens Utiles": "manual/fr/introduction/Useful-links"
-			},
-
-			"Étapes Suivantes": {
-				"Mettre les éléments à jour": "manual/fr/introduction/How-to-update-things",
-				"Supprimer un objet": "manual/fr/introduction/How-to-dispose-of-objects",
-				"Créer du contenu VR": "manual/fr/introduction/How-to-create-VR-content",
-				"Utiliser le post-processing": "manual/fr/introduction/How-to-use-post-processing",
-				"Matrices de transformation": "manual/fr/introduction/Matrix-transformations",
-				"Système d'animation": "manual/fr/introduction/Animation-system",
-				"Gestion des couleurs": "manual/fr/introduction/Color-management"
-			}
-
-		},
 
 		"Référence": {
 
@@ -1939,432 +1720,6 @@
 
 		}
 
-	},
-
-	"ru": {
-
-		"Руководство": {
-
-			"Приступая к работе": {
-				"Установка": "manual/ru/introduction/Installation",
-				"Создание сцены": "manual/ru/introduction/Creating-a-scene",
-				"Проверка совместимости с WebGL": "manual/ru/introduction/WebGL-compatibility-check",
-				"Рисование линий": "manual/ru/introduction/Drawing-lines",
-				"Создание текста": "manual/ru/introduction/Creating-text",
-				"Загрузка 3D-моделей": "manual/ru/introduction/Loading-3D-models",
-				"Библиотеки и плагины": "manual/ru/introduction/Libraries-and-Plugins",
-				"Часто задаваемые вопросы": "manual/ru/introduction/FAQ",
-				"Полезные ссылки": "manual/ru/introduction/Useful-links"
-			},
-
-			"Next Steps": {
-				"How to update things": "manual/en/introduction/How-to-update-things",
-				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
-				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
-				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
-				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
-				"Animation system": "manual/en/introduction/Animation-system",
-				"Color management": "manual/en/introduction/Color-management"
-			}
-
-		},
-
-		"Reference": {
-
-			"Animation": {
-				"AnimationAction": "api/en/animation/AnimationAction",
-				"AnimationClip": "api/en/animation/AnimationClip",
-				"AnimationMixer": "api/en/animation/AnimationMixer",
-				"AnimationObjectGroup": "api/en/animation/AnimationObjectGroup",
-				"AnimationUtils": "api/en/animation/AnimationUtils",
-				"KeyframeTrack": "api/en/animation/KeyframeTrack",
-				"PropertyBinding": "api/en/animation/PropertyBinding",
-				"PropertyMixer": "api/en/animation/PropertyMixer"
-			},
-
-			"Animation / Tracks": {
-				"BooleanKeyframeTrack": "api/en/animation/tracks/BooleanKeyframeTrack",
-				"ColorKeyframeTrack": "api/en/animation/tracks/ColorKeyframeTrack",
-				"NumberKeyframeTrack": "api/en/animation/tracks/NumberKeyframeTrack",
-				"QuaternionKeyframeTrack": "api/en/animation/tracks/QuaternionKeyframeTrack",
-				"StringKeyframeTrack": "api/en/animation/tracks/StringKeyframeTrack",
-				"VectorKeyframeTrack": "api/en/animation/tracks/VectorKeyframeTrack"
-			},
-
-			"Audio": {
-				"Audio": "api/en/audio/Audio",
-				"AudioAnalyser": "api/en/audio/AudioAnalyser",
-				"AudioContext": "api/en/audio/AudioContext",
-				"AudioListener": "api/en/audio/AudioListener",
-				"PositionalAudio": "api/en/audio/PositionalAudio"
-			},
-
-			"Cameras": {
-				"ArrayCamera": "api/en/cameras/ArrayCamera",
-				"Camera": "api/en/cameras/Camera",
-				"CubeCamera": "api/en/cameras/CubeCamera",
-				"OrthographicCamera": "api/en/cameras/OrthographicCamera",
-				"PerspectiveCamera": "api/en/cameras/PerspectiveCamera",
-				"StereoCamera": "api/en/cameras/StereoCamera"
-			},
-
-			"Constants": {
-				"Animation": "api/en/constants/Animation",
-				"Core": "api/en/constants/Core",
-				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
-				"BufferAttributeUsage": "api/en/constants/BufferAttributeUsage",
-				"Materials": "api/en/constants/Materials",
-				"Renderer": "api/en/constants/Renderer",
-				"Textures": "api/en/constants/Textures"
-			},
-
-			"Core": {
-				"BufferAttribute": "api/en/core/BufferAttribute",
-				"BufferGeometry": "api/en/core/BufferGeometry",
-				"Clock": "api/en/core/Clock",
-				"EventDispatcher": "api/en/core/EventDispatcher",
-				"GLBufferAttribute": "api/en/core/GLBufferAttribute",
-				"InstancedBufferAttribute": "api/en/core/InstancedBufferAttribute",
-				"InstancedBufferGeometry": "api/en/core/InstancedBufferGeometry",
-				"InstancedInterleavedBuffer": "api/en/core/InstancedInterleavedBuffer",
-				"InterleavedBuffer": "api/en/core/InterleavedBuffer",
-				"InterleavedBufferAttribute": "api/en/core/InterleavedBufferAttribute",
-				"Layers": "api/en/core/Layers",
-				"Object3D": "api/en/core/Object3D",
-				"Raycaster": "api/en/core/Raycaster",
-				"Uniform": "api/en/core/Uniform"
-			},
-
-			"Core / BufferAttributes": {
-				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
-			},
-
-			"Extras": {
-				"DataUtils": "api/en/extras/DataUtils",
-				"Earcut": "api/en/extras/Earcut",
-				"ImageUtils": "api/en/extras/ImageUtils",
-				"PMREMGenerator": "api/en/extras/PMREMGenerator",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
-			},
-
-			"Extras / Core": {
-				"Curve": "api/en/extras/core/Curve",
-				"CurvePath": "api/en/extras/core/CurvePath",
-				"Interpolations": "api/en/extras/core/Interpolations",
-				"Path": "api/en/extras/core/Path",
-				"Shape": "api/en/extras/core/Shape",
-				"ShapePath": "api/en/extras/core/ShapePath"
-			},
-
-			"Extras / Curves": {
-				"ArcCurve": "api/en/extras/curves/ArcCurve",
-				"CatmullRomCurve3": "api/en/extras/curves/CatmullRomCurve3",
-				"CubicBezierCurve": "api/en/extras/curves/CubicBezierCurve",
-				"CubicBezierCurve3": "api/en/extras/curves/CubicBezierCurve3",
-				"EllipseCurve": "api/en/extras/curves/EllipseCurve",
-				"LineCurve": "api/en/extras/curves/LineCurve",
-				"LineCurve3": "api/en/extras/curves/LineCurve3",
-				"QuadraticBezierCurve": "api/en/extras/curves/QuadraticBezierCurve",
-				"QuadraticBezierCurve3": "api/en/extras/curves/QuadraticBezierCurve3",
-				"SplineCurve": "api/en/extras/curves/SplineCurve"
-			},
-
-			"Geometries": {
-				"BoxGeometry": "api/en/geometries/BoxGeometry",
-				"CapsuleGeometry": "api/en/geometries/CapsuleGeometry",
-				"CircleGeometry": "api/en/geometries/CircleGeometry",
-				"ConeGeometry": "api/en/geometries/ConeGeometry",
-				"CylinderGeometry": "api/en/geometries/CylinderGeometry",
-				"DodecahedronGeometry": "api/en/geometries/DodecahedronGeometry",
-				"EdgesGeometry": "api/en/geometries/EdgesGeometry",
-				"ExtrudeGeometry": "api/en/geometries/ExtrudeGeometry",
-				"IcosahedronGeometry": "api/en/geometries/IcosahedronGeometry",
-				"LatheGeometry": "api/en/geometries/LatheGeometry",
-				"OctahedronGeometry": "api/en/geometries/OctahedronGeometry",
-				"PlaneGeometry": "api/en/geometries/PlaneGeometry",
-				"PolyhedronGeometry": "api/en/geometries/PolyhedronGeometry",
-				"RingGeometry": "api/en/geometries/RingGeometry",
-				"ShapeGeometry": "api/en/geometries/ShapeGeometry",
-				"SphereGeometry": "api/en/geometries/SphereGeometry",
-				"TetrahedronGeometry": "api/en/geometries/TetrahedronGeometry",
-				"TorusGeometry": "api/en/geometries/TorusGeometry",
-				"TorusKnotGeometry": "api/en/geometries/TorusKnotGeometry",
-				"TubeGeometry": "api/en/geometries/TubeGeometry",
-				"WireframeGeometry": "api/en/geometries/WireframeGeometry"
-			},
-
-			"Helpers": {
-				"ArrowHelper": "api/en/helpers/ArrowHelper",
-				"AxesHelper": "api/en/helpers/AxesHelper",
-				"BoxHelper": "api/en/helpers/BoxHelper",
-				"Box3Helper": "api/en/helpers/Box3Helper",
-				"CameraHelper": "api/en/helpers/CameraHelper",
-				"DirectionalLightHelper": "api/en/helpers/DirectionalLightHelper",
-				"GridHelper": "api/en/helpers/GridHelper",
-				"PolarGridHelper": "api/en/helpers/PolarGridHelper",
-				"HemisphereLightHelper": "api/en/helpers/HemisphereLightHelper",
-				"PlaneHelper": "api/en/helpers/PlaneHelper",
-				"PointLightHelper": "api/en/helpers/PointLightHelper",
-				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
-				"SpotLightHelper": "api/en/helpers/SpotLightHelper"
-			},
-
-			"Lights": {
-				"AmbientLight": "api/en/lights/AmbientLight",
-				"DirectionalLight": "api/en/lights/DirectionalLight",
-				"HemisphereLight": "api/en/lights/HemisphereLight",
-				"Light": "api/en/lights/Light",
-				"LightProbe": "api/en/lights/LightProbe",
-				"PointLight": "api/en/lights/PointLight",
-				"RectAreaLight": "api/en/lights/RectAreaLight",
-				"SpotLight": "api/en/lights/SpotLight"
-			},
-
-			"Lights / Shadows": {
-				"LightShadow": "api/en/lights/shadows/LightShadow",
-				"PointLightShadow": "api/en/lights/shadows/PointLightShadow",
-				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
-				"SpotLightShadow": "api/en/lights/shadows/SpotLightShadow"
-			},
-
-			"Loaders": {
-				"AnimationLoader": "api/en/loaders/AnimationLoader",
-				"AudioLoader": "api/en/loaders/AudioLoader",
-				"BufferGeometryLoader": "api/en/loaders/BufferGeometryLoader",
-				"Cache": "api/en/loaders/Cache",
-				"CompressedTextureLoader": "api/en/loaders/CompressedTextureLoader",
-				"CubeTextureLoader": "api/en/loaders/CubeTextureLoader",
-				"DataTextureLoader": "api/en/loaders/DataTextureLoader",
-				"FileLoader": "api/en/loaders/FileLoader",
-				"ImageBitmapLoader": "api/en/loaders/ImageBitmapLoader",
-				"ImageLoader": "api/en/loaders/ImageLoader",
-				"Loader": "api/en/loaders/Loader",
-				"LoaderUtils": "api/en/loaders/LoaderUtils",
-				"MaterialLoader": "api/en/loaders/MaterialLoader",
-				"ObjectLoader": "api/en/loaders/ObjectLoader",
-				"TextureLoader": "api/en/loaders/TextureLoader"
-			},
-
-			"Loaders / Managers": {
-				"DefaultLoadingManager": "api/en/loaders/managers/DefaultLoadingManager",
-				"LoadingManager": "api/en/loaders/managers/LoadingManager"
-			},
-
-			"Materials": {
-				"LineBasicMaterial": "api/en/materials/LineBasicMaterial",
-				"LineDashedMaterial": "api/en/materials/LineDashedMaterial",
-				"Material": "api/en/materials/Material",
-				"MeshBasicMaterial": "api/en/materials/MeshBasicMaterial",
-				"MeshDepthMaterial": "api/en/materials/MeshDepthMaterial",
-				"MeshDistanceMaterial": "api/en/materials/MeshDistanceMaterial",
-				"MeshLambertMaterial": "api/en/materials/MeshLambertMaterial",
-				"MeshMatcapMaterial": "api/en/materials/MeshMatcapMaterial",
-				"MeshNormalMaterial": "api/en/materials/MeshNormalMaterial",
-				"MeshPhongMaterial": "api/en/materials/MeshPhongMaterial",
-				"MeshPhysicalMaterial": "api/en/materials/MeshPhysicalMaterial",
-				"MeshStandardMaterial": "api/en/materials/MeshStandardMaterial",
-				"MeshToonMaterial": "api/en/materials/MeshToonMaterial",
-				"PointsMaterial": "api/en/materials/PointsMaterial",
-				"RawShaderMaterial": "api/en/materials/RawShaderMaterial",
-				"ShaderMaterial": "api/en/materials/ShaderMaterial",
-				"ShadowMaterial": "api/en/materials/ShadowMaterial",
-				"SpriteMaterial": "api/en/materials/SpriteMaterial"
-			},
-
-			"Math": {
-				"Box2": "api/en/math/Box2",
-				"Box3": "api/en/math/Box3",
-				"Color": "api/en/math/Color",
-				"Cylindrical": "api/en/math/Cylindrical",
-				"Euler": "api/en/math/Euler",
-				"Frustum": "api/en/math/Frustum",
-				"Interpolant": "api/en/math/Interpolant",
-				"Line3": "api/en/math/Line3",
-				"MathUtils": "api/en/math/MathUtils",
-				"Matrix3": "api/en/math/Matrix3",
-				"Matrix4": "api/en/math/Matrix4",
-				"Plane": "api/en/math/Plane",
-				"Quaternion": "api/en/math/Quaternion",
-				"Ray": "api/en/math/Ray",
-				"Sphere": "api/en/math/Sphere",
-				"Spherical": "api/en/math/Spherical",
-				"SphericalHarmonics3": "api/en/math/SphericalHarmonics3",
-				"Triangle": "api/en/math/Triangle",
-				"Vector2": "api/en/math/Vector2",
-				"Vector3": "api/en/math/Vector3",
-				"Vector4": "api/en/math/Vector4"
-			},
-
-			"Math / Interpolants": {
-				"CubicInterpolant": "api/en/math/interpolants/CubicInterpolant",
-				"DiscreteInterpolant": "api/en/math/interpolants/DiscreteInterpolant",
-				"LinearInterpolant": "api/en/math/interpolants/LinearInterpolant",
-				"QuaternionLinearInterpolant": "api/en/math/interpolants/QuaternionLinearInterpolant"
-			},
-
-			"Objects": {
-				"Bone": "api/en/objects/Bone",
-				"Group": "api/en/objects/Group",
-				"InstancedMesh": "api/en/objects/InstancedMesh",
-				"Line": "api/en/objects/Line",
-				"LineLoop": "api/en/objects/LineLoop",
-				"LineSegments": "api/en/objects/LineSegments",
-				"LOD": "api/en/objects/LOD",
-				"Mesh": "api/en/objects/Mesh",
-				"Points": "api/en/objects/Points",
-				"Skeleton": "api/en/objects/Skeleton",
-				"SkinnedMesh": "api/en/objects/SkinnedMesh",
-				"Sprite": "api/en/objects/Sprite"
-			},
-
-			"Renderers": {
-				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
-				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
-				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
-				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
-				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
-			},
-
-			"Renderers / Shaders": {
-				"ShaderChunk": "api/en/renderers/shaders/ShaderChunk",
-				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
-				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
-				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
-			},
-
-			"Renderers / WebXR": {
-				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
-			},
-
-			"Scenes": {
-				"Fog": "api/en/scenes/Fog",
-				"FogExp2": "api/en/scenes/FogExp2",
-				"Scene": "api/en/scenes/Scene"
-			},
-
-			"Textures": {
-				"CanvasTexture": "api/en/textures/CanvasTexture",
-				"CompressedTexture": "api/en/textures/CompressedTexture",
-				"CompressedArrayTexture": "api/en/textures/CompressedArrayTexture",
-				"CubeTexture": "api/en/textures/CubeTexture",
-				"Data3DTexture": "api/en/textures/Data3DTexture",
-				"DataArrayTexture": "api/en/textures/DataArrayTexture",
-				"DataTexture": "api/en/textures/DataTexture",
-				"DepthTexture": "api/en/textures/DepthTexture",
-				"FramebufferTexture": "api/en/textures/FramebufferTexture",
-				"Source": "api/en/textures/Source",
-				"Texture": "api/en/textures/Texture",
-				"VideoTexture": "api/en/textures/VideoTexture"
-			}
-
-		},
-
-		"Examples": {
-
-			"Animations": {
-				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/en/animations/MMDPhysics"
-			},
-
-			"Controls": {
-				"ArcballControls": "examples/en/controls/ArcballControls",
-				"DragControls": "examples/en/controls/DragControls",
-				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
-				"FlyControls": "examples/en/controls/FlyControls",
-				"OrbitControls": "examples/en/controls/OrbitControls",
-				"PointerLockControls": "examples/en/controls/PointerLockControls",
-				"TrackballControls": "examples/en/controls/TrackballControls",
-				"TransformControls": "examples/en/controls/TransformControls"
-			},
-
-			"Geometries": {
-				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/en/geometries/DecalGeometry",
-				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"TextGeometry": "examples/en/geometries/TextGeometry"
-			},
-
-			"Helpers": {
-				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
-				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
-				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
-				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
-				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
-			},
-
-			"Lights": {
-				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
-			},
-
-			"Loaders": {
-				"3DMLoader": "examples/en/loaders/3DMLoader",
-				"DRACOLoader": "examples/en/loaders/DRACOLoader",
-				"FontLoader": "examples/en/loaders/FontLoader",
-				"GLTFLoader": "examples/en/loaders/GLTFLoader",
-				"KTX2Loader": "examples/en/loaders/KTX2Loader",
-				"LDrawLoader": "examples/en/loaders/LDrawLoader",
-				"MMDLoader": "examples/en/loaders/MMDLoader",
-				"MTLLoader": "examples/en/loaders/MTLLoader",
-				"OBJLoader": "examples/en/loaders/OBJLoader",
-				"PCDLoader": "examples/en/loaders/PCDLoader",
-				"PDBLoader": "examples/en/loaders/PDBLoader",
-				"SVGLoader": "examples/en/loaders/SVGLoader",
-				"TGALoader": "examples/en/loaders/TGALoader"
-			},
-
-			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
-			},
-
-			"Post-Processing": {
-				"EffectComposer": "examples/en/postprocessing/EffectComposer"
-			},
-
-			"Exporters": {
-				"EXRExporter": "examples/en/exporters/EXRExporter",
-				"GLTFExporter": "examples/en/exporters/GLTFExporter",
-				"OBJExporter": "examples/en/exporters/OBJExporter",
-				"PLYExporter": "examples/en/exporters/PLYExporter"
-			},
-
-			"Math": {
-				"LookupTable": "examples/en/math/Lut",
-				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
-				"OBB": "examples/en/math/OBB"
-			},
-
-			"ConvexHull": {
-				"Face": "examples/en/math/convexhull/Face",
-				"HalfEdge": "examples/en/math/convexhull/HalfEdge",
-				"ConvexHull": "examples/en/math/convexhull/ConvexHull",
-				"VertexNode": "examples/en/math/convexhull/VertexNode",
-				"VertexList": "examples/en/math/convexhull/VertexList"
-			},
-
-			"Renderers": {
-				"CSS2DRenderer": "examples/en/renderers/CSS2DRenderer",
-				"CSS3DRenderer": "examples/en/renderers/CSS3DRenderer",
-				"SVGRenderer": "examples/en/renderers/SVGRenderer"
-
-			},
-
-			"Utils": {
-				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
-				"CameraUtils": "examples/en/utils/CameraUtils",
-				"SceneUtils": "examples/en/utils/SceneUtils",
-				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
-			}
-
-		},
-
-		"Developer Reference": {
-
-			"WebGLRenderer": {
-				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
-			}
-
-		}
-
 	}
+
 }
