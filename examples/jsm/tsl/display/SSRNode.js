@@ -389,7 +389,7 @@ class SSRNode extends TempNode {
 			// it does not exceed d1 (the maximum ray extend)
 			Loop( totalStep, ( { i } ) => {
 
-				// advance on the ray by computing a new position in screen space
+				// advance on the ray by computing a new position in screen coordinates
 				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
 
 				// stop processing if the new position lies outside of the screen
@@ -399,11 +399,10 @@ class SSRNode extends TempNode {
 
 				} );
 
-				// compute new uv, depth, viewZ and viewPosition for the new location on the ray
+				// compute new uv, depth, viewZ and viewPosition for the next fragment
 				const uvNode = xy.div( this._resolution );
 				const d = sampleDepth( uvNode ).toVar();
 				const vZ = getViewZ( d ).toVar();
-				const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 
 				const viewReflectRayZ = float( 0 ).toVar();
 
@@ -427,6 +426,7 @@ class SSRNode extends TempNode {
 
 					// compute the distance of the new location to the ray in view space
 					// to clarify vP is the fragment's view position which is not an exact point on the ray
+					const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 					const away = pointToLineDistance( vP, viewPosition, d1viewPosition ).toVar();
 
 					// compute the minimum thickness between the current fragment and its neighbor in the x-direction.
