@@ -70,15 +70,15 @@ class SSRNode extends TempNode {
 		this.camera = camera;
 
 		/**
-		 * The resolution scale. By default SSR reflections
-		 * are computed in half resolutions. Setting the value
-		 * to `1` improves quality but also results in more
-		 * computational overhead.
+		 * The resolution scale. Valid values are in the range
+		 * `[0,1]`. `1` means best quality but also results in
+		 * more computational overhead. Setting to `0.5` means
+		 * the effect is computed in half-resolution.
 		 *
 		 * @type {number}
-		 * @default 0.5
+		 * @default 1
 		 */
-		this.resolutionScale = 0.5;
+		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -99,8 +99,8 @@ class SSRNode extends TempNode {
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
-		 * Controls how far a fragment can reflect.
-		 *
+		 * Controls how far a fragment can reflect. Increasing this value result in more
+		 * computational overhead but also increases the reflection distance.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -114,11 +114,24 @@ class SSRNode extends TempNode {
 		this.thickness = uniform( 0.1 );
 
 		/**
-		 * Controls the transparency of the reflected colors.
+		 * Controls how the SSR reflections are blended with the beauty pass.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.opacity = uniform( 1 );
+
+		/**
+		 * This parameter controls how detailed the raymarching process works.
+		 * The value ranges is `[0,1]` where `1` means best quality (the maximum number
+		 * of raymarching iterations/samples) and `0` means no samples at all.
+		 *
+		 * A quality of `0.5` is usually sufficient for most use cases. Try to keep
+		 * this parameter as low as possible. Larger values result in noticable more
+		 * overhead.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.quality = uniform( 0.5 );
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -169,15 +182,6 @@ class SSRNode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 
 		/**
-		 * This value is derived from the resolution and restricts
-		 * the maximum raymarching steps in the fragment shader.
-		 *
-		 * @private
-		 * @type {UniformNode<float>}
-		 */
-		this._maxStep = uniform( 0 );
-
-		/**
 		 * The material that is used to render the effect.
 		 *
 		 * @private
@@ -219,8 +223,6 @@ class SSRNode extends TempNode {
 		height = Math.round( this.resolutionScale * height );
 
 		this._resolution.value.set( width, height );
-		this._maxStep.value = Math.round( Math.sqrt( width * width + height * height ) );
-
 		this._ssrRenderTarget.setSize( width, height );
 
 	}
@@ -374,7 +376,7 @@ class SSRNode extends TempNode {
 			// determine the larger delta
 			// The larger difference will help to determine how much to travel in the X and Y direction each iteration and
 			// how many iterations are needed to travel the entire ray
-			const totalStep = max( abs( xLen ), abs( yLen ) ).toVar();
+			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
 
 			// step sizes in the x and y directions
 			const xSpan = xLen.div( totalStep ).toVar();
@@ -385,23 +387,9 @@ class SSRNode extends TempNode {
 			// the actual ray marching loop
 			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
-			Loop( { start: int( 0 ), end: int( this._maxStep ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( totalStep, ( { i } ) => {
 
-				// TODO: Remove this when Chrome is fixed, see https://issues.chromium.org/issues/372714384#comment14
-				If( metalness.equal( 0 ), () => {
-
-					Break();
-
-				} );
-
-				// stop if the maximum number of steps is reached for this specific ray
-				If( float( i ).greaterThanEqual( totalStep ), () => {
-
-					Break();
-
-				} );
-
-				// advance on the ray by computing a new position in screen space
+				// advance on the ray by computing a new position in screen coordinates
 				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
 
 				// stop processing if the new position lies outside of the screen
@@ -411,11 +399,10 @@ class SSRNode extends TempNode {
 
 				} );
 
-				// compute new uv, depth, viewZ and viewPosition for the new location on the ray
+				// compute new uv, depth and viewZ for the next fragment
 				const uvNode = xy.div( this._resolution );
 				const d = sampleDepth( uvNode ).toVar();
 				const vZ = getViewZ( d ).toVar();
-				const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 
 				const viewReflectRayZ = float( 0 ).toVar();
 
@@ -439,6 +426,7 @@ class SSRNode extends TempNode {
 
 					// compute the distance of the new location to the ray in view space
 					// to clarify vP is the fragment's view position which is not an exact point on the ray
+					const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 					const away = pointToLineDistance( vP, viewPosition, d1viewPosition ).toVar();
 
 					// compute the minimum thickness between the current fragment and its neighbor in the x-direction.
