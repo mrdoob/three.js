@@ -665,15 +665,7 @@ ${ this.tab }} )`;
 
 			}
 
-			if ( node.linker.assignments.length > 0 ) {
-
-				varStr += ' = ' + valueStr + '.toVar()';
-
-			} else {
-
-				varStr += ' = ' + valueStr;
-
-			}
+			varStr += ' = ' + valueStr;
 
 		} else {
 
