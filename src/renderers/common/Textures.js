@@ -331,7 +331,7 @@ class Textures extends DataMap {
 
 			if ( texture.isVideoTexture && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
 
-				console.warn( 'Textures: VideoTexture only supports SRGBColorSpace.' );
+				console.warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
 
 			}
 
