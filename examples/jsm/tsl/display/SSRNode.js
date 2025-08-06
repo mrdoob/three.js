@@ -399,7 +399,7 @@ class SSRNode extends TempNode {
 
 				} );
 
-				// compute new uv, depth, viewZ and viewPosition for the next fragment
+				// compute new uv, depth and viewZ for the next fragment
 				const uvNode = xy.div( this._resolution );
 				const d = sampleDepth( uvNode ).toVar();
 				const vZ = getViewZ( d ).toVar();
