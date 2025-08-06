@@ -67,6 +67,12 @@ class AnimationClip {
 		 */
 		this.uuid = generateUUID();
 
+		/**
+		 * An object that can be used to store custom data about the animation clip.
+		 * It should not hold references to functions as these will not be cloned.
+		 *
+		 * @type {Object}
+		 */
 		this.userData = {};
 
 		// this means it should figure out its duration by scanning the tracks
