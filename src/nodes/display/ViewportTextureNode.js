@@ -98,6 +98,15 @@ class ViewportTextureNode extends TextureNode {
 
 	}
 
+	/**
+	 * This methods returns a framebuffer texture for the given render target reference.
+	 *
+	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
+	 * for different render contexts.
+	 *
+	 * @param {?RenderTarget} [reference=null] - The render target reference.
+	 * @return {Texture} The framebuffer texture.
+	 */
 	getFrameBufferTexture( reference = null ) {
 
 		let defaultFramebuffer;
