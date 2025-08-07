@@ -543,8 +543,7 @@ function getCanvas() {
 
 function getToBlobPromise( canvas, mimeType ) {
 
-	// fix for Firefox 141.0.2+ not executing resolve function within the toBlob method of OffscreenCanvas
-	if ( ( canvas instanceof OffscreenCanvas ) === false )
+	if ( ( canvas instanceof OffscreenCanvas ) === false ) {
 
 		return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
 
