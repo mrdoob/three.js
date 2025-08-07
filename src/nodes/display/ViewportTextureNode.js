@@ -9,8 +9,6 @@ import { LinearMipmapLinearFilter } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
-const _textures = /*@__PURE__*/ new WeakMap();
-
 /**
  * A special type of texture node which represents the data of the current viewport
  * as a texture. The module extracts data from the current bound framebuffer with
@@ -90,11 +88,32 @@ class ViewportTextureNode extends TextureNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * The framebuffer texture for the current renderer context.
+		 *
+		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
+		 * @private
+		 */
+		this._cacheTextures = new WeakMap();
+
 	}
 
 	getFrameBufferTexture( reference = null ) {
 
-		const defaultFramebuffer = this.referenceNode ? this.referenceNode.defaultFramebuffer : this.defaultFramebuffer;
+		let defaultFramebuffer;
+		let cacheTextures;
+
+		if ( this.referenceNode ) {
+
+			defaultFramebuffer = this.referenceNode.defaultFramebuffer;
+			cacheTextures = this.referenceNode._cacheTextures;
+
+		} else {
+
+			defaultFramebuffer = this.defaultFramebuffer;
+			cacheTextures = this._cacheTextures;
+
+		}
 
 		if ( reference === null ) {
 
@@ -102,15 +121,15 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
-		if ( _textures.has( reference ) === false ) {
+		if ( cacheTextures.has( reference ) === false ) {
 
 			const framebufferTexture = defaultFramebuffer.clone();
 
-			_textures.set( reference, framebufferTexture );
+			cacheTextures.set( reference, framebufferTexture );
 
 		}
 
-		return _textures.get( reference );
+		return cacheTextures.get( reference );
 
 	}
 
