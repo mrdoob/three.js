@@ -77,7 +77,7 @@ export default /* glsl */`
 
 		float depth = unpackRGBAToDepth( texture2D( depths, uv ) );
 
-		#ifdef USE_REVERSEDEPTHBUF
+		#ifdef USE_REVERSED_DEPTH_BUFFER
 
 			return step( depth, compare );
 
@@ -101,7 +101,7 @@ export default /* glsl */`
 
 		vec2 distribution = texture2DDistribution( shadow, uv );
 
-		#ifdef USE_REVERSEDEPTHBUF
+		#ifdef USE_REVERSED_DEPTH_BUFFER
 
 			float hard_shadow = step( distribution.x, compare ); // Hard Shadow
 
