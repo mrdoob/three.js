@@ -39,6 +39,12 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 	}
 
+	getFrameBufferTexture() {
+
+		return _sharedFramebuffer;
+
+	}
+
 	updateReference() {
 
 		return this;
