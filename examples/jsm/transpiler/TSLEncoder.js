@@ -340,7 +340,7 @@ class TSLEncoder {
 
 			if ( node.hasAssignment ) {
 
-				if ( node.after === false ) {
+				if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
 
 					type += 'Before';
 
