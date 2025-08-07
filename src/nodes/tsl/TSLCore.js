@@ -322,12 +322,12 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 class ShaderCallNodeInternal extends Node {
 
-	constructor( shaderNode, inputNodes ) {
+	constructor( shaderNode, rawInputs ) {
 
 		super();
 
 		this.shaderNode = shaderNode;
-		this.inputNodes = inputNodes;
+		this.rawInputs = rawInputs;
 
 		this.isShaderCallNodeInternal = true;
 
@@ -347,7 +347,7 @@ class ShaderCallNodeInternal extends Node {
 
 	call( builder ) {
 
-		const { shaderNode, inputNodes } = this;
+		const { shaderNode, rawInputs } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
 
@@ -392,43 +392,13 @@ class ShaderCallNodeInternal extends Node {
 
 			builder.addInclude( functionNode );
 
-			result = nodeObject( functionNode.call( inputNodes ) );
+			//
+
+			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
+
+			result = nodeObject( functionNode.call( inputs ) );
 
 		} else {
-
-			let inputs = inputNodes;
-
-			if ( Array.isArray( inputs ) ) {
-
-				// If inputs is an array, we need to convert it to a Proxy
-				// so we can call TSL functions using the syntax `Fn( ( { r, g, b } ) => { ... } )`
-				// and call through `fn( 0, 1, 0 )` or `fn( { r: 0, g: 1, b: 0 } )`
-
-				let index = 0;
-
-				inputs = new Proxy( inputs, {
-
-					get: ( target, property, receiver ) => {
-
-						let value;
-
-						if ( target[ property ] === undefined ) {
-
-							value = target[ index ++ ];
-
-						} else {
-
-							value = Reflect.get( target, property, receiver );
-
-						}
-
-						return value;
-
-					}
-
-				} );
-
-			}
 
 			const secureNodeBuilder = new Proxy( builder, {
 
@@ -456,8 +426,14 @@ class ShaderCallNodeInternal extends Node {
 
 			} );
 
+			//
+
+			const inputs = rawInputs ? getProxyParameters( rawInputs ) : null;
+
+			const hasParameters = Array.isArray( rawInputs ) ? rawInputs.length > 0 : rawInputs !== null;
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputs !== null || jsFunc.length > 1 ? jsFunc( inputs || [], secureNodeBuilder ) : jsFunc( secureNodeBuilder );
+			const outputNode = hasParameters || jsFunc.length > 1 ? jsFunc( inputs, secureNodeBuilder ) : jsFunc( secureNodeBuilder );
 
 			result = nodeObject( outputNode );
 
@@ -560,6 +536,110 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
+function getLayoutParameters( params ) {
+
+	let output;
+
+	nodeObjects( params );
+
+	const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+	if ( isArrayAsParameter ) {
+
+		output = [ ...params ];
+
+	} else {
+
+		output = params[ 0 ];
+
+	}
+
+	return output;
+
+}
+
+function getProxyParameters( params ) {
+
+	let index = 0;
+
+	nodeObjects( params );
+
+	return new Proxy( params, {
+
+		get: ( target, property, receiver ) => {
+
+			let value;
+
+			if ( property === 'length' ) {
+
+				value = params.length;
+
+				return value;
+
+			}
+
+			if ( Symbol.iterator === property ) {
+
+				value = function* () {
+
+					for ( const inputNode of params ) {
+
+						yield nodeObject( inputNode );
+
+					}
+
+				};
+
+			} else {
+
+				if ( params.length > 0 ) {
+
+					if ( Object.getPrototypeOf( params[ 0 ] ) === Object.prototype ) {
+
+						const objectTarget = params[ 0 ];
+
+						if ( objectTarget[ property ] === undefined ) {
+
+							value = objectTarget[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( objectTarget, property, receiver );
+
+						}
+
+					} else if ( params[ 0 ] instanceof Node ) {
+
+						if ( params[ property ] === undefined ) {
+
+							value = params[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( params, property, receiver );
+
+						}
+
+					}
+
+				} else {
+
+					value = Reflect.get( target, property, receiver );
+
+				}
+
+				value = nodeObject( value );
+
+			}
+
+			return value;
+
+		}
+
+	} );
+
+}
+
 class ShaderNodeInternal extends Node {
 
 	constructor( jsFunc, nodeType ) {
@@ -583,11 +663,9 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	call( inputs = null ) {
+	call( rawInputs = null ) {
 
-		nodeObjects( inputs );
-
-		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
+		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
 
 	}
 
@@ -799,23 +877,7 @@ class FnNode extends Node {
 
 	call( ...params ) {
 
-		let inputs;
-
-		nodeObjects( params );
-
-		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-		if ( isArrayAsParameter ) {
-
-			inputs = [ ...params ];
-
-		} else {
-
-			inputs = params[ 0 ];
-
-		}
-
-		const fnCall = this.shaderNode.call( inputs );
+		const fnCall = this.shaderNode.call( params );
 
 		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
 
