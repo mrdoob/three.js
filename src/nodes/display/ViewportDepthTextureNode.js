@@ -45,7 +45,7 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 	 *
 	 * @return {DepthTexture} The shared depth texture.
 	 */
-	getFrameBufferTexture() {
+	getTextureForReference() {
 
 		return _sharedDepthbuffer;
 

@@ -99,7 +99,7 @@ class ViewportTextureNode extends TextureNode {
 	}
 
 	/**
-	 * This methods returns a framebuffer texture for the given render target reference.
+	 * This methods returns a texture for the given render target reference.
 	 *
 	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
 	 * for different render contexts.
@@ -107,7 +107,7 @@ class ViewportTextureNode extends TextureNode {
 	 * @param {?RenderTarget} [reference=null] - The render target reference.
 	 * @return {Texture} The framebuffer texture.
 	 */
-	getFrameBufferTexture( reference = null ) {
+	getTextureForReference( reference = null ) {
 
 		let defaultFramebuffer;
 		let cacheTextures;
@@ -146,7 +146,7 @@ class ViewportTextureNode extends TextureNode {
 
 		const renderTarget = frame.renderer.getRenderTarget();
 
-		this.value = this.getFrameBufferTexture( renderTarget );
+		this.value = this.getTextureForReference( renderTarget );
 
 		return this.value;
 
@@ -169,7 +169,7 @@ class ViewportTextureNode extends TextureNode {
 
 		//
 
-		const framebufferTexture = this.getFrameBufferTexture( renderTarget );
+		const framebufferTexture = this.getTextureForReference( renderTarget );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
