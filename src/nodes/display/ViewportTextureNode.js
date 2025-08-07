@@ -9,6 +9,8 @@ import { LinearMipmapLinearFilter } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
+const _textures = /*@__PURE__*/ new WeakMap();
+
 /**
  * A special type of texture node which represents the data of the current viewport
  * as a texture. The module extracts data from the current bound framebuffer with
@@ -80,21 +82,13 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node renders the
-		 * scene once per render in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
+		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.RENDER;
-
-		/**
-		 * The framebuffer texture for the current renderer context.
-		 *
-		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
-		 * @private
-		 */
-		this._textures = new WeakMap();
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
@@ -108,15 +102,25 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
-		if ( this._textures.has( reference ) === false ) {
+		if ( _textures.has( reference ) === false ) {
 
 			const framebufferTexture = defaultFramebuffer.clone();
 
-			this._textures.set( reference, framebufferTexture );
+			_textures.set( reference, framebufferTexture );
 
 		}
 
-		return this._textures.get( reference );
+		return _textures.get( reference );
+
+	}
+
+	updateReference( frame ) {
+
+		const renderTarget = frame.renderer.getRenderTarget();
+
+		this.value = this.getFrameBufferTexture( renderTarget );
+
+		return this.value;
 
 	}
 
@@ -155,8 +159,6 @@ class ViewportTextureNode extends TextureNode {
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
 		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
-
-		this.value = framebufferTexture;
 
 	}
 
