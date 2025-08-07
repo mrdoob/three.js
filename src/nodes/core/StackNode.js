@@ -80,13 +80,13 @@ class StackNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.outputNode ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.outputNode ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.hasOutput ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -97,6 +97,13 @@ class StackNode extends Node {
 	 * @return {StackNode} A reference to this stack node.
 	 */
 	add( node ) {
+
+		if ( node.isNode !== true ) {
+
+			console.error( 'THREE.TSL: Invalid node added to stack.' );
+			return this;
+
+		}
 
 		this.nodes.push( node );
 
@@ -191,7 +198,7 @@ class StackNode extends Node {
 
 		} else {
 
-			throw new Error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			console.error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 
@@ -275,6 +282,12 @@ class StackNode extends Node {
 
 	}
 
+	get hasOutput() {
+
+		return this.outputNode && this.outputNode.isNode;
+
+	}
+
 	build( builder, ...params ) {
 
 		const previousBuildStack = builder.currentStack;
@@ -325,7 +338,19 @@ class StackNode extends Node {
 
 		}
 
-		const result = this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		//
+
+		let result;
+
+		if ( this.hasOutput ) {
+
+			result = this.outputNode.build( builder, ...params );
+
+		} else {
+
+			result = super.build( builder, ...params );
+
+		}
 
 		setCurrentStack( previousStack );
 

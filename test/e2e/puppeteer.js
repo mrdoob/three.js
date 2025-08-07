@@ -118,7 +118,7 @@ const exceptionList = [
 	'webgl_batch_lod_bvh',
 
 	// Intentional z-fighting in this demo makes it non-deterministic
-	'webgl_reverse_depth_buffer',
+	'webgl_reversed_depth_buffer',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?

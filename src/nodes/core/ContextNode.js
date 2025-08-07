@@ -132,6 +132,16 @@ export default ContextNode;
 export const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength( 1, 2 );
 
 /**
+ * TSL function for defining a uniformFlow context value for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node whose dependencies should all execute within a uniform control-flow path.
+ * @returns {ContextNode}
+ */
+export const uniformFlow = ( node ) => context( node, { uniformFlow: true } );
+
+/**
  * TSL function for defining a name for the context value for a given node.
  *
  * @tsl
@@ -162,4 +172,5 @@ export function label( node, name ) {
 
 addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
+addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );

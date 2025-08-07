@@ -271,7 +271,7 @@ export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( n
  */
 export const convertToTexture = ( node, ...params ) => {
 
-	if ( node.isTextureNode ) return node;
+	if ( node.isSampleNode || node.isTextureNode ) return node;
 	if ( node.isPassNode ) return node.getTextureNode();
 
 	return rtt( node, ...params );

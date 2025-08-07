@@ -1,5 +1,6 @@
 import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, NoColorSpace, LinearTransfer, SRGBTransfer } from '../../../constants.js';
 import { ColorManagement } from '../../../math/ColorManagement.js';
+import { getByteLength } from '../../../extras/TextureUtils.js';
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
@@ -564,7 +565,27 @@ class WebGLTextureUtils {
 
 			const image = options.image;
 
-			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+			if ( texture.layerUpdates.size > 0 ) {
+
+				const layerByteLength = getByteLength( image.width, image.height, texture.format, texture.type );
+
+				for ( const layerIndex of texture.layerUpdates ) {
+
+					const layerData = image.data.subarray(
+						layerIndex * layerByteLength / image.data.BYTES_PER_ELEMENT,
+						( layerIndex + 1 ) * layerByteLength / image.data.BYTES_PER_ELEMENT
+					);
+					gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, layerData );
+
+				}
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+			}
 
 		} else if ( texture.isData3DTexture ) {
 

@@ -2,7 +2,8 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType } from '../../constants.js';
+import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, SRGBTransfer } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 const _size = /*@__PURE__*/ new Vector3();
 
@@ -325,6 +326,14 @@ class Textures extends DataMap {
 			//
 
 			this.info.memory.textures ++;
+
+			//
+
+			if ( texture.isVideoTexture && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
+
+				console.warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
+
+			}
 
 			// dispose
 

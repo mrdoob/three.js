@@ -112,11 +112,10 @@ class AssignNode extends TempNode {
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
+		const target = targetNode.build( builder );
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
 		const source = sourceNode.build( builder, targetType );
-
 		const sourceType = sourceNode.getNodeType( builder );
 
 		const nodeData = builder.getDataFromNode( this );

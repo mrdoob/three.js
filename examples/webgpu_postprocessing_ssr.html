@@ -44,6 +44,7 @@
 		import Stats from 'three/addons/libs/stats.module.js';
 
 		const params = {
+			quality: 0.5,
 			maxDistance: 0.5,
 			opacity: 1,
 			thickness: 0.015,
@@ -150,12 +151,11 @@
 			//
 
 			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, customMetalness, camera );
-			ssrPass.resolutionScale = 1.0;
 
 			// blend SSR over beauty
 
 			const outputNode = smaa( blendColor( scenePassColor, ssrPass.mul( scenePassMetalRough.g.oneMinus() ) ) );
-
+		
 			postProcessing.outputNode = outputNode;
 
 			//
@@ -174,6 +174,7 @@
 			// GUI
 
 			gui = new GUI();
+			gui.add( params, 'quality' ).min( 0 ).max( 1 ).onChange( updateParameters );
 			gui.add( params, 'maxDistance' ).min( 0 ).max( 1 ).onChange( updateParameters );
 			gui.add( params, 'opacity' ).min( 0 ).max( 1 ).onChange( updateParameters );
 			gui.add( params, 'thickness' ).min( 0 ).max( 0.05 ).onChange( updateParameters );
@@ -199,6 +200,7 @@
 
 		function updateParameters() {
 
+			ssrPass.quality.value = params.quality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.opacity.value = params.opacity;
 			ssrPass.thickness.value = params.thickness;
