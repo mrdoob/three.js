@@ -11,22 +11,21 @@ const arithmeticOperators = [
 ];
 
 const precedenceOperators = [
-	'/', '*', '%',
-	'-', '+',
-	'<<', '>>',
-	'<', '>', '<=', '>=',
-	'==', '!=',
-	'&',
-	'^',
-	'|',
-	'&&',
-	'^^',
-	'||',
-	'?',
-	'=',
-	'+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=',
-	','
-].reverse();
+	[ ',' ],
+	[ '=', '+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=' ],
+	[ '?' ],
+	[ '||' ],
+	[ '^^' ],
+	[ '&&' ],
+	[ '|' ],
+	[ '^' ],
+	[ '&' ],
+	[ '==', '!=' ],
+	[ '<', '>', '<=', '>=' ],
+	[ '<<', '>>' ],
+	[ '+', '-' ],
+	[ '*', '/', '%' ]
+];
 
 const associativityRightToLeft = [
 	'=',
@@ -334,7 +333,7 @@ class GLSLDecoder {
 
 		let groupIndex = 0;
 
-		for ( const operator of precedenceOperators ) {
+		for ( const operators of precedenceOperators ) {
 
 			const parseToken = ( i, inverse = false ) => {
 
@@ -351,7 +350,9 @@ class GLSLDecoder {
 
 				}
 
-				if ( groupIndex === 0 && token.str === operator ) {
+				if ( groupIndex === 0 && operators.includes( token.str ) ) {
+
+					const operator = token.str;
 
 					if ( operator === '?' ) {
 
@@ -396,7 +397,9 @@ class GLSLDecoder {
 
 			};
 
-			if ( associativityRightToLeft.includes( operator ) ) {
+			const isRightAssociative = operators.some( op => associativityRightToLeft.includes( op ) );
+
+			if ( isRightAssociative ) {
 
 				for ( let i = 0; i < tokens.length; i ++ ) {
 
