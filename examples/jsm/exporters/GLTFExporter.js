@@ -543,32 +543,36 @@ function getCanvas() {
 
 function getToBlobPromise( canvas, mimeType ) {
 
-	if ( ( canvas instanceof OffscreenCanvas ) === false ) {
+	if ( typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas ) {
+
+		let quality;
+
+		// Blink's implementation of convertToBlob seems to default to a quality level of 100%
+		// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+		if ( mimeType === 'image/jpeg' ) {
+
+			quality = 0.92;
+
+		} else if ( mimeType === 'image/webp' ) {
+
+			quality = 0.8;
+
+		}
+
+		return canvas.convertToBlob( {
+
+			type: mimeType,
+			quality: quality
+
+		} );
+
+	} else {
+
+		// HTMLCanvasElement code path
 
 		return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
 
 	}
-
-	let quality;
-
-	// Blink's implementation of convertToBlob seems to default to a quality level of 100%
-	// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
-	if ( mimeType === 'image/jpeg' ) {
-
-		quality = 0.92;
-
-	} else if ( mimeType === 'image/webp' ) {
-
-		quality = 0.8;
-
-	}
-
-	return canvas.convertToBlob( {
-
-		type: mimeType,
-		quality: quality
-
-	} );
 
 }
 
