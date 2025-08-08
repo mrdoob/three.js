@@ -179,6 +179,7 @@ class Textures extends DataMap {
 				}
 
 				this.delete( renderTarget );
+				this.backend.delete( renderTarget );
 
 			};
 

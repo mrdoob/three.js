@@ -390,7 +390,6 @@ class WebGPUBackend extends Backend {
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.dimensions !== renderTarget.dimensions ||
 			renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel ||
 			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
 			renderTargetData.samples !== renderTarget.samples
@@ -399,21 +398,6 @@ class WebGPUBackend extends Backend {
 			descriptors = {};
 
 			renderTargetData.descriptors = descriptors;
-
-			// dispose
-
-			const onDispose = () => {
-
-				renderTarget.removeEventListener( 'dispose', onDispose );
-				this.delete( renderTarget );
-
-			};
-
-			if ( renderTarget.hasEventListener( 'dispose', onDispose ) === false ) {
-
-				renderTarget.addEventListener( 'dispose', onDispose );
-
-			}
 
 		}
 
@@ -534,7 +518,6 @@ class WebGPUBackend extends Backend {
 			renderTargetData.samples = renderTarget.samples;
 			renderTargetData.activeMipmapLevel = renderContext.activeMipmapLevel;
 			renderTargetData.activeCubeFace = renderContext.activeCubeFace;
-			renderTargetData.dimensions = renderTarget.dimensions;
 
 		}
 
@@ -2230,7 +2213,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Checks if the given feature is supported  by the backend.
+	 * Checks if the given feature is supported by the backend.
 	 *
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
