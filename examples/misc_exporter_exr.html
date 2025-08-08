@@ -56,14 +56,14 @@
 				scene = new THREE.Scene();
 
 				exporter = new EXRExporter();
-				const rgbeloader = new HDRLoader();
+				const hdrLoader = new HDRLoader();
 
 				//
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				rgbeloader.load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr', function ( texture ) {
+				hdrLoader.load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 

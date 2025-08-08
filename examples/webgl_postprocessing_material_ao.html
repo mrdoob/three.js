@@ -78,7 +78,7 @@
 				renderer.shadowMap.enabled = sceneParameters.shadow;
 
 				const plyLoader = new PLYLoader();
-				const rgbeloader = new HDRLoader();
+				const hdrLoader = new HDRLoader();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 50 );
 				camera.position.set( 0, 3, 5 );
@@ -103,7 +103,7 @@
 				composer.addPass( renderPasse );
 				composer.addPass( outputPass );
 
-				rgbeloader.load( 'textures/equirectangular/royal_esplanade_1k.hdr', function ( texture ) {
+				hdrLoader.load( 'textures/equirectangular/royal_esplanade_1k.hdr', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.environment = texture;

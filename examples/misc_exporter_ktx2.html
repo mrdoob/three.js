@@ -55,14 +55,14 @@
 				scene = new THREE.Scene();
 
 				exporter = new KTX2Exporter();
-				const rgbeloader = new HDRLoader();
+				const hdrLoader = new HDRLoader();
 
 				//
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				rgbeloader.load( 'textures/equirectangular/venice_sunset_1k.hdr', function ( texture ) {
+				hdrLoader.load( 'textures/equirectangular/venice_sunset_1k.hdr', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 
