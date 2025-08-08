@@ -51,8 +51,8 @@
 
 				// environment
 
-				const rgbeLoader = new HDRLoader();
-				rgbeLoader.load( './textures/equirectangular/royal_esplanade_1k.hdr', ( environmentMap ) => {
+				const hdrLoader = new HDRLoader();
+				hdrLoader.load( './textures/equirectangular/royal_esplanade_1k.hdr', ( environmentMap ) => {
 
 					environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 

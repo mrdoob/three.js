@@ -56,11 +56,11 @@
 				controls.addEventListener( 'change', render );
 				controls.update();
 
-				const rgbeLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' ),
+					hdrLoader.loadAsync( 'royal_esplanade_1k.hdr' ),
 					gltfLoader.loadAsync( 'AnisotropyBarnLamp.glb' ),
 				] );
 

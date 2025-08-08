@@ -50,8 +50,8 @@
 
 				// environment
 
-				const rgbeLoader = new HDRLoader();
-				rgbeLoader.load( './textures/equirectangular/pedestrian_overpass_1k.hdr', ( environmentMap ) => {
+				const hdrLoader = new HDRLoader();
+				hdrLoader.load( './textures/equirectangular/pedestrian_overpass_1k.hdr', ( environmentMap ) => {
 
 					environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 

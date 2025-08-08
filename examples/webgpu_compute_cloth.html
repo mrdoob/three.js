@@ -89,9 +89,9 @@
 				controls.target.set( 0, - 0.1, 0 );
 				controls.update();
 
-				const rgbeLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
 
-				const hdrTexture = await rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_1k.hdr' );
 				hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background = hdrTexture;
 				scene.backgroundBlurriness = 0.5;

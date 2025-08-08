@@ -48,14 +48,14 @@
 
 				scene = new THREE.Scene();
 
-				const rgbeLoader = new HDRLoader()
+				const hdrLoader = new HDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const usdzLoader = new USDLoader()
 					.setPath( 'models/usdz/' );
 
 				const [ texture, model ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					hdrLoader.loadAsync( 'venice_sunset_1k.hdr' ),
 					usdzLoader.loadAsync( 'saeukkang.usdz' ),
 				] );
 
