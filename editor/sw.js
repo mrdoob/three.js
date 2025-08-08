@@ -59,7 +59,7 @@ const assets = [
 
 	'../examples/jsm/loaders/EXRLoader.js',
 	'../examples/jsm/loaders/KTX2Loader.js',
-	'../examples/jsm/loaders/RGBELoader.js',
+	'../examples/jsm/loaders/HDRLoader.js',
 	'../examples/jsm/loaders/TGALoader.js',
 
 	'../examples/jsm/curves/NURBSCurve.js',

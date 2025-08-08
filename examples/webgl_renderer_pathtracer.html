@@ -57,7 +57,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
 			import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
 			import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';
@@ -210,7 +210,7 @@
 						.catch( onError );
 
 				const envMapPromise =
-					new RGBELoader()
+					new HDRLoader()
 						.setPath( 'textures/equirectangular/' )
 						.loadAsync( 'royal_esplanade_1k.hdr' )
 						.then( tex => {
