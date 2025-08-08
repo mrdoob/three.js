@@ -243,7 +243,7 @@ class Textures extends DataMap {
 
 		//
 
-		if ( isRenderTarget || texture.isStorageTexture === true ) {
+		if ( isRenderTarget || texture.isStorageTexture === true || texture.isExternalTexture === true ) {
 
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
@@ -307,7 +307,11 @@ class Textures extends DataMap {
 
 				// async update
 
-				backend.createDefaultTexture( texture );
+				if ( options.source === undefined ) {
+
+					backend.createDefaultTexture( texture );
+
+				}
 
 				textureData.isDefaultTexture = true;
 				textureData.generation = texture.version;
@@ -341,7 +345,11 @@ class Textures extends DataMap {
 
 				texture.removeEventListener( 'dispose', onDispose );
 
-				this._destroyTexture( texture );
+				if ( options.source === undefined ) {
+
+					this._destroyTexture( texture );
+
+				}
 
 			};
 
