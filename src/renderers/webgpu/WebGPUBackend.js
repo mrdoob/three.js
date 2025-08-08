@@ -2213,7 +2213,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Checks if the given feature is supported  by the backend.
+	 * Checks if the given feature is supported by the backend.
 	 *
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
