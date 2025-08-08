@@ -26,7 +26,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { EXRExporter, ZIP_COMPRESSION, ZIPS_COMPRESSION, NO_COMPRESSION } from 'three/addons/exporters/EXRExporter.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh, controls, renderTarget, dataTexture;
@@ -56,7 +56,7 @@
 				scene = new THREE.Scene();
 
 				exporter = new EXRExporter();
-				const rgbeloader = new RGBELoader();
+				const rgbeloader = new HDRLoader();
 
 				//
 

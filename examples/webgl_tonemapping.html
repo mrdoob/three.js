@@ -32,7 +32,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let renderer, scene, camera, controls;
 			let gui, guiExposure = null;
@@ -111,7 +111,7 @@
 				controls.target.set( 0, 0.03, 0 );
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
+				const rgbeLoader = new HDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const dracoLoader = new DRACOLoader();

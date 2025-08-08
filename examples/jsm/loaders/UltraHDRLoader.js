@@ -89,7 +89,7 @@ class UltraHDRLoader extends Loader {
 	 * Sets the texture type.
 	 *
 	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
-	 * @return {RGBELoader} A reference to this loader.
+	 * @return {HDRLoader} A reference to this loader.
 	 */
 	setDataType( value ) {
 
