@@ -129,6 +129,7 @@ export * from './gpgpu/ComputeBuiltinNode.js';
 export * from './gpgpu/BarrierNode.js';
 export * from './gpgpu/WorkgroupInfoNode.js';
 export * from './gpgpu/AtomicFunctionNode.js';
+export * from './gpgpu/SubgroupFunctionNode.js';
 
 // lighting
 export * from './accessors/Lights.js';
