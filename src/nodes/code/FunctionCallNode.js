@@ -69,9 +69,28 @@ class FunctionCallNode extends TempNode {
 
 	}
 
+	/**
+	 * Returns the type of this function call node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @returns {string} The type of this node.
+	 */
 	getNodeType( builder ) {
 
 		return this.functionNode.getNodeType( builder );
+
+	}
+
+	/**
+	 * Returns the function node of this function call node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} [name] - The name of the member.
+	 * @returns {string} The type of the member.
+	 */
+	getMemberType( builder, name ) {
+
+		return this.functionNode.getMemberType( builder, name );
 
 	}
 
