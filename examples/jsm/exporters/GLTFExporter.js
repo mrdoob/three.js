@@ -761,7 +761,7 @@ class GLTFWriter {
 	/**
 	 * Serializes a userData.
 	 *
-	 * @param {THREE.Object3D|THREE.Material} object
+	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry|THREE.AnimationClip} object
 	 * @param {Object} objectDef
 	 */
 	serializeUserData( object, objectDef ) {
@@ -2283,11 +2283,15 @@ class GLTFWriter {
 
 		}
 
-		json.animations.push( {
+		const animationDef = {
 			name: clip.name || 'clip_' + json.animations.length,
 			samplers: samplers,
 			channels: channels
-		} );
+		};
+
+		this.serializeUserData( clip, animationDef );
+
+		json.animations.push( animationDef );
 
 		return json.animations.length - 1;
 
