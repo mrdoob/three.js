@@ -78,6 +78,19 @@ class ContextNode extends Node {
 
 	}
 
+	/**
+	 * This method is overwritten to ensure it returns the member type of {@link ContextNode#node}.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The member name.
+	 * @returns {string} The member type.
+	 */
+	getMemberType( builder, name ) {
+
+		return this.node.getMemberType( builder, name );
+
+	}
+
 	analyze( builder ) {
 
 		const previousContext = builder.getContext();
