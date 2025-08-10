@@ -200,6 +200,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( glFormat === _gl.RGB ) {
 
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGB8;
 			if ( glType === _gl.UNSIGNED_INT_5_9_9_9_REV ) internalFormat = _gl.RGB9_E5;
 
 		}
