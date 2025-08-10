@@ -31,7 +31,8 @@ import {
 	RedFormat,
 	SRGBColorSpace,
 	UnsignedByteType,
-	UnsignedInt5999Type
+	UnsignedInt5999Type,
+	UnsignedInt101111Type
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -73,6 +74,7 @@ import {
 	VK_FORMAT_R8_SRGB,
 	VK_FORMAT_R8_UNORM,
 	VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
+	VK_FORMAT_B10G11R11_UFLOAT_PACK32,
 	VK_FORMAT_UNDEFINED
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
@@ -941,6 +943,7 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R8_UNORM ]: RedFormat,
 
 	[ VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 ]: RGBFormat,
+	[ VK_FORMAT_B10G11R11_UFLOAT_PACK32 ]: RGBFormat,
 
 	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: RGB_ETC2_Format,
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: RGBA_ETC2_EAC_Format,
@@ -985,6 +988,7 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
 
 	[ VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 ]: UnsignedInt5999Type,
+	[ VK_FORMAT_B10G11R11_UFLOAT_PACK32 ]: UnsignedInt101111Type,
 
 	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: UnsignedByteType,
@@ -1078,7 +1082,7 @@ async function createRawTexture( container ) {
 
 			);
 
-		} else if ( TYPE_MAP[ vkFormat ] === UnsignedInt5999Type ) {
+		} else if ( TYPE_MAP[ vkFormat ] === UnsignedInt5999Type || TYPE_MAP[ vkFormat ] === UnsignedInt101111Type ) {
 
 			data = new Uint32Array(
 
