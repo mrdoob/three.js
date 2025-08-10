@@ -9,6 +9,8 @@ import {
 	HalfFloatType,
 	LinearFilter,
 	LinearMipmapLinearFilter,
+	NearestFilter,
+	NearestMipmapNearestFilter,
 	LinearSRGBColorSpace,
 	Loader,
 	NoColorSpace,
@@ -1035,7 +1037,6 @@ async function createRawTexture( container ) {
 
 	const mipmaps = [];
 
-
 	for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
 
 		const levelWidth = Math.max( 1, container.pixelWidth >> levelIndex );
@@ -1109,6 +1110,9 @@ async function createRawTexture( container ) {
 
 	}
 
+	// levelCount = 0 implies runtime-generated mipmaps.
+	const useMipmaps = container.levelCount === 0 || mipmaps.length > 1
+
 	let texture;
 
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
@@ -1116,14 +1120,16 @@ async function createRawTexture( container ) {
 		texture = container.pixelDepth === 0
 			? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
 			: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
+		texture.magFilter = NearestFilter;
+		texture.generateMipmaps = container.levelCount === 0;
 
 	} else {
 
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
 
 		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
-
-		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		texture.minFilter = useMipmaps ? LinearMipmapLinearFilter : LinearFilter;
 		texture.magFilter = LinearFilter;
 
 	}
