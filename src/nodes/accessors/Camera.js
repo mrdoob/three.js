@@ -1,10 +1,10 @@
 import { uniform } from '../core/UniformNode.js';
 import { renderGroup, sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { Fn } from '../tsl/TSLBase.js';
+import { Fn, vec4 } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
-import { Vector4 } from '../../math/Vector4.js';
+import { screenSize } from '../display/ScreenNode.js';
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -277,7 +277,7 @@ export const cameraViewport = /*@__PURE__*/ Fn( ( { camera } ) => {
 	} else {
 
 	  // Fallback for single camera
-	  cameraViewport = uniform( new Vector4( 0, 0, 1, 1 ) ).setName(
+	  cameraViewport = vec4( 0, 0, screenSize.x, screenSize.y ).setName(
 			'cameraViewport'
 	  );
 
