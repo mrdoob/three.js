@@ -17,8 +17,8 @@ import {
 } from 'three';
 
 import {
+	createDefaultContainer,
 	write,
-	KTX2Container,
 	KHR_DF_CHANNEL_RGBSDA_ALPHA,
 	KHR_DF_CHANNEL_RGBSDA_BLUE,
 	KHR_DF_CHANNEL_RGBSDA_GREEN,
@@ -191,7 +191,7 @@ export class KTX2Exporter {
 
 		const array = texture.image.data;
 		const channelCount = getChannelCount( texture );
-		const container = new KTX2Container();
+		const container = createDefaultContainer();
 
 		container.vkFormat = VK_FORMAT_MAP[ texture.format ][ texture.type ][ texture.colorSpace ];
 		container.typeSize = array.BYTES_PER_ELEMENT;
@@ -256,6 +256,8 @@ export class KTX2Exporter {
 		}
 
 		//
+
+		container.levelCount = 1;
 
 		container.levels = [ {
 
