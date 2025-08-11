@@ -252,35 +252,31 @@ export const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<vec4>}
  */
-export const cameraViewport = /*@__PURE__*/ Fn( ( { camera } ) => {
+export const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	let cameraViewport;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-	  const viewports = [];
+		const viewports = [];
 
-	  for ( const subCamera of camera.cameras ) {
+		for ( const subCamera of camera.cameras ) {
 
 			viewports.push( subCamera.viewport );
 
 		}
 
-	  const cameraViewports = uniformArray( viewports, 'vec4' )
-			.setGroup( renderGroup )
-			.setName( 'cameraViewports' );
+		const cameraViewports = uniformArray( viewports, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' );
 
-	  cameraViewport = cameraViewports
-			.element( cameraIndex )
-			.toConst( 'cameraViewport' );
+		cameraViewport = cameraViewports.element( cameraIndex ).toConst( 'cameraViewport' );
 
 	} else {
 
-	  // Fallback for single camera
-	  cameraViewport = vec4( 0, 0, screenSize.x, screenSize.y ).toConst( 'cameraViewport' );
+		// Fallback for single camera
+		cameraViewport = vec4( 0, 0, screenSize.x, screenSize.y ).toConst( 'cameraViewport' );
 
 	}
 
 	return cameraViewport;
 
-} ).once()();
+} ).once() )();
