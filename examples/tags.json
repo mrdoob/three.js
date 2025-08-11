@@ -138,6 +138,7 @@
 	"webgpu_mirror": [ "reflection" ],
 	"webgpu_multiple_rendertargets": [ "mrt" ],
 	"webgpu_multiple_rendertargets_readback": [ "mrt" ],
+	"webgpu_particles": [ "fire" ],
 	"webgpu_postprocessing_3dlut": [ "color grading" ],
 	"webgpu_postprocessing_afterimage": [ "trails" ],
 	"webgpu_postprocessing_ao": [ "ambient occlusion", "mrt" ],
