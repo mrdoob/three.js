@@ -1867,7 +1867,6 @@ ${ flowData.code }
 			const workgroupSize = this.object.workgroupSize;
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
-			console.log( this.computeShader );
 
 		}
 

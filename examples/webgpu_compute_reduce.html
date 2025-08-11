@@ -7,6 +7,153 @@
 	</head>
 	<body>
 
+	<style>
+    #reduction-panel {
+        background-color: #111;
+				width: 100%;
+        display: flex;
+				position: fixed;
+				height: auto;
+				bottom: 0px;
+				z-index: 99;
+        flex-direction: column;
+        justify-content: center;
+				align-items: center;
+        border-left: 2px solid #222;
+				text-align: center;
+    }
+
+		#panel-title {
+			width: fit-content;
+		}
+
+    .thread-row {
+        display: flex;
+				flex-direction: row;
+        align-items: center;
+        margin: 4px 0;
+        position: relative;
+    }
+    .thread {
+        width: 16px;
+        height: 16px;
+        background-color: #444;
+        margin-right: 2px;
+        transition: background-color 0.5s, transform 0.5s;
+    }
+
+		.stage-display {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			margin-bottom: 5px;
+		}
+    .stage-label {
+      font-size: 1.2em;
+      color: #aaa;
+			font-style: bold;
+      margin-top: 6px;
+      margin-bottom: 20px; 
+    }
+
+		.thread {
+    	display: flex;
+    	justify-content: center;
+    	align-items: center;
+    	width: 40px;
+    	height: 40px;
+    	margin: 2px;
+    	border: 1px solid rgba(255, 255, 255, 0.2);
+    	border-radius: 4px;
+    	background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2));
+    	box-shadow: inset 0 0 2px rgba(255,255,255,0.1);
+    	font-family: monospace;
+    	color: white;
+		}
+
+		.thread_data {
+    	display: block;
+    	max-width: 100%;
+    	padding: 0 2px;
+    	white-space: nowrap;
+    	overflow: hidden;
+    	text-overflow: ellipsis;
+    	font-size: clamp(8px, 2vw, 14px); 
+    	text-align: center;
+		}
+
+		.subgroup {
+			display: flex;
+			position: relative;
+			margin-left: 10px;
+			margin-right: 10px;
+		}
+
+		.subgroup::before {
+			/* label text for each subgroup label */
+    	content: "subgroupAdd()"; 
+    	position: absolute;
+    	top: -20px; 
+			/* Hide until animation is displayed */
+    	opacity: 0; 
+			z-index: 100;
+    	transition: opacity 0.5s ease; /* Fade in and fade out */
+    	font-weight: bold;
+    	color: white;
+			width: 100%;
+		}
+
+		.subgroup::after {
+  		content: attr(data-label);
+  		position: absolute;
+  		bottom: -20px;
+  		opacity: 1;
+  		z-index: 100;
+  		color: gray;
+			width: 100%;
+		}
+
+		.reduction-stage {
+			margin-bottom: 20px;
+		}
+
+		@keyframes labelAbsorb {
+    	0% {
+        opacity: 0;
+        transform: translateY(-50%);
+    	}
+    	40% {
+        opacity: 1;
+        transform: translateY(0%);
+    	}
+			60% {
+				opacity: 1;
+				transform: translateY(0%);
+			}
+    	80% {
+        opacity: 1;
+        transform: translate(0%, -20%);
+    	}
+    	100% {
+        opacity: 0;
+        transform: translate(0%, 100%);
+    	}
+		}
+
+
+		.subgroup.anim::before {
+    	opacity: 0;
+			animation-name: labelAbsorb;
+			animation-duration: 1.5s;
+    	transition:
+        transform 0.6s ease-out,
+        opacity 0.3s ease-in 0.3s; /* fade out after delay */
+		}
+
+		
+
+	</style>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<br /> This example demonstrates the performance of various simple parallel reduction kernels.
@@ -17,6 +164,17 @@
 			<div id="left_side_display" style="position: absolute;top: 150px;left: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 			<div id="right_side_display" style="position: absolute;top: 150px;right: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 		</div>
+		
+		<div id="reduction-panel">
+			<h3 id="panel-title" style="flex: 0 0 auto;">Subgroup Reduction Explanation</h3>
+			<div class="reduction-stage" id="subgroup-reduction-stage">
+    		<div class="stage-label">Use subgroupAdd() to capture reduction of each workgroup's subgroups (Hover for animation)</div>
+				<div class="stage-display">
+					<div id="workgroup_threads" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+					<div id="subgroup_reduction" style="display: flex; justify-content: center; margin-bottom: 5px;"></div>
+				</div>
+			</div>
+    </div>
 
 		<script type="importmap">
 			{
@@ -43,6 +201,137 @@
 				right_side_display: document.getElementById( 'right_side_display' )
 			};
 
+			const divRoundUp = ( size, part_size ) => {
+
+				return Math.floor( ( size + part_size - 1 ) / part_size );
+
+			};
+
+			const cssSubgroupSize = 4;
+			const cssWorkgroupSize = 16;
+
+			const workgroupThreadsContainer = document.getElementById( 'workgroup_threads' );
+			const subgroupReductionContainer = document.getElementById( 'subgroup_reduction' );
+
+			document.getElementById( 'panel-title' ).textContent += ` (Subgroup Size: ${cssSubgroupSize}, Workgroup Size: ${cssWorkgroupSize})`;
+
+			const createThreadWithData = ( data ) => {
+
+				const threadEle = document.createElement( 'div' );
+				threadEle.className = 'thread';
+				const threadData = document.createElement( 'span' );
+				threadData.textContent = data; // safer than innerHTML for just text
+				threadData.className = 'thread_data';
+				threadEle.append( threadData );
+
+				return threadEle;
+
+			};
+
+			// Create thread elements
+			const workgroupThreads = [];
+			const initialSubgroups = [];
+			const initialData = [];
+			let currentSubgroupDiv = null;
+			for ( let i = 0; i < cssWorkgroupSize; i ++ ) {
+
+				if ( i % cssSubgroupSize === 0 ) {
+
+					const currentSubgroupIndex = Math.floor( i / cssSubgroupSize );
+
+					const subgroupReductionThread = createThreadWithData( 0 );
+					subgroupReductionThread.id = `subgroup_reduction_element_${currentSubgroupIndex}`;
+					subgroupReductionContainer.appendChild( subgroupReductionThread );
+
+					currentSubgroupDiv = document.createElement( 'div' );
+					currentSubgroupDiv.className = 'subgroup';
+					currentSubgroupDiv.setAttribute( 'data-label', `Threads ${currentSubgroupIndex * cssSubgroupSize}-${( currentSubgroupIndex + 1 ) * cssSubgroupSize - 1}` );
+					initialSubgroups.push( currentSubgroupDiv );
+					workgroupThreadsContainer.appendChild( currentSubgroupDiv );
+			
+				}
+
+				const data = Math.floor( Math.random() * 9 ) + 1;
+				initialData.push( data );
+
+				const thread = createThreadWithData( data );
+				workgroupThreads.push( thread );
+				currentSubgroupDiv.appendChild( thread );
+			
+			}
+
+			const deactivateLabelAnimation = ( subgroupDiv, idx ) => {
+
+				subgroupDiv.classList.remove( 'anim' );
+
+				const subgroupReductionBufferElement = document.getElementById( `subgroup_reduction_element_${idx}` ).querySelector( '.thread_data' );
+
+				subgroupReductionBufferElement.innerHTML = 0;
+			
+			};
+
+			const activateLabelAnimation = ( subgroupDiv, idx ) => {
+
+				const threads = Array.from( subgroupDiv.children );
+				let total = 0;
+
+				for ( let i = idx * cssSubgroupSize; i < idx * cssSubgroupSize + cssSubgroupSize; i ++ ) {
+
+					total += initialData[ i ];
+
+				}
+
+				subgroupDiv.classList.add( 'anim' );
+
+				setTimeout( () => {
+
+					threads.forEach( t => {
+
+						t.querySelector( '.thread_data' ).textContent = total;
+
+					} );
+
+					const subgroupReductionBufferElement = document.getElementById( `subgroup_reduction_element_${idx}` ).querySelector( '.thread_data' );
+
+					subgroupReductionBufferElement.innerHTML = total;
+
+				}, 1000 );
+
+				// Remove the class after the animation ends so it can be triggered again
+				setTimeout( () => {
+
+					subgroupDiv.classList.remove( 'anim' );
+
+				}, 1500 ); // matches animation duration in CSS
+
+			};
+
+			document.getElementById( 'subgroup-reduction-stage' ).addEventListener( 'mouseenter', () => {
+
+				initialSubgroups.forEach( ( subgroupDiv, idx ) => {
+
+					activateLabelAnimation( subgroupDiv, idx );
+			
+				} );
+
+			} );
+
+			document.getElementById( 'subgroup-reduction-stage' ).addEventListener( 'mouseleave', () => {
+
+				initialSubgroups.forEach( ( subgroupDiv, idx ) => {
+
+					deactivateLabelAnimation( subgroupDiv, idx );
+			
+				} );
+
+				workgroupThreads.forEach( ( thread, idx ) => {
+
+					thread.querySelector( '.thread_data' ).textContent = initialData[ idx ];
+
+				} );
+
+			} );
+			
 			
 			if ( WebGPU.isAvailable() === false ) {
 
@@ -51,12 +340,6 @@
 				throw new Error( 'No WebGPU support' );
 
 			}
-
-			const divRoundUp = ( size, part_size ) => {
-
-				return Math.floor( ( size + part_size - 1 ) / part_size );
-
-			};
 
 			// Total number of elements and the dimensions of the display grid.
 			const size = 262144;
@@ -1065,7 +1348,7 @@
 
 					}
 
-					setTimeout( stepAnimation, 500 );
+					setTimeout( stepAnimation, 1000 );
 
 				};
 
@@ -1089,7 +1372,7 @@
 
 				}
 
-				setTimeout( stepAnimation, 500 );
+				setTimeout( stepAnimation, 1000 );
 
 			}
 
