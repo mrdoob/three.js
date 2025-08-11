@@ -851,7 +851,7 @@
 
 					// In cases where the number of subgroups in a workgroup is greater than the subgroup size itself,
 					// we need to iterate over the array again to capture all the data in the workgroup array buffer
-					Loop( { start: subgroupSize, end: alignedSize, condition: '<=', name: 'j', type: 'uint', update: '<<= subgroupSizeLog' }, ( j ) => {
+					Loop( { start: subgroupSize, end: alignedSize, condition: '<=', name: 'j', type: 'uint', update: '<<= subgroupSizeLog' }, () => {
 
 						const subgroupIndex = ( ( invocationLocalIndex.add( 1 ) ).shiftLeft( offset ) ).sub( 1 );
 

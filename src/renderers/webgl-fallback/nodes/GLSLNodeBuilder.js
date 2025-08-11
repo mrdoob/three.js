@@ -11,7 +11,6 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 const glslMethods = {
 	textureDimensions: 'textureSize',
 	equals: 'equal',
-	countTrailingZeros: 'findLSB'
 };
 
 const precisionLib = {
