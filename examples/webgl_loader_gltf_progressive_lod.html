@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - GLTFloader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTF progressive loading  - <a href="https://www.npmjs.com/package/@needle-tools/gltf-progressive" target="_blank" rel="noopener">@needle-tools/gltf-progressive</a><br/><br />
+			Southern District Police Station by
+			<a href="https://sketchfab.com/katiewolfe" target="_blank" rel="noopener">katiewolfe</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=quarry_01" target="_blank" rel="noopener">Quarry 01</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/examples/": "./",
+					"@needle-tools/gltf-progressive": "https://cdn.jsdelivr.net/npm/@needle-tools/gltf-progressive/gltf-progressive.min.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+      		import { useNeedleProgressive } from '@needle-tools/gltf-progressive';
+
+			let camera, scene, renderer, mixer;
+
+			init();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20 );
+				camera.position.set( - 2.8, 1.6, 3.7 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+
+				mixer = new THREE.AnimationMixer(scene);
+
+				new RGBELoader()
+					// .load("https://cdn.needle.tools/static/skybox/modelviewer-Neutral-small.hdr", function ( texture ) {
+					.setPath( 'textures/equirectangular/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = texture;
+						scene.backgroundBlurriness = .5;
+						scene.environment = texture;
+						scene.environmentRotation = new THREE.Euler( 0, Math.PI / -2, 0, 'XYZ' );
+
+					} );
+
+				
+
+				const loader = new GLTFLoader();
+
+				useNeedleProgressive('https://cloud.needle.tools/-/assets/Z23hmXBZ1pLCFR-Z1pLCFR-world/file', renderer, loader);
+
+				loader.load('https://cloud.needle.tools/-/assets/Z23hmXBZ1pLCFR-Z1pLCFR-world/file', async function ( gltf ) {
+
+					const model = gltf.scene;
+
+					model.scale.multiplyScalar( 0.1 );
+
+					scene.add( model );
+					
+					const animations = gltf.animations;
+					if ( animations && animations.length ) {
+
+						for (const animation of animations) {
+
+							mixer.clipAction(animation).play();
+
+						}
+					}
+			
+				} );
+
+				container.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = .5;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 1, - 0.2 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				mixer.update(0.01);
+
+				renderer.render( scene, camera );
+
+				window.requestAnimationFrame( animate );
+			}
+
+			animate();
+
+		</script>
+
+	</body>
+</html>
