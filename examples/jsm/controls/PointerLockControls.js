@@ -141,14 +141,6 @@ class PointerLockControls extends Controls {
 
 	}
 
-	getObject() {
-
-		console.warn( 'THREE.PointerLockControls: getObject() has been deprecated. Use controls.object instead.' ); // @deprecated r169
-
-		return this.object;
-
-	}
-
 	/**
 	 * Returns the look direction of the camera.
 	 *
