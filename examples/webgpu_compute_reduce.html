@@ -94,18 +94,18 @@
 
 		.subgroup::before {
 			/* label text for each subgroup label */
-			content: "subgroupAdd()"; 
-    	position: absolute;
+			content: "subgroupAdd()";
+			position: absolute;
 			top: -20px; 
 			/* Hide until animation is displayed */
 			opacity: 0; 
 			z-index: 100;
-			transition: opacity 0.5s ease; /* Fade in and fade out */
+			transition: opacity 0.5s ease;
 			font-weight: bold;
 			color: white;
 			width: 100%;
 		}
-
+		
 		.subgroup::after {
 			content: attr(data-label);
 			position: absolute;
