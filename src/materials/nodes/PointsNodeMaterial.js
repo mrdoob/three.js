@@ -4,7 +4,7 @@ import { positionGeometry, positionLocal, positionView } from '../../nodes/acces
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, vec2, vec3, vec4, sin, cos } from '../../nodes/tsl/TSLBase.js';
+import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
 
