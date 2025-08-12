@@ -1,5 +1,4 @@
 import NodeMaterial from './NodeMaterial.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
