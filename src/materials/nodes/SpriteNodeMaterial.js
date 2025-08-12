@@ -111,9 +111,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const { object, camera } = builder;
 
-		const sizeAttenuation = this.sizeAttenuation;
-
-		const { positionNode, rotationNode, scaleNode } = this;
+		const { positionNode, rotationNode, scaleNode, sizeAttenuation } = this;
 
 		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
@@ -125,18 +123,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		if ( sizeAttenuation === false ) {
+		if ( camera.isPerspectiveCamera && sizeAttenuation === false ) {
 
-			if ( camera.isPerspectiveCamera ) {
-
-				scale = scale.mul( mvPosition.z.negate() );
-
-			} else {
-
-				const orthoScale = float( 2.0 ).div( cameraProjectionMatrix.element( 1 ).element( 1 ) );
-				scale = scale.mul( orthoScale.mul( 2 ) );
-
-			}
+			scale = scale.mul( mvPosition.z.negate() );
 
 		}
 
