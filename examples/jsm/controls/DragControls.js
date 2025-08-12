@@ -234,56 +234,6 @@ class DragControls extends Controls {
 
 	}
 
-	getRaycaster() {
-
-		console.warn( 'THREE.DragControls: getRaycaster() has been deprecated. Use controls.raycaster instead.' ); // @deprecated r169
-
-		return this.raycaster;
-
-	}
-
-	setObjects( objects ) {
-
-		console.warn( 'THREE.DragControls: setObjects() has been deprecated. Use controls.objects instead.' ); // @deprecated r169
-
-		this.objects = objects;
-
-	}
-
-	getObjects() {
-
-		console.warn( 'THREE.DragControls: getObjects() has been deprecated. Use controls.objects instead.' ); // @deprecated r169
-
-		return this.objects;
-
-	}
-
-	activate() {
-
-		console.warn( 'THREE.DragControls: activate() has been renamed to connect().' ); // @deprecated r169
-		this.connect();
-
-	}
-
-	deactivate() {
-
-		console.warn( 'THREE.DragControls: deactivate() has been renamed to disconnect().' ); // @deprecated r169
-		this.disconnect();
-
-	}
-
-	set mode( value ) {
-
-		console.warn( 'THREE.DragControls: The .mode property has been removed. Define the type of transformation via the .mouseButtons or .touches properties.' ); // @deprecated r169
-
-	}
-
-	get mode() {
-
-		console.warn( 'THREE.DragControls: The .mode property has been removed. Define the type of transformation via the .mouseButtons or .touches properties.' ); // @deprecated r169
-
-	}
-
 }
 
 function onPointerMove( event ) {
