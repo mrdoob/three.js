@@ -317,9 +317,9 @@ const wood_params =
     {
         center_size: 1.11, large_warp_scale: 0.39, large_grain_stretch: 0.12, small_warp_strength: 0.061,
         small_warp_scale: 1.9, fine_warp_strength: 0.006, fine_warp_scale: 4.8, ring_count: 25,
-        ring_bias: 0.01, ring_size_variance: 0.07, ring_variance_scale: 6.7, bark_thickness: 1.21,
-        splotch_scale: 0.61, splotch_intensity: 2.54, cell_scale: 330, cell_size: 0.36,
-        dark_wood_color: "#90462c", light_wood_color: "#83442a"
+        ring_bias: 0.01, ring_size_variance: 0.07, ring_variance_scale: 6.7, bark_thickness: 0.1,
+        splotch_scale: 0.61, splotch_intensity: 2.54, cell_scale: 630, cell_size: 0.19,
+        dark_wood_color: "#9a5b49", light_wood_color: "#ae745e"
     },
     mahogany:
     {
