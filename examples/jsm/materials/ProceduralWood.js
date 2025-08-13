@@ -382,7 +382,7 @@ export function GetWoodPreset( genus, finish ) {
 
 export function GenerateWoodMaterial( params ) {
 
-	const material = new THREE.MeshPhysicalMaterial();
+	const material = new THREE.MeshPhysicalNodeMaterial();
 
 	const uniforms = {};
 
