@@ -215,26 +215,26 @@ const cell_structure = TSL.Fn(([p, cell_scale, cell_size]) =>
     return map_range(cells, cell_size, cell_size.add(0.21), 0, 1, TSL.bool(true));
 });
 
-const wood = TSL.Fn(([p,
-        center_size,
-        large_warp_scale,
-        large_grain_stretch,
-        small_warp_strength,
-        small_warp_scale,
-        fine_warp_strength,
-        fine_warp_scale,
-        ring_count,
-        ring_bias,
-        ring_size_variance,
-        ring_variance_scale,
-        bark_thickness,
-        splotch_scale,
-        splotch_intensity,
-        cell_scale,
-        cell_size,
-        dark_wood_color,
-        light_wood_color
-]) =>
+const center_size = TSL.uniform(1.0);
+const large_warp_scale = TSL.uniform(1.0);
+const large_grain_stretch = TSL.uniform(1.0);
+const small_warp_strength = TSL.uniform(1.0);
+const small_warp_scale = TSL.uniform(1.0);
+const fine_warp_strength = TSL.uniform(1.0);
+const fine_warp_scale = TSL.uniform(1.0);
+const ring_count = TSL.uniform(1.0);
+const ring_bias = TSL.uniform(1.0);
+const ring_size_variance = TSL.uniform(1.0);
+const ring_variance_scale = TSL.uniform(1.0);
+const bark_thickness = TSL.uniform(1.0);
+const splotch_scale = TSL.uniform(1.0);
+const splotch_intensity = TSL.uniform(1.0);
+const cell_scale = TSL.uniform(1.0);
+const cell_size = TSL.uniform(1.0);
+const dark_wood_color = TSL.uniform(TSL.vec3(0.0));
+const light_wood_color = TSL.uniform(TSL.vec3(0.0));
+
+const wood = TSL.Fn(([p]) =>
 {
     const center      = wood_center(p, center_size);
     const main_warp   = space_warp(space_warp(p, center, large_warp_scale, large_grain_stretch), small_warp_strength, small_warp_scale, 0.17);
@@ -242,7 +242,7 @@ const wood = TSL.Fn(([p,
     const rings       = wood_rings(detail_warp.length(), ring_count, ring_bias, ring_size_variance, ring_variance_scale, bark_thickness); 
     const detail      = wood_detail(detail_warp, p, detail_warp.length(), splotch_scale);
     const cells       = cell_structure(main_warp, cell_scale, cell_size);
-    const base_color  = TSL.mix(dark_wood_color.rgb, light_wood_color.rgb, rings);
+    const base_color  = TSL.mix(dark_wood_color, light_wood_color, rings);
     
     return soft_light_mix(splotch_intensity, soft_light_mix(0.407, base_color, cells), detail);
 });
@@ -366,17 +366,19 @@ export function GenerateWoodMaterial(params)
 {
     const material = new THREE.MeshPhysicalMaterial();
 
+    for (const key in params.wood_params) {
+        if (key === 'dark_wood_color' || key === 'light_wood_color') {
+            material.uniforms[key] = { value: new THREE.Color(params.wood_params[key]).convertLinearToSRGB() };
+        } else {
+            material.uniforms[key] = { value: params.wood_params[key] };
+        }
+    }
+
     material.colorNode = wood(
-        TSL.positionLocal.add(TSL.vec3(-0.4, (Math.random()-0.5)*2, Math.random()*2)),
-        params.wood_params.center_size, params.wood_params.large_warp_scale, params.wood_params.large_grain_stretch, params.wood_params.small_warp_strength,
-        params.wood_params.small_warp_scale, params.wood_params.fine_warp_strength, params.wood_params.fine_warp_scale, params.wood_params.ring_count,
-        params.wood_params.ring_bias, params.wood_params.ring_size_variance, params.wood_params.ring_variance_scale, params.wood_params.bark_thickness,
-        params.wood_params.splotch_scale, params.wood_params.splotch_intensity, params.wood_params.cell_scale, params.wood_params.cell_size,
-        new THREE.Color(params.wood_params.dark_wood_color).convertLinearToSRGB(),
-        new THREE.Color(params.wood_params.light_wood_color).convertLinearToSRGB()
+        TSL.positionLocal.add(TSL.vec3(-0.4, (Math.random()-0.5)*2, Math.random()*2))
     ).mul(params.wood_clearcoat_darken);
 
-    material.customProgramCacheKey = () => params.wood_type + params.wood_finish;
+    //material.customProgramCacheKey = () => params.wood_type + params.wood_finish;
     material.clearcoatNode = params.wood_clearcoat;
     material.clearcoatRoughness = params.wood_clearcoat_roughness;
 
