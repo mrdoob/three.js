@@ -47,6 +47,7 @@
 	"webgl_lines_fat_raycasting": [ "gpu", "stats", "panel", "raycast" ],
 	"webgl_loader_3dtiles": [ "external", "3dtiles", "3d-tiles", "maps", "tiles", "globe", "earth", "cesium" ],
 	"webgl_loader_gltf_dispersion": [ "transmission" ],
+	"webgl_loader_gltf_progressive_lod": [ "external", "performance", "plugin", "library", "level", "details" ],
 	"webgl_loader_ifc": [ "external" ],
 	"webgl_loader_ldraw": [ "lego" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
