@@ -361,6 +361,7 @@
 		"webgpu_materials_alphahash",
 		"webgpu_materials_arrays",
 		"webgpu_materials_basic",
+		"webgpu_materials_cubemap_mipmaps",
 		"webgpu_materials_displacementmap",
 		"webgpu_materials_envmaps_bpcem",
 		"webgpu_materials_envmaps",
