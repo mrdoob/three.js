@@ -266,6 +266,7 @@ const wood = TSL.Fn( ( [
 
 const woodParams = {
 	teak: {
+        originOffset: { x: -0.4, y: 0, z: 0 },
 		centerSize: 1.11, largeWarpScale: 0.32, largeGrainStretch: 0.24, smallWarpStrength: 0.059,
 		smallWarpScale: 2, fineWarpStrength: 0.006, fineWarpScale: 32.8, ringCount: 34,
 		ringBias: 0.59, ringSizeVariance: 0.16, ringVarianceScale: 1.4, barkThickness: 0.61,
@@ -273,6 +274,7 @@ const woodParams = {
 		darkGrainColor: '#0c0504', lightGrainColor: '#533319'
 	},
 	walnut: {
+        originOffset: { x: -0.4, y: 0, z: 0 },
 		centerSize: 1.07, largeWarpScale: 0.42, largeGrainStretch: 0.34, smallWarpStrength: 0.016,
 		smallWarpScale: 10.3, fineWarpStrength: 0.028, fineWarpScale: 12.7, ringCount: 32,
 		ringBias: 0.08, ringSizeVariance: 0.03, ringVarianceScale: 5.5, barkThickness: 0.98,
@@ -280,6 +282,7 @@ const woodParams = {
 		darkGrainColor: '#311e13', lightGrainColor: '#523424'
 	},
 	white_oak: {
+        originOffset: { x: -0.4, y: 0, z: 0 },
 		centerSize: 1.23, largeWarpScale: 0.21, largeGrainStretch: 0.21, smallWarpStrength: 0.034,
 		smallWarpScale: 2.44, fineWarpStrength: 0.01, fineWarpScale: 14.3, ringCount: 34,
 		ringBias: 0.82, ringSizeVariance: 0.16, ringVarianceScale: 1.4, barkThickness: 0.7,
@@ -287,6 +290,7 @@ const woodParams = {
 		darkGrainColor: '#8b4c21', lightGrainColor: '#c57e43'
 	},
 	pine: {
+        originOffset: { x: -0.4, y: 0, z: -0.2 },
 		centerSize: 1.23, largeWarpScale: 0.21, largeGrainStretch: 0.18, smallWarpStrength: 0.041,
 		smallWarpScale: 2.44, fineWarpStrength: 0.006, fineWarpScale: 23.2, ringCount: 24,
 		ringBias: 0.1, ringSizeVariance: 0.07, ringVarianceScale: 5, barkThickness: 0.35,
@@ -294,6 +298,7 @@ const woodParams = {
 		darkGrainColor: '#c58355', lightGrainColor: '#d19d61'
 	},
 	poplar: {
+        originOffset: { x: -0.4, y: 0, z: 0.2 },
 		centerSize: 1.43, largeWarpScale: 0.33, largeGrainStretch: 0.18, smallWarpStrength: 0.04,
 		smallWarpScale: 4.3, fineWarpStrength: 0.004, fineWarpScale: 33.6, ringCount: 37,
 		ringBias: 0.07, ringSizeVariance: 0.03, ringVarianceScale: 3.8, barkThickness: 0.3,
@@ -301,6 +306,7 @@ const woodParams = {
 		darkGrainColor: '#716347', lightGrainColor: '#998966'
 	},
 	maple: {
+        originOffset: { x: -0.4, y: 0.3, z: -0.2 },
 		centerSize: 1.4, largeWarpScale: 0.38, largeGrainStretch: 0.25, smallWarpStrength: 0.067,
 		smallWarpScale: 2.5, fineWarpStrength: 0.005, fineWarpScale: 33.6, ringCount: 35,
 		ringBias: 0.1, ringSizeVariance: 0.07, ringVarianceScale: 4.6, barkThickness: 0.61,
@@ -308,6 +314,7 @@ const woodParams = {
 		darkGrainColor: '#b08969', lightGrainColor: '#bc9d7d'
 	},
 	red_oak: {
+        originOffset: { x: -0.4, y: 0, z: 0.4 },
 		centerSize: 1.21, largeWarpScale: 0.24, largeGrainStretch: 0.25, smallWarpStrength: 0.044,
 		smallWarpScale: 2.54, fineWarpStrength: 0.01, fineWarpScale: 14.5, ringCount: 34,
 		ringBias: 0.92, ringSizeVariance: 0.03, ringVarianceScale: 5.6, barkThickness: 1.01,
@@ -315,6 +322,7 @@ const woodParams = {
 		darkGrainColor: '#af613b', lightGrainColor: '#e0a27a'
 	},
 	cherry: {
+        originOffset: { x: -0.4, y: 0.3, z: 0 },
 		centerSize: 1.33, largeWarpScale: 0.11, largeGrainStretch: 0.33, smallWarpStrength: 0.024,
 		smallWarpScale: 2.48, fineWarpStrength: 0.01, fineWarpScale: 15.3, ringCount: 36,
 		ringBias: 0.02, ringSizeVariance: 0.04, ringVarianceScale: 6.5, barkThickness: 0.09,
@@ -322,6 +330,7 @@ const woodParams = {
 		darkGrainColor: '#913f27', lightGrainColor: '#b45837'
 	},
 	cedar: {
+        originOffset: { x: -0.4, y: 0.1, z: 0.1 },
 		centerSize: 1.11, largeWarpScale: 0.39, largeGrainStretch: 0.12, smallWarpStrength: 0.061,
 		smallWarpScale: 1.9, fineWarpStrength: 0.006, fineWarpScale: 4.8, ringCount: 25,
 		ringBias: 0.01, ringSizeVariance: 0.07, ringVarianceScale: 6.7, barkThickness: 0.1,
@@ -329,6 +338,7 @@ const woodParams = {
 		darkGrainColor: '#9a5b49', lightGrainColor: '#ae745e'
 	},
 	mahogany: {
+        originOffset: { x: -0.4, y: 0.2, z: 0 },
 		centerSize: 1.25, largeWarpScale: 0.26, largeGrainStretch: 0.29, smallWarpStrength: 0.044,
 		smallWarpScale: 2.54, fineWarpStrength: 0.01, fineWarpScale: 15.3, ringCount: 38,
 		ringBias: 0.01, ringSizeVariance: 0.33, ringVarianceScale: 1.2, barkThickness: 0.07,
@@ -395,8 +405,11 @@ export function GenerateWoodMaterial( params ) {
 	uniforms.darkGrainColor = TSL.uniform( new THREE.Color( params.darkGrainColor ) );
 	uniforms.lightGrainColor = TSL.uniform( new THREE.Color( params.lightGrainColor ) );
 
+    // remember uniforms for real-time updates
+    material.uniforms = uniforms;
+
 	material.colorNode = wood(
-		TSL.positionLocal.add( TSL.vec3( - 0.4, ( Math.random() - 0.5 ) * 2, Math.random() * 2 ) ),
+		TSL.positionLocal.add( TSL.vec3( params.originOffset?.x ?? 0, params.originOffset?.y ?? 0, params.originOffset?.z ?? 0 ) ),
 		uniforms.centerSize,
 		uniforms.largeWarpScale,
 		uniforms.largeGrainStretch,
