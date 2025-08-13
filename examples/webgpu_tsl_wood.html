@@ -64,10 +64,6 @@
 
                 stats = new Stats();
                 document.body.appendChild(stats.dom);
-            
-                const directional_light = new THREE.DirectionalLight(0xfdfdfd, 4);
-                directional_light.position.set(-1, 0.3, 0.3).normalize();
-                scene.add(directional_light);
                 
                 font = await new FontLoader().loadAsync("./fonts/helvetiker_regular.typeface.json");
 
