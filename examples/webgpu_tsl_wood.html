@@ -40,7 +40,7 @@
             import { FontLoader } from "three/addons/loaders/FontLoader.js";
             import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
             import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-            import { GenerateWoodMaterial, GetWoodPreset, WoodTypes, FinishTypes } from "three/addons/materials/ProceduralWood.js";
+            import { GenerateWoodMaterial, GetWoodPreset, WoodGenuses, Finishes } from "three/addons/materials/ProceduralWood.js";
 
             let scene, camera, renderer, controls, canvas, stats, font;
 
@@ -78,14 +78,14 @@
                     scene.environment = env_map;
                     scene.environmentIntensity = 1;
 
-                    for (let x = 0; x < WoodTypes.length; x++)
+                    for (let x = 0; x < WoodGenuses.length; x++)
                     {
                         await add_wood(x, text_mat);
                     }
                 });
 
-                for (let y = 0; y < FinishTypes.length; y++) {
-                    const txt_geo = new TextGeometry(FinishTypes[y], {
+                for (let y = 0; y < Finishes.length; y++) {
+                    const txt_geo = new TextGeometry(Finishes[y], {
                         font: font,
                         size: 0.1,
                         depth: 0.001,
@@ -100,7 +100,7 @@
                     txt_geo.translate(offx, offy, offz);
 
                     const txt = new THREE.Mesh(txt_geo, text_mat);
-                    txt.position.set(0, y - FinishTypes.length/2, -WoodTypes.length/2 + 0.45 - 1);
+                    txt.position.set(0, y - Finishes.length/2, -WoodGenuses.length/2 + 0.45 - 1);
                     txt.rotateY(-Math.PI/2);
                     scene.add(txt);
                 }
@@ -131,7 +131,7 @@
 
             async function add_wood(x, text_mat)
             {
-                const txt_geo = new TextGeometry(WoodTypes[x],
+                const txt_geo = new TextGeometry(WoodGenuses[x],
                 {
                     font: font,
                     size: 0.1,
@@ -147,21 +147,21 @@
                 txt_geo.translate(offx, offy, offz);
 
                 const txt = new THREE.Mesh(txt_geo, text_mat);
-                txt.position.set(0, FinishTypes.length/2 - 0.25, x - WoodTypes.length/2 + 0.45);
+                txt.position.set(0, Finishes.length/2 - 0.25, x - WoodGenuses.length/2 + 0.45);
                 txt.rotateY(-Math.PI/2);
                 scene.add(txt);
 
-                for (let y = 0; y < FinishTypes.length; y++)
+                for (let y = 0; y < Finishes.length; y++)
                 {
                     const geometry = new RoundedBoxGeometry(0.125, 0.9, 0.9, 10, 0.02);
                     const position =
                     {
                         x: 0,
-                        y: y - FinishTypes.length/2,
-                        z: x - WoodTypes.length/2 + 0.45
+                        y: y - Finishes.length/2,
+                        z: x - WoodGenuses.length/2 + 0.45
                     };
                     
-                    const cube = new THREE.Mesh(geometry, GenerateWoodMaterial(GetWoodPreset(WoodTypes[x], FinishTypes[y])));
+                    const cube = new THREE.Mesh(geometry, GenerateWoodMaterial(GetWoodPreset(WoodGenuses[x], Finishes[y])));
                     cube.position.set(position.x, position.y, position.z);
                     scene.add(cube);
                 }
