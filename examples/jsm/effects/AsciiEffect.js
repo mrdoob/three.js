@@ -11,10 +11,9 @@ class AsciiEffect {
 	 * Constructs a new ASCII effect.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.
-	 * @param {string} [charSet=' .:-=+*#%@'] - The char set.
 	 * @param {AsciiEffect~Options} [options] - The configuration parameter.
 	 */
-	constructor( renderer, charSet = ' .:-=+*#%@', options = {} ) {
+	constructor( renderer, options = {} ) {
 
 		// ' .,:;=|iI+hHOE#`$';
 		// darker bolder character set from https://github.com/saw/Canvas-ASCII-Art/
@@ -29,6 +28,14 @@ class AsciiEffect {
 		const bBlock = options[ 'block' ] || false;
 		const bInvert = options[ 'invert' ] || false;
 		const strResolution = options[ 'strResolution' ] || 'low';
+		const strFont = options[ 'fontFamily' ] || 'Courier New, monospace';
+		const strCharSet = options[ 'charSet' ] || ' .:-=+*#%@';
+		const iFontWeight = options[ 'fontWeight' ] || 400;
+		let strFontSize = options[ 'fontSize' ] || 'Dynamically computed according to resolution';
+		let strLetterSpacing = options[ 'letterSpacing' ] || '0px';
+
+		// Store composer reference if provided
+		const composer = options[ 'composer' ] || null;
 
 		let width, height;
 
@@ -67,8 +74,28 @@ class AsciiEffect {
 		 */
 		this.render = function ( scene, camera ) {
 
-			renderer.render( scene, camera );
+			if ( composer ) {
+
+				composer.render();
+
+			} else {
+
+				renderer.render( scene, camera );
+
+			}
+
 			asciifyImage( oAscii );
+
+		};
+
+		/**
+		 * Sets the composer to be used for post-processing effects.
+		 *
+		 * @param {EffectComposer} newComposer - The composer to use for rendering.
+		 */
+		this.setComposer = function ( newComposer ) {
+
+			composer = newComposer;
 
 		};
 
@@ -110,17 +137,15 @@ class AsciiEffect {
 			oStyle.whiteSpace = 'pre';
 			oStyle.margin = '0px';
 			oStyle.padding = '0px';
-			oStyle.letterSpacing = fLetterSpacing + 'px';
-			oStyle.fontFamily = strFont;
-			oStyle.fontSize = fFontSize + 'px';
+			oStyle.letterSpacing = strLetterSpacing;
+			oStyle.fontFamily = strFont.toLowerCase();
+			oStyle.fontWeight = iFontWeight;
+			oStyle.fontSize = strFontSize;
 			oStyle.lineHeight = fLineHeight + 'px';
 			oStyle.textAlign = 'left';
 			oStyle.textDecoration = 'none';
 
 		}
-
-
-		const strFont = 'courier new, monospace';
 
 		const oCanvasImg = renderer.domElement;
 
@@ -139,9 +164,9 @@ class AsciiEffect {
 		}
 
 		let aCharList;
-		if ( charSet ) {
+		if ( strCharSet ) {
 
-			aCharList = ( charSet ).split( '' );
+			aCharList = ( strCharSet ).split( '' );
 
 		} else {
 
@@ -154,55 +179,61 @@ class AsciiEffect {
 
 		// Setup dom
 
-		const fFontSize = ( 2 / fResolution ) * iScale;
+		if ( strFontSize === 'Dynamically computed according to resolution' ) {
+
+			strFontSize = ( 2 / fResolution ) * iScale + 'px';
+
+		}
+
 		const fLineHeight = ( 2 / fResolution ) * iScale;
 
 		// adjust letter-spacing for all combinations of scale and resolution to get it to fit the image width.
 
-		let fLetterSpacing = 0;
+		if ( strFont === 'Courier New, monospace' ) {
 
-		if ( strResolution == 'low' ) {
+			if ( strResolution == 'low' ) {
 
-			switch ( iScale ) {
+				switch ( iScale ) {
 
-				case 1 : fLetterSpacing = - 1; break;
-				case 2 :
-				case 3 : fLetterSpacing = - 2.1; break;
-				case 4 : fLetterSpacing = - 3.1; break;
-				case 5 : fLetterSpacing = - 4.15; break;
+					case 1 : strLetterSpacing = '-1px'; break;
+					case 2 :
+					case 3 : strLetterSpacing = '-2.1px'; break;
+					case 4 : strLetterSpacing = '-3.1px'; break;
+					case 5 : strLetterSpacing = '-4.15px'; break;
+
+				}
+
+			}
+
+			if ( strResolution == 'medium' ) {
+
+				switch ( iScale ) {
+
+					case 1 : strLetterSpacing = '0px'; break;
+					case 2 : strLetterSpacing = '-1px'; break;
+					case 3 : strLetterSpacing = '-1.04px'; break;
+					case 4 :
+					case 5 : strLetterSpacing = '-2.1px'; break;
+
+				}
+
+			}
+
+			if ( strResolution == 'high' ) {
+
+				switch ( iScale ) {
+
+					case 1 :
+					case 2 : strLetterSpacing = '0px'; break;
+					case 3 :
+					case 4 :
+					case 5 : strLetterSpacing = '-1px'; break;
+
+				}
 
 			}
 
 		}
-
-		if ( strResolution == 'medium' ) {
-
-			switch ( iScale ) {
-
-				case 1 : fLetterSpacing = 0; break;
-				case 2 : fLetterSpacing = - 1; break;
-				case 3 : fLetterSpacing = - 1.04; break;
-				case 4 :
-				case 5 : fLetterSpacing = - 2.1; break;
-
-			}
-
-		}
-
-		if ( strResolution == 'high' ) {
-
-			switch ( iScale ) {
-
-				case 1 :
-				case 2 : fLetterSpacing = 0; break;
-				case 3 :
-				case 4 :
-				case 5 : fLetterSpacing = - 1; break;
-
-			}
-
-		}
-
 
 		// can't get a span or div to flow like an img element, but a table works?
 
@@ -305,6 +336,12 @@ class AsciiEffect {
  * @property {boolean} [block=false] - Whether blocked characters should be enabled or not.
  * @property {boolean} [invert=false] - Whether colors should be inverted or not.
  * @property {('low'|'medium'|'high')} [strResolution='low'] - The string resolution.
+ * @property {string} [fontFamily='Courier New, monospace'] - The font family used for the effect.
+ * @property {string} [charSet=' .:-=+*#%@'] - The character set used for the effect.
+ * @property {number} [fontWeight=400] - The font weight used for the effect.
+ * @property {string} [fontSize='Dynamically computed according to resolution'] - The font size used for the effect. Input a valid CSS font size value.
+ * @property {string} [letterSpacing='0px'] - The letter spacing used for the effect. Highly recommended to tweak if you input a custom font family and/or font size.
+ * @property {EffectComposer} [composer=null] - An optional EffectComposer to use for post-processing effects, that will be applied before the ASCII rendering.
  **/
 
 export { AsciiEffect };
