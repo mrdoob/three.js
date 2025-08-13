@@ -476,7 +476,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY, texture.premultiplyAlpha );
+			this._copyCubeMapToTexture( texture, textureData.texture, textureDescriptorGPU );
 
 		} else {
 
@@ -626,27 +626,46 @@ class WebGPUTextureUtils {
 	 * Uploads cube texture image data to the GPU memory.
 	 *
 	 * @private
-	 * @param {Array} images - The cube image data.
+	 * @param {CubeTexture} texture - The cube texture.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
-	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY, premultiplyAlpha ) {
+	_copyCubeMapToTexture( texture, textureGPU, textureDescriptorGPU ) {
+
+		const images = texture.images;
+		const mipmaps = texture.mipmaps;
 
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const image = images[ i ];
 
-			const flipIndex = flipY === true ? _flipMap[ i ] : i;
+			const flipIndex = texture.flipY === true ? _flipMap[ i ] : i;
 
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
+				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY );
 
 			} else {
 
-				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY, premultiplyAlpha );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY, texture.premultiplyAlpha );
+
+			}
+
+			for ( let j = 0; j < mipmaps.length; j ++ ) {
+
+				const mipmap = mipmaps[ j ];
+				const image = mipmap.images[ i ];
+
+				if ( image.isDataTexture ) {
+
+					this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY, 0, j + 1 );
+
+				} else {
+
+					this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY, texture.premultiplyAlpha, j + 1 );
+
+				}
+
 
 			}
 

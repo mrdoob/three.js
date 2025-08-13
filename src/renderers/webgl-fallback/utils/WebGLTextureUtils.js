@@ -553,12 +553,22 @@ class WebGLTextureUtils {
 		} else if ( texture.isCubeTexture ) {
 
 			const images = options.images;
+			const mipmaps = texture.mipmaps;
 
 			for ( let i = 0; i < 6; i ++ ) {
 
 				const image = getImage( images[ i ] );
 
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
+
+				for ( let j = 0; j < mipmaps.length; j ++ ) {
+
+					const mipmap = mipmaps[ j ];
+					const image = getImage( mipmap.images[ i ] );
+
+					gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, image.width, image.height, glFormat, glType, image );
+
+				}
 
 			}
 
