@@ -39,7 +39,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
       		import { useNeedleProgressive } from '@needle-tools/gltf-progressive';
 
 			let camera, scene, renderer, mixer;
@@ -72,7 +72,7 @@
 				controls.target.set( -1, 2.1, 0 );
 				controls.update();
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
