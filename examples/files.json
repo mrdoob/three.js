@@ -460,6 +460,7 @@
 		"webgpu_tsl_vfx_flames",
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
+		"webgpu_tsl_wood",
 		"webgpu_video_frame",
 		"webgpu_video_panorama",
 		"webgpu_volume_caustics",
@@ -468,7 +469,6 @@
 		"webgpu_volume_lighting_rectarea",
 		"webgpu_volume_perlin",
 		"webgpu_water",
-		"webgpu_procedural_wood",
 		"webgpu_xr_rollercoaster",
 		"webgpu_xr_cubes",
 		"webgpu_xr_native_layers"

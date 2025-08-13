@@ -16,7 +16,8 @@
     </head>
     <body>
         <div id="info">
-            <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - procedural wood materials<br/>Scene by Logan Seeley, Blender tutorial by Lance Phan
+            <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - tsl procedural wood materials<br/>
+            by Logan Seeley, based on <a href="https://www.youtube.com/watch?v=n7e0vxgBS8A">Lance Phan's Blender tutorial</a>
         </div>
 
         <script type="importmap">
@@ -63,11 +64,9 @@
 
                 stats = new Stats();
                 document.body.appendChild(stats.dom);
-
-                const hdr_loader = new HDRLoader();
-                
-                const directional_light = new THREE.DirectionalLight(0xfdfdfd, 3);
-                directional_light.position.set(-1, 0, 0);
+            
+                const directional_light = new THREE.DirectionalLight(0xfdfdfd, 4);
+                directional_light.position.set(-1, 0.3, 0.3).normalize();
                 scene.add(directional_light);
                 
                 font = await new FontLoader().loadAsync("./fonts/helvetiker_regular.typeface.json");
