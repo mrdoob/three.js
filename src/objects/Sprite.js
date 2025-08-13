@@ -48,7 +48,7 @@ class Sprite extends Object3D {
 	/**
 	 * Constructs a new sprite.
 	 *
-	 * @param {SpriteMaterial | SpriteNodeMaterial} [material] - The sprite material.
+	 * @param {(SpriteMaterial|SpriteNodeMaterial)} [material] - The sprite material.
 	 */
 	constructor( material = new SpriteMaterial() ) {
 
@@ -94,7 +94,7 @@ class Sprite extends Object3D {
 		/**
 		 * The sprite material.
 		 *
-		 * @type {SpriteMaterial | SpriteNodeMaterial}
+		 * @type {(SpriteMaterial|SpriteNodeMaterial)}
 		 */
 		this.material = material;
 
