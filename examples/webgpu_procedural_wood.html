@@ -66,10 +66,14 @@
 
                 const hdr_loader = new HDRLoader();
                 
+                const directional_light = new THREE.DirectionalLight(0xfdfdfd, 3);
+                directional_light.position.set(-1, 0, 0);
+                scene.add(directional_light);
+                
                 font = await new FontLoader().loadAsync("./fonts/helvetiker_regular.typeface.json");
 
                 const text_mat = new THREE.MeshStandardMaterial();
-                text_mat.colorNode = TSL.color("#626262");
+                text_mat.colorNode = TSL.color("#fdfdfd");  
 
                 new HDRLoader().load("./textures/equirectangular/royal_esplanade_1k.hdr", async (env_map) =>
                 {
