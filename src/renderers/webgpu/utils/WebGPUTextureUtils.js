@@ -434,6 +434,7 @@ class WebGPUTextureUtils {
 	updateTexture( texture, options ) {
 
 		const textureData = this.backend.get( texture );
+		const mipmaps = texture.mipmaps;
 
 		const { textureDescriptorGPU } = textureData;
 
@@ -444,7 +445,22 @@ class WebGPUTextureUtils {
 
 		if ( texture.isDataTexture ) {
 
-			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					this._copyBufferToTexture( mipmap, textureData.texture, textureDescriptorGPU, 0, texture.flipY, 0, i );
+
+				}
+
+
+			} else {
+
+				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+
+			}
 
 		} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
@@ -464,7 +480,22 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					this._copyImageToTexture( mipmap, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha, i );
+
+				}
+
+
+			} else {
+
+				this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
+
+			}
 
 		}
 
@@ -633,10 +664,14 @@ class WebGPUTextureUtils {
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
 	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
+	 * @param {number} [mipLevel=0] - The mip level where the data should be copied to.
 	 */
-	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha, mipLevel = 0 ) {
 
 		const device = this.backend.device;
+
+		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
+		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
 		device.queue.copyExternalImageToTexture(
 			{
@@ -644,12 +679,12 @@ class WebGPUTextureUtils {
 				flipY: flipY
 			}, {
 				texture: textureGPU,
-				mipLevel: 0,
+				mipLevel: mipLevel,
 				origin: { x: 0, y: 0, z: originDepth },
 				premultipliedAlpha: premultiplyAlpha
 			}, {
-				width: textureDescriptorGPU.size.width,
-				height: textureDescriptorGPU.size.height,
+				width: width,
+				height: height,
 				depthOrArrayLayers: 1
 			}
 		);
@@ -713,9 +748,10 @@ class WebGPUTextureUtils {
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {number} [depth=0] - TODO.
+	 * @param {number} [depth=0] - The depth offset when copying array or 3D texture data.
+	 * @param {number} [mipLevel=0] - The mip level where the data should be copied to.
 	 */
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0, mipLevel = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -730,7 +766,7 @@ class WebGPUTextureUtils {
 		device.queue.writeTexture(
 			{
 				texture: textureGPU,
-				mipLevel: 0,
+				mipLevel: mipLevel,
 				origin: { x: 0, y: 0, z: originDepth }
 			},
 			data,

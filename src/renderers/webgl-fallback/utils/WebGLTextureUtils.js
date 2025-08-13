@@ -603,9 +603,26 @@ class WebGLTextureUtils {
 
 		} else {
 
-			const image = getImage( options.image );
+			const mipmaps = texture.mipmaps;
 
-			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					const image = getImage( mipmap );
+					gl.texSubImage2D( glTextureType, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, image );
+
+				}
+
+			} else {
+
+				const image = getImage( options.image );
+				gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+
+			}
+
 
 		}
 

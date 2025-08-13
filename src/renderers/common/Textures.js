@@ -418,21 +418,25 @@ class Textures extends DataMap {
 
 		let mipLevelCount;
 
-		if ( texture.isCompressedTexture ) {
+		if ( texture.mipmaps.length > 0 ) {
 
-			if ( texture.mipmaps ) {
-
-				mipLevelCount = texture.mipmaps.length;
-
-			} else {
-
-				mipLevelCount = 1;
-
-			}
+			mipLevelCount = texture.mipmaps.length;
 
 		} else {
 
-			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+			if ( texture.isCompressedTexture === true ) {
+
+				// it is not possible to compute mipmaps for compressed textures. So
+				// when no mipmaps are defined in "texture.mipmaps", force a texture
+				// level of 1
+
+				mipLevelCount = 1;
+
+			} else {
+
+				mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+			}
 
 		}
 
@@ -441,14 +445,14 @@ class Textures extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given texture requires mipmaps.
+	 * Returns `true` if the given texture makes use of mipmapping.
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @return {boolean} Whether mipmaps are required or not.
 	 */
 	needsMipmaps( texture ) {
 
-		return texture.isCompressedTexture === true || texture.generateMipmaps;
+		return texture.generateMipmaps === true || texture.mipmaps.length > 0;
 
 	}
 
