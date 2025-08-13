@@ -409,7 +409,7 @@ export function GenerateWoodMaterial( params ) {
     material.uniforms = uniforms;
 
 	material.colorNode = wood(
-		TSL.positionLocal.add( TSL.vec3( params.originOffset?.x ?? 0, params.originOffset?.y ?? 0, params.originOffset?.z ?? 0 ) ),
+		TSL.positionLocal.add( TSL.vec3( params.originOffset.x, params.originOffset.y, params.originOffset.z ) ),
 		uniforms.centerSize,
 		uniforms.largeWarpScale,
 		uniforms.largeGrainStretch,
