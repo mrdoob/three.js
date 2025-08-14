@@ -57,6 +57,7 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 renderer.toneMapping = THREE.NeutralToneMapping;
                 renderer.toneMappingExposure = 1.0;
+                renderer.setAnimationLoop(render);
                 document.body.appendChild(renderer.domElement);
 
                 canvas = document.querySelector("canvas");
@@ -73,20 +74,8 @@
 
                 base = new THREE.Group();
                 base.rotation.set(0, -Math.PI/2, 0);
+                scene.add(base);
 
-                new HDRLoader().load("./textures/equirectangular/royal_esplanade_1k.hdr", async (env_map) =>
-                {
-                    env_map.mapping = THREE.EquirectangularReflectionMapping;
-
-                    scene.background = env_map;
-                    scene.environment = env_map;
-                    scene.environmentIntensity = 6;
-
-                    for (let x = 0; x < WoodGenuses.length; x++)
-                    {
-                        await add_wood(x, text_mat);
-                    }
-                });
 
             
                 for (let y = 0; y < Finishes.length; y++) {
@@ -110,11 +99,23 @@
                     base.add(txt);
                 }
 
-                scene.add(base);
 
+                new HDRLoader().load("./textures/equirectangular/royal_esplanade_1k.hdr", async (env_map) =>
+                {
+                    env_map.mapping = THREE.EquirectangularReflectionMapping;
 
-                renderer.setAnimationLoop(render);
-            }
+                    scene.background = env_map;
+                    scene.environment = env_map;
+                    scene.environmentIntensity = 6;
+
+                    for (let x = 0; x < WoodGenuses.length; x++)
+                    {
+                        await add_wood(x, text_mat);
+                    }
+                });
+
+            
+                }
 
             function render() {
                 controls.update();
@@ -172,7 +173,10 @@
                     const cube = new THREE.Mesh(geometry, GenerateWoodMaterial(GetWoodPreset(WoodGenuses[x], Finishes[y])));
                     cube.position.set(position.x, position.y, position.z);
                     base.add(cube);
+
+                    // sleep
                 }
+                await new Promise(resolve => setTimeout(resolve, 0));
             }
         </script>
     </body>
