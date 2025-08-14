@@ -159,27 +159,29 @@
 						scene.environment = texture;
 						scene.environmentIntensity = 2;
 
+						for ( let x = 0; x < WoodGenuses.length; x ++ ) {
+
+							for ( let y = 0; y < Finishes.length; y ++ ) {
+
+								const cube = add_wood( x, y, text_mat );
+								base.add( cube );
+
+								await new Promise( resolve => setTimeout( resolve, 0 ) );
+
+							}
+
+						}
+
 					} );
 
-				for ( let x = 0; x < WoodGenuses.length; x ++ ) {
-
-					for ( let y = 0; y < Finishes.length; y ++ ) {
-
-						const cube = add_wood( x, y, text_mat );
-						base.add( cube );
-						await new Promise( resolve => setTimeout( resolve, 0 ) );
-			
-					}
-			
-				}
-			
 			}
 
 			function render() {
 
 				controls.update();
 				stats.update();
-				return renderer.renderAsync( scene, camera );
+
+				renderer.render( scene, camera );
 			
 			}
 
