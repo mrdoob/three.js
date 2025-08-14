@@ -57,6 +57,7 @@ class AsciiEffect {
 			height = h;
 
 			renderer.setSize( w, h );
+			renderer.setPixelRatio( fResolution );
 
 			initAsciiSize();
 

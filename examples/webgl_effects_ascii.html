@@ -23,14 +23,37 @@
 
 			import * as THREE from 'three';
 
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 			import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';
 			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
-			let camera, controls, scene, renderer, effect;
+			let camera, controls, scene, renderer, effect, stats;
 
 			let sphere, plane;
 
 			const start = Date.now();
+
+			// ASCII effect parameters
+			const asciiParams = {
+				resolution: 0.15,
+				scale: 1,
+				color: false,
+				block: false,
+				invert: true,
+				strResolution: 'low',
+				fontFamily: 'Courier New, monospace',
+				charSet: ' .:-=+*#%@',
+				fontWeight: 400,
+				fontSize: 'auto',
+				letterSpacing: '-0.085em'
+			};
+
+			// Display parameters
+			const displayParams = {
+				useAsciiEffect: true
+			};
 
 			init();
 
@@ -65,7 +88,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 
-				effect = new AsciiEffect( renderer, { invert: true } );
+				effect = new AsciiEffect( renderer, asciiParams );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';
@@ -76,6 +99,15 @@
 				document.body.appendChild( effect.domElement );
 
 				controls = new TrackballControls( camera, effect.domElement );
+
+				// Stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// GUI
+
+				setupGUI();
 
 				//
 
@@ -93,10 +125,108 @@
 
 			}
 
+			function setupGUI() {
+
+				const gui = new GUI();
+
+				// Display mode toggle
+				const folderDisplay = gui.addFolder( 'Display Mode' );
+				folderDisplay.add( displayParams, 'useAsciiEffect' ).name( 'ASCII Effect' ).onChange( toggleDisplayMode );
+
+				// ASCII Effect parameters
+				const folderEffect = gui.addFolder( 'ASCII Effect' );
+
+				folderEffect.add( asciiParams, 'resolution', 0.05, 0.5, 0.01 ).name( 'Resolution' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'scale', 1, 5, 1 ).name( 'Scale' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'color' ).name( 'Color' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'block' ).name( 'Block' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'invert' ).name( 'Invert' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'strResolution', [ 'low', 'medium', 'high' ] ).name( 'String Resolution' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'charSet' ).name( 'Character Set' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'fontFamily' ).name( 'Font Family' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'fontWeight', 100, 900, 100 ).name( 'Font Weight' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'fontSize' ).name( 'Font Size' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'letterSpacing' ).name( 'Letter Spacing' ).onChange( recreateEffect );
+
+				// Visual settings
+				const folderVisual = gui.addFolder( 'Visual' );
+				const visualParams = {
+					backgroundColor: '#000000',
+					textColor: '#ffffff'
+				};
+
+				folderVisual.addColor( visualParams, 'backgroundColor' ).name( 'Background Color' ).onChange( function ( value ) {
+
+					effect.domElement.style.backgroundColor = value;
+
+	} );
+
+				folderVisual.addColor( visualParams, 'textColor' ).name( 'Text Color' ).onChange( function ( value ) {
+
+					effect.domElement.style.color = value;
+
+	} );
+
+			}
+
+			function toggleDisplayMode() {
+
+				// Remove currently displayed element
+				if ( effect && effect.domElement && effect.domElement.parentNode ) {
+
+					effect.domElement.parentNode.removeChild( effect.domElement );
+
+				}
+
+				if ( renderer && renderer.domElement && renderer.domElement.parentNode ) {
+
+					renderer.domElement.parentNode.removeChild( renderer.domElement );
+
+				}
+
+				// Add the appropriate element based on toggle state
+				if ( displayParams.useAsciiEffect ) {
+
+					document.body.appendChild( effect.domElement );
+					controls.domElement = effect.domElement;
+
+				} else {
+
+					document.body.appendChild( renderer.domElement );
+					controls.domElement = renderer.domElement;
+
+				}
+
+			}
+
+			function recreateEffect() {
+
+				// Remove old effect element
+				if ( effect && effect.domElement && effect.domElement.parentNode ) {
+
+					effect.domElement.parentNode.removeChild( effect.domElement );
+
+	}
+
+				// Create new effect with updated parameters
+				effect = new AsciiEffect( renderer, asciiParams );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.domElement.style.color = 'white';
+				effect.domElement.style.backgroundColor = 'black';
+
+				// Add new effect element
+				document.body.appendChild( effect.domElement );
+
+				// Update controls
+				controls.domElement = effect.domElement;
+
+			}
+
 			//
 
 			function animate() {
 
+				stats.begin();
 				const timer = Date.now() - start;
 
 				sphere.position.y = Math.abs( Math.sin( timer * 0.002 ) ) * 150;
@@ -105,7 +235,17 @@
 
 				controls.update();
 
-				effect.render( scene, camera );
+				if ( displayParams.useAsciiEffect ) {
+
+					effect.render( scene, camera );
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
+
+				stats.end();
 
 			}
 
