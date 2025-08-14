@@ -133,7 +133,7 @@
 
 				folderEffect.add( asciiParams, 'resolution', 0.05, 0.5, 0.01 ).name( 'Resolution' ).onChange( function ( value ) {
 
-					effect.updateResolution( value );
+					effect.updateVisualSettings( { resolution: value } );
 
 				} );
 

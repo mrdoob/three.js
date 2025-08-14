@@ -97,40 +97,16 @@ class AsciiEffect {
 		this.domElement = domElement;
 
 		/**
-		 * Updates the resolution of the ASCII effect.
-		 *
-		 * @param {number} newResolution - The new resolution value.
-		 */
-		this.updateResolution = function ( newResolution ) {
-
-			if ( isDisposed ) return;
-
-			fResolution = newResolution;
-			renderer.setPixelRatio( fResolution );
-
-			// Recalculate font size and line height
-			baseFontSize = 2 / fResolution;
-			strFontSize = ( baseFontSize * fCharScale ) + 'px';
-			fLineHeight = ( 2 / fResolution );
-
-			// Don't force letter spacing recalculation - the ratios remain valid
-			// as they're based on character scale, not resolution
-
-			initAsciiSize();
-
-		};
-
-		/**
-		 * Updates visual settings and font parameters.
+		 * Updates visual settings, font parameters, and resolution.
 		 *
 		 * @param {Object} newSettings - Object containing the new settings.
 		 */
-
 		this.updateVisualSettings = function ( newSettings ) {
 
 			if ( isDisposed ) return;
 
 			let needsFontRecalculation = false;
+			let needsResolutionUpdate = false;
 
 			if ( newSettings.color !== undefined ) bColor = newSettings.color;
 			if ( newSettings.alpha !== undefined ) bAlpha = newSettings.alpha;
@@ -141,6 +117,15 @@ class AsciiEffect {
 
 				strCharSet = newSettings.charSet;
 				aCharList = strCharSet.split( '' );
+
+			}
+
+			// Handle resolution updates
+			if ( newSettings.resolution !== undefined ) {
+
+				fResolution = newSettings.resolution;
+				renderer.setPixelRatio( fResolution );
+				needsResolutionUpdate = true;
 
 			}
 
@@ -166,17 +151,16 @@ class AsciiEffect {
 
 			}
 
-			// If any font-related parameter changed, recalculate everything
-			if ( needsFontRecalculation ) {
-
-				// Recalculate font size
-				baseFontSize = 2 / fResolution;
-				strFontSize = ( baseFontSize * fCharScale ) + 'px';
-
-				// Force recalculation of letter spacing since font parameters changed
-				cachedLetterSpacing = null;
+			if ( needsResolutionUpdate ) {
 
 				initAsciiSize();
+
+			}
+
+			// Force recalculation of letter spacing since font parameters changed
+			if ( needsFontRecalculation ) {
+
+				cachedLetterSpacing = null;
 
 			}
 
@@ -238,8 +222,7 @@ class AsciiEffect {
 					currentFontConfig.fontFamily,
 					currentFontConfig.fontSize,
 					currentFontConfig.fontWeight,
-					currentFontConfig.lineHeight,
-					currentFontConfig.charScale
+					currentFontConfig.lineHeight
 				);
 
 				// Cache the results
@@ -285,13 +268,11 @@ class AsciiEffect {
 
 		}
 
-		// Setup dom
-
 		// Apply character scaling to font size (fully dynamic calculation)
-		let baseFontSize = 2 / fResolution;
-		let strFontSize = ( baseFontSize * fCharScale ) + 'px';
+		const baseFontSize = 2 / fResolution;
+		const strFontSize = ( baseFontSize * fCharScale ) + 'px';
 
-		let fLineHeight = ( 2 / fResolution );
+		const fLineHeight = ( 2 / fResolution );
 
 		// Calculate letter spacing for monospace fonts, so that each character fits in a perfect square
 		function calculateLetterSpacing( fontFamily, fontSize, fontWeight, lineHeight ) {
@@ -322,18 +303,8 @@ class AsciiEffect {
 			// Clean up
 			document.body.removeChild( testElement );
 
-			// Calculate effective vertical spacing per character (this is our target)
-			const effectiveVerticalSpacing = lineHeight;
-
-			// Calculate current horizontal spacing per character
-			// Current horizontal space per character is elementWidth / 2 (for two chars)
-			const currentHorizontalSpacing = elementWidth / 2;
-
-			// We want the horizontal spacing to match the vertical line height
-			const targetHorizontalSpacing = effectiveVerticalSpacing;
-
 			// Calculate the letter-spacing adjustment needed
-			const letterSpacingAdjustment = targetHorizontalSpacing - currentHorizontalSpacing;
+			const letterSpacingAdjustment = lineHeight - ( elementWidth / 2 );
 
 			// Convert to em units (relative to the current scaled font size)
 			const fontSizeValue = parseFloat( fontSize );
